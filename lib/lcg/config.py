@@ -18,14 +18,16 @@
 
 """The configuration variables for the Learning Content Generator."""
 
-default_resource_dir = '/home/cerha/work/eurochance/src/resources'
+_base_dir = '/home/cerha/work/eurochance/src'
+
+default_resource_dir = _base_dir+'/resources'
 
 """The LCG comes with a set of default resources (stylesheets, scripts and
 media files).  They are used if no custom files of the same name are present in
 the source directory.  This variable specifies the name of the directory, where
 LCG default resources are installed."""
 
-translation_dir = '/home/cerha/work/eurochance/src/translations'
+translation_dir = _base_dir+'/translations'
 
 """The LCG inserts some texts into the generated documents.  These texts can be
 translated using a GNU gettext catalog.  This variable specifies the location
