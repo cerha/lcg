@@ -1,4 +1,50 @@
+2005-02-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (_ChoiceTask.__init__): Assertion added.
+	(_ChoiceTask.correct_choice): New method.
+	(Exercise._AUDIO_VERSION_LABEL): Removed.
+	(Exercise.__init__): Don't allocate the JavaScript code resource.
+	(Exercise._export_instructions): Use `self._export_recording()'
+	and `self._export_audio_version()'.
+	(Exercise._export_recording): New method.
+	(Exercise._export_audio_version): New method.
+	(SentenceCompletion._AUDIO_VERSION_LABEL): Removed.
+	(SentenceCompletion._export_audio_version): New method.
+	(_InteractiveExercise): New class.
+	(_FillInExercise): New class.
+	(_Cloze): Class removed.
+	(Cloze): Derive from `_FillInExercise', not `_Cloze'.
+	(_ChoiceBasedExercise): Derive from `_InteractiveExercise', not
+	`Exercise'.
+	(_ChoiceBasedExercise._FORM_HANDLER): New constant.
+	(_ChoiceBasedExercise._answer_control): Completely rewritten.
+	(_ChoiceBasedExercise._answers): New method.
+	(_ChoiceBasedExercise._results): Method removed.
+	(_ChoiceBasedExercise._buttons): New method.
+	(_ChoiceBasedExercise._format_choice): Pass the `Choice' to
+	`self._answer_control()'.
+	(TrueFalseStatements._format_choice): Pass the `Choice' to
+	`self._answer_control()'.
+	(VocabExercise, Transformation, Dictation): Derive from
+	`_FillInExercise', not `_Cloze'.
+
+	* lcg/_html.py (_attr, _input): New functions.
+	(field, button): Reimplemented using `_input()'.
+	(reset, hidden, radio): New functions.
+	(link): Use `_attr()'.
+
+	* resources/css/default.css (results): Minor improvements.
+
+	* resources/scripts/exercises.js (eval_choice, reset_choices)
+	(display_choice_results, init_cloze_form, eval_cloze_field)
+	(handle_cloze_field_keypress, fill_cloze, eval_cloze): Functions
+	removed and replaced by handler class methods.
+	(Handler, ChoiceBasedExerciseHandler, FillInExerciseHandler): New
+	classes.
+
 2005-02-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/de.po: Updated.
 
 	* lcg/wiki.py (CommonFormatter._rules): The `wikilink' rule removed.
 	(CommonFormatter._wikilink_formatter): Method removed.
