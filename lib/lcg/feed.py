@@ -241,7 +241,11 @@ class ExerciseFeeder(Feeder):
         return ClozeTask(parent, text)
 
     def _read_transformation(self, parent, text):
-        return TransformationTask(parent, text)
+        lines = text.splitlines()
+        assert len(lines) == 2, \
+               "Transformation task specification must consist of just two " + \
+               "lines (%d given)." % len(lines)
+        return TransformationTask(parent, *lines)
 
     def _read_true_false_statement(self, parent, text):
         text = text.strip()
