@@ -336,9 +336,9 @@ class Section(SectionContainer):
             numbers = [str(x.section_number()) for x in self._section_path()]
             return 'sec-' + '-'.join(numbers)
 
-    def url(self):
+    def url(self, relative=False):
         """Return the URL of the section relative to the course root."""
-        return self._parent.url() + "#" + self.anchor()
+        return (relative and self._parent.url() or '') + "#" + self.anchor()
     
     def _header(self):
         l = len(self._section_path()) + 1
@@ -380,6 +380,7 @@ class TableOfContents(Content):
         self._title = title
         self._depth = depth
         self._detailed = detailed
+                      
         
     def export(self):
         item = self._item
@@ -407,7 +408,8 @@ class TableOfContents(Content):
                 items = [s for s in item.sections() if s.in_toc()]
         if len(items) == 0:
             return ''
-        links = [link(i.title(), i.url()) + \
+        links = [link(i.title(), isinstance(i, Section) and \
+                      i.url(i.parent() is not self.parent()) or i.url()) + \
                  self._make_toc(i, indent=indent+4, depth=depth-1)
                  for i in items]
         return "\n" + itemize(links, indent=indent) + "\n" + ' '*(indent-2)
