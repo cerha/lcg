@@ -111,7 +111,6 @@ class ContentNode(object):
         if parent is not None:
             parent._register_child(self)
         self.resource(Stylesheet, 'default.css')
-
         
     def _register_child(self, child):
         assert isinstance(child, ContentNode)
@@ -401,9 +400,11 @@ class InnerNode(ContentNode):
 class RootNode(InnerNode):
     """The root node of the content hierarchy.
 
-    You still need to override the '_create_children()' method to get some
-    sub-content into the course.
+    The only special thing about this node is, that it doesn't have a parent.
     
+    You still need to override the '_create_children()' method to get some
+    content into the course.
+
     """
     def __init__(self, *args, **kwargs):
         super(RootNode, self).__init__(None, *args, **kwargs)
@@ -461,6 +462,23 @@ class Unit(ContentNode):
                 for title, piece in zip(titles, pieces)]
 
     
+class Instructions(TextNode):
+    """A general set of pre-course instructions."""
+    _TITLE = _("General Course Instructions")
+
+    def _create_content(self):
+        return (super(Instructions, self)._create_content(),
+                TableOfContents(self))
+
+    
+    def _create_children(self):
+        return [self._create_child(ExerciseInstructions, e, 'help')
+                for e in Exercise.used_types()]
+
+    def _id(self):
+        return 'instructions'
+
+    
 class ExerciseInstructions(TextNode):
     """Exercise instructions."""
     def __init__(self, parent, exercise_class_, *args, **kwargs):
@@ -483,29 +501,13 @@ class ExerciseInstructions(TextNode):
 
     def src_dir(self):
         return os.path.join(self.default_resource_dir(), 'help')
+
     
 class CourseIndex(ContentNode):
     _TITLE = _("Detailed Course Index")
 
     def _create_content(self):
         return TableOfContents(self, item=self.parent(), depth=3)
-
-    
-class Instructions(TextNode):
-    """A general set of pre-course instructions."""
-    _TITLE = _("General Course Instructions")
-
-    def _create_content(self):
-        return (super(Instructions, self)._create_content(),
-                TableOfContents(self))
-
-    
-    def _create_children(self):
-        return [self._create_child(ExerciseInstructions, e, 'help')
-                for e in Exercise.used_types()]
-
-    def _id(self):
-        return 'instructions'
 
     
 class EurochanceCourse(RootNode):
