@@ -5,11 +5,6 @@ body {
 a:link, a:visited { color: #06d; text-decoration: none; }
 a:hover   { color: #f60; text-decoration: underline; }
 
-a.speaking-text:link, a.speaking-text:visited, a.speaking-text:hover { 
-    color: #04b;
-    //text-decoration: none;
-}
-
 hr.navigation { 
     display: none; 
 }
@@ -59,7 +54,7 @@ form.sound-control input.button {
     font-weight: bold;
 }
 
-input.cloze { 
+input.fill-in-task { 
     border: solid gray 1px;
     margin: 1px;
     background: #e8e8e8;
@@ -69,6 +64,16 @@ input.cloze {
 .citation, .quotation { 
     font-style: italic;
 }
+
+/*.speaking-text:link, .speaking-text:visited, .speaking-text:hover { */
+.speaking-text { 
+    color: #04b;
+    text-decoration: none;
+    background: none;
+    border: none;
+    font-size: 1em;
+}
+
 
 .results { 
     margin-top: .8em;
@@ -94,7 +99,7 @@ dl dt {
 }
 
 table.vocab-list td {
-    padding-right: 1em;
+    /*padding-right: 1em;*/
 }
 
 table.lcg-table {
