@@ -58,20 +58,24 @@ class Content(object):
                "Not a 'ContentNode' instance: %s" % parent
         self._parent = parent
 
-
     def _field(self, text='', name='', size=20, cls=None, readonly=False):
-        cls = cls and 'text ' + cls or 'text'
         f = '<input type="text" name="%s" class="%s" value="%s" size="%d"%s>'
-        return f % (name, cls, text, size, readonly and ' readonly' or '')
+        return f % (name, cls and 'text ' + cls or 'text', text, size,
+                    readonly and ' readonly' or '')
 
-    def _button(self, label, handler, cls='button'):
+    def _button(self, label, handler, cls=None):
+        cls = cls and 'button ' + cls or 'button'
         return '<input type="button" value="%s"' % label + \
                ' class="%s" onClick="javascript: %s">' % (cls, handler)
 
-    def _script_write(self, content, noscript_content):
+    def _script(self, code, noscript=None):
+        noscript = noscript and '<noscript>'+ noscript +'</noscript>' or ''
         return '<script type="text/javascript" language="Javascript"><!--\n' + \
-               'document.write("'+ content.replace('"','\\"') +'"); //-->' + \
-               '</script><noscript>'+ noscript_content +'</noscript>'
+               code +' //--></script>' + noscript
+        
+    def _script_write(self, content, noscript=None):
+        c = content.replace('"','\\"').replace('\n','\\n').replace("'","\\'")
+        return self._script('document.write("'+ c +'");', noscript)
 
     def _speaking_text(self, text, media):
         self._parent.script('audio.js')
@@ -356,18 +360,20 @@ class Exercise(Content):
         return self._task_type
     task_type = classmethod(task_type)
 
-    def form_name(self):
-        return "exercise_%s" % id(self)
-    
-    def task_index(self, task):
-        return self._tasks.index(task)
-    
     def export(self):
         return "\n\n".join((self._header(),
                             self._export_instructions(),
-                            '<form name="%s" action="">' % self.form_name(),
-                            self._export_tasks(),
-                            '</form>'))
+                            '<form name="%s" action="">' % self._form_name(),
+                            "\n".join(map(self._export_task, self._tasks)),
+                            self._results(),
+                            '</form>',
+                            self._script(self._init_script())))
+    
+    def _form_name(self):
+        return "exercise_%s" % id(self)
+    
+    def _form(self):
+        return "document.forms['%s']" % self._form_name()
     
     def _header(self):
         name = self._name or re.sub('([^^])([A-Z])', '\\1 \\2',
@@ -381,19 +387,18 @@ class Exercise(Content):
         """Return the HTML formatted instructions for this type of exercise."""
         result = "<p>" + self._instructions() + "</p>"
         if self._recording is not None:
-            play = self._button("Play", "play_audio('%s')" % \
-                                self._recording.url(), cls='sound-control')
-            stop = self._button("Stop", 'stop_audio()', cls='sound-control')
-            c = self._script_write('<form action="">Recording: %s %s</form>' % \
-                                   (play, stop),
-                                   '<p>Recording: [<a href="%s">Play</a>]</p>'%\
-                                   self._recording.url())
-            result += '\n\n'+ c
+            url = self._recording.url()
+            f = ('<form class="sound-control" action="">Recording:',
+                 self._button("Play", "play_audio('%s')" % url),
+                 self._button("Stop", 'stop_audio()'),
+                 '</form>')
+            a = '<p>Recording: [<a href="%s">Play</a>]</p>' % url
+            result += '\n\n'+ self._script_write('\n'.join(f), a)
         return result
 
-    def _export_tasks(self):
-        return "\n".join(map(self._export_task, self._tasks))
-
+    def _init_script(self):
+        return ''
+        
     def _export_task(self, task):
         raise "This Method must be overriden"
     
@@ -414,7 +419,6 @@ class Cloze(Exercise):
                      tts_input='some of the answers are wrong!')
 
     def _instructions(self):
-        
         if self._recording is None:
             return """You will hear a short recording.  Listen carefully and
             then fill in the gaps in the text below using the same words.
@@ -426,24 +430,25 @@ class Cloze(Exercise):
             buttons below the text.  Sometimes there might be more correct
             answers, but the evaluation only recognizes one.  Contact the tutor
             when in doubt."""
-        
-    def _export_tasks(self):
+
+    def _init_script(self):
         answers = ",".join(map(lambda a: "'%s'" % a.replace("'", "\\'"),
                                reduce(lambda a, b: a + b,
                                       map(lambda t: t.answers(), self._tasks))))
-        form = "document.forms['%s']" % self.form_name()
-        b1 = self._button('Evaluate', "eval_cloze(%s, [%s])" % (form, answers))
-        b2 = self._button('Fill', "fill_cloze(%s, [%s])" % (form, answers))
-        result = self._field('Use the Evaluate button to see the result.',
-                             name='result', size=70, cls='result cloze',
-                             readonly=True)
-        return "\n".join((super(Cloze, self)._export_tasks(),
-                          '<p class="results">', b1, b2,
-                          '<input type="reset" value="Reset">', result, '</p>'))
+        return "init_cloze_form(%s, [%s])" % (self._form(), answers)
+
+    def _results(self):
+        r = ('<p class="results">Results: ', 
+             self._field('Use the Evaluate button to see the results.',
+                         name='result', size=70, readonly=True), '<br/>',
+             self._button('Evaluate', "eval_cloze(%s)" % self._form()),
+             self._button('Fill', "fill_cloze(%s)" % self._form()),
+             '<input type="reset" value="Reset">',
+             '</p>')
+        return self._script_write("\n".join(r))
 
     def _make_field(self, match):
-        return '<input class="cloze" type="text" size="%d">' % \
-               (len(match.group(1))+1)
+        return self._field(cls='cloze', size=len(match.group(1))+1)
     
     def _export_task(self, task):
         return "\n".join(('<p>', task.text(self._make_field), '</p>'))
@@ -453,7 +458,7 @@ class _ChoiceBasedExercise(Exercise):
 
     _task_format = '<p>%s\n<div class="choices">\n%s\n</div></p>\n'
 
-    def _answer_control(self, text, correct, form_name, n):
+    def _answer_control(self, task, text, correct):
         self._parent.script('audio.js')
         if correct: 
             media = self._parent.media('correct-response.ogg', shared=True,
@@ -461,22 +466,24 @@ class _ChoiceBasedExercise(Exercise):
         else:
             media = self._parent.media('incorrect-response.ogg', shared=True,
                                        tts_input='you are wrong!')
-        handler = "eval_answer(document.forms['%s'], %d, %d, '%s')" % \
-                  (form_name, n, correct and 1 or 0, media.url())
+        handler = "eval_choice(%s, %d, %d, %d, '%s')" % \
+                  (self._form(), self._tasks.index(task), len(self._tasks),
+                   correct and 1 or 0, media.url())
         b = self._button(text, handler, cls='answer-control')
         a = '<a href="%s">%s</a>' % ('media.url()', text)
         return self._script_write(b, a)
     
-    def _export_tasks(self):
-        return super(_ChoiceBasedExercise, self)._export_tasks() + \
-               '<p class="results">Answered: %s<br>\nResults: %s\n</p>' % \
-               (self._field(name='finished', cls='result', readonly=True),
-                self._field(name='result', cls='result', readonly=True))
+    def _results(self):
+        r = '<p class="results">Answered: %s<br/>\nCorrect: %s %s</p>' % \
+            (self._field(name='answered', size=5, readonly=True),
+             self._field(name='result', size=8, readonly=True),
+             self._button('Reset', "reset_choices(%s, %d)" % \
+                          (self._form(), len(self._tasks))))
+        return self._script_write(r, '')
 
     def _format_choice(self, task, choice):
         a = chr(ord('a') + task.choice_index(choice)) + ')'
-        ctrl = self._answer_control(a, choice.correct(), self.form_name(),
-                                    self.task_index(task))
+        ctrl = self._answer_control(task, a, choice.correct())
         return '&nbsp;' + ctrl + '&nbsp;' + choice.answer() + '<br/>'
         
     def _export_task(self, task):
@@ -504,8 +511,7 @@ class TrueFalseStatements(_ChoiceBasedExercise):
         or select 'FALSE' if you think it is false.""" % len(self._tasks)
 
     def _format_choice(self, task, choice):
-        return self._answer_control(choice.answer(), choice.correct(),
-                                    self.form_name(), self.task_index(task))
+        return self._answer_control(task, choice.answer(), choice.correct())
     
     
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
