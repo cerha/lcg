@@ -65,7 +65,7 @@ class Resource(object):
                                   self._parent.default_resource_dir())]
             dst_subdir = self.SUBDIR
         else:
-            src_dirs = (parent.src_dir(), )
+            src_dirs = (os.path.join(parent.src_dir(), self.SUBDIR), )
             dst_subdir = os.path.join(self.SUBDIR, parent.subdir())
         self._src_path = self._find_source_file(src_dirs, file)
         self._dst_path = os.path.join(dst_subdir, file)
@@ -131,6 +131,7 @@ class Media(Resource):
         
     def _find_source_file(self, dirs, file):
         basename, extension = os.path.splitext(file)
+        dirs += (os.path.join(self._parent.src_dir(), Transcript.SUBDIR),)
         for ext in ('.ogg','.mp3','.wav','.tts.txt', '.txt'):
             path = super(Media, self)._find_source_file(dirs, basename + ext)
             if os.path.exists(path):
