@@ -106,10 +106,15 @@ class ExcelVocabFeeder(Feeder):
     """Vocabulary Feeder reading data from XLS file."""
     
     _LANGUAGE_ORDER = ['cs', 'sk', 'de', 'no', 'es']
-
+    _CHARSET = {'cs': 'iso-8859-2',
+                'sk': 'iso-8859-2',
+                'de': 'iso-8859-1',
+                'no': 'iso-8859-1',
+                'es': 'iso-8859-1'}
+    
     def feed(self, parent):
         assert parent.lang() in self._LANGUAGE_ORDER
-        command = 'xls2csv -q0 -c\| '+self._input_file() #+'| konwert iso2-utf8'
+        command = 'xls2csv -q0 -c\| %s' % self._input_file()
         status, output = commands.getstatusoutput(command)
         if status: raise Exception(output)
         items = []
@@ -118,7 +123,8 @@ class ExcelVocabFeeder(Feeder):
             word = col[0]
             note = len(col) > 1 and col[1] or ''
             try:
-                trans = col[self._LANGUAGE_ORDER.index(parent.lang())+2]
+                t = col[self._LANGUAGE_ORDER.index(parent.lang()) + 2]
+                trans = unicode(t, self._CHARSET[parent.lang()])
             except IndexError:
                 trans = '???'
                 print 'No translation for "%s"!' % word
