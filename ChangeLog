@@ -1,4 +1,68 @@
+2005-03-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (Section.__init__): New argument `anchor'.
+	Docstring improved.
+	(Section.anchor): If the `anchor' was specified, return it.
+	(TableOfContents.__init__): Allow also a sequence of `Content'
+	instances as the `item' arguemnt.
+	(TableOfContents._make_toc): Handle the sequence of `Content'
+	instances as the `item' arguemnt.
+	(VocabList.__init__): New argument `reverse'.
+	(VocabList.export): Reverse the word pair if `reverse' is true.
+
+	* resources/css/default.css (citation, quotation): New classes. 
+	(results): BG color changed.
+	(display): BG color for input fields set to `none'.
+
+	* lcg/wiki.py: File encoding set to utf-8.
+	(InlineFormatter._MARKUP): New markup added.
+	(InlineFormatter._PAIR): New constant.
+	(InlineFormatter._FORMAT): New formatting rules adeed.
+	(InlineFormatter._markup_handler): Handle the pair/unpair tags.
+	(InlineFormatter._formatter): Handle the pair/unpair tags.
+	(InlineFormatter._example_formatter): Renamed to `_citation_formatter'. 
+	(InlineFormatter._citation_formatter): CSS class changed to `citation'.
+	(Parser._LIST_MARKER): New constant.
+	(Parser._SECTION_RE, Parser._SPLITTER_RE): Use it.
+	(Parser._MATCHERS): New rule for `table'.
+	(Parser._MATCHER): Use `re.DOTALL' and not `re.MULTILINE'.
+	(Parser._make_itemized_list): Method removed.
+	(Parser._identify_block): Return the type `paragraph' for
+	unmatched block.
+	(Parser._parse_section_content): Handle the list type for list
+	items.  Handle all other blocks by the `_make_<type>' method.
+	(Parser._make_paragraph, Parser._make_paragraph) 
+	(Parser._list_item_type): New methods.
+
+	* lcg/course.py (Unit._create_content): Don't limit the TOC depth.
+	(CourseIndex._create_content): Set TOC depth to 99.
+	(ContentNode.find_section): New method.
+	(Unit._create_content): Save the vocab items to the attribute
+	`self.vocab'.
+	(Unit._create_content): Pass the `anchor' argument to the Grammar
+	section constructor.
+	(_Index): New class.
+	(CourseIndex): Derive from `_Index'.
+	(GrammarIndex): New class.
+	(VocabIndex): New class.
+	(EurochanceCourse._create_children): Add `GrammarIndex' and
+	`VocabIndex' to children.
+
 2005-03-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (ItemizedList.TYPE_UNORDERED, ItemizedList.TYPE_ALPHA)
+	(ItemizedList.TYPE_NUMERIC): New constants.
+	(ItemizedList.__init__): New argument `type'.
+	(ItemizedList.export): Reflect the list type.
+	(TableCell, TableRow, Table): New classes.
+	(SectionContainer.__init__): Only count sections with `in_toc' set
+	to True.
+	(Section.__init__): New argument `in_toc'.
+	(Section.in_toc): New method.
+	(TableOfContents._make_toc): Only use sections with `in_toc' set
+	to True.
+	(Exercise.__init__): Set `in_toc' to False in superclass
+	constructor call.
 
 	* lcg/wiki.py (InlineFormatter._MARKUP): Italics commented out.
 	(Parser._REGEXPS): added the MULTILINE switch.
