@@ -10,8 +10,9 @@ This document describes the course structure for Eurochance language courses.
 
 == Overview == *
 
-A course consists of a certain number of units (15 units for intermediate
-course.  Each unit is focused on certain topic (e.g. finance, catering etc.).
+A course consists of a certain number of units (for instance 15 units for
+the Intermediate course).  Each unit is focused on certain topic (e.g. finance,
+catering etc.).
 
 Each unit consists of several sections:
 
@@ -19,10 +20,10 @@ Each unit consists of several sections:
 * *Vocabulary* ... vocabulary listing
 * *Key language use* ... key structures
 * *Key Grammar* ... a very basic explanation
-* *Exercises* ... series of exercises to practise the 
+* *Exercises* ... series of exercises to practise the acquired knowledge
 * *Consolidation* ... an overview of competences achieved in the unit
 
-== Types of content == *
+== Types of Content == *
 
 === Introduction Section === intro
 
@@ -45,16 +46,25 @@ User can browse the vocabulary up and down and search for a concrete word
 === Key Language Use === use
 
 To contents of this section comprises a Structured text (as described in the
-[#intro|Introduction Section] above) with the possibility to use sound resordings that can be replayed
+[#intro] above) with the possibility to use sound resordings that can be replayed
 on user request.
 
 === Key Grammar === *
 
-The same as the [#use|Key Language Use] section above.
+The same as the [#use] section above.
 
 === Exercises === *
 
+This section consists of a series of exercises.  There is a predefined set of
+exercise types that can be used.  The order and number of exercises does not
+matter as long as the types are respected, however it is advisable to stick to
+cartain convention for beter users orientation.
+
+The detailed description of exercise types and their content can be found at
+the [manual.wiki|Language Content Generator manual].
 
 === Consolidation === *
 
+This is a short section of structured text.  Most often this will be an
+itemised list of the competences achieved in the unit.
 
