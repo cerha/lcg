@@ -85,7 +85,8 @@ class ContentNode(object):
         """
         assert parent is None or isinstance(parent, ContentNode)
         assert subdir is None or isinstance(subdir, types.StringType)
-        assert isinstance(language, types.StringType)
+        assert isinstance(language, types.StringType) and \
+               len(language) == 2
         assert isinstance(input_encoding, types.StringType)
         assert isinstance(default_resource_dir, types.StringType)
         codecs.lookup(input_encoding)
@@ -147,13 +148,15 @@ class ContentNode(object):
                        'default_resource_dir': self._default_resource_dir})
         return cls(self, *args, **kwargs)
     
-    def _input_file(self, name, ext='txt'):
+    def _input_file(self, name, ext='txt', lang=None):
         """Return the full path to the source file."""
+        if lang:
+            ext = lang +'.'+ ext
         return os.path.join(self.src_dir(), name + '.' + ext)
         
-    def _read_file(self, name, comment=None):
+    def _read_file(self, name, comment=None, lang=None):
         """Return all the text read from the source file."""
-        filename = self._input_file(name)
+        filename = self._input_file(name, lang=lang)
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
             lines = fh.readlines()
@@ -166,6 +169,10 @@ class ContentNode(object):
         fh.close()
         return content
 
+    def _parse_wiki_file(self, name, lang=None):
+        p = wiki.Parser(self)
+        return p.parse(self._read_file(name, lang=lang))
+    
     def _node_path(self):
         """Return the path from the root to this node as a sequence of nodes."""
         if self._parent is not None:
@@ -382,15 +389,6 @@ class ContentNode(object):
         return self._input_encoding
     
     
-class TextNode(ContentNode):
-    """A section of stuctured text read from a wiki-formatted file."""
-
-    def _create_content(self):
-        parser = wiki.Parser(self)        
-        name = self.__class__.__name__.lower()
-        return parser.parse(self._read_file(name))
-
-    
 class InnerNode(ContentNode):
     """Inner node of the content tree.
 
@@ -400,8 +398,7 @@ class InnerNode(ContentNode):
     """
     
     def _create_content(self):
-        parser = wiki.Parser(self)
-        return parser.parse(self._read_file('intro')) + \
+        return self._parse_wiki_file('intro') + \
                [TableOfContents(self, title=_("Table of Contents:"))]
     
     def _title(self):
@@ -421,86 +418,25 @@ class RootNode(InnerNode):
         super(RootNode, self).__init__(None, *args, **kwargs)
 
 
-################################################################################
-# A Concrete implemantation of Eurochance course structure.
-################################################################################
-
-class Unit(ContentNode):
-    """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
-    _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
-
-    def _id(self):
-        return 'unit%02d' % self._parent.index(self)
-    
-    def _abbrev_title(self, abbrev=False):
-        return _("Unit %d") % self._parent.index(self)
-
-    def _title(self, abbrev=False):
-        return self._read_file('title')
+class TextNode(ContentNode):
+    """A section of stuctured text read from a wiki-formatted file."""
 
     def _create_content(self):
-        feeder = feed.ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
-                                       input_encoding=self._input_encoding)
-        self.vocab = feeder.feed(self)
-        p = wiki.Parser(self)
-        sections = (Section(self, _("Aims and Objectives"),
-                            p.parse(self._read_file('aims'))),
-                    Section(self, _("Vocabulary"),
-                            VocabList(self, self.vocab)),
-                    Section(self, _("Grammar"), anchor='grammar', toc_depth=9,
-                            content=p.parse(self._read_file('grammar'))),
-                    Section(self, _("Exercises"),
-                            self._create_exercises(self.vocab), toc_depth=1),
-                    Section(self, _("Checklist"),
-                            p.parse(self._read_file('checklist'))))
-        return SectionContainer(self, sections)
+        name = self.__class__.__name__.lower()
+        return self._parse_wiki_file(name)
 
-    def _create_exercises(self, vocab):
-        filename = self._input_file('exercises')
-        text = self._read_file('exercises', '^//')
-        splittable = SplittableText(text, input_file=filename)
-        pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
-        assert len(pieces) == 5, \
-               "%s: 5 sections expected, %d found." % (filename, len(pieces))
-        titles = (_("Vocabulary Practice"),
-                  _("Listening Comprehension"),
-                  _("General Comprehension"),
-                  _("Grammar Practice"),
-                  _("Consolidation"))
-        enc = self._input_encoding
-        return [Section(self, _("Section %d") + ': ' + title,
-                        feed.ExerciseFeeder(piece, vocabulary=vocab,
-                                            input_encoding=enc).feed(self))
-                for title, piece in zip(titles, pieces)]
 
-    
-class Instructions(TextNode):
-    """A general set of pre-course instructions."""
-    _TITLE = _("General Course Instructions")
-
-    def _create_content(self):
-        return super(Instructions, self)._create_content() + \
-               [TableOfContents(self)]
-    
-    def _create_children(self):
-        return [self._create_child(ExerciseInstructions, e, 'help')
-                for e in Exercise.used_types()]
-
-    def _id(self):
-        return 'instructions'
-
-    
 class ExerciseInstructions(TextNode):
     """Exercise instructions."""
+    
     def __init__(self, parent, exercise_class_, *args, **kwargs):
         assert issubclass(exercise_class_, Exercise)
         self._exercise_class_ = exercise_class_
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
-        parser = wiki.Parser(self)            
         try:
-            return parser.parse(self._read_file(self._exercise_class_.id()))
+            return self._parse_wiki_file(self._exercise_class_.id())
         except IOError, e:
             print "Warning: %s" % e
             return Content(self)
@@ -513,59 +449,3 @@ class ExerciseInstructions(TextNode):
 
     def src_dir(self):
         return os.path.join(self.default_resource_dir(), 'help')
-
-
-class _Index(ContentNode):
-
-    def __init__(self, parent, units, *args, **kwargs):
-        self._units = units
-        super(_Index, self).__init__(parent, *args, **kwargs)
-    
-class CourseIndex(_Index):
-    _TITLE = _("Detailed Course Index")
-
-    def _create_content(self):
-        return TableOfContents(self, item=self.parent(), depth=99)
-
-    
-class GrammarIndex(_Index):
-    _TITLE = _("Grammar Index")
-
-    def _create_content(self):
-        all = reduce(lambda a,b: a+b, [u.find_section('grammar').sections()
-                                       for u in self._units])
-        return TableOfContents(self, all, depth=99)
-
-    
-class VocabIndex(_Index):
-    _TITLE = _("Vocabulary Index")
-
-    def _create_content(self):
-        vocab = reduce(lambda a,b: a+b, [u.vocab for u in self._units])
-        vocab.sort(lambda a,b: cmp(a.word().lower(), b.word().lower()))
-        rev = vocab[:]
-        rev.sort(lambda a,b: cmp(a.translation().lower(), b.translation().lower()))
-        sections = (Section(self, _("Ordered by the English term"),
-                            VocabList(self, vocab)),
-                    Section(self, _("Ordered by the translation"),
-                            VocabList(self, rev, reverse=True)))
-        return SectionContainer(self, sections)
-
-    
-class EurochanceCourse(RootNode):
-    """The course is a root node which comprises a set of 'Unit' instances."""
-
-    def _create_children(self):
-        units = [self._create_child(Unit, subdir=d)
-                 for d in list_subdirs(self.src_dir())
-                 if d[0] in map(str, range(0, 9))]
-        return [self._create_child(Instructions)] + \
-               units + \
-               [self._create_child(CourseIndex, units),
-                self._create_child(GrammarIndex, units),
-                self._create_child(VocabIndex, units)]
-    
-    def meta(self):
-        return {'author': 'Eurochance Team',
-                'copyright': "Copyright (c) 2004 Eurochance Team"}
-
