@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-02-15 16:12+0100\n"
+"POT-Creation-Date: 2005-03-23 14:29+0100\n"
 "PO-Revision-Date: 2004-12-08 19:25+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -14,240 +14,594 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lcg/content.py:136
+#: ../lcg/content.py:274
 msgid "Index:"
-msgstr "Lektionsverzeichnis:"
+msgstr "Verzeichnis:"
 
-#: ../lcg/content.py:445
+#: ../lcg/content.py:535
+msgid "Terms"
+msgstr ""
+
+#: ../lcg/content.py:537
+msgid "Phrases"
+msgstr ""
+
+#: ../lcg/content.py:644
 msgid "TRUE"
 msgstr "RICHTIG"
 
-#: ../lcg/content.py:445
+#: ../lcg/content.py:644
 msgid "FALSE"
 msgstr "FALSCH"
 
-#: ../lcg/content.py:492
-msgid "This exercise can be also done purely aurally/orally"
-msgstr ""
-
-#: ../lcg/content.py:520
-msgid "Exercise"
+#: ../lcg/content.py:739
+#, fuzzy, python-format
+msgid "Exercise %d"
 msgstr "Übung"
 
-#: ../lcg/content.py:595
+#: ../lcg/content.py:795
+msgid "Shortcut Keys"
+msgstr ""
+
+#: ../lcg/content.py:796
+msgid ""
+"In all the exercises where you fill in the text into a text-box you can use "
+"the two shortcut keys described below."
+msgstr ""
+
+#: ../lcg/content.py:800
+msgid "Display"
+msgstr ""
+
+#: ../lcg/content.py:801
+msgid "The display box below the exercise shows the following values:"
+msgstr ""
+
+#: ../lcg/content.py:804
+msgid "Buttons"
+msgstr ""
+
+#: ../lcg/content.py:805
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr ""
+
+#: ../lcg/content.py:810
+msgid "Instructions"
+msgstr ""
+
+#: ../lcg/content.py:829
 msgid "show transcript"
 msgstr ""
 
-#: ../lcg/content.py:600 ../lcg/content.py:603
+#: ../lcg/content.py:834 ../lcg/content.py:836
 msgid "Play"
 msgstr "Wiedergabe"
 
-#: ../lcg/content.py:601
+#: ../lcg/content.py:835
 msgid "Stop"
 msgstr "Stop"
 
-#: ../lcg/content.py:610
+#: ../lcg/content.py:854
 msgid "detailed instructions"
 msgstr ""
 
-#: ../lcg/content.py:614
+#: ../lcg/content.py:863
 msgid "Recording"
 msgstr "Aufnahme"
 
-#: ../lcg/content.py:635
+#: ../lcg/content.py:867
+msgid "This exercise can be also done purely aurally/orally"
+msgstr ""
+
+#: ../lcg/content.py:883
 msgid "Sentence Completion"
 msgstr "Satzergänzung"
 
-#: ../lcg/content.py:637
+#: ../lcg/content.py:887
+msgid ""
+"The aim of this exercise is to provide an opportunity for the\n"
+"    user to produce a complete sentence in English and compare "
+"pronunciation\n"
+"    with an original and is therefore purely aural-oral, with no written "
+"tasks.\n"
+"\n"
+"    If you wish to check your answers against the written text, you can see "
+"the\n"
+"    textual transcript of the recording.  Since this is not a written "
+"exercise,\n"
+"    there is no way to check your results automatically."
+msgstr ""
+
+#: ../lcg/content.py:896
+msgid ""
+"This exercise can be only done purely aurally/orally.  You\n"
+"        will hear an unfinished sentence and your goal is to say the "
+"missing\n"
+"        part."
+msgstr ""
+
+#: ../lcg/content.py:901
 #, fuzzy
 msgid "The exercise"
 msgstr "Übung"
 
-#: ../lcg/content.py:641
-msgid ""
-"This exercise can be only done purely aurally/orally.  You\n"
-"        will hear some of the sentences from the previous exercise "
-"unfinished\n"
-"        and your goal is to say the missing part."
-msgstr ""
-
-#: ../lcg/content.py:687
-msgid "Cloze"
-msgstr "Lückentext"
-
-#: ../lcg/content.py:696
-msgid ""
-"Listen to the recording carefully and then fill in the\n"
-"            gaps in the text below using the same words."
-msgstr ""
-
-#: ../lcg/content.py:699
-msgid ""
-"Fill in the gaps in the text below.  There is just one\n"
-"            correct word for each gap."
-msgstr ""
-
-#: ../lcg/content.py:712
-msgid "Correct"
+#: ../lcg/content.py:917
+#, fuzzy
+msgid "Correct!"
 msgstr "Richtig"
 
-#: ../lcg/content.py:716
+#: ../lcg/content.py:918
+msgid "Perfect!"
+msgstr ""
+
+#: ../lcg/content.py:919
+msgid "Well done!"
+msgstr ""
+
+#: ../lcg/content.py:920
 msgid "You are wrong!"
 msgstr "Das ist falsch!"
 
-#: ../lcg/content.py:752
-msgid "True/False Statements"
-msgstr "Richtig/Falsch Aussagen"
-
-#: ../lcg/content.py:756
-#, python-format
-msgid ""
-"For each of the %d statements below indicate whether you\n"
-"        think they are true or false."
+#: ../lcg/content.py:921
+msgid "Oh no, I'm sorry."
 msgstr ""
 
-#: ../lcg/content.py:767
+#: ../lcg/content.py:922
+msgid "Try again!"
+msgstr ""
+
+#: ../lcg/content.py:925
+msgid ", $x ($y%) on first attempt"
+msgstr ""
+
+#: ../lcg/content.py:927
+msgid "Answered:"
+msgstr ""
+
+#: ../lcg/content.py:928
+msgid ""
+"Displays the number of the tasks you have already\n"
+"                    answered.  For example the value 4/10 means, that you "
+"have\n"
+"                    answered four out of ten questions."
+msgstr ""
+
+#: ../lcg/content.py:931
+#, fuzzy
+msgid "Correct:"
+msgstr "Richtig"
+
+#: ../lcg/content.py:932
+msgid ""
+"Displays the number and percentage of successful\n"
+"                    answers.  The first pair of numbers shows the results "
+"of\n"
+"                    all current answers.  If you didn't answer all of them\n"
+"                    correctly on first attempt, there is also a second pair "
+"of\n"
+"                    numbers showing how many answers you did succesfully on "
+"the\n"
+"                    first try.  Use the ``Reset'' button to start again."
+msgstr ""
+
+#: ../lcg/content.py:939
+msgid "Fill"
+msgstr ""
+
+#: ../lcg/content.py:940
+msgid "Fill in the whole exercise with correct answers."
+msgstr ""
+
+#: ../lcg/content.py:941
+msgid "Reset"
+msgstr ""
+
+#: ../lcg/content.py:942
+msgid "Reset all your answers and start again."
+msgstr ""
+
+#: ../lcg/content.py:998
+msgid ""
+"You will hear a response immediately after choosing the\n"
+"    answer.  When you decide for a wrong answer, you can try again until "
+"you\n"
+"    find the correct one.  The results below the exercise will show you how\n"
+"    many answers you did right on the first try (see the [#display] section\n"
+"    below)."
+msgstr ""
+
+#: ../lcg/content.py:1038
 msgid "Multiple Choice Questions"
 msgstr "Auswahlfragebogen"
 
-#: ../lcg/content.py:770
+#: ../lcg/content.py:1040
+msgid ""
+"Each question in this exercise is followed by a list of\n"
+"    possible answers labaled a, b and c.  Only one answer is correct.\n"
+"\n"
+"    "
+msgstr ""
+
+#: ../lcg/content.py:1046
 #, python-format
 msgid ""
 "For each of the %d questions below choose the correct\n"
 "        answer from the list."
 msgstr ""
 
-#: ../lcg/content.py:778
+#: ../lcg/content.py:1054
 msgid "Select the Correct One"
 msgstr "Wählen Sie das Richtige aus"
 
-#: ../lcg/content.py:781
+#: ../lcg/content.py:1056
+msgid ""
+"There are several pairs of simmillar sentences, however one\n"
+"    sentence in each pair is always incorrect.  Your goal is to decide which "
+"is\n"
+"    the correct one.\n"
+"\n"
+"    "
+msgstr ""
+
+#: ../lcg/content.py:1063
 #, python-format
 msgid ""
 "For each of the %d pairs of statements below decide which\n"
 "        one is correct."
 msgstr ""
 
-#: ../lcg/content.py:789
+#: ../lcg/content.py:1084
+msgid "True/False Statements"
+msgstr "Richtig/Falsch Aussagen"
+
+#: ../lcg/content.py:1086
+msgid ""
+"Each sentence in this exercise is followed by a control with\n"
+"    two options -- 'TRUE' and 'FALSE'.  Your goal is to decide whether the\n"
+"    sentence is true or not and choose the corresponding option.\n"
+"\n"
+"    "
+msgstr ""
+
+#: ../lcg/content.py:1093
+#, python-format
+msgid ""
+"For each of the %d statements below indicate whether you\n"
+"        think they are true or false."
+msgstr ""
+
+#: ../lcg/content.py:1102
 msgid "Gap Filling"
 msgstr "Lückentext"
 
-#: ../lcg/content.py:792
-#, python-format
+#: ../lcg/content.py:1104
 msgid ""
-"For each of the %d sentences below choose the correct piece\n"
-"        of text from the list to fill in the gap."
+"Your goal is to choose the correct word to fill in a gap in a\n"
+"    sentence.  For each gap you have three choices.  Only one of them is\n"
+"    correct.\n"
+"\n"
+"    "
 msgstr ""
 
-#: ../lcg/content.py:797 ../lcg/course.py:452
+#: ../lcg/content.py:1111
+#, python-format
+msgid ""
+"For each of the %d sentences below choose the correct word\n"
+"        from the list to fill in the gap."
+msgstr ""
+
+#: ../lcg/content.py:1132
+msgid "Everything correct!"
+msgstr ""
+
+#: ../lcg/content.py:1133
+msgid "All the answers are wrong!"
+msgstr ""
+
+#: ../lcg/content.py:1134
+msgid "Some of the answers are wrong!"
+msgstr ""
+
+#: ../lcg/content.py:1139
+msgid "Evaluate"
+msgstr ""
+
+#: ../lcg/content.py:1140
+msgid ""
+"Evaluate the entire exercise.  If an error is found, the\n"
+"                 cursor is moved to the first incorrect answer (and to the\n"
+"                 first incorrect character within this answer, when some "
+"part\n"
+"                 of the answer is correct)."
+msgstr ""
+
+#: ../lcg/content.py:1146
+msgid "Enter"
+msgstr ""
+
+#: ../lcg/content.py:1147
+msgid ""
+"Use this key within the text-field to evaluate the current\n"
+"              answer.  You hear a sound response and in case of an error, "
+"the\n"
+"              cursor is moved to the position of the first incorrect "
+"character\n"
+"              within the text."
+msgstr ""
+
+#: ../lcg/content.py:1151
+msgid "Ctrl-Space"
+msgstr ""
+
+#: ../lcg/content.py:1153
+msgid ""
+"If you don't know the answer, you can also use the ``hint''\n"
+"              feature.  Just press the key combination (holding the Ctrl "
+"key,\n"
+"              press the spacebar) and one letter of the correct answer will "
+"be\n"
+"              filled in automatically.  If you have already entered some "
+"text,\n"
+"              the cursor will be moved behind the last correct character "
+"and\n"
+"              next one will be inserted.  It also means, that if there is "
+"some\n"
+"              text behind the cursor, there is at least one error in it.  "
+"Try\n"
+"              to locate this error and correct it.  Then you can try to\n"
+"              evaluate your answer using the 'Enter' key (see above) or use\n"
+"              ``hint'' again, until you find the correct answer."
+msgstr ""
+
+#: ../lcg/content.py:1164
+msgid ""
+"Use the buttons at the bottom of the exercise to evaluate all\n"
+"    the answers.  You can also check each answer individually using the\n"
+"    shortcut keys (see the section [#keys] for more information)."
+msgstr ""
+
+#: ../lcg/content.py:1181
+msgid "Cloze"
+msgstr "Lückentext"
+
+#: ../lcg/content.py:1184
+msgid ""
+"Your goal in this exercise is to fill in the gaps in the text\n"
+"    using exactly the same words as you have heard in the recording.\n"
+"\n"
+"    "
+msgstr ""
+
+#: ../lcg/content.py:1195
+msgid ""
+"Listen to the recording carefully and then fill in the\n"
+"            gaps in the text below using the same words."
+msgstr ""
+
+#: ../lcg/content.py:1198
+msgid ""
+"Fill in the gaps in the text below.  There is just one\n"
+"            correct word for each gap."
+msgstr ""
+
+#: ../lcg/content.py:1205 ../lcg/eurochance.py:70
 #, fuzzy
 msgid "Vocabulary Practice"
 msgstr "Vokabeln"
 
-#: ../lcg/content.py:800
+#: ../lcg/content.py:1207
+msgid ""
+"There are two ways how you can do the exercise: The oral form\n"
+"    and the written form.  Do both of them for best results.\n"
+"\n"
+"    The oral version is based on the listening below.  You will hear each "
+"item\n"
+"    in your language.  Say the word or expression in English and listen to "
+"the\n"
+"    model pronunciation.\n"
+"\n"
+"    The written version lists all the vocabulary items on the page.  For "
+"each\n"
+"    item, there is a text box next to it.  Your goal is to type the "
+"translation\n"
+"    into this text box.\n"
+"\n"
+"    "
+msgstr ""
+
+#: ../lcg/content.py:1221
 msgid ""
 "You will hear a word or expression in your language.  Say\n"
 "        it in English and listen to the model pronunciation."
 msgstr ""
 
-#: ../lcg/content.py:811
+#: ../lcg/content.py:1232
 msgid "Transformation"
 msgstr "Übersetzung"
 
-#: ../lcg/content.py:814
+#: ../lcg/content.py:1234
+msgid ""
+"Your goal is to transform a structure (pattern or paradigm)\n"
+"    into a different structure.  The recording contains detailed "
+"instructions\n"
+"    for this transformation.\n"
+"\n"
+"    "
+msgstr ""
+
+#: ../lcg/content.py:1241
 #, python-format
 msgid ""
 "Listen to the recording and transform each of the %d\n"
 "        sentences below according to the instructions."
 msgstr ""
 
-#: ../lcg/content.py:825
+#: ../lcg/content.py:1251
 msgid "Substitution"
 msgstr ""
 
-#: ../lcg/content.py:829
+#: ../lcg/content.py:1253
+msgid ""
+"Your goal is to substitute a structure (pattern or paradigm)\n"
+"    with a different structure.  Each sentence is followed by text in "
+"brackets.\n"
+"    Replace the corresponding part of the sentence using this text.\n"
+"\n"
+"    "
+msgstr ""
+
+#: ../lcg/content.py:1260
 msgid ""
 "Substitute a part of each sentence using the text in\n"
 "        brackets."
 msgstr ""
 
-#: ../lcg/content.py:833
+#: ../lcg/content.py:1267
 msgid "Dictation"
 msgstr ""
 
-#: ../lcg/course.py:56
+#: ../lcg/content.py:1271
+msgid "Correct"
+msgstr "Richtig"
+
+#: ../lcg/content.py:1272
+msgid "Error(s) found"
+msgstr ""
+
+#: ../lcg/content.py:1275
+msgid "Result:"
+msgstr ""
+
+#: ../lcg/content.py:1276
+msgid ""
+"Displays the result of the last evaluation (evaluate\n"
+"                  your answer by pressing the 'Enter' key or by the\n"
+"                  ``Evaluate'' button below the exercise)."
+msgstr ""
+
+#: ../lcg/content.py:1280
+msgid ""
+"Listen to the recording and type what you hear into the large\n"
+"    text box below.  You can replay the recording how many times you need "
+"to\n"
+"    understand it, however two attempts should be enough for a well "
+"performing\n"
+"    student.\n"
+"\n"
+"    Pay special attention to punctuation and case, since they often cause "
+"most\n"
+"    of the problems when evaluating dictation.  Write all the sentences as "
+"you\n"
+"    hear them, using the appropriate punctuation character and one space "
+"after\n"
+"    each sentence.  No space is allowed at after the last sentence."
+msgstr ""
+
+#: ../lcg/course.py:54
 msgid "Node"
 msgstr ""
 
-#: ../lcg/course.py:395
-msgid "Table of Contents:"
-msgstr "Inhaltsverzeichnis:"
-
-#: ../lcg/course.py:424
+#: ../lcg/eurochance.py:39
 #, python-format
 msgid "Unit %d"
 msgstr "Lektion %d"
 
-#: ../lcg/course.py:433
-msgid "Aims and Objectives"
-msgstr ""
-
-#: ../lcg/course.py:435
-msgid "Vocabulary"
-msgstr "Vokabeln"
-
-#: ../lcg/course.py:437
-msgid "Grammar"
-msgstr "Wichtigsten grammatikalischen Formen"
-
-#: ../lcg/course.py:439
-msgid "Exercises"
-msgstr "Übungen"
-
-#: ../lcg/course.py:441
-msgid "Checklist"
-msgstr ""
-
-#: ../lcg/course.py:453
+#: ../lcg/eurochance.py:71
 msgid "Listening Comprehension"
 msgstr ""
 
-#: ../lcg/course.py:454
+#: ../lcg/eurochance.py:72
 msgid "General Comprehension"
 msgstr ""
 
-#: ../lcg/course.py:455
+#: ../lcg/eurochance.py:73
 msgid "Grammar Practice"
 msgstr ""
 
-#: ../lcg/course.py:456
+#: ../lcg/eurochance.py:74
 msgid "Consolidation"
 msgstr ""
 
-#: ../lcg/course.py:458
+#: ../lcg/eurochance.py:76
 #, python-format
 msgid "Section %d"
 msgstr ""
 
-#: ../lcg/course.py:466
+#: ../lcg/eurochance.py:83
+msgid "Aims and Objectives"
+msgstr ""
+
+#: ../lcg/eurochance.py:85
+msgid "Vocabulary"
+msgstr "Vokabeln"
+
+#: ../lcg/eurochance.py:86
+msgid "Grammar"
+msgstr "Wichtigsten grammatikalischen Formen"
+
+#: ../lcg/eurochance.py:88
+msgid "Exercises"
+msgstr "Übungen"
+
+#: ../lcg/eurochance.py:90
+msgid "Checklist"
+msgstr ""
+
+#: ../lcg/eurochance.py:98
 msgid "General Course Instructions"
 msgstr ""
 
-#: ../lcg/course.py:496
+#: ../lcg/eurochance.py:120
 #, python-format
 msgid "Instructions for %s"
 msgstr ""
 
-#: ../lcg/course.py:506
+#: ../lcg/eurochance.py:134
 #, fuzzy
 msgid "Detailed Course Index"
 msgstr "Kursindex"
 
-#: ../lcg/export.py:121
+#: ../lcg/eurochance.py:141
+#, fuzzy
+msgid "Grammar Index"
+msgstr "Wichtigsten grammatikalischen Formen"
+
+#: ../lcg/eurochance.py:150
+#, fuzzy
+msgid "Vocabulary Index"
+msgstr "Vokabeln"
+
+#: ../lcg/eurochance.py:158
+msgid "Ordered by the English term"
+msgstr ""
+
+#: ../lcg/eurochance.py:159
+msgid "Ordered by the translation"
+msgstr ""
+
+#: ../lcg/eurochance.py:165
+msgid "Answer Sheets"
+msgstr ""
+
+#: ../lcg/eurochance.py:168 ../lcg/eurochance.py:195 ../lcg/eurochance.py:221
+msgid "Table of Contents:"
+msgstr "Inhaltsverzeichnis:"
+
+#: ../lcg/eurochance.py:181
+#, python-format
+msgid "Answer Sheet for %s"
+msgstr ""
+
+#: ../lcg/eurochance.py:192
+#, fuzzy
+msgid "Help Index"
+msgstr "Kursindex"
+
+#: ../lcg/export.py:120
 msgid "Next"
 msgstr "Nächste"
 
-#: ../lcg/export.py:122
+#: ../lcg/export.py:121
 msgid "Previous"
 msgstr "Vorhergehend"
 
@@ -255,6 +609,6 @@ msgstr "Vorhergehend"
 msgid "Up"
 msgstr ""
 
-#: ../lcg/export.py:127
+#: ../lcg/export.py:129
 msgid "Course Index"
 msgstr "Kursindex"
