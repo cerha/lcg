@@ -61,6 +61,9 @@ def list_subdirs(dir):
     If the directory contains the file 'index.txt' the list is read from there.
     Otherwise all subdirectories in the directory are returned in alphabetical
     order.
+
+    Directory names beginning with an underscore and 'CVS' directories are
+    ignored.
     
     """
     try:
@@ -68,7 +71,7 @@ def list_subdirs(dir):
         items = filter(len, map(string.strip, index))
     except:
         items = filter(lambda d: os.path.isdir(os.path.join(dir, d)) and \
-                       d[0] != '_', os.listdir(dir))
+                       d[0] != '_' and d != 'CVS', os.listdir(dir))
         items.sort()
     return items
 
