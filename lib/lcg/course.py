@@ -197,6 +197,10 @@ class ContentNode(object):
         """Return the title of this node as a string."""
         return separator.join(map(lambda n: n.title(), self._node_path()))
 
+    def lang(self):
+        #TODO: pass from the script...
+        return 'cs'
+
     def meta(self):
         """Return the meta data as a dictionary.
 
