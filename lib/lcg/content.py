@@ -33,6 +33,7 @@ from util import *
 from course import *
 from _html import *
 
+
 class Content(object):
     """Generic base class for all types of content.
 
@@ -59,6 +60,7 @@ class Content(object):
         assert isinstance(parent, ContentNode), \
                "Not a 'ContentNode' instance: %s" % parent
         self._parent = parent
+        self._container = None
 
     def sections(self):
         """Return the contained sections as a sequence of 'Section' instances.
@@ -76,11 +78,192 @@ class Content(object):
     def parent(self):
         """Return the parent 'ContentNone' of this content element."""
         return self._parent
-        
+
+    def set_container(self, container):
+        self._container = container
+
+    def _container_path(self):
+        path = [self]
+        while path[0]._container is not None:
+            path.insert(0, path[0]._container)
+        return tuple(path)
+    
     def export(self):
         """Return the HTML formatted content as a string."""
         return ''
- 
+
+    
+class Container(Content):
+    """Container of multiple parts, each of which is a 'Content' instance.
+
+    Containers allow to build a hierarchy of 'Content' instances inside the
+    scope of one node.  This is an addition to the hierarchy of the actual
+    nodes (separate pages).
+
+    All the contained (wrapped) content elements will be notified about the
+    fact, that they are contained within this container and thus belong to the
+    hierarchy.
+
+    'Container' exports all the parts concatenated in unchanged order.  For any
+    contained 'Section' instances, a local 'TableOfContents' is created
+    automatically, preceeding the actual content.
+
+    """
+
+    def __init__(self, parent, content, toc_depth=99):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          content -- the actual content wrapped into this container as a
+            sequence of 'Content' instances in the order in which they should
+            appear in the output.
+          toc_depth -- the depth of local table of contents.  Corresponds to
+            the same constructor argument of 'TableOfContents'.
+
+        """
+        super(Container, self).__init__(parent)
+        if operator.isSequenceType(content):
+            assert is_sequence_of(content, Content)
+            self._content = tuple(content)
+        else:
+            assert isinstance(content, Content)
+            self._content = (content,)
+        self._sections = [p for p in self._content if isinstance(p, Section)]
+        if len(self._sections) > 1 and toc_depth > 0:
+            self._toc = TableOfContents(parent, self, title=_("Index:"),
+                                        depth=toc_depth)
+        else:
+            self._toc = Content(parent)
+        for c in self._content:
+            c.set_container(self)
+
+    def sections(self):
+        return self._sections
+    
+    def export(self):
+        return "\n".join([p.export() for p in (self._toc,) + self._content])
+
+    
+class Section(Container):
+    """Section wraps the subordinary contents into an inline section.
+
+    Section is very simillar to a 'Container', but there are a few differences:
+
+      * Every section has a title, which appears in the output document as a
+        heading.
+
+      * Section can be referenced using an HTML anchor.
+
+      * Sections are numbered.  Each section knows it's number within it's
+        container.
+    
+    """
+    def __init__(self, parent, title, content, toc_depth=0):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          title -- section title as a string.
+          content -- the actual content wrapped into this section as a
+            sequence of 'Content' instances in the order in which they should
+            appear in the output.
+            
+        """
+        super(Section, self).__init__(parent, content, toc_depth=toc_depth)
+        assert isinstance(title, types.StringTypes)
+        self._title = title
+
+    def _section_path(self):
+        return [c for c in self._container_path() if isinstance(c, Section)]
+        
+    def section_number(self):
+        """Return the number of this section within it's container as int."""
+        return self._container.sections().index(self) + 1
+    
+    def title(self):
+        """Return the section title as a string."""
+        title = self._title
+        if self._container is not None and title.find("%d") != -1:
+            title = title % self.section_number()
+        return title
+
+    def anchor(self):
+        """Return the anchor name for this section."""
+        return 'sec-' + '-'.join([str(c.section_number())
+                                  for c in self._section_path()])
+
+    def url(self):
+        """Return the URL of the section relative to the course root."""
+        return self._parent.url() + "#" + self.anchor()
+    
+    def _header(self):
+        l = len(self._section_path()) + 1
+        return '<a name="%s"></a>\n' % self.anchor() + h(self.title(), l)
+               
+    def export(self):
+        return "\n".join((self._header(), super(Section, self).export()))
+
+    
+class TableOfContents(Content):
+    """A contained Table of Contents."""
+    
+    def __init__(self, parent, item=None, title=None, depth=1, detailed=True):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          item -- the place where to start in the content hierarchy tree.
+            'ContentNode' or 'Content' instances are allowed.  None means that
+            'parent' should be used.  See 'Section' documentation for more
+            information how the content tree is built.
+          title -- the title of the TOC as a string.
+          depth -- how deep in the hierarchy should we go.
+          detailed -- A True (default) value means that the 'Content' hierarchy
+            within the leave nodes of the node tree will be included in the
+            TOC.  False means to consider only 'ContentNode' hierarchy.
+
+        """
+        super(TableOfContents, self).__init__(parent)
+        if item is None:
+            item = parent
+        assert isinstance(item, (ContentNode, Content))
+        assert title is None or isinstance(title, types.StringTypes)
+        assert isinstance(depth, types.IntType)
+        assert isinstance(detailed, types.BooleanType)
+        self._item = item
+        self._title = title
+        self._depth = depth
+        self._detailed = detailed
+        
+    def export(self):
+        toc = self._make_toc(self._item, depth=self._depth)
+        if self._title is not None:
+            return div((b(self._title), toc), cls="table-of-contents")
+        else:
+            return toc
+        
+    def _make_toc(self, item, indent=0, depth=1):
+        if depth <= 0:
+            return ''
+        items = ()
+        if isinstance(item, ContentNode):
+            items = item.children()
+        if len(items) == 0 and self._detailed:
+            items = item.sections()
+        if len(items) == 0:
+            return ''
+        links = [link(i.title(), i.url()) + \
+                 self._make_toc(i, indent=indent+4, depth=depth-1)
+                 for i in items]
+        return "\n" + ul(links, indent=indent) + "\n" + ' '*(indent-2)
+
     
 class GenericText(Content):
     """Generic parent class for content generated from a piece of text."""
@@ -107,192 +290,6 @@ class WikiText(GenericText):
     
     def export(self):
         return wiki.format(self._text)
-
-
-class Section(Content):
-    """Section wraps the subordinary contents into an inline section.
-
-    Sections allow to build a hierarchy of Content even inside the scope of one
-    node.  This is an addition to the hierarchy of the actual nodes (separate
-    pages).  This extension, however, introduces a problem.
-    
-    When we want to build a global hierarchy (containing the actual
-    'ContentNone' instances as well as the 'Content' elements contained inside
-    them), it is necessary to decide whether the content sections or the child
-    nodes come as descendants in the tree.  The rule is, that whenever there
-    are any sections, they are the descendants of their parent node, but
-    exactly one of them should define the 'contains_children' flag as true.
-    Then all the child nodes come under that section in the hierarchy.  Se
-    constructor args for this flag.
-
-    """
-    _HEADING_LEVEL = 2
-
-    def __init__(self, parent, title, content, contains_children=False):
-        """Initialize the instance.
-
-        Arguments:
-
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          title -- section title as a string.
-          content -- the actual content wrapped into this section.
-          contains_children -- this flag indicates, that parent's childrens
-            should be considered as if they are contained under this section in
-            the hierarchy (See the documentation for the 'Section' class for
-            more information).
-            
-        """
-        super(Section, self).__init__(parent)
-        assert isinstance(title, types.StringTypes)
-        assert isinstance(content, Content)
-        assert isinstance(contains_children, types.BooleanType)
-        self._number = parent.counter().next()
-        if title.find("%d") != -1:
-            title = title % self._number
-        self._title = title
-        self._content = content
-        self._contains_children = contains_children
-        
-    def title(self):
-        """Return the section title as a string."""
-        return self._title
-
-    def anchor(self):
-        """Return the anchor name for this section."""
-        return "anchor-%02d" % self._number
-
-    def url(self):
-        """Return the URL of the section relative to the course root."""
-        return self._parent.url() + "#" + self.anchor()
-    
-    def sections(self):
-        return self._content.sections()
-
-    def contains_children(self):
-        """Return True if parent's children belong just to this section."""
-        return self._contains_children
-    
-    def _header(self):
-        l = self._HEADING_LEVEL
-        return '<a name="%s"></a>\n' % self.anchor() + h(self.title(), l)
-               
-    def export(self):
-        return "\n".join((self._header(), self._content.export()))
-
-class SubSection(Section):
-    _HEADING_LEVEL = 3
-
-class SubSubSection(Section):
-    _HEADING_LEVEL = 4
-    
-    
-class TableOfContents(Content):
-    """A contained Table of Contents."""
-    
-    def __init__(self, parent, item=None, title=None, depth=1, detailed=True,
-                 local=False):
-        """Initialize the instance.
-
-        Arguments:
-
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          item -- the place where to start in the content hierarchy tree.
-            'ContentNode' or 'Content' instances are allowed.  None means that
-            'parent' should be used.  See 'Section' documentation for more
-            information how the content tree is built.
-          title -- the title of the TOC as a string.
-          depth -- how deep in the hierarchy should we go.
-          detailed -- A True (default) value means that both 'Content'
-            hierarchy within each node and node hierarchy are considered.
-            False means to consider only 'ContentNode' hierarchy.
-          local -- A True value means to consider only the content hierarchy
-            within one node.  No links to other nodes will be included.  False
-            (default) value mens to merge the content hierarchy with the node
-            hierarchy.  Appearently, the combination 'local=True' and
-            'detailed=False' is a nonsense and thus leads to an error.  
-
-        """
-        super(TableOfContents, self).__init__(parent)
-        if item is None:
-            item = parent
-        assert isinstance(item, (ContentNode, Content))
-        assert title is None or isinstance(title, types.StringTypes)
-        assert isinstance(depth, types.IntType)
-        assert isinstance(detailed, types.BooleanType)
-        assert isinstance(local, types.BooleanType)
-        self._item = item
-        self._title = title
-        self._depth = depth
-        self._detailed = detailed
-        self._local = local
-        
-    def export(self):
-        toc = self._make_toc(self._item, depth=self._depth)
-        if self._title is not None:
-            return div(('<h2>%s</h2>' % self._title, toc),
-                       cls="table-of-contents")
-        else:
-            return toc
-        
-    def _make_toc(self, item, indent=0, depth=1):
-        if depth <= 0:
-            return ''
-        items = ()
-        if self._detailed:
-            assert isinstance(item, (ContentNode, Content))
-            items = item.sections()
-            if len(items) == 0 and not self._local:
-                if isinstance(item, ContentNode):
-                    items = item.children()
-                elif isinstance(item, Section) and item.contains_children():
-                    items = item.parent().children()
-        else:
-            assert isinstance(item, ContentNode) and not self._local
-            items = item.children()
-        if len(items) == 0:
-            return ''
-        x = [link(i.title(), i.url()) + \
-             self._make_toc(i, indent=indent+4, depth=depth-1)
-             for i in items]
-        return "\n" + ul(x, indent=indent) + "\n" + ' '*(indent-2)
-
-
-class Container(Content):
-    """Container of multiple parts, each of which is a 'Content' instance.
-
-    'Container' exports all the parts concatenated in unchanged order.  For any
-    contained parts which are 'Section' instances, a local 'TableOfContents' is
-    created automatically, preceeding the actual content.
-
-    """
-
-    def __init__(self, parent, parts, toc_depth=99, toc_local=True):
-        """Initialize the instance.
-
-        Arguments:
-
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          parts -- Sequence of 'Content' instances in the order in which they
-            should appear in the output..
-
-        """
-        super(Container, self).__init__(parent)
-        assert is_sequence_of(parts, Content)
-        self._sections = sections = [p for p in parts if isinstance(p, Section)]
-        if sections and toc_depth > 0:
-            toc = TableOfContents(parent, self, title=_("Index:"),
-                                  depth=toc_depth, local=toc_local)
-            parts = (toc,) + tuple(parts)
-        self._parts = parts
-
-    def sections(self):
-        return self._sections
-        
-    def export(self):
-        return "\n".join([p.export() for p in self._parts])
     
     
 class VocabList(Content):
