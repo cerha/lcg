@@ -26,33 +26,53 @@ We need something very simple and quite specific, so it is not worth using
 import operator
 import types
 
+def _attr(*pairs):
+    return "".join([v is not None and ' %s="%s"' % (a, v) or ''
+                    for a, v in pairs])
+
 def div(content, cls):
     if operator.isSequenceType(content) \
            and not isinstance(content, types.StringTypes):
         content = '\n'.join(content)
     return '\n'.join(('<div class="%s">' % cls, content, '</div>\n'))
 
+def _input(type, name=None, value=None, handler=None, cls=None, size=None,
+           readonly=False):
+    handler = handler and "javascript: %s" % handler
+    return '<input type="%s"%s%s>' % (type, _attr(('name', name),
+                                                  ('value', value),
+                                                  ('size', size),
+                                                  ('onClick', handler),
+                                                  ('class', cls)),
+                                      readonly and ' readonly' or '')
+
 def field(text='', name='', size=20, cls=None, readonly=False):
-    f = '<input type="text" name="%s" class="%s" value="%s" size="%d"%s>'
-    return f % (name, cls and 'text ' + cls or 'text', text, size,
-                readonly and ' readonly' or '')
+    cls = cls and 'text ' + cls or 'text'
+    return _input('text', name=name, value=text, size=size, cls=cls,
+                  readonly=readonly)
 
 def button(label, handler, cls=None):
     cls = cls and 'button ' + cls or 'button'
-    return '<input type="button" value="%s"' % label + \
-           ' onClick="javascript: %s"' % handler + \
-           (cls and ' class="%s">' % cls or '>')
+    return _input('button', value=label, handler=handler, cls=cls)
+
+def reset(label, handler=None, cls=None):
+    return _input('reset', handler=handler, value=label, cls=cls)
+
+def hidden(name, value):
+    return _input('hidden', name=name, value=value)
+
+def radio(name, handler, value=None, cls=None):
+    return _input('radio', name=name, handler=handler, value=value, cls=cls)
 
 def link(label, url, brackets=False,
          title=None, target=None, cls=None, hotkey=None):
     if hotkey:
         t = '(Alt-%s)' % hotkey
         title = title and title + ' ' + t or t
-    attr = "".join([v and ' %s="%s"' % (a, v) or ''
-                    for a, v in (('title', title),
-                                 ('target', target),
-                                 ('class', cls),
-                                 ('accesskey', hotkey))])
+    attr = _attr(('title', title),
+                 ('target', target),
+                 ('class', cls),
+                 ('accesskey', hotkey))
     result = '<a href="%s"%s>%s</a>' % (url, attr, label)
     return brackets and '['+result+']' or result
 
