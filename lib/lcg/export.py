@@ -107,10 +107,12 @@ class StaticExporter(Exporter):
         node.stylesheet(self._stylesheet)
         nav = self._navigation(node)
         meta = node.root_node().meta()
+        http_equiv = {'Content-Type': 'text/html; charset=ISO-8859-1'}
         c = (self.DOCTYPE, '',
              '<html>',
              '<head>',
              '  <title>%s</title>' % node.full_title(),
+             tags('<meta http-equiv="%s" content="%s">', http_equiv.items()),
              tags('<meta name="%s" content="%s">', meta.items()),
              tags('<link rel="%s" href="%s" title="%s">',
                   map(lambda a: (a[0], a[1].output_file(), a[1].title()),
@@ -118,8 +120,9 @@ class StaticExporter(Exporter):
                              (('prev', node.prev()), ('next', node.next()))))),
              tags('<link rel="stylesheet" type="text/css" href="%s">',
                   map(lambda s: s.url(), node.resources(Stylesheet))),
-             tags('<script language="Javascript"' + \
-                  ' src="%s">', map(lambda s: s.url(), node.resources(Script))),
+             tags('<script language="Javascript" type="text/javascript"' + \
+                  ' src="%s"></script>',
+                  map(lambda s: s.url(), node.resources(Script))),
              '</head>',
              '<body>',
              nav, '<hr class="navigation">',
@@ -169,5 +172,3 @@ class StaticExporter(Exporter):
                               deep and self._make_toc(n, indent+'    ') or ''),
                              node.children())) + \
                              "\n" + indent + "</ul>\n" + indent[0:-2] 
-    
-            
