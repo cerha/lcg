@@ -6,53 +6,73 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-07 23:21+0100\n"
-"PO-Revision-Date: 2004-12-07 17:25+0100\n"
+"POT-Creation-Date: 2004-12-08 18:51+0100\n"
+"PO-Revision-Date: 2004-12-08 19:25+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: lcg/content.py:278
+msgid "TRUE"
+msgstr "RECHT"
+
+#: lcg/content.py:278
+msgid "FALSE"
+msgstr "FALSCH"
+
 #: lcg/content.py:378
 msgid "Exercise"
 msgstr "Übung"
 
+#: lcg/content.py:389 lcg/content.py:393
+msgid "Recording"
+msgstr "Aufnahme"
+
+#: lcg/content.py:390
+msgid "Play"
+msgstr "Spiel"
+
+#: lcg/content.py:391
+msgid "Stop"
+msgstr "Halt"
+
 #: lcg/content.py:408
 msgid "Cloze"
-msgstr ""
+msgstr "Cloze"
 
 #: lcg/content.py:464
 msgid "Correct"
-msgstr ""
+msgstr "Korrekt"
 
 #: lcg/content.py:467
 msgid "You are wrong!"
-msgstr ""
+msgstr "Sie sind falsch"
 
 #: lcg/content.py:504
 msgid "True/False Statements"
-msgstr ""
+msgstr "Recht/Falsch Aussagen"
 
 #: lcg/content.py:520
 msgid "Multiple Choice Questions"
-msgstr ""
+msgstr "Mehrfache Auserlesene Fragen"
 
 #: lcg/content.py:532
 msgid "Select the Correct One"
-msgstr ""
+msgstr "Wählen Sie das korrekte"
 
 #: lcg/content.py:543
 msgid "Gap Filling"
-msgstr ""
+msgstr "AbstandscFüllung"
 
 #: lcg/content.py:553
 msgid "Sentence Completion"
-msgstr ""
+msgstr "SatzcBeendigung"
 
 #: lcg/content.py:566
 msgid "Transformation"
-msgstr ""
+msgstr "Umwandlung"
 
 #: lcg/course.py:52
 msgid "Node"
@@ -64,15 +84,15 @@ msgstr ""
 
 #: lcg/course.py:595
 msgid "Vocabulary"
-msgstr ""
+msgstr "Wortschatz"
 
 #: lcg/course.py:605
 msgid "Key Language Use"
-msgstr ""
+msgstr "Verwendung"
 
 #: lcg/course.py:611
 msgid "Key Grammar"
-msgstr ""
+msgstr "Grammatik"
 
 #: lcg/course.py:617
 msgid "Exercises"
@@ -80,28 +100,28 @@ msgstr "Übungen"
 
 #: lcg/course.py:627
 msgid "Consolidation"
-msgstr ""
+msgstr "Zusammenführung"
 
 #: lcg/course.py:633
 msgid "Unit"
-msgstr ""
+msgstr "Lektion"
 
 #: lcg/course.py:634
 msgid "Unit Index"
-msgstr ""
+msgstr "Lektionindex"
 
 #: lcg/export.py:125
 msgid "Next"
-msgstr "Weiter"
+msgstr "Zunächst"
 
 #: lcg/export.py:126
 msgid "Previous"
-msgstr "Letzte"
+msgstr "Vorhergehend"
 
 #: lcg/export.py:132
 msgid "Course Index"
-msgstr ""
+msgstr "Kursindex"
 
 #: lcg/export.py:139
 msgid "Table of Contents"
-msgstr "Inhalt"
+msgstr "Inhaltsverzeichnis"
