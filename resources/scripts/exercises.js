@@ -78,6 +78,15 @@ function last_correct_char_index(field, answer) {
    return i;
 }
 
+function simulate_click_on_keypress(e) {
+   if (document.all) e = window.event;
+   var key = event_key(e);
+   var target = event_target(e);
+   if (key == 'Enter' || key == 'Space') target.onclick();
+   return true;
+}
+
+
 // Exercises
 
 function init_form(f, handler, answers, responses, messages) {
@@ -282,7 +291,7 @@ SelectBasedExerciseHandler.prototype._init_field = function(field) {
 }
 
 SelectBasedExerciseHandler.prototype.set_answer = function(i, value) {
-   var i = this._fields[i];
+   var field = this._fields[i];
    for (var i=0; i < field.options.length; i++) {
       var option = field.options[i];
       if (option.value == value) option.selected = true;
