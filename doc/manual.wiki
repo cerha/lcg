@@ -135,7 +135,7 @@ mandatory.
 
 Column headings are not mandatory, but when used, the first column must begin
 with a '#' character to inform the parser, that this row does not contain real
-vocabulady data.
+vocabulary data.
 
 == Exercises == *
 
