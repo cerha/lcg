@@ -25,6 +25,7 @@ all: en de
 
 en de:
 	rm -f $(DST)/*.html
+	#find $(SRC) -name "*.txt" | xargs perl -i -pe 's/^﻿// if $$. == 1'
 	bin/generate.py $(SRC) $(DST) $(LANG)
 #	rm -f $(DST)/intermediate.zip
 #	(cd $(DST); zip -qr intermediate.zip .)
@@ -56,3 +57,4 @@ sync-data:
 	rsync $(RSYNC_OPTS) --update data $(REMOTE_HOST):$(REMOTE_DIR)/
 	rsync $(RSYNC_OPTS) --update $(REMOTE_HOST):$(REMOTE_DIR)/data .
 	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR);chmod -R g+w .;chgrp -R www-data ."
+
