@@ -1,5 +1,8 @@
 2004-09-01  Tomas Cerha  <cerha@brailcom.org>
 
+	* Makefile: Remove the html files before running the generator.
+	Don't zip the package.  Export the `LCG_TTS_COMMAND' variable.
+
 	* lcg/course.py (ContentNode.linear, ContentNode.next) 
 	(ContentNode.prev): Docstring written.
 	(ContentNode.index): New method.
