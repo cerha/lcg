@@ -1,3 +1,12 @@
+2004-09-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/export.py (StaticExporter._link): New method.
+	(StaticExporter._navigation): Use it.  Also create a link to
+	parent node when it's not a root node.
+
+	* lcg/course.py (ContentNode.parent): New method.
+	(Media.source_file): Cosmetic improvements. 
+
 2004-09-01  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/export.py (StaticExporter._toc): New method.
