@@ -34,6 +34,11 @@ class ContentNode(unittest.TestCase):
         assert a.root_node() == b.root_node() == a
         assert a.src_dir() == 'aaa'
         assert b.src_dir() == os.path.join('aaa', 'bbb')
+        assert b in a.children()
+        assert b.id() != a.id()
+        assert a.counter().next() == 1
+        assert a.counter().next() == 2
+        assert b.counter().next() == 1
 
     def check_media(self):
     	a = lcg.ContentNode(None, 'aaa')
