@@ -255,8 +255,7 @@ class ExerciseFeeder(SplittableTextFeeder):
             else:
                 assert len(task_specs) >= 1, "No tasks found."
                 if type == TrueFalseStatements and len(task_specs) == 1:
-                    self._warn("TrueFalseStatements have only onetask!",
-                               text)
+                    self._warn("TrueFalseStatements have only onetask!", text)
                 tasks = [self._read_task(type.task_type(), p)
                          for p in task_specs]
             kwargs['tasks'] = tuple(tasks)
