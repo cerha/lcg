@@ -258,7 +258,10 @@ class ExerciseFeeder(Feeder):
         assert len(lines) == 2, \
                "Transformation task specification must consist of just two " + \
                "lines (%d given)." % len(lines)
-        return TransformationTask(*lines)
+        orig, transformation = lines
+        if transformation.find('[') == -1:
+            transformation = '['+transformation+']'
+        return TransformationTask(orig, transformation)
 
     def _read_true_false_statement(self, text):
         text = text.strip()
