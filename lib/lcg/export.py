@@ -106,30 +106,30 @@ class StaticExporter(Exporter):
         node.stylesheet(self._stylesheet)
         nav = self._navigation(node)
         meta = node.root_node().meta()
-        parts = (self.DOCTYPE, '',
-                 '<html>',
-                 '<head>',
-                 '  <title>%s</title>' % node.full_title(),
-                 tags('<meta name="%s" content="%s">', meta.items()),
-                 tags('<link rel="%s" href="%s" title="%s">',
-                      map(lambda a: (a[0], a[1].output_file(), a[1].title()),
-                          filter(lambda a: a[1] is not None,
-                              (('prev', node.prev()), ('next', node.next()))))),
-                 tags('<link rel="stylesheet" type="text/css" href="%s">',
-                      map(lambda s: s.url(), node.resources(Stylesheet))),
-                 tags('<script type="text/javacript" src="%s">',
-                      map(lambda s: s.url(), node.resources(Script))),
-                 '</head>',
-                 '<body>',
-                 nav, '<hr class="navigation">',
-                 '<a name="content" accesskey="%s"></a>' % 
-                 self._hotkey['content-beginning'],
-                 '<h1>%s</h1>' % node.title(),
-                 self._div('content', node.content().export()),
-                 self._toc(node),
-                 '<hr class="navigation">', nav,
-                 '</body></html>')
-        return "\n".join(parts)
+        c = (self.DOCTYPE, '',
+             '<html>',
+             '<head>',
+             '  <title>%s</title>' % node.full_title(),
+             tags('<meta name="%s" content="%s">', meta.items()),
+             tags('<link rel="%s" href="%s" title="%s">',
+                  map(lambda a: (a[0], a[1].output_file(), a[1].title()),
+                      filter(lambda a: a[1] is not None,
+                             (('prev', node.prev()), ('next', node.next()))))),
+             tags('<link rel="stylesheet" type="text/css" href="%s">',
+                  map(lambda s: s.url(), node.resources(Stylesheet))),
+             tags('<script language="Javascript" type="text/javacript"' + \
+                  ' src="%s">', map(lambda s: s.url(), node.resources(Script))),
+             '</head>',
+             '<body>',
+             nav, '<hr class="navigation">',
+             '<a name="content" accesskey="%s"></a>' % 
+             self._hotkey['content-beginning'],
+             '<h1>%s</h1>' % node.title(),
+             self._div('content', node.content().export()),
+             self._toc(node),
+             '<hr class="navigation">', nav,
+             '</body></html>')
+        return "\n".join(c)
 
     def _div(self, cls, *contents):
         return '\n'.join(('<div class="%s">' % cls,) + contents + ('</div>\n',))
