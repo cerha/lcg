@@ -928,16 +928,19 @@ class _InteractiveExercise(Exercise):
                      'incorrect-response-3.ogg': _("Try again!")}
 
     _FORM_HANDLER = 'Handler'
-    _MESSAGES = {};
+    _MESSAGES = {", $x ($y%) on first attempt":_(", $x ($y%) on first attempt")}
 
     _DISPLAYS = ((_('Answered:'), 'answered',
-                  _("Displays the number of the tasks you have already "
-                    "answered.  For example the value 4/10 means, that you "
-                    "have answered four out of ten questions.")),
+                  _("""Displays the number of the tasks you have already
+                    answered.  For example the value 4/10 means, that you have
+                    answered four out of ten questions.""")),
                  (_('Correct:'),  'result',
-                  _("Displays the number of correct answers.  Only the "
-                    "first attempt for each answer is taken into account.  "
-                    "Use the ``Reset'' button to start again.")))
+                  _("""Displays the number and percentage of successful
+                    answers.  The first pair of numbers shows the results of
+                    all current answers.  If you didn't answer all of them
+                    correctly on first attempt, there is also a second pair of
+                    numbers showing how many answers you did succesfully on the
+                    first try.  Use the ``Reset'' button to start again.""")))
 
     _BUTTONS = ((_('Fill'), button, "this.form.handler.fill()",
                  _("Fill in the whole exercise with correct answers.")),
@@ -988,8 +991,9 @@ class _ChoiceBasedExercise(_InteractiveExercise):
 
     _HELP = _("""You will hear a response immediately after choosing the
     answer.  When you decide for a wrong answer, you can try again until you
-    find the correct one, however the other attempts will not count into
-    results (see the [#display] section below).""")
+    find the correct one.  The results below the exercise will show you how
+    many answers you did right on the first try (see the [#display] section
+    below).""")
     
     def _answers(self):
         return [t.choice_index(t.correct_choice()) for t in self._tasks]
@@ -1040,9 +1044,9 @@ class Selections(_ChoiceBasedExercise):
     _TASK_TYPE = Selection
     _NAME = _("Select the Correct One")
     
-    _HELP = _("""There are several pairs of simmillar sentences, however one of
-    the sentences in each pair is always incorrect.  Your goal is to decide
-    which is the correct one.
+    _HELP = _("""There are several pairs of simmillar sentences, however one
+    sentence in each pair is always incorrect.  Your goal is to decide which is
+    the correct one.
 
     """) + _ChoiceBasedExercise._HELP
     
@@ -1124,7 +1128,7 @@ class _FillInExercise(_InteractiveExercise):
     _FORM_HANDLER = 'FillInExerciseHandler'
 
     _BUTTONS = ((_("Evaluate"), button, "this.form.handler.evaluate()",
-                 _("""Evaluate the entire exercise.  If an error is found the
+                 _("""Evaluate the entire exercise.  If an error is found, the
                  cursor is moved to the first incorrect answer (and to the
                  first incorrect character within this answer, when some part
                  of the answer is correct).""")),
@@ -1136,16 +1140,17 @@ class _FillInExercise(_InteractiveExercise):
               cursor is moved to the position of the first incorrect character
               within the text.""")),
              (_("Ctrl-Space"),
+              
               _("""If you don't know the answer, you can also use the ``hint''
-              feature.  Just press the *''* key combination (holding the Ctrl
-              key, press the spacebar) and one letter of the correct answer
-              will be filled in automatically.  If you have already entered
-              some text, the cursor will be moved behind the last correct
-              character and next one will be inserted.  It also means, that if
-              there is some text behind the cursor, there is at least one error
-              in it.  Try to locate this error and correct it.  Then you can
-              try to evaluate your answer using the 'Enter' key (see above) or
-              use the ``hint'' again, until you find the correct answer.""")))
+              feature.  Just press the key combination (holding the Ctrl key,
+              press the spacebar) and one letter of the correct answer will be
+              filled in automatically.  If you have already entered some text,
+              the cursor will be moved behind the last correct character and
+              next one will be inserted.  It also means, that if there is some
+              text behind the cursor, there is at least one error in it.  Try
+              to locate this error and correct it.  Then you can try to
+              evaluate your answer using the 'Enter' key (see above) or use
+              ``hint'' again, until you find the correct answer.""")))
 
     _HELP = _("""Use the buttons at the bottom of the exercise to evaluate all
     the answers.  You can also check each answer individually using the
@@ -1256,6 +1261,7 @@ class Dictation(_FillInExercise):
     _RECORDING_REQUIRED = True
     _MESSAGES = {'Correct': _('Correct'),
                  'Error(s) found': _('Error(s) found')}
+    _MESSAGES.update(_FillInExercise._MESSAGES)
 
     _DISPLAYS = ((_('Result:'), 'result',
                   _("""Displays the result of the last evaluation (evaluate
