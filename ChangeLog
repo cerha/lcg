@@ -4,7 +4,7 @@
 
 	* lcg/__init__.py: Import also the  modules `export' a `ims'.
 
-	* lcg/course.py: Module docstring updated.	
+	* lcg/course.py: Module docstring updated.
 	(ContentNode): Docstring updated.
 	(ContentNode._export): Method removed.
 	(full_title): Method removed.
@@ -14,13 +14,42 @@
 	(_export): Method removed.
 	(Media._source_file): Renamed to `source_file()'.
 	(Media._destination_file): Renamed to `destination_file()'.
-	(Media.__init__, Media.url):  Honour the change above.
+	(Media.__init__, Media.url): Honour the change above.
 	(Media.export): Method removed.
+	(ContentNode.__str__): Report `subdir' instead of `src_dir'.
+	(ContentNode.__str__): Use
+	(ContentNode.linear): New method.
+	(ContentNode.next): New method.
+	(ContentNode.prev): New method.
+	(ContentNode.subdir): New method.
+	(ContentNode.dst_dir): Method removed.
+	(ContentNode.src_dir): Construct the path out of root nodes
+	`src_dir' and the `subdir'.
+	(ContentNode.id): Make the id out of name and `subdir'.
+	(ContentNode.full_title): New method.
+	(ContentNode.meta): New method.
+	(Course.output_file): Don't use `self.dst_path()'.
+	(Media.shared_directory): Renamed to `SUBDIRECTORY'.
+	(Media.source_file): `self.shared_directory' ->
+	`self.SUBDIRECTORY'.
+	(Media.destination_file): Put all media files into one directory,
+	with a subdirectory for each node.
+	(EurochanceCourse._create_children): New method.
 
 	* lcg/ims.py (Manifest): Renamed to `_Manifest'. 
 	(IMSExporter): New class.
 
 	* lcg/export.py (Module): New module.
+	(Exporter._full_title): Method removed.
+	(Exporter._export_node): Put all files into the same directory.
+	(Exporter._wrap_content): Use `node.full_title()' instead of
+	`self._full_title()'.
+	(Exporter._export_media): Don't take the `dir' argument.  Use
+	`self._dir' instead.
+	(StaticExporter._wrap_content): Print the doctype, meta
+	information, title header and navigation.
+	(StaticExporter._wrap_content): New method.
+	(StaticExporter._wrap_content): New method.
 
 2004-06-25  Tomas Cerha  <cerha@brailcom.org>
 
