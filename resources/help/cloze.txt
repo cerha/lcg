@@ -1,0 +1,26 @@
+The recording here is the first or second half of the listening text in
+Exercise 1.  You can listen to it either before or after doing the exercise, or
+both, in order to hear the human pronunciation and intonation again.
+
+Your goal in this exercise is to fill in the gaps in the text using
+exactly the same words as you've heard in the recording.
+
+After filling all the gaps, check your results using the buttons below the
+text.  The evaluate button moves the cursor to the first incorrect answer, if
+an error is found (and the cursor is moved to the first incorrect character, in
+case that some part of the answer is correct).
+
+== Shortcut keys == keys
+
+Press the *'Enter'* key within the text-field and the answer will be evaluated.
+You hear a sound response and in case of an error, the cursor is moved to the
+position of the first incorrect character within the text.
+
+If you don't know the answer, you can also use the ``hint'' feature.  Just
+press the *'Ctrl-Space'* key combination (holding the Ctrl key, press the
+spacebar) and one letter of the correct answer will be filled in automatically.
+If you have already entered some text, the cursor will be moved behind the last
+correct character and next one will be inserted.  After using the hint, you can
+think once more what the correct answer is.  You will probably do some more
+editing and try to evaluate or use the hint again, until you find the correct
+answer.
