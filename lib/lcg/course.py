@@ -18,14 +18,17 @@
 
 """Course abstraction for Learning Content Generator.
 
-This module includes classes used as an abstraction of a language course.  Each
-course consists of lessons.  Lessons have a regular structure of sections.
+This module includes classes used as an abstraction of a course structure based
+on a tree structure with nodes capable of reading their content from input
+resources (either directly from files or using helper 'Feeder' classes),
+exporting themselves into HTML and giving some information about themselves.
+This information is then used to build the IMS manifest for the generated
+content package (implemented by the top-level 'Course' node).
 
-All these classes make a tree structure with nodes capable of reading their
-content from input resources (either directly from files or using helper
-'Feeder' classes), exporting themselves into HTML and giving some information
-about themselves.  This information is then used to build the IMS manifest for
-the generated content package.
+In the second part of this module there are several derived classes which
+define a concrete implementation of the language course for Eurochance project.
+Any other course structure is possible by proper implementation of derived
+classes.
 
 """
 
@@ -41,10 +44,10 @@ from feed import *
 class ContentNode(object):
     """Representation of one output document within a course material.
 
-    This class represents a generic node of a course material capable of IMS
-    export.  The derived classes defined below define a concrete implementation
-    of the language course for Eurochance project.  Any other course structure
-    is possible by proper implementation of derived classes.
+    This class represents a generic node of a course material capable of
+    exporting all its content into one HTML document (and corresponding 'Media'
+    files it depends on).  All the subsequent nodes are also exported
+    recursively.
 
     """
     
@@ -61,12 +64,27 @@ class ContentNode(object):
             directory of the parent node).
 
         """
+        assert parent is None or isinstance(parent, ContentNode)
+        assert type(subdir) == type('')
         self._parent = parent
         self._subdir = subdir
         self._media = {}
         self._counter = Counter(1)
         self._content = self._create_content()
-        self._children = self._create_children()
+        assert isinstance(self._content, Content)
+        self._children = []
+        children = self._create_children()
+        for child in children:
+            assert child._parent == self
+            assert child in self._children
+        if parent is not None:
+            parent._register_child(self)
+
+        
+    def _register_child(self, child):
+        assert isinstance(child, ContentNode)
+        assert child not in self._children
+        self._children.append(child)
         
     def __str__(self):
         return "<%s title='%s' id='%s' src_dir='%s' output_file='%s'>" % \
@@ -74,11 +92,21 @@ class ContentNode(object):
                 self.src_dir(), self.output_file())
 
     def _create_content(self):
-        """Create the content for this node as a 'Content' instance."""
+        """Create the content for this node as a 'Content' instance.
+
+        This method should be overriden in derived classes to create the actual
+        content displayed when this node is selected.
+
+        """
         return Content(self)
     
     def _create_children(self):
-        """Create any descendant nodes and return them in a sequence."""
+        """Create any descendant nodes and return them in a sequence.
+
+        This method should be overriden in derived classes which represent an
+        inner node of the content tree.
+
+        """
         return ()
         
     def _read_resource(self, name):
@@ -242,7 +270,16 @@ class NumberedNode(InnerNode):
 
     
 class Course(InnerNode):
-    """The course is a root node of the actual IMS package."""
+    """The course is a root node of the actual IMS package.
+
+    This class exports the entire course (all the subsequent nodes) to HTML and
+    builds an IMS manifest file, so that an IMS package can be made out of a
+    course.
+
+    You still need to override the '_create_children()' method to get some
+    sub-content into the course.
+    
+    """
     
     def __init__(self, dir):
         self._dir = dir
