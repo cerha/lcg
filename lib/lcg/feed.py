@@ -70,28 +70,22 @@ class Feeder(object):
 class FileFeeder(Feeder):
     """Generic Feeder reading its data from an input file."""
     
-    def __init__(self, dir, file, *args, **kwargs):
+    def __init__(self, filename, *args, **kwargs):
         """Initialize the Feeder.
 
         Arguments:
 
-          dir -- the source directory
           file -- the source file name
 
           All the remaining arguments are inherited from parent class.
 
         """
         super(FileFeeder, self).__init__(*args, **kwargs)
-        self._dir = dir
-        self._file = file
-        assert os.path.exists(self._input_file()), \
-               "File does not exest: " + self._input_file()
+        assert os.path.exists(filename), "File does not exest: " + filename
+        self._filename = filename
 
-    def _input_file(self):
-        return os.path.join(self._dir, self._file)
-    
     def _current_input_position(self):
-        return "File %s" % self._input_file()
+        return "File %s" % self._filename
 
 
 class SplittableTextFeeder(Feeder):
@@ -134,23 +128,20 @@ class PySpecFeeder(FileFeeder):
     The mechanism is based on calling a function 'content()' in the
     specification file.  This function must return a 'Content' instance.
 
-    The specification file is in fact a Python module.  The name given as
-    constructor argument 'file' must not contain the '.py' extension.
-
     """
-    
-    def _input_file(self):
-        return super(PySpecFeeder, self)._input_file() + '.py'
 
     def _get_module(self):
         module = file = None
+        dirname, filename = os.path.split(self._filename)
+        modulename, ext = os.path.splitext(filename)
+        assert ext.lower() == '.py'
         try:
             try:
-                file, path, descr = imp.find_module(self._file, [self._dir])
-                module = imp.load_module(self._file, file, path, descr)
+                file, path, descr = imp.find_module(modulename, [dirname])
+                module = imp.load_module(modulename, file, path, descr)
             except ImportError, e:
-                msg = "Unable to load specification file '%s':" % self._file
-                raise PySpecFeederError(msg, self._dir, str(e))
+                msg = "Unable to load specification file '%s':" % self._filename
+                raise PySpecFeederError(msg, dirname, str(e))
         finally:
             if file is not None:
                 file.close()
@@ -172,7 +163,7 @@ class ExcelVocabFeeder(FileFeeder):
     
     def feed(self, parent):
         
-        command = 'xls2csv -q0 -c\| %s' % self._input_file()
+        command = 'xls2csv -q0 -c\| %s' % self._filename
         status, output = commands.getstatusoutput(command)
         if status: raise Exception(output)
         encoding = self._ENCODING.get(parent.language(), 'iso-8859-1')
