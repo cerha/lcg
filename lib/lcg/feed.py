@@ -29,6 +29,7 @@ import os
 import commands
 import string
 import traceback
+import codecs
 
 import imp
 import util
@@ -39,17 +40,19 @@ from content import *
 class Feeder(object):
     """Generic Feeder"""
     
-    def __init__(self, dir, file):
+    def __init__(self, dir, file, encoding='ascii'):
         """Initialize the Feeder.
 
         Arguments:
 
-          dir -- the sourse directory
+          dir -- the source directory
           file -- the source file name
+          encoding -- the source file encoding
 
         """
         self._dir = dir
         self._file = file
+        self._encoding = encoding
         assert os.path.exists(self._input_file()), \
                "File does not exest: " + self._input_file()
 
@@ -103,30 +106,34 @@ class PySpecFeeder(Feeder):
     
 
 class ExcelVocabFeeder(Feeder):
-    """Vocabulary Feeder reading data from XLS file."""
+    """Vocabulary Feeder reading data from an XLS file."""
     
-    _LANGUAGE_ORDER = ['cs', 'sk', 'de', 'no', 'es']
-    _CHARSET = {'cs': 'iso-8859-2',
-                'sk': 'iso-8859-2',
-                'de': 'iso-8859-1',
-                'no': 'iso-8859-1',
-                'es': 'iso-8859-1'}
+    _TRANSLATION_ORDER = [('en', 'iso-8859-1'),
+                          ('de', 'iso-8859-1'),
+                          ('cs', 'iso-8859-2'),
+                          ('es', 'iso-8859-1'),
+                          ('no', 'iso-8859-1'),
+                          ('sk', 'iso-8859-2')]
     
     def feed(self, parent):
-        assert parent.lang() in self._LANGUAGE_ORDER
         command = 'xls2csv -q0 -c\| %s' % self._input_file()
         status, output = commands.getstatusoutput(command)
         if status: raise Exception(output)
+        lang = 'cs' # TODO: pass from somewhere...
+        languages = [lang for lang, encoding in self._TRANSLATION_ORDER]
+        translation_index = languages.index(lang)
+        translation_encoding = self._TRANSLATION_ORDER[translation_index][1]
         items = []
         for line in output.splitlines():
             col = map(string.strip, line.split('|')[0:4])
-            word = col[0]
-            note = len(col) > 1 and col[1] or ''
+            word = unicode(col[0], encoding=self._encoding)
+            note = unicode(len(col) > 1 and col[1] or '',
+                           encoding=self._encoding)
             try:
-                t = col[self._LANGUAGE_ORDER.index(parent.lang()) + 2]
-                trans = unicode(t, self._CHARSET[parent.lang()])
+                t = col[translation_index + 2]
+                trans = unicode(t, translation_encoding)
             except IndexError:
-                trans = '???'
+                trans = u'???'
                 #print 'No translation for "%s"!' % word
             name = re.sub('[^a-zA-Z0-9-]', '', word.replace(' ', '-'))
             media_file = os.path.join('vocabulary', name + '.ogg')
@@ -139,21 +146,22 @@ class ExcelVocabFeeder(Feeder):
 class ExerciseFeeder(Feeder):
     """Exercise Feeder reading data from a plain text file."""
 
-    _splitter_matcher = re.compile(r"\r?\n----+\s*\r?\n")
-    _blank_line_matcher = re.compile(r"\r?\n\s*\r?\n")
-    _header_matcher = re.compile(r"^(?P<key>[a-z0-9_]+): (?P<value>.*)$")
+    _SPLITTER_MATCHER = re.compile(r"\r?\n----+\s*\r?\n")
+    _BLANK_LINE_MATCHER = re.compile(r"\r?\n\s*\r?\n")
+    _HEADER_MATCHER = re.compile(r"^(?P<key>[a-z0-9_]+): (?P<value>.*)$")
         
     def feed(self, parent):
-        contents = ''.join(open(self._input_file()).readlines())
-        text = SplittableText(contents)
-        return Container(parent,
-                         map(lambda piece: self._exercise(parent, piece),
-                             text.split(self._splitter_matcher)))
+        fh = codecs.open(self._input_file(), encoding=self._encoding)
+        text = SplittableText(''.join(fh.readlines()))
+        fh.close()
+        exercises = [self._exercise(parent, piece)
+                     for piece in text.split(self._SPLITTER_MATCHER)]
+        return Container(parent, exercises)
 
     def _exercise(self, parent, text):
         """Convert textual exercise specification into an Exercise instance."""
         try:
-            pieces = text.split(self._blank_line_matcher)
+            pieces = text.split(self._BLANK_LINE_MATCHER)
             assert len(pieces) >= 2, \
                    "Exercise must comprise a header and at least one task."
             type, kwargs = self._read_header(pieces[0])
@@ -180,7 +188,7 @@ class ExerciseFeeder(Feeder):
         """
         info = {}
         for line in str(text).splitlines():
-            match = self._header_matcher.match(line)
+            match = self._HEADER_MATCHER.match(line)
             assert match, "Invalid exercise header syntax."
             info[match.group('key')] = match.group('value')
         try:
@@ -205,7 +213,7 @@ class ExerciseFeeder(Feeder):
             TrueFalseStatement:     self._read_true_false_statement,
             }[type]
         try:
-            return method(str(text))
+            return method(unicode(text))
         except:
             m = "Exception caught while processing task specification:\n" +\
                 '  File "%s", line %d\n' %(self._input_file(), text.firstline())
