@@ -1,3 +1,74 @@
+2005-01-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/feed.py: Docstring updated.  Don't import `unicodedata'.
+	(Feeder.__init__): Arguments `file' a `dir' removed.  The
+	`encoding' argument renamed to `input_encoding'.  Docstring added.
+	(FileFeeder): New class.
+	(SplittableTextFeeder): New class.
+	(PySpecFeeder): Docstring updated.
+	(ExcelVocabFeeder): Derive from `FileFeeder'.
+	(ExcelVocabFeeder.feed): Don't create the `Media' instance here
+	and don't pass it to `VocabItem' constructor.  Return the items as
+	a sequence.  Don't wrap them.
+	(ExcelVocabFeeder.feed.safe_char): Removed.
+	(ExerciseFeeder): Derive from `SplittableTextFeeder'.
+	(ExerciseFeeder._EXERCISE_MATCHER)
+	(ExerciseFeeder._BLANK_LINE_MATCHER): Renamed to
+	`ExerciseFeeder._EXERCISE_SPLITTER' and
+	`ExerciseFeeder._BLANK_LINE_SPLITTER'
+	(ExerciseFeeder.feed): Don't read the input file.  Take the source
+	text from the constructor argument /from `SplittableTextFeeder'/.
+	Don't wrap the exercises into a `Container'.  Return them as a
+	sequence.
+	(ExerciseFeeder._panic): New method.
+	(ExerciseFeeder._exercise): `self._BLANK_LINE_MATCHER' ->
+	`self._BLANK_LINE_SPLITTER'.
+	(ExerciseFeeder._exercise): Use the new `_panic()' method.
+	(ExerciseFeeder._read_task): Use the new `_panic()' method.
+
+	* lcg/course.py: Docstring updated.
+	(ContentNode): Docstring updated.
+	(ContentNode.__init__): Make the `subdir' argument a kayword
+	argument which defaults to 'None'.
+	(ContentNode._create_child): New method.
+	(ContentNode._id): Comment transformed to a docstring.
+	(ContentNode._id): Split the CamalCase names with dashes.
+	(ContentNode.subdir): Return parents `subdir()' when
+	`self._subdir' is None.
+	(Resource, Media, Script, Stylesheet): Moved from here to the
+	`content' module.
+	(Use): Class removed.
+	(Vocabulary._create_content): Pass correct arguments to the
+	feeder.  Wrap feered output to a `VocabList'.
+	(Vocabulary.items): New method.
+	(Grammar._TITLE): Changed.
+	(VocabularyPractice, ExerciseNode, ListeningComprehension) 
+	(GrammarPractice, Consolidation): New classes.
+	(Unit._create_children): Completely rewritten.
+	(EurochanceCourse._create_children): Use `_create_child()'.
+
+	* lcg/content.py (VocabItem._DIACRITICS_MATCHER)
+	(VocabItem._DANGER_CHAR_MATCHER): New constants. 
+	(VocabItem.__init__): Argument `media' removed.  Create the
+	`Media' instance here.
+	(VocabItem.word): New method.
+	(VocabItem.word): New method.
+	(Exercise.__init__): When `transcript' not defined, make it out of
+	`sound_file' filename.
+	(VocabExercise): New class.
+	(VocabExercise): New class.
+	(Resource, Media, Script, Stylesheet): Moved here from the
+	`course' module.
+
+	* lcg/util.py (SplittableText.__init__): New argument `input_file'.
+	(SplittableText): Documentation updated.
+	(SplittableText.__init__): New argument `input_file'.  Docstring added.
+	(SplittableText.input_file): New method.
+	(SplittableText._create_piece): Pass the `input_file' to the
+	constructor and use keyed arguments.
+
+	* lcg/export.py: Import everything from `content'.
+
 2004-12-18  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile (en de): Added some preprocessing of wrong unicode files.
