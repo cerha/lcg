@@ -34,7 +34,7 @@
 	(Cloze.__init__, _ChoiceBasedExercise._answer_control): Use
 	`ContentNode.resource()' instead of `ContentNode.media()' and
 	`ContentNode.script()'.
-	
+	(VocabList.__init__): Allocate the `audio.js' script.
 
 	* lcg/resources.py (Module): New module.  
 	(Resource, Media, Script, Stylesheet): Moved here from the
