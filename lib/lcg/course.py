@@ -504,6 +504,10 @@ class DocNode(_WikiNode):
         self._ext = ext[1:]
         super(DocNode, self).__init__(parent, dir, **kwargs)
 
+    def _id(self):
+        return self._file
+        
+        
     def _source_text(self):
         return self._read_file(self._file, ext=self._ext)
                
@@ -546,7 +550,7 @@ class DocMaker(RootNode):
     
     def _create_content(self):
         return [TableOfContents(self, item=self, title=_("Table of Contents:"),
-                                depth=99)]
+                                depth=2)]
                          
     def _create_children(self):
         d = self.src_dir()
