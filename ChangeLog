@@ -1,5 +1,8 @@
 2005-03-16  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/scripts/exercises.js (DictationHandler._eval_field):
+	New method.
+
 	* lcg/eurochance.py (ExerciseInstructions.__init__): Argument
 	`exercise_class' renamed to `type'
 	(ExerciseInstructions._create_content): Use the class method
