@@ -111,7 +111,7 @@ class ContentNode(object):
         
     def _read_resource(self, name):
         """Return all the text read from the resource file."""
-        filename = os.path.join(self.src_dir(), '.'.join((name, 'en', 'txt')))
+        filename = os.path.join(self.src_dir(), name+'.txt')
         return ''.join(open(filename).readlines())
 
     def _export(self, dir):
@@ -263,7 +263,8 @@ class NumberedNode(InnerNode):
     def __init__(self, parent, subdir, number):
         self._number = number
         super(NumberedNode, self).__init__(parent, subdir)
-        
+
+
     def title(self):
         return "%s %d: %s" % (self.__class__.__name__, self._number,
                               self._read_resource('title'))
@@ -379,23 +380,6 @@ class Media(object):
 ################################################################################
  
 
-class Unit(NumberedNode):
-    """Unit is a collection of sections (Vocabulary, ."""
-    
-    def _create_children(self):
-        return map(lambda s: s(self, ''),
-                   (Vocabulary, Use, Grammar, Exercises, Consolidation))
-
-    
-class Module(NumberedNode):
-    """Module is a collection of 'Unit' instances."""
-
-    def _create_children(self):
-        c = Counter(1)
-        return map(lambda subdir: Unit(self, subdir, c.next()),
-                   list_subdirs(self.src_dir()))
-
-
 class Vocabulary(ContentNode):
     """A section comprising a list of vocabulary."""
 
@@ -415,28 +399,32 @@ class Grammar(TextNode):
     pass
 
 
-class Consolidation(TextNode):
-    """A check list of competences achieved."""
-    pass
-
-
 class Exercises(ContentNode):
     """A section consisting of a sequence of exercises."""
 
     def _create_content(self):
-        try:
-            return PySpecFeeder(self.src_dir(), 'exercises').feed(self)
-        except PySpecFeederError, e:
-            print ' '.join(e.args)
-            return Content(self)
-    
+        return ExerciseFeeder(self.src_dir(), 'exercises.txt').feed(self)
 
+
+class Consolidation(TextNode):
+    """A check list of competences achieved."""
+    pass
+
+        
+class Unit(NumberedNode):
+    """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
+    
+    def _create_children(self):
+        subdir = { Exercises: 'exercises' }
+        return map(lambda s: s(self, subdir.get(s, '')),
+                   (Vocabulary, Use, Grammar, Exercises, Consolidation))
+
+    
 class EurochanceCourse(Course):
-    """The course is a root node which comprises a set of 'Module' instances."""
+    """The course is a root node which comprises a set of 'Unit' instances."""
 
     def _create_children(self):
         c = Counter(1)
-        return map(lambda subdir: Module(self, subdir, c.next()),
+        return map(lambda subdir: Unit(self, subdir, c.next()),
                    filter(lambda d: d not in('media'),
                           list_subdirs(self.src_dir())))
-
