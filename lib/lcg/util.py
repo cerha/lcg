@@ -134,3 +134,11 @@ def is_sequence_of(seq, cls):
             return False
     return True
 
+def copy_stream(input, output):
+    """Kopíruj data ze streamu 'input' do streamu 'output'."""
+    while True:
+        data = input.read(4096)
+        if not data:
+            break
+        output.write(data)
+              
