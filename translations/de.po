@@ -1,12 +1,12 @@
 # Translations for the LCG (http://eurochance.brailcom.org).
-# Copyright (C) 2004, Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, Brailcom, o.p.s.
 # Tomas Cerha <cerha@brailcom.org>, 2004.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-15 14:20+0100\n"
+"POT-Creation-Date: 2005-02-15 16:12+0100\n"
 "PO-Revision-Date: 2004-12-08 19:25+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -14,115 +14,247 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: lcg/content.py:278
+#: ../lcg/content.py:136
+msgid "Index:"
+msgstr "Lektionsverzeichnis:"
+
+#: ../lcg/content.py:445
 msgid "TRUE"
 msgstr "RICHTIG"
 
-#: lcg/content.py:278
+#: ../lcg/content.py:445
 msgid "FALSE"
 msgstr "FALSCH"
 
-#: lcg/content.py:378
+#: ../lcg/content.py:492
+msgid "This exercise can be also done purely aurally/orally"
+msgstr ""
+
+#: ../lcg/content.py:520
 msgid "Exercise"
 msgstr "Übung"
 
-#: lcg/content.py:389 lcg/content.py:393
-msgid "Recording"
-msgstr "Aufnahme"
+#: ../lcg/content.py:595
+msgid "show transcript"
+msgstr ""
 
-#: lcg/content.py:390
+#: ../lcg/content.py:600 ../lcg/content.py:603
 msgid "Play"
 msgstr "Wiedergabe"
 
-#: lcg/content.py:391
+#: ../lcg/content.py:601
 msgid "Stop"
 msgstr "Stop"
 
-#: lcg/content.py:408
-msgid "Cloze"
-msgstr "Lückentext"
+#: ../lcg/content.py:610
+msgid "detailed instructions"
+msgstr ""
 
-#: lcg/content.py:464
-msgid "Correct"
-msgstr "Richtig"
+#: ../lcg/content.py:614
+msgid "Recording"
+msgstr "Aufnahme"
 
-#: lcg/content.py:467
-msgid "You are wrong!"
-msgstr "Das ist falsch!"
-
-#: lcg/content.py:504
-msgid "True/False Statements"
-msgstr "Richtig/Falsch Aussagen"
-
-#: lcg/content.py:520
-msgid "Multiple Choice Questions"
-msgstr "Auswahlfragebogen"
-
-#: lcg/content.py:532
-msgid "Select the Correct One"
-msgstr "Wählen Sie das Richtige aus"
-
-#: lcg/content.py:543
-msgid "Gap Filling"
-msgstr "Lückentext"
-
-#: lcg/content.py:553
+#: ../lcg/content.py:635
 msgid "Sentence Completion"
 msgstr "Satzergänzung"
 
-#: lcg/content.py:566
+#: ../lcg/content.py:637
+#, fuzzy
+msgid "The exercise"
+msgstr "Übung"
+
+#: ../lcg/content.py:641
+msgid ""
+"This exercise can be only done purely aurally/orally.  You\n"
+"        will hear some of the sentences from the previous exercise "
+"unfinished\n"
+"        and your goal is to say the missing part."
+msgstr ""
+
+#: ../lcg/content.py:687
+msgid "Cloze"
+msgstr "Lückentext"
+
+#: ../lcg/content.py:696
+msgid ""
+"Listen to the recording carefully and then fill in the\n"
+"            gaps in the text below using the same words."
+msgstr ""
+
+#: ../lcg/content.py:699
+msgid ""
+"Fill in the gaps in the text below.  There is just one\n"
+"            correct word for each gap."
+msgstr ""
+
+#: ../lcg/content.py:712
+msgid "Correct"
+msgstr "Richtig"
+
+#: ../lcg/content.py:716
+msgid "You are wrong!"
+msgstr "Das ist falsch!"
+
+#: ../lcg/content.py:752
+msgid "True/False Statements"
+msgstr "Richtig/Falsch Aussagen"
+
+#: ../lcg/content.py:756
+#, python-format
+msgid ""
+"For each of the %d statements below indicate whether you\n"
+"        think they are true or false."
+msgstr ""
+
+#: ../lcg/content.py:767
+msgid "Multiple Choice Questions"
+msgstr "Auswahlfragebogen"
+
+#: ../lcg/content.py:770
+#, python-format
+msgid ""
+"For each of the %d questions below choose the correct\n"
+"        answer from the list."
+msgstr ""
+
+#: ../lcg/content.py:778
+msgid "Select the Correct One"
+msgstr "Wählen Sie das Richtige aus"
+
+#: ../lcg/content.py:781
+#, python-format
+msgid ""
+"For each of the %d pairs of statements below decide which\n"
+"        one is correct."
+msgstr ""
+
+#: ../lcg/content.py:789
+msgid "Gap Filling"
+msgstr "Lückentext"
+
+#: ../lcg/content.py:792
+#, python-format
+msgid ""
+"For each of the %d sentences below choose the correct piece\n"
+"        of text from the list to fill in the gap."
+msgstr ""
+
+#: ../lcg/content.py:797 ../lcg/course.py:452
+#, fuzzy
+msgid "Vocabulary Practice"
+msgstr "Vokabeln"
+
+#: ../lcg/content.py:800
+msgid ""
+"You will hear a word or expression in your language.  Say\n"
+"        it in English and listen to the model pronunciation."
+msgstr ""
+
+#: ../lcg/content.py:811
 msgid "Transformation"
 msgstr "Übersetzung"
 
-#: lcg/course.py:52
+#: ../lcg/content.py:814
+#, python-format
+msgid ""
+"Listen to the recording and transform each of the %d\n"
+"        sentences below according to the instructions."
+msgstr ""
+
+#: ../lcg/content.py:825
+msgid "Substitution"
+msgstr ""
+
+#: ../lcg/content.py:829
+msgid ""
+"Substitute a part of each sentence using the text in\n"
+"        brackets."
+msgstr ""
+
+#: ../lcg/content.py:833
+msgid "Dictation"
+msgstr ""
+
+#: ../lcg/course.py:56
 msgid "Node"
 msgstr ""
 
-#: lcg/course.py:58
-msgid "Node Index"
+#: ../lcg/course.py:395
+msgid "Table of Contents:"
+msgstr "Inhaltsverzeichnis:"
+
+#: ../lcg/course.py:424
+#, python-format
+msgid "Unit %d"
+msgstr "Lektion %d"
+
+#: ../lcg/course.py:433
+msgid "Aims and Objectives"
 msgstr ""
 
-#: lcg/course.py:598
+#: ../lcg/course.py:435
 msgid "Vocabulary"
 msgstr "Vokabeln"
 
-#: lcg/course.py:608
-msgid "Key Language Use"
-msgstr "Verwendung der wichtigen Sprache"
-
-#: lcg/course.py:614
-msgid "Key Grammar"
+#: ../lcg/course.py:437
+msgid "Grammar"
 msgstr "Wichtigsten grammatikalischen Formen"
 
-#: lcg/course.py:620
+#: ../lcg/course.py:439
 msgid "Exercises"
 msgstr "Übungen"
 
-#: lcg/course.py:630
-msgid "Summary"
+#: ../lcg/course.py:441
+msgid "Checklist"
 msgstr ""
 
-#: lcg/course.py:635
-msgid "Unit"
-msgstr "Lektion"
+#: ../lcg/course.py:453
+msgid "Listening Comprehension"
+msgstr ""
 
-#: lcg/course.py:636
-msgid "Unit Index"
-msgstr "Lektionsverzeichnis"
+#: ../lcg/course.py:454
+msgid "General Comprehension"
+msgstr ""
 
-#: lcg/export.py:125
+#: ../lcg/course.py:455
+msgid "Grammar Practice"
+msgstr ""
+
+#: ../lcg/course.py:456
+msgid "Consolidation"
+msgstr ""
+
+#: ../lcg/course.py:458
+#, python-format
+msgid "Section %d"
+msgstr ""
+
+#: ../lcg/course.py:466
+msgid "General Course Instructions"
+msgstr ""
+
+#: ../lcg/course.py:496
+#, python-format
+msgid "Instructions for %s"
+msgstr ""
+
+#: ../lcg/course.py:506
+#, fuzzy
+msgid "Detailed Course Index"
+msgstr "Kursindex"
+
+#: ../lcg/export.py:121
 msgid "Next"
 msgstr "Nächste"
 
-#: lcg/export.py:126
+#: ../lcg/export.py:122
 msgid "Previous"
 msgstr "Vorhergehend"
 
-#: lcg/export.py:132
+#: ../lcg/export.py:126
+msgid "Up"
+msgstr ""
+
+#: ../lcg/export.py:127
 msgid "Course Index"
 msgstr "Kursindex"
-
-#: lcg/export.py:139
-msgid "Table of Contents"
-msgstr "Inhaltsverzeichnis"
-
