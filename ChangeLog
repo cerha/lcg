@@ -1,3 +1,31 @@
+2005-01-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/util.py (camel_case_to_lower): New function.
+
+	* lcg/export.py (StaticExporter._toc): Use
+	`ContentNode.has_index()' instead of testing node class.
+
+	* lcg/course.py (ContentNode.__init__): Store the children in the
+	order as returned by `_create_children()', not as registered.
+	(ContentNode._register_child): Append registered children to
+	`self._registered_children', not `self._children'.
+	(ContentNode._id): Use `camel_case_to_lower()'.
+	(ContentNode.has_index, InnerNode.has_index, RootNode.has_index):
+	New method.
+	(Unit._id, Unit.title): Don't add one to the index.
+	(ExerciseInstructions): New class.
+	(Instructions): New class.
+	(EurochanceCourse._create_children): Add `Instructions' as a first
+	node.
+
+	* lcg/content.py (Exercise._used_types): New class variable.
+	(Exercise.__init__): Append the exercise class to
+	`Exercise._used_types' if it is not already there.
+	(Exercise.task_type): Cosmetical changes.
+	(Exercise.task_type, Exercise.name, Exercise.id) 
+	(Exercise.used_types): New methods.
+	(Dictation._NAME): New constant.
+
 2005-01-06  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/export.py: Import everything from `resources' instead of
