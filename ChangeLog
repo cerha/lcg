@@ -1,3 +1,72 @@
+2005-02-21  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (GapFillStatement.__init__): Overriden.
+	(GapFillStatement._REGEXP): New constant.
+	(GapFillStatement.substitute_gap): New method.
+	(Exercise._form): Method removed.
+	(Exercise._sound_controls)
+	(Exercise._export_instructions): Use `_html.p()'.
+	(SentenceCompletion._TASK_TYPE): Set to `None'.
+	(SentenceCompletion._export_task): Removed.
+	(_InteractiveExercise): Docstring added.
+	(_InteractiveExercise.__init__): Allocate the script 'audio.js'.
+	(_InteractiveExercise._js_array): Removed.
+	(_InteractiveExercise._response): New method.
+	(_InteractiveExercise._init_script): Don't use `self._form()' and
+	`self._js_array()'.  Use `html.js_array()', `html.js_dict()'.
+	(_ChoiceBasedExercise._answer_control): Method removed.
+	(_ChoiceBasedExercise._non_js_choice_control)
+	(_ChoiceBasedExercise._js_choice_control): New methods.
+	(_ChoiceBasedExercise._format_choice): Use them instead of
+	`self._answer_control()'.  Put the control behind the answer text.
+	(_ChoiceBasedExercise._format_choices): New method.
+	(_ChoiceBasedExercise._export_task): Use it.
+	(_SelectBasedExercise): New class.
+	(GapFilling, TrueFalseStatements): Derive from
+	`_SelectBasedExercise', not `_ChoiceBasedExercise'.
+	(GapFilling._export_task): Overriden.
+	(Transformation._export_task, _FillInExercise._export_task): Use
+	`html.p()'
+	(Cloze, VocabExercise, Transformation, Substitution, Dictation):
+	Docstring updated.
+	(Dictation._RECORDING_REQUIRED): Set to `True'.
+
+	* lcg/_html.py: Import all from `util'.
+	(_attr): Cosmetic improvement.
+	(_tag): New function.
+	(p): New function.
+	(div): Use `types.ListType' and `types.TupleType' to decide.
+	(radio): Make `handler' a keyword argument.
+	(select): New function.
+	(js_value, js_array, js_dict): New functions.
+	(div): Use `_tag()'.  Make `cls' a keyword argument.
+	(link): Use `_tag()'.
+
+	* lcg/feed.py (ExerciseFeeder._read_gap_fill_statement): Don't
+	check for the gaps here.
+
+	* resources/scripts/exercises.js:
+	(ChoiceBasedExerciseHandler._init_fields)
+	(FillInExerciseHandler._init_fields): Removed.
+	(Handler.init): Instead of `this._init_fields()', call
+	`this._init_field()' for each recognized field.  Create the
+	`this._fields' array here.
+	(Handler._eval_answer): Define `i' before the if/else block.
+	(Handler.fill): New method.
+	(Handler.set_field): New method.
+	(ChoiceBasedExerciseHandler.prototype._init_fields)
+	(FillInExerciseHandler._init_fields): Removed.
+	(ChoiceBasedExerciseHandler._recognize_field)
+	(FillInExerciseHandler._recognize_field): New methods.
+	(ChoiceBasedExerciseHandler._init_field)
+	(FillInExerciseHandler._init_field): New methods.
+	(ChoiceBasedExerciseHandler.fill)
+	(FillInExerciseHandler.fill): Removed.
+	(ChoiceBasedExerciseHandler.set_field): New method.
+	(SelectBasedExerciseHandler): New class.
+	
+	* resources/css/default.css (results): Minor improvements.
+
 2005-02-18  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (_ChoiceTask.__init__): Assertion added.
