@@ -74,16 +74,19 @@ def itemize(items, indent=0, ordered=False, style=None, cls=None):
 
 # Form controls
 
-def label(text, id):
-    return '<label for="%s">%s</label>' % (id, text)
+def label(text, id, lang=None):
+    return _tag('label', (('for', id), ('lang', lang)), text)
 
-def _input(type, name=None, value=None, handler=None, cls=None, size=None,
-           readonly=False, id=None):
-    handler = handler and "javascript: %s" % handler
+def _input(type, name=None, value=None,
+           onclick=None, onkeydown=None, onfocus=None,
+           size=None, readonly=False, cls=None, id=None):
+    #handler = handler and "javascript: %s" % handler
     return '<input type="%s"%s%s>' % (type, _attr(('name', name),
                                                   ('value', value),
                                                   ('size', size),
-                                                  ('onClick', handler),
+                                                  ('onclick', onclick),
+                                                  ('onfocus', onfocus),
+                                                  ('onkeydown', onkeydown),
                                                   ('class', cls),
                                                   ('id', id)),
                                       readonly and ' readonly' or '')
@@ -100,24 +103,31 @@ def hidden(name, value):
 
 def button(label, handler, cls=None):
     cls = cls and 'button ' + cls or 'button'
-    return _input('button', value=label, handler=handler, cls=cls)
+    return _input('button', value=label, onclick=handler, cls=cls)
 
-def reset(label, handler=None, cls=None):
-    return _input('reset', handler=handler, value=label, cls=cls)
+def reset(label, onclick=None, cls=None):
+    return _input('reset', onclick=onclick, value=label, cls=cls)
 
-def select(name, options, handler=None, default="", id=None):
+def select(name, options, onchange=None, default="", id=None):
     opts = [_tag('option', (('value', value),), text)
             for text, value in options]
     if default is not None:
         opts.insert(0, _tag('option', (), default))
-    attr = (('name', name), ('id', id), ('onChange', handler))
+    attr = (('name', name), ('id', id), ('onchange', onchange))
     return _tag('select', attr, opts, concat="\n")
 
 # Special controls
 
-def speaking_text(text, media):
-    a1 = link(text, "javascript: play_audio('%s');" % media.url())
-    a2 = link(text, media.url())
+def speaking_text(text, media, id=None):
+    #a1 = link(text, "javascript: play_audio('%s');" % media.url())
+    #attr = (('onkeydown', "play_on_keypress(event_key(window.event), '%s');" %
+    #         media.url()),
+    #        ('onclick', "play_audio('%s');" % media.url()))
+    #a1 = _tag('span', attr, text)
+    a1 = field(text, onclick="play_audio('%s');" % media.url(),
+               onfocus="this.onkeypress = simulate_click_on_keypress;",
+               size=len(text), readonly=True, cls='speaking-text', id=id)
+    a2 = link(text, media.url(), cls='speaking-text')
     return script_write(a1, a2)
 
 # JavaScript code generation.
