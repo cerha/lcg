@@ -65,10 +65,12 @@ def link(label, url, brackets=False,
     result = _tag('a', attr, label)
     return brackets and '['+result+']' or result
 
-def ul(items, indent=0):
+def itemize(items, indent=0, ordered=False, style=None, cls=None):
     spaces = ' ' * indent
+    tag = ordered and 'ol' or 'ul'
+    attr = style and ' style="list-style-type: %s"' % style or ''
     items = [spaces+"  <li>%s</li>" % i for i in items]
-    return "\n".join([spaces+"<ul>"] + items + [spaces+"</ul>"])
+    return "\n".join([spaces+"<"+tag+attr+">"] + items + [spaces+"</"+tag+">"])
 
 # Form controls
 
