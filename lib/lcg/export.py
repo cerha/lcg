@@ -123,9 +123,6 @@ class StaticExporter(Exporter):
              tags('<script language="Javascript" type="text/javascript"' + \
                   ' src="%s"></script>',
                   map(lambda s: s.url(), node.resources(Script))),
-             '  '+('<object id="player" height="0" width="0" ' + \
-                    'classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">' + \
-                    '</object>'),
              '</head>',
              '<body>',
              nav, '<hr class="navigation">',
