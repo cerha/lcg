@@ -430,7 +430,9 @@ def set_language(lang, translation_dir=None):
     
     """
     from gettext import translation, NullTranslations
-    t = translation('lcg', config.translation_dir, (lang,), fallback=True)
+    if translation_dir is None:
+        translation_dir = config.translation_dir
+    t = translation('lcg', translation_dir, (lang,), fallback=True)
     t.install(unicode=True)
     return not isinstance(t, NullTranslations)
     
