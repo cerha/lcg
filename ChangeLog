@@ -1,5 +1,11 @@
 2005-03-11  Tomas Cerha  <cerha@brailcom.org>
 
+	* doc/structure.wiki: Updated.
+
+	* doc/roles.wiki: Updated.
+
+	* doc/manual.wiki: Updated.
+
 	* bin/generate.py (Module): Completely rewritten.
 
 	* bin/wiki-formatter.py (Module): New file.
@@ -32,6 +38,8 @@
 	(Parser._parse_blocks): New method.  Everything whar was before in
 	`_parse_section_content()' was copied here.
 	(Parser._make_toc): New method.
+	(Formatter._MARKUP): New rule for a `dash'.
+	(Formatter._FORMAT): New format for a `dash'.
 
 	* resources/css/default.css: New class `lcg-preformatted-text'.
 
@@ -77,7 +85,10 @@
 	(TableOfContents.export): When the `item' is None, use the
 	container.  If the container is None or not a `SectionContainer'
 	instance, use the parent.
-	
+	(Section.url): New keyword argument `relative'.  Return only the
+	anchor part if true.
+	(TableOfContents._make_toc): Make the URLs of the local sections
+	relative.
 
 	* lcg/config.py (Module): New file.
 
@@ -95,6 +106,7 @@
 	(WikiNode._create_content): Always wrap the sections into a
 	`SectionContainer'.
 	(WikiNode._title): New function.
+	(set_language): Honour the `translation_dir' argument if given.
 
 2005-03-09  Tomas Cerha  <cerha@brailcom.org>
 
