@@ -183,13 +183,13 @@ class VocabItem(Record):
           media -- corresponding sound file as a 'Media' instance.
         
         """
-        assert isinstance(word, types.StringTypes)
-        assert isinstance(note, types.StringTypes)
-        assert isinstance(translation, types.StringTypes)
+        assert isinstance(word, types.UnicodeType)
+        assert isinstance(note, types.UnicodeType)
+        assert isinstance(translation, types.UnicodeType)
         assert isinstance(media, Media)
-        self._word = unicode(word)
-        self._note = unicode(note)
-        self._translation = unicode(translation)
+        self._word = word
+        self._note = note
+        self._translation = translation
         self._media = media
 
 
@@ -214,9 +214,9 @@ class Choice(Record):
     """
     
     def __init__(self, answer, correct=False):
-        assert isinstance(answer, types.StringTypes)
+        assert isinstance(answer, types.UnicodeType)
         assert isinstance(correct, types.BooleanType)
-        self._answer = unicode(answer)
+        self._answer = answer
         self._correct = correct
 
         
@@ -275,7 +275,7 @@ class TrueFalseStatement(_ChoiceTask):
           
         """
         assert isinstance(correct, types.BooleanType)
-        choices = (Choice('TRUE', correct), Choice('FALSE', not correct))
+        choices = (Choice(u'TRUE', correct), Choice(u'FALSE', not correct))
         super(TrueFalseStatement, self).__init__(statement, choices)
 
 
@@ -285,8 +285,8 @@ class ClozeTask(Task):
     
     def __init__(self, text):
         super(ClozeTask, self).__init__()
-        assert isinstance(text, types.StringTypes)
-        self._text = unicode(text)
+        assert isinstance(text, types.UnicodeType)
+        self._text = text
 
     def answers(self):
         return self._REGEXP.findall(self._text)
@@ -299,8 +299,8 @@ class TransformationTask(ClozeTask):
 
     def __init__(self, orig, transformed):
         super(TransformationTask, self).__init__(transformed)
-        assert isinstance(orig, types.StringTypes)
-        self._orig = unicode(orig)
+        assert isinstance(orig, types.UnicodeType)
+        self._orig = orig
 
     def orig(self):
         return self._orig
