@@ -491,15 +491,6 @@ class VocabItem(Record):
             phrase.
           
         """
-        def safe_char(match):
-            char = match.group(0)
-            if char in ('.', ',', '?', '!', ':', ';', '(', ')'):
-                return ''
-            base_name = self._DIACRITICS_MATCHER.sub('', unicodedata.name(char))
-            base_char = unicodedata.lookup(base_name)
-            if self._DANGER_CHAR_MATCHER.match(base_char):
-                return '-'
-            return base_char
         assert isinstance(word, types.UnicodeType)
         assert isinstance(note, types.UnicodeType) or note is None
         assert isinstance(translation, types.UnicodeType)
@@ -511,9 +502,9 @@ class VocabItem(Record):
         self._translation = translation
         self._translation_language = translation_language
         self._is_phrase = is_phrase
-        name = self._DANGER_CHAR_MATCHER.sub(safe_char, word.replace(' ', '-'))
-        filename = os.path.join('vocabulary', name + '.ogg')
-        self._media = parent.resource(Media, filename, tts_input=word)
+        filename = "item-%02d.ogg" % parent.counter(self.__class__).next()
+        path = os.path.join('vocabulary', filename)
+        self._media = parent.resource(Media, path, tts_input=word)
 
 
 class VocabSection(Section):
