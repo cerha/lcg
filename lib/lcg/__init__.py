@@ -21,6 +21,6 @@ from content import *
 from course import *
 
 # Øe¹ení cyklických závislostí souborù
-for file in (course, content):
+for file in (course, content, feed):
     file.__dict__.update(globals())
                                                                                                                                                       
