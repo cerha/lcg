@@ -141,7 +141,10 @@ class ContentNode(object):
         """Return all the text read from the source file."""
         filename = os.path.join(self.src_dir(), name+'.txt')
         fh = codecs.open(filename, encoding=self._input_encoding)
-        content = ''.join(fh.readlines())
+        try:
+            content = ''.join(fh.readlines())
+        except UnicodeDecodeError, e:
+            raise Exception("Error while reading file %s: %s" % (filename, e))
         fh.close()
         return content
 
@@ -622,10 +625,9 @@ class Exercises(ContentNode):
         return feeder.feed(self)
 
 
-class Consolidation(TextNode):
+class Summary(TextNode):
     """A check list of competences achieved."""
-    _TITLE = _("Consolidation")
-    pass
+    _TITLE = _("Summary")
 
         
 class Unit(InnerNode):
@@ -639,7 +641,7 @@ class Unit(InnerNode):
                     language=self._language,
                     input_encoding=self._input_encoding,
                     default_resource_dir=self._default_resource_dir)
-                for cls in (Vocabulary, Use, Grammar, Exercises, Consolidation)]
+                for cls in (Vocabulary, Use, Grammar, Exercises, Summary)]
 
     def _id(self):
         return 'unit%02d' % (self._parent.index(self)+1)
