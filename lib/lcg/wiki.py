@@ -21,6 +21,7 @@
 
 import re
 import time
+import types
 import os
 import StringIO
 import string
@@ -31,13 +32,11 @@ class CommonFormatter:
     """This class contains the patterns common to both Formatter and
     OneLinerFormatter"""
     
-    _rules = [r"""(?P<bold>''')""",
-              r"""(?P<italic>'')""",
-              r"""(?P<underline>__)""",
+    _rules = [r"""(?P<bold>\*)""",
+              r"""(?P<italic>/)""",
+              r"""(?P<underline>_)""",
               r"""(?P<begintt>\{\{\{)""",
-              r"""(?P<endtt>\}\}\})""",
-              r"""(?P<htmlescapeentity>&#[0-9]+;)""",
-              r"""(?P<fancylink>\[(?P<fancyurl>([a-z]+:[^ ]+)) (?P<linkname>.*?)\])"""]
+              r"""(?P<endtt>\}\}\})"""]
 
     def replace(self, fullmatch):
         for type, match in fullmatch.groupdict().items():
@@ -81,30 +80,6 @@ class CommonFormatter:
     def _endtt_formatter(self, match, fullmatch):
         return '</tt>'
 
-    def _htmlescapeentity_formatter(self, match, fullmatch):
-        #dummy function that match html escape entities in the format:
-        # &#[0-9]+;
-        # This function is used to avoid these being matched by
-        # the tickethref regexp
-        return match
-    
-    def _url_formatter(self, match, fullmatch):
-        return '<a href="%s">%s</a>' % (match, match)
-
-    def _fancylink_formatter(self, match, fullmatch):
-        link = fullmatch.group('fancyurl')
-        name = fullmatch.group('linkname')
-        if link[0:5] == 'wiki:':
-            link = href.wiki(link[5:])
-        elif link[0:4] == 'svn:':
-            m = re.search('^svn:(([^#]+)(#([0-9]+))?)', link)
-            if m.group(4):
-                link = href.browser(m.group(2), int(m.group(4)))
-            else:
-                link = href.browser(m.group(1))
-
-        return '<a href="%s">%s</a>' % (link, name)
-
 
 class OneLinerFormatter(CommonFormatter):
     """
@@ -112,10 +87,7 @@ class OneLinerFormatter(CommonFormatter):
     subset of the wiki formatting functions. This version is useful
     for rendering short wiki-formatted messages on a single line
     """
-    
-    _rules = CommonFormatter._rules + \
-             [r"""(?P<url>([a-z]+://[^ ]+[^\., ]))"""]
-    
+    _rules = CommonFormatter._rules
     _compiled_rules = re.compile('(?:' + string.join(_rules, '|') + ')')
 
     def format(self, text, out):
@@ -133,41 +105,21 @@ class OneLinerFormatter(CommonFormatter):
 
 
 class Formatter(CommonFormatter):
-    """
-    A simple Wiki formatter
-    """
-    _rules = [r"""(?P<svnimg>svn:([^ ]+)(\.png|\.jpg|\.jpeg|\.gif))"""] + \
-             CommonFormatter._rules + \
-             [r"""(?P<macro>\[\[(?P<macroname>[a-zA-Z]+)(\((?P<macroargs>[^\)]*)\))?\]\])""",
-              r"""(?P<heading>^\s*(?P<hdepth>=+)\s.*\s(?P=hdepth)$)""",
+    """A simple Wiki formatter"""
+
+    _rules = CommonFormatter._rules + \
+             [r"""(?P<heading>^\s*(?P<hdepth>=+)\s.*\s(?P=hdepth)$)""",
               r"""(?P<list>^(?P<ldepth>\s+)(?:\*|[0-9]+\.) )""",
-              r"""(?P<indent>^(?P<idepth>\s+)(?=[^\s]))""",
-              r"""(?P<imgurl>([a-z]+://[^ ]+)(\.png|\.jpg|\.jpeg|\.gif))""",
-              r"""(?P<url>([a-z]+://[^ ]+[^\., ]))"""]
+              r"""(?P<indent>^(?P<idepth>\s+)(?=[^\s]))"""]
     
     _compiled_rules = re.compile('(?:' + string.join(_rules, '|') + ')')
 
     # RE patterns used by other patterna
-    _helper_patterns = ('idepth', 'ldepth', 'hdepth', 'fancyurl',
-                        'linkname', 'macroname', 'macroargs')
+    _helper_patterns = ('idepth', 'ldepth', 'hdepth', 'linkname')
 
     def __init__(self, hdf = None):
         self.hdf = hdf
         
-    def _macro_formatter(self, match, fullmatch):
-        name = fullmatch.group('macroname')
-        if name in ['br', 'BR']:
-            return '<br />'
-        args = fullmatch.group('macroargs')
-        try:
-            macros = __import__('wikimacros.' + name,
-                                globals(),  locals(), [])
-            module = getattr(macros, name)
-            func = getattr(module, 'execute')
-            return func(self.hdf, args)
-        except Exception, e:
-            return 'Macro %s(%s) failed: %s' % (name, args, e)
-
     def _heading_formatter(self, match, fullmatch):
         depth = min(len(fullmatch.group('hdepth')), 5)
         self.close_paragraph()
@@ -177,12 +129,6 @@ class Formatter(CommonFormatter):
                        (depth, match[depth + 1:len(match) - depth - 1],
                         depth, str(id(self))+'-'+'0'))
         return ''
-
-    def _svnimg_formatter(self, match, fullmatch):
-        return '<img src="%s" alt="%s" />' % (href.file(match[4:]), match[4:])
-
-    def _imgurl_formatter(self, match, fullmatch):
-        return '<img src="%s" alt="%s" />' % (match, match)
 
     def _indent_formatter(self, match, fullmatch):
         depth = int((len(fullmatch.group('idepth')) + 1) / 2)
@@ -309,6 +255,74 @@ class Formatter(CommonFormatter):
         self.close_indentation()
         self.close_list()
 
+      
+class _Node(object):
+    
+    def __init__(self, title, level):
+        assert isinstance(title, types.StringTypes)
+        assert isinstance(level, types.IntType) and level >= 0
+        self.title = title
+        self.level = level
+        self.parent = None
+        self.content = None
+        self.children = []
+
+    def tree(self, indent=0):
+        children = [n.tree(indent+1) for n in self._children]
+        return "%s* %s\n%s" % ("  "*indent, self.title(), "".join(children))
+
+    def sections(self):
+        return [Section(n.title, n.content, n.sections())
+                for n in self.children]
+        
+    def add_child(self, node):
+        assert isinstance(node, _Node)
+        node.parent = self
+        self.children.append(node)
+                
+
+class Section(object):
+
+    def __init__(self, title, text, sections):
+        self._title = title
+        self._text = text
+        self._sections = sections
+        
+    def title(self):
+        return self._title
+
+    def text(self):
+        return self._text
+
+    def sections(self):
+        return self._sections
+
+    
+def parse_sections(text):
+    matcher = re.compile(r"^(?P<level>=+) (?P<title>.*) (?P=level)\s*$",
+                         re.MULTILINE)
+    last = root = _Node('__ROOT_NODE__', 0)
+    while (1):
+        m = matcher.search(text)
+        if not m:
+            last.content = text
+            break
+        last.content = text[:m.start()]
+        text = text[m.end():]
+        this = _Node(m.group('title'), len(m.group('level')))
+        if last.level < this.level:
+            parent = last
+        elif last.level == this.level:
+            parent = last.parent
+        else:
+            parent = last.parent
+            while (parent.level >= this.level):
+                parent = parent.parent
+        parent.add_child(this)
+        last = this
+    return (root.content, root.sections())
+
+    
 def format(wikitext):
     out = StringIO.StringIO()
     Formatter().format(wikitext, out)
@@ -318,7 +332,6 @@ def wiki_to_oneliner(wikitext):
     out = StringIO.StringIO()
     OneLinerFormatter().format(wikitext, out)
     return out.getvalue()
-
 
 def escape(text, param={'"':'&#34;'}):
     """Escapes &, <, > and \""""
