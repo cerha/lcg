@@ -1,3 +1,38 @@
+2004-10-19  Tomas Cerha  <cerha@brailcom.org>
+
+	* TODO: New file.
+
+	* COPYING: New file.
+
+	* Makefile (sync-data): New target.
+	(sync): New target.
+
+	* lcg/export.py (Exporter._export_node): Convert the contents to
+	UTF-8 before writing the file.
+	(StaticExporter._wrap_content): Set the charset to UTF-8.  Include
+	the Media Player object in the header to make it available in MSIE.
+
+	* lcg/feed.py (ExcelVocabFeeder._CHARSET): New constant.
+	(ExcelVocabFeeder.feed): Convert the translation to unicode.
+
+	* lcg/content.py (VocabItem.__init__): Accept also a unicode
+	string as a `translation' arg.
+	(Exercise.__init__): Allocate the dependency on the `audio.js'
+	script.
+	(Transformation._instructions): Unwanted backslash removed.
+
+	* lcg/content.py (Exercise._export_instructions): Format the
+	Recording launcher as a button, rather than a link.
+
+2004-10-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/export.py (StaticExporter._hotkey): Use just numbers as
+	shortcut keys.
+
+	* lcg/course.py (Media.name): New method.
+
+	* lcg/content.py (Transformation._instructions): New method.
+
 2004-10-05  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (TrueFalseStatement.export): New method.
