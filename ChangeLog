@@ -1,5 +1,11 @@
 2004-09-01  Tomas Cerha  <cerha@brailcom.org>
 
+	* lcg/export.py (StaticExporter._toc): New method.
+	(StaticExporter._make_toc): New method.
+	(StaticExporter._wrap_content): Use self._toc().
+
+	* lcg/content.py (TableOfContents): Class removed.
+
 	* Makefile: Remove the html files before running the generator.
 	Don't zip the package.  Export the `LCG_TTS_COMMAND' variable.
 
@@ -20,6 +26,11 @@
 	(EurochanceCourse._create_children): Don't create the counter for
 	counting NumberedNode's number.
 	(ContentNode.__str__): Don't report the `output_file'.
+	(Course): Renamed to `RootNode'.
+	(RootNode.__init__): Honour the name change.
+	(Media.__init__): Docstring updated.
+	(EurochanceCourse): `Course' -> `RootNode'.
+	(RootNoode._create_content): Method removed. 
 
 2004-08-31  Tomas Cerha  <cerha@brailcom.org>
 
