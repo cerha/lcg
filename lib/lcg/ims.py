@@ -75,8 +75,8 @@ class _Manifest:
         self._set_xml_attr(resource, 'type', 'webcontent')
         self._set_xml_attr(resource, 'href', node.output_file())
 
-        media_files = tuple(map(lambda n: n.url(), node.list_media()))
-        for filename in (node.output_file(),) + media_files:
+        resources = tuple(map(lambda n: n.url(), node.resources()))
+        for filename in (node.output_file(),) + resources:
             file = self._append_xml_element(resource, 'file')
             self._set_xml_attr(file, 'href', filename)
 
