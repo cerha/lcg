@@ -366,6 +366,7 @@ class Media(object):
             # Either create the file with tts or copy from source directory.
             if self._tts_input is not None and not os.path.exists(src_path):
                 print "%s: file does not exist!" % dst_path
+                cmd = None
                 try:
                     cmd = os.environ['LCG_TTS_COMMAND']
                 except KeyError:
