@@ -1,5 +1,8 @@
 2005-03-04  Tomas Cerha  <cerha@brailcom.org>
 
+	* lcg/_html.py (ul): Renamed to `itemize()'.
+	(itemize): New arguments `ordered', `style' and `class'.
+
 	* lcg/content.py (Section.__init__): New argument `anchor'.
 	Docstring improved.
 	(Section.anchor): If the `anchor' was specified, return it.
@@ -9,6 +12,11 @@
 	instances as the `item' arguemnt.
 	(VocabList.__init__): New argument `reverse'.
 	(VocabList.export): Reverse the word pair if `reverse' is true.
+	(ListItem): Class removed.
+	(ItemizedList.__init__): Expect a sequence of `Content' instance,
+	not `ListItem'.
+	(ItemizedList.export): Use `itemize()'.
+	(TableOfContents._make_toc): Use `itemize()', not `ul()'.
 
 	* resources/css/default.css (citation, quotation): New classes. 
 	(results): BG color changed.
@@ -33,6 +41,8 @@
 	items.  Handle all other blocks by the `_make_<type>' method.
 	(Parser._make_paragraph, Parser._make_paragraph) 
 	(Parser._list_item_type): New methods.
+	(Parser._parse_section_content): Use just the `WikiText', not
+	`ListItem' for list items.
 
 	* lcg/course.py (Unit._create_content): Don't limit the TOC depth.
 	(CourseIndex._create_content): Set TOC depth to 99.

@@ -1,18 +1,14 @@
 Bugs:
 
- * After first page load, Multiple choice Exercise does'nt count answers
-   correctly.  After reset, it works fine.
-
+ * JavaScript doesn't work witk the `Links' browser.
 
 Required features:
 
- * General instructions in users' own language (a hyperlinked help system).
-
- * Playing sounds in background in MSIE.
+ *  
 
 
 Optional Features:
 
  * Preloading sounds.
 
- * Punctuation insenstive evaluation.
+ * Punctuation insenstive evaluation?
