@@ -25,7 +25,13 @@ data.  It can be used as an example of LCG usage.
 
 from lcg import *
 
-class Unit(ContentNode):
+class EurochanceNode(ContentNode):
+
+    def __init__(self, *args, **kwargs):
+        super(EurochanceNode, self).__init__(*args, **kwargs)
+        self.resource(Stylesheet, 'default.css')
+
+class Unit(EurochanceNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
     _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
@@ -59,7 +65,7 @@ class Unit(ContentNode):
     
     def _create_exercises(self):
         filename = self._input_file('exercises')
-        text = self._read_file('exercises', '^//')
+        text = self._read_file('exercises', comment='^//')
         splittable = SplittableText(text, input_file=filename)
         pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
         assert len(pieces) == 5, \
@@ -90,12 +96,12 @@ class Unit(ContentNode):
 
 
     
-class Instructions(TextNode):
+class Instructions(EurochanceNode):
     """A general set of pre-course instructions."""
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        return super(Instructions, self)._create_content() + \
+        return self._parse_wiki_file('instructions') + \
                [TableOfContents(self)]
     
     def _create_children(self):
@@ -105,8 +111,33 @@ class Instructions(TextNode):
     def _id(self):
         return 'instructions'
 
+    
+class ExerciseInstructions(EurochanceNode):
+    """Exercise instructions."""
+    
+    def __init__(self, parent, exercise_class_, *args, **kwargs):
+        assert issubclass(exercise_class_, Exercise)
+        self._exercise_class_ = exercise_class_
+        super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
+        
+    def _create_content(self):
+        try:
+            return self._parse_wiki_file(self._exercise_class_.id())
+        except IOError, e:
+            print "Warning: %s" % e
+            return Content(self)
 
-class _Index(ContentNode):
+    def title(self, abbrev=False):
+        return _("Instructions for %s") % self._exercise_class_.name()
+
+    def _id(self):
+        return self._exercise_class_.id()
+
+    def src_dir(self):
+        return os.path.join(config.default_resource_dir, 'help')
+
+    
+class _Index(EurochanceNode):
 
     def __init__(self, parent, units, *args, **kwargs):
         self._units = units
@@ -144,18 +175,26 @@ class VocabIndex(_Index):
         return SectionContainer(self, s)
 
     
-class EurochanceCourse(RootNode):
+class EurochanceCourse(EurochanceNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
     def __init__(self, dir, course_language, users_language, **kwargs):
         assert isinstance(users_language, types.StringType) and \
                len(users_language) == 2
         self._users_language = users_language
-        super(EurochanceCourse, self).__init__(dir, language=course_language,
+        super(EurochanceCourse, self).__init__(None, dir,
+                                               language=course_language,
                                                **kwargs)
 
     def users_language(self):
         return self._users_language
+    
+    def _title(self):
+        return self._read_file('title')
+
+    def _create_content(self):
+        return self._parse_wiki_file('intro') + \
+               [TableOfContents(self, title=_("Table of Contents:"))]
     
     def _create_children(self):
         units = [self._create_child(Unit, subdir=d)
@@ -174,7 +213,10 @@ class EurochanceCourse(RootNode):
 
 class Formatter(wiki.Formatter):
 
-    def _citation_formatter(self, close=False):
+    _MARKUP = [(type, markup) for type, markup in wiki.Formatter._MARKUP
+               if type not in ('italic', 'fixed')]
+    
+    def _citation_formatter(self, groups, close=False):
         if not close:
             return '<span class="citation" lang="%s">' % self._parent.language()
         else:
