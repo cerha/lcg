@@ -293,3 +293,11 @@ DictationHandler.prototype.display_results = function() {
    msg = this.msg(this.correct() ? 'Correct':'Error(s) found');
    this._form.result.value = msg
 }
+
+DictationHandler.prototype._eval_answer = function(field) {
+   // In Dictation, we don't want to remember the first answer.
+   var i = field.answer_index;
+   var correct = (field.value == this._answers[i]);
+   this._answered[i] = correct ? 1 : -1;
+   return correct
+}
