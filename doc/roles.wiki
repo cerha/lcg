@@ -1,0 +1,58 @@
+= The process of feeding the course data into the system =
+
+Tomas Cerha, 2004-05-09
+
+This document was created based on the agreements made at the meeting in
+Graz (May 7-8, 2004).  It describes the way how course data made by content
+creators should be entered into the system, so that it can be used in an
+electronic learning environment.
+
+
+== Introduction ==
+
+The Language Content Generator (LCG) processes the input data and produces a
+Content Package (CP) that can be used in an on-line or off-line learning
+environment.  The input doesn't define the presentation.  It only defines the
+content and it must comply with the agreed course structure.
+
+The LCG allows us to generate the CP using any presentation on the output side
+without changing the input data and thus brings the advantage of independent
+work within the user-interface and language-module work-groups.
+
+To be able to process the input data with a computer program (the LCG) we must
+define the rules how this data are represented.  The computer program must be
+able to recognize the logical elements of the content to be able to put them
+together on its output, but on the other hand the content creators must not be
+forced to deal with the technical aspects more than necessary.
+
+
+== Solution ==
+
+With all this in mind, the following model has been chosen for the process:
+
+* the input data will be gradually uploaded to the server in a form defined by
+  a [manual.wiki|manual] as it is being developed/improved.
+* this data will be processed by the technicians (using the LCG) and eventual
+  problems will be either directly corrected where possible or communicated
+  with content creators.
+* the LCG will be gradually modified to produce the best possible presentation
+  of the course material.
+
+
+== Role assignment ==
+
+=== Lawton School, BFI ===
+
+* uploading the content to the server in the form defined by the [manual.wiki|manual]
+
+=== Media LT ===
+
+* processing the content uploaded by content creators
+* solving the problems in the input data and providing feedback to content
+  creators (to avoid the same problems in future)
+
+=== Brailcom ===
+
+* create the [manual.wiki|manual] describing the formats of input data
+* support for Media LT in the process of processing the input data
+* development of the LCG
