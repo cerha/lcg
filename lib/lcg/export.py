@@ -30,42 +30,33 @@ class Exporter(object):
         self._course = course
         self._dir = dir
 
-    def _full_title(self, node):
-        title = node.title()
-        node = node._parent
-        while (node is not None):
-            title = ' - '.join((node.title(), title))
-            node = node._parent
-        return title
-
     def _export_node(self, node):
         """Write the output file for given node and all subsequent nodes."""
         #print "Exporting:", node
-        dir = os.path.join(self._dir, node.dst_dir())
-        if not os.path.isdir(dir):
-            os.makedirs(dir)
+        if not os.path.isdir(self._dir):
+            os.makedirs(self._dir)
         filename = os.path.join(self._dir, node.output_file())
         file = open(filename, 'w')
         file.write(self._wrap_content(node))
         file.close()
         for m in node.list_media():
-            self._export_media(m, self._dir)
+            self._export_media(m)
         for n in node.children():
             self._export_node(n)
 
     def _wrap_content(self, node):
         return "\n".join(('<html>',
                           '  <head>',
-                          '    <title>%s</title>' % self._full_title(node),
+                          '    <title>%s</title>' % node.full_title(),
                           '  </head>',
                           '  <body bgcolor="white">',
                           node.content().export(),
                           '  </body>',
                           '</html>'))
             
-    def _export_media(self, media, dir):
+    def _export_media(self, media):
         src_path = media.source_file()
-        dst_path = media.destination_file(dir)
+        dst_path = media.destination_file(self._dir)
         #print "***", src_path, dst_path
         if not os.path.exists(dst_path) or \
                os.path.exists(src_path) and \
@@ -94,17 +85,37 @@ class Exporter(object):
 
 class StaticExporter(Exporter):
     """Export the content as a set of static web pages."""
+    DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
     
     def _wrap_content(self, node):
-        #base = '../' * len(self.dst_dir().split('/'))
-        return "\n".join(('<html>',
-                          '  <head>',
-                          '    <title>%s</title>' % self._full_title(node),
-                          #'    <base href="%s">' % base,
-                          '  </head>',
-                          '  <body bgcolor="white">',
+        nav = self._navigation(node)
+        
+        return "\n".join((self.DOCTYPE, '',
+                          '<html>',
+                          '<head>',
+                          '  <title>%s</title>' % node.full_title(),
+                          self._meta(node),
+                          '</head>',
+                          '<body bgcolor="white">',
+                          nav, '<hr>',
+                          '<h1>%s</h1>' % node.title(),
                           node.content().export(),
-                          '  </body>',
-                          '</html>'))
+                          '<hr>', nav,
+                          '</body></html>'))
 
-    
+    def _meta(self, node):
+        meta = node.root_node().meta()
+        return '\n'.join(map(lambda k:
+                             '  <meta name="%s" content="%s">' % (k, meta[k]),
+                             meta.keys()))
+
+    def _navigation(self, node):
+        link = '<a href="%s">%s</a>'
+        n = node.next()
+        p = node.prev()
+        next = n and link % (n.output_file(), n.title()) or "None"
+        prev = p and link % (p.output_file(), p.title()) or "None"
+        nav = 'Next: %s | Previous: %s' % (next, prev)
+        if node != node.root_node():
+            nav += ' | ' + link % (node.root_node().output_file(), 'TOC')
+        return nav
