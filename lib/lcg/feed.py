@@ -73,7 +73,7 @@ class Feeder(object):
 class FileFeeder(Feeder):
     """Generic Feeder reading its data from an input file."""
     
-    def __init__(self, filename, *args, **kwargs):
+    def __init__(self, filename, **kwargs):
         """Initialize the Feeder.
 
         Arguments:
@@ -83,7 +83,7 @@ class FileFeeder(Feeder):
           All the remaining arguments are inherited from parent class.
 
         """
-        super(FileFeeder, self).__init__(*args, **kwargs)
+        super(FileFeeder, self).__init__(**kwargs)
         assert os.path.exists(filename), "File does not exest: " + filename
         self._filename = filename
 
@@ -94,36 +94,6 @@ class FileFeeder(Feeder):
             pos += ", line %d" % line
         return pos
 
-
-class SplittableTextFeeder(Feeder):
-    """Generic Feeder reading its data from a piece of textan input file."""
-    
-    def __init__(self, text, *args, **kwargs):
-        """Initialize the Feeder.
-    
-        Arguments:
-
-          text -- the source text as a SplittableText instance or a sequence of
-            SplittableText instances.
-          
-          All the remaining arguments are inherited from parent class.
-          
-        """
-        super(SplittableTextFeeder, self).__init__(*args, **kwargs)
-        assert isinstance(text, SplittableText)
-        self._text = text
-
-    def _pieces(self, splitter):
-        """Return a sequence of all the pieces in input text(s)."""
-        return self._text.split(splitter)
-
-    def _current_input_position(self, text):
-        if text is not None:
-            assert isinstance(text, SplittableText)
-        else:
-            text = self._text
-        return 'File "%s", line %d' % (text.input_file(),
-                                       text.firstline())
     
 class PySpecFeederError(Exception):
     """Exception reised when there is a problem loading specification file."""
@@ -164,45 +134,77 @@ class PySpecFeeder(FileFeeder):
         return spec(parent)
     
 
-class ExcelVocabFeeder(FileFeeder):
-    """Vocabulary Feeder reading data from an XLS file."""
+class SplittableTextFeeder(Feeder):
+    """Generic Feeder reading its data from a piece of textan input file."""
     
-    _TRANSLATION_ORDER = ('en', 'de', 'cs', 'es', 'no', 'sk')
+    def __init__(self, text, **kwargs):
+        """Initialize the Feeder.
     
-    _ENCODING = {'cs': 'iso-8859-2',
-                 'sk': 'iso-8859-2'}
+        Arguments:
+
+          text -- the source text as a SplittableText instance or a sequence of
+            SplittableText instances.
+          
+          All the remaining arguments are inherited from parent class.
+          
+        """
+        super(SplittableTextFeeder, self).__init__(**kwargs)
+        assert isinstance(text, SplittableText)
+        self._text = text
+
+    def _current_input_position(self, text):
+        if text is not None:
+            assert isinstance(text, SplittableText)
+        else:
+            text = self._text
+        return 'File "%s", line %d' % (text.input_file(),
+                                       text.firstline())
+
+    def _process_pieces(self, text, splitter, error_message, func, *args):
+        def f(piece):
+            try:
+                return func(piece, *args)
+            except SystemExit:
+                sys.exit()
+            except:
+                self._panic(error_message, sys.exc_info(), piece)
+        return [x for x in [f(piece) for piece in text.split(splitter)
+                            if piece.text()] if x is not None]
+    
+    
+class VocabFeeder(SplittableTextFeeder):
+    """Vocabulary Feeder"""
+    
+    _LINE_SPLITTER = re.compile(r"\r?\n")
+    _ITEM_SPLITTER = re.compile(r"\s*::\s*")
+    
+    def __init__(self, text, translation_language, **kwargs):
+        assert isinstance(translation_language, types.StringType) and \
+               len(translation_language) == 2
+        self._translation_language = translation_language
+        self._phrases = False
+        super(VocabFeeder, self).__init__(text, **kwargs)
     
     def feed(self, parent):
-        
-        command = 'xls2csv -q0 -c\| %s' % self._filename
-        status, output = commands.getstatusoutput(command)
-        if status: raise Exception(output)
-        encoding = self._ENCODING.get(parent.language(), 'iso-8859-1')
-        translation_language = 'cs' # TODO: pass from somewhere...
-        order = [l for l in self._TRANSLATION_ORDER if l != parent.language()]
-        translation_index = order.index(translation_language)
-        translation_encoding = self._ENCODING.get(translation_language,
-                                                  'iso-8859-1')
-        items = []
-        for line in output.splitlines():
-            col = map(string.strip, line.split('|')[0:4])
-            try:
-                word = unicode(col[0], encoding=encoding)
-            except UnicodeDecodeError:
-                self._panic('Unable to convert "%s" to unicode' % col[0],
-                            sys.exc_info())
-            if word.startswith("#"):
-                continue
-            note = unicode(len(col) > 1 and col[1] or '',
-                           encoding=self._input_encoding)
-            try:
-                t = col[translation_index + 2]
-                trans = unicode(t, translation_encoding)
-            except IndexError:
-                trans = u'???'
-                #self._warn('No translation for "%s"' % word)
-            items.append(VocabItem(parent, word, note, trans))
-        return items
+        m = "Exception caught while processing vocabulary item"
+        return self._process_pieces(self._text, self._LINE_SPLITTER, m,
+                                    self._item, parent)
+
+    def _item(self, line, parent):
+        if line.text().startswith("#"):
+            if line.text().startswith("# phrases"):
+                self._phrases = True
+            return None
+        word, translation = [x.text() for x in line.split(self._ITEM_SPLITTER)]
+        if word.endswith(")"):
+            p = word.find("(")
+            note = word[p:]
+            word = word[:p].strip()
+        else:
+            note = u""
+        return VocabItem(parent, word, note, translation,
+                         translation_language=self._translation_language,
+                         is_phrase=self._phrases)
     
     
 class ExerciseFeeder(SplittableTextFeeder):
@@ -229,40 +231,33 @@ class ExerciseFeeder(SplittableTextFeeder):
         self._vocabulary = vocabulary
         
     def feed(self, parent):
-        return [self._exercise(parent, piece)
-                for piece in self._pieces(self._EXERCISE_SPLITTER)
-                if piece.text() != '']
-
-        
-    def _exercise(self, parent, text):
+        m = "Exception caught while processing exercise specification"
+        return self._process_pieces(self._text, self._EXERCISE_SPLITTER, m,
+                                    self._exercise, parent)
+    
+    def _exercise(self, text, parent):
         """Convert textual exercise specification into an Exercise instance."""
-        try:
-            pieces = text.split(self._BLANK_LINE_SPLITTER)
-            assert len(pieces) >= 1, \
-                   "Exercise specification must contain a header."
-            type, kwargs = self._read_header(pieces[0].text())
-            task_specs = pieces[1:]            
-            if type == SentenceCompletion:
-                if len(task_specs) > 0:
-                    self._warn("SentenceCompletion should not have any tasks",
-                               text)
-                tasks = ()
-            elif type == VocabExercise and len(task_specs) == 0:
-                tasks = [ClozeTask("%s: [%s]" % (i.translation(), i.word()))
-                         for i in self._vocabulary]
-            else:
-                assert len(task_specs) >= 1, "No tasks found."
-                if type == TrueFalseStatements and len(task_specs) == 1:
-                    self._warn("TrueFalseStatements have only onetask!", text)
-                tasks = [self._read_task(type.task_type(), p)
-                         for p in task_specs]
-            kwargs['tasks'] = tuple(tasks)
-            return type(parent, **kwargs)
-        except SystemExit:
-            sys.exit()
-        except:
-            m = "Exception caught while processing exercise specification"
-            self._panic(m, sys.exc_info(), text)
+        pieces = text.split(self._BLANK_LINE_SPLITTER)
+        assert len(pieces) >= 1, \
+               "Exercise specification must contain a header."
+        type, kwargs = self._read_header(pieces[0].text())
+        task_specs = pieces[1:]            
+        if type == SentenceCompletion:
+            if len(task_specs) > 0:
+                self._warn("SentenceCompletion should not have any tasks",
+                           text)
+            tasks = ()
+        elif type == VocabExercise and len(task_specs) == 0:
+            tasks = [ClozeTask("%s [%s]" % (i.translation(), i.word()))
+                     for i in self._vocabulary]
+        else:
+            assert len(task_specs) >= 1, "No tasks found."
+            if type == TrueFalseStatements and len(task_specs) == 1:
+                self._warn("TrueFalseStatements have only onetask!", text)
+            tasks = [self._read_task(type.task_type(), p)
+                     for p in task_specs]
+        kwargs['tasks'] = tuple(tasks)
+        return type(parent, **kwargs)
     
     def _read_header(self, text):
         """Read excercise header and return the tuple (type, info).
