@@ -127,7 +127,7 @@ class StaticExporter(Exporter):
         if node is not node.root_node():
             p = node.parent()
             if p is not node.root_node():
-                nav.append(node.toc_title() + ': ' + \
+                nav.append(p.toc_title() + ': ' + \
                            self._link(p, key='local-index'))
             nav.append(self._link(node.root_node(), label=_('Course Index'),
                                   key='global-index'))
