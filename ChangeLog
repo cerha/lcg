@@ -1,3 +1,52 @@
+2004-10-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/exercises.js (count):
+	(event_key): New function.
+	(event_target): New function.
+	(highlight): New function.
+	(eval_choice): New function.
+	(reset_choices): New function.
+	(display_choice_results): New function.
+	(init_cloze_form): New function.
+	(last_correct_char_index): New function.
+	(handle_cloze_field_keypress): New function.
+	(eval_cloze_field): New function.
+	(eval_answer): Function removed.
+	(eval_cloze): Don't take the `answers' as argument.
+	(fill_cloze): Don't take the `answers' as argument.
+	
+
+	* resources/scripts/audio.js (play_audio): Don't set status-bar
+	messages.
+
+	* resources/css/default.css: Reflect the changes in page structure.
+
+	* lcg/content.py (Content._field): Cosmetic hanges.
+	(Content._button): Always add the `button' class.
+	(Content._script): New method.
+	(Content._script_write): Use it.
+	(Exercise.task_index): Method removed.
+	(Exercise.form_name): Renamed to `_form_name'.
+	(Exercise._form): New method.
+	(Exercise._export_tasks): Method removed.
+	(Exercise._init_script): New method.
+	(Exercise.export): Print the Javascript code returned by the
+	`_init_script()' method after the form.  Don't use
+	`_export_tasks()', just map `_export_tasks()' to all tasks.
+	(Cloze._init_script): New method.
+	(Cloze._results): New method.
+	(Cloze._export_tasks): Method removed.
+	(Cloze._make_field): Use `self._field()'.
+	(_ChoiceBasedExercise._answer_control): Take `task' as argument
+	and not form_name and task number.  Use `eval_choice()' as
+	javascript handler.
+	(Cloze._export_tasks): Removed (transformed to `_results()').
+	(_ChoiceBasedExercise._results): New method.
+	(_ChoiceBasedExercise._format_choice): Reflect the change in
+	`_answer_control()' arguments.
+	(TrueFalseStatements._format_choice): Reflect the change in
+	`_answer_control()' arguments.
+
 2004-10-22  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/scripts/exercises.js (eval_answer): New function.
