@@ -97,7 +97,8 @@ Handler.prototype.init = function(form, answers, responses, messages) {
    this._answers = answers;
    this._responses = responses;
    this._messages = messages;
-   this._answered = new Array(answers.length);
+   this._results = new Array(answers.length);
+   this._first_attempt = new Array(answers.length);
    this._fields = new Array();
    this._last_answer_index = 0;
    for (i=0; i < this._form.elements.length; i++) {
@@ -108,30 +109,6 @@ Handler.prototype.init = function(form, answers, responses, messages) {
       }
    }
 }
-
-Handler.prototype._eval_answer = function(field) {
-   var i = field.answer_index;
-   //window.defaultStatus = "*"+i+'/'+this._fields.length+": "+field.value+" | "+this._answers[i];
-   if (field.value != '') {
-      var answer = this._answers[i];
-      var correct = (field.value == answer);
-      if (this._answered[i] == null) this._answered[i] = correct ? 1 : -1;
-      return correct;
-   } else {
-      this._answered[i] = null;
-      return null;
-   }
-}
-
-Handler.prototype.eval_answer = function(field) {
-   var correct = this._eval_answer(field)
-   play_audio(this.response(correct ? 'correct':'incorrect'));
-   this.display_results();
-   if (!correct) this._error_handler(field);
-   return correct;
-}
-
-Handler.prototype._error_handler = function(field) {}
 
 Handler.prototype.response = function(selector) {
    var array = this._responses[selector];
@@ -144,38 +121,113 @@ Handler.prototype.msg = function(text) {
    else return text;
 }
 
+Handler.prototype.set_answer = function(i, value) {
+   this._fields[i].value = value;
+}
+
+Handler.prototype.get_answer = function(i) {
+   return this._fields[i].value;
+}
+
+Handler.prototype._error_handler = function(field) {
+   field.focus();
+}
+
+Handler.prototype._eval_answers = function() {
+   for (var i=0; i < this._answers.length; i++) {
+      var value = this.get_answer(i);
+      if (value != '' && value != null) {
+	 this._results[i] = (value == this._answers[i] ? 1:-1);
+	 if (this._first_attempt[i] == null)
+	    this._first_attempt[i] = this._results[i];
+      } else {
+	 this._results[i] = null;
+      }
+   }
+   this.display_results();
+}
+
+Handler.prototype.eval_answer = function(field) {
+   this._eval_answers();
+   var i = field.answer_index;
+   var result = this._results[i];
+   if (result != null) {
+      play_audio(this.response(result == 1 ? 'correct':'incorrect'));
+      if (result == 1) {
+	 // if (i < this._fields.length)
+	 //    this._fields[i+1].focus();
+	 this._fields[i].focus();
+      } else {
+	 this._error_handler(field);
+      }
+   }
+}
+
+Handler.prototype.evaluate = function() {
+   this._eval_answers();
+   for (var i=0; i < this._results.length; i++) {
+      if (this._results[i] != 1) {
+	 this._error_handler(this._fields[i]);
+	 break;
+      }
+   }
+   if (this._fields.length > 1) {
+      switch (this.percentage()) {
+	 case 100: selector = 'all_correct'; break;
+	 case   0: selector = 'all_wrong'; break;
+	 default:  selector = 'some_wrong';
+      }
+   } else {
+      selector = this.correct() ? 'correct':'incorrect';
+   }
+   play_audio(this.response(selector));
+}
+
 Handler.prototype.correct = function() {
-   return count(this._answered, 1);
+   return count(this._results, 1);
 }
 
 Handler.prototype.incorrect = function() {
-   return count(this._answered, -1);
+   return count(this._results, -1);
 }
 
 Handler.prototype.percentage = function() {
    return Math.round(100 * this.correct() / this._answers.length)
 }
 
+Handler.prototype.first_attempt_correct = function() {
+   return count(this._first_attempt, 1);
+}
+
+Handler.prototype.first_attempt_percentage = function() {
+   return Math.round(100 * this.first_attempt_correct() / this._answers.length)
+}
+
 Handler.prototype.display_results = function() {
    var correct = this.correct();
    var incorrect =  this.incorrect();
+   var first_attempt_correct = this.first_attempt_correct();
    this._form.answered.value = (correct+incorrect) +'/'+ this._answers.length;
-   this._form.result.value = correct +' ('+ this.percentage() +'%)';
+   result = correct + " ($x%)".replace("\$x", this.percentage());
+   if (correct != first_attempt_correct) {
+      msg = this.msg(", $x ($y%) on first attempt");
+      msg = msg.replace("\$x", first_attempt_correct);
+      msg = msg.replace("\$y", this.first_attempt_percentage());
+      result += msg
+   }
+   this._form.result.value = result;
 }
 
 Handler.prototype.fill = function() {
-   for (var i=0; i < this._fields.length; i++) {
-      var field = this._fields[i];
-      this.set_field(field, this._answers[field.answer_index]);
+   for (var i=0; i < this._answers.length; i++) {
+      this.set_answer(i, this._answers[i]);
    }
-}
-
-Handler.prototype.set_field = function(field, value) {
-   field.value = value;
+   this._eval_answers();
 }
 
 Handler.prototype.reset = function() {
-   this._answered = new Array(this._answers.length);
+   this._results = new Array(this._answers.length);
+   this._first_attempt = new Array(this._answers.length);
    this.display_results();
 }
 
@@ -197,20 +249,40 @@ ChoiceBasedExerciseHandler.prototype._init_field = function(field) {
    field.answer_index = this._last_answer_index;
 }
 
-ChoiceBasedExerciseHandler.prototype.set_field = function(field, value) {
-   field.checked = (field.value == value);
+ChoiceBasedExerciseHandler.prototype.set_answer = function(i, value) {
+   for (var n=0; n < this._fields.length; n++) {
+      var field = this._fields[n];
+      if (field.answer_index == i) {
+	 field.checked = (field.value == value);
+      }
+   }
+}
+
+ChoiceBasedExerciseHandler.prototype.get_answer = function(i) {
+   for (var n=0; n < this._fields.length; n++) {
+      var field = this._fields[n];
+      if (field.answer_index == i && field.checked) {
+	 return field.value;
+      }
+   }
+   return null;
 }
 
 //=============================================================================
 
 function SelectBasedExerciseHandler() {}
-SelectBasedExerciseHandler.prototype = new ChoiceBasedExerciseHandler()
+SelectBasedExerciseHandler.prototype = new Handler()
 
 SelectBasedExerciseHandler.prototype._recognize_field = function(field) {
    return field.options != null;
 }
 
-SelectBasedExerciseHandler.prototype.set_field = function(field, value) {
+SelectBasedExerciseHandler.prototype._init_field = function(field) {
+   field.answer_index = this._last_answer_index++;
+}
+
+SelectBasedExerciseHandler.prototype.set_answer = function(i, value) {
+   var i = this._fields[i];
    for (var i=0; i < field.options.length; i++) {
       var option = field.options[i];
       if (option.value == value) option.selected = true;
@@ -264,40 +336,10 @@ FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
    return true;
 }
 
-FillInExerciseHandler.prototype.evaluate = function() {
-   var focused = false;
-   for (var i=0; i < this._fields.length; i++) {
-      correct = this._eval_answer(this._fields[i]);
-      if (!correct && !focused) {
-	 this._error_handler(this._fields[i]);
-	 focused = true;
-      }
-   }
-   if (this._fields.length > 1) {
-      switch (this.percentage()) {
-	 case 100: selector = 'all_correct'; break;
-	 case   0: selector = 'all_wrong'; break;
-	 default:  selector = 'some_wrong';
-      }
-   } else {
-      selector = this.correct() ? 'correct':'incorrect';
-   }
-   play_audio(this.response(selector));
-   this.display_results();
-}
-
 function DictationHandler() {}
 DictationHandler.prototype = new FillInExerciseHandler();
 
 DictationHandler.prototype.display_results = function() {
    msg = this.msg(this.correct() ? 'Correct':'Error(s) found');
    this._form.result.value = msg
-}
-
-DictationHandler.prototype._eval_answer = function(field) {
-   // In Dictation, we don't want to remember the first answer.
-   var i = field.answer_index;
-   var correct = (field.value == this._answers[i]);
-   this._answered[i] = correct ? 1 : -1;
-   return correct
 }
