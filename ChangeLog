@@ -31,12 +31,29 @@
 
 	* lcg/wiki.py (Formatter._link_formatter): Try to find a node
 	by an id and use it's title and url instead of the id.
+	(Formatter._MARKUP): Put the link anchor to a separate group.
+	(Formatter._HELPER_PATTERNS): New item `anchor'.
+	(Formatter._formatter): Don't call the formatter in the try/except
+	block.
+	(Formatter._link_formatter): The logic of searching the url and
+	title within the content rewritten.
 
 	* lcg/eurochance.py (Unit._id): Method removed.
+	(Instructions._create_content): Don't include the index of
+	children within the content.
+	(Instructions._create_children, Instructions._id): Methods removed.
+	(Help): New class.
+	(EurochanceCourse._create_content): Pass `item=self' to the
+	constructor of `TableOfContents'.  
+	(EurochanceCourse._create_children): Add `Help' as a last child.
 
 	* lcg/course.py (ContentNode._id): Don't add a number to the id.
 	(ContentNode.find_node): New method.
-	(ContentNode.id): Add an index number to the id if it is not unique.
+	(ContentNode.id): Add an index number to the id if it is not
+	unique.
+	(ContentNode.__init__): Wrap the content into a `SectionContainer'
+	instead of `Container'.
+	
 
 	* lcg/content.py: 
 	(_InteractiveExercise._MESSAGES): A message added.
