@@ -41,7 +41,8 @@ class SplittableText:
         self._text = text
         self._firstline = firstline
 
-    def __str__(self):
+    def text(self):
+        """Return the actual text as a string or unicode."""
         return self._text
 
     def firstline(self):
