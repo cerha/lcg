@@ -89,4 +89,15 @@ input.cloze {
     border-top: #aaa solid 1px;
 }
 
+table.lcg-table {
+    border-collapse: collapse;
+}
+table.lcg-table td, table.lcg-table th {
+    padding: 2pt;
+    vertical-align: top;
+    white-space: nowrap;
+    border: #ccc solid 1px;
+}
+table.lcg-table td { background: #f4f4f4; }
+table.lcg-table th { background: #eee; }
 
