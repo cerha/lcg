@@ -1,3 +1,7 @@
+2004-06-25  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py (Media.export): Set the `cmd' to None first.
+
 2004-06-24  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/course.py (Media.export): Use the LCG_TTS_COMMAND
