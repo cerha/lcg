@@ -33,13 +33,11 @@ derived classes.
 """
 
 import os
+import re
 import sys
 import codecs
 
-from util import *
-from content import *
-from resources import *
-from feed import *
+from lcg import *
 
 class ContentNode(object):
     """Representation of one output document within a course material.
@@ -377,8 +375,9 @@ class TextNode(ContentNode):
     """A section of stuctured text read from a wiki-formatted file."""
 
     def _create_content(self):
+        parser = wiki.Parser(self)        
         name = self.__class__.__name__.lower()
-        return WikiText(self, self._read_file(name))
+        return parser.parse(self._read_file(name))
 
     
 class InnerNode(ContentNode):
@@ -390,8 +389,9 @@ class InnerNode(ContentNode):
     """
     
     def _create_content(self):
-        return (WikiText(self, self._read_file('intro')),
-                TableOfContents(self, title=_("Table of Contents:")))
+        parser = wiki.Parser(self)
+        return parser.parse(self._read_file('intro')) + \
+               [TableOfContents(self, title=_("Table of Contents:"))]
     
     def _title(self):
         return self._read_file('title')
@@ -428,31 +428,22 @@ class Unit(ContentNode):
         return self._read_file('title')
 
     def _create_content(self):
-        feeder = ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
-                                  input_encoding=self._input_encoding)
+        feeder = feed.ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
+                                       input_encoding=self._input_encoding)
         vocab = feeder.feed(self)
+        p = wiki.Parser(self)
         sections = (Section(self, _("Aims and Objectives"),
-                            WikiText(self, self._read_file('aims'))),
+                            p.parse(self._read_file('aims'))),
                     Section(self, _("Vocabulary"),
                             VocabList(self, vocab)),
                     Section(self, _("Grammar"),
-                            self._create_grammar(self._read_file('grammar')),
-                            toc_depth=99),
+                            p.parse(self._read_file('grammar')), toc_depth=99),
                     Section(self, _("Exercises"),
                             self._create_exercises(vocab), toc_depth=1),
                     Section(self, _("Checklist"),
-                            WikiText(self, self._read_file('checklist'))))
-        return Container(self, sections, toc_depth=2)
+                            p.parse(self._read_file('checklist'))))
+        return SectionContainer(self, sections, toc_depth=2)
 
-    def _create_grammar(self, text):
-        text, sections = wiki.parse_sections(text)
-        def make_sections(sections):
-            return [Section(self, s.title(),
-                            [WikiText(self, s.text())] +
-                            make_sections(s.sections()))
-                    for s in sections]
-        return [WikiText(self, text)] + make_sections(sections)
-    
     def _create_exercises(self, vocab):
         filename = self._input_file('exercises')
         text = self._read_file('exercises', '^//')
@@ -467,8 +458,8 @@ class Unit(ContentNode):
                   _("Consolidation"))
         enc = self._input_encoding
         return [Section(self, _("Section %d") + ': ' + title,
-                        ExerciseFeeder(piece, vocabulary=vocab,
-                                       input_encoding=enc).feed(self))
+                        feed.ExerciseFeeder(piece, vocabulary=vocab,
+                                            input_encoding=enc).feed(self))
                 for title, piece in zip(titles, pieces)]
 
     
@@ -477,9 +468,8 @@ class Instructions(TextNode):
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        return (super(Instructions, self)._create_content(),
-                TableOfContents(self))
-
+        return super(Instructions, self)._create_content() + \
+               [TableOfContents(self)]
     
     def _create_children(self):
         return [self._create_child(ExerciseInstructions, e, 'help')
@@ -497,8 +487,9 @@ class ExerciseInstructions(TextNode):
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
+        parser = wiki.Parser(self)            
         try:
-            return WikiText(self, self._read_file(self._exercise_class_.id()))
+            return parser.parse(self._read_file(self._exercise_class_.id()))
         except IOError, e:
             print "Warning: %s" % e
             return Content(self)
