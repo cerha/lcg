@@ -38,6 +38,7 @@ import codecs
 
 from util import *
 from content import *
+from resources import *
 from feed import *
 
 class ContentNode(object):
@@ -112,7 +113,7 @@ class ContentNode(object):
             assert child in self._children
         if parent is not None:
             parent._register_child(self)
-        self.stylesheet('default.css')
+        self.resource(Stylesheet, 'default.css')
 
         
     def _register_child(self, child):
@@ -286,7 +287,15 @@ class ContentNode(object):
         else:
             return resources
 
-    def _resource(self, cls, key, *args, **kwargs):
+    def resource(self, cls, *args, **kwargs):
+        """Get the resource instance.
+        
+        The instances are cached.  They should never be constructed directly.
+        They should always be allocated using this method.  
+
+        """
+        assert issubclass(cls, Resource)
+        key = (cls, args, tuple(kwargs.items()))
         try:
             return self._resources[key]
         except KeyError:
@@ -294,26 +303,6 @@ class ContentNode(object):
             self._resources[key] = resource
             return resource
         
-    def media(self, file, shared=False, tts_input=None):
-        """Return the 'Media' instance corresponing to given constructor args.
-
-        The instances are cached.  They should never be constructed directly.
-        They should always be acquired using this method.  The same applyes for
-        the following two methods.
-
-        """
-        return self._resource(Media, (file, shared, tts_input),
-                              file, shared=shared, tts_input=tts_input)
-
-    def script(self, file):
-        """Return the 'Script' resource instance."""
-        return self._resource(Script, file, file)
-
-    def stylesheet(self, file):
-        """Return the 'Stylesheet' resource instance."""
-        return self._resource(Stylesheet, file, file)
-
-    
     def counter(self):
         """Return the internal counter as a 'Counter' instance.
         
@@ -431,7 +420,8 @@ class VocabularyPractice(ContentNode):
         exercises = [cls(self, items=self._items)
                      for cls in (VocabExercise, VocabExercise2)]
         return Container(self, exercises)
-        
+
+    
 class ExerciseNode(ContentNode):
     
     def __init__(self, parent, data, *args, **kwargs):
@@ -477,15 +467,14 @@ class Unit(InnerNode):
             print "Warning: %s: 4 sections expected, %d found." % \
                   (filename, len(sections))
             sections = (tuple(sections) + 4*(SplittableText(''),))[0:4]
-        child = self._create_child
-        v = child(Vocabulary)
-        return (v,
-                child(Grammar),
-                child(VocabularyPractice, v.items()),
-                child(ListeningComprehension, sections[0:2]),
-                child(GrammarPractice, sections[2]),
-                child(Consolidation, sections[3]),
-                child(Summary))
+        v = self._create_child(Vocabulary)
+        args = ((Grammar, ),
+                (VocabularyPractice, v.items()),
+                (ListeningComprehension, sections[0:2]),
+                (GrammarPractice, sections[2]),
+                (Consolidation, sections[3]),
+                (Summary, ))
+        return [v] + [self._create_child(*a) for a in args]
 
     def _id(self):
         return 'unit%02d' % (self._parent.index(self)+1)

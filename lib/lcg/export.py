@@ -22,7 +22,7 @@ import os
 import shutil
 
 from course import *
-from content import *
+from resources import *
 
 class Exporter(object):
 
@@ -81,7 +81,7 @@ class StaticExporter(Exporter):
         def tags(template, items):
             return '\n'.join(map(lambda x: "  " + template % x, items))
         if self._stylesheet is not None:
-            node.stylesheet(self._stylesheet)
+            node.resource(Stylesheet, self._stylesheet)
         nav = self._navigation(node)
         meta = node.root_node().meta()
         http_equiv = {'Content-Type': 'text/html; charset=UTF-8'}
