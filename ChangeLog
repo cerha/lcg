@@ -1,3 +1,63 @@
+2004-10-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py
+	(Selection): New class based on `MultipleChoiceQuestion'
+	implementation.
+	(MultipleChoiceQuestion): Derive from `Selection' and only extend
+	the cnostructor and the `export()' method with the question.
+	(TrueFalseStatement._export_choices): Respect the changes in
+	parent class.
+	(Cloze._REGEXP): New constant.
+	(Cloze.__init__): Don't allocate the resources (media and
+	scripts).
+	(Cloze.answers): New method.
+	(Cloze._make_field): Don't add the word to self._answers().
+	(Cloze.export): Don't export anything related to the form.  Export
+	just a paragraph of text with input fields.
+	(Transformation): New class.
+	(Exercise._export_tasks): New method.
+	(Exercise.export): Use it.
+	(ClozeTest.__init__): Allocate the media and script for exercise
+	evaluation.
+	(ClozeTest._instructions): New method.
+	(ClozeTest._export_tasks): Export also a form and controls for
+	exercise evaluation.
+	(ListeningClozeTest): New class.
+	(SelectionExercise): New class.
+	(ListeningSelectionExercise): New class.
+	(GapFillingExercise._instructions): Text updated.
+	(MultipleChoiceExercise._instructions): Text updated.
+	(SentenceCompletionExercise): New class.
+	(TransformationExercise): New class.
+	(Dictation): New class.
+
+	* lcg/export.py (Exporter._export_resource): Escape apostrophes in
+	a TTS input.
+	(StaticExporter._wrap_content): Don't use the `type' attribute for a
+	`script' tag (doesn't work with Mozilla).
+
+	* lcg/course.py (ContentNode.lang): New method.
+
+	* lcg/feed.py (ExcelVocabFeeder._LANGUAGE_ORDER): New constant.
+	(ExcelVocabFeeder.feed): Assertion for parent language existence
+	in `self._LANGUAGE_ORDER'.
+	(ExcelVocabFeeder.feed): Search the translation according to
+	parents language and the `_LANGUAGE_ORDER' constant.  Don't
+	require all the columns to exist (but report missing
+	translations).
+	(ExerciseFeeder._read_task): Add a mapping for `Selection' type
+	task.
+	(ExerciseFeeder._process_choices): Don't expect the statement in
+	the input, unpack just the choices.  Take the sequence of lines as
+	argument instead of multiline text.
+	(ExerciseFeeder._read_selection): Nová metoda.
+	(ExerciseFeeder._read_multiple_choice_question)
+	(ExerciseFeeder._read_gap_fill_statement): Split the text to lines
+	and treat the question/statement separately.  Process only the
+	remaining lines with `_read_selection()'.
+	(ExerciseFeeder._read_task): New mapping for `Transformation'.
+	(ExerciseFeeder._read_transformation): New method'
+
 2004-09-24  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/ims.py (_Manifest._create_item): Use
