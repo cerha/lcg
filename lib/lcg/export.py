@@ -90,7 +90,7 @@ class StaticExporter(Exporter):
         'prev': '1',
         'next': '3',
         'up': '2',
-        'index': '5',
+        'index': '4',
         }
     
     def head(self, node):
