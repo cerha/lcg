@@ -182,8 +182,7 @@ class ContentNode(object):
         
         """
         if self._parent is not None:
-            name = camel_case_to_lower(self.__class__.__name__)
-            return '%02d-%s' % (self._parent.index(self) + 1, name)
+            return camel_case_to_lower(self.__class__.__name__)
         else:
             return 'index'
 
@@ -225,6 +224,17 @@ class ContentNode(object):
                     return found
             return None
         return find(anchor, self.sections())
+
+    def find_node(self, id):
+        def find(id, node):
+            if node.id() == id:
+                return node
+            for n in node.children():
+                found = find(id, n)
+                if found:
+                    return found
+            return None
+        return find(id, self)
     
     def url(self):
         return self.output_file()
@@ -273,10 +283,16 @@ class ContentNode(object):
 
     def id(self):
         """Return a unique id of this node as a string."""
-        if self._parent is None or self._parent is self.root_node():
-            return self._id()
+        id = self._id()
+        if self._parent is None:
+            return id
+        same = [n for n in self._parent.children() if n._id() == id]
+        if len(same) > 1:
+            id += '-%02d' % (same.index(self) + 1)
+        if self._parent is self.root_node():
+            return id
         else:
-            return '-'.join((self._parent.id(), self._id()))
+            return '-'.join((self._parent.id(), id))
         
     def title(self, abbrev=False):
         """Return the title of this node as a string."""
