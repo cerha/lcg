@@ -74,20 +74,29 @@ def itemize(items, indent=0, ordered=False, style=None, cls=None):
 
 # Form controls
 
+def label(text, id):
+    return '<label for="%s">%s</label>' % (id, text)
+
 def _input(type, name=None, value=None, handler=None, cls=None, size=None,
-           readonly=False):
+           readonly=False, id=None):
     handler = handler and "javascript: %s" % handler
     return '<input type="%s"%s%s>' % (type, _attr(('name', name),
                                                   ('value', value),
                                                   ('size', size),
                                                   ('onClick', handler),
-                                                  ('class', cls)),
+                                                  ('class', cls),
+                                                  ('id', id)),
                                       readonly and ' readonly' or '')
 
-def field(text='', name='', size=20, cls=None, readonly=False):
-    cls = cls and 'text ' + cls or 'text'
-    return _input('text', name=name, value=text, size=size, cls=cls,
-                  readonly=readonly)
+def field(text='', name='', size=20, **kwargs):
+    kwargs['cls'] = kwargs.has_key('cls') and 'text '+kwargs['cls'] or 'text'
+    return _input('text', name=name, value=text, size=size, **kwargs)
+
+def radio(name, **kwargs):
+    return _input('radio', name=name, **kwargs)
+
+def hidden(name, value):
+    return _input('hidden', name=name, value=value)
 
 def button(label, handler, cls=None):
     cls = cls and 'button ' + cls or 'button'
@@ -96,18 +105,12 @@ def button(label, handler, cls=None):
 def reset(label, handler=None, cls=None):
     return _input('reset', handler=handler, value=label, cls=cls)
 
-def hidden(name, value):
-    return _input('hidden', name=name, value=value)
-
-def radio(name, handler=None, value=None, cls=None):
-    return _input('radio', name=name, handler=handler, value=value, cls=cls)
-
-def select(name, options, handler=None, default=""):
+def select(name, options, handler=None, default="", id=None):
     opts = [_tag('option', (('value', value),), text)
             for text, value in options]
     if default is not None:
         opts.insert(0, _tag('option', (), default))
-    attr = (('name', name), ('onChange', handler))
+    attr = (('name', name), ('id', id), ('onChange', handler))
     return _tag('select', attr, opts, concat="\n")
 
 # Special controls
@@ -127,6 +130,7 @@ def script(code, noscript=None):
            code +'</script>'+ noscript
 
 def script_write(content, noscript=None):
+    #return content
     if content:
         c = content.replace('"','\\"').replace('\n','\\n').replace("'","\\'")
         content = 'document.write("'+ c +'");'
