@@ -57,7 +57,6 @@ class Exporter(object):
     def _export_media(self, media):
         src_path = media.source_file()
         dst_path = media.destination_file(self._dir)
-        #print "***", src_path, dst_path
         if not os.path.exists(dst_path) or \
                os.path.exists(src_path) and \
                os.path.getmtime(dst_path) < os.path.getmtime(src_path):
@@ -110,16 +109,21 @@ class StaticExporter(Exporter):
                              '  <meta name="%s" content="%s">' % (k, meta[k]),
                              meta.keys()))
 
+    def _link(self, node, label=None, title=''):
+        if node is None: return 'None' 
+        label = label or node.title()
+        return '<a href="%s" title="%s">%s</a>' % \
+               (node.output_file(), title, label)
+    
     def _navigation(self, node):
-        link = '<a href="%s">%s</a>'
-        n = node.next()
-        p = node.prev()
-        next = n and link % (n.output_file(), n.title()) or "None"
-        prev = p and link % (p.output_file(), p.title()) or "None"
-        nav = 'Next: %s | Previous: %s' % (next, prev)
-        if node != node.root_node():
-            nav += ' | ' + link % (node.root_node().output_file(), 'TOC')
-        return nav
+        nav = ['Next: ' + self._link(node.next()),
+               'Previous: ' + self._link(node.prev())]
+        if node is not node.root_node():
+            p = node.parent()
+            if p is not node.root_node():
+                nav.append(p.__class__.__name__ + ' Index: ' + self._link(p))
+            nav.append(self._link(node.root_node(), label='Course Index'))
+        return ' | '.join(nav)
 
     def _toc(self, node):
         if isinstance(node, (RootNode, InnerNode)):
