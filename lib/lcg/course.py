@@ -83,9 +83,8 @@ class ContentNode(object):
         self._children.append(child)
         
     def __str__(self):
-        return "<%s title='%s' id='%s' subdir='%s' output_file='%s'>" % \
-               (self.__class__.__name__, self.title(), self.id(),
-                self.subdir(), self.output_file())
+        return "<%s  id='%s' title='%s' subdir='%s'>" % \
+               (self.__class__.__name__, self.id(), self.title(), self.subdir())
 
     def _create_content(self):
         """Create the content for this node as a 'Content' instance.
