@@ -1,14 +1,21 @@
 #!/usr/bin/env python
 
-import lcg
 import sys
+import gettext
 
-source_dir = sys.argv[1]
-destination_dir = sys.argv[2]
-stylesheet = len(sys.argv) > 3 and sys.argv[3] or None
+try:
+    source_dir, destination_dir, lang = sys.argv[1:4]
+    stylesheet = len(sys.argv) > 4 and sys.argv[4] or None
+except ValueError:
+    raise Exception("Usage: %s source_dir destination_dir lang [stylesheet]" % \
+                    sys.argv[0])
 
-c = lcg.course.EurochanceCourse(source_dir)
+t = gettext.translation('lcg', 'translations', (lang,), fallback=True)
+t.install(unicode=True)
 
+import lcg
+c = lcg.course.EurochanceCourse(source_dir, language=lang,
+                                input_encoding='iso-8859-1')
 #e = lcg.ims.IMSExporter(c, destination_dir)
 e = lcg.export.StaticExporter(c, destination_dir, stylesheet=stylesheet)
 
