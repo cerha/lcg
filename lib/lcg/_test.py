@@ -17,19 +17,37 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import unittest
-
-import lesson
+import lcg
+import os
 
 class TestSuite(unittest.TestSuite):
     def add(self, cls, prefix = 'check_'):
         tests = filter(lambda s: s[:len(prefix)] == prefix, dir(cls))
         self.addTest(unittest.TestSuite(map(cls, tests)))
+
 tests = TestSuite()
 
-class Client(unittest.TestCase):
-    def check_it(self):
-    	a = 8
-tests.add(Client)
+class ContentNode(unittest.TestCase):
+    def check_misc(self):
+    	a = lcg.ContentNode(None, 'aaa')
+        b = lcg.ContentNode(a, 'bbb')
+        assert a.root_node() == b.root_node() == a
+        assert a.src_dir() == 'aaa'
+        assert b.src_dir() == os.path.join('aaa', 'bbb')
+
+    def check_media(self):
+    	a = lcg.ContentNode(None, 'aaa')
+        m1 = a.media('sound1.ogg', tts_input='Hello')
+        try:
+            m2 = a.media('sound2.ogg')
+        except AssertionError, e:
+            msg = "Media file '%s' doesn't exist!" % \
+                  os.path.join('aaa', 'sound2.ogg')
+            assert e.args == (msg, )
+        assert a.list_media() == (m1, )
+
+tests.add(ContentNode)
+
 
 def get_tests():
     return tests
