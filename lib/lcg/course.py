@@ -59,6 +59,7 @@ class ContentNode(object):
     'Module' etc."""
 
     _ABBREV_TITLE = None
+    _PARENT_ID_PREFIX = True
     
     def __init__(self, parent, subdir=None, language='en',
                  input_encoding='ascii'):
@@ -213,8 +214,9 @@ class ContentNode(object):
         return tuple(self._children)
 
     def sections(self):
+        """Return all the top-level sections within this node's content."""
         return self._content.sections()
-
+    
     def find_section(self, anchor):
         def find(anchor, sections):
             for s in sections:
@@ -290,7 +292,7 @@ class ContentNode(object):
         same = [n for n in self._parent.children() if n._id() == id]
         if len(same) > 1:
             id += '-%02d' % (same.index(self) + 1)
-        if self._parent is self.root_node():
+        if self._parent is self.root_node() or not self._PARENT_ID_PREFIX:
             return id
         else:
             return '-'.join((self._parent.id(), id))
