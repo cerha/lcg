@@ -43,8 +43,7 @@ from feed import *
 class ContentNode(object):
     """Representation of one output document within a course material.
 
-    This class represents a generic node of a course material.  Each node can
-    have several children nodes and can depend on several 'Resource' instances.
+    This class represents a generic node of a course material.  Each node can    have several children nodes and can depend on several 'Resource' instances.
     By instantiating a node, all the resources are read and the content is
     built and ready for export.
     
@@ -55,6 +54,14 @@ class ContentNode(object):
     generated content (eg. in Tables Of Contents etc.).  The derived
     classes should define some more meaningful titles, such as 'Lesson',
     'Module' etc."""
+
+    _TOC_TITLE = _("Node Index")
+
+    """The TOC title is used as a text of a link to the node's table of
+    contents.  As well as '_TITLE', it can be overriden to some more meaningful
+    title, such as 'Unit Index' etc.  Obviously, this is not necessary for the
+    nodes which don't contain any child nodes, since no Table of Contents is
+    generated for them."""
     
     def __init__(self, parent, subdir, language='en', input_encoding='ascii',
                  default_resource_dir='resources'):
@@ -219,6 +226,10 @@ class ContentNode(object):
     def title(self):
         """Return the title of this node as a string."""
         return self._TITLE
+    
+    def toc_title(self):
+        """Return the title of the link to this node's Table of Contents."""
+        return self._TOC_TITLE
 
     def full_title(self, separator=' - '):
         """Return the title of this node as a string."""
@@ -620,7 +631,8 @@ class Consolidation(TextNode):
 class Unit(InnerNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
     _TITLE = _("Unit")
-    
+    _TOC_TITLE = _("Unit Index")
+
     def _create_children(self):
         subdir = {Exercises: 'exercises'}
         return [cls(self, subdir.get(cls, ''),
