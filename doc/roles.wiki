@@ -30,29 +30,29 @@ forced to deal with the technical aspects more than necessary.
 
 With all this in mind, the following model has been chosen for the process:
 
-* the input data will be gradually uploaded to the server in a form defined by
-  a [manual.wiki|manual] as it is being developed/improved.
-* this data will be processed by the technicians (using the LCG) and eventual
-  problems will be either directly corrected where possible or communicated
-  with content creators.
-* the LCG will be gradually modified to produce the best possible presentation
-  of the course material.
+ * the input data will be gradually uploaded to the server in a form defined by
+   a [manual.wiki|manual] as it is being developed/improved.
+ * this data will be processed by the technicians (using the LCG) and eventual
+   problems will be either directly corrected where possible or communicated
+   with content creators.
+ * the LCG will be gradually modified to produce the best possible presentation
+   of the course material.
 
 
 == Role assignment ==
 
 === Lawton School, BFI ===
 
-* uploading the content to the server in the form defined by the [manual.wiki|manual]
+ * uploading the content to the server in the form defined by the [manual.wiki|manual]
 
 === Media LT ===
 
-* processing the content uploaded by content creators
-* solving the problems in the input data and providing feedback to content
-  creators (to avoid the same problems in future)
+ * processing the content uploaded by content creators
+ * solving the problems in the input data and providing feedback to content
+   creators (to avoid the same problems in future)
 
 === Brailcom ===
 
-* create the [manual.wiki|manual] describing the formats of input data
-* support for Media LT in the process of processing the input data
-* development of the LCG
+ * create the [manual.wiki|manual] describing the formats of input data
+ * support for Media LT in the process of processing the input data
+ * development of the LCG

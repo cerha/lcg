@@ -4,28 +4,22 @@ Tomas Cerha, 2004-05-19
 
 This document describes the course structure for Eurochance language courses.
 
-Table of Contents: @TOC@
-
-== Overview ==
-
 A course consists of a certain number of units (for instance 15 units for
 the Intermediate course).  Each unit is focused on certain topic (e.g. finance,
 catering etc.).
 
-Each unit consists of several sections:
+== The contents of the units ==
 
-  * *Aims and Objectives* ... outline of the focus of the unit
-  * *Vocabulary* ... vocabulary listing
-  * *Grammar* ... a very basic explanation
-  * *Exercises* ... series of exercises to practise the acquired knowledge
-  * *Checklist* ... an overview of competences achieved in the unit
+Each unit has the same structure.  It consists of five sections.
 
-== Types of Content ==
+The sections are: @TOC@
+
 
 === Aims and Objectives ===
 
-This introduction section consists of a structured text.  This means paragraphs
-of text with simple formatting (text emphasizing, itemized lists etc.).
+This sections is a brief outline of the focus of the unit.  The contents is a
+structured text -- paragraphs, bullet lists etc.
+
 
 === Vocabulary ===
 
@@ -36,23 +30,36 @@ speaker) and read the translation into his mother tongue.
 User can browse the vocabulary up and down and search for a concrete word
 (by the means of the browser).
 
-=== Key Grammar ===
 
-This is another structured text section.  Multiple sections should be used to
-allow direct access to certain parts from the Table of Contents and the Grammar
-Index.
+=== Grammar ===
+
+This section contains grammar explanations for the unit.  These explanations
+are writetn as structured text.
+
+Multiple sections should be used to allow direct access to certain parts from
+the Table of Contents and the Grammar Index.
+
 
 === Exercises ===
 
-This section consists of a series of exercises.  There is a predefined set of
-exercise types that can be used.  The order and number of exercises does not
-matter as long as the types are respected, however it is advisable to stick to
-cartain convention for beter users orientation.
+This section consists of five subsections.  Each subsection consists of a
+series of exercises.  The subsections are:
+
+  * Section 1: Vocabulary Practice
+  * Section 2: Listening Comprehension
+  * Section 3: General Comprehension
+  * Section 4: Grammar Practice
+  * Section 5: Consolidation
+
+There is a predefined set of exercise types that can be used.  The order and
+number of exercises does not matter as long as the types are respected, however
+it is advisable to stick to cartain convention for beter users orientation.
 
 The detailed description of exercise types and their content can be found at
 the [manual.html|Language Content Generator manual].
 
-=== Consolidation ===
+
+=== Checklist ===
 
 This is a short section of structured text.  Most often this will be an
 itemised list of the competences achieved in the unit.
