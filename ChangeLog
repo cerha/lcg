@@ -1,5 +1,27 @@
 2004-12-15  Tomas Cerha  <cerha@brailcom.org>
 
+	* bin/generate.py: Set the input encoding to 'utf-8'.
+
+	* lcg/feed.py (ExcelVocabFeeder._TRANSLATION_ORDER): Include just
+	the tuple of laguage codes here.
+	(ExcelVocabFeeder._ENCODING): New constant.
+	(ExcelVocabFeeder.feed): Use the new constants.
+	(ExcelVocabFeeder.feed.safe_char): Return an empty string for
+	punctuation characters.
+	(ExcelVocabFeeder.feed): Report the filename and the
+	word for `UnicodeDecodeError'.
+	(ExerciseFeeder.feed): Report the filename for
+	`UnicodeDecodeError'.
+	(ExerciseFeeder._exercise): Use the `text()' method when passing
+	the pieces of `SplittableText' to further processing.
+	(ExerciseFeeder._read_header): Consider `text' as a string. not
+	`SplittableText'.
+	(ExerciseFeeder._read_header): Convert the key to a plain string.
+	Convert the exercise type to a plain string.
+
+
+	* lcg/util.py (SplittableText.text): New method.
+
 	* lcg/course.py (ContentNode._read_file): Reportthe filename on
 	`UnicodeDecodeError'.
 	(Consolidation): Renamed to `Summary'.
