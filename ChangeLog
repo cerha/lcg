@@ -1,6 +1,16 @@
 2004-10-05  Tomas Cerha  <cerha@brailcom.org>
 
+	* lcg/content.py (TrueFalseStatement.export): New method.
+	(ClozeTask._export_text): New method.
+	(ClozeTask.export): Use it.
+	(TransformationTask._make_field): Method removed.
+	(TransformationTask.__init__): New method.
+	(TransformationTask.export): New method.
+
 	* lcg/feed.py (ExcelVocabFeeder_LANGUAGE_ORDER): Spanish added.
+	(ExerciseFeeder._read_transformation): Make sure that there are
+	just two lines.  Pass each line as a separate argument to
+	`TransformationTask' constructor.
 
 	* doc/manual.wiki: Exercise names updated.  New exercise types
 	added.  Task type descriptions moved to the descriptions of
