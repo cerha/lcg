@@ -34,6 +34,11 @@
 	onClick handler with "javascript: ".
 	(Cloze._export_tasks): Don't wrap the tasks in a form.
 	(TrueFalseStatements._instructions): Cosmetic changes.
+	(Selection._export_choices): Method removed.
+	(TrueFalseStatement._export_choices): Method removed.
+	(Selection.export): Don't use `self._export_choices()'.
+	(MultipleChoiceQuestion.export): Don't use `self._export_choices()'.
+	(TrueFalseStatement.export): New method.
 
 2004-10-20  Tomas Cerha  <cerha@brailcom.org>
 
