@@ -1,3 +1,41 @@
+2005-01-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/feed.py (Feeder._current_input_position)
+	(Feeder._current_input_position, Feeder._current_input_position)
+	(FileFeeder._current_input_position): New methods.
+	(SplittableTextFeeder): Descend from `Feeder'.
+	(SplittableTextFeeder.__init__): Always expect just a
+	`SplittableText' instance as an argument.
+	(SplittableTextFeeder._pieces): Don't reduce the sequence.  There
+	is just one `SplittableText' instance in `self._text'.
+	(SplittableTextFeeder.__init__): New method.
+	(ExcelVocabFeeder.feed): Use `self._panic()'.
+	(ExcelVocabFeeder.feed): Use `self._warn()'.
+	(ExerciseFeeder._panic): Method removed.
+	(ExerciseFeeder._exercise): Check the tasks for
+	`SentenceCompletion' /temporary hack/.
+	(ExerciseFeeder._exercise, ExerciseFeeder._read_task): Don't pass
+	filename and linenumber to `self._panic()'.
+
+	* lcg/export.py (StaticExporter._div, StaticExporter._toc)
+	(StaticExporter._make_toc): Methods removed.
+	(StaticExporter._link): Use the `link()' function from `_html'.
+	Unused keyword argument `title' removed /always use
+	`node.title()'/.  Use the abbreviated title for label.
+	(StaticExporter._navigation): Use just "Up" instead of
+	`node.toc_title()'.  Use `div()' instead of `self._div()'.
+
+	* lcg/_html.py: Import `operator' and `types'.
+	(div): New function.
+	(link): New arguments `hotkey' and `title'.  Order of keyword
+	arguments changed.
+
+	* lcg/resources.py: Import `codecs' and everything from `util'.
+
+	* translations/Makefile: New file.
+
+	* Makefile: File removed from CVS.
+
 2005-01-07  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/util.py (camel_case_to_lower): New function.
