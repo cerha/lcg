@@ -1,3 +1,25 @@
+2005-03-29  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py (DocNode._id): New method.
+	(DocMaker._create_content): TOC depth set to 2.
+
+	* lcg/export.py (StaticExporter._INDEX_LABEL): New constant.
+	(StaticExporter._navigation): Use it.
+
+	* lcg/eurochance.py (EurochanceExporter): New class.
+
+	* bin/generate.py: Use `EurochanceExporter'.
+
+	* doc/manual.wiki: File removed.
+
+	* doc/structure.wiki: Updated.
+
+	* doc/intro.wiki: New file.
+
+	* doc/index.txt: New file.
+
+	* doc/formats.wiki: New file.
+
 2005-03-24  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/docmaker.py: New script.
