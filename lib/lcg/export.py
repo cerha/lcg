@@ -72,7 +72,8 @@ class Exporter(object):
                 except KeyError:
                     pass
                 if cmd:
-                    cmd = cmd % {'text': r.tts_input(), 'file': dst_path}
+                    input = r.tts_input().replace("'", "\\'")
+                    cmd = cmd % {'text': input, 'file': dst_path}
                     print "  - generating with TTS: %s" % cmd
                     os.system(cmd)
             else:
@@ -117,7 +118,7 @@ class StaticExporter(Exporter):
                              (('prev', node.prev()), ('next', node.next()))))),
              tags('<link rel="stylesheet" type="text/css" href="%s">',
                   map(lambda s: s.url(), node.resources(Stylesheet))),
-             tags('<script language="Javascript" type="text/javacript"' + \
+             tags('<script language="Javascript"' + \
                   ' src="%s">', map(lambda s: s.url(), node.resources(Script))),
              '</head>',
              '<body>',
