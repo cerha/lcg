@@ -119,6 +119,12 @@ class WikiText(TextContent):
     def export(self):
         return wiki.Formatter(self._parent).format(self._text)
 
+class PreformattedText(TextContent):
+    """Preformatted text."""
+
+    def export(self):
+        return '<pre class="lcg-preformatted-text">'+self._text+'</pre>'
+
     
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
