@@ -57,9 +57,7 @@ class ContentNode(object):
           parent -- parent node; the 'ContentNode' instance directly preceeding
             this node in the content hierarchy.  Can be None for the top node.
           subdir -- a directory name relative to parent's source directory.  All
-            input resources are expected in this directory.  The output is also
-            exported to a subdirectory of this name (relative to the destination
-            directory of the parent node).
+            input resources are expected in this directory.
 
         """
         assert parent is None or isinstance(parent, ContentNode)
@@ -85,9 +83,9 @@ class ContentNode(object):
         self._children.append(child)
         
     def __str__(self):
-        return "<%s title='%s' id='%s' src_dir='%s' output_file='%s'>" % \
+        return "<%s title='%s' id='%s' subdir='%s' output_file='%s'>" % \
                (self.__class__.__name__, self.title(), self.id(),
-                self.src_dir(), self.output_file())
+                self.subdir(), self.output_file())
 
     def _create_content(self):
         """Create the content for this node as a 'Content' instance.
@@ -121,39 +119,55 @@ class ContentNode(object):
         else:
             return self._parent.root_node()
         
+    def children(self):
+        """Return the list of all subordinate nodes as a tuple."""
+        return tuple(self._children)
+
+    def linear(self):
+        return [self] + reduce(lambda l, n: l + n.linear(), self.children(), [])
+
+    def next(self):
+        """."""
+        linear = self.root_node().linear()
+        i = linear.index(self)
+        if i < len(linear)-1:
+            return linear[i+1]
+        else:
+            return None
+    
+    def prev(self):
+        """."""
+        linear = self.root_node().linear()
+        i = linear.index(self)
+        if i > 0:
+            return linear[i-1]
+        else:
+            return None
+
+    def subdir(self):
+        """Return the name of this node's subdirectory relative to root node."""
+        if self._parent is None:
+            return self._subdir
+        else:
+            return os.path.normpath(os.path.join(self._parent.subdir(),
+                                                 self._subdir))
+
     def src_dir(self):
-        """Return the absolute path to this node's source directory.
-
-        In fact this path can be relative to current directory when the
-        generator is being run from the command-line.
-
-        """
-        if self._parent is None:
-            return self._subdir
-        else:
-            return os.path.normpath(os.path.join(self._parent.src_dir(),
-                                                 self._subdir))
-
-    def dst_dir(self):
-        """Return the relative path to this node's output directory.
-
-        The path is relative to the export directory.
+        return os.path.normpath(os.path.join(self.root_node().src_dir(),
+                                             self.subdir()))
         
-        """
-        if self._parent is None:
-            return self._subdir
-        else:
-            return os.path.normpath(os.path.join(self._parent.dst_dir(),
-                                                 self._subdir))
-
     def output_file(self):
         """Return full pathname of the output file relative to export dir."""
-        return os.path.join(self.dst_dir(),
-                            self.__class__.__name__.lower()+'.html')
+        return self.id() + '.html'
 
     def id(self):
         """Return a unique id of this node as a string."""
-        return "%s-%d" % (self.__class__.__name__.lower(), id(self))
+        basename = self.subdir().replace(os.path.sep, '-')
+        name = self.__class__.__name__.lower()
+        if basename != '':
+            return '-'.join((basename, name))
+        else:
+            return name
 
     def title(self):
         """Return the title of this node as a string."""
@@ -161,6 +175,25 @@ class ContentNode(object):
             return self._title
         return self.__class__.__name__
 
+    def full_title(self, separator=' - '):
+        """Return the title of this node as a string."""
+        title = self.title()
+        node = self._parent
+        while (node is not None):
+            title = separator.join((node.title(), title))
+            node = node._parent
+        return title
+
+    def meta(self):
+        """Return the meta data as a dictionary.
+
+        This method returns just an empty dictionary, but it is supposed to be
+        overriden in the implementing class.  Only root node's meta information
+        is taken into account, however.
+
+        """
+        return {}
+    
     def content(self):
         return self._content
     
@@ -185,10 +218,6 @@ class ContentNode(object):
             self._media[key] = media
             return media
     
-    def children(self):
-        """Return the list of all subordinate nodes as a tuple."""
-        return tuple(self._children)
-
     def counter(self):
         """Return the internal counter as a 'Counter' instance.
 
@@ -231,7 +260,6 @@ class NumberedNode(InnerNode):
         self._number = number
         super(NumberedNode, self).__init__(parent, subdir)
 
-
     def title(self):
         return "%s %d: %s" % (self.__class__.__name__, self._number,
                               self._read_resource('title'))
@@ -253,7 +281,7 @@ class Course(InnerNode):
         return TableOfContents(self)
     
     def output_file(self):
-        return os.path.join(self.dst_dir(), 'index.html')
+        return 'index.html'
 
     def src_dir(self):
         return self._dir
@@ -270,7 +298,7 @@ class Media(object):
     constructed directly.  Use the 'ContentNode.media()' method instead.
 
     """
-    shared_directory = 'media'
+    SUBDIRECTORY = 'media'
     
     def __init__(self, parent, file, shared=False, tts_input=None):
         """Initialize the instance.
@@ -302,12 +330,13 @@ class Media(object):
     def source_file(self):
         dir = not self._shared and self._parent.src_dir() \
               or os.path.join(self._parent.root_node().src_dir(),
-                              self.shared_directory)
+                              self.SUBDIRECTORY)
         return os.path.join(dir, self._file)
 
     def destination_file(self, dir):
-        subdir = self._shared and \
-                 self.shared_directory or self._parent.dst_dir()
+        subdir = self.SUBDIRECTORY
+        if not self._shared:
+            subdir = os.path.join(subdir, self._parent.subdir())
         return os.path.join(dir, subdir, self._file)
 
     def url(self):
@@ -371,3 +400,8 @@ class EurochanceCourse(Course):
         return map(lambda subdir: Unit(self, subdir, c.next()),
                    filter(lambda d: d not in('media'),
                           list_subdirs(self.src_dir())))
+
+    def meta(self):
+        return {'author': 'Eurochance team',
+                'copyright': "Copyright (c) 2004 Brailcom, o.p.s."}
+
