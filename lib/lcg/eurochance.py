@@ -121,7 +121,11 @@ class ExerciseInstructions(EurochanceNode):
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
-        return self._type.help(self)
+        try:
+            pre = self._parse_wiki_file(self._id())
+        except IOError, e:
+            pre = None
+        return self._type.help(self, pre)
 
     def title(self, abbrev=False):
         return _("Instructions for %s") % self._type.name()
@@ -136,7 +140,7 @@ class _Index(EurochanceNode):
         self._units = units
         super(_Index, self).__init__(parent, *args, **kwargs)
 
-        
+    
 class CourseIndex(_Index):
     _TITLE = _("Detailed Course Index")
 
