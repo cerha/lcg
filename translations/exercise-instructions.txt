@@ -1,0 +1,188 @@
+== Instructions ==
+
+#if issubclass(cls, SentenceCompletion)
+
+The aim of this exercise is to provide an opportunity for the user to produce a
+complete sentence in English and compare pronunciation with an original and is
+therefore purely aural-oral, with no written tasks.
+
+If you wish to check your answers against the written text, you can see the
+textual transcript of the recording.  Since this is not a written exercise,
+there is no way to check your results automatically.
+
+#endif
+
+# **** _ChoiceBasedExercise subclasses ****
+
+#if issubclass(cls, MultipleChoiceQuestions)
+
+Each question in this exercise is followed by a list of possible answers
+labaled a, b and c.  Only one answer is correct.
+
+#endif
+#if issubclass(cls, Selections)
+
+There are several pairs of simmillar sentences, however one sentence in each
+pair is always incorrect.  Your goal is to decide which is the correct one.
+
+#endif
+#if issubclass(cls, TrueFalseStatements)
+
+Each sentence in this exercise is followed by a control with two options --
+'TRUE' and 'FALSE'.  Your goal is to decide whether the sentence is true or not
+and choose the corresponding option.
+
+#endif
+#if issubclass(cls, GapFilling)
+
+Your goal is to choose the correct word to fill in a gap in a sentence.  For
+each gap you have three choices.  Only one of them is correct.
+
+#endif
+#if issubclass(cls, _ChoiceBasedExercise)
+
+You will hear a response immediately after choosing the answer.  When you
+decide for a wrong answer, you can try again until you find the correct one.
+The results below the exercise will show you how many answers you did right on
+the first try (see the [#display] section below).
+
+#endif
+
+# **** _FillInExercise subclasses ****
+
+#if issubclass(cls, VocabExercise)
+
+There are two ways how you can do the exercise: The oral form and the written
+form.  Do both of them for best results.
+
+The oral version is based on the listening below.  You will hear each item in
+your language.  Say the word or expression in English and listen to the model
+pronunciation.
+
+The written version lists all the vocabulary items on the page.  For each item,
+there is a text box next to it.  Your goal is to type the translation into this
+text box.
+
+#endif
+#if issubclass(cls, Transformation)
+
+Your goal is to transform a structure (pattern or paradigm) into a different
+structure.  The recording contains detailed instructions for this
+transformation.
+
+#endif
+#if issubclass(cls, Substitution)
+
+Your goal is to substitute a structure (pattern or paradigm) with a different
+structure.  Each sentence is followed by text in brackets.  Replace the
+corresponding part of the sentence using this text.
+
+#endif
+#if issubclass(cls, Cloze)
+
+Your goal in this exercise is to fill in the gaps in the text using exactly the
+same words as you have heard in the recording.
+
+#endif
+#if issubclass(cls, _FillInExercise) and cls is not Dictation
+
+Use the buttons at the bottom of the exercise to evaluate all the answers.  You
+can also check each answer individually using the shortcut keys (see the
+section [#keys] for more information).
+
+#endif
+#if issubclass(cls, Dictation)
+
+Listen to the recording and type what you hear into the large text box below.
+You can replay the recording how many times you need to understand it, however
+two attempts should be enough for a well performing student.
+
+Pay special attention to punctuation and case, since they often cause most of
+the problems when evaluating dictation.  Write all the sentences as you hear
+them, using the appropriate punctuation character and one space after each
+sentence.  No space is allowed at after the last sentence.
+
+#endif
+
+#if issubclass(cls, _FillInExercise)
+
+== Shortcut Keys == keys
+
+In all the exercises where you fill in the text into a
+text-box you can use the two shortcut keys described
+below.
+
+
+ * *Enter* ... use this key within the text-field to evaluate the current
+   answer.  You hear a sound response and in case of an error, the cursor is
+   moved to the position of the first incorrect character within the text.
+
+ * *Ctrl-Space* ... if you don't know the answer, you can also use the ``hint''
+   feature.  Just press the key combination (holding the Ctrl key, press the
+   spacebar) and one letter of the correct answer will be filled in
+   automatically.  If you have already entered some text, the cursor will be
+   moved behind the last correct character and next one will be inserted.  It
+   also means, that if there is some text behind the cursor, there is at least
+   one error in it.  Try to locate this error and correct it.  Then you can try
+   to evaluate your answer using the 'Enter' key (see above) or use ``hint''
+   again, until you find the correct answer.
+
+#endif
+
+#if displays
+
+== Display == display
+
+The display box below the exercise shows the following values:
+
+#if 'answered' in displays
+
+ * *Answered* ... displays the number of the tasks you have already answered.
+   For example the value 4/10 means, that you have answered four out of ten
+   questions.
+
+#endif
+
+#if 'result' in displays
+#if cls is Dictation
+
+ * *Result* ... displays the result of the last evaluation (evaluate your
+   answer by pressing the 'Enter' key or by the ``Evaluate'' button below the
+   exercise).
+
+#else
+
+ * *Result* ... displays the number and percentage of successful answers.  The
+   first pair of numbers shows the results of all current answers.  If you
+   didn't answer all of them correctly on first attempt, there is also a second
+   pair of numbers showing how many answers you did succesfully on the first
+   try.  Use the ``Reset'' button to start again.
+
+#endif
+#endif
+#endif
+
+#if buttons
+== Buttons == buttons
+
+The control panel below the exercise contains the following buttons:
+
+#if 'eval' in buttons
+
+ * *Evaluate* ... evaluate the entire exercise.  If an error is found, the
+   cursor is moved to the first incorrect answer (and to the first incorrect
+   character within this answer, when some part of the answer is correct).
+   #endif
+
+#endif
+#if 'fill' in buttons
+
+ * *Fill* ... fill in the whole exercise with correct answers.
+
+#endif
+#if 'reset' in buttons
+
+ * *Reset* ... reset all your answers and start again.
+
+#endif
+#endif
