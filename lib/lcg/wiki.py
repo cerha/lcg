@@ -37,10 +37,6 @@ class CommonFormatter:
               r"""(?P<begintt>\{\{\{)""",
               r"""(?P<endtt>\}\}\})""",
               r"""(?P<htmlescapeentity>&#[0-9]+;)""",
-              r"""(?P<tickethref>#[0-9]+)""",
-              r"""(?P<changesethref>\[[0-9]+\])""",
-              r"""(?P<reporthref>\{[0-9]+\})""",
-              r"""(?P<svnhref>(svn:[^ ]+[^\., ]))""",
               r"""(?P<wikilink>(^|(?<=[^A-Za-z]))[A-Z][a-z/]*(?:[A-Z][a-z/]+)+)""",
               r"""(?P<fancylink>\[(?P<fancyurl>([a-z]+:[^ ]+)) (?P<linkname>.*?)\])"""]
 
@@ -93,35 +89,13 @@ class CommonFormatter:
         # the tickethref regexp
         return match
     
-    def _tickethref_formatter(self, match, fullmatch):
-        number = int(match[1:])
-        return '<a href="%s">#%d</a>' % (href.ticket(number), number)
-
-    def _changesethref_formatter(self, match, fullmatch):
-        number = int(match[1:-1])
-        return '[<a href="%s">%d</a>]' % (href.changeset(number), number)
-
-    def _reporthref_formatter(self, match, fullmatch):
-        number = int(match[1:-1])
-        return '{<a href="%s">%d</a>}' % (href.report(number), number)
-
-    def _svnhref_formatter(self, match, fullmatch):
-        m = re.search('^svn:(([^#]+)(#([0-9]+))?)', match)
-        if m.group(4):
-            return '<a href="%s">%s</a>' % (href.browser(m.group(2),
-                                                         int(m.group(4))),
-                                            m.group(1))
-        else:
-            return '<a href="%s">%s</a>' % (href.browser(m.group(1)),
-                                            m.group(1))
-    
     def _wikilink_formatter(self, match, fullmatch):
-        global page_dict
-        if page_dict and not page_dict.has_key(match):
-            return '<a class="wiki-missing-page" href="%s">%s?</a>' % \
-                   (href.wiki(match), match)
-        else:
-            return '<a href="%s">%s</a>' % (href.wiki(match), match)
+        #global page_dict
+        #if page_dict and not page_dict.has_key(match):
+        #    return '<a class="wiki-missing-page" href="%s">%s?</a>' % \
+        #           (href.wiki(match), match)
+        #else:
+        return '<a href="%s">%s</a>' % (match, match)
 
     def _url_formatter(self, match, fullmatch):
         return '<a href="%s">%s</a>' % (match, match)
