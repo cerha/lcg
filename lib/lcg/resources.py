@@ -108,6 +108,9 @@ class Resource(object):
 class Media(Resource):
     """Representation of a media object used within the content."""
     SUBDIR = 'media'
+
+    _FORCE_OUTPUT_FORMAT = 'mp3'
+    "If not None, all wave files will be converted to this format on output."
     
     def __init__(self, parent, file, shared=False, tts_input=None):
         """Initialize the instance.
@@ -120,9 +123,11 @@ class Media(Resource):
             be synthesized.
 
         """
-        ext = os.path.splitext(file)[1]
-        assert ext in ('.ogg','.mp3','.wav'), "Unsupported media type: %s" %ext
-        self._tts_input = tts_input   
+        basename, ext = os.path.splitext(file)
+        assert ext in ('.ogg','.mp3','.wav'), "Unsupported media type: %s" % ext
+        if self._FORCE_OUTPUT_FORMAT is not None:
+            file = basename + '.' + self._FORCE_OUTPUT_FORMAT
+        self._tts_input = tts_input
         super(Media, self).__init__(parent, file, shared=shared)
         
     def _check_file(self):
@@ -198,7 +203,8 @@ class Media(Resource):
                      self._tts_input is not None:
                 wave = self._open_stream_from_tts() 
             else:
-                raise "Unknown input format: %s" % input_format
+                raise Exception("Unsupported conversion: %s -> %s" % \
+                                input_format, output_format)
             if output_format == 'WAV':
                 data = wave
             else:
@@ -230,7 +236,32 @@ class Stylesheet(Resource):
 class Transcript(Resource):
     """Representation of a textual recording transcript."""
     SUBDIR = 'transcripts'
-    
-    def __init__(self, parent, file, shared=False):
-        super(Transcript, self).__init__(parent, file, shared=shared)
 
+    def __init__(self, parent, file, text=None, shared=False):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent, file, shared -- See 'Resource.__init__()'.
+          text -- if defined and the source file does not exist, the
+            destination file will be created using the specified text As its
+            content.
+
+        """
+        self._text = text
+        super(Transcript, self).__init__(parent, file, shared=shared)
+    
+
+    def _check_file(self):
+        if self._text is None:
+            super(Transcript, self)._check_file()
+            
+    def _export(self, dir):
+        # Either create the file using the text or copy from source directory.
+        if self._text is None: # or os.path.exists(self._src_path):
+            return super(Transcript, self)._export(dir)
+        else:
+            dst_path = self._destination_file(dir)
+            output_file = open(dst_path, 'w')
+            output_file.write(self._text)
+            output_file.close()
