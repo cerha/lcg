@@ -1,3 +1,19 @@
+2005-01-19  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py (Unit._create_content): Pass the vocabulary items
+	to the `ExerciseFeeder' constructor.
+	(Unit._create_exercises): Read all five sections from the source
+	file.
+	
+
+	* lcg/feed.py (ExerciseFeeder.__init__): New keyword argument
+	`vocabulary'.
+	(ExerciseFeeder._exercise): Allow also exercises with no tasks.
+	Automatically generate tasks for `VocabExercise'.
+
+	* lcg/content.py (VocabExercise.__init__): Removed.
+	(VocabExercise._create_task): Removed.
+
 2005-01-18  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/resources.py (Resource.__init__): Expect the source files in
