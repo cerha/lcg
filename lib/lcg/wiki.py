@@ -323,3 +323,68 @@ def escape(text, param={'"':'&#34;'}):
         return saxutils.escape(text, param)
     else:
         return text
+
+
+class MacroParser(object):
+    _VARIABLE_REGEX = re.compile(r"(?!\\)\$\{?([a-zA-Z_]+)\}?")
+    _INCLUDE_REGEX = re.compile(r'(?m)^\s*#include (.*)$')
+    _IF_ELSE_REGEX = re.compile(r'(?m)^\s*(#(?:if .+|else|endif))\s*$')
+
+    class _ConditionalText(object):
+        def __init__(self, provider, condition, parent=None):
+            self._provider = provider
+            self._condition = condition
+            self.parent = parent
+            self._state = True
+            self._content = {True: [], False: []}
+            
+        def switch(self):
+            self._state = False
+        
+        def append(self, content):
+            self._content[self._state].append(content)
+
+        def __str__(self):
+            value = bool(self._provider(self._condition))
+            return '\n'.join([str(x) for x in self._content[value]])
+
+    
+    def __init__(self, eval_provider=None, include_provider=None,
+                 include_dir='.'):
+        self._eval_provider = eval_provider or self._python_eval_provider
+        self._include_provider = include_provider
+        self._include_dir = include_dir
+        self._vars = {}
+
+    def _python_eval_provider(self, expr):
+        return eval("bool(%s)" % expr, self._vars)
+
+    def _substitute_variables(self, text):
+        try:
+            return self._VARIABLE_REGEX.sub(lambda m: self._vars[m.group(1)],
+                                            text)
+        except KeyError, e:
+            raise Exception("Unknown variable $%s." % e.args[0])
+
+    def add_globals(self, **kwargs):
+        self._vars.update(kwargs)
+        
+    def parse(self, text):
+        func = lambda m: self._include_provider(m.group(1).strip())
+        text = self._INCLUDE_REGEX.sub(func, text)
+        tokens = self._IF_ELSE_REGEX.split(text)
+        structured = current = self._ConditionalText(self._eval_provider, 1)
+        for t in tokens:
+            if t.startswith('#if'):
+                new = self._ConditionalText(self._eval_provider, t[4:].strip(),
+                                            parent=current)
+                current.append(new)
+                current = new
+            elif t == '#else':
+                current.switch()
+            elif t == '#endif' and current.parent is not None:
+                current = current.parent
+            else:
+                current.append(t)
+        parsed = str(structured)
+        return self._substitute_variables(parsed)
