@@ -89,10 +89,13 @@ input.cloze {
     border-top: #aaa solid 1px;
 }
 
+dl dt {
+    font-weight: bold;
+}
+
 table.vocab-list td {
     padding-right: 1em;
 }
-
 
 table.lcg-table {
     border-collapse: collapse;

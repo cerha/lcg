@@ -1,3 +1,39 @@
+2005-03-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/eurochance.py (ExerciseInstructions.__init__): Argument
+	`exercise_class' renamed to `type'
+	(ExerciseInstructions._create_content): Use the class method
+	`Exercise.help()' instead of reading the help from a file.
+	(ExerciseInstructions._id): Make the id here instead of using the
+	class method `Exercise.id()'.
+	(ExerciseInstructions.src_dir): Method removed.
+
+	* lcg/content.py (Definition): New class.
+	(DefinitionList): New class.
+	(Exercise._BUTTONS, Exercise._DISPLAYS, Exercise._KEYS)
+	(Exercise._HELP, Exercise._help_node): New constants.
+	(Exercise.id): Method removed.
+	(Exercise.help): New class method.
+	(Exercise._export_instructions): Use `self._help_node' instead of
+	a hardcoded URL.
+	(SentenceCompletion._instructions): Text improved.
+	(SentenceCompletion._HELP):
+	(_InteractiveExercise._INITIAL_RESULT): Constant removed.
+	(_InteractiveExercise._DISPLAYS, _InteractiveExercise._BUTTONS)
+	(_ChoiceBasedExercise._HELP, MultipleChoiceQuestions._HELP)
+	(Selections._HELP, TrueFalseStatements._HELP, GapFilling._HELP)
+	(_FillInExercise._BUTTONS, _FillInExercise._KEYS)
+	(_FillInExercise._HELP, Cloze._HELP, VocabExercise._HELP)
+	(Transformation._HELP, Substitution._HELP, Dictation._DISPLAYS)
+	(Dictation._HELP): New constants.
+	(_InteractiveExercise._buttons, _InteractiveExercise._display):
+	Methods removed.
+	(_InteractiveExercise._results): Use the constants `_BUTTONS' and
+	`_DISPLAYS' instead of the methods.
+	(_ChoiceBasedExercise._buttons, _FillInExercise._buttons) 
+	(Dictation._display): Methods removed.
+	(GapFilling._instructions): Text improved.
+
 2005-03-11  Tomas Cerha  <cerha@brailcom.org>
 
 	* doc/structure.wiki: Updated.
