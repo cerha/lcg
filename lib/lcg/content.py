@@ -134,6 +134,7 @@ class VocabList(Content):
         super(VocabList, self).__init__(parent)
         assert is_sequence_of(items, VocabItem)
         self._items = items
+        parent.resource(Script, 'audio.js')
 
     def export(self):
         rows = ['<tr><td>%s %s</td><td>%s</td></tr>' % \
