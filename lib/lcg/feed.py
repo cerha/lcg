@@ -200,6 +200,22 @@ class ExerciseFeeder(SplittableTextFeeder):
     _EXERCISE_SPLITTER = re.compile(r"\r?\n----+\s*\r?\n")
     _BLANK_LINE_SPLITTER = re.compile(r"\r?\n\s*\r?\n")
     _HEADER_MATCHER = re.compile(r"^(?P<key>[a-z0-9_]+): (?P<value>.*)$")
+    
+    def __init__(self, text, vocabulary=(), **kwargs):
+        """Initialize the Feeder.
+    
+        Arguments:
+
+          vocabulary -- the sequence of VocabItem instances.  This vocabulary
+            is used for the VocabExercise, if this exercise is found in the
+            specification.
+          
+          All the remaining arguments are inherited from parent class.
+          
+        """
+        super(ExerciseFeeder, self).__init__(text, **kwargs)
+        assert is_sequence_of(vocabulary, VocabItem)
+        self._vocabulary = vocabulary
         
     def feed(self, parent):
         return [self._exercise(parent, piece)
@@ -211,15 +227,20 @@ class ExerciseFeeder(SplittableTextFeeder):
         """Convert textual exercise specification into an Exercise instance."""
         try:
             pieces = text.split(self._BLANK_LINE_SPLITTER)
-            assert len(pieces) >= 2, \
-                   "Exercise must comprise a header and at least one task."
+            assert len(pieces) >= 1, \
+                   "Exercise specification must contain a header."
             type, kwargs = self._read_header(pieces[0].text())
-            if type == SentenceCompletion: # A temporary hack.
+            task_specs = pieces[1:]            
+            if type == SentenceCompletion and len(task_specs) > 0:
                 self._warn("SentenceCompletion should not have any tasks")
                 tasks = ()
+            elif type == VocabExercise and len(task_specs) == 0:
+                tasks = [ClozeTask("%s: [%s]" % (i.translation(), i.word()))
+                         for i in self._vocabulary]
             else:
+                assert len(task_specs) >= 1, "No tasks found."
                 tasks = [self._read_task(type.task_type(), p)
-                         for p in pieces[1:]]
+                         for p in task_specs]
             kwargs['tasks'] = tuple(tasks)
             return type(parent, **kwargs)
         except SystemExit:
