@@ -17,6 +17,8 @@
 	(Transformation): New class.
 	(Exercise._export_tasks): New method.
 	(Exercise.export): Use it.
+	(ListeningExercise.__init__): Read the transcript file and use it
+	as `tts_input' argument for the created `Media' object.
 	(ClozeTest.__init__): Allocate the media and script for exercise
 	evaluation.
 	(ClozeTest._instructions): New method.
