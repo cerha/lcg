@@ -39,8 +39,8 @@ class Exporter(object):
         file = open(filename, 'w')
         file.write(self._wrap_content(node))
         file.close()
-        for m in node.list_media():
-            self._export_media(m)
+        for m in node.resources():
+            self._export_resource(m)
         for n in node.children():
             self._export_node(n)
 
@@ -54,16 +54,17 @@ class Exporter(object):
                           '  </body>',
                           '</html>'))
             
-    def _export_media(self, media):
-        src_path = media.source_file()
-        dst_path = media.destination_file(self._dir)
+    def _export_resource(self, r):
+        src_path = r.source_file()
+        dst_path = r.destination_file(self._dir)
         if not os.path.exists(dst_path) or \
                os.path.exists(src_path) and \
                os.path.getmtime(dst_path) < os.path.getmtime(src_path):
             if not os.path.isdir(os.path.dirname(dst_path)):
                 os.makedirs(os.path.dirname(dst_path))
             # Either create the file with tts or copy from source directory.
-            if media.tts_input() is not None and not os.path.exists(src_path):
+            if isinstance(r, Media) and r.tts_input() is not None \
+                   and not os.path.exists(src_path):
                 print "%s: file does not exist!" % dst_path
                 cmd = None
                 try:
@@ -71,7 +72,7 @@ class Exporter(object):
                 except KeyError:
                     pass
                 if cmd:
-                    cmd = cmd % {'text': media.tts_input(), 'file': dst_path}
+                    cmd = cmd % {'text': r.tts_input(), 'file': dst_path}
                     print "  - generating with TTS: %s" % cmd
                     os.system(cmd)
             else:
@@ -100,28 +101,35 @@ class StaticExporter(Exporter):
         self._stylesheet = stylesheet
 
     def _wrap_content(self, node):
+        def tags(template, items):
+            return '\n'.join(map(lambda x: "  " + template % x, items))
+        node.stylesheet(self._stylesheet)
         nav = self._navigation(node)
-        style = self._stylesheet and \
-                '  <link rel="stylesheet" type="text/css" href="%s">\n' % \
-                self._stylesheet or ''
-        
-        return "\n".join((self.DOCTYPE, '',
-                          '<html>',
-                          '<head>',
-                          '  <title>%s</title>' % node.full_title(),
-                          style + \
-                          self._meta(node),
-                          self._links(node),
-                          '</head>',
-                          '<body>',
-                          nav, '<hr class="navigation">',
-                          '<a name="content" accesskey="%s"></a>' % \
-                          self._hotkey['content-beginning'],
-                          '<h1>%s</h1>' % node.title(),
-                          self._div('content', node.content().export()),
-                          self._toc(node),
-                          '<hr class="navigation">', nav,
-                          '</body></html>'))
+        meta = node.root_node().meta()
+        parts = (self.DOCTYPE, '',
+                 '<html>',
+                 '<head>',
+                 '  <title>%s</title>' % node.full_title(),
+                 tags('<meta name="%s" content="%s">', meta.items()),
+                 tags('<link rel="%s" href="%s" title="%s">',
+                      map(lambda a: (a[0], a[1].output_file(), a[1].title()),
+                          filter(lambda a: a[1] is not None,
+                              (('prev', node.prev()), ('next', node.next()))))),
+                 tags('<link rel="stylesheet" type="text/css" href="%s">',
+                      map(lambda s: s.url(), node.resources(Stylesheet))),
+                 tags('<script type="text/javacript" src="%s">',
+                      map(lambda s: s.url(), node.resources(Script))),
+                 '</head>',
+                 '<body>',
+                 nav, '<hr class="navigation">',
+                 '<a name="content" accesskey="%s"></a>' % 
+                 self._hotkey['content-beginning'],
+                 '<h1>%s</h1>' % node.title(),
+                 self._div('content', node.content().export()),
+                 self._toc(node),
+                 '<hr class="navigation">', nav,
+                 '</body></html>')
+        return "\n".join(parts)
 
     def _div(self, cls, *contents):
         return '\n'.join(('<div class="%s">' % cls,) + contents + ('</div>\n',))
@@ -133,20 +141,6 @@ class StaticExporter(Exporter):
         return '<a href="%s" title="%s" accesskey="%s">%s</a>' % \
                (node.output_file(), title, hotkey, label)
     
-    def _meta(self, node):
-        meta = node.root_node().meta()
-        return '\n'.join(map(lambda k:
-                             '  <meta name="%s" content="%s">' % (k, meta[k]),
-                             meta.keys()))
-
-    def _links(self, node):
-        return '\n'.join(map(lambda a:
-                             '  <link rel="%s" href="%s" title="%s">' % \
-                             (a[0], a[1].output_file(), a[1].title()),
-                             filter(lambda a: a[1] is not None,
-                                    (('prev', node.prev()),
-                                     ('next', node.next())))))
-
     def _navigation(self, node):
         nav = ['Next: ' + self._link(node.next(), key='next'),
                'Previous: ' + self._link(node.prev(), key='prev')]
@@ -175,14 +169,4 @@ class StaticExporter(Exporter):
                              node.children())) + \
                              "\n" + indent + "</ul>\n" + indent[0:-2] 
     
-    def export(self):
-        super(StaticExporter, self).export()
-        if self._stylesheet is not None:
-            src_path = os.path.join(self._course.src_dir(), self._stylesheet)
-            dst_path = os.path.join(self._dir, self._stylesheet)
-            if not os.path.exists(dst_path) or \
-                   os.path.exists(src_path) and \
-                   os.path.getmtime(dst_path) < os.path.getmtime(src_path):
-                shutil.copy(src_path, dst_path)
-                print "%s: file copied." % dst_path
             
