@@ -1,3 +1,19 @@
+2005-02-10  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/feed.py (Feeder._current_input_position): New argument
+	`object'.  Return None here.
+	(Feeder._panic, Feeder._warn): Test the result of
+	`_current_input_position()' for None.
+	(FileFeeder._current_input_position): Use the line number from the
+	argument, if given.
+	(SplittableTextFeeder._current_input_position): Use the given
+	`SplittableText' instance, if given.
+	(ExerciseFeeder._exercise): Check for `SentenceCompletion'
+	corrected.  Pass current piece of text to `_panic()'.  Check for
+	`TrueFalseStatements' added.
+	(ExerciseFeeder._read_task): Pass current piece of text to
+	`_panic()'.
+
 2005-01-19  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/course.py (Unit._create_content): Pass the vocabulary items
