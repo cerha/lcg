@@ -150,9 +150,13 @@ class ContentNode(object):
                        'default_resource_dir': self._default_resource_dir})
         return cls(self, *args, **kwargs)
     
+    def _input_file(self, name, ext='txt'):
+        """Return the full path to the source file."""
+        return os.path.join(self.src_dir(), name + '.' + ext)
+        
     def _read_file(self, name):
         """Return all the text read from the source file."""
-        filename = os.path.join(self.src_dir(), name+'.txt')
+        filename = self._input_file(name)
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
             content = ''.join(fh.readlines())
@@ -384,7 +388,7 @@ class InnerNode(ContentNode):
     
     def _create_content(self):
         return (WikiText(self, self._read_file('intro')),
-                TableOfContents(self, title=_("Table of Contents")))
+                TableOfContents(self, title=_("Table of Contents:")))
     
     def _title(self):
         return self._read_file('title')
@@ -405,94 +409,53 @@ class RootNode(InnerNode):
 # A Concrete implemantation of Eurochance course structure.
 ################################################################################
 
-class _ExerciseNode(ContentNode):
-    
-    def _abbrev_title(self, abbrev=False):
-        return _("Section %d") % (self._parent.index(self)+1)
-
-    
-class VocabularyPractice(_ExerciseNode):
-    """Vocabulary Practice exercises section."""
-    _TITLE = "Vocabulary Practice"
-
-    def __init__(self, parent, items, *args, **kwargs):
-        self._items = items
-        super(VocabularyPractice, self).__init__(parent, *args, **kwargs)
-
-    def _create_content(self):
-        return VocabExercise(self, items=self._items)
-
-    
-class ExerciseNode(_ExerciseNode):
-    
-    def __init__(self, parent, data, *args, **kwargs):
-        self._data = data
-        kwargs['subdir'] = 'exercises'
-        super(ExerciseNode, self).__init__(parent, *args, **kwargs)
-
-    def _create_content(self):
-        feeder = ExerciseFeeder(self._data,
-                                input_encoding=self._input_encoding)
-        return feeder.feed(self)
-    
-class ListeningComprehension(ExerciseNode):
-    _TITLE = _("Listening Comprehension")
-
-class GeneralComprehension(ExerciseNode):
-    _TITLE = _("General Comprehension")
-    
-class GrammarPractice(ExerciseNode):
-    _TITLE = _("Grammar Practice")
-    
-class Consolidation(ExerciseNode):
-    _TITLE = _("Consolidation")
-
-    
 class Unit(ContentNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
     _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
-    def _create_content(self):
-        feeder = ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls',
-                                  input_encoding=self._input_encoding)
-        self._vocabulary = feeder.feed(self)
-        return (Section(self, _("Aims and Objectives"),
-                        WikiText(self, self._read_file('aims'))),
-                Section(self, _("Vocabulary"),
-                        VocabList(self, self._vocabulary)),
-                Section(self, _("Grammar"),
-                        WikiText(self, self._read_file('grammar'))),
-                Section(self, _("Exercises"),
-                        TableOfContents(self, detailed=False),
-                        contains_children=True),
-                Section(self, _("Checklist"),
-                        WikiText(self, self._read_file('checklist'))))
+    def _id(self):
+        return 'unit%02d' % self._parent.index(self)
     
-    def _create_children(self):
-        filename = os.path.join(self.src_dir(), 'exercises', 'exercises.txt')
-        text = self._read_file(os.path.join('exercises', 'exercises'))
+    def _abbrev_title(self, abbrev=False):
+        return _("Unit %d") % self._parent.index(self)
+
+    def _title(self, abbrev=False):
+        return self._read_file('title')
+
+    def _create_content(self):
+        vocab = ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
+                                 input_encoding=self._input_encoding).feed(self)
+        sections = (Section(self, _("Aims and Objectives"),
+                            WikiText(self, self._read_file('aims'))),
+                    Section(self, _("Vocabulary"),
+                            VocabList(self, vocab)),
+                    Section(self, _("Grammar"),
+                            WikiText(self, self._read_file('grammar'))),
+                    Section(self, _("Exercises"),
+                            self._create_exercises(vocab), toc_depth=1),
+                    Section(self, _("Checklist"),
+                            WikiText(self, self._read_file('checklist'))))
+        return Container(self, sections, toc_depth=2)
+
+    def _create_exercises(self, vocab):
+        filename = self._input_file('exercises')
+        text = self._read_file('exercises')
         splittable = SplittableText(text, input_file=filename)
         pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
         if len(pieces) != 4:
             print "Warning: %s: 4 sections expected, %d found." % \
                   (filename, len(pieces))
             pieces = (pieces + 4 * [SplittableText('')])[0:4]
-        children = (VocabularyPractice,
-                    ListeningComprehension,
-                    GeneralComprehension,
-                    GrammarPractice,
-                    Consolidation)
-        return [self._create_child(*a)
-                for a in zip(children, [self._vocabulary] + pieces)]
-
-    def _id(self):
-        return 'unit%02d' % self._parent.index(self)
-
-    def _abbrev_title(self, abbrev=False):
-        return _("Unit %d") % self._parent.index(self)
-
-    def _title(self, abbrev=False):
-        return self._read_file('title')
+        titles = (_("Section %d: Listening Comprehension"),
+                  _("Section %d: General Comprehension"),
+                  _("Section %d: Grammar Practice"),
+                  _("Section %d: Consolidation"))
+        enc = self._input_encoding
+        sections = [Section(self, t,
+                            ExerciseFeeder(p, input_encoding=enc).feed(self))
+             for t, p in zip(titles, pieces)]
+        return [Section(self, _("Section %d: Vocabulary Practice"),
+                        VocabExercise(self, items=vocab))] + sections
 
     
 class ExerciseInstructions(TextNode):
@@ -522,7 +485,7 @@ class CourseIndex(ContentNode):
     _TITLE = _("Detailed Course Index")
 
     def _create_content(self):
-        return TableOfContents(self, item=self._parent, depth=3)
+        return TableOfContents(self, item=self.parent(), depth=3)
 
     
 class Instructions(TextNode):
