@@ -117,8 +117,11 @@ class ContentNode(object):
         generator is being run from the command-line.
 
         """
-        return os.path.normpath(os.path.join(self._parent.src_dir(),
-                                             self._subdir))
+        if self._parent is None:
+            return self._subdir
+        else:
+            return os.path.normpath(os.path.join(self._parent.src_dir(),
+                                                 self._subdir))
 
     def dst_dir(self):
         """Return the relative path to this node's output directory.
@@ -126,8 +129,11 @@ class ContentNode(object):
         The path is relative to the export directory.
         
         """
-        return os.path.normpath(os.path.join(self._parent.dst_dir(),
-                                             self._subdir))
+        if self._parent is None:
+            return self._subdir
+        else:
+            return os.path.normpath(os.path.join(self._parent.dst_dir(),
+                                                 self._subdir))
 
     def output_file(self):
         """Return full pathname of the output file relative to export dir."""
@@ -234,6 +240,7 @@ class NumberedNode(InnerNode):
         return "%s %d: %s" % (self.__class__.__name__, self._number,
                               self._read_resource('title'))
 
+    
 class Course(InnerNode):
     """The course is a root node of the actual IMS package."""
     
@@ -243,17 +250,17 @@ class Course(InnerNode):
 
     def _create_content(self):
         return TableOfContents(self)
-
+    
     def _export(self, dir):
         super(Course, self)._export(dir)
         manifest = Manifest(self)
         manifest.write(dir)
 
+    def output_file(self):
+        return os.path.join(self.dst_dir(), 'index.html')
+
     def src_dir(self):
         return self._dir
-
-    def dst_dir(self):
-        return ''
 
 ################################################################################
 
