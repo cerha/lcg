@@ -122,21 +122,22 @@ class StaticExporter(Exporter):
                (node.output_file(), title, hotkey, label)
     
     def _navigation(self, node):
-        nav = ['Next: ' + self._link(node.next(), key='next'),
-               'Previous: ' + self._link(node.prev(), key='prev')]
+        nav = [_('Next') + ': ' + self._link(node.next(), key='next'),
+               _('Previous') + ': ' + self._link(node.prev(), key='prev')]
         if node is not node.root_node():
             p = node.parent()
             if p is not node.root_node():
-                nav.append(p.__class__.__name__ + ' Index: ' + \
-                           self._link(p, key='local-index'))
-            nav.append(self._link(node.root_node(), label='Course Index',
+                default = node.__class__.__name__ + " Index" 
+                name = {Unit: _("Unit Index")}.get(node.__class__, _(default))
+                nav.append(name + ': ' + self._link(p, key='local-index'))
+            nav.append(self._link(node.root_node(), label=_('Course Index'),
                                   key='global-index'))
         return self._div('navigation', ' | '.join(nav))
 
     def _toc(self, node):
         if not isinstance(node, (RootNode, InnerNode)): return ''
         return self._div("table-of-contents",
-                         '<h2>Table of Contents</h2>',
+                         '<h2>%s</h2>' % _("Table of Contents"),
                          self._make_toc(node))
     
     def _make_toc(self, node, indent='', deep=False):
