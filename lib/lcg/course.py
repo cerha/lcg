@@ -127,6 +127,10 @@ class ContentNode(object):
 
     # Public methods
 
+    def parent(self):
+        """Return the parent node of this node."""
+        return self._parent
+    
     def root_node(self):
         """Return the top-most node of the hierarchy."""
         if self._parent is None:
@@ -330,9 +334,11 @@ class Media(object):
                    "Media file '%s' doesn't exist!" % self.source_file()
         
     def source_file(self):
-        dir = not self._shared and self._parent.src_dir() \
-              or os.path.join(self._parent.root_node().src_dir(),
-                              self.SUBDIRECTORY)
+        if self._shared:
+            dir = os.path.join(self._parent.root_node().src_dir(),
+                               self.SUBDIRECTORY)
+        else:
+            dir = self._parent.src_dir()
         return os.path.join(dir, self._file)
 
     def destination_file(self, dir):
@@ -347,7 +353,7 @@ class Media(object):
     def tts_input(self):
         return self._tts_input
 
-    
+
 
 ################################################################################
 # Concrete implemantation of Eurochance course structure.
