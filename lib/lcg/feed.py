@@ -54,6 +54,19 @@ class Feeder(object):
         """Return a 'Content' instance constructed by reading Feeder source."""
         pass
 
+    def _current_input_position(self):
+        """Return current position in the source data to refer to an error.""" 
+        return ""
+
+    def _panic(self, message, einfo):
+        sys.stderr.write(message + ':\n  %s\n' % self._current_input_position())
+        apply(traceback.print_exception, einfo)
+        sys.exit()
+
+    def _warn(self, message):
+        sys.stderr.write('Warning: %s: %s\n' % \
+                         (message, self._current_input_position()))
+    
 class FileFeeder(Feeder):
     """Generic Feeder reading its data from an input file."""
     
@@ -76,9 +89,12 @@ class FileFeeder(Feeder):
 
     def _input_file(self):
         return os.path.join(self._dir, self._file)
+    
+    def _current_input_position(self):
+        return "File %s" % self._input_file()
 
 
-class SplittableTextFeeder(object):
+class SplittableTextFeeder(Feeder):
     """Generic Feeder reading its data from a piece of textan input file."""
     
     def __init__(self, text, *args, **kwargs):
@@ -93,18 +109,17 @@ class SplittableTextFeeder(object):
           
         """
         super(SplittableTextFeeder, self).__init__(*args, **kwargs)
-        if isinstance(text, SplittableText):
-            text = (text,)
-        else:
-            assert is_sequence_of(text, SplittableText)
+        assert isinstance(text, SplittableText)
         self._text = text
 
     def _pieces(self, splitter):
         """Return a sequence of all the pieces in input text(s)."""
-        return reduce(lambda x, y: x+y,
-                      [text.split(splitter) for text in self._text])
+        return self._text.split(splitter)
 
-        
+    def _current_input_position(self):
+        return 'File "%s", line %d' % (self._text.input_file(),
+                                       self._text.firstline())
+    
 class PySpecFeederError(Exception):
     """Exception reised when there is a problem loading specification file."""
 
@@ -171,9 +186,9 @@ class ExcelVocabFeeder(FileFeeder):
             col = map(string.strip, line.split('|')[0:4])
             try:
                 word = unicode(col[0], encoding=encoding)
-            except UnicodeDecodeError, e:
-                raise Exception("Error while reading file %s: %s: %s" %
-                                (self._input_file(), e, col[0]))
+            except UnicodeDecodeError:
+                self._panic('Unable to convert "%s" to unicode' % col[0],
+                            sys.exc_info())
             if word.startswith("#"):
                 continue
             note = unicode(len(col) > 1 and col[1] or '',
@@ -183,7 +198,7 @@ class ExcelVocabFeeder(FileFeeder):
                 trans = unicode(t, translation_encoding)
             except IndexError:
                 trans = u'???'
-                #print 'No translation for "%s"!' % word
+                #self._warn('No translation for "%s"' % word)
             items.append(VocabItem(parent, word, note, trans))
         return items
     
@@ -200,10 +215,6 @@ class ExerciseFeeder(SplittableTextFeeder):
                 for piece in self._pieces(self._EXERCISE_SPLITTER)
                 if piece.text() != '']
 
-    def _panic(self, message, einfo, file, line):
-        sys.stderr.write(message +'\n  File "%s", line %d\n' % (file, line))
-        apply(traceback.print_exception, einfo)
-        sys.exit()
         
     def _exercise(self, parent, text):
         """Convert textual exercise specification into an Exercise instance."""
@@ -212,14 +223,19 @@ class ExerciseFeeder(SplittableTextFeeder):
             assert len(pieces) >= 2, \
                    "Exercise must comprise a header and at least one task."
             type, kwargs = self._read_header(pieces[0].text())
-            tasks = [self._read_task(type.task_type(), p) for p in pieces[1:]]
+            if type == SentenceCompletion: # A temporary hack.
+                self._warn("SentenceCompletion should not have any tasks")
+                tasks = ()
+            else:
+                tasks = [self._read_task(type.task_type(), p)
+                         for p in pieces[1:]]
             kwargs['tasks'] = tuple(tasks)
             return type(parent, **kwargs)
         except SystemExit:
             sys.exit()
         except:
-            m = "Exception caught while processing exercise specification:"
-            self._panic(m, sys.exc_info(), text.input_file(), text.firstline())
+            m = "Exception caught while processing exercise specification"
+            self._panic(m, sys.exc_info())
     
     def _read_header(self, text):
         """Read excercise header and return the tuple (type, info).
@@ -258,8 +274,8 @@ class ExerciseFeeder(SplittableTextFeeder):
         try:
             return method(text.text())
         except:
-            m = "Exception caught while processing task specification:"
-            self._panic(m, sys.exc_info(), text.input_file(), text.firstline())
+            m = "Exception caught while processing task specification"
+            self._panic(m, sys.exc_info())
 
     def _process_choices(self, lines):
         # split the list of choices
