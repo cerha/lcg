@@ -1,3 +1,21 @@
+2004-12-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* Makefile (en de): Added some preprocessing of wrong unicode files.
+
+	* lcg/wiki.py
+	(CommonFormatter._tickethref_formatter)
+	(CommonFormatter._changesethref_formatter) 
+	(CommonFormatter._reporthref_formatter)
+	(CommonFormatter._svnhref_formatter): Removed.
+	(CommonFormatter._rules): Removed rules for removed methods.
+	(CommonFormatter._wikilink_formatter): Don't look for a page in
+	the `page_dict'.
+
+	* lcg/feed.py (ExerciseFeeder._exercise): Pass a `SplittableText'
+	instance to `self._read_task()', not a string .
+	(ExerciseFeeder._read_task): Convert the `SplittableText' to a
+	string before passing to a method.
+
 2004-12-15  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/generate.py: Set the input encoding to 'utf-8'.
