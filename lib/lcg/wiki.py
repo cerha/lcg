@@ -122,7 +122,12 @@ class Formatter(object):
                 section = self._parent.find_section(href[1:])
                 title = section and section.title() or href[1:]
             else:
-                title = href
+                node = self._parent.root_node().find_node(href)
+                if node:
+                    title = node.title()
+                    href = node.url()
+                else:
+                    title = href
         return '<a href="%s">%s</a>' % (href, title)
 
     def _uri_formatter(self, groups, close=False):
