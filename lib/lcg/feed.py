@@ -184,8 +184,7 @@ class ExerciseFeeder(Feeder):
             assert len(pieces) >= 2, \
                    "Exercise must comprise a header and at least one task."
             type, kwargs = self._read_header(pieces[0].text())
-            tasks = [self._read_task(type.task_type(), p.text())
-                     for p in pieces[1:]]
+            tasks = [self._read_task(type.task_type(), p) for p in pieces[1:]]
             kwargs['tasks'] = tuple(tasks)
             return type(parent, **kwargs)
         except SystemExit:
@@ -232,7 +231,7 @@ class ExerciseFeeder(Feeder):
             TrueFalseStatement:     self._read_true_false_statement,
             }[type]
         try:
-            return method(unicode(text))
+            return method(text.text())
         except:
             m = "Exception caught while processing task specification:\n" +\
                 '  File "%s", line %d\n' %(self._input_file(), text.firstline())
