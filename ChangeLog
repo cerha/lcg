@@ -1,3 +1,15 @@
+2005-03-19  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (VocabItem.__init__): Make the filename as
+	`item-01.ogg' - `item-50.ogg'.
+
+	* lcg/course.py (ContentNode.__init__): Don't create the counter
+	here, just initialize a dictionary.
+	(ContentNode.counter): New argument `key'.  Try to find a counter
+	for given key in the dictionary or create a new one.
+
+	* lcg/export.py (StaticExporter._hotkey): Key bindings changed. 
+
 2005-03-17  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/export.py (StaticExporter._hotkey): Key names changed.
