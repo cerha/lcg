@@ -59,9 +59,9 @@ class Resource(object):
         self._file = file
         self._shared = shared
         if shared:
-            src_dirs = [os.path.join(d, self.SUBDIR)
-                        for d in (self._parent.root_node().src_dir(),
-                                  self._parent.default_resource_dir())]
+            src_dirs = [''] + [os.path.join(d, self.SUBDIR)
+                               for d in (self._parent.root_node().src_dir(),
+                                         config.default_resource_dir)]
             dst_subdir = self.SUBDIR
         else:
             src_dirs = (os.path.join(parent.src_dir(), self.SUBDIR), )
@@ -98,6 +98,12 @@ class Resource(object):
             if not os.path.isdir(os.path.dirname(dst_path)):
                 os.makedirs(os.path.dirname(dst_path))
             self._export(dir)
+
+    def get(self):
+        fh = open(self._src_path)
+        data = fh.read()
+        fh.close()
+        return data
             
     def _export(self, dir):
         shutil.copy(self._src_path, self._destination_file(dir))
