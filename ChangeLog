@@ -1,0 +1,5 @@
+2004-05-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py: Use `EurochanceCourse' instead of `Course'.
+	Don't use the `lang' argument.
+
