@@ -18,12 +18,14 @@
 
 
 from resources import *
-from content import *
 from course import *
+from content import *
 from export import *
-from ims import *
+import ims
+import feed
+import wiki
 
 # Øe¹ení cyklických závislostí souborù
-for file in (course, content, feed):
+for file in (resources, course, content, feed, wiki):
     file.__dict__.update(globals())
                                                                                                                                                       
