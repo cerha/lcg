@@ -437,12 +437,12 @@ class Unit(ContentNode):
                     Section(self, _("Vocabulary"),
                             VocabList(self, vocab)),
                     Section(self, _("Grammar"),
-                            p.parse(self._read_file('grammar')), toc_depth=99),
+                            p.parse(self._read_file('grammar')), toc_depth=9),
                     Section(self, _("Exercises"),
                             self._create_exercises(vocab), toc_depth=1),
                     Section(self, _("Checklist"),
                             p.parse(self._read_file('checklist'))))
-        return SectionContainer(self, sections, toc_depth=2)
+        return SectionContainer(self, sections)
 
     def _create_exercises(self, vocab):
         filename = self._input_file('exercises')
@@ -508,7 +508,7 @@ class CourseIndex(ContentNode):
     _TITLE = _("Detailed Course Index")
 
     def _create_content(self):
-        return TableOfContents(self, item=self.parent(), depth=3)
+        return TableOfContents(self, item=self.parent(), depth=99)
 
     
 class EurochanceCourse(RootNode):
