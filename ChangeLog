@@ -1,3 +1,59 @@
+2005-01-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/resources.py (Resource.__init__): Expect the source files in
+	the SUBDIR.
+	(Media._find_source_file): Search also the `Transcript' source
+	directory.
+
+	* lcg/course.py (ContentNode._input_file): New method.
+	(ContentNode._read_file): Use it.
+	(InnerNode._create_content): Minor change in TOC title.
+	(_ExerciseNode, VocabularyPractice, ExerciseNode)
+	(ListeningComprehension, GeneralComprehension, GrammarPractice)
+	(Consolidation): Removed.
+	(Unit._create_content): Pass the full path to the input file to
+	`ExcelVocabFeeder'.  Use `self._create_exercises()' to create the
+	`Exercises' section content.  Wrap the sections to a Container to
+	be able to specify the `toc_depth' here.
+	(Unit._create_exercises): New method.
+
+	* lcg/feed.py (FileFeeder.__init__): Arguments `dir' and `file'
+	replaced just by one `filename'.
+	(FileFeeder._input_file): Removed.
+	(FileFeeder._current_input_position): Use just the attribute
+	`self._filename' instead of `self._input_file()'.
+	(PySpecFeeder): Docstring updated.
+	(PySpecFeeder._input_file): Removed.
+	(PySpecFeeder._get_module): Get the dirname and modulename out of
+	`self._filename'.
+	(ExcelVocabFeeder.feed): Use just the attribute
+	`self._filename' instead of `self._input_file()'.
+
+	* lcg/content.py (Content.__init__): Initialize `self._container'.
+	(Content.set_container, Content.container)
+	(Content._container_path): New methods.
+	(Container.__init__): Argument `parts' renamed to `content'.
+	Allow a sequence of 'Content' instances, as well as a `Content'
+	instance as `content' argument.  Set the container for all
+	contained elements.  Don't insert TOC into the contents, just
+	remember it as a separate attribute `self._toc'.
+	(Container.export): Honour the constructor changes.
+	(Section): Docstring rewritten.
+	(Section._HEADING_LEVEL): Removed.
+	(Section.__init__): Argument `contains_children' removed.  New
+	argument `toc_depth'.  Pass it to parent's constructor.  Don't
+	deal with the subsections here, leave it up to the parent class.
+	(Section.contains_children): Removed.
+	(Section.title): Substitute the section number here.
+	(Section.anchor): Include the section numbers of all parent
+	sections in the hierarchy.
+	(Section._header): Set the heading level according to the depth in
+	the section hierarchy.
+	(Section._section_path, Section.section_number): New methods.
+	(TableOfContents.__init__): The argument `local' removed.
+	(TableOfContents._make_toc): Don't consider self._local and
+	`Section.contains_children'.
+
 2005-01-14  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/course.py (ContentNode._TOC_TITLE): Constant removed.

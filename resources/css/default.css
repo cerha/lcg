@@ -29,15 +29,15 @@ div.table-of-contents {
     border-width: 1px 0;
     background: #f0f0f0;
     margin: 1em 0;
+    padding: 3pt;
 }
 
-div.table-of-contents h2 { 
-    margin: 3pt;
+div.table-of-contents b { 
 }
 
 div.table-of-contents ul { 
     margin-top: 3pt;
-    margin-bottom: 3pt;
+    margin-bottom: 0;
 }
 
 div.choices { 
