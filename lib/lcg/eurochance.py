@@ -35,9 +35,6 @@ class Unit(EurochanceNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
     _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
-    def _id(self):
-        return 'unit%02d' % self._parent.index(self)
-    
     def _abbrev_title(self, abbrev=False):
         return _("Unit %d") % self._parent.index(self)
 
