@@ -384,7 +384,10 @@ class TableOfContents(Content):
     def export(self):
         item = self._item
         if not item:
-            item = self._container or self._parent
+            if isinstance(self._container, SectionContainer):
+                item = self._container
+            else:
+                item = self._parent
         toc = self._make_toc(item, depth=self._depth)
         if self._title is not None:
             return div((b(self._title), toc), cls="table-of-contents")
