@@ -1,4 +1,97 @@
+2004-05-20  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/manual.wiki: New file.
+
+	* doc/structure.wiki: New file.
+
+	* doc/roles.wiki: New file.
+
+2004-05-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/util.py (SplittableText): New class.
+
+	* lcg/_test.py (SplittableText): New set of tests.
+
+	* lcg/feed.py: Import the Python module `traceback'.  Import `util'.
+	All commented-out classes at the end of file removed.
+	(Feeder.__init__): New method.
+	(Feeder._input_file): New method.
+	(PySpecFeeder): More documentation added.
+	(PySpecFeeder._input_file): New method.
+	(PySpecFeeder.__init__): Method removed.
+	(PySpecFeeder._get_module): Use `self._file' instead of
+	`self._name'.
+	(ExcelVocabFeeder.__init__): Method removed.
+	(ExcelVocabFeeder.feed): Use `self._input_file()'
+	(ExerciseFeeder): New class.
+	(ExerciseFeeder_PieceOfText): Removed.
+	(ExerciseFeeder.feed): Use `SplittableText' instead of
+	`self._PieceOfText'.
+	(ExerciseFeeder._exercise, ExerciseFeeder._read_task): Use the
+	`traceback' module for printing tracebacks instead of
+	`code.InteractiveInterpreter'.
+	(ExerciseFeeder._read_header): Docstring added.  Assertion message
+	simplified.
+
+	* lcg/course.py (ContentNode._read_resource): Don't use the language
+	extension for filenames.
+	(Module): Class removed.
+	(Exercises._create_content): Use `ExerciseFeeder' instead of
+	`PySpecFeeder'.
+	(Unit._create_children): Act as the removed `Module' node
+	according to course structure changes.
+	(EurochanceCourse): Documentation updated.
+	(EurochanceCourse._create_children): Create just a sequence of `Unit's.
+
+	* lcg/content.py (Exercise.__init__): Report the actual `tasks' value
+	in assertion error message..
+	(Exercise.task_type): New method.
+	(ComprehensionExercise.__init__): Method removed.
+	(ClozeTest.__init__): Method removed.
+	(ClozeTest._task_type): Set.
+	(Container.__init__, GenericText.__init__, VocabList.__init__)
+	(MultipleChoiceQuestion.__init__, Cloze.__init__)
+	(Exercise.__init__, ComprehensionExercise.__init__): Call parent
+	constructor prior to everyting else.
+
+	* lcg/__init__.py: Update globals for module `feed' as well.
+
+2004-05-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/_test.py (ContentNode.check_misc): Check also the methods
+	`counter()', `id()' and `children()'.
+
+	* lcg/course.py (ContentNode._create_content) 
+	(ContentNode._create_children): More documentation added.
+	(ContentNode._register_child): New method.
+	(ContentNode.__init__): Use it.
+	(Course): Docstring improved.
+	(ContentNode._create_children): Docstring improved.
+	(ContentNode._create_content): Docstring improved.
+	(ContentNode): Docstring improved.
+
 2004-05-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/_test.py (Module): Import `lcg' and `os', not `lesson'.
+	(ContentNode): New class
+	(Client): Class removed.
+	
+
+	* lcg/course.py (Module): Code reorganized to separate the general
+	classes from the classes implementing concrete Eurochance Course
+	structure.
+	(EurochanceCourse): New class.
+	(Course._create_children): Method moved to the new
+	`EurochanceCourse' class.
+	(Course.__init__): Unused argument `lang' removed.
+	(NumberedNode.__init__, Course.__init__): Use `super()' to call
+	the constructor of parent class.
+	(ContentNode.src_dir): Return just the subdir if parent is None.
+	(ContentNode.dst_dir): Return just the subdir if parent is None.
+	(Course.output_file): New method.
+	(dst_dir): Method removed.
+
+	* lcg/util.py (list_subdirs): Ignore `CVS' directories.
 
 	* Makefile: New target `test'.
 
