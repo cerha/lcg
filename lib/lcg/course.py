@@ -94,7 +94,8 @@ class ContentNode(object):
         if isinstance(content, Content):
             self._content = content
         else:
-            self._content = Container(self, content)
+            assert isinstance(content, (types.TupleType, types.ListType))
+            self._content = SectionContainer(self, content)
         self._children = self._create_children()
         for child in self._children:
             assert child._parent == self
