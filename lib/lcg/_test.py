@@ -54,6 +54,26 @@ class ContentNode(unittest.TestCase):
 tests.add(ContentNode)
 
 
+class ExerciseFeeder(unittest.TestCase):
+    def check_piece_of_text(self):
+        def check(matcher, lines):
+            piece = lcg.ExerciseFeeder._PieceOfText("\n".join(lines))
+            for p in piece.split(matcher):
+                a = str(p).splitlines()[0] # first line of this part's text
+                b = lines[p.firstline()-1] # the line from the source sequence
+                assert a == b, (a, b)
+        check(lcg.ExerciseFeeder._splitter_matcher,
+              ("bla"," ", "----","",
+               "ehm","","","","","----","",
+               "\t", "xxx","yyy", ""))
+        check(lcg.ExerciseFeeder._blank_line_matcher,
+              ("", "bla","", "", "\t \t","",
+               "ehm"," ",
+               "xxx","yyy", "\t"))
+        
+tests.add(ExerciseFeeder)
+
+
 def get_tests():
     return tests
 

@@ -1,3 +1,38 @@
+2004-05-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* _test.py (ExerciseFeeder): New set of tests.
+
+	* feed.py: Import the Python module `code'.  All commented-out
+	classes at the end of file removed.
+	(Feeder.__init__): New method.
+	(Feeder._input_file): New method.
+	(PySpecFeeder): More documentation added.
+	(PySpecFeeder._input_file): New method.
+	(PySpecFeeder.__init__): Method removed.
+	(PySpecFeeder._get_module): Use `self._file' instead of `self._name'.
+	(ExcelVocabFeeder.__init__): Method removed.
+	(ExcelVocabFeeder.feed): Use `self._input_file()'
+	(ExerciseFeeder): New class.
+
+	* course.py (ContentNode._read_resource): Don't use the language
+	extension for filenames.
+	(Module): Class removed.
+	(Exercises._create_content): Use `ExerciseFeeder' instead of
+	`PySpecFeeder'.
+	(Unit._create_children): Act as the removed `Module' node
+	according to course structure changes.
+	(EurochanceCourse): Documentation updated.
+	(EurochanceCourse._create_children): Create just a sequence of `Unit's.
+
+	* content.py (Exercise.__init__): Report the actual `tasks' value
+	in assertion error message..
+	(Exercise.task_type): New method.
+	(ComprehensionExercise.__init__): Method removed.
+	(ClozeTest.__init__): Method removed.
+	(ClozeTest._task_type): Set.
+
+	* __init__.py: Update globals for module `feed' as well.
+
 2004-05-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* _test.py (ContentNode.check_misc): Check also the methods
