@@ -37,7 +37,7 @@ class InlineFormatter(object):
 
     """
     _MARKUP = (('bold', '\*'),
-               ('italic', '/'),
+               #('italic', '/'),
                ('fixed', '='),
                ('underline', '_'),
                ('example_start', '>>'),
@@ -115,7 +115,7 @@ class Parser(object):
     _MATCHERS = (('list_item', "(?P<depth>\s+)\* (?P<content>.*)"),
                  )
     _REGEXPS = [r"^(?P<%s>%s)$" % (key, matcher) for key, matcher in _MATCHERS]
-    _MATCHER = re.compile('(?:' + '|'.join(_REGEXPS) + ')')
+    _MATCHER = re.compile('(?:' + '|'.join(_REGEXPS) + ')', re.MULTILINE)
     _HELPER_PATTERNS = ('depth', 'content')
     
     class _Section(object):
@@ -201,7 +201,7 @@ class Parser(object):
         return content
 
     def parse(self, text):
-        return self._parse_section_content(text)
+        return self._parse_sections(text)
     
 
 def escape(text, param={'"':'&#34;'}):
