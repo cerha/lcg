@@ -400,6 +400,9 @@ class Media(Resource):
     def tts_input(self):
         return self._tts_input
 
+    def name(self):
+        return "media_%s" % id(self)
+    
         
 class Script(Resource):
     """Representation of a script object used within the content.
