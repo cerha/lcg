@@ -160,7 +160,7 @@ class VocabItem(Record):
         """
         assert type(word) == type('')
         assert type(note) == type('')
-        assert type(translation) == type('')
+        assert isinstance(translation, types.StringTypes)
         assert isinstance(sound_file, Media)
         self._word = word
         self._note = note
@@ -364,7 +364,7 @@ class Exercise(Content):
         else:
             self._recording = None
         self._transcript = transcript
-
+        parent.script('audio.js')
 
     def task_type(self):
         return self._task_type
@@ -391,9 +391,14 @@ class Exercise(Content):
         """Return the HTML formatted instructions for this type of exercise."""
         result = "<p>" + self._instructions() + "</p>"
         if self._recording is not None:
-            result += "\n\n<p>Recording: " + \
-                      '<a href="%s">[press to listen]</a>' % \
-                      self._recording.url()
+            result += '\n\n<form action="">Recording: ' + \
+                      '<input type="button" value="Play"' + \
+                      ' onclick="play_audio(\'%s\')"> ' % \
+                      self._recording.url() + \
+                      '<input type="button" value="Stop"' + \
+                      ' onclick="stop_audio()">' + \
+                      '</form>'
+
         return result
 
 
@@ -513,7 +518,7 @@ class Transformation(Cloze):
     def _instructions(self):
         return """Listen to the recording and transform each of the %d
         sentences below according to the instructions.  Check your results
-        using the buttons below all the sentences.""" % \ len(self._tasks)
+        using the buttons below all the sentences.""" % len(self._tasks)
 
     
 class Dictation(Cloze):
