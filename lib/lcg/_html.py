@@ -52,21 +52,17 @@ def b(text):
 def p(*content, **kwargs):
     return _tag('p', (('class', kwargs.get('cls')),), content, concat='\n')
 
-def div(content, cls):
-    if isinstance(content, (types.ListType, types.TupleType)):
-        content = '\n'.join(content)
-    return '\n'.join(('<div class="%s">' % cls, content, '</div>\n'))
+def div(content, cls=None):
+    return _tag('div', (('class', cls),), content, concat='\n')
 
 def link(label, url, brackets=False,
          title=None, target=None, cls=None, hotkey=None):
     if hotkey:
         t = '(Alt-%s)' % hotkey
         title = title and title + ' ' + t or t
-    attr = _attr(('title', title),
-                 ('target', target),
-                 ('class', cls),
-                 ('accesskey', hotkey))
-    result = '<a href="%s"%s>%s</a>' % (url, attr, label)
+    attr = (('href', url), ('title', title), ('target', target),
+            ('class', cls), ('accesskey', hotkey))
+    result = _tag('a', attr, label)
     return brackets and '['+result+']' or result
 
 def ul(items, indent=0):
