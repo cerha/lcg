@@ -70,3 +70,13 @@ def script_write(content, noscript=None):
     c = content.replace('"','\\"').replace('\n','\\n').replace("'","\\'")
     return script('document.write("'+ c +'");', noscript)
 
+def ul(items, indent=0):
+    spaces = ' ' * indent
+    items = [spaces+"  <li>%s</li>" % i for i in items]
+    return "\n".join([spaces+"<ul>"] + items + [spaces+"</ul>"])
+
+def h2(title):
+    return '<h2>%s</h2>' % title
+
+def b(text):
+    return '<b>%s</b>' % text
