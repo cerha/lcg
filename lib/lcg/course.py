@@ -429,20 +429,30 @@ class Unit(ContentNode):
 
     def _create_content(self):
         feeder = ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
-                                        input_encoding=self._input_encoding)
+                                  input_encoding=self._input_encoding)
         vocab = feeder.feed(self)
         sections = (Section(self, _("Aims and Objectives"),
                             WikiText(self, self._read_file('aims'))),
                     Section(self, _("Vocabulary"),
                             VocabList(self, vocab)),
                     Section(self, _("Grammar"),
-                            WikiText(self, self._read_file('grammar'))),
+                            self._create_grammar(self._read_file('grammar')),
+                            toc_depth=99),
                     Section(self, _("Exercises"),
                             self._create_exercises(vocab), toc_depth=1),
                     Section(self, _("Checklist"),
                             WikiText(self, self._read_file('checklist'))))
         return Container(self, sections, toc_depth=2)
 
+    def _create_grammar(self, text):
+        text, sections = wiki.parse_sections(text)
+        def make_sections(sections):
+            return [Section(self, s.title(),
+                            [WikiText(self, s.text())] +
+                            make_sections(s.sections()))
+                    for s in sections]
+        return [WikiText(self, text)] + make_sections(sections)
+    
     def _create_exercises(self, vocab):
         filename = self._input_file('exercises')
         text = self._read_file('exercises', '^//')
