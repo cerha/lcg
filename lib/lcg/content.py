@@ -57,7 +57,7 @@ class Content(object):
         assert isinstance(parent, ContentNode), \
                "Not a 'ContentNode' instance: %s" % parent
         self._parent = parent
-        
+
     def export(self):
         """Return the HTML formatted content as a string."""
         return ''
@@ -98,8 +98,8 @@ class Container(Content):
             should appear in the output..
 
         """
-        self._parts = parts
         super(Container, self).__init__(parent)
+        self._parts = parts
         
     def export(self):
         return '\n'.join(map(lambda p: p.export(), self._parts))
@@ -118,8 +118,8 @@ class GenericText(Content):
           text -- the actual text content of this element as a string.
 
         """
-        self._text = text
         super(GenericText, self).__init__(parent)
+        self._text = text
 
     def export(self):
         return self._text
@@ -148,9 +148,9 @@ class VocabList(Content):
           items -- Sequence of 'VocabItem' instances.
 
         """
+        super(VocabList, self).__init__(parent)
         assert is_sequence_of(items, VocabItem)
         self._items = items
-        super(VocabList, self).__init__(parent)
 
     def export(self):
         rows = map(lambda i:
@@ -197,7 +197,6 @@ class Task(Content):
     """
     pass
 
-
 class MultipleChoiceQuestion(Task):
     """Answer a question by selecting from a list of predefined choices."""
     
@@ -212,6 +211,7 @@ class MultipleChoiceQuestion(Task):
           choices -- sequence of 'Choice' instances related to this Task.
           
         """
+        super(MultipleChoiceQuestion, self).__init__(parent)
         assert type(question) == type('')
         assert is_sequence_of(choices, Choice)
         self._question = question
@@ -221,7 +221,6 @@ class MultipleChoiceQuestion(Task):
                                tts_input='correct'),
             False: parent.media('incorrect-response.ogg', shared=True,
                                 tts_input='you are wrong!') }
-        super(MultipleChoiceQuestion, self).__init__(parent)
 
     def _export_choices(self, choices):
         return '<ol style="list-style-type: lower-latin;">\n' + \
@@ -278,9 +277,9 @@ class GapFillStatement(MultipleChoiceQuestion):
 class Cloze(Task):
 
     def __init__(self, parent, text):
+        super(Cloze, self).__init__(parent)
         assert type(text) == type('')
         self._text = text
-        super(Cloze, self).__init__(parent)
 
     def _make_field(self, match):
         word = match.group(1)
@@ -314,12 +313,12 @@ class Exercise(Content):
           tasks -- sequence of 'Task' instances related to this exercise.
           
         """
+        super(Exercise, self).__init__(parent)
         assert is_sequence_of(tasks, self._task_type), \
                "Tasks must be a sequence of '%s' instances!: %s" % \
                (self._task_type.__name__, tasks)
         self._number = parent.counter().next()
         self._tasks = tasks
-        super(Exercise, self).__init__(parent)
 
     def task_type(self):
         return self._task_type
@@ -397,11 +396,11 @@ class ComprehensionExercise(Exercise):
           tasks -- sequence of 'Task' instances related to this exercise.
           
         """
+        super(ComprehensionExercise, self).__init__(parent, tasks)
         assert type(sound_file) == type('')
         assert type(transcript) == type('')
         self._sound_file = parent.media(sound_file)
         self._transcript = transcript
-        super(ComprehensionExercise, self).__init__(parent, tasks)
 
     def _instructions(self):
         return "You will hear a short recording. " + \
