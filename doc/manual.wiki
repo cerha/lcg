@@ -19,7 +19,7 @@ presentation two independent issues.
 
 To be able to process the input data with a computer program (the LCG) we must
 define the rules how this data are represented.  The computer program must be
-able to recognize the logical elements of the content to be able to put them
+able to recognise the logical elements of the content to be able to put them
 together on its output, but on the other hand the content creators must not be
 forced to deal with the technical aspects more than necessary.
 
@@ -43,14 +43,14 @@ to the alphabetical order of the names of their directories.  Thus it is
 advisable to prefix the names by a number of the unit and then any name
 describing the focus of the lesson for better orientation.
 
-*An example of the recommended naming scheme of the subdirectories:*
+*An example of the recommended naming scheme for the subdirectories:*
 
- 01-telephoning
- 02-office-admin
- 03-financial
- 04-hotels
- 05-tourism
- ...
+* 01-telephoning
+* 02-office-admin
+* 03-financial
+* 04-hotels
+* 05-tourism
+* ...
 
 == Text Sections == *
 
@@ -59,15 +59,15 @@ sections comprising a structured text content.  For each of these sections, the
 LCG will expect one text file in the subdirectory of each unit.  The following
 table shows the name of the input file for each of the text sections.
 
-| Section          | File |
-| Introduction     | intro.txt |
-| Key language use | use.txt |
-| Key Grammar      | grammar.txt |
+|* Section         |* File             |
+| Introduction     | intro.txt         |
+| Key language use | use.txt           |
+| Key Grammar      | grammar.txt       |
 | Consolidation    | consolidation.txt |
 
 The input text files use Wiki formatting.  This is a very simple and
 straightforward set of rules how to format the plain text to mark the logical
-structure of chapters, paragraphs, itemized lists etc.  A brief description
+structure of chapters, paragraphs, itemised lists etc.  A brief description
 follows.
 
 === Paragraphs === *
@@ -79,15 +79,15 @@ ignored, since the paragraph will be reformatted to fit into the output media.
 It is recommended to wrap the paragraphs not to exceed 80 characters in width.
 This means that no single character should be found beyond the 79th column.
 
-=== Itemized Lists === *
+=== Itemised Lists === *
 
-Itemized lists are marked by an asterisk at the beginning of each item.  The
+Itemised lists are marked by an asterisk at the beginning of each item.  The
 indentation determines the level in the hierarchy.  First level items are
 indented by two spaces, second level by four etc.
 
 *Example:*
 
- This is a normal paragraph.  The itemized list follows.
+ This is a normal paragraph.  The itemised list follows.
 
    * deer
      * doe
@@ -134,14 +134,224 @@ Exercises will often depend on external media files and other data, so all the
 definition is located in a subdirectory named ``=exercises=''.
 
 The main specification file is named ``=exercises.txt=''.  Thus the example of
-full path of an exercise specification file can be
+a full path to the exercise specification file can be
 ``=intermediate/03-financial/exercises/exercises.txt=''.
 
+=== Exercise Specification File Format === *
+
+The exercise specification file is a plain text file.  It consists of a series
+of specifications of individual exercises.  The number of exercises is not
+restricted.  The exercises will be generated on the output in the same order in
+which they appear in the specification file.
+
+The individual exercise specifications are separated by a line containing four
+or more dashes.
+
+*Example:*
+
+ First exercise specification
+
+ ----
+
+ Second exercise specification
+
+ ----
+ 
+ etc.
+
+Blank lines around the separators are omitted.
+
+=== Format of an Individual Exercise Specification === *
+
+Each individual exercise specification consists of a header and a series of
+tasks.  The header defines some necessary information about exercise type, the
+media files it depends on etc.  Tasks define the corresponding questions or
+other jobs depending on the exercise type.
+
+Header and individual tasks are separated by a blank line.  This means that
+both header and a task can be defined over multiple lines, but can not contain
+blank lines.
+
+In the following example, you can see a concrete header and tasks for a
+concrete exercise type.  We will discuss them separately in detail in the
+following sections.
+
+*Example:*
+
+ type: MulitpleChoiceComprehensionExercise
+ sound_file: conversation1.ogg
+ transcript: conversation1.txt
+
+ What does the woman want to buy?
+ - Some clothes.
+ + Some books.
+ - Some cakes.
+
+ Where does she want to buy the books from?
+ - Germany.
+ - England.
+ + America.
+
+ What does the cashier recommend her to do?
+ + Make a transfer.
+ - Use her credit card.
+ - Send cash.
+
+=== Exercise Header Format === *
+
+Exercise header consists of name/value pairs written each on one line.  The
+header name begins at the beginning of the line and ends by a colon.  The colon
+is followed by a space and the corresponding value.
+
+Each exercise header must contain the exercise type.  Depending on the exercise
+type additional arguments may be required.  You can find the list of arguments
+and their descriptions for each exercise type in the section
+[#exercise-types].
+
+You can see an example of an exercise header at the previous section.
+
+=== Exercise Types === exercise-types
+
+The exercise type determines the header arguments and type of the tasks.
+Several exercise types can use the same type of tasks, so the task types are
+independent and you can find their listing with a description of input format
+in the section [#task-types].
+
+The following sub-sections describe the header arguments and task type for each
+exercise type.
+
+==== TrueFalseExercise ==== *
+
+This is exercise does not use any media files.  It is just a list of true/false
+statement.
+
+*Arguments:* None.
+
+*Task type:* [#TrueFalseStatement].
 
 
+==== MultipleChoiceExercise ==== *
 
+Also this is exercise does not use any media files.  It is just a list of
+multiple choice questions.
+
+*Arguments:* None.
+
+*Task type:* [#MultipleChoiceQuestion].
+
+==== TrueFalseComprehensionExercise ==== *
+
+Similar to TrueFalseExercise, but the questions are based on a listening
+and comprehension.
+
+*Arguments:* 
+  
+* =sound_file= ... name of the file with the corresponding recording
+* =transcript= ... textual transcript of the recording
+
+*Task type:* [#TrueFalseStatement].
+
+==== MulitpleChoiceComprehensionExercise ==== *
+
+Similar to MultipleChoiceExercise, but the questions are based on a listening
+and comprehension.
+
+*Arguments:*
+
+* =sound_file= ... name of the file with the corresponding recording
+* =transcript= ... textual transcript of the recording
+
+*Task type:* [#MultipleChoiceQuestion].
+
+==== GapFillingExercise ==== *
+
+Filling in the gaps in sentences by choosing the correct word from the list.
+
+*Arguments:* None.
+
+*Task type:* [#GapFillStatement].
+
+==== ClozeTest ==== *
+
+Filling in the gaps in text by typing the correct word.  Since the Cloze task
+is a piece of text containing multiple gaps, this exercise will usually have
+just one task.
+
+*Arguments:* None.
+
+*Task type:* [#Cloze].
+
+
+=== Task Types === task-types
+
+The following sub-sections describe the input format for particular types of
+the tasks which can be used within exercise specification.
+
+==== TrueFalseStatement ==== TrueFalseStatement
+
+In this task, the user should decide, whether the statement is true or not.
+The specification consists of a sentence and a ![T] of ![F] mark at
+the end to indicate the correct answer.
+
+*Example:*
+
+ The Microsoft Windows operating system never crashes. [F]
+
+==== MultipleChoiceQuestion ==== MultipleChoiceQuestion
+
+The goal is to choose the correct answer from the list of predefined options.
+The specification consists of the question (or prompt) and a sequence of
+choices.  The question is specified at the first line and all the following
+lines are the choices.  Each Choice must be prefixed by a plus or minus sign --
+plus for a correct answer, minus for the incorrect ones.  Number of choices is
+not limited, but only one choice can be defined as correct.
+
+*Example:*
+
+ A screen reader is:
+ - A person.
+ - A device.
+ + A program.
+
+==== GapFillStatement ==== GapFillStatement
+
+The goal is to choose a correct word to fill in the gap in a sentence.  The
+specification format is very similar to MultipleChoiceQuestion specification,
+since there is also the list of choices.  The difference is that the sentence
+must contain a series of underscore characters to mark the gap.
+
+*Example:*
+
+ If you want to send money to somebody, you can ____ a transfer.
+ - do
+ + make
+ - have
+
+
+==== Cloze ==== Cloze
+
+This task is a bit special, since it contains multiple tasks in fact, however
+they are all part of one text, where the individual pieces would often not make
+sense without the context.
+
+Each word surrounded by round brackets will be replaced by a gap.  The goal is
+the fill in all the gaps by correct words.  The restriction is, that you can't
+use round brackets for normal purposes.  It is, however, still possible to use
+slashes, square brackets or any other means...
+
+Special care must be taken to make sure, that the word in the brackets is the
+/only/ correct possibility to fill in the text.
+
+*Example:*
+
+ Commercial banks and savings banks receive and hold deposits (in) current
+ accounts, savings accounts and deposit accounts, make payments (for) their
+ customers, lend money, (and) offer investment advice, foreign exchange
+ facilities, and so on.
 
 == Sound Recordings == *
+
+=== Sound File Format === *
 
 All sounds should be recorded digitally in the WAVe format with CD quality.
 This means in particular:
@@ -152,6 +362,8 @@ This means in particular:
 
 These source data will be converted into an applicable output format in
 reasonable quality by the technical group.
+
+=== Segmentation === *
 
 Each logical piece should be recorded as a separate file except for vocabulary,
 since recording one very short file per one vocab item would be too difficult
@@ -164,6 +376,7 @@ recordings will be cut into pieces automatically.
 All other recordings should be recorded separately -- one file per logical
 unit.  For instance there will be one file for each listening exercise etc.
 
+=== Delivery of the Recorded Data === *
 
 The data should be burned on a CD when ready and sent to the technical group,
 since it will be probably too large for transmission via the Internet.
