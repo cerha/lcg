@@ -60,35 +60,27 @@ class Content(object):
                "Not a 'ContentNode' instance: %s" % parent
         self._parent = parent
 
+    def sections(self):
+        """Return the contained sections as a sequence of 'Section' instances.
+
+        This method allows creation of tables of contents and introcpection of
+        content hierarchy.
+        
+        An empty list is returned in the base class.  The derived
+        classes, however, can override this method to return the list of
+        contained subsections.
+
+        """
+        return ()
+        
+    def parent(self):
+        """Return the parent 'ContentNone' of this content element."""
+        return self._parent
+        
     def export(self):
         """Return the HTML formatted content as a string."""
         return ''
  
-    
-class Container(Content):
-    """Container of multiple parts, each of which is a 'Content' instance.
-
-    'Container' exports all the parts concatenated in unchanged order.
-
-    """
-
-    def __init__(self, parent, parts):
-        """Initialize the instance.
-
-        Arguments:
-
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          parts -- Sequence of 'Content' instances in the order in which they
-            should appear in the output..
-
-        """
-        super(Container, self).__init__(parent)
-        self._parts = parts
-        
-    def export(self):
-        return '\n'.join(map(lambda p: p.export(), self._parts))
-
     
 class GenericText(Content):
     """Generic parent class for content generated from a piece of text."""
@@ -116,6 +108,192 @@ class WikiText(GenericText):
     def export(self):
         return wiki.format(self._text)
 
+
+class Section(Content):
+    """Section wraps the subordinary contents into an inline section.
+
+    Sections allow to build a hierarchy of Content even inside the scope of one
+    node.  This is an addition to the hierarchy of the actual nodes (separate
+    pages).  This extension, however, introduces a problem.
+    
+    When we want to build a global hierarchy (containing the actual
+    'ContentNone' instances as well as the 'Content' elements contained inside
+    them), it is necessary to decide whether the content sections or the child
+    nodes come as descendants in the tree.  The rule is, that whenever there
+    are any sections, they are the descendants of their parent node, but
+    exactly one of them should define the 'contains_children' flag as true.
+    Then all the child nodes come under that section in the hierarchy.  Se
+    constructor args for this flag.
+
+    """
+    _HEADING_LEVEL = 2
+
+    def __init__(self, parent, title, content, contains_children=False):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          title -- section title as a string.
+          content -- the actual content wrapped into this section.
+          contains_children -- this flag indicates, that parent's childrens
+            should be considered as if they are contained under this section in
+            the hierarchy (See the documentation for the 'Section' class for
+            more information).
+            
+        """
+        super(Section, self).__init__(parent)
+        assert isinstance(title, types.StringTypes)
+        assert isinstance(content, Content)
+        assert isinstance(contains_children, types.BooleanType)
+        self._number = parent.counter().next()
+        if title.find("%d") != -1:
+            title = title % self._number
+        self._title = title
+        self._content = content
+        self._contains_children = contains_children
+        
+    def title(self):
+        """Return the section title as a string."""
+        return self._title
+
+    def anchor(self):
+        """Return the anchor name for this section."""
+        return "anchor-%02d" % self._number
+
+    def url(self):
+        """Return the URL of the section relative to the course root."""
+        return self._parent.url() + "#" + self.anchor()
+    
+    def sections(self):
+        return self._content.sections()
+
+    def contains_children(self):
+        """Return True if parent's children belong just to this section."""
+        return self._contains_children
+    
+    def _header(self):
+        l = self._HEADING_LEVEL
+        return '<a name="%s"></a>\n' % self.anchor() + h(self.title(), l)
+               
+    def export(self):
+        return "\n".join((self._header(), self._content.export()))
+
+class SubSection(Section):
+    _HEADING_LEVEL = 3
+
+class SubSubSection(Section):
+    _HEADING_LEVEL = 4
+    
+    
+class TableOfContents(Content):
+    """A contained Table of Contents."""
+    
+    def __init__(self, parent, item=None, title=None, depth=1, detailed=True,
+                 local=False):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          item -- the place where to start in the content hierarchy tree.
+            'ContentNode' or 'Content' instances are allowed.  None means that
+            'parent' should be used.  See 'Section' documentation for more
+            information how the content tree is built.
+          title -- the title of the TOC as a string.
+          depth -- how deep in the hierarchy should we go.
+          detailed -- A True (default) value means that both 'Content'
+            hierarchy within each node and node hierarchy are considered.
+            False means to consider only 'ContentNode' hierarchy.
+          local -- A True value means to consider only the content hierarchy
+            within one node.  No links to other nodes will be included.  False
+            (default) value mens to merge the content hierarchy with the node
+            hierarchy.  Appearently, the combination 'local=True' and
+            'detailed=False' is a nonsense and thus leads to an error.  
+
+        """
+        super(TableOfContents, self).__init__(parent)
+        if item is None:
+            item = parent
+        assert isinstance(item, (ContentNode, Content))
+        assert title is None or isinstance(title, types.StringTypes)
+        assert isinstance(depth, types.IntType)
+        assert isinstance(detailed, types.BooleanType)
+        assert isinstance(local, types.BooleanType)
+        self._item = item
+        self._title = title
+        self._depth = depth
+        self._detailed = detailed
+        self._local = local
+        
+    def export(self):
+        toc = self._make_toc(self._item, depth=self._depth)
+        if self._title is not None:
+            return div(('<h2>%s</h2>' % self._title, toc),
+                       cls="table-of-contents")
+        else:
+            return toc
+        
+    def _make_toc(self, item, indent=0, depth=1):
+        if depth <= 0:
+            return ''
+        items = ()
+        if self._detailed:
+            assert isinstance(item, (ContentNode, Content))
+            items = item.sections()
+            if len(items) == 0 and not self._local:
+                if isinstance(item, ContentNode):
+                    items = item.children()
+                elif isinstance(item, Section) and item.contains_children():
+                    items = item.parent().children()
+        else:
+            assert isinstance(item, ContentNode) and not self._local
+            items = item.children()
+        if len(items) == 0:
+            return ''
+        x = [link(i.title(), i.url()) + \
+             self._make_toc(i, indent=indent+4, depth=depth-1)
+             for i in items]
+        return "\n" + ul(x, indent=indent) + "\n" + ' '*(indent-2)
+
+
+class Container(Content):
+    """Container of multiple parts, each of which is a 'Content' instance.
+
+    'Container' exports all the parts concatenated in unchanged order.  For any
+    contained parts which are 'Section' instances, a local 'TableOfContents' is
+    created automatically, preceeding the actual content.
+
+    """
+
+    def __init__(self, parent, parts, toc_depth=99, toc_local=True):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          parts -- Sequence of 'Content' instances in the order in which they
+            should appear in the output..
+
+        """
+        super(Container, self).__init__(parent)
+        assert is_sequence_of(parts, Content)
+        self._sections = sections = [p for p in parts if isinstance(p, Section)]
+        if sections and toc_depth > 0:
+            toc = TableOfContents(parent, self, title=_("Index:"),
+                                  depth=toc_depth, local=toc_local)
+            parts = (toc,) + tuple(parts)
+        self._parts = parts
+
+    def sections(self):
+        return self._sections
+        
+    def export(self):
+        return "\n".join([p.export() for p in self._parts])
+    
     
 class VocabList(Content):
     """Vocabulary listing consisting of multiple 'VocabItem' instances."""
@@ -303,11 +481,12 @@ class TransformationTask(ClozeTask):
 ################################################################################
 
     
-class Exercise(Content):
+class Exercise(Section):
     """Exercise consists of an assignment and a set of tasks."""
 
     _TASK_TYPE = Task
     _NAME = None
+    _RECORDING_REQUIRED = False
     
     _used_types = []
     
@@ -319,16 +498,18 @@ class Exercise(Content):
           parent -- parent 'ContentNode' instance; the actual output document
             this content element is part of.
           tasks -- sequence of 'Task' instances related to this exercise.
-          sound_file -- name of the file with a recording (string).  Some
-            exercises may not include a recording, so this argument is not
-            mandatory.  When specified, the 'transcript' arguemnt below must be
-            also given.
+          sound_file -- name of the file with a recording as a string.  Some
+            exercise types may require a recording, some may not.
           transcript -- name of the file with a textual transcript of the
-            recording (string).  This argument is mandatory when the
-            'sound_file' arguemnt is specified (and not None).
+            recording (string).  The transcript file is required to exist
+            whenever the 'sound_file' argument is supplied.  This argument
+            doesn't have to be supplied, however, when a default value made out
+            of the 'sound_file' filename using the '.txt' extension instead of
+            the original sound file extension is ok.
           
         """
-        super(Exercise, self).__init__(parent)
+        title = "%s %%d: %s" % (_("Exercise"), self._NAME)
+        super(Exercise, self).__init__(parent, title, Content(parent))
         self.__class__._USED = True
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
@@ -336,7 +517,9 @@ class Exercise(Content):
                "Tasks must be a sequence of '%s' instances!: %s" % \
                (self._TASK_TYPE.__name__, tasks)
         assert sound_file is None or isinstance(sound_file, types.StringTypes)
-        self._number = parent.counter().next()
+        if self._RECORDING_REQUIRED:
+            assert sound_file is not None, \
+            "'%s' requires a recording!" % self.__class__.__name__
         self._tasks = list(tasks)
         if sound_file is not None:
             if transcript is None:
@@ -350,6 +533,8 @@ class Exercise(Content):
         parent.resource(Script, 'audio.js')
         parent.resource(Script, 'exercises.js')
 
+    # Class methods
+        
     def task_type(cls):
         return cls._TASK_TYPE
     task_type = classmethod(task_type)
@@ -366,6 +551,8 @@ class Exercise(Content):
         return cls._used_types
     used_types = classmethod(used_types)
 
+    # Instance methods
+    
     def export(self):
         return "\n\n".join((self._header(),
                             self._export_instructions(),
@@ -381,9 +568,6 @@ class Exercise(Content):
     def _form(self):
         return "document.forms['%s']" % self._form_name()
     
-    def _header(self):
-        return "<h3>%s %d &ndash; %s</h3>" % (_("Exercise"), self._number,
-                                              self._NAME)
     
     def _instructions(self):
         return ""
@@ -412,35 +596,36 @@ class Exercise(Content):
     def _export_task(self, task):
         raise "This Method must be overriden"
 
-
-class Cloze(Exercise):
-    """Filling in gaps in text by typing the correct word."""
-
-    _TASK_TYPE = ClozeTask
-    _NAME = _("Cloze")
+    def _results(self):
+        return ""
 
     
+class SentenceCompletion(Exercise):
+    """Filling in gaps in sentences by typing in the correct completion."""
+
+    _NAME = _("Sentence Completion")
+    _RECORDING_REQUIRED = True
+
+    def _instructions(self):
+        return _("""Listen to the recording and finish the unfinished sentences
+        from previous exercise.""")
+
+    def _export_task(self, task):
+        return ""
+
+    
+class _Cloze(Exercise):
+
+    _TASK_TYPE = ClozeTask
+    
     def __init__(self, parent, *args, **kwargs):
-        super(Cloze, self).__init__(parent, *args, **kwargs),
+        super(_Cloze, self).__init__(parent, *args, **kwargs)
         parent.resource(Media, 'all-correct-response.ogg', shared=True,
                         tts_input='everything correct!')
         parent.resource(Media, 'all-wrong-response.ogg', shared=True,
                         tts_input='all the answers are wrong!')
         parent.resource(Media, 'some-wrong-response.ogg', shared=True,
                         tts_input='some of the answers are wrong!')
-
-    def _instructions(self):
-        if self._recording is None:
-            return """You will hear a short recording.  Listen carefully and
-            then fill in the gaps in the text below using the same words.
-            After filling all the gaps, check your results using the buttons
-            below the text."""
-        else:
-            return """Fill in the gaps in the text below using the a suitable
-            word.  After filling all the gaps, check your results using the
-            buttons below the text.  Sometimes there might be more correct
-            answers, but the evaluation only recognizes one.  Contact the tutor
-            when in doubt."""
 
     def _init_script(self):
         answers = ",".join(map(lambda a: "'%s'" % a.replace("'", "\\'"),
@@ -464,7 +649,21 @@ class Cloze(Exercise):
     def _export_task(self, task):
         return "\n".join(('<p>', task.text(self._make_field), '</p>'))
     
+class Cloze(_Cloze):
+    """Filling in gaps in text by typing the correct word."""
 
+    _NAME = _("Cloze")
+    _RECORDING_REQUIRED = True
+    
+    def _instructions(self):
+        if self._recording is None:
+            return _("""Listen to the recording carefully and then fill in the
+            gaps in the text below using the same words.""")
+        else:
+            return _("""Fill in the gaps in the text below.  There is just one
+            correct word for each gap.""")
+
+        
 class _ChoiceBasedExercise(Exercise):
 
     _TASK_FORMAT = '<p>%s\n<div class="choices">\n%s\n</div></p>\n'
@@ -513,15 +712,13 @@ class TrueFalseStatements(_ChoiceBasedExercise):
     of this specification.
     
     """
-
     _TASK_TYPE = TrueFalseStatement
     _NAME = _("True/False Statements")
     _TASK_FORMAT = "<p>%s\n%s</p>\n"
     
     def _instructions(self):
-        return """A list of %d statements follows.  After each sentence,
-        there are two links.  Select 'TRUE' if you think the sentence is true,
-        or select 'FALSE' if you think it is false.""" % len(self._tasks)
+        return _("""For each of the %d statements below indicate whether you
+        think they are true or false.""") % len(self._tasks)
 
     def _format_choice(self, task, choice):
         return self._answer_control(task, choice.answer(), choice.correct())
@@ -534,9 +731,8 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
     _NAME = _("Multiple Choice Questions")
     
     def _instructions(self):
-        return """Below is a list of %d questions.  For each question choose
-        from the list of possible answers and check your choice by activating
-        the link.""" % len(self._tasks)
+        return _("""For each of the %d questions below choose the correct
+        answer from the list.""") % len(self._tasks)
 
     
 class Selections(_ChoiceBasedExercise):
@@ -546,8 +742,8 @@ class Selections(_ChoiceBasedExercise):
     _NAME = _("Select the Correct One")
     
     def _instructions(self):
-        return """For each of the %d pairs of statements, decide which one is
-        correct.  Activate the link to check the result.""" % len(self._tasks)
+        return _("""For each of the %d pairs of statements below decide which
+        one is correct.""") % len(self._tasks)
 
     
 class GapFilling(_ChoiceBasedExercise):
@@ -557,23 +753,23 @@ class GapFilling(_ChoiceBasedExercise):
     _NAME = _("Gap Filling")
 
     def _instructions(self):
-        return """Select a word from the list below each sentence to fill in
-        the gap.  Activate the link made by the word to check the result."""
+        return _("""For each of the %d sentences below choose the correct piece
+        of text from the list to fill in the gap.""") % len(self._tasks)
 
     
-class VocabExercise(Cloze):
-    _NAME = _("Vocabulary from English")
+class VocabExercise(_Cloze):
+    _NAME = _("Vocabulary Practice")
 
     def __init__(self, parent, items, *args, **kwargs):
         kwargs['tasks'] = [self._create_task(item) for item in items]
-        super(Cloze, self).__init__(parent, *args, **kwargs),
+        super(_Cloze, self).__init__(parent, *args, **kwargs),
 
     def _create_task(self, item):
-        return ClozeTask("%s: [%s]" % (item.word(), item.translation()))
+        return ClozeTask("%s: [%s]" % (item.translation(), item.word()))
 
     def _instructions(self):
-        return _("""Listen to the expression in English and repeat. You will
-        hear a transltion into your language.""")
+        return _("""You will hear a word or expression in your language.  Say
+        it in English and listen to the model pronunciation.""")
     
     def _export_task(self, task):
         return task.text(self._make_field)+'<br/>'
@@ -583,36 +779,22 @@ class VocabExercise2(VocabExercise):
     _NAME = _("Vocabulary to English")
 
     def _create_task(self, item):
-        return ClozeTask("%s: [%s]" % (item.translation(), item.word()))
+        return ClozeTask("%s: [%s]" % (item.word(), item.translation()))
 
     def _instructions(self):
-        return _("""You will hear each item in your language.  Say the word or
-        expression in English and listen to the model pronunciation, then type
-        the word into the box.""")
+        return _("""Listen to the expression in English and repeat.  You will
+        hear a transltion into your language.""")
 
     
-class SentenceCompletion(Cloze):
-    """Filling in gaps in sentences by typing in the correct completion."""
-
-    _NAME = _("Sentence Completion")
-
-    def _instructions(self):
-        return """You will hear a recording comprising %d sentences.  Below,
-        you will find the same sentences unfinished.  Fill in the missing text
-        and check your results using the buttons below all the sentences.""" % \
-        len(self._tasks)
-
-        
-class Transformation(Cloze):
+class Transformation(_Cloze):
     """Transform a whole sentence and write it down."""
 
     _TASK_TYPE = TransformationTask
     _NAME = _("Transformation")
 
     def _instructions(self):
-        return """Listen to the recording and transform each of the %d
-        sentences below according to the instructions.  Check your results
-        using the buttons below all the sentences.""" % len(self._tasks)
+        return _("""Listen to the recording and transform each of the %d
+        sentences below according to the instructions.""") % len(self._tasks)
 
     def _export_task(self, task):
         return "\n".join(('<p>',
@@ -621,7 +803,7 @@ class Transformation(Cloze):
                           '</p>'))
 
 
-class Dictation(Cloze):
+class Dictation(_Cloze):
     _NAME = _("Dictation")
     
     def _instructions(self):
