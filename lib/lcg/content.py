@@ -432,8 +432,19 @@ class Selection(_ChoiceTask):
 
         
 class GapFillStatement(_ChoiceTask):
-    pass
 
+    _REGEXP = re.compile(r"(___+)")
+    
+    def __init__(self, prompt, choices):
+        super(GapFillStatement, self).__init__(prompt, choices)
+        matches = len(self._REGEXP.findall(prompt))
+        assert matches == 1, \
+               "GapFillStatement must include just one gap " + \
+               "marked by three or more underscores. %d found." % matches
+
+    def substitute_gap(self, replacement):
+        return self._REGEXP.sub(replacement, self.prompt())
+    
 
 class TrueFalseStatement(_ChoiceTask):
     """The goal is to indicate whether the statement is true or false."""
@@ -580,24 +591,20 @@ class Exercise(Section):
     def _form_name(self):
         return "exercise_%s" % id(self)
     
-    def _form(self):
-        return "document.forms['%s']" % self._form_name()
-    
     def _instructions(self):
         return ""
 
     def _sound_controls(self, label, media, transcript=None):
         if transcript is not None:
-            t = link(_("show transcript"), transcript.url(),
-                     target="transcript", brackets=True)
+            t = " " + link(_("show transcript"), transcript.url(),
+                           target="transcript", brackets=True)
         else:
             t = ""
         f = ('<form class="sound-control" action="">%s:' % label,
              button(_("Play"), "play_audio('%s')" % media.url()),
              button(_("Stop"), 'stop_audio()'), t, '</form>')
-        a = '<p>%s: %s %s</p>' % \
-            (label, link(_("Play"), media.url(), brackets=True), t)
-        return script_write('\n'.join(f), a)
+        a = '%s: %s' % (label, link(_("Play"), media.url(), brackets=True))
+        return script_write('\n'.join(f), p(a+t))
 
     def export(self):
         return "\n\n".join((self._header(),
@@ -615,10 +622,10 @@ class Exercise(Section):
 
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
-        instructions = "<p>" + self._instructions() + ' ' + \
-                       link(_("detailed instructions"),
-                            "instructions-%s.html" % self.id(),
-                            target='help', brackets=True) + "</p>"
+        instructions = p(self._instructions(),
+                         link(_("detailed instructions"),
+                              "instructions-%s.html" % self.id(),
+                              target='help', brackets=True))
         if self._recording is not None:
             instructions += '\n\n' + self._export_recording()
         if self._audio_version is not None:
@@ -645,6 +652,7 @@ class SentenceCompletion(Exercise):
 
     _NAME = _("Sentence Completion")
     _AUDIO_VERSION_REQUIRED = True
+    _TASK_TYPE = None
 
     def _instructions(self):
         return _("""This exercise can be only done purely aurally/orally.  You
@@ -654,12 +662,14 @@ class SentenceCompletion(Exercise):
     def _export_audio_version(self):
         return self._sound_controls(_("The exercise"), self._audio_version)
 
-    def _export_task(self, task):
-        return ""
 
-    
 class _InteractiveExercise(Exercise):
+    """A common super class for exercises which can be interactively evaluated.
 
+    These exercises allow the user to indicate his answers and the computer
+    gives him a feedback.
+    
+    """
     _RESPONSES = {'correct': ['correct-response-1.ogg',
                               'correct-response-2.ogg',
                               'correct-response-3.ogg'],
@@ -673,37 +683,30 @@ class _InteractiveExercise(Exercise):
                      'incorrect-response-2.ogg': _("Oh no, I'm sorry."),
                      'incorrect-response-3.ogg': _("Try again!")}
 
-    _FORM_HANDLER = 'Handler';
+    _FORM_HANDLER = 'Handler'
     
     def __init__(self, parent, *args, **kwargs):
         super(_InteractiveExercise, self).__init__(parent, *args, **kwargs)
         parent.resource(Script, 'exercises.js')
+        parent.resource(Script, 'audio.js')
         a = [(key, [parent.resource(Media, f, shared=True,
                                     tts_input=self._RESPONSE_TTS.get(f))
                     for f in files])
              for key, files in self._RESPONSES.items()]
         self._responses = dict(a)
 
-    def _js_array(self, items):
-        def item(var):
-            if isinstance(var, types.StringTypes):
-                return "'%s'" % var.replace("'", "\\'")
-            elif isinstance(var, types.IntType):
-                return str(var)
-            else:
-                raise Exception("Invalid type for JavaScript conversion:", var)
-        return '[' + ", ".join([item(i) for i in items]) + ']'
+    def _response(self, selector):
+        return self._responses[selector][0]
         
     def _answers(self):
         return ()
 
     def _init_script(self):
-        #responses = [["%s = %s" % (key, media.url()) for media in values]
-        r = ["%s: %s" % (key, self._js_array([media.url() for media in values]))
-             for key, values in self._responses.items()]
-        return "init_form(%s, new %s(), %s, {%s})" % \
-               (self._form(), self._FORM_HANDLER,
-                self._js_array(self._answers()), ", ".join(r))
+        responses = dict([(key, [media.url() for media in values])
+                          for key, values in self._responses.items()])
+        return "init_form(document.forms['%s'], new %s(), %s, %s)" % \
+               (self._form_name(), self._FORM_HANDLER,
+                js_array(self._answers()), js_dict(responses))
 
     def _buttons(self):
         return ()
@@ -715,7 +718,109 @@ class _InteractiveExercise(Exercise):
         return script_write(r, '')
     
     
+################################################################################
+################################################################################
+  
+class _ChoiceBasedExercise(_InteractiveExercise):
+    "A superclass for all exercises based on choosing from predefined answers."
+
+    _FORM_HANDLER = 'ChoiceBasedExerciseHandler'
+
+    def _answers(self):
+        return [t.choice_index(t.correct_choice()) for t in self._tasks]
+
+    def _buttons(self):
+        return (button(_('Fill'),  "this.form.handler.fill()"),
+                reset( _('Reset'), "this.form.handler.reset()"))
+
+    def _non_js_choice_control(self, task, choice):
+        media = self._response(choice.correct() and 'correct' or 'incorrect')
+        return link(choice.answer(), media.url())
+    
+    def _js_choice_control(self, task, choice):
+        ctrl = radio('task-%d' % self._tasks.index(task),
+                     "this.form.handler.eval_answer(this)",
+                     value=task.choice_index(choice), cls='answer-control')
+        return choice.answer() +'&nbsp;'+ ctrl
+
+    def _format_choice(self, task, choice):
+        label = chr(ord('a') + task.choice_index(choice)) + '.'
+        ctrl = script_write(self._js_choice_control(task, choice),
+                            self._non_js_choice_control(task, choice))
+        return label + '&nbsp;' + ctrl + '<br/>'
+
+    def _format_choices(self, task):
+        formatted = [self._format_choice(task, ch) for ch in task.choices()]
+        return div(formatted, 'choices')
+    
+    def _export_task(self, task):
+        return p(task.prompt(), self._format_choices(task))
+
+    
+class MultipleChoiceQuestions(_ChoiceBasedExercise):
+    """Choosing one of several answers for a given question."""
+    
+    _TASK_TYPE = MultipleChoiceQuestion
+    _NAME = _("Multiple Choice Questions")
+    
+    def _instructions(self):
+        return _("""For each of the %d questions below choose the correct
+        answer from the list.""") % len(self._tasks)
+
+    
+class Selections(_ChoiceBasedExercise):
+    """Selecting one of several statements/sentences (the correct one)."""
+    
+    _TASK_TYPE = Selection
+    _NAME = _("Select the Correct One")
+    
+    def _instructions(self):
+        return _("""For each of the %d pairs of statements below decide which
+        one is correct.""") % len(self._tasks)
+
+class _SelectBasedExercise(_ChoiceBasedExercise):
+
+    _FORM_HANDLER = 'SelectBasedExerciseHandler'
+
+    def _format_choices(self, task):
+        choices = task.choices()
+        js = select('task-%d' % self._tasks.index(task),
+                    [(ch.answer(), task.choice_index(ch)) for ch in choices],
+                    handler="this.form.handler.eval_answer(this)")
+        nonjs = [self._non_js_choice_control(task, ch) for ch in task.choices()]
+        return script_write(js, "("+"|".join(nonjs)+")")
+
+    
+class TrueFalseStatements(_SelectBasedExercise):
+    """Deciding whether the sentence is true or false."""
+    
+    _TASK_TYPE = TrueFalseStatement
+    _NAME = _("True/False Statements")
+    
+    def _instructions(self):
+        return _("""For each of the %d statements below indicate whether you
+        think they are true or false.""") % len(self._tasks)
+
+
+class GapFilling(_SelectBasedExercise):
+    """Choosing from a list of words to fill in a gap in a sentence."""
+
+    _TASK_TYPE = GapFillStatement
+    _NAME = _("Gap Filling")
+
+    def _instructions(self):
+        return _("""For each of the %d sentences below choose the correct piece
+        of text from the list to fill in the gap.""") % len(self._tasks)
+
+    def _export_task(self, task):
+        return p(task.substitute_gap("%s") % self._format_choices(task))
+    
+
+################################################################################
+################################################################################
+
 class _FillInExercise(_InteractiveExercise):
+    """A common base class for exercises based on writing text into fields."""
 
     _TASK_TYPE = ClozeTask
     
@@ -730,7 +835,7 @@ class _FillInExercise(_InteractiveExercise):
           'some-wrong-response.ogg':  _("Some of the answers are wrong!")}
     _RESPONSE_TTS.update(_InteractiveExercise._RESPONSE_TTS)
 
-    _FORM_HANDLER = 'FillInExerciseHandler';
+    _FORM_HANDLER = 'FillInExerciseHandler'
     
     def _answers(self):
         return reduce(lambda a, b: a+b, [t.answers() for t in self._tasks])
@@ -745,10 +850,11 @@ class _FillInExercise(_InteractiveExercise):
         return field(cls='cloze', size=len(match.group(1))+1)
     
     def _export_task(self, task):
-        return "\n".join(('<p>', task.text(self._make_field), '</p>'))
-    
+        return p(task.text(self._make_field))
+
+
 class Cloze(_FillInExercise):
-    """Filling in gaps in text by typing the correct word."""
+    """Paragraphs of text including text-fields for the marked words."""
 
     _NAME = _("Cloze")
     _RECORDING_REQUIRED = True
@@ -766,94 +872,9 @@ class Cloze(_FillInExercise):
             correct word for each gap.""")
 
         
-class _ChoiceBasedExercise(_InteractiveExercise):
-
-    _TASK_FORMAT = '<p>%s\n<div class="choices">\n%s\n</div></p>\n'
-    
-    _FORM_HANDLER = 'ChoiceBasedExerciseHandler';
-
-    def _answers(self):
-        return [t.choice_index(t.correct_choice()) for t in self._tasks]
-    
-    def _answer_control(self, task, choice):
-        self._parent.resource(Script, 'audio.js')
-        button = radio('task-%d' % self._tasks.index(task),
-                       "this.form.handler.eval_answer(this)",
-                       value=task.choice_index(choice), cls='answer-control')
-        selector = choice.correct() and 'correct' or 'incorrect'
-        media = self._responses[selector][0]
-        text = choice.answer()
-        return script_write(button+text, link(text, media.url()))
-    
-    def _buttons(self):
-        return (button(_('Fill'),  "this.form.handler.fill()"),
-                reset( _('Reset'), "this.form.handler.reset()"))
-
-    def _format_choice(self, task, choice):
-        a = chr(ord('a') + task.choice_index(choice)) + ')'
-        ctrl = self._answer_control(task, choice)
-        return '&nbsp;' + a + '&nbsp;' + ctrl + '<br/>'
-        
-    def _export_task(self, task):
-        choices = "\n".join(map(lambda ch: self._format_choice(task, ch),
-                                task.choices()))
-        return self._TASK_FORMAT % (task.prompt(), choices)
-        
-    
-class TrueFalseStatements(_ChoiceBasedExercise):
-    """Exercise Comprising of a list of statements.
-
-    This class overrides the constructor to provide a more comfortable way to
-    specify this concrete type of exercise and to allow more detailed checking
-    of this specification.
-    
-    """
-    _TASK_TYPE = TrueFalseStatement
-    _NAME = _("True/False Statements")
-    _TASK_FORMAT = "<p>%s\n%s</p>\n"
-    
-    def _instructions(self):
-        return _("""For each of the %d statements below indicate whether you
-        think they are true or false.""") % len(self._tasks)
-
-    def _format_choice(self, task, choice):
-        return self._answer_control(task, choice)
-    
-    
-class MultipleChoiceQuestions(_ChoiceBasedExercise):
-    """An Exercise with MultipleChoiceQuestion tasks."""
-    
-    _TASK_TYPE = MultipleChoiceQuestion
-    _NAME = _("Multiple Choice Questions")
-    
-    def _instructions(self):
-        return _("""For each of the %d questions below choose the correct
-        answer from the list.""") % len(self._tasks)
-
-    
-class Selections(_ChoiceBasedExercise):
-    """An Exercise with Selection tasks."""
-    
-    _TASK_TYPE = Selection
-    _NAME = _("Select the Correct One")
-    
-    def _instructions(self):
-        return _("""For each of the %d pairs of statements below decide which
-        one is correct.""") % len(self._tasks)
-
-    
-class GapFilling(_ChoiceBasedExercise):
-    """An exercise composed of GapFillStatement tasks."""
-
-    _TASK_TYPE = GapFillStatement
-    _NAME = _("Gap Filling")
-
-    def _instructions(self):
-        return _("""For each of the %d sentences below choose the correct piece
-        of text from the list to fill in the gap.""") % len(self._tasks)
-
-    
 class VocabExercise(_FillInExercise):
+    """A small text-field for each vocabulary item on a separate row."""
+
     _NAME = _("Vocabulary Practice")
 
     def _instructions(self):
@@ -863,9 +884,9 @@ class VocabExercise(_FillInExercise):
     def _export_task(self, task):
         return task.text(self._make_field)+'<br/>'
 
-    
+
 class Transformation(_FillInExercise):
-    """Transform a whole sentence and write it down."""
+    """A prompt (a sentence) and a big text-field for each task."""
 
     _TASK_TYPE = TransformationTask
     _NAME = _("Transformation")
@@ -875,22 +896,25 @@ class Transformation(_FillInExercise):
         sentences below according to the instructions.""") % len(self._tasks)
 
     def _export_task(self, task):
-        return "\n".join(('<p>',
-                          task.orig(), '<br/>',
-                          task.text(self._make_field),
-                          '</p>'))
+        return p(task.orig(), '<br/>', task.text(self._make_field))
 
     
 class Substitution(Transformation):
+    """A prompt (a sentence) and a big text-field for each task."""
+
     _NAME = _("Substitution")
 
     def _instructions(self):
 
         return _("""Substitute a part of each sentence using the text in
         brackets.""")
-    
+
+        
 class Dictation(_FillInExercise):
+    """One big text-field for a whole exercise."""
+
     _NAME = _("Dictation")
+    _RECORDING_REQUIRED = True
     
     def _instructions(self):
         return """This exercise type is not yet implemented..."""
