@@ -21,16 +21,10 @@ if (navigator.appName=="Microsoft Internet Explorer")
 		  '</object>');
 
 function play_audio(url) {
-   if (navigator.appName=="Microsoft Internet Explorer") {
-      //document.all['bgsound_id'].src=url;
-      if (document.media_player.URL != url) {
-	 window.status = 'Loading: ' + url;
-	 document.media_player.URL = url;
-      }
-      window.status = 'Playing: ' + document.media_player.URL;
-   } else {
+   if (navigator.appName=="Microsoft Internet Explorer")
+      document.media_player.URL = url;
+   else 
       self.location = url;
-   }
 }
 
 function stop_audio() {
