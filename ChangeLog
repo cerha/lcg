@@ -1,3 +1,66 @@
+2005-03-02  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py: Just import * from `lcg' and don't import all the
+	used LCG modules separately.
+	(TextNode._create_content): Use the `wiki.Parser' to create the
+	content.
+	(InnerNode._create_content): Use the `wiki.Parser' to create the
+	content.
+	(Unit._create_content): Refer to the feeder as
+	`feed.ExcelVocabFeeder', not just `ExcelVocabFeeder'.
+	(Unit._create_content): Use the `wiki.Parser' to create some
+	sections.  Use `SectionContainer' instead of just `Container'.
+	(Unit._create_grammar): Method removed.
+	(Unit._create_exercises): Refer to the feeder as
+	`feed.ExerciseFeeder', not just `ExerciseFeeder'.
+	(Instructions._create_content): Expect a tuple form super method
+	call.
+	(ExerciseInstructions._create_content): Use the `wiki.Parser' to
+	create the content.
+
+	* bin/generate.py: New argument `LCG dir'.  Use it to locate
+	translations and default resources.
+
+2005-03-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/wiki.py: All the code borrowed before from the Trac Wiki
+	formatted finally removed.  Thus all the copyright notices removed
+	and added Copyright to Brailcom, o.p.s.  Don't import `time' and
+	`string' and `StringIO'.  Import * from `lcg'.
+	(CommonFormatter, OneLinerFormatter, Formatter, _Node, Section):
+	Classes removed.
+	(InlineFormatter, Parser): New classes.
+	(parse_sections, format, wiki_to_oneliner): Functions removed.
+
+	* lcg/resources.py: Just import * from `lcg' and don't import all
+	the used LCG modules separately.
+
+	* lcg/feed.py: Just import * from `lcg' and don't import all
+	the used LCG modules separately.
+
+	* lcg/export.py: Just import * from `lcg' and don't import all
+	the used LCG modules separately.
+
+	* lcg/content.py: Just import * from `lcg' and don't import all
+	the used LCG modules separately.
+	(Content): Docstring updated.
+	(Content.set_container): Added class assertion.
+	(GenericText): Renamed to `TextContent'.
+	(TextContent.export): New method.
+	(WikiText.export): Use `wiki.InlineFormatter' class instead of
+	`wiki.format()' function.
+	(Container): Don't care about the contained sections and TOC. 
+	(Container.__init__): Argument `toc_depth' removed.
+	(SectionContainer): New class.
+	(Paragraph): New class.
+	(ListItem.export): New Class
+	(Section): Derive from `SectionContainer', not `Container'.
+	
+
+	* lcg/__init__.py: Import also the `feed' and `wiki' and `ims'
+	modules and don't import * from ims.
+	
+
 2005-02-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/wiki.py (CommonFormatter._rules): Markup changed.  Rules for
