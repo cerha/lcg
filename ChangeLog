@@ -1,3 +1,22 @@
+2004-09-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py (ContentNode.linear, ContentNode.next) 
+	(ContentNode.prev): Docstring written.
+	(ContentNode.index): New method.
+	(ContentNode._node_path): New method.
+	(ContentNode._id): New method.
+	(ContentNode.id): Don't use the subdir to construct the id, use
+	concatenating the hierarchy of `self._id()'.
+	(ContentNode.full_title): Use `self._node_path()'.
+	(ContentNode.counter): Docstring updated.
+	(NumberedNode): Class removed.
+	(Course.output_file): Method removed.
+	(Unit): Inherit `InnerNode', not `NumberedNode'.
+	(Unit._id): New method.
+	(Unit.title): New method.
+	(EurochanceCourse._create_children): Don't create the counter for
+	counting NumberedNode's number.
+
 2004-08-31  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/generate.py: Use the `StaticExporter' to export the content.
