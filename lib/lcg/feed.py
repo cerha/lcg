@@ -30,11 +30,9 @@ import commands
 import string
 import traceback
 import codecs
-
 import imp
-import util
 
-from content import *
+from lcg import *
 
 
 class Feeder(object):

@@ -28,8 +28,7 @@ import os
 import shutil
 import codecs
 
-from course import ContentNode
-from util import *
+from lcg import *
 
 class Resource(object):
     """Base resource class.

@@ -21,8 +21,7 @@
 import os
 import shutil
 
-from course import *
-from resources import *
+from lcg import *
 
 class Exporter(object):
 
