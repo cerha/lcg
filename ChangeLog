@@ -19,6 +19,7 @@
 	(Unit.title): New method.
 	(EurochanceCourse._create_children): Don't create the counter for
 	counting NumberedNode's number.
+	(ContentNode.__str__): Don't report the `output_file'.
 
 2004-08-31  Tomas Cerha  <cerha@brailcom.org>
 
