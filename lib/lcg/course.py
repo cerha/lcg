@@ -142,15 +142,17 @@ class ContentNode(object):
                        'input_encoding': self._input_encoding})
         return cls(self, *args, **kwargs)
     
-    def _input_file(self, name, ext='txt', lang=None):
+    def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""
         if lang:
             ext = lang +'.'+ ext
-        return os.path.join(self.src_dir(), name + '.' + ext)
+        if dir is None:
+            dir = self.src_dir()
+        return os.path.join(dir, name + '.' + ext)
         
-    def _read_file(self, name, ext='txt', comment=None, lang=None):
+    def _read_file(self, name, ext='txt', comment=None, dir=None, lang=None):
         """Return all the text read from the source file."""
-        filename = self._input_file(name, ext=ext, lang=lang)
+        filename = self._input_file(name, ext=ext, lang=lang, dir=dir)
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
             lines = fh.readlines()
