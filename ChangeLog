@@ -1,3 +1,15 @@
+2005-02-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/wiki.py (CommonFormatter._rules): The `wikilink' rule removed.
+	(CommonFormatter._wikilink_formatter): Method removed.
+
+	* lcg/course.py (RootNode): Docstring updated.
+
+	* lcg/content.py (VocabExercise2): Class removed.
+
+	* lcg/resources.py (Transcript._export): Encode the text to UTF-8
+	before writing.
+
 2005-02-15  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (ClozeTask.plain_text): New method.
