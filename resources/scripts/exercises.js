@@ -34,6 +34,11 @@ function eval_cloze(f, answers) {
    else self.location="media/some-wrong-response.ogg";
 }
 
+function eval_answer(f, n, correct, snd) {
+   play_audio(snd);
+   f.result.value = n;
+}
+
 function fill_cloze(f, answers) {
    for (i=0; i < answers.length; i++)
       if (f.elements[i].type == 'text')
