@@ -314,8 +314,8 @@ class TransformationTask(ClozeTask):
 class Exercise(Content):
     """Exercise consists of an assignment and a set of tasks."""
 
-    _task_type = Task
-    _name = None
+    _TASK_TYPE = Task
+    _NAME = None
     
     def __init__(self, parent, tasks, sound_file=None, transcript=None):
         """Initialize the instance.
@@ -335,9 +335,9 @@ class Exercise(Content):
           
         """
         super(Exercise, self).__init__(parent)
-        assert is_sequence_of(tasks, self._task_type), \
+        assert is_sequence_of(tasks, self._TASK_TYPE), \
                "Tasks must be a sequence of '%s' instances!: %s" % \
-               (self._task_type.__name__, tasks)
+               (self._TASK_TYPE.__name__, tasks)
         assert sound_file is None or type(sound_file) == type('')
         self._number = parent.counter().next()
         self._tasks = list(tasks)
@@ -356,7 +356,7 @@ class Exercise(Content):
         parent.script('exercises.js')
 
     def task_type(self):
-        return self._task_type
+        return self._TASK_TYPE
     task_type = classmethod(task_type)
 
     def export(self):
@@ -375,9 +375,8 @@ class Exercise(Content):
         return "document.forms['%s']" % self._form_name()
     
     def _header(self):
-        name = self._name or re.sub('([^^])([A-Z])', '\\1 \\2',
-                                    self.__class__.__name__)
-        return "<h3>Exercise %d &ndash; %s</h3>" % (self._number, name)
+        return "<h3>%s %d &ndash; %s</h3>" % (_("Exercise"), self._number,
+                                              self._NAME)
     
     def _instructions(self):
         return ""
@@ -387,11 +386,11 @@ class Exercise(Content):
         result = "<p>" + self._instructions() + "</p>"
         if self._recording is not None:
             url = self._recording.url()
-            f = ('<form class="sound-control" action="">Recording:',
-                 self._button("Play", "play_audio('%s')" % url),
-                 self._button("Stop", 'stop_audio()'),
+            f = ('<form class="sound-control" action="">%s:' % _("Recording"),
+                 self._button(_("Play"), "play_audio('%s')" % url),
+                 self._button(_("Stop"), 'stop_audio()'),
                  '</form>')
-            a = '<p>Recording: [<a href="%s">Play</a>]</p>' % url
+            a = '<p>%s: [<a href="%s">Play</a>]</p>' % (_("Recording"), url)
             result += '\n\n'+ self._script_write('\n'.join(f), a)
         return result
 
@@ -405,7 +404,8 @@ class Exercise(Content):
 class Cloze(Exercise):
     """Filling in gaps in text by typing the correct word."""
 
-    _task_type = ClozeTask
+    _TASK_TYPE = ClozeTask
+    _NAME = _("Cloze")
 
     
     def __init__(self, parent, *args, **kwargs):
@@ -455,7 +455,7 @@ class Cloze(Exercise):
 
 class _ChoiceBasedExercise(Exercise):
 
-    _task_format = '<p>%s\n<div class="choices">\n%s\n</div></p>\n'
+    _TASK_FORMAT = '<p>%s\n<div class="choices">\n%s\n</div></p>\n'
 
     def _answer_control(self, task, text, correct):
         self._parent.script('audio.js')
@@ -488,7 +488,7 @@ class _ChoiceBasedExercise(Exercise):
     def _export_task(self, task):
         choices = "\n".join(map(lambda ch: self._format_choice(task, ch),
                                 task.choices()))
-        return self._task_format % (task.prompt(), choices)
+        return self._TASK_FORMAT % (task.prompt(), choices)
         
     
 class TrueFalseStatements(_ChoiceBasedExercise):
@@ -500,9 +500,9 @@ class TrueFalseStatements(_ChoiceBasedExercise):
     
     """
 
-    _task_type = TrueFalseStatement
-    _name = "True/False Statements"
-    _task_format = "<p>%s\n%s</p>\n"
+    _TASK_TYPE = TrueFalseStatement
+    _NAME = _("True/False Statements")
+    _TASK_FORMAT = "<p>%s\n%s</p>\n"
     
     def _instructions(self):
         return """A list of %d statements follows.  After each sentence,
@@ -516,7 +516,8 @@ class TrueFalseStatements(_ChoiceBasedExercise):
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
     """An Exercise with MultipleChoiceQuestion tasks."""
     
-    _task_type = MultipleChoiceQuestion
+    _TASK_TYPE = MultipleChoiceQuestion
+    _NAME = _("Multiple Choice Questions")
     
     def _instructions(self):
         return """Below is a list of %d questions.  For each question choose
@@ -527,8 +528,8 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
 class Selections(_ChoiceBasedExercise):
     """An Exercise with Selection tasks."""
     
-    _task_type = Selection
-    _name = "Select the Correct One"
+    _TASK_TYPE = Selection
+    _NAME = _("Select the Correct One")
     
     def _instructions(self):
         return """For each of the %d pairs of statements, decide which one is
@@ -538,7 +539,8 @@ class Selections(_ChoiceBasedExercise):
 class GapFilling(_ChoiceBasedExercise):
     """An exercise composed of GapFillStatement tasks."""
 
-    _task_type = GapFillStatement
+    _TASK_TYPE = GapFillStatement
+    _NAME = _("Gap Filling")
 
     def _instructions(self):
         return """Select a word from the list below each sentence to fill in
@@ -547,6 +549,8 @@ class GapFilling(_ChoiceBasedExercise):
     
 class SentenceCompletion(Cloze):
     """Filling in gaps in sentences by typing in the correct completion."""
+
+    _NAME = _("Sentence Completion")
 
     def _instructions(self):
         return """You will hear a recording comprising %d sentences.  Below,
@@ -558,7 +562,8 @@ class SentenceCompletion(Cloze):
 class Transformation(Cloze):
     """Transform a whole sentence and write it down."""
 
-    _task_type = TransformationTask
+    _TASK_TYPE = TransformationTask
+    _NAME = _("Transformation")
 
     def _instructions(self):
         return """Listen to the recording and transform each of the %d
