@@ -1,0 +1,60 @@
+= Eurochance Course Structure =
+
+Tomas Cerha, 2004-05-19
+
+This document describes the course structure for Eurochance language courses.
+
+*Table of Contents:*
+
+@TOC@
+
+== Overview == *
+
+A course consists of a certain number of units (15 units for intermediate
+course.  Each unit is focused on certain topic (e.g. finance, catering etc.).
+
+Each unit consists of several sections:
+
+* *Introduction* ... outline of the focus of the unit
+* *Vocabulary* ... vocabulary listing
+* *Key language use* ... key structures
+* *Key Grammar* ... a very basic explanation
+* *Exercises* ... series of exercises to practise the 
+* *Consolidation* ... an overview of competences achieved in the unit
+
+== Types of content == *
+
+=== Introduction Section === intro
+
+The introduction section consists of a structured text.  This means paragraphs
+of text with simple formatting (bold/italic/underlined text), itemized lists,
+headings.
+
+This section also provides the hyperlinks to all the other sections within the
+unit.
+
+=== Vocabulary === *
+
+Consists of a listing of vocabulary for the unit.  User can read each piece of
+vocabulary separately, hear the correct pronounciation (recorded by native
+speaker) and read the translation into his mother tongue.
+
+User can browse the vocabulary up and down and search for a concrete word
+(by means of the browser).   
+
+=== Key Language Use === use
+
+To contents of this section comprises a Structured text (as described in the
+[#intro|Introduction Section] above) with the possibility to use sound resordings that can be replayed
+on user request.
+
+=== Key Grammar === *
+
+The same as the [#use|Key Language Use] section above.
+
+=== Exercises === *
+
+
+=== Consolidation === *
+
+
