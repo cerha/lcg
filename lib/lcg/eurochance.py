@@ -105,8 +105,8 @@ class Instructions(EurochanceNode):
                [TableOfContents(self)]
     
     def _create_children(self):
-        return [self._create_child(ExerciseInstructions, e, 'help')
-                for e in Exercise.used_types()]
+        return [self._create_child(ExerciseInstructions, t, 'help')
+                for t in Exercise.used_types()]
 
     def _id(self):
         return 'instructions'
@@ -115,26 +115,19 @@ class Instructions(EurochanceNode):
 class ExerciseInstructions(EurochanceNode):
     """Exercise instructions."""
     
-    def __init__(self, parent, exercise_class_, *args, **kwargs):
-        assert issubclass(exercise_class_, Exercise)
-        self._exercise_class_ = exercise_class_
+    def __init__(self, parent, type, *args, **kwargs):
+        assert issubclass(type, Exercise)
+        self._type = type
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
-        try:
-            return self._parse_wiki_file(self._exercise_class_.id())
-        except IOError, e:
-            print "Warning: %s" % e
-            return Content(self)
+        return self._type.help(self)
 
     def title(self, abbrev=False):
-        return _("Instructions for %s") % self._exercise_class_.name()
+        return _("Instructions for %s") % self._type.name()
 
     def _id(self):
-        return self._exercise_class_.id()
-
-    def src_dir(self):
-        return os.path.join(config.default_resource_dir, 'help')
+        return camel_case_to_lower(self._type.__name__)
 
     
 class _Index(EurochanceNode):
