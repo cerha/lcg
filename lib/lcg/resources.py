@@ -26,8 +26,10 @@ that the node is able to keep track of all the resources it depends on.
 
 import os
 import shutil
+import codecs
 
 from course import ContentNode
+from util import *
 
 class Resource(object):
     """Base resource class.
