@@ -92,12 +92,16 @@ class Resource(object):
 
     def export(self, dir):
         dst_path = self._destination_file(dir)
-        if not os.path.exists(dst_path) or \
-               os.path.exists(self._src_path) and \
-               os.path.getmtime(dst_path) < os.path.getmtime(self._src_path):
+        if (not os.path.exists(dst_path)
+            or (os.path.exists(self._src_path) and
+                os.path.getmtime(dst_path) < os.path.getmtime(self._src_path))
+            or self._additional_export_condition()):
             if not os.path.isdir(os.path.dirname(dst_path)):
                 os.makedirs(os.path.dirname(dst_path))
             self._export(dir)
+            
+    def _additional_export_condition(self):
+        return False
 
     def get(self):
         fh = open(self._src_path)
@@ -261,12 +265,25 @@ class Transcript(Resource):
         if self._text is None:
             super(Transcript, self)._check_file()
             
+    def _additional_export_condition(self):
+        return self._text is not None
+    
     def _export(self, dir):
         # Either create the file using the text or copy from source directory.
-        if self._text is None: # or os.path.exists(self._src_path):
-            return super(Transcript, self)._export(dir)
+        dst_path = self._destination_file(dir)
+        if self._text is not None:
+            text = self._text
         else:
-            dst_path = self._destination_file(dir)
-            output_file = open(dst_path, 'w')
-            output_file.write(self._text.encode('utf-8'))
-            output_file.close()
+            fh = codecs.open(self._src_path,
+                             encoding=self._parent.input_encoding())
+            try:
+                text = ''.join(fh.readlines())
+            except UnicodeDecodeError, e:
+                raise Exception("Error while reading file %s: %s" %
+                                (self._src_path, e))
+            fh.close()
+        text = "\n\n".join([textwrap.fill(x)
+                            for x in text.replace("\r\n", "\n").split("\n\n")])
+        output_file = open(dst_path, 'w')
+        output_file.write(text.encode('utf-8'))
+        output_file.close()
