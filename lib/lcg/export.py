@@ -106,21 +106,16 @@ class StaticExporter(Exporter):
              '<a name="content" accesskey="%s"></a>' % 
              self._hotkey['content-beginning'],
              '<h1>%s</h1>' % node.title(),
-             self._div('content', content),
-             self._toc(node),
+             div(content, 'content'),
              '<hr class="navigation">', nav,
              '</body></html>')
         return "\n".join(c)
 
-    def _div(self, cls, *contents):
-        return '\n'.join(('<div class="%s">' % cls,) + contents + ('</div>\n',))
-
-    def _link(self, node, label=None, title='', key=None):
+    def _link(self, node, label=None, key=None):
         if node is None: return 'None' 
-        label = label or node.title()
-        hotkey = not key or self._hotkey[key]
-        return '<a href="%s" title="%s" accesskey="%s">%s</a>' % \
-               (node.output_file(), title, hotkey, label)
+        label = label or node.title(abbrev=True)
+        return link(label, node.output_file(), title=node.title(),
+                    hotkey=not key or self._hotkey[key])
     
     def _navigation(self, node):
         nav = [_('Next') + ': ' + self._link(node.next(), key='next'),
@@ -128,24 +123,7 @@ class StaticExporter(Exporter):
         if node is not node.root_node():
             p = node.parent()
             if p is not node.root_node():
-                nav.append(p.toc_title() + ': ' + \
-                           self._link(p, key='local-index'))
+                nav.append(_("Up") + ': ' + self._link(p, key='local-index'))
             nav.append(self._link(node.root_node(), label=_('Course Index'),
                                   key='global-index'))
-        return self._div('navigation', ' | '.join(nav))
-
-    def _toc(self, node):
-        if not node.has_index(): return ''
-        return self._div("table-of-contents",
-                         '<h2>%s</h2>' % _("Table of Contents"),
-                         self._make_toc(node))
-    
-    def _make_toc(self, node, indent='', deep=False):
-        if len(node.children()) == 0:
-            return ''
-        return "\n" + indent + "<ul>\n" + \
-               "\n".join(map(lambda n: '%s  <li><a href="%s">%s</a>%s</li>' % \
-                             (indent, n.output_file(), n.title(),
-                              deep and self._make_toc(n, indent+'    ') or ''),
-                             node.children())) + \
-                             "\n" + indent + "</ul>\n" + indent[0:-2] 
+        return div(' | '.join(nav), 'navigation')
