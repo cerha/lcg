@@ -49,7 +49,7 @@ class ContentNode(object):
     
     """
     
-    def __init__(self, parent, subdir):
+    def __init__(self, parent, subdir, default_resource_dir='resources'):
         """Initialize the instance.
 
         Arguments:
@@ -58,12 +58,19 @@ class ContentNode(object):
             this node in the content hierarchy.  Can be None for the top node.
           subdir -- a directory name relative to parent's source directory.  All
             input files are expected in this directory.
+          default_resource_dir -- the LCG comes with a set of default resources
+            (stylesheets, scripts and media files).  They are used if no custom
+            files of the same name are present in the source directory.  This
+            argument specifies the name of the directory, where LCG default
+            resources are installed.
+
 
         """
         assert parent is None or isinstance(parent, ContentNode)
         assert type(subdir) == type('')
         self._parent = parent
         self._subdir = subdir
+        self._default_resource_dir = default_resource_dir
         self._resources = {}
         self._counter = Counter(1)
         self._content = self._create_content()
@@ -75,6 +82,7 @@ class ContentNode(object):
             assert child in self._children
         if parent is not None:
             parent._register_child(self)
+        self.stylesheet('default.css')
 
         
     def _register_child(self, child):
@@ -274,8 +282,18 @@ class ContentNode(object):
         
         """
         return self._children.index(node)
-        
 
+    def default_resource_dir(self):
+        """Return the name of the directory containing default LCG resources.
+
+        This is the directory specified by the constructor argument of the same
+        name.
+
+        """
+        
+        return self._default_resource_dir
+
+    
 class TextNode(ContentNode):
     """A section of stuctured text read from a wiki-formatted file."""
 
@@ -357,11 +375,17 @@ class Resource(object):
 
     def source_file(self):
         if self._shared:
-            dir = os.path.join(self._parent.root_node().src_dir(),
-                               self.SUBDIRECTORY)
+            filename = os.path.join(self._parent.root_node().src_dir(),
+                                    self.SUBDIRECTORY, self._file)
+            if not os.path.exists(filename) \
+                   and self._parent.default_resource_dir() is not None:
+                default = os.path.join(self._parent.default_resource_dir(),
+                                       self.SUBDIRECTORY, self._file)
+                if os.path.exists(default):
+                    filename = default
         else:
-            dir = self._parent.src_dir()
-        return os.path.join(dir, self._file)
+            filename = os.path.join(self._parent.src_dir(), self._file)
+        return filename
 
     def destination_file(self, dir):
         subdir = self.SUBDIRECTORY
@@ -371,6 +395,9 @@ class Resource(object):
 
     def url(self):
         return self.destination_file('')
+
+    def name(self):
+        return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
     
 class Media(Resource):
@@ -400,9 +427,6 @@ class Media(Resource):
     def tts_input(self):
         return self._tts_input
 
-    def name(self):
-        return "media_%s" % id(self)
-    
         
 class Script(Resource):
     """Representation of a script object used within the content.
@@ -413,6 +437,7 @@ class Script(Resource):
     """
     SUBDIRECTORY = 'scripts'
 
+    
 class Stylesheet(Resource):
     """Representation of a stylesheet used within the content.
 
@@ -426,7 +451,7 @@ class Stylesheet(Resource):
 ################################################################################
 # Concrete implemantation of Eurochance course structure.
 ################################################################################
- 
+
 
 class Vocabulary(ContentNode):
     """A section comprising a list of vocabulary."""
