@@ -114,26 +114,6 @@ class Counter(object):
         value = self._value
         self._value = self._value + 1
         return value
-
-
-class Record(object):
-    """A generic class to store data.
-
-    Each private attributte (beginning with a single underscore), that is
-    created in the constructor can be accessed (read-only) via a public method
-    of the same name (without the leading underscore).
-
-    A derived class is responsible to initialize the attributes in its
-    constructor.  It only deesn't have to define all the accessor methods.
-
-    """
-        
-    def __getattr__(self, attr):
-        if hasattr(self, '_'+attr):
-            return lambda : getattr(self, '_'+attr)
-        else:
-            raise AttributeError("%s has no property '%s'" % \
-                                 (self.__class__.__name__, attr))
                 
     
 def list_dir(dir):
