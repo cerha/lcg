@@ -25,7 +25,6 @@ all: en de
 
 en de:
 	rm -f $(DST)/*.html
-	#find $(SRC) -name "*.txt" | xargs perl -i -pe 's/^﻿// if $$. == 1'
 	bin/generate.py $(SRC) $(DST) $(LANG)
 #	rm -f $(DST)/intermediate.zip
 #	(cd $(DST); zip -qr intermediate.zip .)
