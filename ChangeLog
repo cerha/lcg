@@ -1,3 +1,32 @@
+2004-11-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* Makefile (LCG_MP3_COMMAND): New variable.
+	(LCG_OGG_COMMAND): New variable.
+	(all): Export new variables.
+
+	* lcg/course.py (Resource.SUBDIRECTORY, Media.SUBDIRECTORY)
+	(Script.SUBDIRECTORY, Stylesheet.SUBDIRECTORY): Renamed to
+	`SUBDIR'.
+	(Resource.__init__): Initialize the variables `self._src_path' and
+	`self._dst_path'.
+	(Resource.source_file): Method removed.
+	(Resource._find_source_file): New Method.
+	(Resource.destination_file): Renamed to `_destination_file'.  Use
+	`self._dst_path'.
+	(Resource.export, Resource.export): New methods.
+	(Media.__init__): Media type assertion.
+	(tts_input): Method removed.
+	(Media._find_source_file): New Method.
+	(Media._command): New Method.
+	(Media._open_stream_from_tts): New Method.
+	(Media._open_stream_from_encoder): New Method.
+	(Media._open_stream_from_encoder): New Method.
+
+	* lcg/content.py (Exercise.__init__): Don't set the `tts_input'
+	argument for the Media instance of the recording.
+
+	* lcg/util.py (copy_stream): New function.
+
 2004-10-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/scripts/exercises.js (count):

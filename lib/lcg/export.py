@@ -40,8 +40,8 @@ class Exporter(object):
         data = self._wrap_content(node, node.content().export())
         file.write(data.encode('utf-8'))
         file.close()
-        for m in node.resources():
-            self._export_resource(m)
+        for r in node.resources():
+            r.export(self._dir)
         for n in node.children():
             self._export_node(n)
 
@@ -54,32 +54,6 @@ class Exporter(object):
                           content,
                           '  </body>',
                           '</html>'))
-            
-    def _export_resource(self, r):
-        src_path = r.source_file()
-        dst_path = r.destination_file(self._dir)
-        if not os.path.exists(dst_path) or \
-               os.path.exists(src_path) and \
-               os.path.getmtime(dst_path) < os.path.getmtime(src_path):
-            if not os.path.isdir(os.path.dirname(dst_path)):
-                os.makedirs(os.path.dirname(dst_path))
-            # Either create the file with tts or copy from source directory.
-            if isinstance(r, Media) and r.tts_input() is not None \
-                   and not os.path.exists(src_path):
-                print "%s: file does not exist!" % dst_path
-                cmd = None
-                try:
-                    cmd = os.environ['LCG_TTS_COMMAND']
-                except KeyError:
-                    pass
-                if cmd:
-                    input = r.tts_input().replace("'", "\\'")
-                    cmd = cmd % {'text': input, 'file': dst_path}
-                    print "  - generating with TTS: %s" % cmd
-                    os.system(cmd)
-            else:
-                shutil.copy(src_path, dst_path)
-                print "%s: file copied." % dst_path
             
     def export(self):
         self._export_node(self._course)
