@@ -24,7 +24,7 @@ from xml.sax import saxutils
 from lcg import *
 
 
-class InlineFormatter(object):
+class Formatter(object):
     """Simple Wiki markup formatter.
 
     This simple Wiki formatter can only format the markup within one block (ie.
@@ -55,6 +55,7 @@ class InlineFormatter(object):
                'fixed': ('<tt>', '</tt>'),
                'underline': ('<span class="underline">', '</span>'),
                'quotation': (u'“<span class="quotation">', u'</span>”'),
+               'citation': ('<span class="citation">**', '**</span>'),
                'linebreak': '<br>',
                'nbsp': '&nbsp;',
                }
@@ -91,16 +92,10 @@ class InlineFormatter(object):
 
     def _formatter(self, type, close=False):
         try:
+            return getattr(self, '_'+type+'_formatter')(close=close)
+        except AttributeError:
             f = self._FORMAT[type]
             return type in self._PAIR and f[close and 1 or 0] or f
-        except KeyError:
-            return getattr(self, '_'+type+'_formatter')(close=close)
-        
-    def _citation_formatter(self, close=False):
-        if not close:
-            return '<span class="citation" lang="%s">' % self._parent.language()
-        else:
-            return '</span>'
         
     def format(self, text):
         self._open = []
