@@ -19,6 +19,8 @@
 
 from content import *
 from course import *
+from export import *
+from ims import *
 
 # Øe¹ení cyklických závislostí souborù
 for file in (course, content, feed):
