@@ -38,12 +38,12 @@ def main():
     lang = opt.get('--lang', 'en')
     lcg.set_language(lang)
     
-    from lcg.eurochance import EurochanceCourse
+    from lcg.eurochance import EurochanceCourse, EurochanceExporter
     c = EurochanceCourse(source_dir, course_language=lang,
                          users_language=opt.get('--user-lang', 'cs'),
                          input_encoding='utf-8')
     #e = lcg.ims.IMSExporter(destination_dir)
-    e = lcg.StaticExporter(stylesheet=opt.get('--stylesheet'))
+    e = EurochanceExporter(stylesheet=opt.get('--stylesheet'))
     e.export(c, destination_dir)
 
 def usage():
