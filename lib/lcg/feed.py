@@ -191,8 +191,8 @@ class ExerciseFeeder(Feeder):
     def _read_task(self, parent, type, text):
         # Read a task specification using a method according to given task type.
         method = {
-            Cloze:                  self._read_cloze,
-            Transformation:         self._read_transformation,
+            ClozeTask:              self._read_cloze,
+            TransformationTask:     self._read_transformation,
             Selection:              self._read_selection,
             MultipleChoiceQuestion: self._read_multiple_choice_question,
             GapFillStatement:       self._read_gap_fill_statement,
@@ -238,10 +238,10 @@ class ExerciseFeeder(Feeder):
                                 self._process_choices(lines[1:]))
     
     def _read_cloze(self, parent, text):
-        return Cloze(parent, text)
+        return ClozeTask(parent, text)
 
     def _read_transformation(self, parent, text):
-        return Transformation(parent, text)
+        return TransformationTask(parent, text)
 
     def _read_true_false_statement(self, parent, text):
         text = text.strip()
