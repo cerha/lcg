@@ -1,0 +1,20 @@
+= Introduction =
+
+The Learning Content Generator (LCG) is a computer program, which processes the
+input data and produces a Content Package (CP) that can be used in an on-line
+or off-line learning environment. 
+
+== The Goals ==
+
+ * The input data formats must allow creating the content without the need for
+   any particular software or tool.  
+
+ * The input data formats must be easy to understand and edit even for
+   non-technicians.
+
+ * It must be easy to change the appearance and user interface of the generated
+   CP without any changes in the input data.
+
+ * It must be possible to generate the output in different formats.  Initially
+   the IMS content package and a set of static web pages must be supported.
+
