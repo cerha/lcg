@@ -239,6 +239,9 @@ class EurochanceCourse(EurochanceNode):
                 'copyright': "Copyright (c) 2004 Eurochance Team"}
 
 
+class EurochanceExporter(StaticExporter):
+    _INDEX_LABEL = _('Course Index')
+    
 class Formatter(wiki.Formatter):
 
     _MARKUP = [(type, markup) for type, markup in wiki.Formatter._MARKUP
