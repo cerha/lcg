@@ -23,6 +23,14 @@ We need something very simple and quite specific, so it is not worth using
 
 """
 
+import operator
+import types
+
+def div(content, cls):
+    if operator.isSequenceType(content) \
+           and not isinstance(content, types.StringTypes):
+        content = '\n'.join(content)
+    return '\n'.join(('<div class="%s">' % cls, content, '</div>\n'))
 
 def field(text='', name='', size=20, cls=None, readonly=False):
     f = '<input type="text" name="%s" class="%s" value="%s" size="%d"%s>'
@@ -35,10 +43,17 @@ def button(label, handler, cls=None):
            ' onClick="javascript: %s"' % handler + \
            (cls and ' class="%s">' % cls or '>')
 
-def link(label, url, target=None, cls=None, brackets=False):
-    result = '<a href="%s"%s%s>%s</a>' % \
-             (url, target and ' target="%s"' % target or '',
-              cls and ' class="%s"' % cls or '', label)
+def link(label, url, brackets=False,
+         title=None, target=None, cls=None, hotkey=None):
+    if hotkey:
+        t = '(Alt-%s)' % hotkey
+        title = title and title + ' ' + t or t
+    attr = "".join([v and ' %s="%s"' % (a, v) or ''
+                    for a, v in (('title', title),
+                                 ('target', target),
+                                 ('class', cls),
+                                 ('accesskey', hotkey))])
+    result = '<a href="%s"%s>%s</a>' % (url, attr, label)
     return brackets and '['+result+']' or result
 
 def speaking_text(text, media):
