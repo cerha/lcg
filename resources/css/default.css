@@ -68,14 +68,21 @@ input.cloze {
 
 
 .results { 
+    margin-top: .8em;
     background: #eee;
-    padding: 2pt;
     border: #ccc solid 1px;
 }
-
-.results input.text, input.result { 
+.results .display { 
+    padding: 2pt;
+}
+.results .display input { 
     border: none;
     font-size: 1em;
     background: #eee;
 }
+.results .buttons { 
+    padding: 2pt;
+    border-top: #ccc solid 1px;
+}
+
 
