@@ -42,7 +42,8 @@ class Formatter(object):
                ('underline', '_'),
                ('citation', ('>>', '<<')),
                ('quotation', ('``', "''")),
-               ('link', '\[(?P<href>[^\]\|]+)(?:\|(?P<title>[^\]]+))?\]'),
+               ('link', ('\[(?P<href>[^\]\|\#]*)(?:#(?P<anchor>[^\]\|]*))?'
+                         '(?:\|(?P<title>[^\]]*))?\]')),
                ('uri', '(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
                ('email', '\w[\w\-\.]*@\w[\w\-\.]+'),
                ('comment', '^#.*'),
@@ -51,7 +52,7 @@ class Formatter(object):
                ('dash', '(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'),
                )
-    _HELPER_PATTERNS = ('href', 'title')
+    _HELPER_PATTERNS = ('href', 'anchor', 'title')
     
     # The list below lists the which elements are paired on the output
     # (formatter) side, not the input (markup) side (they must be opened and
@@ -109,25 +110,33 @@ class Formatter(object):
 
     def _formatter(self, type, groups, close=False):
         try:
-            return getattr(self, '_'+type+'_formatter')(groups, close=close)
+            formatter = getattr(self, '_'+type+'_formatter')
         except AttributeError:
             f = self._FORMAT[type]
             return type in self._PAIR and f[close and 1 or 0] or f
+        return formatter(groups, close=close)
         
     def _link_formatter(self, groups, close=False):
         title = groups['title']
         href = groups['href']
-        if not title:
-            if href.startswith('#'):
-                section = self._parent.find_section(href[1:])
-                title = section and section.title() or href[1:]
+        anchor = groups['anchor']
+        if href:
+            node = self._parent.root_node().find_node(href)
+            if node:
+                href = node.url()
+        else:
+            node = self._parent
+        if node and not title:
+            if anchor:
+                section = node.find_section(anchor)
+                if section:
+                    title = section.title()
             else:
-                node = self._parent.root_node().find_node(href)
-                if node:
-                    title = node.title()
-                    href = node.url()
-                else:
-                    title = href
+                title = node.title()
+        if anchor is not None:
+            href += '#'+anchor
+        if not title:
+            title = href
         return '<a href="%s">%s</a>' % (href, title)
 
     def _uri_formatter(self, groups, close=False):
