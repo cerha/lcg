@@ -1,4 +1,4 @@
-/* Copyright (C) 2004 Brailcom, o.p.s.
+/* Copyright (C) 2004, 2005 Brailcom, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ function count(array, value) {
 }
 
 function event_key(e) {
+   // Return a textual representation of a pressed key.
    var code = document.all ? e.keyCode : e.which;
    var cap = code >= 65 && code <= 90;
    var modifiers = '';
@@ -70,59 +71,157 @@ function highlight(field, start, end) {
   }
 }
 
-// Choice based exercise evaluation
-
-function eval_choice(f, n, total, correct, snd) {
-   if (f._answered == null) f._answered = [total];
-   play_audio(snd);
-   if (f._answered[n] == null) f._answered[n] = correct ? 1 : -1;
-   display_choice_results(f, total);
-}
-
-function reset_choices(f, total) {
-   f._answered = new Array(total);
-   display_choice_results(f, total);
-}
-
-function display_choice_results(f, total) {
-   var correct = count(f._answered, 1);
-   var done = correct + count(f._answered, -1);
-   f.answered.value = done + '/' + total;
-   f.result.value = correct + ' (' + Math.round(100*correct/total) + '%)';
-}
-
-// Fill-in text exercise evaluation
-
-function init_cloze_form(f, answers) {
-   if (document.captureEvents) document.captureEvents(Event.KEYPRESS);
-   f._answers = answers;
-   for (i=0; i < answers.length; i++) {
-      var field = f.elements[i]
-      field.onkeypress = handle_cloze_field_keypress;
-      field._parent_form = f;
-      field._parent_index = i;
-   }
-}
-
 function last_correct_char_index(field, answer) {
    var i = 0;
-   while (field.value.slice(0, i+1) == answer.slice(0, i+1)) i++; 
+   while (field.value.slice(0, i+1) == answer.slice(0, i+1) && i<answer.length)
+      i++; 
    return i;
 }
 
-function handle_cloze_field_keypress(e) {
+// Exercises
+
+function init_form(f, handler, answers, responses) {
+   f.handler = handler;
+   handler.init(f, answers, responses);
+}
+
+//=============================================================================
+// Generic exercise form handler class.
+
+function Handler() {
+   if (document.captureEvents) document.captureEvents(Event.KEYPRESS);
+}
+
+Handler.prototype.init = function(form, answers, responses) {
+   this._form = form;
+   this._answers = answers;
+   this._responses = responses;
+   this._answered = new Array(answers.length);
+   this._init_fields();
+}
+
+Handler.prototype._eval_answer = function(field) {
+   if (field.value != '') {
+      var i = field.answer_index;
+      var answer = this._answers[i]
+      var correct = (field.value == answer);
+      if (this._answered[i] == null) this._answered[i] = correct ? 1 : -1;
+      return correct;
+   } else {
+      this._answered[i] = null;
+      return null;
+   }
+}
+
+Handler.prototype.eval_answer = function(field) {
+   var correct = this._eval_answer(field)
+   play_audio(this.response(correct ? 'correct':'incorrect'));
+   this.display_results();
+   if (!correct) this._error_handler(field);
+   return correct;
+}
+
+Handler.prototype._error_handler = function(field) {}
+
+Handler.prototype.response = function(selector) {
+   array = this._responses[selector];
+   n = Math.floor(Math.random() * array.length);
+   return array[n];
+}
+
+Handler.prototype.correct = function() {
+   return count(this._answered, 1);
+}
+
+Handler.prototype.incorrect = function() {
+   return count(this._answered, -1);
+}
+
+Handler.prototype.percentage = function() {
+   return Math.round(100 * this.correct() / this._answers.length)
+}
+
+Handler.prototype.display_results = function() {
+   var correct = this.correct();
+   var incorrect =  this.incorrect();
+   this._form.answered.value = (correct+incorrect) +'/'+ this._answers.length;
+   this._form.result.value = correct +' ('+ this.percentage() +'%)';
+}
+
+Handler.prototype.reset = function() {
+   this._answered = new Array(this._answers.length);
+   this.display_results();
+}
+
+//=============================================================================
+// Choice based exercise handler class.
+
+function ChoiceBasedExerciseHandler() {}
+ChoiceBasedExerciseHandler.prototype = new Handler();
+
+ChoiceBasedExerciseHandler.prototype._init_fields = function() {
+   var n = 0;
+   var last_group = null;
+   this._fields = new Array();
+   for (i=0; i < this._form.elements.length; i++) {
+      var field = this._form.elements[i];
+      if (field.type == 'radio') {
+	 if (field.name != last_group) {
+	    if (last_group != null) n++;
+	    last_group = field.name;
+	 }
+	 field.answer_index = n;
+	 this._fields.push(field);
+      }
+   }
+}
+
+ChoiceBasedExerciseHandler.prototype.fill = function() {
+   for (var i=0; i < this._fields.length; i++) {
+      var field = this._fields[i];
+      field.checked = (field.value == this._answers[field.answer_index]);
+   }
+}
+
+//=============================================================================
+// Fill-in text exercise handler class.
+
+function FillInExerciseHandler() {}
+FillInExerciseHandler.prototype = new Handler();
+
+FillInExerciseHandler.prototype._init_fields = function() {
+   this._fields = new Array();
+   for (i=0; i < this._answers.length; i++) {
+      var field = this._form.elements[i];
+      if (field.type == 'text') {
+	 field.answer_index = i;
+	 field.onkeypress = this._handle_text_field_keypress;
+	 this._fields.push(field);
+      }
+   }
+}
+
+FillInExerciseHandler.prototype._error_handler = function(field) {
+   var answer = this._answers[field.answer_index]
+   var index = last_correct_char_index(field, answer);
+   highlight(field, index, index);
+}
+
+
+FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
+   // 'this' does not refer to the FillInExerciseHandler instance here!
    if (document.all) e = window.event;
    var key = event_key(e);
    var field = event_target(e);
    if (key == 'Enter') {
-      eval_cloze_field(field._parent_form, field._parent_index);
+      field.form.handler.eval_answer(field);
    } else if (key == 'Ctrl-Space') {
-      var answer = field._parent_form._answers[field._parent_index];
+      var answer = field.form.handler._answers[field.answer_index];
       if (field.value != answer.slice(0, field.value.length)) {
 	 var i = last_correct_char_index(field, answer);
 	 field.value = field.value.slice(0, i);
       } else {
-	 var len = field.value.length
+	 var len = field.value.length;
 	 field.value += answer.slice(len, len+1);
       }
       return false;
@@ -130,40 +229,22 @@ function handle_cloze_field_keypress(e) {
    return true;
 }
 
-function eval_cloze_field(f, i) {
-   var answer = f._answers[i];
-   var field = f.elements[i];
-   if (field.value == answer)
-      play_audio('media/correct-response.ogg');
-   else {
-      play_audio('media/incorrect-response.ogg');
-      var i = last_correct_char_index(field, answer);
-      highlight(field, i, i);
+FillInExerciseHandler.prototype.fill = function() {
+   for (var i=0; i < this._fields.length; i++) {
+      var field = this._fields[i];
+      field.value = this._answers[field.answer_index];
    }
 }
 
-function eval_cloze(f) {
-   var correct = 0;
-   var marked = 0;
-   for (i=0; i < f._answers.length; i++)
-      if (f.elements[i].type == 'text')
-         if (f.elements[i].value == f._answers[i]) correct++;
-         else if (f.elements[i].value) {
-            if (f.elements[i].value[0] != "!")
-               f.elements[i].value = "!" + f.elements[i].value;
-            marked = 1;
-         }
-   f.result.value = "Correct answers: "+correct+"/"+f._answers.length+".";
-   if (marked) f.result.value +=
-	  " Check back for the entries marked with an exclamation mark!";
-   if (correct == f._answers.length) snd = "media/all-correct-response.ogg";
-   else if (correct == 0) snd = "media/all-wrong-response.ogg";
-   else snd = "media/some-wrong-response.ogg";
-   play_audio(snd);
-}
-
-function fill_cloze(f) {
-   for (i=0; i < f._answers.length; i++)
-      if (f.elements[i].type == 'text')
-	f.elements[i].value = f._answers[i];
+FillInExerciseHandler.prototype.evaluate = function() {
+   for (var i=0; i < this._fields.length; i++) {
+      this._eval_answer(this._fields[i]);
+   }
+   switch (this.percentage()) {
+      case 100: selector = 'all_correct'; break;
+      case   0: selector = 'all_wrong'; break;
+      default:  selector = 'some_wrong';
+   }
+   play_audio(this.response(selector));
+   this.display_results();
 }
