@@ -262,6 +262,15 @@ class Cloze(Task):
     def __init__(self, parent, text):
         super(Cloze, self).__init__(parent)
         assert type(text) == type('')
+        self._all_correct_response = \
+            parent.media('all-correct-response.ogg', shared=True,
+                         tts_input='everything correct!')
+        self._all_wrong_response = \
+            parent.media('all-wrong-response.ogg', shared=True,
+                         tts_input='all the answers are wrong!')
+        self._some_wrong_response = \
+            parent.media('some-wrong-response.ogg', shared=True,
+                         tts_input='some of the answers are wrong!')
         self._text = text
         self._answers = []
 
@@ -270,36 +279,41 @@ class Cloze(Task):
         self._answers.append(word)
         return '<input class="cloze" type="text" size="%d">' % (len(word) + 1)
 
-    def _form_name(self):
-        return "cloze_%s" % id(self)
-    
     def _script(self):
-        def check(i):
-            return '' % \
-                   (i, self._answers[i])
         return '''
         <script language="JavaScript">
         //<--
-        function eval_%s() {
-           var f = document.forms["%s"];
-           var answers = new Array(%s);
+        function eval_cloze(f, answers) {
            var correct = 0;
+           var marked = 0;
            for (i=0; i < answers.length; i++)
               if (f.elements[i].value == answers[i]) correct++;
-           f.result.value = "Correct answers: " + correct + "/" + %d;
+              else if (f.elements[i].value) {
+                 if (f.elements[i].value[0] != "!")
+                    f.elements[i].value = "!" + f.elements[i].value;
+                 marked = 1;
+              }
+           f.result.value = "Correct answers: "+correct+"/"+answers.length+".";
+           if (marked) f.result.value +=
+                 " Check back for the entries mark with an exclamation mark!";
+           if (correct == answers.length) self.location="%s"
+           else if (correct == 0) self.location="%s";
+           else self.location="%s";
         }
         //-->
-        </script>''' % (self._form_name(), self._form_name(),
-                        ','.join(map(lambda s: '"%s"' % s, self._answers)),
-                        len(self._answers))
-    
+        </script>''' % (self._all_correct_response.url(),
+                        self._all_wrong_response.url(),
+                        self._some_wrong_response.url())
+
     def export(self):
+        form_name = "cloze_%s" % id(self)
         text = re.sub("\((\w+)\)", self._make_field, self._text)
-        button = '<input type="button" onclick="eval_%s()" value="Evaluate">' %\
-                 self._form_name()
+        button = '<input type="button" value="Evaluate"' + \
+                 ' onClick="eval_cloze(document.forms[\'%s\'], [\'%s\'])">' % \
+                 (form_name, "','".join(self._answers))
         result = '<input class="cloze-result" name="result" type="text"' + \
-                 ' size="50" readonly>'
-        return "\n".join(('<form name="%s">' % self._form_name(),
+                 ' size="60" readonly>'
+        return "\n".join(('<form name="%s">' % form_name,
                           '<p>', text, '</p>', 
                           self._script(), button, result,
                           '</form>'))
