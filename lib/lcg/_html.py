@@ -147,4 +147,4 @@ def js_dict(items):
     if isinstance(items, types.DictType):
         items = items.items()
     assert is_sequence_of(dict(items).keys(), types.StringType)
-    return '{' + ", ".join([k+": "+js_value(v) for k,v in items]) + '}'
+    return '{'+ ", ".join(["'%s': %s" % (k, js_value(v)) for k,v in items]) +'}'
