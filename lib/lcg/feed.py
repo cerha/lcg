@@ -329,11 +329,7 @@ class ExerciseFeeder(SplittableTextFeeder):
     
     def _read_gap_fill_statement(self, text):
         lines = text.splitlines()
-        assert lines[0].find('___') != -1, \
-               "Gap-fill statement must include a gap marked by at least " + \
-               "three underscores."
-        return GapFillStatement(lines[0],
-                                self._process_choices(lines[1:]))
+        return GapFillStatement(lines[0], self._process_choices(lines[1:]))
     
     def _read_cloze(self, text):
         return ClozeTask(text)
