@@ -1,3 +1,11 @@
+2004-10-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/feed.py (ExcelVocabFeeder_LANGUAGE_ORDER): Spanish added.
+
+	* doc/manual.wiki: Exercise names updated.  New exercise types
+	added.  Task type descriptions moved to the descriptions of
+	corresponding exercise types.
+
 2004-10-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/feed.py (ExerciseFeeder._read_task): Honour the name change
