@@ -16,7 +16,7 @@ msgstr ""
 
 #: lcg/content.py:278
 msgid "TRUE"
-msgstr "RECHT"
+msgstr "RICHTIG"
 
 #: lcg/content.py:278
 msgid "FALSE"
@@ -32,47 +32,47 @@ msgstr "Aufnahme"
 
 #: lcg/content.py:390
 msgid "Play"
-msgstr "Spiel"
+msgstr "Wiedergabe"
 
 #: lcg/content.py:391
 msgid "Stop"
-msgstr "Halt"
+msgstr "Stop"
 
 #: lcg/content.py:408
 msgid "Cloze"
-msgstr "Cloze"
+msgstr "Lückentext"
 
 #: lcg/content.py:464
 msgid "Correct"
-msgstr "Korrekt"
+msgstr "Richtig"
 
 #: lcg/content.py:467
 msgid "You are wrong!"
-msgstr "Sie sind falsch"
+msgstr "Das ist falsch!"
 
 #: lcg/content.py:504
 msgid "True/False Statements"
-msgstr "Recht/Falsch Aussagen"
+msgstr "Richtig/Falsch Aussagen"
 
 #: lcg/content.py:520
 msgid "Multiple Choice Questions"
-msgstr "Mehrfache Auserlesene Fragen"
+msgstr "Auswahlfragebogen"
 
 #: lcg/content.py:532
 msgid "Select the Correct One"
-msgstr "Wählen Sie das korrekte"
+msgstr "Wählen Sie das Richtige aus"
 
 #: lcg/content.py:543
 msgid "Gap Filling"
-msgstr "AbstandscFüllung"
+msgstr "Lückentext"
 
 #: lcg/content.py:553
 msgid "Sentence Completion"
-msgstr "SatzcBeendigung"
+msgstr "Satzergänzung"
 
 #: lcg/content.py:566
 msgid "Transformation"
-msgstr "Umwandlung"
+msgstr "Übersetzung"
 
 #: lcg/course.py:52
 msgid "Node"
@@ -84,15 +84,15 @@ msgstr ""
 
 #: lcg/course.py:595
 msgid "Vocabulary"
-msgstr "Wortschatz"
+msgstr "Vokabeln"
 
 #: lcg/course.py:605
 msgid "Key Language Use"
-msgstr "Verwendung"
+msgstr "Verwendung der wichtigen Sprache"
 
 #: lcg/course.py:611
 msgid "Key Grammar"
-msgstr "Grammatik"
+msgstr "Wichtigsten grammatikalischen Formen"
 
 #: lcg/course.py:617
 msgid "Exercises"
@@ -100,7 +100,7 @@ msgstr "Übungen"
 
 #: lcg/course.py:627
 msgid "Consolidation"
-msgstr "Zusammenführung"
+msgstr "Festigung"
 
 #: lcg/course.py:633
 msgid "Unit"
@@ -108,11 +108,11 @@ msgstr "Lektion"
 
 #: lcg/course.py:634
 msgid "Unit Index"
-msgstr "Lektionindex"
+msgstr "Lektionsverzeichnis"
 
 #: lcg/export.py:125
 msgid "Next"
-msgstr "Zunächst"
+msgstr "Nächste"
 
 #: lcg/export.py:126
 msgid "Previous"
@@ -125,3 +125,17 @@ msgstr "Kursindex"
 #: lcg/export.py:139
 msgid "Table of Contents"
 msgstr "Inhaltsverzeichnis"
+
+
+
+
+
+
+
+""
+
+
+#: lcg/export.py:125
+msgid "Next"
+msgstr "Zunächst "  (next = to you mean next one?? Zunächst =
+at first)
