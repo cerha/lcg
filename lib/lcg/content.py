@@ -174,9 +174,9 @@ class Section(Container):
             appear in the output.
             
         """
+        self._title = title
         super(Section, self).__init__(parent, content, toc_depth=toc_depth)
         assert isinstance(title, types.StringTypes)
-        self._title = title
 
     def _section_path(self):
         return [c for c in self._container_path() if isinstance(c, Section)]
@@ -287,7 +287,7 @@ class GenericText(Content):
         
 class WikiText(GenericText):
     """Structured text in Wiki formatting language (on input)."""
-    
+        
     def export(self):
         return wiki.format(self._text)
     
