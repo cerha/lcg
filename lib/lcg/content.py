@@ -180,7 +180,43 @@ class Task(Content):
     """
     pass
 
-class MultipleChoiceQuestion(Task):
+class Selection(Task):
+    """Select the correct statement out of a list of predefined choices."""
+    
+    def __init__(self, parent, choices):
+        """Initialize the instance.
+
+        Arguments:
+        
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          choices -- sequence of 'Choice' instances related to this Task.
+          
+        """
+        super(Selection, self).__init__(parent)
+        assert is_sequence_of(choices, Choice)
+        self._choices = choices
+        self._response = {
+            True: parent.media('correct-response.ogg', shared=True,
+                               tts_input='correct'),
+            False: parent.media('incorrect-response.ogg', shared=True,
+                                tts_input='you are wrong!') }
+        
+    def _choice_controls(self):
+        return map(lambda a: '<a href="%s">%s</a>' % \
+                   (self._response[a.correct()].url(), a.answer()),
+                   self._choices)
+
+    def _export_choices(self):
+        items = map(lambda a: "  <li>%s</li>" % a, self._choice_controls())
+        return "\n".join(('<ol style="list-style-type: lower-latin;">',
+                          "\n".join(items), "</ol>"))
+        
+    def export(self):
+        return "<p>%s</p>\n" % self._export_choices()
+
+
+class MultipleChoiceQuestion(Selection):
     """Answer a question by selecting from a list of predefined choices."""
     
     def __init__(self, parent, question, choices):
@@ -194,35 +230,21 @@ class MultipleChoiceQuestion(Task):
           choices -- sequence of 'Choice' instances related to this Task.
           
         """
-        super(MultipleChoiceQuestion, self).__init__(parent)
+        super(MultipleChoiceQuestion, self).__init__(parent, choices)
         assert type(question) == type('')
-        assert is_sequence_of(choices, Choice)
         self._question = question
-        self._choices = choices
-        self._response = {
-            True: parent.media('correct-response.ogg', shared=True,
-                               tts_input='correct'),
-            False: parent.media('incorrect-response.ogg', shared=True,
-                                tts_input='you are wrong!') }
 
-    def _export_choices(self, choices):
-        return '<ol style="list-style-type: lower-latin;">\n' + \
-               "\n".join(map(lambda a: "  <li>%s</li>" % a, choices)) +"\n"+ \
-               "</ol>\n"
-        
     def export(self):
-        choices = map(lambda a: '<a href="%s">%s</a>' % \
-                      (self._response[a.correct()].url(), a.answer()),
-                      self._choices)
-        return "<p>%s\n%s</p>\n"%(self._question, self._export_choices(choices))
+        return "<p>%s\n%s</p>\n"%(self._question, self._export_choices())
 
-    
+        
 class Choice(Record):
     """Answer text with an information whether it is correct or not.
 
     One of the choices for 'MultipleChoiceQuestion'.
 
     """
+    
     def __init__(self, answer, correct=False):
         assert type(answer) == type('')
         assert type(correct) == type(True)
@@ -249,8 +271,8 @@ class TrueFalseStatement(MultipleChoiceQuestion):
         choices = (Choice('TRUE', correct), Choice('FALSE', not correct))
         super(TrueFalseStatement, self).__init__(parent, statement, choices)
         
-    def _export_choices(self, choices):
-        return "\n".join(map(lambda a: "[%s]" % a, choices)) + "\n"
+    def _export_choices(self):
+        return "\n".join(map(lambda a: "[%s]" % a, self._choice_controls()))
 
 
 class GapFillStatement(MultipleChoiceQuestion):
@@ -259,37 +281,31 @@ class GapFillStatement(MultipleChoiceQuestion):
 
 class Cloze(Task):
 
+    _REGEXP = re.compile(r"\[([^\]]+)\]")
+    
     def __init__(self, parent, text):
         super(Cloze, self).__init__(parent)
         assert type(text) == type('')
         self._text = text
-        self._answers = []
-        parent.script('eval-cloze.js')
-        parent.media('all-correct-response.ogg', shared=True,
-                     tts_input='everything correct!')
-        parent.media('all-wrong-response.ogg', shared=True,
-                     tts_input='all the answers are wrong!')
-        parent.media('some-wrong-response.ogg', shared=True,
-                     tts_input='some of the answers are wrong!')
+
+    def answers(self):
+        return self._REGEXP.findall(self._text)
+    
+    def _make_field(self, match):
+        return '<input class="cloze" type="text" size="%d">' % \
+               (len(match.group(1))+1)
+    
+    def export(self):
+        text = self._REGEXP.sub(self._make_field, self._text)
+        return "\n".join(('<p>', text, '</p>'))
+               
+class Transformation(Cloze):
 
     def _make_field(self, match):
-        word = match.group(1)
-        self._answers.append(word)
-        return '<input class="cloze" type="text" size="%d">' % (len(word) + 1)
+        return "<br>\n" + super(Transformation, self)._make_field(match)
+    pass
 
-    def export(self):
-        form_name = "cloze_%s" % id(self)
-        text = re.sub("\((\w+)\)", self._make_field, self._text)
-        button = '<input type="button" value="Evaluate"' + \
-                 ' onClick="eval_cloze(document.forms[\'%s\'], [\'%s\'])">' % \
-                 (form_name, "','".join(self._answers))
-        result = '<input class="cloze-result" name="result" type="text"' + \
-                 ' size="60" readonly>'
-        return "\n".join(('<form name="%s">' % form_name,
-                          '<p>', text, '</p>', button, result,
-                          '</form>'))
-               
-
+    
 ################################################################################
 ################################   Exercises   #################################
 ################################################################################
@@ -324,8 +340,11 @@ class Exercise(Content):
     task_type = classmethod(task_type)
     
     def export(self):
-        return "\n\n".join((self._header(), self._export_instructions(),
-                            "\n".join(map(lambda t: t.export(), self._tasks))))
+        return "\n\n".join((self._header(),
+                            self._export_instructions(),
+                            self._export_tasks()))
+    def _export_tasks(self):
+        return "\n".join(map(lambda t: t.export(), self._tasks))
     
     def _header(self):
         return "<h3>Exercise %d &ndash; %s</h3>" % (self._number, self._name)
@@ -337,6 +356,92 @@ class Exercise(Content):
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
         return "<p>" + self._instructions() + "</p>"
+
+    
+class ListeningExercise(Exercise):
+    """This exercise is based on listening to a recording."""
+
+    _name = "Listening Comprehension"
+
+    def __init__(self, parent, sound_file, transcript, tasks):
+        """Initialize the instance.
+
+        Arguments:
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          sound_file -- name of the file with the actual recording (as string).
+          transcript -- textual transcript of the recording.
+          tasks -- sequence of 'Task' instances related to this exercise.
+          
+        """
+        super(ListeningExercise, self).__init__(parent, tasks)
+        assert type(sound_file) == type('')
+        assert type(transcript) == type('')
+        tts_filename = os.path.join(parent.src_dir(), transcript)
+        if os.path.exists(tts_filename):
+            tts_input = ''.join(open(tts_filename).readlines())
+        else:
+            tts_input = None
+        self._sound_file = parent.media(sound_file, tts_input=tts_input)
+        self._transcript = transcript
+
+    def _instructions(self):
+        return "You will hear a short recording. " + \
+               super(ListeningExercise, self)._instructions()
+        
+    def _export_instructions(self):
+        return "<p>" + self._instructions() + "</p>\n\n<p>Recording: " + \
+               '<a href="%s">[press to listen]</a>' % self._sound_file.url()
+
+
+class ClozeTest(Exercise):
+    """Filling in gaps in text by typing the correct word."""
+
+    _name = "Cloze Test"
+    _task_type = Cloze
+
+    def __init__(self, parent, *args, **kwargs):
+        super(ClozeTest, self).__init__(parent, *args, **kwargs),
+        parent.script('eval-cloze.js')
+        parent.media('all-correct-response.ogg', shared=True,
+                     tts_input='everything correct!')
+        parent.media('all-wrong-response.ogg', shared=True,
+                     tts_input='all the answers are wrong!')
+        parent.media('some-wrong-response.ogg', shared=True,
+                     tts_input='some of the answers are wrong!')
+
+    def _instructions(self):
+        return """Fill in the gaps in the text below using the a suitable word.
+        After filling all the gaps, check your results using the buttons below
+        the text.  Sometimes there might be more correct answers, but the
+        evaluation only recognizes one.  Contact the tutor when in doubt."""
+        
+    def _export_tasks(self):
+        form_name = "cloze_%s" % id(self)
+        answers = map(lambda a: a.replace("'", "\\'"),
+                      reduce(lambda a, b: a + b,
+                             map(lambda t: t.answers(), self._tasks)))
+        button = '<input type="button" value="%s"' + \
+                 ' onClick="%s(document.forms[\'%s\'], [\'%s\'])">'
+        b1 = button % ('Evaluate', 'eval_cloze', form_name, "','".join(answers))
+        b2 = button % ('Fill', 'fill_cloze', form_name, "','".join(answers))
+        result = 'Result: <input class="cloze-result" name="result"' + \
+                 ' type="text" size="70" value="%s" readonly>' % \
+                 'Use the Evaluate button to see the result.'
+        return "\n".join(('<form name="%s">' % form_name,
+                          super(ClozeTest, self)._export_tasks(),
+                          b1, b2, '<input type="reset" value="Reset">',
+                          result,
+                          '</form>'))
+
+    
+class ListeningClozeTest(ListeningExercise, ClozeTest):
+    """A ClozeTest based on listening."""
+
+    def _instructions(self):
+        return """You will hear a short recording.  Listen carefully and then
+        fill in the gaps in the text below using the same words.  After filling
+        all the gaps, check your results using the buttons below the text."""
 
     
 class TrueFalseExercise(Exercise):
@@ -356,7 +461,10 @@ class TrueFalseExercise(Exercise):
         there are two links.  Select [TRUE] if you think the sentence is true,
         or select [FALSE] if you think it is false.""" % len(self._tasks)
 
-
+    
+class TrueFalseComprehensionExercise(ListeningExercise, TrueFalseExercise):
+    pass
+    
 class MultipleChoiceExercise(Exercise):
     """An Exercise with MultipleChoiceQuestion tasks."""
     
@@ -364,10 +472,29 @@ class MultipleChoiceExercise(Exercise):
     _name = "Multiple Choice Questions"
     
     def _instructions(self):
-        return """Below is a list of %d questions.  For each question, choose
-        from the list of possible answers, and choose the best one by pressing
-        enter on it.""" % len(self._tasks)
+        return """Below is a list of %d questions.  For each question choose
+        from the list of possible answers and check your choice by activating
+        the link.""" % len(self._tasks)
+
     
+class MultipleChoiceComprehensionExercise(ListeningExercise,
+                                          MultipleChoiceExercise):
+    pass
+
+    
+class SelectionExercise(Exercise):
+    """An Exercise with Selection tasks."""
+    
+    _task_type = Selection
+    _name = "Select the Correct One"
+    
+    def _instructions(self):
+        return """For each of the %d pairs of statements, decide which one is
+        correct.  Activate the link to check the result.""" % len(self._tasks)
+
+    
+class ListeningSelectionExercise(ListeningExercise, SelectionExercise):
+    pass
     
 class GapFillingExercise(Exercise):
     """An exercise composed of GapFillStatement tasks."""
@@ -376,58 +503,32 @@ class GapFillingExercise(Exercise):
     _name = "Gap Filling"
 
     def _instructions(self):
-        return """Fill in the gaps in the following %d sentences using a word
-        from the list.""" % len(self._tasks)
+        return """Select a word from the list below each sentence to fill in
+        the gap.  Activate the link made by the word to check the result."""
 
     
-class ComprehensionExercise(Exercise):
-    """This exercise is based on listenning to a recording."""
-
-    _name = "Listening Comprehension"
-
-    def __init__(self, parent, sound_file, transcript, tasks):
-        """Initialize the instance.
-
-        Arguments:
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          sound_file -- name of the file with the actual recording (as string).
-          transcript -- textual transcript of the recording.
-          tasks -- sequence of 'Task' instances related to this exercise.
-          
-        """
-        super(ComprehensionExercise, self).__init__(parent, tasks)
-        assert type(sound_file) == type('')
-        assert type(transcript) == type('')
-        self._sound_file = parent.media(sound_file)
-        self._transcript = transcript
+class SentenceCompletionExercise(ListeningExercise, ClozeTest):
+    """Filling in gaps in sentences by typing in the correct completion."""
 
     def _instructions(self):
-        return "You will hear a short recording. " + \
-               super(ComprehensionExercise, self)._instructions()
-        
-    def _export_instructions(self):
-        return "<p>" + self._instructions() + "</p>\n\n<p>Recording: " + \
-               '<a href="%s">[press to listen]</a>' % self._sound_file.url()
+        return """You will hear a recording comprising %d sentences.  Below,
+        you will find the same sentences unfinished.  Fill in the missing text
+        and check your results using the buttons below all the sentences.""" % \
+        len(self._tasks)
 
+    _name = "Sentence Completion"
 
-
-class MulitpleChoiceComprehensionExercise(ComprehensionExercise,
-                                          MultipleChoiceExercise):
-    """Comprehension exercise with multiple choice questions."""
-
-
-class TrueFalseComprehensionExercise(ComprehensionExercise,
-                                     TrueFalseExercise):
-    """Comprehension exercise with true/false questions."""
-
-class ClozeTest(Exercise):
-    """Filling in gaps in text by typing the correct word."""
-
-    _name = "Cloze Test"
-    _task_type = Cloze
     
-        
+class TransformationExercise(ListeningExercise, ClozeTest):
+    """Transform a whole sentence and write it down."""
 
+    _name = "Transformation"
+    _task_type = Transformation
 
+    
+class Dictation(ListeningExercise, ClozeTest):
 
+    _name = "Dictation"
+    
+   
+    
