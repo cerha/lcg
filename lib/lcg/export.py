@@ -23,45 +23,68 @@ import shutil
 
 from lcg import *
 
+    
 class Exporter(object):
+    DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
+    HTTP_EQUIV = (('Content-Type', 'text/html; charset=UTF-8'),)
 
-    def __init__(self, course, dir):
-        """Initialize the exporter for a given 'Course'."""
-        self._course = course
-        self._dir = dir
+    def __init__(self, stylesheet=None, inlinestyles=False):
+        """Initialize the exporter for a given 'ContentNode' instance."""
+        self._stylesheet = stylesheet
+        self._inlinestyles = inlinestyles
 
-    def _export_node(self, node):
-        """Write the output file for given node and all subsequent nodes."""
-        #print "Exporting:", node
-        if not os.path.isdir(self._dir):
-            os.makedirs(self._dir)
-        filename = os.path.join(self._dir, node.output_file())
+    def _styles(self, node):
+        if self._inlinestyles:
+            return ['<style type="text/css">\n%s</style>' % s.get()
+                    for s in node.resources(Stylesheet)]
+        else:
+            return ['<link rel="stylesheet" type="text/css" href="%s">' % \
+                    s.url() for s in node.resources(Stylesheet)]
+            
+        
+    def head(self, node):
+        if self._stylesheet is not None:
+            node.resource(Stylesheet, self._stylesheet)
+        tags = ['<title>%s</title>' % node.full_title()] + \
+               ['<meta http-equiv="%s" content="%s">' % pair
+                for pair in self.HTTP_EQUIV] + \
+               ['<script language="Javascript" type="text/javascript"' + \
+                ' src="%s"></script>' % s.url()
+                for s in node.resources(Script)]
+        return '  '+'\n  '.join(tags + self._styles(node))
+
+    def body(self, node):
+        return node.content().export()
+
+    def page(self, node):
+        lines = (self.DOCTYPE, '',
+                 '<html>',
+                 '<head>',
+                 self.head(node),
+                 '</head>',
+                 '<body>',
+                 self.body(node),
+                 '</body>',
+                 '</html>')
+        return "\n".join(lines)
+
+    
+    def export(self, node, directory):
+        """Export the node and its children recursively."""
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+        filename = os.path.join(directory, node.output_file())
         file = open(filename, 'w')
-        data = self._wrap_content(node, node.content().export())
-        file.write(data.encode('utf-8'))
+        file.write(self.page(node).encode('utf-8'))
         file.close()
         for r in node.resources():
-            r.export(self._dir)
+            r.export(directory)
         for n in node.children():
-            self._export_node(n)
+            self.export(n, directory)
 
-    def _wrap_content(self, node, content):
-        return "\n".join(('<html>',
-                          '  <head>',
-                          '    <title>%s</title>' % node.full_title(),
-                          '  </head>',
-                          '  <body bgcolor="white">',
-                          content,
-                          '  </body>',
-                          '</html>'))
-            
-    def export(self):
-        self._export_node(self._course)
-
-
+        
 class StaticExporter(Exporter):
     """Export the content as a set of static web pages."""
-    DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
 
     _hotkey = {
         'next': '3',
@@ -71,44 +94,24 @@ class StaticExporter(Exporter):
         'local-index': '4',
         }
     
-    def __init__(self, course, dir, stylesheet=None):
-        """Initialize the exporter for a given 'Course'."""
-        super(StaticExporter, self).__init__(course, dir)
-        self._stylesheet = stylesheet
-
-    def _wrap_content(self, node, content):
-        def tags(template, items):
-            return '\n'.join(map(lambda x: "  " + template % x, items))
-        if self._stylesheet is not None:
-            node.resource(Stylesheet, self._stylesheet)
+    def head(self, node):
+        tags = ['<meta name="%s" content="%s">' % item
+                for item in node.root_node().meta().items()] + \
+               ['<link rel="%s" href="%s" title="%s">' % \
+                (kind, n.url(), n.title())
+                for kind, n in (('prev', node.prev()), ('next', node.next()))
+                if n is not None]
+        return '\n  '.join([super(StaticExporter, self).head(node)] + tags)
+             
+    def body(self, node):
         nav = self._navigation(node)
-        meta = node.root_node().meta()
-        http_equiv = {'Content-Type': 'text/html; charset=UTF-8'}
-        c = (self.DOCTYPE, '',
-             '<html>',
-             '<head>',
-             '  <title>%s</title>' % node.full_title(),
-             tags('<meta http-equiv="%s" content="%s">', http_equiv.items()),
-             tags('<meta name="%s" content="%s">', meta.items()),
-             tags('<link rel="%s" href="%s" title="%s">',
-                  [(kind, n.url(), n.title())
-                   for kind, n in (('prev', node.prev()), ('next', node.next()))
-                   if n is not None]),
-             tags('<link rel="stylesheet" type="text/css" href="%s">',
-                  map(lambda s: s.url(), node.resources(Stylesheet))),
-             tags('<script language="Javascript" type="text/javascript"' + \
-                  ' src="%s"></script>',
-                  map(lambda s: s.url(), node.resources(Script))),
-             '</head>',
-             '<body>',
-             nav, '<hr class="navigation">',
-             '<a name="content" accesskey="%s"></a>' % 
-             self._hotkey['content-beginning'],
-             '<h1>%s</h1>' % node.title(),
-             div(content, 'content'),
-             '<hr class="navigation">', nav,
-             '</body></html>')
-        return "\n".join(c)
+        parts = (nav, '<hr class="navigation">',
+                 '<a name="content" accesskey="%s"></a>' % 
+                 self._hotkey['content-beginning'],
+                 '<h1>%s</h1>' % node.title(),
+                 div(node.content().export(), 'content'),
+                 '<hr class="navigation">', nav)
+        return "\n".join(parts)
 
     def _link(self, node, label=None, key=None):
         if node is None: return 'None' 
