@@ -92,9 +92,9 @@ class StaticExporter(Exporter):
              tags('<meta http-equiv="%s" content="%s">', http_equiv.items()),
              tags('<meta name="%s" content="%s">', meta.items()),
              tags('<link rel="%s" href="%s" title="%s">',
-                  map(lambda a: (a[0], a[1].output_file(), a[1].title()),
-                      filter(lambda a: a[1] is not None,
-                             (('prev', node.prev()), ('next', node.next()))))),
+                  [(kind, n.url(), n.title())
+                   for kind, n in (('prev', node.prev()), ('next', node.next()))
+                   if n is not None]),
              tags('<link rel="stylesheet" type="text/css" href="%s">',
                   map(lambda s: s.url(), node.resources(Stylesheet))),
              tags('<script language="Javascript" type="text/javascript"' + \
@@ -114,7 +114,7 @@ class StaticExporter(Exporter):
     def _link(self, node, label=None, key=None):
         if node is None: return 'None' 
         label = label or node.title(abbrev=True)
-        return link(label, node.output_file(), title=node.title(),
+        return link(label, node.url(), title=node.title(),
                     hotkey=not key or self._hotkey[key])
     
     def _navigation(self, node):
