@@ -104,7 +104,8 @@ class StaticExporter(Exporter):
     def _wrap_content(self, node):
         def tags(template, items):
             return '\n'.join(map(lambda x: "  " + template % x, items))
-        node.stylesheet(self._stylesheet)
+        if self._stylesheet is not None:
+            node.stylesheet(self._stylesheet)
         nav = self._navigation(node)
         meta = node.root_node().meta()
         http_equiv = {'Content-Type': 'text/html; charset=UTF-8'}
