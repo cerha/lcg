@@ -1,5 +1,7 @@
 2004-12-07  Tomas Cerha  <cerha@brailcom.org>
 
+	* translations/de.po: New file.
+
 	* Makefile (LCG_TTS_COMMAND): Export the LCG environment
 	variables.  Make the German course as well as the English one.
 	Extract the translatable strings and create gettext message
@@ -16,6 +18,8 @@
 
 	* lcg/export.py (StaticExporter._navigation, StaticExporter._toc):
 	Use gettext to translate language dependent strings.
+	(StaticExporter._navigation): Use `node.toc_title()' instead of
+	defining the titles here.
 
 	* lcg/feed.py (Feeder.__init__): New keyword argument `encoding'.
 	(ExcelVocabFeeder._LANGUAGE_ORDER, ExcelVocabFeeder._CHARSET):
@@ -67,6 +71,9 @@
 	(EurochanceCourse._create_children): Use a list comprehension
 	instead of `map()'.
 	(EurochanceCourse.meta): Values changed.
+	(ContentNode._TOC_TITLE): New constant.
+	(ContentNode.title): New method.
+	(Unit._TOC_TITLE): New constant.
 
 	* lcg/util.py: Import `types'.
 	(SplittableText.__init__): Use `isinstance()' with a corresponding
