@@ -1,3 +1,151 @@
+2005-03-11  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py (Module): Completely rewritten.
+
+	* bin/wiki-formatter.py (Module): New file.
+
+	* lcg/wiki.py (Formatter._MARKUP): Uncomment the rules for
+	`italic' and `fixed'.  The pair markup defined now as one item.
+	New rules for `link', `uri', `email', `comment' and `rule'
+	(Formatter._HELPER_PATTERNS): New constant.
+	(Formatter._FORMAT): New formats for `comment' and `rule'.
+	(Formatter._REGEXPS, Formatter._RULES): Constants removed.
+	(Formatter.__init__): Compile the rules here.
+	(Formatter._markup_handler): Check whether the type is not in
+	`_HELPER_PATTERNS'.
+	(Formatter._markup_handler): Pass the match groupdict to the
+	formatter.
+	(Formatter._formatter): New argument `groups'.  Pass it to the
+	spicialized formatter.
+	(Formatter._link_formatter, Formatter._uri_formatter)
+	(Formatter._email_formatter): New methods.
+	(Formatter.format): Use `self._rules', not `self._RULES'.  Pass an
+	empty groupdict to the closing formatter.
+	(Parser._SECTION_RE): Allow the anchor name behind the heading.
+	(Parser._PRE_BLOCK_RE): New regexp.
+	(Parser._MATCHERS): New rule for `toc'.
+	(Parser._HELPER_PATTERNS): New `title' pattern.
+	(Parser._Section.__init__): New argument `anchor'.
+	(Parser._parse_sections): Honour it.
+	(Parser._parse_section_content): Search for the preformatter
+	blocks here.
+	(Parser._parse_blocks): New method.  Everything whar was before in
+	`_parse_section_content()' was copied here.
+	(Parser._make_toc): New method.
+
+	* resources/css/default.css: New class `lcg-preformatted-text'.
+
+	* lcg/export.py (Exporter.DOCTYPE, Exporter.HTTP_EQUIV): New
+	constants.
+	(Exporter.__init__): New arguments `stylesheet' and
+	`inlinestyles'.  Arguments `dir' and `course' removed.
+	(Exporter._styles, Exporter.head, Exporter.body, Exporter.page):
+	New methods.
+	(Exporter.export): New arguments `node', `directory'.  Don't call
+	`_export_node()', do everything here.
+	(Exporter._wrap_content, Exporter._export_node): Methods removed
+	(StaticExporter.DOCTYPE, StaticExporter.__init__): Removed.
+	(StaticExporter.head, StaticExporter.body): New methods.
+	(StaticExporter._wrap_content): Method removed.
+
+	* lcg/__init__.py: Install `NullTranslations' as a default
+	`gettext' handler.  Import the `config' module.
+
+	* lcg/resources.py (Resource.__init__): Prepend current directory
+	to the list of src directories.
+	(Resource.get): New method.
+
+	* lcg/eurochance.py (EurochanceNode): New class.
+	(Unit, Instructions, ExerciseInstructions, _Index)
+	(EurochanceCourse): Derive from it
+	(Unit._create_exercises): Use `comment' as a keyword arg. when
+	calling `self._read_file()'.
+	(Instructions._create_content): Don't use superclass method, just
+	use `self._parse_wiki_file()' instead.
+	(ExerciseInstructions): New class (moved from `course.py').
+	(EurochanceCourse.__init__): Reflect the superclass change.
+	(EurochanceCourse._title, EurochanceCourse._create_content): New
+	methods.
+	(Formatter._MARKUP): Exclude the `italics' and `fixed' rules.
+	(Instructions._create_content): Pass `self' as the `item' to
+	`TableOfContents' constructor.
+	(EurochanceCourse._create_content): 
+
+	* lcg/content.py (PreformattedText): New class.
+	(TableOfContents.__init__): Don't use the `parent' as deafult
+	`item'.  Docstring updated.
+	(TableOfContents.export): When the `item' is None, use the
+	container.  If the container is None or not a `SectionContainer'
+	instance, use the parent.
+	
+
+	* lcg/config.py (Module): New file.
+
+	* lcg/course.py (ContentNone.__init__): Argument
+	`default_resource_dir' removed.
+	(ContentNode.__init__): Don't allocate the default stylesheet.
+	(ContentNode._create_child): Don't pass `default_resource_dir'.
+	(ContentNode._read_file): New argument `ext'.
+	(ContentNode._parse_wiki_file): New argument `ext'.
+	(default_resource_dir): Method removed.
+	(InnerNode, RootNode, TextNode): Classes removed.
+	(ExerciseInstructions): Moved to the `eurochance' module.  Classes
+	removed.
+	(WikiNode): New Class.
+	(WikiNode._create_content): Always wrap the sections into a
+	`SectionContainer'.
+	(WikiNode._title): New function.
+
+2005-03-09  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/exercises.js (init_form): New argument
+	`messages'.  Pass it to `handler.init()'
+	(Handler.init): New argument `messages'.
+	(Handler.msg): New method.
+	(FillInExerciseHandler._recognize_field): Recognize also
+	`textarea' fields.
+	(FillInExerciseHandler._error_handler): Focus the field.
+	(FillInExerciseHandler._handle_text_field_keypress): Return false
+	after handling the `Enter' key.  Don't remove the trailing text
+	when handling the `Ctrl-Space' key.  Just insert the next correct
+	character.
+	(FillInExerciseHandler.evaluate): Move the cursor to the first
+	incorrect answer.
+	(FillInExerciseHandler.evaluate): When there is only one field,
+	use the simple `correct/incorrect' responses.
+	(DictationHandler): New class.
+
+	* lcg/content.py (SectionContainer.__init__): Don't generate the
+	TOC when there is only one item.
+	(VocabList.export): Handle `None' value of `VocabItem.note()'.
+	(VocabItem.__init__): Allow `None' value for the `note' argument.
+	(ClozeTask.plain_text): News class.
+	(_InteractiveExercise._INITIAL_RESULT) 
+	(_InteractiveExercise._MESSAGES): New constants.
+	(_InteractiveExercise._init_script): Pass the `messages'
+	dictionary to JavaScript `init_form()'.
+	(_InteractiveExercise._display): New method.
+	(_InteractiveExercise._results): Use it.
+	(_FillInExercise._INITIAL_RESULT): New constant.
+	(Dictation._TASK_TYPE, Dictation._FORM_HANDLER) 
+	(Dictation._MESSAGES): Redefined here.
+	(Dictation.__init__): Redefined here.
+	(Dictation._instructions): Real instructions added.
+	(Dictation._export_task): New method.
+	(Dictation._display): New method.
+
+	* lcg/feed.py (SplittableTextFeeder._process_pieces): The argument
+	`error_message' removed.
+	(VocabFeeder.feed): Honor that.
+	(ExerciseFeeder.feed): Honor that.
+	(VocabFeeder._item): Set note to `None', if none found.
+	(ExerciseFeeder._read_task): Added support for DictationTask.
+	(ExerciseFeeder._read_dictation): New method.
+
+	* lcg/_html.py (js_dict): Surround the keys in quotes.
+
+	* resources/css/default.css: Added styles for `vocab-list' class.
+
 2005-03-08  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (WikiText.export): Use `wiki.Formatter', not
