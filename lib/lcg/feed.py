@@ -104,18 +104,28 @@ class PySpecFeeder(Feeder):
 
 class ExcelVocabFeeder(Feeder):
     """Vocabulary Feeder reading data from XLS file."""
+    
+    _LANGUAGE_ORDER = ['cs', 'sk', 'no', 'de']
 
     def feed(self, parent):
+        assert parent.lang() in self._LANGUAGE_ORDER
         command = 'xls2csv -q0 -c\| '+self._input_file() #+'| konwert iso2-utf8'
         status, output = commands.getstatusoutput(command)
         if status: raise Exception(output)
         items = []
         for line in output.splitlines():
-            word, note, cz, sk = map(string.strip, line.split('|')[0:4])
+            col = map(string.strip, line.split('|')[0:4])
+            word = col[0]
+            note = len(col) > 1 and col[1] or ''
+            try:
+                trans = col[self._LANGUAGE_ORDER.index(parent.lang())+2]
+            except IndexError:
+                trans = '???'
+                print 'No translation for "%s"!' % word
             name = re.sub('[^a-zA-Z0-9-]', '', word.replace(' ', '-'))
             media_file = os.path.join('vocabulary', name + '.ogg')
             from content import VocabItem, VocabList
-            items.append(VocabItem(parent, word, note, word,
+            items.append(VocabItem(parent, word, note, trans,
                                    parent.media(media_file, tts_input=word)))
         return VocabList(parent, items)
     
@@ -182,6 +192,7 @@ class ExerciseFeeder(Feeder):
         # Read a task specification using a method according to given task type.
         method = {
             Cloze:                  self._read_cloze,
+            Selection:              self._read_selection,
             MultipleChoiceQuestion: self._read_multiple_choice_question,
             GapFillStatement:       self._read_gap_fill_statement,
             TrueFalseStatement:     self._read_true_false_statement,
@@ -195,31 +206,35 @@ class ExerciseFeeder(Feeder):
             apply(traceback.print_exception, sys.exc_info())
             sys.exit()
 
-    def _process_choices(self, text):
-        # split the MultipleChoiceQuestion and its list of choices
+    def _process_choices(self, lines):
+        # split the list of choices
         def choice(text):
             assert text.startswith('+ ') or text.startswith('- '), \
                    "A choice must start with a + or minus sign and a space!"
             correct = text.startswith('+ ')
             return Choice(text[2:].strip(), correct=correct)
-        lines = text.splitlines()
-        choices = map(choice, lines[1:])
+        choices = map(choice, lines)
         correct = filter(lambda ch: ch.correct(), choices)
         assert len(correct) == 1, \
                "Number of correct choices must be exactly one! " + \
-               "%d of %d found." % (len(correct), len(choices))
-        return (lines[0], choices)
+               "%d out of %d found." % (len(correct), len(choices))
+        return choices
     
+    def _read_selection(self, parent, text):
+        return Selection(parent, self._process_choices(text.splitlines()))
+
     def _read_multiple_choice_question(self, parent, text):
-        question, choices = self._process_choices(text)
-        return MultipleChoiceQuestion(parent, question, choices)
+        lines = text.splitlines()
+        return MultipleChoiceQuestion(parent, lines[0],
+                                      self._process_choices(lines[1:]))
     
     def _read_gap_fill_statement(self, parent, text):
-        statement, choices = self._process_choices(text)
-        assert statement.find('___') != -1, \
+        lines = text.splitlines()
+        assert lines[0].find('___') != -1, \
                "Gap-fill statement must include a gap marked by at least " + \
                "three underscores."
-        return GapFillStatement(parent, statement, choices)
+        return GapFillStatement(parent, lines[0],
+                                self._process_choices(lines[1:]))
     
     def _read_cloze(self, parent, text):
         return Cloze(parent, text)
