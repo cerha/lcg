@@ -6,14 +6,19 @@
 	instead of `ContentNode.stylesheet()'.
 
 	* lcg/course.py: Import everything from `resources'.
-	(ContentNode.__init__): Use
-	`ContentNode.resource()' instead of `ContentNode.stylesheet()'.
+	(ContentNode.__init__): Use `ContentNode.resource()' instead of
+	`ContentNode.stylesheet()'.
 	(_resource): Removed.
-	(ContentNode.resource): New method /transformed from `_resource()'/.
+	(ContentNode.resource): New method /transformed from
+	`_resource()'/.
 	(media, script, stylesheet): Removed.
 	(Unit._create_children): Use a list comprehension instead of
 	creating each child separately.
-	
+	(ContentNode.subdir): Return an empty string for the root node.
+	(ContentNode.src_dir): Return just `self._subdir' for the root node.
+	(RootNode.__init__): Argument `dir' removed.  Pass args and kwargs
+	as they are.  Only sypply None for `parent'.
+	(RootNode.src_dir): Removed.
 
 	* lcg/content.py: Import everything from `_html'.
 	(Resource, Media, Script, Stylesheet): Moved from here to the new
