@@ -225,15 +225,18 @@ class ContentNode(object):
     def subdir(self):
         """Return the name of this node's subdirectory relative to root node."""
         if self._parent is None:
-            return self._subdir
+            return ''
         elif self._subdir is None:
             return self._parent.subdir()
         else:
             return os.path.join(self._parent.subdir(), self._subdir)
 
     def src_dir(self):
-        return os.path.normpath(os.path.join(self.root_node().src_dir(),
-                                             self.subdir()))
+        if self._parent is None:
+            return self._subdir
+        else:
+            return os.path.normpath(os.path.join(self.root_node().src_dir(),
+                                                 self.subdir()))
         
     def output_file(self):
         """Return full pathname of the output file relative to export dir."""
@@ -374,13 +377,8 @@ class RootNode(InnerNode):
     sub-content into the course.
     
     """
-    
-    def __init__(self, dir, **kwargs):
-        self._dir = dir
-        super(RootNode, self).__init__(None, '', **kwargs)
-
-    def src_dir(self):
-        return self._dir
+    def __init__(self, *args, **kwargs):
+        super(RootNode, self).__init__(None, *args, **kwargs)
 
 
 ################################################################################
