@@ -208,8 +208,7 @@ class Parser(object):
                 content.append(l)
                 items = []
             if type == 'list_item':
-                wt = WikiText(self._parent, groups['content'])
-                items.append(ListItem(self._parent, wt))
+                items.append(WikiText(self._parent, groups['content']))
                 list_type = t
             else:
                 content.append(getattr(self, '_make_'+type)(block, groups))
