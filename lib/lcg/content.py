@@ -757,13 +757,6 @@ class GapFilling(_ChoiceBasedExercise):
 class VocabExercise(_Cloze):
     _NAME = _("Vocabulary Practice")
 
-    def __init__(self, parent, items, *args, **kwargs):
-        kwargs['tasks'] = [self._create_task(item) for item in items]
-        super(_Cloze, self).__init__(parent, *args, **kwargs),
-
-    def _create_task(self, item):
-        return ClozeTask("%s: [%s]" % (item.translation(), item.word()))
-
     def _instructions(self):
         return _("""You will hear a word or expression in your language.  Say
         it in English and listen to the model pronunciation.""")
