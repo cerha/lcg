@@ -22,7 +22,7 @@ import glob
 import os
 import string
 import operator
-
+import types
 
 class SplittableText:
     """A piece of text which can be split keeping track of line numbers.
@@ -36,8 +36,8 @@ class SplittableText:
     """
     
     def __init__(self, text, firstline=1):
-        assert type(text) == type('')
-        assert type(firstline) == type(0)
+        assert isinstance(text, types.StringTypes)
+        assert isinstance(firstline, types.IntType)
         self._text = text
         self._firstline = firstline
 
