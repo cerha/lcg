@@ -787,17 +787,21 @@ class Exercise(Section):
         return cls._NAME
     name = classmethod(name)
 
-    def help(cls, parent):
+    def used_types(cls):
+        return cls._used_types
+    used_types = classmethod(used_types)
+
+    def help(cls, parent, pre=None):
         cls._help_node = p = parent
+        instructions = wiki.Parser(p).parse(cls._HELP)
+        if pre: instructions = pre + instructions
         def sec(title, anchor, text, items):
-            if not items: return Content(parent)
+            if not items: return None
             defs = [Definition(p, TextContent(p, label), WikiText(p, help))
                     for label, help in items]
             content = (Paragraph(p, WikiText(p, text)), DefinitionList(p, defs))
             return Section(parent, title, anchor=anchor, content=content)
-        s = (Section(p, _("Instructions"),
-                     content=wiki.Parser(parent).parse(cls._HELP)),
-             sec(_("Shortcut Keys"), 'keys',
+        s = (sec(_("Shortcut Keys"), 'keys',
                  _("In all the exercises where you fill in the text into a "
                    "text-box you can use the two shortcut keys described "
                    "below."),
@@ -810,14 +814,14 @@ class Exercise(Section):
                  _("The control panel below the exercise "
                    "contains the following buttons:"),
                  [(label, help) for label, t, h, help in cls._BUTTONS]))
-        return SectionContainer(p, s)
+        sections = [x for x in s if x is not None]
+        if sections:
+            instructions = Section(p, _("Instructions"), content=instructions)
+            return SectionContainer(p, [instructions] + sections)
+        else:
+            return Container(parent, instructions)
     help = classmethod(help)
-
     
-    def used_types(cls):
-        return cls._used_types
-    used_types = classmethod(used_types)
-
     # Instance methods
 
     def _create_transcript(self, file):
@@ -849,8 +853,6 @@ class Exercise(Section):
                             self._results(),
                             '</form>',
                             script(self._init_script())))
-    
-        
     
     def _export_task(self, task):
         raise Exception("This Method must be overriden")
@@ -938,7 +940,7 @@ class _InteractiveExercise(Exercise):
                     "Use the ``Reset'' button to start again.")))
 
     _BUTTONS = ((_('Fill'), button, "this.form.handler.fill()",
-                 _("Fill in the whole exercise by correct answers.")),
+                 _("Fill in the whole exercise with correct answers.")),
                 (_('Reset'), reset, "this.form.handler.reset()",
                  _("Reset all your answers and start again.")))
     
