@@ -109,33 +109,37 @@ class PySpecFeeder(Feeder):
 class ExcelVocabFeeder(Feeder):
     """Vocabulary Feeder reading data from an XLS file."""
     
-    _TRANSLATION_ORDER = [('en', 'iso-8859-1'),
-                          ('de', 'iso-8859-1'),
-                          ('cs', 'iso-8859-2'),
-                          ('es', 'iso-8859-1'),
-                          ('no', 'iso-8859-1'),
-                          ('sk', 'iso-8859-2')]
+    _TRANSLATION_ORDER = ('en', 'de', 'cs', 'es', 'no', 'sk')
+    
+    _ENCODING = {'cs': 'iso-8859-2',
+                 'sk': 'iso-8859-2'}
     
     def feed(self, parent):
         command = 'xls2csv -q0 -c\| %s' % self._input_file()
         status, output = commands.getstatusoutput(command)
         if status: raise Exception(output)
-        lang = 'cs' # TODO: pass from somewhere...
-        order = [lang for lang, encoding in self._TRANSLATION_ORDER
-                 if lang != parent.language()]
-        translation_index = order.index(lang)
-        translation_encoding = self._TRANSLATION_ORDER[translation_index][1]
+        encoding = self._ENCODING.get(parent.language(), 'iso-8859-1')
+        translation_language = 'cs' # TODO: pass from somewhere...
+        order = [l for l in self._TRANSLATION_ORDER if l != parent.language()]
+        translation_index = order.index(translation_language)
+        translation_encoding = self._ENCODING.get(translation_language,
+                                                  'iso-8859-1')
         items = []
         diacritics_matcher = re.compile(r" WITH .*")
         danger_char_matcher = re.compile(r"[^a-zA-Z0-9-]")
         def safe_char(match):
             char = match.group(0)
+            if char in ('.', ',', '?', '!', ':', ';'): return ''
             safe_name = diacritics_matcher.sub('', unicodedata.name(char))
             safe_char = unicodedata.lookup(safe_name)
             return danger_char_matcher.match(safe_char) and '-' or safe_char
         for line in output.splitlines():
             col = map(string.strip, line.split('|')[0:4])
-            word = unicode(col[0], encoding=self._encoding)
+            try:
+                word = unicode(col[0], encoding=encoding)
+            except UnicodeDecodeError, e:
+                raise Exception("Error while reading file %s: %s: %s" %
+                                (self._input_file(), e, col[0]))
             if word.startswith("#"):
                 continue
             note = unicode(len(col) > 1 and col[1] or '',
@@ -162,8 +166,13 @@ class ExerciseFeeder(Feeder):
         
     def feed(self, parent):
         fh = codecs.open(self._input_file(), encoding=self._encoding)
-        text = SplittableText(''.join(fh.readlines()))
+        try:
+            content = ''.join(fh.readlines())
+        except UnicodeDecodeError, e:
+            raise Exception("Error while reading file %s: %s" % \
+                            (self._input_file(), e))
         fh.close()
+        text = SplittableText(content)
         exercises = [self._exercise(parent, piece)
                      for piece in text.split(self._SPLITTER_MATCHER)]
         return Container(parent, exercises)
@@ -174,9 +183,9 @@ class ExerciseFeeder(Feeder):
             pieces = text.split(self._BLANK_LINE_MATCHER)
             assert len(pieces) >= 2, \
                    "Exercise must comprise a header and at least one task."
-            type, kwargs = self._read_header(pieces[0])
-            tasks = map(lambda p: self._read_task(type.task_type(), p),
-                        pieces[1:])
+            type, kwargs = self._read_header(pieces[0].text())
+            tasks = [self._read_task(type.task_type(), p.text())
+                     for p in pieces[1:]]
             kwargs['tasks'] = tuple(tasks)
             return type(parent, **kwargs)
         except SystemExit:
@@ -197,12 +206,12 @@ class ExerciseFeeder(Feeder):
 
         """
         info = {}
-        for line in str(text).splitlines():
+        for line in text.splitlines():
             match = self._HEADER_MATCHER.match(line)
             assert match, "Invalid exercise header syntax."
-            info[match.group('key')] = match.group('value')
+            info[str(match.group('key'))] = match.group('value')
         try:
-            type = getattr(content, info['type'])
+            type = getattr(content, str(info['type']))
             assert issubclass(type, Exercise), \
                    "Invalid exercise class %s:" % type
             del(info['type'])
