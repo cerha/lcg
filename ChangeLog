@@ -1,3 +1,19 @@
+2005-03-24  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py (RootNode, _WikiNode, DocNode, DocMaker): New
+	classes.
+	(WikiNode): Derive from `_WikiNode'.
+
+	* lcg/eurochance.py (EurochanceCourse._create_children): Use
+	`list_dir' instead of `list_subdirs'.
+
+	* lcg/util.py (list_subdirs): Removed.
+	(list_dir): New function.
+
+	* lcg/content.py (Container.content): New method.
+
+	* doc/roles.wiki: File removed.
+
 2005-03-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/scripts/audio.js: Don't set the statusbar messages.
