@@ -52,7 +52,7 @@ input.answer-control {
     font-weight: bold;
 }
 
-input.sound-control { 
+form.sound-control input.button { 
     background-color: #e95;
     border: black solid 1px;
     padding: 0;
@@ -67,15 +67,15 @@ input.cloze {
 }
 
 
-p.results { 
+.results { 
     background: #eee;
     padding: 2pt;
     border: #ccc solid 1px;
 }
 
-input.result { 
+.results input.text, input.result { 
     border: none;
     font-size: 1em;
-    background: #e8e8e8;
+    background: #eee;
 }
 
