@@ -97,13 +97,22 @@ Handler.prototype.init = function(form, answers, responses) {
    this._answers = answers;
    this._responses = responses;
    this._answered = new Array(answers.length);
-   this._init_fields();
+   this._fields = new Array();
+   this._last_answer_index = 0;
+   for (i=0; i < this._form.elements.length; i++) {
+      var field = this._form.elements[i];
+      if (this._recognize_field(field)) {
+	 this._init_field(field);
+	 this._fields.push(field);
+      }
+   }
 }
 
 Handler.prototype._eval_answer = function(field) {
+   var i = field.answer_index;
+   //window.defaultStatus = "*"+i+'/'+this._fields.length+": "+field.value+" | "+this._answers[i];
    if (field.value != '') {
-      var i = field.answer_index;
-      var answer = this._answers[i]
+      var answer = this._answers[i];
       var correct = (field.value == answer);
       if (this._answered[i] == null) this._answered[i] = correct ? 1 : -1;
       return correct;
@@ -148,6 +157,17 @@ Handler.prototype.display_results = function() {
    this._form.result.value = correct +' ('+ this.percentage() +'%)';
 }
 
+Handler.prototype.fill = function() {
+   for (var i=0; i < this._fields.length; i++) {
+      var field = this._fields[i];
+      this.set_field(field, this._answers[field.answer_index]);
+   }
+}
+
+Handler.prototype.set_field = function(field, value) {
+   field.value = value;
+}
+
 Handler.prototype.reset = function() {
    this._answered = new Array(this._answers.length);
    this.display_results();
@@ -159,27 +179,35 @@ Handler.prototype.reset = function() {
 function ChoiceBasedExerciseHandler() {}
 ChoiceBasedExerciseHandler.prototype = new Handler();
 
-ChoiceBasedExerciseHandler.prototype._init_fields = function() {
-   var n = 0;
-   var last_group = null;
-   this._fields = new Array();
-   for (i=0; i < this._form.elements.length; i++) {
-      var field = this._form.elements[i];
-      if (field.type == 'radio') {
-	 if (field.name != last_group) {
-	    if (last_group != null) n++;
-	    last_group = field.name;
-	 }
-	 field.answer_index = n;
-	 this._fields.push(field);
-      }
-   }
+ChoiceBasedExerciseHandler.prototype._recognize_field = function(field) {
+   return field.type == 'radio';
 }
 
-ChoiceBasedExerciseHandler.prototype.fill = function() {
-   for (var i=0; i < this._fields.length; i++) {
-      var field = this._fields[i];
-      field.checked = (field.value == this._answers[field.answer_index]);
+ChoiceBasedExerciseHandler.prototype._init_field = function(field) {
+   if (field.name != this._last_group) {
+      if (this._last_group != null) this._last_answer_index++;
+      this._last_group = field.name;
+   }
+   field.answer_index = this._last_answer_index;
+}
+
+ChoiceBasedExerciseHandler.prototype.set_field = function(field, value) {
+   field.checked = (field.value == value);
+}
+
+//=============================================================================
+
+function SelectBasedExerciseHandler() {}
+SelectBasedExerciseHandler.prototype = new ChoiceBasedExerciseHandler()
+
+SelectBasedExerciseHandler.prototype._recognize_field = function(field) {
+   return field.options != null;
+}
+
+SelectBasedExerciseHandler.prototype.set_field = function(field, value) {
+   for (var i=0; i < field.options.length; i++) {
+      var option = field.options[i];
+      if (option.value == value) option.selected = true;
    }
 }
 
@@ -189,16 +217,14 @@ ChoiceBasedExerciseHandler.prototype.fill = function() {
 function FillInExerciseHandler() {}
 FillInExerciseHandler.prototype = new Handler();
 
-FillInExerciseHandler.prototype._init_fields = function() {
-   this._fields = new Array();
-   for (i=0; i < this._answers.length; i++) {
-      var field = this._form.elements[i];
-      if (field.type == 'text') {
-	 field.answer_index = i;
-	 field.onkeypress = this._handle_text_field_keypress;
-	 this._fields.push(field);
-      }
-   }
+FillInExerciseHandler.prototype._recognize_field = function(field) {
+   return (field.type == 'text' && 
+	   this._last_answer_index < this._answers.length);
+}
+
+FillInExerciseHandler.prototype._init_field = function(field) {
+   field.answer_index = this._last_answer_index++;
+   field.onkeypress = this._handle_text_field_keypress;
 }
 
 FillInExerciseHandler.prototype._error_handler = function(field) {
@@ -206,7 +232,6 @@ FillInExerciseHandler.prototype._error_handler = function(field) {
    var index = last_correct_char_index(field, answer);
    highlight(field, index, index);
 }
-
 
 FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
    // 'this' does not refer to the FillInExerciseHandler instance here!
@@ -227,13 +252,6 @@ FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
       return false;
    }
    return true;
-}
-
-FillInExerciseHandler.prototype.fill = function() {
-   for (var i=0; i < this._fields.length; i++) {
-      var field = this._fields[i];
-      field.value = this._answers[field.answer_index];
-   }
 }
 
 FillInExerciseHandler.prototype.evaluate = function() {
