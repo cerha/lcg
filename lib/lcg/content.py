@@ -365,6 +365,7 @@ class Exercise(Content):
             self._recording = None
         self._transcript = transcript
 
+
     def task_type(self):
         return self._task_type
 
@@ -508,6 +509,11 @@ class Transformation(Cloze):
     """Transform a whole sentence and write it down."""
 
     _task_type = TransformationTask
+
+    def _instructions(self):
+        return """Listen to the recording and transform each of the %d
+        sentences below according to the instructions.  Check your results
+        using the buttons below all the sentences.""" % \ len(self._tasks)
 
     
 class Dictation(Cloze):
