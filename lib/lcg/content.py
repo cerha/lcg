@@ -158,13 +158,13 @@ class VocabItem(Record):
           sound_file -- corresponding sound file as a 'Media' instance.
         
         """
-        assert type(word) == type('')
-        assert type(note) == type('')
+        assert isinstance(word, types.StringTypes)
+        assert isinstance(note, types.StringTypes)
         assert isinstance(translation, types.StringTypes)
         assert isinstance(sound_file, Media)
-        self._word = word
-        self._note = note
-        self._translation = translation
+        self._word = unicode(word)
+        self._note = unicode(note)
+        self._translation = unicode(translation)
         self._sound_file = sound_file
 
 
@@ -189,9 +189,9 @@ class Choice(Record):
     """
     
     def __init__(self, answer, correct=False):
-        assert type(answer) == type('')
-        assert type(correct) == type(True)
-        self._answer = answer
+        assert isinstance(answer, types.StringTypes)
+        assert isinstance(correct, types.BooleanType)
+        self._answer = unicode(answer)
         self._correct = correct
 
         
@@ -246,8 +246,8 @@ class MultipleChoiceQuestion(Selection):
           
         """
         super(MultipleChoiceQuestion, self).__init__(parent, choices)
-        assert type(question) == type('')
-        self._question = question
+        assert isinstance(question, types.StringTypes)
+        self._question = unicode(question)
 
     def export(self):
         return "<p>%s</p>\n%s" % (self._question, self._export_choices())
@@ -269,7 +269,7 @@ class TrueFalseStatement(MultipleChoiceQuestion):
             or not (true when it is correct).
           
         """
-        assert type(correct) == type(True)
+        assert isinstance(correct, types.BooleanType)
         choices = (Choice('TRUE', correct), Choice('FALSE', not correct))
         super(TrueFalseStatement, self).__init__(parent, statement, choices)
         
@@ -290,8 +290,8 @@ class ClozeTask(Task):
     
     def __init__(self, parent, text):
         super(ClozeTask, self).__init__(parent)
-        assert type(text) == type('')
-        self._text = text
+        assert isinstance(text, types.StringTypes)
+        self._text = unicode(text)
 
     def answers(self):
         return self._REGEXP.findall(self._text)
@@ -310,8 +310,8 @@ class TransformationTask(ClozeTask):
 
     def __init__(self, parent, orig, transformed):
         super(TransformationTask, self).__init__(parent, transformed)
-        assert type(orig) == type('')
-        self._orig = orig
+        assert isinstance(orig, types.StringTypes)
+        self._orig = unicode(orig)
 
     def export(self):
         return "\n".join(('<p>',self._orig,'<br/>', self._export_text(),'</p>'))
@@ -355,7 +355,7 @@ class Exercise(Content):
         if sound_file is not None:
             assert transcript is not None, \
                    "Transcript file not specified for file: %s" % sound_file
-            assert type(transcript) == type('')
+            assert isinstance(transcript, types.StringTypes)
             tts_filename = os.path.join(parent.src_dir(), transcript)
             assert os.path.exists(tts_filename), \
                    "Transcript file not found: %s" % tts_filename
@@ -409,7 +409,7 @@ class Cloze(Exercise):
 
     def __init__(self, parent, *args, **kwargs):
         super(Cloze, self).__init__(parent, *args, **kwargs),
-        parent.script('eval-cloze.js')
+        parent.script('exercises.js')
         parent.media('all-correct-response.ogg', shared=True,
                      tts_input='everything correct!')
         parent.media('all-wrong-response.ogg', shared=True,
