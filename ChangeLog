@@ -1,4 +1,40 @@
+2005-02-15  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (ClozeTask.plain_text): New method.
+	(Exercise._AUDIO_VERSION_REQUIRED, Exercise._AUDIO_VERSION_LABEL):
+	New constants.
+	(Exercise.__init__): New argument `audio_version'.  Create the
+	transcript using the `_create_transcript()' method.  Make sure the
+	`audio_version' was specified if `self._AUDIO_VERSION_REQUIRED' is
+	true.
+	(Exercise._create_transcript): New method.
+	(Exercise._sound_controls): New method.
+	(Exercise._export_instructions): Use it for both the recording and
+	the audio version.
+	(Cloze._RECORDING_REQUIRED): Unset.
+	(SentenceCompletion._AUDIO_VERSION_REQUIRED): Set to True.
+	(SentenceCompletion._AUDIO_VERSION_LABEL): Set.
+	(SentenceCompletion._instructions): Teext improved.
+	(Cloze._create_transcript): New method.
+	(Cloze._instructions): The condition corrected.
+	(Substitution): New class.
+
+2005-02-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/feed.py (ExerciseFeeder._exercise): Cosmetical improvement.
+
+	* lcg/resources.py (Media._FORCE_OUTPUT_FORMAT): New constant.
+	(Media.__init__): Change the format if `_FORCE_OUTPUT_FORMAT' is set.
+	(Media._export): Raise the exception as an `Exception' instance.
+	(Transcript.__init__): New argument `text'.
+	(Transcript._check_file, Transcript._check_file): New methods.
+
 2005-02-10  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py (ContentNode._read_file): New argument `comment'.
+	Omit the matching lines from the source file.
+	(Unit._create_exercises): Pass the comment regexp to to
+	`_read_file()'.
 
 	* lcg/feed.py (Feeder._current_input_position): New argument
 	`object'.  Return None here.
