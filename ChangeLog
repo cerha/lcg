@@ -1,3 +1,25 @@
+2005-02-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/wiki.py (CommonFormatter._rules): Markup changed.  Rules for
+	`htmlescapeentity' and `fancylink' removed.
+	(CommonFormatter._htmlescapeentity_formatter)
+	(CommonFormatter._url_formatter)
+	(CommonFormatter._fancylink_formatter): Removed.
+	(OneLinerFormatter): Class removed.
+	(OneLinerFormatter): Removed the `url' rule.
+	(Formatter._rules): Removed `svnimg', `macro', `url' and `imgurl'
+	rule.
+	(Formatter._compiled_rules): Removed the unnecessary items.
+	(Formatter._macro_formatter, Formatter._svnimg_formatter): Removed.
+	(_Node, Section): New classes.
+	(parse_sections): New function.
+
+	* lcg/course.py (Unit._create_grammar): New method.
+	(Unit._create_content): Use it.
+
+	* lcg/content.py (Section.__init__): Set `self._title' before
+	calling superclass constructor.
+
 2005-02-21  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (GapFillStatement.__init__): Overriden.
