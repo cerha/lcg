@@ -160,14 +160,15 @@ class SplittableTextFeeder(Feeder):
         return 'File "%s", line %d' % (text.input_file(),
                                        text.firstline())
 
-    def _process_pieces(self, text, splitter, error_message, func, *args):
+    def _process_pieces(self, text, splitter, func, *args):
         def f(piece):
             try:
                 return func(piece, *args)
             except SystemExit:
                 sys.exit()
             except:
-                self._panic(error_message, sys.exc_info(), piece)
+                self._panic(self.__class__.__name__ + " failed",
+                            sys.exc_info(), piece)
         return [x for x in [f(piece) for piece in text.split(splitter)
                             if piece.text()] if x is not None]
     
@@ -186,8 +187,7 @@ class VocabFeeder(SplittableTextFeeder):
         super(VocabFeeder, self).__init__(text, **kwargs)
     
     def feed(self, parent):
-        m = "Exception caught while processing vocabulary item"
-        return self._process_pieces(self._text, self._LINE_SPLITTER, m,
+        return self._process_pieces(self._text, self._LINE_SPLITTER,
                                     self._item, parent)
 
     def _item(self, line, parent):
@@ -201,8 +201,8 @@ class VocabFeeder(SplittableTextFeeder):
             note = word[p:]
             word = word[:p].strip()
         else:
-            note = u""
-        return VocabItem(parent, word, note, translation,
+            note = None
+        return VocabItem(parent, word, note, translation or u"???",
                          translation_language=self._translation_language,
                          is_phrase=self._phrases)
     
@@ -231,8 +231,7 @@ class ExerciseFeeder(SplittableTextFeeder):
         self._vocabulary = vocabulary
         
     def feed(self, parent):
-        m = "Exception caught while processing exercise specification"
-        return self._process_pieces(self._text, self._EXERCISE_SPLITTER, m,
+        return self._process_pieces(self._text, self._EXERCISE_SPLITTER,
                                     self._exercise, parent)
     
     def _exercise(self, text, parent):
@@ -287,6 +286,7 @@ class ExerciseFeeder(SplittableTextFeeder):
         # Read a task specification using a method according to given task type.
         method = {
             ClozeTask:              self._read_cloze,
+            DictationTask:          self._read_dictation,
             TransformationTask:     self._read_transformation,
             Selection:              self._read_selection,
             MultipleChoiceQuestion: self._read_multiple_choice_question,
@@ -326,6 +326,9 @@ class ExerciseFeeder(SplittableTextFeeder):
     
     def _read_cloze(self, text):
         return ClozeTask(text)
+
+    def _read_dictation(self, text):
+        return DictationTask(text)
 
     def _read_transformation(self, text):
         lines = text.splitlines()
