@@ -1,7 +1,35 @@
 2004-10-20  Tomas Cerha  <cerha@brailcom.org>
 
+	* Makefile (all): Don't pass the stylesheet argument to the
+	generator script.
+	(sync-data): Directories fixed.
+
+	* lcg/course.py (ContentNode.__init__): New argument `default_resource_dir'.
+	(ContentNode.default_resource_dir): New method.
+	(Resource.source_file): If the source file does not exist, try the
+	`default_resource_dir' directory.
+	(Resource.name): New method.
+	(Media.name): Moved to parent class.
+
+	* lcg/content.py (Cloze.__init__): The script name changed to
+	`exercises.js'.
+	(VocabItem.__init__, Choice.__init__)
+	(MultipleChoiceQuestion.__init__, TrueFalseStatement.__init__)
+	(ClozeTask.__init__, TransformationTask.__init__)
+	(Exercise.__init__): Use `isinstance()' for type assertions
+	/`StringTypes' for strings and BooleanType' for boolean data/.
+	Convert string values to unicode.
+
+	* resources/scripts/exercises.js: New file.
+
+	* resources/scripts/audio.js: New file.
+
+	* resources/css/default.css: New file.
+
 	* lcg/export.py (StaticExporter._wrap_content): Don't export the
 	MediaPlayer object.
+	(StaticExporter._wrap_content): Alocate the stylesheet only if
+	it is not None.
 
 2004-10-19  Tomas Cerha  <cerha@brailcom.org>
 
