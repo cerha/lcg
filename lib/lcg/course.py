@@ -60,13 +60,7 @@ class ContentNode(object):
     classes should define some more meaningful titles, such as 'Lesson',
     'Module' etc."""
 
-    _TOC_TITLE = _("Node Index")
-
-    """The TOC title is used as a text of a link to the node's table of
-    contents.  As well as '_TITLE', it can be overriden to some more meaningful
-    title, such as 'Unit Index' etc.  Obviously, this is not necessary for the
-    nodes which don't contain any child nodes, since no Table of Contents is
-    generated for them."""
+    _ABBREV_TITLE = None
     
     def __init__(self, parent, subdir=None,
                  language='en', input_encoding='ascii',
@@ -104,9 +98,12 @@ class ContentNode(object):
         self._default_resource_dir = default_resource_dir
         self._resources = {}
         self._counter = Counter(1)
-        self._content = self._create_content()
-        assert isinstance(self._content, Content)
         self._registered_children = []
+        content = self._create_content()
+        if isinstance(content, Content):
+            self._content = content
+        else:
+            self._content = Container(self, content)
         self._children = self._create_children()
         for child in self._children:
             assert child._parent == self
@@ -126,10 +123,13 @@ class ContentNode(object):
                (self.__class__.__name__, self.id(), self.title(), self.subdir())
 
     def _create_content(self):
-        """Create the content for this node as a 'Content' instance.
+        """Create the content for this node.
 
         This method should be overriden in derived classes to create the actual
         content displayed when this node is selected.
+
+        The returned value must be a 'Content' instance or a sequence of
+        'Content' instances.
 
         """
         return Content(self)
@@ -173,7 +173,8 @@ class ContentNode(object):
         
         The identifier is not necesarrily unique within all nodes, but is
         unique within its parent's children.  Thus it can be used
-        as unique in combination with parent's unique id.
+        as unique in combination with parent's unique id.  See the public
+        method 'id()' for that.
         
         """
         if self._parent is not None:
@@ -182,6 +183,14 @@ class ContentNode(object):
         else:
             return 'index'
 
+    def _title(self):
+        """Return the title of this node as a string."""
+        return self._TITLE
+
+    def _abbrev_title(self):
+        """Return the abbreviated title of this node as a string."""
+        return self._ABBREV_TITLE
+    
     # Public methods
 
     def parent(self):
@@ -199,6 +208,12 @@ class ContentNode(object):
         """Return the list of all subordinate nodes as a tuple."""
         return tuple(self._children)
 
+    def sections(self):
+        return self._content.sections()
+    
+    def url(self):
+        return self.output_file()
+    
     def linear(self):
         """Return the linearized subtree of this node as a list."""
         return [self] + reduce(lambda l, n: l + n.linear(), self.children(), [])
@@ -222,7 +237,7 @@ class ContentNode(object):
             return None
 
     def subdir(self):
-        """Return the name of this node's subdirectory relative to root node."""
+        """Return this node's subdirectory name relative to the root node."""
         if self._parent is None:
             return ''
         elif self._subdir is None:
@@ -248,17 +263,24 @@ class ContentNode(object):
         else:
             return '-'.join((self._parent.id(), self._id()))
         
-    def title(self):
+    def title(self, abbrev=False):
         """Return the title of this node as a string."""
-        return self._TITLE
+        abbrev_title = self._abbrev_title()
+        if abbrev_title is not None:
+            if abbrev:
+                return abbrev_title
+            else:
+                return "%s: %s" % (abbrev_title, self._title())
+        else:
+            return self._title()
     
-    def toc_title(self):
-        """Return the title of the link to this node's Table of Contents."""
-        return self._TOC_TITLE
-
     def full_title(self, separator=' - '):
-        """Return the title of this node as a string."""
-        return separator.join([n.title() for n in self._node_path()])
+        """Return the full title of this node as a string.
+
+        Full title is made of titles of all nodes in the path.
+        
+        """
+        return separator.join([n.title(abbrev=True) for n in self._node_path()])
 
     def language(self):
         """Return the content language as an ISO 639-1 Alpha-2 code."""
@@ -342,11 +364,6 @@ class ContentNode(object):
 
         """
         return self._input_encoding
-
-    def has_index(self):
-        """Return True, if this node is supposed to have a TOC at the end."""
-        return False
-
     
     
 class TextNode(ContentNode):
@@ -366,13 +383,12 @@ class InnerNode(ContentNode):
     """
     
     def _create_content(self):
-        return WikiText(self, self._read_file('intro'))
-
-    def title(self):
+        return (WikiText(self, self._read_file('intro')),
+                TableOfContents(self, title=_("Table of Contents")))
+    
+    def _title(self):
         return self._read_file('title')
 
-    def has_index(self):
-        return True
     
 class RootNode(InnerNode):
     """The root node of the content hierarchy.
@@ -384,35 +400,18 @@ class RootNode(InnerNode):
     def __init__(self, *args, **kwargs):
         super(RootNode, self).__init__(None, *args, **kwargs)
 
-    def has_index(self):
-        return True
 
 ################################################################################
 # A Concrete implemantation of Eurochance course structure.
 ################################################################################
 
-class Vocabulary(ContentNode):
-    """A section comprising a list of vocabulary."""
-    _TITLE = _("Vocabulary")
-
-    def _create_content(self):
-        feeder = ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls',
-                                  input_encoding=self._input_encoding)
-        self._items = items = feeder.feed(self)
-        return VocabList(self, items)
-        
-    def items(self):
-        """Return all vocablary items as a sequence of 'VocabItem' instances."""
-        return self._items
+class _ExerciseNode(ContentNode):
+    
+    def _abbrev_title(self, abbrev=False):
+        return _("Section %d") % (self._parent.index(self)+1)
 
     
-class Grammar(TextNode):
-    """Key grammar explanation."""
-    _TITLE = _("Grammar")
-    pass
-
-    
-class VocabularyPractice(ContentNode):
+class VocabularyPractice(_ExerciseNode):
     """Vocabulary Practice exercises section."""
     _TITLE = "Vocabulary Practice"
 
@@ -421,12 +420,10 @@ class VocabularyPractice(ContentNode):
         super(VocabularyPractice, self).__init__(parent, *args, **kwargs)
 
     def _create_content(self):
-        exercises = [cls(self, items=self._items)
-                     for cls in (VocabExercise, VocabExercise2)]
-        return Container(self, exercises)
+        return VocabExercise(self, items=self._items)
 
     
-class ExerciseNode(ContentNode):
+class ExerciseNode(_ExerciseNode):
     
     def __init__(self, parent, data, *args, **kwargs):
         self._data = data
@@ -436,57 +433,68 @@ class ExerciseNode(ContentNode):
     def _create_content(self):
         feeder = ExerciseFeeder(self._data,
                                 input_encoding=self._input_encoding)
-        return Container(self, feeder.feed(self))
-
+        return feeder.feed(self)
     
 class ListeningComprehension(ExerciseNode):
-    _TITLE = _("Listening Comprehension Exercises")
+    _TITLE = _("Listening Comprehension")
 
+class GeneralComprehension(ExerciseNode):
+    _TITLE = _("General Comprehension")
     
 class GrammarPractice(ExerciseNode):
     _TITLE = _("Grammar Practice")
-
     
 class Consolidation(ExerciseNode):
     _TITLE = _("Consolidation")
+
     
-
-class Summary(TextNode):
-    """A check list of competences achieved."""
-    _TITLE = _("Summary")
-
-        
-class Unit(InnerNode):
+class Unit(ContentNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
-    _TITLE = _("Unit")
-    _TOC_TITLE = _("Unit Index")
     _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
+    def _create_content(self):
+        feeder = ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls',
+                                  input_encoding=self._input_encoding)
+        self._vocabulary = feeder.feed(self)
+        return (Section(self, _("Aims and Objectives"),
+                        WikiText(self, self._read_file('aims'))),
+                Section(self, _("Vocabulary"),
+                        VocabList(self, self._vocabulary)),
+                Section(self, _("Grammar"),
+                        WikiText(self, self._read_file('grammar'))),
+                Section(self, _("Exercises"),
+                        TableOfContents(self, detailed=False),
+                        contains_children=True),
+                Section(self, _("Checklist"),
+                        WikiText(self, self._read_file('checklist'))))
+    
     def _create_children(self):
-        filename = os.path.join(self.src_dir(),'exercises', 'exercises.txt')
+        filename = os.path.join(self.src_dir(), 'exercises', 'exercises.txt')
         text = self._read_file(os.path.join('exercises', 'exercises'))
         splittable = SplittableText(text, input_file=filename)
-        sections = splittable.split(self._EXERCISE_SECTION_SPLITTER)
-        if len(sections) != 4:
+        pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
+        if len(pieces) != 4:
             print "Warning: %s: 4 sections expected, %d found." % \
-                  (filename, len(sections))
-            sections = (tuple(sections) + 4*(SplittableText(''),))[0:4]
-        v = self._create_child(Vocabulary)
-        args = ((Grammar, ),
-                (VocabularyPractice, v.items()),
-                (ListeningComprehension, sections[0:2]),
-                (GrammarPractice, sections[2]),
-                (Consolidation, sections[3]),
-                (Summary, ))
-        return [v] + [self._create_child(*a) for a in args]
+                  (filename, len(pieces))
+            pieces = (pieces + 4 * [SplittableText('')])[0:4]
+        children = (VocabularyPractice,
+                    ListeningComprehension,
+                    GeneralComprehension,
+                    GrammarPractice,
+                    Consolidation)
+        return [self._create_child(*a)
+                for a in zip(children, [self._vocabulary] + pieces)]
 
     def _id(self):
         return 'unit%02d' % self._parent.index(self)
 
-    def title(self):
-        title = super(Unit, self).title()
-        return "%s %d: %s" % (self._TITLE, self._parent.index(self), title)
+    def _abbrev_title(self, abbrev=False):
+        return _("Unit %d") % self._parent.index(self)
 
+    def _title(self, abbrev=False):
+        return self._read_file('title')
+
+    
 class ExerciseInstructions(TextNode):
     """Exercise instructions."""
     def __init__(self, parent, exercise_class_, *args, **kwargs):
@@ -501,26 +509,38 @@ class ExerciseInstructions(TextNode):
             print "Warning: %s" % e
             return Content(self)
 
-    def title(self):
+    def title(self, abbrev=False):
         return _("Instructions for %s") % self._exercise_class_.name()
 
     def _id(self):
         return self._exercise_class_.id()
 
+    def src_dir(self):
+        return os.path.join(self.default_resource_dir(), 'help')
+    
+class CourseIndex(ContentNode):
+    _TITLE = _("Detailed Course Index")
+
+    def _create_content(self):
+        return TableOfContents(self, item=self._parent, depth=3)
+
     
 class Instructions(TextNode):
     """A general set of pre-course instructions."""
     _TITLE = _("General Course Instructions")
+
+    def _create_content(self):
+        return (super(Instructions, self)._create_content(),
+                TableOfContents(self))
+
     
     def _create_children(self):
         return [self._create_child(ExerciseInstructions, e, 'help')
                 for e in Exercise.used_types()]
-    
+
     def _id(self):
         return 'instructions'
 
-    def has_index(self):
-        return True
     
 class EurochanceCourse(RootNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
@@ -529,7 +549,9 @@ class EurochanceCourse(RootNode):
         units = [self._create_child(Unit, subdir=d)
                  for d in list_subdirs(self.src_dir())
                  if d[0] in map(str, range(0, 9))]
-        return [self._create_child(Instructions)] + units
+        return [self._create_child(Instructions)] + \
+               units + \
+               [self._create_child(CourseIndex)]
     
     def meta(self):
         return {'author': 'Eurochance Team',
