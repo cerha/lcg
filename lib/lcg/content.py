@@ -360,8 +360,9 @@ class TableOfContents(Content):
             this content element is part of.
           item -- the place where to start in the content hierarchy tree.
             'ContentNode' or 'Content' instances are allowed.  None means that
-            'parent' should be used.  See 'Section' documentation for more
-            information how the content tree is built.
+            container should be used (a local Table of Contents).  See
+            'Section' documentation for more information how the content tree
+            is built.
           title -- the title of the TOC as a string.
           depth -- how deep in the hierarchy should we go.
           detailed -- A True (default) value means that the 'Content' hierarchy
@@ -370,10 +371,8 @@ class TableOfContents(Content):
 
         """
         super(TableOfContents, self).__init__(parent)
-        if item is None:
-            item = parent
         assert isinstance(item, (ContentNode, Content)) or \
-               is_sequence_of(item, Content)
+               is_sequence_of(item, Content) or item is None
         assert title is None or isinstance(title, types.StringTypes)
         assert isinstance(depth, types.IntType)
         assert isinstance(detailed, types.BooleanType)
@@ -383,7 +382,10 @@ class TableOfContents(Content):
         self._detailed = detailed
         
     def export(self):
-        toc = self._make_toc(self._item, depth=self._depth)
+        item = self._item
+        if not item:
+            item = self._container or self._parent
+        toc = self._make_toc(item, depth=self._depth)
         if self._title is not None:
             return div((b(self._title), toc), cls="table-of-contents")
         else:
