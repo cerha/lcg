@@ -37,20 +37,21 @@ class Exporter(object):
             os.makedirs(self._dir)
         filename = os.path.join(self._dir, node.output_file())
         file = open(filename, 'w')
-        file.write(self._wrap_content(node).encode('utf-8'))
+        data = self._wrap_content(node, node.content().export())
+        file.write(data.encode('utf-8'))
         file.close()
         for m in node.resources():
             self._export_resource(m)
         for n in node.children():
             self._export_node(n)
 
-    def _wrap_content(self, node):
+    def _wrap_content(self, node, content):
         return "\n".join(('<html>',
                           '  <head>',
                           '    <title>%s</title>' % node.full_title(),
                           '  </head>',
                           '  <body bgcolor="white">',
-                          node.content().export(),
+                          content,
                           '  </body>',
                           '</html>'))
             
@@ -101,7 +102,7 @@ class StaticExporter(Exporter):
         super(StaticExporter, self).__init__(course, dir)
         self._stylesheet = stylesheet
 
-    def _wrap_content(self, node):
+    def _wrap_content(self, node, content):
         def tags(template, items):
             return '\n'.join(map(lambda x: "  " + template % x, items))
         if self._stylesheet is not None:
@@ -130,7 +131,7 @@ class StaticExporter(Exporter):
              '<a name="content" accesskey="%s"></a>' % 
              self._hotkey['content-beginning'],
              '<h1>%s</h1>' % node.title(),
-             self._div('content', node.content().export()),
+             self._div('content', content),
              self._toc(node),
              '<hr class="navigation">', nav,
              '</body></html>')
