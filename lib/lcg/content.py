@@ -213,7 +213,8 @@ class Table(Container):
         super(Table, self).__init__(parent, content)
         
     def export(self):
-        return '<table class="">%s</table>\n' % super(Table, self).export()
+        return '<table  class="lcg-table">%s</table>\n' % \
+               super(Table, self).export()
     
     
 class SectionContainer(Container):
