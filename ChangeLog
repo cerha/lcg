@@ -1,5 +1,12 @@
 2005-03-17  Tomas Cerha  <cerha@brailcom.org>
 
+	* lcg/export.py (StaticExporter._hotkey): Key names changed.
+	(StaticExporter.body): Don't include the navigation bar at the top
+	of the page.  Don't include the 'content-beginning' anchor.
+	(StaticExporter._navigation): Use the renamed hotkay identifiers.
+	(StaticExporter._navigation): If the "Up" link is omitted, include
+	it as an invisible link (for the shortcut key to work).
+
 	* resources/scripts/exercises.js (Handler.init): Instead of
 	`this._answered' initialize two independent arrays `this._results'
 	and `this._first_attempt'.
