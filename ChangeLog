@@ -1,5 +1,7 @@
 2005-03-24  Tomas Cerha  <cerha@brailcom.org>
 
+	* bin/docmaker.py: New script.
+
 	* lcg/course.py (RootNode, _WikiNode, DocNode, DocMaker): New
 	classes.
 	(WikiNode): Derive from `_WikiNode'.
