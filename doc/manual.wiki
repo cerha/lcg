@@ -166,19 +166,25 @@ Blank lines around the separators are omitted.
 Each individual exercise specification consists of a header and a series of
 tasks.  The header defines some necessary information about exercise type, the
 media files it depends on etc.  Tasks define the corresponding questions or
-other jobs depending on the exercise type.
+goals depending on the exercise type.
 
 Header and individual tasks are separated by a blank line.  This means that
 both header and a task can be defined over multiple lines, but can not contain
-blank lines.
+blank lines.  For each exercise, there is just one header at the beginning and
+an unlimited number of tasks following.
 
-In the following example, you can see a concrete header and tasks for a
-concrete exercise type.  We will discuss them separately in detail in the
-following sections.
+Some tasks are specified by a paragraph-based text.  Line length is unlimited,
+but it is recommended to wrap paragraph-based data not to exceed 80 columns
+width.  Other tasks expect data in lines, so they can not be wrapped, however
+there are usually relatively short pieces of text on each line, so it should
+not happen, that you exceed the 80 columns width.
+
+In the example below, you can see a concrete header and tasks for a concrete
+exercise type.
 
 *Example:*
 
- type: MulitpleChoiceComprehensionExercise
+ type: MulitpleChoiceQuestions
  sound_file: conversation1.ogg
  transcript: conversation1.txt
 
@@ -203,124 +209,84 @@ Exercise header consists of name/value pairs written each on one line.  The
 header name begins at the beginning of the line and ends by a colon.  The colon
 is followed by a space and the corresponding value.
 
-Each exercise header must contain the exercise type.  Depending on the exercise
-type additional arguments may be required.  You can find the list of arguments
-and their descriptions for each exercise type in the section
-[#exercise-types].
+You can see an example of an exercise header at the previous section.  The most
+important header item is an exercise type.  You can find a list of possible
+exercise types in the section [#exercise-types].
 
-You can see an example of an exercise header at the previous section.
+=== Recording Specification === *
+
+Some exercises may be based on a listening.  If this is the case, the following
+header arguments must be specified (as you can see in the example above).  
+  
+* =sound_file= ... name of the file with the corresponding recording
+* =transcript= ... name of the file with a textual transcript of the recording
+
+If there is no listening related to the exercise, you just omit these
+arguments.
 
 === Exercise Types === exercise-types
 
-The exercise type determines the header arguments and type of the tasks.
-Several exercise types can use the same type of tasks, so the task types are
-independent and you can find their listing with a description of input format
-in the section [#task-types].
+The exercise type determines the type of the tasks expected in the source file
+after the header and a way of their interpretation.  For each exercise, all the
+tasks must be of the same type.  
 
-The following sub-sections describe the header arguments and task type for each
-exercise type.
+*Exercise Types Overview*
 
-==== TrueFalseExercise ==== *
+* [#TrueFalseStatements]
+* [#MultipleChoiceQuestions]
+* [#GapFilling]
+* [#Cloze]
+* [#Selections]
+* [#SentenceCompletion]
+* [#Transformation]
+* [#Dictation]
 
-This is exercise does not use any media files.  It is just a list of true/false
-statement.
-
-*Arguments:* None.
-
-*Task type:* [#TrueFalseStatement].
-
-
-==== MultipleChoiceExercise ==== *
-
-Also this is exercise does not use any media files.  It is just a list of
-multiple choice questions.
-
-*Arguments:* None.
-
-*Task type:* [#MultipleChoiceQuestion].
-
-==== TrueFalseComprehensionExercise ==== *
-
-Similar to TrueFalseExercise, but the questions are based on a listening
-and comprehension.
-
-*Arguments:* 
-  
-* =sound_file= ... name of the file with the corresponding recording
-* =transcript= ... textual transcript of the recording
-
-*Task type:* [#TrueFalseStatement].
-
-==== MulitpleChoiceComprehensionExercise ==== *
-
-Similar to MultipleChoiceExercise, but the questions are based on a listening
-and comprehension.
-
-*Arguments:*
-
-* =sound_file= ... name of the file with the corresponding recording
-* =transcript= ... textual transcript of the recording
-
-*Task type:* [#MultipleChoiceQuestion].
-
-==== GapFillingExercise ==== *
-
-Filling in the gaps in sentences by choosing the correct word from the list.
-
-*Arguments:* None.
-
-*Task type:* [#GapFillStatement].
-
-==== ClozeTest ==== *
-
-Filling in the gaps in text by typing the correct word.  Since the Cloze task
-is a piece of text containing multiple gaps, this exercise will usually have
-just one task.
-
-*Arguments:* None.
-
-*Task type:* [#Cloze].
+A brief description of each exercise type follows.
 
 
-=== Task Types === task-types
+==== TrueFalseStatements ==== TrueFalseStatements
 
-The following sub-sections describe the input format for particular types of
-the tasks which can be used within exercise specification.
+A sequence of statements.  The user is expected to indicate whether the
+sentence is true or false.  This is mostly usefull in a combination with a
+recording to test the comprehension.
 
-==== TrueFalseStatement ==== TrueFalseStatement
-
-In this task, the user should decide, whether the statement is true or not.
-The specification consists of a sentence and a ![T] of ![F] mark at
+The specification consists of a sentence and a ![T] or ![F] mark at
 the end to indicate the correct answer.
 
-*Example:*
+*Task specification example:*
 
  The Microsoft Windows operating system never crashes. [F]
 
-==== MultipleChoiceQuestion ==== MultipleChoiceQuestion
 
-The goal is to choose the correct answer from the list of predefined options.
+==== MultipleChoiceQuestions ==== MultipleChoiceQuestions
+
+A sequence of questions with a predefined set of answers.  Also mostly usefull
+as a comprehension exercise (in combination with a recording).
+
+User's goal is to choose the correct answer out of a list of predefined options.
 The specification consists of the question (or prompt) and a sequence of
 choices.  The question is specified at the first line and all the following
 lines are the choices.  Each Choice must be prefixed by a plus or minus sign --
 plus for a correct answer, minus for the incorrect ones.  Number of choices is
 not limited, but only one choice can be defined as correct.
 
-*Example:*
+*Task specification example:*
 
  A screen reader is:
  - A person.
  - A device.
  + A program.
 
-==== GapFillStatement ==== GapFillStatement
 
-The goal is to choose a correct word to fill in the gap in a sentence.  The
-specification format is very similar to MultipleChoiceQuestion specification,
-since there is also the list of choices.  The difference is that the sentence
-must contain a series of underscore characters to mark the gap.
+==== GapFilling ==== GapFilling
 
-*Example:*
+Filling in the gaps in sentences by choosing the correct word from the list.
+
+The specification is very similar to the [#MultipleChoiceQuestions]
+specification, only instead of questions, there are sentences with gaps.  Each
+sentence has just one gap marked by a sequence of four underscores.
+
+*Task specification example:*
 
  If you want to send money to somebody, you can ____ a transfer.
  - do
@@ -330,24 +296,93 @@ must contain a series of underscore characters to mark the gap.
 
 ==== Cloze ==== Cloze
 
-This task is a bit special, since it contains multiple tasks in fact, however
-they are all part of one text, where the individual pieces would often not make
-sense without the context.
+Filling in the gaps in text by typing the correct word.  Since the individual
+pieces would often not make sense without the context, the cloze will usually
+consist of a paragraph of text which can contain more than one gap.
 
-Each word surrounded by round brackets will be replaced by a gap.  The goal is
-the fill in all the gaps by correct words.  The restriction is, that you can't
-use round brackets for normal purposes.  It is, however, still possible to use
-slashes, square brackets or any other means...
+It is recommended to use a cloze in a combination with a recording, so that the
+user's goal is to fill in the exactly same words as he has heard before.  In
+this case, there is just one correct answer and the automatical evaluation can
+surely decide what is a correct answer and what is not.
 
-Special care must be taken to make sure, that the word in the brackets is the
-/only/ correct possibility to fill in the text.
+You can also use a cloze without a recording, so that the user must find
+the correct word according to the lexical context, but there is the risk, that
+the student finds a different completion, than you expected, which might be
+also correct.  Then the automatic evaluation would evaluate such an answer as
+incorrect and the student would be confused.  So please take special care to
+make the completions unambiguous.
 
-*Example:*
+In the input text, you simply put the words in square brackets to indicate,
+that they should be replaced by a gap.  Than the /only/ correct answer for this
+gap is the word in the brackets.
 
- Commercial banks and savings banks receive and hold deposits (in) current
- accounts, savings accounts and deposit accounts, make payments (for) their
- customers, lend money, (and) offer investment advice, foreign exchange
+
+*Task specification example:*
+
+ Commercial banks and savings banks receive and hold deposits [in] current
+ accounts, savings accounts and deposit accounts, make payments [for] their
+ customers, lend money, [and] offer investment advice, foreign exchange
  facilities, and so on.
+
+
+==== Selections ==== Selections
+
+The goal in this exercise is to decide which of the two (or possibly more)
+sentences is correct.  The specification of one task consists of two (or more)
+lines, one of which is marked by a plus sign and the other(s) by a minus sign.
+The plus marked sentence is then considered correct and the other(s) incorrect.
+
+*Task specification example:*
+
+ + She asked me to plant some flowers.
+ - She asked to me to plant some flowers.
+
+==== SentenceCompletion ==== SentenceCompletion
+
+Each task is one sentence.  There is just one gap in each sentence, to be
+filled in by the student.  Unlike in the [#Cloze], there are usually more words
+in the gap to be filled to finish the sentence.  The same warning applies here
+regarding the ambiguity as for the [#Cloze], so it is safer to use this
+exercise together with a listening again.
+
+*Task specification example:*
+
+ If you don't use pesticides you can [grow organic food].
+
+==== Transformation ==== Transformation
+
+The goal is to transform a given sentence according to the instructions, which
+are a part of this exercise's recording. 
+
+The task specification consists of two lines.  First line is the original
+sentence and the second line is the transformed sentence.  The part of the
+transformed sentence, which should be replaced by a gap is marked by the square
+brackets.  
+
+You can either put the whole transformed sentence into the brackets if you want
+the student to fill it in as it is, or provide a part of the transformed
+sentence as a template.  This can often help to avoid slightly different, but
+still correct, transformations, which would be, however, evaluated as
+incorrect.  It also allows the student to concentrate just on the subject of
+the transformation and avoids unnecessary typing and risking typos.
+
+*Task specification example:*
+
+ Mr Hill said: "I don't grow bananas."
+ [Mr Hill said he didn't grow bananas.]
+
+*Task specification example with a template (prefered):*
+
+ Mr Hill said: "I don't grow bananas."
+ Mr Hill said he [didn't] grow bananas.
+
+
+==== Dictation ==== Dictation
+
+Task specification for dictation is empty, since it is based just on listening
+and the transcript of that listening makes the correct answer.  No more
+information needed.
+
 
 == Sound Recordings == *
 
