@@ -98,16 +98,8 @@ class Instructions(EurochanceNode):
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        return self._parse_wiki_file('instructions') + \
-               [TableOfContents(self)]
+        return self._parse_wiki_file('instructions')
     
-    def _create_children(self):
-        return [self._create_child(ExerciseInstructions, t, 'help')
-                for t in Exercise.used_types()]
-
-    def _id(self):
-        return 'instructions'
-
     
 class ExerciseInstructions(EurochanceNode):
     """Exercise instructions."""
@@ -169,6 +161,17 @@ class VocabIndex(_Index):
         return SectionContainer(self, s)
 
     
+class Help(EurochanceNode):
+    _TITLE = _("Help Index")
+
+    def _create_content(self):
+        return TableOfContents(self, title=_("Table of Contents:"))
+
+    def _create_children(self):
+        return [self._create_child(ExerciseInstructions, t, 'help')
+                for t in Exercise.used_types()]
+
+    
 class EurochanceCourse(EurochanceNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
@@ -188,17 +191,18 @@ class EurochanceCourse(EurochanceNode):
 
     def _create_content(self):
         return self._parse_wiki_file('intro') + \
-               [TableOfContents(self, title=_("Table of Contents:"))]
+               [TableOfContents(self, item=self, title=_("Table of Contents:"))]
+                         
     
     def _create_children(self):
         units = [self._create_child(Unit, subdir=d)
                  for d in list_subdirs(self.src_dir())
                  if d[0] in map(str, range(0, 9))]
-        return [self._create_child(Instructions)] + \
-               units + \
+        return [self._create_child(Instructions)] + units + \
                [self._create_child(CourseIndex, units),
                 self._create_child(GrammarIndex, units),
-                self._create_child(VocabIndex, units)]
+                self._create_child(VocabIndex, units),
+                self._create_child(Help)]
     
     def meta(self):
         return {'author': 'Eurochance Team',
