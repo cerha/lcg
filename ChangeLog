@@ -1,3 +1,60 @@
+2004-10-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/exercises.js (eval_answer): New function.
+
+	* resources/css/default.css (a): Styles improved.
+
+	* lcg/feed.py (ExcelVocabFeeder.feed): Don't print warnings on
+	untranslated words.
+	(ExerciseFeeder._read_task): Don't take the `parent' the first argument.
+	(ExerciseFeeder._exercise): Respect it.
+	(ExerciseFeeder._read_multiple_choice_question) 
+	(ExerciseFeeder._read_gap_fill_statement) 
+	(ExerciseFeeder._read_cloze, ExerciseFeeder._read_transformation) 
+	(ExerciseFeeder._read_true_false_statement) 
+	(ExerciseFeeder._read_multiple_choice_question): Don't take
+	`parent' as argument'
+	(ExerciseFeeder._read_task): Respect it.
+
+	(ExerciseFeeder._read_selection)
+	(ExerciseFeeder._read_multiple_choice_question):
+
+	* lcg/content.py (Content._button): method.
+	(Content._field): New method.
+	(Content._answer_control): Method removed.
+	(Task): Don't derive from `Content' (just `object').
+	(_ChoiceTask): New class.
+	(Selection, MultipleChoiceQuestion, TrueFalseStatement): Derive
+	from `_ChoiceTask'.
+	(Selection._format_choice, Selection._choice_controls)
+	(Selection.export, TrueFalseStatement._format_choice)
+	(TrueFalseStatement.export, ClozeTask._make_field)
+	(ClozeTask._export_text, ClozeTask.export)
+	(TransformationTask.export): All removed.
+	(ClozeTask, TransformationTask, Selection, TrueFalseStatement,
+	(MultipleChoiceQuestion, GapFillStatement): Don't take parent as
+	constructor argument.
+
+	(Exercise.task_type): New method.
+	(Exercise.task_type): New Method.
+	(Exercise.export): Use it.
+	(Exercise._export_task) New method.
+	(Exercise._export_instructions): Use `Content._button' and
+	`Content._script_write()' for rendering the controls.
+	(Exercise.__init__): Require the script `exercises.js'.
+	(Cloze._export_tasks): Use `Content._button' and
+	`Content._field()' and `Content._script_write()' for rendering the
+	controls.
+	(Cloze._make_field): New method.
+	(Cloze._export_task): New method.
+	(_ChoiceBasedExercise): New class.
+	(TrueFalseStatements, MultipleChoiceQuestions, Selections) 
+	(GapFilling): Derive from `_ChoiceBasedExercise'.
+	(Dictation._export_task): New method.
+
+	(TransformationTask.orig): New method.
+	(ClozeTask.text): New method.
+	
 2004-10-21  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: New styles added.
