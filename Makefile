@@ -4,11 +4,15 @@ remote_host = cesnet
 remote_dir = /var/www/hosts/eurochance.brailcom.org/share/lcg
 rsync_opts = -avC -e ssh --copy-unsafe-links --exclude "*~"
 
-LCG_TTS_COMMAND = echo "%(text)s" | festival_client --ttw 2>/dev/null | oggenc -q 2 --quiet - -o %(file)s
+LCG_TTS_COMMAND = festival_client --ttw 2>/dev/null
+LCG_OGG_COMMAND = oggenc -q 2 --quiet - -o -
+LCG_MP3_COMMAND = lame --quiet - -
 
 all:
 	rm -f $(dst)/*.html
 	export LCG_TTS_COMMAND='$(LCG_TTS_COMMAND)'
+	export LCG_OGG_COMMAND='$(LCG_OGG_COMMAND)'
+	export LCG_MP3_COMMAND='$(LCG_MP3_COMMAND)'
 	bin/generate.py $(src) $(dst)
 #	rm -f $(dst)/intermediate.zip
 #	(cd $(dst); zip -qr intermediate.zip .)
