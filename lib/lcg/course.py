@@ -34,6 +34,7 @@ derived classes.
 
 import os
 import sys
+import codecs
 
 from util import *
 from content import *
@@ -48,8 +49,15 @@ class ContentNode(object):
     built and ready for export.
     
     """
+
+    _TITLE = _("Node")
+    """The title is a string used to reference to the node from within the
+    generated content (eg. in Tables Of Contents etc.).  The derived
+    classes should define some more meaningful titles, such as 'Lesson',
+    'Module' etc."""
     
-    def __init__(self, parent, subdir, default_resource_dir='resources'):
+    def __init__(self, parent, subdir, language='en', input_encoding='ascii',
+                 default_resource_dir='resources'):
         """Initialize the instance.
 
         Arguments:
@@ -58,18 +66,28 @@ class ContentNode(object):
             this node in the content hierarchy.  Can be None for the top node.
           subdir -- a directory name relative to parent's source directory.  All
             input files are expected in this directory.
+          language -- content language as a lowercase ISO 639-1 Alpha-2
+            language code.
+          input_encoding -- The content read from source files is expected in
+            the specified encoding (ASCII by default).  The output encoding is
+            set by the used exporter class.
           default_resource_dir -- the LCG comes with a set of default resources
             (stylesheets, scripts and media files).  They are used if no custom
             files of the same name are present in the source directory.  This
             argument specifies the name of the directory, where LCG default
             resources are installed.
 
-
         """
         assert parent is None or isinstance(parent, ContentNode)
-        assert type(subdir) == type('')
+        assert isinstance(subdir, types.StringType)
+        assert isinstance(language, types.StringType)
+        assert isinstance(input_encoding, types.StringType)
+        assert isinstance(default_resource_dir, types.StringType)
+        codecs.lookup(input_encoding)
         self._parent = parent
         self._subdir = subdir
+        self._language = language
+        self._input_encoding = input_encoding
         self._default_resource_dir = default_resource_dir
         self._resources = {}
         self._counter = Counter(1)
@@ -115,7 +133,10 @@ class ContentNode(object):
     def _read_file(self, name):
         """Return all the text read from the source file."""
         filename = os.path.join(self.src_dir(), name+'.txt')
-        return ''.join(open(filename).readlines())
+        fh = codecs.open(filename, encoding=self._input_encoding)
+        content = ''.join(fh.readlines())
+        fh.close()
+        return content
 
     def _node_path(self):
         """Return the path from the root to this node as a sequence of nodes."""
@@ -197,17 +218,15 @@ class ContentNode(object):
         
     def title(self):
         """Return the title of this node as a string."""
-        if hasattr(self, '_title'):
-            return self._title
-        return self.__class__.__name__
+        return self._TITLE
 
     def full_title(self, separator=' - '):
         """Return the title of this node as a string."""
-        return separator.join(map(lambda n: n.title(), self._node_path()))
+        return separator.join([n.title() for n in self._node_path()])
 
-    def lang(self):
-        #TODO: pass from the script...
-        return 'cs'
+    def language(self):
+        """Return the content language as an ISO 639-1 Alpha-2 code."""
+        return self._language
 
     def meta(self):
         """Return the meta data as a dictionary.
@@ -293,6 +312,15 @@ class ContentNode(object):
         
         return self._default_resource_dir
 
+    def input_encoding(self):
+        """Return the name of encoding expected in source files.
+
+        The name is a string accepted by 'UnicodeType.encode()'.
+
+        """
+        
+        return self._input_encoding
+
     
 class TextNode(ContentNode):
     """A section of stuctured text read from a wiki-formatted file."""
@@ -325,9 +353,9 @@ class RootNode(InnerNode):
     
     """
     
-    def __init__(self, dir):
+    def __init__(self, dir, **kwargs):
         self._dir = dir
-        super(RootNode, self).__init__(None, '')
+        super(RootNode, self).__init__(None, '', **kwargs)
 
     def src_dir(self):
         return self._dir
@@ -455,13 +483,18 @@ class Media(Resource):
             raise "Environment variable %s not set!\n" % var + errmsg
 
     def _open_stream_from_tts(self):
-        text = self._tts_input or \
-                    ''.join(open(self._src_path).readlines())
+        if self._tts_input is not None:
+            text = self._tts_input
+        else:
+            fh = codecs.open(self._src_path,
+                             encoding=self._parent.input_encoding())
+            text = ''.join(fh.readlines())
+            fh.close()
         cmd = self._command('TTS', "Specify a TTS command synthesizing " + \
                             "the text on STDIN to a wave on STDOUT.")
         print "  - generating with TTS: %s" % cmd
         input, output = os.popen2(cmd, 'b')
-        input.write(text)
+        input.write(text.encode(self._parent.input_encoding()))
         input.close()
         return output
     
@@ -548,60 +581,73 @@ class Stylesheet(Resource):
 
 class Vocabulary(ContentNode):
     """A section comprising a list of vocabulary."""
+    _TITLE = _("Vocabulary")
 
     def _create_content(self):
-        return ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls').feed(self)
+        feeder = ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls',
+                                  encoding=self._input_encoding)
+        return feeder.feed(self)
         
     
 class Use(TextNode):
     """Key language use."""
-    _title = "Key Language Use"
+    _TITLE = _("Key Language Use")
     pass
 
 
 class Grammar(TextNode):
     """Key grammar explanation."""
-    _title = "Key Grammar"
+    _TITLE = _("Key Grammar")
     pass
 
 
 class Exercises(ContentNode):
     """A section consisting of a sequence of exercises."""
+    _TITLE = _("Exercises")
 
     def _create_content(self):
-        return ExerciseFeeder(self.src_dir(), 'exercises.txt').feed(self)
+        feeder = ExerciseFeeder(self.src_dir(), 'exercises.txt',
+                                encoding=self._input_encoding)
+        return feeder.feed(self)
 
 
 class Consolidation(TextNode):
     """A check list of competences achieved."""
+    _TITLE = _("Consolidation")
     pass
 
         
 class Unit(InnerNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
+    _TITLE = _("Unit")
     
     def _create_children(self):
-        subdir = { Exercises: 'exercises' }
-        return map(lambda s: s(self, subdir.get(s, '')),
-                   (Vocabulary, Use, Grammar, Exercises, Consolidation))
+        subdir = {Exercises: 'exercises'}
+        return [cls(self, subdir.get(cls, ''),
+                    language=self._language,
+                    input_encoding=self._input_encoding,
+                    default_resource_dir=self._default_resource_dir)
+                for cls in (Vocabulary, Use, Grammar, Exercises, Consolidation)]
 
     def _id(self):
         return 'unit%02d' % (self._parent.index(self)+1)
 
     def title(self):
         title = super(Unit, self).title()
-        return "Unit %d: %s" % (self._parent.index(self)+1, title)
+        return "%s %d: %s" % (self._TITLE, self._parent.index(self)+1, title)
 
     
 class EurochanceCourse(RootNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
     def _create_children(self):
-        return map(lambda d: Unit(self,d),
-                   filter(lambda d: d[0] in map(str, range(0, 9)),
-                          list_subdirs(self.src_dir())))
+        return [Unit(self, d, language=self._language,
+                     input_encoding=self._input_encoding,
+                     default_resource_dir=self._default_resource_dir)
+                for d in list_subdirs(self.src_dir())
+                if d[0] in map(str, range(0, 9))]
 
     def meta(self):
-        return {'author': 'Eurochance team',
-                'copyright': "Copyright (c) 2004 Brailcom, o.p.s."}
+        return {'author': 'Eurochance Team',
+                'copyright': "Copyright (c) 2004 Eurochance Team"}
 
