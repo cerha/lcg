@@ -1,12 +1,18 @@
-/* Default stylesheet for an LCG generated course */
-
 body { 
     background: white;
 }
 
-a:link    { color: #0060d0; text-decoration: none; }
-a:visited { color: #0060d0; text-decoration: none; }
-a:hover   { color: #ff6000; text-decoration: underline; }
+a:link, a:visited { color: #06d; text-decoration: none; }
+a:hover   { color: #f60; text-decoration: underline; }
+
+a.speaking-text:link, a.speaking-text:visited, a.speaking-text:hover { 
+    color: #04b;
+    //text-decoration: none;
+}
+
+hr.navigation { 
+    display: none; 
+}
 
 div.navigation { 
     border: solid #b8bcc0;
@@ -34,6 +40,25 @@ div.table-of-contents ul {
     margin-bottom: 3pt;
 }
 
+div.choices { 
+    margin-left: 1em;
+}
+
+form { 
+}
+
+input.answer-control { 
+    padding: 0;
+    font-weight: bold;
+}
+
+input.sound-control { 
+    background-color: #e95;
+    border: black solid 1px;
+    padding: 0;
+    font-weight: bold;
+}
+
 input.cloze { 
     border: solid gray 1px;
     margin: 1px;
@@ -45,6 +70,4 @@ input.cloze-result {
     border: none;
 }
 
-hr.navigation { 
-    display: none; 
-}
+
