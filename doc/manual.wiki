@@ -1,0 +1,169 @@
+= Learning Content Generator Manual =
+
+Tomas Cerha, 2004-05-19
+
+This document describes the formats of data used on the input side of the
+Learning Content Generator.  This data are then processed by the LCG.  The
+result is an IMS compatible content package that can be used with any IMS
+compliant Learning Management System.
+
+*Table of Contents:*
+
+@TOC@
+
+== Motivation == *
+
+The LCG makes it possible to generate the content package using any output
+format without changing the input data and thus makes the content and
+presentation two independent issues.
+
+To be able to process the input data with a computer program (the LCG) we must
+define the rules how this data are represented.  The computer program must be
+able to recognize the logical elements of the content to be able to put them
+together on its output, but on the other hand the content creators must not be
+forced to deal with the technical aspects more than necessary.
+
+
+== Basic Structure == *
+
+The basic concept is based on files arranged into directories (folders)
+according to the logical structure of the course (as defined
+[structure.wiki|here]).
+
+There is one /base directory/ for the whole course.  This directory contains
+one /subdirectory/ for each unit of the course.  Each of these subdirectories
+contains files and subdirectories defining the content of the sections within
+the unit.  The input format for each section is different, depending on the
+type of the concent used within the section.  Later sections of this document
+describe the format of each part individually.
+
+Now, let's get back to the structure of units.  The subdirectories can be named
+arbitrarily.  The only important thing is that the units will ordered according
+to the alphabetical order of the names of their directories.  Thus it is
+advisable to prefix the names by a number of the unit and then any name
+describing the focus of the lesson for better orientation.
+
+*An example of the recommended naming scheme of the subdirectories:*
+
+ 01-telephoning
+ 02-office-admin
+ 03-financial
+ 04-hotels
+ 05-tourism
+ ...
+
+== Text Sections == *
+
+According to the [structure.wiki|course structure], there are four types of
+sections comprising a structured text content.  For each of these sections, the
+LCG will expect one text file in the subdirectory of each unit.  The following
+table shows the name of the input file for each of the text sections.
+
+| Section          | File |
+| Introduction     | intro.txt |
+| Key language use | use.txt |
+| Key Grammar      | grammar.txt |
+| Consolidation    | consolidation.txt |
+
+The input text files use Wiki formatting.  This is a very simple and
+straightforward set of rules how to format the plain text to mark the logical
+structure of chapters, paragraphs, itemized lists etc.  A brief description
+follows.
+
+=== Paragraphs === *
+
+A paragraph is each continual set of rows of text.  Whenever you leave a blank
+line, you start a new paragraph.  The line-breaks within the paragraph are
+ignored, since the paragraph will be reformatted to fit into the output media.
+
+It is recommended to wrap the paragraphs not to exceed 80 characters in width.
+This means that no single character should be found beyond the 79th column.
+
+=== Itemized Lists === *
+
+Itemized lists are marked by an asterisk at the beginning of each item.  The
+indentation determines the level in the hierarchy.  First level items are
+indented by two spaces, second level by four etc.
+
+*Exapmple:*
+
+ This is a normal paragraph.  The itemized list follows.
+
+   * deer
+     * doe
+     * elk
+     * caribou
+   * fish
+     * salmon
+     * trout
+     * haddock
+   * birds
+     * swallow
+     * eagle
+
+
+Other formatting rules will be added to the manual when we realize thay are
+necessary...
+
+
+== Vocabulary == *
+
+Vocabulary is defined in one Excel (XLS) spreadsheet file for each unit.  The
+file contains one vocabulary item per row. 
+
+The first column contains the piece of vocabulary itself.  Second column may
+contain the notes, such as (v) for verb, Br/Am for British/American expression
+etc.  It is in the competence of content creators to establish a convention for
+writing the notes.
+
+The third and further columns contain the translations in the following order:
+
+* Czech
+* Slovak
+* German
+* Norwegian
+* Spanish
+
+The translations will be added gradually, so only first and second column is
+mandatory.
+
+
+== Exercises == *
+
+Exercises will often depend on external media files and other data, so all the
+definition is located in a subdirectory named ``=exercises=''.
+
+The main specification file is named ``=exercises.txt=''.  Thus the example of
+full path of an exercise specification file can be
+``=intermediate/03-financial/exercises/exercises.txt=''.
+
+
+
+
+
+== Sound Recordings == *
+
+All sounds should be recorded digitally in the WAVe format with CD quality.
+This means in particular:
+
+* Two channels (stereo)
+* Sampling frequency 44.1 kHz
+* 16 bits per sample.
+
+These source data will be converted into an applicable output format in
+reasonable quality by the technical group.
+
+Each logical piece should be recorded as a separate file except for vocabulary,
+since recording one very short file per one vocab item would be too difficult
+and time consuming.
+
+Vocabulary should be recorded into one file per unit.  There should be distinct
+pauses between individual vocabulary items (one or two seconds).  These
+recordings will be cut into pieces automatically.
+
+All other recordings should be recorded separately -- one file per logical
+unit.  For instance there will be one file for each listenning exercise etc.
+
+
+The data should be burned on a CD when ready and sent to the technical group,
+since it will be probably too large for transmission via the Internet.
