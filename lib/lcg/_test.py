@@ -54,10 +54,16 @@ class ContentNode(unittest.TestCase):
 tests.add(ContentNode)
 
 
-class ExerciseFeeder(unittest.TestCase):
-    def check_piece_of_text(self):
+#class ExerciseFeeder(unittest.TestCase):
+#    def check_it(self):
+#
+#tests.add(ExerciseFeeder)
+
+
+class SplittableText(unittest.TestCase):
+    def check_it(self):
         def check(matcher, lines):
-            piece = lcg.ExerciseFeeder._PieceOfText("\n".join(lines))
+            piece = lcg.SplittableText("\n".join(lines))
             for p in piece.split(matcher):
                 a = str(p).splitlines()[0] # first line of this part's text
                 b = lines[p.firstline()-1] # the line from the source sequence
@@ -71,7 +77,7 @@ class ExerciseFeeder(unittest.TestCase):
                "ehm"," ",
                "xxx","yyy", "\t"))
         
-tests.add(ExerciseFeeder)
+tests.add(SplittableText)
 
 
 def get_tests():
