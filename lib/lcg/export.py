@@ -87,11 +87,10 @@ class StaticExporter(Exporter):
     """Export the content as a set of static web pages."""
 
     _hotkey = {
-        'next': '3',
         'prev': '1',
-        'content-beginning': '0',
-        'global-index': '5',
-        'local-index': '4',
+        'next': '3',
+        'up': '2',
+        'index': '5',
         }
     
     def head(self, node):
@@ -105,27 +104,28 @@ class StaticExporter(Exporter):
              
     def body(self, node):
         nav = self._navigation(node)
-        parts = (nav, '<hr class="navigation">',
-                 '<a name="content" accesskey="%s"></a>' % 
-                 self._hotkey['content-beginning'],
+        parts = (#nav, '<hr class="navigation">',
                  '<h1>%s</h1>' % node.title(),
                  div(node.content().export(), 'content'),
                  '<hr class="navigation">', nav)
         return "\n".join(parts)
 
     def _link(self, node, label=None, key=None):
-        if node is None: return 'None' 
-        label = label or node.title(abbrev=True)
+        if node is None: return 'None'
+        if label is None: label = node.title(abbrev=True)
         return link(label, node.url(), title=node.title(),
                     hotkey=not key or self._hotkey[key])
     
     def _navigation(self, node):
         nav = [_('Next') + ': ' + self._link(node.next(), key='next'),
                _('Previous') + ': ' + self._link(node.prev(), key='prev')]
+        hidden = ''
         if node is not node.root_node():
             p = node.parent()
             if p is not node.root_node():
-                nav.append(_("Up") + ': ' + self._link(p, key='local-index'))
+                nav.append(_("Up") + ': ' + self._link(p, key='up'))
+            else:
+                hidden = "\n"+self._link(p, key='up', label='')
             nav.append(self._link(node.root_node(), label=_('Course Index'),
-                                  key='global-index'))
-        return div(' | '.join(nav), 'navigation')
+                                  key='index'))
+        return div(' |\n'.join(nav) + hidden, 'navigation')
