@@ -1,6 +1,85 @@
 2005-01-14  Tomas Cerha  <cerha@brailcom.org>
 
-	* lcg/_html.py (h): New function.
+	* lcg/course.py (ContentNode._TOC_TITLE): Constant removed.
+	(ContentNode._ABBREV_TITLE): New constant.
+	(ContentNode.__init__): When `self._create_content()' returns a
+	sequence, wrap it into a `Container'.
+	(ContentNode._create_content): Docstrint updated.
+	(ContentNode._id): Docstrint updated.
+	(ContentNode._title): New method.
+	(ContentNode._abbrev_title): New method.
+	(ContentNode.sections): New method.
+	(ContentNode.url): New method.
+	(ContentNode.subdir): Docstrint updated.
+	(ContentNode.title): New keyword arguemnt `abbrev'.  Reimplemented
+	using the new methods `_title()' and `_abbrev_title()'.
+	(ContentNode.toc_title): Method removed.
+	(ContentNode.full_title): Docstrint updated.
+	(ContentNode.has_index): Method removed.
+	(InnerNode._create_content): Add a `TableOfContents' after the
+	intro text.
+	(InnerNode.title): Removed.
+	(InnerNode._title): New method.
+	(RootNode.has_index): Removed.
+	(Vocabulary): Class removed.
+	(Grammar): Class removed.
+	(_ExerciseNode): New class.
+	(VocabularyPractice): Derive from `_ExerciseNode'.
+	(VocabularyPractice._create_content): Create just one exercise.
+	(ExerciseNode): Derive from `_ExerciseNode'.
+	(GeneralComprehension): New class.
+	(ListeningComprehension._TITLE): Changed.
+	(Summary): Class removed.
+	(Unit): Derive from `ContentNode', not `InnerNode'.
+	(Unit._TOC_TITLE, Unit._TITLE): New constants.
+	(Unit._create_content): Completely reimplemented -- create
+	everything except for exercises as inline section.
+	(Unit._create_children): Create only the `ExerciseNode' sections.
+	(Unit.title): Removed.
+	(Unit._abbrev_title): New mothod.
+	(Unit._title): New mothod.
+	(ExerciseInstructions.title): New keyword arguemnt `abbrev'.
+	(ExerciseInstructions.src_dir): New method.
+	(CourseIndex): New class.
+	(Instructions._create_content): New method.
+	(EurochanceCourse.has_index): Removed.
+	(EurochanceCourse._create_children): Create also the `CourseIndex'.
+
+	* lcg/ims.py (_Manifest._create_item): Use `ContentNode.url()'
+	instead of `ContentNode.output_file()'.
+	
+
+	* lcg/export.py (StaticExporter._wrap_content): Use list
+	comprehension.  Use `ContentNode.url()' instead of
+	`ContentNode.output_file()'.
+	(StaticExporter._link): Use `ContentNode.url()' instead of
+	`ContentNode.output_file()'.
+
+	* lcg/content.py (Content.sections): New method.
+	(Content.parent): New method.
+	(Section, SubSection, SubSubSection, TableOfContents)
+	(Container.__init__): New arguments `toc_depth' and `toc_local'.
+	Prepend a `TableOfContents' to the parts when there is more than
+	one `Section' contained.
+	(Container.sections): New method.
+	(Exercise): Derive from `Section'.
+	(Exercise._RECORDING_REQUIRED): New constant.
+	(Exercise.__init__): Honour the two changes above.
+	(Exercise._header): Removed.
+	(Exercise._results): New method.
+	(_Cloze): New class.
+	(Cloze): Derive from it.  All methods except for `_instructions()'
+	moved to `_Cloze.
+	(TrueFalseStatements._instructions)
+	(MultipleChoiceQuestions._instructions, Selections._instructions)
+	(GapFilling._instructions, VocabExercise._instructions)
+	(VocabExercise2._instructions, Transformation._instructions):
+	Instructions simplified and wrapped by gettext.
+	(Dictation, Transformation, VocabExercise): Derive from `_Cloze',
+	not `Cloze'.
+	(SentenceCompletion): Derive from `Exercise' not `Cloze'..
+
+	* lcg/_html.py (h, b): New functions.
 
 2005-01-13  Tomas Cerha  <cerha@brailcom.org>
 
