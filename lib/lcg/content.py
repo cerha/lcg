@@ -176,13 +176,54 @@ class ListItem(Container):
     
 class ItemizedList(Container):
     """An itemized list (sequence of `ListItem' instances)."""
+
+    TYPE_UNORDERED = 'UNORDERED'
+    TYPE_ALPHA = 'ALPHA'
+    TYPE_NUMERIC = 'NUMERIC'
     
-    def __init__(self, parent, content):
+    def __init__(self, parent, content, type=TYPE_UNORDERED):
         assert is_sequence_of(content, ListItem)
+        assert type in (self.TYPE_UNORDERED,
+                        self.TYPE_ALPHA,
+                        self.TYPE_NUMERIC)
+        self._type = type
         super(ItemizedList, self).__init__(parent, content)
+        
 
     def export(self):
-        return "<ul>"+ super(ItemizedList, self).export() +"</ul>\n"
+        mapping = {self.TYPE_UNORDERED: ('ul', ''),
+                   self.TYPE_NUMERIC: ('ol', ''),
+                   self.TYPE_ALPHA: ('ol',
+                                     ' style="list-style-type: lower-alpha"')}
+        tag, attr = mapping[self._type]
+        return "<%s%s>%s</%s>\n" % \
+               (tag, attr, super(ItemizedList, self).export(), tag)
+
+class TableCell(Container):
+    """One cell in a table."""
+
+    def export(self):
+        return "<td>%s</td>" % super(TableCell, self).export()
+    
+class TableRow(Container):
+    """One row in a table."""
+
+    def __init__(self, parent, content):
+        assert is_sequence_of(content, TableCell)
+        super(TableRow, self).__init__(parent, content)
+        
+    def export(self):
+        return "<tr>%s</tr>\n" % super(TableRow, self).export()
+    
+class Table(Container):
+    """One row in a table."""
+
+    def __init__(self, parent, content):
+        assert is_sequence_of(content, TableRow)
+        super(Table, self).__init__(parent, content)
+        
+    def export(self):
+        return '<table class="">%s</table>\n' % super(Table, self).export()
     
     
 class SectionContainer(Container):
@@ -207,8 +248,9 @@ class SectionContainer(Container):
 
         """
         super(SectionContainer, self).__init__(parent, content)
-        self._sections = [p for p in self._content if isinstance(p, Section)]
-        if len(self._sections) > 1 and toc_depth > 0:
+        self._sections = [s for s in self._content if isinstance(s, Section)]
+        toc_sections = [s for s in self._sections if s.in_toc()]
+        if len(toc_sections) > 0 and toc_depth > 0:
             self._toc = TableOfContents(parent, self, title=_("Index:"),
                                         depth=toc_depth)
         else:
@@ -236,7 +278,7 @@ class Section(SectionContainer):
         container.
     
     """
-    def __init__(self, parent, title, content, toc_depth=0):
+    def __init__(self, parent, title, content, toc_depth=0, in_toc=True):
         """Initialize the instance.
 
         Arguments:
@@ -249,9 +291,11 @@ class Section(SectionContainer):
             appear in the output.
             
         """
-        self._title = title
-        super(Section, self).__init__(parent, content, toc_depth=toc_depth)
         assert isinstance(title, types.StringTypes)
+        assert isinstance(in_toc, types.BooleanType)
+        self._title = title
+        self._in_toc = in_toc
+        super(Section, self).__init__(parent, content, toc_depth=toc_depth)
 
     def _section_path(self):
         return [c for c in self._container_path() if isinstance(c, Section)]
@@ -267,6 +311,10 @@ class Section(SectionContainer):
             title = title % self.section_number()
         return title
 
+    def in_toc(self):
+        """Return True if the section is supposed to appear in TOC."""
+        return self._in_toc
+    
     def anchor(self):
         """Return the anchor name for this section."""
         return 'sec-' + '-'.join([str(c.section_number())
@@ -331,7 +379,7 @@ class TableOfContents(Content):
         if isinstance(item, ContentNode):
             items = item.children()
         if len(items) == 0 and self._detailed:
-            items = item.sections()
+            items = [s for s in item.sections() if s.in_toc()]
         if len(items) == 0:
             return ''
         links = [link(i.title(), i.url()) + \
@@ -583,7 +631,8 @@ class Exercise(Section):
             
         """
         title = "%s %%d: %s" % (_("Exercise"), self._NAME)
-        super(Exercise, self).__init__(parent, title, Content(parent))
+        super(Exercise, self).__init__(parent, title, Content(parent),
+                                       in_toc=False)
         self.__class__._USED = True
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
