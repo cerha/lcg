@@ -114,19 +114,28 @@ file contains one vocabulary item per row.
 The first column contains the piece of vocabulary itself.  Second column may
 contain the notes, such as (v) for verb, Br/Am for British/American expression
 etc.  It is in the competence of content creators to establish a convention for
-writing the notes.
+writing the notes.  
 
-The third and further columns contain the translations in the following order:
+The third and further columns contain the translations.  The third column is
+German in an English course and English in a German course.  The remaining
+columns are ordered alphabeticaly by the ISO language code.
 
-* Czech
-* Slovak
-* German
-* Norwegian
-* Spanish
+The final order of columns is following:
+
+* The original word (English/German)
+* Notes
+* German/English translation
+* Czech translation
+* Spanish translation
+* Norwegian translation
+* Slovak translation
 
 The translations will be added gradually, so only first and second column is
 mandatory.
 
+Column headings are not mandatory, but when used, the first column must begin
+with a '#' character to inform the parser, that this row does not contain real
+vocabulady data.
 
 == Exercises == *
 
@@ -376,6 +385,9 @@ the transformation and avoids unnecessary typing and risking typos.
  Mr Hill said: "I don't grow bananas."
  Mr Hill said he [didn't] grow bananas.
 
+When the whole sentence should be filled (the first example), you can omit the
+square brackets.  The whole second line will be automatically considered a
+fill-in text.
 
 ==== Dictation ==== Dictation
 
