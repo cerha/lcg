@@ -66,8 +66,16 @@ input.cloze {
     padding: 1px;
 }
 
-input.cloze-result { 
-    border: none;
+
+p.results { 
+    background: #eee;
+    padding: 2pt;
+    border: #ccc solid 1px;
 }
 
+input.result { 
+    border: none;
+    font-size: 1em;
+    background: #e8e8e8;
+}
 
