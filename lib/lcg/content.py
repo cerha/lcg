@@ -461,10 +461,10 @@ class _ChoiceBasedExercise(Exercise):
         self._parent.script('audio.js')
         if correct: 
             media = self._parent.media('correct-response.ogg', shared=True,
-                                       tts_input='correct')
+                                       tts_input=_('Correct'))
         else:
             media = self._parent.media('incorrect-response.ogg', shared=True,
-                                       tts_input='you are wrong!')
+                                       tts_input=_('You are wrong!'))
         handler = "eval_choice(%s, %d, %d, %d, '%s')" % \
                   (self._form(), self._tasks.index(task), len(self._tasks),
                    correct and 1 or 0, media.url())
