@@ -85,6 +85,14 @@ class Exporter(object):
 class StaticExporter(Exporter):
     """Export the content as a set of static web pages."""
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
+
+    _hotkey = {
+        'next': 'n',
+        'prev': 'p',
+        'content-beginning': 'b',
+        'global-index': 'h',
+        'local-index': 'i',
+        }
     
     def __init__(self, course, dir, stylesheet=None):
         """Initialize the exporter for a given 'Course'."""
@@ -101,39 +109,54 @@ class StaticExporter(Exporter):
                           '<html>',
                           '<head>',
                           '  <title>%s</title>' % node.full_title(),
-                          style + self._meta(node),
+                          style + \
+                          self._meta(node),
+                          self._links(node),
                           '</head>',
                           '<body>',
                           nav, '<hr class="navigation">',
+                          '<a name="content" accesskey="%s"></a>' % \
+                          self._hotkey['content-beginning'],
                           '<h1>%s</h1>' % node.title(),
                           self._div('content', node.content().export()),
                           self._toc(node),
                           '<hr class="navigation">', nav,
                           '</body></html>'))
 
+    def _div(self, cls, *contents):
+        return '\n'.join(('<div class="%s">' % cls,) + contents + ('</div>\n',))
+
+    def _link(self, node, label=None, title='', key=None):
+        if node is None: return 'None' 
+        label = label or node.title()
+        hotkey = not key or self._hotkey[key]
+        return '<a href="%s" title="%s" accesskey="%s">%s</a>' % \
+               (node.output_file(), title, hotkey, label)
+    
     def _meta(self, node):
         meta = node.root_node().meta()
         return '\n'.join(map(lambda k:
                              '  <meta name="%s" content="%s">' % (k, meta[k]),
                              meta.keys()))
 
-    def _div(self, cls, *contents):
-        return '\n'.join(('<div class="%s">' % cls,) + contents + ('</div>\n',))
+    def _links(self, node):
+        return '\n'.join(map(lambda a:
+                             '  <link rel="%s" href="%s" title="%s">' % \
+                             (a[0], a[1].output_file(), a[1].title()),
+                             filter(lambda a: a[1] is not None,
+                                    (('prev', node.prev()),
+                                     ('next', node.next())))))
 
-    def _link(self, node, label=None, title=''):
-        if node is None: return 'None' 
-        label = label or node.title()
-        return '<a href="%s" title="%s">%s</a>' % \
-               (node.output_file(), title, label)
-    
     def _navigation(self, node):
-        nav = ['Next: ' + self._link(node.next()),
-               'Previous: ' + self._link(node.prev())]
+        nav = ['Next: ' + self._link(node.next(), key='next'),
+               'Previous: ' + self._link(node.prev(), key='prev')]
         if node is not node.root_node():
             p = node.parent()
             if p is not node.root_node():
-                nav.append(p.__class__.__name__ + ' Index: ' + self._link(p))
-            nav.append(self._link(node.root_node(), label='Course Index'))
+                nav.append(p.__class__.__name__ + ' Index: ' + \
+                           self._link(p, key='local-index'))
+            nav.append(self._link(node.root_node(), label='Course Index',
+                                  key='global-index'))
         return self._div('navigation', ' | '.join(nav))
 
     def _toc(self, node):
