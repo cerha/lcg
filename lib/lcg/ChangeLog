@@ -1,3 +1,17 @@
+2004-05-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* _test.py (ContentNode.check_misc): Check also the methods
+	`counter()', `id()' and `children()'.
+
+	* course.py (ContentNode._create_content) 
+	(ContentNode._create_children): More documentation added.
+	(ContentNode._register_child): New method.
+	(ContentNode.__init__): Use it.
+	(Course): Docstring improved.
+	(ContentNode._create_children): Docstring improved.
+	(ContentNode._create_content): Docstring improved.
+	(ContentNode): Docstring improved.
+
 2004-05-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* _test.py (Module): Import `lcg' and `os', not `lesson'.
