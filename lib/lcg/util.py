@@ -1,5 +1,7 @@
 # -*- coding: iso8859-2 -*-
 #
+# Author: Tomas Cerha <cerha@brailcom.org>
+#
 # Copyright (C) 2004, 2005 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -134,8 +136,8 @@ class Record(object):
                                  (self.__class__.__name__, attr))
                 
     
-def list_subdirs(dir):
-    """Return the list of subdirectories found in dir.
+def list_dir(dir):
+    """Return the list of all items found in a directory.
 
     If the directory contains the file 'index.txt' the list is read from there.
     Otherwise all subdirectories in the directory are returned in alphabetical
@@ -146,14 +148,16 @@ def list_subdirs(dir):
     
     """
     try:
-        index = open(os.path.join(dir, 'index.txt')).readlines()
-        items = filter(len, map(string.strip, index))
+        return [item.strip()
+                for item in open(os.path.join(dir, 'index.txt')).readlines()
+                if item.strip() != '']
     except:
-        items = filter(lambda d: os.path.isdir(os.path.join(dir, d)) and \
-                       d[0] != '_' and d != 'CVS', os.listdir(dir))
+        items = [item for item in os.listdir(dir)
+                 if not item.startswith('_') and item != 'CVS']
         items.sort()
-    return items
+        return items
 
+                    
 def is_sequence_of(seq, cls):
     """Return true if 'seq' is a sequence of instances of 'cls'."""
     if not operator.isSequenceType(seq):
@@ -163,6 +167,7 @@ def is_sequence_of(seq, cls):
             return False
     return True
 
+
 def copy_stream(input, output):
     """Copy data from the 'input' stream to the 'output' stream."""
     while True:
@@ -171,6 +176,7 @@ def copy_stream(input, output):
             break
         output.write(data)
 
+        
 _CAMEL_CASE_WORD = re.compile(r'[A-Z][a-z\d]+')
         
 def camel_case_to_lower(string, separator='-'):
