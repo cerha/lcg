@@ -1,3 +1,42 @@
+2005-03-08  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (WikiText.export): Use `wiki.Formatter', not
+	`wiki.InlineFormatter'.
+	(VocabList.export): Put the translation into a `span' with the
+	`lang' attributte set.  Set the table class to `vocab-list'.
+	(VocabItem.__init__): New arguments `is_phrase' and
+	`translation_language'.
+	(VocabItem.word, VocabItem.translation): Methods removed.
+	(VocabSection): New class.
+
+	* lcg/feed.py (FileFeeder.__init__): Don't pass `*args', just `**kwargs'.
+	(SplittableTextFeeder._pieces): Method removed.
+	(SplittableTextFeeder._process_pieces): New method.
+	(ExcelVocabFeeder): Class removed.
+	(VocabFeeder): New class.
+	(ExerciseFeeder.feed): Use `self._process_pieces()'.
+	(ExerciseFeeder._exercise): Don't handle exceptions here.
+
+	* lcg/wiki.py (InlineFormatter): Renamed to `Formatter'.
+	(Formatter._FORMAT): Added format for `citation'.
+	(Formatter._formatter): Try the method first and use the `_FORMAT'
+	as a falback.
+	(Formatter._citation_formatter): Method removed.
+
+	* lcg/course.py (ContentNode.__init__): Improved assertion.
+	(ContentNode._input_file): New argument `lang'.
+	(ContentNode._read_file): New argument `lang'.  Pass it to
+	`_input_file()'.
+	(ContentNode._parse_wiki_file): New moethod.
+	(TextNode._create_content): Use `_parse_wiki_file()'.
+	(InnerNode._create_content): Use `_parse_wiki_file()'.
+	(Unit, Instructions, _Index, CourseIndex, GrammarIndex._TITLE)
+	(VocabIndex._TITLE, EurochanceCourse): Classes moved to
+	`eurochance.py'.
+
+	* lcg/eurochance.py: New module.  This module isolates the classes
+	specific for the Eurochance course (taken from `course.py').
+
 2005-03-05  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: Added styles for `lcg-table' class.
