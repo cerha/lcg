@@ -1,3 +1,52 @@
+2005-03-17  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/exercises.js (Handler.init): Instead of
+	`this._answered' initialize two independent arrays `this._results'
+	and `this._first_attempt'.
+	(Handler._eval_answer): Replaced by `Handler._eval_answers()'.
+	Remember the first attempts separately from current results.
+	(Handler.eval_answer): Use `Handler._eval_answers()' instead of
+	`Handler._eval_answer()' and `Handler.display_results()'
+	(Handler.set_answer, Handler.get_answer): New methods.
+	(Handler.evaluate): New method.
+	(Handler.correct, Handler.incorrect): Use `this._results' instead
+	of `this._answers'.
+	(Handler.first_attempt_correct, Handler.first_attempt_percentage):
+	New methods.
+	(Handler.display_results): Display the current results as well as
+	the first attempt results.
+	(Handler.fill): Use `this.set_answer()' instead of
+	`this.set_field()'.  Call `this._eval_answers()' at the end.
+	(Handler.reset): Instead of `this._answered' initialize two
+	independent arrays `this._results' and `this._first_attempt'.
+	(ChoiceBasedExerciseHandler.set_answer)
+	(ChoiceBasedExerciseHandler.get_answer): New mothods.
+	(ChoiceBasedExerciseHandler.set_field): Removed.
+	(SelectBasedExerciseHandler): Derive directly from `Handler', not
+	`ChoiceBasedExerciseHandler'.
+	(SelectBasedExerciseHandler._init_field): New method.
+	(SelectBasedExerciseHandler.set_answer): New method.
+	(FillInExerciseHandler.evaluate): Method moved to `Handler'.
+	(DictationHandler._eval_answer): Method removed.
+
+	* lcg/wiki.py (Formatter._link_formatter): Try to find a node
+	by an id and use it's title and url instead of the id.
+
+	* lcg/eurochance.py (Unit._id): Method removed.
+
+	* lcg/course.py (ContentNode._id): Don't add a number to the id.
+	(ContentNode.find_node): New method.
+	(ContentNode.id): Add an index number to the id if it is not unique.
+
+	* lcg/content.py: 
+	(_InteractiveExercise._MESSAGES): A message added.
+	(_InteractiveExercise._DISPLAYS): Help texts improved.
+	(_ChoiceBasedExercise._HELP): Text improved.
+	(Selections._HELP): Text improved.
+	(_FillInExercise._BUTTONS): Help texts improved.
+	(_FillInExercise._KEYS): Help texts improved.
+	(Dictation._MESSAGES): Marge also the super-class messages.
+
 2005-03-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/scripts/exercises.js (DictationHandler._eval_field):
