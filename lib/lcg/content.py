@@ -246,13 +246,10 @@ class Selection(Task):
     def _choice_controls(self):
         return map(lambda c: self._format_choice(c), self._choices)
 
-    def _export_choices(self):
-        choices = '<br>\n'.join(self._choice_controls())
-        return '<div class="choices">\n'+choices+'\n</div>\n'
-        
     def export(self):
-        return self._export_choices()
 
+        return '<div class="choices">\n<p>\n%s\n</p>\n</div>\n' % \
+    '<br>\n'.join(self._choice_controls())
 
 class MultipleChoiceQuestion(Selection):
     """Answer a question by selecting from a list of predefined choices."""
@@ -273,7 +270,8 @@ class MultipleChoiceQuestion(Selection):
         self._question = unicode(question)
 
     def export(self):
-        return "<p>%s\n%s</p>" % (self._question, self._export_choices())
+        return '<p>%s\n<div class="choices">\n%s\n</div></p>\n' % \
+               (self._question, '<br>\n'.join(self._choice_controls()))
 
         
 class TrueFalseStatement(MultipleChoiceQuestion):
@@ -299,8 +297,9 @@ class TrueFalseStatement(MultipleChoiceQuestion):
         return self._answer_control(choice.answer(),
                                     self._response[choice.correct()])
     
-    def _export_choices(self):
-        return "\n".join(self._choice_controls())
+    def export(self):
+        return "<p>%s\n%s</p>\n" % (self._question,
+                                    "\n".join(self._choice_controls()))
 
 
 class GapFillStatement(MultipleChoiceQuestion):
