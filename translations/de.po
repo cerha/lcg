@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-23 14:29+0100\n"
+"POT-Creation-Date: 2005-03-23 15:12+0100\n"
 "PO-Revision-Date: 2004-12-08 19:25+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -14,77 +14,94 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+# The table of contents...
 #: ../lcg/content.py:274
 msgid "Index:"
 msgstr "Verzeichnis:"
 
+# The first part of vocabulary listing (the seconf is phrases).
 #: ../lcg/content.py:535
 msgid "Terms"
 msgstr ""
 
+# The second part of vocabulary listing.
 #: ../lcg/content.py:537
 msgid "Phrases"
 msgstr ""
 
+# The answer for the True/False exercise.
 #: ../lcg/content.py:644
 msgid "TRUE"
 msgstr "RICHTIG"
 
+# The answer for the True/False exercise.
 #: ../lcg/content.py:644
 msgid "FALSE"
 msgstr "FALSCH"
 
+# Exercise title (first part).
 #: ../lcg/content.py:739
-#, fuzzy, python-format
 msgid "Exercise %d"
-msgstr "Übung"
+msgstr "Übung %d"
 
+# The title of a section in the exercise instructions.
 #: ../lcg/content.py:795
 msgid "Shortcut Keys"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:796
 msgid ""
 "In all the exercises where you fill in the text into a text-box you can use "
 "the two shortcut keys described below."
 msgstr ""
 
+# The title of a section in the exercise instructions.
 #: ../lcg/content.py:800
 msgid "Display"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:801
 msgid "The display box below the exercise shows the following values:"
 msgstr ""
 
+# The title of a section in the exercise instructions.
 #: ../lcg/content.py:804
 msgid "Buttons"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:805
 msgid "The control panel below the exercise contains the following buttons:"
 msgstr ""
 
+# The title of a section in the exercise instructions.
 #: ../lcg/content.py:810
 msgid "Instructions"
 msgstr ""
 
+# The link after the recording controls.
 #: ../lcg/content.py:829
 msgid "show transcript"
 msgstr ""
 
+# Recording controls.
 #: ../lcg/content.py:834 ../lcg/content.py:836
 msgid "Play"
 msgstr "Wiedergabe"
 
+# Recording controls.
 #: ../lcg/content.py:835
 msgid "Stop"
 msgstr "Stop"
 
+# A link within the exercise header.
 #: ../lcg/content.py:854
 msgid "detailed instructions"
 msgstr ""
 
+# Recording controls.
 #: ../lcg/content.py:863
 msgid "Recording"
 msgstr "Aufnahme"
@@ -93,6 +110,7 @@ msgstr "Aufnahme"
 msgid "This exercise can be also done purely aurally/orally"
 msgstr ""
 
+# Exercise type title.
 #: ../lcg/content.py:883
 msgid "Sentence Completion"
 msgstr "Satzergänzung"
@@ -125,27 +143,32 @@ msgstr ""
 msgid "The exercise"
 msgstr "Übung"
 
+# TTS version
 #: ../lcg/content.py:917
-#, fuzzy
 msgid "Correct!"
-msgstr "Richtig"
+msgstr "Richtig!"
 
+# TTS version
 #: ../lcg/content.py:918
 msgid "Perfect!"
 msgstr ""
 
+# TTS version
 #: ../lcg/content.py:919
 msgid "Well done!"
 msgstr ""
 
+# TTS version
 #: ../lcg/content.py:920
 msgid "You are wrong!"
 msgstr "Das ist falsch!"
 
+# TTS version
 #: ../lcg/content.py:921
 msgid "Oh no, I'm sorry."
 msgstr ""
 
+# TTS version
 #: ../lcg/content.py:922
 msgid "Try again!"
 msgstr ""
@@ -154,10 +177,12 @@ msgstr ""
 msgid ", $x ($y%) on first attempt"
 msgstr ""
 
+# The label for the display field with exercise results.
 #: ../lcg/content.py:927
 msgid "Answered:"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:928
 msgid ""
 "Displays the number of the tasks you have already\n"
@@ -166,11 +191,12 @@ msgid ""
 "                    answered four out of ten questions."
 msgstr ""
 
+# The label for the display field with exercise results.
 #: ../lcg/content.py:931
-#, fuzzy
 msgid "Correct:"
-msgstr "Richtig"
+msgstr "Richtig:"
 
+# Exercise instructions.
 #: ../lcg/content.py:932
 msgid ""
 "Displays the number and percentage of successful\n"
@@ -200,6 +226,7 @@ msgstr ""
 msgid "Reset all your answers and start again."
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:998
 msgid ""
 "You will hear a response immediately after choosing the\n"
@@ -214,6 +241,7 @@ msgstr ""
 msgid "Multiple Choice Questions"
 msgstr "Auswahlfragebogen"
 
+# Exercise instructions.
 #: ../lcg/content.py:1040
 msgid ""
 "Each question in this exercise is followed by a list of\n"
@@ -222,8 +250,8 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1046
-#, python-format
 msgid ""
 "For each of the %d questions below choose the correct\n"
 "        answer from the list."
@@ -233,6 +261,7 @@ msgstr ""
 msgid "Select the Correct One"
 msgstr "Wählen Sie das Richtige aus"
 
+# Exercise instructions.
 #: ../lcg/content.py:1056
 msgid ""
 "There are several pairs of simmillar sentences, however one\n"
@@ -243,6 +272,7 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1063
 #, python-format
 msgid ""
@@ -254,6 +284,7 @@ msgstr ""
 msgid "True/False Statements"
 msgstr "Richtig/Falsch Aussagen"
 
+# Exercise instructions.
 #: ../lcg/content.py:1086
 msgid ""
 "Each sentence in this exercise is followed by a control with\n"
@@ -263,6 +294,7 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1093
 #, python-format
 msgid ""
@@ -274,6 +306,7 @@ msgstr ""
 msgid "Gap Filling"
 msgstr "Lückentext"
 
+# Exercise instructions.
 #: ../lcg/content.py:1104
 msgid ""
 "Your goal is to choose the correct word to fill in a gap in a\n"
@@ -283,6 +316,7 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1111
 #, python-format
 msgid ""
@@ -290,22 +324,27 @@ msgid ""
 "        from the list to fill in the gap."
 msgstr ""
 
+# TTS version
 #: ../lcg/content.py:1132
 msgid "Everything correct!"
 msgstr ""
 
+# TTS version
 #: ../lcg/content.py:1133
 msgid "All the answers are wrong!"
 msgstr ""
 
+# TTS version
 #: ../lcg/content.py:1134
 msgid "Some of the answers are wrong!"
 msgstr ""
 
+# Button label
 #: ../lcg/content.py:1139
 msgid "Evaluate"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1140
 msgid ""
 "Evaluate the entire exercise.  If an error is found, the\n"
@@ -315,10 +354,12 @@ msgid ""
 "                 of the answer is correct)."
 msgstr ""
 
+# Keyboard shortcut
 #: ../lcg/content.py:1146
 msgid "Enter"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1147
 msgid ""
 "Use this key within the text-field to evaluate the current\n"
@@ -329,10 +370,12 @@ msgid ""
 "              within the text."
 msgstr ""
 
+# Keyboard shortcut
 #: ../lcg/content.py:1151
 msgid "Ctrl-Space"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1153
 msgid ""
 "If you don't know the answer, you can also use the ``hint''\n"
@@ -353,6 +396,7 @@ msgid ""
 "              ``hint'' again, until you find the correct answer."
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1164
 msgid ""
 "Use the buttons at the bottom of the exercise to evaluate all\n"
@@ -364,6 +408,7 @@ msgstr ""
 msgid "Cloze"
 msgstr "Lückentext"
 
+# Exercise instructions.
 #: ../lcg/content.py:1184
 msgid ""
 "Your goal in this exercise is to fill in the gaps in the text\n"
@@ -372,23 +417,26 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1195
 msgid ""
 "Listen to the recording carefully and then fill in the\n"
 "            gaps in the text below using the same words."
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1198
 msgid ""
 "Fill in the gaps in the text below.  There is just one\n"
 "            correct word for each gap."
 msgstr ""
 
-#: ../lcg/content.py:1205 ../lcg/eurochance.py:70
-#, fuzzy
-msgid "Vocabulary Practice"
-msgstr "Vokabeln"
+# Exercise type name
+#: ../lcg/content.py:1205
+msgid "Vocabulary Practice Exercise"
+msgstr "Vokabelübung"
 
+# Exercise instructions.
 #: ../lcg/content.py:1207
 msgid ""
 "There are two ways how you can do the exercise: The oral form\n"
@@ -409,16 +457,19 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1221
 msgid ""
 "You will hear a word or expression in your language.  Say\n"
 "        it in English and listen to the model pronunciation."
 msgstr ""
 
+# Exercise type name
 #: ../lcg/content.py:1232
 msgid "Transformation"
 msgstr "Übersetzung"
 
+# Exercise instructions.
 #: ../lcg/content.py:1234
 msgid ""
 "Your goal is to transform a structure (pattern or paradigm)\n"
@@ -429,6 +480,7 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1241
 #, python-format
 msgid ""
@@ -436,10 +488,12 @@ msgid ""
 "        sentences below according to the instructions."
 msgstr ""
 
+# Exercise type name
 #: ../lcg/content.py:1251
 msgid "Substitution"
 msgstr ""
 
+# Exercise type name
 #: ../lcg/content.py:1253
 msgid ""
 "Your goal is to substitute a structure (pattern or paradigm)\n"
@@ -450,28 +504,34 @@ msgid ""
 "    "
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1260
 msgid ""
 "Substitute a part of each sentence using the text in\n"
 "        brackets."
 msgstr ""
 
+# Exercise type name
 #: ../lcg/content.py:1267
 msgid "Dictation"
 msgstr ""
 
+# Dictation evaluation result
 #: ../lcg/content.py:1271
 msgid "Correct"
 msgstr "Richtig"
 
+# Dictation evaluation result
 #: ../lcg/content.py:1272
 msgid "Error(s) found"
 msgstr ""
 
+# Label for the display of dictation results
 #: ../lcg/content.py:1275
 msgid "Result:"
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1276
 msgid ""
 "Displays the result of the last evaluation (evaluate\n"
@@ -479,6 +539,7 @@ msgid ""
 "                  ``Evaluate'' button below the exercise)."
 msgstr ""
 
+# Exercise instructions.
 #: ../lcg/content.py:1280
 msgid ""
 "Listen to the recording and type what you hear into the large\n"
@@ -497,88 +558,107 @@ msgid ""
 "    each sentence.  No space is allowed at after the last sentence."
 msgstr ""
 
+# Don't translate
 #: ../lcg/course.py:54
 msgid "Node"
 msgstr ""
 
 #: ../lcg/eurochance.py:39
-#, python-format
 msgid "Unit %d"
 msgstr "Lektion %d"
 
+# Section title
+#: ../lcg/eurochance.py:70
+msgid "Vocabulary Practice"
+msgstr "Vokabelübungen"
+
+# Section title
 #: ../lcg/eurochance.py:71
 msgid "Listening Comprehension"
-msgstr ""
+msgstr "Hörverständnis"
 
+# Section title
 #: ../lcg/eurochance.py:72
 msgid "General Comprehension"
-msgstr ""
+msgstr "Generelles Verständnis"
 
+# Section title
 #: ../lcg/eurochance.py:73
 msgid "Grammar Practice"
-msgstr ""
+msgstr "Grammatikübungen"
 
+# Section title
 #: ../lcg/eurochance.py:74
 msgid "Consolidation"
-msgstr ""
+msgstr "Festigung"
 
+# Section title
 #: ../lcg/eurochance.py:76
-#, python-format
 msgid "Section %d"
-msgstr ""
+msgstr "Abschnitt %d"
 
+# Section title
 #: ../lcg/eurochance.py:83
 msgid "Aims and Objectives"
 msgstr ""
 
+# Section title
 #: ../lcg/eurochance.py:85
 msgid "Vocabulary"
 msgstr "Vokabeln"
 
+# Section title
 #: ../lcg/eurochance.py:86
 msgid "Grammar"
-msgstr "Wichtigsten grammatikalischen Formen"
+msgstr "Grammatik"
 
+# Section title
 #: ../lcg/eurochance.py:88
 msgid "Exercises"
 msgstr "Übungen"
 
+# Section title
 #: ../lcg/eurochance.py:90
 msgid "Checklist"
-msgstr ""
+msgstr "Checkliste"
 
+# Page title
 #: ../lcg/eurochance.py:98
 msgid "General Course Instructions"
 msgstr ""
 
+# Page title
 #: ../lcg/eurochance.py:120
-#, python-format
 msgid "Instructions for %s"
 msgstr ""
 
+# Page title
 #: ../lcg/eurochance.py:134
 #, fuzzy
 msgid "Detailed Course Index"
 msgstr "Kursindex"
 
+# Page title
 #: ../lcg/eurochance.py:141
-#, fuzzy
 msgid "Grammar Index"
-msgstr "Wichtigsten grammatikalischen Formen"
+msgstr ""
 
+# Page title
 #: ../lcg/eurochance.py:150
-#, fuzzy
 msgid "Vocabulary Index"
-msgstr "Vokabeln"
+msgstr ""
 
+# Section title (within the vocabulary index)
 #: ../lcg/eurochance.py:158
 msgid "Ordered by the English term"
 msgstr ""
 
+# Section title (within the vocabulary index)
 #: ../lcg/eurochance.py:159
 msgid "Ordered by the translation"
 msgstr ""
 
+# Page title
 #: ../lcg/eurochance.py:165
 msgid "Answer Sheets"
 msgstr ""
@@ -587,28 +667,32 @@ msgstr ""
 msgid "Table of Contents:"
 msgstr "Inhaltsverzeichnis:"
 
+# Page title
 #: ../lcg/eurochance.py:181
-#, python-format
 msgid "Answer Sheet for %s"
 msgstr ""
 
+# Page title
 #: ../lcg/eurochance.py:192
-#, fuzzy
 msgid "Help Index"
-msgstr "Kursindex"
+msgstr ""
 
+# Navigation bar label
 #: ../lcg/export.py:120
 msgid "Next"
 msgstr "Nächste"
 
+# Navigation bar label
 #: ../lcg/export.py:121
 msgid "Previous"
 msgstr "Vorhergehend"
 
+# Navigation bar label
 #: ../lcg/export.py:126
 msgid "Up"
 msgstr ""
 
+# Navigation bar label
 #: ../lcg/export.py:129
 msgid "Course Index"
 msgstr "Kursindex"
