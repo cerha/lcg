@@ -119,6 +119,7 @@ class WikiText(TextContent):
     def export(self):
         return wiki.Formatter(self._parent).format(self._text)
 
+    
 class PreformattedText(TextContent):
     """Preformatted text."""
 
@@ -221,6 +222,7 @@ class TableCell(Container):
 
     def export(self):
         return "<td>%s</td>" % super(TableCell, self).export()
+
     
 class TableRow(Container):
     """One row in a table."""
@@ -231,6 +233,7 @@ class TableRow(Container):
         
     def export(self):
         return "<tr>%s</tr>\n" % super(TableRow, self).export()
+
     
 class Table(Container):
     """One row in a table."""
@@ -359,7 +362,7 @@ class Section(SectionContainer):
 
     def url(self, relative=False):
         """Return the URL of the section relative to the course root."""
-        return (relative and self._parent.url() or '') + "#" + self.anchor()
+        return (relative and '' or self._parent.url()) + "#" + self.anchor()
     
     def _header(self):
         l = len(self._section_path()) + 1
@@ -690,6 +693,17 @@ class TransformationTask(ClozeTask):
     def orig(self):
         return self._orig
 
+
+class Anchor(TextContent):
+    """An anchor (target of a link)."""
+    def __init__(self, parent, anchor, text=''):
+        assert isinstance(anchor, types.StringType)
+        self._anchor = anchor
+        super(Anchor, self).__init__(parent, text)
+        
+    def export(self):
+        return '<a name="%s">%s</a>' % (self._anchor, self._text)
+
     
 ################################################################################
 ################################   Exercises   #################################
@@ -736,7 +750,7 @@ class Exercise(Section):
             the original sound file extension is ok.
             
         """
-        title = "%s %%d: %s" % (_("Exercise"), self._NAME)
+        title = _("Exercise %d") +": "+ self._NAME
         super(Exercise, self).__init__(parent, title, Content(parent),
                                        in_toc=False)
         self.__class__._USED = True
@@ -957,7 +971,7 @@ class _InteractiveExercise(Exercise):
     def _init_script(self):
         responses = dict([(key, [media.url() for media in values])
                           for key, values in self._responses.items()])
-        return "init_form(document.forms['%s'], new %s(), %s, %s, %s)" % \
+        return "init_form(document.forms['%s'], new %s(), %s, %s, %s);" % \
                (self._form_name(), self._FORM_HANDLER,
                 js_array(self._answers()), js_dict(responses),
                 js_dict(self._MESSAGES))
@@ -969,8 +983,27 @@ class _InteractiveExercise(Exercise):
                    for label, type, handler, help in self._BUTTONS]
         panel = div((div('<br/>'.join(displays), 'display'),
                      div(buttons, 'buttons')), 'results')
-        return script_write(panel, '')
+        url = self._answer_sheet_node.url() +"#"+ self._answer_sheet_anchor()
+        answer_sheet_lnk = p(_("See the %s to check your results.") %
+                             link(_("answer sheet"), url, target="help"))
+        return script_write(panel, answer_sheet_lnk)
+
+    def _answer_sheet_answers(self):
+        return self._answers()
+
+    def _answer_sheet_anchor(self, index=None):
+        if index is None:
+            return "exercise-%s" % id(self)
+        else:
+            return "exercise-%s-answer-%d" % (id(self), index)
     
+    def answer_sheet(self, parent):
+        self._answer_sheet_node = parent
+        answers = [Anchor(parent, self._answer_sheet_anchor(i), answer)
+                   for i, answer in enumerate(self._answer_sheet_answers())]
+        items = ItemizedList(parent, answers, type=ItemizedList.TYPE_NUMERIC)
+        anchor = Anchor(parent, self._answer_sheet_anchor())
+        return Container(parent, (anchor, items))
     
 ################################################################################
 ################################################################################
@@ -1012,6 +1045,8 @@ class _ChoiceBasedExercise(_InteractiveExercise):
     def _export_task(self, task):
         return p(task.prompt(), self._format_choices(task))
 
+    def _answer_sheet_answers(self):
+        return [t.correct_choice().answer() for t in self._tasks]
     
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
     """Choosing one of several answers for a given question."""
@@ -1146,17 +1181,24 @@ class _FillInExercise(_InteractiveExercise):
     _HELP = _("""Use the buttons at the bottom of the exercise to evaluate all
     the answers.  You can also check each answer individually using the
     shortcut keys (see the section [#keys] for more information).""")
-    
+
     def _answers(self):
         return reduce(lambda a, b: a+b, [t.answers() for t in self._tasks])
    
     def _make_field(self, match):
-        return field(cls='cloze', size=len(match.group(1))+1)
+        try:
+            counter = self._field_counter
+        except AttributeError:
+            self._field_counter = counter = Counter(0)
+        url = self._answer_sheet_node.url() + "#" + \
+              self._answer_sheet_anchor(counter.next())
+        return field(cls='cloze', size=len(match.group(1))+1) + \
+               script_write('', link("?", url, brackets=True))
     
     def _export_task(self, task):
         return p(task.text(self._make_field))
 
-
+    
 class Cloze(_FillInExercise):
     """Paragraphs of text including text-fields for the marked words."""
 
@@ -1184,7 +1226,7 @@ class Cloze(_FillInExercise):
 class VocabExercise(_FillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
-    _NAME = _("Vocabulary Practice")
+    _NAME = _("Vocabulary Practice Exercise")
 
     _HELP = _("""There are two ways how you can do the exercise: The oral form
     and the written form.  Do both of them for best results.
