@@ -16,6 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import gettext
+t = gettext.NullTranslations()
+t.install(unicode=True)
 
 from resources import *
 from course import *
@@ -24,6 +27,7 @@ from export import *
 import ims
 import feed
 import wiki
+import config
 
 # Øe¹ení cyklických závislostí souborù
 for file in (resources, course, content, feed, wiki):
