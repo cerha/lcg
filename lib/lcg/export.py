@@ -89,11 +89,11 @@ class StaticExporter(Exporter):
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
 
     _hotkey = {
-        'next': 'n',
-        'prev': 'p',
-        'content-beginning': 'b',
-        'global-index': 'h',
-        'local-index': 'i',
+        'next': '3',
+        'prev': '1',
+        'content-beginning': '0',
+        'global-index': '5',
+        'local-index': '4',
         }
     
     def __init__(self, course, dir, stylesheet=None):
