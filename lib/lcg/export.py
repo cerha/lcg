@@ -92,6 +92,8 @@ class StaticExporter(Exporter):
         'up': '2',
         'index': '4',
         }
+
+    _INDEX_LABEL = None
     
     def head(self, node):
         tags = ['<meta name="%s" content="%s">' % item
@@ -126,6 +128,6 @@ class StaticExporter(Exporter):
                 nav.append(_("Up") + ': ' + self._link(p, key='up'))
             else:
                 hidden = "\n"+self._link(p, key='up', label='')
-            nav.append(self._link(node.root_node(), label=_('Course Index'),
+            nav.append(self._link(node.root_node(), label=self._INDEX_LABEL,
                                   key='index'))
         return div(' |\n'.join(nav) + hidden, 'navigation')
