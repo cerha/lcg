@@ -1,3 +1,40 @@
+2005-03-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/eurochance.py (Unit._create_content): Supply the `anchor'
+	argument to the Exercises section.
+	(AnswerSheets, AnswerSheet): New classes.
+	(EurochanceCourse._create_children): Include also `AnswerSheets'.
+
+	* lcg/content.py (Section.url): Return the relative url when
+	`relative' is True, not vice versa /bug/.
+	(Anchor): New class.
+	(Exercise.__init__): The title string changed to include the `%d'
+	formatting mark (for translations).
+	(_InteractiveExercise._init_script): Added a semicolon to the end
+	of the JavaScript expression.
+	(_InteractiveExercise._results): Include a link to the answer
+	sheets in the non-JavaScript version.
+	(_InteractiveExercise._answer_sheet_answers) 
+	(_InteractiveExercise._answer_sheet_anchor) 
+	(_InteractiveExercise.answer_sheet) 
+	(_ChoiceBasedExercise._answer_sheet_answers): New methods.
+	(_FillInExercise._make_field): Append a direct link to the answer
+	sheet in the non-JavaScript version.
+	(VocabExercise._NAME): Name changed.
+
+	* lcg/course.py (ContentNode._PARENT_ID_PREFIX): New constant.
+	(ContentNode.sections): Docstring added.
+	(ContentNode.id): Dont prefix the id with the parent's id when
+	`self._PARENT_ID_PREFIX' is False.
+
+	* lcg/_html.py (speaking_text): Add a semicolon to the handler
+	statement.
+	(script): Add a Javascript comment in front of the HTML comment.
+	(script_write): Write no script when the `conetnt' is an emptyu
+	srting.
+	(script): Don't wrap the script into comments when there is no
+	code.
+
 2005-03-19  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (VocabItem.__init__): Make the filename as
