@@ -1,6 +1,8 @@
 2004-05-14  Tomas Cerha  <cerha@brailcom.org>
 
-	* _test.py (ExerciseFeeder): New set of tests.
+	* util.py (SplittableText): New class.
+
+	* _test.py (SplittableText): New set of tests.
 
 	* feed.py: Import the Python module `code'.  All commented-out
 	classes at the end of file removed.
@@ -30,6 +32,10 @@
 	(ComprehensionExercise.__init__): Method removed.
 	(ClozeTest.__init__): Method removed.
 	(ClozeTest._task_type): Set.
+	(Container.__init__, GenericText.__init__, VocabList.__init__)
+	(MultipleChoiceQuestion.__init__, Cloze.__init__)
+	(Exercise.__init__, ComprehensionExercise.__init__): Call parent
+	constructor prior to everyting else.
 
 	* __init__.py: Update globals for module `feed' as well.
 
