@@ -19,6 +19,8 @@
 	(StaticExporter._meta): Method removed.
 	(StaticExporter._links): Method removed.
 	(StaticExporter.export): Method removed.
+	(StaticExporter._wrap_content): Set the `language' attribute of
+	the header `script' tag.
 
 	* lcg/course.py: Docstring updated.
 	(ContentNode): Docstring updated.
