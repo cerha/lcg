@@ -17,6 +17,16 @@
 	Don't convert them here.
 	(_ChoiceBasedExercise._answer_control): Translate the strings with
 	gettext.
+	(Exercise._task_type): Renamed to `_TASK_TYPE'.
+	(Exercise._name): Renamed to `_NAME.
+	(Exercise._header): Translate the strings using gettext.
+	(Exercise._export_instructions): Translate the strings using
+	gettext.
+	(_ChoiceBasedExercise._task_format): Renamed to `_TASK_FORMAT.
+	(SentenceCompletion, Transformation, Cloze,
+	MultipleChoiceQuestions)
+	(Selections, GapFilling): Define `_NAME'.  `_TASK_TYPE' ->
+	`_task_type'.
 
 	* lcg/export.py (StaticExporter._navigation, StaticExporter._toc):
 	Use gettext to translate language dependent strings.
