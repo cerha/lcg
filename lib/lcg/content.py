@@ -390,7 +390,10 @@ class Exercise(Content):
 
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
-        result = "<p>" + self._instructions() + "</p>"
+        result = "<p>" + self._instructions() + ' ' + \
+                 link(_("detailed instructions"),
+                      "instructions-%s.html" % self.id(),
+                      target='help', brackets=True) + "</p>"
         if self._recording is not None:
             f = ('<form class="sound-control" action="">%s:' % _("Recording"),
                  button(_("Play"), "play_audio('%s')" % self._recording.url()),
