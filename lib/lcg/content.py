@@ -345,11 +345,10 @@ class Exercise(Content):
             assert transcript is not None, \
                    "Transcript file not specified for file: %s" % sound_file
             assert isinstance(transcript, types.StringTypes)
-            tts_filename = os.path.join(parent.src_dir(), transcript)
-            assert os.path.exists(tts_filename), \
-                   "Transcript file not found: %s" % tts_filename
-            tts_input = ''.join(open(tts_filename).readlines())
-            self._recording = parent.media(sound_file, tts_input=tts_input)
+            transcript_filename = os.path.join(parent.src_dir(), transcript)
+            assert os.path.exists(transcript_filename), \
+                   "Transcript file not found: %s" % transcript_filename
+            self._recording = parent.media(sound_file)
         else:
             self._recording = None
         self._transcript = transcript
