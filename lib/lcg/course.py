@@ -88,7 +88,7 @@ class ContentNode(object):
         self._language = language
         self._input_encoding = input_encoding
         self._resources = {}
-        self._counter = Counter(1)
+        self._counters = {}
         self._registered_children = []
         content = self._create_content()
         if isinstance(content, Content):
@@ -359,17 +359,23 @@ class ContentNode(object):
             self._resources[key] = resource
             return resource
         
-    def counter(self):
+    def counter(self, key=None):
         """Return the internal counter as a 'Counter' instance.
         
-        This counter can be used by content elements to count sections or
-        whatever, depending on type of the content...  There is only one
-        counter for each node and it is not supposed to be used by other nodes,
-        it should be used only within the 'Content' elements.  For node
-        counting, there is the 'index()' method below.
+        This counter can be used by content elements to count their occurences
+        within a node.  There is one counter for each distinct key, which can
+        be given as first argument.  This key can be for example a class of the
+        content element to allow independent counting of different elements.
+
+        See also the 'index()' method below for node counting.
         
         """
-        return self._counter
+        try:
+            return self._counters[key]
+        except KeyError:
+            self._counters[key] = c =Counter(1)
+            return c
+            
 
     def index(self, node):
         """Return the child node's index number within this node's children.
