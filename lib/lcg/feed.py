@@ -30,6 +30,7 @@ import commands
 import string
 import traceback
 import codecs
+import unicodedata
 
 import imp
 import util
@@ -120,13 +121,23 @@ class ExcelVocabFeeder(Feeder):
         status, output = commands.getstatusoutput(command)
         if status: raise Exception(output)
         lang = 'cs' # TODO: pass from somewhere...
-        languages = [lang for lang, encoding in self._TRANSLATION_ORDER]
-        translation_index = languages.index(lang)
+        order = [lang for lang, encoding in self._TRANSLATION_ORDER
+                 if lang != parent.language()]
+        translation_index = order.index(lang)
         translation_encoding = self._TRANSLATION_ORDER[translation_index][1]
         items = []
+        diacritics_matcher = re.compile(r" WITH .*")
+        danger_char_matcher = re.compile(r"[^a-zA-Z0-9-]")
+        def safe_char(match):
+            char = match.group(0)
+            safe_name = diacritics_matcher.sub('', unicodedata.name(char))
+            safe_char = unicodedata.lookup(safe_name)
+            return danger_char_matcher.match(safe_char) and '-' or safe_char
         for line in output.splitlines():
             col = map(string.strip, line.split('|')[0:4])
             word = unicode(col[0], encoding=self._encoding)
+            if word.startswith("#"):
+                continue
             note = unicode(len(col) > 1 and col[1] or '',
                            encoding=self._encoding)
             try:
@@ -135,9 +146,8 @@ class ExcelVocabFeeder(Feeder):
             except IndexError:
                 trans = u'???'
                 #print 'No translation for "%s"!' % word
-            name = re.sub('[^a-zA-Z0-9-]', '', word.replace(' ', '-'))
+            name = danger_char_matcher.sub(safe_char, word.replace(' ', '-'))
             media_file = os.path.join('vocabulary', name + '.ogg')
-            from content import VocabItem, VocabList
             items.append(VocabItem(parent, word, note, trans,
                                    parent.media(media_file, tts_input=word)))
         return VocabList(parent, items)
