@@ -15,6 +15,8 @@
 	(Choice.__init__, TrueFalseStatement.__init__, ClozeTask.__init__)
 	(TransformationTask.__init__): Expect the arguments in unicode.
 	Don't convert them here.
+	(_ChoiceBasedExercise._answer_control): Translate the strings with
+	gettext.
 
 	* lcg/export.py (StaticExporter._navigation, StaticExporter._toc):
 	Use gettext to translate language dependent strings.
@@ -40,7 +42,8 @@
 	`self._HEADER_MATCHER.
 	(ExerciseFeeder._read_task): Covert the text to unicode before
 	calling the right method. 
-	
+	(ExerciseFeeder._read_transformation): Add default brackets to the
+	transformation when no brackets found.
 
 	* lcg/course.py: Import `codecs'.
 	(ContentNode._TITLE): New constant.
