@@ -262,48 +262,20 @@ class Cloze(Task):
     def __init__(self, parent, text):
         super(Cloze, self).__init__(parent)
         assert type(text) == type('')
-        self._all_correct_response = \
-            parent.media('all-correct-response.ogg', shared=True,
-                         tts_input='everything correct!')
-        self._all_wrong_response = \
-            parent.media('all-wrong-response.ogg', shared=True,
-                         tts_input='all the answers are wrong!')
-        self._some_wrong_response = \
-            parent.media('some-wrong-response.ogg', shared=True,
-                         tts_input='some of the answers are wrong!')
         self._text = text
         self._answers = []
+        parent.script('eval-cloze.js')
+        parent.media('all-correct-response.ogg', shared=True,
+                     tts_input='everything correct!')
+        parent.media('all-wrong-response.ogg', shared=True,
+                     tts_input='all the answers are wrong!')
+        parent.media('some-wrong-response.ogg', shared=True,
+                     tts_input='some of the answers are wrong!')
 
     def _make_field(self, match):
         word = match.group(1)
         self._answers.append(word)
         return '<input class="cloze" type="text" size="%d">' % (len(word) + 1)
-
-    def _script(self):
-        return '''
-        <script language="JavaScript">
-        //<--
-        function eval_cloze(f, answers) {
-           var correct = 0;
-           var marked = 0;
-           for (i=0; i < answers.length; i++)
-              if (f.elements[i].value == answers[i]) correct++;
-              else if (f.elements[i].value) {
-                 if (f.elements[i].value[0] != "!")
-                    f.elements[i].value = "!" + f.elements[i].value;
-                 marked = 1;
-              }
-           f.result.value = "Correct answers: "+correct+"/"+answers.length+".";
-           if (marked) f.result.value +=
-                 " Check back for the entries mark with an exclamation mark!";
-           if (correct == answers.length) self.location="%s"
-           else if (correct == 0) self.location="%s";
-           else self.location="%s";
-        }
-        //-->
-        </script>''' % (self._all_correct_response.url(),
-                        self._all_wrong_response.url(),
-                        self._some_wrong_response.url())
 
     def export(self):
         form_name = "cloze_%s" % id(self)
@@ -314,8 +286,7 @@ class Cloze(Task):
         result = '<input class="cloze-result" name="result" type="text"' + \
                  ' size="60" readonly>'
         return "\n".join(('<form name="%s">' % form_name,
-                          '<p>', text, '</p>', 
-                          self._script(), button, result,
+                          '<p>', text, '</p>', button, result,
                           '</form>'))
                
 
