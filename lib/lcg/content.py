@@ -804,17 +804,6 @@ class VocabExercise(_Cloze):
         return task.text(self._make_field)+'<br/>'
 
     
-class VocabExercise2(VocabExercise):
-    _NAME = _("Vocabulary to English")
-
-    def _create_task(self, item):
-        return ClozeTask("%s: [%s]" % (item.word(), item.translation()))
-
-    def _instructions(self):
-        return _("""Listen to the expression in English and repeat.  You will
-        hear a transltion into your language.""")
-
-    
 class Transformation(_Cloze):
     """Transform a whole sentence and write it down."""
 
