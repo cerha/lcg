@@ -75,8 +75,8 @@ def ul(items, indent=0):
     items = [spaces+"  <li>%s</li>" % i for i in items]
     return "\n".join([spaces+"<ul>"] + items + [spaces+"</ul>"])
 
-def h2(title):
-    return '<h2>%s</h2>' % title
-
+def h(title, level=2):
+    return '<h%d>%s</h%d>' % (level, title, level)
+    
 def b(text):
     return '<b>%s</b>' % text
