@@ -154,12 +154,16 @@ class ContentNode(object):
         """Return the full path to the source file."""
         return os.path.join(self.src_dir(), name + '.' + ext)
         
-    def _read_file(self, name):
+    def _read_file(self, name, comment=None):
         """Return all the text read from the source file."""
         filename = self._input_file(name)
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
-            content = ''.join(fh.readlines())
+            lines = fh.readlines()
+            if comment is not None:
+                matcher = re.compile(comment)
+                lines = [line for line in lines if not matcher.match(line)]
+            content = ''.join(lines)
         except UnicodeDecodeError, e:
             raise Exception("Error while reading file %s: %s" % (filename, e))
         fh.close()
@@ -440,7 +444,7 @@ class Unit(ContentNode):
 
     def _create_exercises(self, vocab):
         filename = self._input_file('exercises')
-        text = self._read_file('exercises')
+        text = self._read_file('exercises', '^//')
         splittable = SplittableText(text, input_file=filename)
         pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
         assert len(pieces) == 5, \
