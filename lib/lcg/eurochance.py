@@ -221,12 +221,12 @@ class EurochanceCourse(EurochanceNode):
     def _create_content(self):
         return self._parse_wiki_file('intro') + \
                [TableOfContents(self, item=self, title=_("Table of Contents:"))]
-                         
     
     def _create_children(self):
         units = [self._create_child(Unit, subdir=d)
-                 for d in list_subdirs(self.src_dir())
-                 if d[0] in map(str, range(0, 9))]
+                 for d in list_dir(self.src_dir())
+                 if os.path.isdir(os.path.join(self.src_dir(), d)) \
+                 and d[0].isdigit()]
         return [self._create_child(Instructions)] + units + \
                [self._create_child(CourseIndex, units),
                 self._create_child(GrammarIndex, units),
