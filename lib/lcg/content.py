@@ -241,7 +241,9 @@ class SectionContainer(Container):
         super(SectionContainer, self).__init__(parent, content)
         self._sections = [s for s in self._content if isinstance(s, Section)]
         toc_sections = [s for s in self._sections if s.in_toc()]
-        if len(toc_sections) > 0 and toc_depth > 0:
+        if toc_depth > 0 and \
+               (len(toc_sections) > 1 or len(toc_sections) == 1 and 
+                len([s for s in toc_sections[0].sections() if s.in_toc()])):
             self._toc = TableOfContents(parent, self, title=_("Index:"),
                                         depth=toc_depth)
         else:
@@ -424,11 +426,12 @@ class VocabList(Content):
         parent.resource(Script, 'audio.js')
 
     def export(self):
-        pairs = [(speaking_text(i.word(), i.media())+" "+i.note(),
-                  '<span lang="%s">%s</span>' % \
+        pairs = [(speaking_text(i.word(), i.media())+
+                  (i.note() and " "+i.note() or ""),
+                  '<span lang="%s">%s</span>' %
                   (i.translation_language(), i.translation()))
                  for i in self._items]
-        rows = ['<tr><td>%s</td><td>%s</td></tr>' % \
+        rows = ['<tr><td>%s</td><td>%s</td></tr>' %
                 (self._reverse and (b,a) or (a,b)) for a,b in pairs]
         return '<table class="vocab-list">\n' + '\n'.join(rows) + "\n</table>\n"
 
@@ -464,7 +467,7 @@ class VocabItem(Record):
                 return '-'
             return base_char
         assert isinstance(word, types.UnicodeType)
-        assert isinstance(note, types.UnicodeType)
+        assert isinstance(note, types.UnicodeType) or note is None
         assert isinstance(translation, types.UnicodeType)
         assert isinstance(translation_language, types.StringTypes) and \
                len(translation_language) == 2
@@ -634,6 +637,22 @@ class ClozeTask(Task):
 
     def plain_text(self):
         return self._REGEXP.sub(lambda match: match.group(1), self._text)
+
+
+class DictationTask(Task):
+
+    _REGEXP = re.compile(r"(\s*/\s*|\s+)")
+    
+    def __init__(self, text):
+        super(DictationTask, self).__init__()
+        assert isinstance(text, types.UnicodeType)
+        self._text = text
+
+    def answers(self):
+        return (self.text(),)
+        
+    def text(self):
+        return self._REGEXP.sub(' ', self._text).strip()
 
     
 class TransformationTask(ClozeTask):
@@ -838,6 +857,8 @@ class _InteractiveExercise(Exercise):
                      'incorrect-response-3.ogg': _("Try again!")}
 
     _FORM_HANDLER = 'Handler'
+    _INITIAL_RESULT = None;
+    _MESSAGES = {};
     
     def __init__(self, parent, *args, **kwargs):
         super(_InteractiveExercise, self).__init__(parent, *args, **kwargs)
@@ -858,16 +879,22 @@ class _InteractiveExercise(Exercise):
     def _init_script(self):
         responses = dict([(key, [media.url() for media in values])
                           for key, values in self._responses.items()])
-        return "init_form(document.forms['%s'], new %s(), %s, %s)" % \
+        return "init_form(document.forms['%s'], new %s(), %s, %s, %s)" % \
                (self._form_name(), self._FORM_HANDLER,
-                js_array(self._answers()), js_dict(responses))
+                js_array(self._answers()), js_dict(responses),
+                js_dict(self._MESSAGES))
 
     def _buttons(self):
         return ()
-    
+
+    def _display(self):
+        return ((_('Answered:'), field(name='answered', size=8, readonly=True)),
+                (_('Correct:'),  field(name='result', size=50, readonly=True,
+                                       text=self._INITIAL_RESULT)))
+
+
     def _results(self):
-        d = (_('Answered:'), field(name='answered', size=8, readonly=True), '<br/>',
-             _('Correct:'),  field(name='result',   size=8, readonly=True))
+        d = '<br/>'.join([' '.join((label, f)) for label, f in self._display()])
         r = div((div(d, 'display'), div(self._buttons(), 'buttons')), 'results')
         return script_write(r, '')
     
@@ -990,12 +1017,13 @@ class _FillInExercise(_InteractiveExercise):
     _RESPONSE_TTS.update(_InteractiveExercise._RESPONSE_TTS)
 
     _FORM_HANDLER = 'FillInExerciseHandler'
+
+    _INITIAL_RESULT = _("Use the 'Evaluate' button to see the results.")
     
     def _answers(self):
         return reduce(lambda a, b: a+b, [t.answers() for t in self._tasks])
 
     def _buttons(self):
-        #_("Use the 'Evaluate' button to see the results.")
         return (button(_('Evaluate'), "this.form.handler.evaluate()"),
                 button(_('Fill'),     "this.form.handler.fill()"),
                 reset( _('Reset'),    "this.form.handler.reset()"))
@@ -1068,7 +1096,26 @@ class Dictation(_FillInExercise):
     """One big text-field for a whole exercise."""
 
     _NAME = _("Dictation")
+    _TASK_TYPE = DictationTask
+    _FORM_HANDLER = 'DictationHandler'
     _RECORDING_REQUIRED = True
+    _MESSAGES = {'Correct': _('Correct'),
+                 'Error(s) found': _('Error(s) found')}
     
+    def __init__(self, parent, tasks, *args, **kwargs):
+        super(Dictation, self).__init__(parent, tasks, *args, **kwargs)
+        assert len(tasks) == 1, \
+               "Dictation must consist of just one task (paragraph of text)."
+
+
     def _instructions(self):
-        return """This exercise type is not yet implemented..."""
+        return """Listen to the recording and type exactly what you hear into
+        the textbox below."""
+
+    def _export_task(self, task):
+        return '<textarea rows="10" cols="60"></textarea>'
+    
+    def _display(self):
+        return ((_('Result:'), field(name='result', size=50, readonly=True,
+                                     text=self._INITIAL_RESULT)),)
+    
