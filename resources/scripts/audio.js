@@ -1,4 +1,4 @@
-/* Copyright (C) 2004 Brailcom, o.p.s.
+/* Copyright (C) 2004, 2005 Brailcom, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,7 @@ function play_audio(url) {
 
 function stop_audio() {
    if (navigator.appName=="Microsoft Internet Explorer") {
-      window.status = 'Playback stopped';
       document.media_player.controls.stop();
-   } else {
-
+      //} else {
    }
 }
-
