@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-07 22:46+0100\n"
+"POT-Creation-Date: 2004-12-07 23:21+0100\n"
 "PO-Revision-Date: 2004-12-07 17:25+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -14,12 +14,44 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: lcg/content.py:378
+msgid "Exercise"
+msgstr "Übung"
+
+#: lcg/content.py:408
+msgid "Cloze"
+msgstr ""
+
 #: lcg/content.py:464
 msgid "Correct"
 msgstr ""
 
 #: lcg/content.py:467
 msgid "You are wrong!"
+msgstr ""
+
+#: lcg/content.py:504
+msgid "True/False Statements"
+msgstr ""
+
+#: lcg/content.py:520
+msgid "Multiple Choice Questions"
+msgstr ""
+
+#: lcg/content.py:532
+msgid "Select the Correct One"
+msgstr ""
+
+#: lcg/content.py:543
+msgid "Gap Filling"
+msgstr ""
+
+#: lcg/content.py:553
+msgid "Sentence Completion"
+msgstr ""
+
+#: lcg/content.py:566
+msgid "Transformation"
 msgstr ""
 
 #: lcg/course.py:52
@@ -44,7 +76,7 @@ msgstr ""
 
 #: lcg/course.py:617
 msgid "Exercises"
-msgstr ""
+msgstr "Übungen"
 
 #: lcg/course.py:627
 msgid "Consolidation"
