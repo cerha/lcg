@@ -423,8 +423,9 @@ class Unit(ContentNode):
         return self._read_file('title')
 
     def _create_content(self):
-        vocab = ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
-                                 input_encoding=self._input_encoding).feed(self)
+        feeder = ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
+                                        input_encoding=self._input_encoding)
+        vocab = feeder.feed(self)
         sections = (Section(self, _("Aims and Objectives"),
                             WikiText(self, self._read_file('aims'))),
                     Section(self, _("Vocabulary"),
@@ -442,20 +443,18 @@ class Unit(ContentNode):
         text = self._read_file('exercises')
         splittable = SplittableText(text, input_file=filename)
         pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
-        if len(pieces) != 4:
-            print "Warning: %s: 4 sections expected, %d found." % \
-                  (filename, len(pieces))
-            pieces = (pieces + 4 * [SplittableText('')])[0:4]
-        titles = (_("Section %d: Listening Comprehension"),
-                  _("Section %d: General Comprehension"),
-                  _("Section %d: Grammar Practice"),
-                  _("Section %d: Consolidation"))
+        assert len(pieces) == 5, \
+               "%s: 5 sections expected, %d found." % (filename, len(pieces))
+        titles = (_("Vocabulary Practice"),
+                  _("Listening Comprehension"),
+                  _("General Comprehension"),
+                  _("Grammar Practice"),
+                  _("Consolidation"))
         enc = self._input_encoding
-        sections = [Section(self, t,
-                            ExerciseFeeder(p, input_encoding=enc).feed(self))
-             for t, p in zip(titles, pieces)]
-        return [Section(self, _("Section %d: Vocabulary Practice"),
-                        VocabExercise(self, items=vocab))] + sections
+        return [Section(self, _("Section %d") + ': ' + title,
+                        ExerciseFeeder(piece, vocabulary=vocab,
+                                       input_encoding=enc).feed(self))
+                for title, piece in zip(titles, pieces)]
 
     
 class ExerciseInstructions(TextNode):
