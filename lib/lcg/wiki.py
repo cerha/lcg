@@ -147,7 +147,6 @@ class Parser(object):
     corresponding 'Conetent' element hierarchy.
 
     """
-    _LIST_MARKER = "(?:\*|(?:[a-z]|\d+)(?:\)|\.))"
     
     _SECTION_RE = re.compile(r"^(?P<level>=+) (?P<title>.*) (?P=level)" + \
                              r"(?:\s+(?:\*|(?P<anchor>[\w\d_-]+)))?\s*$",
@@ -156,6 +155,8 @@ class Parser(object):
     _PRE_BLOCK_RE = re.compile(r"^(?:\{\{\{\s*$(.*?)^\}\}\}\s*$" + 
                                r"|-----+\s*$(.*?)^-----+)\s*$",
                                re.DOTALL|re.MULTILINE)
+
+    _LIST_MARKER = "(?:\*|(?:[a-z]|\d+)(?:\)|\.))"
 
     _SPLITTER_RE = re.compile(r"\r?\n(?:(?:\s*\r?\n)+|(?=\s+" +
                               _LIST_MARKER +" ))")
