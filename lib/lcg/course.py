@@ -397,15 +397,13 @@ class WikiNode(ContentNode):
 
     def _create_content(self):
         p = wiki.Parser(self)
-        sections = p.parse(self._text)
-        if len(sections) == 1 and isinstance(sections[0], Section):
-            content = sections[0]
-            if not self._title_:
-                self._title_ = content.title()
-        else:
-            content = SectionContainer(self, sections)
-            if not self._title_ and content.sections():
-                self._title_ = content.sections()[0].title()
+        content = SectionContainer(self, p.parse(self._text), toc_depth=0)
+        if not self._title_:
+            sections = content.sections()
+            if len(sections):
+                self._title_ = sections[0].title()
+            else:
+                self._title_ = "LCG generated document"
         return content
     
     def _title(self):
