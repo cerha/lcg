@@ -48,6 +48,7 @@ class Formatter(object):
                ('comment', '^#.*'),
                ('linebreak', '//'),
                ('rule', '^----\s*$'),
+               ('dash', '(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'),
                )
     _HELPER_PATTERNS = ('href', 'title')
@@ -66,6 +67,7 @@ class Formatter(object):
                'comment': '',
                'linebreak': '<br/>',
                'rule': '<hr/>',
+               'dash': '&ndash;',
                'nbsp': '&nbsp;',
                }
 
