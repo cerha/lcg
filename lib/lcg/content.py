@@ -338,7 +338,7 @@ class Exercise(Content):
         assert is_sequence_of(tasks, self._TASK_TYPE), \
                "Tasks must be a sequence of '%s' instances!: %s" % \
                (self._TASK_TYPE.__name__, tasks)
-        assert sound_file is None or type(sound_file) == type('')
+        assert sound_file is None or isinstance(sound_file, types.StringTypes)
         self._number = parent.counter().next()
         self._tasks = list(tasks)
         if sound_file is not None:
