@@ -63,23 +63,6 @@ class Content(object):
         return ''
  
     
-class TableOfContents(Content):
-    """Table Of Contents renders as a tree of links to all subsequent nodes."""
-
-    def _export_node(self, node, indent=''):
-        if len(node.children()) == 0:
-            return ''
-        return "\n" + indent + "<ul>\n" + \
-               "\n".join(map(lambda n: '%s  <li><a href="%s">%s</a>%s</li>' % \
-                             (indent, n.output_file(), n.title(),
-                              self._export_node(n, indent+'    ')),
-                             node.children())) + \
-                             "\n" + indent + "</ul>\n" + indent[0:-2] 
-    
-    def export(self):
-        return "<h2>Table of Contents</h2>\n" + self._export_node(self._parent)
-
-    
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
 
