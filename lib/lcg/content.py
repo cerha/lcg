@@ -180,6 +180,21 @@ class Task(Content):
     """
     pass
 
+
+class Choice(Record):
+    """Answer text with an information whether it is correct or not.
+
+    One of the choices for 'MultipleChoiceQuestion'.
+
+    """
+    
+    def __init__(self, answer, correct=False):
+        assert type(answer) == type('')
+        assert type(correct) == type(True)
+        self._answer = answer
+        self._correct = correct
+
+        
 class Selection(Task):
     """Select the correct statement out of a list of predefined choices."""
     
@@ -238,19 +253,6 @@ class MultipleChoiceQuestion(Selection):
         return "<p>%s</p>\n%s" % (self._question, self._export_choices())
 
         
-class Choice(Record):
-    """Answer text with an information whether it is correct or not.
-
-    One of the choices for 'MultipleChoiceQuestion'.
-
-    """
-    
-    def __init__(self, answer, correct=False):
-        assert type(answer) == type('')
-        assert type(correct) == type(True)
-        self._answer = answer
-        self._correct = correct
-
         
 class TrueFalseStatement(MultipleChoiceQuestion):
     """The goal is to indicate whether the statement is true or false."""
@@ -274,6 +276,9 @@ class TrueFalseStatement(MultipleChoiceQuestion):
     def _export_choices(self):
         return "\n".join(map(lambda a: "[%s]" % a, self._choice_controls()))
 
+    def export(self):
+        return "<p>%s\n%s</p>\n" % (self._question, self._export_choices())
+    
 
 class GapFillStatement(MultipleChoiceQuestion):
     """The goal is to select the correct word to complete the sentence."""
@@ -295,15 +300,21 @@ class ClozeTask(Task):
         return '<input class="cloze" type="text" size="%d">' % \
                (len(match.group(1))+1)
     
+    def _export_text(self):
+        return self._REGEXP.sub(self._make_field, self._text)
+
     def export(self):
-        text = self._REGEXP.sub(self._make_field, self._text)
-        return "\n".join(('<p>', text, '</p>'))
+        return "\n".join(('<p>', self._export_text(), '</p>'))
                
 class TransformationTask(ClozeTask):
 
-    def _make_field(self, match):
-        return "<br>\n" + super(TransformationTask, self)._make_field(match)
-    pass
+    def __init__(self, parent, orig, transformed):
+        super(TransformationTask, self).__init__(parent, transformed)
+        assert type(orig) == type('')
+        self._orig = orig
+
+    def export(self):
+        return "\n".join(('<p>',self._orig,'<br/>', self._export_text(),'</p>'))
 
     
 ################################################################################
