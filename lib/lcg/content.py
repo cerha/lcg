@@ -29,6 +29,7 @@ import string
 import re
 import types
 import unicodedata
+import textwrap
 
 from lcg import *
 from _html import *
@@ -773,11 +774,12 @@ class Exercise(Section):
             "'%s' requires an audio version!" % self.__class__.__name__
         self._tasks = list(tasks)
         if sound_file is not None:
+            self._recording = parent.resource(Media, sound_file)
             if transcript is None:
                 transcript = os.path.splitext(sound_file)[0] + '.txt'
             assert isinstance(transcript, types.StringTypes)
-            self._recording = parent.resource(Media, sound_file)
-            self._transcript = self._create_transcript(transcript)
+            self._transcript = parent.resource(Transcript, transcript,
+                                               text=self._transcript_text())
         else:
             self._recording = None
             self._transcript = None
@@ -834,8 +836,8 @@ class Exercise(Section):
     
     # Instance methods
 
-    def _create_transcript(self, file):
-        return self._parent.resource(Transcript, file)
+    def _transcript_text(self):
+        return None
 
     def _form_name(self):
         return "exercise_%s" % id(self)
@@ -1215,9 +1217,8 @@ class Cloze(_FillInExercise):
 
     """) + _FillInExercise._HELP
 
-    def _create_transcript(self, file):
-        text = "\n\n".join([t.plain_text() for t in self._tasks])
-        return self._parent.resource(Transcript, file, text=text)
+    def _transcript_text(self):
+        return "\n\n".join([t.plain_text() for t in self._tasks])
     
     def _instructions(self):
         if self._recording is not None:
@@ -1320,6 +1321,9 @@ class Dictation(_FillInExercise):
         super(Dictation, self).__init__(parent, tasks, *args, **kwargs)
         assert len(tasks) == 1, \
                "Dictation must consist of just one task (paragraph of text)."
+
+    def _transcript_text(self):
+        return self._tasks[0].text()
 
     def _instructions(self):
         return """Listen to the recording and type exactly what you hear into
