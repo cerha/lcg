@@ -110,11 +110,13 @@ class ExerciseInstructions(EurochanceNode):
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
+        template = self._read_file('exercise-instructions',
+                                   dir=config.translation_dir)
         try:
-            pre = self._parse_wiki_file(self._id())
-        except IOError, e:
-            pre = None
-        return self._type.help(self, pre)
+           template = self._read_file('exercise-context') + template
+        except IOError:
+            pass
+        return self._type.help(self, template)
 
     def title(self, abbrev=False):
         return _("Instructions for %s") % self._type.name()
@@ -197,7 +199,7 @@ class Help(EurochanceNode):
         return TableOfContents(self, title=_("Table of Contents:"))
 
     def _create_children(self):
-        return [self._create_child(ExerciseInstructions, t, 'help')
+        return [self._create_child(ExerciseInstructions, t)
                 for t in Exercise.used_types()]
 
     
