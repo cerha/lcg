@@ -1,3 +1,77 @@
+2004-12-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* Makefile (LCG_TTS_COMMAND): Export the LCG environment
+	variables.  Make the German course as well as the English one.
+	Extract the translatable strings and create gettext message
+	catalogs.
+
+	* bin/generate.py: New agument language.  Install the gettext
+	translator.  Pass the `language' and `encoding' arguments to the
+	course constructor. 
+
+	* lcg/content.py (VocabItem.__init__, Choice.__init__)
+	(Choice.__init__, TrueFalseStatement.__init__, ClozeTask.__init__)
+	(TransformationTask.__init__): Expect the arguments in unicode.
+	Don't convert them here.
+
+	* lcg/export.py (StaticExporter._navigation, StaticExporter._toc):
+	Use gettext to translate language dependent strings.
+
+	* lcg/feed.py (Feeder.__init__): New keyword argument `encoding'.
+	(ExcelVocabFeeder._LANGUAGE_ORDER, ExcelVocabFeeder._CHARSET):
+	Removed.
+	(ExcelVocabFeeder._TRANSLATION_ORDER): New constant.
+	(ExcelVocabFeeder.feed): Don't use `parent.lang()'.  Use
+	`self._TRANSLATION_ORDER' instead of
+	`ExcelVocabFeeder._LANGUAGE_ORDER' and `ExcelVocabFeeder._CHARSET'
+	Convert the `VocabItem' constructor arguments to unicode first.
+	(ExerciseFeeder._slitter_matcher,
+	ExerciseFeeder._blank_line_matcher)
+	(ExerciseFeeder._header_matcher): Renamed to upper case names.
+	(ExerciseFeeder.feed): Read the input file through
+	`codecs.open()'.
+	(ExerciseFeeder._exercise): `self._blank_line_matcher' ->
+	`self._BLANK_LINE_MATCHER'.
+	(ExerciseFeeder._read_header): `self._header_matcher ->
+	`self._HEADER_MATCHER.
+	(ExerciseFeeder._read_task): Covert the text to unicode before
+	calling the right method. 
+	
+
+	* lcg/course.py: Import `codecs'.
+	(ContentNode._TITLE): New constant.
+	(ContentNode.__init__): New keyword attributes `language' and
+	`input_encoding'.
+	(ContentNode._read_file): Open the file using `codecs.open()' and
+	use the `input_encoding' passed to the constructor.
+	(ContentNode.title): Just return `self.TITLE'.
+	(ContentNode.full_title): Use a list comprehension instead of
+	`map()'.
+	(ContentNode.lang): Removed.
+	(ContentNode.language): New method.
+	(ContentNode.input_encoding): New method.
+	(RootNode.__init__): Pass the keyword arguments to the parent
+	class constructor.
+	(Media._open_stream_from_tts): Use `codecs.open()' to read the
+	transcript file with a direct conversion to unicode.
+	(Media._open_stream_from_tts): Encode the text written to the
+	pipe.
+	(Vocabulary._TITLE, Use._TITLE, Grammar._TITLE, Exercises._TITLE)
+	(Consolidation._TITLE, Unit._TITLE): New constants.
+	(Use._title, Grammar._title): Removed.
+	(Vocabulary._create_content): Pass the `encoding' to the feeder.
+	(Exercises._create_content): Pass the `encoding' to the feeder.
+	(Unit._create_children): Use a list comprehension instead of
+	`map()'.  Pass the keyword arguments to node constructors.
+	(Unit.title): Use `self._TITLE' to get the node name.
+	(EurochanceCourse._create_children): Use a list comprehension
+	instead of `map()'.
+	(EurochanceCourse.meta): Values changed.
+
+	* lcg/util.py: Import `types'.
+	(SplittableText.__init__): Use `isinstance()' with a corresponding
+	type for assertions.
+
 2004-11-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile (LCG_MP3_COMMAND): New variable.
