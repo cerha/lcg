@@ -1,5 +1,7 @@
 2005-03-05  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/css/default.css: Added styles for `lcg-table' class.
+
 	* lcg/content.py (Table.export): Specify the class `lcg-table' for
 	the generated table.
 
