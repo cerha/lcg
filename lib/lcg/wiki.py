@@ -1,4 +1,4 @@
-# -*- coding: iso8859-2 -*-
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2004, 2005 Brailcom, o.p.s.
 #
@@ -38,15 +38,25 @@ class InlineFormatter(object):
     """
     _MARKUP = (('bold', '\*'),
                #('italic', '/'),
-               ('fixed', '='),
+               #('fixed', '='),
                ('underline', '_'),
-               ('example_start', '>>'),
-               ('example_end', '<<'))
+               ('citation_start', '>>'),
+               ('citation_end', '<<'),
+               ('quotation_start', '``'),
+               ('quotation_end', "''"),
+               ('linebreak', '//'),
+               ('nbsp', '~'),
+               )
+    
+    _PAIR = ('bold', 'italic', 'fixed', 'underline', 'citation', 'quotation')
 
     _FORMAT = {'bold': ('<strong>', '</strong>'),
                'italic': ('<i>', '</i>'),
                'fixed': ('<tt>', '</tt>'),
                'underline': ('<span class="underline">', '</span>'),
+               'quotation': (u'“<span class="quotation">', u'</span>”'),
+               'linebreak': '<br>',
+               'nbsp': '&nbsp;',
                }
 
     _REGEXPS = [r"(?P<%s>\!?%s)" % (tag, markup) for tag, markup in _MARKUP]
@@ -75,18 +85,20 @@ class InlineFormatter(object):
             # We have to close the nested open tags as-well.
             return ''.join([self._formatter(t, close=True) for t in to_close])
         elif not end:
-            self._open.append(type)
+            if type in self._PAIR:
+                self._open.append(type)
             return self._formatter(type)
 
     def _formatter(self, type, close=False):
         try:
-            return self._FORMAT[type][close and 1 or 0]
-        except:
+            f = self._FORMAT[type]
+            return type in self._PAIR and f[close and 1 or 0] or f
+        except KeyError:
             return getattr(self, '_'+type+'_formatter')(close=close)
         
-    def _example_formatter(self, close=False):
+    def _citation_formatter(self, close=False):
         if not close:
-            return '<span class="example" lang="%s">' % self._parent.language()
+            return '<span class="citation" lang="%s">' % self._parent.language()
         else:
             return '</span>'
         
@@ -107,15 +119,20 @@ class Parser(object):
     corresponding 'Conetent' element hierarchy.
 
     """
+    _LIST_MARKER = "(?:\*|(?:[a-z]|\d+)(?:\)|\.))"
     
     _SECTION_RE = re.compile(r"^(?P<level>=+) (?P<title>.*) (?P=level)\s*$",
                              re.MULTILINE)
-    _SPLITTER_RE = re.compile(r"\r?\n(?:(?:\s*\r?\n)+|(?=\s+\* ))")
+    _SPLITTER_RE = re.compile(r"\r?\n(?:(?:\s*\r?\n)+|(?=\s+" +
+                              _LIST_MARKER +" ))")
 
-    _MATCHERS = (('list_item', "(?P<depth>\s+)\* (?P<content>.*)"),
+    _MATCHERS = (('list_item',
+                  "(?P<depth> +)(?P<type>"+ _LIST_MARKER +") (?P<content>.*)"),
+                 ('table',
+                  "\s*((\|[^\r\n\|]*)+\|\s*)+"),
                  )
     _REGEXPS = [r"^(?P<%s>%s)$" % (key, matcher) for key, matcher in _MATCHERS]
-    _MATCHER = re.compile('(?:' + '|'.join(_REGEXPS) + ')', re.MULTILINE)
+    _MATCHER = re.compile('(?:' + '|'.join(_REGEXPS) + ')', re.DOTALL)
     _HELPER_PATTERNS = ('depth', 'content')
     
     class _Section(object):
@@ -168,9 +185,6 @@ class Parser(object):
         else:
             return section.content + subsections
         
-    def _make_itemized_list(self, items):
-        pass
-    
     def _identify_block(self, text):
         match = self._MATCHER.match(text)
         if match:
@@ -179,26 +193,49 @@ class Parser(object):
                      if m and not key in self._HELPER_PATTERNS]
             return (text, found[0][0], found[0][1])
         else:
-            return (text, None, None)
+            return (text, 'paragraph', {})
 
     def _parse_section_content(self, text):
         blocks = [self._identify_block(p)
                   for p in self._SPLITTER_RE.split(text) if len(p.strip()) > 0]
-        items = []
         content = []
+        items = []
+        list_type = None
         for block, type, groups in blocks:
-            if items and type != 'list_item':
-                content.append(ItemizedList(self._parent, items))
+            t = self._list_item_type(groups)
+            if items and (type != 'list_item' or list_type != t) :
+                l = ItemizedList(self._parent, items, type=list_type)
+                content.append(l)
                 items = []
             if type == 'list_item':
                 wt = WikiText(self._parent, groups['content'])
                 items.append(ListItem(self._parent, wt))
+                list_type = t
             else:
-                p = Paragraph(self._parent, WikiText(self._parent, block))
-                content.append(p)
+                content.append(getattr(self, '_make_'+type)(block, groups))
         if items:
-            content.append(ItemizedList(self._parent, items))
+            content.append(ItemizedList(self._parent, items, type=list_type))
         return content
+
+    def _make_paragraph(self, block, groups):
+        return Paragraph(self._parent, WikiText(self._parent, block))
+    
+    def _make_table(self, block, groups):
+        p = self._parent
+        return Table(p, [TableRow(p, [TableCell(p, WikiText(p, x.strip()))
+                                      for x in row.split('|')[1:-1]])
+                         for row in block.strip().splitlines()])
+    
+    def _list_item_type(self, groups):
+        t = groups.get('type')
+        if not t:
+            return None
+        elif t == '*':
+            return ItemizedList.TYPE_UNORDERED
+        elif t[0].isalpha():
+            return ItemizedList.TYPE_ALPHA
+        else:
+            return ItemizedList.TYPE_NUMERIC
 
     def parse(self, text):
         return self._parse_sections(text)
