@@ -113,7 +113,7 @@ def select(name, options, handler=None, default=""):
 # Special controls
 
 def speaking_text(text, media):
-    a1 = link(text, "javascript: play_audio('%s')" % media.url())
+    a1 = link(text, "javascript: play_audio('%s');" % media.url())
     a2 = link(text, media.url())
     return script_write(a1, a2)
 
@@ -121,12 +121,16 @@ def speaking_text(text, media):
 
 def script(code, noscript=None):
     noscript = noscript and '<noscript>'+ noscript +'</noscript>' or ''
-    return '<script type="text/javascript" language="Javascript"><!--\n' + \
-           code +' //--></script>' + noscript
+    if code:
+        code = '//<!--\n'+ code +' //-->'
+    return '<script type="text/javascript" language="Javascript">' + \
+           code +'</script>'+ noscript
 
 def script_write(content, noscript=None):
-    c = content.replace('"','\\"').replace('\n','\\n').replace("'","\\'")
-    return script('document.write("'+ c +'");', noscript)
+    if content:
+        c = content.replace('"','\\"').replace('\n','\\n').replace("'","\\'")
+        content = 'document.write("'+ c +'");'
+    return script(content, noscript)
 
 def js_value(var):
     if isinstance(var, types.StringTypes):
