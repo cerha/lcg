@@ -27,8 +27,8 @@ forced to deal with the technical aspects more than necessary.
 == Basic Structure == *
 
 The basic concept is based on files arranged into directories (folders)
-according to the logical structure of the course (as defined
-[structure.wiki|here]).
+according to the logical structure of the course (see also the
+[structure.wiki|course structure] specification).
 
 There is one /base directory/ for the whole course.  This directory contains
 one /subdirectory/ for each unit of the course.  Each of these subdirectories
