@@ -86,21 +86,29 @@ class StaticExporter(Exporter):
     """Export the content as a set of static web pages."""
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
     
+    def __init__(self, course, dir, stylesheet=None):
+        """Initialize the exporter for a given 'Course'."""
+        super(StaticExporter, self).__init__(course, dir)
+        self._stylesheet = stylesheet
+
     def _wrap_content(self, node):
         nav = self._navigation(node)
+        style = self._stylesheet and \
+                '  <link rel="stylesheet" type="text/css" href="%s">\n' % \
+                self._stylesheet or ''
         
         return "\n".join((self.DOCTYPE, '',
                           '<html>',
                           '<head>',
                           '  <title>%s</title>' % node.full_title(),
-                          self._meta(node),
+                          style + self._meta(node),
                           '</head>',
-                          '<body bgcolor="white">',
-                          nav, '<hr>',
+                          '<body>',
+                          nav, '<hr class="navigation">',
                           '<h1>%s</h1>' % node.title(),
-                          node.content().export(),
+                          self._div('content', node.content().export()),
                           self._toc(node),
-                          '<hr>', nav,
+                          '<hr class="navigation">', nav,
                           '</body></html>'))
 
     def _meta(self, node):
@@ -108,6 +116,9 @@ class StaticExporter(Exporter):
         return '\n'.join(map(lambda k:
                              '  <meta name="%s" content="%s">' % (k, meta[k]),
                              meta.keys()))
+
+    def _div(self, cls, *contents):
+        return '\n'.join(('<div class="%s">' % cls,) + contents + ('</div>\n',))
 
     def _link(self, node, label=None, title=''):
         if node is None: return 'None' 
@@ -123,13 +134,13 @@ class StaticExporter(Exporter):
             if p is not node.root_node():
                 nav.append(p.__class__.__name__ + ' Index: ' + self._link(p))
             nav.append(self._link(node.root_node(), label='Course Index'))
-        return ' | '.join(nav)
+        return self._div('navigation', ' | '.join(nav))
 
     def _toc(self, node):
-        if isinstance(node, (RootNode, InnerNode)):
-            return "<h2>Table of Contents</h2>\n" + self._make_toc(node)
-        else:
-            return ''
+        if not isinstance(node, (RootNode, InnerNode)): return ''
+        return self._div("table-of-contents",
+                         '<h2>Table of Contents</h2>',
+                         self._make_toc(node))
     
     def _make_toc(self, node, indent='', deep=False):
         if len(node.children()) == 0:
@@ -141,3 +152,14 @@ class StaticExporter(Exporter):
                              node.children())) + \
                              "\n" + indent + "</ul>\n" + indent[0:-2] 
     
+    def export(self):
+        super(StaticExporter, self).export()
+        if self._stylesheet is not None:
+            src_path = os.path.join(self._course.src_dir(), self._stylesheet)
+            dst_path = os.path.join(self._dir, self._stylesheet)
+            if not os.path.exists(dst_path) or \
+                   os.path.exists(src_path) and \
+                   os.path.getmtime(dst_path) < os.path.getmtime(src_path):
+                shutil.copy(src_path, dst_path)
+                print "%s: file copied." % dst_path
+            
