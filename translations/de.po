@@ -1,0 +1,67 @@
+# Translations for the LCG (http://eurochance.brailcom.org).
+# Copyright (C) 2004, Brailcom, o.p.s.
+# Tomas Cerha <cerha@brailcom.org>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-12-07 22:24+0100\n"
+"PO-Revision-Date: 2004-12-07 17:25+0100\n"
+"Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
+"Language-Team: German <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lcg/course.py:52
+msgid "Node"
+msgstr ""
+
+#: lcg/course.py:58
+msgid "Node Index"
+msgstr ""
+
+#: lcg/course.py:595
+msgid "Vocabulary"
+msgstr ""
+
+#: lcg/course.py:605
+msgid "Key Language Use"
+msgstr ""
+
+#: lcg/course.py:611
+msgid "Key Grammar"
+msgstr ""
+
+#: lcg/course.py:617
+msgid "Exercises"
+msgstr ""
+
+#: lcg/course.py:627
+msgid "Consolidation"
+msgstr ""
+
+#: lcg/course.py:633
+msgid "Unit"
+msgstr ""
+
+#: lcg/course.py:634
+msgid "Unit Index"
+msgstr ""
+
+#: lcg/export.py:125
+msgid "Next"
+msgstr "Weiter"
+
+#: lcg/export.py:126
+msgid "Previous"
+msgstr "Letzte"
+
+#: lcg/export.py:132
+msgid "Course Index"
+msgstr ""
+
+#: lcg/export.py:139
+msgid "Table of Contents"
+msgstr "Inhalt"
