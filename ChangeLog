@@ -1,3 +1,14 @@
+2004-12-15  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/course.py (ContentNode._read_file): Reportthe filename on
+	`UnicodeDecodeError'.
+	(Consolidation): Renamed to `Summary'.
+	(Summary._TITLE): Reflect the name change. 
+	(Unit._create_children): `Consolidation' -> `Summary'.
+
+	* lcg/content.py (Exercise.__init__): Make an assertion to an
+	instance of `types.StringTypes'.
+
 2004-12-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/de.po: Translations improved.
