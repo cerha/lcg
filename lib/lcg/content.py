@@ -166,13 +166,6 @@ class Paragraph(Container):
     def export(self):
         return "<p>\n"+ super(Paragraph, self).export() +"</p>\n\n"
 
-
-class ListItem(Container):
-    """One item of an itemized list (can contain any subcontent)."""
-
-    def export(self):
-        return "<li>"+ super(ListItem, self).export() +"</li>\n"
-
     
 class ItemizedList(Container):
     """An itemized list (sequence of `ListItem' instances)."""
@@ -182,23 +175,20 @@ class ItemizedList(Container):
     TYPE_NUMERIC = 'NUMERIC'
     
     def __init__(self, parent, content, type=TYPE_UNORDERED):
-        assert is_sequence_of(content, ListItem)
+        assert is_sequence_of(content, Content)
         assert type in (self.TYPE_UNORDERED,
                         self.TYPE_ALPHA,
                         self.TYPE_NUMERIC)
         self._type = type
         super(ItemizedList, self).__init__(parent, content)
-        
 
     def export(self):
-        mapping = {self.TYPE_UNORDERED: ('ul', ''),
-                   self.TYPE_NUMERIC: ('ol', ''),
-                   self.TYPE_ALPHA: ('ol',
-                                     ' style="list-style-type: lower-alpha"')}
-        tag, attr = mapping[self._type]
-        return "<%s%s>%s</%s>\n" % \
-               (tag, attr, super(ItemizedList, self).export(), tag)
+        o, s = {self.TYPE_UNORDERED: (False, None),
+                self.TYPE_NUMERIC: (True, None),
+                self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
+        return itemize([p.export() for p in self._content], ordered=o, style=s)
 
+    
 class TableCell(Container):
     """One cell in a table."""
 
@@ -406,7 +396,7 @@ class TableOfContents(Content):
         links = [link(i.title(), i.url()) + \
                  self._make_toc(i, indent=indent+4, depth=depth-1)
                  for i in items]
-        return "\n" + ul(links, indent=indent) + "\n" + ' '*(indent-2)
+        return "\n" + itemize(links, indent=indent) + "\n" + ' '*(indent-2)
 
     
 class VocabList(Content):
