@@ -110,6 +110,22 @@ class ContentNode(object):
         filename = os.path.join(self.src_dir(), name+'.txt')
         return ''.join(open(filename).readlines())
 
+    def _node_path(self):
+        """Return the path from the root to this node as a sequence of nodes."""
+        if self._parent is not None:
+            return self._parent._node_path() + (self,)
+        else:
+            return (self,)
+        
+    def _id(self):
+        # The not-necesarrily unique id string of this node.  This can be used
+        # as a part of the unique id in connection with parent's id.
+        if self._parent is not None:
+            return '%02d%s' % (self._parent.index(self) + 1,
+                               self.__class__.__name__.lower())
+        else:
+            return 'index'
+
     # Public methods
 
     def root_node(self):
@@ -124,10 +140,11 @@ class ContentNode(object):
         return tuple(self._children)
 
     def linear(self):
+        """Return the linearized subtree of this node as a list."""
         return [self] + reduce(lambda l, n: l + n.linear(), self.children(), [])
 
     def next(self):
-        """."""
+        """Return the node following this node in the linearized structure."""
         linear = self.root_node().linear()
         i = linear.index(self)
         if i < len(linear)-1:
@@ -136,7 +153,7 @@ class ContentNode(object):
             return None
     
     def prev(self):
-        """."""
+        """Return the node preceeding this node in the linearized structure."""
         linear = self.root_node().linear()
         i = linear.index(self)
         if i > 0:
@@ -162,13 +179,11 @@ class ContentNode(object):
 
     def id(self):
         """Return a unique id of this node as a string."""
-        basename = self.subdir().replace(os.path.sep, '-')
-        name = self.__class__.__name__.lower()
-        if basename != '':
-            return '-'.join((basename, name))
+        if self._parent is None or self._parent is self.root_node():
+            return self._id()
         else:
-            return name
-
+            return '-'.join((self._parent.id(), self._id()))
+        
     def title(self):
         """Return the title of this node as a string."""
         if hasattr(self, '_title'):
@@ -177,12 +192,7 @@ class ContentNode(object):
 
     def full_title(self, separator=' - '):
         """Return the title of this node as a string."""
-        title = self.title()
-        node = self._parent
-        while (node is not None):
-            title = separator.join((node.title(), title))
-            node = node._parent
-        return title
+        return separator.join(map(lambda n: n.title(), self._node_path()))
 
     def meta(self):
         """Return the meta data as a dictionary.
@@ -220,14 +230,24 @@ class ContentNode(object):
     
     def counter(self):
         """Return the internal counter as a 'Counter' instance.
-
+        
         This counter can be used by content elements to count sections or
         whatever, depending on type of the content...  There is only one
         counter for each node and it is not supposed to be used by other nodes,
-        it should be used only within the 'Content' elements.
-
+        it should be used only within the 'Content' elements.  For node
+        counting, there is the 'index()' method below.
+        
         """
         return self._counter
+
+    def index(self, node):
+        """Return the child node's index number within this node's children.
+
+        The numbering begins at zero and corresponds to the natural order of
+        child nodes.
+        
+        """
+        return self._children.index(node)
         
 
 class TextNode(ContentNode):
@@ -252,18 +272,6 @@ class InnerNode(ContentNode):
     def title(self):
         return self._read_resource('title')
 
-
-class NumberedNode(InnerNode):
-    """Numbered node has a serial number within its parent node."""
-
-    def __init__(self, parent, subdir, number):
-        self._number = number
-        super(NumberedNode, self).__init__(parent, subdir)
-
-    def title(self):
-        return "%s %d: %s" % (self.__class__.__name__, self._number,
-                              self._read_resource('title'))
-
     
 class Course(InnerNode):
     """The root node of the content hierarchy.
@@ -280,9 +288,6 @@ class Course(InnerNode):
     def _create_content(self):
         return TableOfContents(self)
     
-    def output_file(self):
-        return 'index.html'
-
     def src_dir(self):
         return self._dir
 
@@ -383,7 +388,7 @@ class Consolidation(TextNode):
     pass
 
         
-class Unit(NumberedNode):
+class Unit(InnerNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
     
     def _create_children(self):
@@ -391,15 +396,20 @@ class Unit(NumberedNode):
         return map(lambda s: s(self, subdir.get(s, '')),
                    (Vocabulary, Use, Grammar, Exercises, Consolidation))
 
+    def _id(self):
+        return 'unit%02d' % (self._parent.index(self)+1)
+
+    def title(self):
+        title = super(Unit, self).title()
+        return "Unit %d: %s" % (self._parent.index(self)+1, title)
+
+    
     
 class EurochanceCourse(Course):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
     def _create_children(self):
-        c = Counter(1)
-        return map(lambda subdir: Unit(self, subdir, c.next()),
-                   filter(lambda d: d not in('media'),
-                          list_subdirs(self.src_dir())))
+        return map(lambda d: Unit(self, d), list_subdirs(self.src_dir()))
 
     def meta(self):
         return {'author': 'Eurochance team',
