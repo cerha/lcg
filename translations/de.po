@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-08 18:51+0100\n"
+"POT-Creation-Date: 2004-12-15 14:20+0100\n"
 "PO-Revision-Date: 2004-12-08 19:25+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -82,31 +82,31 @@ msgstr ""
 msgid "Node Index"
 msgstr ""
 
-#: lcg/course.py:595
+#: lcg/course.py:598
 msgid "Vocabulary"
 msgstr "Vokabeln"
 
-#: lcg/course.py:605
+#: lcg/course.py:608
 msgid "Key Language Use"
 msgstr "Verwendung der wichtigen Sprache"
 
-#: lcg/course.py:611
+#: lcg/course.py:614
 msgid "Key Grammar"
 msgstr "Wichtigsten grammatikalischen Formen"
 
-#: lcg/course.py:617
+#: lcg/course.py:620
 msgid "Exercises"
 msgstr "Übungen"
 
-#: lcg/course.py:627
-msgid "Consolidation"
-msgstr "Festigung"
+#: lcg/course.py:630
+msgid "Summary"
+msgstr ""
 
-#: lcg/course.py:633
+#: lcg/course.py:635
 msgid "Unit"
 msgstr "Lektion"
 
-#: lcg/course.py:634
+#: lcg/course.py:636
 msgid "Unit Index"
 msgstr "Lektionsverzeichnis"
 
@@ -126,16 +126,3 @@ msgstr "Kursindex"
 msgid "Table of Contents"
 msgstr "Inhaltsverzeichnis"
 
-
-
-
-
-
-
-""
-
-
-#: lcg/export.py:125
-msgid "Next"
-msgstr "Zunächst "  (next = to you mean next one?? Zunächst =
-at first)
