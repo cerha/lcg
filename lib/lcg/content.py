@@ -24,13 +24,11 @@ abstract container capable of HTML export.
 """
 
 import string
-import wiki
 import re
 import types
 import unicodedata
 
-from util import *
-from course import *
+from lcg import *
 from _html import *
 
 
@@ -38,14 +36,14 @@ class Content(object):
     """Generic base class for all types of content.
 
     One instance always makes a part of one document -- it cannot be split over
-    multiple output documents.  On the other hand, one document may consist of
-    multiple 'Content' instances (in theory).
+    multiple output documents.  On the other hand, one document usually
+    consists of multiple 'Content' instances (elements).
 
-    Each content element may contain other content elements and thus they make
-    a tree structure.  All the elements within this structure have the same
-    parent 'ContentNode' instance and through it are able to gather some
-    context information, such as input/output directory etc.  This is sometimes
-    necessary to generete correct HTML output (e.g. URI for links etc.).
+    Each content element may be contained in another content element (see the
+    'Container' class) and thus they make a hierarchical structure.  All the
+    elements within this structure have the same parent 'ContentNode' instance
+    and through it are able to gather some context information and access other
+    objects (i.e. the resources).
 
     """
     def __init__(self, parent):
@@ -80,6 +78,8 @@ class Content(object):
         return self._parent
 
     def set_container(self, container):
+        assert isinstance(container, Container), \
+               "Not a 'Container' instance: %s" % container
         self._container = container
 
     def _container_path(self):
@@ -91,6 +91,33 @@ class Content(object):
     def export(self):
         """Return the HTML formatted content as a string."""
         return ''
+
+
+class TextContent(Content):
+    """A simple piece of text."""
+
+    def __init__(self, parent, text):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- same as in the parent class.
+          text -- the actual text content of this element as a string.
+
+        """
+        assert isinstance(text, types.StringTypes)
+        super(TextContent, self).__init__(parent)
+        self._text = text
+
+    def export(self):
+        return self._text
+
+        
+class WikiText(TextContent):
+    """Structured text in Wiki formatting language (on input)."""
+        
+    def export(self):
+        return wiki.InlineFormatter(self._parent).format(self._text)
 
     
 class Container(Content):
@@ -104,9 +131,68 @@ class Container(Content):
     fact, that they are contained within this container and thus belong to the
     hierarchy.
 
-    'Container' exports all the parts concatenated in unchanged order.  For any
-    contained 'Section' instances, a local 'TableOfContents' is created
-    automatically, preceeding the actual content.
+    """
+
+    def __init__(self, parent, content):
+        """Initialize the instance.
+
+        Arguments:
+        
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          content -- the actual content wrapped into this container as a
+            sequence of 'Content' instances in the order in which they should
+            appear in the output.
+
+        """
+        super(Container, self).__init__(parent)
+        if operator.isSequenceType(content):
+            assert is_sequence_of(content, Content), \
+                   "Not a 'Content' instances sequence: %s" % (content,)
+            self._content = tuple(content)
+        else:
+            assert isinstance(content, Content)
+            self._content = (content,)
+        for c in self._content:
+            c.set_container(self)
+
+    def export(self):
+        return "".join([p.export() for p in self._content])
+
+
+class Paragraph(Container):
+    """A paragraph of text, where the text can be any 'Content'."""
+
+    def export(self):
+        return "<p>\n"+ super(Paragraph, self).export() +"</p>\n\n"
+
+
+class ListItem(Container):
+    """One item of an itemized list (can contain any subcontent)."""
+
+    def export(self):
+        return "<li>"+ super(ListItem, self).export() +"</li>\n"
+
+    
+class ItemizedList(Container):
+    """An itemized list (sequence of `ListItem' instances)."""
+    
+    def __init__(self, parent, content):
+        assert is_sequence_of(content, ListItem)
+        super(ItemizedList, self).__init__(parent, content)
+
+    def export(self):
+        return "<ul>"+ super(ItemizedList, self).export() +"</ul>\n"
+    
+    
+class SectionContainer(Container):
+    """A 'Container' which recognizes contained sections.
+
+    'SectionContainer' acts as a 'Container', but for any contained 'Section'
+    instances, a local 'TableOfContents' can be created automatically,
+    preceeding the actual content (depending on the 'toc_depth' constructor
+    argument).  The contained sections are also returned by the 'sections()'
+    method to allow builbing a global `TableOfContents'.
 
     """
 
@@ -115,30 +201,18 @@ class Container(Content):
 
         Arguments:
 
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          content -- the actual content wrapped into this container as a
-            sequence of 'Content' instances in the order in which they should
-            appear in the output.
+          parent, content -- same as in the parent class.
           toc_depth -- the depth of local table of contents.  Corresponds to
             the same constructor argument of 'TableOfContents'.
 
         """
-        super(Container, self).__init__(parent)
-        if operator.isSequenceType(content):
-            assert is_sequence_of(content, Content)
-            self._content = tuple(content)
-        else:
-            assert isinstance(content, Content)
-            self._content = (content,)
+        super(SectionContainer, self).__init__(parent, content)
         self._sections = [p for p in self._content if isinstance(p, Section)]
         if len(self._sections) > 1 and toc_depth > 0:
             self._toc = TableOfContents(parent, self, title=_("Index:"),
                                         depth=toc_depth)
         else:
             self._toc = Content(parent)
-        for c in self._content:
-            c.set_container(self)
 
     def sections(self):
         return self._sections
@@ -147,10 +221,11 @@ class Container(Content):
         return "\n".join([p.export() for p in (self._toc,) + self._content])
 
     
-class Section(Container):
+class Section(SectionContainer):
     """Section wraps the subordinary contents into an inline section.
 
-    Section is very simillar to a 'Container', but there are a few differences:
+    Section is very simillar to a 'SectionContainer', but there are a few
+    differences:
 
       * Every section has a title, which appears in the output document as a
         heading.
@@ -264,33 +339,6 @@ class TableOfContents(Content):
                  for i in items]
         return "\n" + ul(links, indent=indent) + "\n" + ' '*(indent-2)
 
-    
-class GenericText(Content):
-    """Generic parent class for content generated from a piece of text."""
-
-    def __init__(self, parent, text):
-        """Initialize the instance.
-
-        Arguments:
-
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          text -- the actual text content of this element as a string.
-
-        """
-        super(GenericText, self).__init__(parent)
-        self._text = text
-
-    def export(self):
-        return self._text
-
-        
-class WikiText(GenericText):
-    """Structured text in Wiki formatting language (on input)."""
-        
-    def export(self):
-        return wiki.format(self._text)
-    
     
 class VocabList(Content):
     """Vocabulary listing consisting of multiple 'VocabItem' instances."""
