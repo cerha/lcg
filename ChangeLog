@@ -1,5 +1,45 @@
 2004-09-24  Tomas Cerha  <cerha@brailcom.org>
 
+	* lcg/ims.py (_Manifest._create_item): Use
+	`ContentNode.resources()' instead of `ContentNode.list_media()'.
+	Use `self._export_resource()' instead of
+	`ContentNode._export_media()'.
+
+	* lcg/export.py (Exporter._export_node): Use
+	`ContentNode.resources()' instead of `ContentNode.list_media()'.
+	Use `self._export_resource()' instead of
+	`ContentNode._export_media()'.
+	(Exporter._export_media): Renamed to
+	`Exporter._export_resource()'.
+	(Exporter._export_resource): Do the TTS only for Media instances.
+	(StaticExporter._wrap_content.tags): New function.
+	(StaticExporter._wrap_content): Use it instead of `self._meta()'
+	and `self._links()'.  Include HTML head tags for all `Script' and
+	`Stylesheet' instances this node depends on.
+	(StaticExporter._meta): Method removed.
+	(StaticExporter._links): Method removed.
+	(StaticExporter.export): Method removed.
+
+	* lcg/course.py: Docstring updated.
+	(ContentNode): Docstring updated.
+	(ContentNode.__init__): Docstring updated.
+	(ContentNode._media: Renamed to `_resources'.
+	(ContentNode._read_resource): Renamed to `_read_file'.
+	(ContentNode.list_media): Renamed to `resources'.  New argument
+	cls to filter the returned list.
+	(ContentNode._resource): New method.
+	(ContentNode.media): Use it.
+	(ContentNode.script): New method.
+	(ContentNode.stylesheet): New method.
+	(TextNode._create_content, InnerNode._create_content)
+	(InnerNode.title): `ContentNode._read_resource()' ->
+	`ContentNode._read_file'.
+	(Resource): New class (based on the Media code.
+	(Media): Derive from it.  Most methods moved to Resource.
+	(EurochanceCourse._create_children): Suppose only directories
+	beginning with numbers as unit subdirectories.
+	(Script, Stylesheet): New classes.
+
 	* lcg/content.py (Cloze.__init__): Allocate media files for the
 	evaluation response.
 	(Cloze._form_name): Method removed.
@@ -9,6 +49,11 @@
 	after evaluation.  Mark incorrect answers by an exclamation mark.
 	(Cloze.export): Pass the form name and correct answers as an
 	argument to a Javascript evaluation function.
+	(Cloze.__init__): Don't store the media in attributtes, just
+	allocate the dependency as well as the new dependency for the
+	Javascript code `eval-cloze.js'.
+	(Cloze._script): Method removed.
+	(Cloze.export): Don't use the removed `_script()' method.
 
 2004-09-23  Tomas Cerha  <cerha@brailcom.org>
 
