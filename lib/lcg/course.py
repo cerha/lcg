@@ -20,35 +20,33 @@
 
 This module includes classes used as an abstraction of a course structure based
 on a tree structure with nodes capable of reading their content from input
-resources (either directly from files or using helper 'Feeder' classes),
-exporting themselves into HTML and giving some information about themselves.
-This information is then used to build the IMS manifest for the generated
-content package (implemented by the top-level 'Course' node).
+resources (either directly from files or using helper 'Feeder' classes) and
+giving some information about themselves.  This information is then used to
+by the exporter classes to write the output files in various formats (eg. as an
+IMS package or static html pages).
 
 In the second part of this module there are several derived classes which
-define a concrete implementation of the language course for Eurochance project.
-Any other course structure is possible by proper implementation of derived
-classes.
+define a concrete implementation of the language course for the Eurochance
+project.  Any other course structure is possible by proper implementation of
+derived classes.
 
 """
 
 import os
 import sys
-import shutil
 
 from util import *
-from ims import *
 from content import *
 from feed import *
 
 class ContentNode(object):
     """Representation of one output document within a course material.
 
-    This class represents a generic node of a course material capable of
-    exporting all its content into one HTML document (and corresponding 'Media'
-    files it depends on).  All the subsequent nodes are also exported
-    recursively.
-
+    This class represents a generic node of a course material.  Each node can
+    have several children nodes and can depend on several 'Media' instances.
+    By instantiating a node, all the resources are read and the content is
+    built and ready for export.
+    
     """
     
     def __init__(self, parent, subdir):
@@ -114,21 +112,6 @@ class ContentNode(object):
         filename = os.path.join(self.src_dir(), name+'.txt')
         return ''.join(open(filename).readlines())
 
-    def _export(self, dir):
-        """Write the output file just for this node."""
-        #print "Exporting:", self
-        #base = '../' * len(self.dst_dir().split('/'))
-        base = "file://" + os.path.abspath(dir) + "/"
-        filename = os.path.join(dir, self.output_file())
-        file = open(filename, 'w')
-        file.write("\n".join(('<html>\n<head>\n' + \
-                              '<title>%s</title>\n' % self.full_title() + \
-                              '<base href="%s">\n' % base + \
-                              '</head>\n<body bgcolor="white">',
-                              self._content.export(),
-                              '</body></html>')))
-        file.close()
-
     # Public methods
 
     def root_node(self):
@@ -172,20 +155,15 @@ class ContentNode(object):
         """Return a unique id of this node as a string."""
         return "%s-%d" % (self.__class__.__name__.lower(), id(self))
 
-    def full_title(self):
-        title = self.title()
-        node = self._parent
-        while (node is not None):
-            title = ' - '.join((node.title(), title))
-            node = node._parent
-        return title
-
     def title(self):
         """Return the title of this node as a string."""
         if hasattr(self, '_title'):
             return self._title
         return self.__class__.__name__
 
+    def content(self):
+        return self._content
+    
     def list_media(self):
         """Return the list of all 'Media' objects within this node's content."""
         return tuple(self._media.values())
@@ -222,17 +200,6 @@ class ContentNode(object):
         """
         return self._counter
         
-    def export(self, dir):
-        """Write the output file for this node and all subsequent nodes."""
-        subdir = os.path.join(dir, self.dst_dir())
-        if not os.path.isdir(subdir):
-            os.makedirs(subdir)
-        self._export(dir)
-        for m in self._media.values():
-            m.export(dir)
-        for node in self._children:
-            node.export(dir)
-
 
 class TextNode(ContentNode):
     """A section of stuctured text read from a wiki-formatted file."""
@@ -271,11 +238,7 @@ class NumberedNode(InnerNode):
 
     
 class Course(InnerNode):
-    """The course is a root node of the actual IMS package.
-
-    This class exports the entire course (all the subsequent nodes) to HTML and
-    builds an IMS manifest file, so that an IMS package can be made out of a
-    course.
+    """The root node of the content hierarchy.
 
     You still need to override the '_create_children()' method to get some
     sub-content into the course.
@@ -289,11 +252,6 @@ class Course(InnerNode):
     def _create_content(self):
         return TableOfContents(self)
     
-    def _export(self, dir):
-        super(Course, self)._export(dir)
-        manifest = Manifest(self)
-        manifest.write(dir)
-
     def output_file(self):
         return os.path.join(self.dst_dir(), 'index.html')
 
@@ -338,46 +296,26 @@ class Media(object):
         self._shared = shared
         self._tts_input = tts_input
         if tts_input is None:
-            assert os.path.exists(self._source_file()), \
-                   "Media file '%s' doesn't exist!" % self._source_file()
+            assert os.path.exists(self.source_file()), \
+                   "Media file '%s' doesn't exist!" % self.source_file()
         
-    def url(self):
-        return self._destination_file('')
-
-    def _source_file(self):
+    def source_file(self):
         dir = not self._shared and self._parent.src_dir() \
               or os.path.join(self._parent.root_node().src_dir(),
                               self.shared_directory)
         return os.path.join(dir, self._file)
 
-    def _destination_file(self, dir):
+    def destination_file(self, dir):
         subdir = self._shared and \
                  self.shared_directory or self._parent.dst_dir()
         return os.path.join(dir, subdir, self._file)
 
-    def export(self, dir):
-        src_path = self._source_file()
-        dst_path = self._destination_file(dir)
-        if not os.path.exists(dst_path) or \
-               os.path.exists(src_path) and \
-               os.path.getmtime(dst_path) < os.path.getmtime(src_path):
-            if not os.path.isdir(os.path.dirname(dst_path)):
-                os.makedirs(os.path.dirname(dst_path))
-            # Either create the file with tts or copy from source directory.
-            if self._tts_input is not None and not os.path.exists(src_path):
-                print "%s: file does not exist!" % dst_path
-                cmd = None
-                try:
-                    cmd = os.environ['LCG_TTS_COMMAND']
-                except KeyError:
-                    pass
-                if cmd:
-                    cmd = cmd % {'text': self._tts_input, 'file':dst_path}
-                    print "  - generating with TTS: %s" % cmd
-                    os.system(cmd)
-            else:
-                shutil.copy(src_path, dst_path)
-                print "%s: file copied." % dst_path
+    def url(self):
+        return self.destination_file('')
+
+    def tts_input(self):
+        return self._tts_input
+
     
 
 ################################################################################
