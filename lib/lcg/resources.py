@@ -263,5 +263,5 @@ class Transcript(Resource):
         else:
             dst_path = self._destination_file(dir)
             output_file = open(dst_path, 'w')
-            output_file.write(self._text)
+            output_file.write(self._text.encode('utf-8'))
             output_file.close()
