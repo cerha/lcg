@@ -174,14 +174,13 @@ class Paragraph(Container):
 
     
 class ItemizedList(Container):
-    """An itemized list (sequence of `ListItem' instances)."""
+    """An itemized list."""
 
     TYPE_UNORDERED = 'UNORDERED'
     TYPE_ALPHA = 'ALPHA'
     TYPE_NUMERIC = 'NUMERIC'
     
     def __init__(self, parent, content, type=TYPE_UNORDERED):
-        assert is_sequence_of(content, Content)
         assert type in (self.TYPE_UNORDERED,
                         self.TYPE_ALPHA,
                         self.TYPE_NUMERIC)
@@ -193,6 +192,28 @@ class ItemizedList(Container):
                 self.TYPE_NUMERIC: (True, None),
                 self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
         return itemize([p.export() for p in self._content], ordered=o, style=s)
+
+    
+class Definition(Container):
+    """A single definition for the 'DefinitionList'."""
+    
+    def __init__(self, parent, term, description):
+        super(Definition, self).__init__(parent, (term, description))
+
+    def export(self):
+        t, d = [c.export() for c in self._content]
+        return "<dt>%s</dt><dd>%s</dd>\n" % (t,d)
+
+    
+class DefinitionList(Container):
+    """A list list of definitions."""
+    
+    def __init__(self, parent, content):
+        assert is_sequence_of(content, Definition)
+        super(DefinitionList, self).__init__(parent, content)
+
+    def export(self):
+        return "<dl>%s</dl>\n" % super(DefinitionList, self).export()
 
     
 class TableCell(Container):
@@ -691,8 +712,13 @@ class Exercise(Section):
     _NAME = None
     _RECORDING_REQUIRED = False
     _AUDIO_VERSION_REQUIRED = False
+    _BUTTONS = ()
+    _DISPLAYS = ()
+    _KEYS = ()
+    _HELP =  ""
 
     _used_types = []
+    _help_node = None
     
     def __init__(self, parent, tasks, sound_file=None, audio_version=None,
                  transcript=None):
@@ -761,9 +787,32 @@ class Exercise(Section):
         return cls._NAME
     name = classmethod(name)
 
-    def id(cls):
-        return camel_case_to_lower(cls.__name__)
-    id = classmethod(id)
+    def help(cls, parent):
+        cls._help_node = p = parent
+        def sec(title, anchor, text, items):
+            if not items: return Content(parent)
+            defs = [Definition(p, TextContent(p, label), WikiText(p, help))
+                    for label, help in items]
+            content = (Paragraph(p, WikiText(p, text)), DefinitionList(p, defs))
+            return Section(parent, title, anchor=anchor, content=content)
+        s = (Section(p, _("Instructions"),
+                     content=wiki.Parser(parent).parse(cls._HELP)),
+             sec(_("Shortcut Keys"), 'keys',
+                 _("In all the exercises where you fill in the text into a "
+                   "text-box you can use the two shortcut keys described "
+                   "below."),
+                 [x for x in cls._KEYS]),
+             sec(_("Display"), 'display',
+                 _("The display box below the exercise "
+                   "shows the following values:"),
+                 [(label, help) for label, name, help in cls._DISPLAYS]),
+             sec(_("Buttons"), 'buttons',
+                 _("The control panel below the exercise "
+                   "contains the following buttons:"),
+                 [(label, help) for label, t, h, help in cls._BUTTONS]))
+        return SectionContainer(p, s)
+    help = classmethod(help)
+
     
     def used_types(cls):
         return cls._used_types
@@ -809,8 +858,7 @@ class Exercise(Section):
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
         instructions = p(self._instructions(),
-                         link(_("detailed instructions"),
-                              "instructions-%s.html" % self.id(),
+                         link(_("detailed instructions"), self._help_node.url(),
                               target='help', brackets=True))
         if self._recording is not None:
             instructions += '\n\n' + self._export_recording()
@@ -840,11 +888,19 @@ class SentenceCompletion(Exercise):
     _AUDIO_VERSION_REQUIRED = True
     _TASK_TYPE = None
 
+    _HELP = _("""The aim of this exercise is to provide an opportunity for the
+    user to produce a complete sentence in English and compare pronunciation
+    with an original and is therefore purely aural-oral, with no written tasks.
+
+    If you wish to check your answers against the written text, you can see the
+    textual transcript of the recording.  Since this is not a written exercise,
+    there is no way to check your results automatically.""")
+
     def _instructions(self):
         return _("""This exercise can be only done purely aurally/orally.  You
-        will hear some of the sentences from the previous exercise unfinished
-        and your goal is to say the missing part.""")
-
+        will hear an unfinished sentence and your goal is to say the missing
+        part.""")
+    
     def _export_audio_version(self):
         return self._sound_controls(_("The exercise"), self._audio_version)
 
@@ -870,8 +926,21 @@ class _InteractiveExercise(Exercise):
                      'incorrect-response-3.ogg': _("Try again!")}
 
     _FORM_HANDLER = 'Handler'
-    _INITIAL_RESULT = None;
     _MESSAGES = {};
+
+    _DISPLAYS = ((_('Answered:'), 'answered',
+                  _("Displays the number of the tasks you have already "
+                    "answered.  For example the value 4/10 means, that you "
+                    "have answered four out of ten questions.")),
+                 (_('Correct:'),  'result',
+                  _("Displays the number of correct answers.  Only the "
+                    "first attempt for each answer is taken into account.  "
+                    "Use the ``Reset'' button to start again.")))
+
+    _BUTTONS = ((_('Fill'), button, "this.form.handler.fill()",
+                 _("Fill in the whole exercise by correct answers.")),
+                (_('Reset'), reset, "this.form.handler.reset()",
+                 _("Reset all your answers and start again.")))
     
     def __init__(self, parent, *args, **kwargs):
         super(_InteractiveExercise, self).__init__(parent, *args, **kwargs)
@@ -897,19 +966,14 @@ class _InteractiveExercise(Exercise):
                 js_array(self._answers()), js_dict(responses),
                 js_dict(self._MESSAGES))
 
-    def _buttons(self):
-        return ()
-
-    def _display(self):
-        return ((_('Answered:'), field(name='answered', size=8, readonly=True)),
-                (_('Correct:'),  field(name='result', size=50, readonly=True,
-                                       text=self._INITIAL_RESULT)))
-
-
     def _results(self):
-        d = '<br/>'.join([' '.join((label, f)) for label, f in self._display()])
-        r = div((div(d, 'display'), div(self._buttons(), 'buttons')), 'results')
-        return script_write(r, '')
+        displays = [' '.join((label, field(name=name, size=50, readonly=True)))
+                    for label, name, help in self._DISPLAYS]
+        buttons = [type(label, handler)
+                   for label, type, handler, help in self._BUTTONS]
+        panel = div((div('<br/>'.join(displays), 'display'),
+                     div(buttons, 'buttons')), 'results')
+        return script_write(panel, '')
     
     
 ################################################################################
@@ -920,12 +984,13 @@ class _ChoiceBasedExercise(_InteractiveExercise):
 
     _FORM_HANDLER = 'ChoiceBasedExerciseHandler'
 
+    _HELP = _("""You will hear a response immediately after choosing the
+    answer.  When you decide for a wrong answer, you can try again until you
+    find the correct one, however the other attempts will not count into
+    results (see the [#display] section below).""")
+    
     def _answers(self):
         return [t.choice_index(t.correct_choice()) for t in self._tasks]
-
-    def _buttons(self):
-        return (button(_('Fill'),  "this.form.handler.fill()"),
-                reset( _('Reset'), "this.form.handler.reset()"))
 
     def _non_js_choice_control(self, task, choice):
         media = self._response(choice.correct() and 'correct' or 'incorrect')
@@ -946,7 +1011,7 @@ class _ChoiceBasedExercise(_InteractiveExercise):
     def _format_choices(self, task):
         formatted = [self._format_choice(task, ch) for ch in task.choices()]
         return div(formatted, 'choices')
-    
+
     def _export_task(self, task):
         return p(task.prompt(), self._format_choices(task))
 
@@ -957,6 +1022,11 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
     _TASK_TYPE = MultipleChoiceQuestion
     _NAME = _("Multiple Choice Questions")
     
+    _HELP = _("""Each question in this exercise is followed by a list of
+    possible answers labaled a, b and c.  Only one answer is correct.
+
+    """) + _ChoiceBasedExercise._HELP
+
     def _instructions(self):
         return _("""For each of the %d questions below choose the correct
         answer from the list.""") % len(self._tasks)
@@ -968,9 +1038,16 @@ class Selections(_ChoiceBasedExercise):
     _TASK_TYPE = Selection
     _NAME = _("Select the Correct One")
     
+    _HELP = _("""There are several pairs of simmillar sentences, however one of
+    the sentences in each pair is always incorrect.  Your goal is to decide
+    which is the correct one.
+
+    """) + _ChoiceBasedExercise._HELP
+    
     def _instructions(self):
         return _("""For each of the %d pairs of statements below decide which
         one is correct.""") % len(self._tasks)
+
 
 class _SelectBasedExercise(_ChoiceBasedExercise):
 
@@ -990,22 +1067,35 @@ class TrueFalseStatements(_SelectBasedExercise):
     
     _TASK_TYPE = TrueFalseStatement
     _NAME = _("True/False Statements")
-    
+
+    _HELP = _("""Each sentence in this exercise is followed by a control with
+    two options -- 'TRUE' and 'FALSE'.  Your goal is to decide whether the
+    sentence is true or not and choose the corresponding option.
+
+    """) + _ChoiceBasedExercise._HELP
+
     def _instructions(self):
         return _("""For each of the %d statements below indicate whether you
         think they are true or false.""") % len(self._tasks)
 
 
+    
 class GapFilling(_SelectBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 
     _TASK_TYPE = GapFillStatement
     _NAME = _("Gap Filling")
 
-    def _instructions(self):
-        return _("""For each of the %d sentences below choose the correct piece
-        of text from the list to fill in the gap.""") % len(self._tasks)
+    _HELP = _("""Your goal is to choose the correct word to fill in a gap in a
+    sentence.  For each gap you have three choices.  Only one of them is
+    correct.
 
+    """) + _ChoiceBasedExercise._HELP
+
+    def _instructions(self):
+        return _("""For each of the %d sentences below choose the correct word
+        from the list to fill in the gap.""") % len(self._tasks)
+    
     def _export_task(self, task):
         return p(task.substitute_gap("%s") % self._format_choices(task))
     
@@ -1031,16 +1121,37 @@ class _FillInExercise(_InteractiveExercise):
 
     _FORM_HANDLER = 'FillInExerciseHandler'
 
-    _INITIAL_RESULT = _("Use the 'Evaluate' button to see the results.")
+    _BUTTONS = ((_("Evaluate"), button, "this.form.handler.evaluate()",
+                 _("""Evaluate the entire exercise.  If an error is found the
+                 cursor is moved to the first incorrect answer (and to the
+                 first incorrect character within this answer, when some part
+                 of the answer is correct).""")),
+                ) + _InteractiveExercise._BUTTONS
+    
+    _KEYS = ((_("Enter"),
+              _("""Use this key within the text-field to evaluate the current
+              answer.  You hear a sound response and in case of an error, the
+              cursor is moved to the position of the first incorrect character
+              within the text.""")),
+             (_("Ctrl-Space"),
+              _("""If you don't know the answer, you can also use the ``hint''
+              feature.  Just press the *''* key combination (holding the Ctrl
+              key, press the spacebar) and one letter of the correct answer
+              will be filled in automatically.  If you have already entered
+              some text, the cursor will be moved behind the last correct
+              character and next one will be inserted.  It also means, that if
+              there is some text behind the cursor, there is at least one error
+              in it.  Try to locate this error and correct it.  Then you can
+              try to evaluate your answer using the 'Enter' key (see above) or
+              use the ``hint'' again, until you find the correct answer.""")))
+
+    _HELP = _("""Use the buttons at the bottom of the exercise to evaluate all
+    the answers.  You can also check each answer individually using the
+    shortcut keys (see the section [#keys] for more information).""")
     
     def _answers(self):
         return reduce(lambda a, b: a+b, [t.answers() for t in self._tasks])
-
-    def _buttons(self):
-        return (button(_('Evaluate'), "this.form.handler.evaluate()"),
-                button(_('Fill'),     "this.form.handler.fill()"),
-                reset( _('Reset'),    "this.form.handler.reset()"))
-
+   
     def _make_field(self, match):
         return field(cls='cloze', size=len(match.group(1))+1)
     
@@ -1054,6 +1165,11 @@ class Cloze(_FillInExercise):
     _NAME = _("Cloze")
     _RECORDING_REQUIRED = True
 
+    _HELP = _("""Your goal in this exercise is to fill in the gaps in the text
+    using exactly the same words as you have heard in the recording.
+
+    """) + _FillInExercise._HELP
+
     def _create_transcript(self, file):
         text = "\n\n".join([t.plain_text() for t in self._tasks])
         return self._parent.resource(Transcript, file, text=text)
@@ -1065,17 +1181,30 @@ class Cloze(_FillInExercise):
         else:
             return _("""Fill in the gaps in the text below.  There is just one
             correct word for each gap.""")
-
+        
         
 class VocabExercise(_FillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Vocabulary Practice")
 
+    _HELP = _("""There are two ways how you can do the exercise: The oral form
+    and the written form.  Do both of them for best results.
+
+    The oral version is based on the listening below.  You will hear each item
+    in your language.  Say the word or expression in English and listen to the
+    model pronunciation.
+
+    The written version lists all the vocabulary items on the page.  For each
+    item, there is a text box next to it.  Your goal is to type the translation
+    into this text box.
+
+    """) + _FillInExercise._HELP
+    
     def _instructions(self):
         return _("""You will hear a word or expression in your language.  Say
         it in English and listen to the model pronunciation.""")
-    
+
     def _export_task(self, task):
         return task.text(self._make_field)+'<br/>'
 
@@ -1085,6 +1214,12 @@ class Transformation(_FillInExercise):
 
     _TASK_TYPE = TransformationTask
     _NAME = _("Transformation")
+
+    _HELP = _("""Your goal is to transform a structure (pattern or paradigm)
+    into a different structure.  The recording contains detailed instructions
+    for this transformation.
+
+    """)  + _FillInExercise._HELP
 
     def _instructions(self):
         return _("""Listen to the recording and transform each of the %d
@@ -1099,8 +1234,13 @@ class Substitution(Transformation):
 
     _NAME = _("Substitution")
 
-    def _instructions(self):
+    _HELP = _("""Your goal is to substitute a structure (pattern or paradigm)
+    with a different structure.  Each sentence is followed by text in brackets.
+    Replace the corresponding part of the sentence using this text.
 
+    """) + _FillInExercise._HELP
+
+    def _instructions(self):
         return _("""Substitute a part of each sentence using the text in
         brackets.""")
 
@@ -1114,12 +1254,26 @@ class Dictation(_FillInExercise):
     _RECORDING_REQUIRED = True
     _MESSAGES = {'Correct': _('Correct'),
                  'Error(s) found': _('Error(s) found')}
+
+    _DISPLAYS = ((_('Result:'), 'result',
+                  _("""Displays the result of the last evaluation (evaluate
+                  your answer by pressing the 'Enter' key or by the
+                  ``Evaluate'' button below the exercise).""")),)
     
+    _HELP = _("""Listen to the recording and type what you hear into the large
+    text box below.  You can replay the recording how many times you need to
+    understand it, however two attempts should be enough for a well performing
+    student.
+
+    Pay special attention to punctuation and case, since they often cause most
+    of the problems when evaluating dictation.  Write all the sentences as you
+    hear them, using the appropriate punctuation character and one space after
+    each sentence.  No space is allowed at after the last sentence.""")
+
     def __init__(self, parent, tasks, *args, **kwargs):
         super(Dictation, self).__init__(parent, tasks, *args, **kwargs)
         assert len(tasks) == 1, \
                "Dictation must consist of just one task (paragraph of text)."
-
 
     def _instructions(self):
         return """Listen to the recording and type exactly what you hear into
@@ -1128,7 +1282,4 @@ class Dictation(_FillInExercise):
     def _export_task(self, task):
         return '<textarea rows="10" cols="60"></textarea>'
     
-    def _display(self):
-        return ((_('Result:'), field(name='result', size=50, readonly=True,
-                                     text=self._INITIAL_RESULT)),)
     
