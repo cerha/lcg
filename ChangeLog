@@ -1,3 +1,47 @@
+2005-01-06  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/export.py: Import everything from `resources' instead of
+	`content'.
+	(StaticExporter._wrap_content): Use `ContentNode.resource()'
+	instead of `ContentNode.stylesheet()'.
+
+	* lcg/course.py: Import everything from `resources'.
+	(ContentNode.__init__): Use
+	`ContentNode.resource()' instead of `ContentNode.stylesheet()'.
+	(_resource): Removed.
+	(ContentNode.resource): New method /transformed from `_resource()'/.
+	(media, script, stylesheet): Removed.
+	(Unit._create_children): Use a list comprehension instead of
+	creating each child separately.
+	
+
+	* lcg/content.py: Import everything from `_html'.
+	(Resource, Media, Script, Stylesheet): Moved from here to the new
+	`resources' module.
+	(_field, _button, _script, _script_write, _speaking_text): Moved
+	to the new `_html' module and renamed.
+	(VocabList.export, Exercise.export)
+	(Exercise._export_instructions, Cloze._results)
+	(Cloze._make_field, _ChoiceBasedExercise._answer_control)
+	(_ChoiceBasedExercise._results): Use functions from the `_html'
+	module instead of the removed methods.
+	(VocabItem.__init__, Exercise.__init__, Exercise.__init__)
+	(Cloze.__init__, _ChoiceBasedExercise._answer_control): Use
+	`ContentNode.resource()' instead of `ContentNode.media()' and
+	`ContentNode.script()'.
+	
+
+	* lcg/resources.py (Module): New module.  
+	(Resource, Media, Script, Stylesheet): Moved here from the
+	`content' module.
+	(Transcript): New class.
+	(Resource.__init__): Argument `check_file' Removed.  Don't check
+	the existence of source file here, just call 'check_file()'
+	(Resource._check_file): New method.
+	(Media._check_file): New method.
+
+	* lcg/__init__.py: Import everything from `resources'.
+
 2005-01-05  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/feed.py: Docstring updated.  Don't import `unicodedata'.

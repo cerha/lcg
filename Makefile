@@ -1,5 +1,5 @@
-SRC = data/$(LANG)/intermediate
-DST = output/$(LANG)/intermediate
+SRC = ../data/$(LANG)/intermediate
+DST = ../output/$(LANG)/intermediate
 
 REMOTE_HOST = cesnet
 REMOTE_DIR = /var/www/hosts/eurochance.brailcom.org/share/lcg
@@ -52,8 +52,8 @@ sync:
 	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR);chmod -R g+w .;chgrp -R www-data ."
 
 # unison ?
+#	rsync $(RSYNC_OPTS) --update $(REMOTE_HOST):$(REMOTE_DIR)/data ..
 sync-data:
-	rsync $(RSYNC_OPTS) --update data $(REMOTE_HOST):$(REMOTE_DIR)/
-	rsync $(RSYNC_OPTS) --update $(REMOTE_HOST):$(REMOTE_DIR)/data .
+	rsync $(RSYNC_OPTS) --update ../data $(REMOTE_HOST):$(REMOTE_DIR)/
 	ssh $(REMOTE_HOST) "cd $(REMOTE_DIR);chmod -R g+w .;chgrp -R www-data ."
 

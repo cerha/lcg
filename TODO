@@ -1,16 +1,18 @@
+Bugs:
+
  * After first page load, Multiple choice Exercise does'nt count answers
    correctly.  After reset, it works fine.
 
- * Sound recordings for exercise tasks?
 
- * A general set of instructions in users' own language.
+Required features:
 
- * Punctuation insenstive evaluation.
-
- * Custom instructions for Transformation & Substitution exercises.
+ * General instructions in users' own language (a hyperlinked help system).
 
  * Playing sounds in background in MSIE.
 
+
+Optional Features:
+
  * Preloading sounds.
 
- * http://atschool.eduweb.co.uk/rgshiwyc/school/curric/HotPotatoes/index.htm
+ * Punctuation insenstive evaluation.
