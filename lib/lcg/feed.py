@@ -24,12 +24,14 @@ derived class).
 
 """
 
-import imp
 import re
 import os
 import commands
 import string
-import code
+import traceback
+
+import imp
+import util
 
 from content import *
 
@@ -61,7 +63,6 @@ class Feeder(object):
 
 class PySpecFeederError(Exception):
     """Exception reised when there is a problem loading specification file."""
-    pass
 
 
 class PySpecFeeder(Feeder):
@@ -118,7 +119,7 @@ class ExcelVocabFeeder(Feeder):
                                    parent.media(media_file, tts_input=word)))
         return VocabList(parent, items)
     
-
+    
 class ExerciseFeeder(Feeder):
     """Exercise Feeder reading data from a plain text file."""
 
@@ -126,47 +127,9 @@ class ExerciseFeeder(Feeder):
     _blank_line_matcher = re.compile(r"\r?\n\s*\r?\n")
     _header_matcher = re.compile(r"^(?P<key>[a-z0-9_]+): (?P<value>.*)$")
         
-
-    class _PieceOfText:
-        """A piece of text which can be split keeping track of line numbers."""
-        
-        def __init__(self, text, firstline=1):
-            assert type(text) == type('')
-            assert type(firstline) == type(0)
-            self._text = text
-            self._firstline = firstline
-
-        def __str__(self):
-            return self._text
-
-        def firstline(self):
-            """Return the number of the first line of this text on input."""
-            return self._firstline
-
-        def _create_piece(self, start, end):
-            # Create a piece as a substring of the text of this piece.
-            n = len(self._text[:start].splitlines()) + self._firstline
-            text = self._text[start:end].rstrip()
-            return ExerciseFeeder._PieceOfText(text, n)
-        
-        def split(self, matcher):
-            """Return parts of the text as a tuple of _PieceOfText instances.
-
-            All beginning and trailing whitespace characters are stripped from
-            the pieces of text.
-
-            """
-            pieces = []
-            lastposition = len(self._text) - len(self._text.lstrip())
-            for match in matcher.finditer(self._text):
-                pieces.append(self._create_piece(lastposition, match.start()))
-                lastposition = match.end()
-            pieces.append(self._create_piece(lastposition, None))
-            return pieces
-
-        
     def feed(self, parent):
-        text = self._PieceOfText(''.join(open(self._input_file()).readlines()))
+        contents = ''.join(open(self._input_file()).readlines())
+        text = SplittableText(contents)
         return Container(parent,
                          map(lambda piece: self._exercise(parent, piece),
                              text.split(self._splitter_matcher)))
@@ -188,20 +151,26 @@ class ExerciseFeeder(Feeder):
             m = "Exception caught while processing exercise specification:\n" +\
                 '  File "%s", line %d\n' %(self._input_file(), text.firstline())
             sys.stderr.write(m)
-            code.InteractiveInterpreter().showtraceback()
+            apply(traceback.print_exception, sys.exc_info())
             sys.exit()
     
     def _read_header(self, text):
+        """Read excercise header and return the tuple (type, info).
+        
+        Here the 'type' is a class of the exercise got by name read as the
+        corresponding header field and 'info' is a dictionary of all other
+        header fields.  This dictionary is supposed to be used as 
+
+        """
         info = {}
         for line in str(text).splitlines():
             match = self._header_matcher.match(line)
-            assert match, "Invalid exercise header syntax: '%s'" % \
-                   (self._input_file(), line)
+            assert match, "Invalid exercise header syntax."
             info[match.group('key')] = match.group('value')
         try:
             type = getattr(content, info['type'])
-            #assert isinstance(type, Exercise), \
-            #       "Invalid exercise class %s" % info['type']
+            assert issubclass(type, Exercise), \
+                   "Invalid exercise class %s:" % type
             del(info['type'])
             return (type, info)
         except KeyError:
@@ -223,7 +192,7 @@ class ExerciseFeeder(Feeder):
             m = "Exception caught while processing task specification:\n" +\
                 '  File "%s", line %d\n' %(self._input_file(), text.firstline())
             sys.stderr.write(m)
-            code.InteractiveInterpreter().showtraceback()
+            apply(traceback.print_exception, sys.exc_info())
             sys.exit()
 
     def _process_choices(self, text):
