@@ -21,7 +21,7 @@
 import os
 import shutil
 
-import course
+from course import *
 
 class Exporter(object):
 
@@ -100,6 +100,7 @@ class StaticExporter(Exporter):
                           nav, '<hr>',
                           '<h1>%s</h1>' % node.title(),
                           node.content().export(),
+                          self._toc(node),
                           '<hr>', nav,
                           '</body></html>'))
 
@@ -119,3 +120,20 @@ class StaticExporter(Exporter):
         if node != node.root_node():
             nav += ' | ' + link % (node.root_node().output_file(), 'TOC')
         return nav
+
+    def _toc(self, node):
+        if isinstance(node, (RootNode, InnerNode)):
+            return "<h2>Table of Contents</h2>\n" + self._make_toc(node)
+        else:
+            return ''
+    
+    def _make_toc(self, node, indent='', deep=False):
+        if len(node.children()) == 0:
+            return ''
+        return "\n" + indent + "<ul>\n" + \
+               "\n".join(map(lambda n: '%s  <li><a href="%s">%s</a>%s</li>' % \
+                             (indent, n.output_file(), n.title(),
+                              deep and self._make_toc(n, indent+'    ') or ''),
+                             node.children())) + \
+                             "\n" + indent + "</ul>\n" + indent[0:-2] 
+    
