@@ -1,3 +1,32 @@
+2004-09-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* Makefile (all): Pass a stylesheet filename to the generator.
+
+	* bin/generate.py (course): Take the stylesheet name as a third
+	argument and pass it to the StaticExporter constructor.
+
+	* lcg/content.py (Cloze.__init__): Initialize the variable
+	`self._answers'.
+	(Cloze._make_field): Don't set fields style at all.  Store the
+	words in the `self._answers' array.
+	(Cloze._form_name): New method.
+	(Cloze._script.check): New method.
+	(Cloze.export): Include also the evaluate button and the
+	Javascript code to evaluate the results.
+	(Exercise._header): New method.
+	(Exercise.export): Use it.
+
+	* lcg/export.py (StaticExporter.__init__): New method.
+	(StaticExporter._wrap_content): Add a stylesheet link to the
+	header if a stylesheet is defined.  Set the class of the `<hr>'
+	tag to separate the nevigation.  Don'd set the bgcolor body
+	attributte.  Wrap the content in a div.
+	(StaticExporter._div): New method.
+	(StaticExporter._navigation): Wrap the result in a div.
+	(StaticExporter._toc): Wrap the result in a div.
+	(StaticExporter.export): New method (copy the stylesheet file
+	after exporting).
+
 2004-09-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/export.py (StaticExporter._link): New method.
