@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,10 +73,10 @@ class _Manifest:
         resource = self._append_xml_element(r, 'resource')
         self._set_xml_attr(resource, 'identifier', node.id())
         self._set_xml_attr(resource, 'type', 'webcontent')
-        self._set_xml_attr(resource, 'href', node.output_file())
+        self._set_xml_attr(resource, 'href', node.url())
 
         resources = tuple(map(lambda n: n.url(), node.resources()))
-        for filename in (node.output_file(),) + resources:
+        for filename in (node.url(),) + resources:
             file = self._append_xml_element(resource, 'file')
             self._set_xml_attr(file, 'href', filename)
 
