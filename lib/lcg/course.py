@@ -1,5 +1,7 @@
 # -*- coding: iso8859-2 -*-
 #
+# Author: Tomas Cerha <cerha@brailcom.org>
+#
 # Copyright (C) 2004, 2005 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -397,7 +399,62 @@ class ContentNode(object):
         return self._input_encoding
     
     
-class WikiNode(ContentNode):
+class RootNode(ContentNode):
+    """Root node of the hierarchy.
+
+    The only differnce is that 'RootNone' doesn't take the 'parent' constructor
+    argument.
+
+    """
+    
+    def __init__(self, dir, **kwargs):
+        """Initialize the instance.
+
+        The arguments are inherited from the parent class, except for 'parent'
+        which is not needed for the root node.
+          
+        """
+        super(RootNode, self).__init__(None, dir, **kwargs)
+
+    
+class _WikiNode(ContentNode):
+
+    def __init__(self, *args, **kwargs):
+        """Initialize the instance.
+
+        Arguments:
+        
+          title -- the page title as a unicode string.  If None, the title of
+            the first top-level section within the content will be used.  Thus
+            it is required, that the document contains just one top-level
+            section, when the title is not specified, or an exception will be
+            raised.
+
+          The other arguments are inherited from the parent class.
+          
+        """
+        self._title_ = kwargs.get('title')
+        if kwargs.has_key('title'): del kwargs['title']
+        super(_WikiNode, self).__init__(*args, **kwargs)
+
+    def _source_text(self):
+        return ""
+        
+    def _create_content(self):
+        sections = wiki.Parser(self).parse(self._source_text())
+        if not self._title_:
+            assert len(sections) == 1, \
+                   "The wiki document must have just one top-level section!"
+            s = sections[0]
+            self._title_ = s.title()
+            sections = s.content()
+        return SectionContainer(self, sections, toc_depth=0) 
+    
+    def _title(self):
+        return self._title_
+
+
+class WikiNode(_WikiNode):
     """A single-purpose class serving as a wiki parser and formatter.
     
     You simply instantiate this node (giving a wiki-formatted text as a
@@ -408,33 +465,96 @@ class WikiNode(ContentNode):
 
     """
 
-    def __init__(self, text, title=None, **kwargs):
+    def __init__(self, text, **kwargs):
+        """Initialize the instance.
+        
+        Arguments:
+        
+          text -- the wiki-formatted text as a unicode string.
+          title -- the page title as a unicode string.  If None, the title of
+            the first top-level section within the content will be used.
+
+          The other arguments are inherited from the parent class.
+          
+        """
+        self._text = text
+        super(WikiNode, self).__init__(None, '.', **kwargs)
+    
+    def _source_text(self):
+        return self._text
+    
+    def _title(self):
+        return self._title_ or super(WikiNode, self)._title()
+
+
+class DocNode(_WikiNode):
+
+    def __init__(self, parent, dir, file, **kwargs):
         """Initialize the instance.
 
         Arguments:
         
-          text -- the wiki-formatted text as a unicode string
+          file -- the name of the wiki-formatted input file.
 
+          The other arguments are inherited from the parent class.
+          
         """
-        self._text = text
+        file, ext = os.path.splitext(file)
+        self._file = file
+        self._ext = ext[1:]
+        super(DocNode, self).__init__(parent, dir, **kwargs)
+
+    def _source_text(self):
+        return self._read_file(self._file, ext=self._ext)
+               
+        
+class DocMaker(RootNode):
+    """The root node for a file based wiki documentation.
+
+    This class is also used to build the LCG documentation from wiki files.
+    All files with the '.wiki' suffix in the source directory are read and
+    represented as separate nodes.  The root node with a table of contents is
+    generated.
+
+    The order of the nodes can be given by the file 'index.txt', which contains
+    the filenames of the source files each on one line.  Otherwise the
+    alphabetical order is used.
+
+    Any other hierarchy can be implemented by overriding the
+    '_create_children()' method.
+
+    """
+
+    def __init__(self, dir, title=None, **kwargs):
+        """Initialize the instance.
+
+        Arguments:
+        
+          title -- the page title as a unicode string.  If the title is not
+            given as constructor argument, the file 'title.txt' must exist in
+            the source directory.  The contents of this file is then used as
+            the document title.
+
+          The other arguments are inherited from the parent class.
+          
+        """
         self._title_ = title
-        super(WikiNode, self).__init__(None, '.', **kwargs)
+        super(DocMaker, self).__init__(dir, **kwargs)
 
-    def _create_content(self):
-        p = wiki.Parser(self)
-        content = SectionContainer(self, p.parse(self._text), toc_depth=0)
-        if not self._title_:
-            sections = content.sections()
-            if len(sections):
-                self._title_ = sections[0].title()
-            else:
-                self._title_ = "LCG generated document"
-        return content
-    
     def _title(self):
-        return self._title_
+        return self._title_ or self._read_file('title')
+    
+    def _create_content(self):
+        return [TableOfContents(self, item=self, title=_("Table of Contents:"),
+                                depth=99)]
+                         
+    def _create_children(self):
+        d = self.src_dir()
+        return [self._create_child(DocNode, '.', f) for f in list_dir(d)
+                if os.path.isfile(os.path.join(d, f)) and f.endswith('.wiki')]
 
 
+    
 def set_language(lang, translation_dir=None):
     """Initialize the LCG to use a given language for its translations.
 
