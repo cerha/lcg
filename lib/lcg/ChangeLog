@@ -1,1 +1,23 @@
+2004-05-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* _test.py (Module): Import `lcg' and `os', not `lesson'.
+	(ContentNode): New class
+	(Client): Class removed.
+	
+
+	* course.py (Module): Code reorganized to separate the general
+	classes from the classes implementing concrete Eurochance Course
+	structure.
+	(EurochanceCourse): New class.
+	(Course._create_children): Method moved to the new
+	`EurochanceCourse' class.
+	(Course.__init__): Unused argument `lang' removed.
+	(NumberedNode.__init__, Course.__init__): Use `super()' to call
+	the constructor of parent class.
+	(ContentNode.src_dir): Return just the subdir if parent is None.
+	(ContentNode.dst_dir): Return just the subdir if parent is None.
+	(Course.output_file): New method.
+	(dst_dir): Method removed.
+
+	* util.py (list_subdirs): Ignore `CVS' directories.
 
