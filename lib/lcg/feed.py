@@ -247,7 +247,7 @@ class ExerciseFeeder(SplittableTextFeeder):
                            text)
             tasks = ()
         elif type == VocabExercise and len(task_specs) == 0:
-            tasks = [ClozeTask("%s [%s]" % (i.translation(), i.word()))
+            tasks = [FillInTask(i.translation(), i.word())
                      for i in self._vocabulary]
         else:
             assert len(task_specs) >= 1, "No tasks found."
@@ -285,13 +285,13 @@ class ExerciseFeeder(SplittableTextFeeder):
     def _read_task(self, type, text):
         # Read a task specification using a method according to given task type.
         method = {
-            ClozeTask:              self._read_cloze,
-            DictationTask:          self._read_dictation,
-            TransformationTask:     self._read_transformation,
-            Selection:              self._read_selection,
             MultipleChoiceQuestion: self._read_multiple_choice_question,
-            GapFillStatement:       self._read_gap_fill_statement,
             TrueFalseStatement:     self._read_true_false_statement,
+            GapFillStatement:       self._read_gap_fill_statement,
+            Selection:              self._read_selection,
+            FillInTask:             self._read_fill_in_task,
+            DictationTask:          self._read_dictation,
+            ClozeTask:              self._read_cloze,
             }[type]
         try:
             return method(text.text())
@@ -330,15 +330,15 @@ class ExerciseFeeder(SplittableTextFeeder):
     def _read_dictation(self, text):
         return DictationTask(text)
 
-    def _read_transformation(self, text):
+    def _read_fill_in_task(self, text):
         lines = text.splitlines()
         assert len(lines) == 2, \
-               "Transformation task specification must consist of just two " + \
-               "lines (%d given)." % len(lines)
-        orig, transformation = lines
-        if transformation.find('[') == -1:
-            transformation = '['+transformation+']'
-        return TransformationTask(orig, transformation)
+               "Task specification must consist of just 2 lines (%d given)." % \
+               len(lines)
+        prompt, answer = [l.strip() for l in lines]
+        if answer.startswith('[') and answer.endswith(']'):
+            answer = answer[1:-1]
+        return FillInTask(prompt.strip(), answer)
 
     def _read_true_false_statement(self, text):
         text = text.strip()
