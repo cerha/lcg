@@ -80,9 +80,9 @@ function last_correct_char_index(field, answer) {
 
 // Exercises
 
-function init_form(f, handler, answers, responses) {
+function init_form(f, handler, answers, responses, messages) {
    f.handler = handler;
-   handler.init(f, answers, responses);
+   handler.init(f, answers, responses, messages);
 }
 
 //=============================================================================
@@ -92,10 +92,11 @@ function Handler() {
    if (document.captureEvents) document.captureEvents(Event.KEYPRESS);
 }
 
-Handler.prototype.init = function(form, answers, responses) {
+Handler.prototype.init = function(form, answers, responses, messages) {
    this._form = form;
    this._answers = answers;
    this._responses = responses;
+   this._messages = messages;
    this._answered = new Array(answers.length);
    this._fields = new Array();
    this._last_answer_index = 0;
@@ -133,9 +134,14 @@ Handler.prototype.eval_answer = function(field) {
 Handler.prototype._error_handler = function(field) {}
 
 Handler.prototype.response = function(selector) {
-   array = this._responses[selector];
-   n = Math.floor(Math.random() * array.length);
+   var array = this._responses[selector];
+   var n = Math.floor(Math.random() * array.length);
    return array[n];
+}
+
+Handler.prototype.msg = function(text) {
+   if (text in this._messages) return this._messages[text];
+   else return text;
 }
 
 Handler.prototype.correct = function() {
@@ -218,7 +224,7 @@ function FillInExerciseHandler() {}
 FillInExerciseHandler.prototype = new Handler();
 
 FillInExerciseHandler.prototype._recognize_field = function(field) {
-   return (field.type == 'text' && 
+   return ((field.type == 'text' || field.type == 'textarea') && 
 	   this._last_answer_index < this._answers.length);
 }
 
@@ -230,6 +236,7 @@ FillInExerciseHandler.prototype._init_field = function(field) {
 FillInExerciseHandler.prototype._error_handler = function(field) {
    var answer = this._answers[field.answer_index]
    var index = last_correct_char_index(field, answer);
+   field.focus()
    highlight(field, index, index);
 }
 
@@ -240,11 +247,14 @@ FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
    var field = event_target(e);
    if (key == 'Enter') {
       field.form.handler.eval_answer(field);
+      return false;
    } else if (key == 'Ctrl-Space') {
       var answer = field.form.handler._answers[field.answer_index];
       if (field.value != answer.slice(0, field.value.length)) {
 	 var i = last_correct_char_index(field, answer);
-	 field.value = field.value.slice(0, i);
+	 field.value = answer.slice(0, i+1) +
+	    field.value.slice(i, field.value.length);
+	 highlight(field, i+1, i+1);
       } else {
 	 var len = field.value.length;
 	 field.value += answer.slice(len, len+1);
@@ -255,14 +265,31 @@ FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
 }
 
 FillInExerciseHandler.prototype.evaluate = function() {
+   var focused = false;
    for (var i=0; i < this._fields.length; i++) {
-      this._eval_answer(this._fields[i]);
+      correct = this._eval_answer(this._fields[i]);
+      if (!correct && !focused) {
+	 this._error_handler(this._fields[i]);
+	 focused = true;
+      }
    }
-   switch (this.percentage()) {
-      case 100: selector = 'all_correct'; break;
-      case   0: selector = 'all_wrong'; break;
-      default:  selector = 'some_wrong';
+   if (this._fields.length > 1) {
+      switch (this.percentage()) {
+	 case 100: selector = 'all_correct'; break;
+	 case   0: selector = 'all_wrong'; break;
+	 default:  selector = 'some_wrong';
+      }
+   } else {
+      selector = this.correct() ? 'correct':'incorrect';
    }
    play_audio(this.response(selector));
    this.display_results();
+}
+
+function DictationHandler() {}
+DictationHandler.prototype = new FillInExerciseHandler();
+
+DictationHandler.prototype.display_results = function() {
+   msg = this.msg(this.correct() ? 'Correct':'Error(s) found');
+   this._form.result.value = msg
 }
