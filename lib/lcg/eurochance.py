@@ -85,8 +85,8 @@ class Unit(EurochanceNode):
                     VocabSection(self, _("Vocabulary"), self.vocab),
                     Section(self, _("Grammar"), anchor='grammar', toc_depth=9,
                             content=self._parse_wiki_file('grammar')),
-                    Section(self, _("Exercises"),
-                            self._create_exercises(), toc_depth=1),
+                    Section(self, _("Exercises"), anchor='exercises',
+                            content=self._create_exercises(), toc_depth=1),
                     Section(self, _("Checklist"),
                             self._parse_wiki_file('checklist')))
         return SectionContainer(self, sections)
@@ -161,6 +161,35 @@ class VocabIndex(_Index):
         return SectionContainer(self, s)
 
     
+class AnswerSheets(_Index):
+    _TITLE = _("Answer Sheets")
+
+    def _create_content(self):
+        return TableOfContents(self, title=_("Table of Contents:"))
+    
+    def _create_children(self):
+        return [self._create_child(AnswerSheet, u) for u in self._units]
+
+    
+class AnswerSheet(EurochanceNode):
+    _PARENT_ID_PREFIX = False
+    
+    def __init__(self, parent, unit, *args, **kwargs):
+        self._unit = unit
+        super(AnswerSheet, self).__init__(parent, *args, **kwargs)
+        
+    def _title(self):
+        return _("Answer Sheet for %s") % self._unit.title(abbrev=True)
+
+    def _create_content(self):
+        x = [Section(self, sec.title(),
+                     [Section(self, e.title(), e.answer_sheet(self))
+                      for e in sec.sections() if isinstance(e, Exercise) \
+                      and hasattr(e, 'answer_sheet')])
+             for sec in self._unit.find_section('exercises').sections()]
+        return SectionContainer(self, x)
+
+    
 class Help(EurochanceNode):
     _TITLE = _("Help Index")
 
@@ -202,6 +231,7 @@ class EurochanceCourse(EurochanceNode):
                [self._create_child(CourseIndex, units),
                 self._create_child(GrammarIndex, units),
                 self._create_child(VocabIndex, units),
+                self._create_child(AnswerSheets, units),
                 self._create_child(Help)]
     
     def meta(self):
