@@ -15,7 +15,7 @@ t.install(unicode=True)
 
 import lcg
 c = lcg.course.EurochanceCourse(source_dir, language=lang,
-                                input_encoding='iso-8859-1')
+                                input_encoding='utf-8')
 #e = lcg.ims.IMSExporter(c, destination_dir)
 e = lcg.export.StaticExporter(c, destination_dir, stylesheet=stylesheet)
 
