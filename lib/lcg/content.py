@@ -275,7 +275,7 @@ class TrueFalseStatement(_ChoiceTask):
           
         """
         assert isinstance(correct, types.BooleanType)
-        choices = (Choice(u'TRUE', correct), Choice(u'FALSE', not correct))
+        choices = (Choice(_('TRUE'), correct), Choice(_('FALSE'), not correct))
         super(TrueFalseStatement, self).__init__(statement, choices)
 
 
