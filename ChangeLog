@@ -1,3 +1,40 @@
+2004-10-21  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/css/default.css: New styles added.
+
+	* lcg/export.py (Exporter._export_node): Pass the exported content
+	to `self._wrap_content()'.
+	(Exporter._wrap_content, StaticExporter._wrap_content): Take the
+	exported content as an argument.
+
+	* lcg/content.py (Content._script_write): New method.
+	(Content._speaking_text): New method.
+	(Content._answer_control): New method.
+	(VocabList.export): Use self._speaking_text() to render the
+	english word.
+	(VocabItem.__init__): The `sound_file' arguemtnt renamed to `media'.
+	(Selection._format_choice): New method.
+	(Selection._choice_controls): Use `self._format_choice()' to
+	format the choice.
+	(Selection._export_choices): Render choices as a div with separate
+	lines, rather than
+	an ordered list.
+	(MultipleChoiceQuestion.export): Enclose the whole task in a
+	paragraph (including the choices).
+	(TrueFalseStatement._format_choice): New method.
+	(TrueFalseStatement._export_choices): Return the controls just as
+	they are, without any aditional formatting.
+	(Exercise.export): Wrap all the tasks in a form.  Pass the form
+	name to `self._export_tasks()'.
+	(Exercise._export_tasks): Take the `form_name' argument.
+	(Exercise._export_instructions): Use `self._script_write()' to
+	format the recording controls compatible also with non-javascript
+	enabled browsers.
+	(Cloze._export_tasks): Take the `form_name' argument.  Prefix the
+	onClick handler with "javascript: ".
+	(Cloze._export_tasks): Don't wrap the tasks in a form.
+	(TrueFalseStatements._instructions): Cosmetic changes.
+
 2004-10-20  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile (all): Don't pass the stylesheet argument to the
