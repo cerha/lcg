@@ -20,10 +20,10 @@
 
 This module includes classes used as an abstraction of a course structure based
 on a tree structure with nodes capable of reading their content from input
-resources (either directly from files or using helper 'Feeder' classes) and
-giving some information about themselves.  This information is then used to
-by the exporter classes to write the output files in various formats (eg. as an
-IMS package or static html pages).
+files (either directly or using helper 'Feeder' classes) and giving some
+information about themselves.  This information is then used to by the exporter
+classes to write the output files in various formats (eg. as an IMS package or
+static html pages).
 
 In the second part of this module there are several derived classes which
 define a concrete implementation of the language course for the Eurochance
@@ -43,7 +43,7 @@ class ContentNode(object):
     """Representation of one output document within a course material.
 
     This class represents a generic node of a course material.  Each node can
-    have several children nodes and can depend on several 'Media' instances.
+    have several children nodes and can depend on several 'Resource' instances.
     By instantiating a node, all the resources are read and the content is
     built and ready for export.
     
@@ -57,14 +57,14 @@ class ContentNode(object):
           parent -- parent node; the 'ContentNode' instance directly preceeding
             this node in the content hierarchy.  Can be None for the top node.
           subdir -- a directory name relative to parent's source directory.  All
-            input resources are expected in this directory.
+            input files are expected in this directory.
 
         """
         assert parent is None or isinstance(parent, ContentNode)
         assert type(subdir) == type('')
         self._parent = parent
         self._subdir = subdir
-        self._media = {}
+        self._resources = {}
         self._counter = Counter(1)
         self._content = self._create_content()
         assert isinstance(self._content, Content)
@@ -104,8 +104,8 @@ class ContentNode(object):
         """
         return ()
         
-    def _read_resource(self, name):
-        """Return all the text read from the resource file."""
+    def _read_file(self, name):
+        """Return all the text read from the source file."""
         filename = os.path.join(self.src_dir(), name+'.txt')
         return ''.join(open(filename).readlines())
 
@@ -210,26 +210,45 @@ class ContentNode(object):
     def content(self):
         return self._content
     
-    def list_media(self):
-        """Return the list of all 'Media' objects within this node's content."""
-        return tuple(self._media.values())
+    def resources(self, cls=None):
+        """Return the list of all resources this node depends on.
 
+        If cls is specifies, only instances of a specified class are returned.
+        
+        """
+        resources = tuple(self._resources.values())
+        if cls is not None:
+            return filter(lambda r: isinstance(r, cls), resources)
+        else:
+            return resources
+
+    def _resource(self, cls, key, *args, **kwargs):
+        try:
+            return self._resources[key]
+        except KeyError:
+            resource = apply(cls, (self,) + args, kwargs)
+            self._resources[key] = resource
+            return resource
+        
     def media(self, file, shared=False, tts_input=None):
         """Return the 'Media' instance corresponing to given constructor args.
 
         The instances are cached.  They should never be constructed directly.
-        They should always be acquired using this method.
-
-        The arguments correspond to arguments of 'Media' constructor.
+        They should always be acquired using this method.  The same applyes for
+        the following two methods.
 
         """
-        key = (file, shared, tts_input)
-        try:
-            return self._media[key]
-        except KeyError:
-            media = Media(self, file, shared=shared, tts_input=tts_input)
-            self._media[key] = media
-            return media
+        return self._resource(Media, (file, shared, tts_input),
+                              file, shared=shared, tts_input=tts_input)
+
+    def script(self, file):
+        """Return the 'Script' resource instance."""
+        return self._resource(Script, file, file)
+
+    def stylesheet(self, file):
+        """Return the 'Stylesheet' resource instance."""
+        return self._resource(Stylesheet, file, file)
+
     
     def counter(self):
         """Return the internal counter as a 'Counter' instance.
@@ -258,7 +277,7 @@ class TextNode(ContentNode):
 
     def _create_content(self):
         name = self.__class__.__name__.lower()
-        return WikiText(self, self._read_resource(name))
+        return WikiText(self, self._read_file(name))
 
     
 class InnerNode(ContentNode):
@@ -270,10 +289,10 @@ class InnerNode(ContentNode):
     """
     
     def _create_content(self):
-        return WikiText(self, self._read_resource('intro'))
+        return WikiText(self, self._read_file('intro'))
 
     def title(self):
-        return self._read_resource('title')
+        return self._read_file('title')
 
     
 class RootNode(InnerNode):
@@ -294,33 +313,33 @@ class RootNode(InnerNode):
     
 ################################################################################
 
-class Media(object):
-    """Representation of a media object used within the content.
+class Resource(object):
+    """Representation of an external resource, the content depends on.
 
-    Any 'ContentNode' (or more often a piece of 'Content' within it) can use
-    media objects (typically recordings).  All the media objects are maintained
-    by parent 'ContentNode' so that the node is able to keep track of all media
-    objects it depends on.  That is also why 'Media' instances should not be
-    constructed directly.  Use the 'ContentNode.media()' method instead.
+    Any 'ContentNode' (or more often a piece of 'Content' within it) can depend
+    on several external resources.  They are maintained by parent 'ContentNode'
+    so that the node is able to keep track of all the resources it depends on.
+    
+    This is a base class for particular resource types, such as `Media' or
+    `Script'.
 
     """
-    SUBDIRECTORY = 'media'
+    SUBDIRECTORY = 'resources'
     
-    def __init__(self, parent, file, shared=False, tts_input=None):
+    def __init__(self, parent, file, shared=True, check_file=True):
         """Initialize the instance.
 
         Arguments:
 
           parent -- parent 'ContentNode' instance; the actual output document
-            this media object is part of.
-          file -- path to the actual media file relative to its parent node's
-            source/destination directory.
+            this resource belongs to.
+          file -- path to the actual resource file relative to its parent
+            node's source/destination directory.
           shared -- a boolean flag indicating that the file is not located
             within the node-specific subdirectory, but rather in a course-wide
-            media directory.
-          tts_input -- if defined and the source file does not exist, the
-            destination file will be generated via TTS.  The given string will be
-            synthesized.
+            resource directory.
+          check_file -- if true, an exception will be risen when the source file
+            can not be found.
 
         """
         assert isinstance(parent, ContentNode), \
@@ -328,11 +347,10 @@ class Media(object):
         self._parent = parent
         self._file = file
         self._shared = shared
-        self._tts_input = tts_input
-        if tts_input is None:
+        if check_file:
             assert os.path.exists(self.source_file()), \
-                   "Media file '%s' doesn't exist!" % self.source_file()
-        
+                   "Resource file '%s' doesn't exist!" % self.source_file()
+
     def source_file(self):
         if self._shared:
             dir = os.path.join(self._parent.root_node().src_dir(),
@@ -350,9 +368,52 @@ class Media(object):
     def url(self):
         return self.destination_file('')
 
+    
+class Media(Resource):
+    """Representation of a media object used within the content.
+
+    'Media' instances should not be constructed directly.  Use the
+    'ContentNode.media()' method instead.
+
+    """
+    SUBDIRECTORY = 'media'
+    
+    def __init__(self, parent, file, shared=False, tts_input=None):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent, file, shared -- See 'Resource.__init__()'.
+          tts_input -- if defined and the source file does not exist, the
+            destination file will be generated via TTS.  The given string will be
+            synthesized.
+
+        """
+        super(Media, self).__init__(parent, file, shared=shared,
+                                    check_file=(tts_input is None))
+        self._tts_input = tts_input        
+        
     def tts_input(self):
         return self._tts_input
 
+        
+class Script(Resource):
+    """Representation of a script object used within the content.
+
+    The 'Script' instances should not be constructed directly.  Use the
+    'ContentNode.script()' method instead.
+
+    """
+    SUBDIRECTORY = 'scripts'
+
+class Stylesheet(Resource):
+    """Representation of a stylesheet used within the content.
+
+    The 'Stylesheet' instances should not be constructed directly.  Use the
+    'ContentNode.stylesheet()' method instead.
+
+    """
+    SUBDIRECTORY = 'css'
 
 
 ################################################################################
@@ -407,12 +468,13 @@ class Unit(InnerNode):
         return "Unit %d: %s" % (self._parent.index(self)+1, title)
 
     
-    
 class EurochanceCourse(RootNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
     def _create_children(self):
-        return map(lambda d: Unit(self, d), list_subdirs(self.src_dir()))
+        return map(lambda d: Unit(self,d),
+                   filter(lambda d: d[0] in map(str, range(0, 9)),
+                          list_subdirs(self.src_dir())))
 
     def meta(self):
         return {'author': 'Eurochance team',
