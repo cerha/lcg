@@ -37,7 +37,6 @@ class CommonFormatter:
               r"""(?P<begintt>\{\{\{)""",
               r"""(?P<endtt>\}\}\})""",
               r"""(?P<htmlescapeentity>&#[0-9]+;)""",
-              r"""(?P<wikilink>(^|(?<=[^A-Za-z]))[A-Z][a-z/]*(?:[A-Z][a-z/]+)+)""",
               r"""(?P<fancylink>\[(?P<fancyurl>([a-z]+:[^ ]+)) (?P<linkname>.*?)\])"""]
 
     def replace(self, fullmatch):
@@ -89,14 +88,6 @@ class CommonFormatter:
         # the tickethref regexp
         return match
     
-    def _wikilink_formatter(self, match, fullmatch):
-        #global page_dict
-        #if page_dict and not page_dict.has_key(match):
-        #    return '<a class="wiki-missing-page" href="%s">%s?</a>' % \
-        #           (href.wiki(match), match)
-        #else:
-        return '<a href="%s">%s</a>' % (match, match)
-
     def _url_formatter(self, match, fullmatch):
         return '<a href="%s">%s</a>' % (match, match)
 
