@@ -135,7 +135,7 @@ class StaticExporter(Exporter):
         return self._div('navigation', ' | '.join(nav))
 
     def _toc(self, node):
-        if not isinstance(node, (RootNode, InnerNode)): return ''
+        if not node.has_index(): return ''
         return self._div("table-of-contents",
                          '<h2>%s</h2>' % _("Table of Contents"),
                          self._make_toc(node))

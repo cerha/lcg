@@ -309,6 +309,8 @@ class Exercise(Content):
     _TASK_TYPE = Task
     _NAME = None
     
+    _used_types = []
+    
     def __init__(self, parent, tasks, sound_file=None, transcript=None):
         """Initialize the instance.
 
@@ -327,6 +329,9 @@ class Exercise(Content):
           
         """
         super(Exercise, self).__init__(parent)
+        self.__class__._USED = True
+        if self.__class__ not in Exercise._used_types:
+            Exercise._used_types.append(self.__class__)
         assert is_sequence_of(tasks, self._TASK_TYPE), \
                "Tasks must be a sequence of '%s' instances!: %s" % \
                (self._TASK_TYPE.__name__, tasks)
@@ -345,9 +350,21 @@ class Exercise(Content):
         parent.resource(Script, 'audio.js')
         parent.resource(Script, 'exercises.js')
 
-    def task_type(self):
-        return self._TASK_TYPE
+    def task_type(cls):
+        return cls._TASK_TYPE
     task_type = classmethod(task_type)
+    
+    def name(cls):
+        return cls._NAME
+    name = classmethod(name)
+
+    def id(cls):
+        return camel_case_to_lower(cls.__name__)
+    id = classmethod(id)
+    
+    def used_types(cls):
+        return cls._used_types
+    used_types = classmethod(used_types)
 
     def export(self):
         return "\n\n".join((self._header(),
@@ -602,6 +619,7 @@ class Transformation(Cloze):
 
 
 class Dictation(Cloze):
+    _NAME = _("Dictation")
     
     def _instructions(self):
         return """This exercise type is not yet implemented..."""

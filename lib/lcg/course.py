@@ -106,11 +106,11 @@ class ContentNode(object):
         self._counter = Counter(1)
         self._content = self._create_content()
         assert isinstance(self._content, Content)
-        self._children = []
-        children = self._create_children()
-        for child in children:
+        self._registered_children = []
+        self._children = self._create_children()
+        for child in self._children:
             assert child._parent == self
-            assert child in self._children
+            assert child in self._registered_children
         if parent is not None:
             parent._register_child(self)
         self.resource(Stylesheet, 'default.css')
@@ -118,8 +118,8 @@ class ContentNode(object):
         
     def _register_child(self, child):
         assert isinstance(child, ContentNode)
-        assert child not in self._children
-        self._children.append(child)
+        assert child not in self._registered_children
+        self._registered_children.append(child)
         
     def __str__(self):
         return "<%s  id='%s' title='%s' subdir='%s'>" % \
@@ -177,9 +177,8 @@ class ContentNode(object):
         
         """
         if self._parent is not None:
-            name = re.sub(r'[A-Z]', lambda m: '-'+m.group(0).lower(),
-                          self.__class__.__name__)
-            return '%02d%s' % (self._parent.index(self) + 1, name)
+            name = camel_case_to_lower(self.__class__.__name__)
+            return '%02d-%s' % (self._parent.index(self) + 1, name)
         else:
             return 'index'
 
@@ -334,7 +333,6 @@ class ContentNode(object):
         name.
 
         """
-        
         return self._default_resource_dir
 
     def input_encoding(self):
@@ -343,9 +341,13 @@ class ContentNode(object):
         The name is a string accepted by 'UnicodeType.encode()'.
 
         """
-        
         return self._input_encoding
 
+    def has_index(self):
+        """Return True, if this node is supposed to have a TOC at the end."""
+        return False
+
+    
     
 class TextNode(ContentNode):
     """A section of stuctured text read from a wiki-formatted file."""
@@ -369,6 +371,8 @@ class InnerNode(ContentNode):
     def title(self):
         return self._read_file('title')
 
+    def has_index(self):
+        return True
     
 class RootNode(InnerNode):
     """The root node of the content hierarchy.
@@ -380,6 +384,8 @@ class RootNode(InnerNode):
     def __init__(self, *args, **kwargs):
         super(RootNode, self).__init__(None, *args, **kwargs)
 
+    def has_index(self):
+        return True
 
 ################################################################################
 # A Concrete implemantation of Eurochance course structure.
@@ -475,21 +481,56 @@ class Unit(InnerNode):
         return [v] + [self._create_child(*a) for a in args]
 
     def _id(self):
-        return 'unit%02d' % (self._parent.index(self)+1)
+        return 'unit%02d' % self._parent.index(self)
 
     def title(self):
         title = super(Unit, self).title()
-        return "%s %d: %s" % (self._TITLE, self._parent.index(self)+1, title)
+        return "%s %d: %s" % (self._TITLE, self._parent.index(self), title)
 
+class ExerciseInstructions(TextNode):
+    """Exercise instructions."""
+    def __init__(self, parent, exercise_class_, *args, **kwargs):
+        assert issubclass(exercise_class_, Exercise)
+        self._exercise_class_ = exercise_class_
+        super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
+        
+    def _create_content(self):
+        try:
+            return WikiText(self, self._read_file(self._exercise_class_.id()))
+        except IOError, e:
+            print "Warning: %s" % e
+            return Content(self)
+
+    def title(self):
+        return _("Instructions for %s") % self._exercise_class_.name()
+
+    def _id(self):
+        return self._exercise_class_.id()
+
+    
+class Instructions(TextNode):
+    """A general set of pre-course instructions."""
+    _TITLE = _("General Course Instructions")
+    
+    def _create_children(self):
+        return [self._create_child(ExerciseInstructions, e, 'help')
+                for e in Exercise.used_types()]
+    
+    def _id(self):
+        return 'instructions'
+
+    def has_index(self):
+        return True
     
 class EurochanceCourse(RootNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
     def _create_children(self):
-        return [self._create_child(Unit, subdir=d)
-                for d in list_subdirs(self.src_dir())
-                if d[0] in map(str, range(0, 9))]
-
+        units = [self._create_child(Unit, subdir=d)
+                 for d in list_subdirs(self.src_dir())
+                 if d[0] in map(str, range(0, 9))]
+        return [self._create_child(Instructions)] + units
+    
     def meta(self):
         return {'author': 'Eurochance Team',
                 'copyright': "Copyright (c) 2004 Eurochance Team"}

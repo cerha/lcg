@@ -23,6 +23,7 @@ import os
 import string
 import operator
 import types
+import re
 
 class SplittableText:
     """A piece of text which can be split keeping track of line numbers.
@@ -163,10 +164,17 @@ def is_sequence_of(seq, cls):
     return True
 
 def copy_stream(input, output):
-    """Kopíruj data ze streamu 'input' do streamu 'output'."""
+    """Copy data from the 'input' stream to the 'output' stream."""
     while True:
         data = input.read(4096)
         if not data:
             break
         output.write(data)
-              
+
+_CAMEL_CASE_WORD = re.compile(r'[A-Z][a-z\d]+')
+        
+def camel_case_to_lower(string, separator='-'):
+    """Return a lowercase string using 'separator' to concatenate words."""
+    words = _CAMEL_CASE_WORD.findall(string)
+    return separator.join([w.lower() for w in words])
+    
