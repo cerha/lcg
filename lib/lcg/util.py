@@ -24,6 +24,56 @@ import string
 import operator
 
 
+class SplittableText:
+    """A piece of text which can be split keeping track of line numbers.
+
+    The string representation of this class is the actual text.  The 'split()'
+    method allows you to split the text into pieces (each represented by a new
+    SplittableText instance) using any regex splitter.  The 'firstline()'
+    method then reports the line number where the text of each part begins in
+    the original text.  It keeps working when you split the pieces recursively.
+
+    """
+    
+    def __init__(self, text, firstline=1):
+        assert type(text) == type('')
+        assert type(firstline) == type(0)
+        self._text = text
+        self._firstline = firstline
+
+    def __str__(self):
+        return self._text
+
+    def firstline(self):
+        """Return the number of the first line of this text on input."""
+        return self._firstline
+
+    def _create_piece(self, start, end):
+        # Create a piece as a substring of the text of this piece.
+        n = len(self._text[:start].splitlines()) + self._firstline
+        text = self._text[start:end].rstrip()
+        return SplittableText(text, n)
+    
+    def split(self, matcher):
+        """Return parts of the text as a tuple of SplittableText instances.
+
+        The 'matcher' argument is an instance of compiled regular expression.
+        This regex should match the splitter used to devide the pieces of the
+        input text into subsequent parts.
+
+        All beginning and trailing whitespace characters are stripped from
+        the pieces of text.
+
+        """
+        pieces = []
+        lastposition = len(self._text) - len(self._text.lstrip())
+        for match in matcher.finditer(self._text):
+            pieces.append(self._create_piece(lastposition, match.start()))
+            lastposition = match.end()
+        pieces.append(self._create_piece(lastposition, None))
+        return pieces
+
+
 class Counter(object):
     """Incrementing counter."""
     def __init__(self, initial_value=0):
