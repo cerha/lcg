@@ -1,3 +1,10 @@
+2005-03-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/wiki.py (InlineFormatter._MARKUP): Italics commented out.
+	(Parser._REGEXPS): added the MULTILINE switch.
+	(Parser.parse): Call `self._parse_sections()' instead of
+	`self._parse_section_content()'
+
 2005-03-02  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/course.py: Just import * from `lcg' and don't import all the
