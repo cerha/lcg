@@ -849,7 +849,7 @@ class Exercise(Section):
         f = ('<form class="sound-control" action="">%s:' % label,
              button(_("Play"), "play_audio('%s')" % media.url()),
              button(_("Stop"), 'stop_audio()'), t, '</form>')
-        a = '%s: %s' % (label, link(_("Play"), media.url(), brackets=True))
+        a = '%s %s' % (label, link(_("Play"), media.url(), brackets=True))
         return script_write('\n'.join(f), p(a+t))
 
     def export(self):
@@ -876,11 +876,11 @@ class Exercise(Section):
         return instructions
 
     def _export_recording(self):
-        return self._sound_controls(_("Recording"), self._recording,
+        return self._sound_controls(_("Recording:"), self._recording,
                                     self._transcript)
     
     def _export_audio_version(self):
-        label = _("This exercise can be also done purely aurally/orally")
+        label = _("This exercise can be also done purely aurally/orally:")
         return self._sound_controls(label, self._audio_version)
 
     def _init_script(self):
@@ -903,7 +903,7 @@ class SentenceCompletion(Exercise):
         part.""")
     
     def _export_audio_version(self):
-        return self._sound_controls(_("The exercise"), self._audio_version)
+        return self._sound_controls(_("The exercise:"), self._audio_version)
 
 
 class _InteractiveExercise(Exercise):
@@ -951,6 +951,8 @@ class _InteractiveExercise(Exercise):
         return ()
 
     def _init_script(self):
+        #return "init_form(document.forms['%s'], '%s', NULL, NULL, NULL);" % \
+        #       (self._form_name(), self._FORM_HANDLER)
         responses = dict([(key, [media.url() for media in values])
                           for key, values in self._responses.items()])
         return "init_form(document.forms['%s'], new %s(), %s, %s, %s);" % \
