@@ -105,7 +105,7 @@ class PySpecFeeder(Feeder):
 class ExcelVocabFeeder(Feeder):
     """Vocabulary Feeder reading data from XLS file."""
     
-    _LANGUAGE_ORDER = ['cs', 'sk', 'no', 'de']
+    _LANGUAGE_ORDER = ['cs', 'sk', 'de', 'no', 'es']
 
     def feed(self, parent):
         assert parent.lang() in self._LANGUAGE_ORDER
