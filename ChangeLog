@@ -1,5 +1,8 @@
 2005-03-23  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/scripts/audio.js: Don't set the statusbar messages.
+	Some cosmetical changes.
+
 	* lcg/eurochance.py (Unit._create_content): Supply the `anchor'
 	argument to the Exercises section.
 	(AnswerSheets, AnswerSheet): New classes.
