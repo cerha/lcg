@@ -7,6 +7,9 @@
 	(ExerciseInstructions._id): Make the id here instead of using the
 	class method `Exercise.id()'.
 	(ExerciseInstructions.src_dir): Method removed.
+	(ExerciseInstructions._create_content): Pass the `pre' argument to
+	`Exercise.help()' if a file for given exercise type exists in the
+	source direstory.
 
 	* lcg/content.py (Definition): New class.
 	(DefinitionList): New class.
@@ -33,6 +36,9 @@
 	(_ChoiceBasedExercise._buttons, _FillInExercise._buttons) 
 	(Dictation._display): Methods removed.
 	(GapFilling._instructions): Text improved.
+	(Exercise.help): New keyword argument `pre'.  Add the `pre'
+	content before the instructions.  Only wrap instructions into a
+	section, when other sections exist.
 
 2005-03-11  Tomas Cerha  <cerha@brailcom.org>
 
