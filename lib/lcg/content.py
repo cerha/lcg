@@ -58,11 +58,20 @@ class Content(object):
                "Not a 'ContentNode' instance: %s" % parent
         self._parent = parent
 
+
+    def _field(self, text='', name='', size=20, cls=None, readonly=False):
+        cls = cls and 'text ' + cls or 'text'
+        f = '<input type="text" name="%s" class="%s" value="%s" size="%d"%s>'
+        return f % (name, cls, text, size, readonly and ' readonly' or '')
+
+    def _button(self, label, handler, cls='button'):
+        return '<input type="button" value="%s"' % label + \
+               ' class="%s" onClick="javascript: %s">' % (cls, handler)
+
     def _script_write(self, content, noscript_content):
         return '<script type="text/javascript" language="Javascript"><!--\n' + \
                'document.write("'+ content.replace('"','\\"') +'"); //-->' + \
                '</script><noscript>'+ noscript_content +'</noscript>'
-    
 
     def _speaking_text(self, text, media):
         self._parent.script('audio.js')
@@ -72,14 +81,6 @@ class Content(object):
         a2 = '<a href="%s">%s</a>' % (media.url(), text)
         return self._script_write(a1, a2)
 
-    def _answer_control(self, text, media):
-        self._parent.script('audio.js')
-        b = '<input type="button" class="answer-control"' + \
-            ' value="%s" onclick="javascript: play_audio(\'%s\')">' % \
-            (text, media.url())
-        a = '<a href="%s">%s</a>' % (media.url(), text)
-        return self._script_write(b, a)
-        
     def export(self):
         """Return the HTML formatted content as a string."""
         return ''
@@ -192,7 +193,7 @@ class VocabItem(Record):
 ################################     Tasks     #################################
 ################################################################################
 
-class Task(Content):
+class Task(object):
     """This class an abstract base class for various concrete tasks.
 
     A set of concrete tasks is a part of each 'Exercise'.
@@ -215,75 +216,55 @@ class Choice(Record):
         self._correct = correct
 
         
-class Selection(Task):
+class _ChoiceTask(Task):
     """Select the correct statement out of a list of predefined choices."""
     
-    def __init__(self, parent, choices):
+    def __init__(self, prompt, choices):
         """Initialize the instance.
 
         Arguments:
         
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
           choices -- sequence of 'Choice' instances related to this Task.
           
         """
-        super(Selection, self).__init__(parent)
+        super(_ChoiceTask, self).__init__()
+        assert isinstance(prompt, types.StringTypes)
         assert is_sequence_of(choices, Choice)
-        self._choices = choices
-        self._response = {
-            True: parent.media('correct-response.ogg', shared=True,
-                               tts_input='correct'),
-            False: parent.media('incorrect-response.ogg', shared=True,
-                                tts_input='you are wrong!') }
+        self._prompt = prompt
+        self._choices = list(choices)
 
-    def _format_choice(self, choice):
-        a = chr(ord('a') + self._choices.index(choice))
-        return '&nbsp;' + \
-               self._answer_control(a+')', self._response[choice.correct()]) + \
-               '&nbsp;' + choice.answer()
-               
-    def _choice_controls(self):
-        return map(lambda c: self._format_choice(c), self._choices)
-
-    def export(self):
-
-        return '<div class="choices">\n<p>\n%s\n</p>\n</div>\n' % \
-    '<br>\n'.join(self._choice_controls())
-
-class MultipleChoiceQuestion(Selection):
-    """Answer a question by selecting from a list of predefined choices."""
+    def prompt(self):
+        return self._prompt
     
-    def __init__(self, parent, question, choices):
-        """Initialize the instance.
+    def choices(self):
+        return self._choices
 
-        Arguments:
+    def choice_index(self, choice):
+        return self._choices.index(choice)
         
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          question --  exercise within the containing section.
-          choices -- sequence of 'Choice' instances related to this Task.
-          
-        """
-        super(MultipleChoiceQuestion, self).__init__(parent, choices)
-        assert isinstance(question, types.StringTypes)
-        self._question = unicode(question)
+        
+class MultipleChoiceQuestion(_ChoiceTask):
+    pass
 
-    def export(self):
-        return '<p>%s\n<div class="choices">\n%s\n</div></p>\n' % \
-               (self._question, '<br>\n'.join(self._choice_controls()))
+
+class Selection(_ChoiceTask):
+    
+    def __init__(self, choices):
+        super(Selection, self).__init__('', choices)
 
         
-class TrueFalseStatement(MultipleChoiceQuestion):
+class GapFillStatement(_ChoiceTask):
+    pass
+
+
+class TrueFalseStatement(_ChoiceTask):
     """The goal is to indicate whether the statement is true or false."""
     
-    def __init__(self, parent, statement, correct=True):
+    def __init__(self, statement, correct=True):
         """Initialize the instance.
 
         Arguments:
         
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
           statement --  exercise within the containing section.
           correct -- boolean flag indicating whether the statement is correct
             or not (true when it is correct).
@@ -291,53 +272,34 @@ class TrueFalseStatement(MultipleChoiceQuestion):
         """
         assert isinstance(correct, types.BooleanType)
         choices = (Choice('TRUE', correct), Choice('FALSE', not correct))
-        super(TrueFalseStatement, self).__init__(parent, statement, choices)
-        
-    def _format_choice(self, choice):
-        return self._answer_control(choice.answer(),
-                                    self._response[choice.correct()])
-    
-    def export(self):
-        return "<p>%s\n%s</p>\n" % (self._question,
-                                    "\n".join(self._choice_controls()))
-
-
-class GapFillStatement(MultipleChoiceQuestion):
-    """The goal is to select the correct word to complete the sentence."""
+        super(TrueFalseStatement, self).__init__(statement, choices)
 
 
 class ClozeTask(Task):
 
     _REGEXP = re.compile(r"\[([^\]]+)\]")
     
-    def __init__(self, parent, text):
-        super(ClozeTask, self).__init__(parent)
+    def __init__(self, text):
+        super(ClozeTask, self).__init__()
         assert isinstance(text, types.StringTypes)
         self._text = unicode(text)
 
     def answers(self):
         return self._REGEXP.findall(self._text)
-    
-    def _make_field(self, match):
-        return '<input class="cloze" type="text" size="%d">' % \
-               (len(match.group(1))+1)
-    
-    def _export_text(self):
-        return self._REGEXP.sub(self._make_field, self._text)
 
-    def export(self):
-        return "\n".join(('<p>', self._export_text(), '</p>'))
+    def text(self, field_formatter):
+        return self._REGEXP.sub(field_formatter, self._text)
 
     
 class TransformationTask(ClozeTask):
 
-    def __init__(self, parent, orig, transformed):
-        super(TransformationTask, self).__init__(parent, transformed)
+    def __init__(self, orig, transformed):
+        super(TransformationTask, self).__init__(transformed)
         assert isinstance(orig, types.StringTypes)
         self._orig = unicode(orig)
 
-    def export(self):
-        return "\n".join(('<p>',self._orig,'<br/>', self._export_text(),'</p>'))
+    def orig(self):
+        return self._orig
 
     
 ################################################################################
@@ -374,7 +336,7 @@ class Exercise(Content):
                (self._task_type.__name__, tasks)
         assert sound_file is None or type(sound_file) == type('')
         self._number = parent.counter().next()
-        self._tasks = tasks
+        self._tasks = list(tasks)
         if sound_file is not None:
             assert transcript is not None, \
                    "Transcript file not specified for file: %s" % sound_file
@@ -388,27 +350,29 @@ class Exercise(Content):
             self._recording = None
         self._transcript = transcript
         parent.script('audio.js')
+        parent.script('exercises.js')
 
     def task_type(self):
         return self._task_type
-
     task_type = classmethod(task_type)
+
+    def form_name(self):
+        return "exercise_%s" % id(self)
+    
+    def task_index(self, task):
+        return self._tasks.index(task)
     
     def export(self):
-        form_name = "exercise_%s" % id(self)
         return "\n\n".join((self._header(),
                             self._export_instructions(),
-                            '<form name="%s" action="">' % form_name,
-                            self._export_tasks(form_name),
+                            '<form name="%s" action="">' % self.form_name(),
+                            self._export_tasks(),
                             '</form>'))
-    def _export_tasks(self, form_name):
-        return "\n".join(map(lambda t: t.export(), self._tasks))
     
     def _header(self):
         name = self._name or re.sub('([^^])([A-Z])', '\\1 \\2',
                                     self.__class__.__name__)
         return "<h3>Exercise %d &ndash; %s</h3>" % (self._number, name)
-
     
     def _instructions(self):
         return ""
@@ -417,26 +381,31 @@ class Exercise(Content):
         """Return the HTML formatted instructions for this type of exercise."""
         result = "<p>" + self._instructions() + "</p>"
         if self._recording is not None:
-            b = '<input type="button" value="Play" class="sound-control"' + \
-                ' onclick="javascript: play_audio(\'%s\')"> ' % \
-                self._recording.url() + \
-                '<input type="button" value="Stop" class="sound-control"' + \
-                ' onclick="javascript: stop_audio()">'
-            c = self._script_write('<form action="">Recording: %s</form>' % b,
+            play = self._button("Play", "play_audio('%s')" % \
+                                self._recording.url(), cls='sound-control')
+            stop = self._button("Stop", 'stop_audio()', cls='sound-control')
+            c = self._script_write('<form action="">Recording: %s %s</form>' % \
+                                   (play, stop),
                                    '<p>Recording: [<a href="%s">Play</a>]</p>'%\
                                    self._recording.url())
             result += '\n\n'+ c
         return result
 
+    def _export_tasks(self):
+        return "\n".join(map(self._export_task, self._tasks))
+
+    def _export_task(self, task):
+        raise "This Method must be overriden"
+    
 
 class Cloze(Exercise):
     """Filling in gaps in text by typing the correct word."""
 
     _task_type = ClozeTask
 
+    
     def __init__(self, parent, *args, **kwargs):
         super(Cloze, self).__init__(parent, *args, **kwargs),
-        parent.script('exercises.js')
         parent.media('all-correct-response.ogg', shared=True,
                      tts_input='everything correct!')
         parent.media('all-wrong-response.ogg', shared=True,
@@ -458,23 +427,65 @@ class Cloze(Exercise):
             answers, but the evaluation only recognizes one.  Contact the tutor
             when in doubt."""
         
-    def _export_tasks(self, form_name):
-        answers = map(lambda a: a.replace("'", "\\'"),
-                      reduce(lambda a, b: a + b,
-                             map(lambda t: t.answers(), self._tasks)))
-        button = '<input type="button" value="%s"' + \
-                 ' onClick="javascript: %s(document.forms[\'%s\'], [\'%s\'])">'
-        b1 = button % ('Evaluate', 'eval_cloze', form_name, "','".join(answers))
-        b2 = button % ('Fill', 'fill_cloze', form_name, "','".join(answers))
-        result = 'Result: <input class="cloze-result" name="result"' + \
-                 ' type="text" size="70" value="%s" readonly>' % \
-                 'Use the Evaluate button to see the result.'
-        return "\n".join((super(Cloze, self)._export_tasks(form_name),
-                          b1, b2, '<input type="reset" value="Reset">',
-                          result))
+    def _export_tasks(self):
+        answers = ",".join(map(lambda a: "'%s'" % a.replace("'", "\\'"),
+                               reduce(lambda a, b: a + b,
+                                      map(lambda t: t.answers(), self._tasks))))
+        form = "document.forms['%s']" % self.form_name()
+        b1 = self._button('Evaluate', "eval_cloze(%s, [%s])" % (form, answers))
+        b2 = self._button('Fill', "fill_cloze(%s, [%s])" % (form, answers))
+        result = self._field('Use the Evaluate button to see the result.',
+                             name='result', size=70, cls='result cloze',
+                             readonly=True)
+        return "\n".join((super(Cloze, self)._export_tasks(),
+                          '<p class="results">', b1, b2,
+                          '<input type="reset" value="Reset">', result, '</p>'))
 
+    def _make_field(self, match):
+        return '<input class="cloze" type="text" size="%d">' % \
+               (len(match.group(1))+1)
     
-class TrueFalseStatements(Exercise):
+    def _export_task(self, task):
+        return "\n".join(('<p>', task.text(self._make_field), '</p>'))
+    
+
+class _ChoiceBasedExercise(Exercise):
+
+    _task_format = '<p>%s\n<div class="choices">\n%s\n</div></p>\n'
+
+    def _answer_control(self, text, correct, form_name, n):
+        self._parent.script('audio.js')
+        if correct: 
+            media = self._parent.media('correct-response.ogg', shared=True,
+                                       tts_input='correct')
+        else:
+            media = self._parent.media('incorrect-response.ogg', shared=True,
+                                       tts_input='you are wrong!')
+        handler = "eval_answer(document.forms['%s'], %d, %d, '%s')" % \
+                  (form_name, n, correct and 1 or 0, media.url())
+        b = self._button(text, handler, cls='answer-control')
+        a = '<a href="%s">%s</a>' % ('media.url()', text)
+        return self._script_write(b, a)
+    
+    def _export_tasks(self):
+        return super(_ChoiceBasedExercise, self)._export_tasks() + \
+               '<p class="results">Answered: %s<br>\nResults: %s\n</p>' % \
+               (self._field(name='finished', cls='result', readonly=True),
+                self._field(name='result', cls='result', readonly=True))
+
+    def _format_choice(self, task, choice):
+        a = chr(ord('a') + task.choice_index(choice)) + ')'
+        ctrl = self._answer_control(a, choice.correct(), self.form_name(),
+                                    self.task_index(task))
+        return '&nbsp;' + ctrl + '&nbsp;' + choice.answer() + '<br/>'
+        
+    def _export_task(self, task):
+        choices = "\n".join(map(lambda ch: self._format_choice(task, ch),
+                                task.choices()))
+        return self._task_format % (task.prompt(), choices)
+        
+    
+class TrueFalseStatements(_ChoiceBasedExercise):
     """Exercise Comprising of a list of statements.
 
     This class overrides the constructor to provide a more comfortable way to
@@ -485,14 +496,19 @@ class TrueFalseStatements(Exercise):
 
     _task_type = TrueFalseStatement
     _name = "True/False Statements"
+    _task_format = "<p>%s\n%s</p>\n"
     
     def _instructions(self):
         return """A list of %d statements follows.  After each sentence,
         there are two links.  Select 'TRUE' if you think the sentence is true,
         or select 'FALSE' if you think it is false.""" % len(self._tasks)
 
+    def _format_choice(self, task, choice):
+        return self._answer_control(choice.answer(), choice.correct(),
+                                    self.form_name(), self.task_index(task))
     
-class MultipleChoiceQuestions(Exercise):
+    
+class MultipleChoiceQuestions(_ChoiceBasedExercise):
     """An Exercise with MultipleChoiceQuestion tasks."""
     
     _task_type = MultipleChoiceQuestion
@@ -503,7 +519,7 @@ class MultipleChoiceQuestions(Exercise):
         the link.""" % len(self._tasks)
 
     
-class Selections(Exercise):
+class Selections(_ChoiceBasedExercise):
     """An Exercise with Selection tasks."""
     
     _task_type = Selection
@@ -514,7 +530,7 @@ class Selections(Exercise):
         correct.  Activate the link to check the result.""" % len(self._tasks)
 
     
-class GapFilling(Exercise):
+class GapFilling(_ChoiceBasedExercise):
     """An exercise composed of GapFillStatement tasks."""
 
     _task_type = GapFillStatement
@@ -544,7 +560,13 @@ class Transformation(Cloze):
         sentences below according to the instructions.  Check your results
         using the buttons below all the sentences.""" % len(self._tasks)
 
-    
+    def _export_task(self, task):
+        return "\n".join(('<p>',
+                          task.orig(), '<br/>',
+                          task.text(self._make_field),
+                          '</p>'))
+
+
 class Dictation(Cloze):
     
     def _instructions(self):
