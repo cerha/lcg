@@ -215,6 +215,17 @@ class ContentNode(object):
 
     def sections(self):
         return self._content.sections()
+
+    def find_section(self, anchor):
+        def find(anchor, sections):
+            for s in sections:
+                if s.anchor() == anchor:
+                    return s
+                found = find(anchor, s.sections())
+                if found:
+                    return found
+            return None
+        return find(anchor, self.sections())
     
     def url(self):
         return self.output_file()
@@ -430,16 +441,16 @@ class Unit(ContentNode):
     def _create_content(self):
         feeder = feed.ExcelVocabFeeder(self._input_file('vocabulary', 'xls'),
                                        input_encoding=self._input_encoding)
-        vocab = feeder.feed(self)
+        self.vocab = feeder.feed(self)
         p = wiki.Parser(self)
         sections = (Section(self, _("Aims and Objectives"),
                             p.parse(self._read_file('aims'))),
                     Section(self, _("Vocabulary"),
-                            VocabList(self, vocab)),
-                    Section(self, _("Grammar"),
-                            p.parse(self._read_file('grammar')), toc_depth=9),
+                            VocabList(self, self.vocab)),
+                    Section(self, _("Grammar"), anchor='grammar', toc_depth=9,
+                            content=p.parse(self._read_file('grammar'))),
                     Section(self, _("Exercises"),
-                            self._create_exercises(vocab), toc_depth=1),
+                            self._create_exercises(self.vocab), toc_depth=1),
                     Section(self, _("Checklist"),
                             p.parse(self._read_file('checklist'))))
         return SectionContainer(self, sections)
@@ -503,12 +514,42 @@ class ExerciseInstructions(TextNode):
     def src_dir(self):
         return os.path.join(self.default_resource_dir(), 'help')
 
+
+class _Index(ContentNode):
+
+    def __init__(self, parent, units, *args, **kwargs):
+        self._units = units
+        super(_Index, self).__init__(parent, *args, **kwargs)
     
-class CourseIndex(ContentNode):
+class CourseIndex(_Index):
     _TITLE = _("Detailed Course Index")
 
     def _create_content(self):
         return TableOfContents(self, item=self.parent(), depth=99)
+
+    
+class GrammarIndex(_Index):
+    _TITLE = _("Grammar Index")
+
+    def _create_content(self):
+        all = reduce(lambda a,b: a+b, [u.find_section('grammar').sections()
+                                       for u in self._units])
+        return TableOfContents(self, all, depth=99)
+
+    
+class VocabIndex(_Index):
+    _TITLE = _("Vocabulary Index")
+
+    def _create_content(self):
+        vocab = reduce(lambda a,b: a+b, [u.vocab for u in self._units])
+        vocab.sort(lambda a,b: cmp(a.word().lower(), b.word().lower()))
+        rev = vocab[:]
+        rev.sort(lambda a,b: cmp(a.translation().lower(), b.translation().lower()))
+        sections = (Section(self, _("Ordered by the English term"),
+                            VocabList(self, vocab)),
+                    Section(self, _("Ordered by the translation"),
+                            VocabList(self, rev, reverse=True)))
+        return SectionContainer(self, sections)
 
     
 class EurochanceCourse(RootNode):
@@ -520,7 +561,9 @@ class EurochanceCourse(RootNode):
                  if d[0] in map(str, range(0, 9))]
         return [self._create_child(Instructions)] + \
                units + \
-               [self._create_child(CourseIndex)]
+               [self._create_child(CourseIndex, units),
+                self._create_child(GrammarIndex, units),
+                self._create_child(VocabIndex, units)]
     
     def meta(self):
         return {'author': 'Eurochance Team',
