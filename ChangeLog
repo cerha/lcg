@@ -1,3 +1,8 @@
+2005-03-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (Table.export): Specify the class `lcg-table' for
+	the generated table.
+
 2005-03-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/_html.py (ul): Renamed to `itemize()'.
