@@ -1,3 +1,67 @@
+2004-10-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/feed.py (ExerciseFeeder._read_task): Honour the name change
+	`Cloze' -> `ClozeTask' and `Transformation' ->
+	`TransformationTask'.
+	(ExerciseFeeder._read_cloze): Honour the name change `Cloze' ->
+	`ClozeTask'.
+	(ExerciseFeeder._read_transformation): Honour the name change
+	 `Transformation' -> `TransformationTask'.
+
+	* lcg/content.py (Selection.export): Don't wrap the choices into a
+	paragraph.
+	(MultipleChoiceQuestion.export): Don't include the choices in the
+	paragraph, leave there just the question.
+	(Cloze): Renamed to `ClozeTask'.
+	(ClozeTask.__init__): Honour the change `Cloze' -> `ClozeTask'.
+	(Transformation): Honour the change `Cloze' -> `ClozeTask'.
+	(Transformation): Renamed to `TransformationTask'.
+	(TransformationTask._make_field): Honour the change
+	`Transformation' -> `TransformationTask'.
+	(Exercise.__init__): New optional arguments `sound_file' and
+	`transcript'.  Initialize the corresponding media object if a
+	`sound_file' specified.
+	(Exercise._header): If `self._name' is Null, take the name from
+	class name.
+	(ListeningExercise): Class removed.
+	(Exercise._export_instructions): If `sound_file' was specified in
+	constructor, include the link to play the recording.
+	(ClozeTest): Renamed to `Cloze'.
+	(Cloze_task_type): Honour the change `Cloze' -> `ClozeTask'.
+	(Cloze_name): Removed.
+	(Cloze.__init__): Honour the change `ClozeTest' -> `Cloze'.
+	(Cloze._instructions): Return different instructions when the
+	`sound_file' was specified at constructor.
+	(Cloze._export_tasks): Use the 'action' attribute for the <form>
+	tag.
+	(ListeningClozeTest): Class removed.
+	(TrueFalseExercise): Renamed to `TrueFalseStatements'.
+	(TrueFalseComprehensionExercise): Class removed.
+	(MultipleChoiceExercise): Renamed to `MultipleChoiceQuestions'.
+	(MultipleChoiceQuestions._name): Removed.
+	(MultipleChoiceComprehensionExercise): Class removed.
+	(SelectionExercise): Renamed to `Selections'.  Honour the parent
+	class name change.
+	(ListeningSelectionExercise): Class removed.
+	(GapFillingExercise): Renamed to `GapFilling'.  Honour the parent
+	class name change.
+	(GapFilling._name): Removed.
+	(SentenceCompletionExercise): Renamed to `SentenceCompletion'.
+	Honour the parent class name change.
+	(SentenceCompletion._name): Renmoved.
+	(TransformationExercise): Renamed to `Transformation'.  Honour the
+	parent class name change.
+	(Transformation._task_type): Honour the change `Transformation' ->
+	`TransformationTask'.
+	(Transformation._name): Removed. 
+	(Dictation): Honour the change `ClozeTest' -> `Cloze'.
+	(Dictation._name): Removed. 
+
+	* lcg/export.py (StaticExporter._wrap_content): Added support for
+	http-equiv meta tags and encoding specified.  Don't forget to
+	close the <script> header tag.  Use the 'type' attribute with the
+	<script> tag.
+
 2004-10-01  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py
