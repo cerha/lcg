@@ -1,3 +1,27 @@
+2004-08-31  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py: Use the `StaticExporter' to export the content.
+
+	* lcg/__init__.py: Import also the  modules `export' a `ims'.
+
+	* lcg/course.py: Module docstring updated.	
+	(ContentNode): Docstring updated.
+	(ContentNode._export): Method removed.
+	(full_title): Method removed.
+	(ContentNode.content): New method.
+	(export): Method removed.
+	(Course): Docstring updated.
+	(_export): Method removed.
+	(Media._source_file): Renamed to `source_file()'.
+	(Media._destination_file): Renamed to `destination_file()'.
+	(Media.__init__, Media.url):  Honour the change above.
+	(Media.export): Method removed.
+
+	* lcg/ims.py (Manifest): Renamed to `_Manifest'. 
+	(IMSExporter): New class.
+
+	* lcg/export.py (Module): New module.
+
 2004-06-25  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/course.py (Media.export): Set the `cmd' to None first.
