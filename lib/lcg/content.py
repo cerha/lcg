@@ -58,6 +58,28 @@ class Content(object):
                "Not a 'ContentNode' instance: %s" % parent
         self._parent = parent
 
+    def _script_write(self, content, noscript_content):
+        return '<script type="text/javascript" language="Javascript"><!--\n' + \
+               'document.write("'+ content.replace('"','\\"') +'"); //-->' + \
+               '</script><noscript>'+ noscript_content +'</noscript>'
+    
+
+    def _speaking_text(self, text, media):
+        self._parent.script('audio.js')
+        a1 = '<a class="speaking-text"' + \
+             ' href="javascript: play_audio(\'%s\')">%s</a>' % \
+             (media.url(), text)
+        a2 = '<a href="%s">%s</a>' % (media.url(), text)
+        return self._script_write(a1, a2)
+
+    def _answer_control(self, text, media):
+        self._parent.script('audio.js')
+        b = '<input type="button" class="answer-control"' + \
+            ' value="%s" onclick="javascript: play_audio(\'%s\')">' % \
+            (text, media.url())
+        a = '<a href="%s">%s</a>' % (media.url(), text)
+        return self._script_write(b, a)
+        
     def export(self):
         """Return the HTML formatted content as a string."""
         return ''
@@ -115,8 +137,6 @@ class WikiText(GenericText):
         return wiki.format(self._text)
 
     
-
-    
 class VocabList(Content):
     """Vocabulary listing consisting of multiple 'VocabItem' instances."""
 
@@ -136,9 +156,9 @@ class VocabList(Content):
         self._items = items
 
     def export(self):
-        rows = map(lambda i:
-                   '<tr><td><a href="%s">%s</a> %s</td><td>%s</td></tr>' % \
-                   (i.sound_file().url(), i.word(), i.note(), i.translation()),
+        rows = map(lambda i: '<tr><td>%s %s</td><td>%s</td></tr>' % \
+                   (self._speaking_text(i.word(), i.media()),
+                    i.note(), i.translation()),
                    self._items)
         return '<table>\n' + '\n'.join(rows) + "\n</table>\n"
 
@@ -146,7 +166,7 @@ class VocabList(Content):
 class VocabItem(Record):
     """One item of vocabulary listing."""
     
-    def __init__(self, parent, word, note, translation, sound_file):
+    def __init__(self, parent, word, note, translation, media):
         """Initialize the instance.
         
         Arguments:
@@ -155,17 +175,17 @@ class VocabItem(Record):
             in parens separated by spaces.  Typical notes are for example
             (v) for verb etc.
           translation -- the translation of the word into target language.
-          sound_file -- corresponding sound file as a 'Media' instance.
+          media -- corresponding sound file as a 'Media' instance.
         
         """
         assert isinstance(word, types.StringTypes)
         assert isinstance(note, types.StringTypes)
         assert isinstance(translation, types.StringTypes)
-        assert isinstance(sound_file, Media)
+        assert isinstance(media, Media)
         self._word = unicode(word)
         self._note = unicode(note)
         self._translation = unicode(translation)
-        self._sound_file = sound_file
+        self._media = media
 
 
 ################################################################################
@@ -216,16 +236,19 @@ class Selection(Task):
                                tts_input='correct'),
             False: parent.media('incorrect-response.ogg', shared=True,
                                 tts_input='you are wrong!') }
-        
+
+    def _format_choice(self, choice):
+        a = chr(ord('a') + self._choices.index(choice))
+        return '&nbsp;' + \
+               self._answer_control(a+')', self._response[choice.correct()]) + \
+               '&nbsp;' + choice.answer()
+               
     def _choice_controls(self):
-        return map(lambda a: '<a href="%s">%s</a>' % \
-                   (self._response[a.correct()].url(), a.answer()),
-                   self._choices)
+        return map(lambda c: self._format_choice(c), self._choices)
 
     def _export_choices(self):
-        items = map(lambda a: "  <li>%s</li>" % a, self._choice_controls())
-        return "\n".join(('<ol style="list-style-type: lower-latin;">',
-                          "\n".join(items), "</ol>"))
+        choices = '<br>\n'.join(self._choice_controls())
+        return '<div class="choices">\n'+choices+'\n</div>\n'
         
     def export(self):
         return self._export_choices()
@@ -250,9 +273,8 @@ class MultipleChoiceQuestion(Selection):
         self._question = unicode(question)
 
     def export(self):
-        return "<p>%s</p>\n%s" % (self._question, self._export_choices())
+        return "<p>%s\n%s</p>" % (self._question, self._export_choices())
 
-        
         
 class TrueFalseStatement(MultipleChoiceQuestion):
     """The goal is to indicate whether the statement is true or false."""
@@ -273,12 +295,13 @@ class TrueFalseStatement(MultipleChoiceQuestion):
         choices = (Choice('TRUE', correct), Choice('FALSE', not correct))
         super(TrueFalseStatement, self).__init__(parent, statement, choices)
         
-    def _export_choices(self):
-        return "\n".join(map(lambda a: "[%s]" % a, self._choice_controls()))
-
-    def export(self):
-        return "<p>%s\n%s</p>\n" % (self._question, self._export_choices())
+    def _format_choice(self, choice):
+        return self._answer_control(choice.answer(),
+                                    self._response[choice.correct()])
     
+    def _export_choices(self):
+        return "\n".join(self._choice_controls())
+
 
 class GapFillStatement(MultipleChoiceQuestion):
     """The goal is to select the correct word to complete the sentence."""
@@ -305,7 +328,8 @@ class ClozeTask(Task):
 
     def export(self):
         return "\n".join(('<p>', self._export_text(), '</p>'))
-               
+
+    
 class TransformationTask(ClozeTask):
 
     def __init__(self, parent, orig, transformed):
@@ -372,10 +396,13 @@ class Exercise(Content):
     task_type = classmethod(task_type)
     
     def export(self):
+        form_name = "exercise_%s" % id(self)
         return "\n\n".join((self._header(),
                             self._export_instructions(),
-                            self._export_tasks()))
-    def _export_tasks(self):
+                            '<form name="%s" action="">' % form_name,
+                            self._export_tasks(form_name),
+                            '</form>'))
+    def _export_tasks(self, form_name):
         return "\n".join(map(lambda t: t.export(), self._tasks))
     
     def _header(self):
@@ -391,14 +418,15 @@ class Exercise(Content):
         """Return the HTML formatted instructions for this type of exercise."""
         result = "<p>" + self._instructions() + "</p>"
         if self._recording is not None:
-            result += '\n\n<form action="">Recording: ' + \
-                      '<input type="button" value="Play"' + \
-                      ' onclick="play_audio(\'%s\')"> ' % \
-                      self._recording.url() + \
-                      '<input type="button" value="Stop"' + \
-                      ' onclick="stop_audio()">' + \
-                      '</form>'
-
+            b = '<input type="button" value="Play" class="sound-control"' + \
+                ' onclick="javascript: play_audio(\'%s\')"> ' % \
+                self._recording.url() + \
+                '<input type="button" value="Stop" class="sound-control"' + \
+                ' onclick="javascript: stop_audio()">'
+            c = self._script_write('<form action="">Recording: %s</form>' % b,
+                                   '<p>Recording: [<a href="%s">Play</a>]</p>'%\
+                                   self._recording.url())
+            result += '\n\n'+ c
         return result
 
 
@@ -431,23 +459,20 @@ class Cloze(Exercise):
             answers, but the evaluation only recognizes one.  Contact the tutor
             when in doubt."""
         
-    def _export_tasks(self):
-        form_name = "cloze_%s" % id(self)
+    def _export_tasks(self, form_name):
         answers = map(lambda a: a.replace("'", "\\'"),
                       reduce(lambda a, b: a + b,
                              map(lambda t: t.answers(), self._tasks)))
         button = '<input type="button" value="%s"' + \
-                 ' onClick="%s(document.forms[\'%s\'], [\'%s\'])">'
+                 ' onClick="javascript: %s(document.forms[\'%s\'], [\'%s\'])">'
         b1 = button % ('Evaluate', 'eval_cloze', form_name, "','".join(answers))
         b2 = button % ('Fill', 'fill_cloze', form_name, "','".join(answers))
         result = 'Result: <input class="cloze-result" name="result"' + \
                  ' type="text" size="70" value="%s" readonly>' % \
                  'Use the Evaluate button to see the result.'
-        return "\n".join(('<form name="%s" action="">' % form_name,
-                          super(Cloze, self)._export_tasks(),
+        return "\n".join((super(Cloze, self)._export_tasks(form_name),
                           b1, b2, '<input type="reset" value="Reset">',
-                          result,
-                          '</form>'))
+                          result))
 
     
 class TrueFalseStatements(Exercise):
@@ -464,8 +489,8 @@ class TrueFalseStatements(Exercise):
     
     def _instructions(self):
         return """A list of %d statements follows.  After each sentence,
-        there are two links.  Select [TRUE] if you think the sentence is true,
-        or select [FALSE] if you think it is false.""" % len(self._tasks)
+        there are two links.  Select 'TRUE' if you think the sentence is true,
+        or select 'FALSE' if you think it is false.""" % len(self._tasks)
 
     
 class MultipleChoiceQuestions(Exercise):
