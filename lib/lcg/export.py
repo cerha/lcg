@@ -37,7 +37,7 @@ class Exporter(object):
             os.makedirs(self._dir)
         filename = os.path.join(self._dir, node.output_file())
         file = open(filename, 'w')
-        file.write(self._wrap_content(node))
+        file.write(self._wrap_content(node).encode('utf-8'))
         file.close()
         for m in node.resources():
             self._export_resource(m)
@@ -107,7 +107,7 @@ class StaticExporter(Exporter):
         node.stylesheet(self._stylesheet)
         nav = self._navigation(node)
         meta = node.root_node().meta()
-        http_equiv = {'Content-Type': 'text/html; charset=ISO-8859-1'}
+        http_equiv = {'Content-Type': 'text/html; charset=UTF-8'}
         c = (self.DOCTYPE, '',
              '<html>',
              '<head>',
@@ -123,6 +123,9 @@ class StaticExporter(Exporter):
              tags('<script language="Javascript" type="text/javascript"' + \
                   ' src="%s"></script>',
                   map(lambda s: s.url(), node.resources(Script))),
+             '  '+('<object id="player" height="0" width="0" ' + \
+                    'classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">' + \
+                    '</object>'),
              '</head>',
              '<body>',
              nav, '<hr class="navigation">',
