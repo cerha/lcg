@@ -263,17 +263,47 @@ class Cloze(Task):
         super(Cloze, self).__init__(parent)
         assert type(text) == type('')
         self._text = text
+        self._answers = []
 
     def _make_field(self, match):
         word = match.group(1)
-        return '<input style="border: solid gray 1px; padding: 1px;' + \
-               ' margin: 1px; background: #e8e8e8" '+\
-               'type="text" size="%d">' % (len(word) + 1)
-        
+        self._answers.append(word)
+        return '<input class="cloze" type="text" size="%d">' % (len(word) + 1)
+
+    def _form_name(self):
+        return "cloze_%s" % id(self)
+    
+    def _script(self):
+        def check(i):
+            return '' % \
+                   (i, self._answers[i])
+        return '''
+        <script language="JavaScript">
+        //<--
+        function eval_%s() {
+           var f = document.forms["%s"];
+           var answers = new Array(%s);
+           var correct = 0;
+           for (i=0; i < answers.length; i++)
+              if (f.elements[i].value == answers[i]) correct++;
+           f.result.value = "Correct answers: " + correct + "/" + %d;
+        }
+        //-->
+        </script>''' % (self._form_name(), self._form_name(),
+                        ','.join(map(lambda s: '"%s"' % s, self._answers)),
+                        len(self._answers))
+    
     def export(self):
         text = re.sub("\((\w+)\)", self._make_field, self._text)
-        return "<p>" + text + "</p>"
-        
+        button = '<input type="button" onclick="eval_%s()" value="Evaluate">' %\
+                 self._form_name()
+        result = '<input class="cloze-result" name="result" type="text"' + \
+                 ' size="50" readonly>'
+        return "\n".join(('<form name="%s">' % self._form_name(),
+                          '<p>', text, '</p>', 
+                          self._script(), button, result,
+                          '</form>'))
+               
 
 ################################################################################
 ################################   Exercises   #################################
@@ -309,18 +339,20 @@ class Exercise(Content):
     task_type = classmethod(task_type)
     
     def export(self):
-        name = self._name and " &ndash; " + self._name or ''
-        return "<h3>Exercise %d" % self._number + name + "</h3>\n\n" + \
-               self._export_instructions() + "\n\n" + \
-               "\n".join(map(lambda t: t.export(), self._tasks))
+        return "\n\n".join((self._header(), self._export_instructions(),
+                            "\n".join(map(lambda t: t.export(), self._tasks))))
+    
+    def _header(self):
+        return "<h3>Exercise %d &ndash; %s</h3>" % (self._number, self._name)
+
     
     def _instructions(self):
         return ""
-    
+
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
         return "<p>" + self._instructions() + "</p>"
-    
+
     
 class TrueFalseExercise(Exercise):
     """Exercise Comprising of a list of statements.
