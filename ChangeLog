@@ -1,3 +1,11 @@
+2005-04-06  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (Exercise._sound_controls): Don't add the colon
+	after the label.
+	(Exercise._export_recording): Add a colon to the label.
+	(Exercise._export_audio_version): Add a colon to the label.
+	(SentenceCompletion._export_audio_version): Add a colon to the label.
+
 2005-04-01  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/exercise-instructions.txt: New file.
