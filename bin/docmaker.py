@@ -36,9 +36,8 @@ def main():
         
     #lcg.set_language('en')
     
-    from lcg.eurochance import DocMaker
-    doc = DocMaker(source_dir, "LCG documentation",
-                   input_encoding=opt.get('--encoding', 'utf-8'))
+    doc = lcg.DocMaker(source_dir, "LCG Manual",
+                       input_encoding=opt.get('--encoding', 'utf-8'))
     e = lcg.StaticExporter(stylesheet=opt.get('--stylesheet'))
     e.export(doc, destination_dir)
 
