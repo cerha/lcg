@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 The classes defined here allow to separate the low-level details of reading
 data from various sources.  The output is always a 'Content' element (usually a
-derived class).
+derived class) or a sequence of elements.
 
 """
 
@@ -30,7 +30,6 @@ import commands
 import string
 import traceback
 import codecs
-import unicodedata
 
 import imp
 import util
@@ -41,39 +40,81 @@ from content import *
 class Feeder(object):
     """Generic Feeder"""
     
-    def __init__(self, dir, file, encoding='ascii'):
+    def __init__(self, input_encoding='ascii'):
+        """Initialize the Feeder.
+
+        Arguments:
+
+          encoding -- the source data encoding
+
+        """
+        self._input_encoding = input_encoding
+
+    def feed(self, parent):
+        """Return a 'Content' instance constructed by reading Feeder source."""
+        pass
+
+class FileFeeder(Feeder):
+    """Generic Feeder reading its data from an input file."""
+    
+    def __init__(self, dir, file, *args, **kwargs):
         """Initialize the Feeder.
 
         Arguments:
 
           dir -- the source directory
           file -- the source file name
-          encoding -- the source file encoding
+
+          All the remaining arguments are inherited from parent class.
 
         """
+        super(FileFeeder, self).__init__(*args, **kwargs)
         self._dir = dir
         self._file = file
-        self._encoding = encoding
         assert os.path.exists(self._input_file()), \
                "File does not exest: " + self._input_file()
 
     def _input_file(self):
         return os.path.join(self._dir, self._file)
+
+
+class SplittableTextFeeder(object):
+    """Generic Feeder reading its data from a piece of textan input file."""
+    
+    def __init__(self, text, *args, **kwargs):
+        """Initialize the Feeder.
+    
+        Arguments:
+
+          text -- the source text as a SplittableText instance or a sequence of
+            SplittableText instances.
+          
+          All the remaining arguments are inherited from parent class.
+          
+        """
+        super(SplittableTextFeeder, self).__init__(*args, **kwargs)
+        if isinstance(text, SplittableText):
+            text = (text,)
+        else:
+            assert is_sequence_of(text, SplittableText)
+        self._text = text
+
+    def _pieces(self, splitter):
+        """Return a sequence of all the pieces in input text(s)."""
+        return reduce(lambda x, y: x+y,
+                      [text.split(splitter) for text in self._text])
+
         
-    def feed(self):
-        """Return a 'Content' instance constructed by reading Feeder source."""
-        pass
-
-
 class PySpecFeederError(Exception):
     """Exception reised when there is a problem loading specification file."""
 
 
-class PySpecFeeder(Feeder):
-    """Generic 'Feeder' reading its data from Python specification files.
+class PySpecFeeder(FileFeeder):
+    """A 'Feeder' reading its data from Python specification files.
 
-    This allows the most simple way of specifying content which does not need
-    any conversion.  You define the content simply in a Python data structure.
+    This allows the most simple and generic way of specifying content which
+    does not need any conversion.  You define the content simply in a Python
+    data structure.
 
     The mechanism is based on calling a function 'content()' in the
     specification file.  This function must return a 'Content' instance.
@@ -106,7 +147,7 @@ class PySpecFeeder(Feeder):
         return spec(parent)
     
 
-class ExcelVocabFeeder(Feeder):
+class ExcelVocabFeeder(FileFeeder):
     """Vocabulary Feeder reading data from an XLS file."""
     
     _TRANSLATION_ORDER = ('en', 'de', 'cs', 'es', 'no', 'sk')
@@ -115,6 +156,7 @@ class ExcelVocabFeeder(Feeder):
                  'sk': 'iso-8859-2'}
     
     def feed(self, parent):
+        
         command = 'xls2csv -q0 -c\| %s' % self._input_file()
         status, output = commands.getstatusoutput(command)
         if status: raise Exception(output)
@@ -125,14 +167,6 @@ class ExcelVocabFeeder(Feeder):
         translation_encoding = self._ENCODING.get(translation_language,
                                                   'iso-8859-1')
         items = []
-        diacritics_matcher = re.compile(r" WITH .*")
-        danger_char_matcher = re.compile(r"[^a-zA-Z0-9-]")
-        def safe_char(match):
-            char = match.group(0)
-            if char in ('.', ',', '?', '!', ':', ';'): return ''
-            safe_name = diacritics_matcher.sub('', unicodedata.name(char))
-            safe_char = unicodedata.lookup(safe_name)
-            return danger_char_matcher.match(safe_char) and '-' or safe_char
         for line in output.splitlines():
             col = map(string.strip, line.split('|')[0:4])
             try:
@@ -143,44 +177,38 @@ class ExcelVocabFeeder(Feeder):
             if word.startswith("#"):
                 continue
             note = unicode(len(col) > 1 and col[1] or '',
-                           encoding=self._encoding)
+                           encoding=self._input_encoding)
             try:
                 t = col[translation_index + 2]
                 trans = unicode(t, translation_encoding)
             except IndexError:
                 trans = u'???'
                 #print 'No translation for "%s"!' % word
-            name = danger_char_matcher.sub(safe_char, word.replace(' ', '-'))
-            media_file = os.path.join('vocabulary', name + '.ogg')
-            items.append(VocabItem(parent, word, note, trans,
-                                   parent.media(media_file, tts_input=word)))
-        return VocabList(parent, items)
+            items.append(VocabItem(parent, word, note, trans))
+        return items
     
     
-class ExerciseFeeder(Feeder):
+class ExerciseFeeder(SplittableTextFeeder):
     """Exercise Feeder reading data from a plain text file."""
 
-    _SPLITTER_MATCHER = re.compile(r"\r?\n----+\s*\r?\n")
-    _BLANK_LINE_MATCHER = re.compile(r"\r?\n\s*\r?\n")
+    _EXERCISE_SPLITTER = re.compile(r"\r?\n----+\s*\r?\n")
+    _BLANK_LINE_SPLITTER = re.compile(r"\r?\n\s*\r?\n")
     _HEADER_MATCHER = re.compile(r"^(?P<key>[a-z0-9_]+): (?P<value>.*)$")
         
     def feed(self, parent):
-        fh = codecs.open(self._input_file(), encoding=self._encoding)
-        try:
-            content = ''.join(fh.readlines())
-        except UnicodeDecodeError, e:
-            raise Exception("Error while reading file %s: %s" % \
-                            (self._input_file(), e))
-        fh.close()
-        text = SplittableText(content)
-        exercises = [self._exercise(parent, piece)
-                     for piece in text.split(self._SPLITTER_MATCHER)]
-        return Container(parent, exercises)
+        return [self._exercise(parent, piece)
+                for piece in self._pieces(self._EXERCISE_SPLITTER)
+                if piece.text() != '']
 
+    def _panic(self, message, einfo, file, line):
+        sys.stderr.write(message +'\n  File "%s", line %d\n' % (file, line))
+        apply(traceback.print_exception, einfo)
+        sys.exit()
+        
     def _exercise(self, parent, text):
         """Convert textual exercise specification into an Exercise instance."""
         try:
-            pieces = text.split(self._BLANK_LINE_MATCHER)
+            pieces = text.split(self._BLANK_LINE_SPLITTER)
             assert len(pieces) >= 2, \
                    "Exercise must comprise a header and at least one task."
             type, kwargs = self._read_header(pieces[0].text())
@@ -190,11 +218,8 @@ class ExerciseFeeder(Feeder):
         except SystemExit:
             sys.exit()
         except:
-            m = "Exception caught while processing exercise specification:\n" +\
-                '  File "%s", line %d\n' %(self._input_file(), text.firstline())
-            sys.stderr.write(m)
-            apply(traceback.print_exception, sys.exc_info())
-            sys.exit()
+            m = "Exception caught while processing exercise specification:"
+            self._panic(m, sys.exc_info(), text.input_file(), text.firstline())
     
     def _read_header(self, text):
         """Read excercise header and return the tuple (type, info).
@@ -233,11 +258,8 @@ class ExerciseFeeder(Feeder):
         try:
             return method(text.text())
         except:
-            m = "Exception caught while processing task specification:\n" +\
-                '  File "%s", line %d\n' %(self._input_file(), text.firstline())
-            sys.stderr.write(m)
-            apply(traceback.print_exception, sys.exc_info())
-            sys.exit()
+            m = "Exception caught while processing task specification:"
+            self._panic(m, sys.exc_info(), text.input_file(), text.firstline())
 
     def _process_choices(self, lines):
         # split the list of choices

@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 """Course abstraction for Learning Content Generator.
 
-This module includes classes used as an abstraction of a course structure based
+This module implements an abstraction of a course structure based
 on a tree structure with nodes capable of reading their content from input
 files (either directly or using helper 'Feeder' classes) and giving some
 information about themselves.  This information is then used to by the exporter
@@ -43,13 +43,17 @@ from feed import *
 class ContentNode(object):
     """Representation of one output document within a course material.
 
-    This class represents a generic node of a course material.  Each node can    have several children nodes and can depend on several 'Resource' instances.
+    This class represents a generic node of a course material.  Each node has
+    its 'Content', may have several children nodes and may depend on several
+    'Resource' instances.
+
     By instantiating a node, all the resources are read and the content is
     built and ready for export.
     
     """
 
     _TITLE = _("Node")
+    
     """The title is a string used to reference to the node from within the
     generated content (eg. in Tables Of Contents etc.).  The derived
     classes should define some more meaningful titles, such as 'Lesson',
@@ -63,7 +67,8 @@ class ContentNode(object):
     nodes which don't contain any child nodes, since no Table of Contents is
     generated for them."""
     
-    def __init__(self, parent, subdir, language='en', input_encoding='ascii',
+    def __init__(self, parent, subdir=None,
+                 language='en', input_encoding='ascii',
                  default_resource_dir='resources'):
         """Initialize the instance.
 
@@ -86,7 +91,7 @@ class ContentNode(object):
 
         """
         assert parent is None or isinstance(parent, ContentNode)
-        assert isinstance(subdir, types.StringType)
+        assert subdir is None or isinstance(subdir, types.StringType)
         assert isinstance(language, types.StringType)
         assert isinstance(input_encoding, types.StringType)
         assert isinstance(default_resource_dir, types.StringType)
@@ -136,7 +141,14 @@ class ContentNode(object):
 
         """
         return ()
-        
+
+    def _create_child(self, cls, *args, **kwargs):
+        """Helper method to be used within '_create_children()'."""
+        kwargs.update({'language': self._language,
+                       'input_encoding': self._input_encoding,
+                       'default_resource_dir': self._default_resource_dir})
+        return cls(self, *args, **kwargs)
+    
     def _read_file(self, name):
         """Return all the text read from the source file."""
         filename = os.path.join(self.src_dir(), name+'.txt')
@@ -156,11 +168,17 @@ class ContentNode(object):
             return (self,)
         
     def _id(self):
-        # The not-necesarrily unique id string of this node.  This can be used
-        # as a part of the unique id in connection with parent's id.
+        """Return the textual identifier of this node as a string.
+        
+        The identifier is not necesarrily unique within all nodes, but is
+        unique within its parent's children.  Thus it can be used
+        as unique in combination with parent's unique id.
+        
+        """
         if self._parent is not None:
-            return '%02d%s' % (self._parent.index(self) + 1,
-                               self.__class__.__name__.lower())
+            name = re.sub(r'[A-Z]', lambda m: '-'+m.group(0).lower(),
+                          self.__class__.__name__)
+            return '%02d%s' % (self._parent.index(self) + 1, name)
         else:
             return 'index'
 
@@ -207,9 +225,10 @@ class ContentNode(object):
         """Return the name of this node's subdirectory relative to root node."""
         if self._parent is None:
             return self._subdir
+        elif self._subdir is None:
+            return self._parent.subdir()
         else:
-            return os.path.normpath(os.path.join(self._parent.subdir(),
-                                                 self._subdir))
+            return os.path.join(self._parent.subdir(), self._subdir)
 
     def src_dir(self):
         return os.path.normpath(os.path.join(self.root_node().src_dir(),
@@ -374,224 +393,10 @@ class RootNode(InnerNode):
     def src_dir(self):
         return self._dir
 
-    
-################################################################################
-
-class Resource(object):
-    """Representation of an external resource, the content depends on.
-
-    Any 'ContentNode' (or more often a piece of 'Content' within it) can depend
-    on several external resources.  They are maintained by parent 'ContentNode'
-    so that the node is able to keep track of all the resources it depends on.
-    
-    This is a base class for particular resource types, such as `Media' or
-    `Script'.
-
-    """
-    SUBDIR = 'resources'
-    
-    def __init__(self, parent, file, shared=True, check_file=True):
-        """Initialize the instance.
-
-        Arguments:
-
-          parent -- parent 'ContentNode' instance; the actual output document
-            this resource belongs to.
-          file -- path to the actual resource file relative to its parent
-            node's source/destination directory.
-          shared -- a boolean flag indicating that the file may be shared by
-            multiple nodes (is not located within the node-specific
-            subdirectory, but rather in a course-wide resource directory).
-          check_file -- if true, an exception will be risen when the source file
-            can not be found.
-
-        """
-        assert isinstance(parent, ContentNode), \
-               "Not a 'ContentNode' instance: %s" % parent
-        self._parent = parent
-        self._file = file
-        self._shared = shared
-        if shared:
-            src_dirs = [os.path.join(d, self.SUBDIR)
-                        for d in (self._parent.root_node().src_dir(),
-                                  self._parent.default_resource_dir())]
-            dst_subdir = self.SUBDIR
-        else:
-            src_dirs = (parent.src_dir(), )
-            dst_subdir = os.path.join(self.SUBDIR, parent.subdir())
-        self._src_path = self._find_source_file(src_dirs, file)
-        self._dst_path = os.path.join(dst_subdir, file)
-        if check_file:
-            assert os.path.exists(self._src_path), \
-                   "Resource file '%s' doesn't exist!" % self._src_path
-        
-    def _find_source_file(self, dirs, file):
-        for d in dirs:
-            path = os.path.join(d, file)
-            if os.path.exists(path):
-                return path
-        return os.path.join(dirs[0], file)
-                
-    def _destination_file(self, dir):
-        return os.path.join(dir, self._dst_path)
-
-    def url(self):
-        return '/'.join(self._dst_path.split(os.path.sep))
-
-    def name(self):
-        return "%s_%s" % (self.__class__.__name__.lower(), id(self))
-
-    def export(self, dir):
-        dst_path = self._destination_file(dir)
-        if not os.path.exists(dst_path) or \
-               os.path.exists(self._src_path) and \
-               os.path.getmtime(dst_path) < os.path.getmtime(self._src_path):
-            if not os.path.isdir(os.path.dirname(dst_path)):
-                os.makedirs(os.path.dirname(dst_path))
-            self._export(dir)
-            
-    def _export(self, dir):
-        shutil.copy(self._src_path, self._destination_file(dir))
-        print "%s: file copied." % self._destination_file(dir)
-
-    
-class Media(Resource):
-    """Representation of a media object used within the content.
-
-    'Media' instances should not be constructed directly.  Use the
-    'ContentNode.media()' method instead.
-
-    """
-    SUBDIR = 'media'
-    
-    def __init__(self, parent, file, shared=False, tts_input=None):
-        """Initialize the instance.
-
-        Arguments:
-
-          parent, file, shared -- See 'Resource.__init__()'.
-          tts_input -- if defined and the source file does not exist, the
-            destination file will be generated via TTS.  The given string will
-            be synthesized.
-
-        """
-        ext = os.path.splitext(file)[1]
-        assert ext in ('.ogg','.mp3','.wav'), "Unsupported media type: %s" %ext
-        super(Media, self).__init__(parent, file, shared=shared,
-                                    check_file=(tts_input is None))
-        self._tts_input = tts_input   
-        
-    def _find_source_file(self, dirs, file):
-        basename, extension = os.path.splitext(file)
-        for ext in ('.ogg','.mp3','.wav','.tts.txt', '.txt'):
-            path = super(Media, self)._find_source_file(dirs, basename + ext)
-            if os.path.exists(path):
-                return path
-        return super(Media, self)._find_source_file(dirs, file)
-
-    def _command(self, which, errmsg):
-        var = 'LCG_%s_COMMAND' % which
-        try:
-            return os.environ[var]
-        except KeyError:
-            raise "Environment variable %s not set!\n" % var + errmsg
-
-    def _open_stream_from_tts(self):
-        if self._tts_input is not None:
-            text = self._tts_input
-        else:
-            fh = codecs.open(self._src_path,
-                             encoding=self._parent.input_encoding())
-            text = ''.join(fh.readlines())
-            fh.close()
-        cmd = self._command('TTS', "Specify a TTS command synthesizing " + \
-                            "the text on STDIN to a wave on STDOUT.")
-        print "  - generating with TTS: %s" % cmd
-        input, output = os.popen2(cmd, 'b')
-        input.write(text.encode(self._parent.input_encoding()))
-        input.close()
-        return output
-    
-    def _open_stream_from_encoder(self, output_format, wave):
-        # The tmp file is a hack.  It would be better to send the data into a
-        # pipe, but popen2 gets stuck while reading it.  Why?
-        tmp = os.tmpnam() + '.wav'
-        self._tmp_files.append(tmp)
-        f = open(tmp, 'wb')
-        copy_stream(wave, f)
-        f.close()
-        cmd = self._command(output_format, "Specify a command encoding a " + \
-                            "wave on STDIN to %s on STDOUT." % output_format)
-        print "  - converting to %s: %s" % (output_format, cmd)
-        output = os.popen('cat %s |' % tmp + cmd)
-        #input, output = os.popen2(convert_cmd)
-        #copy_stream(wave, input)
-        #input.close()
-        return output
-
-    
-    def _export(self, dir):
-        # Either create the file with tts or copy from source directory.
-        input_format = os.path.splitext(self._src_path)[1].upper()[1:]
-        output_format = os.path.splitext(self._dst_path)[1].upper()[1:]
-        if input_format == output_format and os.path.exists(self._src_path):
-            return super(Media, self)._export(dir)
-        dst_path = self._destination_file(dir)
-        wave = None
-        data = None
-        self._tmp_files = []
-        try:
-            print dst_path + ':'
-            # Open the input stream
-            if input_format == 'WAV' and os.path.exists(self._src_path):
-                wave = open(self._src_path)
-            elif input_format in ('TXT', 'TTS.TXT') or \
-                     self._tts_input is not None:
-                wave = self._open_stream_from_tts() 
-            else:
-                raise "Unknown input format: %s" % input_format
-            if output_format == 'WAV':
-                data = wave
-            else:
-                data = self._open_stream_from_encoder(output_format, wave)
-            # Write the output stream
-            output_file = open(dst_path, 'wb')
-            copy_stream(data, output_file)
-            output_file.close()
-        finally:
-            if wave is not None:
-                wave.close()                
-            if data is not None:
-                data.close()
-            # This is just because of the hack in _open_output_stream().
-            for f in self._tmp_files:
-                os.remove(f)
-        
-        
-class Script(Resource):
-    """Representation of a script object used within the content.
-
-    The 'Script' instances should not be constructed directly.  Use the
-    'ContentNode.script()' method instead.
-
-    """
-    SUBDIR = 'scripts'
-
-    
-class Stylesheet(Resource):
-    """Representation of a stylesheet used within the content.
-
-    The 'Stylesheet' instances should not be constructed directly.  Use the
-    'ContentNode.stylesheet()' method instead.
-
-    """
-    SUBDIR = 'css'
-
 
 ################################################################################
-# Concrete implemantation of Eurochance course structure.
+# A Concrete implemantation of Eurochance course structure.
 ################################################################################
-
 
 class Vocabulary(ContentNode):
     """A section comprising a list of vocabulary."""
@@ -599,31 +404,58 @@ class Vocabulary(ContentNode):
 
     def _create_content(self):
         feeder = ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls',
-                                  encoding=self._input_encoding)
-        return feeder.feed(self)
+                                  input_encoding=self._input_encoding)
+        self._items = items = feeder.feed(self)
+        return VocabList(self, items)
         
+    def items(self):
+        """Return all vocablary items as a sequence of 'VocabItem' instances."""
+        return self._items
+
     
-class Use(TextNode):
-    """Key language use."""
-    _TITLE = _("Key Language Use")
-    pass
-
-
 class Grammar(TextNode):
     """Key grammar explanation."""
-    _TITLE = _("Key Grammar")
+    _TITLE = _("Grammar")
     pass
 
+    
+class VocabularyPractice(ContentNode):
+    """Vocabulary Practice exercises section."""
+    _TITLE = "Vocabulary Practice"
 
-class Exercises(ContentNode):
-    """A section consisting of a sequence of exercises."""
-    _TITLE = _("Exercises")
+    def __init__(self, parent, items, *args, **kwargs):
+        self._items = items
+        super(VocabularyPractice, self).__init__(parent, *args, **kwargs)
 
     def _create_content(self):
-        feeder = ExerciseFeeder(self.src_dir(), 'exercises.txt',
-                                encoding=self._input_encoding)
-        return feeder.feed(self)
+        exercises = [cls(self, items=self._items)
+                     for cls in (VocabExercise, VocabExercise2)]
+        return Container(self, exercises)
+        
+class ExerciseNode(ContentNode):
+    
+    def __init__(self, parent, data, *args, **kwargs):
+        self._data = data
+        kwargs['subdir'] = 'exercises'
+        super(ExerciseNode, self).__init__(parent, *args, **kwargs)
 
+    def _create_content(self):
+        feeder = ExerciseFeeder(self._data,
+                                input_encoding=self._input_encoding)
+        return Container(self, feeder.feed(self))
+
+    
+class ListeningComprehension(ExerciseNode):
+    _TITLE = _("Listening Comprehension Exercises")
+
+    
+class GrammarPractice(ExerciseNode):
+    _TITLE = _("Grammar Practice")
+
+    
+class Consolidation(ExerciseNode):
+    _TITLE = _("Consolidation")
+    
 
 class Summary(TextNode):
     """A check list of competences achieved."""
@@ -634,14 +466,26 @@ class Unit(InnerNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
     _TITLE = _("Unit")
     _TOC_TITLE = _("Unit Index")
+    _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
     def _create_children(self):
-        subdir = {Exercises: 'exercises'}
-        return [cls(self, subdir.get(cls, ''),
-                    language=self._language,
-                    input_encoding=self._input_encoding,
-                    default_resource_dir=self._default_resource_dir)
-                for cls in (Vocabulary, Use, Grammar, Exercises, Summary)]
+        filename = os.path.join(self.src_dir(),'exercises', 'exercises.txt')
+        text = self._read_file(os.path.join('exercises', 'exercises'))
+        splittable = SplittableText(text, input_file=filename)
+        sections = splittable.split(self._EXERCISE_SECTION_SPLITTER)
+        if len(sections) != 4:
+            print "Warning: %s: 4 sections expected, %d found." % \
+                  (filename, len(sections))
+            sections = (tuple(sections) + 4*(SplittableText(''),))[0:4]
+        child = self._create_child
+        v = child(Vocabulary)
+        return (v,
+                child(Grammar),
+                child(VocabularyPractice, v.items()),
+                child(ListeningComprehension, sections[0:2]),
+                child(GrammarPractice, sections[2]),
+                child(Consolidation, sections[3]),
+                child(Summary))
 
     def _id(self):
         return 'unit%02d' % (self._parent.index(self)+1)
@@ -655,9 +499,7 @@ class EurochanceCourse(RootNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
     def _create_children(self):
-        return [Unit(self, d, language=self._language,
-                     input_encoding=self._input_encoding,
-                     default_resource_dir=self._default_resource_dir)
+        return [self._create_child(Unit, subdir=d)
                 for d in list_subdirs(self.src_dir())
                 if d[0] in map(str, range(0, 9))]
 

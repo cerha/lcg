@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,19 +27,42 @@ import types
 class SplittableText:
     """A piece of text which can be split keeping track of line numbers.
 
-    The string representation of this class is the actual text.  The 'split()'
-    method allows you to split the text into pieces (each represented by a new
-    SplittableText instance) using any regex splitter.  The 'firstline()'
-    method then reports the line number where the text of each part begins in
-    the original text.  It keeps working when you split the pieces recursively.
+    The 'text()' method can be used to retrieve the actual text as a string.
+    
+    The 'split()' method allows you to split the text into pieces (each
+    represented by a new SplittableText instance) using any regex splitter.
+    These new pieces keep track of the original input_file (if any) and line
+    numbers relative to the original piece of text.
+
+    The 'firstline()' method reports the line number of the first line of given
+    piece within the original text.
+
+    This class should work well with UNICODE, as-well as with ordinary strings.
 
     """
     
-    def __init__(self, text, firstline=1):
+    def __init__(self, text, input_file=None, firstline=1):
+        """Initialize the instance.
+
+        Arguments:
+
+          text -- the actual text which is subject to split as a String or
+            Unicode string.
+          input_file -- name of the input file as a string.  This argument can
+            be optionally used when the text was read from a file.  This is
+            mainly useful when you want to report an error in the input file
+            found within the text of this instance.  You set the filename when
+            creating the instance and it is passed to the pieces automatically
+            when sp[litting the text and passing it elswhere in the program.
+          firstline -- Line number of the first line.  Normally you should not
+            care about this argument.  
+
+        """
         assert isinstance(text, types.StringTypes)
         assert isinstance(firstline, types.IntType)
         self._text = text
         self._firstline = firstline
+        self._input_file = input_file
 
     def text(self):
         """Return the actual text as a string or unicode."""
@@ -49,11 +72,15 @@ class SplittableText:
         """Return the number of the first line of this text on input."""
         return self._firstline
 
+    def input_file(self):
+        """Return the name of the input file (if specified in constructor)."""
+        return self._input_file
+
     def _create_piece(self, start, end):
         # Create a piece as a substring of the text of this piece.
         n = len(self._text[:start].splitlines()) + self._firstline
         text = self._text[start:end].rstrip()
-        return SplittableText(text, n)
+        return SplittableText(text, input_file=self._input_file, firstline=n)
     
     def split(self, matcher):
         """Return parts of the text as a tuple of SplittableText instances.
