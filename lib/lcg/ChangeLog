@@ -4,17 +4,26 @@
 
 	* _test.py (SplittableText): New set of tests.
 
-	* feed.py: Import the Python module `code'.  All commented-out
-	classes at the end of file removed.
+	* feed.py: Import the Python module `traceback'.  Import `util'.
+	All commented-out classes at the end of file removed.
 	(Feeder.__init__): New method.
 	(Feeder._input_file): New method.
 	(PySpecFeeder): More documentation added.
 	(PySpecFeeder._input_file): New method.
 	(PySpecFeeder.__init__): Method removed.
-	(PySpecFeeder._get_module): Use `self._file' instead of `self._name'.
+	(PySpecFeeder._get_module): Use `self._file' instead of
+	`self._name'.
 	(ExcelVocabFeeder.__init__): Method removed.
 	(ExcelVocabFeeder.feed): Use `self._input_file()'
 	(ExerciseFeeder): New class.
+	(ExerciseFeeder_PieceOfText): Removed.
+	(ExerciseFeeder.feed): Use `SplittableText' instead of
+	`self._PieceOfText'.
+	(ExerciseFeeder._exercise, ExerciseFeeder._read_task): Use the
+	`traceback' module for printing tracebacks instead of
+	`code.InteractiveInterpreter'.
+	(ExerciseFeeder._read_header): Docstring added.  Assertion message
+	simplified.
 
 	* course.py (ContentNode._read_resource): Don't use the language
 	extension for filenames.
