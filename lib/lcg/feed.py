@@ -127,7 +127,7 @@ class ExcelVocabFeeder(Feeder):
                 trans = unicode(t, self._CHARSET[parent.lang()])
             except IndexError:
                 trans = '???'
-                print 'No translation for "%s"!' % word
+                #print 'No translation for "%s"!' % word
             name = re.sub('[^a-zA-Z0-9-]', '', word.replace(' ', '-'))
             media_file = os.path.join('vocabulary', name + '.ogg')
             from content import VocabItem, VocabList
@@ -157,7 +157,7 @@ class ExerciseFeeder(Feeder):
             assert len(pieces) >= 2, \
                    "Exercise must comprise a header and at least one task."
             type, kwargs = self._read_header(pieces[0])
-            tasks = map(lambda p: self._read_task(parent, type.task_type(), p),
+            tasks = map(lambda p: self._read_task(type.task_type(), p),
                         pieces[1:])
             kwargs['tasks'] = tuple(tasks)
             return type(parent, **kwargs)
@@ -194,7 +194,7 @@ class ExerciseFeeder(Feeder):
         except AttributeError:
             raise Exception("Invalid exercise type: %s" % info['type'])
     
-    def _read_task(self, parent, type, text):
+    def _read_task(self, type, text):
         # Read a task specification using a method according to given task type.
         method = {
             ClozeTask:              self._read_cloze,
@@ -205,7 +205,7 @@ class ExerciseFeeder(Feeder):
             TrueFalseStatement:     self._read_true_false_statement,
             }[type]
         try:
-            return method(parent, str(text))
+            return method(str(text))
         except:
             m = "Exception caught while processing task specification:\n" +\
                 '  File "%s", line %d\n' %(self._input_file(), text.firstline())
@@ -227,37 +227,36 @@ class ExerciseFeeder(Feeder):
                "%d out of %d found." % (len(correct), len(choices))
         return choices
     
-    def _read_selection(self, parent, text):
-        return Selection(parent, self._process_choices(text.splitlines()))
+    def _read_selection(self, text):
+        return Selection(self._process_choices(text.splitlines()))
 
-    def _read_multiple_choice_question(self, parent, text):
+    def _read_multiple_choice_question(self, text):
         lines = text.splitlines()
-        return MultipleChoiceQuestion(parent, lines[0],
-                                      self._process_choices(lines[1:]))
+        return MultipleChoiceQuestion(lines[0],self._process_choices(lines[1:]))
     
-    def _read_gap_fill_statement(self, parent, text):
+    def _read_gap_fill_statement(self, text):
         lines = text.splitlines()
         assert lines[0].find('___') != -1, \
                "Gap-fill statement must include a gap marked by at least " + \
                "three underscores."
-        return GapFillStatement(parent, lines[0],
+        return GapFillStatement(lines[0],
                                 self._process_choices(lines[1:]))
     
-    def _read_cloze(self, parent, text):
-        return ClozeTask(parent, text)
+    def _read_cloze(self, text):
+        return ClozeTask(text)
 
-    def _read_transformation(self, parent, text):
+    def _read_transformation(self, text):
         lines = text.splitlines()
         assert len(lines) == 2, \
                "Transformation task specification must consist of just two " + \
                "lines (%d given)." % len(lines)
-        return TransformationTask(parent, *lines)
+        return TransformationTask(*lines)
 
-    def _read_true_false_statement(self, parent, text):
+    def _read_true_false_statement(self, text):
         text = text.strip()
         assert text.endswith('[T]') or text.endswith('[F]'), \
                "A true/false statement must end with '[T]' or '[F]'!"
         correct = text.endswith('[T]')
         text = ' '.join(map(string.strip, text.splitlines()))[:-3].strip()
-        return TrueFalseStatement(parent, text, correct=correct)
+        return TrueFalseStatement(text, correct=correct)
     
