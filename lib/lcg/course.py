@@ -272,7 +272,7 @@ class InnerNode(ContentNode):
         return self._read_resource('title')
 
     
-class Course(InnerNode):
+class RootNode(InnerNode):
     """The root node of the content hierarchy.
 
     You still need to override the '_create_children()' method to get some
@@ -282,14 +282,12 @@ class Course(InnerNode):
     
     def __init__(self, dir):
         self._dir = dir
-        super(Course, self).__init__(None, '')
+        super(RootNode, self).__init__(None, '')
 
-    def _create_content(self):
-        return TableOfContents(self)
-    
     def src_dir(self):
         return self._dir
 
+    
 ################################################################################
 
 class Media(object):
@@ -314,8 +312,8 @@ class Media(object):
           file -- path to the actual media file relative to its parent node's
             source/destination directory.
           shared -- a boolean flag indicating that the file is not located
-            within the source/destination directory, but rather in a 'Course'
-            wide media directory.
+            within the node-specific subdirectory, but rather in a course-wide
+            media directory.
           tts_input -- if defined and the source file does not exist, the
             destination file will be generated via TTS.  The given string will be
             synthesized.
@@ -352,7 +350,7 @@ class Media(object):
     
 
 ################################################################################
-# Concrete implemantation of Eurochance Course structure.
+# Concrete implemantation of Eurochance course structure.
 ################################################################################
  
 
@@ -404,7 +402,7 @@ class Unit(InnerNode):
 
     
     
-class EurochanceCourse(Course):
+class EurochanceCourse(RootNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
     def _create_children(self):
