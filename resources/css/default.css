@@ -66,10 +66,13 @@ input.cloze {
     padding: 1px;
 }
 
+.citation, .quotation { 
+    font-style: italic;
+}
 
 .results { 
     margin-top: .8em;
-    background: #eea;
+    background: #f8f8b0;
     border: #aaa solid 0px;
     border-width: 1px 0;
 }
@@ -79,7 +82,7 @@ input.cloze {
 .results .display input { 
     border: none;
     font-size: 1em;
-    background: #eea;
+    background: none;
 }
 .results .buttons { 
     padding: 2pt;
