@@ -199,48 +199,15 @@ class ContentNode(object):
         for node in self._children:
             node.export(dir)
 
-           
-class Vocabulary(ContentNode):
-    """A section comprising a list of vocabulary."""
 
-    def _create_content(self):
-        return ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls').feed(self)
-        
-    
 class TextNode(ContentNode):
-    """A section consisting of some explanatoty texts."""
+    """A section of stuctured text read from a wiki-formatted file."""
+
     def _create_content(self):
         name = self.__class__.__name__.lower()
         return WikiText(self, self._read_resource(name))
 
-
-class Use(TextNode):
-    """Key language use."""
-    _title = "Key Language Use"
-    pass
-
-
-class Grammar(TextNode):
-    """Key grammar explanation."""
-    _title = "Key Grammar"
-    pass
-
-
-class Consolidation(TextNode):
-    """A check list of competences achieved."""
-    pass
-
-
-class Exercises(ContentNode):
-    """A section consisting of a sequence of exercises."""
-    def _create_content(self):
-        try:
-            return PySpecFeeder(self.src_dir(), 'exercises').feed(self)
-        except PySpecFeederError, e:
-            print ' '.join(e.args)
-            return Content(self)
-
-        
+    
 class InnerNode(ContentNode):
     """Inner node of the content tree.
 
@@ -261,47 +228,22 @@ class NumberedNode(InnerNode):
 
     def __init__(self, parent, subdir, number):
         self._number = number
-        InnerNode.__init__(self, parent, subdir)
+        super(NumberedNode, self).__init__(parent, subdir)
         
     def title(self):
         return "%s %d: %s" % (self.__class__.__name__, self._number,
                               self._read_resource('title'))
 
-
-class Unit(NumberedNode):
-    """Unit is a collection of sections."""
-    
-    def _create_children(self):
-        return map(lambda s: s(self, ''),
-                   (Vocabulary, Use, Grammar, Exercises, Consolidation))
-
-    
-class Module(NumberedNode):
-    """Module is a collection of 'Unit' instances."""
-
-    def _create_children(self):
-        c = Counter(1)
-        return map(lambda subdir: Unit(self, subdir, c.next()),
-                   list_subdirs(self.src_dir()))
-    
-
 class Course(InnerNode):
-    """The course is a root node which comprises a set of 'Module' instances."""
+    """The course is a root node of the actual IMS package."""
     
-    def __init__(self, dir, lang):
+    def __init__(self, dir):
         self._dir = dir
-        self._lang = lang
-        ContentNode.__init__(self, None, '')
-
-    def _create_children(self):
-        c = Counter(1)
-        return map(lambda subdir: Module(self, subdir, c.next()),
-                   filter(lambda d: d not in('media'), list_subdirs(self._dir)))
+        super(Course, self).__init__(None, '')
 
     def _create_content(self):
         return TableOfContents(self)
 
-    
     def _export(self, dir):
         super(Course, self)._export(dir)
         manifest = Manifest(self)
@@ -313,9 +255,7 @@ class Course(InnerNode):
     def dst_dir(self):
         return ''
 
-
 ################################################################################
-
 
 class Media(object):
     """Representation of a media object used within the content.
@@ -388,3 +328,71 @@ class Media(object):
             else:
                 shutil.copy(src_path, dst_path)
                 print "%s: file copied." % dst_path
+    
+
+################################################################################
+# Concrete implemantation of Eurochance Course structure.
+################################################################################
+ 
+
+class Unit(NumberedNode):
+    """Unit is a collection of sections (Vocabulary, ."""
+    
+    def _create_children(self):
+        return map(lambda s: s(self, ''),
+                   (Vocabulary, Use, Grammar, Exercises, Consolidation))
+
+    
+class Module(NumberedNode):
+    """Module is a collection of 'Unit' instances."""
+
+    def _create_children(self):
+        c = Counter(1)
+        return map(lambda subdir: Unit(self, subdir, c.next()),
+                   list_subdirs(self.src_dir()))
+
+
+class Vocabulary(ContentNode):
+    """A section comprising a list of vocabulary."""
+
+    def _create_content(self):
+        return ExcelVocabFeeder(self.src_dir(), 'vocabulary.xls').feed(self)
+        
+    
+class Use(TextNode):
+    """Key language use."""
+    _title = "Key Language Use"
+    pass
+
+
+class Grammar(TextNode):
+    """Key grammar explanation."""
+    _title = "Key Grammar"
+    pass
+
+
+class Consolidation(TextNode):
+    """A check list of competences achieved."""
+    pass
+
+
+class Exercises(ContentNode):
+    """A section consisting of a sequence of exercises."""
+
+    def _create_content(self):
+        try:
+            return PySpecFeeder(self.src_dir(), 'exercises').feed(self)
+        except PySpecFeederError, e:
+            print ' '.join(e.args)
+            return Content(self)
+    
+
+class EurochanceCourse(Course):
+    """The course is a root node which comprises a set of 'Module' instances."""
+
+    def _create_children(self):
+        c = Counter(1)
+        return map(lambda subdir: Module(self, subdir, c.next()),
+                   filter(lambda d: d not in('media'),
+                          list_subdirs(self.src_dir())))
+
