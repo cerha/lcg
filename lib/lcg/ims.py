@@ -16,18 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""IMS package creation tools."""
+"""Exporter class which generates an IMS compliant package."""
 
 import os
-import sys
-from StringIO import StringIO
 
 from xml.dom import minidom
 from xml.dom.domreg import getDOMImplementation
 
-import course
+import lcg
 
-class Manifest:
+class _Manifest:
     """IMS manifest is a collection of information about all files in a package.
 
     It defines the structure and dependencies of the content material.
@@ -110,4 +108,14 @@ class Manifest:
         file = open(os.path.join(dir, 'imsmanifest.xml'), 'w')
         file.write('<?xml version="1.0" ?>\n')
         self._manifest.writexml(file, newl = '\n', addindent='  ')
+
+        
+class IMSExporter(lcg.Exporter):
+    """Export the content as an IMS package."""
+   
+    def export(self):
+        super(IMSExporter, self).export()
+        manifest = _Manifest(self._course)
+        manifest.write(self._dir)
+
 
