@@ -1,3 +1,98 @@
+2005-04-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/exercise-instructions.txt: New file.
+
+	* resources/scripts/exercises.js (simulate_click_on_keypress): New
+	function.
+	(SelectBasedExerciseHandler.set_answer): Bug fixed.
+
+	* resources/css/default.css: Updated.
+
+	* lcg/eurochance.py (ExerciseInstructions._create_content): Read
+	the template file and pass it to `Exercise.help()'.
+	(Help._create_children): Don't set the `subdir' constructor arguement.
+
+	* lcg/content.py (VocabItem.export): Wrap the translation into a
+	`label'.
+	(VocabItem): Derive from `object', not `Record'.
+	(VocabItem.word, VocabItem.word, VocabItem.word, VocabItem.word)
+	(VocabItem.word, VocabItem.word): New methods.
+	(Task.__init__, Task.id, Task.prompt): New methods.
+	(Choice): Derive from `object', not `Record'.
+	(Choice.answer, Choice.answer): New methods.
+	(_ChoiceTask.__init__): Pass prompt to super-class's constructor.
+	(_ChoiceTask.prompt): Removed.
+	(Selection.__init__): Pass `None', not an empty string as `prompt'
+	to super-class's constructor.
+	(FillInTask): New class.
+	(TransformationTask): Class removed.
+	(DictationTask): Derive from `FillInTask'.
+	(Exercise._KEYS, Exercise._HELP): Constants removed.
+	(Exercise.help): Method completely rewritten using the
+	`MacroParser' and a template passed as an argument.
+	(SentenceCompletion._HELP, _InteractiveExercise._HELP)
+	(_ChoiceBasedExercise._HELP, Selections._HELP)
+	(_SelectBasedExercise._HELP, MultipleChoiceQuestions._HELP)
+	(TrueFalseStatements._HELP, GapFilling._HELP)
+	(_FillInExercise._HELP, Cloze._HELP, VocabExercise._HELP)
+	(Transformation._HELP, Substitution._HELP, Dictation._HELP):
+	Constants removed.
+	(_FillInExercise._KEYS): Constant removed.
+	(_InteractiveExercise._DISPLAYS, Dictation._DISPLAYS)
+	(_InteractiveExercise._BUTTONS, _FillInExercise._BUTTONS): Make
+	the name the first item in the spec and don't include the help in
+	the spec at all.
+	(_InteractiveExercise._results): Respect the changed display and
+	button spec.
+	(_ChoiceBasedExercise._js_choice_control): Wrap the choice into a
+	`label' element.  Put the Radio-button in front of the label and
+	assign id an `id'..
+	(_ChoiceBasedExercise._export_task): Don't wrap the task into a
+	paragreph, separate each line using the `br' element.
+	(_SelectBasedExercise._format_choices): Assign an `id' to the
+	combo-box and pass the handler as `onchange' to `select()'.
+	(_SelectBasedExercise._export_task): New method.
+	(_FillInExercise._TASK_TYPE): Set to `FillInTask'.
+	(_FillInExercise._TASK_FORMAT): New constant.
+	(_FillInExercise._answers): Make use of `FillInTask.answer()'.
+	(_FillInExercise._make_field): New argument `id'.  Pass it to `field()'.
+	(_FillInExercise._export_task): Wrap the prompt into a `label'
+	element and assign an `id' to the field.
+	(VocabExercise._TASK_FORMAT): New constant.
+	(VocabExercise._export_task): Method removed.
+	(Transformation._TASK_TYPE): Constant removed.
+	(Transformation._export_task): Method removed.
+	(Dictation._transcript_text): Make use of `FillInTask.answer()'.
+	(Cloze._answers): New method.
+
+	* lcg/util.py (Record): Class removed.
+
+	* lcg/wiki.py (MacroParser): New Class.
+
+	* lcg/feed.py (ExerciseFeeder._exercise)
+	(ExerciseFeeder._exercise): Use `FillInTask', not `ClozeTask', for
+	`VocabExercise'.
+	(ExerciseFeeder._read_task): Update the mapping.
+	(ExerciseFeeder._read_fill_in_task): New method.
+	(ExerciseFeeder._read_transformation): Method removed.
+
+	* lcg/course.py (ContentNode._input_file): New argument `dir'.
+	(ContentNode._read_file): New argument `dir'.  Pass it to
+	`self._input_file()'.
+
+	* lcg/config.py: Declare the base directory as `_base_dir' and use it.
+
+	* lcg/_html.py (label): New function.
+	(_input): New argument `id'.
+	(field, radio): Accept and pass the arguments as `**kwargs'.
+	(select): New argument `id'.
+	(label): New function.
+	(_input): New arguments `onclick', `onkeydown' and `onfocus'.
+	Arguemnt `handler' removed.
+	(button, reset): Arguemnt `handler' renamed to `onclick'.
+	(select): Arguemnt `handler' renamed to `onchange'.
+	(speaking_text): Implement the control using a read-only text field.
+
 2005-03-31  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (Exercise.__init__): Don't use
