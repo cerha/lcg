@@ -278,7 +278,8 @@ class Section(SectionContainer):
         container.
     
     """
-    def __init__(self, parent, title, content, toc_depth=0, in_toc=True):
+    def __init__(self, parent, title, content, anchor=None, toc_depth=0,
+                 in_toc=True):
         """Initialize the instance.
 
         Arguments:
@@ -289,13 +290,26 @@ class Section(SectionContainer):
           content -- the actual content wrapped into this section as a
             sequence of 'Content' instances in the order in which they should
             appear in the output.
+          anchor -- section anchor name as a string.  If None (default) the
+            anchor name will be generated automatically.  If you want to refer
+            to a section explicitly from somewhere, you will probably not rely
+            on the default anchor name, so that's how you can define your own.
+            This also allows you to find a section by it's anchor name in the
+            hierarchy (see 'ContentNode.find_section()').
+          toc_depth -- The depth of the local Table of Contents (see
+            'SectionContainer').
+          in_toc -- a boolean flag indicating whether this section is supposed
+            to be included in the Table of Contets.
             
         """
         assert isinstance(title, types.StringTypes)
+        assert isinstance(anchor, types.StringTypes) or anchor is None
         assert isinstance(in_toc, types.BooleanType)
         self._title = title
         self._in_toc = in_toc
+        self._anchor = anchor
         super(Section, self).__init__(parent, content, toc_depth=toc_depth)
+        
 
     def _section_path(self):
         return [c for c in self._container_path() if isinstance(c, Section)]
@@ -317,8 +331,11 @@ class Section(SectionContainer):
     
     def anchor(self):
         """Return the anchor name for this section."""
-        return 'sec-' + '-'.join([str(c.section_number())
-                                  for c in self._section_path()])
+        if self._anchor is not None:
+            return self._anchor
+        else:
+            numbers = [str(x.section_number()) for x in self._section_path()]
+            return 'sec-' + '-'.join(numbers)
 
     def url(self):
         """Return the URL of the section relative to the course root."""
@@ -356,7 +373,8 @@ class TableOfContents(Content):
         super(TableOfContents, self).__init__(parent)
         if item is None:
             item = parent
-        assert isinstance(item, (ContentNode, Content))
+        assert isinstance(item, (ContentNode, Content)) or \
+               is_sequence_of(item, Content)
         assert title is None or isinstance(title, types.StringTypes)
         assert isinstance(depth, types.IntType)
         assert isinstance(detailed, types.BooleanType)
@@ -379,7 +397,10 @@ class TableOfContents(Content):
         if isinstance(item, ContentNode):
             items = item.children()
         if len(items) == 0 and self._detailed:
-            items = [s for s in item.sections() if s.in_toc()]
+            if isinstance(item, (types.ListType, types.TupleType)):
+                items = item
+            else:
+                items = [s for s in item.sections() if s.in_toc()]
         if len(items) == 0:
             return ''
         links = [link(i.title(), i.url()) + \
@@ -392,25 +413,30 @@ class VocabList(Content):
     """Vocabulary listing consisting of multiple 'VocabItem' instances."""
 
     
-    def __init__(self, parent, items):
+    def __init__(self, parent, items, reverse=False):
         """Initialize the instance.
 
         Arguments:
 
           parent -- parent 'ContentNode' instance; the actual output document
             this content element is part of.
-          items -- Sequence of 'VocabItem' instances.
+          items -- sequence of 'VocabItem' instances.
+          reverse -- a boolean flag indicating, that the word pairs should be
+            printed in reversed order - translation first.
 
         """
         super(VocabList, self).__init__(parent)
         assert is_sequence_of(items, VocabItem)
+        assert isinstance(reverse, types.BooleanType)
         self._items = items
+        self._reverse = reverse
         parent.resource(Script, 'audio.js')
 
     def export(self):
-        rows = ['<tr><td>%s %s</td><td>%s</td></tr>' % \
-                (speaking_text(i.word(), i.media()), i.note(), i.translation())
-                for i in self._items]
+        pairs = [(speaking_text(i.word(), i.media())+" "+i.note(),
+                  i.translation()) for i in self._items]
+        rows = ['<tr><td>%s</td><td>%s</td></tr>' % \
+                (self._reverse and (b,a) or (a,b)) for a,b in pairs]
         return '<table>\n' + '\n'.join(rows) + "\n</table>\n"
 
     
