@@ -60,9 +60,8 @@ class ContentNode(object):
 
     _ABBREV_TITLE = None
     
-    def __init__(self, parent, subdir=None,
-                 language='en', input_encoding='ascii',
-                 default_resource_dir='resources'):
+    def __init__(self, parent, subdir=None, language='en',
+                 input_encoding='ascii'):
         """Initialize the instance.
 
         Arguments:
@@ -76,11 +75,6 @@ class ContentNode(object):
           input_encoding -- The content read from source files is expected in
             the specified encoding (ASCII by default).  The output encoding is
             set by the used exporter class.
-          default_resource_dir -- the LCG comes with a set of default resources
-            (stylesheets, scripts and media files).  They are used if no custom
-            files of the same name are present in the source directory.  This
-            argument specifies the name of the directory, where LCG default
-            resources are installed.
 
         """
         assert parent is None or isinstance(parent, ContentNode)
@@ -88,13 +82,11 @@ class ContentNode(object):
         assert isinstance(language, types.StringType) and \
                len(language) == 2
         assert isinstance(input_encoding, types.StringType)
-        assert isinstance(default_resource_dir, types.StringType)
         codecs.lookup(input_encoding)
         self._parent = parent
         self._subdir = subdir
         self._language = language
         self._input_encoding = input_encoding
-        self._default_resource_dir = default_resource_dir
         self._resources = {}
         self._counter = Counter(1)
         self._registered_children = []
@@ -109,7 +101,6 @@ class ContentNode(object):
             assert child in self._registered_children
         if parent is not None:
             parent._register_child(self)
-        self.resource(Stylesheet, 'default.css')
         
     def _register_child(self, child):
         assert isinstance(child, ContentNode)
@@ -144,8 +135,7 @@ class ContentNode(object):
     def _create_child(self, cls, *args, **kwargs):
         """Helper method to be used within '_create_children()'."""
         kwargs.update({'language': self._language,
-                       'input_encoding': self._input_encoding,
-                       'default_resource_dir': self._default_resource_dir})
+                       'input_encoding': self._input_encoding})
         return cls(self, *args, **kwargs)
     
     def _input_file(self, name, ext='txt', lang=None):
@@ -154,13 +144,14 @@ class ContentNode(object):
             ext = lang +'.'+ ext
         return os.path.join(self.src_dir(), name + '.' + ext)
         
-    def _read_file(self, name, comment=None, lang=None):
+    def _read_file(self, name, ext='txt', comment=None, lang=None):
         """Return all the text read from the source file."""
-        filename = self._input_file(name, lang=lang)
+        filename = self._input_file(name, ext=ext, lang=lang)
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
             lines = fh.readlines()
             if comment is not None:
+                # This is a dirty hack.  It should be solved elsewhere.
                 matcher = re.compile(comment)
                 lines = [line for line in lines if not matcher.match(line)]
             content = ''.join(lines)
@@ -169,9 +160,10 @@ class ContentNode(object):
         fh.close()
         return content
 
-    def _parse_wiki_file(self, name, lang=None):
+    def _parse_wiki_file(self, name, ext='txt', lang=None):
+        """Parse the file and return a sequence of content elements."""
         p = wiki.Parser(self)
-        return p.parse(self._read_file(name, lang=lang))
+        return p.parse(self._read_file(name, ext=ext, lang=lang))
     
     def _node_path(self):
         """Return the path from the root to this node as a sequence of nodes."""
@@ -371,15 +363,6 @@ class ContentNode(object):
         """
         return self._children.index(node)
 
-    def default_resource_dir(self):
-        """Return the name of the directory containing default LCG resources.
-
-        This is the directory specified by the constructor argument of the same
-        name.
-
-        """
-        return self._default_resource_dir
-
     def input_encoding(self):
         """Return the name of encoding expected in source files.
 
@@ -389,63 +372,41 @@ class ContentNode(object):
         return self._input_encoding
     
     
-class InnerNode(ContentNode):
-    """Inner node of the content tree.
+class WikiNode(ContentNode):
+    """A single-purpose class serving as a wiki parser and formatter.
+    
+    You simply instantiate this node (giving a wiki-formatted text as a
+    constructor argument) and the text is parsed and a hierarchy of 'Content'
+    elements representing the document is built.  Then you can access the
+    content structure or simply export the content into HTML or use an
+    'Exporter' class to dump a whole page.
 
-    Inner node's content is an introduction of the content represented by
-    subordinal nodes.
-    
     """
-    
+
+    def __init__(self, text, title=None, **kwargs):
+        """Initialize the instance.
+
+        Arguments:
+        
+          text -- the wiki-formatted text as a unicode string
+
+        """
+        self._text = text
+        self._title_ = title
+        super(WikiNode, self).__init__(None, '.', **kwargs)
+
     def _create_content(self):
-        return self._parse_wiki_file('intro') + \
-               [TableOfContents(self, title=_("Table of Contents:"))]
+        p = wiki.Parser(self)
+        sections = p.parse(self._text)
+        if len(sections) == 1 and isinstance(sections[0], Section):
+            content = sections[0]
+            if not self._title_:
+                self._title_ = content.title()
+        else:
+            content = SectionContainer(self, sections)
+            if not self._title_ and content.sections():
+                self._title_ = content.sections()[0].title()
+        return content
     
     def _title(self):
-        return self._read_file('title')
-
-    
-class RootNode(InnerNode):
-    """The root node of the content hierarchy.
-
-    The only special thing about this node is, that it doesn't have a parent.
-    
-    You still need to override the '_create_children()' method to get some
-    content into the course.
-
-    """
-    def __init__(self, *args, **kwargs):
-        super(RootNode, self).__init__(None, *args, **kwargs)
-
-
-class TextNode(ContentNode):
-    """A section of stuctured text read from a wiki-formatted file."""
-
-    def _create_content(self):
-        name = self.__class__.__name__.lower()
-        return self._parse_wiki_file(name)
-
-
-class ExerciseInstructions(TextNode):
-    """Exercise instructions."""
-    
-    def __init__(self, parent, exercise_class_, *args, **kwargs):
-        assert issubclass(exercise_class_, Exercise)
-        self._exercise_class_ = exercise_class_
-        super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
-        
-    def _create_content(self):
-        try:
-            return self._parse_wiki_file(self._exercise_class_.id())
-        except IOError, e:
-            print "Warning: %s" % e
-            return Content(self)
-
-    def title(self, abbrev=False):
-        return _("Instructions for %s") % self._exercise_class_.name()
-
-    def _id(self):
-        return self._exercise_class_.id()
-
-    def src_dir(self):
-        return os.path.join(self.default_resource_dir(), 'help')
+        return self._title_
