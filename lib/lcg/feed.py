@@ -54,18 +54,23 @@ class Feeder(object):
         """Return a 'Content' instance constructed by reading Feeder source."""
         pass
 
-    def _current_input_position(self):
-        """Return current position in the source data to refer to an error.""" 
-        return ""
+    def _current_input_position(self, object):
+        """Return the current position within the source data as a string."""
+        return None
 
-    def _panic(self, message, einfo):
-        sys.stderr.write(message + ':\n  %s\n' % self._current_input_position())
+    def _panic(self, message, einfo, object=None):
+        position = self._current_input_position(object)
+        if position is not None:
+            message += ":\n  " + position
+        sys.stderr.write(message + "\n")
         apply(traceback.print_exception, einfo)
         sys.exit()
 
-    def _warn(self, message):
-        sys.stderr.write('Warning: %s: %s\n' % \
-                         (message, self._current_input_position()))
+    def _warn(self, message, object=None):
+        position = self._current_input_position(object)
+        if position is not None:
+            message += ": " + position
+        sys.stderr.write('Warning: %s\n' % message)
     
 class FileFeeder(Feeder):
     """Generic Feeder reading its data from an input file."""
@@ -84,8 +89,12 @@ class FileFeeder(Feeder):
         assert os.path.exists(filename), "File does not exest: " + filename
         self._filename = filename
 
-    def _current_input_position(self):
-        return "File %s" % self._filename
+    def _current_input_position(self, line):
+        pos = 'File "%s"' % self._filename
+        if line is not None:
+            assert isinstance(line, types.IntType)
+            pos += ", line %d" % line
+        return pos
 
 
 class SplittableTextFeeder(Feeder):
@@ -110,9 +119,13 @@ class SplittableTextFeeder(Feeder):
         """Return a sequence of all the pieces in input text(s)."""
         return self._text.split(splitter)
 
-    def _current_input_position(self):
-        return 'File "%s", line %d' % (self._text.input_file(),
-                                       self._text.firstline())
+    def _current_input_position(self, text):
+        if text is not None:
+            assert isinstance(text, SplittableText)
+        else:
+            text = self._text
+        return 'File "%s", line %d' % (text.input_file(),
+                                       text.firstline())
     
 class PySpecFeederError(Exception):
     """Exception reised when there is a problem loading specification file."""
@@ -231,14 +244,19 @@ class ExerciseFeeder(SplittableTextFeeder):
                    "Exercise specification must contain a header."
             type, kwargs = self._read_header(pieces[0].text())
             task_specs = pieces[1:]            
-            if type == SentenceCompletion and len(task_specs) > 0:
-                self._warn("SentenceCompletion should not have any tasks")
+            if type == SentenceCompletion:
+                if len(task_specs) > 0:
+                    self._warn("SentenceCompletion should not have any tasks",
+                               text)
                 tasks = ()
             elif type == VocabExercise and len(task_specs) == 0:
                 tasks = [ClozeTask("%s: [%s]" % (i.translation(), i.word()))
                          for i in self._vocabulary]
             else:
                 assert len(task_specs) >= 1, "No tasks found."
+                if type == TrueFalseStatements and len(task_specs) == 1:
+                    self._warn("TrueFalseStatements have only onetask!",
+                               text)
                 tasks = [self._read_task(type.task_type(), p)
                          for p in task_specs]
             kwargs['tasks'] = tuple(tasks)
@@ -247,7 +265,7 @@ class ExerciseFeeder(SplittableTextFeeder):
             sys.exit()
         except:
             m = "Exception caught while processing exercise specification"
-            self._panic(m, sys.exc_info())
+            self._panic(m, sys.exc_info(), text)
     
     def _read_header(self, text):
         """Read excercise header and return the tuple (type, info).
@@ -287,7 +305,7 @@ class ExerciseFeeder(SplittableTextFeeder):
             return method(text.text())
         except:
             m = "Exception caught while processing task specification"
-            self._panic(m, sys.exc_info())
+            self._panic(m, sys.exc_info(), text)
 
     def _process_choices(self, lines):
         # split the list of choices
