@@ -1,3 +1,21 @@
+2005-03-31  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/content.py (Exercise.__init__): Don't use
+	`self._create_transcript()'.  Create the instance here, but use
+	`self._transcript_text()' as a value for it's `text' argument.
+	(Exercise._create_transcript, Cloze._create_transcript): Methods
+	removed.
+	(Exercise._transcript_text, Cloze._transcript_text)
+	(Dictation._transcript_text): New method.
+
+	* lcg/resources.py (Resource.export): Also do the export if
+	`self._additional_export_condition()' returns True.
+	(Resource._additional_export_condition): New method.
+	(Transcript._additional_export_condition): New method.
+	(Transcript._export): Wrap the text before exporting.
+
+	* doc/index.txt: Order changed.
+
 2005-03-29  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/course.py (DocNode._id): New method.
