@@ -315,12 +315,17 @@ class Exercise(Content):
           
         """
         assert is_sequence_of(tasks, self._task_type), \
-               "Tasks must be a sequence of '%s' instances!" % \
-               self._task_type.__class__.__name__
+               "Tasks must be a sequence of '%s' instances!: %s" % \
+               (self._task_type.__name__, tasks)
         self._number = parent.counter().next()
         self._tasks = tasks
         super(Exercise, self).__init__(parent)
-        
+
+    def task_type(self):
+        return self._task_type
+
+    task_type = classmethod(task_type)
+    
     def export(self):
         name = self._name and " &ndash; " + self._name or ''
         return "<h3>Exercise %d" % self._number + name + "</h3>\n\n" + \
@@ -347,33 +352,6 @@ class TrueFalseExercise(Exercise):
     _task_type = TrueFalseStatement
     _name = "True/False Statements"
     
-    def __init__(self, parent, tasks):
-        """Initialize the instance.
-
-        Arguments:
-        
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          tasks -- a tuple of (statement, flag) pairs.  Statement is the
-            actual string and flag is a boolean value indicating whether the
-            statement is true or not.
-
-        """
-        assert isinstance(tasks, types.TupleType), \
-               "The 'tasks' argument must be a tuple: %s" % tasks
-        for item in tasks:
-            assert isinstance(item, types.TupleType) and len(item) == 2, \
-                   "Each item of 'tasks' must be a pair (statement, flag)."
-            statement, flag = item
-            assert type(statement) == type(''), \
-                   "First item of each (statement, flag) pair must be a string."
-            assert type(flag) == type(True), \
-                   "Second item of each (statement, flag) pair must be a " + \
-                   "boolean value."
-        tasks = map(lambda s: TrueFalseStatement(parent, s[0], correct=s[1]),
-                   tasks)
-        super(TrueFalseExercise, self).__init__(parent, tasks)
-        
     def _instructions(self):
         return """A list of %d statements follows.  After each sentence,
         there are two links.  Select [TRUE] if you think the sentence is true,
@@ -448,10 +426,8 @@ class ClozeTest(Exercise):
     """Filling in gaps in text by typing the correct word."""
 
     _name = "Cloze Test"
-
-    def __init__(self, parent, text):
-        tasks = (Cloze(parent, text), )
-        super(ClozeTest, self).__init__(parent, tasks)
+    _task_type = Cloze
+    
         
 
 
