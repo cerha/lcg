@@ -365,11 +365,15 @@ class Media(object):
                 os.makedirs(os.path.dirname(dst_path))
             # Either create the file with tts or copy from source directory.
             if self._tts_input is not None and not os.path.exists(src_path):
-                print "%s: file does not exist! Generating with TTS '%s'." % \
-                      (dst_path, self._tts_input)
-                os.system(('echo "%s" | festival_client --ttw 2>/dev/null | '+\
-                           'oggenc -q 2 --quiet - -o %s') % \
-                          (self._tts_input, dst_path))
+                print "%s: file does not exist!" % dst_path
+                try:
+                    cmd = os.environ['LCG_TTS_COMMAND']
+                except KeyError:
+                    pass
+                if cmd:
+                    cmd = cmd % {'text': self._tts_input, 'file':dst_path}
+                    print "  - generating with TTS: %s" % cmd
+                    os.system(cmd)
             else:
                 shutil.copy(src_path, dst_path)
                 print "%s: file copied." % dst_path
