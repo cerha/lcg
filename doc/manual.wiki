@@ -34,7 +34,7 @@ There is one /base directory/ for the whole course.  This directory contains
 one /subdirectory/ for each unit of the course.  Each of these subdirectories
 contains files and subdirectories defining the content of the sections within
 the unit.  The input format for each section is different, depending on the
-type of the concent used within the section.  Later sections of this document
+type of the content used within the section.  Later sections of this document
 describe the format of each part individually.
 
 Now, let's get back to the structure of units.  The subdirectories can be named
@@ -85,7 +85,7 @@ Itemized lists are marked by an asterisk at the beginning of each item.  The
 indentation determines the level in the hierarchy.  First level items are
 indented by two spaces, second level by four etc.
 
-*Exapmple:*
+*Example:*
 
  This is a normal paragraph.  The itemized list follows.
 
@@ -102,7 +102,7 @@ indented by two spaces, second level by four etc.
      * eagle
 
 
-Other formatting rules will be added to the manual when we realize thay are
+Other formatting rules will be added to the manual when we realize they are
 necessary...
 
 
@@ -162,7 +162,7 @@ pauses between individual vocabulary items (one or two seconds).  These
 recordings will be cut into pieces automatically.
 
 All other recordings should be recorded separately -- one file per logical
-unit.  For instance there will be one file for each listenning exercise etc.
+unit.  For instance there will be one file for each listening exercise etc.
 
 
 The data should be burned on a CD when ready and sent to the technical group,
