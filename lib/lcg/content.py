@@ -461,6 +461,9 @@ class ClozeTask(Task):
     def text(self, field_formatter):
         return self._REGEXP.sub(field_formatter, self._text)
 
+    def plain_text(self):
+        return self._REGEXP.sub(lambda match: match.group(1), self._text)
+
     
 class TransformationTask(ClozeTask):
 
@@ -484,26 +487,35 @@ class Exercise(Section):
     _TASK_TYPE = Task
     _NAME = None
     _RECORDING_REQUIRED = False
-    
+    _AUDIO_VERSION_REQUIRED = False
+    _AUDIO_VERSION_LABEL = \
+                       _("This exercise can be also done purely aurally/orally")
     _used_types = []
     
-    def __init__(self, parent, tasks, sound_file=None, transcript=None):
+    def __init__(self, parent, tasks, sound_file=None, audio_version=None,
+                 transcript=None):
         """Initialize the instance.
 
         Arguments:
 
           parent -- parent 'ContentNode' instance; the actual output document
             this content element is part of.
+
           tasks -- sequence of 'Task' instances related to this exercise.
+
           sound_file -- name of the file with a recording as a string.  Some
             exercise types may require a recording, some may not.
+            
+          audio_version -- name of the file with an audio version of this
+            exercise
+          
           transcript -- name of the file with a textual transcript of the
             recording (string).  The transcript file is required to exist
             whenever the 'sound_file' argument is supplied.  This argument
             doesn't have to be supplied, however, when a default value made out
             of the 'sound_file' filename using the '.txt' extension instead of
             the original sound file extension is ok.
-          
+            
         """
         title = "%s %%d: %s" % (_("Exercise"), self._NAME)
         super(Exercise, self).__init__(parent, title, Content(parent))
@@ -517,16 +529,23 @@ class Exercise(Section):
         if self._RECORDING_REQUIRED:
             assert sound_file is not None, \
             "'%s' requires a recording!" % self.__class__.__name__
+        if self._AUDIO_VERSION_REQUIRED:
+            assert audio_version is not None, \
+            "'%s' requires an audio version!" % self.__class__.__name__
         self._tasks = list(tasks)
         if sound_file is not None:
             if transcript is None:
                 transcript = os.path.splitext(sound_file)[0] + '.txt'
             assert isinstance(transcript, types.StringTypes)
             self._recording = parent.resource(Media, sound_file)
-            self._transcript = parent.resource(Transcript, transcript)
+            self._transcript = self._create_transcript(transcript)
         else:
             self._recording = None
             self._transcript = None
+        if audio_version is not None:
+            self._audio_version = parent.resource(Media, audio_version)
+        else:
+            self._audio_version = None
         parent.resource(Script, 'audio.js')
         parent.resource(Script, 'exercises.js')
 
@@ -549,7 +568,10 @@ class Exercise(Section):
     used_types = classmethod(used_types)
 
     # Instance methods
-    
+
+    def _create_transcript(self, file):
+        return self._parent.resource(Transcript, file)
+
     def export(self):
         return "\n\n".join((self._header(),
                             self._export_instructions(),
@@ -565,10 +587,23 @@ class Exercise(Section):
     def _form(self):
         return "document.forms['%s']" % self._form_name()
     
-    
     def _instructions(self):
         return ""
 
+    def _sound_controls(self, label, media, transcript=None):
+        if transcript is not None:
+            t = link(_("show transcript"), transcript.url(),
+                     target="transcript", brackets=True)
+        else:
+            t = ""
+        f = ('<form class="sound-control" action="">%s:' % label,
+             button(_("Play"), "play_audio('%s')" % media.url()),
+             button(_("Stop"), 'stop_audio()'), t, '</form>')
+        a = '<p>%s: %s %s</p>' % \
+            (label, link(_("Play"), media.url(), brackets=True), t)
+        return script_write('\n'.join(f), a)
+        
+    
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
         result = "<p>" + self._instructions() + ' ' + \
@@ -576,15 +611,12 @@ class Exercise(Section):
                       "instructions-%s.html" % self.id(),
                       target='help', brackets=True) + "</p>"
         if self._recording is not None:
-            f = ('<form class="sound-control" action="">%s:' % _("Recording"),
-                 button(_("Play"), "play_audio('%s')" % self._recording.url()),
-                 button(_("Stop"), 'stop_audio()'),
-                 link(_("show transcript"), self._transcript.url(),
-                      target="transcript", brackets=True),
-                 '</form>')
-            a = '<p>' + _("Recording") + ': ' + \
-                link(_("Play"), self._recording.url(), brackets=True) + '</p>'
-            result += '\n\n'+ script_write('\n'.join(f), a)
+            result += '\n\n' + self._sound_controls(_("Recording"),
+                                                    self._recording,
+                                                    self._transcript)
+        if self._audio_version is not None:
+            label = self._AUDIO_VERSION_LABEL
+            result += '\n\n' + self._sound_controls(label, self._audio_version)
         return result
 
     def _init_script(self):
@@ -601,11 +633,14 @@ class SentenceCompletion(Exercise):
     """Filling in gaps in sentences by typing in the correct completion."""
 
     _NAME = _("Sentence Completion")
-    _RECORDING_REQUIRED = True
+    _AUDIO_VERSION_REQUIRED = True
+    _AUDIO_VERSION_LABEL = _("The exercise")
 
     def _instructions(self):
-        return _("""Listen to the recording and finish the unfinished sentences
-        from previous exercise.""")
+        
+        return _("""This exercise can be only done purely aurally/orally.  You
+        will hear some of the sentences from the previous exercise unfinished
+        and your goal is to say the missing part.""")
 
     def _export_task(self, task):
         return ""
@@ -651,9 +686,13 @@ class Cloze(_Cloze):
 
     _NAME = _("Cloze")
     _RECORDING_REQUIRED = True
+
+    def _create_transcript(self, file):
+        text = "\n\n".join([t.plain_text() for t in self._tasks])
+        return self._parent.resource(Transcript, file, text=text)
     
     def _instructions(self):
-        if self._recording is None:
+        if self._recording is not None:
             return _("""Listen to the recording carefully and then fill in the
             gaps in the text below using the same words.""")
         else:
@@ -792,7 +831,15 @@ class Transformation(_Cloze):
                           task.text(self._make_field),
                           '</p>'))
 
+    
+class Substitution(Transformation):
+    _NAME = _("Substitution")
 
+    def _instructions(self):
+
+        return _("""Substitute a part of each sentence using the text in
+        brackets.""")
+    
 class Dictation(_Cloze):
     _NAME = _("Dictation")
     
