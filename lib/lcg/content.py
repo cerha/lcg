@@ -117,7 +117,7 @@ class WikiText(TextContent):
     """Structured text in Wiki formatting language (on input)."""
         
     def export(self):
-        return wiki.InlineFormatter(self._parent).format(self._text)
+        return wiki.Formatter(self._parent).format(self._text)
 
     
 class Container(Content):
@@ -425,10 +425,12 @@ class VocabList(Content):
 
     def export(self):
         pairs = [(speaking_text(i.word(), i.media())+" "+i.note(),
-                  i.translation()) for i in self._items]
+                  '<span lang="%s">%s</span>' % \
+                  (i.translation_language(), i.translation()))
+                 for i in self._items]
         rows = ['<tr><td>%s</td><td>%s</td></tr>' % \
                 (self._reverse and (b,a) or (a,b)) for a,b in pairs]
-        return '<table>\n' + '\n'.join(rows) + "\n</table>\n"
+        return '<table class="vocab-list">\n' + '\n'.join(rows) + "\n</table>\n"
 
     
 class VocabItem(Record):
@@ -436,7 +438,8 @@ class VocabItem(Record):
     _DIACRITICS_MATCHER = re.compile(r" WITH .*")
     _DANGER_CHAR_MATCHER = re.compile(r"[^a-zA-Z0-9-]")
     
-    def __init__(self, parent, word, note, translation):
+    def __init__(self, parent, word, note, translation,
+                 translation_language, is_phrase=False):
         """Initialize the instance.
         
         Arguments:
@@ -445,7 +448,11 @@ class VocabItem(Record):
             in parens separated by spaces.  Typical notes are for example
             (v) for verb etc.
           translation -- the translation of the word into target language.
-        
+          translation_language -- the lowercase ISO 639-1 Alpha-2 language
+            code.
+          is_phrase a boolean flag indicating, that given vocabulary item is a
+            phrase.
+          
         """
         def safe_char(match):
             char = match.group(0)
@@ -459,20 +466,53 @@ class VocabItem(Record):
         assert isinstance(word, types.UnicodeType)
         assert isinstance(note, types.UnicodeType)
         assert isinstance(translation, types.UnicodeType)
+        assert isinstance(translation_language, types.StringTypes) and \
+               len(translation_language) == 2
+        assert isinstance(is_phrase, types.BooleanType)
         self._word = word
         self._note = note
         self._translation = translation
+        self._translation_language = translation_language
+        self._is_phrase = is_phrase
         name = self._DANGER_CHAR_MATCHER.sub(safe_char, word.replace(' ', '-'))
         filename = os.path.join('vocabulary', name + '.ogg')
         self._media = parent.resource(Media, filename, tts_input=word)
 
 
-    def word(self):
-        return self._word
-    
-    def translation(self):
-        return self._translation
-    
+class VocabSection(Section):
+    """Section of vocabulary listing.
+
+    The section is automatically split into two subsections -- the Vocabulary
+    and the Phrases.
+
+    """
+    def __init__(self, parent, title, items, reverse=False):
+        """Initialize the instance.
+
+        Arguments:
+
+          parent -- parent 'ContentNode' instance; the actual output document
+            this content element is part of.
+          title -- The title of the section.
+          items -- sequence of 'VocabItem' instances.
+          reverse -- see the same constructor argument for `VocabList'.
+
+        """
+        assert isinstance(title, types.StringTypes)
+        assert is_sequence_of(items, VocabItem)
+        assert isinstance(reverse, types.BooleanType)
+        terms = [x for x in items if not x.is_phrase()]
+        phrases = [x for x in items if x.is_phrase()]
+        if phrases:
+            c = [Section(parent, _("Terms"),
+                         VocabList(parent, terms, reverse=reverse)),
+                 Section(parent, _("Phrases"),
+                         VocabList(parent, phrases, reverse=reverse))]
+        else:
+            c = VocabList(parent, terms, reverse=reverse)
+        super(VocabSection, self).__init__(parent, title, c)
+
+        
 ################################################################################
 ################################     Tasks     #################################
 ################################################################################
