@@ -26,6 +26,13 @@
 	(StaticExporter._toc): Wrap the result in a div.
 	(StaticExporter.export): New method (copy the stylesheet file
 	after exporting).
+	(StaticExporter._wrap_content): Add the `next' and `prev' `link'
+	tags to the header.  Add an anchor with an accesskey to the
+	beginning of the contents.
+	(StaticExporter._hotkey): New variable. 
+	(StaticExporter._links): New method. 
+	(StaticExporter._navigation): Add hotkeys to the links.
+	(StaticExporter._link): New keyword argument 'key'.
 
 2004-09-03  Tomas Cerha  <cerha@brailcom.org>
 
