@@ -408,3 +408,29 @@ class WikiNode(ContentNode):
     
     def _title(self):
         return self._title_
+
+
+def set_language(lang, translation_dir=None):
+    """Initialize the LCG to use a given language for its translations.
+
+    Arguments:
+
+      lang -- an ISO 639-1 Alpha-2 language code as a string.
+      translation_dir -- override the configuration variable
+        'config.translation_dir'.  See the 'config' module for more
+        information.
+    
+    Call this method after importing the `lcg' module to set the language
+    used to lookup for the translations of the texts inserted by the LCG to the
+    generated documents.
+
+    A True value is returned when the correct message catalog is loaded.  A
+    False notifies about the failure.  Standard English texts are used in such
+    a case.
+    
+    """
+    from gettext import translation, NullTranslations
+    t = translation('lcg', config.translation_dir, (lang,), fallback=True)
+    t.install(unicode=True)
+    return not isinstance(t, NullTranslations)
+    
