@@ -52,8 +52,8 @@ def b(text):
 def p(*content, **kwargs):
     return _tag('p', (('class', kwargs.get('cls')),), content, concat='\n')
 
-def div(content, cls=None):
-    return _tag('div', (('class', cls),), content, concat='\n')
+def div(content, cls=None, lang=None):
+    return _tag('div', (('class', cls), ('lang', lang)), content, concat='\n')
 
 def link(label, url, brackets=False,
          title=None, target=None, cls=None, hotkey=None):
