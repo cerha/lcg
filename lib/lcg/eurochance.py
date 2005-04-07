@@ -31,6 +31,13 @@ class EurochanceNode(ContentNode):
         super(EurochanceNode, self).__init__(*args, **kwargs)
         self.resource(Stylesheet, 'default.css')
 
+    def resource(self, cls, file, *args, **kwargs):
+        if cls is Media:
+            basename, ext = os.path.splitext(file)
+            file = basename + '.mp3'
+        return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)    
+
+        
 class Unit(EurochanceNode):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
     _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
@@ -110,13 +117,15 @@ class ExerciseInstructions(EurochanceNode):
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
+        lang = None #self.root_node().users_language()
         template = self._read_file('exercise-instructions',
-                                   dir=config.translation_dir)
+                                   lang=lang, dir=config.translation_dir)
         try:
-           template = self._read_file('exercise-context') + template
+           template = self._read_file('exercise-context', lang=lang) + template
         except IOError:
             pass
-        return self._type.help(self, template)
+        content = self._type.help(self, template)
+        return SectionContainer(self, content, lang=lang)
 
     def title(self, abbrev=False):
         return _("Instructions for %s") % self._type.name()
@@ -256,3 +265,5 @@ class Formatter(wiki.Formatter):
             return '</span>'
     
 wiki.Formatter = Formatter
+
+
