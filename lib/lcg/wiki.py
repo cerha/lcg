@@ -346,7 +346,7 @@ class MacroParser(object):
 
         def __str__(self):
             value = bool(self._provider(self._condition))
-            return '\n'.join([str(x) for x in self._content[value]])
+            return '\n'.join([unicode(x) for x in self._content[value]])
 
     
     def __init__(self, eval_provider=None, include_provider=None,
@@ -386,5 +386,5 @@ class MacroParser(object):
                 current = current.parent
             else:
                 current.append(t)
-        parsed = str(structured)
+        parsed = unicode(structured)
         return self._substitute_variables(parsed)
