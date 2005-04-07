@@ -1,3 +1,55 @@
+2005-04-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg/_html.py (div): New keyword argument `lang'.
+
+	* lcg/content.py (Content.__init__): New argument `lang'.
+	(Content.lang): New method.
+	(Container.__init__): Pass **kwargs to the super-class.
+	(SectionContainer.__init__): Pass **kwargs to the super-class.
+	(SectionContainer.export): Wrap the content to a `div()' with the
+	language set correctly.
+	(Section.__init__): Pass **kwargs to the super-class.
+	(VocabItem.__init__): Don't pass the removed `tts_input' argument
+	to the `Media' constructor.
+	(Exercise.help): Don't wrap the content into the `SectionContainer'
+	(_InteractiveExercise._RESPONSES): Changed specification format.
+	(_InteractiveExercise._RESPONSE_TTS): Constant removed.
+	(_InteractiveExercise.__init__): The creation of `self.responses' reimplemented.
+	(_InteractiveExercise._response): Select a random response with
+	given selector.
+	(_FillInExercise._RESPONSES): Changed specification format.
+	(_FillInExercise._RESPONSE_TTS): Constant removed.
+	* lcg/eurochance.py (EurochanceNode.resource): New method.
+	(ExerciseInstructions._create_content): Added support for reading
+	the instructions in users language.  Wrap the result af calling
+	`Exercise.help()' into a `SectionContainer'.
+	
+
+	* lcg/wiki.py (MacroParser._ConditionalText.__str__): Use
+	`unicode()' instead of `str()'.
+	(MacroParser.parse): Use `unicode()' instead of `str()'.
+
+	* lcg/resources.py (ResourceNotFound): New exception class.
+	(Resource._check_file): Raise `ResourceNotFound' when the resource
+	was not found.
+	(Resource._destination_file): Method removed.
+	(Resource.export): Don't use `self._destination_file()'. Pass
+	`infile' and `outfile' to `self._export()'.
+	(Resource._export): New arguments `infile' and `outfile' replacing
+	the old `dir'.
+	(Media._FORCE_OUTPUT_FORMAT): Constant removed.
+	(Media.__init__): Argument `tts_input' removed.  Don't care about
+	`_FORCE_OUTPUT_FORMAT'.
+	(Media._check_file): Method removed.
+	(Media._find_source_file): Don't add the transcript dir to input
+	dirs.  Omit the text formats from input formats.
+	(Media._command, Media._open_stream_from_tts)
+	(Media._open_stream_from_encoder): Methods removed.
+	(Media._export): Don't care about TTS, just do the conversion if
+	necessary.
+	(Transcript._export): New arguments `infile' and `outfile'
+	replacing the old `dir'.
+
 2005-04-06  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/content.py (Exercise._sound_controls): Don't add the colon
