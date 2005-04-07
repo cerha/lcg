@@ -109,7 +109,7 @@ class Resource(object):
 
     def _export(self, infile, outfile):
         shutil.copy(infile, outfile)
-        print "%s: file copied." % self._destination_file(dir)
+        print "%s: file copied." % outfile
 
     def get(self):
         fh = open(self._src_path)
