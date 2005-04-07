@@ -30,6 +30,7 @@ import re
 import types
 import unicodedata
 import textwrap
+import random
 
 from lcg import *
 from _html import *
@@ -49,7 +50,7 @@ class Content(object):
     objects (i.e. the resources).
 
     """
-    def __init__(self, parent):
+    def __init__(self, parent, lang=None):
         """Initialize the instance.
 
         Arguments:
@@ -62,7 +63,8 @@ class Content(object):
                "Not a 'ContentNode' instance: %s" % parent
         self._parent = parent
         self._container = None
-
+        self._lang = lang
+        
     def sections(self):
         """Return the contained sections as a sequence of 'Section' instances.
 
@@ -90,7 +92,10 @@ class Content(object):
         while path[0]._container is not None:
             path.insert(0, path[0]._container)
         return tuple(path)
-    
+
+    def lang(self):
+        return self._lang
+
     def export(self):
         """Return the HTML formatted content as a string."""
         return ''
@@ -143,7 +148,7 @@ class Container(Content):
 
     """
 
-    def __init__(self, parent, content):
+    def __init__(self, parent, content, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -155,7 +160,7 @@ class Container(Content):
             appear in the output.
 
         """
-        super(Container, self).__init__(parent)
+        super(Container, self).__init__(parent, **kwargs)
         if operator.isSequenceType(content):
             assert is_sequence_of(content, Content), \
                    "Not a 'Content' instances sequence: %s" % (content,)
@@ -264,7 +269,7 @@ class SectionContainer(Container):
 
     """
 
-    def __init__(self, parent, content, toc_depth=99):
+    def __init__(self, parent, content, toc_depth=99, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -274,7 +279,7 @@ class SectionContainer(Container):
             the same constructor argument of 'TableOfContents'.
 
         """
-        super(SectionContainer, self).__init__(parent, content)
+        super(SectionContainer, self).__init__(parent, content, **kwargs)
         self._sections = [s for s in self._content if isinstance(s, Section)]
         toc_sections = [s for s in self._sections if s.in_toc()]
         if toc_depth > 0 and \
@@ -289,8 +294,9 @@ class SectionContainer(Container):
         return self._sections
     
     def export(self):
-        return "\n".join([p.export() for p in (self._toc,) + self._content])
-
+        return div([p.export() for p in (self._toc,) + self._content],
+                   lang=self.lang())
+    
     
 class Section(SectionContainer):
     """Section wraps the subordinary contents into an inline section.
@@ -308,7 +314,7 @@ class Section(SectionContainer):
     
     """
     def __init__(self, parent, title, content, anchor=None, toc_depth=0,
-                 in_toc=True):
+                 in_toc=True, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -337,7 +343,8 @@ class Section(SectionContainer):
         self._title = title
         self._in_toc = in_toc
         self._anchor = anchor
-        super(Section, self).__init__(parent, content, toc_depth=toc_depth)
+        super(Section, self).__init__(parent, content, toc_depth=toc_depth,
+                                      **kwargs)
         
 
     def _section_path(self):
@@ -490,7 +497,7 @@ class VocabItem(object):
         self._is_phrase = is_phrase
         filename = "item-%02d.ogg" % parent.counter(self.__class__).next()
         path = os.path.join('vocabulary', filename)
-        self._media = parent.resource(Media, path, tts_input=word)
+        self._media = parent.resource(Media, path)
 
     def word(self):
         return self._word
@@ -826,7 +833,7 @@ class Exercise(Section):
         mp.add_globals(cls=cls, displays=[x[0] for x in cls._DISPLAYS],
                        buttons=[x[0] for x in cls._BUTTONS], **globals())
         text = mp.parse(template)
-        return SectionContainer(parent, wiki.Parser(parent).parse(text))
+        return wiki.Parser(parent).parse(text)
     help = classmethod(help)
     
     # Instance methods
@@ -913,19 +920,8 @@ class _InteractiveExercise(Exercise):
     gives him a feedback.
     
     """
-    _RESPONSES = {'correct': ['correct-response-1.ogg',
-                              'correct-response-2.ogg',
-                              'correct-response-3.ogg'],
-                  'incorrect': ['incorrect-response-1.ogg',
-                                'incorrect-response-2.ogg',
-                                'incorrect-response-3.ogg']}
-    _RESPONSE_TTS = {'correct-response-1.ogg': _("Correct!"),
-                     'correct-response-2.ogg': _("Perfect!"),
-                     'correct-response-3.ogg': _("Well done!"),
-                     'incorrect-response-1.ogg': _("You are wrong!"),
-                     'incorrect-response-2.ogg': _("Oh no, I'm sorry."),
-                     'incorrect-response-3.ogg': _("Try again!")}
-
+    _RESPONSES = (('correct', 'c%02d.ogg'), ('incorrect', 'i%02d.ogg'))
+    
     _FORM_HANDLER = 'Handler'
     _MESSAGES = {", $x ($y%) on first attempt":_(", $x ($y%) on first attempt")}
 
@@ -938,14 +934,26 @@ class _InteractiveExercise(Exercise):
         super(_InteractiveExercise, self).__init__(parent, *args, **kwargs)
         parent.resource(Script, 'exercises.js')
         parent.resource(Script, 'audio.js')
-        a = [(key, [parent.resource(Media, f, shared=True,
-                                    tts_input=self._RESPONSE_TTS.get(f))
-                    for f in files])
-             for key, files in self._RESPONSES.items()]
-        self._responses = dict(a)
+        
+        self._responses = {}
+        for key, filename in self._RESPONSES:
+            self._responses[key] = responses = []
+            for i in range(100):
+                try:
+                    f = filename % (i+1)
+                except TypeError:
+                    f = filename
+                path = os.path.join('responses', f)
+                try:
+                    m = parent.resource(Media, path, shared=True)
+                except ResourceNotFound, e:
+                    if len(responses) == 0: raise e
+                    break
+                responses.append(m)
 
     def _response(self, selector):
-        return self._responses[selector][0]
+        responses = self._responses[selector]
+        return responses[random.randint(0, len(responses)-1)]
         
     def _answers(self):
         return ()
@@ -1102,17 +1110,11 @@ class _FillInExercise(_InteractiveExercise):
 
     _TASK_TYPE = FillInTask
     
-    _RESPONSES = {'all_correct': ['all-correct-response.ogg'],
-                  'all_wrong': ['all-wrong-response.ogg'],
-                  'some_wrong': ['some-wrong-response.ogg']}
-    _RESPONSES.update(_InteractiveExercise._RESPONSES)
+    _RESPONSES = (('all_correct', 'all-correct.ogg'),
+                  ('all_wrong',   'all-wrong.ogg'),
+                  ('some_wrong',  'some-wrong.ogg')) + \
+                  _InteractiveExercise._RESPONSES
         
-    _RESPONSE_TTS = \
-         {'all-correct-response.ogg': _("Everything correct!"),
-          'all-wrong-response.ogg':   _("All the answers are wrong!"),
-          'some-wrong-response.ogg':  _("Some of the answers are wrong!")}
-    _RESPONSE_TTS.update(_InteractiveExercise._RESPONSE_TTS)
-
     _FORM_HANDLER = 'FillInExerciseHandler'
 
     _BUTTONS = (('eval', _("Evaluate"), button,
