@@ -1,3 +1,14 @@
+2005-05-11  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py (main): Recognize the `ims' arg and use the IMS
+	exported when passed.
+
+	* lcg/content.py (VocabList.export): Use `span' for the
+	translation, not a `label'.
+
+	* lcg/_html.py (span): New function.
+	(speaking_text): Implement the JavaScript control as a button.
+
 2005-04-07  Tomas Cerha  <cerha@brailcom.org>
 
 	* lcg/_html.py (div): New keyword argument `lang'.
