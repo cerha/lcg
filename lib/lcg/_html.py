@@ -49,6 +49,12 @@ def h(title, level=2):
 def b(text):
     return '<b>%s</b>' % text
 
+def span(text, cls=None, id=None, lang=None):
+    attr = (('class', cls),
+            ('lang', lang),
+            ('id', id))
+    return _tag('span', attr, text)
+
 def p(*content, **kwargs):
     return _tag('p', (('class', kwargs.get('cls')),), content, concat='\n')
 
@@ -118,15 +124,10 @@ def select(name, options, onchange=None, default="", id=None):
 
 # Special controls
 
-def speaking_text(text, media, id=None):
-    #a1 = link(text, "javascript: play_audio('%s');" % media.url())
-    #attr = (('onkeydown', "play_on_keypress(event_key(window.event), '%s');" %
-    #         media.url()),
-    #        ('onclick', "play_audio('%s');" % media.url()))
-    #a1 = _tag('span', attr, text)
-    a1 = field(text, onclick="play_audio('%s');" % media.url(),
-               onfocus="this.onkeypress = simulate_click_on_keypress;",
-               size=len(text), readonly=True, cls='speaking-text', id=id)
+def speaking_text(text, media):
+    id_ = 'text_%s' % id(media)
+    a1 = button(text, "javascript: play_audio('%s');" % media.url(),
+                cls='speaking-text')
     a2 = link(text, media.url(), cls='speaking-text')
     return script_write(a1, a2)
 
