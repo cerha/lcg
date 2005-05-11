@@ -3,7 +3,7 @@ body {
 }
 
 a:link, a:visited { color: #06d; text-decoration: none; }
-a:hover   { color: #f60; text-decoration: underline; }
+a:hover, .speaking-text:hover { color: #f60; text-decoration: underline; }
 
 hr.navigation { 
     display: none; 
@@ -65,7 +65,6 @@ input.fill-in-task {
     font-style: italic;
 }
 
-/*.speaking-text:link, .speaking-text:visited, .speaking-text:hover { */
 .speaking-text { 
     color: #04b;
     text-decoration: none;
@@ -73,7 +72,6 @@ input.fill-in-task {
     border: none;
     font-size: 1em;
 }
-
 
 .results { 
     margin-top: .8em;
