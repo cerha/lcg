@@ -1,5 +1,9 @@
 2005-05-11  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/config.py (_base_dir): Removed.
+	(lcg_dir): New variable.
+	(translation_dir, default_resource_dir): Use it.
+
 	* resources/media/responses/*.mp3: New sound files.
 
 	* resources/css/default.css (a): Updated for new `speaking_text'
