@@ -18,16 +18,18 @@
 
 """The configuration variables for the Learning Content Generator."""
 
-_base_dir = '/home/cerha/work/eurochance/src'
+import os
 
-default_resource_dir = _base_dir+'/resources'
+lcg_dir = os.environ.get('LCG_DIR', '/usr/share/lcg')
+
+default_resource_dir = os.path.join(lcg_dir, 'resources')
 
 """The LCG comes with a set of default resources (stylesheets, scripts and
 media files).  They are used if no custom files of the same name are present in
 the source directory.  This variable specifies the name of the directory, where
 LCG default resources are installed."""
 
-translation_dir = _base_dir+'/translations'
+translation_dir = os.path.join(lcg_dir, 'translations')
 
 """The LCG inserts some texts into the generated documents.  These texts can be
 translated using a GNU gettext catalog.  This variable specifies the location
