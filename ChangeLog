@@ -1,5 +1,10 @@
 2005-05-11  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/media/responses/*.mp3: New sound files.
+
+	* resources/css/default.css (a): Updated for new `speaking_text'
+	implementation.
+
 	* bin/generate.py (main): Recognize the `ims' arg and use the IMS
 	exported when passed.
 
