@@ -542,9 +542,9 @@ class VocabList(Content):
         parent.resource(Script, 'audio.js')
 
     def export(self):
-        pairs = [(speaking_text(i.word(), i.media(), id=id(i))+
+        pairs = [(speaking_text(i.word(), i.media()) +
                   (i.note() and " "+i.note() or ""),
-                  label(i.translation(), id(i), lang=i.translation_language()))
+                  span(i.translation(), lang=i.translation_language()))
                  for i in self._items]
         rows = ['<tr><td>%s</td><td>%s</td></tr>' %
                 (self._reverse and (b,a) or (a,b)) for a,b in pairs]
