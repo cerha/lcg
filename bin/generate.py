@@ -25,7 +25,7 @@ def main():
     try:
         optlist, args = getopt.getopt(sys.argv[1:], '',
                                       ('encoding=', 'lang=', 'user-lang=',
-                                       'stylesheet='))
+                                       'stylesheet=', 'ims'))
         opt = dict(optlist)
         source_dir, destination_dir = args
     except getopt.GetoptError:
@@ -42,8 +42,10 @@ def main():
     c = EurochanceCourse(source_dir, course_language=lang,
                          users_language=opt.get('--user-lang', 'cs'),
                          input_encoding='utf-8')
-    #e = lcg.ims.IMSExporter(destination_dir)
-    e = EurochanceExporter(stylesheet=opt.get('--stylesheet'))
+    if opt.get('--ims'):
+        e = lcg.ims.IMSExporter(destination_dir)
+    else:
+        e = EurochanceExporter(stylesheet=opt.get('--stylesheet'))
     e.export(c, destination_dir)
 
 def usage():
