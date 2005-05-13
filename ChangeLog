@@ -1,5 +1,9 @@
 2005-05-13  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/content.py (Section.url): Handle the `relative' flag
+	correctly.
+	(TableOfContents._make_toc): Pass the `relative' flag correctly.
+
 	* lib/lcg/course.py (_WikiNode._create_content): Test
 	`self._title_' for None, not just as boolean.
 
