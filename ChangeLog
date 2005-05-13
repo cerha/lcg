@@ -1,3 +1,10 @@
+2005-05-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/course.py (_WikiNode._create_content): Test
+	`self._title_' for None, not just as boolean.
+
+	* lib/lcg/__init__.py (__version__): New variable.
+
 2005-05-11  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/config.py (_base_dir): Removed.
