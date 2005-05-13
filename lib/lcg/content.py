@@ -375,7 +375,11 @@ class Section(SectionContainer):
 
     def url(self, relative=False):
         """Return the URL of the section relative to the course root."""
-        return (relative and '' or self._parent.url()) + "#" + self.anchor()
+        if relative:
+            base = ''
+        else:
+            base = self._parent.url()
+        return base + "#" + self.anchor()
     
     def _header(self):
         l = len(self._section_path()) + 1
@@ -446,7 +450,8 @@ class TableOfContents(Content):
         if len(items) == 0:
             return ''
         links = [link(i.title(), isinstance(i, Section) and \
-                      i.url(i.parent() is not self.parent()) or i.url()) + \
+                      i.url(relative=(i.parent() is self.parent())) or \
+                      i.url()) + \
                  self._make_toc(i, indent=indent+4, depth=depth-1)
                  for i in items]
         return "\n" + itemize(links, indent=indent) + "\n" + ' '*(indent-2)
