@@ -444,7 +444,7 @@ class _WikiNode(ContentNode):
         
     def _create_content(self):
         sections = wiki.Parser(self).parse(self._source_text())
-        if not self._title_:
+        if self._title_ is None:
             assert len(sections) == 1, \
                    "The wiki document must have just one top-level section!"
             s = sections[0]
