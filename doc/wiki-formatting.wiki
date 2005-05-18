@@ -1,0 +1,375 @@
+= Wiki Formatting Manual =
+
+ 
+This document describes the Wiki markup used by the
+[http://www.freebsoft.org/lcg|LCG Wiki Formatter].
+
+Table of contents: @TOC@
+
+
+== Basics ==
+
+Wiki uses simple conventions to mark the logical structure of a text document
+as well as some text properties.  The advantage is that the document source
+stays easilly readable and editable without any particular tool.  Just a simple
+text editor can do the job.
+
+=== Text Emphasizing ===
+
+You can use *Bold text*, /italic text/, _underlined text_, =fixed font=,
+/*or their _combinations_*/.
+
+The source code for the paragraph above looks like:
+
+-----
+You can use *Bold text*, /italic text/, _underlined text_, =fixed font=,
+/*or their _combinations_*/.
+-----
+
+
+=== Escaping ===
+
+You can avoid the special meaning of all the constructs described in this
+document by prefixing them by the exclamation mark.
+
+*Example:*
+
+------
+Slashes are used for /italic/, however sometimes you want just the slash like
+in GNU!/Linux.
+------
+
+This renders as:
+
+Slashes are used for /italic/, however sometimes you want just the slash like
+in GNU!/Linux.
+
+
+=== Paragraphs ===
+
+A paragraph is each continual set of rows of text.  Whenever you leave a blank
+line, you start a new paragraph.  The line-breaks within the paragraph are
+ignored, since the paragraph will be reformatted to fit the output media
+(i.e. browser window).
+
+
+=== Links === links
+
+Link is marked by square brackets.  The text in the brackets is the link
+target.  The link name can be optionally included after the link target,
+separated with a pipe '|' character.
+
+*Example:*
+
+------
+Visit [http://www.gnu.org|GNU].  See also [#anchors].
+------
+
+This renders as:
+
+Visit [http://www.gnu.org|GNU].  See also [#anchors].
+
+Link names are automatically supplied for links to local anchors within the
+document (see [#anchors]) and also for links to other wiki documents when the
+generator implements this feature.
+
+External links begining with '!http://', such as http://www.freebsoft.org, are
+recognized automatically, so the square brackets are not necessary.  Also
+e-mail addresses automatically become links.
+
+
+=== Images ===
+
+Any link pointing to an image will display the image in-line.
+
+*Example:*
+
+------
+http://www.google.com/images/logo.gif
+------
+
+This renders as:
+
+http://www.google.com/images/logo.gif
+
+
+
+== Structure ==
+
+The main strenght of the LCG wiki formatter is the recognition of the logical
+structure within the document.  This structure is based on the hierarchy of
+sections.
+
+The knowledge of the structure is than used to allow the advanced features,
+such as [#anchors] and [#toc].
+
+=== Section Headings ===
+
+Section headings are marked by equation characters at the beginning and end of
+the line.  The text between the equation signs is a section title.  The number
+of the equation signs determines the level.
+
+All the text below the heading belongs to the section of that name until
+another section heading is found.
+
+*Example:*
+
+------
+ == This is the main heading ==
+
+ The paragraphs below belong to the first section.
+
+ === Subsection Heading ===
+
+ This paragraph belongs to the subsection of the first section.
+
+ == A second section ==
+
+ This is a secnod section on the same level as the first one.
+----- 
+
+It is /important/ to /separate/ the equation marks from the heading text (using
+a space) and to /avoid/ any other (even blank) characters after the final
+equation sign.
+
+
+=== Anchors === anchors
+
+Additionally an anchor name can be defined for each heading.  The anchor can
+consist of alpha-numerical characteres, underscores and dashes and is writetn
+at the end of the heading line separated with at least one blank character
+(space).
+
+-----
+ == Introduiction == intro
+-----
+
+An anchor can be used to refer to the section.  The link ![#intro], for
+example, will be rendered as [#intro|Introduction] (see [#links] for more
+details).
+
+
+=== Tables of Contents === toc
+
+Table of contents is a hierarchical list of all sections within a document or
+it's part.  It can be included in the document using the '=@TOC@=' macro.
+
+*Example:*
+
+-----
+Table of Contents: @TOC@
+-----
+
+This source line will be replaced with the table of contents.  The text before
+the colon is used for the caption and the TOC includes all the subsections of
+the section, within which the macro is used.  This means you can also create local tables of contents
+in particular subsections.
+
+The TOC at the top of this manual is made the same way.
+
+
+== Advanced Constructs ==
+
+=== Itemized Lists ===
+
+Itemized lists are marked by an asterisk at the beginning of each item.  Each
+item is indented by a space.
+
+*Example:*
+
+------
+ * cats
+ * dogs
+ * frogs
+------
+
+This renders as:
+
+ * cats
+ * dogs
+ * frogs
+
+Ordered lists can be made using a number with a period instead of an asterisk.
+The numbers in the source document are ignored, since the output numbers are
+generated.  This means that you are free to mark all items with zero for
+example or you can use real order numbers if you prefer.
+
+*Example:*
+
+------
+ 0. cats
+ 0. dogs
+ 0. frogs
+
+or:
+
+ 1. mice
+ 2. rats
+ 3. bats
+------
+
+This renders as:
+
+ 0. cats
+ 0. dogs
+ 0. frogs
+
+or:
+
+ 1. mice
+ 2. rats
+ 3. bats
+
+Similarly, alpha-ordered lists can be made:
+
+------
+ a. cats
+ b. dogs
+ c. frogs
+------
+
+This renders as:
+
+ a. cats
+ b. dogs
+ c. frogs
+
+
+=== Preformatted Text === preformatted-text
+
+You can mark a block of text as a preformatted text by surrounding it by lines
+of five or more dashes.
+
+No further formatting is then applied to the preformatted text.  It is rendered
+as it appears in the source document.
+
+*Example:*
+
+------
+ ------
+  foo   bar
+   x     y
+   1     2
+ ------
+------
+
+This renders as:
+
+------
+ foo   bar
+  x     y
+  1     2
+------
+
+All the examples in this manual are written as preformatted text.
+
+
+
+
+=== Tables ===
+
+You can make simple tables with constant number of cells per row.  Each row in
+on one line and pipe characters are used to separate the cells.  The line must
+also begin and end with a pipe character.
+
+
+*Example:*
+
+------
+|        | Dick   | Jane |
+| height | 72"    | 65"  |
+| weight | 130lbs | 150lbs |
+------
+
+|        | Dick   | Jane |
+| height | 72"    | 65"  |
+| weight | 130lbs | 150lbs |
+
+
+== Other Features ==
+
+
+=== Special and Typographical Characters ===
+
+
+==== Non-breakable Space ====
+
+The line-breaks are inserted automatically, when the paragraph is formatted to
+fit the output media.  However, you sometimes don't want a line-break in a
+certain place.  You can use a tilde character '=!~=' instead of a space in such
+cases.
+
+*Example:*
+
+------
+We can forbid a line-break between the first and second name of
+Richard~Stallman, but we must prefix the tilde with an exclamation sign, when
+we need to write the shell command =cd !~=.
+------
+
+This renders as:
+
+We can forbid a line-break between the first and second name of
+Richard~Stallman, but we must prefix the tilde with an exclamation sign, when
+we need to write the shell command '=cd !~='.
+
+
+==== Long Dash ====
+
+Double dash (two minus signs) procuce a long dash on the output
+
+*Example:*
+
+------
+LCG -- highway to excellence.
+------
+
+This renders as:
+
+LCG -- highway to excellence.
+
+==== Double Quotes ====
+
+Double quotes begin with two reverse apostrophes and end with two single
+apostrophes.
+
+*Example:*
+
+------
+He said: ``Who knows?''
+------
+
+This renders as:
+
+He said: ``Who knows?''
+
+
+=== Horizontal Lines ===
+
+Horizontal line can be made with 4 dashes on a separate line.
+
+*Example:*
+
+------
+----
+------
+
+This renders as:
+
+----
+
+=== Comments ===
+
+You can comment out any text with '# ' at the beginning of a line.  This will
+make the text invisible on output media (e.g. by making it an HTML comment in
+the HTML output):
+
+------
+  # These lines have been 
+  # commented out
+------
+
+This renders as nothing:
+
+# These lines have been 
+# commented out
