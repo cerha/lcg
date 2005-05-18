@@ -1,3 +1,13 @@
+2005-05-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/index.txt: `wiki-formatting.wiki' added.
+
+	* doc/wiki-formatting.wiki: New file.
+
+	* lib/lcg/wiki.py (Formatter._link_formatter): Get the groups
+	using `.get()', not directory indexing.
+	(Formatter._FORMAT): Use the `<u></u>' tag for `underline'.
+
 2005-05-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (Section.url): Handle the `relative' flag
