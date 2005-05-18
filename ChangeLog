@@ -1,6 +1,13 @@
 2005-05-18  Tomas Cerha  <cerha@brailcom.org>
 
-	* doc/index.txt: `wiki-formatting.wiki' added.
+	* doc/eurochance.wiki: New file.
+
+	* doc/structure.wiki: File remoevd.
+
+	* doc/formats.wiki: File remoevd.
+
+	* doc/index.txt: `wiki-formatting.wiki' added.  `structure.wiki'
+	and `formats.wiki' replaced with `eurochance.wiki'.
 
 	* doc/wiki-formatting.wiki: New file.
 
