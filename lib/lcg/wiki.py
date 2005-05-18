@@ -119,9 +119,9 @@ class Formatter(object):
         return formatter(groups, close=close)
         
     def _link_formatter(self, groups, close=False):
-        title = groups['title']
-        href = groups['href']
-        anchor = groups['anchor']
+        title = groups.get('title')
+        href = groups.get('href')
+        anchor = groups.get('anchor')
         if href:
             node = self._parent.root_node().find_node(href)
             if node:
