@@ -9,7 +9,7 @@ with the LCG.
 This document includes the description of the course structure for Eurochance
 courses as well as a guide for input data creation.
 
-== Eurochance Course Structure ==
+== Eurochance Course Structure == structure
 
 A course consists of a certain number of units (for instance 15 units for
 the Intermediate course).  Each unit is focused on certain topic (e.g. finance,
@@ -61,7 +61,7 @@ number of exercises does not matter as long as the types are respected, however
 it is advisable to stick to cartain convention for beter user's orientation.
 
 The detailed description of exercise types and their content can be found in
-the section [formats].
+the section [#exercise-types].
 
 
 === Checklist ===
@@ -89,7 +89,7 @@ encoding* or convert it to this encoding afterwards.
 
 The basic concept is based on files arranged into directories (folders)
 according to the logical structure of the course (see also the
-[structure|course structure] specification).
+[#structure] specification).
 
 There is one /base directory/ for the whole course.  This directory contains
 one /subdirectory/ for each unit of the course.  Each of these subdirectories
@@ -116,7 +116,7 @@ describing the focus of the lesson for better orientation.
 
 === Text Sections ===
 
-According to the [structure|course structure], there are several sections
+According to the [#structure], there are several sections
 comprising a ``structured text'' in each unit.  For each of these sections, the
 LCG will expect a text file in unit source directory.
 
@@ -277,7 +277,7 @@ Can I take a message? :: Mohu pĹevzĂ­t vzkaz?
 
 === Exercises ===
 
-According to the [structure|course structure] specification, there are
+According to the [#structure] specification, there are
 five sections of exercises in each unit.  All these sections are defined in the
 same file.  This file is named '=exercises.txt=' and it is again located within
 each unit's source directory.
