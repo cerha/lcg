@@ -64,7 +64,7 @@ class Formatter(object):
     _FORMAT = {'bold': ('<strong>', '</strong>'),
                'italic': ('<i>', '</i>'),
                'fixed': ('<tt>', '</tt>'),
-               'underline': ('<span class="underline">', '</span>'),
+               'underline': ('<u>', '</u>'),
                'quotation': (u'“<span class="quotation">', u'</span>”'),
                'citation': ('<span class="citation">', '</span>'),
                'comment': '',
