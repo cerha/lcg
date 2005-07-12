@@ -1,3 +1,15 @@
+2005-07-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/css/default.css: New classes `reading' and `explanation'.
+
+	* bin/generate.py (main): New command-line argument '--advanced'.
+	Generate an `AdvancedCourse' if given, or 'IntermediateCouirse'
+	otherwise.w
+	(usage): Call `sys.exit(2)' at the end.
+	(main): Don't call `sys.exit(2)' after `usage()'.
+
+	* doc/eurochance.wiki: Bad unicode fixed.
+
 2005-05-18  Tomas Cerha  <cerha@brailcom.org>
 
 	* doc/eurochance.wiki: New file.
