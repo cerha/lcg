@@ -201,7 +201,7 @@ Example (with the citations in italics):
 
 The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
 would<<) have only one form.  There are also short affirmative forms for
-â>>shall<<â (>>'ll<<) â>>will<<â (>>'ll<<) and â>>would<<â (>>'d<<)
+>>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
 
 The citations must be marked by surrounding them into double angle brackets
 like this: =!>>word!<<=.  The paragraph above would be written like this:
@@ -209,7 +209,7 @@ like this: =!>>word!<<=.  The paragraph above would be written like this:
 -----
 The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
 would<<) have only one form.  There are also short affirmative forms for
-â>>shall<<â (>>'ll<<) â>>will<<â (>>'ll<<) and â>>would<<â (>>'d<<)
+>>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
 -----
 
 
