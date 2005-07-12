@@ -42,6 +42,18 @@ div.choices {
 form { 
 }
 
+div.explanation, div.reading { 
+    border: 0px solid #999;
+    border-width: 1px 0px;
+    padding: 0pt 3pt;
+}
+div.reading { 
+    background-color: #eee;
+}
+div.explanation { 
+    background-color: #ddf;
+}
+
 input.answer-control { 
     padding: 0;
     font-weight: bold;
