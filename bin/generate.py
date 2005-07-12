@@ -25,24 +25,26 @@ def main():
     try:
         optlist, args = getopt.getopt(sys.argv[1:], '',
                                       ('encoding=', 'lang=', 'user-lang=',
-                                       'stylesheet=', 'ims'))
+                                       'stylesheet=', 'ims', 'advanced'))
         opt = dict(optlist)
         source_dir, destination_dir = args
     except getopt.GetoptError:
         usage()
-        sys.exit(2)
     except ValueError:
         usage()
-        sys.exit(2)
 
     lang = opt.get('--lang', 'en')
     lcg.set_language(lang)
     
-    from lcg.eurochance import EurochanceCourse, EurochanceExporter
-    c = EurochanceCourse(source_dir, course_language=lang,
-                         users_language=opt.get('--user-lang', 'cs'),
-                         input_encoding='utf-8')
-    if opt.get('--ims'):
+    from lcg.eurochance import IntermediateCourse, AdvancedCourse, \
+                               EurochanceExporter
+    if opt.get('--advanced') is not None:
+        c = AdvancedCourse(source_dir, language=lang, input_encoding='utf-8')
+    else:
+        c = IntermediateCourse(source_dir, course_language=lang,
+                               users_language=opt.get('--user-lang', 'cs'),
+                               input_encoding='utf-8')
+    if opt.get('--ims') is not None:
         e = lcg.ims.IMSExporter(destination_dir)
     else:
         e = EurochanceExporter(stylesheet=opt.get('--stylesheet'))
@@ -63,6 +65,7 @@ def usage():
     output encoding is always UTF-8.
     """ % os.path.split(sys.argv[0])[-1]
     sys.stderr.write(help.replace("\n    ", "\n"))
+    sys.exit(2)
 
 if __name__ == "__main__":
     main()
