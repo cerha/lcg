@@ -252,7 +252,7 @@ Example (using Czech translations):
 -----
 call :: volat, hovor
 ring :: zvonit
-cell-phone (U.S.) :: mobilnÃ­ telefon, mobil
+cell-phone (U.S.) :: mobilnÄ‚Â­ telefon, mobil
 ...
 -----
 
@@ -266,12 +266,12 @@ a line with the comment "phrases" like this:
 
 -----
 to switch off :: odpojit, vypnout
-tone :: tón
-yellow pages :: zlaté stránky
+tone :: tÃ³n
+yellow pages :: zlatÃ© strÃ¡nky
 # phrases :: 
-Can I speak to ...? :: Mohu prosím mluvit s ...?
-Can I help you? :: Mohu Vám nìjak pomoci?
-Can I take a message? :: Mohu pøevzít vzkaz?
+Can I speak to ...? :: Mohu prosÃ­m mluvit s ...?
+Can I help you? :: Mohu VÃ¡m nÄ›jak pomoci?
+Can I take a message? :: Mohu pÅ™evzÃ­t vzkaz?
 -----
 
 
