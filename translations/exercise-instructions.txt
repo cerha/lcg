@@ -22,7 +22,7 @@ labaled a, b and c.  Only one answer is correct.
 #endif
 #if issubclass(cls, Selections)
 
-There are several pairs of simmillar sentences, however one sentence in each
+There are several pairs of simmilar sentences, however one sentence in each
 pair is always incorrect.  Your goal is to decide which is the correct one.
 
 #endif
@@ -155,7 +155,7 @@ The display box below the exercise shows the following values:
  * *Result* ... displays the number and percentage of successful answers.  The
    first pair of numbers shows the results of all current answers.  If you
    didn't answer all of them correctly on first attempt, there is also a second
-   pair of numbers showing how many answers you did succesfully on the first
+   pair of numbers showing how many answers you did succesfuly on the first
    try.  Use the ``Reset'' button to start again.
 
 #endif
