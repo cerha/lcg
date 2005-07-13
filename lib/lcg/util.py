@@ -56,7 +56,7 @@ class SplittableText:
             mainly useful when you want to report an error in the input file
             found within the text of this instance.  You set the filename when
             creating the instance and it is passed to the pieces automatically
-            when sp[litting the text and passing it elswhere in the program.
+            when splitting the text and passing it elsewhere in the program.
           firstline -- Line number of the first line.  Normally you should not
             care about this argument.  
 
@@ -89,7 +89,7 @@ class SplittableText:
         """Return parts of the text as a tuple of SplittableText instances.
 
         The 'matcher' argument is an instance of compiled regular expression.
-        This regex should match the splitter used to devide the pieces of the
+        This regex should match the splitter used to divide the pieces of the
         input text into subsequent parts.
 
         All beginning and trailing whitespace characters are stripped from

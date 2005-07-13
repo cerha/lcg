@@ -162,7 +162,7 @@ class Parser(object):
     """Structured Wiki document parser.
 
     This parser parses the structure of the document and builds the
-    corresponding 'Conetent' element hierarchy.
+    corresponding 'Content' element hierarchy.
 
     """
     

@@ -58,7 +58,7 @@ class _Manifest:
 
         self._append_xml_text(o, 'title', course.title())
 
-        # Ressources
+        # Resources
         resources = self._append_xml_element(manifest, 'resources')
         
         for child in course.children():
