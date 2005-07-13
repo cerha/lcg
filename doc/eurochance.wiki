@@ -2,8 +2,8 @@
 
 The Eurochance language course (see http://eurochance.brailcom.org) was the
 initial implementation of a course using the LCG framework.  Thus the LCG
-sources contain an implementation of the Eurochance cource structure in a
-separate module.  This can serve as an example for creration of other projects
+sources contain an implementation of the Eurochance course structure in a
+separate module.  This can serve as an example for creation of other projects
 with the LCG.
 
 This document includes the description of the course structure for Eurochance
@@ -29,7 +29,7 @@ structured text -- paragraphs, bullet lists etc.
 === Vocabulary ===
 
 Consists of a listing of vocabulary for the unit.  User can read each piece of
-vocabulary separately, hear the correct pronounciation (recorded by native
+vocabulary separately, hear the correct pronunciation (recorded by native
 speaker) and read the translation into his mother tongue.
 
 User can browse the vocabulary up and down and search for a concrete word
@@ -39,7 +39,7 @@ User can browse the vocabulary up and down and search for a concrete word
 === Grammar ===
 
 This section contains grammar explanations for the unit.  These explanations
-are writetn as structured text.
+are written as structured text.
 
 Multiple sections should be used to allow direct access to certain parts from
 the Table of Contents and the Grammar Index.
@@ -58,7 +58,7 @@ series of exercises.  The subsections are:
 
 There is a predefined set of exercise types that can be used.  The order and
 number of exercises does not matter as long as the types are respected, however
-it is advisable to stick to cartain convention for beter user's orientation.
+it is advisable to stick to certain convention for better user's orientation.
 
 The detailed description of exercise types and their content can be found in
 the section [#exercise-types].
@@ -179,7 +179,7 @@ equation signs determines the level.
 
  == A second section ==
 
- This is a secnod section on the same level as the first one.
+ This is a second section on the same level as the first one.
 ----- 
 
 The main purpose of the sections is to have an additional logical structure
@@ -187,13 +187,13 @@ within the text sections.  All the sections will appear in the Table of
 Contents (reflecting their hierarchy).  Thus sections should be used as much as
 possible in the grammar explanations to allow direct access to certain points
 from the table of contents.  Also links from within the exercises can be
-targetted to a particular subsection of the Grammar section.
+targeted to a particular subsection of the Grammar section.
 
 
 ==== Citations ====
 
 Within the Grammar explanations, there are often words or structures, which can
-be considered citations.  They cen be recognized easily: Even after translating
+be considered citations.  They can be recognised easily: Even after translating
 the grammar explanations into another language, these words or structures will
 still remain in English (or German for the German course).
 
@@ -259,19 +259,19 @@ cell-phone (U.S.) :: mobilnÃ­ telefon, mobil
 All lines beginning with a hash "#" are comments (ignored).
 
 Sometimes the vocabulary defines also phrases.  The LCG needs to be able to
-recognize phrases (for example to be able to generate a global listing of
+recognise phrases (for example to be able to generate a global listing of
 vocabulary and phrases) so all the phrases should go to the end of the
 vocabulary file and the beginning of the phrases section should be separated by
 a line with the comment "phrases" like this:
 
 -----
 to switch off :: odpojit, vypnout
-tone :: tÃ³n
-yellow pages :: zlatÃ© strÃ¡nky
+tone :: tón
+yellow pages :: zlaté stránky
 # phrases :: 
-Can I speak to ...? :: Mohu prosÃ­m mluvit s ...?
-Can I help you? :: Mohu VÃ¡m nÄ›jak pomoci?
-Can I take a message? :: Mohu pÅ™evzÃ­t vzkaz?
+Can I speak to ...? :: Mohu prosím mluvit s ...?
+Can I help you? :: Mohu Vám nìjak pomoci?
+Can I take a message? :: Mohu pøevzít vzkaz?
 -----
 
 
@@ -294,7 +294,7 @@ rules making the types and number of exercises within each section consistent
 throughout the course.
 
 So, technically, the individual exercise specifications are separated by a line
-containing four or more dashes.  When the next sections begins, a sparator of
+containing four or more dashes.  When the next sections begins, a separator of
 four or more equation signs must be used.
 
 *Example:*
@@ -362,7 +362,7 @@ What does the cashier recommend her to do?
 - Send cash.
 -----
 
-/Details abot line length:/ Line length is unlimited, but it is recommended to
+/Details about line length:/ Line length is unlimited, but it is recommended to
 wrap the text not to exceed 80 columns width.  However you can only wrap
 certain types of lines.  For example exercise header lines can not be wrapped
 and also certain types of exercises expect their tasks as distinct lines.
@@ -393,7 +393,7 @@ Exercise header arguments:
   * =transcript= ... When ='sound_file'= is defined, you must also define the
     name of the file with a textual transcript of that recording.
 
-The difference between the /recording/ and the /audion version/ should be
+The difference between the /recording/ and the /audio n version/ should be
 obvious.  First the user listens to the recording (if there is one) and than he
 decides if he wants to do the written tasks (filling in texts or choosing from
 predefined answers interactively) or to do the same tasks purely
@@ -478,7 +478,7 @@ consist of a paragraph of text which can contain more than one gap.
 
 It is recommended to use a cloze in a combination with a recording, so that the
 user's goal is to fill in the exactly same words as he has heard before.  In
-this case, there is just one correct answer and the automatical evaluation can
+this case, there is just one correct answer and the automatic evaluation can
 surely decide what is a correct answer and what is not.
 
 You can also use a cloze without a recording, so that the user must find
