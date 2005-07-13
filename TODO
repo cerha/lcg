@@ -1,14 +1,16 @@
 Bugs:
 
- * JavaScript doesn't work witk the `Links' browser.
+ * OGG playback in MS Media Player.
 
 Required features:
 
- *  
+ * Finish the IMS export.
 
 
 Optional Features:
 
  * Preloading sounds.
 
- * Punctuation insenstive evaluation?
+ * Punctuation insensitive evaluation?
+
+ * JavaScript support for the `Links' browser.
