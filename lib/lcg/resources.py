@@ -27,9 +27,78 @@ that the node is able to keep track of all the resources it depends on.
 import os
 import shutil
 import codecs
+import glob
 
 from lcg import *
 
+_cache = {}
+
+def resource(cls, parent, file, **kwargs):
+    """Return the resource instance for given ContentNode.
+
+    Arguments:
+
+       cls -- resource class.
+       parent -- the ContentNone instance, for which the resource is allocated.
+       file -- filename of the resource
+       kwargs -- constructor arguments which should be passed after the
+         'src_path' and 'dst_path' arguments.
+
+    The possible source directories are first searched for the input file:
+
+      * For shared resource types this is the current working directory, course
+        root directory and than LCG default resource directory
+        ('config.default_resource_dir') in the subdirectory given by the
+        resource type.
+
+      * For other media types the source files are always expected in parent
+        node's source directory ('ContentNode.src_dir()').
+    
+    The instances are cached properly, so it is recommended to use this
+    function instead of creating the instances directly.
+
+    """
+         
+    assert issubclass(cls, Resource)
+    assert isinstance(parent, ContentNode), \
+           "Not a 'ContentNode' instance: %s" % parent
+    key = (cls, file, tuple(kwargs.items()))
+    if not cls.SHARED:
+        key = (parent, ) + key
+    global _cache
+    try:
+        return _cache[key]
+    except KeyError:
+        if cls.SHARED:
+            src_dirs = ('',
+                        os.path.join(parent.root_node().src_dir(), cls.SUBDIR),
+                        os.path.join(config.default_resource_dir, cls.SUBDIR))
+            dst_dir = cls.SUBDIR
+        else:
+            src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
+            dst_dir = os.path.join(cls.SUBDIR, parent.subdir())
+        for d in src_dirs:
+            src_path = os.path.join(d, file)
+            dst_path = os.path.join(dst_dir, file)
+            if os.path.exists(src_path):
+                result = cls(src_path, dst_path, **kwargs)
+                _cache[key] = result
+                print "***",  dst_path, key
+                return result
+            elif src_path.find('*') != -1:
+                pathlist = glob.glob(src_path)
+                if pathlist:
+                    r = [cls(src_path, dst_dir + src_path[len(d):], **kwargs)
+                         for src_path in pathlist]
+                    _cache[key] = r
+                    print "***",  dst_path, key
+                    return r
+        result = cls(os.path.join(src_dirs[0], file), dst_path, **kwargs)
+        _cache[key] = result
+        print "***", dst_path, key
+        return result
+
+    
 class ResourceNotFound(Exception):
     def __init__(self, filename):
         msg = "Resource file not found: %s" % filename
@@ -44,49 +113,28 @@ class Resource(object):
 
     """
     SUBDIR = 'resources'
+    SHARED = True
+    """A boolean flag indicating that the file may be shared by multiple nodes
+    (is not located within the node-specific subdirectory, but rather in a
+    course-wide resource directory)."""
     
-    def __init__(self, parent, file, shared=True):
+    def __init__(self, src_path, dst_path):
         """Initialize the instance.
 
         Arguments:
 
-          parent -- parent 'ContentNode' instance; the actual output document
-            this resource belongs to.
-          file -- path to the actual resource file relative to its parent
-            node's source/destination directory.
-          shared -- a boolean flag indicating that the file may be shared by
-            multiple nodes (is not located within the node-specific
-            subdirectory, but rather in a course-wide resource directory).
+          src_path -- source file path.
+          dst_path -- destination file path.
 
         """
-        assert isinstance(parent, ContentNode), \
-               "Not a 'ContentNode' instance: %s" % parent
-        self._parent = parent
-        self._file = file
-        self._shared = shared
-        if shared:
-            src_dirs = [''] + [os.path.join(d, self.SUBDIR)
-                               for d in (self._parent.root_node().src_dir(),
-                                         config.default_resource_dir)]
-            dst_subdir = self.SUBDIR
-        else:
-            src_dirs = (os.path.join(parent.src_dir(), self.SUBDIR), )
-            dst_subdir = os.path.join(self.SUBDIR, parent.subdir())
-        self._src_path = self._find_source_file(src_dirs, file)
-        self._dst_path = os.path.join(dst_subdir, file)
-        self._check_file()
+        self._src_path = src_path
+        self._dst_path = dst_path
+        if self._needs_source_file() and not os.path.exists(path):
+            raise ResourceNotFound(path)
 
-    def _check_file(self):
-        if not os.path.exists(self._src_path):
-            raise ResourceNotFound(self._src_path)
+    def _needs_source_file(self):
+        return True
         
-    def _find_source_file(self, dirs, file):
-        for d in dirs:
-            path = os.path.join(d, file)
-            if os.path.exists(path):
-                return path
-        return os.path.join(dirs[0], file)
-                
     def url(self):
         return '/'.join(self._dst_path.split(os.path.sep))
 
@@ -122,19 +170,12 @@ class Resource(object):
 class Media(Resource):
     """Representation of a media object used within the content."""
     SUBDIR = 'media'
+    SHARED = False
 
-    def __init__(self, parent, file, shared=False):
-        basename, ext = os.path.splitext(file)
+    def __init__(self, src_path, dst_path):
+        basename, ext = os.path.splitext(src_path)
         assert ext in ('.ogg','.mp3','.wav'), "Unsupported media type: %s" % ext
-        super(Media, self).__init__(parent, file, shared=shared)
-        
-    def _find_source_file(self, dirs, file):
-        basename, extension = os.path.splitext(file)
-        for ext in ('.ogg','.mp3','.wav'):
-            path = super(Media, self)._find_source_file(dirs, basename + ext)
-            if os.path.exists(path):
-                return path
-        return super(Media, self)._find_source_file(dirs, file)
+        super(Media, self).__init__(src_path, dst_path)
 
     def _export(self, infile, outfile):
         input_format = os.path.splitext(infile)[1].upper()[1:]
@@ -161,6 +202,9 @@ class Media(Resource):
         if os.system(command):
             raise IOError("Subprocess returned a non-zero exit status.")
         
+
+class SharedMedia(Media):
+    SHARED = True
         
 class Script(Resource):
     """Representation of a script object used within the content."""
@@ -175,25 +219,25 @@ class Stylesheet(Resource):
 class Transcript(Resource):
     """Representation of a textual recording transcript."""
     SUBDIR = 'transcripts'
+    SHARED = False
 
-    def __init__(self, parent, file, text=None, shared=False):
+    def __init__(self, src_path, dst_path, text=None, input_encoding='utf-8'):
         """Initialize the instance.
 
         Arguments:
-
-          parent, file, shared -- See 'Resource.__init__()'.
+        
+          src_path, dst_path -- see 'Resource.__init__()'.
           text -- if defined and the source file does not exist, the
             destination file will be created using the specified text As its
             content.
 
         """
         self._text = text
-        super(Transcript, self).__init__(parent, file, shared=shared)
-    
+        self._input_encoding = input_encoding
+        super(Transcript, self).__init__(src_path, dst_path)
 
-    def _check_file(self):
-        if self._text is None:
-            super(Transcript, self)._check_file()
+    def _needs_source_file(self):
+        return self._text is None
             
     def _additional_export_condition(self):
         return self._text is not None
@@ -202,7 +246,7 @@ class Transcript(Resource):
         if self._text is not None:
             text = self._text
         else:
-            fh = codecs.open(infile, encoding=self._parent.input_encoding())
+            fh = codecs.open(infile, encoding=self._input_encoding)
             try:
                 text = ''.join(fh.readlines())
             except UnicodeDecodeError, e:
