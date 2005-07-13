@@ -1,3 +1,21 @@
+2005-07-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/wiki.py: Typos fixed.
+
+	* lib/lcg/util.py: Typos fixed.
+
+	* lib/lcg/ims.py: Typos fixed.
+
+	* lib/lcg/_test.py: Typos fixed.
+
+	* doc/wiki-formatting.wiki: Typos fixed.
+
+	* doc/eurochance.wiki: Typos fixed.
+
+	* translations/exercise-instructions.txt: Typos fixed.
+
+	* TODO: Updated.
+
 2005-07-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: New classes `reading' and `explanation'.
