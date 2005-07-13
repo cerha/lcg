@@ -69,7 +69,7 @@ class ContentNode(object):
 
         Arguments:
 
-          parent -- parent node; the 'ContentNode' instance directly preceeding
+          parent -- parent node; the 'ContentNode' instance directly preceding
             this node in the content hierarchy.  Can be None for the top node.
           subdir -- a directory name relative to parent's source directory.  All
             input files are expected in this directory.
@@ -158,15 +158,14 @@ class ContentNode(object):
             lines = fh.readlines()
             if comment is not None:
                 # This is a dirty hack.  It should be solved elsewhere.
-                matcher = re.compile(comment)
-                lines = [line for line in lines if not matcher.match(line)]
+                lines = [l for l in lines if not re.compile(comment).match(l)]
             content = ''.join(lines)
         except UnicodeDecodeError, e:
             raise Exception("Error while reading file %s: %s" % (filename, e))
         fh.close()
         return content
 
-    def _parse_wiki_file(self, name, ext='txt', lang=None):
+    def parse_wiki_file(self, name, ext='txt', lang=None):
         """Parse the file and return a sequence of content elements."""
         p = wiki.Parser(self)
         return p.parse(self._read_file(name, ext=ext, lang=lang))
@@ -260,7 +259,7 @@ class ContentNode(object):
             return None
     
     def prev(self):
-        """Return the node preceeding this node in the linearized structure."""
+        """Return the node preceding this node in the linearized structure."""
         linear = self.root_node().linear()
         i = linear.index(self)
         if i > 0:
@@ -340,30 +339,30 @@ class ContentNode(object):
     def resources(self, cls=None):
         """Return the list of all resources this node depends on.
 
-        If cls is specifies, only instances of a specified class are returned.
+        If cls is specified, only instances of given class are returned.
         
         """
-        resources = tuple(self._resources.values())
+        resources = self._resources.keys()
         if cls is not None:
-            return filter(lambda r: isinstance(r, cls), resources)
+            return tuple(filter(lambda r: isinstance(r, cls), resources))
         else:
-            return resources
+            return tuple(resources)
 
-    def resource(self, cls, *args, **kwargs):
+    def resource(self, cls, file, **kwargs):
         """Get the resource instance.
         
-        The instances are cached.  They should never be constructed directly.
-        They should always be allocated using this method.  
+        There is some additional magic so the instances should never be
+        constructed directly.  Always use this method to allocate a resource.
+        The arguments correspond to arguments of the 'resource()' function.
 
         """
-        assert issubclass(cls, Resource)
-        key = (cls, args, tuple(kwargs.items()))
-        try:
-            return self._resources[key]
-        except KeyError:
-            resource = apply(cls, (self,) + args, kwargs)
-            self._resources[key] = resource
-            return resource
+        result = resource(cls, self, file, **kwargs)
+        if isinstance(result, (types.ListType, types.TupleType)):
+            for r in result:
+                self._resources[r] = 1
+        else:
+            self._resources[result] = 1
+        return result
         
     def counter(self, key=None):
         """Return the internal counter as a 'Counter' instance.
@@ -404,7 +403,7 @@ class ContentNode(object):
 class RootNode(ContentNode):
     """Root node of the hierarchy.
 
-    The only differnce is that 'RootNone' doesn't take the 'parent' constructor
+    The only difference is that 'RootNone' doesn't take the 'parent' constructor
     argument.
 
     """
