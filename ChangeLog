@@ -1,4 +1,35 @@
+2005-07-19  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/de.po: File updated.
+
+	* translations/Makefile (LCG_SOURCE_FILES): Path fixed.
+
 2005-07-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/course.py (ContentNode._read_file): Cosmetic changes.
+	(ContentNode._parse_wiki_file): Renamed to `parse_wiki_file'.
+	(ContentNode.resources): Return keys, not the values of
+	`self._resources'.
+	(ContentNode.resources): Make a tuple from the returned list.
+	(ContentNode.resource): Don't cache the resources here, use the
+	new `resource()' function instead.
+
+	* lib/lcg/resources.py (_cache): New variable.
+	(resource): New function.
+	(Resource.SHARED): New constant.
+	(Resource.__init__): The arguments replaced just by `src_path' and
+	`dst_path'.
+	(Resource._check_file): Method removed.
+	(Removed._needs_source_file): New method.
+	(Resource._find_source_file): Method removed.
+	(Resource._export): Catch the `IOError' when copying
+	(Media.SHARED): New constant.
+	(Media.__init__): Reflect the constructor args change.
+	(Media._find_source_file): Method removed.
+	(SharedMedia.SHARED): New class.
+	(Transcript.__init__): Reflect the constructor args change.
+	(Transcript._check_file): Method removed.
+	(Transcript._needs_source_file): New method.
 
 	* lib/lcg/wiki.py: Typos fixed.
 
