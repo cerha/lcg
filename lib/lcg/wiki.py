@@ -21,10 +21,8 @@
 import os
 import types
 import re
-from xml.sax import saxutils
 
 from lcg import *
-
 
 class Formatter(object):
     """Simple Wiki markup formatter.
@@ -38,48 +36,56 @@ class Formatter(object):
     appropriate).
 
     """
-    _MARKUP = (('bold', '\*'),
-               ('italic', '/'),
-               ('fixed', '='),
-               ('underline', '_'),
-               ('citation', ('>>', '<<')),
+    _MARKUP = (('linebreak', '//'),
+               ('emphasize', ('/',  '/')),
+               ('strong',    ('\*', '\*')),
+               ('fixed',     ('=',  '=')),
+               ('underline', ('_',  '_')),
+               ('citation',  ('>>', '<<')),
                ('quotation', ('``', "''")),
-               ('link', ('\[(?P<href>[^\]\|\#]*)(?:#(?P<anchor>[^\]\|]*))?'
-                         '(?:\|(?P<title>[^\]]*))?\]')),
-               ('uri', '(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
-               ('email', '\w[\w\-\.]*@\w[\w\-\.]+'),
-               ('comment', '^#.*'),
-               ('linebreak', '//'),
-               ('rule', '^----\s*$'),
-               ('dash', '(^|(?<=\s))--($|(?=\s))'),
+               ('link', (r'\[(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
+                         r'(?:(?:\||\s+)(?P<title>[^\]]*))?\]')),
+               ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
+               ('email', r'\w[\w\-\.]*@\w[\w\-\.]+'),
+               ('comment', r'^#.*'),
+               ('rule', r'^----+\s*$'),
+               ('dash', r'(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'),
+               ('lt', '<'),
+               ('gt', '>'),
+               ('amp', '&'),
                )
     _HELPER_PATTERNS = ('href', 'anchor', 'title')
     
     # The list below lists the which elements are paired on the output
     # (formatter) side, not the input (markup) side (they must be opened and
     # then closed individually).
-    _PAIR = ('bold', 'italic', 'fixed', 'underline', 'citation', 'quotation')
+    _PAIR = ('emphasize', 'strong', 'fixed', 'underline', 'citation',
+             'quotation')
     
-    _FORMAT = {'bold': ('<strong>', '</strong>'),
-               'italic': ('<i>', '</i>'),
+    _FORMAT = {'strong': ('<strong>', '</strong>'),
+               'emphasize': ('<em>', '</em>'),
                'fixed': ('<tt>', '</tt>'),
                'underline': ('<u>', '</u>'),
                'quotation': (u'“<span class="quotation">', u'</span>”'),
                'citation': ('<span class="citation">', '</span>'),
                'comment': '',
-               'linebreak': '<br/>',
+               'linebreak': '<br/>\n',
                'rule': '<hr/>',
                'dash': '&ndash;',
                'nbsp': '&nbsp;',
+               'lt':   '&lt;',
+               'gt':   '&gt;',
+               'amp':   '&amp;',
                }
 
     def __init__(self, parent):
-        regexp = "(?P<%s>\!?%s)"
+        regexp = r"(?P<%s>\!?%s)"
+        pair_regexp = '|'.join((regexp % ("%s_start", r"(?<!\w)%s(?=\S)"),
+                                regexp % ("%s_end",   r"(?<=\S)%s(?!\w)")))
         regexps = [isinstance(markup, types.StringType)
                    and regexp % (type, markup)
-                   or '|'.join((regexp, regexp)) % (type+'_start', markup[0],
-                                                    type+'_end', markup[1])
+                   or pair_regexp % (type, markup[0], type, markup[1])
                    for type, markup in self._MARKUP]
         self._rules = re.compile('(?:' +'|'.join(regexps)+ ')', re.MULTILINE)
         self._parent = parent
@@ -167,28 +173,40 @@ class Parser(object):
     """
     
     _SECTION_RE = re.compile(r"^(?P<level>=+) (?P<title>.*) (?P=level)" + \
-                             r"(?:\s+(?:\*|(?P<anchor>[\w\d_-]+)))?\s*$",
+                             r"(?:[\t ]+(?:\*|(?P<anchor>[\w\d_-]+)))?\s*$",
                              re.MULTILINE)
 
     _PRE_BLOCK_RE = re.compile(r"^(?:\{\{\{\s*$(.*?)^\}\}\}\s*$" + 
                                r"|-----+\s*$(.*?)^-----+)\s*$",
                                re.DOTALL|re.MULTILINE)
 
-    _LIST_MARKER = "(?:\*|(?:[a-z]|\d+)(?:\)|\.))"
+    _LIST_MARKER = r"\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.))"
 
-    _SPLITTER_RE = re.compile(r"\r?\n(?:(?:\s*\r?\n)+|(?=\s+" +
-                              _LIST_MARKER +" ))")
+    _SPLITTER_RE = re.compile(r"\r?\n(?:(?:\s*\r?\n)+|(?=(?:[\t ]+" +
+                              _LIST_MARKER +"[\t ]|:[^:]*\S:\s+)))")
 
     _MATCHERS = (('list_item',
-                  "(?P<depth> +)(?P<type>"+ _LIST_MARKER +") (?P<content>.*)"),
-                 ('table',
-                  "\s*((\|[^\r\n\|]*)+\|\s*)+"),
+                  r"(?P<indent>[\t ]+)(?P<type>" + _LIST_MARKER + ")[\t ]+" + \
+                  r"(?P<content>.+)"),
+                 ('field',
+                  r":(?P<label>[^:]*\S):[\t ]*" + \
+                  r"(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)"),
+                 ('definition',
+                  r"(?P<term>\S[^\r\n]*)\r?\n" + \
+                  r"(?P<descr>([\t ]+[^\r\n]+\r?\n?)+)"),
                  ('toc',
-                  "\s*(?:(?P<title>.+)\s+)?\@TOC\@\s*"),
+                  r"(?:(?P<title>[^\r\n]+)[\t ]+)?\@TOC\@\s*"),
+                 ('table',
+                  r"((\|[^\r\n\|]*)+\|\s*)+"),
                  )
-    _REGEXPS = [r"^(?P<%s>%s)$" % (key, matcher) for key, matcher in _MATCHERS]
+    
+    _REGEXPS = [r"^(\s*\r?\n)*(?P<%s>%s)$" % (key, matcher)
+                for key, matcher in _MATCHERS]
+
     _MATCHER = re.compile('(?:' + '|'.join(_REGEXPS) + ')', re.DOTALL)
-    _HELPER_PATTERNS = ('depth', 'content', 'title')
+
+    _HELPER_PATTERNS = ('indent', 'content', 'title', 'label', 'value', 'term',
+                        'descr')
     
     class _Section(object):
         def __init__(self, title, anchor, level):
@@ -208,7 +226,8 @@ class Parser(object):
         #def tree(self, indent=0):
         #    children = [n.tree(indent+1) for n in self._children]
         #    return "%s* %s\n%s" % ("  "*indent, self.title(), "".join(children))
-
+            
+        
     def __init__(self, parent):
         self._parent = parent
 
@@ -233,10 +252,10 @@ class Parser(object):
                     parent = parent.parent
             parent.add_child(this)
             last = this
-        return self._build_sections(root)
+        return self._make_sections(root)
 
-    def _build_sections(self, section):
-        subsections = [Section(self._parent, s.title, self._build_sections(s),
+    def _make_sections(self, section):
+        subsections = [Section(self._parent, s.title, self._make_sections(s),
                                anchor=s.anchor)
                        for s in section.children]
         if section.content is None:
@@ -267,25 +286,101 @@ class Parser(object):
         else:
             return (text, 'paragraph', {})
 
+    def _store_list_item(self, block, groups):
+        content = WikiText(self._parent, groups['content'])
+        indent = re.sub(' {0,7}\t', 8*' ', groups['indent'])
+        return (self._list_item_type(groups), len(indent), content)
+        
+    def _finish_list_item(self, stored):
+        parent = self._parent
+        class _Context:
+            def __init__(self, type, indent, content):
+                self.type = type
+                self.indent = indent
+                self.content = content
+                self.items = []
+            def state(self):
+                return (self.type, self.indent, self.content, self.items)
+            def make_list(self):
+                #_log("**")
+                items = [len(i) > 1 and Container(parent, i) or i[0]
+                         for i in self.items]
+                self.content.append(ItemizedList(parent, items, type=self.type))
+                self.items = []
+        result = []
+        stack = [] # For storing the context between level changes.
+        context = _Context(stored[0][0], stored[0][1], result)
+        stored.append(('xxx', 0, None))
+        for type, indent, content in stored:
+            #_log("====", content, indent, type, len(stack), context.state())
+            if indent != context.indent:
+                if indent > context.indent:
+                    # Save the context and start a new level.
+                    stack.append(context)
+                    context = _Context(type, indent, context.items[-1])
+                else:
+                    # Restore the context of the higher level.
+                    while indent < context.indent:
+                        context.make_list()
+                        if stack and stack[-1].indent >= indent:
+                            context = stack.pop()
+                        else:
+                            # That's a bad indentation, but let's not panic.
+                            context = _Context(type, indent, context.content)
+                #_log("<=>", context.state())
+            if context.items and context.type != type:
+                context.make_list()
+                context.type = type
+            if content is not None:
+                context.items.append([content])
+        assert not stack
+        return result
+
+    def _store_field(self, block, groups):
+        label = WikiText(self._parent, groups['label'])
+        content = WikiText(self._parent, groups['value'])
+        return (label, content)
+        
+    def _finish_field(self, stored):
+        p = self._parent
+        fields = [Field(p, label, value) for label, value in stored]
+        return (FieldSet(p, fields),)
+    
+    def _store_definition(self, block, groups):
+        term = WikiText(self._parent, groups['term'])
+        content = WikiText(self._parent, groups['descr'])
+        return (term, content)
+        
+    def _finish_definition(self, stored):
+        p = self._parent
+        definitions = [Definition(p, term, descr) for term, descr in stored]
+        return (DefinitionList(p, definitions),)
+    
     def _parse_blocks(self, text):
-        blocks = [self._identify_block(p)
-                  for p in self._SPLITTER_RE.split(text) if len(p.strip()) > 0]
+        def finish(type, data):
+            f = getattr(self, '_finish_'+type)
+            return f(data)
         content = []
-        items = []
-        list_type = None
-        for block, type, groups in blocks:
-            t = self._list_item_type(groups)
-            if items and (type != 'list_item' or list_type != t) :
-                l = ItemizedList(self._parent, items, type=list_type)
-                content.append(l)
-                items = []
-            if type == 'list_item':
-                items.append(WikiText(self._parent, groups['content']))
-                list_type = t
+        unfinished = None
+        for piece in self._SPLITTER_RE.split(text):
+            if len(piece.strip()) == 0: continue
+            block, type, groups = self._identify_block(piece)
+            #_log("============", type)
+            #_log(block)
+            if unfinished and unfinished[0] != type:
+                content.extend(finish(*unfinished))
+                unfinished = None
+            if hasattr(self, '_store_'+type):
+                store = getattr(self, '_store_'+type)
+                data = store(block, groups)
+                if unfinished:
+                    unfinished[1].append(data)
+                else:
+                    unfinished = (type, [data])
             else:
                 content.append(getattr(self, '_make_'+type)(block, groups))
-        if items:
-            content.append(ItemizedList(self._parent, items, type=list_type))
+        if unfinished:
+            content.extend(finish(*unfinished))
         return content
 
     def _make_paragraph(self, block, groups):
@@ -304,7 +399,7 @@ class Parser(object):
         t = groups.get('type')
         if not t:
             return None
-        elif t == '*':
+        elif t in ('*', '-'):
             return ItemizedList.TYPE_UNORDERED
         elif t[0].isalpha():
             return ItemizedList.TYPE_ALPHA
@@ -313,16 +408,6 @@ class Parser(object):
 
     def parse(self, text):
         return self._parse_sections(text)
-    
-
-def escape(text, param={'"':'&#34;'}):
-    """Escapes &, <, > and \""""
-    if not text:
-        return ''
-    elif type(text) is types.StringType:
-        return saxutils.escape(text, param)
-    else:
-        return text
 
 
 class MacroParser(object):
@@ -388,3 +473,22 @@ class MacroParser(object):
                 current.append(t)
         parsed = unicode(structured)
         return self._substitute_variables(parsed)
+
+    
+def _log(*args):
+    """Just for internal debugging purposes..."""
+    def _str(x):
+        if isinstance(x, WikiText):
+            return '"'+str(x._text.encode('ascii', 'replace'))+'"'
+        elif isinstance(x, Container):
+            return "<%s %s>" % (x.__class__.__name__, _str(x._content))
+        elif isinstance(x, (types.ListType, types.TupleType)):
+            result = ', '.join([_str(i) for i in x])
+            if isinstance(x, types.ListType):
+                return '[' + result + ']'
+            else:
+                return '(' + result + ')'
+        else:
+            return str(x.encode('ascii', 'replace'))
+    sys.stderr.write(' '.join([_str(a) for a in args])+"\n")
+   
