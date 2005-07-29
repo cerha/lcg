@@ -93,6 +93,7 @@ class ContentNode(object):
         self._resources = {}
         self._counters = {}
         self._registered_children = []
+        self._wiki_parser = wiki.Parser(self)
         content = self._create_content()
         if isinstance(content, Content):
             self._content = content
@@ -156,8 +157,12 @@ class ContentNode(object):
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
             lines = fh.readlines()
+            marker = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE')
+            if lines and lines[0][0] == marker:
+                # Strip the Unicode marker 
+                lines[0] = lines[0][1:]
             if comment is not None:
-                # This is a dirty hack.  It should be solved elsewhere.
+                # This is a hack (it breaks line numbering).
                 lines = [l for l in lines if not re.compile(comment).match(l)]
             content = ''.join(lines)
         except UnicodeDecodeError, e:
@@ -165,10 +170,13 @@ class ContentNode(object):
         fh.close()
         return content
 
+    def parse_wiki_text(self, text):
+        """Parse the file and return a sequence of content elements."""
+        return self._wiki_parser.parse(text)
+    
     def parse_wiki_file(self, name, ext='txt', lang=None):
         """Parse the file and return a sequence of content elements."""
-        p = wiki.Parser(self)
-        return p.parse(self._read_file(name, ext=ext, lang=lang))
+        return self.parse_wiki_text(self._read_file(name, ext=ext, lang=lang))
     
     def _node_path(self):
         """Return the path from the root to this node as a sequence of nodes."""
@@ -442,7 +450,7 @@ class _WikiNode(ContentNode):
         return ""
         
     def _create_content(self):
-        sections = wiki.Parser(self).parse(self._source_text())
+        sections = self.parse_wiki_text(self._source_text())
         if self._title_ is None:
             assert len(sections) == 1, \
                    "The wiki document must have just one top-level section!"
@@ -557,7 +565,6 @@ class DocMaker(RootNode):
         d = self.src_dir()
         return [self._create_child(DocNode, '.', f) for f in list_dir(d)
                 if os.path.isfile(os.path.join(d, f)) and f.endswith('.wiki')]
-
 
     
 def set_language(lang, translation_dir=None):
