@@ -2,7 +2,8 @@
 
  
 This document describes the Wiki markup used by the
-[http://www.freebsoft.org/lcg|LCG Wiki Formatter].
+[http://www.freebsoft.org/lcg LCG Wiki Formatter].
+
 
 Table of contents: @TOC@
 
@@ -35,14 +36,12 @@ document by prefixing them by the exclamation mark.
 *Example:*
 
 ------
-Slashes are used for /italic/, however sometimes you want just the slash like
-in GNU!/Linux.
+Slashes are used for /italic/, however sometimes you want !/just them!/.
 ------
 
 This renders as:
 
-Slashes are used for /italic/, however sometimes you want just the slash like
-in GNU!/Linux.
+Slashes are used for /italic/, however sometimes you want !/just them!/.
 
 
 === Paragraphs ===
@@ -56,18 +55,19 @@ ignored, since the paragraph will be reformatted to fit the output media
 === Links === links
 
 Link is marked by square brackets.  The text in the brackets is the link
-target.  The link name can be optionally included after the link target,
-separated with a pipe '|' character.
+target.  The target can be optionally followed by a link name separated simply
+with a space (or the pipe '|' character for backwards compatibility with an old
+syntax).
 
 *Example:*
 
 ------
-Visit [http://www.gnu.org|GNU].  See also [#anchors].
+Visit [http://www.gnu.org GNU homepage].  See also [#anchors].
 ------
 
 This renders as:
 
-Visit [http://www.gnu.org|GNU].  See also [#anchors].
+Visit [http://www.gnu.org GNU homepage].  See also [#anchors].
 
 Link names are automatically supplied for links to local anchors within the
 document (see [#anchors]) and also for links to other wiki documents when the
@@ -145,7 +145,7 @@ at the end of the heading line separated with at least one blank character
 -----
 
 An anchor can be used to refer to the section.  The link ![#intro], for
-example, will be rendered as [#intro|Introduction] (see [#links] for more
+example, will be rendered as [#intro Introduction] (see [#links] for more
 details).
 
 
@@ -170,69 +170,143 @@ The TOC at the top of this manual is made the same way.
 
 == Advanced Constructs ==
 
-=== Itemized Lists ===
+=== Bullet Lists === bullet-lists
 
-Itemized lists are marked by an asterisk at the beginning of each item.  Each
-item is indented by a space.
+Bullet lists are marked by an asterisk (or optionally a minus sign) at the
+beginning of each item.  The indentation determines the level (lists can be
+nested).  
 
 *Example:*
 
 ------
  * cats
+   - black
+   - white
+   - other
  * dogs
+   * big
+   * little
  * frogs
 ------
 
 This renders as:
 
  * cats
+   - black
+   - white
+   - other
  * dogs
+   * big
+   * little
  * frogs
 
-Ordered lists can be made using a number with a period instead of an asterisk.
-The numbers in the source document are ignored, since the output numbers are
-generated.  This means that you are free to mark all items with zero for
-example or you can use real order numbers if you prefer.
+
+=== Ordered Lists ===
+
+Ordered lists work like [#bullet-lists] but you use a number or a letter with a
+period (or round bracket(s)) instead of an asterisk.
 
 *Example:*
 
 ------
- 0. cats
- 0. dogs
- 0. frogs
+ * General rules:
+   1. Each item must be indented by at least one space character.
+   2. Longer item texts can be split over multiple lines, provided
+      that they are indented properly.
+   3. Tabs and spaces can be used for indentation, but tab is always considered
+      8 characters wide, so you may have problems when your editor sets the tab
+      width differently (then converting tabs to spaces is recommended).
 
-or:
+   4. Empty lines between the list items are optional and have no effect on the
+      output.  That's just a matter of your preference.
 
- 1. mice
- 2. rats
- 3. bats
+ * Rules for ordered lists:
+   0. The numbers in the source document are ignored, since the output numbers
+      are automatically generated.  Thus you are free to mark all items with
+      zero, for example, or you can use real order numbers if you prefer.
+   0. You can also use letters for alphabetically ordered lists.
+ * Intermixing different kinds of lists:
+   a) There are basically three different kinds of lists:
+      (1) unordered
+      (2) numerically ordered
+      (3) alpha-ordered
+   b) Whenever you switch from one kind to another (at the same indentation
+      level), the previous list is finished and ordering starts from the
+      beginning.
+   c. It does not matter, whether you use a dot or brackets in the source
+      text.  The output style of each list kind is given by the output settings
+      (i.e. a style-sheet).
 ------
 
 This renders as:
 
- 0. cats
- 0. dogs
- 0. frogs
+ * General rules:
+   1. Each item must be indented by at least one space character.
+   2. Longer item texts can be split over multiple lines, provided
+      that they are indented properly.
+   3. Tabs and spaces can be used for indentation, but tab is always considered
+      8 characters wide, so you may have problems when your editor sets the tab
+      width differently (then converting tabs to spaces is recommended).
 
-or:
+   4. Empty lines between the list items are optional and have no effect on the
+      output.  That's just a matter of your preference.
 
- 1. mice
- 2. rats
- 3. bats
+ * Rules for ordered lists:
+   0. The numbers in the source document are ignored, since the output numbers
+      are automatically generated.  Thus you are free to mark all items with
+      zero, for example, or you can use real order numbers if you prefer.
+   0. You can also use letters for alphabetically ordered lists.
+ * Intermixing different kinds of lists:
+   a) There are basically three different kinds of lists:
+      (1) unordered
+      (2) numerically ordered
+      (3) alpha-ordered
+   b) Whenever you switch from one kind to another (at the same indentation
+      level), the previous list is finished and ordering starts from the
+      beginning.
+   c. It does not matter, whether you use a dot or brackets in the source
+      text.  The output style of each list kind is given by the output settings
+      (i.e. a style-sheet).
 
-Similarly, alpha-ordered lists can be made:
+
+=== Definition Lists ===
 
 ------
- a. cats
- b. dogs
- c. frogs
+Term
+   Definition is an indented paragraph following a one-line term.
+
+Another Term
+   Each term/definition pair must be surrounded by blank lines (as-well as
+   an ordinary paragraph).
 ------
 
-This renders as:
+Term
+   Definition is an indented paragraph following a one-line term.
 
- a. cats
- b. dogs
- c. frogs
+Another Term
+   Each term/definition pair must be surrounded by blank lines (as-well as
+   an ordinary paragraph).
+
+
+=== Field-sets ===
+
+Field-sets can be used for generic two-column tabular data.  The label is marked
+with colons from both sides.  Values can be multi-line, but must be indented
+properly.
+
+------
+:Birth Date: 1975-08-30
+:Address:
+   38 Ocean View Dr. //
+   Laguna Beach
+:Occupation: Oil Magnate
+------
+
+:Birth Date: 1975-08-30
+:Address:
+   38 Ocean View Dr. //
+   Laguna Beach
+:Occupation: Oil Magnate
 
 
 === Preformatted Text === preformatted-text
@@ -264,8 +338,6 @@ This renders as:
 All the examples in this manual are written as preformatted text.
 
 
-
-
 === Tables ===
 
 You can make simple tables with constant number of cells per row.  Each row in
@@ -291,12 +363,21 @@ also begin and end with a pipe character.
 
 === Special and Typographical Characters ===
 
+==== Explicit line-break ====
+
+Two slashes force a line-break:
+
+------
+This sentence will break//in the middle.
+------
+
+This sentence will break//in the middle.
 
 ==== Non-breakable Space ====
 
 The line-breaks are inserted automatically, when the paragraph is formatted to
 fit the output media.  However, you sometimes don't want a line-break in a
-certain place.  You can use a tilde character '=!~=' instead of a space in such
+certain place.  You can use a tilde =!~= instead of a space in such
 cases.
 
 *Example:*
@@ -365,11 +446,15 @@ make the text invisible on output media (e.g. by making it an HTML comment in
 the HTML output):
 
 ------
-  # These lines have been 
-  # commented out
+ The first line.
+ # These lines have been 
+ # commented out.
+ The last line.
 ------
 
-This renders as nothing:
+This renders as:
 
+The first line.
 # These lines have been 
 # commented out
+The last line.

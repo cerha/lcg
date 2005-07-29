@@ -4,6 +4,15 @@ body {
 
 a:link, a:visited { color: #06d; text-decoration: none; }
 a:hover, .speaking-text:hover { color: #f60; text-decoration: underline; }
+a.backref { text-decoration: none; color: black; }
+
+h1 { font-size: 2.0em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.6em; }
+h4 { font-size: 1.4em; }
+h5 { font-size: 1.3em; }
+h6 { font-size: 1.2em; }
+h7,h8,h9 { font-size: 1.1em; }
 
 hr.navigation { 
     display: none; 
@@ -42,16 +51,20 @@ div.choices {
 form { 
 }
 
-div.explanation, div.reading { 
+.explanation, .reading, .example { 
     border: 0px solid #999;
     border-width: 1px 0px;
     padding: 0pt 3pt;
 }
-div.reading { 
+.reading { 
     background-color: #eee;
 }
-div.explanation { 
+.explanation { 
     background-color: #ddf;
+}
+.example { 
+    background-color: #dfc;
+    border-color: #8a8;
 }
 
 input.answer-control { 
