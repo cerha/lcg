@@ -68,7 +68,7 @@ class Content(object):
     def sections(self):
         """Return the contained sections as a sequence of 'Section' instances.
 
-        This method allows creation of tables of contents and introcpection of
+        This method allows creation of tables of contents and introspection of
         content hierarchy.
         
         An empty list is returned in the base class.  The derived
@@ -117,6 +117,14 @@ class TextContent(Content):
         super(TextContent, self).__init__(parent)
         self._text = text
 
+    def __str__(self):
+        text = self._text.strip()
+        sample = text.splitlines()[0][:10]
+        if len(sample) < len(text):
+            sample += '...'
+        cls = self.__class__.__name__
+        return '<%s at 0x%x text="%s">' % (cls, id(self), sample)
+
     def export(self):
         return self._text
 
@@ -132,7 +140,9 @@ class PreformattedText(TextContent):
     """Preformatted text."""
 
     def export(self):
-        return '<pre class="lcg-preformatted-text">'+self._text+'</pre>'
+        from xml.sax import saxutils
+        text = saxutils.escape(self._text)
+        return '<pre class="lcg-preformatted-text">'+text+'</pre>'
 
     
 class Container(Content):
@@ -218,7 +228,7 @@ class Definition(Container):
 
     
 class DefinitionList(Container):
-    """A list list of definitions."""
+    """A list of definitions."""
     
     def __init__(self, parent, content):
         assert is_sequence_of(content, Definition)
@@ -226,6 +236,29 @@ class DefinitionList(Container):
 
     def export(self):
         return "<dl>%s</dl>\n" % super(DefinitionList, self).export()
+
+
+class Field(Container):
+    """A pair of label and a value for a FieldSet."""
+    
+    def __init__(self, parent, label, value):
+        super(Field, self).__init__(parent, (label, value))
+
+    def export(self):
+        f = '<tr><th align="left" valign="top">%s:</th><td>%s</td></tr>\n'
+        return f % tuple([c.export() for c in self._content])
+
+    
+class FieldSet(Container):
+    """A list of label, value pairs (fields)."""
+    
+    def __init__(self, parent, content):
+        assert is_sequence_of(content, Field)
+        super(FieldSet, self).__init__(parent, content)
+
+    def export(self):
+        fields = super(FieldSet, self).export()
+        return '<table class="lcg-fieldset">%s</table>\n' % fields
 
     
 class TableCell(Container):
@@ -263,9 +296,9 @@ class SectionContainer(Container):
 
     'SectionContainer' acts as a 'Container', but for any contained 'Section'
     instances, a local 'TableOfContents' can be created automatically,
-    preceeding the actual content (depending on the 'toc_depth' constructor
+    preceding the actual content (depending on the 'toc_depth' constructor
     argument).  The contained sections are also returned by the 'sections()'
-    method to allow builbing a global `TableOfContents'.
+    method to allow building a global `TableOfContents'.
 
     """
 
@@ -301,7 +334,7 @@ class SectionContainer(Container):
 class Section(SectionContainer):
     """Section wraps the subordinary contents into an inline section.
 
-    Section is very simillar to a 'SectionContainer', but there are a few
+    Section is very similar to a 'SectionContainer', but there are a few
     differences:
 
       * Every section has a title, which appears in the output document as a
@@ -334,7 +367,7 @@ class Section(SectionContainer):
           toc_depth -- The depth of the local Table of Contents (see
             'SectionContainer').
           in_toc -- a boolean flag indicating whether this section is supposed
-            to be included in the Table of Contets.
+            to be included in the Table of Contents.
             
         """
         assert isinstance(title, types.StringTypes)
@@ -372,7 +405,17 @@ class Section(SectionContainer):
         else:
             numbers = [str(x.section_number()) for x in self._section_path()]
             return 'sec-' + '-'.join(numbers)
-
+        
+    def backref(self):
+        if hasattr(self, '_backref_used'):
+            return None
+        else:
+            self._backref_used = True
+            return self._backref()
+    
+    def _backref(self):
+        return "backref-" + self.anchor()
+        
     def url(self, relative=False):
         """Return the URL of the section relative to the course root."""
         if relative:
@@ -382,8 +425,12 @@ class Section(SectionContainer):
         return base + "#" + self.anchor()
     
     def _header(self):
-        l = len(self._section_path()) + 1
-        return '<a name="%s"></a>\n' % self.anchor() + h(self.title(), l)
+        if hasattr(self, '_backref_used'):
+            href = "#"+self._backref()
+        else:
+            href = None
+        return h(link(self.title(), href, cls='backref', name=self.anchor()),
+                 len(self._section_path()) + 1)+'\n'
                
     def export(self):
         return "\n".join((self._header(), super(Section, self).export()))
@@ -449,11 +496,16 @@ class TableOfContents(Content):
                 items = [s for s in item.sections() if s.in_toc()]
         if len(items) == 0:
             return ''
-        links = [link(i.title(), isinstance(i, Section) and \
-                      i.url(relative=(i.parent() is self.parent())) or \
-                      i.url()) + \
-                 self._make_toc(i, indent=indent+4, depth=depth-1)
-                 for i in items]
+        links = []
+        for i in items:
+            url = i.url()
+            name = None
+            if isinstance(i, Section):
+                if i.parent() is self.parent():
+                    url = i.url(relative=True)
+                name = i.backref()
+            links.append(link(i.title(), url, name=name) + \
+                         self._make_toc(i, indent=indent+4, depth=depth-1))
         return "\n" + itemize(links, indent=indent) + "\n" + ' '*(indent-2)
 
     
@@ -479,9 +531,9 @@ class VocabItem(object):
         
         Arguments:
           word -- The actual piece of vocabulary as a string
-          note -- Notes in parens as a string.  Can contain multiple notes
-            in parens separated by spaces.  Typical notes are for example
-            (v) for verb etc.
+          note -- Notes in round brackets as a string.  Can contain multiple
+            notes in brackets separated by spaces.  Typical notes are for
+            example (v) for verb etc.
           translation -- the translation of the word into target language.
           translation_language -- the lowercase ISO 639-1 Alpha-2 language
             code.
@@ -500,7 +552,7 @@ class VocabItem(object):
         self._translation = translation
         self._translation_language = translation_language
         self._is_phrase = is_phrase
-        filename = "item-%02d.ogg" % parent.counter(self.__class__).next()
+        filename = "item-%02d.mp3" % parent.counter(self.__class__).next()
         path = os.path.join('vocabulary', filename)
         self._media = parent.resource(Media, path)
 
@@ -549,7 +601,7 @@ class VocabList(Content):
     def export(self):
         pairs = [(speaking_text(i.word(), i.media()) +
                   (i.note() and " "+i.note() or ""),
-                  span(i.translation(), lang=i.translation_language()))
+                  span(i.translation() or "???", lang=i.translation_language()))
                  for i in self._items]
         rows = ['<tr><td>%s</td><td>%s</td></tr>' %
                 (self._reverse and (b,a) or (a,b)) for a,b in pairs]
@@ -643,7 +695,7 @@ class _ChoiceTask(Task):
           
         """
         assert is_sequence_of(choices, Choice)
-        assert len([ch for ch in choices if ch.correct()]) == 1
+        assert len([ch for ch in choices if ch.correct()]) == 1 or not choices
         self._choices = list(choices)
         super(_ChoiceTask, self).__init__(prompt)
 
@@ -677,9 +729,10 @@ class GapFillStatement(_ChoiceTask):
     def __init__(self, prompt, choices):
         super(GapFillStatement, self).__init__(prompt, choices)
         matches = len(self._REGEXP.findall(prompt))
-        assert matches == 1, \
-               "GapFillStatement must include just one gap " + \
-               "marked by three or more underscores. %d found." % matches
+        if choices:
+            assert matches == 1, \
+                   "GapFillStatement must include just one gap " + \
+                   "marked by three or more underscores. %d found." % matches
 
     def substitute_gap(self, replacement):
         return self._REGEXP.sub(replacement, self.prompt())
@@ -713,6 +766,9 @@ class FillInTask(Task):
     def answer(self):
         return self._answer
 
+    def text(self, field_formatter):
+        return field_formatter(self.answer(), id=self.id())
+
     
 class DictationTask(FillInTask):
     _REGEXP = re.compile(r"(\s*/\s*|\s+)")
@@ -723,25 +779,46 @@ class DictationTask(FillInTask):
         super(DictationTask, self).__init__(None, text)
 
 
-class ClozeTask(Task):
-    _REGEXP = re.compile(r"\[([^\]]+)\]")
+class _ClozeTask(Task):
+    _REGEXP = re.compile(r"\[([^\]]*)\]")
         
-    def __init__(self, text):
+    def __init__(self, prompt, text):
         assert isinstance(text, types.UnicodeType)
         self._text = text
-        super(ClozeTask, self).__init__(None)
+        super(_ClozeTask, self).__init__(prompt)
         
     def answers(self):
         return self._REGEXP.findall(self._text)
 
     def text(self, field_formatter):
-        return self._REGEXP.sub(lambda match: field_formatter(match.group(1)),
-                                self._text)
+        formatter = lambda match: field_formatter(match.group(1))
+        return self._REGEXP.sub(formatter, self._text)
 
     def plain_text(self):
         return self._REGEXP.sub(lambda match: match.group(1), self._text)
 
 
+class ClozeTask(_ClozeTask):
+        
+    def __init__(self, text):
+        super(ClozeTask, self).__init__(None, text)
+
+    def text(self, field_formatter, text_transform=None):
+        formatter = lambda match: field_formatter(match.group(1))
+        text = self._text
+        if text_transform:
+            text = text_transform(text)
+        return self._REGEXP.sub(formatter, text)
+    
+class TransformationTask(_ClozeTask):
+
+    def __init__(self, orig, transformation):
+        if not self._REGEXP.search(transformation):
+            transformation = '[' + transformation + ']'
+        super(TransformationTask, self).__init__(orig, transformation)
+        
+
+    
 ################################################################################
 ################################   Exercises   #################################
 ################################################################################
@@ -752,16 +829,21 @@ class Exercise(Section):
 
     _TASK_TYPE = Task
     _NAME = None
+    _READING_REQUIRED = False
     _RECORDING_REQUIRED = False
     _AUDIO_VERSION_REQUIRED = False
     _BUTTONS = ()
     _DISPLAYS = ()
-
+    _INSTRUCTIONS = ""
+    _AUDIO_VERSION_LABEL = _("""This exercise can be also done purely
+    aurally/orally:""")
+    
     _used_types = []
     _help_node = None
     
-    def __init__(self, parent, tasks, sound_file=None, audio_version=None,
-                 transcript=None):
+    def __init__(self, parent, tasks, instructions=None, audio_version=None,
+                 sound_file=None, transcript=None, reading=None,
+                 explanation=None, example=None):
         """Initialize the instance.
 
         Arguments:
@@ -771,30 +853,63 @@ class Exercise(Section):
 
           tasks -- sequence of 'Task' instances related to this exercise.
 
+          instructions -- user supplied instructions.  This is a way how to
+            include more specific instructions instead of default exercise
+            isnstructions (which are intentionally very general).  The given
+            text will be printed at the beginning of the exercise and should be
+            a complete sentence (usually starting with a capital letter and
+            ending with a dot).  This, in consequence, also allows to use the
+            same exercise type for different purposes.
+            
+          audio_version -- name of the file with an audio version of this
+            exercise.
+
           sound_file -- name of the file with a recording as a string.  Some
             exercise types may require a recording, some may not.
             
-          audio_version -- name of the file with an audio version of this
-            exercise
-          
           transcript -- name of the file with a textual transcript of the
-            recording (string).  The transcript file is required to exist
-            whenever the 'sound_file' argument is supplied.  This argument
-            doesn't have to be supplied, however, when a default value made out
-            of the 'sound_file' filename using the '.txt' extension instead of
-            the original sound file extension is ok.
+            recording as a string.  The transcript file is required to exist
+            whenever the 'sound_file' argument is supplied.  This argument,
+            however, is not required when the transcript filename is the same
+            as the 'sound_file' filename using the '.txt' extension instead of
+            the original sound file extension.
+            
+          reading -- specifies the reading text, which is displayed at the
+            begining of the exercise.  Some exercise types may require a
+            reading, some may not.  If a one-line value is supplied, this is
+            considered a filename.  The file is then searched within the
+            `readings' subdirectory of current node's source directory.  A
+            multi-line value is used as the reading text itself.  The text
+            (regardless whether read from file or not) is a structured text
+            using the 'wiki' formatting.
+
+          explanation -- any exercise can start with a brief explanation
+            (usually of the subject of it's tasks).  Explanations are quite
+            similar to readings texts but serve a different purpose.  When both
+            are defined, the explanation goes first on the output.  They are
+            defined as a multi-line structured text using the 'wiki'
+            formatting.
+            
+          example -- a model answer.  If defined, the tasks will be preceeded
+            with given example (a multi-line structured text using the 'wiki'
+            formatting).  The formatting should usually follow the formatting
+            of the tasks within the exercise.
             
         """
         title = _("Exercise %d") +": "+ self._NAME
         super(Exercise, self).__init__(parent, title, Content(parent),
                                        in_toc=False)
-        self.__class__._USED = True
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
+        assert instructions is None or \
+               isinstance(instructions, types.StringTypes)
         assert is_sequence_of(tasks, self._TASK_TYPE), \
                "Tasks must be a sequence of '%s' instances!: %s" % \
                (self._TASK_TYPE.__name__, tasks)
         assert sound_file is None or isinstance(sound_file, types.StringTypes)
+        if self._READING_REQUIRED:
+            assert reading is not None, \
+            "'%s' requires a reading!" % self.__class__.__name__
         if self._RECORDING_REQUIRED:
             assert sound_file is not None, \
             "'%s' requires a recording!" % self.__class__.__name__
@@ -802,21 +917,64 @@ class Exercise(Section):
             assert audio_version is not None, \
             "'%s' requires an audio version!" % self.__class__.__name__
         self._tasks = list(tasks)
+        self._instructions_ = instructions
+        if example is not None:
+            assert isinstance(example, types.StringTypes)
+            self._example = self._wiki_content(example)
+        else:
+            self._example = None
+        if explanation is not None:
+            assert isinstance(explanation, types.StringTypes)
+            self._explanation = self._wiki_content(explanation)
+        else:
+            self._explanation = None
+        if reading is not None:
+            assert isinstance(reading, types.StringTypes)
+            if len(reading.splitlines()) == 1:
+                name, ext = os.path.splitext(reading)
+                name = os.path.join('readings', name)
+                try:
+                    content = parent.parse_wiki_file(name, ext=ext[1:])
+                except IOError, e :
+                    print "Unable to read the reading file: %s" % e
+                    self._reading = None
+                else:
+                    self._reading = Container(parent, content)
+            else:
+                self._reading = self._wiki_content(reading)
+        else:
+            self._reading = None
         if sound_file is not None:
-            self._recording = parent.resource(Media, sound_file)
+            try:
+                self._recording = parent.resource(Media, sound_file)
+            except ResourceNotFound, e:
+                self._recording = None
+                print e
             if transcript is None:
                 transcript = os.path.splitext(sound_file)[0] + '.txt'
             assert isinstance(transcript, types.StringTypes)
-            self._transcript = parent.resource(Transcript, transcript,
-                                               text=self._transcript_text())
+            t = parent.resource(Transcript, transcript,
+                                text=self._transcript_text(),
+                                input_encoding=parent.input_encoding())
+            self._transcript = t
         else:
+            if transcript is not None:
+                t = parent.resource(Transcript, transcript)
+                print "Transcript without a 'sound_file': %s" % t.url()
             self._recording = None
             self._transcript = None
         if audio_version is not None:
             self._audio_version = parent.resource(Media, audio_version)
         else:
             self._audio_version = None
-        parent.resource(Script, 'audio.js')
+        self._init_resources()
+
+    def _wiki_content(self, text):
+        t = re.sub('\[', '![', text)
+        return Container(self._parent, self._parent.parse_wiki_text(t))
+    
+    def _init_resources(self):
+        self._parent.resource(Script, 'audio.js')
 
     # Class methods
         
@@ -850,7 +1008,7 @@ class Exercise(Section):
         return "exercise_%s" % id(self)
     
     def _instructions(self):
-        return ""
+        return self._INSTRUCTIONS
 
     def _sound_controls(self, label, media, transcript=None):
         if transcript is not None:
@@ -858,66 +1016,101 @@ class Exercise(Section):
                            target="transcript", brackets=True)
         else:
             t = ""
-        f = ('<form class="sound-control" action="">%s:' % label,
-             button(_("Play"), "play_audio('%s')" % media.url()),
-             button(_("Stop"), 'stop_audio()'), t, '</form>')
+        beg  = '<form class="sound-control" action="">%s\n' % label
+        play = button(_("Play"), "play_audio('%s')" % media.url())
+        stop = button(_("Stop"), 'stop_audio()')
+        end  = t + '\n</form>'
         a = '%s %s' % (label, link(_("Play"), media.url(), brackets=True))
-        return script_write('\n'.join(f), p(a+t))
+        result = (script_write(beg + play),
+                  script_write(stop, condition='document.media_player'),
+                  script_write(end, p(a+t)))
+        return '\n'.join(result)
 
     def export(self):
-        return "\n\n".join((self._header(),
-                            self._export_instructions(),
-                            '<form name="%s" action="">' % self._form_name(),
-                            "\n".join(map(self._export_task, self._tasks)),
-                            self._results(),
-                            '</form>',
-                            script(self._init_script())))
-    
-    def _export_task(self, task):
-        raise Exception("This Method must be overriden")
+        parts = (self._header(),
+                 self._export_explanation(),
+                 self._export_reading(),
+                 self._export_instructions(),
+                 self._export_recording(),
+                 self._export_audio_version(),
+                 self._export_example(),
+                 '<form name="%s" action="">' % self._form_name(),
+                 "\n".join([self._export_task(t) for t in self._tasks]),
+                 self._results(),
+                 '</form>',
+                 script(self._init_script()))
+        return "\n\n".join([part for part in parts if part is not None])
 
+    def _export_explanation(self):
+        if self._explanation is not None:
+            return _("Explanation:") + \
+                   div(self._explanation.export(), cls="explanation")
+        else:
+            return None
+        
+    def _export_example(self):
+        if self._example is not None:
+            return _("Example:") + div(self._example.export(), cls="example")
+        else:
+            return None
+    
+    def _export_reading(self):
+        if self._reading is not None:
+            return _("Reading text:") + \
+                   div(self._reading.export(), cls="reading")
+        else:
+            return None
+    
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
-        instructions = p(self._instructions(),
-                         link(_("detailed instructions"), self._help_node.url(),
-                              target='help', brackets=True))
-        if self._recording is not None:
-            instructions += '\n\n' + self._export_recording()
-        if self._audio_version is not None:
-            instructions += '\n\n' + self._export_audio_version()
-        return instructions
+        return p(self._instructions_ or self._instructions(),
+                 link(_("detailed instructions"), self._help_node.url(),
+                      target='help', brackets=True))
 
     def _export_recording(self):
-        return self._sound_controls(_("Recording:"), self._recording,
-                                    self._transcript)
+        if self._recording:
+            return self._sound_controls(_("Recording:"), self._recording,
+                                        self._transcript)
+        else:
+            return None
     
     def _export_audio_version(self):
-        label = _("This exercise can be also done purely aurally/orally:")
-        return self._sound_controls(label, self._audio_version)
+        if self._audio_version:
+            label = self._AUDIO_VERSION_LABEL
+            return self._sound_controls(label, self._audio_version)
+        else:
+            return None
+
+    def _export_task(self, task):
+        raise Exception("This Method must be overridden")
+
+    def _results(self):
+        return None
 
     def _init_script(self):
-        return ''
+        return ""
         
-    def _results(self):
-        return ''
+    
+class Listening(Exercise):
+    _NAME = _("Listening")
+    _RECORDING_REQUIRED = True
+
+    
+class Reading(Exercise):
+    _NAME = _("Listening")
+    _READING_REQUIRED = True
 
     
 class SentenceCompletion(Exercise):
-    """Filling in gaps in sentences by typing in the correct completion."""
-
     _NAME = _("Sentence Completion")
     _AUDIO_VERSION_REQUIRED = True
     _TASK_TYPE = None
-
-    def _instructions(self):
-        return _("""This exercise can be only done purely aurally/orally.  You
-        will hear an unfinished sentence and your goal is to say the missing
-        part.""")
+    _INSTRUCTIONS = _("""Practise speech according to the instructions within
+    the recording.""")
+    _AUDIO_VERSION_LABEL = _("""This exercise can be only done purely
+    aurally/orally:""")
     
-    def _export_audio_version(self):
-        return self._sound_controls(_("The exercise:"), self._audio_version)
-
-
+    
 class _InteractiveExercise(Exercise):
     """A common super class for exercises which can be interactively evaluated.
 
@@ -925,7 +1118,8 @@ class _InteractiveExercise(Exercise):
     gives him a feedback.
     
     """
-    _RESPONSES = (('correct', 'c%02d.ogg'), ('incorrect', 'i%02d.ogg'))
+    _RESPONSES = (('correct', 'responses/c*.mp3'),
+                  ('incorrect', 'responses/i*.mp3'))
     
     _FORM_HANDLER = 'Handler'
     _MESSAGES = {", $x ($y%) on first attempt":_(", $x ($y%) on first attempt")}
@@ -935,27 +1129,17 @@ class _InteractiveExercise(Exercise):
     _BUTTONS = (('fill',  _('Fill'),  button, "this.form.handler.fill()"),
                 ('reset', _('Reset'), reset,  "this.form.handler.reset()"))
     
-    def __init__(self, parent, *args, **kwargs):
-        super(_InteractiveExercise, self).__init__(parent, *args, **kwargs)
-        parent.resource(Script, 'exercises.js')
-        parent.resource(Script, 'audio.js')
-        
+    def _init_resources(self):
+        super(_InteractiveExercise, self)._init_resources()
+        self._parent.resource(Script, 'exercises.js')
+        self._parent.resource(Script, 'audio.js')
         self._responses = {}
         for key, filename in self._RESPONSES:
-            self._responses[key] = responses = []
-            for i in range(100):
-                try:
-                    f = filename % (i+1)
-                except TypeError:
-                    f = filename
-                path = os.path.join('responses', f)
-                try:
-                    m = parent.resource(Media, path, shared=True)
-                except ResourceNotFound, e:
-                    if len(responses) == 0: raise e
-                    break
-                responses.append(m)
-
+            media = self._parent.resource(SharedMedia, filename)
+            if not isinstance(media, (types.ListType, types.TupleType)):
+                media = (media,)
+            self._responses[key] = tuple(media)
+            
     def _response(self, selector):
         responses = self._responses[selector]
         return responses[random.randint(0, len(responses)-1)]
@@ -980,20 +1164,23 @@ class _InteractiveExercise(Exercise):
                    for id, label, type, handler in self._BUTTONS]
         panel = div((div('<br/>'.join(displays), 'display'),
                      div(buttons, 'buttons')), 'results')
-        url = self._answer_sheet_node.url() +"#"+ self._answer_sheet_anchor()
-        answer_sheet_lnk = p(_("See the %s to check your results.") %
-                             link(_("answer sheet"), url, target="help"))
-        return script_write(panel, answer_sheet_lnk)
+        l = p(_("See the %s to check your results.") %
+              link(_("answer sheet"), self._answer_sheet_url(), target="help"))
+        return script_write(panel, l)
 
     def _answer_sheet_answers(self):
         return self._answers()
-
+    
     def _answer_sheet_anchor(self, index=None):
         if index is None:
             return "exercise-%s" % id(self)
         else:
             return "exercise-%s-answer-%d" % (id(self), index)
     
+    def _answer_sheet_url(self, index=None):
+        return self._answer_sheet_node.url() + "#" + \
+               self._answer_sheet_anchor(index)
+
     def answer_sheet(self, parent):
         self._answer_sheet_node = parent
         answers = [Anchor(parent, self._answer_sheet_anchor(i), answer)
@@ -1011,10 +1198,12 @@ class _ChoiceBasedExercise(_InteractiveExercise):
     _FORM_HANDLER = 'ChoiceBasedExerciseHandler'
 
     def _answers(self):
-        return [t.choice_index(t.correct_choice()) for t in self._tasks]
-
+        return [t.choice_index(t.correct_choice())
+                for t in self._tasks if len(t.choices()) > 0]
+    
     def _answer_sheet_answers(self):
-        return [t.correct_choice().answer() for t in self._tasks]
+        return [t.correct_choice().answer()
+                for t in self._tasks if len(t.choices()) > 0]
 
     def _non_js_choice_control(self, task, choice):
         media = self._response(choice.correct() and 'correct' or 'incorrect')
@@ -1027,11 +1216,13 @@ class _ChoiceBasedExercise(_InteractiveExercise):
                      value=task.choice_index(choice), cls='answer-control')
         return ctrl +' '+ label(choice.answer(), choice_id)
 
+    def _choice_label(self, task, choice):
+        return chr(ord('a') + task.choice_index(choice)) + '.&nbsp;'
+        
     def _format_choice(self, task, choice):
-        label = chr(ord('a') + task.choice_index(choice)) +'.'
         ctrl = script_write(self._js_choice_control(task, choice),
                             self._non_js_choice_control(task, choice))
-        return label + '&nbsp;' + ctrl + '<br/>'
+        return self._choice_label(task, choice) + ctrl + '<br/>'
 
     def _format_choices(self, task):
         formatted = [self._format_choice(task, ch) for ch in task.choices()]
@@ -1047,22 +1238,29 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
     
     _TASK_TYPE = MultipleChoiceQuestion
     _NAME = _("Multiple Choice Questions")
-
-    def _instructions(self):
-        return _("""For each of the %d questions below choose the correct
-        answer from the list.""") % len(self._tasks)
+    _INSTRUCTIONS = _("""For each of the questions below choose the correct
+    answer from the list.""")
 
     
 class Selections(_ChoiceBasedExercise):
     """Selecting one of several statements/sentences (the correct one)."""
     
     _TASK_TYPE = Selection
-    _NAME = _("Select the Correct One")
-    
-    def _instructions(self):
-        return _("""For each of the %d pairs of statements below decide which
-        one is correct.""") % len(self._tasks)
+    _NAME = _("Select the best alternative")
+    _INSTRUCTIONS = _("""Decide which statement is correct for each of the
+    groups below .""")
 
+    
+class TrueFalseStatements(_ChoiceBasedExercise):
+    """Deciding whether the sentence is true or false."""
+    
+    _TASK_TYPE = TrueFalseStatement
+    _NAME = _("True/False Statements")
+    _INSTRUCTIONS = _("""For each of the statements below indicate whether
+    you think they are true or false.""")
+    
+    def _choice_label(self, task, choice):
+        return ""
 
 class _SelectBasedExercise(_ChoiceBasedExercise):
 
@@ -1081,30 +1279,17 @@ class _SelectBasedExercise(_ChoiceBasedExercise):
         return p(label(task.prompt(), task.id()), self._format_choices(task))
     
     
-class TrueFalseStatements(_SelectBasedExercise):
-    """Deciding whether the sentence is true or false."""
-    
-    _TASK_TYPE = TrueFalseStatement
-    _NAME = _("True/False Statements")
-
-    def _instructions(self):
-        return _("""For each of the %d statements below indicate whether you
-        think they are true or false.""") % len(self._tasks)
-
-
-    
 class GapFilling(_SelectBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 
     _TASK_TYPE = GapFillStatement
     _NAME = _("Gap Filling")
+    _INSTRUCTIONS = _("""For each of the statements below choose the correct
+    word to fill in the gap.""")
 
-    def _instructions(self):
-        return _("""For each of the %d sentences below choose the correct word
-        from the list to fill in the gap.""") % len(self._tasks)
-    
     def _export_task(self, task):
-        return p(task.substitute_gap("%s") % self._format_choices(task))
+        statement = task.substitute_gap("%s")
+        return p(statement.replace('%s', self._format_choices(task)))
     
 
 ################################################################################
@@ -1115,9 +1300,9 @@ class _FillInExercise(_InteractiveExercise):
 
     _TASK_TYPE = FillInTask
     
-    _RESPONSES = (('all_correct', 'all-correct.ogg'),
-                  ('all_wrong',   'all-wrong.ogg'),
-                  ('some_wrong',  'some-wrong.ogg')) + \
+    _RESPONSES = (('all_correct', 'responses/all-correct.mp3'),
+                  ('all_wrong',   'responses/all-wrong.mp3'),
+                  ('some_wrong',  'responses/some-wrong.mp3')) + \
                   _InteractiveExercise._RESPONSES
         
     _FORM_HANDLER = 'FillInExerciseHandler'
@@ -1129,52 +1314,73 @@ class _FillInExercise(_InteractiveExercise):
     _TASK_FORMAT = p("%s<br/>%s")
 
     def _answers(self):
-        return [t.answer() for t in self._tasks]
+        if issubclass(self._TASK_TYPE, _ClozeTask):
+            return reduce(lambda a,b: a+b, [t.answers() for t in self._tasks],
+                          [])
+        else:
+            return [t.answer() for t in self._tasks]
    
     def _make_field(self, text, id=None):
         try:
             counter = self._field_counter
         except AttributeError:
             self._field_counter = counter = Counter(0)
-        answer_sheet_url = self._answer_sheet_node.url() + "#" + \
-                           self._answer_sheet_anchor(counter.next())
-        return field(cls='fill-in-task', size=len(text)+1, id=id) + \
-               script_write('', link("?", answer_sheet_url, brackets=True))
+        lnk = link("?", self._answer_sheet_url(counter.next()), brackets=True)
+        return field(cls='fill-in-task', size=max(4, len(text)+1), id=id) + \
+               script_write('', lnk)
     
     def _export_task(self, task):
-        f = self._make_field(task.answer(), id=task.id())
+        f = task.text(self._make_field)
         return self._TASK_FORMAT % (label(task.prompt(), task.id()), f)
-
+        
     
 class VocabExercise(_FillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Vocabulary Practice Exercise")
     _TASK_FORMAT = "%s %s<br/>"
-    
-    def _instructions(self):
-        return _("""You will hear a word or expression in your language.  Say
-        it in English and listen to the model pronunciation.""")
+    _INSTRUCTIONS = _("""Fill in a correct translation for each of the terms
+    below.""")
+    _AUDIO_VERSION_LABEL = _("""Use the recording to hear the model
+    pronunciation:""")
+
+    def __init__(self, parent, tasks, *args, **kwargs):
+        if not tasks:
+            dict = {}
+            for item in parent.vocab:
+                translation, word = (item.translation(), item.word())
+                if translation:
+                    if dict.has_key(translation):
+                        word = dict[translation] +'|'+ word
+                    dict[translation] = word
+            tasks = [FillInTask(t, w) for t, w in dict.items()]
+        super(VocabExercise, self).__init__(parent, tasks, *args, **kwargs)
+   
 
 
-class Transformation(_FillInExercise):
-    """A prompt (a sentence) and a big text-field for each task."""
-
-    _NAME = _("Transformation")
-
-    def _instructions(self):
-        return _("""Listen to the recording and transform each of the %d
-        sentences below according to the instructions.""") % len(self._tasks)
-
-    
-class Substitution(Transformation):
+class Substitution(_FillInExercise):
     """A prompt (a sentence) and a big text-field for each task."""
 
     _NAME = _("Substitution")
+    _INSTRUCTIONS = _("Use the text in brackets to transform each sentence.")
 
+    
+
+class Transformation(_FillInExercise):
+    """Pairs of sentences, the later with a gap (text-field)."""
+
+    _NAME = _("Transformation")
+    _TASK_TYPE = TransformationTask
+    _TASK_FORMAT = p("A. %s<br>B. %s")
+    _INSTRUCTIONS = _("""Fill in the gap in sentence B so that it means the same
+    as sentence A.""")
+    
     def _instructions(self):
-        return _("""Substitute a part of each sentence using the text in
-        brackets.""")
+        if self._example:
+            return _("Transform the sentences below according to the example.")
+        else:
+            return self._INSTRUCTIONS
+
 
         
 class Dictation(_FillInExercise):
@@ -1188,11 +1394,8 @@ class Dictation(_FillInExercise):
                  'Error(s) found': _('Error(s) found')}
     _MESSAGES.update(_FillInExercise._MESSAGES)
     _DISPLAYS = (('result', _('Result:')),)
-
-    def __init__(self, parent, tasks, *args, **kwargs):
-        super(Dictation, self).__init__(parent, tasks, *args, **kwargs)
-        assert len(tasks) == 1, \
-               "Dictation must consist of just one task (paragraph of text)."
+    _INSTRUCTIONS = _("""Listen to the recording and type exactly what you hear
+    into the textbox below.""")
 
     def _transcript_text(self):
         return self._tasks[0].answer()
@@ -1200,26 +1403,20 @@ class Dictation(_FillInExercise):
     def _export_task(self, task):
         return '<textarea rows="10" cols="60"></textarea>'
     
-    def _instructions(self):
-        return """Listen to the recording and type exactly what you hear into
-        the textbox below."""
-
     
 class Cloze(_FillInExercise):
     """Paragraphs of text including text-fields for the marked words."""
 
     _NAME = _("Cloze")
-    _RECORDING_REQUIRED = True
+    #_RECORDING_REQUIRED = True
     _TASK_TYPE = ClozeTask
-    
+
     def _transcript_text(self):
         return "\n\n".join([t.plain_text() for t in self._tasks])
     
-    def _answers(self):
-        return reduce(lambda a, b: a+b, [t.answers() for t in self._tasks])
-
     def _export_task(self, task):
-        return p(task.text(self._make_field))
+        transform = lambda t: self._wiki_content(t).export()
+        return p(task.text(self._make_field, transform))
 
     def _instructions(self):
         if self._recording is not None:
@@ -1227,6 +1424,29 @@ class Cloze(_FillInExercise):
             gaps in the text below using the same words.""")
         else:
             return _("""Fill in the gaps in the text below.  There is just one
-            correct word for each gap.""")
+            correct answer for each gap.""")
+
         
-        
+class NumberedCloze(Cloze):
+
+    def _export_task(self, task):
+        text = task.text(self._make_field)+"<br>"
+        return "%d. " % (self._tasks.index(task) + 1) + text
+
+    
+class ExposedCloze(Cloze):
+
+    _NAME = _("Exposed Cloze")
+    _RECORDING_REQUIRED = False
+    _INSTRUCTIONS = _("""Fill in gaps in the sentences using words or
+    expressions listed below.""")
+
+    def _export_instructions(self):
+        answers = self._answers()
+        answers.sort()
+        instructions = super(ExposedCloze, self)._export_instructions()
+        return instructions + itemize(answers)
+               
+class NumberedExposedCloze(ExposedCloze, NumberedCloze):
+    pass
+    
