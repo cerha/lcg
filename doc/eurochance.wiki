@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
+
 = Eurochance Course Implementation =
+
 
 The Eurochance language course (see http://eurochance.brailcom.org) was the
 initial implementation of a course using the LCG framework.  Thus the LCG
@@ -20,13 +23,13 @@ Each unit has the same structure.  It consists of five sections.
 The sections are: @TOC@
 
 
-=== Aims and Objectives ===
+=== Aims and Objectives === aims-sec
 
 This sections is a brief outline of the focus of the unit.  The contents is a
-structured text -- paragraphs, bullet lists etc.
+[#structured-text].
 
 
-=== Vocabulary ===
+=== Vocabulary === vocab-sec
 
 Consists of a listing of vocabulary for the unit.  User can read each piece of
 vocabulary separately, hear the correct pronunciation (recorded by native
@@ -36,16 +39,16 @@ User can browse the vocabulary up and down and search for a concrete word
 (by the means of the browser).
 
 
-=== Grammar ===
+=== Grammar === grammar-sec
 
 This section contains grammar explanations for the unit.  These explanations
-are written as structured text.
+are written as [#structured-text].
 
 Multiple sections should be used to allow direct access to certain parts from
 the Table of Contents and the Grammar Index.
 
 
-=== Exercises ===
+=== Exercises === exercises-sec
 
 This section consists of five subsections.  Each subsection consists of a
 series of exercises.  The subsections are:
@@ -64,11 +67,10 @@ The detailed description of exercise types and their content can be found in
 the section [#exercise-types].
 
 
-=== Checklist ===
+=== Checklist === checklist-sec
 
-This is a short section of structured text.  Most often this will be an
-itemised list of the competences achieved in the unit.
-
+This is a short section of [#structured-text].  Most often this will be a bullet
+list of the competences achieved in the unit.
 
 
 == Input Data Formats ==
@@ -87,9 +89,11 @@ A simple editor, such as Notepad in MS Windows should do the job.  The only
 requirement is that you must be able to save the output file in *UTF-8
 encoding* or convert it to this encoding afterwards.
 
+=== Files and Directories ===
+
 The basic concept is based on files arranged into directories (folders)
-according to the logical structure of the course (see also the
-[#structure] specification).
+according to the logical structure of the course (see also the [#structure]
+specification).
 
 There is one /base directory/ for the whole course.  This directory contains
 one /subdirectory/ for each unit of the course.  Each of these subdirectories
@@ -113,25 +117,29 @@ describing the focus of the lesson for better orientation.
   * 05-tourism
   * ...
 
+The following table shows the name of the input files and their formats for the
+Intermediate course:
 
-=== Text Sections ===
+| *Section*        | *File*           | *Format*           |
+| [#aims-sec]      | =aims.txt=       | [#structured-text] |
+| [#vocab-sec]     | =vocabulary.txt= | [#vocabulary] |
+| [#grammar-sec]   | =grammar.txt=    | [#structured-text] |
+| [#exercises-sec] | =exercises.txt=  | [#exercises]       |
+| [#checklist-sec] | =checklist.txt=  | [#structured-text] |
 
-According to the [#structure], there are several sections
-comprising a ``structured text'' in each unit.  For each of these sections, the
-LCG will expect a text file in unit source directory.
 
-The following table shows the name of the input file for each of the text
-sections.  
+=== Structured Text === structured-text
 
-| *Section*           | *File*          |
-| Aims and Objectives | =aims.txt=      |
-| Grammar             | =grammar.txt=   |
-| Checklist           | =checklist.txt= |
+According to the [#structure], there are several sections comprising a
+``structured text'' in each unit.  You will find a brief description of the
+most useful constructs below.  See the [wiki-formatting] for a complete guide.
 
-The input text files use the Wiki formatting.  This is a very simple and
-straightforward set of rules how to format a plain text document.  The
-formatting allows to mark the logical structure of sections, paragraphs,
-itemised lists etc.  A brief description follows.
+The Wiki formatting is a very simple and straightforward set of rules how to
+format a plain text document.  The formatting allows to mark the logical
+structure of sections, paragraphs, bullet lists etc.  A brief description
+follows.
+
+Overview: @TOC@
 
 
 ==== Paragraphs ====
@@ -142,22 +150,6 @@ ignored, since the paragraph will be reformatted to fit into the browser
 window.
 
 It is recommended to wrap the paragraphs not to exceed 80 characters in width.
-
-
-==== Itemised Lists ====
-
-Itemised lists are marked by an asterisk at the beginning of each item.  Each
-item is indented by a space.
-
-*Example:*
-
-------
-This is a normal paragraph.  The itemised list follows.
-
- * can
- * may
- * must
-------
 
 
 ==== Sections ====
@@ -213,7 +205,67 @@ would<<) have only one form.  There are also short affirmative forms for
 -----
 
 
-=== Vocabulary ===
+==== Bullet Lists ====
+
+Bullet lists are marked by an asterisk at the beginning of each item.  Each
+item is indented by a space.
+
+*Example:*
+
+------
+ * can
+ * may
+ * must
+------
+
+This is rendered as:
+
+ * can
+ * may
+ * must
+
+Bullet lists can be nested, you can also make ordered lists etc.  More details
+can be found in the [wiki-formatting].
+
+
+==== Field-sets ====
+
+Field-sets are very handy within the exercises for writing down a conversation.
+
+*Example:*
+
+------
+:Granny: I thought you told me you'd already made up your mind to do
+         accountancy.
+:Emma:   I don't know. There are all kinds of other work in finance and I'm not
+         sure accounting would be too exciting.
+:Granny: Exciting? What you need is a good steady job and a good steady
+         boyfriend, my girl. Take my word for it.  Do your accounting course
+         then find a good job round here instead of traipsing off to the big
+         city. And here's your cup of tea.
+:Emma:   Oh, thanks. But Granny, there's more to life than getting married and
+	 having babies. And I want to see a bit of the world before I
+	 settle down. I've been thinking about private banking ...
+------
+
+This is rendered as:
+
+:Granny: I thought you told me you'd already made up your mind to do
+         accountancy.
+:Emma:   I don't know. There are all kinds of other work in finance and I'm not
+         sure accounting would be too exciting.
+:Granny: Exciting? What you need is a good steady job and a good steady
+         boyfriend, my girl. Take my word for it.  Do your accounting course
+         then find a good job round here instead of traipsing off to the big
+         city. And here's your cup of tea.
+:Emma:   Oh, thanks. But Granny, there's more to life than getting married and
+	 having babies. And I want to see a bit of the world before I
+	 settle down. I've been thinking about private banking ...
+
+See the [wiki-formatting] for a detailed syntax description.
+
+
+=== Vocabulary === vocabulary
 
 All the vocabulary is stored in plain text files.  There is one file for each
 unit and each target language (Norwegian, Czech, Slovak, German, Spanish, ...).
@@ -252,7 +304,7 @@ Example (using Czech translations):
 -----
 call :: volat, hovor
 ring :: zvonit
-cell-phone (U.S.) :: mobilnĂ­ telefon, mobil
+cell-phone (U.S.) :: mobilní telefon, mobil
 ...
 -----
 
@@ -274,8 +326,15 @@ Can I help you? :: Mohu Vám nějak pomoci?
 Can I take a message? :: Mohu převzít vzkaz?
 -----
 
+Optionally a phrase can be marked using the `` (phr.)'' note at the end of the
+phrase like that:
 
-=== Exercises ===
+-----
+Can I speak to ...? (phr.) :: Mohu prosím mluvit s ...?
+-----
+
+
+=== Exercises === exercises
 
 According to the [#structure] specification, there are
 five sections of exercises in each unit.  All these sections are defined in the
@@ -294,7 +353,7 @@ rules making the types and number of exercises within each section consistent
 throughout the course.
 
 So, technically, the individual exercise specifications are separated by a line
-containing four or more dashes.  When the next sections begins, a separator of
+containing four or more dashes.  When the next section begins, a separator of
 four or more equation signs must be used.
 
 *Example:*
@@ -327,14 +386,10 @@ section must contain at least one exercise (technically).
 
 ==== Format of an Individual Exercise Specification ====
 
-Each individual exercise specification consists of a header and a series of
+Each individual exercise specification consists of a header and one or more
 tasks.  The header defines some necessary information about the exercise type,
 media files it depends on etc.  Tasks define the corresponding questions or
 goals depending on the exercise type.
-
-Header and individual tasks are separated by a blank line.  For each exercise,
-there is just one header at the beginning and an unlimited number of tasks
-following.
 
 In the example below, you can see a concrete header and tasks for a concrete
 exercise type.
@@ -371,33 +426,86 @@ See the exercise format specifications for more details.
 
 ==== Exercise Header ====
 
-Exercise header consists of name/value pairs written each on one line.  The
-header name begins at the beginning of the line and ends by a colon.  The colon
-is followed by a space and the corresponding value.
+Exercise header consists of arguments -- name/value pairs written each on one
+line.  The header name (at the beginning of the line) is followed by a colon, a
+space and the corresponding value (see the example above).
 
-You can see an example of an exercise header at the previous section.
+If the value of an argument takes more than one line, an alternate syntax is
+allowed.  The value is surrounded by XML-like tags named as the argument.  The
+tags must appear alone on separate lines.
 
-Exercise header arguments:
+*Example*:
 
-  * =type= ... This argument is mandatory.  See the list of all possible
-    [#exercise-types].
+------
+<instructions>
+After talking to her grandmother, Emma sent an email to a friend of hers called
+Willy Cookham. Willy was doing a work placement while studying to be a
+managerial accountant like his dad Kenny. Emma asked him if he knew how to get
+into private banking. Here is Willy's reply. Fill in the gaps:
+</instructions>
+------
+
+This construct defines the ='instructions'= argument and assigns it a
+multi-line value.  All such argument definitions must immediately follow the
+one-line argument definitions, leaving a blank line for separation.
+
+Exercise header arguments are:
+
+=type=
+   This argument is mandatory.  See the list of all possible [#exercise-types].
   
-  * =audio_version= ... Any exercise may also be available in the purely
-    oral!/aural version.  In such a case you supply a name of the file with the
-    corresponding recording.  This argument is not mandatory.
-  
-  * =sound_file= ... When the exercises is based on a listening, you specify
-    the name of the file with the recording here.  This argument is not
-    mandatory.
+=instructions=
+   This argument allows to override the default (intentionally very general)
+   exercise instructions with custom (usually more specific) instructions.
+   These instructions are then printed before the exercise task(s) and tell the
+   user what is his goal.  It should be a complete sentence (usually starting
+   with a capital letter and ending with a dot).  This, in consequence, also
+   allows to use the same exercise type for different purposes.
 
-  * =transcript= ... When ='sound_file'= is defined, you must also define the
-    name of the file with a textual transcript of that recording.
+=audio_version=
+   Any exercise may also be available in purely oral/aural version.  In such a
+   case you supply a name of the file with the corresponding recording.  This
+   argument is not mandatory.
 
-The difference between the /recording/ and the /audio n version/ should be
-obvious.  First the user listens to the recording (if there is one) and than he
+=sound_file=
+   When the exercises is based on a listening, you specify the name of the file
+   with the recording here.  The file is then searched within the ='media'=
+   subdirectory of current node's source directory.  This argument is not
+   mandatory.
+
+=transcript= 
+   The name of the file with a textual transcript of the recording.  This file
+   is required to exist whenever the 'sound_file' argument is supplied.  This
+   argument, however, is not required when the transcript filename is the same
+   as the 'sound_file' filename using the '.txt' extension instead of the
+   original sound file extension.  The file is then searched within the
+   ='transcripts'= subdirectory of current node's source directory.
+
+
+=reading= 
+   Specifies the reading text, which is displayed at the beginning of the
+   exercise.  Some exercise types may require a reading, some may not.  If a
+   one-line value is supplied, this is considered a filename.  The file is then
+   searched within the ='readings'= subdirectory of current node's source
+   directory.  A multi-line value is used as the reading text itself.  The text
+   (regardless whether read from file or not) is a [#structured-text].
+
+=explanation= 
+   Any exercise can start with a brief explanation (usually of the subject of
+   it's tasks).  Explanations are quite similar to readings texts but serve a
+   different purpose.  When both are defined, the explanation goes first on the
+   output.  They are defined as a multi-line [#structured-text].
+
+=example= 
+   A model answer.  If defined, the tasks will be preceded with given example
+   (a multi-line [#structured-text]).  The formatting should usually follow the
+   formatting of the tasks within the exercise.
+
+/Note:/ The difference between the /recording/ and the /audio version/ should be
+obvious.  The user listens to the recording first (if there is one) and than he
 decides if he wants to do the written tasks (filling in texts or choosing from
 predefined answers interactively) or to do the same tasks purely
-aurally!/orally (just listening to the questions and answering orally).
+aurally/orally (just listening to the questions and answering orally).
 
 That's also why there is no transcript for the ='audio_version'= argument,
 since the interactive version of the exercise also serves as a transcript.
@@ -472,35 +580,70 @@ If you want to send money to somebody, you can ____ a transfer.
 
 ===== Cloze ===== Cloze
 
-Filling in the gaps in text by typing the correct word.  Since the individual
-pieces would often not make sense without the context, the cloze will usually
-consist of a paragraph of text which can contain more than one gap.
+Filling in the gaps in text by typing the correct word into a text-box.  The
+text is a [#structured-text], so you can use any of it's constructs to affect
+the formatting.
+
+The gaps are simply done by putting a word or expression into square brackets.
+Than the /only/ correct answer for this gap is the word in the brackets.
+
+*Specification example (simple paragraphs of text):*
+
+-----
+Commercial banks and savings banks receive and hold deposits [in] current
+accounts, savings accounts and deposit accounts, make payments [for] their
+customers, lend money, [and] offer investment advice, foreign exchange
+facilities, and so on. 
+
+[Many] banks nowadays also offer online banking services. [Some] banks only
+have branches in one region or country; large international banks have
+[branches] in many countries.
+-----
+
+*Specification example (a conversation):*
+
+-----
+:Granny: I thought you told me you'd already made up your [mind] to do
+         accountancy.
+:Emma:   I don't know. There are all kinds of other work in finance and I'm not
+         sure accounting would be too [exciting] .
+:Granny: Exciting? What you need is a good steady job and a good [steady]
+         boyfriend, my girl. Take my word for it.  Do your accounting course
+         then find a good job round here instead of traipsing off to the big
+         city. And here's your cup of tea.
+:Emma:   Oh, thanks. But Granny, there's more to life than getting married and
+	 [having] babies. And I want to see a bit of the world before I
+	 [settle] down. I've been thinking about private banking ...
+-----
+
+This example uses the Field-set construct to format the conversation.  See the
+[wiki-formatting] for more details.
 
 It is recommended to use a cloze in a combination with a recording, so that the
 user's goal is to fill in the exactly same words as he has heard before.  In
 this case, there is just one correct answer and the automatic evaluation can
 surely decide what is a correct answer and what is not.
 
-You can also use a cloze without a recording, so that the user must find
-the correct word according to the lexical context, but there is the risk, that
-the student finds a different completion, than you expected, which might be
-also correct.  Then the automatic evaluation would evaluate such an answer as
-incorrect and the student would be confused.  So please take special care to
-make the completions unambiguous.
-
-In the input text, you simply put the words in square brackets to indicate,
-that they should be replaced by a gap.  Than the /only/ correct answer for this
-gap is the word in the brackets.
+You can also use a cloze without a recording, so that the user must find the
+correct answer from the context, but there is the risk, that the student finds
+a different completion, than you expected, which might be also correct (it
+may be possible to understand the same sentence in different ways).  Then the
+automatic evaluation would evaluate such an answer as incorrect and the student
+would be confused.  So please take special care to make the completions
+unambiguous.
 
 
-*Task specification example:*
+===== ExposedCloze ===== ExposedCloze
 
------
-Commercial banks and savings banks receive and hold deposits [in] current
-accounts, savings accounts and deposit accounts, make payments [for] their
-customers, lend money, [and] offer investment advice, foreign exchange
-facilities, and so on.
------
+This a normal Cloze exercise, but all the used words/expressions are listed at
+the beginning of the exercise.  This is useful when we want the user to choose
+from a set of predefined answers.  This also avoids the risk of ambiguous
+completions.
+
+The task specification is same as for Cloze, since the only difference is in
+the output (the list is automatically generated by extracting the correct
+completions from the exercise).  The completions are sorted alphabetically on
+the output.
 
 
 ===== Selections =====
@@ -519,7 +662,7 @@ The plus marked sentence is then considered correct and the other(s) incorrect.
 
 ===== SentenceCompletion =====
 
-Sentence completion exercise is designed to be purely aural!/oral so there are
+Sentence completion exercise is designed to be purely aural/oral so there are
 no tasks in the specification file.  On the other hand, the ='audio_version'=
 argument is mandatory for that exercise.
 
@@ -537,18 +680,29 @@ argument is mandatory for that exercise.
 
 ===== Transformation =====
 
-The goal is to transform a given sentence according to the instructions, which
-are a part of the recording. 
+The goal is to transform a given sentence according to the instructions (they
+should be given using the 'instructions' and/or the 'example' header arguments).
 
 The task specification consists of two lines.  First line is the original
-sentence and the second line is the transformed sentence.
+sentence and the second line is the transformed sentence.  The square brackets
+can be used within the transformed sentence to mark the part which should be
+left out.  If no square brackets are found, the whole sentence will be left out
+for completion.
 
 *Task specification example:*
+
+-----
+The area you specialise in could be intensive care or theatre work.
+The area in [which] you specialise could be intensive care or theatre work.
+-----
+
+*Another example (the whole sentence must be filled):*
 
 -----
 Mr Hill said: "I don't grow bananas."
 Mr Hill said he didn't grow bananas.
 -----
+
 
 ===== Substitution =====
 
@@ -601,3 +755,5 @@ unit.  For instance there will be one file for each listening exercise etc.
 
 The data should be burned on a CD when ready and sent to the technical group,
 since it will be probably too large for transmission via the Internet.
+
+
