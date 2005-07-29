@@ -18,6 +18,10 @@
 
 """Simple HTML generation utility functions.
 
+This is an attempt to separate at least the most used constructs somewhere out of
+the code to allow later rewrite of the output rutines by something more
+sophisticated (e.g. pluggable formatters) if necessary.
+
 We need something very simple and quite specific, so it is not worth using
 'htmlgen'.
 
@@ -61,12 +65,12 @@ def p(*content, **kwargs):
 def div(content, cls=None, lang=None):
     return _tag('div', (('class', cls), ('lang', lang)), content, concat='\n')
 
-def link(label, url, brackets=False,
+def link(label, url, name=None, brackets=False,
          title=None, target=None, cls=None, hotkey=None):
     if hotkey:
         t = '(Alt-%s)' % hotkey
         title = title and title + ' ' + t or t
-    attr = (('href', url), ('title', title), ('target', target),
+    attr = (('href', url), ('name', name), ('title', title), ('target', target),
             ('class', cls), ('accesskey', hotkey))
     result = _tag('a', attr, label)
     return brackets and '['+result+']' or result
@@ -136,15 +140,17 @@ def speaking_text(text, media):
 def script(code, noscript=None):
     noscript = noscript and '<noscript>'+ noscript +'</noscript>' or ''
     if code:
-        code = '//<!--\n'+ code +' //-->'
+        code = '//<!--\n'+ code +' //-->\n'
     return '<script type="text/javascript" language="Javascript">' + \
            code +'</script>'+ noscript
 
-def script_write(content, noscript=None):
+def script_write(content, noscript=None, condition=None):
     #return content
     if content:
         c = content.replace('"','\\"').replace('\n','\\n').replace("'","\\'")
         content = 'document.write("'+ c +'");'
+        if condition:
+            content = 'if ('+condition+') ' + content
     return script(content, noscript)
 
 def js_value(var):
@@ -167,3 +173,4 @@ def js_dict(items):
         items = items.items()
     assert is_sequence_of(dict(items).keys(), types.StringType)
     return '{'+ ", ".join(["'%s': %s" % (k, js_value(v)) for k,v in items]) +'}'
+
