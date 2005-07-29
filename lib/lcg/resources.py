@@ -83,7 +83,6 @@ def resource(cls, parent, file, **kwargs):
             if os.path.exists(src_path):
                 result = cls(src_path, dst_path, **kwargs)
                 _cache[key] = result
-                print "***",  dst_path, key
                 return result
             elif src_path.find('*') != -1:
                 pathlist = glob.glob(src_path)
@@ -91,11 +90,9 @@ def resource(cls, parent, file, **kwargs):
                     r = [cls(src_path, dst_dir + src_path[len(d):], **kwargs)
                          for src_path in pathlist]
                     _cache[key] = r
-                    print "***",  dst_path, key
                     return r
         result = cls(os.path.join(src_dirs[0], file), dst_path, **kwargs)
         _cache[key] = result
-        print "***", dst_path, key
         return result
 
     
@@ -129,8 +126,10 @@ class Resource(object):
         """
         self._src_path = src_path
         self._dst_path = dst_path
-        if self._needs_source_file() and not os.path.exists(path):
-            raise ResourceNotFound(path)
+        if self._needs_source_file() and not os.path.exists(src_path):
+            exception = ResourceNotFound(src_path)
+            print exception
+            #raise exception
 
     def _needs_source_file(self):
         return True
@@ -156,8 +155,10 @@ class Resource(object):
         return False
 
     def _export(self, infile, outfile):
-        shutil.copy(infile, outfile)
-        print "%s: file copied." % outfile
+        if os.path.exists(infile): 
+            shutil.copy(infile, outfile)
+            print "%s: file copied." % outfile
+            
 
     def get(self):
         fh = open(self._src_path)
