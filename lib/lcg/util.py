@@ -79,29 +79,36 @@ class SplittableText:
         """Return the name of the input file (if specified in constructor)."""
         return self._input_file
 
-    def _create_piece(self, start, end):
-        # Create a piece as a substring of the text of this piece.
+    def piece(self, start, end):
+        """Create a 'SplittableText' instance as a substring."""
         n = len(self._text[:start].splitlines()) + self._firstline
         text = self._text[start:end].rstrip()
         return SplittableText(text, input_file=self._input_file, firstline=n)
     
-    def split(self, matcher):
+    def split(self, matcher, maxsplit=None):
         """Return parts of the text as a tuple of SplittableText instances.
 
         The 'matcher' argument is an instance of compiled regular expression.
         This regex should match the splitter used to divide the pieces of the
         input text into subsequent parts.
 
+        If 'maxsplit; is given, at most 'maxsplit' splits are done. (thus, the
+        list will have at most `maxsplit+1' elements).  If MAXSPLIT is not
+        specified or is zero, then there is no limit on the number of splits
+        (all possible splits are made).
+        
         All beginning and trailing whitespace characters are stripped from
         the pieces of text.
 
         """
         pieces = []
         lastposition = len(self._text) - len(self._text.lstrip())
-        for match in matcher.finditer(self._text):
-            pieces.append(self._create_piece(lastposition, match.start()))
+        for i, match in enumerate(matcher.finditer(self._text)):
+            if i == maxsplit:
+                break
+            pieces.append(self.piece(lastposition, match.start()))
             lastposition = match.end()
-        pieces.append(self._create_piece(lastposition, None))
+        pieces.append(self.piece(lastposition, None))
         return pieces
 
 
