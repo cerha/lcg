@@ -407,7 +407,7 @@ class Parser(object):
             return ItemizedList.TYPE_NUMERIC
 
     def parse(self, text):
-        return self._parse_sections(text)
+        return self._parse_sections(re.sub("(?m)^#.*$", "", text))
 
 
 class MacroParser(object):
