@@ -156,7 +156,7 @@ class Resource(object):
 
     def _export(self, infile, outfile):
         if os.path.exists(infile): 
-            shutil.copy(infile, outfile)
+            shutil.copyfile(infile, outfile)
             print "%s: file copied." % outfile
             
 
