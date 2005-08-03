@@ -6,10 +6,11 @@ Required features:
 
  * Finish the IMS export.
 
-
 Optional Features:
 
  * Preloading sounds.
+
+ * Playing pieces of a recording on demand in Dictation.
 
  * Punctuation insensitive evaluation?
 
