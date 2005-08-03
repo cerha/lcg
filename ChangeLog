@@ -1,5 +1,7 @@
 2005-08-03  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/css/default.css: New styles added.
+
 	* TODO: Updated.
 
 	* resources/scripts/exercises.js (last_correct_char_index):
