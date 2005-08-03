@@ -346,6 +346,8 @@ class Section(SectionContainer):
         container.
     
     """
+    _ANCHOR_PREFIX = 'sec'
+    
     def __init__(self, parent, title, content, anchor=None, toc_depth=0,
                  in_toc=True, **kwargs):
         """Initialize the instance.
@@ -376,6 +378,7 @@ class Section(SectionContainer):
         self._title = title
         self._in_toc = in_toc
         self._anchor = anchor
+        self._backref_used = False
         super(Section, self).__init__(parent, content, toc_depth=toc_depth,
                                       **kwargs)
         
@@ -404,14 +407,16 @@ class Section(SectionContainer):
             return self._anchor
         else:
             numbers = [str(x.section_number()) for x in self._section_path()]
-            return 'sec-' + '-'.join(numbers)
+            return '-'.join([self._ANCHOR_PREFIX] + numbers)
         
-    def backref(self):
-        if hasattr(self, '_backref_used'):
-            return None
-        else:
+    def backref(self, node):
+        # We can allow just one backref target on the page.  Links on other
+        # pages are not backreferenced.
+        if node is self._parent and not self._backref_used:
             self._backref_used = True
             return self._backref()
+        else:
+            return None
     
     def _backref(self):
         return "backref-" + self.anchor()
@@ -425,7 +430,7 @@ class Section(SectionContainer):
         return base + "#" + self.anchor()
     
     def _header(self):
-        if hasattr(self, '_backref_used'):
+        if self._backref_used:
             href = "#"+self._backref()
         else:
             href = None
@@ -503,7 +508,7 @@ class TableOfContents(Content):
             if isinstance(i, Section):
                 if i.parent() is self.parent():
                     url = i.url(relative=True)
-                name = i.backref()
+                name = i.backref(self._parent)
             links.append(link(i.title(), url, name=name) + \
                          self._make_toc(i, indent=indent+4, depth=depth-1))
         return "\n" + itemize(links, indent=indent) + "\n" + ' '*(indent-2)
@@ -518,6 +523,17 @@ class Anchor(TextContent):
         
     def export(self):
         return '<a name="%s">%s</a>' % (self._anchor, self._text)
+
+class Link(TextContent):
+    """An anchor (target of a link)."""
+    def __init__(self, parent, target, text=''):
+        assert isinstance(target, Section)
+        self._target = target
+        super(Link, self).__init__(parent, text)
+        
+    def export(self):
+        t = self._target
+        return '<a href="%s">%s</a>' % (t.url(), self._text or t.title())
 
     
 class VocabItem(object):
@@ -653,8 +669,10 @@ class Task(object):
 
     """
 
-    def __init__(self, prompt):
+    def __init__(self, prompt, comment=None):
         assert isinstance(prompt, types.UnicodeType) or prompt is None
+        assert isinstance(comment, types.UnicodeType) or comment is None
+        self._comment = comment
         self._prompt = prompt
 
     def id(self):
@@ -662,6 +680,9 @@ class Task(object):
         
     def prompt(self):
         return self._prompt
+    
+    def comment(self):
+        return self._comment
 
 
 class Choice(object):
@@ -686,7 +707,7 @@ class Choice(object):
 class _ChoiceTask(Task):
     """Select the correct statement out of a list of predefined choices."""
     
-    def __init__(self, prompt, choices):
+    def __init__(self, prompt, choices, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -697,7 +718,7 @@ class _ChoiceTask(Task):
         assert is_sequence_of(choices, Choice)
         assert len([ch for ch in choices if ch.correct()]) == 1 or not choices
         self._choices = list(choices)
-        super(_ChoiceTask, self).__init__(prompt)
+        super(_ChoiceTask, self).__init__(prompt, **kwargs)
 
     def choices(self):
         return self._choices
@@ -718,16 +739,16 @@ class MultipleChoiceQuestion(_ChoiceTask):
 
 class Selection(_ChoiceTask):
     
-    def __init__(self, choices):
-        super(Selection, self).__init__(None, choices)
+    def __init__(self, choices, **kwargs):
+        super(Selection, self).__init__(None, choices, **kwargs)
 
         
 class GapFillStatement(_ChoiceTask):
 
     _REGEXP = re.compile(r"(___+)")
     
-    def __init__(self, prompt, choices):
-        super(GapFillStatement, self).__init__(prompt, choices)
+    def __init__(self, prompt, choices, **kwargs):
+        super(GapFillStatement, self).__init__(prompt, choices, **kwargs)
         matches = len(self._REGEXP.findall(prompt))
         if choices:
             assert matches == 1, \
@@ -741,7 +762,7 @@ class GapFillStatement(_ChoiceTask):
 class TrueFalseStatement(_ChoiceTask):
     """The goal is to indicate whether the statement is true or false."""
     
-    def __init__(self, statement, correct=True):
+    def __init__(self, statement, correct=True, comment=None):
         """Initialize the instance.
 
         Arguments:
@@ -753,15 +774,15 @@ class TrueFalseStatement(_ChoiceTask):
         """
         assert isinstance(correct, types.BooleanType)
         choices = (Choice(_('TRUE'), correct), Choice(_('FALSE'), not correct))
-        super(TrueFalseStatement, self).__init__(statement, choices)
+        super(TrueFalseStatement, self).__init__(statement, choices, comment=comment)
 
 
 class FillInTask(Task):
     
-    def __init__(self, prompt, answer):
+    def __init__(self, prompt, answer, comment=None):
         assert isinstance(answer, types.UnicodeType)
         self._answer = answer
-        super(FillInTask, self).__init__(prompt)
+        super(FillInTask, self).__init__(prompt, comment=comment)
 
     def answer(self):
         return self._answer
@@ -773,52 +794,88 @@ class FillInTask(Task):
 class DictationTask(FillInTask):
     _REGEXP = re.compile(r"(\s*/\s*|\s+)")
     
-    def __init__(self, text):
+    def __init__(self, text, comment=None):
         assert isinstance(text, types.UnicodeType)
         text = self._REGEXP.sub(' ', text).strip()
-        super(DictationTask, self).__init__(None, text)
+        super(DictationTask, self).__init__(None, text, comment=comment)
 
 
-class _ClozeTask(Task):
-    _REGEXP = re.compile(r"\[([^\]]*)\]")
-        
-    def __init__(self, prompt, text):
-        assert isinstance(text, types.UnicodeType)
-        self._text = text
-        super(_ClozeTask, self).__init__(prompt)
-        
-    def answers(self):
+class _ClozeTask(FillInTask):
+    _REGEXP = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
+
+    def _fields(self):
         return self._REGEXP.findall(self._text)
-
-    def text(self, field_formatter):
-        formatter = lambda match: field_formatter(match.group(1))
-        return self._REGEXP.sub(formatter, self._text)
-
-    def plain_text(self):
-        return self._REGEXP.sub(lambda match: match.group(1), self._text)
-
-
-class ClozeTask(_ClozeTask):
-        
-    def __init__(self, text):
-        super(ClozeTask, self).__init__(None, text)
-
+    
+    def answers(self):
+        return [answer for answer, label in self._fields()]
+    
+    def answer(self):
+        answers = self.answers()
+        if answers:
+            assert len(answers) == 1
+            return answers[0]
+        else:
+            return None
+    
     def text(self, field_formatter, text_transform=None):
         formatter = lambda match: field_formatter(match.group(1))
         text = self._text
         if text_transform:
             text = text_transform(text)
         return self._REGEXP.sub(formatter, text)
-    
+
+    def plain_text(self):
+        return self._REGEXP.sub(lambda match: match.group(1), self._text)
+
+        
 class TransformationTask(_ClozeTask):
 
-    def __init__(self, orig, transformation):
+    def __init__(self, orig, transformation, comment=None):
         if not self._REGEXP.search(transformation):
             transformation = '[' + transformation + ']'
-        super(TransformationTask, self).__init__(orig, transformation)
-        
+        self._text = transformation
+        assert len(self.answers()) == 1
+        answer = self.answers()[0]
+        super(TransformationTask, self).__init__(orig, answer, comment=comment)
 
-    
+        
+class ClozeTask(_ClozeTask):
+        
+    def __init__(self, text, comments=(), comment=None):
+        self._text = text
+        if comment:
+            assert comments == ()
+            assert len(self.answers()) == 1
+            self._comments = (comment, )
+        else:
+            assert isinstance(comments, (types.ListType, types.TupleType))
+            fields = self._fields()
+            if comments:
+                dict = {}
+                for c in comments:
+                    match = re.search("^<(?P<label>[\w\d]+)>\s*", c)
+                    assert match, ('Cloze comments must begin with a label ' +
+                                   '(e.g. <1> to refer to a field [xxx<1>]).',
+                                   c)
+                    dict[match.group('label')] = c[match.end():]
+                def _comment(dict, label):
+                    try:
+                        c = dict[label]
+                        del dict[label]
+                        return c
+                    except KeyError:
+                        return None
+                self._comments = [_comment(dict, label) for a, label in fields]
+                assert not dict, ("Unused comments (labels don't match any "
+                                  "field label): %s") % dict
+            else:
+                self._comments = [None for x in fields]
+        super(ClozeTask, self).__init__(None, text, comment=comment)
+
+    def comments(self):
+        return self._comments
+
+
 ################################################################################
 ################################   Exercises   #################################
 ################################################################################
@@ -827,6 +884,7 @@ class TransformationTask(_ClozeTask):
 class Exercise(Section):
     """Exercise consists of an assignment and a set of tasks."""
 
+    _ANCHOR_PREFIX = 'ex'
     _TASK_TYPE = Task
     _NAME = None
     _READING_REQUIRED = False
@@ -837,6 +895,7 @@ class Exercise(Section):
     _INSTRUCTIONS = ""
     _AUDIO_VERSION_LABEL = _("""This exercise can be also done purely
     aurally/orally:""")
+    _TASK_COUNT = None
     
     _used_types = []
     _help_node = None
@@ -916,7 +975,12 @@ class Exercise(Section):
         if self._AUDIO_VERSION_REQUIRED:
             assert audio_version is not None, \
             "'%s' requires an audio version!" % self.__class__.__name__
+        if self._TASK_COUNT is not None:
+            assert len(tasks) == self._TASK_COUNT, \
+            "'%s' requires just %d task(s) (%d found)!" % \
+            (self.__class__.__name__, self._TASK_COUNT, len(tasks))
         self._tasks = list(tasks)
+
         self._instructions_ = instructions
         if example is not None:
             assert isinstance(example, types.StringTypes)
@@ -1082,7 +1146,13 @@ class Exercise(Section):
             return None
 
     def _export_task(self, task):
-        raise Exception("This Method must be overridden")
+        parts = self._export_task_parts(task)
+        if not isinstance(parts, (types.TupleType, types.ListType)):
+            parts = (parts, )
+        else:
+            parts = [p for p in parts if p is not None]
+        cls = camel_case_to_lower(self.__class__.__name__)
+        return div(parts, cls='task %s-task' % cls)
 
     def _results(self):
         return None
@@ -1118,6 +1188,7 @@ class _InteractiveExercise(Exercise):
     gives him a feedback.
     
     """
+    _ANSWER_SHEET_LINK_CLASS = 'answer-sheet-link'
     _RESPONSES = (('correct', 'responses/c*.mp3'),
                   ('incorrect', 'responses/i*.mp3'))
     
@@ -1128,7 +1199,7 @@ class _InteractiveExercise(Exercise):
                  ('result', _('Correct:')))
     _BUTTONS = (('fill',  _('Fill'),  button, "this.form.handler.fill()"),
                 ('reset', _('Reset'), reset,  "this.form.handler.reset()"))
-    
+
     def _init_resources(self):
         super(_InteractiveExercise, self)._init_resources()
         self._parent.resource(Script, 'exercises.js')
@@ -1168,26 +1239,42 @@ class _InteractiveExercise(Exercise):
               link(_("answer sheet"), self._answer_sheet_url(), target="help"))
         return script_write(panel, l)
 
-    def _answer_sheet_answers(self):
-        return self._answers()
+    def _answer_sheet_items(self):
+        return ()
     
     def _answer_sheet_anchor(self, index=None):
+        a = self.anchor()
         if index is None:
-            return "exercise-%s" % id(self)
+            return a
         else:
-            return "exercise-%s-answer-%d" % (id(self), index)
+            return "%s-a%d" % (a, index)
     
     def _answer_sheet_url(self, index=None):
         return self._answer_sheet_node.url() + "#" + \
                self._answer_sheet_anchor(index)
 
+    def _answer_sheet_link(self, index):
+        lnk = link("?", self._answer_sheet_url(index),
+                   title=_("Show the answer sheet."),
+                   brackets=True, target='help')
+        return span(lnk, cls=self._ANSWER_SHEET_LINK_CLASS)
+        
     def answer_sheet(self, parent):
-        self._answer_sheet_node = parent
-        answers = [Anchor(parent, self._answer_sheet_anchor(i), answer)
-                   for i, answer in enumerate(self._answer_sheet_answers())]
-        items = ItemizedList(parent, answers, type=ItemizedList.TYPE_NUMERIC)
-        anchor = Anchor(parent, self._answer_sheet_anchor())
-        return Container(parent, (anchor, items))
+        self._answer_sheet_node = p = parent
+        i = 0
+        items = []
+        for answer, comment in self._answer_sheet_items():
+            a = Anchor(p, self._answer_sheet_anchor(i), answer)
+            if comment:
+                c = Paragraph(p, WikiText(p, comment))
+                items.append(Container(p, (a, c)))
+            else:
+                items.append(a)
+            i += 1
+        lnk = Link(p, self, 'Go to the exercise.')
+        anchor = Anchor(p, self._answer_sheet_anchor())
+        answers = ItemizedList(p, items, type=ItemizedList.TYPE_NUMERIC)
+        return Container(p, (lnk, anchor, answers))
     
 ################################################################################
 ################################################################################
@@ -1201,8 +1288,8 @@ class _ChoiceBasedExercise(_InteractiveExercise):
         return [t.choice_index(t.correct_choice())
                 for t in self._tasks if len(t.choices()) > 0]
     
-    def _answer_sheet_answers(self):
-        return [t.correct_choice().answer()
+    def _answer_sheet_items(self):
+        return [(t.correct_choice().answer(), t.comment())
                 for t in self._tasks if len(t.choices()) > 0]
 
     def _non_js_choice_control(self, task, choice):
@@ -1228,9 +1315,9 @@ class _ChoiceBasedExercise(_InteractiveExercise):
         formatted = [self._format_choice(task, ch) for ch in task.choices()]
         return div(formatted, 'choices')
 
-    def _export_task(self, task):
-        prompt = task.prompt() and task.prompt() +"<br/>\n" or ''
-        return prompt + self._format_choices(task) +"<br/>\n"
+    def _export_task_parts(self, task):
+        lnk = self._answer_sheet_link(self._tasks.index(task))
+        return (task.prompt(), self._format_choices(task), lnk)
 
     
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
@@ -1262,6 +1349,7 @@ class TrueFalseStatements(_ChoiceBasedExercise):
     def _choice_label(self, task, choice):
         return ""
 
+    
 class _SelectBasedExercise(_ChoiceBasedExercise):
 
     _FORM_HANDLER = 'SelectBasedExerciseHandler'
@@ -1275,9 +1363,6 @@ class _SelectBasedExercise(_ChoiceBasedExercise):
         nonjs = [self._non_js_choice_control(task, ch) for ch in task.choices()]
         return script_write(js, "("+"|".join(nonjs)+")")
 
-    def _export_task(self, task):
-        return p(label(task.prompt(), task.id()), self._format_choices(task))
-    
     
 class GapFilling(_SelectBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
@@ -1287,9 +1372,10 @@ class GapFilling(_SelectBasedExercise):
     _INSTRUCTIONS = _("""For each of the statements below choose the correct
     word to fill in the gap.""")
 
-    def _export_task(self, task):
+    def _export_task_parts(self, task):
         statement = task.substitute_gap("%s")
-        return p(statement.replace('%s', self._format_choices(task)))
+        lnk = self._answer_sheet_link(self._tasks.index(task))
+        return statement.replace('%s', self._format_choices(task)) + lnk 
     
 
 ################################################################################
@@ -1311,34 +1397,34 @@ class _FillInExercise(_InteractiveExercise):
                  "this.form.handler.evaluate()"),) + \
                  _InteractiveExercise._BUTTONS
     
-    _TASK_FORMAT = p("%s<br/>%s")
+    _TASK_FORMAT = "%s<br/>%s"
 
     def _answers(self):
-        if issubclass(self._TASK_TYPE, _ClozeTask):
-            return reduce(lambda a,b: a+b, [t.answers() for t in self._tasks],
-                          [])
-        else:
-            return [t.answer() for t in self._tasks]
-   
+        return [t.answer() for t in self._tasks if t.answer() is not None]
+        
+    def _answer_sheet_items(self):
+        return [(t.answer(), t.comment()) for t in self._tasks
+                if t.answer() is not None]
+    
     def _make_field(self, text, id=None):
         try:
             counter = self._field_counter
         except AttributeError:
             self._field_counter = counter = Counter(0)
-        lnk = link("?", self._answer_sheet_url(counter.next()), brackets=True)
-        return field(cls='fill-in-task', size=max(4, len(text)+1), id=id) + \
-               script_write('', lnk)
+        lnk = self._answer_sheet_link(counter.next())
+        return field(cls='fill-in-task', size=max(4, len(text)+1), id=id) + lnk
     
-    def _export_task(self, task):
-        f = task.text(self._make_field)
-        return self._TASK_FORMAT % (label(task.prompt(), task.id()), f)
+    def _export_task_parts(self, task):
+        text = task.text(self._make_field)
+        return self._TASK_FORMAT % (label(task.prompt(), task.id()), text)
+                               
         
     
 class VocabExercise(_FillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Vocabulary Practice Exercise")
-    _TASK_FORMAT = "%s %s<br/>"
+    _TASK_FORMAT = "%s %s"
     _INSTRUCTIONS = _("""Fill in a correct translation for each of the terms
     below.""")
     _AUDIO_VERSION_LABEL = _("""Use the recording to hear the model
@@ -1357,13 +1443,11 @@ class VocabExercise(_FillInExercise):
         super(VocabExercise, self).__init__(parent, tasks, *args, **kwargs)
    
 
-
 class Substitution(_FillInExercise):
     """A prompt (a sentence) and a big text-field for each task."""
 
     _NAME = _("Substitution")
     _INSTRUCTIONS = _("Use the text in brackets to transform each sentence.")
-
     
 
 class Transformation(_FillInExercise):
@@ -1371,7 +1455,7 @@ class Transformation(_FillInExercise):
 
     _NAME = _("Transformation")
     _TASK_TYPE = TransformationTask
-    _TASK_FORMAT = p("A. %s<br>B. %s")
+    _TASK_FORMAT = "A. %s<br/>B. %s"
     _INSTRUCTIONS = _("""Fill in the gap in sentence B so that it means the same
     as sentence A.""")
     
@@ -1380,7 +1464,6 @@ class Transformation(_FillInExercise):
             return _("Transform the sentences below according to the example.")
         else:
             return self._INSTRUCTIONS
-
 
         
 class Dictation(_FillInExercise):
@@ -1396,28 +1479,23 @@ class Dictation(_FillInExercise):
     _DISPLAYS = (('result', _('Result:')),)
     _INSTRUCTIONS = _("""Listen to the recording and type exactly what you hear
     into the textbox below.""")
+    _TASK_COUNT = 1
 
     def _transcript_text(self):
         return self._tasks[0].answer()
 
-    def _export_task(self, task):
+    def _export_task_parts(self, task):
         return '<textarea rows="10" cols="60"></textarea>'
     
-    
-class Cloze(_FillInExercise):
-    """Paragraphs of text including text-fields for the marked words."""
 
+class _Cloze(_FillInExercise):
     _NAME = _("Cloze")
-    #_RECORDING_REQUIRED = True
     _TASK_TYPE = ClozeTask
+    #_RECORDING_REQUIRED = True
 
     def _transcript_text(self):
         return "\n\n".join([t.plain_text() for t in self._tasks])
     
-    def _export_task(self, task):
-        transform = lambda t: self._wiki_content(t).export()
-        return p(task.text(self._make_field, transform))
-
     def _instructions(self):
         if self._recording is not None:
             return _("""Listen to the recording carefully and then fill in the
@@ -1427,26 +1505,46 @@ class Cloze(_FillInExercise):
             correct answer for each gap.""")
 
         
-class NumberedCloze(Cloze):
-
-    def _export_task(self, task):
-        text = task.text(self._make_field)+"<br>"
-        return "%d. " % (self._tasks.index(task) + 1) + text
-
-    
-class ExposedCloze(Cloze):
-
+class _ExposedCloze(_Cloze):
     _NAME = _("Exposed Cloze")
-    _RECORDING_REQUIRED = False
     _INSTRUCTIONS = _("""Fill in gaps in the sentences using words or
     expressions listed below.""")
 
     def _export_instructions(self):
         answers = self._answers()
         answers.sort()
-        instructions = super(ExposedCloze, self)._export_instructions()
+        instructions = super(_ExposedCloze, self)._export_instructions()
         return instructions + itemize(answers)
-               
-class NumberedExposedCloze(ExposedCloze, NumberedCloze):
+
+    
+class NumberedCloze(_Cloze):
+
+    def _export_task_parts(self, task):
+        text = task.text(self._make_field)
+        return "%d. " % (self._tasks.index(task) + 1) + text
+
+class NumberedExposedCloze(_ExposedCloze, NumberedCloze):
     pass
+    
+class Cloze(_Cloze):
+    """Paragraphs of text including text-fields for the marked words."""
+    _TASK_COUNT = 1
+    _ANSWER_SHEET_LINK_CLASS = 'cloze-answer-sheet-link'
+
+    def _answers(self):
+        return self._tasks[0].answers()
+        
+    def _answer_sheet_items(self):
+        t = self._tasks[0]
+        return zip(t.answers(), t.comments())
+        
+    def _export_task_parts(self, task):
+        transform = lambda t: self._wiki_content(t).export()
+        return task.text(self._make_field, transform)
+
+        
+class ExposedCloze(_ExposedCloze, Cloze):
+    pass
+
+
     
