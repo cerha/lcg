@@ -1,3 +1,189 @@
+2005-08-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* TODO: Updated.
+
+	* resources/scripts/exercises.js (last_correct_char_index):
+	Function removed.
+	(Handler.get_answer): Renamed to `get_value'.
+	(Handler._eval_answer): New method.
+	(Handler._eval_answers): `get_answer' -> `get_value'.  Use
+	`_eval_answer()'.
+	(Handler._fill_answer): New method.
+	(Handler.fill): Use it.
+	(ChoiceBasedExerciseHandler.get_answer): Renamed to `get_value'.
+	(FillInExerciseHandler._find_answer): New method.
+	(FillInExerciseHandler._error_handler): Use it.
+	(FillInExerciseHandler._eval_answer)
+	(FillInExerciseHandler._fill_answer): New methods.
+	(FillInExerciseHandler._handle_text_field_keypress): Define
+	`_this' instead of inexistent `this'.  Use it.  Use
+	`_find_answer()' and chnge the hint behavior accordingly.
+
+	* lib/lcg/content.py (Section._ANCHOR_PREFIX): New constant.
+	(Section.__init__): initialize `self._backref_used'.
+	(Section.anchor): Use `self._ANCHOR_PREFIX'.
+	(backref): New argument node.  Return backref only for the TOC
+	links within the same page.
+	(TableOfContents._make_toc): Pass parent to `i.backref()'.
+	(Link): New class.
+	(Task.__init__): New keyword argument `comment'.
+	(Task.comment): New method.
+	(_ChoiceTask.__init__, Selection.__init__)
+	(GapFillStatement.__init__): Pass the **kwargs.
+	(TrueFalseStatement.__init__, FillInTask.__init__)
+	(TransformationTask.__init__): Pass the `comment' kwarg.
+	(_ClozeTask, TransformationTask, ClozeTask): Heavilly rewritten.
+	(Exercise._ANCHOR_PREFIX): Redefined.
+	(Exercise._TASK_COUNT): New constant.
+	(Exercise.__init__): Check task count.
+	(Exercise._export_task): Call `self._export_task_parts()' and
+	format the resulting parts.
+	(_InteractiveExercise._ANSWER_SHEET_LINK_CLASS): New constant.
+	(_InteractiveExercise._answer_sheet_answers): Removed.
+	(_InteractiveExercise._answer_sheet_items): New method.
+	(_InteractiveExercise._answer_sheet_anchor): Use `self.anchor()'
+	to make the anchor.
+	(_InteractiveExercise._answer_sheet_link): New method.
+	(_InteractiveExercise.answer_sheet): Append comments (if they
+	exist) after the answer.
+	(_ChoiceBasedExercise._answer_sheet_answers): Removed.
+	(_ChoiceBasedExercise._answer_sheet_items): New method.
+	(_ChoiceBasedExercise._export_task)
+	(GapFilling._export_task_parts, _FillInExercise._TASK_FORMAT):
+	Replaced by `_export_task_parts()'.  Don't wrap the text into a
+	paragraph.
+	(_FillInExercise._answers): Don't care about the Cloze Task here.
+	(_FillInExercise._answer_sheet_items): new method.
+	(_FillInExercise._make_field): Use `self._answer_sheet_link()'.
+	(_FillInExercise._export_task): Replaced by `_export_task_parts()'.
+	(VocabExercise._TASK_FORMAT): Don't add a linebreak at the end.
+	(Transformation._TASK_FORMAT): Don't wrap the text into a paragraph.
+	(Cloze): Renamed to `_Cloze'.
+	(ExposedCloze): Renamed to `_ExposedCloze'.
+	(_Cloze._export_task): Removed.
+	(NumberedCloze): Derive from `_Cloze', not `Cloze'.
+	(NumberedExposedCloze): Derive from `_ExposedCloze' and `NumberedCloze'.
+	(Cloze): New class derived from `_Cloze'.
+	(ExposedCloze) New class derived from `_ExposedCloze' and Cloze:
+
+2005-07-29  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (TextContent.__str__): New method.
+	(PreformattedText.export): Replace the '<', '>', '&' and '"'
+	characters by HTML entities.
+	(Field): New class.
+	(FieldSet): New class.
+	(Section.backref, Section._backref): New methods.
+	(Section._header): Make the header a beck-reference to the TOC.
+	(TableOfContents._make_toc): Set also the link names to allow
+	back-referencing.
+	(VocabList.export): Export `None' translations as `???'.
+	(GapFillStatement.__init__): Removed assert to allow just plain
+	sentences between the statements.
+	(_ChoiceTask.__init__): Allow a plain sentence without choices.
+	(FillInTask.text): New method.
+	(_ClozeTask): New class.
+	(ClozeTask, TransformationTask): Derive from it.
+	(Exercise._READING_REQUIRED): New constant.
+	(Exercise._INSTRUCTIONS, Exercise._AUDIO_VERSION_LABEL): New
+	constants.
+	(Exercise.__init__): New keyword arguemnts `instructions',
+	`reading', `explanation' and `example'.
+	(Exercise._wiki_content): New method.
+	(Exercise._sound_controls): Make the `Stop' button invisible, when
+	Media Player is not in use.
+	(Exercise.export): Export also explanations, reading example and
+	recording.
+	(Exercise._export_explanation, Exercise._export_example)
+	(Exercise._export_reading): New methods.
+	(Exercise._export_instructions): Use self._INSTRUCTIONS constant
+	or the custom instructions from the constructor argument.
+	(Exercise._export_recording): Return `None', when there is no
+	recording.
+	(Exercise._export_audio_version): Use the constant
+	`self._AUDIO_VERSION_LABEL'.
+	(Listening, Reading): New classes.
+	(SentenceCompletion._instructions)
+	(MultipleChoiceQuestions._instructions, Selections._instructions)
+	(TrueFalseStatements._instructions, GapFilling._instructions)
+	(VocabExercise._instructions, Substitution._instructions)
+	(Cloze._instructions): Methods removed.
+	(MultipleChoiceQuestions._INSTRUCTIONS, Selections._INSTRUCTIONS)
+	(TrueFalseStatements._INSTRUCTIONS, GapFilling._INSTRUCTIONS)
+	(VocabExercise._INSTRUCTIONS, Substitution._INSTRUCTIONS)
+	(Cloze._INSTRUCTIONS): New constants.
+	(_InteractiveExercise._RESPONSES): Use the glob-style filenames.
+	(_InteractiveExercise._init_resources): Dont search the existing
+	responses here.
+	(_InteractiveExercise._answer_sheet_url): New method.
+	(_InteractiveExercise._results): Use it.
+	(_ChoiceBasedExercise._answers): Ignore tasks with no choices.
+	(_ChoiceBasedExercise._choice_label): New method.
+	(_ChoiceBasedExercise._format_choice):  Use it.
+	(TrueFalseStatements._choice_label): New method.
+	(GapFilling._export_task): Use `.replace()', not string
+	formatting, to replace the gap (it may not be there...).
+	(_FillInExercise._answers): Act according to task type.
+	(_FillInExercise._make_field): Use `self._answer_sheet_url()'.
+	(_FillInExercise._export_task): Use the `text()' method of the task.
+	(VocabExercise._AUDIO_VERSION_LABEL): Redefined here.
+	(VocabExercise.__init__): Include each word only once and allow
+	multiple correct answers, where there are more translations.
+	(Cloze._answers): Method removed.
+	(Cloze._export_task): Format the text using self._wiki_content().
+	(NumberedCloze): New class.
+	(ExposedCloze): New class.
+	(NumberedExposedCloze): New class.
+
+	* lib/lcg/course.py (ContentNode.__init__): Create instance's own
+	wiki Parser as `self._wiki_parser'.
+	(ContentNode._read_file): Remove the UNICODE marker from the first line.
+	(ContentNode.parse_wiki_text): New method.
+	(ContentNode.parse_wiki_file): Use `self._wiki_parser'.
+	(_WikiNode._create_content): Use `ContentNode.parse_wiki_text()'.
+
+	* resources/css/default.css: Updated.
+
+	* doc/wiki-formatting.wiki: Updated.
+
+	* doc/eurochance.wiki: Updated.
+
+	* lib/lcg/wiki.py (Formatter._MARKUP): New items added.  Some
+	items renamed.
+	(Formatter._PAIR, Formatter._FORMAT): Respect the changes in `_MARKUP'.
+	(Parser._LIST_MARKER): Allow also a minus sign and a preceding bracket.
+	(Parser._SPLITTER_RE): Allow also tabs in list item indentation.
+	Split also at field-set item start.
+	(Parser._MATCHERS): New rules for `field' and `definition'.
+	(Parser._REGEXPS): Allow empty lines preceding any of the regesps.
+	(Parser._HELPER_PATTERNS): Add new patterns from new rules.
+	(Parser._build_sections): Renamed to `_make_sections()'.
+	(Parser._parse_sections): `_build_sections()' -> `_make_sections()'.
+	(Parser._store_list_item, Parser._finish_list_item) 
+	(Parser._store_field, Parser._finish_field) 
+	(Parser._store_definition, Parser._finish_definition) 
+	(Parser._parse_blocks): Completely rewritten.
+	(Parser._list_item_type): Recognize a minus sign as an unordered type.
+	(escape): Removed.
+	(_log): New funftion.
+	(Parser.parse): Remove all comment lines before further processing.
+
+	New method.
+
+	* lib/lcg/_html.py (link): New keyword argument 'name'.
+	(script): Add a final newline after the comment end.
+	(script_write): New keyword argument 'condition'.
+
+	* lib/lcg/resources.py (Resource._export): Don't do anything, when
+	the source file doesn't exist.
+	(Resource.__init__): Don't raise the exception, just print it.
+	(resource): Forgotten debug prints removed.
+	(Resource._export): Use `shutil.copyfile()' instead of
+	``shutil.copy()'.
+
+	* lib/lcg/util.py (_create_piece): Renamed to 'piece()'.
+	(SplittableText.split): New keyword argument `maxsplit'.
+
 2005-07-19  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/de.po: File updated.
