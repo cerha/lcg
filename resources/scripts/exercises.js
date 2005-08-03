@@ -71,13 +71,6 @@ function highlight(field, start, end) {
   }
 }
 
-function last_correct_char_index(field, answer) {
-   var i = 0;
-   while (field.value.slice(0, i+1) == answer.slice(0, i+1) && i<answer.length)
-      i++; 
-   return i;
-}
-
 function simulate_click_on_keypress(e) {
    if (document.all) e = window.event;
    var key = event_key(e);
@@ -134,7 +127,7 @@ Handler.prototype.set_answer = function(i, value) {
    this._fields[i].value = value;
 }
 
-Handler.prototype.get_answer = function(i) {
+Handler.prototype.get_value = function(i) {
    return this._fields[i].value;
 }
 
@@ -142,11 +135,15 @@ Handler.prototype._error_handler = function(field) {
    field.focus();
 }
 
+Handler.prototype._eval_answer = function(value, i) {
+   return value == this._answers[i];
+}
+
 Handler.prototype._eval_answers = function() {
    for (var i=0; i < this._answers.length; i++) {
-      var value = this.get_answer(i);
+      var value = this.get_value(i);
       if (value != '' && value != null) {
-	 this._results[i] = (value == this._answers[i] ? 1:-1);
+	 this._results[i] = (this._eval_answer(value, i) ? 1:-1);
 	 if (this._first_attempt[i] == null)
 	    this._first_attempt[i] = this._results[i];
       } else {
@@ -229,9 +226,13 @@ Handler.prototype.display_results = function() {
 
 Handler.prototype.fill = function() {
    for (var i=0; i < this._answers.length; i++) {
-      this.set_answer(i, this._answers[i]);
+      this._fill_answer(i);
    }
    this._eval_answers();
+}
+
+Handler.prototype._fill_answer = function(i) {
+      this.set_answer(i, this._answers[i]);
 }
 
 Handler.prototype.reset = function() {
@@ -267,7 +268,7 @@ ChoiceBasedExerciseHandler.prototype.set_answer = function(i, value) {
    }
 }
 
-ChoiceBasedExerciseHandler.prototype.get_answer = function(i) {
+ChoiceBasedExerciseHandler.prototype.get_value = function(i) {
    for (var n=0; n < this._fields.length; n++) {
       var field = this._fields[n];
       if (field.answer_index == i && field.checked) {
@@ -314,31 +315,63 @@ FillInExerciseHandler.prototype._init_field = function(field) {
    field.onkeypress = this._handle_text_field_keypress;
 }
 
+FillInExerciseHandler.prototype._find_answer = function(field) {
+   var answers = this._answers[field.answer_index].split('|');
+   var value = field.value;
+   var answer_index = 0;
+   var char_index = 0; // max last correct char index
+   for (var i=0; i < answers.length; i++) {
+      var a = answers[i];
+      var j = 0;
+      while (value.slice(0, j+1) == a.slice(0, j+1) && j < a.length) j++; 
+      if (j > char_index) {
+	 char_index = j;
+	 answer_index = i;
+      }
+   }
+   return {"answer": answers[answer_index], "index": char_index};
+}
+
 FillInExerciseHandler.prototype._error_handler = function(field) {
-   var answer = this._answers[field.answer_index]
-   var index = last_correct_char_index(field, answer);
+   var found = this._find_answer(field);
+   var index = found.index
    field.focus()
    highlight(field, index, index);
 }
 
+FillInExerciseHandler.prototype._eval_answer = function(value, i) {
+   var answers = this._answers[i].split('|');
+   for (var j=0; j < answers.length; j++) {
+      if (value == answers[j]) return true;
+   }
+   return false;
+}
+
+FillInExerciseHandler.prototype._fill_answer = function(i) {
+   var answers = this._answers[i].split('|');
+   this.set_answer(i, answers[0]);
+}
+
 FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
-   // 'this' does not refer to the FillInExerciseHandler instance here!
    if (document.all) e = window.event;
    var key = event_key(e);
    var field = event_target(e);
-   if (key == 'Enter') {
-      field.form.handler.eval_answer(field);
+   // 'this' does not refer to the FillInExerciseHandler instance here!
+   var _this = field.form.handler;
+   if (key == 'Enter') { // Eval
+      _this.eval_answer(field);
       return false;
-   } else if (key == 'Ctrl-Space') {
-      var answer = field.form.handler._answers[field.answer_index];
-      if (field.value != answer.slice(0, field.value.length)) {
-	 var i = last_correct_char_index(field, answer);
-	 field.value = answer.slice(0, i+1) +
-	    field.value.slice(i, field.value.length);
+   } else if (key == 'Ctrl-Space') { // Hint
+      var found = _this._find_answer(field);
+      var answer = found.answer; 
+      var i = found.index; 
+      var val = field.value
+      if (answer.length > i) {
+	 field.value = answer.slice(0, i+1) + val.slice(i, val.length);
 	 highlight(field, i+1, i+1);
-      } else {
-	 var len = field.value.length;
-	 field.value += answer.slice(len, len+1);
+      } else if (field.value.length > i) {
+	 field.value = val.slice(0, i);
+	 highlight(field, i, i);
       }
       return false;
    }
