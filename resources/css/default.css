@@ -51,11 +51,32 @@ div.choices {
 form { 
 }
 
+div.task { 
+    margin-bottom: 0.7em;
+    position: relative;
+}
+div.cloze-task, div.numbered-cloze-task, div.vocab-exercise-task  {
+    margin-bottom: 0;
+}
+
 .explanation, .reading, .example { 
     border: 0px solid #999;
     border-width: 1px 0px;
     padding: 0pt 3pt;
+    margin-bottom: 0.7em;
 }
+
+.answer-sheet-link { 
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.cloze-answer-sheet-link { 
+    font-size: 0.8em;
+    vertical-align: top;
+}
+
 .reading { 
     background-color: #eee;
 }
