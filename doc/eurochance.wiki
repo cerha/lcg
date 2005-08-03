@@ -229,7 +229,10 @@ can be found in the [wiki-formatting].
 
 ==== Field-sets ====
 
-Field-sets are very handy within the exercises for writing down a conversation.
+Field-sets are very handy within the exercises for writing down a
+conversation. Speaker's name must start the line and is enclosed in colons
+from both sides.  The spoken text follows.  When split over multiple lines, all
+the subsequent lines must be indented, until the next speaker name appears.
 
 *Example:*
 
@@ -448,7 +451,7 @@ This construct defines the ='instructions'= argument and assigns it a
 multi-line value.  All such argument definitions must immediately follow the
 one-line argument definitions, leaving a blank line for separation.
 
-Exercise header arguments are:
+Recognized exercise header arguments are:
 
 =type=
    This argument is mandatory.  See the list of all possible [#exercise-types].
@@ -500,14 +503,13 @@ Exercise header arguments are:
    (a multi-line [#structured-text]).  The formatting should usually follow the
    formatting of the tasks within the exercise.
 
-/Note:/ The difference between the /recording/ and the /audio version/ should be
-obvious.  The user listens to the recording first (if there is one) and than he
-decides if he wants to do the written tasks (filling in texts or choosing from
-predefined answers interactively) or to do the same tasks purely
-aurally/orally (just listening to the questions and answering orally).
-
-That's also why there is no transcript for the ='audio_version'= argument,
-since the interactive version of the exercise also serves as a transcript.
+/Note:/ The difference between the /recording/ and the /audio version/ should
+be obvious.  The user listens to the recording first (if there is one) and than
+he decides if he wants to do the written tasks (filling in texts or choosing
+from predefined answers interactively) or to do the same tasks purely
+aurally/orally (just listening to the questions and answering orally).  That's
+also why there is no transcript for the ='audio_version'= argument, since the
+interactive version of the exercise also serves as a transcript.
 
 
 ==== Exercise Types ==== exercise-types
@@ -631,6 +633,10 @@ automatic evaluation would evaluate such an answer as incorrect and the student
 would be confused.  So please take special care to make the completions
 unambiguous.
 
+Using [#comments comments] is another recommended way of avoiding confusion.
+Within a comment, you may even admit other options, but explain why the
+suggested one is the best for the situation.
+
 
 ===== ExposedCloze ===== ExposedCloze
 
@@ -665,17 +671,6 @@ Sentence completion exercise is designed to be purely aural/oral so there are
 no tasks in the specification file.  On the other hand, the ='audio_version'=
 argument is mandatory for that exercise.
 
-#Each task is one sentence.  There is just one gap in each sentence, to be
-#filled in by the student.  Unlike in the [#Cloze], there are usually more words
-#in the gap to be filled to finish the sentence.  The same warning applies here
-##regarding the ambiguity as for the [#Cloze], so it is safer to use this
-#exercise together with a listening again.
-
-#*Task specification example:*
-
-#-----
-#If you don't use pesticides you can [grow organic food].
-#-----
 
 ===== Transformation =====
 
@@ -720,7 +715,76 @@ Can you take a message, please?
 ===== Dictation =====
 
 Task specification for the dictation is the text of the dictation as one
-paragraph of text.  The recording is required for this exercise
+paragraph of text.  The recording is required for this exercise.
+
+==== Exercise comments ==== comments
+
+It may be desirable to add a comment to a task, which explains briefly the
+reason why the correct answer is just the one suggested in the task definition.
+This is possible for any exercise type easily.  Most exercise types
+(except for Cloze), define their tasks as a sequence of individual text
+blocks separated by blank lines.  Just add a separate block of text following
+any task specification and start it with two dots and a space (='.. '=).  Any
+such block is considered a comment for the previous task.
+
+Example of use:
+
+-----
+type: TrueFalseStatemnts
+reading: 2_text18.txt
+
+The IRS is the American government body in charge of collecting taxes. [T]
+
+The training course is for people who already have a degree in
+telecommunications. [F]
+
+.. The text doesn't say that.  You need a degree (or related work experience)
+to get employment by IRS.
+
+People who want to do the course must already have excellent computer
+skills. [F]
+
+.. The text says ``Functional knowledge of the computer''.
+
+-----
+
+The blank lines between the task and the comment are MANDATORY.
+
+As mentioned above, the notation is different for the [#Cloze] exercise (as
+well as [#ExposedCloze]).  Since there are usually several fields within the
+cloze text and this text is processed as whole, the comments can be
+placed at the very end of exercise specification and must use labels
+to refer to a particular field.  The label is enclosed in angle brackets and
+must be present at the end of the field and at the beginning of the
+corresponding comment.
+
+Example:
+
+-----
+:Granny: I thought you told me you'd already made up your [mind<1>] to do
+         accountancy.
+:Emma:   I don't know. There are all kinds of other work in finance and I'm not
+         sure accounting would be too [exciting].
+:Granny: Exciting? What you need is a good steady job and a good [steady]
+         boyfriend, my girl. Take my word for it.  Do your accounting course
+         then find a good job round here instead of traipsing off to the big
+         city. And here's your cup of tea.
+:Emma:   Oh, thanks. But Granny, there's more to life than getting married and
+	 [having<2>] babies. And I want to see a bit of the world before I
+	 [settle<3>] down. I've been thinking about private banking ...
+
+.. <1> ``Make up someones mind'' is a fixed expression.
+
+.. <2> Other verbs would make sense here, but ``having'' is the most natural in
+this sort of conversation.
+
+.. <3> Again, ``settle down'' is a fixed expression.
+
+-----
+
+Labels can be any combination of letters, numbers and underscores and the order
+doesn't have to match the order of the fields.  Fields don't have to be marked,
+when there is no comment for them.
 
 
 === Sound Recordings === recordings
