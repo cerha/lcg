@@ -1,3 +1,103 @@
+2005-08-08  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/feed.py (Feeder.__init__): Method removed.
+	(FileFeeder, PySpecFeederError, PySpecFeeder): Classes removed.
+	(VocabFeeder._item): Also consider the term a phrase, when "(phr.)
+	note found.
+	(VocabFeeder._item): Pass `None' as translation, when no
+	translation found.
+	(ExerciseFeeder._MULITLINE_ARG_MATCHER): New constant.
+	(ExerciseFeeder.__init__): Method removed.
+	(ExerciseFeeder._exercise): Parse also task comments
+	(ExerciseFeeder._parse_exercise_spec)
+	(ExerciseFeeder._read_multiline_args): New methods.
+	(ExerciseFeeder._read_header): Docstring updated.
+	(ExerciseFeeder._read_task): New arguemnt `comment'.  More task
+	types added.  Method mapping updated.
+	(ExerciseFeeder._read_selection): Method removed.
+	(ExerciseFeeder._read_generic_task): New method.
+	(ExerciseFeeder._read_choices): New method.
+	(ExerciseFeeder._read_multiple_choice_question): Method removed.
+	(ExerciseFeeder._read_prompt_and_choices): New method.
+	(ExerciseFeeder._read_cloze, ExerciseFeeder._read_dictation)
+	(ExerciseFeeder._read_fill_in_task): Methods removed.
+	(ExerciseFeeder._read_true_false_statement): New arguemnts `type'
+	and `comment'.
+
+	* lib/lcg/eurochance.py (Unit._read_xls_vocab): Method removed.
+	(Unit): Docstring updated.
+	(Unit._create_content): Implement a simple reader for the advanced
+	course.
+	(IntermediateUnit): New class.
+	(IntermediateUnit._create_vocab): Don't pass the `input_encoding'
+	argument to `VocabFeeder' constructor.
+	(IntermediateUnit._create_exercises): Use '#' as a comment start.
+	Don't pass `input_encoding' argument to `ExerciseFeeder'
+	constructor.
+	(IntermediateUnit._create_content): `_parse_wiki_file()' ->
+	`parse_wiki_file()'.  Use the grammar file in the user's language.
+	(Instructions._create_content): Use the instructions in the user's
+	language.
+	(GrammarIndex._TITLE): Changed to "Grammar Bank".
+	(AnswerSheet._answer_sheets): New method.
+	(AnswerSheet._create_content): Different implementation for the advanced
+	course.
+	(AdvancedCourse, IntermediateCourse): New classes.
+
+	* bin/generate.py (main): Don't call `lcg.set_language()'.  Just
+	set the environment variable `LCG_LANGUAGE' and import lcg afterwards.
+
+	* lib/lcg/wiki.py (Formatter._FORMAT): Don't insert a "\n" after
+	the "br" tag.
+
+	* lib/lcg/export.py: 
+	(Exporter.HTTP_EQUIV): Constant removed. 
+	(Exporter.head): Don't use it.  Just supply `Content-Type' and
+	`Content-Language' here.  Also add meta information from the
+	`ContenNode.meta()' method.
+	(StaticExporter.head): Don't add the meta information here.
+
+	* lib/lcg/course.py (ContentNode._read_file): When the file of
+	given language extension is not found, try the same file without
+	this extension.
+	(set_language): Function removed.
+
+	* lib/lcg/content.py (Content.lang): When `self._lang' is None,
+	return container's or parent's language.
+	(TextContent.__init__): Pass keyword arguments to parent class.
+	(Container._TAG, Container._CLASS, Container.EXPORT_INLINE): New
+	constants.
+	(Container._export_content): New method.
+	(Container.export): Implemented a general HTML tag exporter with a
+	support for `lang' and `class' attributes configurable by class
+	constants.
+	(Paragraph.export, DefinitionList.export, FieldSet.export)
+	(TableCell.export, TableRow.export, Table.export): Methods removed.
+	(Paragraph._TAG, DefinitionList._TAG, FieldSet._TAG, FieldSet._CLASS) 
+	(TableCell._TAG, TableCell._EXPORT_INLINE, TableRow._TAG)
+	(Table._TAG, Table._CLASS): New constants.
+	(ItemizedList.__init__): Pass keyword arguments to parent class.
+	(SectionContainer._export_content): New method.
+	(SectionContainer.export): Method removed.
+
+	* lib/lcg/_test.py (Module): Don't care about `gettext'.
+	(ContentNode.check_misc): Use keyword arguemnts with their names.
+	Don't assume b in a's children.
+	(ContentNode.check_media): Don't use the removed arguemnt `tts_input'.
+	(ContentNode.check_media): Don't expect the result of
+	`resources()' in any particular order.
+	(SplittableText.check_it): Import `lcg.feed'.  Refer to the feeder
+	using a full name.
+	
+
+	* lib/lcg/_html.py (_tag): Cosmetic improvements.
+	(itemize): New argument `lang'.
+
+	* lib/lcg/__init__.py: When the environment variable
+	`LCG_LANGUAGE' is set, install gettext with an appropriate language.
+
+	* translations/de.po: File updated. Translations added.
+
 2005-08-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: New styles added.
