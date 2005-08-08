@@ -154,6 +154,11 @@ class ContentNode(object):
     def _read_file(self, name, ext='txt', comment=None, dir=None, lang=None):
         """Return all the text read from the source file."""
         filename = self._input_file(name, ext=ext, lang=lang, dir=dir)
+        if not os.path.exists(filename):
+            filename2 = self._input_file(name, ext=ext, dir=dir)
+            print "File '%s' not found. Trying '%s' instead." % (filename,
+                                                                  filename2)
+            filename = filename2
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
             lines = fh.readlines()
@@ -566,30 +571,4 @@ class DocMaker(RootNode):
         return [self._create_child(DocNode, '.', f) for f in list_dir(d)
                 if os.path.isfile(os.path.join(d, f)) and f.endswith('.wiki')]
 
-    
-def set_language(lang, translation_dir=None):
-    """Initialize the LCG to use a given language for its translations.
-
-    Arguments:
-
-      lang -- an ISO 639-1 Alpha-2 language code as a string.
-      translation_dir -- override the configuration variable
-        'config.translation_dir'.  See the 'config' module for more
-        information.
-    
-    Call this method after importing the `lcg' module to set the language
-    used to lookup for the translations of the texts inserted by the LCG to the
-    generated documents.
-
-    A True value is returned when the correct message catalog is loaded.  A
-    False notifies about the failure.  Standard English texts are used in such
-    a case.
-    
-    """
-    from gettext import translation, NullTranslations
-    if translation_dir is None:
-        translation_dir = config.translation_dir
-    t = translation('lcg', translation_dir, (lang,), fallback=True)
-    t.install(unicode=True)
-    return not isinstance(t, NullTranslations)
     
