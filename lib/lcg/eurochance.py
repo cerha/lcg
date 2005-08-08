@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""A Concrete implemantation of Eurochance course structure.
+"""A Concrete implementation of Eurochance course structure.
 
 This module defines classes which create the actual course from the source
 data.  It can be used as an example of LCG usage.
@@ -35,12 +35,9 @@ class EurochanceNode(ContentNode):
         if cls is Media:
             basename, ext = os.path.splitext(file)
             file = basename + '.mp3'
-        return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)    
+        return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)
 
-        
 class Unit(EurochanceNode):
-    """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
-    _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
     def _abbrev_title(self, abbrev=False):
         return _("Unit %d") % self._parent.index(self)
@@ -48,14 +45,21 @@ class Unit(EurochanceNode):
     def _title(self, abbrev=False):
         return self._read_file('title')
 
-    def _read_xls_vocab(self):
-        file = self._input_file('vocabulary', 'xls',
-                                lang=self.root_node().users_language())
-        command = 'xls2csv -q0 -c\| %s' % self._filename
-        status, output = commands.getstatusoutput(command)
-        if status: raise Exception(output)
-        return 
+    def _create_content(self):
+        filename = self._input_file('exercises')
+        text = self._read_file('exercises', comment='^#')
+        src = SplittableText(text, input_file=filename)
+        exercises = feed.ExerciseFeeder(src).feed(self)
+        toc = TableOfContents(self, exercises)
+        return SectionContainer(self, [toc] + exercises)
+    
+class IntermediateUnit(Unit):
+    """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
+    _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
+    def _id(self):
+        return 'unit'
+    
     def _read_splittable_text(self, name, lang=None):
         filename = self._input_file(name, lang=lang)
         text = self._read_file(name, lang=lang)
@@ -64,12 +68,11 @@ class Unit(EurochanceNode):
     def _create_vocab(self):
         ulang = self.root_node().users_language()
         text = self._read_splittable_text('vocabulary', lang=ulang)
-        f = feed.VocabFeeder(text, ulang, input_encoding=self._input_encoding)
-        return f.feed(self)
+        return feed.VocabFeeder(text, ulang).feed(self)
     
     def _create_exercises(self):
         filename = self._input_file('exercises')
-        text = self._read_file('exercises', comment='^//')
+        text = self._read_file('exercises', comment='^#')
         splittable = SplittableText(text, input_file=filename)
         pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
         assert len(pieces) == 5, \
@@ -79,23 +82,24 @@ class Unit(EurochanceNode):
                   _("General Comprehension"),
                   _("Grammar Practice"),
                   _("Consolidation"))
-        enc = self._input_encoding
-        return [Section(self, _("Section %d") + ': ' + title,
-                        feed.ExerciseFeeder(piece, vocabulary=self.vocab,
-                                            input_encoding=enc).feed(self))
+        return [Section(self, _("Section %d") +': '+ title,
+                        feed.ExerciseFeeder(piece).feed(self))
                 for title, piece in zip(titles, pieces)]
     
     def _create_content(self):
         self.vocab = self._create_vocab()
+        ulang = self.root_node().users_language()
         sections = (Section(self, _("Aims and Objectives"),
-                            self._parse_wiki_file('aims')),
+                            self.parse_wiki_file('aims')),
                     VocabSection(self, _("Vocabulary"), self.vocab),
                     Section(self, _("Grammar"), anchor='grammar', toc_depth=9,
-                            content=self._parse_wiki_file('grammar')),
+                            content=self.parse_wiki_file('grammar',
+                                                         lang=ulang),
+                            lang=ulang),
                     Section(self, _("Exercises"), anchor='exercises',
                             content=self._create_exercises(), toc_depth=1),
                     Section(self, _("Checklist"),
-                            self._parse_wiki_file('checklist')))
+                            self.parse_wiki_file('checklist')))
         return SectionContainer(self, sections)
 
 
@@ -105,7 +109,9 @@ class Instructions(EurochanceNode):
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        return self._parse_wiki_file('instructions')
+        ulang = self.root_node().users_language()
+        content = self.parse_wiki_file('instructions', lang=ulang)
+        return SectionContainer(self, content, lang=ulang)
     
     
 class ExerciseInstructions(EurochanceNode):
@@ -149,7 +155,7 @@ class CourseIndex(_Index):
 
     
 class GrammarIndex(_Index):
-    _TITLE = _("Grammar Index")
+    _TITLE = _("Grammar Bank")
 
     def _create_content(self):
         all = reduce(lambda a,b: a+b, [u.find_section('grammar').sections()
@@ -192,13 +198,20 @@ class AnswerSheet(EurochanceNode):
     def _title(self):
         return _("Answer Sheet for %s") % self._unit.title(abbrev=True)
 
+    def _answer_sheets(self, section):
+        return [Section(self, e.title(), e.answer_sheet(self))
+                for e in section.sections()
+                if isinstance(e, Exercise) and hasattr(e, 'answer_sheet')]
+
     def _create_content(self):
-        x = [Section(self, sec.title(),
-                     [Section(self, e.title(), e.answer_sheet(self))
-                      for e in sec.sections() if isinstance(e, Exercise) \
-                      and hasattr(e, 'answer_sheet')])
-             for sec in self._unit.find_section('exercises').sections()]
-        return SectionContainer(self, x)
+        parent = self._unit.find_section('exercises')
+        if parent is not None:
+            # For the intermediate course
+            sections = [Section(self, sec.title(), self._answer_sheets(sec))
+                        for sec in parent.sections()]
+        else:
+            sections = self._answer_sheets(self._unit)
+        return SectionContainer(self, sections)
 
     
 class Help(EurochanceNode):
@@ -215,6 +228,39 @@ class Help(EurochanceNode):
 class EurochanceCourse(EurochanceNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
+    def _title(self):
+        return self._read_file('title')
+
+    def _unit_dirs(self):
+        return [d for d in list_dir(self.src_dir())
+                if os.path.isdir(os.path.join(self.src_dir(), d)) \
+                and d[0].isdigit()]
+
+    
+    def _create_content(self):
+        return self.parse_wiki_file('intro') + \
+               [TableOfContents(self, item=self, title=_("Table of Contents:"))]
+    
+    def meta(self):
+        return {'author': 'Eurochance Team',
+                'copyright': "Copyright (c) 2004-2005 Eurochance Team"}
+
+    
+class AdvancedCourse(EurochanceCourse):
+
+    def __init__(self, *args, **kwargs):
+        super(EurochanceCourse, self).__init__(None, *args, **kwargs)
+        
+    def _create_children(self):
+        units = [self._create_child(Unit, subdir=d) for d in self._unit_dirs()]
+        return [self._create_child(Instructions)] + units + \
+               [self._create_child(CourseIndex, units),
+                self._create_child(AnswerSheets, units),
+                self._create_child(Help)]
+
+    
+class IntermediateCourse(EurochanceCourse):
+    
     def __init__(self, dir, course_language, users_language, **kwargs):
         assert isinstance(users_language, types.StringType) and \
                len(users_language) == 2
@@ -225,19 +271,10 @@ class EurochanceCourse(EurochanceNode):
 
     def users_language(self):
         return self._users_language
-    
-    def _title(self):
-        return self._read_file('title')
 
-    def _create_content(self):
-        return self._parse_wiki_file('intro') + \
-               [TableOfContents(self, item=self, title=_("Table of Contents:"))]
-    
     def _create_children(self):
-        units = [self._create_child(Unit, subdir=d)
-                 for d in list_dir(self.src_dir())
-                 if os.path.isdir(os.path.join(self.src_dir(), d)) \
-                 and d[0].isdigit()]
+        units = [self._create_child(IntermediateUnit, subdir=d)
+                 for d in self._unit_dirs()]
         return [self._create_child(Instructions)] + units + \
                [self._create_child(CourseIndex, units),
                 self._create_child(GrammarIndex, units),
@@ -245,11 +282,7 @@ class EurochanceCourse(EurochanceNode):
                 self._create_child(AnswerSheets, units),
                 self._create_child(Help)]
     
-    def meta(self):
-        return {'author': 'Eurochance Team',
-                'copyright': "Copyright (c) 2004 Eurochance Team"}
-
-
+    
 class EurochanceExporter(StaticExporter):
     _INDEX_LABEL = _('Course Index')
     
