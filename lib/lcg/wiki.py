@@ -70,7 +70,7 @@ class Formatter(object):
                'quotation': (u'“<span class="quotation">', u'</span>”'),
                'citation': ('<span class="citation">', '</span>'),
                'comment': '',
-               'linebreak': '<br/>\n',
+               'linebreak': '<br/>',
                'rule': '<hr/>',
                'dash': '&ndash;',
                'nbsp': '&nbsp;',
