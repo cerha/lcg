@@ -94,7 +94,12 @@ class Content(object):
         return tuple(path)
 
     def lang(self):
-        return self._lang
+        lang = self._lang
+        if lang is None and self._container is not None:
+            lang = self._container.lang()
+        if lang is None:
+            lang =  self._parent.language()
+        return lang
 
     def export(self):
         """Return the HTML formatted content as a string."""
@@ -104,17 +109,18 @@ class Content(object):
 class TextContent(Content):
     """A simple piece of text."""
 
-    def __init__(self, parent, text):
+    def __init__(self, parent, text, **kwargs):
         """Initialize the instance.
 
         Arguments:
 
           parent -- same as in the parent class.
           text -- the actual text content of this element as a string.
+          kwargs -- keyword arguemnts for parent class constructor.
 
         """
         assert isinstance(text, types.StringTypes)
-        super(TextContent, self).__init__(parent)
+        super(TextContent, self).__init__(parent, **kwargs)
         self._text = text
 
     def __str__(self):
@@ -145,6 +151,29 @@ class PreformattedText(TextContent):
         return '<pre class="lcg-preformatted-text">'+text+'</pre>'
 
     
+class Anchor(TextContent):
+    """An anchor (target of a link)."""
+    def __init__(self, parent, anchor, text=''):
+        assert isinstance(anchor, types.StringType)
+        self._anchor = anchor
+        super(Anchor, self).__init__(parent, text)
+        
+    def export(self):
+        return '<a name="%s">%s</a>' % (self._anchor, self._text)
+
+    
+class Link(TextContent):
+    """An anchor (target of a link)."""
+    def __init__(self, parent, target, text=''):
+        assert isinstance(target, Section)
+        self._target = target
+        super(Link, self).__init__(parent, text)
+        
+    def export(self):
+        t = self._target
+        return '<a href="%s">%s</a>' % (t.url(), self._text or t.title())
+
+    
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
 
@@ -157,7 +186,10 @@ class Container(Content):
     hierarchy.
 
     """
-
+    _TAG = None
+    _CLASS = None
+    _EXPORT_INLINE = False
+    
     def __init__(self, parent, content, **kwargs):
         """Initialize the instance.
 
@@ -168,6 +200,7 @@ class Container(Content):
           content -- the actual content wrapped into this container as a
             sequence of 'Content' instances in the order in which they should
             appear in the output.
+          kwargs -- keyword arguemnts for parent class constructor.
 
         """
         super(Container, self).__init__(parent, **kwargs)
@@ -184,15 +217,29 @@ class Container(Content):
     def content(self):
         return self._content
             
-    def export(self):
-        return "".join([p.export() for p in self._content])
+    #def export(self):
+    #    return "".join([p.export() for p in self._content])
 
+    def _export_content(self, concat=''):
+        return concat.join([p.export() for p in self._content])
+    
+    def export(self):
+        tag = self._TAG
+        content = self._export_content()
+        attr = self._lang   and ' lang="%s"'  % self._lang  or ''
+        attr += self._CLASS and ' class="%s"' % self._CLASS or ''
+        if attr and not tag:
+            tag = 'div'
+        if tag:
+            content = '<%s>%s</%s>' % (tag + attr, content, tag)
+        if not self._EXPORT_INLINE:
+            content += "\n"
+        return content
+            
 
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
-
-    def export(self):
-        return "<p>\n"+ super(Paragraph, self).export() +"</p>\n\n"
+    _TAG = 'p'
 
     
 class ItemizedList(Container):
@@ -202,22 +249,23 @@ class ItemizedList(Container):
     TYPE_ALPHA = 'ALPHA'
     TYPE_NUMERIC = 'NUMERIC'
     
-    def __init__(self, parent, content, type=TYPE_UNORDERED):
+    def __init__(self, parent, content, type=TYPE_UNORDERED, **kwargs):
         assert type in (self.TYPE_UNORDERED,
                         self.TYPE_ALPHA,
                         self.TYPE_NUMERIC)
         self._type = type
-        super(ItemizedList, self).__init__(parent, content)
+        super(ItemizedList, self).__init__(parent, content, **kwargs)
 
     def export(self):
         o, s = {self.TYPE_UNORDERED: (False, None),
                 self.TYPE_NUMERIC: (True, None),
                 self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
-        return itemize([p.export() for p in self._content], ordered=o, style=s)
+        items = [p.export() for p in self._content]
+        return itemize(items, ordered=o, style=s, lang=self._lang)
 
     
 class Definition(Container):
-    """A single definition for the 'DefinitionList'."""
+    """A single definition pair for the 'DefinitionList'."""
     
     def __init__(self, parent, term, description):
         super(Definition, self).__init__(parent, (term, description))
@@ -229,13 +277,11 @@ class Definition(Container):
     
 class DefinitionList(Container):
     """A list of definitions."""
+    _TAG = 'dl'
     
     def __init__(self, parent, content):
         assert is_sequence_of(content, Definition)
         super(DefinitionList, self).__init__(parent, content)
-
-    def export(self):
-        return "<dl>%s</dl>\n" % super(DefinitionList, self).export()
 
 
 class Field(Container):
@@ -251,44 +297,37 @@ class Field(Container):
     
 class FieldSet(Container):
     """A list of label, value pairs (fields)."""
+    _TAG = 'table'
+    _CLASS = 'lcg-fieldset'
     
     def __init__(self, parent, content):
         assert is_sequence_of(content, Field)
         super(FieldSet, self).__init__(parent, content)
 
-    def export(self):
-        fields = super(FieldSet, self).export()
-        return '<table class="lcg-fieldset">%s</table>\n' % fields
-
     
 class TableCell(Container):
     """One cell in a table."""
-
-    def export(self):
-        return "<td>%s</td>" % super(TableCell, self).export()
+    _TAG = 'td'
+    _EXPORT_INLINE = True
 
     
 class TableRow(Container):
     """One row in a table."""
+    _TAG = 'tr'
 
-    def __init__(self, parent, content):
+    def __init__(self, parent, content, **kwargs):
         assert is_sequence_of(content, TableCell)
-        super(TableRow, self).__init__(parent, content)
+        super(TableRow, self).__init__(parent, content, **kwargs)
         
-    def export(self):
-        return "<tr>%s</tr>\n" % super(TableRow, self).export()
-
-    
+        
 class Table(Container):
     """One row in a table."""
+    _TAG = 'table'
+    _CLASS = 'lcg-table'
 
     def __init__(self, parent, content):
         assert is_sequence_of(content, TableRow)
         super(Table, self).__init__(parent, content)
-        
-    def export(self):
-        return '<table  class="lcg-table">%s</table>\n' % \
-               super(Table, self).export()
     
     
 class SectionContainer(Container):
@@ -326,9 +365,8 @@ class SectionContainer(Container):
     def sections(self):
         return self._sections
     
-    def export(self):
-        return div([p.export() for p in (self._toc,) + self._content],
-                   lang=self.lang())
+    def _export_content(self, concat="\n"):
+        return concat.join([p.export() for p in (self._toc,) + self._content])
     
     
 class Section(SectionContainer):
@@ -514,27 +552,6 @@ class TableOfContents(Content):
         return "\n" + itemize(links, indent=indent) + "\n" + ' '*(indent-2)
 
     
-class Anchor(TextContent):
-    """An anchor (target of a link)."""
-    def __init__(self, parent, anchor, text=''):
-        assert isinstance(anchor, types.StringType)
-        self._anchor = anchor
-        super(Anchor, self).__init__(parent, text)
-        
-    def export(self):
-        return '<a name="%s">%s</a>' % (self._anchor, self._text)
-
-class Link(TextContent):
-    """An anchor (target of a link)."""
-    def __init__(self, parent, target, text=''):
-        assert isinstance(target, Section)
-        self._target = target
-        super(Link, self).__init__(parent, text)
-        
-    def export(self):
-        t = self._target
-        return '<a href="%s">%s</a>' % (t.url(), self._text or t.title())
-
     
 class VocabItem(object):
     """One item of vocabulary listing."""
@@ -1453,6 +1470,7 @@ class Substitution(_FillInExercise):
 class Transformation(_FillInExercise):
     """Pairs of sentences, the later with a gap (text-field)."""
 
+
     _NAME = _("Transformation")
     _TASK_TYPE = TransformationTask
     _TASK_FORMAT = "A. %s<br/>B. %s"
@@ -1523,9 +1541,11 @@ class NumberedCloze(_Cloze):
         text = task.text(self._make_field)
         return "%d. " % (self._tasks.index(task) + 1) + text
 
+    
 class NumberedExposedCloze(_ExposedCloze, NumberedCloze):
     pass
     
+
 class Cloze(_Cloze):
     """Paragraphs of text including text-fields for the marked words."""
     _TASK_COUNT = 1
@@ -1542,9 +1562,6 @@ class Cloze(_Cloze):
         transform = lambda t: self._wiki_content(t).export()
         return task.text(self._make_field, transform)
 
-        
+
 class ExposedCloze(_ExposedCloze, Cloze):
     pass
-
-
-    
