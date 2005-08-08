@@ -42,7 +42,7 @@ def _tag(tag, attr, content, concat=''):
     if isinstance(content, (types.ListType, types.TupleType)):
         result = (start,) + tuple(content) + (end,)
     else:
-        result = [start, content, end]
+        result = (start, content, end)
     return concat.join(result)
 
 # Some basic ones...
@@ -75,10 +75,11 @@ def link(label, url, name=None, brackets=False,
     result = _tag('a', attr, label)
     return brackets and '['+result+']' or result
 
-def itemize(items, indent=0, ordered=False, style=None, cls=None):
+def itemize(items, indent=0, ordered=False, style=None, cls=None, lang=None):
     spaces = ' ' * indent
     tag = ordered and 'ol' or 'ul'
-    attr = style and ' style="list-style-type: %s"' % style or ''
+    attr = _attr(('style', style and 'list-style-type: %s' % style),
+                 ('lang', lang))
     items = [spaces+"  <li>%s</li>" % i for i in items]
     return "\n".join([spaces+"<"+tag+attr+">"] + items + [spaces+"</"+tag+">"])
 
