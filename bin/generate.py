@@ -19,7 +19,8 @@
 
 """A generator for the Eurochance courses."""
 
-import sys, getopt, codecs, lcg
+import sys, getopt, codecs, os
+from gettext import translation, NullTranslations
 
 def main():
     try:
@@ -34,7 +35,8 @@ def main():
         usage()
 
     lang = opt.get('--lang', 'en')
-    lcg.set_language(lang)
+    os.environ['LCG_LANGUAGE'] = lang
+    import lcg
     
     from lcg.eurochance import IntermediateCourse, AdvancedCourse, \
                                EurochanceExporter
@@ -51,7 +53,6 @@ def main():
     e.export(c, destination_dir)
 
 def usage():
-    import os
     help = """Usage: %s [options] source_dir destination_dir
 
     Options:
