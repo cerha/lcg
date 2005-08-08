@@ -38,16 +38,6 @@ from lcg import *
 class Feeder(object):
     """Generic Feeder"""
     
-    def __init__(self, input_encoding='ascii'):
-        """Initialize the Feeder.
-
-        Arguments:
-
-          encoding -- the source data encoding
-
-        """
-        self._input_encoding = input_encoding
-
     def feed(self, parent):
         """Return a 'Content' instance constructed by reading Feeder source."""
         pass
@@ -70,72 +60,10 @@ class Feeder(object):
             message += ": " + position
         sys.stderr.write('Warning: %s\n' % message)
     
-class FileFeeder(Feeder):
-    """Generic Feeder reading its data from an input file."""
-    
-    def __init__(self, filename, **kwargs):
-        """Initialize the Feeder.
 
-        Arguments:
-
-          file -- the source file name
-
-          All the remaining arguments are inherited from parent class.
-
-        """
-        super(FileFeeder, self).__init__(**kwargs)
-        assert os.path.exists(filename), "File does not exest: " + filename
-        self._filename = filename
-
-    def _current_input_position(self, line):
-        pos = 'File "%s"' % self._filename
-        if line is not None:
-            assert isinstance(line, types.IntType)
-            pos += ", line %d" % line
-        return pos
-
-    
-class PySpecFeederError(Exception):
-    """Exception reised when there is a problem loading specification file."""
-
-
-class PySpecFeeder(FileFeeder):
-    """A 'Feeder' reading its data from Python specification files.
-
-    This allows the most simple and generic way of specifying content which
-    does not need any conversion.  You define the content simply in a Python
-    data structure.
-
-    The mechanism is based on calling a function 'content()' in the
-    specification file.  This function must return a 'Content' instance.
-
-    """
-
-    def _get_module(self):
-        module = file = None
-        dirname, filename = os.path.split(self._filename)
-        modulename, ext = os.path.splitext(filename)
-        assert ext.lower() == '.py'
-        try:
-            try:
-                file, path, descr = imp.find_module(modulename, [dirname])
-                module = imp.load_module(modulename, file, path, descr)
-            except ImportError, e:
-                msg = "Unable to load specification file '%s':" % self._filename
-                raise PySpecFeederError(msg, dirname, str(e))
-        finally:
-            if file is not None:
-                file.close()
-        return module
-
-    def feed(self, parent):
-        module = self._get_module()
-        spec = getattr(module, 'content')
-        return spec(parent)
-    
-
+        
 class SplittableTextFeeder(Feeder):
-    """Generic Feeder reading its data from a piece of textan input file."""
+    """Generic Feeder reading its data from a piece of text."""
     
     def __init__(self, text, **kwargs):
         """Initialize the Feeder.
@@ -196,74 +124,101 @@ class VocabFeeder(SplittableTextFeeder):
                 self._phrases = True
             return None
         word, translation = [x.text() for x in line.split(self._ITEM_SPLITTER)]
+        if word.endswith("(phr.)"):
+            word = word[:-6].strip()
+            is_phrase = True
+        else:
+            is_phrase = self._phrases
         if word.endswith(")"):
             p = word.find("(")
             note = word[p:]
             word = word[:p].strip()
         else:
             note = None
-        return VocabItem(parent, word, note, translation or u"???",
+        return VocabItem(parent, word, note, translation,
                          translation_language=self._translation_language,
-                         is_phrase=self._phrases)
+                         is_phrase=is_phrase)
     
     
 class ExerciseFeeder(SplittableTextFeeder):
-    """Exercise Feeder reading data from a plain text file."""
+    """Turns a textual exercise spec. into a seq. of 'Exercise' instances."""
 
     _EXERCISE_SPLITTER = re.compile(r"\r?\n----+\s*\r?\n")
     _BLANK_LINE_SPLITTER = re.compile(r"\r?\n\s*\r?\n")
     _HEADER_MATCHER = re.compile(r"^(?P<key>[a-z0-9_]+): (?P<value>.*)$")
+    _MULITLINE_ARG_MATCHER = \
+            re.compile(r"^<(?P<key>[a-z_]+)>\s*$(?P<value>.*)^</(?P=key)>\s*$",
+                       re.MULTILINE|re.DOTALL)
     
-    def __init__(self, text, vocabulary=(), **kwargs):
-        """Initialize the Feeder.
-    
-        Arguments:
-
-          vocabulary -- the sequence of VocabItem instances.  This vocabulary
-            is used for the VocabExercise, if this exercise is found in the
-            specification.
-          
-          All the remaining arguments are inherited from parent class.
-          
-        """
-        super(ExerciseFeeder, self).__init__(text, **kwargs)
-        assert is_sequence_of(vocabulary, VocabItem)
-        self._vocabulary = vocabulary
-        
     def feed(self, parent):
         return self._process_pieces(self._text, self._EXERCISE_SPLITTER,
                                     self._exercise, parent)
     
     def _exercise(self, text, parent):
         """Convert textual exercise specification into an Exercise instance."""
-        pieces = text.split(self._BLANK_LINE_SPLITTER)
-        assert len(pieces) >= 1, \
-               "Exercise specification must contain a header."
-        type, kwargs = self._read_header(pieces[0].text())
-        task_specs = pieces[1:]            
-        if type == SentenceCompletion:
-            if len(task_specs) > 0:
-                self._warn("SentenceCompletion should not have any tasks",
-                           text)
-            tasks = ()
-        elif type == VocabExercise and len(task_specs) == 0:
-            tasks = [FillInTask(i.translation(), i.word())
-                     for i in self._vocabulary]
+        type, kwargs, body = self._parse_exercise_spec(text)
+        if body:
+            if issubclass(type, Cloze):
+                cstart = body.text().find("\n.. ") + 1
+                if cstart != 0:
+                    s = self._BLANK_LINE_SPLITTER
+                    comments = [c.text()[3:]
+                                for c in body.piece(cstart,None).split(s)]
+                    body = body.piece(0, cstart)
+                else:
+                    comments = []
+                t = type.task_type()
+                tasks = (t(body.text(), comments=comments), )
+            else:
+                pieces = body.split(self._BLANK_LINE_SPLITTER)
+                tasks = []
+                i = 0
+                while i < len(pieces):
+                    t = pieces[i]
+                    if i+1<len(pieces) and pieces[i+1].text().startswith('.. '):
+                        comment = pieces[i+1].text()[3:]
+                        i += 2
+                    else:
+                        comment = None
+                        i += 1
+                    tasks.append(self._read_task(type.task_type(), t, comment))
+                if type == TrueFalseStatements and len(tasks) == 1:
+                    self._warn("TrueFalseStatements have only one task!", text)
+                if type == Dictation  and len(tasks) != 1:
+                    self._warn("Dictation should have just one task!", text)
         else:
-            assert len(task_specs) >= 1, "No tasks found."
-            if type == TrueFalseStatements and len(task_specs) == 1:
-                self._warn("TrueFalseStatements have only onetask!", text)
-            tasks = [self._read_task(type.task_type(), p)
-                     for p in task_specs]
+            tasks = ()
         kwargs['tasks'] = tuple(tasks)
         return type(parent, **kwargs)
     
-    def _read_header(self, text):
-        """Read excercise header and return the tuple (type, info).
+    def _parse_exercise_spec(self, text):
+        parts = text.split(self._BLANK_LINE_SPLITTER, maxsplit=1)
+        type, kwargs = self._read_header(parts[0].text())
+        if len(parts) == 2:
+            args, body = self._read_multiline_args(parts[1])
+            kwargs.update(args)
+        else:
+            body = None
+        return type, kwargs, body
+
+    def _read_multiline_args(self, text):
+        args = {}
+        body = text
+        last_arg_end = 0
+        matcher = self._MULITLINE_ARG_MATCHER
+        t = text.text()
+        for match in matcher.finditer(t):
+            if t[last_arg_end:match.start()].strip(): break
+            last_arg_end = match.end()
+            args[str(match.group('key'))] = match.group('value')
+        return args, text.piece(last_arg_end, None)
         
-        Here the 'type' is a class of the exercise got by name read as the
-        corresponding header field and 'info' is a dictionary of all other
-        header fields.  This dictionary is supposed to be used as 
+    
+    def _read_header(self, text):
+        """Read exercise header and return the tuple (type, info).
+        
+        Here 'type' is the exercise class (read from the corresponding header
+        field) and 'info' is a dictionary of all the remaining header fields.
 
         """
         info = {}
@@ -282,19 +237,23 @@ class ExerciseFeeder(SplittableTextFeeder):
         except AttributeError:
             raise Exception("Invalid exercise type: %s" % info['type'])
     
-    def _read_task(self, type, text):
+    def _read_task(self, type, text, comment):
         # Read a task specification using a method according to given task type.
-        method = {
-            MultipleChoiceQuestion: self._read_multiple_choice_question,
-            TrueFalseStatement:     self._read_true_false_statement,
-            GapFillStatement:       self._read_gap_fill_statement,
-            Selection:              self._read_selection,
-            FillInTask:             self._read_fill_in_task,
-            DictationTask:          self._read_dictation,
-            ClozeTask:              self._read_cloze,
-            }[type]
         try:
-            return method(text.text())
+            method = {
+                Selection:              self._read_choices,
+                MultipleChoiceQuestion: self._read_prompt_and_choices,
+                GapFillStatement:       self._read_gap_fill,
+                FillInTask:             self._read_pair_of_statements,
+                TransformationTask:     self._read_pair_of_statements,
+                TrueFalseStatement:     self._read_true_false_statement,
+                DictationTask:          self._read_generic_task,
+                ClozeTask:              self._read_generic_task,
+                }[type]
+        except KeyError:
+            raise Exception("Unknown type:", type)
+        try:
+            return method(type, text.text(), comment)
         except:
             m = "Exception caught while processing task specification"
             self._panic(m, sys.exc_info(), text)
@@ -313,24 +272,25 @@ class ExerciseFeeder(SplittableTextFeeder):
                "%d out of %d found." % (len(correct), len(choices))
         return choices
     
-    def _read_selection(self, text):
-        return Selection(self._process_choices(text.splitlines()))
+    def _read_generic_task(self, type, text, comment):
+        return type(text, comment=comment)
 
-    def _read_multiple_choice_question(self, text):
+    def _read_choices(self, type, text, comment):
+        return type(self._process_choices(text.splitlines()), comment=comment)
+
+    def _read_prompt_and_choices(self, type, text, comment):
         lines = text.splitlines()
-        return MultipleChoiceQuestion(lines[0],self._process_choices(lines[1:]))
+        return type(lines[0], self._process_choices(lines[1:]), comment=comment)
     
-    def _read_gap_fill_statement(self, text):
+    def _read_gap_fill(self, type, text, comment):
         lines = text.splitlines()
-        return GapFillStatement(lines[0], self._process_choices(lines[1:]))
+        if lines[0].find('___') != -1:
+            choices = self._process_choices(lines[1:])
+            return type(lines[0], choices, comment=comment)
+        else:
+            return type(text, (), comment=comment)
     
-    def _read_cloze(self, text):
-        return ClozeTask(text)
-
-    def _read_dictation(self, text):
-        return DictationTask(text)
-
-    def _read_fill_in_task(self, text):
+    def _read_pair_of_statements(self, type, text, comment):
         lines = text.splitlines()
         assert len(lines) == 2, \
                "Task specification must consist of just 2 lines (%d given)." % \
@@ -338,13 +298,13 @@ class ExerciseFeeder(SplittableTextFeeder):
         prompt, answer = [l.strip() for l in lines]
         if answer.startswith('[') and answer.endswith(']'):
             answer = answer[1:-1]
-        return FillInTask(prompt.strip(), answer)
+        return type(prompt.strip(), answer, comment=comment)
 
-    def _read_true_false_statement(self, text):
+    def _read_true_false_statement(self, type, text, comment):
         text = text.strip()
         assert text.endswith('[T]') or text.endswith('[F]'), \
                "A true/false statement must end with '[T]' or '[F]'!"
         correct = text.endswith('[T]')
         text = ' '.join(map(string.strip, text.splitlines()))[:-3].strip()
-        return TrueFalseStatement(text, correct=correct)
+        return type(text, correct=correct, comment=comment)
     
