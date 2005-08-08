@@ -26,7 +26,6 @@ from lcg import *
     
 class Exporter(object):
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
-    HTTP_EQUIV = (('Content-Type', 'text/html; charset=UTF-8'),)
 
     def __init__(self, stylesheet=None, inlinestyles=False):
         """Initialize the exporter for a given 'ContentNode' instance."""
@@ -41,13 +40,15 @@ class Exporter(object):
             return ['<link rel="stylesheet" type="text/css" href="%s">' % \
                     s.url() for s in node.resources(Stylesheet)]
             
-        
     def head(self, node):
         if self._stylesheet is not None:
             node.resource(Stylesheet, self._stylesheet)
         tags = ['<title>%s</title>' % node.full_title()] + \
                ['<meta http-equiv="%s" content="%s">' % pair
-                for pair in self.HTTP_EQUIV] + \
+                for pair in (('Content-Type', 'text/html; charset=UTF-8'),
+                             ('Content-Language', node.language()))] + \
+               ['<meta name="%s" content="%s">' % item
+                for item in node.root_node().meta().items()] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % s.url()
                 for s in node.resources(Script)]
@@ -96,9 +97,7 @@ class StaticExporter(Exporter):
     _INDEX_LABEL = None
     
     def head(self, node):
-        tags = ['<meta name="%s" content="%s">' % item
-                for item in node.root_node().meta().items()] + \
-               ['<link rel="%s" href="%s" title="%s">' % \
+        tags = ['<link rel="%s" href="%s" title="%s">' % \
                 (kind, n.url(), n.title())
                 for kind, n in (('prev', node.prev()), ('next', node.next()))
                 if n is not None]
