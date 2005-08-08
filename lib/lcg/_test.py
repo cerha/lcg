@@ -18,11 +18,7 @@
 
 import unittest
 import os
-import gettext
-
-gettext.NullTranslations().install(unicode=True)
 import lcg
-
 
 class TestSuite(unittest.TestSuite):
     def add(self, cls, prefix = 'check_'):
@@ -33,12 +29,11 @@ tests = TestSuite()
 
 class ContentNode(unittest.TestCase):
     def check_misc(self):
-    	a = lcg.ContentNode(None, 'aaa')
-        b = lcg.ContentNode(a, 'bbb')
+    	a = lcg.ContentNode(None, subdir='aaa')
+        b = lcg.ContentNode(a, subdir='bbb')
         assert a.root_node() == b.root_node() == a
         assert a.src_dir() == 'aaa'
         assert b.src_dir() == os.path.join('aaa', 'bbb')
-        assert b in a.children()
         assert b.id() != a.id()
         assert a.counter().next() == 1
         assert a.counter().next() == 2
@@ -46,37 +41,33 @@ class ContentNode(unittest.TestCase):
 
     def check_media(self):
     	a = lcg.ContentNode(None, 'aaa')
-        m1 = a.resource(lcg.Media, 'sound1.ogg', tts_input='Hello')
+        m1 = a.resource(lcg.Media, 'sound1.ogg')
         try:
             m2 = a.resource(lcg.Media, 'sound2.ogg')
         except AssertionError, e:
             msg = "Resource file '%s' doesn't exist!" % \
                   os.path.join('aaa', 'sound2.ogg')
             assert e.args == (msg, ), e.args
-        assert a.resources(lcg.Media) == (m1, )
+        r = a.resources(lcg.Media)
+        assert len(r) == 2 and m1 in r and m2 in r, a.resources(lcg.Media)
 
 tests.add(ContentNode)
 
 
-#class ExerciseFeeder(unittest.TestCase):
-#    def check_it(self):
-#
-#tests.add(ExerciseFeeder)
-
-
 class SplittableText(unittest.TestCase):
     def check_it(self):
+        import lcg.feed
         def check(matcher, lines):
             piece = lcg.SplittableText("\n".join(lines))
             for p in piece.split(matcher):
                 a = p.text().splitlines()[0] # first line of this part's text
                 b = lines[p.firstline()-1] # the line from the source sequence
                 assert a == b, (a, b)
-        check(lcg.ExerciseFeeder._EXERCISE_SPLITTER,
+        check(lcg.feed.ExerciseFeeder._EXERCISE_SPLITTER,
               ("bla"," ", "----","",
                "ehm","","","","","----","",
                "\t", "xxx","yyy", ""))
-        check(lcg.ExerciseFeeder._BLANK_LINE_SPLITTER,
+        check(lcg.feed.ExerciseFeeder._BLANK_LINE_SPLITTER,
               ("", "bla","", "", "\t \t","",
                "ehm"," ",
                "xxx","yyy", "\t"))
