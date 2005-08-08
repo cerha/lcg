@@ -18,9 +18,22 @@
 
 __version__ = '0.9'
 
-import gettext
-t = gettext.NullTranslations()
-t.install(unicode=True)
+"""Learning Content Genarator.
+
+Set the environment variable LCG_LANGUAGE to an ISO 639-1 Alpha-2 language code
+before importing this module to set the language used to lookup for the
+translations of the texts inserted by the LCG to the generated documents.
+
+"""
+
+import config, gettext, os
+
+_lang = os.environ.get('LCG_LANGUAGE')
+if _lang and _lang != 'en':
+    _t = gettext.translation('lcg', config.translation_dir, (_lang,))
+else:
+    _t = gettext.NullTranslations()
+_t.install(unicode=True)
 
 from resources import *
 from course import *
@@ -29,7 +42,6 @@ from export import *
 import ims
 import feed
 import wiki
-import config
 
 # Øe¹ení cyklických závislostí souborù
 for file in (resources, course, content, feed, wiki):
