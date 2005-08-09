@@ -161,8 +161,9 @@ Handler.prototype.eval_answer = function(field) {
       play_audio(this.response(result == 1 ? 'correct':'incorrect'));
       if (result == 1) {
 	 // if (i < this._fields.length)
+	 //    This doesn't work in MultipleChoiceQuestions (answer index is not
+	 //    a field index).  But we probably don't want it anyway...
 	 //    this._fields[i+1].focus();
-	 this._fields[i].focus();
       } else {
 	 this._error_handler(field);
       }
