@@ -17,6 +17,9 @@ h7,h8,h9 { font-size: 1.1em; }
 hr.navigation { 
     display: none; 
 }
+br.task-separator { 
+    display: none; 
+}
 
 div.navigation { 
     border: solid #b8bcc0;
@@ -44,6 +47,15 @@ div.table-of-contents ul {
     margin-bottom: 0;
 }
 
+div.exercise-header { 
+    position: relative;
+}
+a.exercise-help-link {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
 div.choices { 
     margin-left: 1em;
 }
@@ -66,15 +78,26 @@ div.cloze-task, div.numbered-cloze-task, div.vocab-exercise-task  {
     margin-bottom: 0.7em;
 }
 
-.answer-sheet-link { 
+a.external-link { 
+    background-color: #eee;
+    border: #aaa solid 1px;
+    font-size: 0.8em;
+}
+a.answer-sheet-link, a.cloze-answer-sheet-link { 
+    font-size: 0.8em;
+}
+a.answer-sheet-link:hover, a.cloze-answer-sheet-link:hover { 
+    text-decoration: none;
+}
+a.answer-sheet-link { 
     position: absolute;
     top: 0;
     right: 0;
 }
-
 .cloze-answer-sheet-link { 
-    font-size: 0.8em;
     vertical-align: top;
+    padding: 0;
+    margin: 2px;
 }
 
 .reading { 
