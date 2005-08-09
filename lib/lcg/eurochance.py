@@ -92,12 +92,12 @@ class IntermediateUnit(Unit):
         sections = (Section(self, _("Aims and Objectives"),
                             self.parse_wiki_file('aims')),
                     VocabSection(self, _("Vocabulary"), self.vocab),
-                    Section(self, _("Grammar"), anchor='grammar', toc_depth=9,
+                    Section(self, _("Grammar"), anchor='grammar', 
                             content=self.parse_wiki_file('grammar',
                                                          lang=ulang),
                             lang=ulang),
                     Section(self, _("Exercises"), anchor='exercises',
-                            content=self._create_exercises(), toc_depth=1),
+                            content=self._create_exercises()),
                     Section(self, _("Checklist"),
                             self.parse_wiki_file('checklist')))
         return SectionContainer(self, sections)
@@ -109,7 +109,10 @@ class Instructions(EurochanceNode):
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        ulang = self.root_node().users_language()
+        if isinstance(self.root_node(), IntermediateCourse):
+            ulang = self.root_node().users_language()
+        else:
+            ulang = None
         content = self.parse_wiki_file('instructions', lang=ulang)
         return SectionContainer(self, content, lang=ulang)
     
