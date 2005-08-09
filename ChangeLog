@@ -1,3 +1,53 @@
+2005-08-09  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/feed.py
+	(ExerciseFeeder._TEMPLATE_TASK_MATCHER): New constant.
+	(ExerciseFeeder._exercise): Added support for the `template' argument.
+
+	* lib/lcg/content.py (Anchor.export): Use `link()'.
+	(Link.export): Use `link()'.
+	(Exercise._TASK_SEPARATOR): New constant.
+	(Exercise.__init__): New argument template.  Simplified processing
+	of `example', `explanation' and `instructions'.
+	(Exercise._wiki_content): Return None, when the arguemnt is None.
+	Assertion added in the other case.
+	(Exercise._form_name): Use '%d', not '%s' to format the id.
+	(Exercise._sound_controls): Don't use the `brackets' argument of
+	`link()'.
+	(Exercise.export): Wrap the header into a div and add the help
+	link here.  Use `self._export_tasks()'.
+	(Exercise._export_tasks): New method.
+	(Exercise._export_instructions): Don't include the link "detailed
+	instructions".
+	(Exercise._export_task): Append `self._TASK_SEPARATOR'.
+	(_InteractiveExercise._answer_sheet_link): Don't use the
+	`brackets' argument of `link()'.  Don't wrap the link into a `span'.
+	(_InteractiveExercise.answer_sheet): Dont include the link back to
+	the exercise.
+	(_FillInExercise._answer_sheet_items): Join the alternatives using
+	a semicolon.
+	(Cloze._TASK_SEPARATOR): New constant.
+
+	* lib/lcg/course.py (ContentNode._read_file): Don't try the
+	version without the language extension when tha language was not
+	specified at all.
+
+	* lib/lcg/_html.py (link): Arguemnt 'brackets' removed.
+	Add the 'external-link' class when target is not None.
+
+	* lib/lcg/eurochance.py (IntermediateUnit._create_content): Don't
+	create the local Table of Contants at the and Grammar Exercises
+	sections.
+	(Instructions._create_content): Act differently for the advanced
+	course.
+
+	* resources/css/default.css: New styles added.
+
+	* translations/de.po: Updated.
+
+	* resources/scripts/exercises.js (Handler.eval_answer): Don't
+	focus the field.
+
 2005-08-08  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/feed.py (Feeder.__init__): Method removed.
