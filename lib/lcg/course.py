@@ -154,7 +154,7 @@ class ContentNode(object):
     def _read_file(self, name, ext='txt', comment=None, dir=None, lang=None):
         """Return all the text read from the source file."""
         filename = self._input_file(name, ext=ext, lang=lang, dir=dir)
-        if not os.path.exists(filename):
+        if lang is not None and not os.path.exists(filename):
             filename2 = self._input_file(name, ext=ext, dir=dir)
             print "File '%s' not found. Trying '%s' instead." % (filename,
                                                                   filename2)
