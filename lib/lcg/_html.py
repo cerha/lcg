@@ -65,15 +65,15 @@ def p(*content, **kwargs):
 def div(content, cls=None, lang=None):
     return _tag('div', (('class', cls), ('lang', lang)), content, concat='\n')
 
-def link(label, url, name=None, brackets=False,
-         title=None, target=None, cls=None, hotkey=None):
+def link(label, url, name=None, title=None, target=None, cls=None, hotkey=None):
     if hotkey:
         t = '(Alt-%s)' % hotkey
         title = title and title + ' ' + t or t
+    if target:
+        cls = (cls and cls+' ' or '') + 'external-link'
     attr = (('href', url), ('name', name), ('title', title), ('target', target),
             ('class', cls), ('accesskey', hotkey))
-    result = _tag('a', attr, label)
-    return brackets and '['+result+']' or result
+    return _tag('a', attr, label)
 
 def itemize(items, indent=0, ordered=False, style=None, cls=None, lang=None):
     spaces = ' ' * indent
