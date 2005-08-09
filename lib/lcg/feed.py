@@ -149,6 +149,8 @@ class ExerciseFeeder(SplittableTextFeeder):
     _MULITLINE_ARG_MATCHER = \
             re.compile(r"^<(?P<key>[a-z_]+)>\s*$(?P<value>.*)^</(?P=key)>\s*$",
                        re.MULTILINE|re.DOTALL)
+    _TEMPLATE_TASK_MATCHER = re.compile(r"^<task>\s*\r?\n(.*?)^</task>",
+                                        re.MULTILINE|re.DOTALL)
     
     def feed(self, parent):
         return self._process_pieces(self._text, self._EXERCISE_SPLITTER,
@@ -158,6 +160,7 @@ class ExerciseFeeder(SplittableTextFeeder):
         """Convert textual exercise specification into an Exercise instance."""
         type, kwargs, body = self._parse_exercise_spec(text)
         if body:
+            tt = type.task_type()
             if issubclass(type, Cloze):
                 cstart = body.text().find("\n.. ") + 1
                 if cstart != 0:
@@ -167,21 +170,32 @@ class ExerciseFeeder(SplittableTextFeeder):
                     body = body.piece(0, cstart)
                 else:
                     comments = []
-                t = type.task_type()
-                tasks = (t(body.text(), comments=comments), )
+                tasks = (tt(body.text(), comments=comments), )
             else:
-                pieces = body.split(self._BLANK_LINE_SPLITTER)
-                tasks = []
-                i = 0
-                while i < len(pieces):
-                    t = pieces[i]
-                    if i+1<len(pieces) and pieces[i+1].text().startswith('.. '):
-                        comment = pieces[i+1].text()[3:]
-                        i += 2
-                    else:
-                        comment = None
-                        i += 1
-                    tasks.append(self._read_task(type.task_type(), t, comment))
+                if kwargs.has_key('template'):
+                    tasks = []
+                    def makesub(match):
+                        t = SplittableText(match.group(1),
+                                           input_file=text.input_file(),
+                                           firstline=text.firstline())
+                        tasks.append(self._read_task(tt, t, None))
+                        return "%s"
+                    m = self._TEMPLATE_TASK_MATCHER
+                    template = kwargs['template'].replace('%', '%%')
+                    kwargs['template'] = m.sub(makesub, template)
+                else:
+                    pieces = body.split(self._BLANK_LINE_SPLITTER)
+                    tasks = []
+                    i = 0
+                    while i < len(pieces):
+                        t = pieces[i]
+                        if i+1<len(pieces) and pieces[i+1].text().startswith('.. '):
+                            comment = pieces[i+1].text()[3:]
+                            i += 2
+                        else:
+                            comment = None
+                            i += 1
+                        tasks.append(self._read_task(tt, t, comment))
                 if type == TrueFalseStatements and len(tasks) == 1:
                     self._warn("TrueFalseStatements have only one task!", text)
                 if type == Dictation  and len(tasks) != 1:
