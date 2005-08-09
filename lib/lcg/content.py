@@ -159,7 +159,7 @@ class Anchor(TextContent):
         super(Anchor, self).__init__(parent, text)
         
     def export(self):
-        return '<a name="%s">%s</a>' % (self._anchor, self._text)
+        return link(self._text, None, name=self._anchor)
 
     
 class Link(TextContent):
@@ -171,7 +171,7 @@ class Link(TextContent):
         
     def export(self):
         t = self._target
-        return '<a href="%s">%s</a>' % (t.url(), self._text or t.title())
+        return link(self._text or t.title(), t.url())
 
     
 class Container(Content):
@@ -913,13 +913,13 @@ class Exercise(Section):
     _AUDIO_VERSION_LABEL = _("""This exercise can be also done purely
     aurally/orally:""")
     _TASK_COUNT = None
-    
+    _TASK_SEPARATOR = '<br class="task-separator"/>\n'
     _used_types = []
     _help_node = None
     
     def __init__(self, parent, tasks, instructions=None, audio_version=None,
                  sound_file=None, transcript=None, reading=None,
-                 explanation=None, example=None):
+                 explanation=None, example=None, template=None):
         """Initialize the instance.
 
         Arguments:
@@ -997,18 +997,10 @@ class Exercise(Section):
             "'%s' requires just %d task(s) (%d found)!" % \
             (self.__class__.__name__, self._TASK_COUNT, len(tasks))
         self._tasks = list(tasks)
-
-        self._instructions_ = instructions
-        if example is not None:
-            assert isinstance(example, types.StringTypes)
-            self._example = self._wiki_content(example)
-        else:
-            self._example = None
-        if explanation is not None:
-            assert isinstance(explanation, types.StringTypes)
-            self._explanation = self._wiki_content(explanation)
-        else:
-            self._explanation = None
+        self._custom_instructions = self._wiki_content(instructions)
+        self._example = self._wiki_content(example)
+        self._template = self._wiki_content(template)
+        self._explanation = self._wiki_content(explanation)
         if reading is not None:
             assert isinstance(reading, types.StringTypes)
             if len(reading.splitlines()) == 1:
@@ -1051,8 +1043,12 @@ class Exercise(Section):
         self._init_resources()
 
     def _wiki_content(self, text):
-        t = re.sub('\[', '![', text)
-        return Container(self._parent, self._parent.parse_wiki_text(t))
+        if text is None:
+            return None
+        else:
+            assert isinstance(text, types.StringTypes)
+            t = re.sub('\[', '![', text)
+            return Container(self._parent, self._parent.parse_wiki_text(t))
     
     def _init_resources(self):
         self._parent.resource(Script, 'audio.js')
@@ -1086,7 +1082,7 @@ class Exercise(Section):
         return None
 
     def _form_name(self):
-        return "exercise_%s" % id(self)
+        return "exercise_%d" % id(self)
     
     def _instructions(self):
         return self._INSTRUCTIONS
@@ -1094,21 +1090,23 @@ class Exercise(Section):
     def _sound_controls(self, label, media, transcript=None):
         if transcript is not None:
             t = " " + link(_("show transcript"), transcript.url(),
-                           target="transcript", brackets=True)
+                           target="transcript")
         else:
             t = ""
         beg  = '<form class="sound-control" action="">%s\n' % label
         play = button(_("Play"), "play_audio('%s')" % media.url())
         stop = button(_("Stop"), 'stop_audio()')
         end  = t + '\n</form>'
-        a = '%s %s' % (label, link(_("Play"), media.url(), brackets=True))
+        a = '%s [%s]' % (label, link(_("Play"), media.url()))
         result = (script_write(beg + play),
                   script_write(stop, condition='document.media_player'),
                   script_write(end, p(a+t)))
         return '\n'.join(result)
 
     def export(self):
-        parts = (self._header(),
+        hlp = link(_("Exercise Help"), self._help_node.url(),
+                   target='help', cls='exercise-help-link')
+        parts = (div((self._header(), hlp), cls='exercise-header'),
                  self._export_explanation(),
                  self._export_reading(),
                  self._export_instructions(),
@@ -1116,11 +1114,18 @@ class Exercise(Section):
                  self._export_audio_version(),
                  self._export_example(),
                  '<form name="%s" action="">' % self._form_name(),
-                 "\n".join([self._export_task(t) for t in self._tasks]),
+                 self._export_tasks(),
                  self._results(),
                  '</form>',
                  script(self._init_script()))
         return "\n\n".join([part for part in parts if part is not None])
+
+    def _export_tasks(self):
+        tasks = [self._export_task(t) for t in self._tasks]
+        if self._template:
+            return self._template.export() % tuple(tasks)
+        else:
+            return "\n".join(tasks)
 
     def _export_explanation(self):
         if self._explanation is not None:
@@ -1144,9 +1149,8 @@ class Exercise(Section):
     
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
-        return p(self._instructions_ or self._instructions(),
-                 link(_("detailed instructions"), self._help_node.url(),
-                      target='help', brackets=True))
+        custom = self._custom_instructions
+        return p(custom and custom.export() or self._instructions())
 
     def _export_recording(self):
         if self._recording:
@@ -1169,7 +1173,7 @@ class Exercise(Section):
         else:
             parts = [p for p in parts if p is not None]
         cls = camel_case_to_lower(self.__class__.__name__)
-        return div(parts, cls='task %s-task' % cls)
+        return div(parts, cls='task %s-task' % cls) + self._TASK_SEPARATOR
 
     def _results(self):
         return None
@@ -1273,8 +1277,9 @@ class _InteractiveExercise(Exercise):
     def _answer_sheet_link(self, index):
         lnk = link("?", self._answer_sheet_url(index),
                    title=_("Show the answer sheet."),
-                   brackets=True, target='help')
-        return span(lnk, cls=self._ANSWER_SHEET_LINK_CLASS)
+                   target='help', cls=self._ANSWER_SHEET_LINK_CLASS)
+        return lnk
+        #return span(lnk, cls=self._ANSWER_SHEET_LINK_CLASS)
         
     def answer_sheet(self, parent):
         self._answer_sheet_node = p = parent
@@ -1288,10 +1293,9 @@ class _InteractiveExercise(Exercise):
             else:
                 items.append(a)
             i += 1
-        lnk = Link(p, self, 'Go to the exercise.')
         anchor = Anchor(p, self._answer_sheet_anchor())
         answers = ItemizedList(p, items, type=ItemizedList.TYPE_NUMERIC)
-        return Container(p, (lnk, anchor, answers))
+        return Container(p, (anchor, answers))
     
 ################################################################################
 ################################################################################
@@ -1392,7 +1396,7 @@ class GapFilling(_SelectBasedExercise):
     def _export_task_parts(self, task):
         statement = task.substitute_gap("%s")
         lnk = self._answer_sheet_link(self._tasks.index(task))
-        return statement.replace('%s', self._format_choices(task)) + lnk 
+        return statement.replace('%s', self._format_choices(task)) +'\n'+ lnk 
     
 
 ################################################################################
@@ -1420,8 +1424,8 @@ class _FillInExercise(_InteractiveExercise):
         return [t.answer() for t in self._tasks if t.answer() is not None]
         
     def _answer_sheet_items(self):
-        return [(t.answer(), t.comment()) for t in self._tasks
-                if t.answer() is not None]
+        return [('; '.join(t.answer().split('|')), t.comment())
+                for t in self._tasks if t.answer() is not None]
     
     def _make_field(self, text, id=None):
         try:
@@ -1446,6 +1450,7 @@ class VocabExercise(_FillInExercise):
     below.""")
     _AUDIO_VERSION_LABEL = _("""Use the recording to hear the model
     pronunciation:""")
+    _TASK_SEPARATOR = ''
 
     def __init__(self, parent, tasks, *args, **kwargs):
         if not tasks:
@@ -1550,6 +1555,7 @@ class Cloze(_Cloze):
     """Paragraphs of text including text-fields for the marked words."""
     _TASK_COUNT = 1
     _ANSWER_SHEET_LINK_CLASS = 'cloze-answer-sheet-link'
+    _TASK_SEPARATOR = ''
 
     def _answers(self):
         return self._tasks[0].answers()
