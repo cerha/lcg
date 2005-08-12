@@ -66,7 +66,7 @@ class IntermediateUnit(Unit):
         return SplittableText(text, input_file=filename)
 
     def _create_vocab(self):
-        ulang = self.root_node().users_language()
+        ulang = self.root().users_language()
         text = self._read_splittable_text('vocabulary', lang=ulang)
         return feed.VocabFeeder(text, ulang).feed(self)
     
@@ -88,7 +88,7 @@ class IntermediateUnit(Unit):
     
     def _create_content(self):
         self.vocab = self._create_vocab()
-        ulang = self.root_node().users_language()
+        ulang = self.root().users_language()
         sections = (Section(self, _("Aims and Objectives"),
                             self.parse_wiki_file('aims')),
                     VocabSection(self, _("Vocabulary"), self.vocab),
@@ -109,8 +109,8 @@ class Instructions(EurochanceNode):
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        if isinstance(self.root_node(), IntermediateCourse):
-            ulang = self.root_node().users_language()
+        if isinstance(self.root(), IntermediateCourse):
+            ulang = self.root().users_language()
         else:
             ulang = None
         content = self.parse_wiki_file('instructions', lang=ulang)
@@ -126,7 +126,7 @@ class ExerciseInstructions(EurochanceNode):
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
-        lang = None #self.root_node().users_language()
+        lang = None #self.root().users_language()
         template = self._read_file('exercise-instructions',
                                    lang=lang, dir=config.translation_dir)
         try:
