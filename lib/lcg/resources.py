@@ -71,7 +71,7 @@ def resource(cls, parent, file, **kwargs):
     except KeyError:
         if cls.SHARED:
             src_dirs = ('',
-                        os.path.join(parent.root_node().src_dir(), cls.SUBDIR),
+                        os.path.join(parent.root().src_dir(), cls.SUBDIR),
                         os.path.join(config.default_resource_dir, cls.SUBDIR))
             dst_dir = cls.SUBDIR
         else:
