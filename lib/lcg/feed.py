@@ -149,7 +149,7 @@ class ExerciseFeeder(SplittableTextFeeder):
     _MULITLINE_ARG_MATCHER = \
             re.compile(r"^<(?P<key>[a-z_]+)>\s*$(?P<value>.*)^</(?P=key)>\s*$",
                        re.MULTILINE|re.DOTALL)
-    _BODY_TASK_MATCHER = re.compile(r"^<task>\s*\r?\n(.*?)^</task>",
+    _TEMPLATE_TASK_MATCHER = re.compile(r"^<task>\s*\r?\n(.*?)^</task>",
                                         re.MULTILINE|re.DOTALL)
     
     def feed(self, parent):
@@ -186,14 +186,15 @@ class ExerciseFeeder(SplittableTextFeeder):
                 self._warn("TrueFalseStatements have only one task!", text)
             if type == Dictation  and len(tasks) != 1:
                 self._warn("Dictation should have just one task!", text)
-        elif kwargs.has_key('body'):
-            body = kwargs['body'].replace('%', '%%')
+        elif kwargs.has_key('template'):
             def maketask(match):
                 t = SplittableText(match.group(1), input_file=text.input_file(),
                                    firstline=text.firstline())
                 tasks.append(self._read_task(type.task_type(), t, None))
                 return "%s"
-            kwargs['body'] = self._BODY_TASK_MATCHER.sub(maketask, body)
+            m = self._TEMPLATE_TASK_MATCHER
+            kwargs['template'] = m.sub(maketask,
+                                       kwargs['template'].replace('%', '%%'))
         kwargs['tasks'] = tuple(tasks)
         return type(parent, **kwargs)
     
