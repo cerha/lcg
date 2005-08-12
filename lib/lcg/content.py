@@ -902,10 +902,10 @@ class Exercise(Section):
     """Exercise consists of an assignment and a set of tasks."""
 
     _ANCHOR_PREFIX = 'ex'
-    _TASK_TYPE = Task
+    _TASK_TYPE = None
     _NAME = None
-    _READING_REQUIRED = False
     _RECORDING_REQUIRED = False
+    _READING_REQUIRED = False
     _AUDIO_VERSION_REQUIRED = False
     _BUTTONS = ()
     _DISPLAYS = ()
@@ -914,12 +914,15 @@ class Exercise(Section):
     aurally/orally:""")
     _TASK_COUNT = None
     _TASK_SEPARATOR = '<br class="task-separator"/>\n'
+    _EXPORT_ORDER = None
+    
     _used_types = []
     _help_node = None
     
     def __init__(self, parent, tasks, instructions=None, audio_version=None,
                  sound_file=None, transcript=None, reading=None,
-                 explanation=None, example=None, template=None):
+                 explanation=None, example=None, template=None,
+                 reading_instructions=_("Read the following text:")):
         """Initialize the instance.
 
         Arguments:
@@ -932,10 +935,10 @@ class Exercise(Section):
           instructions -- user supplied instructions.  This is a way how to
             include more specific instructions instead of default exercise
             isnstructions (which are intentionally very general).  The given
-            text will be printed at the beginning of the exercise and should be
-            a complete sentence (usually starting with a capital letter and
-            ending with a dot).  This, in consequence, also allows to use the
-            same exercise type for different purposes.
+            text will be printed before the exercise tasks and should be a
+            complete sentence (usually starting with a capital letter and
+            ending with a dot or a colon).  This, in consequence, also allows
+            to use the same exercise type for different purposes.
             
           audio_version -- name of the file with an audio version of this
             exercise.
@@ -979,6 +982,7 @@ class Exercise(Section):
             Exercise._used_types.append(self.__class__)
         assert instructions is None or \
                isinstance(instructions, types.StringTypes)
+        assert isinstance(reading_instructions, types.StringTypes)
         assert is_sequence_of(tasks, self._TASK_TYPE), \
                "Tasks must be a sequence of '%s' instances!: %s" % \
                (self._TASK_TYPE.__name__, tasks)
@@ -998,25 +1002,13 @@ class Exercise(Section):
             (self.__class__.__name__, self._TASK_COUNT, len(tasks))
         self._tasks = list(tasks)
         self._custom_instructions = self._wiki_content(instructions)
-        self._example = self._wiki_content(example)
-        self._template = self._wiki_content(template)
         self._explanation = self._wiki_content(explanation)
-        if reading is not None:
-            assert isinstance(reading, types.StringTypes)
-            if len(reading.splitlines()) == 1:
-                name, ext = os.path.splitext(reading)
-                name = os.path.join('readings', name)
-                try:
-                    content = parent.parse_wiki_file(name, ext=ext[1:])
-                except IOError, e :
-                    print "Unable to read the reading file: %s" % e
-                    self._reading = None
-                else:
-                    self._reading = Container(parent, content)
-            else:
-                self._reading = self._wiki_content(reading)
-        else:
-            self._reading = None
+        self._example = self._wiki_content(example)
+        self._reading = self._wiki_content(reading, allow_file=True,
+                                           subdir='readings')
+        self._reading_instructions = self._wiki_content(reading_instructions)
+        self._template = self._wiki_content(template, allow_file=True,
+                                            subdir='templates')
         if sound_file is not None:
             try:
                 self._recording = parent.resource(Media, sound_file)
@@ -1040,15 +1032,25 @@ class Exercise(Section):
             self._audio_version = parent.resource(Media, audio_version)
         else:
             self._audio_version = None
+            
         self._init_resources()
 
-    def _wiki_content(self, text):
+    def _wiki_content(self, text, allow_file=False, subdir=None):
         if text is None:
             return None
+        assert isinstance(text, types.StringTypes)
+        if allow_file and len(text.splitlines()) == 1:
+            name, ext = os.path.splitext(text)
+            if subdir:
+                name = os.path.join(subdir, name)
+            try:
+                content = self._parent.parse_wiki_file(name, ext=ext[1:])
+            except IOError, e :
+                print "Unable to read file: %s" % e
+                return None
         else:
-            assert isinstance(text, types.StringTypes)
-            t = re.sub('\[', '![', text)
-            return Container(self._parent, self._parent.parse_wiki_text(t))
+            content = self._parent.parse_wiki_text(re.sub('\[', '![', text))
+        return Container(self._parent, content)
     
     def _init_resources(self):
         self._parent.resource(Script, 'audio.js')
@@ -1093,7 +1095,7 @@ class Exercise(Section):
                            target="transcript")
         else:
             t = ""
-        beg  = '<form class="sound-control" action="">%s\n' % label
+        beg  = '<form class="sound-control" action="#">%s\n' % label
         play = button(_("Play"), "play_audio('%s')" % media.url())
         stop = button(_("Stop"), 'stop_audio()')
         end  = t + '\n</form>'
@@ -1104,28 +1106,31 @@ class Exercise(Section):
         return '\n'.join(result)
 
     def export(self):
-        hlp = link(_("Exercise Help"), self._help_node.url(),
-                   target='help', cls='exercise-help-link')
-        parts = (div((self._header(), hlp), cls='exercise-header'),
-                 self._export_explanation(),
-                 self._export_reading(),
-                 self._export_instructions(),
-                 self._export_recording(),
-                 self._export_audio_version(),
-                 self._export_example(),
-                 '<form name="%s" action="">' % self._form_name(),
-                 self._export_tasks(),
-                 self._results(),
-                 '</form>',
-                 script(self._init_script()))
-        return "\n\n".join([part for part in parts if part is not None])
+        header = div((self._header(),
+                      link(_("Exercise Help"), self._help_node.url(),
+                           target='help', cls='exercise-help-link')),
+                     cls='exercise-header')
+        parts = [getattr(self, '_export_'+part)()
+                 for part in self._EXPORT_ORDER or ('reading',
+                                                    'explanation',
+                                                    'instructions',
+                                                    'recording',
+                                                    'audio_version',
+                                                    'example',
+                                                    'tasks')]
+        parts.append(script(self._init_script()))
+        return "\n\n".join([x for x in [header]+parts if x is not None])
 
     def _export_tasks(self):
         tasks = [self._export_task(t) for t in self._tasks]
         if self._template:
-            return self._template.export() % tuple(tasks)
+            tasks = self._template.export() % tuple(tasks)
         else:
-            return "\n".join(tasks)
+            tasks = "\n".join(tasks)
+        if tasks:
+            return form((tasks, self._results() or ''), name=self._form_name())
+        else:
+            return None
 
     def _export_explanation(self):
         if self._explanation is not None:
@@ -1142,7 +1147,7 @@ class Exercise(Section):
     
     def _export_reading(self):
         if self._reading is not None:
-            return _("Reading text:") + \
+            return self._reading_instructions.export() + \
                    div(self._reading.export(), cls="reading")
         else:
             return None
@@ -1150,7 +1155,7 @@ class Exercise(Section):
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
         custom = self._custom_instructions
-        return p(custom and custom.export() or self._instructions())
+        return custom and custom.export() or p(self._instructions())
 
     def _export_recording(self):
         if self._recording:
@@ -1188,9 +1193,9 @@ class Listening(Exercise):
 
     
 class Reading(Exercise):
-    _NAME = _("Listening")
+    _NAME = _("Reading")
     _READING_REQUIRED = True
-
+        
     
 class SentenceCompletion(Exercise):
     _NAME = _("Sentence Completion")
@@ -1354,7 +1359,7 @@ class Selections(_ChoiceBasedExercise):
     """Selecting one of several statements/sentences (the correct one)."""
     
     _TASK_TYPE = Selection
-    _NAME = _("Select the best alternative")
+    _NAME = _("Selections")
     _INSTRUCTIONS = _("""Decide which statement is correct for each of the
     groups below .""")
 
@@ -1432,8 +1437,10 @@ class _FillInExercise(_InteractiveExercise):
             counter = self._field_counter
         except AttributeError:
             self._field_counter = counter = Counter(0)
-        lnk = self._answer_sheet_link(counter.next())
-        return field(cls='fill-in-task', size=max(4, len(text)+1), id=id) + lnk
+        n = counter.next()
+        f = field(cls='fill-in-task', name="task-%d" % n,
+                  size=max(4, len(text)+1), id=id)
+        return f + self._answer_sheet_link(n)
     
     def _export_task_parts(self, task):
         text = task.text(self._make_field)
@@ -1514,8 +1521,9 @@ class Dictation(_FillInExercise):
 class _Cloze(_FillInExercise):
     _NAME = _("Cloze")
     _TASK_TYPE = ClozeTask
-    #_RECORDING_REQUIRED = True
-
+    _INSTRUCTIONS = _("""Fill in the gaps in the text below.  There is just one
+    correct answer for each gap.""")
+    
     def _transcript_text(self):
         return "\n\n".join([t.plain_text() for t in self._tasks])
     
@@ -1524,8 +1532,7 @@ class _Cloze(_FillInExercise):
             return _("""Listen to the recording carefully and then fill in the
             gaps in the text below using the same words.""")
         else:
-            return _("""Fill in the gaps in the text below.  There is just one
-            correct answer for each gap.""")
+            return self._INSTRUCTIONS
 
         
 class _ExposedCloze(_Cloze):
@@ -1547,7 +1554,7 @@ class NumberedCloze(_Cloze):
         return "%d. " % (self._tasks.index(task) + 1) + text
 
     
-class NumberedExposedCloze(_ExposedCloze, NumberedCloze):
+class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
     pass
     
 
@@ -1569,5 +1576,5 @@ class Cloze(_Cloze):
         return task.text(self._make_field, transform)
 
 
-class ExposedCloze(_ExposedCloze, Cloze):
+class ExposedCloze(Cloze, _ExposedCloze):
     pass
