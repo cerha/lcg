@@ -962,10 +962,15 @@ class Exercise(Section):
             (regardless whether read from file or not) is a structured text
             using the 'wiki' formatting.
 
+          reading_instructions -- The reading text is introduced by a brief
+            label 'Read the following text:' by default.  If you want to change
+            this, use this argument su supply any text.  Wiki formatting can be
+            used here as-well.
+            
           explanation -- any exercise can start with a brief explanation
             (usually of the subject of it's tasks).  Explanations are quite
             similar to readings texts but serve a different purpose.  When both
-            are defined, the explanation goes first on the output.  They are
+            are defined, the reading goes first on the output.  They are
             defined as a multi-line structured text using the 'wiki'
             formatting.
             
@@ -973,6 +978,15 @@ class Exercise(Section):
             with given example (a multi-line structured text using the 'wiki'
             formatting).  The formatting should usually follow the formatting
             of the tasks within the exercise.
+
+          template -- the tasks are rendered as a simple sequence on the
+            output.  If you need something more sophisticated (e.g. have text
+            and the tasks 'mixed' within it), you can use a template.  Just
+            specify any stuctured text and use '%s' placehodlers to be replaced
+            by the actual tasks.  Note that you must have exactly the same
+            number of the placeholders within the template as the number of
+            tasks you pass as the `tasks' arguemnt.  You must also double any
+            '%' signs, which are not a part of a placeholder.
             
         """
         title = _("Exercise %d") +": "+ self._NAME
