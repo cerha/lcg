@@ -129,7 +129,7 @@ class Formatter(object):
         href = groups.get('href')
         anchor = groups.get('anchor')
         if href:
-            node = self._parent.root_node().find_node(href)
+            node = self._parent.root().find_node(href)
             if node:
                 href = node.url()
         else:
