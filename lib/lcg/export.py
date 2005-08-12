@@ -48,7 +48,7 @@ class Exporter(object):
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', node.language()))] + \
                ['<meta name="%s" content="%s">' % item
-                for item in node.root_node().meta().items()] + \
+                for item in node.root().meta().items()] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % s.url()
                 for s in node.resources(Script)]
@@ -99,8 +99,10 @@ class StaticExporter(Exporter):
     def head(self, node):
         tags = ['<link rel="%s" href="%s" title="%s">' % \
                 (kind, n.url(), n.title())
-                for kind, n in (('prev', node.prev()), ('next', node.next()))
-                if n is not None]
+                for kind, n in (('start', node.root()), 
+                                ('prev', node.prev()),
+                                ('next', node.next()))
+                if n is not None and n is not node]
         return '\n  '.join([super(StaticExporter, self).head(node)] + tags)
              
     def body(self, node):
@@ -121,12 +123,12 @@ class StaticExporter(Exporter):
         nav = [_('Next') + ': ' + self._link(node.next(), key='next'),
                _('Previous') + ': ' + self._link(node.prev(), key='prev')]
         hidden = ''
-        if node is not node.root_node():
+        if node is not node.root():
             p = node.parent()
-            if p is not node.root_node():
+            if p is not node.root():
                 nav.append(_("Up") + ': ' + self._link(p, key='up'))
             else:
                 hidden = "\n"+self._link(p, key='up', label='')
-            nav.append(self._link(node.root_node(), label=self._INDEX_LABEL,
+            nav.append(self._link(node.root(), label=self._INDEX_LABEL,
                                   key='index'))
         return div(' |\n'.join(nav) + hidden, 'navigation')
