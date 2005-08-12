@@ -1,3 +1,59 @@
+2005-08-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (Exercise._TASK_TYPE): Set to None.
+	(Exercise._TASK_SEPARATOR): New constant.
+	(Exercise.__init__): New argument `reading_instructions'.  Don't
+	try to open the file for reading, leave it to `_wiki_content'.
+	Allow also `template' to be read from an external file.
+	(Exercise._wiki_content): New arguments `allow_file' and `subdir'.
+	When `allow_file' is true `text' is only one line, consider it a
+	filename and read that file.
+	(Exercise._sound_controls): Make a non-empty `action' attribute
+	for the form.
+	(Exercise.export): Use self._EXPORT_ORDER if not None.  The
+	default export order changed (explanation goes after reading).
+	(Exercise._export_tasks): Wrap the tasks and results bar into a
+	form here.
+	(Exercise._export_reading): Use `self._reading_instructions'.
+	(Exercise._export_instructions): Don't wrap the wiki formatted
+	custom instructions into a paragraph.
+	(Reading._NAME): Set to "Reading".
+	(Selections._NAME): Set to "Selections".
+	(_FillInExercise._make_field): Give the field a name.
+	(_Cloze._INSTRUCTIONS): New constant.
+	(_Cloze._instructions): Use it.
+	(NumberedExposedCloze, ExposedCloze): Changed order of inherited
+	classes.
+
+	* lib/lcg/_test.py (ContentNode.check_misc): 'root_node' -> 'root'.
+
+	* lib/lcg/wiki.py (Formatter._link_formatter): 'root_node' -> 'root'.
+
+	* lib/lcg/resources.py (resource): 'root_node' -> 'root'.
+
+	* lib/lcg/feed.py (ExerciseFeeder._exercise): Code reorganized and
+	simplyfied.
+	(ExerciseFeeder._read_multiline_args): Return template as None,
+	when there is no more content.
+
+	* lib/lcg/export.py (Exporter.head, StaticExporter._navigation):
+	'root_node' -> 'root'.
+	(StaticExporter.head): Add a `rel' link to `start'.
+
+	* lib/lcg/eurochance.py (IntermediateUnit._create_vocab) 
+	(IntermediateUnit._create_content, Instructions._create_content) 
+	(ExerciseInstructions._create_content): 'root_node' -> 'root'.
+
+	* lib/lcg/course.py (ContentNode.root_node): Renamed to `root'.
+	(ContentNode.root, ContentNode.next, ContentNode.prev) 
+	(ContentNode.src_dir, ContentNode.id): 'root_node' -> 'root'.
+
+	* lib/lcg/_html.py (form): New function.
+	(_input): Add a slash at the end of the tag for XHTML compatibility.
+	(script_write): Escape also the `</' sequence.
+
+	* translations/de.po: Updated.
+
 2005-08-09  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/feed.py
