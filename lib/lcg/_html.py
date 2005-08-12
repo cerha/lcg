@@ -85,6 +85,10 @@ def itemize(items, indent=0, ordered=False, style=None, cls=None, lang=None):
 
 # Form controls
 
+def form(content, name=None, action="#"):
+    attr = (('name', name), ('action', action))
+    return _tag('form', attr, content, concat="\n")
+
 def label(text, id, lang=None):
     return _tag('label', (('for', id), ('lang', lang)), text)
 
@@ -92,7 +96,7 @@ def _input(type, name=None, value=None,
            onclick=None, onkeydown=None, onfocus=None,
            size=None, readonly=False, cls=None, id=None):
     #handler = handler and "javascript: %s" % handler
-    return '<input type="%s"%s%s>' % (type, _attr(('name', name),
+    return '<input type="%s"%s%s />' % (type, _attr(('name', name),
                                                   ('value', value),
                                                   ('size', size),
                                                   ('onclick', onclick),
@@ -148,7 +152,8 @@ def script(code, noscript=None):
 def script_write(content, noscript=None, condition=None):
     #return content
     if content:
-        c = content.replace('"','\\"').replace('\n','\\n').replace("'","\\'")
+        c = content.replace('"','\\"').replace("'","\\'")
+        c = c.replace('</', '<\\/').replace('\n','\\n')
         content = 'document.write("'+ c +'");'
         if condition:
             content = 'if ('+condition+') ' + content
