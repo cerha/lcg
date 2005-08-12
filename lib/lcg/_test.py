@@ -31,7 +31,7 @@ class ContentNode(unittest.TestCase):
     def check_misc(self):
     	a = lcg.ContentNode(None, subdir='aaa')
         b = lcg.ContentNode(a, subdir='bbb')
-        assert a.root_node() == b.root_node() == a
+        assert a.root() == b.root() == a
         assert a.src_dir() == 'aaa'
         assert b.src_dir() == os.path.join('aaa', 'bbb')
         assert b.id() != a.id()
