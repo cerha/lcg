@@ -218,12 +218,12 @@ class ContentNode(object):
         """Return the parent node of this node."""
         return self._parent
     
-    def root_node(self):
+    def root(self):
         """Return the top-most node of the hierarchy."""
         if self._parent is None:
             return self
         else:
-            return self._parent.root_node()
+            return self._parent.root()
         
     def children(self):
         """Return the list of all subordinate nodes as a tuple."""
@@ -264,7 +264,7 @@ class ContentNode(object):
 
     def next(self):
         """Return the node following this node in the linearized structure."""
-        linear = self.root_node().linear()
+        linear = self.root().linear()
         i = linear.index(self)
         if i < len(linear)-1:
             return linear[i+1]
@@ -273,7 +273,7 @@ class ContentNode(object):
     
     def prev(self):
         """Return the node preceding this node in the linearized structure."""
-        linear = self.root_node().linear()
+        linear = self.root().linear()
         i = linear.index(self)
         if i > 0:
             return linear[i-1]
@@ -293,7 +293,7 @@ class ContentNode(object):
         if self._parent is None:
             return self._subdir
         else:
-            return os.path.normpath(os.path.join(self.root_node().src_dir(),
+            return os.path.normpath(os.path.join(self.root().src_dir(),
                                                  self.subdir()))
         
     def output_file(self):
@@ -308,7 +308,7 @@ class ContentNode(object):
         same = [n for n in self._parent.children() if n._id() == id]
         if len(same) > 1:
             id += '-%02d' % (same.index(self) + 1)
-        if self._parent is self.root_node() or not self._PARENT_ID_PREFIX:
+        if self._parent is self.root() or not self._PARENT_ID_PREFIX:
             return id
         else:
             return '-'.join((self._parent.id(), id))
