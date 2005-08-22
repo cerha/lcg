@@ -47,9 +47,11 @@ def main():
                                users_language=opt.get('--user-lang', 'cs'),
                                input_encoding='utf-8')
     if opt.get('--ims') is not None:
-        e = lcg.ims.IMSExporter(destination_dir)
+        exporter = lcg.ims.IMSExporter
     else:
-        e = EurochanceExporter(stylesheet=opt.get('--stylesheet'))
+        exporter = EurochanceExporter
+        
+    e = exporter(stylesheet=opt.get('--stylesheet'))
     e.export(c, destination_dir)
 
 def usage():
