@@ -51,6 +51,7 @@ class _Manifest:
 
         # Organisations
         organisations = self._append_xml_element(manifest, 'organizations')
+        self._set_xml_attr(organizations, 'default', 'TOC1')
 
         o = self._append_xml_element(organisations, 'organization')
         self._set_xml_attr(o, 'identifier', 'TOC1')
@@ -75,8 +76,9 @@ class _Manifest:
         self._set_xml_attr(resource, 'type', 'webcontent')
         self._set_xml_attr(resource, 'href', node.url())
 
-        resources = tuple(map(lambda n: n.url(), node.resources()))
-        for filename in (node.url(),) + resources:
+        resources = [n.url() for n in node.resources()]
+        resources.sort()
+        for filename in (node.url(),) + tuple(resources):
             file = self._append_xml_element(resource, 'file')
             self._set_xml_attr(file, 'href', filename)
 
@@ -103,19 +105,19 @@ class _Manifest:
 
     # Public methods
     
-    def write(self, dir):
+    def write(self, directory):
         """Write the IMS Manifest into a file."""
-        file = open(os.path.join(dir, 'imsmanifest.xml'), 'w')
-        file.write('<?xml version="1.0" ?>\n')
+        file = open(os.path.join(directory, 'imsmanifest.xml'), 'w')
+        file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         self._manifest.writexml(file, newl = '\n', addindent='  ')
 
         
 class IMSExporter(lcg.Exporter):
     """Export the content as an IMS package."""
    
-    def export(self):
-        super(IMSExporter, self).export()
-        manifest = _Manifest(self._course)
-        manifest.write(self._dir)
+    def export(self, node, directory):
+        super(IMSExporter, self).export(node, directory)
+        manifest = _Manifest(node)
+        manifest.write(directory)
 
 
