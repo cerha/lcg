@@ -1,3 +1,13 @@
+2005-08-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py (main): Use whichever exporer with same arguemnts.
+
+	* lib/lcg/ims.py (_Manifest.__init__): Set the `default'
+	attributte for `organizations'.
+	(_Manifest._create_item): Sort the resources alphabetically.
+	(_Manifest.write): Set the xml encoding.
+	(IMSExporter.export): Accept `node' and `directory' as arguments.
+
 2005-08-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (Exercise._TASK_TYPE): Set to None.
@@ -24,6 +34,7 @@
 	(_Cloze._instructions): Use it.
 	(NumberedExposedCloze, ExposedCloze): Changed order of inherited
 	classes.
+	(Exercise.__init__): Docstring updated.
 
 	* lib/lcg/_test.py (ContentNode.check_misc): 'root_node' -> 'root'.
 
