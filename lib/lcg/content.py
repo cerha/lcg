@@ -105,6 +105,13 @@ class Content(object):
         """Return the HTML formatted content as a string."""
         return ''
 
+    
+class HorizontalSeparator(Content):
+    
+    def export(self):
+        """Return the HTML formatted content as a string."""
+        return '<hr/>'
+        
 
 class TextContent(Content):
     """A simple piece of text."""
@@ -134,6 +141,7 @@ class TextContent(Content):
     def export(self):
         return self._text
 
+    
         
 class WikiText(TextContent):
     """Structured text in Wiki formatting language (on input)."""
@@ -762,18 +770,18 @@ class Selection(_ChoiceTask):
         
 class GapFillStatement(_ChoiceTask):
 
-    _REGEXP = re.compile(r"(___+)")
+    _GAP_MATCHER = re.compile(r"(___+)")
     
     def __init__(self, prompt, choices, **kwargs):
         super(GapFillStatement, self).__init__(prompt, choices, **kwargs)
-        matches = len(self._REGEXP.findall(prompt))
+        matches = len(self._GAP_MATCHER.findall(prompt))
         if choices:
             assert matches == 1, \
                    "GapFillStatement must include just one gap " + \
                    "marked by three or more underscores. %d found." % matches
 
     def substitute_gap(self, replacement):
-        return self._REGEXP.sub(replacement, self.prompt())
+        return self._GAP_MATCHER.sub(replacement, self.prompt())
     
 
 class TrueFalseStatement(_ChoiceTask):
@@ -798,7 +806,7 @@ class FillInTask(Task):
     
     def __init__(self, prompt, answer, comment=None):
         assert isinstance(answer, types.UnicodeType)
-        self._answer = answer
+        self._answer = answer.replace('\n', ' ')
         super(FillInTask, self).__init__(prompt, comment=comment)
 
     def answer(self):
@@ -818,10 +826,11 @@ class DictationTask(FillInTask):
 
 
 class _ClozeTask(FillInTask):
-    _REGEXP = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
+    _FIELD_MATCHER = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
 
     def _fields(self):
-        return self._REGEXP.findall(self._text)
+        return [(answer.replace('\n', ' '), label)
+                for answer, label in self._FIELD_MATCHER.findall(self._text)]
     
     def answers(self):
         return [answer for answer, label in self._fields()]
@@ -839,16 +848,16 @@ class _ClozeTask(FillInTask):
         text = self._text
         if text_transform:
             text = text_transform(text)
-        return self._REGEXP.sub(formatter, text)
+        return self._FIELD_MATCHER.sub(formatter, text)
 
     def plain_text(self):
-        return self._REGEXP.sub(lambda match: match.group(1), self._text)
+        return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._text)
 
         
 class TransformationTask(_ClozeTask):
 
     def __init__(self, orig, transformation, comment=None):
-        if not self._REGEXP.search(transformation):
+        if not self._FIELD_MATCHER.search(transformation):
             transformation = '[' + transformation + ']'
         self._text = transformation
         assert len(self.answers()) == 1
@@ -912,7 +921,6 @@ class Exercise(Section):
     _INSTRUCTIONS = ""
     _AUDIO_VERSION_LABEL = _("""This exercise can be also done purely
     aurally/orally:""")
-    _TASK_COUNT = None
     _TASK_SEPARATOR = '<br class="task-separator"/>\n'
     _EXPORT_ORDER = None
     
@@ -1010,11 +1018,7 @@ class Exercise(Section):
         if self._AUDIO_VERSION_REQUIRED:
             assert audio_version is not None, \
             "'%s' requires an audio version!" % self.__class__.__name__
-        if self._TASK_COUNT is not None:
-            assert len(tasks) == self._TASK_COUNT, \
-            "'%s' requires just %d task(s) (%d found)!" % \
-            (self.__class__.__name__, self._TASK_COUNT, len(tasks))
-        self._tasks = list(tasks)
+        self._tasks = list(self._check_tasks(tasks))
         self._custom_instructions = self._wiki_content(instructions)
         self._explanation = self._wiki_content(explanation)
         self._example = self._wiki_content(example)
@@ -1093,6 +1097,9 @@ class Exercise(Section):
     help = classmethod(help)
     
     # Instance methods
+
+    def _check_tasks(self, tasks):
+        return tasks
 
     def _transcript_text(self):
         return None
@@ -1439,6 +1446,13 @@ class _FillInExercise(_InteractiveExercise):
     
     _TASK_FORMAT = "%s<br/>%s"
 
+    def _check_tasks(self, tasks):
+        for t in tasks:
+            assert not isinstance(t, ClozeTask) or len(t.answers()) == 1, \
+                       "%s requires just one textbox per task (%d found)!" % \
+                   (self.__class__.__name__, len(t.answers())) 
+        return tasks
+    
     def _answers(self):
         return [t.answer() for t in self._tasks if t.answer() is not None]
         
@@ -1473,17 +1487,17 @@ class VocabExercise(_FillInExercise):
     pronunciation:""")
     _TASK_SEPARATOR = ''
 
-    def __init__(self, parent, tasks, *args, **kwargs):
+    def _check_tasks(self, tasks):
         if not tasks:
             dict = {}
-            for item in parent.vocab:
+            for item in self._parent.vocab:
                 translation, word = (item.translation(), item.word())
                 if translation:
                     if dict.has_key(translation):
                         word = dict[translation] +'|'+ word
                     dict[translation] = word
             tasks = [FillInTask(t, w) for t, w in dict.items()]
-        super(VocabExercise, self).__init__(parent, tasks, *args, **kwargs)
+        return tasks
    
 
 class Substitution(_FillInExercise):
@@ -1523,8 +1537,11 @@ class Dictation(_FillInExercise):
     _DISPLAYS = (('result', _('Result:')),)
     _INSTRUCTIONS = _("""Listen to the recording and type exactly what you hear
     into the textbox below.""")
-    _TASK_COUNT = 1
 
+    def _check_tasks(self, tasks):
+        assert len(tasks) == 1
+        return tasks
+    
     def _transcript_text(self):
         return self._tasks[0].answer()
 
@@ -1574,10 +1591,13 @@ class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
 
 class Cloze(_Cloze):
     """Paragraphs of text including text-fields for the marked words."""
-    _TASK_COUNT = 1
     _ANSWER_SHEET_LINK_CLASS = 'cloze-answer-sheet-link'
     _TASK_SEPARATOR = ''
 
+    def _check_tasks(self, tasks):
+        assert len(tasks) == 1
+        return tasks
+    
     def _answers(self):
         return self._tasks[0].answers()
         
