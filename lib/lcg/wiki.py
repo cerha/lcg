@@ -48,7 +48,6 @@ class Formatter(object):
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]+'),
                ('comment', r'^#.*'),
-               ('rule', r'^----+\s*$'),
                ('dash', r'(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'),
                ('lt', '<'),
@@ -57,44 +56,45 @@ class Formatter(object):
                )
     _HELPER_PATTERNS = ('href', 'anchor', 'title')
     
-    # The list below lists the which elements are paired on the output
-    # (formatter) side, not the input (markup) side (they must be opened and
-    # then closed individually).
-    _PAIR = ('emphasize', 'strong', 'fixed', 'underline', 'citation',
-             'quotation')
-    
-    _FORMAT = {'strong': ('<strong>', '</strong>'),
-               'emphasize': ('<em>', '</em>'),
+    _FORMAT = {'emphasize': ('<em>', '</em>'),
+               'strong': ('<strong>', '</strong>'),
                'fixed': ('<tt>', '</tt>'),
                'underline': ('<u>', '</u>'),
-               'quotation': (u'“<span class="quotation">', u'</span>”'),
                'citation': ('<span class="citation">', '</span>'),
+               'quotation': (u'“<span class="quotation">', u'</span>”'),
                'comment': '',
                'linebreak': '<br/>',
-               'rule': '<hr/>',
                'dash': '&ndash;',
                'nbsp': '&nbsp;',
                'lt':   '&lt;',
                'gt':   '&gt;',
-               'amp':   '&amp;',
+               'amp':  '&amp;',
                }
 
     def __init__(self, parent):
-        regexp = r"(?P<%s>\!?%s)"
-        pair_regexp = '|'.join((regexp % ("%s_start", r"(?<!\w)%s(?=\S)"),
-                                regexp % ("%s_end",   r"(?<=\S)%s(?!\w)")))
+        self._parent = parent
+        regexp = r"(?P<%s>\\*%s)"
+        pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
+                                regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
         regexps = [isinstance(markup, types.StringType)
                    and regexp % (type, markup)
                    or pair_regexp % (type, markup[0], type, markup[1])
                    for type, markup in self._MARKUP]
         self._rules = re.compile('(?:' +'|'.join(regexps)+ ')', re.MULTILINE)
-        self._parent = parent
+        self._paired_on_output = [type for type, format in self._FORMAT.items()
+                                  if isinstance(format, types.TupleType)]
 
     def _markup_handler(self, match):
         type = [key for key, m in match.groupdict().items()
                 if m and not key in self._HELPER_PATTERNS][0]
-        if match.group(type).startswith('!'):
-            return match.group(type)[1:]
+        markup = match.group(type)
+        backslashes = markup.count('\\')
+        markup = markup[backslashes:]
+        prefix = backslashes / 2 * '\\'
+        if backslashes % 2:
+            return prefix + markup
+        # We need two variables (start and end), because both can be False for
+        # unpaired markup.
         start = False
         end = False
         if type.endswith('_start'):
@@ -103,25 +103,28 @@ class Formatter(object):
         elif type.endswith('_end'):
             type = type[:-4]
             end = True
-        if not start and type in self._open:
-            i = self._open.index(type)
-            to_close = self._open[i:]
-            del self._open[i:]
-            to_close.reverse()
-            # We have to close the nested open tags as-well.
-            return ''.join([self._formatter(t, match.groupdict(), close=True)
-                            for t in to_close])
-        elif not end:
-            if type in self._PAIR:
+        if not start and self._open and type == self._open[-1]:
+            # Closing an open markup.
+            self._open.pop()
+            result = self._formatter(type, match.groupdict(), close=True)
+        elif not end and not (start and type in self._open):
+            # Start markup or an unpaired markup.
+            if start:
                 self._open.append(type)
-            return self._formatter(type, match.groupdict())
+            result = self._formatter(type, match.groupdict())
+        else:
+            # Markup in an invalid context is just printed as is.
+            # This can be end markup, which was not opened or start markup,
+            # which was already opened.
+            result = markup
+        return prefix + result
 
     def _formatter(self, type, groups, close=False):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
         except AttributeError:
             f = self._FORMAT[type]
-            return type in self._PAIR and f[close and 1 or 0] or f
+            return type in self._paired_on_output and f[close and 1 or 0] or f
         return formatter(groups, close=close)
         
     def _link_formatter(self, groups, close=False):
@@ -198,6 +201,8 @@ class Parser(object):
                   r"(?:(?P<title>[^\r\n]+)[\t ]+)?\@TOC\@\s*"),
                  ('table',
                   r"((\|[^\r\n\|]*)+\|\s*)+"),
+                 ('rule',
+                  r'^----+\s*$'),
                  )
     
     _REGEXPS = [r"^(\s*\r?\n)*(?P<%s>%s)$" % (key, matcher)
@@ -394,6 +399,9 @@ class Parser(object):
 
     def _make_toc(self, block, groups):
         return TableOfContents(self._parent, title=groups['title'], depth=99)
+
+    def _make_rule(self, block, groups):
+        return HorizontalSeparator(self._parent)
     
     def _list_item_type(self, groups):
         t = groups.get('type')
