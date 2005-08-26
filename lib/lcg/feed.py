@@ -59,7 +59,6 @@ class Feeder(object):
         if position is not None:
             message += ": " + position
         sys.stderr.write('Warning: %s\n' % message)
-    
 
         
 class SplittableTextFeeder(Feeder):

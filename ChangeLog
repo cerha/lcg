@@ -1,3 +1,46 @@
+2005-08-26  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/feed.py (ExerciseFeeder._exercise): New assertion.
+	(ExerciseFeeder._exercise.maketask): Don't print warnings here.
+
+	* doc/eurochance.wiki: Updated.
+
+	* doc/wiki-formatting.wiki: Updated.
+
+	* lib/lcg/content.py (Content.export): New class.
+	(GapFillStatement._REGEXP): Renamed to `_GAP_MATCHER'.
+	(GapFillStatement.__init__, GapFillStatement.substitute_gap):
+	Honour the change above.
+	(Choice.__init__): Replace newlines in the answer by spaces.
+	(_ClozeTask._REGEXP): Renamed to `_FIELD_MATCHER'.
+	(_ClozeTask._fields, _ClozeTask.text, _ClozeTask.plain_text)
+	(TransformationTask.__init__): Honour the change above.
+	(_ClozeTask._fields): Replace newlines in answers by spaces.
+	(Exercise._TASK_COUNT, Dictation._TASK_COUNT, Cloze._TASK_COUNT):
+	Constant removed.
+	(Exercise.__init__): Don't check task count.  Use
+	`_check_tasks()'.
+	(Exercise._check_tasks): New method.
+	(_FillInExercise._check_tasks, VocabExercise._check_tasks) 
+	(Dictation._check_tasks, Cloze._check_tasks): New methods.
+	(VocabExercise.__init__): Method removed.
+
+	* lib/lcg/wiki.py (Formatter._MARKUP): The horizontal rule
+	removed.
+	(Formatter._FORMAT): The format for horizontal rule removed.
+	(Formatter._PAIR): Constant removed.
+	(Formatter.__init__): Include the end markup rule first in the
+	regexp.  Initialize the attribute `_paired_on_output'.  Allow
+	backslashes in front of any markup for escaping insted of an
+	exclamation mark.
+	(Formatter._markup_handler): Process the escape characters
+	correctly.  Don't allow improperly nested markup.  Write the
+	invalid markup as is to the output.  Don't use `self._PAIR'.
+	(Formatter._formatter): Use `self._paired_on_output' instead of
+	`self._PAIR'.
+	(Parser._MATCHERS): New matcher for horizontal rule.
+	(Parser._make_rule): New method.
+
 2005-08-22  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/generate.py (main): Use whichever exporer with same arguemnts.
