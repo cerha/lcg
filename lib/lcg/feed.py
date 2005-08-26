@@ -171,6 +171,7 @@ class ExerciseFeeder(SplittableTextFeeder):
                 comments = []
             tasks = (type.task_type()(body.text(), comments=comments), )
         elif body:
+            assert not kwargs.has_key('template')
             pieces = body.split(self._BLANK_LINE_SPLITTER)
             i = 0
             while i < len(pieces):
@@ -182,10 +183,6 @@ class ExerciseFeeder(SplittableTextFeeder):
                     comment = None
                     i += 1
                 tasks.append(self._read_task(type.task_type(), t, comment))
-            if type == TrueFalseStatements and len(tasks) == 1:
-                self._warn("TrueFalseStatements have only one task!", text)
-            if type == Dictation  and len(tasks) != 1:
-                self._warn("Dictation should have just one task!", text)
         elif kwargs.has_key('template'):
             def maketask(match):
                 t = SplittableText(match.group(1), input_file=text.input_file(),
