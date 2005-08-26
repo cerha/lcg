@@ -17,13 +17,13 @@ text editor can do the job.
 
 === Text Emphasizing ===
 
-You can use *Bold text*, /italic text/, _underlined text_, =fixed font=,
+You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
 /*or their _combinations_*/.
 
 The source code for the paragraph above looks like:
 
 -----
-You can use *Bold text*, /italic text/, _underlined text_, =fixed font=,
+You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
 /*or their _combinations_*/.
 -----
 
@@ -31,17 +31,27 @@ You can use *Bold text*, /italic text/, _underlined text_, =fixed font=,
 === Escaping ===
 
 You can avoid the special meaning of all the constructs described in this
-document by prefixing them by the exclamation mark.
+document by prefixing them with a backslash.
 
 *Example:*
 
 ------
-Slashes are used for /italic/, however sometimes you want !/just them!/.
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a murkup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
 ------
 
 This renders as:
 
-Slashes are used for /italic/, however sometimes you want !/just them!/.
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a murkup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+
+
 
 
 === Paragraphs ===
@@ -73,7 +83,7 @@ Link names are automatically supplied for links to local anchors within the
 document (see [#anchors]) and also for links to other wiki documents when the
 generator implements this feature.
 
-External links beginning with '!http://', such as http://www.freebsoft.org, are
+External links beginning with '\http://', such as http://www.freebsoft.org, are
 recognized automatically, so the square brackets are not necessary.  Also
 e-mail addresses automatically become links.
 
@@ -144,7 +154,7 @@ at the end of the heading line separated with at least one blank character
  == Introduction == intro
 -----
 
-An anchor can be used to refer to the section.  The link ![#intro], for
+An anchor can be used to refer to the section.  The link \[#intro], for
 example, will be rendered as [#intro Introduction] (see [#links] for more
 details).
 
@@ -152,7 +162,7 @@ details).
 === Tables of Contents === toc
 
 Table of contents is a hierarchical list of all sections within a document or
-it's part.  It can be included in the document using the '=@TOC@=' macro.
+it's part.  It can be included in the document using the =@TOC@= macro.
 
 *Example:*
 
@@ -377,22 +387,22 @@ This sentence will break//in the middle.
 
 The line-breaks are inserted automatically, when the paragraph is formatted to
 fit the output media.  However, you sometimes don't want a line-break in a
-certain place.  You can use a tilde =!~= instead of a space in such
+certain place.  You can use a tilde =\~= instead of a space in such
 cases.
 
 *Example:*
 
 ------
 We can forbid a line-break between the first and second name of
-Richard~Stallman, but we must prefix the tilde with an exclamation sign, when
-we need to write the shell command =cd !~=.
+Richard~Stallman, but we must prefix the tilde with a backslash, when
+we need to write the shell command 'cd \~'.
 ------
 
 This renders as:
 
 We can forbid a line-break between the first and second name of
-Richard~Stallman, but we must prefix the tilde with an exclamation sign, when
-we need to write the shell command '=cd !~='.
+Richard~Stallman, but we must prefix the tilde with a backslash, when
+we need to write the shell command 'cd \~'.
 
 
 ==== Long Dash ====

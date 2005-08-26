@@ -328,7 +328,7 @@ Can I help you? :: Mohu Vám nějak pomoci?
 Can I take a message? :: Mohu převzít vzkaz?
 -----
 
-Optionally a phrase can be marked using the `` (phr.)'' note at the end of the
+Optionally a phrase can be marked using the ``(phr.)'' note at the end of the
 phrase like that:
 
 -----
