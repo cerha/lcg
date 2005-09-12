@@ -78,7 +78,7 @@ class Formatter(object):
                                 regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
         regexps = [isinstance(markup, types.StringType)
                    and regexp % (type, markup)
-                   or pair_regexp % (type, markup[0], type, markup[1])
+                   or pair_regexp % (type, markup[1], type, markup[0])
                    for type, markup in self._MARKUP]
         self._rules = re.compile('(?:' +'|'.join(regexps)+ ')', re.MULTILINE)
         self._paired_on_output = [type for type, format in self._FORMAT.items()
