@@ -1067,7 +1067,7 @@ class Exercise(Section):
                 print "Unable to read file: %s" % e
                 return None
         else:
-            content = self._parent.parse_wiki_text(re.sub('\[', '![', text))
+            content = self._parent.parse_wiki_text(re.sub('\[', '\\[', text))
         return Container(self._parent, content)
     
     def _init_resources(self):
@@ -1168,7 +1168,7 @@ class Exercise(Section):
     
     def _export_reading(self):
         if self._reading is not None:
-            return self._reading_instructions.export() + \
+            return div(self._reading_instructions.export(), cls="label") + \
                    div(self._reading.export(), cls="reading")
         else:
             return None
@@ -1176,7 +1176,11 @@ class Exercise(Section):
     def _export_instructions(self):
         """Return the HTML formatted instructions for this type of exercise."""
         custom = self._custom_instructions
-        return custom and custom.export() or p(self._instructions())
+        if custom:
+            return custom.export()
+        else:
+            default = self._instructions()
+            return default and p(default)
 
     def _export_recording(self):
         if self._recording:
@@ -1449,7 +1453,7 @@ class _FillInExercise(_InteractiveExercise):
     def _check_tasks(self, tasks):
         for t in tasks:
             assert not isinstance(t, ClozeTask) or len(t.answers()) == 1, \
-                       "%s requires just one textbox per task (%d found)!" % \
+                   "%s requires just one textbox per task (%d found)!" % \
                    (self.__class__.__name__, len(t.answers())) 
         return tasks
     
