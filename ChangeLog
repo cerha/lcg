@@ -1,3 +1,30 @@
+2005-09-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/css/default.css (Module): New styles added.
+
+	* lib/lcg/wiki.py (Formatter.__init__): Fixed order of the parts
+	within the paired regexp.
+
+	* lib/lcg/util.py (SplittableText.split): Include also the groups
+	of the match within the result (when there are any).
+	
+
+	* lib/lcg/eurochance.py (Unit._EXERCISE_SECTION_SPLITTER): Allow
+	titled sections.
+	(Unit._exercise_sections): New method.
+	(Unit._create_exercises): Make use of `self._exercise_sections()'.
+	(Unit._create_content): Just wrap the result od `_create_exercises()'.
+	(Formatter): Don't override the `_MARKUP' constant.
+	(AnswerSheet._create_content): Expect sections for both types of
+	courses.
+
+	* lib/lcg/content.py (Exercise._wiki_content): Use backslash as a
+	Wiki parser escape.
+	(Exercise._export_reading): Wrap the label to a div with a class
+	`label'.
+	(Exercise._export_instructions): Avoid an empty paragraph on
+	output when the instructions are empty.
+
 2005-08-26  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/feed.py (ExerciseFeeder._exercise): New assertion.
