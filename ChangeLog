@@ -1,5 +1,13 @@
 2005-09-12  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/scripts/exercises.js (event_key): Append modifiers
+	only for mapped (special) keys.  Map also a `Backspace' key.
+	(init_form): Function removed.
+	(FillInExerciseHandler._handle_key): New method.
+	(FillInExerciseHandler._handle_text_field_keypress): Call it.
+	(DictationHandler.init_recordings): New method.
+	(DictationHandler._handle_key): New method.
+
 	* resources/css/default.css (Module): New styles added.
 
 	* lib/lcg/wiki.py (Formatter.__init__): Fixed order of the parts
@@ -24,6 +32,11 @@
 	`label'.
 	(Exercise._export_instructions): Avoid an empty paragraph on
 	output when the instructions are empty.
+	(_InteractiveExercise._init_script): Don't rely on the Javascript
+	function `init_form()' and initialize the handler directly.
+	(Dictation._export_recording): Return None if the recording is a list.
+	(Dictation._init_script): Call handler's method `init_recordings'
+	when the recording is a list.
 
 2005-08-26  Tomas Cerha  <cerha@brailcom.org>
 
