@@ -1270,14 +1270,16 @@ class _InteractiveExercise(Exercise):
         return ()
 
     def _init_script(self):
-        #return "init_form(document.forms['%s'], '%s', NULL, NULL, NULL);" % \
-        #       (self._form_name(), self._FORM_HANDLER)
-        responses = dict([(key, [media.url() for media in values])
-                          for key, values in self._responses.items()])
-        return "init_form(document.forms['%s'], new %s(), %s, %s, %s);" % \
-               (self._form_name(), self._FORM_HANDLER,
-                js_array(self._answers()), js_dict(responses),
+        args = (js_array(self._answers()),
+                js_dict(dict([(key, [media.url() for media in values])
+                              for key, values in self._responses.items()])),
                 js_dict(self._MESSAGES))
+        return """
+        form = document.forms['%s'];
+        handler = new %s();
+        form.handler = handler;
+        handler.init(form, %s);
+        """ % (self._form_name(), self._FORM_HANDLER, ", ".join(args))
 
     def _results(self):
         displays = [' '.join((label, field(name=name, size=50, readonly=True)))
@@ -1551,6 +1553,20 @@ class Dictation(_FillInExercise):
 
     def _export_task_parts(self, task):
         return '<textarea rows="10" cols="60"></textarea>'
+
+    def _export_recording(self):
+        if isinstance(self._recording, (types.ListType, types.TupleType)):
+            return None
+        else:
+            return super(Dictation, self)._export_recording()
+        
+    def _init_script(self):
+        if isinstance(self._recording, (types.ListType, types.TupleType)):
+            init_recordings = "handler.init_recordings(%s);" % \
+                              js_array([m.url() for m in self._recording])
+        else:
+            init_recordings = ""
+        return super(Dictation, self)._init_script() + init_recordings
     
 
 class _Cloze(_FillInExercise):
