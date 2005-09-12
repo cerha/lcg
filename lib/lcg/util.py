@@ -107,6 +107,8 @@ class SplittableText:
             if i == maxsplit:
                 break
             pieces.append(self.piece(lastposition, match.start()))
+            if match.groups():
+                pieces.append(match.groups())
             lastposition = match.end()
         pieces.append(self.piece(lastposition, None))
         return pieces
