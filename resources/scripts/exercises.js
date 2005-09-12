@@ -28,24 +28,30 @@ function count(array, value) {
 function event_key(e) {
    // Return a textual representation of a pressed key.
    var code = document.all ? e.keyCode : e.which;
-   var cap = code >= 65 && code <= 90;
-   var modifiers = '';
-   if (document.all || document.getElementById) {
-      modifiers += e.ctrlKey ? 'Ctrl-' : '';
-      modifiers += e.altKey ? 'Alt-' : '';
-      modifiers += e.shiftKey && !cap ? 'Shift-' : '';
-   } else if (document.layers) {
-      modifiers += e.modifiers & Event.CONTROL_MASK ? 'Ctrl-' : '';
-      modifiers += e.modifiers & Event.ALT_MASK ? 'Alt-' : '';
-      modifiers += e.modifiers & Event.SHIFT_MASK && !cap ? 'Shift-' : '';
-   }
    var map = [];
+   map[8] = 'Backspace';
    map[13] = 'Enter';
    map[32] = 'Space';
    map[10] = 'Enter';
-   var key = map[code] != null ? map[code] : String.fromCharCode(code);
+   var key;
+   if (map[code] != null) {
+      var cap = code >= 65 && code <= 90;
+      var modifiers = '';
+      if (document.all || document.getElementById) {
+	 modifiers += e.ctrlKey ? 'Ctrl-' : '';
+	 modifiers += e.altKey ? 'Alt-' : '';
+	 modifiers += e.shiftKey && !cap ? 'Shift-' : '';
+      } else if (document.layers) {
+	 modifiers += e.modifiers & Event.CONTROL_MASK ? 'Ctrl-' : '';
+	 modifiers += e.modifiers & Event.ALT_MASK ? 'Alt-' : '';
+	 modifiers += e.modifiers & Event.SHIFT_MASK && !cap ? 'Shift-' : '';
+      }
+      key = modifiers + map[code]
+   } else {
+      key = String.fromCharCode(code);
+   }
    //alert(modifiers+key +' ('+code+')');
-   return modifiers+key;
+   return key;
 }
 
 function event_target(e) {
@@ -81,11 +87,6 @@ function simulate_click_on_keypress(e) {
 
 
 // Exercises
-
-function init_form(f, handler, answers, responses, messages) {
-   f.handler = handler;
-   handler.init(f, answers, responses, messages);
-}
 
 //=============================================================================
 // Generic exercise form handler class.
@@ -375,12 +376,39 @@ FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
 	 highlight(field, i, i);
       }
       return false;
-   }
+   } 
+   return _this._handle_key(key);
+}
+
+FillInExerciseHandler.prototype._handle_key = function(key) {
    return true;
 }
 
 function DictationHandler() {}
 DictationHandler.prototype = new FillInExerciseHandler();
+
+DictationHandler.prototype.init_recordings = function(recordings) {
+   this._recordings = recordings;
+   this._current_recording = -1;
+}
+
+DictationHandler.prototype._handle_key = function(key) {
+   if (this._recordings == null) return true;
+   if (key == '>' || key == '<' || key == 'Ctrl-Enter') {
+      stop_audio()
+      if (key == '>') {
+	 if (this._current_recording >= this._recordings.length-1) return false;
+	 this._current_recording++;
+      }
+      if (key == '<') {
+	 if (this._current_recording <= 0) return false;
+	 this._current_recording--;
+      }
+      play_audio(this._recordings[this._current_recording]);
+      return false;
+   } 
+   return true;
+}
 
 DictationHandler.prototype.display_results = function() {
    msg = this.msg(this.correct() ? 'Correct':'Error(s) found');
