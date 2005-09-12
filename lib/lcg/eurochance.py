@@ -38,24 +38,39 @@ class EurochanceNode(ContentNode):
         return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)
 
 class Unit(EurochanceNode):
+    _EXERCISE_SECTION_SPLITTER = re.compile(r"^==(?P<title>.+)?==+\s*$", re.M)
 
     def _abbrev_title(self, abbrev=False):
         return _("Unit %d") % self._parent.index(self)
 
     def _title(self, abbrev=False):
         return self._read_file('title')
-
-    def _create_content(self):
+    
+    def _exercise_sections(self, split_result):
+        title = ''
+        pieces = []
+        for x in split_result:
+            if isinstance(x, SplittableText):
+                if x.text().strip():
+                    pieces.append((title, x))
+            else:
+                title = x[0]
+        return pieces
+    
+    def _create_exercises(self):
         filename = self._input_file('exercises')
         text = self._read_file('exercises', comment='^#')
-        src = SplittableText(text, input_file=filename)
-        exercises = feed.ExerciseFeeder(src).feed(self)
-        toc = TableOfContents(self, exercises)
-        return SectionContainer(self, [toc] + exercises)
+        splittable = SplittableText(text, input_file=filename)
+        pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
+        return [Section(self, _("Section %d") +': '+ title,
+                        feed.ExerciseFeeder(piece).feed(self))
+                for title, piece in self._exercise_sections(pieces)]
+
+    def _create_content(self):
+        return SectionContainer(self, self._create_exercises())
     
 class IntermediateUnit(Unit):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
-    _EXERCISE_SECTION_SPLITTER = re.compile(r"\r?\n====+\s*\r?\n")
 
     def _id(self):
         return 'unit'
@@ -69,22 +84,17 @@ class IntermediateUnit(Unit):
         ulang = self.root().users_language()
         text = self._read_splittable_text('vocabulary', lang=ulang)
         return feed.VocabFeeder(text, ulang).feed(self)
-    
-    def _create_exercises(self):
-        filename = self._input_file('exercises')
-        text = self._read_file('exercises', comment='^#')
-        splittable = SplittableText(text, input_file=filename)
-        pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
+
+    def _exercise_sections(self, pieces):
+        pieces = [p for p in pieces if isinstance(p, SplittableText)]
         assert len(pieces) == 5, \
-               "%s: 5 sections expected, %d found." % (filename, len(pieces))
+               "5 sections expected! (%d found)" % len(pieces)
         titles = (_("Vocabulary Practice"),
                   _("Listening Comprehension"),
                   _("General Comprehension"),
                   _("Grammar Practice"),
                   _("Consolidation"))
-        return [Section(self, _("Section %d") +': '+ title,
-                        feed.ExerciseFeeder(piece).feed(self))
-                for title, piece in zip(titles, pieces)]
+        return zip(titles, pieces)
     
     def _create_content(self):
         self.vocab = self._create_vocab()
@@ -208,12 +218,11 @@ class AnswerSheet(EurochanceNode):
 
     def _create_content(self):
         parent = self._unit.find_section('exercises')
-        if parent is not None:
-            # For the intermediate course
-            sections = [Section(self, sec.title(), self._answer_sheets(sec))
-                        for sec in parent.sections()]
-        else:
-            sections = self._answer_sheets(self._unit)
+        if parent is None:
+            # For the advanced course
+            parent = self._unit
+        sections = [Section(self, sec.title(), self._answer_sheets(sec))
+                    for sec in parent.sections()]
         return SectionContainer(self, sections)
 
     
@@ -291,9 +300,6 @@ class EurochanceExporter(StaticExporter):
     
 class Formatter(wiki.Formatter):
 
-    _MARKUP = [(type, markup) for type, markup in wiki.Formatter._MARKUP
-               if type not in ('italic', 'fixed')]
-    
     def _citation_formatter(self, groups, close=False):
         if not close:
             return '<span class="citation" lang="%s">' % self._parent.language()
