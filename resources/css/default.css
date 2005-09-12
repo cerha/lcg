@@ -100,6 +100,11 @@ a.answer-sheet-link {
     margin: 2px;
 }
 
+.label p { 
+    margin: 0;
+    padding: 0;
+}
+
 .reading { 
     background-color: #eee;
 }
