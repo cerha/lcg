@@ -1,5 +1,8 @@
 2005-09-13  Tomas Cerha  <cerha@brailcom.org>
 
+	* translations/exercise-instructions.txt: Dictation instructions
+	updated.  Formatting improved.
+
 	* lib/lcg/content.py (Dictation.__init__): New method adding a
 	keyword argument `pieces'.
 	(Dictation._export_recording): Removed.

@@ -138,6 +138,13 @@ input.fill-in-task {
 .citation, .quotation { 
     font-style: italic;
 }
+dt .citation { 
+    font-style: normal;
+}
+dt em { 
+    font-weight: normal;
+}
+
 
 .speaking-text { 
     color: #04b;
