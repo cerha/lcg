@@ -483,6 +483,15 @@ Recognized exercise header arguments are:
    original sound file extension.  The file is then searched within the
    ='transcripts'= subdirectory of current node's source directory.
 
+=pieces=
+   This argument is only valid for the [#Dictation] exercise.  It specifies a
+   filename mask for the recording split up to pieces.  These pieces can be
+   then replayed by the user on demand (using shortcut keys).  You can have for
+   example the recording in a file ='dictation.mp3'= (specified by the
+   =sound_file= argument) and you will split this file up to 10 pieces named
+   ='dictation-01.mp3'= through ='dictation-10.mp3'=.  Thus you specify the
+   =pieces= argument's value as ='dictation-*.mp3'=.  Remember, that the files
+   are sorted alphabetically, and name them properly.
 
 =reading= 
    Specifies the reading text, which is displayed at the beginning of the
@@ -712,10 +721,13 @@ Can you wait a moment, please? (Take a message.)
 Can you take a message, please?
 -----
 
-===== Dictation =====
+===== Dictation ===== Dictation
 
 Task specification for the dictation is the text of the dictation as one
-paragraph of text.  The recording is required for this exercise.
+paragraph of text.  A recording is required for this exercise.  An optional
+(but recommanded) argument =pieces= can point to the recording split to pieces.
+These pieces can be then replayed separately byt the user while writing down
+the dictation text.  See the description of this argument for more details.
 
 ==== Exercise comments ==== comments
 
