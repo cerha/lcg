@@ -1544,6 +1544,14 @@ class Dictation(_FillInExercise):
     _INSTRUCTIONS = _("""Listen to the recording and type exactly what you hear
     into the textbox below.""")
 
+    def __init__(self, parent, tasks, pieces=None, **kwargs):
+        if pieces is not None:
+            self._pieces = parent.resource(Media, pieces)
+            assert isinstance(self._pieces, (types.ListType, types.TupleType))
+        else:
+            self._pieces = None
+        super(Dictation, self).__init__(parent, tasks, **kwargs)
+
     def _check_tasks(self, tasks):
         assert len(tasks) == 1
         return tasks
@@ -1553,20 +1561,13 @@ class Dictation(_FillInExercise):
 
     def _export_task_parts(self, task):
         return '<textarea rows="10" cols="60"></textarea>'
-
-    def _export_recording(self):
-        if isinstance(self._recording, (types.ListType, types.TupleType)):
-            return None
-        else:
-            return super(Dictation, self)._export_recording()
         
     def _init_script(self):
-        if isinstance(self._recording, (types.ListType, types.TupleType)):
-            init_recordings = "handler.init_recordings(%s);" % \
-                              js_array([m.url() for m in self._recording])
-        else:
-            init_recordings = ""
-        return super(Dictation, self)._init_script() + init_recordings
+        init_script = super(Dictation, self)._init_script()
+        if self._pieces:
+            init_script += "handler.init_recordings(%s);" % \
+                           js_array([m.url() for m in self._pieces])
+        return init_script
     
 
 class _Cloze(_FillInExercise):
