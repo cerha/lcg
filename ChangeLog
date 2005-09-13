@@ -1,3 +1,14 @@
+2005-09-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (Dictation.__init__): New method adding a
+	keyword argument `pieces'.
+	(Dictation._export_recording): Removed.
+	(Dictation._init_script): Use `self._pieces', not
+	`self._recording' to initialize the handler.
+
+	* doc/eurochance.wiki (transcript): New Dictation argument
+	`pieces' documented.
+
 2005-09-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/scripts/exercises.js (event_key): Append modifiers
