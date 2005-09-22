@@ -1,5 +1,6 @@
 body { 
     background: white;
+    font-family: sans-serif;
 }
 
 a:link, a:visited { color: #06d; text-decoration: none; }
@@ -145,13 +146,13 @@ dt em {
     font-weight: normal;
 }
 
-
 .speaking-text { 
     color: #04b;
     text-decoration: none;
     background: none;
     border: none;
     font-size: 1em;
+    text-align: left;
 }
 
 .results { 
