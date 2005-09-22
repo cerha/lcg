@@ -173,18 +173,20 @@ Handler.prototype.eval_answer = function(field) {
 
 Handler.prototype.evaluate = function() {
    this._eval_answers();
-   for (var i=0; i < this._results.length; i++) {
-      if (this._results[i] != 1) {
-	 this._error_handler(this._fields[i]);
+   for (var i=0; i < this._fields.length; i++) {
+      var field = this._fields[i];
+      if (this._results[field.answer_index] != 1) {
+	 this._error_handler(field);
 	 break;
       }
    }
    if (this._fields.length > 1) {
-      switch (this.percentage()) {
-	 case 100: selector = 'all_correct'; break;
-	 case   0: selector = 'all_wrong'; break;
-	 default:  selector = 'some_wrong';
-      }
+      percentage = this.percentage()
+      if      (percentage < 50)  selector='f0-49';
+      else if (percentage < 70)  selector='f50-69';
+      else if (percentage < 85)  selector='f70-84';
+      else if (percentage < 100) selector='f85-99';
+      else selector='f100';
    } else {
       selector = this.correct() ? 'correct':'incorrect';
    }
@@ -278,6 +280,18 @@ ChoiceBasedExerciseHandler.prototype.get_value = function(i) {
       }
    }
    return null;
+}
+
+ChoiceBasedExerciseHandler.prototype._error_handler = function(field) {
+   var i = field.answer_index;
+   for (var n=0; n < this._fields.length; n++) {
+      var f = this._fields[n];
+      if (f.answer_index == i && f.checked) {
+	 f.focus();
+	 return;
+      }
+   }
+   field.focus();
 }
 
 //=============================================================================
