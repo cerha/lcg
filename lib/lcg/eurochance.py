@@ -30,13 +30,20 @@ class EurochanceNode(ContentNode):
     def __init__(self, *args, **kwargs):
         super(EurochanceNode, self).__init__(*args, **kwargs)
         self.resource(Stylesheet, 'default.css')
-
+    
     def resource(self, cls, file, *args, **kwargs):
         if cls is Media:
             basename, ext = os.path.splitext(file)
             file = basename + '.mp3'
         return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)
 
+    def _lang(self):
+        if isinstance(self.root(), IntermediateCourse):
+            return self.root().users_language()
+        else:
+            return None
+
+    
 class Unit(EurochanceNode):
     _EXERCISE_SECTION_SPLITTER = re.compile(r"^==(?P<title>.+)?==+\s*$", re.M)
 
@@ -81,7 +88,7 @@ class IntermediateUnit(Unit):
         return SplittableText(text, input_file=filename)
 
     def _create_vocab(self):
-        ulang = self.root().users_language()
+        ulang = self._lang()
         text = self._read_splittable_text('vocabulary', lang=ulang)
         return feed.VocabFeeder(text, ulang).feed(self)
 
@@ -98,14 +105,9 @@ class IntermediateUnit(Unit):
     
     def _create_content(self):
         self.vocab = self._create_vocab()
-        ulang = self.root().users_language()
         sections = (Section(self, _("Aims and Objectives"),
                             self.parse_wiki_file('aims')),
                     VocabSection(self, _("Vocabulary"), self.vocab),
-                    Section(self, _("Grammar"), anchor='grammar', 
-                            content=self.parse_wiki_file('grammar',
-                                                         lang=ulang),
-                            lang=ulang),
                     Section(self, _("Exercises"), anchor='exercises',
                             content=self._create_exercises()),
                     Section(self, _("Checklist"),
@@ -119,10 +121,7 @@ class Instructions(EurochanceNode):
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        if isinstance(self.root(), IntermediateCourse):
-            ulang = self.root().users_language()
-        else:
-            ulang = None
+        ulang = self._lang()
         content = self.parse_wiki_file('instructions', lang=ulang)
         return SectionContainer(self, content, lang=ulang)
     
@@ -130,21 +129,15 @@ class Instructions(EurochanceNode):
 class ExerciseInstructions(EurochanceNode):
     """Exercise instructions."""
     
-    def __init__(self, parent, type, *args, **kwargs):
+    def __init__(self, parent, type, template, *args, **kwargs):
         assert issubclass(type, Exercise)
         self._type = type
+        self._template = template
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
-        lang = None #self.root().users_language()
-        template = self._read_file('exercise-instructions',
-                                   lang=lang, dir=config.translation_dir)
-        try:
-           template = self._read_file('exercise-context', lang=lang) + template
-        except IOError:
-            pass
-        content = self._type.help(self, template)
-        return SectionContainer(self, content, lang=lang)
+        content = self._type.help(self, self._template)
+        return SectionContainer(self, content, lang=self._lang())
 
     def title(self, abbrev=False):
         return _("Instructions for %s") % self._type.name()
@@ -152,28 +145,26 @@ class ExerciseInstructions(EurochanceNode):
     def _id(self):
         return camel_case_to_lower(self._type.__name__)
 
-    
+
+class GrammarBank(EurochanceNode):
+    _TITLE = _("Grammar Bank")
+
+    def _create_content(self):
+        content = self.parse_wiki_file('grammar', lang=self._lang())
+        return SectionContainer(self, content, lang=self._lang())
+
+
 class _Index(EurochanceNode):
 
     def __init__(self, parent, units, *args, **kwargs):
         self._units = units
         super(_Index, self).__init__(parent, *args, **kwargs)
 
-    
 class CourseIndex(_Index):
     _TITLE = _("Detailed Course Index")
 
     def _create_content(self):
         return TableOfContents(self, item=self.parent(), depth=99)
-
-    
-class GrammarIndex(_Index):
-    _TITLE = _("Grammar Bank")
-
-    def _create_content(self):
-        all = reduce(lambda a,b: a+b, [u.find_section('grammar').sections()
-                                       for u in self._units])
-        return TableOfContents(self, all, depth=99)
 
     
 class VocabIndex(_Index):
@@ -233,7 +224,9 @@ class Help(EurochanceNode):
         return TableOfContents(self, title=_("Table of Contents:"))
 
     def _create_children(self):
-        return [self._create_child(ExerciseInstructions, t)
+        template = self._read_file('help', lang=self._lang(),
+                                   dir=config.translation_dir)
+        return [self._create_child(ExerciseInstructions, t, template)
                 for t in Exercise.used_types()]
 
     
@@ -266,8 +259,7 @@ class AdvancedCourse(EurochanceCourse):
     def _create_children(self):
         units = [self._create_child(Unit, subdir=d) for d in self._unit_dirs()]
         return [self._create_child(Instructions)] + units + \
-               [self._create_child(CourseIndex, units),
-                self._create_child(AnswerSheets, units),
+               [self._create_child(AnswerSheets, units),
                 self._create_child(Help)]
 
     
@@ -288,8 +280,7 @@ class IntermediateCourse(EurochanceCourse):
         units = [self._create_child(IntermediateUnit, subdir=d)
                  for d in self._unit_dirs()]
         return [self._create_child(Instructions)] + units + \
-               [self._create_child(CourseIndex, units),
-                self._create_child(GrammarIndex, units),
+               [self._create_child(GrammarBank),
                 self._create_child(VocabIndex, units),
                 self._create_child(AnswerSheets, units),
                 self._create_child(Help)]
@@ -299,13 +290,18 @@ class EurochanceExporter(StaticExporter):
     _INDEX_LABEL = _('Course Index')
     
 class Formatter(wiki.Formatter):
-
     def _citation_formatter(self, groups, close=False):
         if not close:
             return '<span class="citation" lang="%s">' % self._parent.language()
         else:
             return '</span>'
-    
 wiki.Formatter = Formatter
 
+#class _Section(wiki.Parser._Section):
+#    def __init__(self, title, *args, **kwargs):
+#        title = title.replace('>>', '<span class="citation" lang="%s">' %
+#                              self._parent.language())
+#        title = title.replace('<<', '</span>')
+#        super(wiki.Parser._Section, self).__init__(title, *args, **kwargs)
+#wiki.Parser._Section = _Section
 
