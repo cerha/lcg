@@ -1,3 +1,53 @@
+2005-09-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/eurochance.py (EurochanceNode._lang): New method.
+	(IntermediateUnit._create_vocab, Instructions._create_content)
+	(ExerciseInstructions._create_content)
+	(GrammarBank._create_content, Help._create_children): Use it.
+	(ExerciseInstructions.__init__): New argument `template'.
+	(IntermediateUnit._create_content): Don't include the grammar
+	sections here.
+	(ExerciseInstructions._create_content): Don't open the template
+	here.  Don't use the `exercise-context' file.
+	(GrammarBank): New class.
+	(GrammarIndex): Removed.
+	(Help._create_children): Read the template once and pass it to the
+	children.
+	(AdvancedCourse._create_children)
+	(IntermediateCourse._create_children): Omit `CourseIndex' and
+	`GrammarIndex'.
+	(IntermediateCourse._create_children): Add the `GrammarBank'.
+
+	* lib/lcg/content.py (Exercise._BUTTONS): Removed.
+	(Exercise._DISPLAYS): Renamed to `_INDICATORS'.
+	(Exercise._INDICATORS): New constant.
+	(Exercise.help): Don't add the `buttons' and `displays' to
+	parser's globals.  Pass class as `type', not `cls'.
+	(_InteractiveExercise._RESPONSES): Added also the overall
+	evaluation results.
+	(_InteractiveExercise._DISPLAYS): -> `_INDICATORS'.
+	(_InteractiveExercise._BUTTONS): Removed.
+	(_InteractiveExercise._results): Define buttons right
+	here. `_DISPLAYS' -> `_INDICATORS'.
+	(_FillInExercise._RESPONSES): Removed.
+	(_FillInExercise._BUTTONS): Removed.
+	(VocabExercise._NAME): Changed to "Test Yourself".
+
+	* resources/css/default.css: Minor improvements.
+
+	* resources/scripts/exercises.js (Handler.evaluate): Cycle
+	through the fields, not the results.
+	(Handler.evaluate): Use new responses according to the parcentage.
+	(ChoiceBasedExerciseHandler._error_handler): New method.
+
+	* resources/media/responses/i02.mp3: Removed.
+
+	* resources/media/responses/c12.mp3: Removed.
+
+	* translations/help.txt: New file.
+
+	* translations/exercise-instructions.txt: Renamed to `help.txt'.
+
 2005-09-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/exercise-instructions.txt: Dictation instructions
