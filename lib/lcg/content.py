@@ -530,6 +530,7 @@ class TableOfContents(Content):
                 item = self._parent
         toc = self._make_toc(item, depth=self._depth)
         if self._title is not None:
+            #TODO: add a "skip" link.
             return div((b(self._title), toc), cls="table-of-contents")
         else:
             return toc
@@ -917,7 +918,7 @@ class Exercise(Section):
     _READING_REQUIRED = False
     _AUDIO_VERSION_REQUIRED = False
     _BUTTONS = ()
-    _DISPLAYS = ()
+    _INDICATORS = ()
     _INSTRUCTIONS = ""
     _AUDIO_VERSION_LABEL = _("""This exercise can be also done purely
     aurally/orally:""")
@@ -1090,8 +1091,7 @@ class Exercise(Section):
     def help(cls, parent, template):
         cls._help_node = parent
         mp = wiki.MacroParser()
-        mp.add_globals(cls=cls, displays=[x[0] for x in cls._DISPLAYS],
-                       buttons=[x[0] for x in cls._BUTTONS], **globals())
+        mp.add_globals(type=cls, **globals())
         text = mp.parse(template)
         return wiki.Parser(parent).parse(text)
     help = classmethod(help)
@@ -1241,16 +1241,19 @@ class _InteractiveExercise(Exercise):
     """
     _ANSWER_SHEET_LINK_CLASS = 'answer-sheet-link'
     _RESPONSES = (('correct', 'responses/c*.mp3'),
-                  ('incorrect', 'responses/i*.mp3'))
+                  ('incorrect', 'responses/i*.mp3'),
+                  ('f0-49',  'responses/f0-49.mp3'),
+                  ('f50-69', 'responses/f50-69.mp3'),
+                  ('f70-84', 'responses/f70-84.mp3'),
+                  ('f85-99', 'responses/f85-99.mp3'),
+                  ('f100',   'responses/f100.mp3'))
     
     _FORM_HANDLER = 'Handler'
     _MESSAGES = {", $x ($y%) on first attempt":_(", $x ($y%) on first attempt")}
 
-    _DISPLAYS = (('answered', _('Answered:')),
-                 ('result', _('Correct:')))
-    _BUTTONS = (('fill',  _('Fill'),  button, "this.form.handler.fill()"),
-                ('reset', _('Reset'), reset,  "this.form.handler.reset()"))
-
+    _INDICATORS = (('answered', _('Answered:')),
+                   ('result', _('Correct:')))
+    
     def _init_resources(self):
         super(_InteractiveExercise, self)._init_resources()
         self._parent.resource(Script, 'exercises.js')
@@ -1283,13 +1286,15 @@ class _InteractiveExercise(Exercise):
 
     def _results(self):
         displays = [' '.join((label, field(name=name, size=50, readonly=True)))
-                    for name, label in self._DISPLAYS]
-        buttons = [type(label, handler)
-                   for id, label, type, handler in self._BUTTONS]
+                    for name, label in self._INDICATORS]
+        buttons = [f(label, handler) for f, label, handler in
+                   ((button, _("Evaluate"), "this.form.handler.evaluate()"),
+                    (button, _('Fill'),     "this.form.handler.fill()"),
+                    (reset,  _('Reset'),    "this.form.handler.reset()"))]
         panel = div((div('<br/>'.join(displays), 'display'),
                      div(buttons, 'buttons')), 'results')
         l = p(_("See the %s to check your results.") %
-              link(_("answer sheet"), self._answer_sheet_url(), target="help"))
+              link(_("answer sheet"), self._answer_sheet_url(), target='help'))
         return script_write(panel, l)
 
     def _answer_sheet_items(self):
@@ -1388,7 +1393,7 @@ class Selections(_ChoiceBasedExercise):
     _TASK_TYPE = Selection
     _NAME = _("Selections")
     _INSTRUCTIONS = _("""Decide which statement is correct for each of the
-    groups below .""")
+    groups below.""")
 
     
 class TrueFalseStatements(_ChoiceBasedExercise):
@@ -1439,17 +1444,8 @@ class _FillInExercise(_InteractiveExercise):
 
     _TASK_TYPE = FillInTask
     
-    _RESPONSES = (('all_correct', 'responses/all-correct.mp3'),
-                  ('all_wrong',   'responses/all-wrong.mp3'),
-                  ('some_wrong',  'responses/some-wrong.mp3')) + \
-                  _InteractiveExercise._RESPONSES
-        
     _FORM_HANDLER = 'FillInExerciseHandler'
 
-    _BUTTONS = (('eval', _("Evaluate"), button,
-                 "this.form.handler.evaluate()"),) + \
-                 _InteractiveExercise._BUTTONS
-    
     _TASK_FORMAT = "%s<br/>%s"
 
     def _check_tasks(self, tasks):
@@ -1485,7 +1481,7 @@ class _FillInExercise(_InteractiveExercise):
 class VocabExercise(_FillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
-    _NAME = _("Vocabulary Practice Exercise")
+    _NAME = _("Test Yourself")
     _TASK_FORMAT = "%s %s"
     _INSTRUCTIONS = _("""Fill in a correct translation for each of the terms
     below.""")
@@ -1540,7 +1536,7 @@ class Dictation(_FillInExercise):
     _MESSAGES = {'Correct': _('Correct'),
                  'Error(s) found': _('Error(s) found')}
     _MESSAGES.update(_FillInExercise._MESSAGES)
-    _DISPLAYS = (('result', _('Result:')),)
+    _INDICATORS = (('result', _('Result:')),)
     _INSTRUCTIONS = _("""Listen to the recording and type exactly what you hear
     into the textbox below.""")
 
