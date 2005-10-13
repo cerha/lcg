@@ -1,3 +1,48 @@
+2005-10-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/feed.py (VocabFeeder.__init__): Initialize `self._attr'
+	instead of `self._phrases'.
+	(VocabFeeder._item): Set `self._attr' when a marker is found.  Set
+	`VocabItem's `attr' argument according to `self._attr'.
+
+	* lib/lcg/content.py (VocabItem.ATTR_EXTENDED)
+	(VocabItem.ATTR_PHRASE): New constants.
+	(VocabItem.__init__): New argument `attr' replacing the
+	`is_phrase' flag.
+	(VocabItem.attr): New method.
+	(VocabItem.is_phrase): Method removed.
+	(VocabSection.__init__): Call `self._subsections()' to get a list
+	of vocab sections.
+	(VocabSection._subsections): New method.
+	(VocabIndexSection._subsections): New class.
+	(Exercise.help): Method removed.
+	(Exercise.set_help_node, Exercise.typedict): New methods.
+	(SentenceCompletion._INSTRUCTIONS)
+	(SentenceCompletion._AUDIO_VERSION_LABEL)
+	(_ChoiceBasedExercise._INSTRUCTIONS, Selections._INSTRUCTIONS)
+	(TrueFalseStatements._INSTRUCTIONS)
+	(TrueFalseStatements.._INSTRUCTIONS, GapFilling._INSTRUCTIONS) 
+	(VocabExercise._INSTRUCTIONS, Transformation._INSTRUCTIONS) 
+	(Transformation._instructions, Dictation._INSTRUCTIONS) 
+	(_Cloze._INSTRUCTIONS, _Cloze._instructions) 
+	(_ExposedCloze._INSTRUCTIONS): Instruction texts improved.
+
+	* lib/lcg/eurochance.py (_lang): Renamed to `_user_lang'.
+	(EurochanceNode._localized_wiki_content): New method.
+	(IntermediateUnit._create_vocab): `self._lang()' ->
+	`self._user_lang()'.
+	(Instructions._create_content): Use `self._localized_wiki_content()'.
+	(ExerciseInstructions.__init__): Call `set_help_node()' on the
+	exercise type.
+	(ExerciseInstructions._create_content): Instead of using
+	`Exercise.help()', run the parser right from here.
+	(GrammarBank._create_content): Use `self._localized_wiki_content()'.
+	(VocabIndex._create_content): Use `VocabIndexSection' instead of
+	`VocabSection'.
+	(Help._create_children): `self._lang()' ->
+	`self._user_lang()'.
+	(_Section): Redefine the parser's `_Section' class.
+
 2005-09-22  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/eurochance.py (EurochanceNode._lang): New method.
