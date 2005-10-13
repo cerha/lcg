@@ -566,21 +566,26 @@ class VocabItem(object):
     """One item of vocabulary listing."""
     _DIACRITICS_MATCHER = re.compile(r" WITH .*")
     _DANGER_CHAR_MATCHER = re.compile(r"[^a-zA-Z0-9-]")
+
+    ATTR_EXTENDED = 'ATTR_EXTENDED'
+    """Special attribute indicating an extended vocabulary item."""
+    ATTR_PHRASE = 'ATTR_PHRASE'
+    """Special attribute indicating a phrase."""
     
-    def __init__(self, parent, word, note, translation,
-                 translation_language, is_phrase=False):
+    def __init__(self, parent, word, note, translation, translation_language,
+                 attr=None):
         """Initialize the instance.
         
         Arguments:
-          word -- The actual piece of vocabulary as a string
-          note -- Notes in round brackets as a string.  Can contain multiple
+          word -- the actual piece of vocabulary as a string
+          note -- notes in round brackets as a string.  Can contain multiple
             notes in brackets separated by spaces.  Typical notes are for
             example (v) for verb etc.
           translation -- the translation of the word into target language.
           translation_language -- the lowercase ISO 639-1 Alpha-2 language
             code.
-          is_phrase a boolean flag indicating, that given vocabulary item is a
-            phrase.
+          attr -- special attributte.  One of the classes ATTR_* constants or
+            None.
           
         """
         assert isinstance(word, types.UnicodeType)
@@ -588,12 +593,12 @@ class VocabItem(object):
         assert isinstance(translation, types.UnicodeType)
         assert isinstance(translation_language, types.StringTypes) and \
                len(translation_language) == 2
-        assert isinstance(is_phrase, types.BooleanType)
+        assert attr in (None, self.ATTR_EXTENDED, self.ATTR_PHRASE)
         self._word = word
         self._note = note
         self._translation = translation
         self._translation_language = translation_language
-        self._is_phrase = is_phrase
+        self._attr = attr
         filename = "item-%02d.mp3" % parent.counter(self.__class__).next()
         path = os.path.join('vocabulary', filename)
         self._media = parent.resource(Media, path)
@@ -613,8 +618,8 @@ class VocabItem(object):
     def translation_language(self):
         return self._translation_language
 
-    def is_phrase(self):
-        return self._is_phrase
+    def attr(self):
+        return self._attr
 
         
 class VocabList(Content):
@@ -672,17 +677,31 @@ class VocabSection(Section):
         assert isinstance(title, types.StringTypes)
         assert is_sequence_of(items, VocabItem)
         assert isinstance(reverse, types.BooleanType)
-        terms = [x for x in items if not x.is_phrase()]
-        phrases = [x for x in items if x.is_phrase()]
-        if phrases:
-            c = [Section(parent, _("Terms"),
-                         VocabList(parent, terms, reverse=reverse)),
-                 Section(parent, _("Phrases"),
-                         VocabList(parent, phrases, reverse=reverse))]
+        subsections = [(t, i) for t, i in self._subsections(items) if i]
+        if len(subsections) > 1:
+            c = [Section(parent, t, VocabList(parent, i, reverse=reverse))
+                 for t, i in subsections]
         else:
-            c = VocabList(parent, terms, reverse=reverse)
+            c = VocabList(parent, subsections[0][1])
         super(VocabSection, self).__init__(parent, title, c)
 
+    def _subsections(self, items):
+        return ((_("Terms"),
+                 [x for x in items if x.attr() is None]),
+                (_("Phrases"),
+                 [x for x in items if x.attr() is VocabItem.ATTR_PHRASE]),
+                (_("Extended vocabulary"),
+                 [x for x in items if x.attr() is VocabItem.ATTR_EXTENDED]))
+    
+        
+class VocabIndexSection(VocabSection):
+    def _subsections(self, items):
+        return ((_("Terms"),
+                 [x for x in items if x.attr() is not VocabItem.ATTR_PHRASE]),
+                (_("Phrases"),
+                 [x for x in items if x.attr() is VocabItem.ATTR_PHRASE]))
+
+    
         
 ################################################################################
 ################################     Tasks     #################################
@@ -920,8 +939,8 @@ class Exercise(Section):
     _BUTTONS = ()
     _INDICATORS = ()
     _INSTRUCTIONS = ""
-    _AUDIO_VERSION_LABEL = _("""This exercise can be also done purely
-    aurally/orally:""")
+    _AUDIO_VERSION_LABEL = _("This exercise can be also done purely "
+                             "aurally/orally:")
     _TASK_SEPARATOR = '<br class="task-separator"/>\n'
     _EXPORT_ORDER = None
     
@@ -1088,13 +1107,14 @@ class Exercise(Section):
         return cls._used_types
     used_types = classmethod(used_types)
 
-    def help(cls, parent, template):
-        cls._help_node = parent
-        mp = wiki.MacroParser()
-        mp.add_globals(type=cls, **globals())
-        text = mp.parse(template)
-        return wiki.Parser(parent).parse(text)
-    help = classmethod(help)
+    def set_help_node(cls, node):
+        cls._help_node = node
+    set_help_node = classmethod(set_help_node)
+    
+    def typedict(cls):
+        # Quick hack: globals already contain all types...
+        return globals()
+    typedict = classmethod(typedict)
     
     # Instance methods
 
@@ -1226,10 +1246,9 @@ class SentenceCompletion(Exercise):
     _NAME = _("Sentence Completion")
     _AUDIO_VERSION_REQUIRED = True
     _TASK_TYPE = None
-    _INSTRUCTIONS = _("""Practise speech according to the instructions within
-    the recording.""")
-    _AUDIO_VERSION_LABEL = _("""This exercise can be only done purely
-    aurally/orally:""")
+    _INSTRUCTIONS = _("Speaking Practice.  Complete the sentences you hear, "
+                      "using the example as a model.")
+    _AUDIO_VERSION_LABEL = _("Press Play to listen to the instructions:")
     
     
 class _InteractiveExercise(Exercise):
@@ -1341,6 +1360,7 @@ class _ChoiceBasedExercise(_InteractiveExercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
     _FORM_HANDLER = 'ChoiceBasedExerciseHandler'
+    _INSTRUCTIONS = _("Chose the correct answer.")
 
     def _answers(self):
         return [t.choice_index(t.correct_choice())
@@ -1383,8 +1403,6 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
     
     _TASK_TYPE = MultipleChoiceQuestion
     _NAME = _("Multiple Choice Questions")
-    _INSTRUCTIONS = _("""For each of the questions below choose the correct
-    answer from the list.""")
 
     
 class Selections(_ChoiceBasedExercise):
@@ -1392,8 +1410,6 @@ class Selections(_ChoiceBasedExercise):
     
     _TASK_TYPE = Selection
     _NAME = _("Selections")
-    _INSTRUCTIONS = _("""Decide which statement is correct for each of the
-    groups below.""")
 
     
 class TrueFalseStatements(_ChoiceBasedExercise):
@@ -1401,8 +1417,7 @@ class TrueFalseStatements(_ChoiceBasedExercise):
     
     _TASK_TYPE = TrueFalseStatement
     _NAME = _("True/False Statements")
-    _INSTRUCTIONS = _("""For each of the statements below indicate whether
-    you think they are true or false.""")
+    _INSTRUCTIONS = _("For each of the statements below, choose True or False.")
     
     def _choice_label(self, task, choice):
         return ""
@@ -1427,8 +1442,8 @@ class GapFilling(_SelectBasedExercise):
 
     _TASK_TYPE = GapFillStatement
     _NAME = _("Gap Filling")
-    _INSTRUCTIONS = _("""For each of the statements below choose the correct
-    word to fill in the gap.""")
+    _INSTRUCTIONS = _("Choose the correct option to fill the gaps in the "
+                      "following sentences.")
 
     def _export_task_parts(self, task):
         statement = task.substitute_gap("%s")
@@ -1483,10 +1498,8 @@ class VocabExercise(_FillInExercise):
 
     _NAME = _("Test Yourself")
     _TASK_FORMAT = "%s %s"
-    _INSTRUCTIONS = _("""Fill in a correct translation for each of the terms
-    below.""")
-    _AUDIO_VERSION_LABEL = _("""Use the recording to hear the model
-    pronunciation:""")
+    _INSTRUCTIONS = _("Fill in the correct translation for each "
+                      "of the terms below.")
     _TASK_SEPARATOR = ''
 
     def _check_tasks(self, tasks):
@@ -1516,12 +1529,13 @@ class Transformation(_FillInExercise):
     _NAME = _("Transformation")
     _TASK_TYPE = TransformationTask
     _TASK_FORMAT = "A. %s<br/>B. %s"
-    _INSTRUCTIONS = _("""Fill in the gap in sentence B so that it means the same
-    as sentence A.""")
+    _INSTRUCTIONS = _("Fill in the gap in sentence B so that it means the "
+                      "same as sentence A.")
     
     def _instructions(self):
         if self._example:
-            return _("Transform the sentences below according to the example.")
+            return _("Using the example as a model, change the structure "
+                     "and make a new sentence.")
         else:
             return self._INSTRUCTIONS
 
@@ -1537,8 +1551,11 @@ class Dictation(_FillInExercise):
                  'Error(s) found': _('Error(s) found')}
     _MESSAGES.update(_FillInExercise._MESSAGES)
     _INDICATORS = (('result', _('Result:')),)
-    _INSTRUCTIONS = _("""Listen to the recording and type exactly what you hear
-    into the textbox below.""")
+    
+    _INSTRUCTIONS = _("""Listen to the complete recording first.  Then go to
+    the textbox and use the > key to listen to the text section by section.
+    Type what you hear into the textbox.  For detailed instructions, read the
+    Exercise Help.""")
 
     def __init__(self, parent, tasks, pieces=None, **kwargs):
         if pieces is not None:
@@ -1569,24 +1586,24 @@ class Dictation(_FillInExercise):
 class _Cloze(_FillInExercise):
     _NAME = _("Cloze")
     _TASK_TYPE = ClozeTask
-    _INSTRUCTIONS = _("""Fill in the gaps in the text below.  There is just one
-    correct answer for each gap.""")
+    _INSTRUCTIONS = _("Fill in the gaps in the text below. "
+                      "For each gap there is only one correct answer.")
     
     def _transcript_text(self):
         return "\n\n".join([t.plain_text() for t in self._tasks])
     
     def _instructions(self):
         if self._recording is not None:
-            return _("""Listen to the recording carefully and then fill in the
-            gaps in the text below using the same words.""")
+            return _("Listen to the recording carefully and then fill in the "
+                     "gaps in the text below using the same words.")
         else:
             return self._INSTRUCTIONS
 
         
 class _ExposedCloze(_Cloze):
     _NAME = _("Exposed Cloze")
-    _INSTRUCTIONS = _("""Fill in gaps in the sentences using words or
-    expressions listed below.""")
+    _INSTRUCTIONS = _("Use the correct word or expression from the list below "
+                      "to fill in the gaps in the sentences.")
 
     def _export_instructions(self):
         answers = self._answers()
