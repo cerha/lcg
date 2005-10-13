@@ -110,7 +110,7 @@ class VocabFeeder(SplittableTextFeeder):
         assert isinstance(translation_language, types.StringType) and \
                len(translation_language) == 2
         self._translation_language = translation_language
-        self._phrases = False
+        self._attr = None
         super(VocabFeeder, self).__init__(text, **kwargs)
     
     def feed(self, parent):
@@ -120,14 +120,16 @@ class VocabFeeder(SplittableTextFeeder):
     def _item(self, line, parent):
         if line.text().startswith("#"):
             if line.text().startswith("# phrases"):
-                self._phrases = True
+                self._attr = VocabItem.ATTR_PHRASE
+            if line.text().startswith("# ext"):
+                self._attr = VocabItem.ATTR_EXTENDED
             return None
         word, translation = [x.text() for x in line.split(self._ITEM_SPLITTER)]
         if word.endswith("(phr.)"):
             word = word[:-6].strip()
-            is_phrase = True
+            attr = VocabItem.ATTR_PHRASE
         else:
-            is_phrase = self._phrases
+            attr = self._attr
         if word.endswith(")"):
             p = word.find("(")
             note = word[p:]
@@ -135,8 +137,7 @@ class VocabFeeder(SplittableTextFeeder):
         else:
             note = None
         return VocabItem(parent, word, note, translation,
-                         translation_language=self._translation_language,
-                         is_phrase=is_phrase)
+                         self._translation_language, attr=attr)
     
     
 class ExerciseFeeder(SplittableTextFeeder):
