@@ -15,14 +15,14 @@ there is no way to check your results automatically.
 #endif
 #if issubclass(type, Reading)
 
-Read the text in this exercise.  The information form the text will be used in
-further exercises.
+Read the text in this exercise.  The information from the text will be used in
+the following exercises.
 
 #endif
 #if issubclass(type, Listening)
 
-Listen to the recording carefully.  The information will be used in further
-exercises.
+Listen to the recording carefully.  The information will be used in the
+following exercises.
 
 #endif
 
