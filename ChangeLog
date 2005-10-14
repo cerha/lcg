@@ -1,5 +1,13 @@
 2005-10-14  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/eurochance.py (EurochanceCourse._create_content): Read
+	the localized version of the `intro' file.
+
+	* lib/lcg/util.py (copy_stream): Function removed.
+
+	* lib/lcg/feed.py (Feeder._panic): Cosmetic change.
+	(SplittableTextFeeder._process_pieces): Cosmetic change.
+
 	* translations/de.po: Updated.
 
 	* translations/help.txt: Minor tweaks.
