@@ -249,8 +249,8 @@ class EurochanceCourse(EurochanceNode):
 
     
     def _create_content(self):
-        return self.parse_wiki_file('intro') + \
-               [TableOfContents(self, item=self, title=_("Table of Contents:"))]
+        return (self._localized_wiki_content('intro'),
+                TableOfContents(self, item=self, title=_("Table of Contents:")))
     
     def meta(self):
         return {'author': 'Eurochance Team',
