@@ -157,15 +157,6 @@ def is_sequence_of(seq, cls):
     return True
 
 
-def copy_stream(input, output):
-    """Copy data from the 'input' stream to the 'output' stream."""
-    while True:
-        data = input.read(4096)
-        if not data:
-            break
-        output.write(data)
-
-        
 _CAMEL_CASE_WORD = re.compile(r'[A-Z][a-z\d]+')
         
 def camel_case_to_lower(string, separator='-'):
