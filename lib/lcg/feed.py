@@ -51,7 +51,7 @@ class Feeder(object):
         if position is not None:
             message += ":\n  " + position
         sys.stderr.write(message + "\n")
-        apply(traceback.print_exception, einfo)
+        traceback.print_exception(*einfo)
         sys.exit()
 
     def _warn(self, message, object=None):
@@ -96,8 +96,8 @@ class SplittableTextFeeder(Feeder):
             except:
                 self._panic(self.__class__.__name__ + " failed",
                             sys.exc_info(), piece)
-        return [x for x in [f(piece) for piece in text.split(splitter)
-                            if piece.text()] if x is not None]
+        pieces = [f(piece) for piece in text.split(splitter) if piece.text()]
+        return [x for x in pieces if x is not None]
     
     
 class VocabFeeder(SplittableTextFeeder):
