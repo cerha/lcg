@@ -1,0 +1,258 @@
+﻿# -*- coding: utf-8-dos; mode: wiking -*-
+
+== Anleitung ==
+
+#if issubclass(type, SentenceCompletion)
+
+Das Ziel dieser Übung ist es, Ihnen die Möglichkeit zu geben, einen
+vollständigen Satz zu bilden und Ihre Aussprache mit einem Original zu
+vergleichen. Daher handelt es sich hierbei um eine reine Hör-Sprech-Übung ohne
+schriftliche Aufgaben.
+
+Wenn Sie Ihre Antworten mit dem schriftlichen Text vergleichen wollen, können
+Sie in der Textabschrift der Aufnahme nachsehen. Da es sich dabei um keine
+schriftliche Übung handelt, können Ihre Ergebnisse auch nicht automatisch
+überprüft werden.
+
+#endif if issubclass(type, Reading)
+
+Lesen Sie den Text in dieser Übung. In den nachfolgenden Übungen müssen Sie auf
+diesen gelesenen Text Bezug nehmen.
+
+#endif
+#if issubclass(type, Listening)
+
+Hören Sie der Aufnahme aufmerksam zu. Die soeben gehörten Informationen sind
+für die nachfolgenden Übungen wichtig.
+
+#endif
+
+
+########## _ChoiceBasedExercise subclasses ##########
+
+#if issubclass(type, MultipleChoiceQuestions)
+
+Auf jede Frage in dieser Übung folgt eine Liste mit möglichen Antworten, die
+mit a, b und c bezeichnet sind. Nur eine Antwort ist richtig.
+
+#endif
+#if issubclass(type, Selections)
+
+Von mehreren, inhaltlich ähnlichen Sätzen (Zweier- oder Dreierpaare) ist immer
+nur ein Satz pro Satzgruppe richtig. Ihr Ziel ist es, den richtigen Satz zu
+finden.
+
+#endif
+#if issubclass(type, TrueFalseStatements)
+
+Bei jedem Satz in dieser Übung haben Sie die Wahl zwischen zwei Auswahltasten -
+'>>TRUE<<' und '>>FALSE<<'. Entscheiden Sie, ob der Satz
+richtig ist oder nicht, und klicken Sie auf Ihre Auswahl.
+
+#endif
+#if issubclass(type, GapFilling)
+
+Ihr Ziel ist es, die Lücken mit den richtigen Wörtern zu füllen. Dabei stehen
+Ihnen jedes Mal mehrere Optionen zur Verfügung. Nur eine davon ist richtig.
+
+#endif
+#if issubclass(type, _ChoiceBasedExercise)
+
+Nachdem Sie Ihre Auswahl getroffen haben, hören Sie sofort die Antwort. Wenn
+Sie die falsche Option gewählt haben, können Sie so lange weiterprobieren,
+bis Sie die richtige Antwort gefunden haben. Die Ergebnisse am Ende der Übung
+zeigen Ihnen, wie viele Antworten beim ersten Versuch richtig waren (siehe auch
+[#indicators]).
+
+#endif
+
+########## _FillInExercise subclasses ##########
+
+#if issubclass(type, VocabExercise)
+
+Es gibt zwei Möglichkeiten diese Übung durchzuführen:
+Sie können die Übung schriftlich oder mündlich durchführen.
+Arbeiten Sie mit beiden Möglichkeiten, so können Sie daraus Ihren
+maximalen Nutzen ziehen.
+
+Die mündliche Form ist einfach. Sie gehen die einzelenen Begriffe durch und
+überlegen sich die korrekte Übersetzung jedes einzelnen Wortes.
+Hinter jedem Textfeld finden Sie eine >>Play<< Taste. Damit haben Sie 
+die Möglichkeit sich auch gleich die richtige Antwort anzuhören.
+Um die richtige Aussprache zu üben, wiederholen Sie die Antwort! Es gibt keine 
+Möglichkeit Ihre gesprochene Antwort zu kontrollieren, daher ist das Ergebnis
+nicht überprüfbar. Wenn Sie also Ihre Bewertung wissen möchten, müssen Sie 
+die Übung in schriflicher Form wiederholen.
+
+Um die schriftliche Übung durchzuführen, schreiben Sie einfach den jeweiligen
+Begriff in das Textfeld daneben. Achten Sie dabei auch besonders auf die 
+Groß- und Kleinschreibung der Begriffe. Sollte die Schreibweise nicht richtig 
+sein, wird die Antwort auch als falsch bewertet. Wenn Sie einen
+vollständigen Satz schreiben müssen, denken Sie auch an die richtige 
+Zeichensetzung.
+
+#endif
+#if issubclass(type, Transformation)
+
+Ihr Ziel ist es, eine Struktur (ein Muster) in eine andere Struktur zu
+übertragen.
+
+#endif
+#if issubclass(type, Substitution)
+
+Verwenden Sie die Vorgabe, um einen neuen Satz in der selben Struktur
+zu bilden. Nach dem Satz folgt ein weiterer - in Klammern gesetzter - Satzteil. 
+Verwenden Sie diesen Satzteil, um einen neuen sinnvollen Satz zu bilden.
+
+#endif
+#if issubclass(type, _Cloze)
+
+Ziel in dieser Übung ist es, die Lücken in einem längeren Text zu füllen. 
+Achten Sie darauf, dass es nur eine richtige Lösung für jede Lücke im Text
+gibt.
+
+#endif
+#if issubclass(type, Dictation)
+
+Hören Sie sich zuerst das Diktat an. Danach wechseln Sie zum
+Textfeld. Innerhalb dieses Feldes können Sie mit Tastenkombinationen
+arbeiten. Das bedeutet, dass Sie sich einzelne Teile des Diktats nochmals
+individuell anhören können.  Am einfachsten ist es, Sie hören sich einen Teil
+an, indem Sie die *>* Taste (Größer-Zeichen) verwenden und das Gehörte
+niederschreiben.  Danach drücken Sie erneut die *>* Taste, um den nächsten Teil
+zu wiederholen und zu schreiben. Das wiederholen Sie bis zum Ende der
+Aufnahme. Sie sehen nun unterhalb des Textfeldes Ihr Ergebnis. Zu Ihrem
+Ergebnis gelangen Sie auch, wenn Sie die Taste 'Auswerten' anklicken.
+
+Achten Sie besonders auf die Interpunktion und auf die Groß- und
+Kleinschreibung.  Sie führen bei der Auswertung oft zu Problemen. Schreiben Sie
+alle Sätze, sobald Sie sie hören. Verwenden Sie die richtigen
+Interpunktionszeichen und machen Sie nach jedem Satz ein Leerzeichen. Machen
+Sie kein Leerzeichen mehr nach dem letzten Satz.
+
+/Anmerkung:/ Natürlich können Sie die Aufnahme so oft wiederholen, bis Sie
+alles verstanden haben. Zwei Versuche sollten jedoch für einen guten Studenten
+bzw. eine gute Studentin ausreichen.
+
+#else
+#if issubclass(type, _FillInExercise)
+
+Sie können jede Ihrer Antworten individuell überprüfen. Benützen Sie dazu die
+Tastenkombinationen (genauere Informationen finden Sie im Abschnitt
+[#keys]). Wenn Ihre Antwort als falsch ausgewertet wurde und Sie nicht wissen
+warum, dann überprüfen Sie immer zuerst Ihre Interpunktion und die Groß- und
+Kleinschreibung, da es gerade in diesen Bereichen oft zu Fehlern kommt.
+ 
+Drücken Sie die Taste [#panel] am Ende der Übung, um alle Antworten auszuwerten.
+
+Sollte Ihr Browser JavaScript nicht unterstützen, funktionieren leider die
+interaktiven Features und die automatischen Auswertungen nicht. Sie können
+selbstverständlich diesen Kurs trotzdem nutzen, jedoch müssen Sie Ihre
+Antworten anhand des [#answer-sheets] manuell überprüfen.
+
+#endif
+#endif
+
+#if issubclass(type, _FillInExercise)
+
+== Tastenkombinationen == keys
+
+Bei allen Übungen mit Textfeld können Sie die beiden folgenden
+Tastenkombinationen benutzen.
+
+Enter
+   Mit dieser Taste können Sie Ihre Antwort im Textfeld überprüfen. Sie werden
+   eine Antwort hören; wenn Sie einen Fehler gemacht haben, wechselt der Curser
+   zum ersten falschen Zeichen innerhalb des Texts. Auf diesem Weg können Sie
+   genau feststellen, an welcher Position Sie den Fehler gemacht haben, diesen
+   korrigieren und nochmals überprüfen. Wenn Sie die Antwort nicht kennen,
+   können Sie die ''Hinweis''-Funktion benutzen.
+
+
+Ctrl-Space
+   Diese Funktion wird ``Hinweis-Funktion'' genannt. Wenn Sie also Ihre Antwort
+   nicht kennen, können Sie die ``Hinweis-Funktion'' benutzen. Drücken Sie die
+   Tastenkombination (halten Sie die 'Strg'-Taste gedrückt und drücken Sie die
+   Leertaste) und ein Buchstabe der korrekten Antwort erscheint. Wenn Sie
+   bereits Text eingegeben haben, wechselt der Cursor hinter das letzte
+   richtige Zeichen und das nächste Zeichen wird eingefügt. Das bedeutet auch,
+   dass der Text hinter dem Cursor mindestens einen Fehler enthält. Versuchen
+   Sie den Fehler zu finden und ihn zu korrigieren. Versuchen Sie dann, Ihre
+   Antwort mit der 'Enter'-Taste (siehe oben) auszuwerten oder benutzen Sie
+   noch einemal die ``Hinweis-Funktion'', bis Sie die richtige Antwort gefunden
+   haben.
+
+
+#if issubclass(type, Dictation)
+
+Für die Sprachwiedergabe innerhalb des Diktat-Textfeldes können Sie die
+folgenden Funktionen verwenden:
+
+> /('Größer-Zeichen')/
+   Vor - Abspielen des nächsten Abschnitts der Aufnahme.
+
+< /('Kleiner-Zeichen')/
+   Zurück - Abspielen des vorherigen Abschnitts der Aufnahme.
+  
+Ctrl-Enter
+   Wiederholung des aktuellen (zuletzt abgespielten) Teils der Aufnahme.
+
+#endif
+#endif
+
+#if issubclass(type, _InteractiveExercise)
+
+== Anzeige == indicators
+
+Die Ergebnisfelder nach den Übungen zeigen Ihnen die folgenden Werte:
+
+#if issubclass(type, Dictation)
+
+>>Result<<
+   Zeigt das Ergebnis der vorangegangenen Bewertung (Sie können Ihre Antworten
+   auswerten, indem Sie die 'Enter'-Taste oder die Taste >>Evaluate<<
+   drücken).
+
+#else
+
+>>Result<<
+   Zeigt die Anzahl und den Prozentsatz der richtigen Antworten.  Das erste
+   Zahlenpaar zeigt an, wie viele Antworten soeben richtig beantwortet wurden.
+   Wenn Sie die Übungen wiederholen, zeigt Ihnen das zweite Zahlenpaar an, wie
+   viele Antworten beim ersten Versuch richtig waren.  Möchten Sie alle
+   Ergebnisse löschen und von vorne beginnen, drücken Sie auf die Taste
+   >>Reset<< (zurücksetzen).
+
+>>Answered<<
+   Zeigt die Anzahl der bereits durchgeführten Aufgabenstellungen an.  Zum
+   Beispiel: Das Ergebnis 4/10 bedeutet, dass Sie vier Aufgaben von zehn Fragen
+   bereits beantwortet haben. Somit müssen Sie noch weitere sechs verbleibene
+   Fragen bearbeiten.
+
+#endif
+
+== Bedienungsfeld == panel
+
+Das Bedienungsfeld nach jeder Übung beinhaltet folgende Tastenfelder:
+
+>>Evaluate<<
+   Auswertung der vollständigen Übung. Wenn Sie einen Fehler gemacht haben,
+   wechselt der Curser zur ersten falschen Antwort. Innerhalb eines Textfeldes
+   wechselt der Curser zum ersten falschen Zeichen innerhalb des Textes.
+
+>>Fill<<
+   Mit dieser Auswahltaste ergänzen Sie die richtigen Antworten in der gesamten
+   Übung.
+
+>>Reset<<
+   Mit dieser Auswahltaste löschen Sie alle Ergebnisse und Sie haben die
+   Möglichkeit von vorne zu beginnen.
+
+== Auflösungsteil == answer-sheets
+
+Im Auflösungsteil finden Sie alle richtigen Antworten zu den gesamten Übungen.
+Einen LINK zum Auflösungsteil finden Sie im Inhaltsverzeichnis. Einfacher ist
+es, wenn Sie in einem Übungsabschnitt am rechten Bildschirmrand auf das '?'
+(Fragezeichen)-Feld klicken und damit direkt in den entsprechenden Lösungsteil
+wechseln.
+
