@@ -1,3 +1,7 @@
+2005-10-17  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/de.po: Updated.
+
 2005-10-14  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/eurochance.py (EurochanceCourse._create_content): Read
