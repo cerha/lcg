@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-10-13 15:22+0200\n"
-"PO-Revision-Date: 2005-10-14 08:50+0200\n"
+"PO-Revision-Date: 2005-10-17 07:18+0200\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,7 @@ msgstr "Verzeichnis:"
 # The first part of vocabulary listing (the second is Phrases).
 #: ../lib/lcg/content.py:689 ../lib/lcg/content.py:699
 msgid "Terms"
-msgstr "Vorgaben"
+msgstr "Begriffe"
 
 # The second part of vocabulary listing.
 #: ../lib/lcg/content.py:691 ../lib/lcg/content.py:701
