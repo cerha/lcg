@@ -360,9 +360,18 @@ class SectionContainer(Container):
 
         """
         super(SectionContainer, self).__init__(parent, content, **kwargs)
-        self._sections = [s for s in self._content if isinstance(s, Section)]
-        toc_sections = [s for s in self._sections if s.in_toc()]
-        if toc_depth > 0 and \
+        sections = []
+        toc_sections = []
+        already_has_toc = False
+        for s in self._content:
+            if isinstance(s, TableOfContents) and not sections:
+                already_has_toc = True
+            elif isinstance(s, Section):
+                sections.append(s)
+                if s.in_toc():
+                    toc_sections.append(s)
+        self._sections = sections
+        if toc_depth > 0 and not already_has_toc and \
                (len(toc_sections) > 1 or len(toc_sections) == 1 and 
                 len([s for s in toc_sections[0].sections() if s.in_toc()])):
             self._toc = TableOfContents(parent, self, title=_("Index:"),
