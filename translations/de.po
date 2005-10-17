@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-13 15:22+0200\n"
+"POT-Creation-Date: 2005-10-17 07:23+0200\n"
 "PO-Revision-Date: 2005-10-17 07:18+0200\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
@@ -175,73 +175,74 @@ msgid "Chose the correct answer."
 msgstr "Wählen Sie die richtige Antwort."
 
 # Title for MultipleChoiceQuestions
-#: ../lib/lcg/content.py:1406
+#: ../lib/lcg/content.py:1405
 msgid "Multiple Choice Questions"
 msgstr "Auswahlfragebogen"
 
 # Section title
-#: ../lib/lcg/content.py:1413
+#: ../lib/lcg/content.py:1412
 msgid "Selections"
 msgstr "Auswahlmöglichkeiten"
 
 # Tile for TrueFalseStatements
-#: ../lib/lcg/content.py:1420
+#: ../lib/lcg/content.py:1419
 msgid "True/False Statements"
 msgstr "Richtig/Falsch Aussagen"
 
 # Instructions for TrueFalseStatements
-#: ../lib/lcg/content.py:1421
+#: ../lib/lcg/content.py:1420
 msgid "For each of the statements below, choose True or False."
-msgstr "Für jede der folgenden Behauptungen wählen Sie zwischen Richtig oder "
-"Falsch."
+msgstr ""
+"Für jede der folgenden Behauptungen wählen Sie zwischen Richtig oder Falsch."
 
 # Title for GapFilling
-#: ../lib/lcg/content.py:1445
+#: ../lib/lcg/content.py:1444
 msgid "Gap Filling"
 msgstr "Lückentext mit Einfüllübung"
 
 # Instructions for GapFilling
-#: ../lib/lcg/content.py:1446
+#: ../lib/lcg/content.py:1445
 msgid "Choose the correct option to fill the gaps in the following sentences."
-msgstr "In den folgenden Sätzen sollen Sie den Lückentext ergänzen. Wählen "
-"Sie dazu die richtige Option aus."
+msgstr ""
+"In den folgenden Sätzen sollen Sie den Lückentext ergänzen. Wählen Sie dazu "
+"die richtige Option aus."
 
 # Title for VocabExercise
-#: ../lib/lcg/content.py:1500
+#: ../lib/lcg/content.py:1499
 msgid "Test Yourself"
 msgstr "Überprüfen Sie Ihr Wissen."
 
 # Instructions for VocabExercise
-#: ../lib/lcg/content.py:1502
+#: ../lib/lcg/content.py:1501
 msgid "Fill in the correct translation for each of the terms below."
 msgstr "Ergänzen Sie die richtige Übersetzung für jede der folgenden Vorgaben."
 
 # Title for Substitution
-#: ../lib/lcg/content.py:1522
+#: ../lib/lcg/content.py:1521
 msgid "Substitution"
 msgstr "Substitution"
 
 # Instructions for Substitution
-#: ../lib/lcg/content.py:1523
+#: ../lib/lcg/content.py:1522
 msgid "Use the text in brackets to transform each sentence."
 msgstr ""
 "Verwenden Sie den Text in den eckigen Klammern, um jeden Satz richtig zu "
 "formen."
 
 # Title for Transformation
-#: ../lib/lcg/content.py:1530
+#: ../lib/lcg/content.py:1529
 msgid "Transformation"
 msgstr "Übersetzung"
 
 # Instructions for Transformation
-#: ../lib/lcg/content.py:1533
+#: ../lib/lcg/content.py:1532
 msgid "Fill in the gap in sentence B so that it means the same as sentence A."
 msgstr ""
 "Füllen Sie die Lücke in Satz B aus, sodass der Inhalt den selben Sinn ergibt "
 "wie im Satz A."
 
 # Instructions for Transformation with an example
-#: ../lib/lcg/content.py:1538
+#: ../lib/lcg/content.py:1537
 msgid ""
 "Using the example as a model, change the structure and make a new sentence."
 msgstr ""
@@ -249,27 +250,27 @@ msgstr ""
 "Struktur und bilden Sie einen neuen Satz."
 
 # Title for Dictation
-#: ../lib/lcg/content.py:1547
+#: ../lib/lcg/content.py:1546
 msgid "Dictation"
 msgstr "Diktat"
 
 # Dictation evaluation result
-#: ../lib/lcg/content.py:1551
+#: ../lib/lcg/content.py:1550
 msgid "Correct"
 msgstr "Richtig"
 
 # Dictation evaluation result
-#: ../lib/lcg/content.py:1552
+#: ../lib/lcg/content.py:1551
 msgid "Error(s) found"
 msgstr "Es wurde ein Fehler gefunden"
 
 # Label for the display of dictation results
-#: ../lib/lcg/content.py:1554
+#: ../lib/lcg/content.py:1553
 msgid "Result:"
 msgstr "Ergebnis:"
 
 # Instructions for Dictation
-#: ../lib/lcg/content.py:1556
+#: ../lib/lcg/content.py:1555
 msgid ""
 "Listen to the complete recording first.  Then go to\n"
 "    the textbox and use the > key to listen to the text section by section.\n"
@@ -283,12 +284,12 @@ msgstr ""
 "Angaben dazu finden Sie auch in der Übungshilfe."
 
 # Title for Cloze
-#: ../lib/lcg/content.py:1588
+#: ../lib/lcg/content.py:1587
 msgid "Cloze"
 msgstr "Lückentext"
 
 # Instructions for Cloze
-#: ../lib/lcg/content.py:1590
+#: ../lib/lcg/content.py:1589
 msgid ""
 "Fill in the gaps in the text below. For each gap there is only one correct "
 "answer."
@@ -297,7 +298,7 @@ msgstr ""
 "es nur eine richtige Antwort."
 
 # Instructions for Cloze with a recording
-#: ../lib/lcg/content.py:1598
+#: ../lib/lcg/content.py:1597
 msgid ""
 "Listen to the recording carefully and then fill in the gaps in the text "
 "below using the same words."
@@ -307,12 +308,12 @@ msgstr ""
 "Aufnahme."
 
 # Title for ExposedCloze
-#: ../lib/lcg/content.py:1605
+#: ../lib/lcg/content.py:1604
 msgid "Exposed Cloze"
 msgstr "Auswahlübung"
 
 # Instructions for ExposedCloze
-#: ../lib/lcg/content.py:1606
+#: ../lib/lcg/content.py:1605
 msgid ""
 "Use the correct word or expression from the list below to fill in the gaps "
 "in the sentences."

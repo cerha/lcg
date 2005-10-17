@@ -38,15 +38,15 @@ labaled a, b and c.  Only one answer is correct.
 #if issubclass(type, Selections)
 
 There are several groups (usually pairs or triples) of similar sentences or
-expressions, however only one sentence in each group is correct.  Your
-goal is to decide which one it is.
+expressions, however only one option in each group is correct.  Your goal is to
+decide which one it is.
 
 #endif
 #if issubclass(type, TrueFalseStatements)
 
-Each sentence in this exercise is followed by two controls labeled 'TRUE' and
-'FALSE'.  Your goal is to decide whether the sentence is true or not and press
-the corresponding button.
+Each sentence in this exercise is followed by two controls labeled '>>TRUE<<'
+and '>>FALSE<<'.  Your goal is to decide whether the sentence is true or not
+and press the corresponding button.
 
 #endif
 #if issubclass(type, GapFilling)
@@ -133,14 +133,8 @@ you do not know why, always check whether you have correct punctuation and
 capital letters where appropriate, since these two things tend to cause most
 confusion.
 
-#endif
-#if issubclass(type, _InteractiveExercise) 
-
-Use the [#panel] at the bottom of the exercise
-to evaluate all the answers.
-
-#endif
-#if issubclass(type, _FillInExercise)
+Use the [#panel] at the bottom of the exercise to evaluate all the answers at
+once.
 
 If your browser doesn't support JavaScript, the interactive features and
 automatic evaluation do not work.  You can still use this course, but you will
