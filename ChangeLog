@@ -1,5 +1,12 @@
 2005-10-17  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/content.py (SectionContainer.__init__): Don't create the
+	table of contents, when there is one already.
+
+	* translations/help.de.txt: New file.
+
+	* translations/help.txt: Updated.
+
 	* translations/de.po: Updated.
 
 2005-10-14  Tomas Cerha  <cerha@brailcom.org>
