@@ -46,7 +46,7 @@ finden.
 #if issubclass(type, TrueFalseStatements)
 
 Bei jedem Satz in dieser Übung haben Sie die Wahl zwischen zwei Auswahltasten -
-'>>TRUE<<' und '>>FALSE<<'. Entscheiden Sie, ob der Satz
+'>>${TRUE}<<' und '>>${FALSE}<<'. Entscheiden Sie, ob der Satz
 richtig ist oder nicht, und klicken Sie auf Ihre Auswahl.
 
 #endif
@@ -77,7 +77,7 @@ maximalen Nutzen ziehen.
 
 Die mündliche Form ist einfach. Sie gehen die einzelenen Begriffe durch und
 überlegen sich die korrekte Übersetzung jedes einzelnen Wortes.
-Hinter jedem Textfeld finden Sie eine >>Play<< Taste. Damit haben Sie 
+Hinter jedem Textfeld finden Sie eine >>${Play}<< Taste. Damit haben Sie 
 die Möglichkeit sich auch gleich die richtige Antwort anzuhören.
 Um die richtige Aussprache zu üben, wiederholen Sie die Antwort! Es gibt keine 
 Möglichkeit Ihre gesprochene Antwort zu kontrollieren, daher ist das Ergebnis
@@ -208,22 +208,22 @@ Die Ergebnisfelder nach den Übungen zeigen Ihnen die folgenden Werte:
 
 #if issubclass(type, Dictation)
 
->>Result<<
+>>${Result}<<
    Zeigt das Ergebnis der vorangegangenen Bewertung (Sie können Ihre Antworten
-   auswerten, indem Sie die 'Enter'-Taste oder die Taste >>Evaluate<<
+   auswerten, indem Sie die 'Enter'-Taste oder die Taste >>${Evaluate}<<
    drücken).
 
 #else
 
->>Result<<
+>>${Result}<<
    Zeigt die Anzahl und den Prozentsatz der richtigen Antworten.  Das erste
    Zahlenpaar zeigt an, wie viele Antworten soeben richtig beantwortet wurden.
    Wenn Sie die Übungen wiederholen, zeigt Ihnen das zweite Zahlenpaar an, wie
    viele Antworten beim ersten Versuch richtig waren.  Möchten Sie alle
    Ergebnisse löschen und von vorne beginnen, drücken Sie auf die Taste
-   >>Reset<< (zurücksetzen).
+   >>${Reset}<< (zurücksetzen).
 
->>Answered<<
+>>${Answered}<<
    Zeigt die Anzahl der bereits durchgeführten Aufgabenstellungen an.  Zum
    Beispiel: Das Ergebnis 4/10 bedeutet, dass Sie vier Aufgaben von zehn Fragen
    bereits beantwortet haben. Somit müssen Sie noch weitere sechs verbleibene
@@ -235,16 +235,16 @@ Die Ergebnisfelder nach den Übungen zeigen Ihnen die folgenden Werte:
 
 Das Bedienungsfeld nach jeder Übung beinhaltet folgende Tastenfelder:
 
->>Evaluate<<
+>>${Evaluate}<<
    Auswertung der vollständigen Übung. Wenn Sie einen Fehler gemacht haben,
    wechselt der Curser zur ersten falschen Antwort. Innerhalb eines Textfeldes
    wechselt der Curser zum ersten falschen Zeichen innerhalb des Textes.
 
->>Fill<<
+>>${Fill}<<
    Mit dieser Auswahltaste ergänzen Sie die richtigen Antworten in der gesamten
    Übung.
 
->>Reset<<
+>>${Reset}<<
    Mit dieser Auswahltaste löschen Sie alle Ergebnisse und Sie haben die
    Möglichkeit von vorne zu beginnen.
 
