@@ -7,6 +7,7 @@
 	(StaticExporter.body, StaticExporter._navigation)
 	(StaticExporter._link): Use all identifiers from `_html' module
 	with their full name `_html.*'.
+	(StaticExporter._link): Localize the string `None' with gettext.
 
 	* lib/lcg/_html.py (Module): Don't import `operator'.
 	(b): Function replaced by `strong'.
