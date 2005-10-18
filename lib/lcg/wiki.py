@@ -148,6 +148,8 @@ class Formatter(object):
             href += '#'+anchor
         if not title:
             title = href
+        if anchor and not node.find_section(anchor):
+            log("Unknown section: %s" % anchor)
         return '<a href="%s">%s</a>' % (href, title)
 
     def _uri_formatter(self, groups, close=False):
@@ -419,7 +421,7 @@ class Parser(object):
 
 
 class MacroParser(object):
-    _VARIABLE_REGEX = re.compile(r"(?!\\)\$\{?([a-zA-Z_]+)\}?")
+    _SUBSTITUTION_REGEX = re.compile(r"(?!\\)\$([a-zA-Z_]+|\{[^\}]+\})")
     _INCLUDE_REGEX = re.compile(r'(?m)^\s*#include (.*)$')
     _IF_ELSE_REGEX = re.compile(r'(?m)^\s*(#(?:if .+|else|endif))\s*$')
 
@@ -443,25 +445,35 @@ class MacroParser(object):
 
     
     def __init__(self, eval_provider=None, include_provider=None,
-                 include_dir='.'):
+                 substitution_provider=None, include_dir='.'):
         self._eval_provider = eval_provider or self._python_eval_provider
         self._include_provider = include_provider
+        self._substitution_provider = substitution_provider
         self._include_dir = include_dir
-        self._vars = {}
+        self._globals = {}
 
     def _python_eval_provider(self, expr):
-        return eval("bool(%s)" % expr, self._vars)
+        return eval("bool(%s)" % expr, self._globals)
 
-    def _substitute_variables(self, text):
+    def _substitution(self, match):
+        # get the substitution value for _SUBSTITUTION_REGEX match
+        name = match.group(1)
+        if name[0] == '{' and name[-1] == '}':
+            name = name[1:-1]
         try:
-            return self._VARIABLE_REGEX.sub(lambda m: self._vars[m.group(1)],
-                                            text)
+            return self._globals[name]
         except KeyError, e:
-            raise Exception("Unknown variable $%s." % e.args[0])
+            if self._substitution_provider is not None:
+                return self._substitution_provider(name)
+            else:
+                log("Invalid substitution:" % name)
+    
+    def _substitute(self, text):
+        return self._SUBSTITUTION_REGEX.sub(self._value, text)
 
     def add_globals(self, **kwargs):
-        self._vars.update(kwargs)
-        
+        self._globals.update(kwargs)
+
     def parse(self, text):
         func = lambda m: self._include_provider(m.group(1).strip())
         text = self._INCLUDE_REGEX.sub(func, text)
@@ -480,7 +492,7 @@ class MacroParser(object):
             else:
                 current.append(t)
         parsed = unicode(structured)
-        return self._substitute_variables(parsed)
+        return self._substitute(parsed)
 
     
 def _log(*args):
