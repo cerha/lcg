@@ -114,7 +114,7 @@ class StaticExporter(Exporter):
         return "\n".join(parts)
 
     def _link(self, node, label=None, key=None):
-        if node is None: return 'None'
+        if node is None: return _("None")
         if label is None: label = node.title(abbrev=True)
         return _html.link(label, node.url(), title=node.title(),
                           hotkey=not key or self._hotkey[key])
