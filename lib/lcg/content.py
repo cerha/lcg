@@ -1057,11 +1057,7 @@ class Exercise(Section):
         self._template = self._wiki_content(template, allow_file=True,
                                             subdir='templates')
         if sound_file is not None:
-            try:
-                self._recording = parent.resource(Media, sound_file)
-            except ResourceNotFound, e:
-                self._recording = None
-                print e
+            self._recording = parent.resource(Media, sound_file)
             if transcript is None:
                 transcript = os.path.splitext(sound_file)[0] + '.txt'
             assert isinstance(transcript, types.StringTypes)
@@ -1072,7 +1068,7 @@ class Exercise(Section):
         else:
             if transcript is not None:
                 t = parent.resource(Transcript, transcript)
-                print "Transcript without a 'sound_file': %s" % t.url()
+                log("Transcript without a 'sound_file': %s", t.url())
             self._recording = None
             self._transcript = None
         if audio_version is not None:
@@ -1093,7 +1089,7 @@ class Exercise(Section):
             try:
                 content = self._parent.parse_wiki_file(name, ext=ext[1:])
             except IOError, e :
-                print "Unable to read file: %s" % e
+                log("Unable to read file: %s", e)
                 return None
         else:
             content = self._parent.parse_wiki_text(re.sub('\[', '\\[', text))
