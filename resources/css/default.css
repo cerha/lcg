@@ -3,8 +3,8 @@ body {
     font-family: sans-serif;
 }
 
-a:link, a:visited { color: #06d; text-decoration: none; }
-a:hover, .speaking-text:hover { color: #f60; text-decoration: underline; }
+a:link, a:visited { color: #04b; }
+a:hover, .speaking-text:hover { color: #f60; }
 a.backref { text-decoration: none; color: black; }
 
 h1 { font-size: 2.0em; }
@@ -27,6 +27,7 @@ div.navigation {
     border-width: 1px 0;
     background: #e8ecf0;
 }
+div.navigation a { text-decoration: none; }
 
 div.content { 
     margin-bottom: 1.6em;
@@ -39,9 +40,7 @@ div.table-of-contents {
     margin: 1em 0;
     padding: 3pt;
 }
-
-div.table-of-contents b { 
-}
+div.table-of-contents a { text-decoration: none; }
 
 div.table-of-contents ul { 
     margin-top: 3pt;
@@ -55,6 +54,7 @@ a.exercise-help-link {
     position: absolute;
     top: 0;
     right: 0;
+    text-decoration: none;
 }
 
 div.choices { 
@@ -83,11 +83,10 @@ a.external-link {
     background-color: #eee;
     border: #aaa solid 1px;
     font-size: 0.8em;
+    text-decoration: none;
 }
 a.answer-sheet-link, a.cloze-answer-sheet-link { 
     font-size: 0.8em;
-}
-a.answer-sheet-link:hover, a.cloze-answer-sheet-link:hover { 
     text-decoration: none;
 }
 a.answer-sheet-link { 
@@ -122,11 +121,18 @@ input.answer-control {
     font-weight: bold;
 }
 
-form.sound-control input.button { 
+form.sound-control input.button, input.button.sound-control { 
     background-color: #e95;
     border: black solid 1px;
     padding: 0;
     font-weight: bold;
+}
+input.button.sound-control { 
+    margin: 1px;
+    vertical-align: top;
+}
+form.sound-control.audio-version input.button { 
+    background-color: #ed6;
 }
 
 input.fill-in-task { 
@@ -148,7 +154,7 @@ dt em {
 
 .speaking-text { 
     color: #04b;
-    text-decoration: none;
+    text-decoration: underline;
     background: none;
     border: none;
     font-size: 1em;

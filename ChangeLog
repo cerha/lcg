@@ -1,5 +1,19 @@
 2005-10-18  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/__init__.py: Import `*' from `util'.  Version set to `0.1'.
+
+	* lib/lcg/export.py (Module): Don't import `shutil'.  Import
+	`_html'.
+	(StaticExporter.body, StaticExporter._navigation)
+	(StaticExporter._link): Use all identifiers from `_html' module
+	with their full name `_html.*'.
+
+	* lib/lcg/_html.py (Module): Don't import `operator'.
+	(b): Function replaced by `strong'.
+	(strong): New function.
+	(itemize): Renamed to `list'.
+	(_input, button): New argument `title'.
+
 	* lib/lcg/eurochance.py (ExerciseInstructions._create_content):
 	Use gettext as `substitution_provider' when creating the
 	`MacroParser' instance.
@@ -7,10 +21,28 @@
 	* lib/lcg/course.py (ContentNode._read_file): Use `log' instead of
 	`print'.
 
-	* lib/lcg/content.py (Exercise.__init__): Don't catch
-	`ResourceNotFound' exeptions..
+	* lib/lcg/content.py (Module): Import `operator'.  Import `_html',
+	not `* from _html'.  Use all identifiers from `_html' module with
+	their full name `_html.*'.
+	(Exercise.__init__): Don't catch `ResourceNotFound' exeptions..
 	(Exercise.__init__, Exercise._wiki_content): Use `log' instead of
 	`print'.
+	(VocabItem._DIACRITICS_MATCHER, VocabItem._DANGER_CHAR_MATCHER):
+	Constants removed.
+	(FillInTask.__init__): New argument `media'.
+	(FillInTask.media): New method.
+	(FillInTask.text): Pass `media' arg. to `field_formatter'.
+	(_ClozeTask): Renamed to `MixedTextFillInTask'.
+	(TransformationTask, ClozeTask): `_ClozeTask' ->
+	`MixedTextFillInTask'.
+	(Exercise._sound_controls): New argument `cls'.
+	(Exercise._export_audio_version): Use it.
+	(_FillInExercise._make_field): New arguemnt `media'.  Create sound
+	control buttons when passed.
+	(VocabExercise._check_tasks): Create the tasks together with
+	corresponding `media'.
+	(ItemizedList.export, TableOfContents._make_toc)
+	(_ExposedCloze._export_instructions): `itemize' -> `_html.list'.
 
 	* lib/lcg/wiki.py (Formatter._link_formatter): Log an invalid
 	section name.
@@ -31,11 +63,12 @@
 	(Resource.__init__): Use `log' instead of `print'.  Don't create
 	the `ResourceNotFound' exception instance. 
 	(Resource._export, Media._export): Use `log' instead of `print'.
+	(Image): New class.
 
 	* lib/lcg/util.py (log): New function.
 
 	* translations/de.po: Updated.
-	
+
 	* translations/help.txt: Updated.
 
 	* translations/help.de.txt: Updated.
