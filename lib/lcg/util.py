@@ -26,6 +26,7 @@ import string
 import operator
 import types
 import re
+import sys
 
 class SplittableText:
     """A piece of text which can be split keeping track of line numbers.
@@ -164,3 +165,30 @@ def camel_case_to_lower(string, separator='-'):
     words = _CAMEL_CASE_WORD.findall(string)
     return separator.join([w.lower() for w in words])
     
+
+def log(message, *args):
+    """Log a processing information to STDERR.
+
+    Arguments:
+
+      message -- The text of a message.  Any object will be converted to a
+        unicode string.
+        
+      *args -- message arguments.  When formatting the message with these
+        arguments doesn't succeed, the arguemnts are simply appended to the end
+        of the message.
+
+    """
+    if not isinstance(message, types.StringTypes):
+        message = unicode(message)
+    try:
+        message %= args
+    except TypeError:
+        if not message.endswith(":"):
+            message += ":"
+        if not message.endswith(" "):
+            message += " "
+        message += ', '.join([unicode(a) for a in args])
+    if not message.endswith("\n"):
+        message += "\n"
+    sys.stderr.write(message)
