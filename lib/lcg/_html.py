@@ -102,7 +102,7 @@ def _input(type, name=None, value=None, title=None, id=None,
                                                     ('onclick', onclick),
                                                     ('onfocus', onfocus),
                                                     ('onkeydown', onkeydown),
-                                                    ('class', cls))
+                                                    ('class', cls)),
                                         readonly and ' readonly' or '')
 
 def field(text='', name='', size=20, **kwargs):
