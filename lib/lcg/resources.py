@@ -95,13 +95,7 @@ def resource(cls, parent, file, **kwargs):
         _cache[key] = result
         return result
 
-    
-class ResourceNotFound(Exception):
-    def __init__(self, filename):
-        msg = "Resource file not found: %s" % filename
-        Exception.__init__(self, msg)
-    
-    
+  
 class Resource(object):
     """Base resource class.
     
@@ -127,9 +121,7 @@ class Resource(object):
         self._src_path = src_path
         self._dst_path = dst_path
         if self._needs_source_file() and not os.path.exists(src_path):
-            exception = ResourceNotFound(src_path)
-            print exception
-            #raise exception
+            log("Resource file not found:", src_path)
 
     def _needs_source_file(self):
         return True
@@ -157,7 +149,7 @@ class Resource(object):
     def _export(self, infile, outfile):
         if os.path.exists(infile): 
             shutil.copyfile(infile, outfile)
-            print "%s: file copied." % outfile
+            log("%s: file copied.", outfile)
             
 
     def get(self):
@@ -198,7 +190,7 @@ class Media(Resource):
         if cmd.find("%infile") == -1 or cmd.find("%outfile") == -1:
             cmd_err("Environment variable %s must refer to "
                     "'%%infile' and '%%outfile'.")
-        print "%s: converting to %s: %s" % (outfile, output_format, cmd)
+        log("%s: converting to %s: %s", outfile, output_format, cmd)
         command = cmd.replace('%infile', infile).replace('%outfile', outfile)
         if os.system(command):
             raise IOError("Subprocess returned a non-zero exit status.")
