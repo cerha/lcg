@@ -199,6 +199,7 @@ class Media(Resource):
 class SharedMedia(Media):
     SHARED = True
         
+
 class Script(Resource):
     """Representation of a script object used within the content."""
     SUBDIR = 'scripts'
@@ -207,6 +208,11 @@ class Script(Resource):
 class Stylesheet(Resource):
     """Representation of a stylesheet used within the content."""
     SUBDIR = 'css'
+
+    
+class Image(Resource):
+    """Representation of an image used within the content."""
+    SUBDIR = 'images'
 
     
 class Transcript(Resource):
