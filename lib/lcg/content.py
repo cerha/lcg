@@ -31,9 +31,10 @@ import types
 import unicodedata
 import textwrap
 import random
+import operator
 
 from lcg import *
-from _html import *
+import _html
 
 
 class Content(object):
@@ -167,7 +168,7 @@ class Anchor(TextContent):
         super(Anchor, self).__init__(parent, text)
         
     def export(self):
-        return link(self._text, None, name=self._anchor)
+        return _html.link(self._text, None, name=self._anchor)
 
     
 class Link(TextContent):
@@ -179,7 +180,7 @@ class Link(TextContent):
         
     def export(self):
         t = self._target
-        return link(self._text or t.title(), t.url())
+        return _html.link(self._text or t.title(), t.url())
 
     
 class Container(Content):
@@ -269,7 +270,7 @@ class ItemizedList(Container):
                 self.TYPE_NUMERIC: (True, None),
                 self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
         items = [p.export() for p in self._content]
-        return itemize(items, ordered=o, style=s, lang=self._lang)
+        return _html.list(items, ordered=o, style=s, lang=self._lang)
 
     
 class Definition(Container):
@@ -489,7 +490,8 @@ class Section(SectionContainer):
             href = "#"+self._backref()
         else:
             href = None
-        return h(link(self.title(), href, cls='backref', name=self.anchor()),
+        return _html.h(_html.link(self.title(), href, cls='backref',
+                                  name=self.anchor()),
                  len(self._section_path()) + 1)+'\n'
                
     def export(self):
@@ -540,7 +542,8 @@ class TableOfContents(Content):
         toc = self._make_toc(item, depth=self._depth)
         if self._title is not None:
             #TODO: add a "skip" link.
-            return div((b(self._title), toc), cls="table-of-contents")
+            return _html.div((_html.strong(self._title), toc),
+                             cls="table-of-contents")
         else:
             return toc
         
@@ -565,16 +568,14 @@ class TableOfContents(Content):
                 if i.parent() is self.parent():
                     url = i.url(relative=True)
                 name = i.backref(self._parent)
-            links.append(link(i.title(), url, name=name) + \
+            links.append(_html.link(i.title(), url, name=name) + \
                          self._make_toc(i, indent=indent+4, depth=depth-1))
-        return "\n" + itemize(links, indent=indent) + "\n" + ' '*(indent-2)
+        return "\n" + _html.list(links, indent=indent) + "\n" + ' '*(indent-2)
 
     
     
 class VocabItem(object):
     """One item of vocabulary listing."""
-    _DIACRITICS_MATCHER = re.compile(r" WITH .*")
-    _DANGER_CHAR_MATCHER = re.compile(r"[^a-zA-Z0-9-]")
 
     ATTR_EXTENDED = 'ATTR_EXTENDED'
     """Special attribute indicating an extended vocabulary item."""
@@ -655,9 +656,10 @@ class VocabList(Content):
         parent.resource(Script, 'audio.js')
 
     def export(self):
-        pairs = [(speaking_text(i.word(), i.media()) +
+        pairs = [(_html.speaking_text(i.word(), i.media()) +
                   (i.note() and " "+i.note() or ""),
-                  span(i.translation() or "???", lang=i.translation_language()))
+                  _html.span(i.translation() or "???",
+                             lang=i.translation_language()))
                  for i in self._items]
         rows = ['<tr><td>%s</td><td>%s</td></tr>' %
                 (self._reverse and (b,a) or (a,b)) for a,b in pairs]
@@ -833,16 +835,24 @@ class TrueFalseStatement(_ChoiceTask):
 
 class FillInTask(Task):
     
-    def __init__(self, prompt, answer, comment=None):
+    def __init__(self, prompt, answer, comment=None, media=()):
         assert isinstance(answer, types.UnicodeType)
+        if isinstance(media, Media):
+            media = (media, )
+        else: 
+            assert is_sequence_of(media, Media)
         self._answer = answer.replace('\n', ' ')
+        self._media = media
         super(FillInTask, self).__init__(prompt, comment=comment)
 
     def answer(self):
         return self._answer
 
     def text(self, field_formatter):
-        return field_formatter(self.answer(), id=self.id())
+        return field_formatter(self.answer(), id=self.id(), media=self._media)
+
+    def media(self):
+        return self._media
 
     
 class DictationTask(FillInTask):
@@ -854,7 +864,7 @@ class DictationTask(FillInTask):
         super(DictationTask, self).__init__(None, text, comment=comment)
 
 
-class _ClozeTask(FillInTask):
+class MixedTextFillInTask(FillInTask):
     _FIELD_MATCHER = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
 
     def _fields(self):
@@ -883,7 +893,7 @@ class _ClozeTask(FillInTask):
         return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._text)
 
         
-class TransformationTask(_ClozeTask):
+class TransformationTask(MixedTextFillInTask):
 
     def __init__(self, orig, transformation, comment=None):
         if not self._FIELD_MATCHER.search(transformation):
@@ -894,7 +904,7 @@ class TransformationTask(_ClozeTask):
         super(TransformationTask, self).__init__(orig, answer, comment=comment)
 
         
-class ClozeTask(_ClozeTask):
+class ClozeTask(MixedTextFillInTask):
         
     def __init__(self, text, comments=(), comment=None):
         self._text = text
@@ -1135,27 +1145,28 @@ class Exercise(Section):
     def _instructions(self):
         return self._INSTRUCTIONS
 
-    def _sound_controls(self, label, media, transcript=None):
+    def _sound_controls(self, label, media, transcript=None, cls=None):
         if transcript is not None:
-            t = " " + link(_("show transcript"), transcript.url(),
-                           target="transcript")
+            t = " " + _html.link(_("show transcript"), transcript.url(),
+                                 target="transcript")
         else:
             t = ""
-        beg  = '<form class="sound-control" action="#">%s\n' % label
-        play = button(_("Play"), "play_audio('%s')" % media.url())
-        stop = button(_("Stop"), 'stop_audio()')
+        beg  = '<form class="sound-control%s" action="#">%s\n' % \
+               (cls and ' '+cls or '', label)
+        play = _html.button(_("Play"), "play_audio('%s')" % media.url())
+        stop = _html.button(_("Stop"), 'stop_audio()')
         end  = t + '\n</form>'
-        a = '%s [%s]' % (label, link(_("Play"), media.url()))
-        result = (script_write(beg + play),
-                  script_write(stop, condition='document.media_player'),
-                  script_write(end, p(a+t)))
+        a = '%s [%s]' % (label, _html.link(_("Play"), media.url()))
+        result = (_html.script_write(beg + play),
+                  _html.script_write(stop, condition='document.media_player'),
+                  _html.script_write(end, _html.p(a+t)))
         return '\n'.join(result)
 
     def export(self):
-        header = div((self._header(),
-                      link(_("Exercise Help"), self._help_node.url(),
-                           target='help', cls='exercise-help-link')),
-                     cls='exercise-header')
+        header = _html.div((self._header(),
+                      _html.link(_("Exercise Help"), self._help_node.url(),
+                                 target='help', cls='exercise-help-link')),
+                           cls='exercise-header')
         parts = [getattr(self, '_export_'+part)()
                  for part in self._EXPORT_ORDER or ('reading',
                                                     'explanation',
@@ -1164,7 +1175,7 @@ class Exercise(Section):
                                                     'audio_version',
                                                     'example',
                                                     'tasks')]
-        parts.append(script(self._init_script()))
+        parts.append(_html.script(self._init_script()))
         return "\n\n".join([x for x in [header]+parts if x is not None])
 
     def _export_tasks(self):
@@ -1174,27 +1185,28 @@ class Exercise(Section):
         else:
             tasks = "\n".join(tasks)
         if tasks:
-            return form((tasks, self._results() or ''), name=self._form_name())
+            return _html.form((tasks, self._results()), name=self._form_name())
         else:
             return None
 
     def _export_explanation(self):
         if self._explanation is not None:
             return _("Explanation:") + \
-                   div(self._explanation.export(), cls="explanation")
+                   _html.div(self._explanation.export(), cls="explanation")
         else:
             return None
         
     def _export_example(self):
         if self._example is not None:
-            return _("Example:") + div(self._example.export(), cls="example")
+            return _("Example:") + \
+                   _html.div(self._example.export(), cls="example")
         else:
             return None
     
     def _export_reading(self):
         if self._reading is not None:
-            return div(self._reading_instructions.export(), cls="label") + \
-                   div(self._reading.export(), cls="reading")
+            return _html.div(self._reading_instructions.export(), cls="label")+\
+                   _html.div(self._reading.export(), cls="reading")
         else:
             return None
     
@@ -1205,7 +1217,7 @@ class Exercise(Section):
             return custom.export()
         else:
             default = self._instructions()
-            return default and p(default)
+            return default and _html.p(default)
 
     def _export_recording(self):
         if self._recording:
@@ -1217,7 +1229,8 @@ class Exercise(Section):
     def _export_audio_version(self):
         if self._audio_version:
             label = self._AUDIO_VERSION_LABEL
-            return self._sound_controls(label, self._audio_version)
+            return self._sound_controls(label, self._audio_version,
+                                        cls='audio-version')
         else:
             return None
 
@@ -1228,10 +1241,10 @@ class Exercise(Section):
         else:
             parts = [p for p in parts if p is not None]
         cls = camel_case_to_lower(self.__class__.__name__)
-        return div(parts, cls='task %s-task' % cls) + self._TASK_SEPARATOR
+        return _html.div(parts, cls='task %s-task' % cls) + self._TASK_SEPARATOR
 
     def _results(self):
-        return None
+        return ""
 
     def _init_script(self):
         return ""
@@ -1297,10 +1310,11 @@ class _InteractiveExercise(Exercise):
         return ()
 
     def _init_script(self):
-        args = (js_array(self._answers()),
-                js_dict(dict([(key, [media.url() for media in values])
-                              for key, values in self._responses.items()])),
-                js_dict(self._MESSAGES))
+        args = (_html.js_array(self._answers()),
+                _html.js_dict(dict([(key, [media.url() for media in values])
+                                    for key, values
+                                    in self._responses.items()])),
+                _html.js_dict(self._MESSAGES))
         return """
         form = document.forms['%s'];
         handler = new %s();
@@ -1309,17 +1323,19 @@ class _InteractiveExercise(Exercise):
         """ % (self._form_name(), self._FORM_HANDLER, ", ".join(args))
 
     def _results(self):
-        displays = [' '.join((label, field(name=name, size=50, readonly=True)))
+        displays = [' '.join((label, _html.field(name=name, size=50,
+                                                 readonly=True)))
                     for name, label in self._INDICATORS]
         buttons = [f(label, handler) for f, label, handler in
-                   ((button, _("Evaluate"), "this.form.handler.evaluate()"),
-                    (button, _('Fill'),     "this.form.handler.fill()"),
-                    (reset,  _('Reset'),    "this.form.handler.reset()"))]
-        panel = div((div('<br/>'.join(displays), 'display'),
-                     div(buttons, 'buttons')), 'results')
-        l = p(_("See the %s to check your results.") %
-              link(_("answer sheet"), self._answer_sheet_url(), target='help'))
-        return script_write(panel, l)
+                   ((_html.button,_("Evaluate"),"this.form.handler.evaluate()"),
+                    (_html.button,_('Fill'),    "this.form.handler.fill()"),
+                    (_html.reset, _('Reset'),   "this.form.handler.reset()"))]
+        panel = _html.div((_html.div('<br/>'.join(displays), 'display'),
+                           _html.div(buttons, 'buttons')), 'results')
+        l = _html.p(_("See the %s to check your results.") %
+                    _html.link(_("answer sheet"), self._answer_sheet_url(),
+                               target='help'))
+        return _html.script_write(panel, l)
 
     def _answer_sheet_items(self):
         return ()
@@ -1336,11 +1352,11 @@ class _InteractiveExercise(Exercise):
                self._answer_sheet_anchor(index)
 
     def _answer_sheet_link(self, index):
-        lnk = link("?", self._answer_sheet_url(index),
-                   title=_("Show the answer sheet."),
-                   target='help', cls=self._ANSWER_SHEET_LINK_CLASS)
+        lnk = _html.link("?", self._answer_sheet_url(index),
+                         title=_("Show the answer sheet."),
+                         target='help', cls=self._ANSWER_SHEET_LINK_CLASS)
         return lnk
-        #return span(lnk, cls=self._ANSWER_SHEET_LINK_CLASS)
+        #return _html.span(lnk, cls=self._ANSWER_SHEET_LINK_CLASS)
         
     def answer_sheet(self, parent):
         self._answer_sheet_node = p = parent
@@ -1377,26 +1393,27 @@ class _ChoiceBasedExercise(_InteractiveExercise):
 
     def _non_js_choice_control(self, task, choice):
         media = self._response(choice.correct() and 'correct' or 'incorrect')
-        return link(choice.answer(), media.url())
+        return _html.link(choice.answer(), media.url())
     
     def _js_choice_control(self, task, choice):
         choice_id = 'choice_%s' % id(choice)
-        ctrl = radio('task-%d' % self._tasks.index(task), id=choice_id,
-                     onclick="this.form.handler.eval_answer(this)", 
-                     value=task.choice_index(choice), cls='answer-control')
-        return ctrl +' '+ label(choice.answer(), choice_id)
+        ctrl = _html.radio('task-%d' % self._tasks.index(task), id=choice_id,
+                           onclick="this.form.handler.eval_answer(this)", 
+                           value=task.choice_index(choice),
+                           cls='answer-control')
+        return ctrl +' '+ _html.label(choice.answer(), choice_id)
 
     def _choice_label(self, task, choice):
         return chr(ord('a') + task.choice_index(choice)) + '.&nbsp;'
         
     def _format_choice(self, task, choice):
-        ctrl = script_write(self._js_choice_control(task, choice),
-                            self._non_js_choice_control(task, choice))
+        ctrl = _html.script_write(self._js_choice_control(task, choice),
+                                  self._non_js_choice_control(task, choice))
         return self._choice_label(task, choice) + ctrl + '<br/>'
 
     def _format_choices(self, task):
         formatted = [self._format_choice(task, ch) for ch in task.choices()]
-        return div(formatted, 'choices')
+        return _html.div(formatted, 'choices')
 
     def _export_task_parts(self, task):
         lnk = self._answer_sheet_link(self._tasks.index(task))
@@ -1433,13 +1450,13 @@ class _SelectBasedExercise(_ChoiceBasedExercise):
     _FORM_HANDLER = 'SelectBasedExerciseHandler'
 
     def _format_choices(self, task):
-        choices = task.choices()
-        js = select('task-%d' % self._tasks.index(task),
-                    [(ch.answer(), task.choice_index(ch)) for ch in choices],
-                    onchange="this.form.handler.eval_answer(this)",
-                    id=task.id())
+        js = _html.select('task-%d' % self._tasks.index(task),
+                          [(ch.answer(), task.choice_index(ch))
+                           for ch in task.choices()],
+                          onchange="this.form.handler.eval_answer(this)",
+                          id=task.id())
         nonjs = [self._non_js_choice_control(task, ch) for ch in task.choices()]
-        return script_write(js, "("+"|".join(nonjs)+")")
+        return _html.script_write(js, "("+"|".join(nonjs)+")")
 
     
 class GapFilling(_SelectBasedExercise):
@@ -1482,19 +1499,23 @@ class _FillInExercise(_InteractiveExercise):
         return [('; '.join(t.answer().split('|')), t.comment())
                 for t in self._tasks if t.answer() is not None]
     
-    def _make_field(self, text, id=None):
+    def _make_field(self, text, id=None, media=()):
         try:
             counter = self._field_counter
         except AttributeError:
             self._field_counter = counter = Counter(0)
         n = counter.next()
-        f = field(cls='fill-in-task', name="task-%d" % n,
-                  size=max(4, len(text)+1), id=id)
-        return f + self._answer_sheet_link(n)
+        f = _html.field(cls='fill-in-task', name="task-%d" % n,
+                        size=max(4, len(text)+1), id=id)
+        #triangle = unicodedata.lookup('BLACK RIGHT-POINTING TRIANGLE')
+        controls = [_html.button(_("Play"), "play_audio('%s')" % m.url(),
+                                 cls='sound-control')
+                    for m in media]
+        return f + ''.join(controls) + self._answer_sheet_link(n)
     
     def _export_task_parts(self, task):
         text = task.text(self._make_field)
-        return self._TASK_FORMAT % (label(task.prompt(), task.id()), text)
+        return self._TASK_FORMAT % (_html.label(task.prompt(), task.id()), text)
                                
         
     
@@ -1511,14 +1532,18 @@ class VocabExercise(_FillInExercise):
         if not tasks:
             dict = {}
             for item in self._parent.vocab:
-                translation, word = (item.translation(), item.word())
+                translation = item.translation()
                 if translation:
-                    if dict.has_key(translation):
-                        word = dict[translation] +'|'+ word
-                    dict[translation] = word
-            tasks = [FillInTask(t, w) for t, w in dict.items()]
-        return tasks
-   
+                    words, media = dict.get(translation, ([], []))
+                    if item.word() in words:
+                        continue
+                    words.append(item.word())
+                    media.append(item.media())
+                    dict[translation] = (words, media)
+            tasks = [FillInTask(t, '|'.join(x[0]), media=x[1])
+                     for t, x in dict.items()]
+        return tasks    
+
 
 class Substitution(_FillInExercise):
     """A prompt (a sentence) and a big text-field for each task."""
@@ -1584,7 +1609,7 @@ class Dictation(_FillInExercise):
         init_script = super(Dictation, self)._init_script()
         if self._pieces:
             init_script += "handler.init_recordings(%s);" % \
-                           js_array([m.url() for m in self._pieces])
+                           _html.js_array([m.url() for m in self._pieces])
         return init_script
     
 
@@ -1614,7 +1639,7 @@ class _ExposedCloze(_Cloze):
         answers = self._answers()
         answers.sort()
         instructions = super(_ExposedCloze, self)._export_instructions()
-        return instructions + itemize(answers)
+        return instructions + _html.list(answers)
 
     
 class NumberedCloze(_Cloze):
