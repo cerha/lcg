@@ -27,9 +27,7 @@ We need something very simple and quite specific, so it is not worth using
 
 """
 
-import operator
 import types
-
 from util import *
 
 def _attr(*pairs):
@@ -50,8 +48,8 @@ def _tag(tag, attr, content, concat=''):
 def h(title, level=2):
     return '<h%d>%s</h%d>' % (level, title, level)
     
-def b(text):
-    return '<b>%s</b>' % text
+def strong(text):
+    return '<strong>%s</strong>' % text
 
 def span(text, cls=None, id=None, lang=None):
     attr = (('class', cls),
@@ -75,7 +73,7 @@ def link(label, url, name=None, title=None, target=None, cls=None, hotkey=None):
             ('class', cls), ('accesskey', hotkey))
     return _tag('a', attr, label)
 
-def itemize(items, indent=0, ordered=False, style=None, cls=None, lang=None):
+def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
     spaces = ' ' * indent
     tag = ordered and 'ol' or 'ul'
     attr = _attr(('style', style and 'list-style-type: %s' % style),
@@ -92,19 +90,20 @@ def form(content, name=None, action="#"):
 def label(text, id, lang=None):
     return _tag('label', (('for', id), ('lang', lang)), text)
 
-def _input(type, name=None, value=None,
+def _input(type, name=None, value=None, title=None, id=None,
            onclick=None, onkeydown=None, onfocus=None,
-           size=None, readonly=False, cls=None, id=None):
+           size=None, readonly=False, cls=None):
     #handler = handler and "javascript: %s" % handler
     return '<input type="%s"%s%s />' % (type, _attr(('name', name),
-                                                  ('value', value),
-                                                  ('size', size),
-                                                  ('onclick', onclick),
-                                                  ('onfocus', onfocus),
-                                                  ('onkeydown', onkeydown),
-                                                  ('class', cls),
-                                                  ('id', id)),
-                                      readonly and ' readonly' or '')
+                                                    ('value', value),
+                                                    ('title', title),
+                                                    ('id', id),
+                                                    ('size', size),
+                                                    ('onclick', onclick),
+                                                    ('onfocus', onfocus),
+                                                    ('onkeydown', onkeydown),
+                                                    ('class', cls))
+                                        readonly and ' readonly' or '')
 
 def field(text='', name='', size=20, **kwargs):
     kwargs['cls'] = kwargs.has_key('cls') and 'text '+kwargs['cls'] or 'text'
@@ -116,9 +115,9 @@ def radio(name, **kwargs):
 def hidden(name, value):
     return _input('hidden', name=name, value=value)
 
-def button(label, handler, cls=None):
+def button(label, handler, cls=None, title=None):
     cls = cls and 'button ' + cls or 'button'
-    return _input('button', value=label, onclick=handler, cls=cls)
+    return _input('button', value=label, onclick=handler, cls=cls, title=title)
 
 def reset(label, onclick=None, cls=None):
     return _input('reset', onclick=onclick, value=label, cls=cls)
