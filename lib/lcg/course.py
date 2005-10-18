@@ -156,8 +156,7 @@ class ContentNode(object):
         filename = self._input_file(name, ext=ext, lang=lang, dir=dir)
         if lang is not None and not os.path.exists(filename):
             filename2 = self._input_file(name, ext=ext, dir=dir)
-            print "File '%s' not found. Trying '%s' instead." % (filename,
-                                                                  filename2)
+            log("File '%s' not found. Trying '%s' instead.", filename,filename2)
             filename = filename2
         fh = codecs.open(filename, encoding=self._input_encoding)
         try:
