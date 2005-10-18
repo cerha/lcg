@@ -1,3 +1,45 @@
+2005-10-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/eurochance.py (ExerciseInstructions._create_content):
+	Use gettext as `substitution_provider' when creating the
+	`MacroParser' instance.
+
+	* lib/lcg/course.py (ContentNode._read_file): Use `log' instead of
+	`print'.
+
+	* lib/lcg/content.py (Exercise.__init__): Don't catch
+	`ResourceNotFound' exeptions..
+	(Exercise.__init__, Exercise._wiki_content): Use `log' instead of
+	`print'.
+
+	* lib/lcg/wiki.py (Formatter._link_formatter): Log an invalid
+	section name.
+	(MacroParser._VARIABLE_REGEX): Removed.
+	(MacroParser._SUBSTITUTION_REGEX): New constant.
+	(MacroParser.__init__): New argument `substitution_provider'.
+	`self._vars' renamed to `self._globals'.
+	(MacroParser._python_eval_provider): `self._vars' ->
+	`self._globals'.
+	(MacroParser._substitute_variables): Removed.
+	(MacroParser._substitute): New method.
+	(MacroParser._substitution): New method.
+	(MacroParser.add_globals): `self._vars' -> `self._globals'.
+	(MacroParser.parse): Use `self._substitute' instead of
+	`self._substitute_variables'.
+
+	* lib/lcg/resources.py (ResourceNotFound): Class removed.
+	(Resource.__init__): Use `log' instead of `print'.  Don't create
+	the `ResourceNotFound' exception instance. 
+	(Resource._export, Media._export): Use `log' instead of `print'.
+
+	* lib/lcg/util.py (log): New function.
+
+	* translations/de.po: Updated.
+	
+	* translations/help.txt: Updated.
+
+	* translations/help.de.txt: Updated.
+
 2005-10-17  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (SectionContainer.__init__): Don't create the
