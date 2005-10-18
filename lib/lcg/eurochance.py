@@ -140,7 +140,7 @@ class ExerciseInstructions(EurochanceNode):
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
-        mp = wiki.MacroParser()
+        mp = wiki.MacroParser(substitution_provider=_)
         mp.add_globals(type=self._type, **self._type.typedict())
         content = self.parse_wiki_text(mp.parse(self._template))
         return SectionContainer(self, content, lang=self._user_lang())
