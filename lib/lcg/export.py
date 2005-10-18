@@ -19,9 +19,9 @@
 """Course exporter."""
 
 import os
-import shutil
 
 from lcg import *
+import _html
 
     
 class Exporter(object):
@@ -109,15 +109,15 @@ class StaticExporter(Exporter):
         nav = self._navigation(node)
         parts = (#nav, '<hr class="navigation">',
                  '<h1>%s</h1>' % node.title(),
-                 div(node.content().export(), 'content'),
+                 _html.div(node.content().export(), 'content'),
                  '<hr class="navigation">', nav)
         return "\n".join(parts)
 
     def _link(self, node, label=None, key=None):
         if node is None: return 'None'
         if label is None: label = node.title(abbrev=True)
-        return link(label, node.url(), title=node.title(),
-                    hotkey=not key or self._hotkey[key])
+        return _html.link(label, node.url(), title=node.title(),
+                          hotkey=not key or self._hotkey[key])
     
     def _navigation(self, node):
         nav = [_('Next') + ': ' + self._link(node.next(), key='next'),
@@ -131,4 +131,4 @@ class StaticExporter(Exporter):
                 hidden = "\n"+self._link(p, key='up', label='')
             nav.append(self._link(node.root(), label=self._INDEX_LABEL,
                                   key='index'))
-        return div(' |\n'.join(nav) + hidden, 'navigation')
+        return _html.div(' |\n'.join(nav) + hidden, 'navigation')
