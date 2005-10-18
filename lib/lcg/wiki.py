@@ -469,7 +469,7 @@ class MacroParser(object):
                 log("Invalid substitution:" % name)
     
     def _substitute(self, text):
-        return self._SUBSTITUTION_REGEX.sub(self._value, text)
+        return self._SUBSTITUTION_REGEX.sub(self._substitution, text)
 
     def add_globals(self, **kwargs):
         self._globals.update(kwargs)
