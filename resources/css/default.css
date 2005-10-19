@@ -202,6 +202,8 @@ table.lcg-table td, table.lcg-table th {
 table.lcg-table td { background: #f4f4f4; }
 table.lcg-table th { background: #eee; }
 
+table.lcg-fieldset th { white-space: nowrap; }
+
 pre.lcg-preformatted-text {
     background: #efffb8;
     border: 1px solid #aaa;
