@@ -49,6 +49,7 @@ div.table-of-contents ul {
 
 div.exercise-header { 
     position: relative;
+    padding-right: 3em;
 }
 a.exercise-help-link {
     position: absolute;
@@ -66,6 +67,7 @@ form {
 
 div.task { 
     margin-bottom: 0.7em;
+    padding-right: 1em;
     position: relative;
 }
 div.cloze-task, div.numbered-cloze-task, div.vocab-exercise-task  {
