@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-10-18 17:15+0200\n"
-"PO-Revision-Date: 2005-10-18 17:15+0200\n"
+"PO-Revision-Date: 2005-10-19 12:43+0200\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -449,7 +449,7 @@ msgstr "Kursindex"
 # This label is actually not used.
 #: ../lib/lcg/export.py:117 ../lib/lcg/export.py:118
 msgid "None"
-msgstr "keins"
+msgstr "Nichts"
 
 # Navigation bar label (at the bottom of each page)
 #: ../lib/lcg/export.py:117 ../lib/lcg/export.py:124
