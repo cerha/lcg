@@ -1507,7 +1507,6 @@ class _FillInExercise(_InteractiveExercise):
         n = counter.next()
         f = _html.field(cls='fill-in-task', name="task-%d" % n,
                         size=max(4, len(text)+1), id=id)
-        #triangle = unicodedata.lookup('BLACK RIGHT-POINTING TRIANGLE')
         controls = [_html.button(_("Play"), "play_audio('%s')" % m.url(),
                                  cls='sound-control')
                     for m in media]
