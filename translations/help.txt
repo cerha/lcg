@@ -72,18 +72,18 @@ There are two ways how you can do the exercise: The oral form and the written
 form.  Do both of them for best results.
 
 The oral form is simple.  Go through the items below and think of a correct
-translation for each term.  There is a >>${Play}<< button behind the text-box for
-each item which allows you to hear the correct answer.  Repeat the answer to
-practise correct pronunciation.  Since there is no way how to check your oral
-answers, the results are not available.  If you want to see your score, you
-must do the written form.
+translation for each term.  There is a >>${Play}<< button behind the text-box
+for each item which allows you to hear the correct answer.  Repeat the answer
+to practise correct pronunciation.  Some terms have more than one correct
+answer.  Thus there may be multiple buttons to play each of them.  Since there
+is no way how to check your oral answers, the results are not available.  If
+you want to see your score, you must do the written form.
 
 To do the written form, simply write down the translation of each item into the
 text-box.  Pay special attention to use capital letters, where appropriate,
 since an answer without correct capitalization is always considered incorrect.
 When the prompt is a complete sentence, you must also take care of correct
 punctuation.  
-
 
 #endif
 #if issubclass(type, Transformation)
