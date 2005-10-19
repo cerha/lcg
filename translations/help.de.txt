@@ -45,9 +45,9 @@ finden.
 #endif
 #if issubclass(type, TrueFalseStatements)
 
-Bei jedem Satz in dieser Übung haben Sie die Wahl zwischen zwei Auswahltasten -
-'>>${TRUE}<<' und '>>${FALSE}<<'. Entscheiden Sie, ob der Satz
-richtig ist oder nicht, und klicken Sie auf Ihre Auswahl.
+Bei jedem Satz in dieser Übung haben Sie die Wahl zwischen zwei Auswahltasten
+-- '>>${TRUE}<<' und '>>${FALSE}<<'. Entscheiden Sie, ob der Satz richtig ist
+oder nicht, und klicken Sie auf Ihre Auswahl.
 
 #endif
 #if issubclass(type, GapFilling)
@@ -59,8 +59,8 @@ Ihnen jedes Mal mehrere Optionen zur Verfügung. Nur eine davon ist richtig.
 #if issubclass(type, _ChoiceBasedExercise)
 
 Nachdem Sie Ihre Auswahl getroffen haben, hören Sie sofort die Antwort. Wenn
-Sie die falsche Option gewählt haben, können Sie so lange weiterprobieren,
-bis Sie die richtige Antwort gefunden haben. Die Ergebnisse am Ende der Übung
+Sie die falsche Option gewählt haben, können Sie so lange weiterprobieren, bis
+Sie die richtige Antwort gefunden haben. Die Ergebnisse am Ende der Übung
 zeigen Ihnen, wie viele Antworten beim ersten Versuch richtig waren (siehe auch
 [#indicators]).
 
@@ -70,26 +70,26 @@ zeigen Ihnen, wie viele Antworten beim ersten Versuch richtig waren (siehe auch
 
 #if issubclass(type, VocabExercise)
 
-Es gibt zwei Möglichkeiten diese Übung durchzuführen:
-Sie können die Übung schriftlich oder mündlich durchführen.
-Arbeiten Sie mit beiden Möglichkeiten, so können Sie daraus Ihren
-maximalen Nutzen ziehen.
+Es gibt zwei Möglichkeiten diese Übung durchzuführen: Sie können die Übung
+schriftlich oder mündlich durchführen.  Arbeiten Sie mit beiden Möglichkeiten,
+so können Sie daraus Ihren maximalen Nutzen ziehen.
 
 Die mündliche Form ist einfach. Sie gehen die einzelenen Begriffe durch und
-überlegen sich die korrekte Übersetzung jedes einzelnen Wortes.
-Hinter jedem Textfeld finden Sie eine >>${Play}<< Taste. Damit haben Sie 
-die Möglichkeit sich auch gleich die richtige Antwort anzuhören.
-Um die richtige Aussprache zu üben, wiederholen Sie die Antwort! Es gibt keine 
-Möglichkeit Ihre gesprochene Antwort zu kontrollieren, daher ist das Ergebnis
-nicht überprüfbar. Wenn Sie also Ihre Bewertung wissen möchten, müssen Sie 
-die Übung in schriflicher Form wiederholen.
+überlegen sich die korrekte Übersetzung jedes einzelnen Wortes.  Hinter jedem
+Textfeld finden Sie eine >>${Play}<< Taste. Damit haben Sie die Möglichkeit
+sich auch gleich die richtige Antwort anzuhören.  Um die richtige Aussprache zu
+üben, wiederholen Sie die Antwort!  Für einige Begriffe gibt es mehr als eine
+richtige Antwort. In diesem Fall gibt es für jede Antwort eine
+>>${Play}<<-Taste hinter dem Textfeld.  Es gibt keine Möglichkeit Ihre
+gesprochene Antwort zu kontrollieren, daher ist das Ergebnis nicht
+überprüfbar. Wenn Sie also Ihre Bewertung wissen möchten, müssen Sie die Übung
+in schriflicher Form wiederholen.
 
 Um die schriftliche Übung durchzuführen, schreiben Sie einfach den jeweiligen
-Begriff in das Textfeld daneben. Achten Sie dabei auch besonders auf die 
-Groß- und Kleinschreibung der Begriffe. Sollte die Schreibweise nicht richtig 
-sein, wird die Antwort auch als falsch bewertet. Wenn Sie einen
-vollständigen Satz schreiben müssen, denken Sie auch an die richtige 
-Zeichensetzung.
+Begriff in das Textfeld daneben. Achten Sie dabei auch besonders auf die Groß-
+und Kleinschreibung der Begriffe. Sollte die Schreibweise nicht richtig sein,
+wird die Antwort auch als falsch bewertet. Wenn Sie einen vollständigen Satz
+schreiben müssen, denken Sie auch an die richtige Zeichensetzung.
 
 #endif
 #if issubclass(type, Transformation)
