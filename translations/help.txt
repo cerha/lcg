@@ -4,25 +4,30 @@
 
 #if issubclass(type, SentenceCompletion)
 
-The aim of this exercise is to provide an opportunity for the user to produce a
-complete sentence and compare pronunciation with the original and is therefore
-purely aural-oral, with no written tasks.
+The aim of this exercise is to give you an opportunity to produce a complete
+sentence and compare your pronunciation with the original.  Therefore the
+exercise is purely aural-oral, with no written tasks.
 
-If you wish to check your answers against the written text, you can see the
-textual transcript of the recording.  Since this is not a written exercise,
-there is no way to check your results automatically.
+If you wish to check your answers against the written text, you can use the
+transcript of the recording.  Since this is not a written exercise, your
+results cannot be checked automatically.
 
 #endif
 #if issubclass(type, Reading)
 
-Read the text in this exercise.  The information from the text will be used in
-the following exercises.
+Read the text and try to understand as much as you can. Use a dictionary if
+necessary. In many cases you will find the information relevant for your own
+purposes, but it will also be needed in the exercises which follow.
+
 
 #endif
 #if issubclass(type, Listening)
 
-Listen to the recording carefully.  The information will be used in the
-following exercises.
+Listen to the recording to practice understanding native speakers.  You will
+hear the complete recording first, and then you will be able to practice your
+own pronunciation by listening to shorter sections and repeating them until you
+are satisfied with your pronunciation.
+
 
 #endif
 
@@ -31,36 +36,35 @@ following exercises.
 
 #if issubclass(type, MultipleChoiceQuestions)
 
-Each question in this exercise is followed by a list of possible answers
-labaled a, b and c.  Only one answer is correct.
+Each question in this exercise is followed by two or more possible
+answers. Only one answer is correct.
 
 #endif
 #if issubclass(type, Selections)
 
-There are several groups (usually pairs or triples) of similar sentences or
-expressions, however only one option in each group is correct.  Your goal is to
-decide which one it is.
+There are several groups of two or three similar sentences or expressions. Only
+one option in each group is correct.  Your goal is to decide which one.
 
 #endif
 #if issubclass(type, TrueFalseStatements)
 
-Each sentence in this exercise is followed by two controls labeled '>>${TRUE}<<'
-and '>>${FALSE}<<'.  Your goal is to decide whether the sentence is true or not
+Each sentence in this exercise is followed by two controls labeled
+'>>${TRUE}<<' and '>>${FALSE}<<'.  Decide whether the sentence is true or not
 and press the corresponding button.
 
 #endif
 #if issubclass(type, GapFilling)
 
-Your goal is to choose the correct word to fill in a gap in a sentence.  For
-each gap you have several choices.  Only one of them is correct.
+Choose the correct word to fill in a gap in a sentence.  For each gap you have
+several choices.  Only one of them is correct.
 
 #endif
 #if issubclass(type, _ChoiceBasedExercise)
 
 You will hear a response immediately after choosing the answer.  When you
-decide for a wrong answer, you can try again until you find the correct one.
-The results below the exercise will show you how many answers you did right on
-the first try (see the [#indicators] section below).
+choose the wrong answer, you can try again until you find the correct one.  The
+results below the exercise will show you how many answers you got right on the
+first try (see the [#indicators] section below).
 
 #endif
 
@@ -68,28 +72,29 @@ the first try (see the [#indicators] section below).
 
 #if issubclass(type, VocabExercise)
 
-There are two ways how you can do the exercise: The oral form and the written
-form.  Do both of them for best results.
+There are two ways to do the exercise: orally and written.  Do the exercise
+both ways to get the best results.
 
-The oral form is simple.  Go through the items below and think of a correct
-translation for each term.  There is a >>${Play}<< button behind the text-box
-for each item which allows you to hear the correct answer.  Repeat the answer
-to practise correct pronunciation.  Some terms have more than one correct
-answer.  Thus there may be multiple buttons to play each of them.  Since there
-is no way how to check your oral answers, the results are not available.  If
-you want to see your score, you must do the written form.
+To do the exercise orally is simple.  Go through the vocabulary list and think
+of the correct translation for each word or expression.  There is a >>${Play}<<
+button behind the text-box for each item which allows you to hear the correct
+answer.  Repeat the answer to practise the correct pronunciation.  Some items
+have more than one correct answer, so there may be multiple buttons to play
+each of them.  Since there is no way of checking your oral answers, the results
+are not available.  If you want to see your score, you must do the written
+exercise.
 
-To do the written form, simply write down the translation of each item into the
-text-box.  Pay special attention to use capital letters, where appropriate,
-since an answer without correct capitalization is always considered incorrect.
-When the prompt is a complete sentence, you must also take care of correct
-punctuation.  
+To do the exercise in written form, simply type the translation of each item
+into the text-box.  Be careful to use capital letters where this is
+appropriate, since an answer without correct capitalization is always
+considered incorrect.  When the prompt is a complete sentence, you must also
+use correct punctuation.
 
 #endif
 #if issubclass(type, Transformation)
 
-Your goal is to transform a structure (pattern or paradigm) into a different
-structure.
+Your goal is to transform a structure (pattern or paradigm) into a  different
+structure, for example changing an affirmative sentence into a question.
 
 #endif
 #if issubclass(type, Substitution)
@@ -101,36 +106,36 @@ the sentence using this text.
 #endif
 #if issubclass(type, _Cloze)
 
-Your goal in this exercise is to fill in the gaps in a longer piece of text.
+Your goal in this exercise is to fill in the gaps in a longer piece  of text.
 There is just one correct answer for each gap.
 
 #endif
 #if issubclass(type, Dictation)
 
 First listen to the recording once and then go to the large text entry box
-below.  Within the box, you can use shortcut keys to replay individual pieces
-of the recording.  Typically you always play one piece using the *>* key (right
-angle bracket) and write down what you hear.  Then you press the *>* key again
-to replay the next part and write it down again until you reach the end of the
-recording.  Then you can use the evaluation keys (or the buttons below) to
-evaluate the whole text.
+below.  Within the box, you can use shortcut keys to play individual pieces of
+the recording.  Typically you play one part using the *>* key (right angle
+bracket) and type what you hear. Then you press the *>* key again to play the
+next part and type it too, and so on until you reach the end of the recording.
+Then you can use the evaluation keys (or the buttons below) to evaluate the
+whole text.
 
-Pay special attention to punctuation and case, since they often cause most of
-the problems when evaluating your answer.  Write all the sentences as you hear
-them, using the appropriate punctuation character and one space after each
-sentence.  No space is allowed at after the last sentence.
+Pay special attention to punctuation and case, since these cause most of the
+problems when evaluating your answer. Type all the sentences as you hear them,
+using the appropriate punctuation character and one space after each sentence.
+No space is allowed after the last sentence.
 
-/Note:/ Of course, you can replay the recording how many times you need to
-understand it, however two attempts should be enough for a well performing
-student.
+/Note:/ Of course, you can replay the recording as many times as you need in
+order to understand it, although two attempts should be enough for a well
+performing student.
 
 #else
 #if issubclass(type, _FillInExercise)
 
 You can check each answer individually using the shortcut keys (see the section
 [#keys] for more information).  When your answer is evaluated as incorrect and
-you do not know why, always check whether you have correct punctuation and
-capital letters where appropriate, since these two things tend to cause most
+you do not know why, always check whether you have used correct punctuation and
+capital letters where appropriate. These two things are the cause of most
 confusion.
 
 Use the [#panel] at the bottom of the exercise to evaluate all the answers at
@@ -138,7 +143,7 @@ once.
 
 If your browser doesn't support JavaScript, the interactive features and
 automatic evaluation do not work.  You can still use this course, but you will
-have to check your answers against the [#answer-sheets] manually.  
+have to check your answers against the [#answer-sheets] manually.
 
 #endif
 #endif
@@ -163,24 +168,24 @@ Ctrl-Space
    answer or you don't know how to fix an error in your answer.  Just press the
    key combination (holding the Ctrl key, press the spacebar) and one letter of
    the correct answer will be filled in automatically.  If you have already
-   entered some text, the cursor will be moved behind the last correct
-   character and next one will be inserted.  It also means, that if there is
-   some text behind the cursor, there is at least one error in it.  Try to
-   locate this error and correct it.  Then you can try to evaluate your answer
-   using the 'Enter' key (see above) or use ``hint'' again, until you find the
+   entered some text, the cursor will be moved to after the last correct
+   character and next one will be inserted.  This also means that if there is
+   some text after the cursor, there is at least one error in it.  Try to
+   locate this error and correct it.  Then you can evaluate your answer using
+   the 'Enter' key (see above) or use ``hint'' again, until you find the
    complete answer.
 
 #if issubclass(type, Dictation)
 
-Morover, within the dictation exercise text box, you can also use the following
-keys to control the playback of the recording:
+Also, in the dictation exercise text box, you can use the following keys to
+control the playback of the recording:
 
 > /(right angle bracket, greater than sign)/
    Play next piece of the recording.
 
 < /(left angle bracket, less than sign)/
    Play the previous piece of the recording.
-  
+
 Ctrl-Enter
    Replay the current (last played) piece of the recording once again.
 
@@ -209,9 +214,9 @@ The indicator panel below the exercise shows the following values:
    >>${Reset}<< button to start again.
 
 >>${Answered:}<<
-   Displays the number of the tasks you have already answered.  For example the
-   value 4/10 means, that you have answered four out of ten questions.  Thus
-   you should finish the remaining six.
+   Displays the number of the tasks you have already answered.  For example
+   4/10 means, that you have answered four out of ten questions so you should
+   finish the remaining six.
 
 #endif
 
@@ -225,15 +230,15 @@ The control panel below the exercise contains the following buttons:
    the first incorrect character of your answer.
 
 >>${Fill}<<
-   Fill in the whole exercise with correct answers.
+   Fill in the whole exercise with the correct answers.
 
 >>${Reset}<<
    Reset all your answers and start again.
 
 == Answer Sheets == answer-sheets
 
-Answer Sheets contain all the correct answers for all exercises.  You can
-access Answer Sheets from the Course Index, or more conveniently, you can use
-the '?'  (question mark) link behind every task.  This link leads you directly
-to the corresponding answer in the Answer Sheet.
+The Answer Sheets contain all the correct answers for all the exercises.  You
+can access Answer Sheets from the Course Index, or more conveniently, you can
+use the '?'  (question mark) link after each task.  This link takes you
+directly to the corresponding answer in the Answer Sheet.
 
