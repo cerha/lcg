@@ -15,18 +15,21 @@ results cannot be checked automatically.
 #endif
 #if issubclass(type, Reading)
 
-Read the text and try to understand as much as you can. Use a dictionary if
-necessary. In many cases you will find the information relevant for your own
+Read the text and try to understand as much as you can.  Use a dictionary if
+necessary.  In many cases you will find the information relevant for your own
 purposes, but it will also be needed in the exercises which follow.
 
 
 #endif
 #if issubclass(type, Listening)
 
-Listen to the recording to practice understanding native speakers.  You will
-hear the complete recording first, and then you will be able to practice your
-own pronunciation by listening to shorter sections and repeating them until you
-are satisfied with your pronunciation.
+Listen to the recording to practice understanding native speakers.  In many
+cases you will find the information relevant for your own purposes, but it will
+also be needed in the exercises which follow.
+
+You will hear the complete recording first, and then you will be able to
+practice your own pronunciation by listening to shorter sections and repeating
+them until you are satisfied with your pronunciation.
 
 
 #endif
