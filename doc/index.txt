@@ -1,3 +1,4 @@
 intro.wiki
 eurochance.wiki
-wiki-formatting.wiki
+data-formats.wiki
+formatting.wiki
