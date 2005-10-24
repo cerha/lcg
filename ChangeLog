@@ -1,5 +1,18 @@
 2005-10-24  Tomas Cerha  <cerha@brailcom.org>
 
+	* doc/index.txt: Updated.
+
+	* doc/formatting.wiki: The renamed `wiki-formatting.wiki' file.
+
+	* doc/wiki-formatting.wiki: Renamed to `formatting.wiki'.
+
+	* doc/data-formats.wiki: New document.
+
+	* doc/eurochance.wiki: Reorganized.  Sections about translations
+	written.  Course structure for both courses Described in more
+	detail.  All general information for the LCG taken out into the
+	new document `data-formats'.
+
 	* translations/help.txt (Listening): Improved.
 
 2005-10-21  Tomas Cerha  <cerha@brailcom.org>
