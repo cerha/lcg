@@ -23,14 +23,11 @@ purposes, but it will also be needed in the exercises which follow.
 #endif
 #if issubclass(type, Listening)
 
-Listen to the recording to practice understanding native speakers.  In many
-cases you will find the information relevant for your own purposes, but it will
-also be needed in the exercises which follow.
+Listen to the recording to practice understanding native speakers.
 
-You will hear the complete recording first, and then you will be able to
-practice your own pronunciation by listening to shorter sections and repeating
-them until you are satisfied with your pronunciation.
-
+# You will hear the complete recording first, and then you will be able to
+# practice your own pronunciation by listening to shorter sections and
+# repeating them until you are satisfied with your pronunciation.
 
 #endif
 
@@ -241,7 +238,7 @@ The control panel below the exercise contains the following buttons:
 == Answer Sheets == answer-sheets
 
 The Answer Sheets contain all the correct answers for all the exercises.  You
-can access Answer Sheets from the Course Index, or more conveniently, you can
-use the '?'  (question mark) link after each task.  This link takes you
+can access >>${Answer Sheets}<< from the Course Index, or more conveniently,
+you can use the '?'  (question mark) link after each task.  This link takes you
 directly to the corresponding answer in the Answer Sheet.
 
