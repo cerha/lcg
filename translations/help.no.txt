@@ -1,0 +1,239 @@
+﻿# -*- coding: utf-8-dos; mode: wiking -*-
+
+#Innholdsfortegnelse: @TOC@
+
+== Instruksjoner ==
+
+#if issubclass(type, SentenceCompletion)
+
+Målet til denne oppgaven er å gi deg en mulighet til å lage en hel setning og
+sammenligne dine uttalelser med originalen. Derfor er hele oppgaven basert på å
+høre/snakke, ingen skriftlige oppgaver.
+
+Hvis du ønsker å sjekke svarene dine mot den skrevne teksten, kan du bruke
+gjengivelsen av opptaket. Siden dette ikke er en skrevet oppgave, kan ikke
+svarene bli sjekket automatisk.
+
+#endif
+#if issubclass(type, Reading)
+
+Les teksten og prøv å forstå så mye du kan. Bruk en ordbok hvis nødvendig.  I
+mange tilfeller vil informasjonen være relevant for dine egen hensikter, men
+vil også brukt i oppgavene som følger.
+
+#endif
+#if issubclass(type, Listening)
+
+Hør på opptaket for å trene deg på å forstå de som har det som morsmål.  I
+mange tilfeller vil informasjonen være relevant for dine egen hensikter, men
+vil også brukt i oppgavene som følger.
+
+# Du vil høre det komplette opptaket først, og så vil du være klar for å trene
+# på din egen uttale ved å lytte til kortere deler og ved å repetere de til du
+# er fornøyd med egen uttale.
+
+#endif
+
+
+########## _ChoiceBasedExercise subclasses ##########
+
+#if issubclass(type, MultipleChoiceQuestions)
+
+Hvert spørsmål i denne oppgaven er fulgt av to eller flere svar. Bare ett
+svar er korrekt.
+
+#endif
+#if issubclass(type, Selections)
+
+Det er mange grupper av to eller tre like setninger eller uttrykk. Bare ett
+valg i hver gruppe er korrekt. Din oppgave er å bestemme hvilken.
+
+#endif
+#if issubclass(type, TrueFalseStatements)
+
+Hver setning i denne oppgaven er fulgt av to muligheter merket '>>${TRUE}<<' og
+'>>${FALSE}<<'. Bestem om setningen er sann eller usann og trykk den
+korresponderende knappen.
+
+#endif
+#if issubclass(type, GapFilling)
+
+Velg det riktige ordet for fylle tomrommet i setningen. For hvert tomrom har du
+flere valg. Bare ett av dem er korrekt.
+
+#endif
+#if issubclass(type, _ChoiceBasedExercise)
+
+Du vil høre en respons rett etter at du har valgt et svar. Når du velger galt
+svar, kan du prøve igjen til finner det riktige. Resultatene under oppgaven vil
+vise hvor mange riktige svar du fikk på første forsøk (se [#indikatorer]
+seksjonen nedenfor).
+
+#endif
+
+########## _FillInExercise subclasses ##########
+
+#if issubclass(type, VocabExercise)
+
+Det er 2 måter å gjøre oppgaven på: muntlig eller skriftlig. Gjør oppgaven
+på begge måter for å oppnå best resultater.
+
+Å gjøre oppgaven muntlig er enkelt. Gå gjennom listen med vokabular og tenk på
+den riktige oversettelsen av hvert ord eller uttrykk. Det er en >>${Play}<<
+knapp bak tekstboksen for hvert element som tillater deg å høre det riktige
+svaret. Gjenta svaret for å trene på den korrekte uttalen. Noen elementer har
+flere enn ett riktig svar, så det kan være flere knapper for spille av hver og
+en av dem.  Siden det ikke er noen måte å sjekke de muntlige svarene på, er
+resultatene ikke tilgjengelige. Hvis du vil se din poengsum, må du gjøre den
+skriftlige oppgaven.
+
+For å gjøre oppgaven skriftlig, skriver du inn oversettelsen på hvert enkelt
+element i tekstboksen. Hver forsiktig med å bruke store bokstaver der hvor det
+passer, siden et svar uten korrekt skrivemåte blir alltid vurdert som feil. Når
+tilfellet er en hel setning, må du også bruke riktig tegnsetting.
+
+#endif
+#if issubclass(type, Transformation)
+
+Ditt mål er å gjøre om strukturen (mønster eller paradigme) til en annen, for
+eksempel ved å forandre en bekreftende setning til en spørrende.
+
+#endif
+#if issubclass(type, Substitution)
+
+Bruk utgangspunktet til å lage en ny setning med samme struktur. Hver setning
+er fulgt av tekst i klammer. Erstatt den korresponderende delen av setningen
+ved å bruke denne teksten.
+
+#endif
+#if issubclass(type, _Cloze)
+
+Ditt mål i denne oppgaven er å fylle ut tomrommene i en lengre tekstdel. Det er
+bare ett korrekt svar for hvert tomrom.
+
+#endif
+#if issubclass(type, Dictation)
+
+Hør først på opptaket en gang og gå så til den store tekstboksen under. I
+boksen kan du bruke hurtigtaster for å spille av individuelle deler av
+opptaket. Som vanlig bruker du ">" tasten for spille neste del og skriv den
+også, osv. til du kommer til slutten på opptaket. Så kan du bruke
+evalueringstastene (eller knappene under) for å evaluere hele teksten.
+
+Vær spesielt oppmerksom på tegnsetting og små/store bokstaver, siden dette
+forårsaker de fleste av problemene når svaret evalueres. Skriv inn alle
+setningene som du hører dem, ved å bruke det passende tegnet og ett mellomrom
+etter hver setning. Mellomrom etter siste setning er ikke nødvendig.
+
+/OBS:" Selvfølgelig kan du spille av opptaket så mange ganger som du trenger
+for å forstå det, selvom to ganger burde være nok for en god student.
+
+#else
+#if issubclass(type, _FillInExercise)
+
+Du kan sjekke hvert svar individuelt ved å bruke hurtigtastene (se seksjonen
+[#hurtigtaster] for mer informasjon). Når ditt svar er evaluert som feil og du
+ikke skjønner hvorfor , sjekk alltid om du har brukt riktig tegnsetting og
+store bokstaver der hvor det er passende. Disse to tingene er det som lager
+mest forvirring.
+
+Bruk [#panel] nederst på oppgaven for å evaluere alle svarene på en gang.
+
+Hvis nettleseren din ikke støtter javascript, vil de interaktive delene og
+automatisk evaluering ikke fungere. Du kan fortsatt bruke kurset, men du må
+sjekke svarene mot [#svarark] manuelt.
+
+#endif
+#endif
+
+#if issubclass(type, _FillInExercise)
+
+== Hurtigtaster == hurtigtaster
+
+I alle oppgavene hvor du fyller inn tekst i en tekstboks, kan du bruke de to 
+hurtigtastene beskrevet nedenfor.
+
+Enter
+   Bruk denne tasten innen tekstfeltet for å evaluere det aktuelle svaret. Du
+   hører en lydrespons og hvis det er noe feil, flytter markøren seg til
+   posisjonen av den første gale bokstaven i teksten. På denne måten kan du
+   finne feilen, rette den og evaluere igjen. Når du ikke vet hva som er rett,
+   kan du bruke "hint" tasten beskrevet nedenfor.
+
+Ctrl-Space
+   Denne funksjonen kalles et "hint". Den hjelper deg i tilfelle du ikke vet
+   svaret eller du ikke vet hvordan du skal rette en feil i svaret. Bare trykk
+   tastkombinasjonen (ved å holde crtl-tasten nede og så trykke
+   space/mellomrom) og det riktige svaret vil bli fylt inn automatisk. Hvis du
+   allerede har fylt inn tekst, vil markøren bli flyttet til etter den siste
+   korrekte bokstaven og neste vil bli lagt til. Dette betyr også at hvis det
+   noe tekst etter markøren, så er det minst en i den. Prøv å finne feilen og
+   rett den. Så kan du evaluere ditt svar ved å bruke enter-tasten (se over)
+   eller bruke "hint" igjen, til du finner hele svaret.
+
+#if issubclass(type, Dictation)
+
+I diktat-oppgave tekstboksen kan du i tillegg bruke følgende taster for å
+kontrollere avspillingen av opptaket.
+
+> /(høyrevinklet klamme, større enn tegn)/
+   Spill neste del av opptaket.
+
+< /(venstrevinklet klamme, mindre enn tegn)/
+   Spill forrige del av opptaket.
+
+Ctrl-Enter
+   Gjenta aktuell (sist spilte) del av opptaket en gang til.
+
+#endif
+#endif
+
+#if issubclass(type, _InteractiveExercise)
+
+== Indikatorer == indikatorer
+
+Indikatorpanelet nedendfor oppgaven viser følgende verdier:
+
+#if issubclass(type, Dictation)
+
+>>${Result:}<<
+   Viser resultatet av siste evaluering (evaluer svaret ditt ved å trykke 
+   enter-tasten	 eller ved >>${Evaluate}<< knappen nedenfor oppgaven).
+
+#else
+
+>>${Correct:}<<
+   Viser antall og prosent av riktige svar. De første nummerne viser
+   resultatene av alle aktuelle svar. Hvis du ikke svarte riktig på alle i
+   første forsøk, så er det også noen andre nummer som viser hvor mange svar
+   som du svarte korrekt på i første forsøk. Bruk >>${Reset}<< knappen for å
+   starte på nytt.
+
+>>${Answered:}<<
+   Viser antall av oppgaver som du allerede har svart på. For eksempel,
+   4/10 betyr at du svart på fire av 10 spørsmål, så du burde svare på de 
+   resterende seks.
+
+#endif
+
+== Kontrollpanel == panel
+
+Kontrollpanelet nedenfor oppgaven inneholder følgende knapper:
+
+>>${Evaluate}<<
+   Evaluer hele oppgaven. Hvis en feil blir funnet, blir markøren flyttet til 
+   første gale svar. Inne i en tekstboks, blir markøren også flyttet til den
+   første gale bokstaven i svaret.
+
+>>${Fill}<<
+   Fyll inn hele oppgaven med de korrekte svarene.
+
+>>${Reset}<<
+   Still alle svar tilbake og start på nytt
+
+== Svarark == svarark
+
+Svararket (>>${Answer Sheets}<<) inneholder alle de korrekte svarene for alle
+oppgavene. Du kan få tilgang til svararket fra kursindeksen, eller raskere ved
+å bruke "?"  (spørsmålstegn) lenken etter hver del. Denne lenken tar deg
+direkte til det korresponderende svaret i svararket.
