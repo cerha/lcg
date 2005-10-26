@@ -16,13 +16,13 @@ schriftliche Übung handelt, können Ihre Ergebnisse auch nicht automatisch
 
 #endif if issubclass(type, Reading)
 
-Lesen Sie den Text in dieser Übung. In den nachfolgenden Übungen müssen Sie auf
-diesen gelesenen Text Bezug nehmen.
+Lesen Sie den Text in dieser Übung.  In den nachfolgenden Übungen müssen Sie
+auf diesen gelesenen Text Bezug nehmen.
 
 #endif
 #if issubclass(type, Listening)
 
-Hören Sie der Aufnahme aufmerksam zu. Die soeben gehörten Informationen sind
+Hören Sie der Aufnahme aufmerksam zu.  Die soeben gehörten Informationen sind
 für die nachfolgenden Übungen wichtig.
 
 #endif
@@ -251,8 +251,8 @@ Das Bedienungsfeld nach jeder Übung beinhaltet folgende Tastenfelder:
 == Auflösungsteil == answer-sheets
 
 Im Auflösungsteil finden Sie alle richtigen Antworten zu den gesamten Übungen.
-Einen LINK zum Auflösungsteil finden Sie im Inhaltsverzeichnis. Einfacher ist
-es, wenn Sie in einem Übungsabschnitt am rechten Bildschirmrand auf das '?'
+Einen LINK zum >>${Answer Sheets}<< finden Sie im Inhaltsverzeichnis. Einfacher
+ist es, wenn Sie in einem Übungsabschnitt am rechten Bildschirmrand auf das '?'
 (Fragezeichen)-Feld klicken und damit direkt in den entsprechenden Lösungsteil
 wechseln.
 
