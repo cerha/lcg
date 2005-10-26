@@ -40,9 +40,8 @@ def resource(cls, parent, file, **kwargs):
 
        cls -- resource class.
        parent -- the ContentNone instance, for which the resource is allocated.
-       file -- filename of the resource
-       kwargs -- constructor arguments which should be passed after the
-         'src_path' and 'dst_path' arguments.
+       file -- filename of the resource.
+       kwargs -- additional constructor arguments.
 
     The possible source directories are first searched for the input file:
 
@@ -54,17 +53,17 @@ def resource(cls, parent, file, **kwargs):
       * For other media types the source files are always expected in parent
         node's source directory ('ContentNode.src_dir()').
     
-    The instances are cached properly, so it is recommended to use this
-    function instead of creating the instances directly.
+    The instances are cached.  Use this function instead of creating the
+    instances directly.
 
     """
          
     assert issubclass(cls, Resource)
     assert isinstance(parent, ContentNode), \
            "Not a 'ContentNode' instance: %s" % parent
-    key = (cls, file, tuple(kwargs.items()))
     if not cls.SHARED:
-        key = (parent, ) + key
+        kwargs['parent'] = parent
+    key = (cls, file, tuple(kwargs.items()))
     global _cache
     try:
         return _cache[key]
@@ -73,25 +72,25 @@ def resource(cls, parent, file, **kwargs):
             src_dirs = ('',
                         os.path.join(parent.root().src_dir(), cls.SUBDIR),
                         os.path.join(config.default_resource_dir, cls.SUBDIR))
-            dst_dir = cls.SUBDIR
         else:
             src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
-            dst_dir = os.path.join(cls.SUBDIR, parent.subdir())
-        for d in src_dirs:
-            src_path = os.path.join(d, file)
-            dst_path = os.path.join(dst_dir, file)
-            if os.path.exists(src_path):
-                result = cls(src_path, dst_path, **kwargs)
-                _cache[key] = result
-                return result
-            elif src_path.find('*') != -1:
-                pathlist = glob.glob(src_path)
-                if pathlist:
-                    r = [cls(src_path, dst_dir + src_path[len(d):], **kwargs)
-                         for src_path in pathlist]
-                    _cache[key] = r
-                    return r
-        result = cls(os.path.join(src_dirs[0], file), dst_path, **kwargs)
+        basename, ext = os.path.splitext(file)
+        altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
+        for src_file in [file] + altnames:
+            for d in src_dirs:
+                src_path = os.path.join(d, src_file)
+                if os.path.exists(src_path):
+                    result = cls(file, src_path, **kwargs)
+                    _cache[key] = result
+                    return result
+                elif src_path.find('*') != -1:
+                    pathlist = glob.glob(src_path)
+                    if pathlist:
+                        result = [cls(path[len(d)+1:], path, **kwargs)
+                                  for path in pathlist]
+                        _cache[key] = result
+                        return result
+        result = cls(file, os.path.join(src_dirs[0], file), **kwargs)
         _cache[key] = result
         return result
 
@@ -108,33 +107,50 @@ class Resource(object):
     """A boolean flag indicating that the file may be shared by multiple nodes
     (is not located within the node-specific subdirectory, but rather in a
     course-wide resource directory)."""
+
+    ALT_SRC_EXTENSIONS = ()
     
-    def __init__(self, src_path, dst_path):
+    def __init__(self, file, src_path, parent=None):
         """Initialize the instance.
 
         Arguments:
 
-          src_path -- source file path.
-          dst_path -- destination file path.
+          file -- name of the resource file.
+          src_path -- source file path.  This is an absolut filename of the
+            source file.  The filename of the source file must not necessarily
+            be the same as 'file'.  For examlpe a conversion may be involved
+            (depending on particular 'Resource' subclass).
+          parent -- parent node.  This argument is only needed for the resource
+            types which are not shared.
 
         """
+        assert self.SHARED and parent is None or isinstance(parent, ContentNode)
+        self._file = file
         self._src_path = src_path
-        self._dst_path = dst_path
+        self._parent = parent
         if self._needs_source_file() and not os.path.exists(src_path):
             log("Resource file not found:", src_path)
 
+    def _dst_path(self):
+        if self.SHARED:
+            dst_dir = self.SUBDIR
+        else:
+            dst_dir = os.path.join(self.SUBDIR, self._parent.id())
+        return os.path.join(dst_dir, self._file)
+            
+            
     def _needs_source_file(self):
         return True
         
     def url(self):
-        return '/'.join(self._dst_path.split(os.path.sep))
+        return '/'.join(self._dst_path().split(os.path.sep))
 
     def name(self):
         return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
     def export(self, dir):
         infile = self._src_path
-        outfile = os.path.join(dir, self._dst_path)
+        outfile = os.path.join(dir, self._dst_path())
         if (not os.path.exists(outfile)
             or (os.path.exists(infile) and
                 os.path.getmtime(outfile) < os.path.getmtime(infile))
@@ -164,11 +180,14 @@ class Media(Resource):
     """Representation of a media object used within the content."""
     SUBDIR = 'media'
     SHARED = False
+    ALT_SRC_EXTENSIONS = ('.wav',)
 
-    def __init__(self, src_path, dst_path):
-        basename, ext = os.path.splitext(src_path)
-        assert ext in ('.ogg','.mp3','.wav'), "Unsupported media type: %s" % ext
-        super(Media, self).__init__(src_path, dst_path)
+    def __init__(self, file, src_path, parent=None):
+        for f in (file, src_path):
+            basename, ext = os.path.splitext(f)
+            assert ext in ('.ogg','.mp3','.wav'), \
+                   "Unsupported media type: %s" % ext
+        super(Media, self).__init__(file, src_path, parent=parent)
 
     def _export(self, infile, outfile):
         input_format = os.path.splitext(infile)[1].upper()[1:]
@@ -198,7 +217,7 @@ class Media(Resource):
 
 class SharedMedia(Media):
     SHARED = True
-        
+    
 
 class Script(Resource):
     """Representation of a script object used within the content."""
@@ -220,20 +239,20 @@ class Transcript(Resource):
     SUBDIR = 'transcripts'
     SHARED = False
 
-    def __init__(self, src_path, dst_path, text=None, input_encoding='utf-8'):
+    def __init__(self, file, src_path, parent=None, 
+                 text=None, input_encoding='utf-8'):
         """Initialize the instance.
 
         Arguments:
         
-          src_path, dst_path -- see 'Resource.__init__()'.
           text -- if defined and the source file does not exist, the
-            destination file will be created using the specified text As its
+            destination file will be created using the specified text as its
             content.
 
         """
         self._text = text
         self._input_encoding = input_encoding
-        super(Transcript, self).__init__(src_path, dst_path)
+        super(Transcript, self).__init__(file, src_path, parent=parent)
 
     def _needs_source_file(self):
         return self._text is None
@@ -258,3 +277,4 @@ class Transcript(Resource):
             output.write(text.encode('utf-8'))
         finally:
             output.close()
+            
