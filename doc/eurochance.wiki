@@ -21,7 +21,9 @@ more details.
 Index: @TOC@
 
 
-== The Intermediate Course Structure ==
+== Course Structure Specification ==
+
+=== The Intermediate Course Structure ===
 
 The Intermediate Course consists of 15 units.  Each unit is focused on a
 certain topic (e.g. finance, catering etc.).  The structure of each unit is
@@ -33,14 +35,14 @@ contents is [#instructions].  The 15 units follow.  Then there is a
 [#grammar-bank], [#vocabulary-index] and [#help-index].
 
 
-=== General Course Instructions === instructions
+==== General Course Instructions ==== instructions
 
 The first document linked form the table of contents id called General Course
 Instructions and contains basic information about the course, its usage,
 navigation etc.
 
 
-=== Unit Structure === unit
+==== Unit Structure ==== unit
 
 The structure of each unit is uniform.  The first section is "Aims and
 Objectives".  It informs you briefly about the focus of the unit and lists the
@@ -67,7 +69,7 @@ The detailed description of exercise types can be found in the section
 The final section, "Checklist", lists the skills that the user has practised
 and should have acquired.
 
-=== Grammar Bank === grammar-bank
+==== Grammar Bank ==== grammar-bank
 
 Apart from the 15 units there is also a Grammar Bank that the learners can use
 for study or reference.
@@ -78,7 +80,7 @@ contents is generated automatically at the beginning of the page to allow
 direct access to any topic.
 
 
-=== Vocabulary Index === vocabulary-index
+==== Vocabulary Index ==== vocabulary-index
 
 This is simply a collection of all the vocabulary from all units sorted
 albhabetically by the original term and also by the translation.  Phrases are
@@ -88,7 +90,7 @@ The vocabulary index is generated automatically by the LCG, so no source data
 are needed.
 
 
-=== Answer Sheets === answer-sheets
+==== Answer Sheets ==== answer-sheets
 
 Answer Sheets contain all the correct answers for all exercises.  You can
 access Answer Sheets from the Course Index, or more conveniently, you can use
@@ -99,7 +101,7 @@ The answer sheets are generated automatically by the LCG and no source data are
 needed.
 
 
-=== Help Index === help-index
+==== Help Index ==== help-index
 
 The Help Index simply lists all the exercise types used within the course and
 provides links to their help pages.  Every exercise within the course has its
@@ -109,7 +111,7 @@ collection somewhere...
 The help texts are part of the LCG, so no source data are needed.
 
 
-== The Advanced Course Structure ==
+=== The Advanced Course Structure ===
 
 The Advanced course consists of 10 units.  Their structure is more flexible.
 The First and last section is the same (the "Aims & Objectives" and the
@@ -127,6 +129,7 @@ The top level structure is very similar to the Intermediate Course.  The Course
 Index contains a short introduction text and a table of contants.  The table of
 contents starts with General Course Instructions, the 10 units, Answer Sheets
 and Help Index.
+
 
 
 == Organization of the Input Data ==
@@ -236,7 +239,18 @@ of the files.
 
 == Translations ==
 
+In general, all the translation data are plain text files.  You always download
+the source file and edit it using your favorite text editor.  A simple editor,
+such as Notepad should do the job.  The source files are UTF-8 encoded and this
+encoding must be also preserved when saving them.
+
+The text format is let's say the ``low level'' format.  There is, however, also
+a higher level format imposed by the type of the content.  Specific rules allpy
+to each file, depending on it's content:
+
 @TOC@
+
+
 
 === Translating the Vocabulary === vocab-translations
 
@@ -343,11 +357,9 @@ That's mostly all.  More detailed manual can be found at
 -----
 
 
-
-
 ==== Citations ==== citations
 
-The citations (marked by angle brackets) within an English course always mark
+The citations (marked by angle brackets) within the English course always mark
 text which will stay in English.  In the German course, this is the text in
 German.  Thus you don't translate what's inside.
 
@@ -362,14 +374,14 @@ Citations are used in the following cases:
       such User Interface elements must stay in the language in which they
       appear in the course, so that the user knows what we are talking about.
 
-Sometimes it might be appropriate to add a translation of the text
-marked as a citation (for example in round brackets after this text), when the
-meaning of the citation might not be obvious from the context.
+Sometimes it might be appropriate to add a translation of the cited text (for
+example in parenthesis after this text, when the meaning might not be obvious
+from the context.  This can often happen in the Grammar Bank.
 
-
-
-
-
+Also in General Course Instructions the meaning of the referenced English label
+might not be obvious.  Thus, for example, ``the \>>Grammar Bank\<<'' can be
+translated as ``un \>>Grammar Bank\<< (base de datos gramatical)'' into
+Spanish.
 
 
 == Sound Recordings == recordings
