@@ -1,3 +1,30 @@
+2005-10-26  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/eurochance.wiki: Section structure improved.  General
+	translation instructions added.
+
+	* lib/lcg/resources.py (resource): Docstring updated.  Pass parent
+	in kwargs for resource types which are not shared.  Search all
+	files given by `cls.ALT_SRC_EXTENSIONS' within the source paths.
+	(Resource.ALT_SRC_EXTENSIONS, Media.ALT_SRC_EXTENSIONS): New
+	constants.
+	(Resource.__init__): New argument 'file'.  Argument `dst_path'
+	removed.  New keyword argument `parent'.
+	(Resource._dst_path): New method.
+	(Resource.url, Resource.export): Use it.
+	(Transcript.__init__): Respect the new constructor args.
+	
+
+	* translations/help.no.txt: New file.
+
+	* translations/help.es.txt: New file.
+
+	* translations/help.de.txt (Listening): Removed the part about
+	shorter sections.
+
+	* translations/help.txt (answer-sheets): Mark 'Answer Sheets' as a
+	translatable string.
+
 2005-10-24  Tomas Cerha  <cerha@brailcom.org>
 
 	* doc/index.txt: Updated.
