@@ -77,7 +77,7 @@ both ways to get the best results.
 
 To do the exercise orally is simple.  Go through the vocabulary list and think
 of the correct translation for each word or expression.  There is a >>${Play}<<
-button behind the text-box for each item which allows you to hear the correct
+button after the text-box for each item which allows you to hear the correct
 answer.  Repeat the answer to practise the correct pronunciation.  Some items
 have more than one correct answer, so there may be multiple buttons to play
 each of them.  Since there is no way of checking your oral answers, the results
