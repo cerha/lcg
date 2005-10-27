@@ -1277,13 +1277,13 @@ class _InteractiveExercise(Exercise):
     
     """
     _ANSWER_SHEET_LINK_CLASS = 'answer-sheet-link'
-    _RESPONSES = (('correct', 'responses/c*.mp3'),
+    _RESPONSES = (('correct',   'responses/c*.mp3'),
                   ('incorrect', 'responses/i*.mp3'),
-                  ('f0-49',  'responses/f0-49.mp3'),
-                  ('f50-69', 'responses/f50-69.mp3'),
-                  ('f70-84', 'responses/f70-84.mp3'),
-                  ('f85-99', 'responses/f85-99.mp3'),
-                  ('f100',   'responses/f100.mp3'))
+                  ('f0-49',     'responses/o0-49*.mp3'),
+                  ('f50-69',    'responses/o50-69*.mp3'),
+                  ('f70-84',    'responses/o70-84*.mp3'),
+                  ('f85-99',    'responses/o85-99*.mp3'),
+                  ('f100',      'responses/o100*.mp3'))
     
     _FORM_HANDLER = 'Handler'
     _MESSAGES = {", $x ($y%) on first attempt":_(", $x ($y%) on first attempt")}
