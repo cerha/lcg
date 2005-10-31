@@ -1,5 +1,7 @@
 2005-10-31  Tomas Cerha  <cerha@brailcom.org>
 
+	* translations/help.sk.txt: New translation.
+
 	* lcg-mode.el: New file.
 
 	* lib/lcg/util.py (log): Indent the log message with two spaces.
