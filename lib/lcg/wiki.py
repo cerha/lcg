@@ -132,9 +132,15 @@ class Formatter(object):
         href = groups.get('href')
         anchor = groups.get('anchor')
         if href:
-            node = self._parent.root().find_node(href)
-            if node:
-                href = node.url()
+            if not re.match('^[a-z]+:.*$', href):
+                node = self._parent.root().find_node(href)
+                if node:
+                    href = node.url()
+                else:
+                    log("Unknown node: %s" % href)
+            else:
+                # External reference
+                node = None
         else:
             node = self._parent
         if node and not title:
@@ -148,7 +154,7 @@ class Formatter(object):
             href += '#'+anchor
         if not title:
             title = href
-        if anchor and not node.find_section(anchor):
+        if anchor and node and not node.find_section(anchor):
             log("Unknown section: %s" % anchor)
         return '<a href="%s">%s</a>' % (href, title)
 
