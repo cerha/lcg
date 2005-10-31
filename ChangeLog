@@ -1,4 +1,21 @@
+2005-10-31  Tomas Cerha  <cerha@brailcom.org>
+
+	* lcg-mode.el: New file.
+
+	* lib/lcg/util.py (log): Indent the log message with two spaces.
+
+	* lib/lcg/wiki.py (Formatter._link_formatter): Don't search the
+	node for external links.  Report unknown nodes.
+
+	* lib/lcg/resources.py (resource): Search the source directories
+	in outer cycle and the alternative filenames in inner.  Restore
+	original file extension when creating wildcard match instances.
+
+	* translations/help.cs.txt: New translation.
+
 2005-10-27  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/help.txt (Module): Minor fix.
 
 	* resources/media/responses/o0-49a.mp3: 
 
