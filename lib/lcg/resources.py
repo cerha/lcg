@@ -57,7 +57,6 @@ def resource(cls, parent, file, **kwargs):
     instances directly.
 
     """
-         
     assert issubclass(cls, Resource)
     assert isinstance(parent, ContentNode), \
            "Not a 'ContentNode' instance: %s" % parent
@@ -76,8 +75,8 @@ def resource(cls, parent, file, **kwargs):
             src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
         basename, ext = os.path.splitext(file)
         altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
-        for src_file in [file] + altnames:
-            for d in src_dirs:
+        for d in src_dirs:
+            for src_file in [file] + altnames:
                 src_path = os.path.join(d, src_file)
                 if os.path.exists(src_path):
                     result = cls(file, src_path, **kwargs)
@@ -86,7 +85,8 @@ def resource(cls, parent, file, **kwargs):
                 elif src_path.find('*') != -1:
                     pathlist = glob.glob(src_path)
                     if pathlist:
-                        result = [cls(path[len(d)+1:], path, **kwargs)
+                        result = [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
+                                      path, **kwargs)
                                   for path in pathlist]
                         _cache[key] = result
                         return result
