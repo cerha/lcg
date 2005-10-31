@@ -1,0 +1,250 @@
+﻿# -*- coding: utf-8-dos; mode: wiking -*-
+
+== Instrukce ==
+
+#if issubclass(type, SentenceCompletion)
+
+Cílem tohoto cvičení je dát studentovi příležitost utvořit kompletní větu a
+porovnat svou výslovnost s originálem.  Cvičení je proto čistě
+verbálně-poslechové, bez písemných úkolů.
+
+Pokud chcete své odpovědi porovnat s psaným textem, použijte textový přepis
+nahrávky (>>${transcript}<<).  Protože nejde o písemné cvičení, není možné Vaše
+výsledky vyhodnotit automaticky.
+
+#endif
+#if issubclass(type, Reading)
+
+Přečtěte si text a zkuste mu porozumět jak jen to je možné.  Pokud potřebujete,
+použijte slovník.  V mnoha případech shledáte informace užitečné sami pro sebe,
+ale kromě toho je budete potřebovat při práci na následujících cvičeních.
+
+#endif
+#if issubclass(type, Listening)
+
+Vyslechněte nahrávku a procvičte si schopnost porozumět rodilému mluvčímu.
+
+# You will hear the complete recording first, and then you will be able to
+# practice your own pronunciation by listening to shorter sections and
+# repeating them until you are satisfied with your pronunciation.
+
+#endif
+
+
+########## _ChoiceBasedExercise subclasses ##########
+
+#if issubclass(type, MultipleChoiceQuestions)
+
+Za každou otázkou v tomto cvičení následují dvě nebo více možných odpovědí.
+Pouze jedna z nich je správná.
+
+#endif
+#if issubclass(type, Selections)
+
+Ve cvičení najdete několik skupin po dvou či třech podobných větách či
+výrazech.  Pouze jedna možnost v každé skupině je však správná.  Vaším úkolem
+je rozhodnout, která to je.
+
+#endif
+#if issubclass(type, TrueFalseStatements)
+
+Za každou větou v tomto cvičení následují dva ovládací prvky označené
+'>>${TRUE}<<' a '>>${FALSE}<<'.  Rozhodněte, zda je věta pravdivá či nikoliv a
+stiskněte odpovídající tlačítko.
+
+#endif
+#if issubclass(type, GapFilling)
+
+Vyberte správné slovo, kterým doplníte mezeru ve větě.  Pro každé chybějící
+slovo máte několik možností.  Pouze jedna z nich je správná.
+
+#endif
+#if issubclass(type, _ChoiceBasedExercise)
+
+Okamžitě po zvolení odpovědi uslyšíte odezvu, ze které se dozvíte, zda byla
+tato odpověď správná.  Pokud jste zvolili špatně, můžete to zkusit znovu, dokud
+správnou odpověď nenaleznete.  Výsledky vespod cvičení ukazují kolik odpovědí
+bylo zodpovězeno správně na první pokus (více viz [#indicators]).
+
+#endif
+
+########## _FillInExercise subclasses ##########
+
+#if issubclass(type, VocabExercise)
+
+Jsou dva způsoby, jak můžete dělat toto cvičení: ústní forma a psaná forma.
+Využijte obou možností k dosažení nejlepších výsledků.
+
+Ústní forma je snadná.  Procházejte seznamem slovíček a zkoušejte uhodnout
+správný překlad daného slova či výrazu.  Za každou položkou seznamu následuje
+vstupní políčko a za ním najdete tlačítko ${Play}, kterým si můžete přehrát
+správnou odpověď.  Zopakujte správnou odpověď abyste si procvičili výslovnost.
+Některé položky mají více správných odpovědí.  V takovém případě najdete také
+více tlačítek k jejich přehrání.  Protože není možné vaše ústní odpovědi
+počítačem vyhodnotit, výsledky nejsou k dispozici.  Pokud chcete znát své
+skóre, musíte vyplnit cvičení písemnou formou.
+
+V písemné formě jednoduše vepíšete překlad každého slovíčka do textového
+políčka.  Věnujte zvýšenou pozornost správnému psaní velkých a malých písmen,
+protože odpověď s nesprávným použitím velkých a malých písmen je vždy
+považována za chybnou.  Pokud překládáte celou větu, dbejte také správné
+interpunkce.
+
+#endif
+#if issubclass(type, Transformation)
+
+Vaším úkolem je převést určitou strukturu (stavbu věty) na jinou strukturu
+(například větu oznamovací na otázku).
+
+#endif
+#if issubclass(type, Substitution)
+
+Užijte předloženého výrazu k utvoření jiné věty stejné stavby.  Každá věta je
+následována textem v závorkách.  Nahraďte odpovídající část věty s použitím
+tohoto textu.
+
+#endif
+#if issubclass(type, _Cloze)
+
+Vaším úkolem v tomto cvičení je vyplnit vynechaná slova v delším textu.  Pro
+každou mezeru existuje pouze jedna správná odpověď.
+
+#endif
+#if issubclass(type, Dictation)
+
+Nejprve si jednou poslechněte kompletní nahrávku a poté přejděte do velkého
+textového vstupního pole níže.  Když je kurzor v tomto poli, můžete používat
+klávesové zkratky k postupnému přehrávání jednotlivých částí nahrávky.  Typicky
+si vždy přehrajete jednu část pomocí klávesy *>* (znaménko "je větší") a
+zapíšete text, který jste slyšeli.  Poté stisknete *>* znovu a přehrajete tak
+další část a tu také zapíšete atd, až dosáhnete konce nahrávky.  Potom můžete
+použít vyhodnocovacích kláves (nebo tlačítek níže) k vyhodnocení správnosti
+celého zapsaného textu.
+
+Věnujte prosím zvýšenou pozornost interpunkci a psaní velkých a malých písmen,
+protože ty způsobují nejčastější problémy při vyhodnocování.  Pište všechny
+věty jak je slyšíte s odpovídajícím interpunkčním znaménkem a jednou mezerou na
+konci každé věty.  Za poslední větou není mezera přípustná.
+
+/Poznámka:/ Samozřejmě si můžete nahrávku přehrát tolikrát, kolikrát
+potřebujete k plnému porozumění, nicméně dva pokusy by měly být dostatečné pro
+dobrého studenta.
+
+#else
+#if issubclass(type, _FillInExercise)
+
+Můžete zkontrolovat každou odpověď samostatně pomocí klávesových zkratek (více
+viz sekce [#keys]).  Pokud je odpověď vyhodnocena jako nesprávná a Vy nevíte
+proč, vždy si nejprve zkontrolujte interpunkci a správné použití velkých a
+malých písmen.  Tyto dvě věci způsobují nejvíce nejasností. 
+
+Použijte [#panel] na konci cvičení k vyhodnocení všech odpovědí naráz.
+
+pokud Váš prohlížeč nepodporuje JavaScript, interaktivní vlastnosti a
+automatické vyhodnocování cvičení nebude fungovat.  I přesto můžete tento kurz
+používat, ale budete si muset své odpovědi zkontrolovat sami s použitím
+[#answer-sheets klíče].
+
+#endif
+#endif
+
+#if issubclass(type, _FillInExercise)
+
+== Klávesové zkratky == keys
+
+Ve všech cvičeních, kde vyplňujete text do textového vstupního pole, můžete
+používat následující klávesové zkratky:
+
+Enter
+   Stiskem této klávesy uvnitř textového pole vyvoláte vyhodnocení Vaší
+   odpovědi.  Uslyšíte okamžitě výsledek vyhodnocení.  V případě chybné
+   odpovědi je navíc kurzor posunut na pozici prvního chybného znaku v rámci
+   zadané odpovědi.  Tímto způsobem můžete nalézt chybu (například překlep),
+   opravit ji a zkusit odpověď vyhodnotit znovu.  Pokud si z chybou nevíte
+   rady, můžete použít ``napovídací'' klávesu popsanou níže.
+
+
+Ctrl-Space 
+   Tato funkce Vám může ``napovídat'' v případě, že neznáte správnou odpověď
+   (nemůžete si vzpomenout), nebo nevíte, jak opravit chybu nalezenou při
+   automatickém vyhodnocování Vaší odpovědi.  Jednoduše stiskněte danou
+   klávesovou kombinaci (Přidržte klávesu 'Control' a stiskněte mezerník) a
+   jeden znak správné odpovědi bude doplněn automaticky.  Pokud jste již
+   vložili nějaký text, kurzor se nejprve posune za poslední správný znak Vaší
+   odpovědi a následující znak bude vložen.  To také znamená, že pokud je za
+   kurzorem po vyvolání této funkce nějaký text, obsahoval tento text alespoň
+   jednu chybu.  Pokuste se chybu najít a opravit.  Poté můžete zkusit
+   vyhodnotit novou odpověď pomocí klávesy 'Enter' (viz výše) nebo znovu použít
+   ``napovídací'' klávesu dokud nenaleznete kompletní správnou odpověď.
+
+#if issubclass(type, Dictation)
+
+Navíc můžete při práci s diktátem, pokud je váš kurzor uvnitř vstupního pole,
+používat následující klávesu pro ovládání přehrávání diktovaného textu:
+
+> /(znaménko ``je větší'')/
+   Přehrát následující úsek diktátu.
+
+< /(znaménko ``je menší'')/
+   Přehrát předchozí úsek diktátu.
+
+Ctrl-Enter
+   Přehrát aktuální (naposledy přehraný) úsek diktátu ještě jednou.
+
+#endif
+#endif
+
+#if issubclass(type, _InteractiveExercise)
+
+== Indikátory == indicators
+
+Panel indikátorů zobrazuje u každého cvičení následující hodnoty:
+
+#if issubclass(type, Dictation)
+
+>>${Result:}<<
+   Zobrazuje výsledek posledního vyhodnocení Vaši odpovědi (vyhodnocení
+   proveďte uvnitř vstupního pole klávesou Enter (viz [#keys]), nebo tlačítkem
+   >>${Evaluate}<< na [#panel ovládacím panelu]).
+
+#else
+
+>>${Correct:}<<
+   Zobrazuje celkový počet a procento úspěšných odpovědí.  První dvojice čísel
+   ukazuje výsledek vyhodnocení všech současných odpovědí.  Pokud jste však
+   některé odpovědi neuhodli správně na první pokus, je zobrazena ještě druhá
+   dvojice čísel, která již zohledňuje pouze ty správné odpovědi, které byly
+   zodpovězeny správně napoprvé.  Můžete použít tlačítko >>${Reset}<<, pokud
+   chcete začít znovu.
+
+>>${Answered:}<<
+   Zobrazuje počet úkolů (otázek), které již byly v daném cvičení zodpovězeny.
+   Například údaj 4/10 znamená, že byly splněny čtyři z celkového počtu
+   deseti úkolů, nehledě na to, zda dobře či špatně.  Zbývá tedy dokončit
+   šest úkolů.
+
+#endif
+
+== Ovládací panel == panel
+
+Ovládací panel najdete pod každým interaktivním cvičením.  Obsahuje vždy
+následující tlačítka:
+
+>>${Evaluate}<<
+   Vyhodnotí celkový výsledek cvičení.  Pokud je nalezena chyba, kurzor je
+   přesunut na první nesprávnou odpověď.  V textovém poli je navíc kurzor
+   posunut na první chybný znak Vaší odpovědi.
+
+>>${Fill}<<
+   Vyplní celé cvičení správnými odpověďmi.
+
+>>${Reset}<< 
+   Vymaže všechny odpovědi i výsledky a umožní začít celé cvičení znovu od
+   začátku.
+
+== Klíč odpovědí == answer-sheets
+
+Klíč (>>${Answer Sheets}<<) obsahuje správné odpovědi pro všechna cvičení.  Je
+dostupný z úvodní stránky kurzu.  Mnohem pohodlnější možností je však použít
+odkazu ve formě otazníku, který najdete za každým jednotlivým úkolem.  Tento
+odkaz vás přesune přímo na odpovídající správnou odpověď v klíči.
