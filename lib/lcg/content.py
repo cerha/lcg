@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -127,7 +127,7 @@ class TextContent(Content):
           kwargs -- keyword arguemnts for parent class constructor.
 
         """
-        assert isinstance(text, types.StringTypes)
+        assert isinstance(text, types.StringTypes), type(text)
         super(TextContent, self).__init__(parent, **kwargs)
         self._text = text
 
@@ -148,7 +148,7 @@ class WikiText(TextContent):
     """Structured text in Wiki formatting language (on input)."""
         
     def export(self):
-        return wiki.Formatter(self._parent).format(self._text)
+        return self._parent.format_wiki_text(self._text)
 
     
 class PreformattedText(TextContent):
@@ -719,11 +719,7 @@ class VocabIndexSection(VocabSection):
 ################################################################################
 
 class Task(object):
-    """This class an abstract base class for various concrete tasks.
-
-    A set of concrete tasks is a part of each 'Exercise'.
-
-    """
+    """Abstract base class of all task types."""
 
     def __init__(self, prompt, comment=None):
         assert isinstance(prompt, types.UnicodeType) or prompt is None
@@ -742,9 +738,9 @@ class Task(object):
 
 
 class Choice(object):
-    """Answer text with an information whether it is correct or not.
+    """Representation of one choice for '_ChoiceTask'.
 
-    It is used for representation of the choices for '_ChoiceTask'.
+    This is the answer text with an information whether it is correct or not.
 
     """
     def __init__(self, answer, correct=False):
@@ -761,7 +757,7 @@ class Choice(object):
 
         
 class _ChoiceTask(Task):
-    """Select the correct statement out of a list of predefined choices."""
+    """Abstract base class for all choice-based tasks."""
     
     def __init__(self, prompt, choices, **kwargs):
         """Initialize the instance.
@@ -802,7 +798,7 @@ class Selection(_ChoiceTask):
 class GapFillStatement(_ChoiceTask):
 
     _GAP_MATCHER = re.compile(r"(___+)")
-    
+
     def __init__(self, prompt, choices, **kwargs):
         super(GapFillStatement, self).__init__(prompt, choices, **kwargs)
         matches = len(self._GAP_MATCHER.findall(prompt))
@@ -816,7 +812,6 @@ class GapFillStatement(_ChoiceTask):
     
 
 class TrueFalseStatement(_ChoiceTask):
-    """The goal is to indicate whether the statement is true or false."""
     
     def __init__(self, statement, correct=True, comment=None):
         """Initialize the instance.
@@ -830,10 +825,12 @@ class TrueFalseStatement(_ChoiceTask):
         """
         assert isinstance(correct, types.BooleanType)
         choices = (Choice(_('TRUE'), correct), Choice(_('FALSE'), not correct))
-        super(TrueFalseStatement, self).__init__(statement, choices, comment=comment)
+        super(TrueFalseStatement, self).__init__(statement, choices,
+                                                 comment=comment)
 
 
 class FillInTask(Task):
+    """Abstract base class for all fill-in text tasks."""
     
     def __init__(self, prompt, answer, comment=None, media=()):
         assert isinstance(answer, types.UnicodeType)
@@ -841,7 +838,7 @@ class FillInTask(Task):
             media = (media, )
         else: 
             assert is_sequence_of(media, Media)
-        self._answer = answer.replace('\n', ' ')
+        self._answer = answer.replace('\n', ' ').replace('\r','')
         self._media = media
         super(FillInTask, self).__init__(prompt, comment=comment)
 
@@ -868,7 +865,7 @@ class MixedTextFillInTask(FillInTask):
     _FIELD_MATCHER = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
 
     def _fields(self):
-        return [(answer.replace('\n', ' '), label)
+        return [(answer.replace('\n', ' ').replace('\r',''), label)
                 for answer, label in self._FIELD_MATCHER.findall(self._text)]
     
     def answers(self):
@@ -960,6 +957,7 @@ class Exercise(Section):
     _INSTRUCTIONS = ""
     _AUDIO_VERSION_LABEL = _("This exercise can be also done purely "
                              "aurally/orally:")
+    _READING_INSTRUCTIONS = _("Read the following text:")
     _TASK_SEPARATOR = '<br class="task-separator"/>\n'
     _EXPORT_ORDER = None
     
@@ -969,7 +967,7 @@ class Exercise(Section):
     def __init__(self, parent, tasks, instructions=None, audio_version=None,
                  sound_file=None, transcript=None, reading=None,
                  explanation=None, example=None, template=None,
-                 reading_instructions=_("Read the following text:")):
+                 reading_instructions=None):
         """Initialize the instance.
 
         Arguments:
@@ -1043,7 +1041,8 @@ class Exercise(Section):
             Exercise._used_types.append(self.__class__)
         assert instructions is None or \
                isinstance(instructions, types.StringTypes)
-        assert isinstance(reading_instructions, types.StringTypes)
+        assert reading_instructions is None \
+               or isinstance(reading_instructions, types.StringTypes)
         assert is_sequence_of(tasks, self._TASK_TYPE), \
                "Tasks must be a sequence of '%s' instances!: %s" % \
                (self._TASK_TYPE.__name__, tasks)
@@ -1063,6 +1062,8 @@ class Exercise(Section):
         self._example = self._wiki_content(example)
         self._reading = self._wiki_content(reading, allow_file=True,
                                            subdir='readings')
+        if reading_instructions is None:
+            reading_instructions = self._READING_INSTRUCTIONS
         self._reading_instructions = self._wiki_content(reading_instructions)
         self._template = self._wiki_content(template, allow_file=True,
                                             subdir='templates')
@@ -1073,7 +1074,8 @@ class Exercise(Section):
             assert isinstance(transcript, types.StringTypes)
             t = parent.resource(Transcript, transcript,
                                 text=self._transcript_text(),
-                                input_encoding=parent.input_encoding())
+                                input_encoding=parent.input_encoding(),
+                                fallback=False)
             self._transcript = t
         else:
             if transcript is not None:
@@ -1417,7 +1419,8 @@ class _ChoiceBasedExercise(_InteractiveExercise):
 
     def _export_task_parts(self, task):
         lnk = self._answer_sheet_link(self._tasks.index(task))
-        return (task.prompt(), self._format_choices(task), lnk)
+        prompt = self._parent.format_wiki_text(task.prompt())
+        return (prompt, self._format_choices(task), lnk)
 
     
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
@@ -1459,7 +1462,7 @@ class _SelectBasedExercise(_ChoiceBasedExercise):
         return _html.script_write(js, "("+"|".join(nonjs)+")")
 
     
-class GapFilling(_SelectBasedExercise):
+class GapFilling(_ChoiceBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 
     _TASK_TYPE = GapFillStatement
@@ -1467,10 +1470,10 @@ class GapFilling(_SelectBasedExercise):
     _INSTRUCTIONS = _("Choose the correct option to fill the gaps in the "
                       "following sentences.")
 
-    def _export_task_parts(self, task):
-        statement = task.substitute_gap("%s")
-        lnk = self._answer_sheet_link(self._tasks.index(task))
-        return statement.replace('%s', self._format_choices(task)) +'\n'+ lnk 
+#    def _export_task_parts(self, task):
+#        statement = task.substitute_gap("%s")
+#        lnk = self._answer_sheet_link(self._tasks.index(task))
+#        return statement.replace('%s', self._format_choices(task)) +'\n'+ lnk 
     
 
 ################################################################################
@@ -1514,7 +1517,8 @@ class _FillInExercise(_InteractiveExercise):
     
     def _export_task_parts(self, task):
         text = task.text(self._make_field)
-        return self._TASK_FORMAT % (_html.label(task.prompt(), task.id()), text)
+        prompt = self._parent.format_wiki_text(task.prompt())
+        return self._TASK_FORMAT % (_html.label(prompt, task.id()), text)
                                
         
     
@@ -1588,8 +1592,10 @@ class Dictation(_FillInExercise):
 
     def __init__(self, parent, tasks, pieces=None, **kwargs):
         if pieces is not None:
-            self._pieces = parent.resource(Media, pieces)
-            assert isinstance(self._pieces, (types.ListType, types.TupleType))
+            media = parent.resource(Media, pieces)
+            if not isinstance(media, (types.ListType, types.TupleType)):
+                media = ()
+            self._pieces = media
         else:
             self._pieces = None
         super(Dictation, self).__init__(parent, tasks, **kwargs)
@@ -1644,7 +1650,8 @@ class _ExposedCloze(_Cloze):
 class NumberedCloze(_Cloze):
 
     def _export_task_parts(self, task):
-        text = task.text(self._make_field)
+        tr = lambda t: self._parent.format_wiki_text(t.replace('[','\\['))
+        text = task.text(self._make_field, tr)
         return "%d. " % (self._tasks.index(task) + 1) + text
 
     
