@@ -37,6 +37,17 @@
 (defvar lcg-mode-version "$Id"
   "The version of lcg-mode currently loaded")
 
+(defvar lcg-args 
+  '("reading" "instructions" "explanation" "example" "audio_version"
+    "sound_file" "transcript" "reading_instructions" "template" "pieces"))
+
+(defun lcg-list-2-regexp(altlist)
+  "Takes a list and returns the regexp \\(elem1\\|elem2\\|...\\)"
+  (let ((regexp "\\("))
+    (mapcar (lambda(elem) (setq regexp (concat regexp elem "\\|"))) altlist)
+    (concat (substring regexp 0 -2) "\\)") ; cutting the last "\\|"
+    ))
+
 (defvar lcg-font-lock-syntactic-keywords
   '(("^<[a-z_-]+>\\([ \t\n\r]\\)"  (1 '(15)))
     ("\\([\n\r]\\)</[a-z_-]+>" (1 '(15)))
@@ -55,27 +66,27 @@
     (list "\\[.*?\\]"            0 'font-lock-warning-face) ; fill-in text
     (list "^=+ \\(.*?\\) =+$" ; section headers
 	  1 'font-lock-function-name-face)
-    (list "^\\(type:\\) \\(.*\\)$" ; exercise type definition
+    ; exercise type definition
+    (list "^\\(type:\\) \\(.*\\)$" 
 	  '(1 'font-lock-variable-name-face)
 	  '(2 'font-lock-keyword-face)) 
-    (list "^\\([a-z_-]+:\\) \\(.*\\)$" ; other header arguments
+    ; header arguments
+    (list (concat "^\\(" (lcg-list-2-regexp lcg-args) ":\\) \\(.*\\)$")
 	  '(1 'font-lock-variable-name-face)
 	  '(2 'font-lock-string-face)) 
-    (list "^\\(</?\\(reading\\|instructions\\|explanation\\|example\\|reading_instructions\\|\\)>\\)"
+    ; multiline header arguments
+    (list (concat "^\\(</?" (lcg-list-2-regexp lcg-args) ">\\)")
 	  0 'font-lock-variable-name-face)
     ))
   "Expressions to highlight in LCG exercise definition files.")
 
-(defun lcg-mode ()
+(define-derived-mode lcg-mode text-mode "LCG"
   "Major mode for editing LCG exercise definition files."
-  (interactive)
-  (kill-all-local-variables)
   (set (make-local-variable 'font-lock-defaults)
        '(lcg-font-lock-keywords
 	 nil t nil nil 
 	 (font-lock-syntactic-keywords . lcg-font-lock-syntactic-keywords)))
   (setq major-mode 'lcg-mode
-	mode-name "LCG"
 	fill-column 79)
   (run-hooks 'lcg-mode-hook))
 
