@@ -94,6 +94,7 @@ class ContentNode(object):
         self._counters = {}
         self._registered_children = []
         self._wiki_parser = wiki.Parser(self)
+        self._wiki_formatter = wiki.Formatter(self)
         content = self._create_content()
         if isinstance(content, Content):
             self._content = content
@@ -174,16 +175,32 @@ class ContentNode(object):
         fh.close()
         return content
 
-    def parse_wiki_text(self, text):
-        """Parse the file and return a sequence of content elements."""
+    def format_wiki_text(self, text):
+        """Format text with wiki markup and return HTML."""
+        if text:
+            return self._wiki_formatter.format(text)
+        else:
+            return ''
+    
+    def parse_wiki_text(self, text, macro=False, globals=None):
+        """Parse the text and return a sequence of content elements."""
+        if macro:
+            def mygettext(x):
+                return _(re.sub('\s*\n', ' ', x))
+            mp = wiki.MacroParser(substitution_provider=mygettext)
+            if globals:
+                mp.add_globals(**globals)
+            text = mp.parse(text)
         return self._wiki_parser.parse(text)
     
-    def parse_wiki_file(self, name, ext='txt', lang=None):
+    def parse_wiki_file(self, name, ext='txt', lang=None,
+                        macro=False, globals=None):
         """Parse the file and return a sequence of content elements."""
-        return self.parse_wiki_text(self._read_file(name, ext=ext, lang=lang))
+        return self.parse_wiki_text(self._read_file(name, ext=ext, lang=lang),
+                                    macro=macro, globals=globals)
     
     def _node_path(self):
-        """Return the path from the root to this node as a sequence of nodes."""
+        """Return the path from root to this node as a sequence of nodes."""
         if self._parent is not None:
             return self._parent._node_path() + (self,)
         else:
@@ -372,7 +389,7 @@ class ContentNode(object):
         if isinstance(result, (types.ListType, types.TupleType)):
             for r in result:
                 self._resources[r] = 1
-        else:
+        elif result is not None:
             self._resources[result] = 1
         return result
         
@@ -565,9 +582,15 @@ class DocMaker(RootNode):
         return [TableOfContents(self, item=self, title=_("Table of Contents:"),
                                 depth=2)]
                          
-    def _create_children(self):
-        d = self.src_dir()
-        return [self._create_child(DocNode, '.', f) for f in list_dir(d)
-                if os.path.isfile(os.path.join(d, f)) and f.endswith('.wiki')]
-
+    def _create_children(self, subdir='.'):
+        children = []
+        dir = os.path.join(self.src_dir(), subdir)
+        for name in list_dir(dir):
+            path = os.path.join(dir, name)
+            if os.path.isfile(path) and path.endswith('.wiki'):
+                children.append(self._create_child(DocNode, subdir, name))
+            if os.path.isdir(path):
+                d = os.path.join(subdir, name)
+                children.extend(self._create_children(subdir=d))
+        return children
     
