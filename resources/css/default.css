@@ -159,6 +159,8 @@ dt em {
     text-decoration: underline;
     background: none;
     border: none;
+    padding: 0;
+    margin: 0;
     font-size: 1em;
     text-align: left;
 }
