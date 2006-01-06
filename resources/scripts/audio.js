@@ -15,21 +15,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA */
 
-if (navigator.appName=="Microsoft Internet Explorer")
-   document.write('<object id="media_player" height="0" width="0"' +
-		  ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">' +
-		  '</object>');
+var ua = navigator.userAgent.toLowerCase()
+
+if (navigator.appName == "Microsoft Internet Explorer" &&
+    ua.indexOf("win98") == -1 && ua.indexOf("windows 98") == -1)
+     document.write('<object id="media_player" height="0" width="0"' +
+		    ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">' +
+		    '</object>');
 
 function play_audio(url) {
-   if (navigator.appName=="Microsoft Internet Explorer")
+   if (document.media_player)
       document.media_player.URL = url;
    else 
       self.location = url;
 }
 
 function stop_audio() {
-   if (navigator.appName=="Microsoft Internet Explorer") {
+   if (document.media_player)
       document.media_player.controls.stop();
-      //} else {
-   }
 }
