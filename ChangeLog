@@ -1,3 +1,78 @@
+2006-01-06  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/eurochance.py (EurochanceNode._localized_wiki_content):
+	New argument `macro'.
+	(EurochanceNode._localized_wiki_content): New argument `macro'.
+	(Unit._exercise_sections): Supply the unit number for the title
+	here.
+	(Unit._create_content): Create also the `Aims and Objectives' and
+	`Checklist' sections.
+	(IntermediateUnit._exercise_sections): Supply the `Section %d:'
+	prefix to section titles here.
+	(Instructions._create_content): Replaced by `_create_exercises'.
+	(Instructions._create_exercises): Don't create the `Aims and
+	Objectives' and `Checklist' sections here.
+	(Instructions._create_content): Expand macros in instructions.
+	(ExerciseInstructions._create_content): Don't expand macros here,
+	leave it to `parse_wiki_text()'.
+
+	* resources/scripts/audio.js: Don't use Windows Media Player in
+	Windows 98.
+
+	* lib/lcg/content.py (Exercise._wiki_content): Report the actual
+	type in assertion.
+	(WikiText.export): Use parents `format_wiki_text()' method.
+	(Task, Choice, _ChoiceTask): Docstring updated.
+	(FillInTask.__init__): Also remove '\r' from the answer text.
+	(MixedTextFillInTask._fields): Also remove '\r' from the answer
+	text.
+	(Exercise._READING_INSTRUCTIONS): New constant.
+	(Exercise.__init__): Set the default value of
+	`reading_instructions' to the above constant.  Pass
+	`fallback=False' when creating media instances.
+	(_ChoiceBasedExercise._export_task_parts): Format the prompt as a
+	wiki text.
+	(GapFilling): Derive from `_ChoiceBasedExercise', not
+	`_SelectBasedExercise'.
+	(GapFilling._export_task_parts): Method removed.
+	(_FillInExercise._export_task_parts): Format the prompt as a
+	wiki text.
+	(Dictation.__init__): Test None as a result of `resource()'.
+	(_FillInExercise._export_task_parts): Format the task text as a
+	wiki text.
+
+	* lib/lcg/course.py (ContentNode.format_wiki_text): New method.
+	(ContentNode.parse_wiki_text): New arguments `macro' and
+	`globals'.
+	(ContentNode.parse_wiki_file): New arguments `macro' and
+	`globals'.
+	(ContentNode._node_path): Docstring improved.
+	(ContentNode.resources, ContentNode.resource): Test if the
+	resource is `None'.
+	(DocMaker._create_children): Recourse directories.
+
+	* lcg-mode.el (lcg-args): New variable.
+	(lcg-args): New function.
+	(lcg-font-lock-keywords): Use it.
+	(lcg-mode): Derive the mode from `text-mode'.
+
+	* resources/css/default.css: Updated.
+
+	* lib/lcg/util.py (log): Encode the message into 8 bits before
+	writing it to stderr.
+
+	* lib/lcg/resources.py (_ResourceNotFound): Class removed.
+	(resource): New argument `fallback'.  Return None if `fallback' is
+	False and log the problem.
+	(Resource.__init__): Argument `raise_error' removed.  Don't log
+	inexisting source file here.
+	(Resource.ok): New method.
+	(Resource._needs_source_file): Method removed.
+	(Transcript.__init__): Argument `raise_error' removed.
+	(Transcript._needs_source_file): Method removed.
+	(Transcript.ok): New method.
+	(Transcript._export): Test whether the file exists.
+
 2005-10-31  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/help.sk.txt: New translation.
