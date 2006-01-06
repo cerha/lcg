@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ from lcg import *
 
 _cache = {}
 
-def resource(cls, parent, file, **kwargs):
+def resource(cls, parent, file, fallback=True, **kwargs):
     """Return the resource instance for given ContentNode.
 
     Arguments:
@@ -41,6 +41,10 @@ def resource(cls, parent, file, **kwargs):
        cls -- resource class.
        parent -- the ContentNone instance, for which the resource is allocated.
        file -- filename of the resource.
+       fallback -- if True, a valid 'Resource' instance will be returned even if
+          the resource file doesn't exist.  The problem will be logged, but the
+          program will continue as if the resource was there.  If False, None
+          is returned when the resource file doesn't exist.
        kwargs -- additional constructor arguments.
 
     The possible source directories are first searched for the input file:
@@ -85,16 +89,21 @@ def resource(cls, parent, file, **kwargs):
                 elif src_path.find('*') != -1:
                     pathlist = glob.glob(src_path)
                     if pathlist:
+                        pathlist.sort()
                         result = [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
                                       path, **kwargs)
                                   for path in pathlist]
                         _cache[key] = result
                         return result
-        result = cls(file, os.path.join(src_dirs[0], file), **kwargs)
-        _cache[key] = result
+        if fallback:
+            result = cls(file, os.path.join(src_dirs[0], file), **kwargs)
+            _cache[key] = result
+            if not result.ok():
+                log("Resource file not found:", file, src_dirs)
+        else:
+            result = None
         return result
 
-  
 class Resource(object):
     """Base resource class.
     
@@ -110,7 +119,7 @@ class Resource(object):
 
     ALT_SRC_EXTENSIONS = ()
     
-    def __init__(self, file, src_path, parent=None):
+    def __init__(self, file, src_path, parent=None, raise_error=False):
         """Initialize the instance.
 
         Arguments:
@@ -128,8 +137,9 @@ class Resource(object):
         self._file = file
         self._src_path = src_path
         self._parent = parent
-        if self._needs_source_file() and not os.path.exists(src_path):
-            log("Resource file not found:", src_path)
+
+    def ok(self):
+        return os.path.exists(self._src_path)
 
     def _dst_path(self):
         if self.SHARED:
@@ -138,10 +148,6 @@ class Resource(object):
             dst_dir = os.path.join(self.SUBDIR, self._parent.id())
         return os.path.join(dst_dir, self._file)
             
-            
-    def _needs_source_file(self):
-        return True
-        
     def url(self):
         return '/'.join(self._dst_path().split(os.path.sep))
 
@@ -167,7 +173,6 @@ class Resource(object):
             shutil.copyfile(infile, outfile)
             log("%s: file copied.", outfile)
             
-
     def get(self):
         fh = open(self._src_path)
         data = fh.read()
@@ -240,7 +245,7 @@ class Transcript(Resource):
     SHARED = False
 
     def __init__(self, file, src_path, parent=None, 
-                 text=None, input_encoding='utf-8'):
+                 text=None, input_encoding='utf-8', raise_error=False):
         """Initialize the instance.
 
         Arguments:
@@ -252,10 +257,11 @@ class Transcript(Resource):
         """
         self._text = text
         self._input_encoding = input_encoding
-        super(Transcript, self).__init__(file, src_path, parent=parent)
+        super(Transcript, self).__init__(file, src_path, parent=parent,
+                                         raise_error=raise_error)
 
-    def _needs_source_file(self):
-        return self._text is None
+    def ok(self):
+        return os.path.exists(self._src_path) or self._text is not None
             
     def _additional_export_condition(self):
         return self._text is not None
@@ -263,13 +269,15 @@ class Transcript(Resource):
     def _export(self, infile, outfile):
         if self._text is not None:
             text = self._text
-        else:
+        elif os.path.exists(infile): 
             fh = codecs.open(infile, encoding=self._input_encoding)
             try:
                 text = ''.join(fh.readlines())
             except UnicodeDecodeError, e:
                 raise Exception("Error while reading file %s: %s" % (infile, e))
             fh.close()
+        else:
+            return
         text = "\n\n".join([textwrap.fill(x)
                             for x in text.replace("\r\n", "\n").split("\n\n")])
         output = open(outfile, 'w')
