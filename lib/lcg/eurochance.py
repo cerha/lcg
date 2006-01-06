@@ -43,9 +43,9 @@ class EurochanceNode(ContentNode):
         else:
             return None
 
-    def _localized_wiki_content(self, filename):
+    def _localized_wiki_content(self, filename, macro=False):
         ulang = self._user_lang()
-        content = self.parse_wiki_file(filename, lang=ulang)
+        content = self.parse_wiki_file(filename, lang=ulang, macro=macro)
         return SectionContainer(self, content, lang=ulang)
         
     
@@ -64,6 +64,7 @@ class Unit(EurochanceNode):
         for x in split_result:
             if isinstance(x, SplittableText):
                 if x.text().strip():
+                    title = _("Section %d") % (len(pieces)+1)  + ": " + title
                     pieces.append((title, x))
             else:
                 title = x[0]
@@ -74,12 +75,16 @@ class Unit(EurochanceNode):
         text = self._read_file('exercises', comment='^#')
         splittable = SplittableText(text, input_file=filename)
         pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
-        return [Section(self, _("Section %d") +': '+ title,
-                        feed.ExerciseFeeder(piece).feed(self))
+        return [Section(self, title, feed.ExerciseFeeder(piece).feed(self))
                 for title, piece in self._exercise_sections(pieces)]
 
     def _create_content(self):
-        return SectionContainer(self, self._create_exercises())
+        aims = Section(self, _("Aims and Objectives"),
+                       self.parse_wiki_file('aims'))
+        exercises = self._create_exercises()
+        checklist = Section(self, _("Checklist"),
+                            self.parse_wiki_file('checklist'))
+        return SectionContainer(self, (aims,) + tuple(exercises) + (checklist,))
 
     
 class IntermediateUnit(Unit):
@@ -102,23 +107,19 @@ class IntermediateUnit(Unit):
         pieces = [p for p in pieces if isinstance(p, SplittableText)]
         assert len(pieces) == 5, \
                "5 sections expected! (%d found)" % len(pieces)
-        titles = (_("Vocabulary Practice"),
-                  _("Listening Comprehension"),
-                  _("General Comprehension"),
-                  _("Grammar Practice"),
-                  _("Consolidation"))
+        titles = [_("Section %d") +': '+ t 
+                  for t in (_("Vocabulary Practice"),
+                            _("Listening Comprehension"),
+                            _("General Comprehension"),
+                            _("Grammar Practice"),
+                            _("Consolidation"))]
         return zip(titles, pieces)
     
-    def _create_content(self):
+    def _create_exercises(self):
         self.vocab = self._create_vocab()
-        sections = (Section(self, _("Aims and Objectives"),
-                            self.parse_wiki_file('aims')),
-                    VocabSection(self, _("Vocabulary"), self.vocab),
-                    Section(self, _("Exercises"), anchor='exercises',
-                            content=self._create_exercises()),
-                    Section(self, _("Checklist"),
-                            self.parse_wiki_file('checklist')))
-        return SectionContainer(self, sections)
+        e = super(IntermediateUnit, self)._create_exercises()
+        return (VocabSection(self, _("Vocabulary"), self.vocab),
+                Section(self, _("Exercises"), anchor='exercises', content=e))
 
     
 class Instructions(EurochanceNode):
@@ -126,7 +127,7 @@ class Instructions(EurochanceNode):
     _TITLE = _("General Course Instructions")
 
     def _create_content(self):
-        return self._localized_wiki_content('instructions')
+        return self._localized_wiki_content('instructions', macro=True)
     
     
 class ExerciseInstructions(EurochanceNode):
@@ -140,9 +141,8 @@ class ExerciseInstructions(EurochanceNode):
         super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
         
     def _create_content(self):
-        mp = wiki.MacroParser(substitution_provider=_)
-        mp.add_globals(type=self._type, **self._type.typedict())
-        content = self.parse_wiki_text(mp.parse(self._template))
+        g = dict(type=self._type, **self._type.typedict())
+        content = self.parse_wiki_text(self._template, macro=True, globals=g)
         return SectionContainer(self, content, lang=self._user_lang())
 
     def title(self, abbrev=False):
