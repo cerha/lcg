@@ -191,4 +191,4 @@ def log(message, *args):
         message += ', '.join([unicode(a) for a in args])
     if not message.endswith("\n"):
         message += "\n"
-    sys.stderr.write("  "+message)
+    sys.stderr.write("  "+message.encode('iso-8859-2'))
