@@ -1,3 +1,13 @@
+2006-01-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/__init__.py: Added `exercises'.
+
+	* lib/lcg/content.py: Documentation improved.  Don't import
+	`unicodedata', `textwrap' and `random'.   All exercises and tasks
+	removed -- moved to the module `exercises.txt'.
+
+	* lib/lcg/course.py: Import `unicodedata'.
+
 2006-01-06  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/eurochance.py (EurochanceNode._localized_wiki_content):
