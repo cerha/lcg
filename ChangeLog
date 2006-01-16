@@ -1,5 +1,7 @@
 2006-01-16  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/exercises.py: New module.
+
 	* lib/lcg/__init__.py: Added `exercises'.
 
 	* lib/lcg/content.py: Documentation improved.  Don't import
