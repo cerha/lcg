@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ _t.install(unicode=True)
 from resources import *
 from course import *
 from content import *
+from exercises import *
 from export import *
 from util import *
 import ims
@@ -45,6 +46,6 @@ import feed
 import wiki
 
 # Řešení cyklických závislostí souborů
-for file in (resources, course, content, feed, wiki):
+for file in (resources, course, content, exercises, feed, wiki):
     file.__dict__.update(globals())
                                                                                                                                                       
