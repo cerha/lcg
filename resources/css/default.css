@@ -18,9 +18,6 @@ h7,h8,h9 { font-size: 1.1em; }
 hr.navigation { 
     display: none; 
 }
-br.task-separator { 
-    display: none; 
-}
 
 div.navigation { 
     border: solid #b8bcc0;
@@ -58,21 +55,44 @@ a.exercise-help-link {
     text-decoration: none;
 }
 
-div.choices { 
-    margin-left: 1em;
-}
 
 form { 
 }
 
+ol.tasks {
+    marker-offset: 0;
+}
+ol.tasks li {
+    padding-left: 0;
+    margin-left: 0;
+}
 div.task { 
     margin-bottom: 0.7em;
     padding-right: 1em;
     position: relative;
 }
-div.cloze-task, div.numbered-cloze-task, div.vocab-exercise-task  {
+br.task-separator { 
+    display: none; 
+}
+
+div.cloze-task, div.vocab-exercise-task {
     margin-bottom: 0;
 }
+
+div.choices { 
+    margin-left: 1em;
+}
+div.selections-task div.choices { 
+    margin-left: 0;
+}
+
+input.fill-in-task { 
+    border: solid gray 1px;
+    margin: 1px;
+    background: #e8e8e8;
+    padding: 1px;
+}
+
 
 .explanation, .reading, .example { 
     border: 0px solid #999;
@@ -135,13 +155,6 @@ input.button.sound-control {
 }
 form.sound-control.audio-version input.button { 
     background-color: #ed6;
-}
-
-input.fill-in-task { 
-    border: solid gray 1px;
-    margin: 1px;
-    background: #e8e8e8;
-    padding: 1px;
 }
 
 .citation, .quotation { 
