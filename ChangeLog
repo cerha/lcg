@@ -1,6 +1,27 @@
 2006-01-16  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/exercises.py: New module.
+	* resources/css/default.css (Module): Added styles for numbered tasks.
+
+	* lib/lcg/util.py (positive_id): New function.
+
+	* lib/lcg/resources.py: Import `textwarp'.
+
+	* lib/lcg/_html.py (list): Don't ignore the `cls' argument.
+
+	* lib/lcg/exercises.py: New module - all exercise related classes
+	from `contetnt.py'.
+	(Exercise._wrap_exported_tasks): New method.
+	(Exercise._export_tasks): Use it.
+	(_NumberedTasksExercise): New class.
+	(_ChoiceBasedExercise, Substitution, Transformation)
+	(NumberedCloze): Derive from it.
+	(NumberedCloze._export_task_parts): Don't add the numbers
+	manually.
+	(_InteractiveExercise._results): Mark the result display labels as
+	`label's.
+
+	(Exercise._form_name, _ChoiceBasedExercise._js_choice_control)
+	(Task.id): Use `positive_id()' instead of `id()'.
 
 	* lib/lcg/__init__.py: Added `exercises'.
 
