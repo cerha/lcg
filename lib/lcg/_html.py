@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,10 +74,11 @@ def link(label, url, name=None, title=None, target=None, cls=None, hotkey=None):
     return _tag('a', attr, label)
 
 def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
-    spaces = ' ' * indent
     tag = ordered and 'ol' or 'ul'
     attr = _attr(('style', style and 'list-style-type: %s' % style),
-                 ('lang', lang))
+                 ('lang', lang),
+                 ('class', cls))
+    spaces = ' ' * indent
     items = [spaces+"  <li>%s</li>" % i for i in items]
     return "\n".join([spaces+"<"+tag+attr+">"] + items + [spaces+"</"+tag+">"])
 
