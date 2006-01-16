@@ -57,7 +57,7 @@ class Task(object):
         self._prompt = prompt
 
     def id(self):
-        return 'task_%s' % id(self)
+        return 'task_%s' % positive_id(self)
         
     def prompt(self):
         return self._prompt
@@ -471,7 +471,7 @@ class Exercise(Section):
         return None
 
     def _form_name(self):
-        return "exercise_%d" % id(self)
+        return "exercise_%x" % positive_id(self)
     
     def _instructions(self):
         return self._INSTRUCTIONS
@@ -509,12 +509,15 @@ class Exercise(Section):
         parts.append(_html.script(self._init_script()))
         return "\n\n".join([x for x in [header]+parts if x is not None])
 
+    def _wrap_exported_tasks(self, tasks):
+        return "\n".join(tasks)
+    
     def _export_tasks(self):
         tasks = [self._export_task(t) for t in self._tasks]
         if self._template:
             tasks = self._template.export() % tuple(tasks)
         else:
-            tasks = "\n".join(tasks)
+            tasks = self._wrap_exported_tasks(tasks)
         if tasks:
             return _html.form((tasks, self._results()), name=self._form_name())
         else:
@@ -580,6 +583,12 @@ class Exercise(Section):
     def _init_script(self):
         return ""
         
+    
+class _NumberedTasksExercise(Exercise):
+    
+    def _wrap_exported_tasks(self, tasks):
+        return _html.list(tasks, ordered=True, cls="tasks")
+
     
 class Listening(Exercise):
     _NAME = _("Listening")
@@ -654,8 +663,10 @@ class _InteractiveExercise(Exercise):
         """ % (self._form_name(), self._FORM_HANDLER, ", ".join(args))
 
     def _results(self):
-        displays = [' '.join((label, _html.field(name=name, size=50,
-                                                 readonly=True)))
+        field_id = lambda name: self._form_name() + '_' + name
+        displays = [' '.join((_html.label(label, id=field_id(name)),
+                              _html.field(name=name, size=50, readonly=True,
+                                          id=field_id(name))))
                     for name, label in self._INDICATORS]
         buttons = [f(label, handler) for f, label, handler in
                    ((_html.button,_("Evaluate"),"this.form.handler.evaluate()"),
@@ -704,11 +715,12 @@ class _InteractiveExercise(Exercise):
         anchor = Anchor(p, self._answer_sheet_anchor())
         answers = ItemizedList(p, items, type=ItemizedList.TYPE_NUMERIC)
         return Container(p, (anchor, answers))
+
     
 ################################################################################
 ################################################################################
   
-class _ChoiceBasedExercise(_InteractiveExercise):
+class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
     _FORM_HANDLER = 'ChoiceBasedExerciseHandler'
@@ -727,7 +739,7 @@ class _ChoiceBasedExercise(_InteractiveExercise):
         return _html.link(choice.answer(), media.url())
     
     def _js_choice_control(self, task, choice):
-        choice_id = 'choice_%s' % id(choice)
+        choice_id = 'choice_%s' % positive_id(choice)
         ctrl = _html.radio('task-%d' % self._tasks.index(task), id=choice_id,
                            onclick="this.form.handler.eval_answer(this)", 
                            value=task.choice_index(choice),
@@ -877,14 +889,14 @@ class VocabExercise(_FillInExercise):
         return tasks    
 
 
-class Substitution(_FillInExercise):
+class Substitution(_FillInExercise, _NumberedTasksExercise):
     """A prompt (a sentence) and a big text-field for each task."""
 
     _NAME = _("Substitution")
     _INSTRUCTIONS = _("Use the text in brackets to transform each sentence.")
     
 
-class Transformation(_FillInExercise):
+class Transformation(_FillInExercise, _NumberedTasksExercise):
     """Pairs of sentences, the later with a gap (text-field)."""
 
 
@@ -976,12 +988,11 @@ class _ExposedCloze(_Cloze):
         return instructions + _html.list(answers)
 
     
-class NumberedCloze(_Cloze):
+class NumberedCloze(_Cloze, _NumberedTasksExercise):
 
     def _export_task_parts(self, task):
         tr = lambda t: self._parent.format_wiki_text(t.replace('[','\\['))
-        text = task.text(self._make_field, tr)
-        return "%d. " % (self._tasks.index(task) + 1) + text
+        return task.text(self._make_field, tr)
 
     
 class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
