@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -164,7 +164,26 @@ def camel_case_to_lower(string, separator='-'):
     """Return a lowercase string using 'separator' to concatenate words."""
     words = _CAMEL_CASE_WORD.findall(string)
     return separator.join([w.lower() for w in words])
-    
+
+
+def positive_id(obj):
+    """Return id(obj) as a non-negative integer."""
+    result = id(obj)
+    if result < 0:
+        # This is a puzzle:  there's no way to know the natural width of
+        # addresses on this box (in particular, there's no necessary
+        # relation to sys.maxint).  Try 32 bits first (and on a 32-bit
+        # box, adding 2**32 gives a positive number with the same hex
+        # representation as the original result).
+        result += 1L << 32
+        if result < 0:
+            # Undo that, and try 64 bits.
+            result -= 1L << 32
+            result += 1L << 64
+            assert result >= 0 # else addresses are fatter than 64 bits
+    return result
+
+
 
 def log(message, *args):
     """Log a processing information to STDERR.
