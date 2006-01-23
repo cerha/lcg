@@ -1,3 +1,7 @@
+2006-01-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/de.po: Updated.
+
 2006-01-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css (Module): Added styles for numbered tasks.
