@@ -1,5 +1,5 @@
 # Translations for the LCG (http://eurochance.brailcom.org).
-# Copyright (C) 2004, 2005, Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, Brailcom, o.p.s.
 # Tomas Cerha <cerha@brailcom.org>, 2004.
 #
 msgid ""
@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-10-18 17:15+0200\n"
-"PO-Revision-Date: 2005-10-19 12:43+0200\n"
+"PO-Revision-Date: 2006-01-23 09:50+0100\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -99,12 +99,12 @@ msgstr "Aufnahme:"
 # Exercise type name.
 #: ../lib/lcg/content.py:1254
 msgid "Listening"
-msgstr "Hören Sie"
+msgstr "Hörübung"
 
 # Recording controls.
 #: ../lib/lcg/content.py:1259
 msgid "Reading"
-msgstr "Aufnahme"
+msgstr "Leseübung"
 
 # Exercise type name.
 #: ../lib/lcg/content.py:1264
@@ -233,7 +233,7 @@ msgstr ""
 # Title for Transformation
 #: ../lib/lcg/content.py:1559
 msgid "Transformation"
-msgstr "Übersetzung"
+msgstr "Transformation"
 
 # Instructions for Transformation
 #: ../lib/lcg/content.py:1562
