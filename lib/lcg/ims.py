@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -117,7 +117,10 @@ class IMSExporter(lcg.Exporter):
    
     def export(self, node, directory):
         super(IMSExporter, self).export(node, directory)
-        manifest = _Manifest(node)
-        manifest.write(directory)
+        if node == node.root():
+            manifest = _Manifest(node)
+            manifest.write(directory)
 
-
+    def _body_parts(self, node):
+        return (node.content().export(),)
+        
