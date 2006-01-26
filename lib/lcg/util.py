@@ -130,20 +130,24 @@ def list_dir(dir):
     """Return the list of all items found in a directory.
 
     If the directory contains the file 'index.txt' the list is read from there.
-    Otherwise all subdirectories in the directory are returned in alphabetical
-    order.
+    Otherwise all the files and directories within it are read, filenames are
+    stripped of their extensions and a list of distinct names is returned in
+    alphabetical order.
 
-    Directory names beginning with an underscore and 'CVS' directories are
-    ignored.
+    Names beginning with an underscore and 'CVS' directories are ignored.
     
     """
     try:
-        return [item.strip()
-                for item in open(os.path.join(dir, 'index.txt')).readlines()
-                if item.strip() != '']
-    except:
-        items = [item for item in os.listdir(dir)
-                 if not item.startswith('_') and item != 'CVS']
+        index = open(os.path.join(dir, 'index.txt'))
+        return [item for item in [line.strip() for line in index.readlines()]
+                if item != '' and not item.startswith('#')]
+    except IOError:
+        items = []
+        for item in os.listdir(dir):
+            item = os.path.splitext(os.path.splitext(item)[0])[0]
+            if item and item not in items and item != 'CVS' \
+                   and not item.startswith('_') and not item.startswith('.'):
+                items.append(item)
         items.sort()
         return items
 
@@ -211,3 +215,4 @@ def log(message, *args):
     if not message.endswith("\n"):
         message += "\n"
     sys.stderr.write("  "+message.encode('iso-8859-2'))
+
