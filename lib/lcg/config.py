@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 import os
 
-lcg_dir = os.environ.get('LCG_DIR', '/usr/share/lcg')
+lcg_dir = os.environ.get('LCGDIR', '/usr/share/lcg')
 
 default_resource_dir = os.path.join(lcg_dir, 'resources')
 
@@ -33,5 +33,5 @@ translation_dir = os.path.join(lcg_dir, 'translations')
 
 """The LCG inserts some texts into the generated documents.  These texts can be
 translated using a GNU gettext catalog.  This variable specifies the location
-where the compiled message catalogs are installed.  More precisely it is the
+where the compiled message catalogs are installed.  More precisely, it is the
 base directory, where the subdirectories for different languages reside."""
