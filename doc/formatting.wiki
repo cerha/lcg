@@ -170,10 +170,25 @@ Table of Contents: @TOC@
 
 This source line will be replaced with the table of contents.  The text before
 the colon is used for the caption and the TOC includes all the subsections of
-the section, within which the macro is used.  This means you can also create local tables of contents
-in particular subsections.
+the section, within which the macro is used.  This means you can also create
+local tables of contents in particular subsections.
 
 The TOC at the top of this manual is made the same way.
+
+The =@TOC@= makes the index of current content element (eg. lists the subsections
+of the current section of the current document), however you may also wish to
+make an index of the subnodes of current node (all documents, that are below
+the current document in the hierarchy).  This can be done by using the =@NTOC@=
+macro.  The syntax is the same.
+
+The Tables of Content are hierarchical, so you may also wish to /restrict the
+depth/.  This can be done by supplying a number in round brackets, such as:
+
+-----
+Index: @TOC(1)@
+-----
+
+This will create a plain listing, without the subsections.
 
 
 == Advanced Constructs ==
