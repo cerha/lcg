@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,8 +54,12 @@ class Exporter(object):
                 for s in node.resources(Script)]
         return '  '+'\n  '.join(tags + self._styles(node))
 
+    def _body_parts(self, node):
+        return ('<h1>%s</h1>' % node.title(),
+                _html.div(node.content().export(), 'content'))
+    
     def body(self, node):
-        return node.content().export()
+        return "\n".join(self._body_parts(node))
 
     def page(self, node):
         lines = (self.DOCTYPE, '',
@@ -105,13 +109,9 @@ class StaticExporter(Exporter):
                 if n is not None and n is not node]
         return '\n  '.join([super(StaticExporter, self).head(node)] + tags)
              
-    def body(self, node):
-        nav = self._navigation(node)
-        parts = (#nav, '<hr class="navigation">',
-                 '<h1>%s</h1>' % node.title(),
-                 _html.div(node.content().export(), 'content'),
-                 '<hr class="navigation">', nav)
-        return "\n".join(parts)
+    def _body_parts(self, node):
+        return super(StaticExporter, self)._body_parts(node) + \
+               ('<hr class="navigation">', self._navigation(node))
 
     def _link(self, node, label=None, key=None):
         if node is None: return _("None")
