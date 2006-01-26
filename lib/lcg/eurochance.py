@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -230,8 +230,8 @@ class Help(EurochanceNode):
         return TableOfContents(self, title=_("Table of Contents:"))
 
     def _create_children(self):
-        template = self._read_file('help', lang=self._user_lang(),
-                                   dir=config.translation_dir)
+        lng = self._user_lang() or self.language()
+        template = self._read_file('help', lang=lng, dir=config.translation_dir)
         return [self._create_child(ExerciseInstructions, t, template)
                 for t in Exercise.used_types()]
 
