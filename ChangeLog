@@ -1,3 +1,42 @@
+2006-01-26  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/util.py (list_dir): Strip the extensions from filenames
+	and return only distinct names.  Ignore comments in index files.
+
+	* bin/docmaker.py: File removed.
+
+	* translations/de.po: Updated.
+
+	* doc/formatting.wiki: Toc syntax extensions documented.
+
+	* lib/lcg/wiki.py (Parser._MATCHERS): Extended syntax for Table of
+	Contents.
+	(Parser._HELPER_PATTERNS): New items `toctype' and `tocdepth'.
+	(Parser._make_toc): Support the new syntax, allowing to specify
+	the toc depth and type.  The new type `NTOC' makes the toc of the
+	current node (listing it's child nodes), while TOC makes the toc
+	of the current content element (eg. current section).
+
+	* lib/lcg/ims.py (IMSExporter.export): Write the meanifest only
+	for the root node.
+	(IMSExporter._body_parts): New method.
+
+	* lib/lcg/export.py (Exporter._body_parts): New method.
+	(Exporter.body): Use it.
+	(body): Method removed.
+	(StaticExporter._body_parts): New method.
+
+	* lib/lcg/eurochance.py (Help._create_children): When
+	`self._user_lang()' is None, use `self.language()'.
+
+	* lib/lcg/_html.py (br): New funftion.
+
+	* lib/lcg/config.py (lcg_dir): Name of the environment variable
+	changed to `LCGDIR'.
+
+	* lib/lcg/content.py (TableOfContents._export_title): New method.
+	(TableOfContents.export): Use it.
+
 2006-01-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/de.po: Updated.
