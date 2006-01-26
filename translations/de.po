@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-01-23 11:26+0100\n"
+"POT-Creation-Date: 2006-01-26 17:38+0100\n"
 "PO-Revision-Date: 2006-01-23 09:50+0100\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
@@ -20,17 +20,17 @@ msgid "Index:"
 msgstr "Verzeichnis:"
 
 # The first part of vocabulary listing (the second is Phrases).
-#: ../lib/lcg/content.py:709 ../lib/lcg/content.py:719
+#: ../lib/lcg/content.py:711 ../lib/lcg/content.py:721
 msgid "Terms"
 msgstr "Begriffe"
 
 # The second part of vocabulary listing.
-#: ../lib/lcg/content.py:711 ../lib/lcg/content.py:721
+#: ../lib/lcg/content.py:713 ../lib/lcg/content.py:723
 msgid "Phrases"
 msgstr "Phrasen"
 
 # Section title
-#: ../lib/lcg/content.py:713
+#: ../lib/lcg/content.py:715
 msgid "Extended vocabulary"
 msgstr "Zusätzliche Vokabeln"
 
@@ -38,11 +38,6 @@ msgstr "Zusätzliche Vokabeln"
 #: ../lib/lcg/course.py:57
 msgid "Node"
 msgstr "Verbindung"
-
-#: ../lib/lcg/course.py:583 ../lib/lcg/eurochance.py:195
-#: ../lib/lcg/eurochance.py:230 ../lib/lcg/eurochance.py:253
-msgid "Table of Contents:"
-msgstr "Inhaltsverzeichnis:"
 
 # Unit title
 #: ../lib/lcg/eurochance.py:56
@@ -141,6 +136,11 @@ msgstr "Übersetzung"
 #: ../lib/lcg/eurochance.py:192
 msgid "Answer Sheets"
 msgstr "Auflösungsteil"
+
+#: ../lib/lcg/eurochance.py:195 ../lib/lcg/eurochance.py:230
+#: ../lib/lcg/eurochance.py:253
+msgid "Table of Contents:"
+msgstr "Inhaltsverzeichnis:"
 
 # Page title
 #: ../lib/lcg/eurochance.py:209
