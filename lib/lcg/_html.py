@@ -60,6 +60,9 @@ def span(text, cls=None, id=None, lang=None):
 def p(*content, **kwargs):
     return _tag('p', (('class', kwargs.get('cls')),), content, concat='\n')
 
+def br(cls=None):
+    return '<br%s/>' % _attr(('class', cls),)
+
 def div(content, cls=None, lang=None):
     return _tag('div', (('class', cls), ('lang', lang)), content, concat='\n')
 
