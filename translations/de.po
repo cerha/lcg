@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-18 17:15+0200\n"
+"POT-Creation-Date: 2006-01-23 11:26+0100\n"
 "PO-Revision-Date: 2006-01-23 09:50+0100\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,319 +15,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # The table of contents...
-#: ../lib/lcg/content.py:378
+#: ../lib/lcg/content.py:387
 msgid "Index:"
 msgstr "Verzeichnis:"
 
 # The first part of vocabulary listing (the second is Phrases).
-#: ../lib/lcg/content.py:700 ../lib/lcg/content.py:710
+#: ../lib/lcg/content.py:709 ../lib/lcg/content.py:719
 msgid "Terms"
 msgstr "Begriffe"
 
 # The second part of vocabulary listing.
-#: ../lib/lcg/content.py:702 ../lib/lcg/content.py:712
+#: ../lib/lcg/content.py:711 ../lib/lcg/content.py:721
 msgid "Phrases"
 msgstr "Phrasen"
 
 # Section title
-#: ../lib/lcg/content.py:704
+#: ../lib/lcg/content.py:713
 msgid "Extended vocabulary"
 msgstr "Zusätzliche Vokabeln"
 
-# The answer for the True/False exercise.
-#: ../lib/lcg/content.py:832
-msgid "TRUE"
-msgstr "RICHTIG"
-
-# The answer for the True/False exercise.
-#: ../lib/lcg/content.py:832
-msgid "FALSE"
-msgstr "FALSCH"
-
-#: ../lib/lcg/content.py:961
-msgid "This exercise can be also done purely aurally/orally:"
-msgstr "Diese Übung kann auch nur mit Sprachausgabe gemacht werden"
-
-# Recording controls.
-#: ../lib/lcg/content.py:972
-msgid "Read the following text:"
-msgstr "Lesen Sie den folgenden Text:"
-
-# Exercise title (first part).
-#: ../lib/lcg/content.py:1039
-#, python-format
-msgid "Exercise %d"
-msgstr "Übung %d"
-
-# The link after the recording controls.
-#: ../lib/lcg/content.py:1150
-msgid "show transcript"
-msgstr "Protokoll"
-
-# Recording controls.
-#: ../lib/lcg/content.py:1156 ../lib/lcg/content.py:1159
-#: ../lib/lcg/content.py:1511
-msgid "Play"
-msgstr "Wiedergabe"
-
-# Recording controls.
-#: ../lib/lcg/content.py:1157
-msgid "Stop"
-msgstr "Stop"
-
-# Exercise title (first part).
-#: ../lib/lcg/content.py:1167
-msgid "Exercise Help"
-msgstr "Übunghilfe"
-
-# Label for a section of grammar explanations included within an exercise.
-# This is only used in the advanced course.
-#: ../lib/lcg/content.py:1194
-msgid "Explanation:"
-msgstr "Erklärung:"
-
-# Label for an example (often used with the Transformation exercise).
-#: ../lib/lcg/content.py:1201
-msgid "Example:"
-msgstr "Beispiel:"
-
-# Recording controls.
-#: ../lib/lcg/content.py:1224
-msgid "Recording:"
-msgstr "Aufnahme:"
-
-# Exercise type name.
-#: ../lib/lcg/content.py:1254
-msgid "Listening"
-msgstr "Hörübung"
-
-# Recording controls.
-#: ../lib/lcg/content.py:1259
-msgid "Reading"
-msgstr "Leseübung"
-
-# Exercise type name.
-#: ../lib/lcg/content.py:1264
-msgid "Sentence Completion"
-msgstr "Satzergänzung"
-
-#: ../lib/lcg/content.py:1267
-msgid ""
-"Speaking Practice.  Complete the sentences you hear, using the example as a "
-"model."
-msgstr ""
-"Sprachübung. Vervollständigen Sie die gehörten Sätze, wie im vorangegangenen "
-"Beispiel."
-
-#: ../lib/lcg/content.py:1269
-msgid "Press Play to listen to the instructions:"
-msgstr "Um sich die Anleitungen anzuhören, klicken Sie auf Wiedergabe:"
-
-# Exercise evaluation response.
-# $x is replaced by a number and $y by percentage of correct answers.
-#: ../lib/lcg/content.py:1289
-msgid ", $x ($y%) on first attempt"
-msgstr ", $x ($y%) mit dem ersten Versuch"
-
-# The label for the display field with exercise results.
-#: ../lib/lcg/content.py:1291
-msgid "Answered:"
-msgstr "Antwort:"
-
-# Dictation evaluation result
-#: ../lib/lcg/content.py:1292
-msgid "Correct:"
-msgstr "Richtig:"
-
-# Button label
-#: ../lib/lcg/content.py:1330
-msgid "Evaluate"
-msgstr "auswerten"
-
-# Button label.
-#: ../lib/lcg/content.py:1331
-msgid "Fill"
-msgstr "einfügen"
-
-# Button label.
-#: ../lib/lcg/content.py:1332
-msgid "Reset"
-msgstr "zurücksetzen"
-
-# Not visible in the Javascript version.
-#: ../lib/lcg/content.py:1335
-#, python-format
-msgid "See the %s to check your results."
-msgstr "Klicken Sie auf folgende Feld %s, um Ihr Ergebnis zu überprüfen."
-
-# Link to the answer sheet (not visible in the Javascript version)
-#: ../lib/lcg/content.py:1336
-msgid "answer sheet"
-msgstr "Auflösungsteil"
-
-# Link to the answer sheet (not visible in the Javascript version)
-#: ../lib/lcg/content.py:1356
-msgid "Show the answer sheet."
-msgstr "Hier finden Sie die Auflösung."
-
-# Instructions for MultipleChoiceQuestions and Selections
-#: ../lib/lcg/content.py:1384
-msgid "Chose the correct answer."
-msgstr "Wählen Sie die richtige Antwort."
-
-# Title for MultipleChoiceQuestions
-#: ../lib/lcg/content.py:1427
-msgid "Multiple Choice Questions"
-msgstr "Auswahlfragebogen"
-
-# Section title
-#: ../lib/lcg/content.py:1434
-msgid "Selections"
-msgstr "Auswahlmöglichkeiten"
-
-# Tile for TrueFalseStatements
-#: ../lib/lcg/content.py:1441
-msgid "True/False Statements"
-msgstr "Richtig/Falsch Aussagen"
-
-# Instructions for TrueFalseStatements
-#: ../lib/lcg/content.py:1442
-msgid "For each of the statements below, choose True or False."
-msgstr ""
-"Für jede der folgenden Behauptungen wählen Sie zwischen Richtig oder Falsch."
-
-# Title for GapFilling
-#: ../lib/lcg/content.py:1466
-msgid "Gap Filling"
-msgstr "Lückentext mit Einfüllübung"
-
-# Instructions for GapFilling
-#: ../lib/lcg/content.py:1467
-msgid "Choose the correct option to fill the gaps in the following sentences."
-msgstr ""
-"In den folgenden Sätzen sollen Sie den Lückentext ergänzen. Wählen Sie dazu "
-"die richtige Option aus."
-
-# Title for VocabExercise
-#: ../lib/lcg/content.py:1525
-msgid "Test Yourself"
-msgstr "Überprüfen Sie Ihr Wissen."
-
-# Instructions for VocabExercise
-#: ../lib/lcg/content.py:1527
-msgid "Fill in the correct translation for each of the terms below."
-msgstr "Ergänzen Sie die richtige Übersetzung für jede der folgenden Vorgaben."
-
-# Title for Substitution
-#: ../lib/lcg/content.py:1551
-msgid "Substitution"
-msgstr "Substitution"
-
-# Instructions for Substitution
-#: ../lib/lcg/content.py:1552
-msgid "Use the text in brackets to transform each sentence."
-msgstr ""
-"Verwenden Sie den Text in den eckigen Klammern, um jeden Satz richtig zu "
-"formen."
-
-# Title for Transformation
-#: ../lib/lcg/content.py:1559
-msgid "Transformation"
-msgstr "Transformation"
-
-# Instructions for Transformation
-#: ../lib/lcg/content.py:1562
-msgid "Fill in the gap in sentence B so that it means the same as sentence A."
-msgstr ""
-"Füllen Sie die Lücke in Satz B aus, sodass der Inhalt den selben Sinn ergibt "
-"wie im Satz A."
-
-# Instructions for Transformation with an example
-#: ../lib/lcg/content.py:1567
-msgid ""
-"Using the example as a model, change the structure and make a new sentence."
-msgstr ""
-"Formen Sie die nachfolgenden Sätze entsprechend dem Beispiel. Ändern Sie die "
-"Struktur und bilden Sie einen neuen Satz."
-
-# Title for Dictation
-#: ../lib/lcg/content.py:1576
-msgid "Dictation"
-msgstr "Diktat"
-
-# The label for the display field with exercise results.
-#: ../lib/lcg/content.py:1580
-msgid "Correct"
-msgstr "Richtig"
-
-# Dictation evaluation result
-#: ../lib/lcg/content.py:1581
-msgid "Error(s) found"
-msgstr "Es wurde ein Fehler gefunden"
-
-# Label for the display of dictation results
-#: ../lib/lcg/content.py:1583
-msgid "Result:"
-msgstr "Ergebnis:"
-
-# Instructions for Dictation
-#: ../lib/lcg/content.py:1585
-msgid ""
-"Listen to the complete recording first.  Then go to\n"
-"    the textbox and use the > key to listen to the text section by section.\n"
-"    Type what you hear into the textbox.  For detailed instructions, read "
-"the\n"
-"    Exercise Help."
-msgstr ""
-"Hören Sie sich die komplette Aufnahme aufmerksam an. Dann gegen Sie in das "
-"Textfeld und drücken Sie die > Taste, um sich den Text Abschnitt für "
-"Abschnitt anzuhören. Schreiben Sie das Gehörte in das Textfeld. Genauere "
-"Angaben dazu finden Sie auch in der Übungshilfe."
-
-# Title for Cloze
-#: ../lib/lcg/content.py:1617
-msgid "Cloze"
-msgstr "Lückentext"
-
-# Instructions for Cloze
-#: ../lib/lcg/content.py:1619
-msgid ""
-"Fill in the gaps in the text below. For each gap there is only one correct "
-"answer."
-msgstr ""
-"Füllen Sie im folgenden Text die Textlücken aus. Für jedes leere Feld gibt "
-"es nur eine richtige Antwort."
-
-# Instructions for Cloze with a recording
-#: ../lib/lcg/content.py:1627
-msgid ""
-"Listen to the recording carefully and then fill in the gaps in the text "
-"below using the same words."
-msgstr ""
-"Hören Sie der Aufnahme aufmerksam zu. Dann ergänzen Sie den Lückentext mit "
-"den fehlenden Wörtern. Verwenden Sie dabei die selben Wörter wie in der "
-"Aufnahme."
-
-# Title for ExposedCloze
-#: ../lib/lcg/content.py:1634
-msgid "Exposed Cloze"
-msgstr "Auswahlübung"
-
-# Instructions for ExposedCloze
-#: ../lib/lcg/content.py:1635
-msgid ""
-"Use the correct word or expression from the list below to fill in the gaps "
-"in the sentences."
-msgstr ""
-"Ergänzen Sie die richtigen Wörter im Lückentext. Verwenden Sie dazu die "
-"Wörter oder Ausdrücke die zur Auswahl stehen."
-
 # This label is actually not used.
-#: ../lib/lcg/course.py:56
+#: ../lib/lcg/course.py:57
 msgid "Node"
 msgstr "Verbindung"
 
-#: ../lib/lcg/course.py:565 ../lib/lcg/eurochance.py:195
+#: ../lib/lcg/course.py:583 ../lib/lcg/eurochance.py:195
 #: ../lib/lcg/eurochance.py:230 ../lib/lcg/eurochance.py:253
 msgid "Table of Contents:"
 msgstr "Inhaltsverzeichnis:"
@@ -339,58 +51,58 @@ msgid "Unit %d"
 msgstr "Lektion %d"
 
 # Section title
-#: ../lib/lcg/eurochance.py:77
+#: ../lib/lcg/eurochance.py:67 ../lib/lcg/eurochance.py:110
 #, python-format
 msgid "Section %d"
 msgstr "Abschnitt %d"
 
 # Section title
-#: ../lib/lcg/eurochance.py:105
-msgid "Vocabulary Practice"
-msgstr "Vokabelübungen"
-
-# Section title
-#: ../lib/lcg/eurochance.py:106
-msgid "Listening Comprehension"
-msgstr "Hörverständnis"
-
-# Section title
-#: ../lib/lcg/eurochance.py:107
-msgid "General Comprehension"
-msgstr "Generelles Verständnis"
-
-# Section title
-#: ../lib/lcg/eurochance.py:108
-msgid "Grammar Practice"
-msgstr "Grammatikübungen"
-
-# Section title
-#: ../lib/lcg/eurochance.py:109
-msgid "Consolidation"
-msgstr "Festigung"
-
-# Section title
-#: ../lib/lcg/eurochance.py:114
+#: ../lib/lcg/eurochance.py:82
 msgid "Aims and Objectives"
 msgstr "Lernziele"
 
 # Section title
-#: ../lib/lcg/eurochance.py:116
+#: ../lib/lcg/eurochance.py:85
+msgid "Checklist"
+msgstr "Checkliste"
+
+# Section title
+#: ../lib/lcg/eurochance.py:111
+msgid "Vocabulary Practice"
+msgstr "Vokabelübungen"
+
+# Section title
+#: ../lib/lcg/eurochance.py:112
+msgid "Listening Comprehension"
+msgstr "Hörverständnis"
+
+# Section title
+#: ../lib/lcg/eurochance.py:113
+msgid "General Comprehension"
+msgstr "Generelles Verständnis"
+
+# Section title
+#: ../lib/lcg/eurochance.py:114
+msgid "Grammar Practice"
+msgstr "Grammatikübungen"
+
+# Section title
+#: ../lib/lcg/eurochance.py:115
+msgid "Consolidation"
+msgstr "Festigung"
+
+# Section title
+#: ../lib/lcg/eurochance.py:121
 msgid "Vocabulary"
 msgstr "Vokabeln"
 
 # Section title
-#: ../lib/lcg/eurochance.py:117
+#: ../lib/lcg/eurochance.py:122
 msgid "Exercises"
 msgstr "Übungen"
 
-# Section title
-#: ../lib/lcg/eurochance.py:119
-msgid "Checklist"
-msgstr "Checkliste"
-
 # Page title
-#: ../lib/lcg/eurochance.py:126
+#: ../lib/lcg/eurochance.py:127
 msgid "General Course Instructions"
 msgstr "Allgemeine Kursinformation"
 
@@ -446,23 +158,311 @@ msgstr "Hilfeverzeichnis"
 msgid "Course Index"
 msgstr "Kursindex"
 
+# The answer for the True/False exercise.
+#: ../lib/lcg/exercises.py:156
+msgid "TRUE"
+msgstr "RICHTIG"
+
+# The answer for the True/False exercise.
+#: ../lib/lcg/exercises.py:156
+msgid "FALSE"
+msgstr "FALSCH"
+
+#: ../lib/lcg/exercises.py:287
+msgid "This exercise can be also done purely aurally/orally:"
+msgstr "Diese Übung kann auch nur mit Sprachausgabe gemacht werden"
+
+# Recording controls.
+#: ../lib/lcg/exercises.py:289
+msgid "Read the following text:"
+msgstr "Lesen Sie den folgenden Text:"
+
+# Exercise title (first part).
+#: ../lib/lcg/exercises.py:366
+#, python-format
+msgid "Exercise %d"
+msgstr "Übung %d"
+
+# The link after the recording controls.
+#: ../lib/lcg/exercises.py:481
+msgid "show transcript"
+msgstr "Protokoll"
+
+# Recording controls.
+#: ../lib/lcg/exercises.py:487 ../lib/lcg/exercises.py:490
+#: ../lib/lcg/exercises.py:854
+msgid "Play"
+msgstr "Wiedergabe"
+
+# Recording controls.
+#: ../lib/lcg/exercises.py:488
+msgid "Stop"
+msgstr "Stop"
+
+# Exercise title (first part).
+#: ../lib/lcg/exercises.py:498
+msgid "Exercise Help"
+msgstr "Übunghilfe"
+
+# Label for a section of grammar explanations included within an exercise.
+# This is only used in the advanced course.
+#: ../lib/lcg/exercises.py:528
+msgid "Explanation:"
+msgstr "Erklärung:"
+
+# Label for an example (often used with the Transformation exercise).
+#: ../lib/lcg/exercises.py:535
+msgid "Example:"
+msgstr "Beispiel:"
+
+# Recording controls.
+#: ../lib/lcg/exercises.py:558
+msgid "Recording:"
+msgstr "Aufnahme:"
+
+# Exercise type name.
+#: ../lib/lcg/exercises.py:594
+msgid "Listening"
+msgstr "Hörübung"
+
+# Recording controls.
+#: ../lib/lcg/exercises.py:599
+msgid "Reading"
+msgstr "Leseübung"
+
+# Exercise type name.
+#: ../lib/lcg/exercises.py:604
+msgid "Sentence Completion"
+msgstr "Satzergänzung"
+
+#: ../lib/lcg/exercises.py:607
+msgid ""
+"Speaking Practice.  Complete the sentences you hear, using the example as a "
+"model."
+msgstr ""
+"Sprachübung. Vervollständigen Sie die gehörten Sätze, wie im vorangegangenen "
+"Beispiel."
+
+#: ../lib/lcg/exercises.py:609
+msgid "Press Play to listen to the instructions:"
+msgstr "Um sich die Anleitungen anzuhören, klicken Sie auf Wiedergabe:"
+
+# Exercise evaluation response.
+# $x is replaced by a number and $y by percentage of correct answers.
+#: ../lib/lcg/exercises.py:629
+msgid ", $x ($y%) on first attempt"
+msgstr ", $x ($y%) mit dem ersten Versuch"
+
+# The label for the display field with exercise results.
+#: ../lib/lcg/exercises.py:631
+msgid "Answered:"
+msgstr "Antwort:"
+
+# Dictation evaluation result
+#: ../lib/lcg/exercises.py:632
+msgid "Correct:"
+msgstr "Richtig:"
+
+# Button label
+#: ../lib/lcg/exercises.py:672
+msgid "Evaluate"
+msgstr "auswerten"
+
+# Button label.
+#: ../lib/lcg/exercises.py:673
+msgid "Fill"
+msgstr "einfügen"
+
+# Button label.
+#: ../lib/lcg/exercises.py:674
+msgid "Reset"
+msgstr "zurücksetzen"
+
+# Not visible in the Javascript version.
+#: ../lib/lcg/exercises.py:677
+#, python-format
+msgid "See the %s to check your results."
+msgstr "Klicken Sie auf folgende Feld %s, um Ihr Ergebnis zu überprüfen."
+
+# Link to the answer sheet (not visible in the Javascript version)
+#: ../lib/lcg/exercises.py:678
+msgid "answer sheet"
+msgstr "Auflösungsteil"
+
+# Link to the answer sheet (not visible in the Javascript version)
+#: ../lib/lcg/exercises.py:698
+msgid "Show the answer sheet."
+msgstr "Hier finden Sie die Auflösung."
+
+# Instructions for MultipleChoiceQuestions and Selections
+#: ../lib/lcg/exercises.py:727
+msgid "Chose the correct answer."
+msgstr "Wählen Sie die richtige Antwort."
+
+# Title for MultipleChoiceQuestions
+#: ../lib/lcg/exercises.py:771
+msgid "Multiple Choice Questions"
+msgstr "Auswahlfragebogen"
+
+# Section title
+#: ../lib/lcg/exercises.py:778
+msgid "Selections"
+msgstr "Auswahlmöglichkeiten"
+
+# Tile for TrueFalseStatements
+#: ../lib/lcg/exercises.py:785
+msgid "True/False Statements"
+msgstr "Richtig/Falsch Aussagen"
+
+# Instructions for TrueFalseStatements
+#: ../lib/lcg/exercises.py:786
+msgid "For each of the statements below, choose True or False."
+msgstr ""
+"Für jede der folgenden Behauptungen wählen Sie zwischen Richtig oder Falsch."
+
+# Title for GapFilling
+#: ../lib/lcg/exercises.py:810
+msgid "Gap Filling"
+msgstr "Lückentext mit Einfüllübung"
+
+# Instructions for GapFilling
+#: ../lib/lcg/exercises.py:811
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr ""
+"In den folgenden Sätzen sollen Sie den Lückentext ergänzen. Wählen Sie dazu "
+"die richtige Option aus."
+
+# Title for VocabExercise
+#: ../lib/lcg/exercises.py:869
+msgid "Test Yourself"
+msgstr "Überprüfen Sie Ihr Wissen."
+
+# Instructions for VocabExercise
+#: ../lib/lcg/exercises.py:871
+msgid "Fill in the correct translation for each of the terms below."
+msgstr "Ergänzen Sie die richtige Übersetzung für jede der folgenden Vorgaben."
+
+# Title for Substitution
+#: ../lib/lcg/exercises.py:895
+msgid "Substitution"
+msgstr "Substitution"
+
+# Instructions for Substitution
+#: ../lib/lcg/exercises.py:896
+msgid "Use the text in brackets to transform each sentence."
+msgstr ""
+"Verwenden Sie den Text in den eckigen Klammern, um jeden Satz richtig zu "
+"formen."
+
+# Title for Transformation
+#: ../lib/lcg/exercises.py:903
+msgid "Transformation"
+msgstr "Transformation"
+
+# Instructions for Transformation
+#: ../lib/lcg/exercises.py:906
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr ""
+"Füllen Sie die Lücke in Satz B aus, sodass der Inhalt den selben Sinn ergibt "
+"wie im Satz A."
+
+# Instructions for Transformation with an example
+#: ../lib/lcg/exercises.py:911
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr ""
+"Formen Sie die nachfolgenden Sätze entsprechend dem Beispiel. Ändern Sie die "
+"Struktur und bilden Sie einen neuen Satz."
+
+# Title for Dictation
+#: ../lib/lcg/exercises.py:920
+msgid "Dictation"
+msgstr "Diktat"
+
+# The label for the display field with exercise results.
+#: ../lib/lcg/exercises.py:924
+msgid "Correct"
+msgstr "Richtig"
+
+# Dictation evaluation result
+#: ../lib/lcg/exercises.py:925
+msgid "Error(s) found"
+msgstr "Es wurde ein Fehler gefunden"
+
+# Label for the display of dictation results
+#: ../lib/lcg/exercises.py:927
+msgid "Result:"
+msgstr "Ergebnis:"
+
+# Instructions for Dictation
+#: ../lib/lcg/exercises.py:929
+msgid ""
+"Listen to the complete recording first.  Then go to\n"
+"    the textbox and use the > key to listen to the text section by section.\n"
+"    Type what you hear into the textbox.  For detailed instructions, read "
+"the\n"
+"    Exercise Help."
+msgstr ""
+"Hören Sie sich die komplette Aufnahme aufmerksam an. Dann gegen Sie in das "
+"Textfeld und drücken Sie die > Taste, um sich den Text Abschnitt für "
+"Abschnitt anzuhören. Schreiben Sie das Gehörte in das Textfeld. Genauere "
+"Angaben dazu finden Sie auch in der Übungshilfe."
+
+# Title for Cloze
+#: ../lib/lcg/exercises.py:963
+msgid "Cloze"
+msgstr "Lückentext"
+
+# Instructions for Cloze
+#: ../lib/lcg/exercises.py:965
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+"Füllen Sie im folgenden Text die Textlücken aus. Für jedes leere Feld gibt "
+"es nur eine richtige Antwort."
+
+# Instructions for Cloze with a recording
+#: ../lib/lcg/exercises.py:973
+msgid ""
+"Listen to the recording carefully and then fill in the gaps in the text "
+"below using the same words."
+msgstr ""
+"Hören Sie der Aufnahme aufmerksam zu. Dann ergänzen Sie den Lückentext mit "
+"den fehlenden Wörtern. Verwenden Sie dabei die selben Wörter wie in der "
+"Aufnahme."
+
+# Title for ExposedCloze
+#: ../lib/lcg/exercises.py:980
+msgid "Exposed Cloze"
+msgstr "Auswahlübung"
+
+# Instructions for ExposedCloze
+#: ../lib/lcg/exercises.py:981
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr ""
+"Ergänzen Sie die richtigen Wörter im Lückentext. Verwenden Sie dazu die "
+"Wörter oder Ausdrücke die zur Auswahl stehen."
+
 # This label is actually not used.
-#: ../lib/lcg/export.py:117 ../lib/lcg/export.py:118
+#: ../lib/lcg/export.py:117
 msgid "None"
 msgstr "Nichts"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export.py:117 ../lib/lcg/export.py:124
+#: ../lib/lcg/export.py:123
 msgid "Next"
 msgstr "weiter"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export.py:125
+#: ../lib/lcg/export.py:124
 msgid "Previous"
 msgstr "vorhergehend"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export.py:130
+#: ../lib/lcg/export.py:129
 msgid "Up"
 msgstr "hinauf"
 
