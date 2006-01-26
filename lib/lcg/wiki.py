@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -206,7 +206,7 @@ class Parser(object):
                   r"(?P<term>\S[^\r\n]*)\r?\n" + \
                   r"(?P<descr>([\t ]+[^\r\n]+\r?\n?)+)"),
                  ('toc',
-                  r"(?:(?P<title>[^\r\n]+)[\t ]+)?\@TOC\@\s*"),
+                  r"(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>N?TOC)(\((?P<tocdepth>\d+)\))?\@\s*"),
                  ('table',
                   r"((\|[^\r\n\|]*)+\|\s*)+"),
                  ('rule',
@@ -219,7 +219,7 @@ class Parser(object):
     _MATCHER = re.compile('(?:' + '|'.join(_REGEXPS) + ')', re.DOTALL)
 
     _HELPER_PATTERNS = ('indent', 'content', 'title', 'label', 'value', 'term',
-                        'descr')
+                        'descr', 'toctype', 'tocdepth')
     
     class _Section(object):
         def __init__(self, title, anchor, level):
@@ -406,7 +406,10 @@ class Parser(object):
                          for row in block.strip().splitlines()])
 
     def _make_toc(self, block, groups):
-        return TableOfContents(self._parent, title=groups['title'], depth=99)
+        title = groups['title']
+        item = groups['toctype'] == 'NTOC' and self._parent or None
+        d = groups['tocdepth'] and int(groups['tocdepth']) or 99
+        return TableOfContents(self._parent, item=item, title=title, depth=d)
 
     def _make_rule(self, block, groups):
         return HorizontalSeparator(self._parent)
