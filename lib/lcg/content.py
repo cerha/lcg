@@ -540,6 +540,8 @@ class TableOfContents(Content):
         self._depth = depth
         self._detailed = detailed
                       
+    def _export_title(self):
+        return _html.strong(self._title)
         
     def export(self):
         item = self._item
@@ -551,7 +553,7 @@ class TableOfContents(Content):
         toc = self._make_toc(item, depth=self._depth)
         if self._title is not None:
             #TODO: add a "skip" link.
-            return _html.div((_html.strong(self._title), toc),
+            return _html.div((self._export_title(), toc),
                              cls="table-of-contents")
         else:
             return toc
