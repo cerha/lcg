@@ -26,7 +26,7 @@ OPTIONS = (
     ('language=', 'en', "The language to use."),
     ('encoding=', 'utf-8', "Input encoding (output encoding is always utf-8)"),
     ('stylesheet=', None, "Filename of the stylesheet to use."),
-    ('ext=', 'wiki', "Extension of the source files."),
+    ('ext=', 'txt', "Extension of the source files."),
     ('root=', 'index', "Filename of the root document."),
     ('hhp', False, "generate a MS HTML Help Workshop package."),
     )
@@ -40,8 +40,8 @@ def main():
     os.environ['LCG_LANGUAGE'] = opt['language']
     import lcg
     
-    doc = lcg.DocMaker(source_dir, file=opt['root'], ext=opt['ext'],
-                       language=opt['language'], input_encoding=opt['encoding'])
+    doc = lcg.DocRoot(source_dir, file=opt['root'], ext=opt['ext'],
+                      language=opt['language'], input_encoding=opt['encoding'])
     
     if opt['hhp']:
         from lcg import hhp
