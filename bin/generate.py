@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,56 +19,44 @@
 
 """A generator for the Eurochance courses."""
 
-import sys, getopt, codecs, os
-from gettext import translation, NullTranslations
+import os
+from lcgmake import getoptions, usage
+
+OPTIONS = (
+    ('lang=', 'en', "The language of the course  (the taught language)."),
+    ('user-lang=', 'cs', "The user's (learner's) language"),
+    ('stylesheet=', None, "Filename of the stylesheet to use."),
+    ('ims', False, "Generate an IMS package instead of a standalone HTML."),
+    ('advanced', False, "This is the advanced version of the course.")
+    )
 
 def main():
-    try:
-        optlist, args = getopt.getopt(sys.argv[1:], '',
-                                      ('encoding=', 'lang=', 'user-lang=',
-                                       'stylesheet=', 'ims', 'advanced'))
-        opt = dict(optlist)
-        source_dir, destination_dir = args
-    except getopt.GetoptError:
-        usage()
-    except ValueError:
-        usage()
+    opt, args = getoptions(OPTIONS)
+    if opt is None or len(args) != 2:
+        usage(OPTIONS)
+    source_dir, destination_dir = args
 
-    lang = opt.get('--lang', 'en')
+    lang = opt['lang']
     os.environ['LCG_LANGUAGE'] = lang
     import lcg
     
     from lcg.eurochance import IntermediateCourse, AdvancedCourse, \
                                EurochanceExporter
-    if opt.get('--advanced') is not None:
+    if opt['advanced']:
         c = AdvancedCourse(source_dir, language=lang, input_encoding='utf-8')
     else:
         c = IntermediateCourse(source_dir, course_language=lang,
-                               users_language=opt.get('--user-lang', 'cs'),
+                               users_language=opt['user-lang'],
                                input_encoding='utf-8')
-    if opt.get('--ims') is not None:
+    if opt['ims']:
         exporter = lcg.ims.IMSExporter
     else:
         exporter = EurochanceExporter
         
-    e = exporter(stylesheet=opt.get('--stylesheet'))
+    e = exporter(stylesheet=opt['stylesheet'])
     e.export(c, destination_dir)
 
-def usage():
-    help = """Usage: %s [options] source_dir destination_dir
-
-    Options:
     
-      --encoding   ... the input encoding.
-      --lang       ... the course language (the taught language).
-      --user-lang  ... the user's language.
-      --stylesheet ... the filename of the stylesheet to use.
-                       
-    The languages are specified using an ISO 639-1 Alpha-2 language code.  The
-    output encoding is always UTF-8.
-    """ % os.path.split(sys.argv[0])[-1]
-    sys.stderr.write(help.replace("\n    ", "\n"))
-    sys.exit(2)
-
 if __name__ == "__main__":
     main()
+
