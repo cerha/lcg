@@ -1,3 +1,52 @@
+2006-01-30  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py: Import `getoptions' and `usage' from `lcgmake'.
+	(main): Use getoptions' and `usage' from `lcgmake'.
+	(usage): Removed.
+
+	* bin/lcgmake.py (OPTIONS): The default input file extension set
+	to `txt'.
+	(main): Use `DocRoot' instead of `DocMaker'.
+
+	* doc/_index.txt: New file.
+
+	* doc/index.en.txt: New file.
+	
+	* doc/intro.en.txt: New file.
+
+	* doc/data-formats.en.txt: New file.
+
+	* doc/eurochance.en.txt: New file.
+
+	* doc/formatting.en.txt: New file.
+
+	* doc/fdl.en.txt: New file.
+
+	* doc/data-formats.wiki: File removed.
+
+	* doc/eurochance.wiki: File removed.
+
+	* doc/formatting.wiki: File removed.
+
+	* doc/intro.wiki: File removed.
+
+	* doc/index.txt: File removed.
+
+	* lib/lcg/util.py (list_dir): New keyword argument `indexfile'.
+
+	* lib/lcg/course.py (_WikiNode.__init__): The argument 'title' removed.
+	(_WikiNode._create_content): Always require one top-level
+	section.  Initialize `self._document_title'.
+	(_WikiNode._title): Return `self._document_title'.
+	(DocNode.__init__): New argument `ext'.
+	(DocNode._title): Method removed.
+	(DocNode._id): Method removed.
+	(DocNode.id): New method.
+	(DocNode._source_text): Pass also `lang' to `_source_file'.
+	(DocMaker): Class removed.
+	(DocChapter): New class.
+	(DocRoot): New class.
+
 2006-01-26  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/util.py (list_dir): Strip the extensions from filenames
