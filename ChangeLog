@@ -1,5 +1,7 @@
 2006-01-30  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/hhp.py: New module.
+
 	* bin/generate.py: Import `getoptions' and `usage' from `lcgmake'.
 	(main): Use getoptions' and `usage' from `lcgmake'.
 	(usage): Removed.
