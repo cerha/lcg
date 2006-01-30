@@ -126,10 +126,11 @@ class Counter(object):
         return value
                 
     
-def list_dir(dir):
+def list_dir(dir, indexfile='_index.txt'):
     """Return the list of all items found in a directory.
 
-    If the directory contains the file 'index.txt' the list is read from there.
+    If the directory contains the index file (the name id given by the
+    'indexfile' argument ('_index.txt' by default) the list is read from there.
     Otherwise all the files and directories within it are read, filenames are
     stripped of their extensions and a list of distinct names is returned in
     alphabetical order.
@@ -138,7 +139,7 @@ def list_dir(dir):
     
     """
     try:
-        index = open(os.path.join(dir, 'index.txt'))
+        index = open(os.path.join(dir, indexfile))
         return [item for item in [line.strip() for line in index.readlines()]
                 if item != '' and not item.startswith('#')]
     except IOError:
