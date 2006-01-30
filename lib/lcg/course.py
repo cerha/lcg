@@ -453,19 +453,14 @@ class _WikiNode(ContentNode):
     def __init__(self, *args, **kwargs):
         """Initialize the instance.
 
-        Arguments:
-        
-          title -- the page title as a unicode string.  If None, the title of
-            the first top-level section within the content will be used.  Thus
-            it is required, that the document contains just one top-level
-            section, when the title is not specified, or an exception will be
-            raised.
+        The node's content is read from a wiki document.  The title of the
+        top-level section within the document will be used as node's title.
+        Thus it is required, that the document contains just one top-level
+        section.  If not, an exception will be raised.
 
-          The other arguments are inherited from the parent class.
+        The other arguments are inherited from the parent class.
           
         """
-        self._title_ = kwargs.get('title')
-        if kwargs.has_key('title'): del kwargs['title']
         super(_WikiNode, self).__init__(*args, **kwargs)
 
     def _source_text(self):
@@ -473,22 +468,20 @@ class _WikiNode(ContentNode):
         
     def _create_content(self):
         sections = self.parse_wiki_text(self._source_text())
-        if self._title_ is None:
-            assert len(sections) == 1, \
-                   "The wiki document must have just one top-level section!"
-            s = sections[0]
-            self._title_ = s.title()
-            sections = s.content()
-        return SectionContainer(self, sections, toc_depth=0) 
+        if len(sections) != 1 or not isinstance(sections[0], Section):
+            raise Exception("The document has no top-level section:", self.id())
+        s = sections[0]
+        self._document_title = s.title()
+        return SectionContainer(self, s.content(), toc_depth=0) 
     
     def _title(self):
-        return self._title_
+        return self._document_title
 
 
 class WikiNode(_WikiNode):
     """A single-purpose class serving as a wiki parser and formatter.
     
-    You simply instantiate this node (giving a wiki-formatted text as a
+    You simply instantiate this node (giving a string of Structured Text as a
     constructor argument) and the text is parsed and a hierarchy of 'Content'
     elements representing the document is built.  Then you can access the
     content structure or simply export the content into HTML or use an
@@ -502,8 +495,6 @@ class WikiNode(_WikiNode):
         Arguments:
         
           text -- the wiki-formatted text as a unicode string.
-          title -- the page title as a unicode string.  If None, the title of
-            the first top-level section within the content will be used.
 
           The other arguments are inherited from the parent class.
           
@@ -513,85 +504,79 @@ class WikiNode(_WikiNode):
     
     def _source_text(self):
         return self._text
-    
-    def _title(self):
-        return self._title_ or super(WikiNode, self)._title()
 
 
 class DocNode(_WikiNode):
-
-    def __init__(self, parent, dir, file, **kwargs):
+    """Node of a Structured Text read from a source file."""
+    
+    def __init__(self, parent, dir, file, ext='txt', **kwargs):
         """Initialize the instance.
 
         Arguments:
         
-          file -- the name of the wiki-formatted input file.
+          file -- the name of the input file (without extension).
+          ext -- the extension of the input file ('txt' by default)
 
           The other arguments are inherited from the parent class.
           
         """
-        file, ext = os.path.splitext(file)
         self._file = file
-        self._ext = ext[1:]
+        self._ext = ext
         super(DocNode, self).__init__(parent, dir, **kwargs)
-
-    def _id(self):
+        
+    def id(self):
         return self._file
         
-        
     def _source_text(self):
-        return self._read_file(self._file, ext=self._ext)
-               
-        
-class DocMaker(RootNode):
-    """The root node for a file based wiki documentation.
+        return self._read_file(self._file, lang=self._language, ext=self._ext)
 
-    This class is also used to build the LCG documentation from wiki files.
-    All files with the '.wiki' suffix in the source directory are read and
-    represented as separate nodes.  The root node with a table of contents is
-    generated.
-
-    The order of the nodes can be given by the file 'index.txt', which contains
-    the filenames of the source files each on one line.  Otherwise the
-    alphabetical order is used.
-
-    Any other hierarchy can be implemented by overriding the
-    '_create_children()' method.
+    
+class DocChapter(DocNode):
+    """A Structured Text node with children read from the source directory.
+    
+    Child nodes are created automatically using the files and subdirectories
+    found in the source directory.  See the documentation of 'DocRoot' for more
+    information.
 
     """
-
-    def __init__(self, dir, title=None, **kwargs):
-        """Initialize the instance.
-
-        Arguments:
-        
-          title -- the page title as a unicode string.  If the title is not
-            given as constructor argument, the file 'title.txt' must exist in
-            the source directory.  The contents of this file is then used as
-            the document title.
-
-          The other arguments are inherited from the parent class.
-          
-        """
-        self._title_ = title
-        super(DocMaker, self).__init__(dir, **kwargs)
-
-    def _title(self):
-        return self._title_ or self._read_file('title')
     
-    def _create_content(self):
-        return [TableOfContents(self, item=self, title=_("Table of Contents:"),
-                                depth=2)]
-                         
-    def _create_children(self, subdir='.'):
+    def _create_children(self):
         children = []
-        dir = os.path.join(self.src_dir(), subdir)
-        for name in list_dir(dir):
-            path = os.path.join(dir, name)
-            if os.path.isfile(path) and path.endswith('.wiki'):
-                children.append(self._create_child(DocNode, subdir, name))
-            if os.path.isdir(path):
-                d = os.path.join(subdir, name)
-                children.extend(self._create_children(subdir=d))
+        for name in list_dir(self.src_dir()):
+            if os.path.isdir(os.path.join(self.src_dir(), name)):
+                children.append(self._create_child(DocChapter, name, name))
+            elif name != self.id():
+                f = self._input_file(name, lang=self._language, ext=self._ext)
+                if not os.path.isfile(f):
+                    f = self._input_file(name, ext=self._ext)
+                if os.path.isfile(f):
+                    children.append(self._create_child(DocNode, '.', name))
         return children
+
     
+class DocRoot(DocChapter):
+    """The root node for a documentation based on LCG Structured Text.
+
+    This class may be used to build a document structure from textual files
+    organized in directories.  All files in the source directory with given
+    suffix ('txt' by default) are read and represented as separate nodes.
+    Further more all directories are read recursively.  Inside each directory,
+    a file with the same filename as the name of the directory (plus the
+    suffix) must exist and this file represents the directory.  All other files
+    (and directories) are child nodes of this node.
+
+    The nodes are ordered alphabetically by default, but the order can be also
+    defined explicitly using a file named 'index.txt', which contains the
+    filenames of source files (and directories) one per line.
+
+    Files within the whole directory structure must have unique names, since
+    they are used node identifiers.  This also means that it is possible to
+    refer to any node using it's name, without caring which subdirectory it is
+    located in.
+
+    This class is also used to build the LCG documentation itself.
+
+    """
+    
+    def __init__(self, dir, file='index', **kwargs):
+        super(DocRoot, self).__init__(None, dir, file, **kwargs)
