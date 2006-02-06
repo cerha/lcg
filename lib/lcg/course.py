@@ -341,14 +341,6 @@ class ContentNode(object):
         else:
             return self._title()
     
-    def full_title(self, separator=' - '):
-        """Return the full title of this node as a string.
-
-        Full title is made of titles of all nodes in the path.
-        
-        """
-        return separator.join([n.title(abbrev=True) for n in self._node_path()])
-
     def language(self):
         """Return the content language as an ISO 639-1 Alpha-2 code."""
         return self._language
@@ -449,30 +441,38 @@ class RootNode(ContentNode):
 
     
 class _WikiNode(ContentNode):
+    """Node read from a LCG Structured Text (wiki) document.
 
-    def __init__(self, *args, **kwargs):
+    The node's content is read from a Structured Text document.  The title of
+    the top-level section within the document will be used as node's title when
+    the `title' constructor argument is not passed.  Thus it is required, that
+    the document contains just one top-level section, when no title is passed.
+    If not, an exception will be raised.
+    
+    """
+    def __init__(self, parent, subdir=None, title=None, **kwargs):
         """Initialize the instance.
 
-        The node's content is read from a wiki document.  The title of the
-        top-level section within the document will be used as node's title.
-        Thus it is required, that the document contains just one top-level
-        section.  If not, an exception will be raised.
 
         The other arguments are inherited from the parent class.
           
         """
-        super(_WikiNode, self).__init__(*args, **kwargs)
+        self._document_title = title
+        super(_WikiNode, self).__init__(parent, subdir=subdir, **kwargs)
 
     def _source_text(self):
         return ""
         
     def _create_content(self):
         sections = self.parse_wiki_text(self._source_text())
-        if len(sections) != 1 or not isinstance(sections[0], Section):
-            raise Exception("The document has no top-level section:", self.id())
-        s = sections[0]
-        self._document_title = s.title()
-        return SectionContainer(self, s.content(), toc_depth=0) 
+        if self._document_title is None:
+            if len(sections) != 1 or not isinstance(sections[0], Section):
+                raise Exception("The document has no top-level section:",
+                                self._id())
+            s = sections[0]
+            self._document_title = s.title()
+            sections = s.content()
+        return SectionContainer(self, sections, toc_depth=0) 
     
     def _title(self):
         return self._document_title
