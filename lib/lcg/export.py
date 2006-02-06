@@ -43,7 +43,7 @@ class Exporter(object):
     def head(self, node):
         if self._stylesheet is not None:
             node.resource(Stylesheet, self._stylesheet)
-        tags = ['<title>%s</title>' % node.full_title()] + \
+        tags = ['<title>%s</title>' % node.title()] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', node.language()))] + \
