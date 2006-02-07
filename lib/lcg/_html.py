@@ -91,8 +91,8 @@ def form(content, name=None, action="#"):
     attr = (('name', name), ('action', action))
     return _tag('form', attr, content, concat="\n")
 
-def label(text, id, lang=None):
-    return _tag('label', (('for', id), ('lang', lang)), text)
+def label(text, id, lang=None, cls=None):
+    return _tag('label', (('for', id), ('lang', lang), ('class', cls)), text)
 
 def _input(type, name=None, value=None, title=None, id=None,
            onclick=None, onkeydown=None, onfocus=None,
