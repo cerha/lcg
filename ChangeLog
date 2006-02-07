@@ -1,4 +1,23 @@
+2006-02-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_html.py (label): New argument `cls'.w
+
+2006-02-06  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export.py (Exporter.head): Use just `title()' instead of
+	`full_title()'.
+
+	* lib/lcg/course.py (ContentNode.full_title): Method removed.
+	(_WikiNode): Docstring added.
+	(_WikiNode.__init__): New argument `title'.
+	(_WikiNode._create_content): When title was passed as constructor
+	argument, don't extract the title from the top level section.
+
+	* lib/lcg/eurochance.py (EurochanceNode.full_title): 
+
 2006-01-30  Tomas Cerha  <cerha@brailcom.org>
+
+	*  (Module): 
 
 	* lib/lcg/hhp.py: New module.
 
