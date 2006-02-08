@@ -36,7 +36,7 @@ else:
 _t.install(unicode=True)
 
 from resources import *
-from course import *
+from nodes import *
 from content import *
 from exercises import *
 from export import *
@@ -46,6 +46,6 @@ import feed
 import wiki
 
 # Øe¹ení cyklických závislostí souborù
-for file in (resources, course, content, exercises, feed, wiki):
+for file in (resources, nodes, content, exercises, feed, wiki):
     file.__dict__.update(globals())
                                                                                                                                                       
