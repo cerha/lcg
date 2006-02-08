@@ -17,10 +17,10 @@ The only requirement is that you must be able to save the output file in *UTF-8
 encoding* or convert it to this encoding afterwards.
 
 LCG also supports other data types within the content, such as sound and video
-files, images, scripts etc., but these are not considered /source files/ from
-this point of view.  They are called /resources/ in this manual.  To include
-such files, you usually refer to them from the source files, so you will also
-find the relavant information in the later sections.
+files, images, scripts, stylesheets etc., but these are not considered /source
+files/ from this point of view.  They are called /resources/ in this manual.
+To include such files, you usually refer to them from the source files, so you
+will also find the relavant information in the later sections.
 
 The basic concept is based on files arranged into directories (folders)
 according to the logical structure of the course.  A custom structure can be
@@ -29,7 +29,7 @@ defined for each course.
 
 == Data Format Categories ==
 
-The following data formats can be used:
+The following data formats are being used:
   * [#plain-text Plain Text]
   * [#structured-text Structured Text]
   * [#vocabulary Vocabulary]
@@ -210,7 +210,11 @@ Could you repeat that please? :: ¿Podría repitir, por favor?
 
 === Exercise Specification === exercises
 
-
+Exercises are designed for exercising the skills learned within the course
+material.  There is a predefined set of exercise types and new types can be
+devepoled to address new learning objectives.  Most of the exercise types are
+interactive and give the learner an immediate feedback about his answers.  Thus
+exercises should not be confused with testing.
 
 
 ==== Exercise Specification File Format ====
