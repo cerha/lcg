@@ -551,6 +551,11 @@ class DocChapter(DocNode):
                     f = self._input_file(name, ext=self._ext)
                 if os.path.isfile(f):
                     children.append(self._create_child(DocNode, '.', name))
+                elif os.path.isfile(self._input_file(name, ext='py')):
+                    import imp
+                    file, path, descr = imp.find_module(name, [self.src_dir()])
+                    m = imp.load_module(name, file, path, descr)
+                    children.append(self._create_child(m.IndexNode))
         return children
 
     
