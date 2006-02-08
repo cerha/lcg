@@ -1,5 +1,5 @@
 intro
-eurochance
 data-formats
+eurochance
 formatting
 fdl
