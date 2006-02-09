@@ -27,10 +27,6 @@ from lcg import *
 
 class EurochanceNode(ContentNode):
 
-    def __init__(self, *args, **kwargs):
-        super(EurochanceNode, self).__init__(*args, **kwargs)
-        self.resource(Stylesheet, 'default.css')
-    
     def resource(self, cls, file, *args, **kwargs):
         if cls is Media:
             basename, ext = os.path.splitext(file)
@@ -90,9 +86,6 @@ class Unit(EurochanceNode):
 class IntermediateUnit(Unit):
     """Unit is a collection of sections (Vocabulary, Grammar, Exercises...)."""
 
-    def _id(self):
-        return 'unit'
-    
     def _read_splittable_text(self, name, lang=None):
         filename = self._input_file(name, lang=lang)
         text = self._read_file(name, lang=lang)
@@ -130,7 +123,7 @@ class Instructions(EurochanceNode):
         return self._localized_wiki_content('instructions', macro=True)
     
     
-class ExerciseInstructions(EurochanceNode):
+class ExerciseHelp(EurochanceNode):
     """Exercise instructions."""
     
     def __init__(self, parent, type, template, *args, **kwargs):
@@ -138,7 +131,8 @@ class ExerciseInstructions(EurochanceNode):
         self._type = type
         self._template = template
         type.set_help_node(self)
-        super(ExerciseInstructions, self).__init__(parent, *args, **kwargs)
+        name = 'help-' + camel_case_to_lower(type.__name__)
+        super(ExerciseHelp, self).__init__(parent, name, *args, **kwargs)
         
     def _create_content(self):
         g = dict(type=self._type, **self._type.typedict())
@@ -147,9 +141,6 @@ class ExerciseInstructions(EurochanceNode):
 
     def title(self, abbrev=False):
         return _("Instructions for %s") % self._type.name()
-
-    def _id(self):
-        return camel_case_to_lower(self._type.__name__)
 
 
 class GrammarBank(EurochanceNode):
@@ -161,9 +152,9 @@ class GrammarBank(EurochanceNode):
 
 class _Index(EurochanceNode):
 
-    def __init__(self, parent, units, *args, **kwargs):
+    def __init__(self, parent, id, units, *args, **kwargs):
         self._units = units
-        super(_Index, self).__init__(parent, *args, **kwargs)
+        super(_Index, self).__init__(parent, id, *args, **kwargs)
 
         
 class CourseIndex(_Index):
@@ -195,15 +186,15 @@ class AnswerSheets(_Index):
         return TableOfContents(self, title=_("Table of Contents:"))
     
     def _create_children(self):
-        return [self._create_child(AnswerSheet, u) for u in self._units]
+        return [self._create_child(AnswerSheet, 'answers%02d' % (i+1), u)
+                for i, u in enumerate(self._units)]
 
     
 class AnswerSheet(EurochanceNode):
-    _PARENT_ID_PREFIX = False
     
-    def __init__(self, parent, unit, *args, **kwargs):
+    def __init__(self, parent, id, unit, *args, **kwargs):
         self._unit = unit
-        super(AnswerSheet, self).__init__(parent, *args, **kwargs)
+        super(AnswerSheet, self).__init__(parent, id, *args, **kwargs)
         
     def _title(self):
         return _("Answer Sheet for %s") % self._unit.title(abbrev=True)
@@ -232,13 +223,16 @@ class Help(EurochanceNode):
     def _create_children(self):
         lng = self._user_lang() or self.language()
         template = self._read_file('help', lang=lng, dir=config.translation_dir)
-        return [self._create_child(ExerciseInstructions, t, template)
+        return [self._create_child(ExerciseHelp, t, template)
                 for t in Exercise.used_types()]
 
     
 class EurochanceCourse(EurochanceNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
+    def __init__(self, *args, **kwargs):
+        super(EurochanceCourse, self).__init__(None, 'index', *args, **kwargs)
+        
     def _title(self):
         return self._read_file('title')
 
@@ -259,14 +253,12 @@ class EurochanceCourse(EurochanceNode):
     
 class AdvancedCourse(EurochanceCourse):
 
-    def __init__(self, *args, **kwargs):
-        super(EurochanceCourse, self).__init__(None, *args, **kwargs)
-        
     def _create_children(self):
-        units = [self._create_child(Unit, subdir=d) for d in self._unit_dirs()]
-        return [self._create_child(Instructions)] + units + \
-               [self._create_child(AnswerSheets, units),
-                self._create_child(Help)]
+        units = [self._create_child(Unit, 'unit%02d' % (i+1), subdir=d)
+                 for i, d in enumerate(self._unit_dirs())]
+        return [self._create_child(Instructions, 'instructions')] + units + \
+               [self._create_child(AnswerSheets, 'answers', units),
+                self._create_child(Help, 'help')]
 
     
 class IntermediateCourse(EurochanceCourse):
@@ -275,22 +267,24 @@ class IntermediateCourse(EurochanceCourse):
         assert isinstance(users_language, types.StringType) and \
                len(users_language) == 2
         self._users_language = users_language
-        super(EurochanceCourse, self).__init__(None, dir,
-                                               language=course_language,
-                                               **kwargs)
+        super(IntermediateCourse, self).__init__(subdir=dir,
+                                                 language=course_language,
+                                                 **kwargs)
 
     def users_language(self):
         return self._users_language
 
     def _create_children(self):
-        units = [self._create_child(IntermediateUnit, subdir=d)
-                 for d in self._unit_dirs()]
-        return [self._create_child(Instructions)] + units + \
-               [self._create_child(GrammarBank),
-                self._create_child(VocabIndex, units),
-                self._create_child(AnswerSheets, units),
-                self._create_child(Help)]
+        units = [self._create_child(IntermediateUnit, 'unit%02d' % (i+1),
+                                    subdir=d)
+                 for i, d in enumerate(self._unit_dirs())]
+        return [self._create_child(Instructions, 'instructions')] + units + \
+               [self._create_child(GrammarBank, 'grammar'),
+                self._create_child(VocabIndex, 'vocab', units),
+                self._create_child(AnswerSheets, 'answers', units),
+                self._create_child(Help, 'help')]
     
+
     
 class EurochanceExporter(StaticExporter):
     _INDEX_LABEL = _('Course Index')
