@@ -40,7 +40,7 @@ def main():
     os.environ['LCG_LANGUAGE'] = opt['language']
     import lcg
     
-    doc = lcg.DocRoot(source_dir, file=opt['root'], ext=opt['ext'],
+    doc = lcg.DocRoot(source_dir, id=opt['root'], ext=opt['ext'],
                       language=opt['language'], input_encoding=opt['encoding'])
     
     if opt['hhp']:
