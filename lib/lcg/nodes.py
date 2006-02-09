@@ -43,11 +43,11 @@ import unicodedata
 from lcg import *
 
 class ContentNode(object):
-    """Representation of one output document within a course material.
+    """Representation of one output document within the package.
 
-    This class represents a generic node of a course material.  Each node has
-    its 'Content', may have several children nodes and may depend on several
-    'Resource' instances.
+    This class represents a generic node of the output document structure.
+    Each node has its 'Content', may have several child nodes and manages the
+    dependencies on externam resources ('Resource' instances).
 
     By instantiating a node, all the resources are read and the content is
     built and ready for export.
@@ -62,9 +62,8 @@ class ContentNode(object):
     'Module' etc."""
 
     _ABBREV_TITLE = None
-    _PARENT_ID_PREFIX = True
     
-    def __init__(self, parent, subdir=None, language='en',
+    def __init__(self, parent, id, subdir=None, language='en',
                  input_encoding='ascii'):
         """Initialize the instance.
 
@@ -72,6 +71,7 @@ class ContentNode(object):
 
           parent -- parent node; the 'ContentNode' instance directly preceding
             this node in the content hierarchy.  Can be None for the top node.
+          id -- a textual identifier of this node.
           subdir -- a directory name relative to parent's source directory.  All
             input files are expected in this directory.
           language -- content language as a lowercase ISO 639-1 Alpha-2
@@ -82,12 +82,14 @@ class ContentNode(object):
 
         """
         assert parent is None or isinstance(parent, ContentNode)
+        assert isinstance(id, types.StringType)
         assert subdir is None or isinstance(subdir, types.StringType)
         assert isinstance(language, types.StringType) and \
                len(language) == 2
         assert isinstance(input_encoding, types.StringType)
         codecs.lookup(input_encoding)
         self._parent = parent
+        self._id = id
         self._subdir = subdir
         self._language = language
         self._input_encoding = input_encoding
@@ -96,6 +98,7 @@ class ContentNode(object):
         self._registered_children = []
         self._wiki_parser = wiki.Parser(self)
         self._wiki_formatter = wiki.Formatter(self)
+        
         content = self._create_content()
         if isinstance(content, Content):
             self._content = content
@@ -103,11 +106,20 @@ class ContentNode(object):
             assert isinstance(content, (types.TupleType, types.ListType))
             self._content = SectionContainer(self, content)
         self._children = self._create_children()
-        for child in self._children:
-            assert child._parent == self
-            assert child in self._registered_children
+        if __debug__:
+            for child in self._children:
+                assert child._parent == self
+                assert child in self._registered_children
         if parent is not None:
             parent._register_child(self)
+        else:
+            if __debug__:
+                seen = {}
+                for n in self.linear():
+                    nid = n.id()
+                    assert not seen.has_key(nid), \
+                           "Duplicate node id: %s, %s" % (n, seen[nid])
+                    seen[nid] = n
         
     def _register_child(self, child):
         assert isinstance(child, ContentNode)
@@ -115,8 +127,9 @@ class ContentNode(object):
         self._registered_children.append(child)
         
     def __str__(self):
-        return "<%s  id='%s' title='%s' subdir='%s'>" % \
-               (self.__class__.__name__, self.id(), self.title(), self.subdir())
+        return "<%s id='%s' title='%s' subdir='%s'>" % \
+               (self.__class__.__name__, self.id(),
+                self.title().encode('ascii', 'replace'), self.subdir())
 
     def _create_content(self):
         """Create the content for this node.
@@ -145,6 +158,23 @@ class ContentNode(object):
                        'input_encoding': self._input_encoding})
         return cls(self, *args, **kwargs)
     
+    def _title(self):
+        """Return the title of this node as a string."""
+        return self._TITLE
+
+    def _abbrev_title(self):
+        """Return the abbreviated title of this node as a string."""
+        return self._ABBREV_TITLE
+    
+    def _node_path(self):
+        """Return the path from root to this node as a sequence of nodes."""
+        if self._parent is not None:
+            return self._parent._node_path() + (self,)
+        else:
+            return (self,)
+
+    # File-related private methods
+        
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""
         if lang:
@@ -176,61 +206,23 @@ class ContentNode(object):
         fh.close()
         return content
 
-    def format_wiki_text(self, text):
-        """Format text with wiki markup and return HTML."""
-        if text:
-            return self._wiki_formatter.format(text)
-        else:
-            return ''
-    
-    def parse_wiki_text(self, text, macro=False, globals=None):
-        """Parse the text and return a sequence of content elements."""
-        if macro:
-            def mygettext(x):
-                return _(re.sub('\s*\n', ' ', x))
-            mp = wiki.MacroParser(substitution_provider=mygettext)
-            if globals:
-                mp.add_globals(**globals)
-            text = mp.parse(text)
-        return self._wiki_parser.parse(text)
-    
-    def parse_wiki_file(self, name, ext='txt', lang=None,
-                        macro=False, globals=None):
-        """Parse the file and return a sequence of content elements."""
-        return self.parse_wiki_text(self._read_file(name, ext=ext, lang=lang),
-                                    macro=macro, globals=globals)
-    
-    def _node_path(self):
-        """Return the path from root to this node as a sequence of nodes."""
-        if self._parent is not None:
-            return self._parent._node_path() + (self,)
-        else:
-            return (self,)
-        
-    def _id(self):
-        """Return the textual identifier of this node as a string.
-        
-        The identifier is not necesarrily unique within all nodes, but is
-        unique within its parent's children.  Thus it can be used
-        as unique in combination with parent's unique id.  See the public
-        method 'id()' for that.
-        
-        """
-        if self._parent is not None:
-            return camel_case_to_lower(self.__class__.__name__)
-        else:
-            return 'index'
-
-    def _title(self):
-        """Return the title of this node as a string."""
-        return self._TITLE
-
-    def _abbrev_title(self):
-        """Return the abbreviated title of this node as a string."""
-        return self._ABBREV_TITLE
-    
     # Public methods
 
+    def id(self):
+        """Return a unique id of this node as a string."""
+        return self._id
+        
+    def title(self, abbrev=False):
+        """Return the title of this node as a string."""
+        abbrev_title = self._abbrev_title()
+        if abbrev_title is not None:
+            if abbrev:
+                return abbrev_title
+            else:
+                return "%s: %s" % (abbrev_title, self._title())
+        else:
+            return self._title()
+    
     def parent(self):
         """Return the parent node of this node."""
         return self._parent
@@ -246,6 +238,9 @@ class ContentNode(object):
         """Return the list of all subordinate nodes as a tuple."""
         return tuple(self._children)
 
+    def content(self):
+        return self._content
+    
     def sections(self):
         """Return all the top-level sections within this node's content."""
         return self._content.sections()
@@ -272,9 +267,6 @@ class ContentNode(object):
             return None
         return find(id, self)
     
-    def url(self):
-        return self.output_file()
-    
     def linear(self):
         """Return the linearized subtree of this node as a list."""
         return [self] + reduce(lambda l, n: l + n.linear(), self.children(), [])
@@ -297,54 +289,18 @@ class ContentNode(object):
         else:
             return None
 
-    def subdir(self):
-        """Return this node's subdirectory name relative to the root node."""
-        if self._parent is None:
-            return ''
-        elif self._subdir is None:
-            return self._parent.subdir()
-        else:
-            return os.path.join(self._parent.subdir(), self._subdir)
-
-    def src_dir(self):
-        if self._parent is None:
-            return self._subdir
-        else:
-            return os.path.normpath(os.path.join(self.root().src_dir(),
-                                                 self.subdir()))
-        
-    def output_file(self):
-        """Return full pathname of the output file relative to export dir."""
-        return self.id() + '.html'
-
-    def id(self):
-        """Return a unique id of this node as a string."""
-        id = self._id()
-        if self._parent is None:
-            return id
-        same = [n for n in self._parent.children() if n._id() == id]
-        if len(same) > 1:
-            id += '-%02d' % (same.index(self) + 1)
-        if self._parent is self.root() or not self._PARENT_ID_PREFIX:
-            return id
-        else:
-            return '-'.join((self._parent.id(), id))
-        
-    def title(self, abbrev=False):
-        """Return the title of this node as a string."""
-        abbrev_title = self._abbrev_title()
-        if abbrev_title is not None:
-            if abbrev:
-                return abbrev_title
-            else:
-                return "%s: %s" % (abbrev_title, self._title())
-        else:
-            return self._title()
-    
     def language(self):
         """Return the content language as an ISO 639-1 Alpha-2 code."""
         return self._language
 
+    def input_encoding(self):
+        """Return the name of encoding expected in source files.
+
+        The name is a string accepted by 'UnicodeType.encode()'.
+
+        """
+        return self._input_encoding
+    
     def meta(self):
         """Return the meta data as a dictionary.
 
@@ -354,9 +310,6 @@ class ContentNode(object):
 
         """
         return {}
-    
-    def content(self):
-        return self._content
     
     def resources(self, cls=None):
         """Return the list of all resources this node depends on.
@@ -402,8 +355,7 @@ class ContentNode(object):
         except KeyError:
             self._counters[key] = c =Counter(1)
             return c
-            
-
+        
     def index(self, node):
         """Return the child node's index number within this node's children.
 
@@ -413,14 +365,58 @@ class ContentNode(object):
         """
         return self._children.index(node)
 
-    def input_encoding(self):
-        """Return the name of encoding expected in source files.
-
-        The name is a string accepted by 'UnicodeType.encode()'.
-
-        """
-        return self._input_encoding
+    # File-related methods
     
+    def output_file(self):
+        """Return full pathname of the output file relative to export dir."""
+        return self.id() + '.html'
+
+    def url(self):
+        return self.output_file()
+    
+    def subdir(self):
+        """Return this node's subdirectory name relative to the root node."""
+        if self._parent is None:
+            return ''
+        elif self._subdir is None:
+            return self._parent.subdir()
+        else:
+            return os.path.join(self._parent.subdir(), self._subdir)
+
+    def src_dir(self):
+        if self._parent is None:
+            return self._subdir
+        else:
+            return os.path.normpath(os.path.join(self.root().src_dir(),
+                                                 self.subdir()))
+    # Wiki-related methods
+
+    def format_wiki_text(self, text):
+        """Format text with wiki markup and return HTML."""
+        if text:
+            return self._wiki_formatter.format(text)
+        else:
+            return ''
+    
+    def parse_wiki_text(self, text, macro=False, globals=None):
+        """Parse the text and return a sequence of content elements."""
+        if macro:
+            def mygettext(x):
+                return _(re.sub('\s*\n', ' ', x))
+            mp = wiki.MacroParser(substitution_provider=mygettext)
+            if globals:
+                mp.add_globals(**globals)
+            text = mp.parse(text)
+        return self._wiki_parser.parse(text)
+    
+    def parse_wiki_file(self, name, ext='txt', lang=None,
+                        macro=False, globals=None):
+        """Parse the file and return a sequence of content elements."""
+        return self.parse_wiki_text(self._read_file(name, ext=ext, lang=lang),
+                                    macro=macro, globals=globals)
+    
+        
+
     
 class RootNode(ContentNode):
     """Root node of the hierarchy.
@@ -430,14 +426,14 @@ class RootNode(ContentNode):
 
     """
     
-    def __init__(self, dir, **kwargs):
+    def __init__(self, dir, id='index', **kwargs):
         """Initialize the instance.
 
         The arguments are inherited from the parent class, except for 'parent'
         which is not needed for the root node.
           
         """
-        super(RootNode, self).__init__(None, dir, **kwargs)
+        super(RootNode, self).__init__(None, id, dir, **kwargs)
 
     
 class _WikiNode(ContentNode):
@@ -450,7 +446,7 @@ class _WikiNode(ContentNode):
     If not, an exception will be raised.
     
     """
-    def __init__(self, parent, subdir=None, title=None, **kwargs):
+    def __init__(self, parent, id, title=None, **kwargs):
         """Initialize the instance.
 
 
@@ -458,7 +454,7 @@ class _WikiNode(ContentNode):
           
         """
         self._document_title = title
-        super(_WikiNode, self).__init__(parent, subdir=subdir, **kwargs)
+        super(_WikiNode, self).__init__(parent, id, **kwargs)
 
     def _source_text(self):
         return ""
@@ -468,7 +464,7 @@ class _WikiNode(ContentNode):
         if self._document_title is None:
             if len(sections) != 1 or not isinstance(sections[0], Section):
                 raise Exception("The document has no top-level section:",
-                                self._id())
+                                self._id)
             s = sections[0]
             self._document_title = s.title()
             sections = s.content()
@@ -489,7 +485,7 @@ class WikiNode(_WikiNode):
 
     """
 
-    def __init__(self, text, **kwargs):
+    def __init__(self, id, text, **kwargs):
         """Initialize the instance.
         
         Arguments:
@@ -500,7 +496,7 @@ class WikiNode(_WikiNode):
           
         """
         self._text = text
-        super(WikiNode, self).__init__(None, '.', **kwargs)
+        super(WikiNode, self).__init__(None, id, **kwargs)
     
     def _source_text(self):
         return self._text
@@ -509,26 +505,23 @@ class WikiNode(_WikiNode):
 class DocNode(_WikiNode):
     """Node of a Structured Text read from a source file."""
     
-    def __init__(self, parent, dir, file, ext='txt', **kwargs):
+    def __init__(self, parent, id, ext='txt', **kwargs):
         """Initialize the instance.
 
         Arguments:
         
-          file -- the name of the input file (without extension).
-          ext -- the extension of the input file ('txt' by default)
+          ext -- the extension of the input file ('txt' by default).  The
+            complete filename is the node's id, an optional language extension
+            and this extension.
 
           The other arguments are inherited from the parent class.
           
         """
-        self._file = file
         self._ext = ext
-        super(DocNode, self).__init__(parent, dir, **kwargs)
-        
-    def id(self):
-        return self._file
+        super(DocNode, self).__init__(parent, id, **kwargs)
         
     def _source_text(self):
-        return self._read_file(self._file, lang=self._language, ext=self._ext)
+        return self._read_file(self._id, lang=self._language, ext=self._ext)
 
     
 class DocChapter(DocNode):
@@ -544,18 +537,18 @@ class DocChapter(DocNode):
         children = []
         for name in list_dir(self.src_dir()):
             if os.path.isdir(os.path.join(self.src_dir(), name)):
-                children.append(self._create_child(DocChapter, name, name))
+                children.append(self._create_child(DocChapter, name, subdir=name))
             elif name != self.id():
                 f = self._input_file(name, lang=self._language, ext=self._ext)
                 if not os.path.isfile(f):
                     f = self._input_file(name, ext=self._ext)
                 if os.path.isfile(f):
-                    children.append(self._create_child(DocNode, '.', name))
+                    children.append(self._create_child(DocNode, name))
                 elif os.path.isfile(self._input_file(name, ext='py')):
                     import imp
                     file, path, descr = imp.find_module(name, [self.src_dir()])
                     m = imp.load_module(name, file, path, descr)
-                    children.append(self._create_child(m.IndexNode))
+                    children.append(self._create_child(m.IndexNode, name))
         return children
 
     
@@ -583,5 +576,5 @@ class DocRoot(DocChapter):
 
     """
     
-    def __init__(self, dir, file='index', **kwargs):
-        super(DocRoot, self).__init__(None, dir, file, **kwargs)
+    def __init__(self, dir, id='index', **kwargs):
+        super(DocRoot, self).__init__(None, id, subdir=dir, **kwargs)
