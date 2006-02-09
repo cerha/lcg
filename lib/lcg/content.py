@@ -224,10 +224,11 @@ class Container(Content):
         super(Container, self).__init__(parent, **kwargs)
         if operator.isSequenceType(content):
             assert is_sequence_of(content, Content), \
-                   "Not a 'Content' instances sequence: %s" % (content,)
+                   "Not a 'Content' instances sequence: %s" % content
             self._content = tuple(content)
         else:
-            assert isinstance(content, Content)
+            assert isinstance(content, Content), \
+                   "Not Content instance: %s" % content
             self._content = (content,)
         for c in self._content:
             c.set_container(self)
@@ -450,7 +451,7 @@ class Section(SectionContainer):
 
     def _section_path(self):
         return [c for c in self._container_path() if isinstance(c, Section)]
-        
+    
     def section_number(self):
         """Return the number of this section within it's container as int."""
         return self._container.sections().index(self) + 1
@@ -672,7 +673,7 @@ class VocabList(Content):
                   _html.span(i.translation() or "???",
                              lang=i.translation_language()))
                  for i in self._items]
-        rows = ['<tr><td>%s</td><td>%s</td></tr>' %
+        rows = ['<tr><td scope="row">%s</td><td>%s</td></tr>' %
                 (self._reverse and (b,a) or (a,b)) for a,b in pairs]
         return '<table class="vocab-list">\n' + '\n'.join(rows) + "\n</table>\n"
 
