@@ -25,7 +25,7 @@ from lcgmake import getoptions, usage
 OPTIONS = (
     ('lang=', 'en', "The language of the course  (the taught language)."),
     ('user-lang=', 'cs', "The user's (learner's) language"),
-    ('stylesheet=', None, "Filename of the stylesheet to use."),
+    ('stylesheet=', 'default.css', "Filename of the stylesheet to use."),
     ('ims', False, "Generate an IMS package instead of a standalone HTML."),
     ('advanced', False, "This is the advanced version of the course.")
     )
