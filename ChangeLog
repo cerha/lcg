@@ -1,3 +1,59 @@
+2006-02-09  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py (OPTIONS): Set the default stylesheet to
+	`default'css'.
+
+	* bin/lcgmake.py (main): Pass the filename as `id', not `file'.
+
+	* lib/lcg/content.py (Container.__init__): Added assertion messages.
+	(VocabList.export): Use the `scope' attribure in the html output.
+
+	* lib/lcg/eurochance.py (Module): In all `ConetentNode'
+	constructor calls, pass the node id as an argument.
+
+	* lib/lcg/nodes.py (ContentNode): Docstring updated.  Order of
+	methods in the source file changed.
+	(ContentNode._PARENT_ID_PREFIX): Constant removed.
+	(ContentNode.__init__): New argument `id'.  Store it in the
+	attribute `_id'.  After creating the whole structure, check for
+	duplicate identifiers, when this is a root node.
+	(ContentNode._id): Method removed.
+	(ContentNode.id): Just return `self._id'.
+	(ContentNode.__str__): Encode the title into acsii with `replace'
+	on errors.
+	(RootNode.__init__): New keyword artument `id'.
+	(_WikiNode.__init__): New keyword artument `id'.  Don't care about
+	the `subdir' argument.
+	(_WikiNode._create_content): Use `self._id' instead of
+	`self._id()'.
+	(WikiNode.__init__): Pass the `id' and not the `subdir' to parent
+	class constructor.
+	(DocNode.__init__): New keyword artument `id'.  The `dir' argument
+	removed.
+	(DocNode.id): Method removed.
+	(DocNode._source_text): Use
+	`self._id' instead od `self._file'.
+	(DocChapter._create_children): Pass `subdir' to child constructors
+	as a keyword argument, or not at all.  Always pass `id'.
+	(DocRoot.__init__): Keyword argument `file' renamed to `id'.  Pass
+	`id' to parent's constructor and `subdir' as a keyword argument.
+
+2006-02-08  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/data-formats.en.txt: A few updates and additions.
+
+	* lib/lcg/__init__.py: `course' -> `nodes'.
+
+	* doc/_index.txt: Order changed.
+
+	* doc/intro.en.txt: Updated.
+
+	* lib/lcg/nodes.py: Renamed file `course.py'.
+
+	* lib/lcg/course.py (DocChapter._create_children): Added support
+	for Python files which can generate subcontent programatically.
+	(Module): File renamed to `nodes.py'.
+
 2006-02-07  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/_html.py (label): New argument `cls'.w
