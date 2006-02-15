@@ -536,19 +536,17 @@ class DocChapter(DocNode):
     def _create_children(self):
         children = []
         for name in list_dir(self.src_dir()):
-            if os.path.isdir(os.path.join(self.src_dir(), name)):
-                children.append(self._create_child(DocChapter, name, subdir=name))
-            elif name != self.id():
-                f = self._input_file(name, lang=self._language, ext=self._ext)
-                if not os.path.isfile(f):
-                    f = self._input_file(name, ext=self._ext)
-                if os.path.isfile(f):
-                    children.append(self._create_child(DocNode, name))
-                elif os.path.isfile(self._input_file(name, ext='py')):
+            if name != self.id():
+                if os.path.isfile(self._input_file(name, ext='py')):
                     import imp
                     file, path, descr = imp.find_module(name, [self.src_dir()])
                     m = imp.load_module(name, file, path, descr)
                     children.append(self._create_child(m.IndexNode, name))
+                elif os.path.isdir(os.path.join(self.src_dir(), name)):
+                    children.append(self._create_child(DocChapter, name,
+                                                       subdir=name))
+                else:
+                    children.append(self._create_child(DocNode, name))
         return children
 
     
