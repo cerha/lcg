@@ -1,3 +1,31 @@
+2006-02-15  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/nodes.py (DocChapter._create_children): Whenever a
+	python file exists, use it with preference to a plain text file.
+	(DocChapter._create_children): Don't test the existence of the
+	input file.  Just create a node and rely on it's constructor to
+	complain.
+
+	* lib/lcg/hhp.py (HhpExporter.__init__): Added a two more simple
+	hacks.
+
+	* lib/lcg/content.py (Content_ALLOWED_CONTAINER)
+	(Container._ALLOWED_CONTENT, Container._ATTR): New constants.
+	(Content.set_container): Make assertions using
+	`_ALLOWED_CONTAINER'.
+	(Container.__init__): Make assertions using `_ALLOWED_CONTENT'.
+	(Container.export): Add also attributes from `self._ATTR'.
+	(DefinitionList._ALLOWED_CONTENT, TableRow._ALLOWED_CONTENT)
+	(Table._ALLOWED_CONTENT, FieldSet._ALLOWED_CONTENT)
+	(Definition._ALLOWED_CONTAINER, TableCell._ALLOWED_CONTAINER)
+	(TableRow._ALLOWED_CONTAINER, Field._ALLOWED_CONTAINER): New constants.
+	(TableRow.__init__, FieldSet.__init__, DefinitionList.__init__):
+	Methods removed.
+	(Table.__init__): New keyword argument `title'.
+	(FieldSet): Inherit from `Table'.
+	(FieldSet._TAG): Constant removed.
+	(Section.section_number): Convert the sections to a list..
+
 2006-02-09  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/generate.py (OPTIONS): Set the default stylesheet to
