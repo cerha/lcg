@@ -104,10 +104,14 @@ class HhpExporter(lcg.Exporter):
         # export of some Conent elements.
         # We want to make a linebreak before any Table of Contents.
         x = lcg.TableOfContents._export_title
-        lcg.TableOfContents._export_title = lambda toc: '<br>' + x(toc)
+        lcg.TableOfContents._export_title = lambda self_: '<br>' + x(self_)
         # We want to prevent beckreferencing in section titles. 
         lcg.Section.backref = lambda s, n: None
-    
+        # We also want Tables with old HTML attributes.
+        lcg.Table._ATTR = 'cellspacing="3" cellpadding="0"'
+        # We don't want
+        HorizontalSeparator.export = lambda self_: '<hr>'
+
     def export(self, node, directory):
         super(HhpExporter, self).export(node, directory)
         if node == node.root():
