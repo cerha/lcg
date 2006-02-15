@@ -60,6 +60,8 @@ class Content(object):
     objects (i.e. the resources).
 
     """
+    _ALLOWED_CONTAINER = None
+    
     def __init__(self, parent, lang=None):
         """Initialize the instance.
 
@@ -93,8 +95,10 @@ class Content(object):
         return self._parent
 
     def set_container(self, container):
-        assert isinstance(container, Container), \
-               "Not a 'Container' instance: %s" % container
+        if __debug__:
+            cls = self._ALLOWED_CONTAINER or Container
+            assert isinstance(container, cls), \
+                   "Not a '%s' instance: %s" % (cls.__name__, container)
         self._container = container
 
     def _container_path(self):
@@ -205,9 +209,11 @@ class Container(Content):
 
     """
     _TAG = None
+    _ATTR = None
     _CLASS = None
     _EXPORT_INLINE = False
-    
+    _ALLOWED_CONTENT = Content
+
     def __init__(self, parent, content, **kwargs):
         """Initialize the instance.
 
@@ -222,13 +228,14 @@ class Container(Content):
 
         """
         super(Container, self).__init__(parent, **kwargs)
+        cls = self._ALLOWED_CONTENT
         if operator.isSequenceType(content):
-            assert is_sequence_of(content, Content), \
-                   "Not a 'Content' instances sequence: %s" % content
+            assert is_sequence_of(content, cls), \
+                   "Not a '%s' instances sequence: %s" % (cls.__name__, content)
             self._content = tuple(content)
         else:
-            assert isinstance(content, Content), \
-                   "Not Content instance: %s" % content
+            assert isinstance(content, cls), \
+                   "Not a '%s' instance: %s" % (cls.__name__, content)
             self._content = (content,)
         for c in self._content:
             c.set_container(self)
@@ -247,6 +254,7 @@ class Container(Content):
         content = self._export_content()
         attr = self._lang   and ' lang="%s"'  % self._lang  or ''
         attr += self._CLASS and ' class="%s"' % self._CLASS or ''
+        attr += self._ATTR  and (' '+self._ATTR) or ''
         if attr and not tag:
             tag = 'div'
         if tag:
@@ -297,31 +305,8 @@ class Definition(Container):
 class DefinitionList(Container):
     """A list of definitions."""
     _TAG = 'dl'
-    
-    def __init__(self, parent, content):
-        assert is_sequence_of(content, Definition)
-        super(DefinitionList, self).__init__(parent, content)
-
-
-class Field(Container):
-    """A pair of label and a value for a FieldSet."""
-    
-    def __init__(self, parent, label, value):
-        super(Field, self).__init__(parent, (label, value))
-
-    def export(self):
-        f = '<tr><th align="left" valign="top">%s:</th><td>%s</td></tr>\n'
-        return f % tuple([c.export() for c in self._content])
-
-    
-class FieldSet(Container):
-    """A list of label, value pairs (fields)."""
-    _TAG = 'table'
-    _CLASS = 'lcg-fieldset'
-    
-    def __init__(self, parent, content):
-        assert is_sequence_of(content, Field)
-        super(FieldSet, self).__init__(parent, content)
+    _ALLOWED_CONTENT = Definition
+Definition._ALLOWED_CONTAINER = DefinitionList
 
     
 class TableCell(Container):
@@ -333,21 +318,44 @@ class TableCell(Container):
 class TableRow(Container):
     """One row in a table."""
     _TAG = 'tr'
-
-    def __init__(self, parent, content, **kwargs):
-        assert is_sequence_of(content, TableCell)
-        super(TableRow, self).__init__(parent, content, **kwargs)
-        
+    _ALLOWED_CONTENT = TableCell
+TableCell._ALLOWED_CONTAINER = TableRow
+    
         
 class Table(Container):
     """One row in a table."""
     _TAG = 'table'
     _CLASS = 'lcg-table'
+    _ALLOWED_CONTENT = TableRow
 
-    def __init__(self, parent, content):
-        assert is_sequence_of(content, TableRow)
-        super(Table, self).__init__(parent, content)
+    def __init__(self, parent, content, title=None, **kwargs):
+        assert title is None or isinstance(title, types.StringTypes)
+        self._title = title
+        super(Table, self).__init__(parent, content, **kwargs)
+        
+    def _export_content(self, concat=''):
+        caption = self._title and "<caption>%s</caption>" % self._title or ''
+        return caption + super(Table, self)._export_content(concat=concat)
+TableRow._ALLOWED_CONTAINER = Table
+
     
+class Field(Container):
+    """A pair of label and a value for a FieldSet."""
+    
+    def __init__(self, parent, label, value):
+        super(Field, self).__init__(parent, (label, value))
+
+    def export(self):
+        f = '<tr><th align="left" valign="top">%s:</th><td>%s</td></tr>\n'
+        return f % tuple([c.export() for c in self._content])
+
+    
+class FieldSet(Table):
+    """A list of label, value pairs (fields)."""
+    _CLASS = 'lcg-fieldset'
+    _ALLOWED_CONTENT = Field
+Field._ALLOWED_CONTAINER = FieldSet
+
     
 class SectionContainer(Container):
     """A 'Container' which recognizes contained sections.
@@ -454,7 +462,7 @@ class Section(SectionContainer):
     
     def section_number(self):
         """Return the number of this section within it's container as int."""
-        return self._container.sections().index(self) + 1
+        return list(self._container.sections()).index(self) + 1
     
     def title(self):
         """Return the section title as a string."""
