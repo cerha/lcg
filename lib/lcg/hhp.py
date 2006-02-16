@@ -110,7 +110,7 @@ class HhpExporter(lcg.Exporter):
         # We also want Tables with old HTML attributes.
         lcg.Table._ATTR = 'cellspacing="3" cellpadding="0"'
         # We don't want
-        HorizontalSeparator.export = lambda self_: '<hr>'
+        lcg.HorizontalSeparator.export = lambda self_: '<hr>'
 
     def export(self, node, directory):
         super(HhpExporter, self).export(node, directory)
