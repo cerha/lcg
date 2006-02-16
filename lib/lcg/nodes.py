@@ -228,10 +228,6 @@ class ContentNode(object):
         else:
             return self._title()
 
-    def full_title(self, separator=' - ', relative_to=None, abbrev=False):
-        path = self._node_path(relative_to=relative_to)
-        return separator.join([n.title(abbrev=abbrev) for n in path])
-    
     def parent(self):
         """Return the parent node of this node."""
         return self._parent
