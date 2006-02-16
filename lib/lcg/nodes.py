@@ -166,12 +166,17 @@ class ContentNode(object):
         """Return the abbreviated title of this node as a string."""
         return self._ABBREV_TITLE
     
-    def _node_path(self):
-        """Return the path from root to this node as a sequence of nodes."""
-        if self._parent is not None:
-            return self._parent._node_path() + (self,)
-        else:
+    def _node_path(self, relative_to=None):
+        """Return the path from root to this node as a sequence of nodes.
+
+        When the optional argument `relative_to' is specified, the returned
+        path is relative to this node, when it exists in the path.
+        
+        """
+        if self._parent is None or self._parent is relative_to:
             return (self,)
+        else:
+            return self._parent._node_path(relative_to=relative_to) + (self,)
 
     # File-related private methods
         
@@ -222,6 +227,10 @@ class ContentNode(object):
                 return "%s: %s" % (abbrev_title, self._title())
         else:
             return self._title()
+
+    def full_title(self, separator=' - ', relative_to=None, abbrev=False):
+        path = self._node_path(relative_to=relative_to)
+        return separator.join([n.title(abbrev=abbrev) for n in path])
     
     def parent(self):
         """Return the parent node of this node."""
