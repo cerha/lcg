@@ -187,7 +187,7 @@ class Anchor(TextContent):
 class Link(TextContent):
     """An anchor (target of a link)."""
     def __init__(self, parent, target, text=''):
-        assert isinstance(target, Section)
+        assert isinstance(target, (Section, ContentNode))
         self._target = target
         super(Link, self).__init__(parent, text)
         
