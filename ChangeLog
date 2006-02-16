@@ -1,3 +1,15 @@
+2006-02-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (Link.__init__): Allow also `ContentNode' as
+	the link target.
+
+	* lib/lcg/nodes.py (ContentNode._node_path): New optional argument
+	`relative_to'.
+	(ContentNode.full_title): Method removed again...
+
+	* lib/lcg/hhp.py (HhpExporter.__init__): Refer to
+	`HorizontalSeparator' by its full name.
+
 2006-02-15  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/nodes.py (DocChapter._create_children): Whenever a
