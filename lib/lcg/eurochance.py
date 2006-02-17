@@ -33,14 +33,8 @@ class EurochanceNode(ContentNode):
             file = basename + '.mp3'
         return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)
 
-    def _user_lang(self):
-        if isinstance(self.root(), IntermediateCourse):
-            return self.root().users_language()
-        else:
-            return None
-
     def _localized_wiki_content(self, filename, macro=False):
-        ulang = self._user_lang()
+        ulang = self.root().users_language()
         content = self.parse_wiki_file(filename, lang=ulang, macro=macro)
         return SectionContainer(self, content, lang=ulang)
         
@@ -92,7 +86,7 @@ class IntermediateUnit(Unit):
         return SplittableText(text, input_file=filename)
 
     def _create_vocab(self):
-        ulang = self._user_lang()
+        ulang = self.root().users_language()
         text = self._read_splittable_text('vocabulary', lang=ulang)
         return feed.VocabFeeder(text, ulang).feed(self)
 
@@ -126,18 +120,18 @@ class Instructions(EurochanceNode):
 class ExerciseHelp(EurochanceNode):
     """Exercise instructions."""
     
-    def __init__(self, parent, type, template, *args, **kwargs):
+    def __init__(self, parent, id, type, template, *args, **kwargs):
         assert issubclass(type, Exercise)
         self._type = type
         self._template = template
         type.set_help_node(self)
-        name = 'help-' + camel_case_to_lower(type.__name__)
-        super(ExerciseHelp, self).__init__(parent, name, *args, **kwargs)
+        super(ExerciseHelp, self).__init__(parent, id, *args, **kwargs)
         
     def _create_content(self):
         g = dict(type=self._type, **self._type.typedict())
         content = self.parse_wiki_text(self._template, macro=True, globals=g)
-        return SectionContainer(self, content, lang=self._user_lang())
+        return SectionContainer(self, content,
+                                lang=self.root().users_language())
 
     def title(self, abbrev=False):
         return _("Instructions for %s") % self._type.name()
@@ -221,17 +215,28 @@ class Help(EurochanceNode):
         return TableOfContents(self, title=_("Table of Contents:"))
 
     def _create_children(self):
-        lng = self._user_lang() or self.language()
+        lng = self.root().users_language() or self.language()
         template = self._read_file('help', lang=lng, dir=config.translation_dir)
-        return [self._create_child(ExerciseHelp, t, template)
-                for t in Exercise.used_types()]
+        return [self._create_child(ExerciseHelp, 'help%02d'%(i+1), t, template)
+                for i, t in enumerate(Exercise.used_types())]
 
     
 class EurochanceCourse(EurochanceNode):
     """The course is a root node which comprises a set of 'Unit' instances."""
 
-    def __init__(self, *args, **kwargs):
-        super(EurochanceCourse, self).__init__(None, 'index', *args, **kwargs)
+    def __init__(self, dir, language, **kwargs):
+        if '-' in language:
+            language, users_language = language.split('-')
+            assert len(language) == len(users_language) == 2
+            self._users_language = users_language
+            self._unit_cls = IntermediateUnit
+        else:
+            self._users_language = None
+            self._unit_cls = Unit
+        super(EurochanceCourse, self).__init__(None, 'index', dir, language, **kwargs)
+
+    def users_language(self):
+        return self._users_language
         
     def _title(self):
         return self._read_file('title')
@@ -241,48 +246,24 @@ class EurochanceCourse(EurochanceNode):
                 if os.path.isdir(os.path.join(self.src_dir(), d)) \
                 and d[0].isdigit()]
 
+    def meta(self):
+        return {'author': 'Eurochance Team',
+                'copyright': "Copyright (c) 2004-2005 Eurochance Team"}
     
     def _create_content(self):
         return (self._localized_wiki_content('intro'),
                 TableOfContents(self, item=self, title=_("Table of Contents:")))
     
-    def meta(self):
-        return {'author': 'Eurochance Team',
-                'copyright': "Copyright (c) 2004-2005 Eurochance Team"}
-
-    
-class AdvancedCourse(EurochanceCourse):
-
     def _create_children(self):
-        units = [self._create_child(Unit, 'unit%02d' % (i+1), subdir=d)
+        units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d)
                  for i, d in enumerate(self._unit_dirs())]
-        return [self._create_child(Instructions, 'instructions')] + units + \
-               [self._create_child(AnswerSheets, 'answers', units),
-                self._create_child(Help, 'help')]
-
-    
-class IntermediateCourse(EurochanceCourse):
-    
-    def __init__(self, dir, course_language, users_language, **kwargs):
-        assert isinstance(users_language, types.StringType) and \
-               len(users_language) == 2
-        self._users_language = users_language
-        super(IntermediateCourse, self).__init__(subdir=dir,
-                                                 language=course_language,
-                                                 **kwargs)
-
-    def users_language(self):
-        return self._users_language
-
-    def _create_children(self):
-        units = [self._create_child(IntermediateUnit, 'unit%02d' % (i+1),
-                                    subdir=d)
-                 for i, d in enumerate(self._unit_dirs())]
-        return [self._create_child(Instructions, 'instructions')] + units + \
-               [self._create_child(GrammarBank, 'grammar'),
-                self._create_child(VocabIndex, 'vocab', units),
-                self._create_child(AnswerSheets, 'answers', units),
-                self._create_child(Help, 'help')]
+        children = [self._create_child(Instructions, 'instructions')] + units
+        if issubclass(self._unit_cls, IntermediateUnit):
+            children.extend((self._create_child(GrammarBank, 'grammar'),
+                             self._create_child(VocabIndex, 'vocab', units)))
+        children.extend((self._create_child(AnswerSheets, 'answers', units),
+                         self._create_child(Help, 'help')))
+        return children
     
 
     
