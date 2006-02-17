@@ -18,7 +18,7 @@
 
 """Exporter class which generates an IMS compliant package."""
 
-import os
+import os, codecs
 
 from xml.dom import minidom
 from xml.dom.domreg import getDOMImplementation
@@ -51,7 +51,7 @@ class _Manifest:
 
         # Organisations
         organisations = self._append_xml_element(manifest, 'organizations')
-        self._set_xml_attr(organizations, 'default', 'TOC1')
+        self._set_xml_attr(organisations, 'default', 'TOC1')
 
         o = self._append_xml_element(organisations, 'organization')
         self._set_xml_attr(o, 'identifier', 'TOC1')
@@ -107,9 +107,11 @@ class _Manifest:
     
     def write(self, directory):
         """Write the IMS Manifest into a file."""
-        file = open(os.path.join(directory, 'imsmanifest.xml'), 'w')
-        file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        self._manifest.writexml(file, newl = '\n', addindent='  ')
+        filename = os.path.join(directory, 'imsmanifest.xml')
+        fh = codecs.open(filename, 'w', encoding="utf-8")
+        fh.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        self._manifest.writexml(fh, newl = '\n', addindent='  ')
+        fh.close()
 
         
 class IMSExporter(lcg.Exporter):
