@@ -207,9 +207,12 @@ class MixedTextFillInTask(FillInTask):
             return answers[0]
         else:
             return None
-    
+
+    def _field_formatter(self, field_formatter):
+        return lambda match: field_formatter(match.group(1))
+        
     def text(self, field_formatter, text_transform=None):
-        formatter = lambda match: field_formatter(match.group(1))
+        formatter = self._field_formatter(field_formatter)
         text = self._text
         if text_transform:
             text = text_transform(text)
@@ -229,7 +232,10 @@ class TransformationTask(MixedTextFillInTask):
         answer = self.answers()[0]
         super(TransformationTask, self).__init__(orig, answer, comment=comment)
 
-        
+    def _field_formatter(self, field_formatter):
+        return lambda match: field_formatter(match.group(1), id=self.id())
+
+    
 class ClozeTask(MixedTextFillInTask):
         
     def __init__(self, text, comments=(), comment=None):
