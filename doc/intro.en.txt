@@ -9,24 +9,33 @@ The Learning Content Generator (LCG) is a computer program designed to process
 structured textual data and multimedia files and produce their output
 presentation, suitable for use in an on-line or off-line learning environment.
 
-The term ``learning environment'' should be considered as general as it sounds,
-ranging from an on-line Learning Management System, to a printed document which
-can be studied independently.
+The term ``learning environment'' should be undersood as general as it stands.
+Currently the following output formats are supported:
 
-== The Goals ==
+  * Static HTML (a set of hyperlinked pages for off-line use)
+  * IMS content package (for use within a Learning Management Systems)
+  * HTML Help Workshop (format used by most help viewers)
 
- * The input data formats must allow creating the content without the need for
-   any particular software or tool.
+LCG supports /multimedia/ and /interactive/ content and /accessibility/ is one
+of the major concerns, with a special attention to blind users, since this was
+the original target group, for which the product was developed.
 
- * The input data formats must be easy to understand and edit even for
-   non-technicians.
+The input data formats were designed to allow content creation without the need
+for any particular software or tool and to be easy to understand and edit even
+for non-technicians.
 
- * It must be possible to include multimedia and interactive content.
+One of the key points is a total /separation/ of the /input data/ and their /output
+presentation/.  Thus it is easy to change the appearance and user interface of
+the generated output without any changes in the source data.  This proved to be
+very useful when customizing the interactive user interfaces to different
+output formats and for different target groups (e.g. people with various
+handicaps or using special technologies).
 
- * The input data must be totally independent of the output presentation.  It
-   must be easy to change the appearance and user interface of the generated
-   output without any changes in the input data.
+LCG recognizes the structure of the data, with support for simple generic
+elements, such as /paragraphs, sections, bullet lists/ as well as more advanced
+and quite specialized constructs, such as /interactive exercises/ (multiple
+choice, fill-in texts, dictations).
 
- * It must be possible to generate the output in different formats.  Initially
-   an IMS content package and a set of static web pages must be supported.
-
+LCG also handles documents in /multiple languages/ correctly.  It is able to
+manage several language versions of one document, as well as intermix more
+languages in one document.
