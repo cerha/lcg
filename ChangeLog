@@ -1,3 +1,35 @@
+2006-02-17  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py (OPTIONS): Removed command line arguments
+	`user-lang' and `advanced'.  They are now deduced from just `lang'.
+	(main): Always create the `EurochanceCourse', don't distinguish
+	the level here.  Respect the changed `lang' specification format.
+
+	* lib/lcg/eurochance.py (_user_lang): Method removed.
+	(EurochanceNode._localized_wiki_content)
+	(IntermediateUnit._create_vocab, Help._create_children)
+	(ExerciseHelp._create_content): Use `self.root().users_language()'
+	instead of `self._user_lang()'.
+	(ExerciseHelp.__init__): New argument `id'.  Don't create it here.
+	(Help._create_children): Pass `id' to `ExerciseHelp' constructor.
+	(EurochanceCourse.__init__): When the languege comnsists of a pair
+	of language codes sparated with a hyphen, use the later language
+	code as `self._users_language' and consider the course an
+	intermediate course.
+	(AdvancedCourse, IntermediateCourse): Classes removed.
+	(EurochanceCourse._create_children): New method.
+	(EurochanceCourse.users_language): New method.
+
+	* lib/lcg/ims.py: Import codecs.
+	(_Manifest.write): Open the file using an 'utf-8' codec.
+	(_Manifest.__init__): Typo fixed.
+
+	* resources/css/default.css: Added styles for table and fieldset captions.
+
+	* lib/lcg/exercises.py (MixedTextFillInTask._field_formatter): New method.
+	(MixedTextFillInTask.text): Use it.
+	(TransformationTask._field_formatter): New method.
+
 2006-02-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (Link.__init__): Allow also `ContentNode' as
