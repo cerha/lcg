@@ -23,11 +23,12 @@ import os
 from lcgmake import getoptions, usage
 
 OPTIONS = (
-    ('lang=', 'en', "The language of the course  (the taught language)."),
-    ('user-lang=', 'cs', "The user's (learner's) language"),
+    ('lang=', 'en', ("The course language.  A two-letter laguage code.  "
+                     "For the Intermediate Course, it consists of a pair "
+                     "(course language, users language) concatenated with "
+                     "a hyphen - e.g. 'en-es').")),
     ('stylesheet=', 'default.css', "Filename of the stylesheet to use."),
     ('ims', False, "Generate an IMS package instead of a standalone HTML."),
-    ('advanced', False, "This is the advanced version of the course.")
     )
 
 def main():
@@ -37,17 +38,15 @@ def main():
     source_dir, destination_dir = args
 
     lang = opt['lang']
-    os.environ['LCG_LANGUAGE'] = lang
+    if '-' in lang:
+        os.environ['LCG_LANGUAGE'] = lang[:2]
+    else:
+        os.environ['LCG_LANGUAGE'] = lang        
     import lcg
     
-    from lcg.eurochance import IntermediateCourse, AdvancedCourse, \
-                               EurochanceExporter
-    if opt['advanced']:
-        c = AdvancedCourse(source_dir, language=lang, input_encoding='utf-8')
-    else:
-        c = IntermediateCourse(source_dir, course_language=lang,
-                               users_language=opt['user-lang'],
-                               input_encoding='utf-8')
+    from lcg.eurochance import EurochanceCourse, EurochanceExporter
+    c = EurochanceCourse(source_dir, language=lang, input_encoding='utf-8')
+    
     if opt['ims']:
         exporter = lcg.ims.IMSExporter
     else:
