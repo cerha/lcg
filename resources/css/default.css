@@ -214,8 +214,15 @@ table.lcg-table td, table.lcg-table th {
     white-space: nowrap;
     border: #ccc solid 1px;
 }
+
+table.lcg-table, table.lcg-fieldset { margin: 0.5em, 0, 0.5em, 0; }
 table.lcg-table td { background: #f4f4f4; }
 table.lcg-table th { background: #eee; }
+table.lcg-table caption, table.lcg-fieldset caption {
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: left;
+}
 
 table.lcg-fieldset th { white-space: nowrap; }
 
