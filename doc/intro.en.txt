@@ -39,3 +39,6 @@ choice, fill-in texts, dictations).
 LCG also handles documents in /multiple languages/ correctly.  It is able to
 manage several language versions of one document, as well as intermix more
 languages in one document.
+
+LCG is a /Free Software/ distributed under the terms of GNU General Pyblic
+License.
