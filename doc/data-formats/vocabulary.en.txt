@@ -1,0 +1,52 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+=== Vocabulary === vocabulary
+
+Vocabulary lists are -- quite obviously -- designed for a language course.
+Let's suppose we make a course of English language for Spanish learners.
+
+Each vocabulary file consists of word pairs -- the original term and the
+translation.  Each pair is on a separate line.  The line starts with the
+original term (in English according to the example).  The term may be followed
+by a note in round brackets.  The translation follows after the separator "::"
+- a double colon.  Blank characters (spaces, tabs) before and after the
+separator and at the beginning and end of the line are ignored.
+
+Example (for the English/Spanish course):
+
+-----
+busy :: ocupado
+call :: llamada 
+cell-phone (U.S.) :: teléfono celular
+-----
+
+All lines beginning with a hash "#" are comments (ignored).
+
+Sometimes the vocabulary defines also phrases.  The LCG needs to be able to
+recognise phrases (they are listed separately).  The phrases can be defined in
+one file with "ordinary" vocabulary but must be marked.  
+
+You can either put all the phrases together after a line containing a special
+comment "#phrases":
+
+-----
+Could you repeat that please? (phr.) :: ¿Podría repitir, por favor? 
+to switch off :: apagar
+tone :: señal
+yellow pages :: páginas amarillas
+# phrases
+Can I speak to ..? :: ¿Puedo hablar con ... ?
+Can I help you? :: ¿Puedo ayudarle?
+Can I take a message? :: ¿Puedo tomar algún recado?
+-----
+
+Optionally a phrase can be marked using the ``(phr.)'' note at the end of the
+phrase like that:
+
+-----
+Could you repeat that please? :: ¿Podría repitir, por favor? 
+-----
+

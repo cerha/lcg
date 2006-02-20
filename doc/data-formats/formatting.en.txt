@@ -1,0 +1,524 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Structured Text Formatting Manual =
+ 
+This document describes the markup used by the [http://www.freebsoft.org/lcg
+LCG] Structured Text Processor.
+
+Table of contents: @TOC@
+
+
+== Basics ==
+
+Structured Text uses simple conventions to mark the logical structure of a text
+document as well as some text properties.  The syntax is simillar to well known
+``wiki'' markup.  The advantage is that the document source stays easily
+readable and editable without any particular tool.  Just a simple text editor
+can do the job.
+
+
+=== Paragraphs ===
+
+A paragraph is each continual set of rows of text.  Whenever you leave a blank
+line, you start a new paragraph.  The line-breaks within the paragraph are
+ignored, since the paragraph will be reformatted to fit the output media
+(i.e. browser window).
+
+
+=== Text Emphasizing ===
+
+You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
+/*or their _combinations_*/.
+
+The source code for the paragraph above looks like:
+
+-----
+You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
+/*or their _combinations_*/.
+-----
+
+
+=== Links === links
+
+Hypertext links are references to other relevant information (another section,
+another document, web address, etc).  They are marked by square brackets.  The
+first part of the text in the brackets is the link target.  The target can be
+optionally followed by a space and a link name.  Depending on the type of the
+link target, we recognize several kinds of links.
+
+Link categories: @TOC@
+
+
+==== Local Links ====
+
+Local links lead to another document withing the hierarchy, or another section
+within the same document.  Documents are referenced by their id, sections by
+their anchor names (see [#anchors] for more details) prefixed with a hash.  A
+section of another document must be also preceeded by that document's id.
+
+*Example:*
+
+------
+Read the [intro].  See also [#anchors].
+------
+
+This renders as:
+
+Read the [intro].  See also [#anchors].
+
+The title of the referenced document or section becomes the name of the link
+automatically.  You can also supply your own name within the
+brackets explicitly.
+
+*Example:*
+
+-----
+The chapter [exercises#exercise-types] describes the 
+[exercises#exercise-types Types of Exercises].
+-----
+
+This renders as:
+
+
+The chapter [exercises#exercise-types] describes the 
+[exercises#exercise-types Types of Exercises].
+
+
+==== External Links ====
+
+External links beginning with '\http://', are recognized automatically, so the
+square brackets are not necessary, unless you want to give the link a more
+descriptive name.  Also e-mail addresses automatically become links.
+
+------
+The adddress http://www.gnu.org is the [http://www.gnu.org GNU homepage].
+Contact bill@microsoft.com for more information.
+------
+
+The adddress http://www.gnu.org is the [http://www.gnu.org GNU homepage].
+Contact bill@microsoft.com for more information.
+
+
+==== Images ====
+
+Any link pointing to an image will display the image in-line.
+
+*Example:*
+
+------
+http://www.google.com/images/logo.gif
+------
+
+This renders as:
+
+http://www.google.com/images/logo.gif
+
+
+=== Escaping ===
+
+You can avoid the special meaning of all the constructs described in this
+document by prefixing them with a backslash.
+
+*Example:*
+
+------
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a murkup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+------
+
+This renders as:
+
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a murkup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+
+
+
+== Structure ==
+
+The main strength of the LCG formatter is the recognition of the logical
+structure within the document.  This structure is based on the hierarchy of
+sections.
+
+The knowledge of the structure is than used to allow the advanced features,
+such as [#anchors] and [#toc].
+
+=== Section Headings ===
+
+Section headings are marked by equation characters at the beginning and end of
+the line.  The text between the equation signs is a section title.  The number
+of the equation signs determines the level.
+
+*Example:*
+
+------
+ = The First Section = 
+
+ Everything after the section heading belongs to this section, until another
+ section heading is found.  Any number of paragraphs or other constructs can be
+ used within the text of a section.
+
+ == Subsection of the First Section == 
+
+ Since the heading has more equation signs than the previous one, this section
+ logically belongs to the previous section in the hierarchy.
+
+ = The Second Section = 
+
+ This is the second section of the same level as the first one.
+----- 
+
+Note: It is /important/ to /separate/ the equation marks from the heading text
+(using a space) and to /avoid/ any other (even blank) characters after the
+final equation sign.  Otherwise the section is not recognized.
+
+
+=== Anchors === anchors
+
+Additionally an anchor name can be defined for each heading.  The anchor can
+consist of alpha-numerical characters, underscores and dashes and is written
+at the end of the heading line separated with at least one blank character
+(space).
+
+-----
+ == Introduction == intro
+-----
+
+An anchor can be used to refer to the section.  The link \[#intro], for
+example, will refer to the above section header and will be named using the
+full section title (see [#links] for more details).
+
+
+=== Tables of Contents === toc
+
+Table of contents is a hierarchical list of all sections within a document or
+it's part.  It can be included in the document using the =@TOC@= macro.
+
+*Example:*
+
+-----
+Table of Contents: @TOC@
+-----
+
+This source line will be replaced with the table of contents.  The text before
+the colon is used for the caption and the TOC includes all the subsections of
+the section, within which the macro is used.  This means you can also create
+local tables of contents in particular subsections.
+
+The TOC at the top of this manual is made the same way.
+
+The =@TOC@= makes the index of current content element (eg. lists the subsections
+of the current section of the current document), however you may also wish to
+make an index of the subnodes of current node (all documents, that are below
+the current document in the hierarchy).  This can be done by using the =@NTOC@=
+macro.  The syntax is the same.
+
+The Tables of Content are hierarchical, so you may also wish to /restrict the
+depth/.  This can be done by supplying a number in round brackets, such as:
+
+-----
+Index: @TOC(1)@
+-----
+
+This will create a plain listing, without the subsections.
+
+
+== Advanced Constructs ==
+
+=== Bullet Lists === bullet-lists
+
+Bullet lists are marked by an asterisk (or optionally a minus sign) at the
+beginning of each item.  The indentation determines the level (lists can be
+nested).  
+
+*Example:*
+
+------
+ * cats
+   - black
+   - white
+   - other
+ * dogs
+   * big
+   * little
+ * frogs
+------
+
+This renders as:
+
+ * cats
+   - black
+   - white
+   - other
+ * dogs
+   * big
+   * little
+ * frogs
+
+
+=== Ordered Lists ===
+
+Ordered lists work like [#bullet-lists] but you use a number or a letter with a
+period (or round bracket(s)) instead of an asterisk.
+
+*Example:*
+
+------
+ * General rules:
+   1. Each item must be indented by at least one space character.
+   2. Longer item texts can be split over multiple lines, provided
+      that they are indented properly.
+   3. Tabs and spaces can be used for indentation, but tab is always considered
+      8 characters wide, so you may have problems when your editor sets the tab
+      width differently (then converting tabs to spaces is recommended).
+
+   4. Empty lines between the list items are optional and have no effect on the
+      output.  That's just a matter of your preference.
+
+ * Rules for ordered lists:
+   0. The numbers in the source document are ignored, since the output numbers
+      are automatically generated.  Thus you are free to mark all items with
+      zero, for example, or you can use real order numbers if you prefer.
+   0. You can also use letters for alphabetically ordered lists.
+ * Intermixing different kinds of lists:
+   a) There are basically three different kinds of lists:
+      (1) unordered
+      (2) numerically ordered
+      (3) alpha-ordered
+   b) Whenever you switch from one kind to another (at the same indentation
+      level), the previous list is finished and ordering starts from the
+      beginning.
+   c. It does not matter, whether you use a dot or brackets in the source
+      text.  The output style of each list kind is given by the output settings
+      (i.e. a style-sheet).
+------
+
+This renders as:
+
+ * General rules:
+   1. Each item must be indented by at least one space character.
+   2. Longer item texts can be split over multiple lines, provided
+      that they are indented properly.
+   3. Tabs and spaces can be used for indentation, but tab is always considered
+      8 characters wide, so you may have problems when your editor sets the tab
+      width differently (then converting tabs to spaces is recommended).
+
+   4. Empty lines between the list items are optional and have no effect on the
+      output.  That's just a matter of your preference.
+
+ * Rules for ordered lists:
+   0. The numbers in the source document are ignored, since the output numbers
+      are automatically generated.  Thus you are free to mark all items with
+      zero, for example, or you can use real order numbers if you prefer.
+   0. You can also use letters for alphabetically ordered lists.
+ * Intermixing different kinds of lists:
+   a) There are basically three different kinds of lists:
+      (1) unordered
+      (2) numerically ordered
+      (3) alpha-ordered
+   b) Whenever you switch from one kind to another (at the same indentation
+      level), the previous list is finished and ordering starts from the
+      beginning.
+   c. It does not matter, whether you use a dot or brackets in the source
+      text.  The output style of each list kind is given by the output settings
+      (i.e. a style-sheet).
+
+
+=== Definition Lists ===
+
+------
+Term
+   Definition is an indented paragraph following a one-line term.
+
+Another Term
+   Each term/definition pair must be surrounded by blank lines (as-well as
+   an ordinary paragraph).
+------
+
+Term
+   Definition is an indented paragraph following a one-line term.
+
+Another Term
+   Each term/definition pair must be surrounded by blank lines (as-well as
+   an ordinary paragraph).
+
+
+=== Field-sets ===
+
+Field-sets can be used for generic two-column tabular data, where the first
+column is the label and the second column is the corresponding value.  The
+label is marked with colons from both sides.  Values can be multi-line, but
+must be indented properly.
+
+------
+:Birth Date: 1975-08-30
+:Address:
+   38 Ocean View Dr. //
+   Laguna Beach
+:Occupation: Oil Magnate
+------
+
+:Birth Date: 1975-08-30
+:Address:
+   38 Ocean View Dr. //
+   Laguna Beach
+:Occupation: Oil Magnate
+
+
+=== Preformatted Text === preformatted-text
+
+You can mark a block of text as a preformatted text by surrounding it by lines
+of five or more dashes.
+
+No further formatting is then applied to the preformatted text.  It is rendered
+as it appears in the source document.
+
+*Example:*
+
+------
+ ------
+  foo   bar
+   x     y
+   1     2
+ ------
+------
+
+This renders as:
+
+------
+ foo   bar
+  x     y
+  1     2
+------
+
+All the examples in this manual are written as preformatted text.
+
+
+=== Tables ===
+
+You can make simple tables with constant number of cells per row.  Each row in
+on one line and pipe characters are used to separate the cells.  The line must
+also begin and end with a pipe character.
+
+
+*Example:*
+
+------
+|        | Dick   | Jane |
+| height | 72"    | 65"  |
+| weight | 130lbs | 150lbs |
+------
+
+|        | Dick   | Jane |
+| height | 72"    | 65"  |
+| weight | 130lbs | 150lbs |
+
+
+== Other Features ==
+
+
+=== Special and Typographical Characters ===
+
+==== Explicit line-break ====
+
+Two slashes force a line-break:
+
+------
+This sentence will break//in the middle.
+------
+
+This sentence will break//in the middle.
+
+==== Non-breakable Space ====
+
+The line-breaks are inserted automatically, when the paragraph is formatted to
+fit the output media.  However, you sometimes don't want a line-break in a
+certain place.  You can use a tilde =\~= instead of a space in such
+cases.
+
+*Example:*
+
+------
+We can forbid a line-break between the first and second name of
+Richard~Stallman, but we must prefix the tilde with a backslash, when
+we need to write the shell command 'cd \~'.
+------
+
+This renders as:
+
+We can forbid a line-break between the first and second name of
+Richard~Stallman, but we must prefix the tilde with a backslash, when
+we need to write the shell command 'cd \~'.
+
+
+==== Long Dash ====
+
+Double dash (two minus signs) produce a long dash on the output
+
+*Example:*
+
+------
+LCG -- highway to excellence.
+------
+
+This renders as:
+
+LCG -- highway to excellence.
+
+==== Double Quotes ====
+
+Double quotes begin with two reverse apostrophes and end with two single
+apostrophes.
+
+*Example:*
+
+------
+He said: ``Who knows?''
+------
+
+This renders as:
+
+He said: ``Who knows?''
+
+
+=== Horizontal Lines ===
+
+Horizontal line can be made with 4 dashes on a separate line.
+
+*Example:*
+
+------
+----
+------
+
+This renders as:
+
+----
+
+=== Comments ===
+
+You can comment out any text with '# ' at the beginning of a line.  This will
+make the text invisible on output media (e.g. by making it an HTML comment in
+the HTML output):
+
+------
+ The first line.
+ # These lines have been 
+ # commented out.
+ The last line.
+------
+
+This renders as:
+
+The first line.
+# These lines have been 
+# commented out
+The last line.

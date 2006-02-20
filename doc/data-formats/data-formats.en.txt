@@ -1,0 +1,31 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Input Data Formats =
+
+To be able to process the input data with a computer program (the LCG) we must
+define a set of rules how this data are represented.  This chapter describes
+the data formats currently used by the LCG.
+
+All LCG source files are text files.  Thus you can edit them using any text
+editor.  A simple editor, such as Notepad in MS Windows should do the job.  LCG
+accepts UTF-8 as the default encoding of the source data, so you should be able
+to save your files in this encoding.
+
+LCG also supports other data types within the content, such as sound and video
+files, images, scripts, stylesheets etc., but these are not considered /source
+files/ from this point of view.  They are called /resources/ in this manual.
+To include such files, you usually refer to them from the source files, so you
+will also find the relavant information in the later sections.
+
+The following data formats are being used: @NTOC(1)@
+
+
+
+
+
+
+
+

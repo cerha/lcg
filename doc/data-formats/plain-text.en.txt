@@ -1,0 +1,11 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+=== Plain Text ===
+
+This is the simplest format.  This format is only used for texts which don't
+require any formatting or other processing.  No higher level constructs are
+recognized within plain text.
+
