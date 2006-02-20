@@ -63,7 +63,7 @@ class ContentNode(object):
 
     _ABBREV_TITLE = None
     
-    def __init__(self, parent, id, subdir=None, language='en',
+    def __init__(self, parent, id, subdir=None, hidden=False, language='en',
                  input_encoding='ascii'):
         """Initialize the instance.
 
@@ -84,6 +84,7 @@ class ContentNode(object):
         assert parent is None or isinstance(parent, ContentNode)
         assert isinstance(id, types.StringType)
         assert subdir is None or isinstance(subdir, types.StringType)
+        assert isinstance(hidden, types.BooleanType), hidden
         assert isinstance(language, types.StringType) and \
                len(language) == 2
         assert isinstance(input_encoding, types.StringType)
@@ -91,6 +92,7 @@ class ContentNode(object):
         self._parent = parent
         self._id = id
         self._subdir = subdir
+        self._hidden = hidden
         self._language = language
         self._input_encoding = input_encoding
         self._resources = {}
@@ -228,6 +230,9 @@ class ContentNode(object):
         else:
             return self._title()
 
+    def hidden(self):
+        return self._hidden
+        
     def parent(self):
         """Return the parent node of this node."""
         return self._parent
@@ -537,21 +542,50 @@ class DocChapter(DocNode):
     information.
 
     """
+
+    def _list_dir(self, dir, indexfile='_index.txt'):
+        def listdir(dir, exclude=()):
+            items = []
+            for item in os.listdir(dir):
+                if os.path.isfile(os.path.join(dir, item)):
+                    if item.endswith('~'):
+                        continue
+                    item = os.path.splitext(os.path.splitext(item)[0])[0]
+                if item and item not in items and item not in exclude \
+                       and item != 'CVS' \
+                       and not item.startswith('_') \
+                       and not item.startswith('.'):
+                    items.append(item)
+            items.sort()
+            return items
+        try:
+            index = open(os.path.join(dir, indexfile))
+        except IOError:
+            return [(item, False) for item in listdir(dir)]
+        else:
+            items = [item for item in [line.strip()
+                                       for line in index.readlines()]
+                     if item != '' and not item.startswith('#')]
+            hidden = listdir(dir, exclude=items)
+            return [(x, False) for x in items] + [(x, True) for x in hidden]
+
     
     def _create_children(self):
         children = []
-        for name in list_dir(self.src_dir()):
+        for name, hidden in self._list_dir(self.src_dir()):
             if name != self.id():
+                kwargs = dict(hidden=hidden)
                 if os.path.isfile(self._input_file(name, ext='py')):
                     import imp
                     file, path, descr = imp.find_module(name, [self.src_dir()])
                     m = imp.load_module(name, file, path, descr)
-                    children.append(self._create_child(m.IndexNode, name))
+                    cls = m.IndexNode
                 elif os.path.isdir(os.path.join(self.src_dir(), name)):
-                    children.append(self._create_child(DocChapter, name,
-                                                       subdir=name))
+                    cls = DocChapter
+                    kwargs['subdir'] = name
                 else:
-                    children.append(self._create_child(DocNode, name))
+                    cls = DocNode
+                children.append(self._create_child(cls, name, **kwargs))
         return children
 
     
@@ -566,9 +600,14 @@ class DocRoot(DocChapter):
     suffix) must exist and this file represents the directory.  All other files
     (and directories) are child nodes of this node.
 
-    The nodes are ordered alphabetically by default, but the order can be also
-    defined explicitly using a file named 'index.txt', which contains the
-    filenames of source files (and directories) one per line.
+    The nodes are ordered alphabetically by default.  Names beginning with an a
+    dot, an underscore, ending with a tilde and 'CVS' directories are ignored.
+
+    The order can be also defined explicitly using an index file (named
+    '_index.txt' by default), which contains the filenames of source files (and
+    directories) one per line.  Valid source files and directories (as
+    described above) not included in the index file will be still used, but
+    they will not appear in the table of contents.
 
     Files within the whole directory structure must have unique names, since
     they are used node identifiers.  This also means that it is possible to
