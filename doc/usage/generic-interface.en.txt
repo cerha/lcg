@@ -1,0 +1,24 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= The Generic Interface =
+
+The /Generic Interface/ is the simplest way to use the LCG.  It is ideal for
+documents with a hierarchical structure, such as manuals, help systems and
+simple e-learning courses.  When the format described below doesn't suit your
+needs, consider using [custom-interface].
+
+The /Generic Interface/ is implemented with the =lcgmake.py= program, which
+comes with the LCG.  This program processes a directory containing the source
+data and produces the result in one of the supported formats.  The details
+about how to specify the output format and how to influence the process of
+generation are described when the program is launched with the =--help=
+argument like this:
+
+-----
+lcgmake.py --help
+-----
+
+/The rest of this chapter needs to be written.../

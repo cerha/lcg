@@ -1,0 +1,31 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= The Custom Interface =
+
+The Custom LCG Interface becomes handy, when you want to have some more control
+over the processing of your data.  Here are a few examples:
+
+  * Reading the input data from other than the supported sources.
+  * Imposing further restrictions (integrity checking etc).
+  * Implementing a custom (eg. a fixed) structure.
+  * Customizing the output (for appearance, accessibility etc.).
+
+Creating a custom interface is in practise a matter of Python coding.  You will
+most likely derive your own classes from the standard LCG classes, implementing
+any special handling and you will use these classes to process your data.
+
+The Eurochance course is an example of a custom interface built on the top of
+the LCG API.  It is implemented within a module 'eurochance', which is a part
+of the LCG.  This is because some requirements of the Eurochance course were so
+specific, that it was not worth mixing this functionality into the generic LCG
+API and also because it was more practical to define our own structure of the
+input data, than the Generic Interface is able to read.
+
+A reasonable knowledge of the LCG API is needed when you want to create Custom
+LCG Interfaces.  The LCG classes are documented within their Python docstrings.
+Use pydoc to view the documentation or read the source code itself.  See the
+[http://www.freebsoft.org/lcg LCG Project Homepage] for more information how to
+get LCG source code.
