@@ -1,0 +1,114 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+== Course Structure Specification ==
+
+=== The Intermediate Course Structure ===
+
+The Intermediate Course consists of 15 units.  Each unit is focused on a
+certain topic (e.g. finance, catering etc.).  The structure of each unit is
+described below in the section [#unit].
+
+The course starts at a Course Index page.  This page contains a short
+introduction text and a table of contents.  The first document in the table of
+contents is [#instructions].  The 15 units follow.  Then there is a
+[#grammar-bank], [#vocabulary-index] and [#help-index].
+
+
+==== General Course Instructions ==== instructions
+
+The first document linked form the table of contents id called General Course
+Instructions and contains basic information about the course, its usage,
+navigation etc.
+
+
+==== Unit Structure ==== unit
+
+The structure of each unit is uniform.  The first section is "Aims and
+Objectives".  It informs you briefly about the focus of the unit and lists the
+grammar points which will be practised, with links to the [#grammar-bank].
+
+The next section contains a listing of vocabulary for the unit.  You can browse
+through the vocabulary, see the translations and play native speaker recordings
+to hear the correct pronunciation.
+
+Five sections of exercises follow:
+  * Section 1: Vocabulary Practice
+  * Section 2: Listening Comprehension
+  * Section 3: General Comprehension
+  * Section 4: Grammar Practice
+  * Section 5: Consolidation
+
+There is a predefined set of exercise types that can be used.  The type, order
+and number of exercises in each section is not strictly fixed, however it is as
+consistent as possible for easier orientation of the user.
+
+The detailed description of exercise types can be found in the section
+[exercises#exercise-types].
+
+The final section, "Checklist", lists the skills that the user has practised
+and should have acquired.
+
+==== Grammar Bank ==== grammar-bank
+
+Apart from the 15 units there is also a Grammar Bank that the learners can use
+for study or reference.
+
+The grammar bank consists of a number of sections focused on different topics.
+These sections can be linked directly from any unit.  A hierarchical table of
+contents is generated automatically at the beginning of the page to allow
+direct access to any topic.
+
+
+==== Vocabulary Index ==== vocabulary-index
+
+This is simply a collection of all the vocabulary from all units sorted
+albhabetically by the original term and also by the translation.  Phrases are
+listed separately.
+
+The vocabulary index is generated automatically by the LCG, so no source data
+are needed.
+
+
+==== Answer Sheets ==== answer-sheets
+
+Answer Sheets contain all the correct answers for all exercises.  You can
+access Answer Sheets from the Course Index, or more conveniently, you can use
+the '?'  (question mark) link behind every task within the exercises.  This
+link leads you directly to the corresponding answer in the Answer Sheet.
+
+The answer sheets are generated automatically by the LCG and no source data are
+needed.
+
+
+==== Help Index ==== help-index
+
+The Help Index simply lists all the exercise types used within the course and
+provides links to their help pages.  Every exercise within the course has its
+own link to the respective help page, but it may be practical to have a
+collection somewhere...
+
+The help texts are part of the LCG, so no source data are needed.
+
+
+=== The Advanced Course Structure ===
+
+The Advanced course consists of 10 units.  Their structure is more flexible.
+The First and last section is the same (the "Aims & Objectives" and the
+"Checklist") as in the Intermediate course.  All the other sections contain
+exercises, however their titles and focus is not fixed as in the Intermediate
+Course.
+
+There is no separate "Vocabulary" section.  The learners are supposed to use a
+dictionary when they discover a new word or expression.
+
+Also the Grammar Bank is omitted for the advanced level.  There are short
+explanations before many exercises as the grammar points are being practised.
+
+The top level structure is very similar to the Intermediate Course.  The Course
+Index contains a short introduction text and a table of contants.  The table of
+contents starts with General Course Instructions, the 10 units, Answer Sheets
+and Help Index.
+

@@ -1,0 +1,105 @@
+
+== Organization of the Input Data ==
+
+The basic LCG concept is based on files arranged into directories (folders)
+according to the logical structure of the course.
+
+There is one /base directory/ for the whole course.  This directory contains
+one /subdirectory/ for each unit of the course.  Each of these subdirectories
+contains files and subdirectories defining the content of the sections within
+the unit.
+
+The subdirectories can be named arbitrarily.  The only important thing is that
+the units are ordered according to the alphabetical order of the names of their
+directories.  Thus it is advisable to prefix the names by a number of the unit
+and then any name describing the focus of the unit for better orientation.  The
+diretory names never appear in the output.  They are only used for organization
+of the input files.
+
+*An example of the recommended naming scheme for the subdirectories:*
+
+  * 01-telephoning
+  * 02-office-admin
+  * 03-financial
+  * 04-hotels
+  * 05-tourism
+  * ...
+
+
+Let's take a look into the course /base directory/ first and then we will
+describe the contents of a unit directory.
+
+=== Course-Wide data ===
+
+The data format of each input file depends on the type of the content it is
+used for.
+
+Here is an overview of files needed for the whole course:
+
+intro.txt
+  A brief course introductory text for the base course page (the index page).
+  The file format is the [structured-text]
+
+grammar.txt
+  The data for the Grammar Bank as the [structured-text].
+  Obviously, this file is only needed for the Intermediate Course, since the
+  Advanced Course has no Grammar Bank.  See the following section for more
+  details about writing the Grammar Bank.
+
+==== Notes for Writing the Grammar Bank ====
+
+Within the contents of the Grammar Bank, there are often words or structures,
+which can be considered citations.  They can be recognised easily: Even after
+translating the grammar explanations into another language, these words or
+structures will still remain in English (or German for the German course).
+
+Example (with the citations in italics): 
+
+The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
+would<<) have only one form.  There are also short affirmative forms for
+>>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
+
+The citations must be marked by surrounding them into double angle brackets
+like this: =\>>word\<<=.  The paragraph above would be written like this:
+
+-----
+The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
+would<<) have only one form.  There are also short affirmative forms for
+>>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
+-----
+
+
+=== Inside the Unit Directory ===
+
+
+Here is an overview of files needed for each unit:
+
+title.txt
+  The content of this file determines the title of the unit.  This
+  should be just one line of [plain-text].
+
+aims.txt
+  Source for the "Aims and Objectives" section as
+  [structured-text].
+
+vocabulary.txt
+  The Vocabulary lists are only present in the Intermediate
+  Course, so this file is not needed for the Advanced Course.  The file
+  'vocabulary.txt' is the primary source of the vocabulary.  The creator of the
+  course defines the terms here with empty translations first.  Then the
+  translators make different translations of this file.  Each translation is
+  stored in a different file as described in [eurochance-translations#vocab].
+
+exercises.txt
+  In the Intermediate Course, the file has five sections (corresponding to the
+  five exericise sections defined above) separated by a line of four equation
+  signs.  In the advanced course, the file uses section headers as described in
+  the [exercises].
+
+checklist.txt
+  Source for the "Checklist" section as [structured-text].
+
+
+See the description of each LCG data format for more datails about the contents
+of the files.
+

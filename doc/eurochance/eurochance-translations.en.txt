@@ -1,0 +1,146 @@
+== Translations ==
+
+In general, all the translation data are plain text files.  You always download
+the source file and edit it using your favorite text editor.  A simple editor,
+such as Notepad should do the job.  The source files are UTF-8 encoded and this
+encoding must be also preserved when saving them.
+
+The text format is let's say the ``low level'' format.  There is, however, also
+a higher level format imposed by the type of the content.  Specific rules allpy
+to each file, depending on it's content:
+
+@TOC@
+
+
+
+=== Translating the Vocabulary === vocab
+
+All the vocabulary is stored in plain text files.  There is one file for each
+unit and each target language.  In other words, one vocabulary file contains
+vocabulary for one unit and one target language.
+
+Initially only one vocabulary file per unit is created (the English/German one)
+without translations.  Then, the translators add the translations into this
+file and upload it to the source directory with a different filename.
+
+The name of the initial vocabulary file (without translations) is
+=vocabulary.txt=.  There must be one file of that name in each unit's source
+directory.
+
+The translation files are then named according to the following table:
+
+| *Language* | *Filename*          | *Note* |
+| Czech      | =vocabulary.cs.txt= || 
+| English    | =vocabulary.en.txt= | for the German course only) |
+| German     | =vocabulary.de.txt= | for the English course only) |
+| Norwegian  | =vocabulary.no.txt= ||
+| Slovak     | =vocabulary.sk.txt= ||
+| Spanish    | =vocabulary.es.txt= ||
+
+See the description of the [vocabulary Vocabulary Data Format] for
+more details about the contents of vocabulary files.
+
+
+=== Translating the Stuctured Text === translating-structured-text
+
+The text is formatted using a simple markup.  You should preserve the markup
+when translating.  You will find a brief reference below and this is all you
+need to know.  In general, you simply don't care about the markup too much.
+You just edit the text and leave the markup untouched.
+
+==== Brief Formatting Reference ====
+
+ * Section headers are marked with equation signs surrounding the section
+   title.  The identifier at the end of the heading line must be preserved (not
+   translated).
+
+ * Paragraphs are blocks of text separated with blank lines from each other.
+
+ * References to English terms which should /NOT/ be translated are marked by
+   double angle brackets.  For example in a sentence ``You can find a link
+   named \>>Exercise Help\<< at the beginning of each exercise.'', the label
+   ``Exercise Help'' must stay in English and you also leave the angle brackets
+   where they are.  See also [#citations] for more details.
+
+ * Hypertext links are marked by square brackets.  Something like
+   [http://eurochance.brailcom.org Eurochance project homepage].  The link
+   target (verything before the first space) must stay unchanged.  The link
+   name (everything within the brackets after the first space) should be
+   translated, when the link is not surrounded by double angle brackets.  Some
+   links have no names (are named automatically), so there is nothing to
+   translate.
+
+ * Bullet lists are indented with spaces and each item starts with an asterisk
+   (as in this text).
+
+ * Lines which start with a hash (#) character are comments and must be left
+   untouched.
+
+That's mostly all.  More detailed manual can be found at
+[structured-text].  The example below illustrates these rules.
+
+
+-----
+ == Simple Example == example
+
+ This is a paragraph of text.  This text belongs to a section named "Simple
+ Example".  Simple text emphasizing can be done using /slashes for italics/ or
+ *asterisks for bold*.  You should preserve these characters while translating.
+
+ You definitely want to translate the section title "Simple Example", but you
+ must leave the equation signs around the translation so the new title will be
+ still recognized as section title.  The string 'example' at the end of the
+ line is a section identifier.  It doesn't appear in the output document, but
+ is used by the LCG internally to refer to a section.  Thus it must be
+ preserved as is and not translated.
+
+ Examples of hypertext links:
+
+   * [#example] ... nothing to translate (#example is a link target and can not
+     be changed).
+
+   * [http:eurochance.brailcom.org Project Homepage] ... "Project Homepage" is
+     a link name and should be translated.
+
+   * >>[index Course Index]<< ... This is marked as citation, so should be left
+     as is.
+
+ The above list is an example of a bullet list.  You must preserve the asterisk
+ at the beginning of each item and also the same amount of spaces at the
+ beginning of each line (the indentation).
+
+ # This line begins with a hash and thus it is a comment or a special control
+ # directive.  You never touch comment lines and leave them in the translated
+ # document.  They never appear in the output, but may be important for
+ # processing.
+
+
+-----
+
+
+==== Citations ==== citations
+
+The citations (marked by angle brackets) within the English course always mark
+text which will stay in English.  In the German course, this is the text in
+German.  Thus you don't translate what's inside.
+
+Citations are used in the following cases:
+
+    * English/German sentence or expression which is a subject of some
+      explanation (mostly within the Grammar Bank).  Quite obviously, we could
+      not teach English without using English expressions and sentences.
+
+    * English/German label or text, which is a part of the User Interface and
+      appears in English/German in the resulting course.  Thus references to
+      such User Interface elements must stay in the language in which they
+      appear in the course, so that the user knows what we are talking about.
+
+Sometimes it might be appropriate to add a translation of the cited text (for
+example in parenthesis after this text, when the meaning might not be obvious
+from the context.  This can often happen in the Grammar Bank.
+
+Also in General Course Instructions the meaning of the referenced English label
+might not be obvious.  Thus, for example, ``the \>>Grammar Bank\<<'' can be
+translated as ``un \>>Grammar Bank\<< (base de datos gramatical)'' into
+Spanish.
+

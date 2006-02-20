@@ -1,0 +1,22 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= The Eurochance Course =
+
+The Eurochance language course (see http://eurochance.brailcom.org) was the
+initial implementation of a course using the LCG framework.  It is an example
+of an implementation of a /Custom Interface/ on top of LCG API.  See [usage]
+for more details.
+
+This document should serve as a reference for creation of the input data for
+the course.
+
+Index: @NTOC@
+
+
+
+
+
+
