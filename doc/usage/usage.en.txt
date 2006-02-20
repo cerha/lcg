@@ -1,0 +1,22 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Using LCG =
+
+LCG can be used in two different ways:
+
+  * [generic-interface] doesn't require any coding.  You simply create the
+    input data in the form described in this manual, run LCG to process your
+    data and you get the output in one of the supported output formats.
+
+  * [custom-interface] can be used when the generic interface doesn't fit your
+    needs.  You can for example read the input data out of a database or any
+    other source, you can verify the validity and integrity of the input data
+    and impose further restrictions, or you can customize the output format.
+    The customizations are done using the Python programming language.
+
+
+
+
