@@ -233,7 +233,8 @@ class EurochanceCourse(EurochanceNode):
         else:
             self._users_language = None
             self._unit_cls = Unit
-        super(EurochanceCourse, self).__init__(None, 'index', dir, language, **kwargs)
+        super(EurochanceCourse, self).__init__(None, 'index', dir,
+                                               language=language, **kwargs)
 
     def users_language(self):
         return self._users_language
@@ -242,7 +243,7 @@ class EurochanceCourse(EurochanceNode):
         return self._read_file('title')
 
     def _unit_dirs(self):
-        return [d for d in list_dir(self.src_dir())
+        return [d for d in os.listdir(self.src_dir())
                 if os.path.isdir(os.path.join(self.src_dir(), d)) \
                 and d[0].isdigit()]
 
