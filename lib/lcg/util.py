@@ -126,33 +126,6 @@ class Counter(object):
         return value
                 
     
-def list_dir(dir, indexfile='_index.txt'):
-    """Return the list of all items found in a directory.
-
-    If the directory contains the index file (the name id given by the
-    'indexfile' argument ('_index.txt' by default) the list is read from there.
-    Otherwise all the files and directories within it are read, filenames are
-    stripped of their extensions and a list of distinct names is returned in
-    alphabetical order.
-
-    Names beginning with an underscore and 'CVS' directories are ignored.
-    
-    """
-    try:
-        index = open(os.path.join(dir, indexfile))
-        return [item for item in [line.strip() for line in index.readlines()]
-                if item != '' and not item.startswith('#')]
-    except IOError:
-        items = []
-        for item in os.listdir(dir):
-            item = os.path.splitext(os.path.splitext(item)[0])[0]
-            if item and item not in items and item != 'CVS' \
-                   and not item.startswith('_') and not item.startswith('.'):
-                items.append(item)
-        items.sort()
-        return items
-
-                    
 def is_sequence_of(seq, cls):
     """Return true if 'seq' is a sequence of instances of 'cls'."""
     if not operator.isSequenceType(seq):
