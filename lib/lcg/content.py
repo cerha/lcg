@@ -572,7 +572,7 @@ class TableOfContents(Content):
             return ''
         items = ()
         if isinstance(item, ContentNode):
-            items = item.children()
+            items = [node for node in item.children() if not node.hidden()]
         if len(items) == 0 and self._detailed:
             if isinstance(item, (types.ListType, types.TupleType)):
                 items = item
