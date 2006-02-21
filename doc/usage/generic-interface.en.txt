@@ -16,6 +16,9 @@ the corresponding content hierarchy is built in the computer memory in an
 independent internal representation.  Then this model is exported into one of
 the supported output formats.
 
+Index: @TOC@
+
+
 == Terminology ==
 
 We use the following terminology in the text below:
@@ -82,7 +85,7 @@ with a dot, an underscore and ending with a tilde are ignored.
 === Index File === index-file
 
 The nodes are ordered alphabetically by default, but the order can be also
-defined explicitly using a file named '_index.txt', which contains the list of
+defined explicitly using a file named '\_index.txt', which contains the list of
 child node identifiers one per line.  
 
 Nodes, which don't appear in the index file, but for which an input file is
