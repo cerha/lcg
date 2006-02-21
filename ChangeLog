@@ -1,5 +1,7 @@
 2006-02-21  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/nodes.py (DocRoot): Docstring updated.
+
 	* doc/usage/generic-interface.en.txt: Finished.
 
 2006-02-20  Tomas Cerha  <cerha@brailcom.org>
