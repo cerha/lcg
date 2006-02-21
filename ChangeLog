@@ -1,4 +1,79 @@
+2006-02-21  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/usage/generic-interface.en.txt: Finished.
+
+2006-02-20  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/usage/_index.txt: New file.
+
+	* doc/usage/usage.en.txt: New file.
+
+	* doc/usage/generic-interface.en.txt: New file.
+
+	* doc/usage/custom-interface.en.txt: New file.
+
+	* doc/eurochance/eurochance.en.txt: New file.
+
+	* doc/eurochance/_index.txt: New file.
+
+	* doc/eurochance/course-structure.en.txt: New file.
+
+	* doc/eurochance/eurochance-data.en.txt: New file.
+
+	* doc/eurochance/eurochance-translations.en.txt: New file.
+
+	* doc/eurochance/eurochance-recordings.en.txt: New file.
+
+	* doc/data-formats/data-formats.en.txt: New file.
+
+	* doc/data-formats/_index.txt: New file.
+
+	* doc/data-formats/plain-text.en.txt: New file.
+
+	* doc/data-formats/structured-text.en.txt: New file.
+
+	* doc/data-formats/formatting.en.txt: New file.
+
+	* doc/data-formats/exercises.en.txt: New file.
+
+	* doc/data-formats/vocabulary.en.txt: New file.
+
+	* doc/intro.en.txt: Updated.
+
+	* doc/index.en.txt: Updated.
+
+	* doc/_index.txt: Updated.
+
+	* doc/formatting.en.txt: File moved to the `data-formats'
+	directory.
+
+	* lib/lcg/nodes.py (ContentNode.__init__): New keyword argument
+	`hidden'.
+	(ContentNode.hidden): New method.
+	(DocChapter,_list_dir): New method.
+	(DocChapter._create_children): Use `self._list_dir()' and
+	recognize hidden nodes.
+	(DocRoot): Docstring updated.
+
+	* lib/lcg/util.py (list_dir): Function removed.
+
+	* lib/lcg/eurochance.py (EurochanceCourse.__init__): Pass language
+	as a keyword argument to the parent's method.
+	(EurochanceCourse._unit_dirs): Use `os.listdir()' insteadd of the
+	list_dir function.
+
+	* lib/lcg/content.py (TableOfContents._make_toc): Omit hidden
+	nodes from the table of contents.
+
+	* doc/eurochance.en.txt: File removed.  Contents split into
+	smaller files in the `eurochance' directory.
+
+	* doc/data-formats.en.txt: File removed.  Contents split into
+	smaller files in the `data-formats' directory.
+
 2006-02-17  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/intro.en.txt: Updated.
 
 	* bin/generate.py (OPTIONS): Removed command line arguments
 	`user-lang' and `advanced'.  They are now deduced from just `lang'.
@@ -80,7 +155,7 @@
 	* lib/lcg/content.py (Container.__init__): Added assertion messages.
 	(VocabList.export): Use the `scope' attribure in the html output.
 
-	* lib/lcg/eurochance.py (Module): In all `ConetentNode'
+	* lib/lcg/eurochance.py: In all `ConetentNode'
 	constructor calls, pass the node id as an argument.
 
 	* lib/lcg/nodes.py (ContentNode): Docstring updated.  Order of
@@ -144,8 +219,6 @@
 	* lib/lcg/eurochance.py (EurochanceNode.full_title): 
 
 2006-01-30  Tomas Cerha  <cerha@brailcom.org>
-
-	*  (Module): 
 
 	* lib/lcg/hhp.py: New module.
 
