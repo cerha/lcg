@@ -604,10 +604,10 @@ class DocRoot(DocChapter):
     dot, an underscore, ending with a tilde and 'CVS' directories are ignored.
 
     The order can be also defined explicitly using an index file (named
-    '_index.txt' by default), which contains the filenames of source files (and
-    directories) one per line.  Valid source files and directories (as
-    described above) not included in the index file will be still used, but
-    they will not appear in the table of contents.
+    '_index.txt' by default), which contains child node identifiers one per
+    line.  Valid source files and directories (as described above) not included
+    in the index file will be still used, but they will not appear in the table
+    of contents.
 
     Files within the whole directory structure must have unique names, since
     they are used node identifiers.  This also means that it is possible to
