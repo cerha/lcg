@@ -26,7 +26,18 @@ data.  It can be used as an example of LCG usage.
 from lcg import *
 
 class EurochanceNode(ContentNode):
-
+    
+    def meta(self):
+        author = 'Lawton Idiomas (http://www.lawtonschool.com)'
+        copyright = "Copyright (c) 2004-2005 Lawton Idiomas (content), "
+        if self.language() == 'de':
+            author += ', BFI Steiermark (http://www.bfi-stmk.at)'
+            copyright += ("BFI Steiermark (translation and "
+                          "adaptations for German language), ")
+        copyright += "Brailcom, o.p.s. (presentation)"
+        return (('author', author),
+                ('copyright', copyright))
+    
     def resource(self, cls, file, *args, **kwargs):
         if cls is Media:
             basename, ext = os.path.splitext(file)
@@ -243,14 +254,12 @@ class EurochanceCourse(EurochanceNode):
         return self._read_file('title')
 
     def _unit_dirs(self):
-        return [d for d in os.listdir(self.src_dir())
+        dirs = [d for d in os.listdir(self.src_dir())
                 if os.path.isdir(os.path.join(self.src_dir(), d)) \
                 and d[0].isdigit()]
+        dirs.sort()
+        return dirs
 
-    def meta(self):
-        return {'author': 'Eurochance Team',
-                'copyright': "Copyright (c) 2004-2005 Eurochance Team"}
-    
     def _create_content(self):
         return (self._localized_wiki_content('intro'),
                 TableOfContents(self, item=self, title=_("Table of Contents:")))
