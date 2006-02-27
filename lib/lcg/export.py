@@ -43,12 +43,15 @@ class Exporter(object):
     def head(self, node):
         if self._stylesheet is not None:
             node.resource(Stylesheet, self._stylesheet)
+        import lcg
+        meta = node.meta() + \
+               (('generator',
+                 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
         tags = ['<title>%s</title>' % node.title()] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', node.language()))] + \
-               ['<meta name="%s" content="%s">' % item
-                for item in node.root().meta().items()] + \
+               ['<meta name="%s" content="%s">' % pair for pair in meta] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % s.url()
                 for s in node.resources(Script)]
