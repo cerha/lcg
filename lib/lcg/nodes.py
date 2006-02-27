@@ -310,16 +310,10 @@ class ContentNode(object):
 
         """
         return self._input_encoding
-    
+
     def meta(self):
-        """Return the meta data as a dictionary.
-
-        This method returns just an empty dictionary, but it is supposed to be
-        overriden in the implementing class.  Only root node's meta information
-        is taken into account, however.
-
-        """
-        return {}
+        """Return the meta data as a tuple of pairs (name, value)."""
+        return ()
     
     def resources(self, cls=None):
         """Return the list of all resources this node depends on.
