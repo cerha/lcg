@@ -1,3 +1,17 @@
+2006-02-27  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/__init__.py (__version__): Changed to 0.3.
+
+	* lib/lcg/export.py (Exporter.head): Add `generator' to the meta
+	tags.  Use meta data of the current node, not the root node.
+	Expect a tuple from `node.meta()'.
+
+	* lib/lcg/nodes.py (ContentNode.meta): Return a tuple, not a dictionary.
+
+	* lib/lcg/eurochance.py (EurochanceNode.meta): New method.
+	(meta): Method removed.
+	(EurochanceCourse._unit_dirs): Sort the names alphabetically.
+
 2006-02-21  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/nodes.py (DocRoot): Docstring updated.
