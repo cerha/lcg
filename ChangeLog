@@ -1,3 +1,31 @@
+2006-03-02  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/wiki.py (Formatter._link_formatter): If possible, use
+	`Link' and it's `export' method to format the link.
+
+	* lib/lcg/nodes.py (ContentNode._TITLE,
+	ContentNode._ABBREV_TITLE): Constants removed.
+	(ContentNode.__init__): Initiate the attributes `self._title_',
+	`self._brief_title_' and `self._descr_'.
+	(ContentNode.__str__): Use just the id and class name.
+	(ContentNode._brief_title, ContentNode._descr): New methods.
+	(ContentNode._title): Return None in this class.
+	(ContentNode._abbrev_title): Removed.
+	(ContentNode.title): Argument `abbrev' renamed to `brief'.  Return 
+	(ContentNode.descr): New method.
+
+	* lib/lcg/export.py (StaticExporter._link): `abbrev' -> `brief'.
+
+	* lib/lcg/eurochance.py (EurochanceNode._title): New method.
+	(Unit._abbrev_title): Renamed to `_brief_title'.
+	(Unit._title): Don't take the argument `abbrev'.
+	(ExerciseHelp.title): Replaced by `_title'.
+	(AnswerSheet._title): `abbrev' -> `brief'.
+
+	* lib/lcg/content.py (Link.target, Link.label, Link.descr): New methods.
+	(Link.export): Use them.
+	(Anchor.anchor): New method.
+
 2006-02-27  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/__init__.py (__version__): Changed to 0.3.
