@@ -30,8 +30,8 @@ class Formatter(object):
     This simple Wiki formatter can only format the markup within one block (ie.
     a single paragraph or other non-structured piece of text).
 
-    All the document structure (headings, paragraphs, bullet lists etc.) should
-    be recognized by the 'Parser' class below.  Then only the contents of the
+    All the document structure (headings, paragraphs, bullet lists etc.) is
+    recognized by the 'Parser' class below.  Then only the contents of the
     recognized structured elements can be formatter using this formatter (where
     appropriate).
 
@@ -80,7 +80,8 @@ class Formatter(object):
                    and regexp % (type, markup)
                    or pair_regexp % (type, markup[1], type, markup[0])
                    for type, markup in self._MARKUP]
-        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')', re.MULTILINE)
+        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')',
+                                 re.MULTILINE|re.UNICODE)
         self._paired_on_output = [type for type, format in self._FORMAT.items()
                                   if isinstance(format, types.TupleType)]
 
@@ -131,32 +132,27 @@ class Formatter(object):
         title = groups.get('title')
         href = groups.get('href')
         anchor = groups.get('anchor')
-        if href:
-            if not re.match('^[a-z]+:.*$', href):
-                node = self._parent.root().find_node(href)
-                if node:
-                    href = node.url()
-                else:
-                    log("Unknown node: %s" % href)
-            else:
+        if not href:
+            node = self._parent
+        else:
+            if re.match('^[a-z]+:.*$', href):
                 # External reference
                 node = None
-        else:
-            node = self._parent
-        if node and not title:
-            if anchor:
-                section = node.find_section(anchor)
-                if section:
-                    title = section.title()
             else:
-                title = node.title()
-        if anchor is not None:
-            href += '#'+anchor
-        if not title:
-            title = href
-        if anchor and node and not node.find_section(anchor):
-            log("Unknown section: %s" % anchor)
-        return '<a href="%s">%s</a>' % (href, title)
+                node = self._parent.root().find_node(href)
+                if not node:
+                    log("Unknown node: %s" % href)
+        target = node
+        if node and anchor:
+            target = node.find_section(anchor)
+            if target is None:
+                log("Unknown section in %s: %s" % (node.id(), anchor))
+        if target:
+            return Link(self._parent, target, title or '').export()
+        else:
+            if anchor is not None:
+                href += '#'+anchor
+            return '<a href="%s">%s</a>' % (href, title or href)
 
     def _uri_formatter(self, groups, close=False):
         return self._link_formatter({'href': groups['uri'], 'title': None})
