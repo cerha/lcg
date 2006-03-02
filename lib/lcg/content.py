@@ -173,27 +173,44 @@ class PreformattedText(TextContent):
         return '<pre class="lcg-preformatted-text">'+text+'</pre>'
 
     
+class Link(TextContent):
+    """Hypertext reference."""
+    def __init__(self, parent, target, name=''):
+        assert isinstance(target, (Section, ContentNode))
+        self._target = target
+        super(Link, self).__init__(parent, name)
+
+    def label(self):
+        return self._text or self._target.title()
+    
+    def target(self):
+        return self._target
+
+    def descr(self):
+        target = self._target
+        descr = None
+        if isinstance(target, ContentNode):
+            descr = target.descr()
+        elif target.parent() is not self._parent:
+            descr = "%s (%s)" % (target.title(), target.parent().title())
+        return descr
+    
+    def export(self):
+        return _html.link(self.label(), self._target.url(), title=self.descr())
+
+    
 class Anchor(TextContent):
     """An anchor (target of a link)."""
     def __init__(self, parent, anchor, text=''):
         assert isinstance(anchor, types.StringType)
         self._anchor = anchor
         super(Anchor, self).__init__(parent, text)
-        
-    def export(self):
-        return _html.link(self._text, None, name=self._anchor)
 
-    
-class Link(TextContent):
-    """An anchor (target of a link)."""
-    def __init__(self, parent, target, text=''):
-        assert isinstance(target, (Section, ContentNode))
-        self._target = target
-        super(Link, self).__init__(parent, text)
+    def anchor(self):
+        return self._anchor
         
     def export(self):
-        t = self._target
-        return _html.link(self._text or t.title(), t.url())
+        return _html.link(self._text, None, name=self.anchor())
 
     
 class Container(Content):
