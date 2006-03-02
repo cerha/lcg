@@ -1,5 +1,7 @@
 2006-03-02  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/__init__.py (__version__): 0.3.0.
+
 	* lib/lcg/wiki.py (Formatter._link_formatter): If possible, use
 	`Link' and it's `export' method to format the link.
 
