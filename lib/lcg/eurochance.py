@@ -26,6 +26,9 @@ data.  It can be used as an example of LCG usage.
 from lcg import *
 
 class EurochanceNode(ContentNode):
+
+    def _title(self):
+        return self._TITLE
     
     def meta(self):
         author = 'Lawton Idiomas (http://www.lawtonschool.com)'
@@ -53,11 +56,11 @@ class EurochanceNode(ContentNode):
 class Unit(EurochanceNode):
     _EXERCISE_SECTION_SPLITTER = re.compile(r"^==(?P<title>.+)?==+\s*$", re.M)
 
-    def _abbrev_title(self, abbrev=False):
-        return _("Unit %d") % self._parent.index(self)
+    def _brief_title(self):
+        return _("Unit %d") % int(self._id[4:])
 
-    def _title(self, abbrev=False):
-        return self._read_file('title')
+    def _title(self):
+        return "%s: %s" % (self._brief_title(), self._read_file('title'))
     
     def _exercise_sections(self, split_result):
         title = ''
@@ -144,7 +147,7 @@ class ExerciseHelp(EurochanceNode):
         return SectionContainer(self, content,
                                 lang=self.root().users_language())
 
-    def title(self, abbrev=False):
+    def _title(self):
         return _("Instructions for %s") % self._type.name()
 
 
@@ -202,7 +205,7 @@ class AnswerSheet(EurochanceNode):
         super(AnswerSheet, self).__init__(parent, id, *args, **kwargs)
         
     def _title(self):
-        return _("Answer Sheet for %s") % self._unit.title(abbrev=True)
+        return _("Answer Sheet for %s") % self._unit.title(brief=True)
 
     def _answer_sheets(self, section):
         return [Section(self, e.title(), e.answer_sheet(self))
