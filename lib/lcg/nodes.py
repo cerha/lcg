@@ -54,15 +54,6 @@ class ContentNode(object):
     
     """
 
-    _TITLE = _("Node")
-    
-    """The title is a string used to reference to the node from within the
-    generated content (eg. in Tables Of Contents etc.).  The derived
-    classes should define some more meaningful titles, such as 'Lesson',
-    'Module' etc."""
-
-    _ABBREV_TITLE = None
-    
     def __init__(self, parent, id, subdir=None, hidden=False, language='en',
                  input_encoding='ascii'):
         """Initialize the instance.
@@ -100,7 +91,6 @@ class ContentNode(object):
         self._registered_children = []
         self._wiki_parser = wiki.Parser(self)
         self._wiki_formatter = wiki.Formatter(self)
-        
         content = self._create_content()
         if isinstance(content, Content):
             self._content = content
@@ -122,6 +112,10 @@ class ContentNode(object):
                     assert not seen.has_key(nid), \
                            "Duplicate node id: %s, %s" % (n, seen[nid])
                     seen[nid] = n
+        brief_title = self._brief_title()
+        self._title_ = self._title() or brief_title or self._id
+        self._brief_title_ = brief_title or self._title_
+        self._descr_ = self._descr()
         
     def _register_child(self, child):
         assert isinstance(child, ContentNode)
@@ -129,9 +123,31 @@ class ContentNode(object):
         self._registered_children.append(child)
         
     def __str__(self):
-        return "<%s id='%s' title='%s' subdir='%s'>" % \
-               (self.__class__.__name__, self.id(),
-                self.title().encode('ascii', 'replace'), self.subdir())
+        return "<%s id='%s'>" % (self.__class__.__name__, self.id())
+
+    def _title(self):
+        """Return the title of this node as a string.
+
+        This method should be overridden by a derived class (returns 'None' in
+        this class).
+        
+        """
+        return None
+
+    def _brief_title(self):
+        """Return a brief title of this node as a string.
+
+        This allows to define a short title, which can be used in contexts,
+        where brevity is important.  This method should return 'None' to
+        indicate that there is no breif variant of the title, and the title
+        returned by '_title()' should be used.
+        
+        """
+        return self._title()
+
+    def _descr(self):
+        """Return a short description of this node as a string or None."""
+        return None
 
     def _create_content(self):
         """Create the content for this node.
@@ -159,14 +175,6 @@ class ContentNode(object):
         kwargs.update({'language': self._language,
                        'input_encoding': self._input_encoding})
         return cls(self, *args, **kwargs)
-    
-    def _title(self):
-        """Return the title of this node as a string."""
-        return self._TITLE
-
-    def _abbrev_title(self):
-        """Return the abbreviated title of this node as a string."""
-        return self._ABBREV_TITLE
     
     def _node_path(self, relative_to=None):
         """Return the path from root to this node as a sequence of nodes.
@@ -219,16 +227,18 @@ class ContentNode(object):
         """Return a unique id of this node as a string."""
         return self._id
         
-    def title(self, abbrev=False):
-        """Return the title of this node as a string."""
-        abbrev_title = self._abbrev_title()
-        if abbrev_title is not None:
-            if abbrev:
-                return abbrev_title
-            else:
-                return "%s: %s" % (abbrev_title, self._title())
-        else:
-            return self._title()
+    def title(self, brief=False):
+        """Return the title of this node as a string.
+
+        If a true value is passed to the optional argument 'brief', a shorter
+        version of the title will be returned, when available.
+        
+        """
+        return brief and self._brief_title_ or self._title_
+
+    def descr(self):
+        """Return a short description of this node as a string or None."""
+        return self._descr_
 
     def hidden(self):
         return self._hidden
