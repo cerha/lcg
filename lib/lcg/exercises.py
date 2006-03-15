@@ -884,7 +884,7 @@ class _FillInExercise(_InteractiveExercise):
                                
         
     
-class VocabExercise(_FillInExercise):
+class VocabExercise(_FillInExercise, _NumberedTasksExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Test Yourself")
