@@ -35,7 +35,6 @@ not able to render themselves.  They just hold the data.
 
 """
 
-import unicodedata
 import random
 import types
 import re
@@ -174,18 +173,16 @@ class FillInTask(Task):
     def answer(self):
         return self._answer
 
-    def text(self, field_formatter):
-        return field_formatter(self.answer(), id=self.id(), media=self._media)
-
     def media(self):
         return self._media
 
-    
+
 class DictationTask(FillInTask):
     _REGEXP = re.compile(r"(\s*/\s*|\s+)")
     
     def __init__(self, text, comment=None):
         assert isinstance(text, types.UnicodeType)
+        # TODO: This just fixed the input.  It's probably not needed anymore.
         text = self._REGEXP.sub(' ', text).strip()
         super(DictationTask, self).__init__(None, text, comment=comment)
 
@@ -208,20 +205,19 @@ class MixedTextFillInTask(FillInTask):
         else:
             return None
 
-    def _field_formatter(self, field_formatter):
-        return lambda match: field_formatter(match.group(1))
-        
-    def text(self, field_formatter, text_transform=None):
-        formatter = self._field_formatter(field_formatter)
-        text = self._text
-        if text_transform:
-            text = text_transform(text)
-        return self._FIELD_MATCHER.sub(formatter, text)
+    def is_mixed(self):
+        return self._FIELD_MATCHER.match(self._text) is None
+
+    def text(self, field_maker, formatter):
+        def make_field(match):
+            return field_maker(match.group(1), id=self.id(), media=self.media())
+        text = formatter(self._text.replace('[', '\['))
+        return self._FIELD_MATCHER.sub(make_field, text)
 
     def plain_text(self):
         return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._text)
 
-        
+    
 class TransformationTask(MixedTextFillInTask):
 
     def __init__(self, orig, transformation, comment=None):
@@ -231,10 +227,7 @@ class TransformationTask(MixedTextFillInTask):
         assert len(self.answers()) == 1
         answer = self.answers()[0]
         super(TransformationTask, self).__init__(orig, answer, comment=comment)
-
-    def _field_formatter(self, field_formatter):
-        return lambda match: field_formatter(match.group(1), id=self.id())
-
+        
     
 class ClozeTask(MixedTextFillInTask):
         
@@ -293,9 +286,9 @@ class Exercise(Section):
     _AUDIO_VERSION_LABEL = _("This exercise can be also done purely "
                              "aurally/orally:")
     _READING_INSTRUCTIONS = _("Read the following text:")
-    _TASK_SEPARATOR = '<br class="task-separator"/>\n'
     _EXPORT_ORDER = None
-    
+    _ANSWER_SHEET_LINK_PER_TASK = True
+
     _used_types = []
     _help_node = None
     
@@ -394,7 +387,7 @@ class Exercise(Section):
         self._tasks = list(self._check_tasks(tasks))
         self._custom_instructions = self._wiki_content(instructions)
         self._explanation = self._wiki_content(explanation)
-        self._example = self._wiki_content(example)
+        self._example = self._wiki_content(example, escape=True)
         self._reading = self._wiki_content(reading, allow_file=True,
                                            subdir='readings')
         if reading_instructions is None:
@@ -425,7 +418,7 @@ class Exercise(Section):
             
         self._init_resources()
 
-    def _wiki_content(self, text, allow_file=False, subdir=None):
+    def _wiki_content(self, text, allow_file=False, subdir=None, escape=False):
         if text is None:
             return None
         assert isinstance(text, types.StringTypes)
@@ -439,7 +432,9 @@ class Exercise(Section):
                 log("Unable to read file: %s", e)
                 return None
         else:
-            content = self._parent.parse_wiki_text(re.sub('\[', '\\[', text))
+            if escape:
+                text = re.sub('\[', '\\[', text)
+            content = self._parent.parse_wiki_text(text)
         return Container(self._parent, content)
     
     def _init_resources(self):
@@ -482,21 +477,24 @@ class Exercise(Section):
     def _instructions(self):
         return self._INSTRUCTIONS
 
+    def _play_button(self, media):
+        play = _html.button(_("Play"), "play_audio('%s')" % media.url(),
+                            cls='sound-control')
+        link = '[%s]' % _html.link(_("Play"), media.url())
+        return _html.script_write(play, link)
+                  
     def _sound_controls(self, label, media, transcript=None, cls=None):
         if transcript is not None:
-            t = " " + _html.link(_("show transcript"), transcript.url(),
-                                 target="transcript")
+            t = _html.link(_("show transcript"), transcript.url(),
+                           target="transcript") + "\n"
         else:
             t = ""
-        beg  = '<form class="sound-control%s" action="#">%s\n' % \
-               (cls and ' '+cls or '', label)
-        play = _html.button(_("Play"), "play_audio('%s')" % media.url())
-        stop = _html.button(_("Stop"), 'stop_audio()')
-        end  = t + '\n</form>'
-        a = '%s [%s]' % (label, _html.link(_("Play"), media.url()))
-        result = (_html.script_write(beg + play),
-                  _html.script_write(stop, condition='document.media_player'),
-                  _html.script_write(end, _html.p(a+t)))
+        result = ('<form class="sound-control%s" action="#">%s\n' % \
+                  (cls and ' '+cls or '', label),
+                  self._play_button(media),
+                  _html.script_write(_html.button(_("Stop"), 'stop_audio()'),
+                                     condition='document.media_player'),
+                  t + '</form>')
         return '\n'.join(result)
 
     def export(self):
@@ -519,13 +517,14 @@ class Exercise(Section):
         return "\n".join(tasks)
     
     def _export_tasks(self):
-        tasks = [self._export_task(t) for t in self._tasks]
+        exported = [self._export_task(t) for t in self._tasks]
         if self._template:
-            tasks = self._template.export() % tuple(tasks)
+            exported = self._template.export() % tuple(exported)
         else:
-            tasks = self._wrap_exported_tasks(tasks)
-        if tasks:
-            return _html.form((tasks, self._results()), name=self._form_name())
+            exported = self._wrap_exported_tasks(exported)
+        if exported:
+            return _html.form((exported, self._results()),
+                              name=self._form_name())
         else:
             return None
 
@@ -574,14 +573,18 @@ class Exercise(Section):
         else:
             return None
 
+    def _task_style_cls(self):
+        return 'task %s-task' % camel_case_to_lower(self.__class__.__name__)
+        
     def _export_task(self, task):
         parts = self._export_task_parts(task)
         if not isinstance(parts, (types.TupleType, types.ListType)):
-            parts = (parts, )
+            parts = [parts]
         else:
             parts = [p for p in parts if p is not None]
-        cls = camel_case_to_lower(self.__class__.__name__)
-        return _html.div(parts, cls='task %s-task' % cls) + self._TASK_SEPARATOR
+        if self._ANSWER_SHEET_LINK_PER_TASK:
+            parts.append(self._answer_sheet_link(self._tasks.index(task)))
+        return _html.div(parts, cls=self._task_style_cls())
 
     def _results(self):
         return ""
@@ -622,7 +625,6 @@ class _InteractiveExercise(Exercise):
     gives him a feedback.
     
     """
-    _ANSWER_SHEET_LINK_CLASS = 'answer-sheet-link'
     _RESPONSES = (('correct',   'responses/c*.mp3'),
                   ('incorrect', 'responses/i*.mp3'),
                   ('f0-49',     'responses/o0-49*.mp3'),
@@ -700,11 +702,11 @@ class _InteractiveExercise(Exercise):
                self._answer_sheet_anchor(index)
 
     def _answer_sheet_link(self, index):
-        lnk = _html.link("?", self._answer_sheet_url(index),
+        lnk = _html.link('?', self._answer_sheet_url(index),
                          title=_("Show the answer sheet."),
-                         target='help', cls=self._ANSWER_SHEET_LINK_CLASS)
-        return lnk
-        #return _html.span(lnk, cls=self._ANSWER_SHEET_LINK_CLASS)
+                         target='help', cls='answer-sheet-link')
+        b1, b2 = [_html.span(b, cls='hidden') for b in ('[', ']')]
+        return b1 + lnk + b2
         
     def answer_sheet(self, parent):
         self._answer_sheet_node = p = parent
@@ -764,10 +766,13 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         formatted = [self._format_choice(task, ch) for ch in task.choices()]
         return _html.div(formatted, 'choices')
 
+    def _task_style_cls(self):
+        cls = super(_ChoiceBasedExercise, self)._task_style_cls()
+        return cls + ' choice-based-task'
+    
     def _export_task_parts(self, task):
-        lnk = self._answer_sheet_link(self._tasks.index(task))
         prompt = self._parent.format_wiki_text(task.prompt())
-        return (prompt, self._format_choices(task), lnk)
+        return (prompt, self._format_choices(task))
 
     
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
@@ -819,8 +824,7 @@ class GapFilling(_ChoiceBasedExercise):
 
 #    def _export_task_parts(self, task):
 #        statement = task.substitute_gap("%s")
-#        lnk = self._answer_sheet_link(self._tasks.index(task))
-#        return statement.replace('%s', self._format_choices(task)) +'\n'+ lnk 
+#        return statement.replace('%s', self._format_choices(task)) +'\n'
     
 
 ################################################################################
@@ -837,7 +841,9 @@ class _FillInExercise(_InteractiveExercise):
 
     def _check_tasks(self, tasks):
         for t in tasks:
-            assert not isinstance(t, ClozeTask) or len(t.answers()) == 1, \
+            assert t.answer() is not None or \
+                   isnistance(t, MixedTextFillInTask) and \
+                   len(t.answers()) == 1, \
                    "%s requires just one textbox per task (%d found)!" % \
                    (self.__class__.__name__, len(t.answers())) 
         return tasks
@@ -852,20 +858,29 @@ class _FillInExercise(_InteractiveExercise):
     def _make_field(self, text, id=None, media=()):
         try:
             counter = self._field_counter
+            counter.next()
         except AttributeError:
             self._field_counter = counter = Counter(0)
-        n = counter.next()
-        f = _html.field(cls='fill-in-task', name="task-%d" % n,
-                        size=max(4, len(text)+1), id=id)
-        controls = [_html.button(_("Play"), "play_audio('%s')" % m.url(),
-                                 cls='sound-control')
-                    for m in media]
-        return f + ''.join(controls) + self._answer_sheet_link(n)
+        n = counter.current()
+        field = _html.field(cls='fill-in-task', name="task-%d" % n,
+                            size=max(4, len(text)+1), id=id)
+        controls = [self._play_button(m) for m in media]
+        field += ''.join(controls)
+        return field
     
     def _export_task_parts(self, task):
-        text = task.text(self._make_field)
         prompt = self._parent.format_wiki_text(task.prompt())
-        return self._TASK_FORMAT % (_html.label(prompt, task.id()), text)
+        if isinstance(task, MixedTextFillInTask):
+            text = task.text(self._make_field, self._parent.format_wiki_text)
+        else:
+            text = self._make_field(task.answer(), id=task.id(),
+                                    media=task.media())
+        if not (isinstance(task, MixedTextFillInTask) and task.is_mixed()):
+            # When the inputfield is emeded within the text, it is confusing to
+            # have the prompt marked as a label.  Morover some screeen-readers
+            # (JAWs) are confused too and present the task incorrectly.
+            prompt = _html.label(prompt, task.id())
+        return self._TASK_FORMAT % (prompt, text)
                                
         
     
@@ -876,7 +891,6 @@ class VocabExercise(_FillInExercise):
     _TASK_FORMAT = "%s %s"
     _INSTRUCTIONS = _("Fill in the correct translation for each "
                       "of the terms below.")
-    _TASK_SEPARATOR = ''
 
     def _check_tasks(self, tasks):
         if not tasks:
@@ -981,7 +995,11 @@ class _Cloze(_FillInExercise):
         else:
             return self._INSTRUCTIONS
 
-        
+    def _export_task_parts(self, task):
+        formatter = self._parent.format_wiki_text
+        return task.text(self._make_field, formatter)
+
+
 class _ExposedCloze(_Cloze):
     _NAME = _("Exposed Cloze")
     _INSTRUCTIONS = _("Use the correct word or expression from the list below "
@@ -995,10 +1013,7 @@ class _ExposedCloze(_Cloze):
 
     
 class NumberedCloze(_Cloze, _NumberedTasksExercise):
-
-    def _export_task_parts(self, task):
-        tr = lambda t: self._parent.format_wiki_text(t.replace('[','\\['))
-        return task.text(self._make_field, tr)
+    pass
 
     
 class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
@@ -1007,8 +1022,10 @@ class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
 
 class Cloze(_Cloze):
     """Paragraphs of text including text-fields for the marked words."""
-    _ANSWER_SHEET_LINK_CLASS = 'cloze-answer-sheet-link'
-    _TASK_SEPARATOR = ''
+
+    # Here we want an answer-sheet link per field (see _maike_field).
+    # Tasks and answers are not 1:1.
+    _ANSWER_SHEET_LINK_PER_TASK = False
 
     def _check_tasks(self, tasks):
         assert len(tasks) == 1
@@ -1020,11 +1037,15 @@ class Cloze(_Cloze):
     def _answer_sheet_items(self):
         t = self._tasks[0]
         return zip(t.answers(), t.comments())
-        
+
+    def _make_field(self, text, id=None, **kwargs):
+        field = super(Cloze, self)._make_field(text, **kwargs)
+        return field + self._answer_sheet_link(self._field_counter.current())
+
     def _export_task_parts(self, task):
-        transform = lambda t: self._wiki_content(t).export()
-        return task.text(self._make_field, transform)
-
-
+        # The formatter here actually works as a parser and formatter.
+        formatter = lambda t: self._wiki_content(t).export()
+        return task.text(self._make_field, formatter)
+    
 class ExposedCloze(Cloze, _ExposedCloze):
     pass
