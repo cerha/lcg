@@ -1,3 +1,52 @@
+2006-03-15  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/exercises.py: Don't import `unicodedata' here.
+	(FillInTask.text): Method removed.
+	(MixedTextFillInTask.text): Argument names changed.  Formatter
+	always required. Don't use `_field_formatter()'
+	(MixedTextFillInTask.is_mixed): New method.
+	(ClozeTask._field_formatter)
+	(MixedTextFillInTask._field_formatter): Method removed.
+	(Exercise._TASK_SEPARATOR): Constant removed.
+	(Exercise._ANSWER_SHEET_LINK_PER_TASK): New constant.
+	(Exercise._wiki_content): New argument `escape'.  Only escape
+	square brackets when True.
+	(Exercise.__init__): Set `escape' to True just for `example'.
+	(Exercise._play_button): New method.
+	(Exercise._sound_controls): Use it.  Simplified.
+	(Exercise._task_style_cls): New method.
+	(Exercise._export_task): Use it.  Automatically append answer
+	sheet link.
+	(_InteractiveExercise._ANSWER_SHEET_LINK_CLASS): Constant removed.
+	(Cloze._ANSWER_SHEET_LINK_CLASS, Cloze._TASK_SEPARATOR): Constants
+	removed.
+	(Cloze._ANSWER_SHEET_LINK_PER_TASK) New constant.
+	(_InteractiveExercise._answer_sheet_link): Surround the link with
+	hidden brackets.  Don't use `self._ANSWER_SHEET_LINK_CLASS'.
+	(_ChoiceBasedExercise._task_style_cls): New method.
+	(_ChoiceBasedExercise._export_task_parts): Don't add the
+	answer-sheet link here.
+	(_FillInExercise._check_tasks): Assertion extended.
+	(_FillInExercise._make_field): Increment the counter forst and
+	than use the its `current()' method.  Use `self._play_button()'.
+	(_FillInExercise._export_task_parts): Decide which presentation is
+	appropriate according to the task type and other properties.
+	(Dictation._init_script): Don't escape the square brackets within
+	the text.
+	(Cloze._make_field): New method.
+	(Cloze._export_task_parts): Identifier changed.
+	(VocabExercise): Derive also from `_NumberedTasksExercise'.
+
+	* lib/lcg/nodes.py (ContentNode.counter): Initialize the counter
+	with a zero, not one.
+
+	* lib/lcg/wiki.py (Formatter._link_formatter): Report the parent
+	node id, when reporting an unknown node or section.
+
+	* lib/lcg/util.py (Counter.current): New method.
+	(Counter.next): Return the incremented value, not the one before
+	increment.
+
 2006-03-02  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/__init__.py (__version__): 0.3.0.
