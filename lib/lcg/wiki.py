@@ -141,12 +141,13 @@ class Formatter(object):
             else:
                 node = self._parent.root().find_node(href)
                 if not node:
-                    log("Unknown node: %s" % href)
+                    log("%s: Unknown node: %s" % (self._parent.id(), href))
         target = node
         if node and anchor:
             target = node.find_section(anchor)
             if target is None:
-                log("Unknown section in %s: %s" % (node.id(), anchor))
+                log("%s: Unknown section: %s:%s" %
+                    (self._parent.id(), node.id(), anchor))
         if target:
             return Link(self._parent, target, title or '').export()
         else:
