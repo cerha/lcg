@@ -120,9 +120,11 @@ class Counter(object):
     def __init__(self, initial_value=0):
         self._value = initial_value
         
+    def current(self):
+        return self._value
+
     def next(self):
-        value = self._value
-        self._value = self._value + 1
+        self._value = value = self._value + 1
         return value
                 
     
