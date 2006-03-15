@@ -367,7 +367,7 @@ class ContentNode(object):
         try:
             return self._counters[key]
         except KeyError:
-            self._counters[key] = c =Counter(1)
+            self._counters[key] = c = Counter(0)
             return c
         
     def index(self, node):
