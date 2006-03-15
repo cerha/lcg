@@ -18,6 +18,21 @@ h7,h8,h9 { font-size: 1.1em; }
 hr.navigation { 
     display: none; 
 }
+.hidden { 
+    display: none; 
+}
+.citation, .quotation { 
+    font-style: italic;
+}
+dt .citation { 
+    font-style: normal;
+}
+dt em { 
+    font-weight: normal;
+}
+dl dt {
+    font-weight: bold;
+}
 
 div.navigation { 
     border: solid #b8bcc0;
@@ -38,7 +53,6 @@ div.table-of-contents {
     padding: 3pt;
 }
 div.table-of-contents a { text-decoration: none; }
-
 div.table-of-contents ul { 
     margin-top: 3pt;
     margin-bottom: 0;
@@ -68,15 +82,10 @@ ol.tasks li {
 }
 div.task { 
     margin-bottom: 0.7em;
-    padding-right: 1em;
-    position: relative;
-}
-br.task-separator { 
-    display: none; 
 }
 
 div.cloze-task, div.vocab-exercise-task {
-    margin-bottom: 0;
+    margin-bottom: 0.1em;
 }
 
 div.choices { 
@@ -110,17 +119,22 @@ a.external-link {
 a.answer-sheet-link, a.cloze-answer-sheet-link { 
     font-size: 0.8em;
     text-decoration: none;
+    vertical-align: top;
+    padding: 0;
+    margin: 0.1em;
 }
-a.answer-sheet-link { 
+
+div.choice-based-task { 
+    position: relative;
+    padding-right: 1em;
+}
+div.choice-based-task .answer-sheet-link { 
     position: absolute;
     top: 0;
     right: 0;
 }
-.cloze-answer-sheet-link { 
-    vertical-align: top;
-    padding: 0;
-    margin: 2px;
-}
+
+
 
 .label p { 
     margin: 0;
@@ -157,16 +171,6 @@ form.sound-control.audio-version input.button {
     background-color: #ed6;
 }
 
-.citation, .quotation { 
-    font-style: italic;
-}
-dt .citation { 
-    font-style: normal;
-}
-dt em { 
-    font-weight: normal;
-}
-
 .speaking-text { 
     color: #04b;
     text-decoration: underline;
@@ -197,25 +201,17 @@ dt em {
     border-top: #aaa solid 1px;
 }
 
-dl dt {
-    font-weight: bold;
-}
-
-table.vocab-list td {
-    /*padding-right: 1em;*/
-}
 
 table.lcg-table {
     border-collapse: collapse;
 }
+table.lcg-table, table.lcg-fieldset { margin: 0.5em, 0, 0.5em, 0; }
 table.lcg-table td, table.lcg-table th {
     padding: 2pt;
     vertical-align: top;
     white-space: nowrap;
     border: #ccc solid 1px;
 }
-
-table.lcg-table, table.lcg-fieldset { margin: 0.5em, 0, 0.5em, 0; }
 table.lcg-table td { background: #f4f4f4; }
 table.lcg-table th { background: #eee; }
 table.lcg-table caption, table.lcg-fieldset caption {
@@ -223,7 +219,6 @@ table.lcg-table caption, table.lcg-fieldset caption {
     font-size: 1.1em;
     text-align: left;
 }
-
 table.lcg-fieldset th { white-space: nowrap; }
 
 pre.lcg-preformatted-text {
