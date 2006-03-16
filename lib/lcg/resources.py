@@ -55,7 +55,7 @@ def resource(cls, parent, file, fallback=True, **kwargs):
         ('config.default_resource_dir') in the subdirectory given by the
         resource type.
 
-      * For other media types the source files are always expected in parent
+      * For other resource types the source files are always expected in parent
         node's source directory ('ContentNode.src_dir()').
     
     The instances are cached.  Use this function instead of creating the
@@ -106,19 +106,27 @@ def resource(cls, parent, file, fallback=True, **kwargs):
         return result
 
 class Resource(object):
-    """Base resource class.
+    """Generic resource class.
     
     Instances should not be constructed directly.  Use the
     'ContentNode.resource()' method instead.
 
     """
+    
     SUBDIR = 'resources'
+    """The subdirectory, where the resource files are both searched on input
+    and stored on output."""
+
     SHARED = True
     """A boolean flag indicating that the file may be shared by multiple nodes
     (is not located within the node-specific subdirectory, but rather in a
     course-wide resource directory)."""
 
     ALT_SRC_EXTENSIONS = ()
+    """A list of alternative source file extensions.  When the input file of
+    the same name as passed to the constructor does not exist, other files are
+    searched with the same baseneme and all the extensions listed here.  An
+    appropriate conversion is possible within the '_export()' method."""
     
     def __init__(self, file, src_path, parent=None, raise_error=False):
         """Initialize the instance.
@@ -183,7 +191,7 @@ class Resource(object):
 
         
 class Media(Resource):
-    """Representation of a media object used within the content."""
+    """A media object used within the content."""
     SUBDIR = 'media'
     SHARED = False
     ALT_SRC_EXTENSIONS = ('.wav',)
@@ -226,22 +234,22 @@ class SharedMedia(Media):
     
 
 class Script(Resource):
-    """Representation of a script object used within the content."""
+    """A script object used within the content."""
     SUBDIR = 'scripts'
 
     
 class Stylesheet(Resource):
-    """Representation of a stylesheet used within the content."""
+    """A stylesheet used within the content."""
     SUBDIR = 'css'
 
     
 class Image(Resource):
-    """Representation of an image used within the content."""
+    """An image used within the content."""
     SUBDIR = 'images'
 
     
 class Transcript(Resource):
-    """Representation of a textual recording transcript."""
+    """A textual transcript of a recording ."""
     SUBDIR = 'transcripts'
     SHARED = False
 
