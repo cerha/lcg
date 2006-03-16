@@ -1,5 +1,7 @@
 2006-03-16  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/resources.py: Docstrings improved.
+
 	* lib/lcg/wiki.py (Formatter._link_formatter): Improved
 	recognition of external links.
 
