@@ -135,13 +135,13 @@ class Formatter(object):
         if not href:
             node = self._parent
         else:
-            if re.match('^[a-z]+:.*$', href):
-                # External reference
-                node = None
-            else:
+            if href.find('@') == href.find('/') == -1:
                 node = self._parent.root().find_node(href)
                 if not node:
                     log("%s: Unknown node: %s" % (self._parent.id(), href))
+            else:
+                # External reference
+                node = None
         target = node
         if node and anchor:
             target = node.find_section(anchor)
