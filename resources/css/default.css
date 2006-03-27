@@ -205,7 +205,7 @@ form.sound-control.audio-version input.button {
 table.lcg-table {
     border-collapse: collapse;
 }
-table.lcg-table, table.lcg-fieldset { margin: 0.5em, 0, 0.5em, 0; }
+table.lcg-table, table.lcg-fieldset { margin: 0.5em 0 0.5em 0; }
 table.lcg-table td, table.lcg-table th {
     padding: 2pt;
     vertical-align: top;
@@ -224,7 +224,6 @@ table.lcg-fieldset th { white-space: nowrap; }
 pre.lcg-preformatted-text {
     background: #efffb8;
     border: 1px solid #aaa;
-    color: $color.foreground;
     padding: 4pt;
     white-space: pre;
 }
