@@ -95,17 +95,13 @@ def label(text, id, lang=None, cls=None):
     return _tag('label', (('for', id), ('lang', lang), ('class', cls)), text)
 
 def _input(type, name=None, value=None, title=None, id=None,
-           onclick=None, onkeydown=None, onfocus=None,
-           size=None, readonly=False, cls=None):
-    #handler = handler and "javascript: %s" % handler
+           onclick=None, size=None, readonly=False, cls=None):
     return '<input type="%s"%s%s />' % (type, _attr(('name', name),
                                                     ('value', value),
                                                     ('title', title),
                                                     ('id', id),
                                                     ('size', size),
                                                     ('onclick', onclick),
-                                                    ('onfocus', onfocus),
-                                                    ('onkeydown', onkeydown),
                                                     ('class', cls)),
                                         readonly and ' readonly' or '')
 
@@ -138,7 +134,7 @@ def select(name, options, onchange=None, default="", id=None):
 
 def speaking_text(text, media):
     id_ = 'text_%s' % id(media)
-    a1 = button(text, "javascript: play_audio('%s');" % media.url(),
+    a1 = button(text, "play_audio('%s');" % media.url(),
                 cls='speaking-text')
     a2 = link(text, media.url(), cls='speaking-text')
     return script_write(a1, a2)
