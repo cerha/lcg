@@ -55,9 +55,6 @@ class Task(object):
         self._comment = comment
         self._prompt = prompt
 
-    def id(self):
-        return 'task_%s' % positive_id(self)
-        
     def prompt(self):
         return self._prompt
     
@@ -210,7 +207,7 @@ class MixedTextFillInTask(FillInTask):
 
     def text(self, field_maker, formatter):
         def make_field(match):
-            return field_maker(match.group(1), id=self.id(), media=self.media())
+            return field_maker(self, match.group(1))
         text = formatter(self._text.replace('[', '\['))
         return self._FIELD_MATCHER.sub(make_field, text)
 
@@ -415,7 +412,6 @@ class Exercise(Section):
             self._audio_version = parent.resource(Media, audio_version)
         else:
             self._audio_version = None
-            
         self._init_resources()
 
     def _wiki_content(self, text, allow_file=False, subdir=None, escape=False):
@@ -471,17 +467,20 @@ class Exercise(Section):
     def _transcript_text(self):
         return None
 
+    def _exercise_id(self):
+        return self.anchor()
+    
     def _form_name(self):
-        return "exercise_%x" % positive_id(self)
+        return self._exercise_id().replace('.', '_')
     
     def _instructions(self):
         return self._INSTRUCTIONS
 
     def _play_button(self, media):
-        play = _html.button(_("Play"), "play_audio('%s')" % media.url(),
-                            cls='sound-control')
-        link = '[%s]' % _html.link(_("Play"), media.url())
-        return _html.script_write(play, link)
+        button = _html.button(_("Play"), "play_audio('%s')" % media.url(),
+                              cls='sound-control')
+        link = _html.link(_("Play"), media.url())
+        return _html.script_write(button, '[' + link + ']')
                   
     def _sound_controls(self, label, media, transcript=None, cls=None):
         if transcript is not None:
@@ -573,6 +572,7 @@ class Exercise(Section):
         else:
             return None
 
+        
     def _task_style_cls(self):
         return 'task %s-task' % camel_case_to_lower(self.__class__.__name__)
         
@@ -585,6 +585,9 @@ class Exercise(Section):
         if self._ANSWER_SHEET_LINK_PER_TASK:
             parts.append(self._answer_sheet_link(self._tasks.index(task)))
         return _html.div(parts, cls=self._task_style_cls())
+
+    def _task_name(self, task):
+        return self._exercise_id() + '-t%d' % (self._tasks.index(task)+1)
 
     def _results(self):
         return ""
@@ -671,7 +674,7 @@ class _InteractiveExercise(Exercise):
         """ % (self._form_name(), self._FORM_HANDLER, ", ".join(args))
 
     def _results(self):
-        field_id = lambda name: self._form_name() + '_' + name
+        field_id = lambda name: self._exercise_id() + '.' + name
         displays = [' '.join((_html.label(label, id=field_id(name)),
                               _html.field(name=name, size=50, readonly=True,
                                           id=field_id(name))))
@@ -747,11 +750,12 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         return _html.link(choice.answer(), media.url())
     
     def _js_choice_control(self, task, choice):
-        choice_id = 'choice_%s' % positive_id(choice)
-        ctrl = _html.radio('task-%d' % self._tasks.index(task), id=choice_id,
+        i = task.choices().index(choice)
+        task_name = self._task_name(task)
+        choice_id = task_name + '-ch%d' % (i+1)
+        ctrl = _html.radio(task_name , id=choice_id,
                            onclick="this.form.handler.eval_answer(this)", 
-                           value=task.choice_index(choice),
-                           cls='answer-control')
+                           value=i, cls='answer-control')
         return ctrl +' '+ _html.label(choice.answer(), choice_id)
 
     def _choice_label(self, task, choice):
@@ -805,11 +809,11 @@ class _SelectBasedExercise(_ChoiceBasedExercise):
     _FORM_HANDLER = 'SelectBasedExerciseHandler'
 
     def _format_choices(self, task):
-        js = _html.select('task-%d' % self._tasks.index(task),
-                          [(ch.answer(), task.choice_index(ch))
-                           for ch in task.choices()],
-                          onchange="this.form.handler.eval_answer(this)",
-                          id=task.id())
+        task_name = self._task_name(task)
+        js = _html.select(task_name, id=task_name,
+                          options=[(ch.answer(), task.choice_index(ch))
+                                   for ch in task.choices()],
+                          onchange="this.form.handler.eval_answer(this)")
         nonjs = [self._non_js_choice_control(task, ch) for ch in task.choices()]
         return _html.script_write(js, "("+"|".join(nonjs)+")")
 
@@ -822,9 +826,11 @@ class GapFilling(_ChoiceBasedExercise):
     _INSTRUCTIONS = _("Choose the correct option to fill the gaps in the "
                       "following sentences.")
 
-#    def _export_task_parts(self, task):
-#        statement = task.substitute_gap("%s")
-#        return statement.replace('%s', self._format_choices(task)) +'\n'
+
+    def _export_task_parts(self, task):
+        prompt = self._parent.format_wiki_text(task.substitute_gap("\____"))
+        #return prompt.replace('%s', self._format_choices(task)) +'\n'
+        return (prompt, self._format_choices(task))
     
 
 ################################################################################
@@ -855,16 +861,11 @@ class _FillInExercise(_InteractiveExercise):
         return [('; '.join(t.answer().split('|')), t.comment())
                 for t in self._tasks if t.answer() is not None]
     
-    def _make_field(self, text, id=None, media=()):
-        try:
-            counter = self._field_counter
-            counter.next()
-        except AttributeError:
-            self._field_counter = counter = Counter(0)
-        n = counter.current()
-        field = _html.field(cls='fill-in-task', name="task-%d" % n,
-                            size=max(4, len(text)+1), id=id)
-        controls = [self._play_button(m) for m in media]
+    def _make_field(self, task, text):
+        name = self._task_name(task)
+        field = _html.field(cls='fill-in-task', name=name, id=name,
+                            size=max(4, len(text)+1))
+        controls = [self._play_button(m) for m in task.media()]
         field += ''.join(controls)
         return field
     
@@ -873,13 +874,12 @@ class _FillInExercise(_InteractiveExercise):
         if isinstance(task, MixedTextFillInTask):
             text = task.text(self._make_field, self._parent.format_wiki_text)
         else:
-            text = self._make_field(task.answer(), id=task.id(),
-                                    media=task.media())
+            text = self._make_field(task, task.answer())
         if not (isinstance(task, MixedTextFillInTask) and task.is_mixed()):
             # When the inputfield is emeded within the text, it is confusing to
             # have the prompt marked as a label.  Morover some screeen-readers
             # (JAWs) are confused too and present the task incorrectly.
-            prompt = _html.label(prompt, task.id())
+            prompt = _html.label(prompt, self._task_name(task))
         return self._TASK_FORMAT % (prompt, text)
                                
         
@@ -1038,9 +1038,16 @@ class Cloze(_Cloze):
         t = self._tasks[0]
         return zip(t.answers(), t.comments())
 
-    def _make_field(self, text, id=None, **kwargs):
-        field = super(Cloze, self)._make_field(text, **kwargs)
-        return field + self._answer_sheet_link(self._field_counter.current())
+    def _make_field(self, task, text):
+        try:
+            counter = self._field_counter
+        except AttributeError:
+            counter = self._field_counter = Counter(0)
+        n = counter.next()
+        name = self._exercise_id() + '-f%d' % n
+        field = _html.field(name=name,
+                            size=max(4, len(text)+1), cls='fill-in-task')
+        return field + self._answer_sheet_link(n-1)
 
     def _export_task_parts(self, task):
         # The formatter here actually works as a parser and formatter.
