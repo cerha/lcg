@@ -1,4 +1,4 @@
-/* Copyright (C) 2004, 2005 Brailcom, o.p.s.
+/* Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ Handler.prototype.evaluate = function() {
       }
    }
    if (this._fields.length > 1) {
-      percentage = this.percentage()
+      percentage = this.first_attempt_percentage()
       if      (percentage < 50)  selector='f0-49';
       else if (percentage < 70)  selector='f50-69';
       else if (percentage < 85)  selector='f70-84';
@@ -329,6 +329,7 @@ FillInExerciseHandler.prototype._recognize_field = function(field) {
 FillInExerciseHandler.prototype._init_field = function(field) {
    field.answer_index = this._last_answer_index++;
    field.onkeypress = this._handle_text_field_keypress;
+   field.ondblclick = this._handle_dlbclick;
 }
 
 FillInExerciseHandler.prototype._find_answer = function(field) {
@@ -366,6 +367,13 @@ FillInExerciseHandler.prototype._eval_answer = function(value, i) {
 FillInExerciseHandler.prototype._fill_answer = function(i) {
    var answers = this._answers[i].split('|');
    this.set_answer(i, answers[0]);
+}
+
+FillInExerciseHandler.prototype._handle_dlbclick = function(e) {
+   if (document.all) e = window.event;
+   var field = event_target(e);
+   field.form.handler.eval_answer(field);
+   return false;
 }
 
 FillInExerciseHandler.prototype._handle_text_field_keypress = function(e) {
