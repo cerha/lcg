@@ -1,3 +1,42 @@
+2006-03-27  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (Section.anchor): Use dots instead of dashes.
+	(VocabList.export): Supply `summary' and `title' attributes.
+
+	* lib/lcg/_html.py (_input): Removed unused arguments `onkeydown'
+	and `onfocus'.
+	(speaking_text): Don't prefix the handler with "javascript:".
+
+	* lib/lcg/exercises.py (Task.id): Method removed.
+	(Exercise._exercise_id): New method.
+	(Exercise._form_name): Use it.
+	(Exercise._play_button): Cosmetic changes.
+	(Exercise._task_name): New method.
+	(_SelectBasedExercise._format_choices): Use `self._task_name()'.
+	(GapFilling._export_task_parts): Escape the gap to prevent it from
+	being formatted as a markup.
+	(_FillInExercise._make_field): Accept just two positional
+	arguments: `task' and `text'.  Use `self._task_name()'.  Don't
+	create the counter here.
+	(_FillInExercise._export_task_parts): Use self._task_name(task) as
+	label id.  Pass the right arguments to
+	`_FillInExercise._make_field'.
+	(Cloze._make_field): Don't use the superclass method.  Create the
+	field here.  Use a counter here create a field name and
+	answer-sheet link.
+	(MixedTextFillInTask.text.make_field): Pass just `task' and `text'
+	to the `field_maker'.
+	(_FillInExercise._export_task_parts): Use `self._task_name()'
+	instead of `task.id()'.
+
+	* resources/scripts/exercises.js (Handler.evaluate): Use the first
+	attempt percentage, not the current percentage.
+	(FillInExerciseHandler._handle_dlbclick): New method.
+	(FillInExerciseHandler._init_field): Use it to handle double click
+	on input fields.
+
+	* resources/css/default.css: Syntax fixed.
+
 2006-03-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/resources.py: Docstrings improved.
