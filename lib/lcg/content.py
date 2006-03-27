@@ -498,7 +498,7 @@ class Section(SectionContainer):
             return self._anchor
         else:
             numbers = [str(x.section_number()) for x in self._section_path()]
-            return '-'.join([self._ANCHOR_PREFIX] + numbers)
+            return self._ANCHOR_PREFIX + '.'.join(numbers)
         
     def backref(self, node):
         # We can allow just one backref target on the page.  Links on other
@@ -698,9 +698,17 @@ class VocabList(Content):
                   _html.span(i.translation() or "???",
                              lang=i.translation_language()))
                  for i in self._items]
-        rows = ['<tr><td scope="row">%s</td><td>%s</td></tr>' %
-                (self._reverse and (b,a) or (a,b)) for a,b in pairs]
-        return '<table class="vocab-list">\n' + '\n'.join(rows) + "\n</table>\n"
+        if self._reverse:
+            pairs = [(b, a) for a,b in pairs]
+        t = ['<table class="vocab-list" title="%s" summary="%s">' % \
+             (_("Vocabulary Listing"),
+              _("The vocabulary is presented in a two-column table with a "
+                "term on the left and its translation on the right in each "
+                "row."))] + \
+            ['<tr><td scope="row">%s</td><td>%s</td></tr>' % pair
+             for pair in pairs] + \
+            ["</table>"]
+        return '\n'.join(t) + '\n'
 
     
 class VocabSection(Section):
