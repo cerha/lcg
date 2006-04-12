@@ -144,7 +144,7 @@ def speaking_text(text, media):
 def script(code, noscript=None):
     noscript = noscript and '<noscript>'+ noscript +'</noscript>' or ''
     if code:
-        code = '//<!--\n'+ code +' //-->\n'
+        code = '<!--\n'+ code +' //-->\n'
     return '<script type="text/javascript" language="Javascript">' + \
            code +'</script>'+ noscript
 
