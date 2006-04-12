@@ -1,11 +1,12 @@
-body { 
-    background: white;
+/* Generic content styles */
+
+html, body { 
+    background: #fff;
     font-family: sans-serif;
 }
-
-a:link, a:visited { color: #04b; }
-a:hover, .speaking-text:hover { color: #f60; }
-a.backref { text-decoration: none; color: black; }
+div.content { 
+    margin-bottom: 1.6em;
+}
 
 h1 { font-size: 2.0em; }
 h2 { font-size: 1.8em; }
@@ -15,14 +16,37 @@ h5 { font-size: 1.3em; }
 h6 { font-size: 1.2em; }
 h7,h8,h9 { font-size: 1.1em; }
 
-hr.navigation { 
-    display: none; 
+a:link, a:visited { color: #04b; }
+a:hover, .speaking-text:hover { color: #f60; }
+a.backref { text-decoration: none; color: #000; }
+
+.hidden { display: none; }
+
+/* Exporter generated parts */
+
+div.navigation { 
+    border: solid #b8bcc0;
+    border-width: 1px 0;
+    background: #e8ecf0;
 }
-.hidden { 
-    display: none; 
+div.navigation a, div.copyright a { text-decoration: none; }
+hr.navigation { display: none; }
+
+div.copyright { 
+    font-size: 0.8em;
+    float: right;
 }
+div.version { 
+    font-size: 0.8em;
+}
+
+/* LCG Formatter */
+
 .citation, .quotation { 
     font-style: italic;
+}
+.underline { 
+    text-decoration: underline;
 }
 dt .citation { 
     font-style: normal;
@@ -34,15 +58,32 @@ dl dt {
     font-weight: bold;
 }
 
-div.navigation { 
-    border: solid #b8bcc0;
-    border-width: 1px 0;
-    background: #e8ecf0;
-}
-div.navigation a { text-decoration: none; }
+/* Generic LCG content elements */
 
-div.content { 
-    margin-bottom: 1.6em;
+table.lcg-table {
+    border-collapse: collapse;
+}
+table.lcg-table, table.lcg-fieldset { margin: 0.5em 0; }
+table.lcg-table td, table.lcg-table th {
+    padding: 2pt;
+    vertical-align: top;
+    white-space: nowrap;
+    border: #ccc solid 1px;
+}
+table.lcg-table td { background: #f4f4f4; }
+table.lcg-table th { background: #eee; }
+table.lcg-table caption, table.lcg-fieldset caption {
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: left;
+}
+table.lcg-fieldset th { white-space: nowrap; }
+
+pre.lcg-preformatted-text {
+    background: #efffb8;
+    border: 1px solid #aaa;
+    padding: 4pt;
+    white-space: pre;
 }
 
 div.table-of-contents { 
@@ -58,6 +99,8 @@ div.table-of-contents ul {
     margin-bottom: 0;
 }
 
+/* LCG exercises */
+
 div.exercise-header { 
     position: relative;
     padding-right: 3em;
@@ -67,10 +110,6 @@ a.exercise-help-link {
     top: 0;
     right: 0;
     text-decoration: none;
-}
-
-
-form { 
 }
 
 ol.tasks {
@@ -83,31 +122,44 @@ ol.tasks li {
 div.task { 
     margin-bottom: 0.7em;
 }
-
 div.cloze-task, div.vocab-exercise-task {
     margin-bottom: 0.1em;
 }
-
 div.choices { 
     margin-left: 1em;
 }
 div.selections-task div.choices { 
     margin-left: 0;
 }
-
-input.fill-in-task { 
-    border: solid gray 1px;
-    margin: 1px;
-    background: #e8e8e8;
-    padding: 1px;
+div.choice-based-task { 
+    position: relative;
+    padding-right: 1em;
+}
+div.choice-based-task .answer-sheet-link { 
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
-
+.label p { 
+    margin: 0;
+    padding: 0;
+}
 .explanation, .reading, .example { 
     border: 0px solid #999;
     border-width: 1px 0px;
     padding: 0pt 3pt;
     margin-bottom: 0.7em;
+}
+.reading { 
+    background-color: #eee;
+}
+.explanation { 
+    background-color: #ddf;
+}
+.example { 
+    background-color: #dfc;
+    border-color: #8a8;
 }
 
 a.external-link { 
@@ -124,53 +176,30 @@ a.answer-sheet-link, a.cloze-answer-sheet-link {
     margin: 0.1em;
 }
 
-div.choice-based-task { 
-    position: relative;
-    padding-right: 1em;
-}
-div.choice-based-task .answer-sheet-link { 
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
-
-
-.label p { 
-    margin: 0;
-    padding: 0;
-}
-
-.reading { 
-    background-color: #eee;
-}
-.explanation { 
-    background-color: #ddf;
-}
-.example { 
-    background-color: #dfc;
-    border-color: #8a8;
-}
-
-input.answer-control { 
-    padding: 0;
-    font-weight: bold;
-}
-
 form.sound-control input.button, input.button.sound-control { 
     background-color: #e95;
     border: black solid 1px;
     padding: 0;
     font-weight: bold;
 }
+form.sound-control.audio-version input.button { 
+    background-color: #ed6;
+}
 input.button.sound-control { 
     margin: 1px;
     vertical-align: top;
 }
-form.sound-control.audio-version input.button { 
-    background-color: #ed6;
-}
 
+input.fill-in-task { 
+    border: solid gray 1px;
+    margin: 1px;
+    background: #e8e8e8;
+    padding: 1px;
+}
+input.answer-control { 
+    padding: 0;
+    font-weight: bold;
+}
 .speaking-text { 
     color: #04b;
     text-decoration: underline;
@@ -196,34 +225,7 @@ form.sound-control.audio-version input.button {
     font-size: 1em;
     background: none;
 }
-.results .buttons { 
+.results .buttons {
     padding: 2pt;
     border-top: #aaa solid 1px;
-}
-
-
-table.lcg-table {
-    border-collapse: collapse;
-}
-table.lcg-table, table.lcg-fieldset { margin: 0.5em 0 0.5em 0; }
-table.lcg-table td, table.lcg-table th {
-    padding: 2pt;
-    vertical-align: top;
-    white-space: nowrap;
-    border: #ccc solid 1px;
-}
-table.lcg-table td { background: #f4f4f4; }
-table.lcg-table th { background: #eee; }
-table.lcg-table caption, table.lcg-fieldset caption {
-    font-weight: bold;
-    font-size: 1.1em;
-    text-align: left;
-}
-table.lcg-fieldset th { white-space: nowrap; }
-
-pre.lcg-preformatted-text {
-    background: #efffb8;
-    border: 1px solid #aaa;
-    padding: 4pt;
-    white-space: pre;
 }
