@@ -109,8 +109,11 @@ class HhpExporter(lcg.Exporter):
         lcg.Section.backref = lambda s, n: None
         # We also want Tables with old HTML attributes.
         lcg.Table._ATTR = 'cellspacing="3" cellpadding="0"'
-        # We don't want
+        # We don't want XHTML tag syntax (<hr/>).
         lcg.HorizontalSeparator.export = lambda self_: '<hr>'
+        # We want old HTML 'visial' tags.
+        lcg.Formatter._FORMAT['underline'] = ('<u>', '</u>')
+        
 
     def export(self, node, directory):
         super(HhpExporter, self).export(node, directory)
