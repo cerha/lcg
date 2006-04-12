@@ -175,6 +175,8 @@ class PreformattedText(TextContent):
     
 class Link(TextContent):
     """Hypertext reference."""
+    _HTML_TAG = re.compile(r'<[^>]+>')
+    
     def __init__(self, parent, target, name=''):
         assert isinstance(target, (Section, ContentNode))
         self._target = target
@@ -196,7 +198,10 @@ class Link(TextContent):
         return descr
     
     def export(self):
-        return _html.link(self.label(), self._target.url(), title=self.descr())
+        # TODO: This hack removes any html from the description (it is used as
+        # an HTML attribute value).
+        descr = self.descr() and self._HTML_TAG.sub('', self.descr())
+        return _html.link(self.label(), self._target.url(), title=descr)
 
     
 class Anchor(TextContent):
