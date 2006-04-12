@@ -31,8 +31,8 @@ class EurochanceNode(ContentNode):
         return self._TITLE
     
     def meta(self):
-        author = 'Lawton Idiomas (http://www.lawtonschool.com)'
-        copyright = "Copyright (c) 2004-2005 Lawton Idiomas (content), "
+        author = 'Lawton School S.L. (http://www.lawtonschool.com)'
+        copyright = "Copyright (c) 2005-2006 Lawton School S.L. (content), "
         if self.language() == 'de':
             author += ', BFI Steiermark (http://www.bfi-stmk.at)'
             copyright += ("BFI Steiermark (translation and "
@@ -129,6 +129,13 @@ class Instructions(EurochanceNode):
 
     def _create_content(self):
         return self._localized_wiki_content('instructions', macro=True)
+    
+class CopyrightInfo(EurochanceNode):
+    """A general set of pre-course instructions."""
+    _TITLE = _("Copyright and License Information")
+
+    def _create_content(self):
+        return self.parse_wiki_file('copyright')
     
     
 class ExerciseHelp(EurochanceNode):
@@ -252,6 +259,9 @@ class EurochanceCourse(EurochanceNode):
 
     def users_language(self):
         return self._users_language
+
+    def version(self):
+        return self._read_file('version')
         
     def _title(self):
         return self._read_file('title')
@@ -275,13 +285,23 @@ class EurochanceCourse(EurochanceNode):
             children.extend((self._create_child(GrammarBank, 'grammar'),
                              self._create_child(VocabIndex, 'vocab', units)))
         children.extend((self._create_child(AnswerSheets, 'answers', units),
-                         self._create_child(Help, 'help')))
+                         self._create_child(Help, 'help'),
+                         self._create_child(CopyrightInfo, 'copyright')))
         return children
     
 
     
 class EurochanceExporter(StaticExporter):
     _INDEX_LABEL = _('Course Index')
+    def body(self, node):
+        import _html
+        body = super(EurochanceExporter, self).body(node)
+        copyright = node.root().find_node('copyright')
+        if copyright is not node:
+            body += _html.div(Link(node, copyright).export(), cls='copyright')
+        body += _html.div("Version %s" % node.root().version(), cls='version')
+        return body
+            
     
 class Formatter(wiki.Formatter):
     def _citation_formatter(self, groups, close=False):
