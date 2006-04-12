@@ -43,7 +43,8 @@ class Formatter(object):
                ('underline', ('_',  '_')),
                ('citation',  ('>>', '<<')),
                ('quotation', ('``', "''")),
-               ('link', (r'\[(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
+               ('link', (r'\[(?:(?P<resource>Resource|Image|Media):)?'
+                         r'(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
                          r'(?:(?:\||\s+)(?P<title>[^\]]*))?\]')),
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]+'),
@@ -59,7 +60,7 @@ class Formatter(object):
     _FORMAT = {'emphasize': ('<em>', '</em>'),
                'strong': ('<strong>', '</strong>'),
                'fixed': ('<tt>', '</tt>'),
-               'underline': ('<u>', '</u>'),
+               'underline': ('<span class="underline">', '</span>'),
                'citation': ('<span class="citation">', '</span>'),
                'quotation': (u'“<span class="quotation">', u'</span>”'),
                'comment': '',
@@ -132,16 +133,21 @@ class Formatter(object):
         title = groups.get('title')
         href = groups.get('href')
         anchor = groups.get('anchor')
-        if not href:
-            node = self._parent
-        else:
-            if href.find('@') == href.find('/') == -1:
-                node = self._parent.root().find_node(href)
-                if not node:
-                    log("%s: Unknown node: %s" % (self._parent.id(), href))
+        resource_cls = groups.get('resource')
+        node = None
+        if resource_cls:
+            cls = globals()[resource_cls]
+            resource = self._parent.resource(cls, href, fallback=False)
+            if resource:
+                return '<a href="%s">%s</a>' % (resource.url(), title or href)
             else:
-                # External reference
-                node = None
+                log("%s: Unknown resource: %s" % (self._parent.id(), href))
+        elif not href:
+            node = self._parent
+        elif href.find('@') == href.find('/') == -1:
+            node = self._parent.root().find_node(href)
+            if not node:
+                log("%s: Unknown node: %s" % (self._parent.id(), href))
         target = node
         if node and anchor:
             target = node.find_section(anchor)
@@ -217,7 +223,7 @@ class Parser(object):
 
     _HELPER_PATTERNS = ('indent', 'content', 'title', 'label', 'value', 'term',
                         'descr', 'toctype', 'tocdepth')
-    
+
     class _Section(object):
         def __init__(self, title, anchor, level):
             assert isinstance(title, types.StringTypes)
