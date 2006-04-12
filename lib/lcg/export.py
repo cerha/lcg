@@ -50,6 +50,7 @@ class Exporter(object):
         tags = ['<title>%s</title>' % node.title()] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
+                             ('Content-Script-Type', 'text/javascript'),
                              ('Content-Language', node.language()))] + \
                ['<meta name="%s" content="%s">' % pair for pair in meta] + \
                ['<script language="Javascript" type="text/javascript"' + \
@@ -70,7 +71,7 @@ class Exporter(object):
                  '<head>',
                  self.head(node),
                  '</head>',
-                 '<body>',
+                 '<body lang="%s">' % node.language(),
                  self.body(node),
                  '</body>',
                  '</html>')
