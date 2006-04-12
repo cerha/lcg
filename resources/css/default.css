@@ -87,7 +87,7 @@ pre.lcg-preformatted-text {
 }
 
 div.table-of-contents { 
-    border: solid #b8bcc0;
+    border: solid #c8ccd0;
     border-width: 1px 0;
     background: #f0f0f0;
     margin: 1em 0;
@@ -155,11 +155,12 @@ div.choice-based-task .answer-sheet-link {
     background-color: #eee;
 }
 .explanation { 
-    background-color: #ddf;
+    background-color: #dee8f8;
+    border-color: #acd;
 }
 .example { 
-    background-color: #dfc;
-    border-color: #8a8;
+    background-color: #e0e8e4;
+    border-color: #b0bab4;
 }
 
 a.external-link { 
@@ -213,8 +214,8 @@ input.answer-control {
 
 .results { 
     margin-top: .8em;
-    background: #f8f8b0;
-    border: #aaa solid 0px;
+    background: #fff6cb;
+    border: #dca solid 0px;
     border-width: 1px 0;
 }
 .results .display { 
@@ -227,5 +228,5 @@ input.answer-control {
 }
 .results .buttons {
     padding: 2pt;
-    border-top: #aaa solid 1px;
+    border-top: #ccb solid 1px;
 }
