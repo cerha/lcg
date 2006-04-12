@@ -157,9 +157,6 @@ class Resource(object):
             dst_dir = os.path.join(self.SUBDIR, self._parent.id())
         return os.path.join(dst_dir, self._file)
             
-    def file(self):
-        return self._file
-    
     def url(self):
         return '/'.join(self._dst_path().split(os.path.sep))
 
