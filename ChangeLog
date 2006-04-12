@@ -1,3 +1,52 @@
+2006-04-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/wiki.py (Formatter._MARKUP): Allow the Resource
+	specification in the link format.
+	(Formatter._FORMAT): Don't use old visual HTML formatting tags.
+	Use stylesheets instead.
+	(Formatter._link_formatter): Added support for included resources.
+
+	* lib/lcg/hhp.py (HhpExporter.__init__): Change the unlerline
+	format in `lcg.Formatter'.
+
+	* lib/lcg/eurochance.py (EurochanceNode.meta): `Lawton Idiomas'
+	replaced by `Lawton School S.L.'.
+	(CopyrightInfo): New class.
+	(EurochanceCourse.version): New method.
+	(EurochanceCourse._create_children): Create also the
+	`CopyrightInfo' node.
+	(EurochanceExporter.body): New method.
+
+	* lib/lcg/export.py (Exporter.head): Added `Content-Script-Type'
+	meta tag.
+	(Exporter.page): Set the `lang' attribute of the `body' element.
+
+	* lib/lcg/content.py (Link.export): Remove any HTML tags from the
+	description text.
+
+	* lib/lcg/_html.py (script): Don't output JS comment start before
+	sgml comment start.
+
+	* doc/intro.en.txt: Minor improvements.
+
+	* translations/de.po: Updated.
+
+	* translations/cs.po: Updated.
+
+	* translations/help.sk.txt: Added table of contents.
+
+	* translations/help.no.txt: Added table of contents.
+
+	* translations/help.es.txt: Added table of contents.
+
+	* translations/help.en.txt: Added table of contents.
+
+	* translations/help.de.txt: Added table of contents.
+
+	* translations/help.cs.txt: Added table of contents.
+
+	* resources/css/default.css: Reorganized, updated.
+
 2006-03-27  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (Section.anchor): Use dots instead of dashes.
@@ -455,7 +504,7 @@
 
 2006-01-16  Tomas Cerha  <cerha@brailcom.org>
 
-	* resources/css/default.css (Module): Added styles for numbered tasks.
+	* resources/css/default.css: Added styles for numbered tasks.
 
 	* lib/lcg/util.py (positive_id): New function.
 
