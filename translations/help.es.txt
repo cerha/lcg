@@ -1,5 +1,7 @@
 # -*- coding: utf-8-dos; mode: wiking -*-
 
+Indice: @TOC@
+
 == Instrucciones ==
 
 #if issubclass(type, SentenceCompletion)
