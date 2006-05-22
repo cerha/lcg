@@ -92,6 +92,7 @@ div.table-of-contents {
     background: #f0f0f0;
     margin: 1em 0;
     padding: 3pt;
+    clear: both;
 }
 div.table-of-contents a { text-decoration: none; }
 div.table-of-contents ul { 
@@ -99,6 +100,16 @@ div.table-of-contents ul {
     margin-bottom: 0;
 }
 
+.language-selection { 
+    border: 0px solid #c8ccd0;
+    font-size: 0.9em;
+    padding: 0.2em;
+    border-top-width: 1px;
+    text-align: right;
+}
+.language-selection img { 
+    margin: 0 0.2em;
+}
 /* LCG exercises */
 
 div.exercise-header { 
