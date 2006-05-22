@@ -1,3 +1,102 @@
+2006-05-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/lcgmake.py: New command line option `secondary-language'.
+	(main): Pass `secondary-language' to the constructor.
+
+	* resources/images/flags/cs.gif: New file.
+
+	* resources/images/flags/de.gif: New file.
+
+	* resources/images/flags/en.gif: New file.
+
+	* resources/images/flags/es.gif: New file.
+	
+	* resources/images/flags/no.gif: New file.
+
+	* resources/images/flags/sk.gif: New file.
+	
+	* lib/lcg/eurochance.py (EurochanceNode.output_file): New method.
+	(VocabIndex._create_content): Ignore duplicate items.
+	(EurochanceCourse.__init__): Pass `secondary_language' to parent
+	class constructor.
+	(EurochanceCourse._create_content): Add a language selection to
+	the beginning of content for intermediate courses.
+	(EurochanceExporter.body): Translate the "Version" label.
+	(Formatter): Class removed.
+
+	* lib/lcg/_html.py (_attr): Recognize boolean attributes.
+	(form): New argument `cls'.
+	(fieldset): New function.
+	(_input): New argument `checked'.  Added assertions on `checked'
+	and `readonly'.  Pass them both to `_attr'.
+	(select): New argument `selected'.
+
+	* lib/lcg/content.py (WikiText): Docstring improved.
+	(Link.ExternalTarget): New class.
+	(Link.__init__): Allow also `ExternalTarget' instance as `target'.
+	(Link.descr): Method removed.
+	(Link.label): Method removed.
+	(Link._descr): New method.
+	(Link.export): Use `self._descr()' and don't use `self.label()'
+	and `self.descr()'.
+	(InlineImage): New class.
+	(Container._CONTENT_SEPARATOR): New constant.
+	(Container._export_content): Method removed. 
+	(Container._exported_content): New method. 
+	(Container.export): Concatenate the `' result using the
+	`self._CONTENT_SEPARATOR'.
+	(Table._CONTENT_SEPARATOR): New constant.
+	(Table._export_content): Replaced by `exported_content'.
+	(SectionContainer._export_content): Replaced by `exported_content'.
+	(LanguageSelection): New class.
+
+	* lib/lcg/export.py (Exporter.page): Added a nasty hack to include
+	MS Media Player object in the page, when the 'audio.js' script is
+	being used.
+	(StaticExporter._body_parts): Include the navigation only when
+	there are multiple pages.
+
+	* lib/lcg/nodes.py (ContentNode.__init__): New keyword argument
+	`secondary_language'.
+	(ContentNode._create_child): Pass also the `secondary_language'.
+	(ContentNode.secondary_language): New method.
+	(DocNode.language_variants): New method.
+	(DocNode.output_file): New method.
+	(DocChapter._create_children): Ignore the 'resources' directory.
+	(DocRoot._create_content): Prepend the language selection before
+	the actual content, when multiple language versions exist.
+
+	* lib/lcg/resources.py (Image.__init__): Read the file and
+	remember the image width and height.
+	(Image.title, Image.width, Image.height): New methods.
+	(Transcript.__init__, Transcript.__init__): Accept and pass the
+	keyword arguments not used here as `**kwargs'.
+	(Transcript._export): Add a unicode mark to the begining of the
+	output file.  Export with CRLF, not just LF.
+
+	* lib/lcg/util.py (_LANGUAGE_NAMES): New constant.
+	(language_name): New function.
+
+	* lib/lcg/wiki.py (Formatter._link_formatter): Use a `Link'
+	instance instead of directly rendering the html tag.
+	(Formatter._citation_formatter): New method.
+
+	* resources/css/default.css: New styles for language selection.
+
+	* resources/scripts/audio.js (detect): New function.
+	(windows_media_player_available): New variable.
+	(play_audio, stop_audio): Use it.
+	
+	* translations/sk.po: New file.
+
+	* translations/no.po: New file.
+
+	* translations/es.po: New file.
+
+	* translations/de.po: Updated.
+
+	* translations/cs.po: Updated.
+
 2006-04-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/wiki.py (Formatter._MARKUP): Allow the Resource
