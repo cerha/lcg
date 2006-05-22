@@ -23,7 +23,8 @@ import os
 import sys, getopt, os
 
 OPTIONS = (
-    ('language=', 'en', "The language to use."),
+    ('language=', 'en', "The content language."),
+    ('secondary-language=', None, "Secondary content language (citations)."),
     ('encoding=', 'utf-8', "Input encoding (output encoding is always utf-8)"),
     ('stylesheet=', None, "Filename of the stylesheet to use."),
     ('ext=', 'txt', "Extension of the source files."),
@@ -41,7 +42,9 @@ def main():
     import lcg
     
     doc = lcg.DocRoot(source_dir, id=opt['root'], ext=opt['ext'],
-                      language=opt['language'], input_encoding=opt['encoding'])
+                      language=opt['language'],
+                      secondary_language=opt['secondary-language'],
+                      input_encoding=opt['encoding'])
     
     if opt['hhp']:
         from lcg import hhp
