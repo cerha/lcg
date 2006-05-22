@@ -1,144 +1,157 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# LCG message translations
+# Copyright (C) 2005, 2006 Brailcom, o.p.s.
+# Tomas Cerha <cerha@brailcom.org>, 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-12 13:45+0200\n"
-"PO-Revision-Date: 2006-01-26 18:05+0100\n"
+"POT-Creation-Date: 2006-05-05 10:31+0200\n"
+"PO-Revision-Date: 2006-04-21 21:49+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/content.py:418
+#: ../lib/lcg/content.py:454
 msgid "Index:"
 msgstr "Obsah"
 
-#: ../lib/lcg/content.py:709
+#: ../lib/lcg/content.py:746
 msgid "Vocabulary Listing"
 msgstr ""
 
-#: ../lib/lcg/content.py:710
+#: ../lib/lcg/content.py:747
 msgid ""
 "The vocabulary is presented in a two-column table with a term on the left "
 "and its translation on the right in each row."
 msgstr ""
 
-#: ../lib/lcg/content.py:750 ../lib/lcg/content.py:760
+#: ../lib/lcg/content.py:787 ../lib/lcg/content.py:797
 msgid "Terms"
 msgstr ""
 
-#: ../lib/lcg/content.py:752 ../lib/lcg/content.py:762
+#: ../lib/lcg/content.py:789 ../lib/lcg/content.py:799
 msgid "Phrases"
 msgstr ""
 
-#: ../lib/lcg/content.py:754
+#: ../lib/lcg/content.py:791
 msgid "Extended vocabulary"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:60
+#: ../lib/lcg/content.py:808
+msgid "Choose your language:"
+msgstr "Zvolte jazyk:"
+
+#: ../lib/lcg/content.py:817
+msgid "(*)"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:67
 #, python-format
 msgid "Unit %d"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:71 ../lib/lcg/eurochance.py:111
+#: ../lib/lcg/eurochance.py:78 ../lib/lcg/eurochance.py:118
 #, python-format
 msgid "Section %d"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:86
+#: ../lib/lcg/eurochance.py:93
 msgid "Aims and Objectives"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:89
+#: ../lib/lcg/eurochance.py:96
 msgid "Checklist"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:112
+#: ../lib/lcg/eurochance.py:119
 msgid "Vocabulary Practice"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:113
+#: ../lib/lcg/eurochance.py:120
 msgid "Listening Comprehension"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:114
+#: ../lib/lcg/eurochance.py:121
 msgid "General Comprehension"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:115
+#: ../lib/lcg/eurochance.py:122
 msgid "Grammar Practice"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:116
+#: ../lib/lcg/eurochance.py:123
 msgid "Consolidation"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:122
+#: ../lib/lcg/eurochance.py:129
 msgid "Vocabulary"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:123
+#: ../lib/lcg/eurochance.py:130
 msgid "Exercises"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:128
+#: ../lib/lcg/eurochance.py:135
 msgid "General Course Instructions"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:135
+#: ../lib/lcg/eurochance.py:142
 msgid "Copyright and License Information"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:158
+#: ../lib/lcg/eurochance.py:165
 #, python-format
 msgid "Instructions for %s"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:162
+#: ../lib/lcg/eurochance.py:169
 msgid "Grammar Bank"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:176
+#: ../lib/lcg/eurochance.py:183
 msgid "Detailed Course Index"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:183
+#: ../lib/lcg/eurochance.py:190
 msgid "Vocabulary Index"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:191
+#: ../lib/lcg/eurochance.py:205
 msgid "Ordered by the English term"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:192
+#: ../lib/lcg/eurochance.py:206
 msgid "Ordered by the translation"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:198
+#: ../lib/lcg/eurochance.py:212
 msgid "Answer Sheets"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:201 ../lib/lcg/eurochance.py:236
-#: ../lib/lcg/eurochance.py:278
+#: ../lib/lcg/eurochance.py:215 ../lib/lcg/eurochance.py:250
+#: ../lib/lcg/eurochance.py:294
 msgid "Table of Contents:"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:215
+#: ../lib/lcg/eurochance.py:229
 #, python-format
 msgid "Answer Sheet for %s"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:233
+#: ../lib/lcg/eurochance.py:247
 msgid "Help Index"
 msgstr ""
 
-#: ../lib/lcg/eurochance.py:295
+#: ../lib/lcg/eurochance.py:319
 msgid "Course Index"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:326
+#, python-format
+msgid "Version %s"
 msgstr ""
 
 #: ../lib/lcg/exercises.py:152
@@ -357,18 +370,45 @@ msgid ""
 "in the sentences."
 msgstr ""
 
-#: ../lib/lcg/export.py:121
+#: ../lib/lcg/export.py:130
 msgid "None"
 msgstr "není"
 
-#: ../lib/lcg/export.py:127
+#: ../lib/lcg/export.py:136
 msgid "Next"
 msgstr "Dal¹í"
 
-#: ../lib/lcg/export.py:128
+#: ../lib/lcg/export.py:137
 msgid "Previous"
 msgstr "Pøedchozí"
 
-#: ../lib/lcg/export.py:133
+#: ../lib/lcg/export.py:142
 msgid "Up"
 msgstr "Nahoru"
+
+#: ../lib/lcg/util.py:197
+msgid "Czech"
+msgstr "èe¹tina"
+
+#: ../lib/lcg/util.py:198
+msgid "German"
+msgstr "nìmèina"
+
+#: ../lib/lcg/util.py:199
+msgid "English"
+msgstr "angliètina"
+
+#: ../lib/lcg/util.py:200
+msgid "Spanish"
+msgstr "¹panìl¹tina"
+
+#: ../lib/lcg/util.py:201
+msgid "Norwegian"
+msgstr "nor¹tina"
+
+#: ../lib/lcg/util.py:202
+msgid "Slovak"
+msgstr "sloven¹tina"
+
+#~ msgid "(current)"
+#~ msgstr "(aktuální)"
