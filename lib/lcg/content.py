@@ -156,9 +156,12 @@ class TextContent(Content):
         return self._text
 
     
-        
 class WikiText(TextContent):
-    """Structured text in Wiki formatting language (on input)."""
+    """Formatted text using a simple Wiki-based markup.
+
+    See 'wiki.Formatter' for more information about the formatting rules.
+    
+    """
         
     def export(self):
         return self._parent.format_wiki_text(self._text)
@@ -174,36 +177,44 @@ class PreformattedText(TextContent):
 
     
 class Link(TextContent):
-    """Hypertext reference."""
     _HTML_TAG = re.compile(r'<[^>]+>')
     
-    def __init__(self, parent, target, name=''):
-        assert isinstance(target, (Section, ContentNode))
-        self._target = target
-        super(Link, self).__init__(parent, name)
-
-    def label(self):
-        return self._text or self._target.title()
+    class ExternalTarget(object):
+        def __init__(self, url, title, descr=None):
+            self._url = url
+            self._title = title
+            self._descr = descr
+        def url(self):
+            return self._url
+        def title(self):
+            return self._title
+        def descr(self):
+            return self._descr
     
-    def target(self):
-        return self._target
+    def __init__(self, parent, target, label=None):
+        assert isinstance(target, (Section, ContentNode, self.ExternalTarget))
+        self._target = target
+        super(Link, self).__init__(parent, label or '')
 
-    def descr(self):
+    def _descr(self):
         target = self._target
-        descr = None
-        if isinstance(target, ContentNode):
+        if isinstance(target, (ContentNode, self.ExternalTarget)):
             descr = target.descr()
         elif target.parent() is not self._parent:
-            descr = "%s (%s)" % (target.title(), target.parent().title())
+            # TODO: This hack removes any html from the section title (it is
+            # used as an HTML attribute value).  But section titles should
+            # probably rather not be allowed to contain html.
+            section_title = self._HTML_TAG.sub('', target.title())
+            descr = "%s (%s)" % (section_title, target.parent().title())
+        else:
+            descr = None
         return descr
     
     def export(self):
-        # TODO: This hack removes any html from the description (it is used as
-        # an HTML attribute value).
-        descr = self.descr() and self._HTML_TAG.sub('', self.descr())
-        return _html.link(self.label(), self._target.url(), title=descr)
+        label = self._text or self._target.title()
+        return _html.link(label, self._target.url(), title=self._descr())
 
-    
+
 class Anchor(TextContent):
     """An anchor (target of a link)."""
     def __init__(self, parent, anchor, text=''):
@@ -217,7 +228,20 @@ class Anchor(TextContent):
     def export(self):
         return _html.link(self._text, None, name=self.anchor())
 
-    
+
+class InlineImage(Content):
+
+    def __init__(self, parent, image):
+        assert isinstance(image, Image)
+        self._image = image
+        super(InlineImage, self).__init__(parent)
+
+    def export(self):
+        img = self._image
+        return '<img alt="%s" src="%s" width="%d" height="%d" border="0"/>' % \
+               (img.title() or '', img.url(), img.width(), img.height())
+
+
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
 
@@ -233,8 +257,9 @@ class Container(Content):
     _TAG = None
     _ATTR = None
     _CLASS = None
-    _EXPORT_INLINE = False
     _ALLOWED_CONTENT = Content
+    _EXPORT_INLINE = False
+    _CONTENT_SEPARATOR = ''
 
     def __init__(self, parent, content, **kwargs):
         """Initialize the instance.
@@ -268,22 +293,23 @@ class Container(Content):
     #def export(self):
     #    return "".join([p.export() for p in self._content])
 
-    def _export_content(self, concat=''):
-        return concat.join([p.export() for p in self._content])
+    def _exported_content(self):
+        return [p.export() for p in self._content]
     
     def export(self):
         tag = self._TAG
-        content = self._export_content()
+        exported = self._exported_content()
         attr = self._lang   and ' lang="%s"'  % self._lang  or ''
         attr += self._CLASS and ' class="%s"' % self._CLASS or ''
         attr += self._ATTR  and (' '+self._ATTR) or ''
         if attr and not tag:
             tag = 'div'
         if tag:
-            content = '<%s>%s</%s>' % (tag + attr, content, tag)
+            exported = ['<%s>' % (tag+attr)] + exported + ['</%s>' % tag]
+        result = self._CONTENT_SEPARATOR.join(exported)
         if not self._EXPORT_INLINE:
-            content += "\n"
-        return content
+            result += "\n"
+        return result
             
 
 class Paragraph(Container):
@@ -349,15 +375,16 @@ class Table(Container):
     _TAG = 'table'
     _CLASS = 'lcg-table'
     _ALLOWED_CONTENT = TableRow
+    _CONTENT_SEPARATOR = "\n"
 
     def __init__(self, parent, content, title=None, **kwargs):
         assert title is None or isinstance(title, types.StringTypes)
         self._title = title
         super(Table, self).__init__(parent, content, **kwargs)
         
-    def _export_content(self, concat=''):
+    def _exported_content(self):
         caption = self._title and "<caption>%s</caption>" % self._title or ''
-        return caption + super(Table, self)._export_content(concat=concat)
+        return [caption] + super(Table, self)._exported_content()
 TableRow._ALLOWED_CONTAINER = Table
 
     
@@ -423,8 +450,9 @@ class SectionContainer(Container):
     def sections(self):
         return self._sections
     
-    def _export_content(self, concat="\n"):
-        return concat.join([p.export() for p in (self._toc,) + self._content])
+    def _exported_content(self):
+        exported = super(SectionContainer, self)._exported_content()
+        return [self._toc.export()] + exported
     
     
 class Section(SectionContainer):
@@ -763,3 +791,53 @@ class VocabIndexSection(VocabSection):
                  [x for x in items if x.attr() is VocabItem.ATTR_PHRASE]))
 
     
+class LanguageSelection(Container):
+    _CLASS = 'language-selection'
+    _CONTENT_SEPARATOR = '\n'
+
+    def __init__(self, parent, languages, current,
+                 label=_('Choose your language:')):
+        assert current in languages, (current, languages)
+        self._label = label
+        pairs = [(lang, language_name(lang)) for lang in languages]
+        pairs.sort(lambda a,b: cmp(a[0], b[0]))
+        self._targets = targets = []
+        self._flags = flags = []
+        for lang, name in pairs:
+            if lang == current:
+                name += ' ' + _('(*)') #_('(current)')
+            t = Link.ExternalTarget('index.%s.html'% lang, name)
+            if lang == current:
+                self._current = t
+            targets.append(t)
+            flag = parent.resource(Image, 'flags/%s.gif' % lang)
+            flags.append(InlineImage(parent, flag))
+        links = [Container(parent, (Link(parent, target), flag))
+                 for target, flag in zip(targets, flags)]
+        content = [TextContent(parent, label)] + \
+                  [i == len(links)-1 and link or \
+                   Container(parent, (link, TextContent(parent, ' |')))
+                   for i, link in enumerate(links)]
+        super(LanguageSelection, self).__init__(parent, tuple(content))
+
+    def export(self):
+        #handler = "location.href = this.form.language.options[this.form.language.selectedIndex].value"
+        #select = _html.form((_html.label(self._label, 'language-selection'),
+        #                     _html.select('language',
+        #                                  [(t.title(), t.url())
+        #                                   for t in self._targets],
+        #                                  id='language-selection',
+        #                                  selected=self._current.url()),
+        #                     _html.button(_('Switch'), handler)),
+        #                    cls='language-selection')
+        radio = _html.fieldset([_html.radio('language', value=t.url(), id=tid,
+                                            onclick="location.href = this.value",
+                                            checked=(self._current.url()==t.url())
+                                            ) + \
+                                _html.label(flag.export() + t.title(), tid)
+                                for t, tid, flag in
+                                [(t, t.url().replace('.','-'), f)
+                                 for t, f in zip(self._targets, self._flags)]],
+                               legend=self._label, cls='language-selection')
+        links = super(LanguageSelection, self).export()
+        return links #_html.script_write(radio, links)
