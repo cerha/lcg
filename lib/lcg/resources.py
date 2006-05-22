@@ -247,14 +247,31 @@ class Image(Resource):
     """An image used within the content."""
     SUBDIR = 'images'
 
+    def __init__(self, file, src_path, title=None, **kwargs):
+        assert title is None or isinstance(title, types.StringTypes)
+        self._title = title
+        super(Image, self).__init__(file, src_path, **kwargs)
+        import Image as Img
+        im = Img.open(self._src_path)
+        self._width, self._height = im.size
+        
+    def title(self):
+        return self._title
+    
+    def width(self):
+        return self._width
+        
+    def height(self):
+        return self._height
+
     
 class Transcript(Resource):
     """A textual transcript of a recording ."""
     SUBDIR = 'transcripts'
     SHARED = False
 
-    def __init__(self, file, src_path, parent=None, 
-                 text=None, input_encoding='utf-8', raise_error=False):
+    def __init__(self, file, src_path, text=None, input_encoding='utf-8',
+                 **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -266,8 +283,7 @@ class Transcript(Resource):
         """
         self._text = text
         self._input_encoding = input_encoding
-        super(Transcript, self).__init__(file, src_path, parent=parent,
-                                         raise_error=raise_error)
+        super(Transcript, self).__init__(file, src_path, **kwargs)
 
     def ok(self):
         return os.path.exists(self._src_path) or self._text is not None
@@ -287,11 +303,12 @@ class Transcript(Resource):
             fh.close()
         else:
             return
-        text = "\n\n".join([textwrap.fill(x)
+        text = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE') + \
+               "\n\n".join([textwrap.fill(x)
                             for x in text.replace("\r\n", "\n").split("\n\n")])
         output = open(outfile, 'w')
         try:
-            output.write(text.encode('utf-8'))
+            output.write(text.replace('\n', '\r\n').encode('utf-8'))
         finally:
             output.close()
             
