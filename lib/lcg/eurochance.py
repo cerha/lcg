@@ -30,6 +30,11 @@ class EurochanceNode(ContentNode):
     def _title(self):
         return self._TITLE
     
+    def _localized_wiki_content(self, filename, macro=False):
+        ulang = self.root().users_language()
+        content = self.parse_wiki_file(filename, lang=ulang, macro=macro)
+        return SectionContainer(self, content, lang=ulang)
+        
     def meta(self):
         author = 'Lawton School S.L. (http://www.lawtonschool.com)'
         copyright = "Copyright (c) 2005-2006 Lawton School S.L. (content), "
@@ -47,11 +52,13 @@ class EurochanceNode(ContentNode):
             file = basename + '.mp3'
         return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)
 
-    def _localized_wiki_content(self, filename, macro=False):
+    def output_file(self):
         ulang = self.root().users_language()
-        content = self.parse_wiki_file(filename, lang=ulang, macro=macro)
-        return SectionContainer(self, content, lang=ulang)
-        
+        if ulang:
+            return '.'.join((self.id(), self.root().users_language(), 'html'))
+        else:
+            return super(EurochanceNode, self).output_file()
+
     
 class Unit(EurochanceNode):
     _EXERCISE_SECTION_SPLITTER = re.compile(r"^==(?P<title>.+)?==+\s*$", re.M)
@@ -183,7 +190,14 @@ class VocabIndex(_Index):
     _TITLE = _("Vocabulary Index")
 
     def _create_content(self):
-        vocab = reduce(lambda a,b: a+b, [u.vocab for u in self._units])
+        seen = {}
+        vocab = []
+        for i in reduce(lambda a,b: a+b, [u.vocab for u in self._units]):
+            # Ignore duplicate items.
+            key = (i.word(), i.note(), i.translation())
+            if not seen.has_key(key):
+                seen[key] = True
+                vocab.append(i)
         rev = vocab[:]
         vocab.sort(lambda a,b: cmp(a.word().lower(), b.word().lower()))
         rev.sort(lambda a,b:
@@ -255,7 +269,9 @@ class EurochanceCourse(EurochanceNode):
             self._users_language = None
             self._unit_cls = Unit
         super(EurochanceCourse, self).__init__(None, 'index', dir,
-                                               language=language, **kwargs)
+                                               language=language,
+                                               secondary_language=language,
+                                               **kwargs)
 
     def users_language(self):
         return self._users_language
@@ -274,9 +290,16 @@ class EurochanceCourse(EurochanceNode):
         return dirs
 
     def _create_content(self):
-        return (self._localized_wiki_content('intro'),
-                TableOfContents(self, item=self, title=_("Table of Contents:")))
-    
+        content = (self._localized_wiki_content('intro'),
+                   TableOfContents(self, item=self, title=_("Table of Contents:")))
+        ulang = self._users_language
+        if ulang:
+            languages = [os.path.splitext(os.path.splitext(f)[0])[1][1:]
+                         for f in glob.glob(self._input_file('intro', lang='*'))]
+            return (LanguageSelection(self, languages, ulang),) + content
+        else:
+            return content
+        
     def _create_children(self):
         units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d)
                  for i, d in enumerate(self._unit_dirs())]
@@ -290,6 +313,7 @@ class EurochanceCourse(EurochanceNode):
         return children
     
 
+
     
 class EurochanceExporter(StaticExporter):
     _INDEX_LABEL = _('Course Index')
@@ -299,18 +323,10 @@ class EurochanceExporter(StaticExporter):
         copyright = node.root().find_node('copyright')
         if copyright is not node:
             body += _html.div(Link(node, copyright).export(), cls='copyright')
-        body += _html.div("Version %s" % node.root().version(), cls='version')
+        body += _html.div(_("Version %s")% node.root().version(), cls='version')
         return body
             
     
-class Formatter(wiki.Formatter):
-    def _citation_formatter(self, groups, close=False):
-        if not close:
-            return '<span class="citation" lang="%s">' % self._parent.language()
-        else:
-            return '</span>'
-wiki.Formatter = Formatter
-
 class _Section(wiki.Parser._Section):
     def __init__(self, title, *args, **kwargs):
         title = title.replace('>>', '<span class="citation" lang="%s">' % 'de')
