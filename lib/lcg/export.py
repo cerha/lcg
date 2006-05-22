@@ -66,13 +66,20 @@ class Exporter(object):
         return "\n".join(self._body_parts(node))
 
     def page(self, node):
+        if 'audio.js' in [r.url().split('/')[-1]
+                          for r in node.resources(Script)]:
+            clsid = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6"
+            hack = ('\n<object id="media_player" height="0" width="0"'
+		    ' classid="%s">' % clsid + '</object>')
+        else:
+            hack = ''
         lines = (self.DOCTYPE, '',
                  '<html>',
                  '<head>',
                  self.head(node),
                  '</head>',
                  '<body lang="%s">' % node.language(),
-                 self.body(node),
+                 self.body(node) + hack,
                  '</body>',
                  '</html>')
         return "\n".join(lines)
@@ -114,8 +121,10 @@ class StaticExporter(Exporter):
         return '\n  '.join([super(StaticExporter, self).head(node)] + tags)
              
     def _body_parts(self, node):
-        return super(StaticExporter, self)._body_parts(node) + \
-               ('<hr class="navigation">', self._navigation(node))
+        parts = super(StaticExporter, self)._body_parts(node)
+        if len(node.root().linear()) > 1:
+            parts += ('<hr class="navigation">', self._navigation(node))
+        return parts
 
     def _link(self, node, label=None, key=None):
         if node is None: return _("None")
