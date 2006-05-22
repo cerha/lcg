@@ -154,13 +154,20 @@ class Formatter(object):
             if target is None:
                 log("%s: Unknown section: %s:%s" %
                     (self._parent.id(), node.id(), anchor))
-        if target:
-            return Link(self._parent, target, title or '').export()
-        else:
+        if not target:
             if anchor is not None:
                 href += '#'+anchor
-            return '<a href="%s">%s</a>' % (href, title or href)
-
+            target = Link.ExternalTarget(href, title or href)
+        return Link(self._parent, target, label=title).export()
+    
+    def _citation_formatter(self, groups, close=False):
+        if not close:
+            lang = self._parent.secondary_language()
+            langattr = lang and ' lang="%s"' % lang or ''
+            return '<span%s class="citation">' % langattr
+        else:
+            return '</span>'
+    
     def _uri_formatter(self, groups, close=False):
         return self._link_formatter({'href': groups['uri'], 'title': None})
 
