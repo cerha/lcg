@@ -55,7 +55,7 @@ class ContentNode(object):
     """
 
     def __init__(self, parent, id, subdir=None, hidden=False, language='en',
-                 input_encoding='ascii'):
+                 secondary_language=None, input_encoding='ascii'):
         """Initialize the instance.
 
         Arguments:
@@ -67,6 +67,8 @@ class ContentNode(object):
             input files are expected in this directory.
           language -- content language as a lowercase ISO 639-1 Alpha-2
             language code.
+          secondary_language -- secondary content language (used in citations)
+            as a lowercase ISO 639-1 Alpha-2 language code.
           input_encoding -- The content read from source files is expected in
             the specified encoding (ASCII by default).  The output encoding is
             set by the used exporter class.
@@ -78,6 +80,9 @@ class ContentNode(object):
         assert isinstance(hidden, types.BooleanType), hidden
         assert isinstance(language, types.StringType) and \
                len(language) == 2
+        assert secondary_language is None or \
+               isinstance(secondary_language, types.StringType) and \
+               len(secondary_language) == 2
         assert isinstance(input_encoding, types.StringType)
         codecs.lookup(input_encoding)
         self._parent = parent
@@ -85,6 +90,7 @@ class ContentNode(object):
         self._subdir = subdir
         self._hidden = hidden
         self._language = language
+        self._secondary_language = secondary_language
         self._input_encoding = input_encoding
         self._resources = {}
         self._counters = {}
@@ -173,6 +179,7 @@ class ContentNode(object):
     def _create_child(self, cls, *args, **kwargs):
         """Helper method to be used within '_create_children()'."""
         kwargs.update({'language': self._language,
+                       'secondary_language': self._secondary_language,
                        'input_encoding': self._input_encoding})
         return cls(self, *args, **kwargs)
     
@@ -312,6 +319,10 @@ class ContentNode(object):
     def language(self):
         """Return the content language as an ISO 639-1 Alpha-2 code."""
         return self._language
+
+    def secondary_language(self):
+        """Return the secondary language as an ISO 639-1 Alpha-2 code."""
+        return self._secondary_language
 
     def input_encoding(self):
         """Return the name of encoding expected in source files.
@@ -537,7 +548,17 @@ class DocNode(_WikiNode):
     def _source_text(self):
         return self._read_file(self._id, lang=self._language, ext=self._ext)
 
-    
+    def language_variants(self):
+        return [os.path.splitext(os.path.splitext(f)[0])[1][1:]
+                for f in glob.glob(self._input_file(self.id(), lang='*'))]
+        
+    def output_file(self):
+        if self.language() is not None and len(self.root().language_variants()) > 1:
+            return '.'.join((self.id(), self.language(), 'html'))
+        else:
+            return super(DocNode, self).output_file()
+
+        
 class DocChapter(DocNode):
     """A Structured Text node with children read from the source directory.
     
@@ -573,11 +594,10 @@ class DocChapter(DocNode):
             hidden = listdir(dir, exclude=items)
             return [(x, False) for x in items] + [(x, True) for x in hidden]
 
-    
     def _create_children(self):
         children = []
         for name, hidden in self._list_dir(self.src_dir()):
-            if name != self.id():
+            if name not in (self.id(), 'resources'):
                 kwargs = dict(hidden=hidden)
                 if os.path.isfile(self._input_file(name, ext='py')):
                     import imp
@@ -624,3 +644,14 @@ class DocRoot(DocChapter):
     
     def __init__(self, dir, id='index', **kwargs):
         super(DocRoot, self).__init__(None, id, subdir=dir, **kwargs)
+
+    def _create_content(self):
+        content = super(DocRoot, self)._create_content()
+        variants = self.language_variants()
+        if len(variants) > 1:
+            selector = LanguageSelection(self, variants, self.language())
+            return Container(self, (selector, content))
+        else:
+            return content
+
+        
