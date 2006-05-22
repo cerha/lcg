@@ -31,8 +31,18 @@ import types
 from util import *
 
 def _attr(*pairs):
-    all = [v is not None and ' %s="%s"' % (a, v) or '' for a, v in pairs]
-    return "".join(all)
+    attributes = []
+    for attr, value in pairs:
+        if value is None:
+            continue
+        if isinstance(value, types.BooleanType):
+            if not value:
+                continue
+            string = attr
+        else:
+            string = '%s="%s"' % (attr, value)
+        attributes.append(' ' + string)
+    return "".join(attributes)
 
 def _tag(tag, attr, content, concat=''):
     start = '<%s%s>' % (tag, _attr(*attr))
@@ -87,23 +97,32 @@ def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
 
 # Form controls
 
-def form(content, name=None, action="#"):
-    attr = (('name', name), ('action', action))
+def form(content, name=None, cls=None, action="#"):
+    attr = (('name', name), ('action', action), ('class', cls))
     return _tag('form', attr, content, concat="\n")
+
+def fieldset(content, legend=None, cls=None):
+    if legend:
+        content = (_tag('legend', (), legend),) + tuple(content)
+    return _tag('fieldset', (('class', cls),), content, concat="\n")
 
 def label(text, id, lang=None, cls=None):
     return _tag('label', (('for', id), ('lang', lang), ('class', cls)), text)
 
 def _input(type, name=None, value=None, title=None, id=None,
-           onclick=None, size=None, readonly=False, cls=None):
-    return '<input type="%s"%s%s />' % (type, _attr(('name', name),
+           onclick=None, size=None, cls=None, readonly=False, checked=False):
+    assert isinstance(checked, types.BooleanType)
+    assert isinstance(readonly, types.BooleanType)
+    assert not checked or type in ('radio', 'checkbox')
+    return '<input type="%s"%s />' % (type, _attr(('name', name),
                                                     ('value', value),
                                                     ('title', title),
                                                     ('id', id),
                                                     ('size', size),
                                                     ('onclick', onclick),
-                                                    ('class', cls)),
-                                        readonly and ' readonly' or '')
+                                                    ('class', cls),
+                                                    ('checked', checked),
+                                                    ('readonly', readonly)))
 
 def field(text='', name='', size=20, **kwargs):
     kwargs['cls'] = kwargs.has_key('cls') and 'text '+kwargs['cls'] or 'text'
@@ -122,11 +141,14 @@ def button(label, handler, cls=None, title=None):
 def reset(label, onclick=None, cls=None):
     return _input('reset', onclick=onclick, value=label, cls=cls)
 
-def select(name, options, onchange=None, default="", id=None):
-    opts = [_tag('option', (('value', value),), text)
+def select(name, options, onchange=None, selected=None, id=None):
+    assert selected is None or selected in [value for text, value in options],\
+           (selected, options)
+    opts = [_tag('option',
+                 (('value', value),
+                  ('selected', (value == selected))),
+                 text)
             for text, value in options]
-    if default is not None:
-        opts.insert(0, _tag('option', (), default))
     attr = (('name', name), ('id', id), ('onchange', onchange))
     return _tag('select', attr, opts, concat="\n")
 
@@ -150,6 +172,7 @@ def script(code, noscript=None):
 
 def script_write(content, noscript=None, condition=None):
     #return content
+    #return noscript
     if content:
         c = content.replace('"','\\"').replace("'","\\'")
         c = c.replace('</', '<\\/').replace('\n','\\n')
