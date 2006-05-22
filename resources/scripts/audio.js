@@ -1,4 +1,4 @@
-/* Copyright (C) 2004, 2005 Brailcom, o.p.s.
+/* Copyright (C) 2004, 2005, 2002 Brailcom, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,22 +15,28 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA */
 
-var ua = navigator.userAgent.toLowerCase()
+var windows_media_player_available = detect();
 
-if (navigator.appName == "Microsoft Internet Explorer" &&
-    ua.indexOf("win98") == -1 && ua.indexOf("windows 98") == -1)
-     document.write('<object id="media_player" height="0" width="0"' +
-		    ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">' +
-		    '</object>');
+// Detext the existence of Windows Media Player v7 or higher
+function detect() {
+   if (window.ActiveXObject && navigator.userAgent.indexOf('Win') != -1) {
+      try {
+	 var control = new ActiveXObject('WMPlayer.OCX.7');
+	 if (control) return true;
+      }
+      catch(e) {}
+   }
+   return false;
+}
 
 function play_audio(url) {
-   if (document.media_player)
+   if (windows_media_player_available && document.media_player)
       document.media_player.URL = url;
-   else 
+   else
       self.location = url;
 }
 
 function stop_audio() {
-   if (document.media_player)
+   if (windows_media_player_available && document.media_player)
       document.media_player.controls.stop();
 }
