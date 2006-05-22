@@ -1,0 +1,414 @@
+# LCG message translations
+# Copyright (C) 2006 Brailcom, o.p.s.
+# Tomas Cerha <cerha@brailcom.org>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-05-05 10:31+0200\n"
+"PO-Revision-Date: 2006-04-21 21:48+0200\n"
+"Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
+"Language-Team: Slovak <sk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/lcg/content.py:454
+msgid "Index:"
+msgstr "Obsah"
+
+#: ../lib/lcg/content.py:746
+msgid "Vocabulary Listing"
+msgstr ""
+
+#: ../lib/lcg/content.py:747
+msgid ""
+"The vocabulary is presented in a two-column table with a term on the left "
+"and its translation on the right in each row."
+msgstr ""
+
+#: ../lib/lcg/content.py:787 ../lib/lcg/content.py:797
+msgid "Terms"
+msgstr ""
+
+#: ../lib/lcg/content.py:789 ../lib/lcg/content.py:799
+msgid "Phrases"
+msgstr ""
+
+#: ../lib/lcg/content.py:791
+msgid "Extended vocabulary"
+msgstr ""
+
+#: ../lib/lcg/content.py:808
+msgid "Choose your language:"
+msgstr "Zvoµte si jazyk:"
+
+#: ../lib/lcg/content.py:817
+msgid "(*)"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:67
+#, python-format
+msgid "Unit %d"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:78 ../lib/lcg/eurochance.py:118
+#, python-format
+msgid "Section %d"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:93
+msgid "Aims and Objectives"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:96
+msgid "Checklist"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:119
+msgid "Vocabulary Practice"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:120
+msgid "Listening Comprehension"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:121
+msgid "General Comprehension"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:122
+msgid "Grammar Practice"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:123
+msgid "Consolidation"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:129
+msgid "Vocabulary"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:130
+msgid "Exercises"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:135
+msgid "General Course Instructions"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:142
+msgid "Copyright and License Information"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:165
+#, python-format
+msgid "Instructions for %s"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:169
+msgid "Grammar Bank"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:183
+msgid "Detailed Course Index"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:190
+msgid "Vocabulary Index"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:205
+msgid "Ordered by the English term"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:206
+msgid "Ordered by the translation"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:212
+msgid "Answer Sheets"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:215 ../lib/lcg/eurochance.py:250
+#: ../lib/lcg/eurochance.py:294
+msgid "Table of Contents:"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:229
+#, python-format
+msgid "Answer Sheet for %s"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:247
+msgid "Help Index"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:319
+msgid "Course Index"
+msgstr ""
+
+#: ../lib/lcg/eurochance.py:326
+#, python-format
+msgid "Version %s"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:152
+msgid "TRUE"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:152
+msgid "FALSE"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:283
+msgid "This exercise can be also done purely aurally/orally:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:285
+msgid "Read the following text:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:362
+#, python-format
+msgid "Exercise %d"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:480 ../lib/lcg/exercises.py:482
+msgid "Play"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:487
+msgid "show transcript"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:494
+msgid "Stop"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:501
+msgid "Exercise Help"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:532
+msgid "Explanation:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:539
+msgid "Example:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:562
+msgid "Recording:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:606
+msgid "Listening"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:611
+msgid "Reading"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:616
+msgid "Sentence Completion"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:619
+msgid ""
+"Speaking Practice.  Complete the sentences you hear, using the example as a "
+"model."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:621
+msgid "Press Play to listen to the instructions:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:640
+msgid ", $x ($y%) on first attempt"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:642
+msgid "Answered:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:643
+msgid "Correct:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:683
+msgid "Evaluate"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:684
+msgid "Fill"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:685
+msgid "Reset"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:688
+#, python-format
+msgid "See the %s to check your results."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:689
+msgid "answer sheet"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:709
+msgid "Show the answer sheet."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:738
+msgid "Chose the correct answer."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:786
+msgid "Multiple Choice Questions"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:793
+msgid "Selections"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:800
+msgid "True/False Statements"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:801
+msgid "For each of the statements below, choose True or False."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:825
+msgid "Gap Filling"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:826
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:890
+msgid "Test Yourself"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:892
+msgid "Fill in the correct translation for each of the terms below."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:915
+msgid "Substitution"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:916
+msgid "Use the text in brackets to transform each sentence."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:923
+msgid "Transformation"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:926
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:931
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:940
+msgid "Dictation"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:944
+msgid "Correct"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:945
+msgid "Error(s) found"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:947
+msgid "Result:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:949
+msgid ""
+"Listen to the complete recording first.  Then go to\n"
+"    the textbox and use the > key to listen to the text section by section.\n"
+"    Type what you hear into the textbox.  For detailed instructions, read "
+"the\n"
+"    Exercise Help."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:983
+msgid "Cloze"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:985
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:993
+msgid ""
+"Listen to the recording carefully and then fill in the gaps in the text "
+"below using the same words."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1004
+msgid "Exposed Cloze"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1005
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr ""
+
+#: ../lib/lcg/export.py:130
+msgid "None"
+msgstr ""
+
+#: ../lib/lcg/export.py:136
+msgid "Next"
+msgstr ""
+
+#: ../lib/lcg/export.py:137
+msgid "Previous"
+msgstr ""
+
+#: ../lib/lcg/export.py:142
+msgid "Up"
+msgstr ""
+
+#: ../lib/lcg/util.py:197
+msgid "Czech"
+msgstr "èe¹tina"
+
+#: ../lib/lcg/util.py:198
+msgid "German"
+msgstr "nemèina"
+
+#: ../lib/lcg/util.py:199
+msgid "English"
+msgstr "angliètina"
+
+#: ../lib/lcg/util.py:200
+msgid "Spanish"
+msgstr "¹panielèina"
+
+#: ../lib/lcg/util.py:201
+msgid "Norwegian"
+msgstr "nórèina"
+
+#: ../lib/lcg/util.py:202
+msgid "Slovak"
+msgstr "slovenèina"
+
+#~ msgid "(current)"
+#~ msgstr "(súèasný)"
