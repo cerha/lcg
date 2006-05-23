@@ -1,4 +1,11 @@
+2006-05-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/hhp.py (HhpExporter.__init__): Refer to the `Formatter'
+	as `lcg.wiki.Formatter'.
+
 2006-05-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/__init__.py (__version__): Changed to '0.3.1'.
 
 	* bin/lcgmake.py: New command line option `secondary-language'.
 	(main): Pass `secondary-language' to the constructor.
