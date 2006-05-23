@@ -97,7 +97,7 @@ class _Header(_MetaFile):
 
         
 class HhpExporter(lcg.Exporter):
-
+    
     def __init__(self, *args, **kwargs):
         super(HhpExporter, self).__init__(*args, **kwargs)
         # We just want to make the following NASTY HACKS here, to influence the
@@ -112,7 +112,7 @@ class HhpExporter(lcg.Exporter):
         # We don't want XHTML tag syntax (<hr/>).
         lcg.HorizontalSeparator.export = lambda self_: '<hr>'
         # We want old HTML 'visial' tags.
-        lcg.Formatter._FORMAT['underline'] = ('<u>', '</u>')
+        lcg.wiki.Formatter._FORMAT['underline'] = ('<u>', '</u>')
         
 
     def export(self, node, directory):
