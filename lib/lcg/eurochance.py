@@ -318,7 +318,7 @@ class EurochanceCourse(EurochanceNode):
 class EurochanceExporter(StaticExporter):
     _INDEX_LABEL = _('Course Index')
     def body(self, node):
-        import _html
+        from lcg.export import _html
         body = super(EurochanceExporter, self).body(node)
         copyright = node.root().find_node('copyright')
         if copyright is not node:

@@ -35,17 +35,14 @@ else:
     _t = gettext.NullTranslations()
 _t.install(unicode=True)
 
+from util import *
 from resources import *
+from export import *
 from nodes import *
 from content import *
-from exercises import *
-from export import *
-from util import *
-import ims
 import feed
 import wiki
 
-# Øe¹ení cyklických závislostí souborù
-for file in (resources, nodes, content, exercises, feed, wiki):
-    file.__dict__.update(globals())
-                                                                                                                                                      
+# Resolve cyclic dependencies.
+for module in (resources, content, export, nodes, feed, wiki):
+    module.__dict__.update(globals())                                                                                                                                                      
