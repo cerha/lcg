@@ -1,0 +1,127 @@
+# -*- coding: iso8859-2 -*-
+#
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+"""Exporter class which generates an IMS compliant package."""
+
+from lcg.export import *
+
+from xml.dom import minidom
+from xml.dom.domreg import getDOMImplementation
+import os, codecs
+
+class _Manifest:
+    """IMS manifest is a collection of information about all files in a package.
+
+    It defines the structure and dependencies of the content material.
+
+    """
+    
+    def __init__(self, course):
+        """Initialize the manifest for a given 'Course'."""
+        
+        uri = "http://www.imsglobal.org/xsd/imscp_v1p1"
+        minidom = getDOMImplementation('minidom')
+        self._document = document = minidom.createDocument(uri, 'manifest', '')        
+        self._manifest = manifest = document.firstChild
+            
+        # add namespace attributes
+        self._set_xml_attr(manifest, 'xmlns',
+                           'http://www.imsglobal.org/xsd/imscp_v1p1')
+        # Metadata
+        metadata = self._append_xml_element(manifest, 'metadata')
+
+        self._append_xml_text(metadata, 'schema', 'IMS Content')
+        self._append_xml_text(metadata, 'schemaversion', '1.1.3')
+
+        # Organisations
+        organisations = self._append_xml_element(manifest, 'organizations')
+        self._set_xml_attr(organisations, 'default', 'TOC1')
+
+        o = self._append_xml_element(organisations, 'organization')
+        self._set_xml_attr(o, 'identifier', 'TOC1')
+        self._set_xml_attr(o, 'structure',  'hierachical')
+
+        self._append_xml_text(o, 'title', course.title())
+
+        # Resources
+        resources = self._append_xml_element(manifest, 'resources')
+        
+        for child in course.children():
+            self._create_item(o, resources, child)
+
+    def _create_item(self, o, r, node):
+        item = self._append_xml_element(o, 'item')
+        self._set_xml_attr(item, 'identifier', 'toc-' + node.id())
+        self._set_xml_attr(item, 'identifierref', node.id())
+        self._append_xml_text(item, 'title', node.title())
+
+        resource = self._append_xml_element(r, 'resource')
+        self._set_xml_attr(resource, 'identifier', node.id())
+        self._set_xml_attr(resource, 'type', 'webcontent')
+        self._set_xml_attr(resource, 'href', node.url())
+
+        resources = [n.url() for n in node.resources()]
+        resources.sort()
+        for filename in (node.url(),) + tuple(resources):
+            file = self._append_xml_element(resource, 'file')
+            self._set_xml_attr(file, 'href', filename)
+
+        for child in node.children():
+            self._create_item(item, r, child)
+
+    # Some xml helper methods.
+    
+    def _set_xml_attr(self, node, key, value):
+        attr = self._document.createAttribute(key)
+        node.setAttributeNode(attr)            
+        node.setAttribute(key, value)
+        return attr
+
+    def _append_xml_element(self, parent, key):
+        node = self._document.createElement(key)
+        parent.appendChild(node)
+        return node
+
+    def _append_xml_text(self, parent, key, text):
+        node = self._append_xml_element(parent, key)
+        node.appendChild(self._document.createTextNode(text))
+        return node
+
+    # Public methods
+    
+    def write(self, directory):
+        """Write the IMS Manifest into a file."""
+        filename = os.path.join(directory, 'imsmanifest.xml')
+        fh = codecs.open(filename, 'w', encoding="utf-8")
+        fh.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        self._manifest.writexml(fh, newl = '\n', addindent='  ')
+        fh.close()
+
+        
+class IMSExporter(Exporter):
+    """Export the content as an IMS package."""
+   
+    def export(self, node, directory):
+        super(IMSExporter, self).export(node, directory)
+        if node == node.root():
+            manifest = _Manifest(node)
+            manifest.write(directory)
+
+    def _body_parts(self, node):
+        return (node.content().export(),)
+        
