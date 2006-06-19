@@ -1,3 +1,39 @@
+2006-06-19  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/ims.py (Module): File moved.
+
+	* lib/lcg/export/hhp.py (Module): File moved.
+
+	* lib/lcg/export/export.py (Module): File moved.
+
+	* lib/lcg/export/_html.py (Module): File moved.
+
+	* lib/lcg/export/__init__.py (Module): New file.
+
+	* lib/lcg/content/exercises.py (Module): File moved.
+
+	* lib/lcg/content/content.py (Module): File moved.
+
+	* lib/lcg/content/__init__.py (Module): New file.
+
+	* lib/lcg/__init__.py (Module): Respect the new package
+	organization.
+
+	* lib/lcg/eurochance.py (Module): Respect the new package
+	organization.
+
+	* lib/lcg/content.py (Message): Moved to the `content' submodule.
+
+	* lib/lcg/exercises.py (Module): Moved to the `content' submodule.
+
+	* lib/lcg/_html.py (Module): Moved to the `export' submodule.
+
+	* lib/lcg/export.py (Module): Moved to the `export' submodule.
+
+	* lib/lcg/hhp.py (Module): Moved to the `export' submodule.
+	
+	* lib/lcg/ims.py (Module): Moved to the `export' submodule.
+
 2006-05-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/hhp.py (HhpExporter.__init__): Refer to the `Formatter'
