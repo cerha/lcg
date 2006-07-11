@@ -54,21 +54,30 @@ class ContentNode(object):
     
     """
 
-    def __init__(self, parent, id, subdir=None, hidden=False, language='en',
-                 secondary_language=None, input_encoding='ascii'):
+    def __init__(self, parent, id, subdir=None, hidden=False, language=None,
+                 secondary_language=None, language_variants=(),
+                 input_encoding='ascii'):
         """Initialize the instance.
 
         Arguments:
 
           parent -- parent node; the 'ContentNode' instance directly preceding
             this node in the content hierarchy.  Can be None for the top node.
+            
           id -- a textual identifier of this node.
+          
           subdir -- a directory name relative to parent's source directory.  All
             input files are expected in this directory.
+            
           language -- content language as a lowercase ISO 639-1 Alpha-2
             language code.
+            
           secondary_language -- secondary content language (used in citations)
             as a lowercase ISO 639-1 Alpha-2 language code.
+            
+          language_variants -- tuple of other available language variants of
+            this node.  The tuple contains language codes as strings.
+            
           input_encoding -- The content read from source files is expected in
             the specified encoding (ASCII by default).  The output encoding is
             set by the used exporter class.
@@ -91,6 +100,7 @@ class ContentNode(object):
         self._hidden = hidden
         self._language = language
         self._secondary_language = secondary_language
+        self._language_variants = language_variants
         self._input_encoding = input_encoding
         self._resources = {}
         self._counters = {}
@@ -324,6 +334,9 @@ class ContentNode(object):
         """Return the secondary language as an ISO 639-1 Alpha-2 code."""
         return self._secondary_language
 
+    def language_variants(self):
+        return self._language_variants
+        
     def input_encoding(self):
         """Return the name of encoding expected in source files.
 
@@ -392,13 +405,6 @@ class ContentNode(object):
 
     # File-related methods
     
-    def output_file(self):
-        """Return full pathname of the output file relative to export dir."""
-        return self.id() + '.html'
-
-    def url(self):
-        return self.output_file()
-    
     def subdir(self):
         """Return this node's subdirectory name relative to the root node."""
         if self._parent is None:
@@ -408,6 +414,17 @@ class ContentNode(object):
         else:
             return os.path.join(self._parent.subdir(), self._subdir)
 
+    def output_file(self):
+        """Return full pathname of the output file relative to export dir."""
+        name = self.id()
+        if self.language() is not None \
+               and len(self.root().language_variants()) > 1:
+            name += '.'+self.language()
+        return name + '.html'
+
+    def url(self):
+        return self.output_file()
+    
     def src_dir(self):
         if self._parent is None:
             return self._subdir
@@ -530,7 +547,7 @@ class WikiNode(_WikiNode):
 class DocNode(_WikiNode):
     """Node of a Structured Text read from a source file."""
     
-    def __init__(self, parent, id, ext='txt', **kwargs):
+    def __init__(self, parent, id, ext='txt', language=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -543,21 +560,17 @@ class DocNode(_WikiNode):
           
         """
         self._ext = ext
-        super(DocNode, self).__init__(parent, id, **kwargs)
-        
+        variants = [v for v in
+                    [os.path.splitext(os.path.splitext(f)[0])[1][1:]
+                     for f in glob.glob(self._input_file(id, lang='*'))]
+                    if v != language]
+        super(DocNode, self).__init__(parent, id,
+                                      language_variants=variants, **kwargs)
+
     def _source_text(self):
         return self._read_file(self._id, lang=self._language, ext=self._ext)
 
-    def language_variants(self):
-        return [os.path.splitext(os.path.splitext(f)[0])[1][1:]
-                for f in glob.glob(self._input_file(self.id(), lang='*'))]
         
-    def output_file(self):
-        if self.language() is not None and len(self.root().language_variants()) > 1:
-            return '.'.join((self.id(), self.language(), 'html'))
-        else:
-            return super(DocNode, self).output_file()
-
         
 class DocChapter(DocNode):
     """A Structured Text node with children read from the source directory.
@@ -645,13 +658,5 @@ class DocRoot(DocChapter):
     def __init__(self, dir, id='index', **kwargs):
         super(DocRoot, self).__init__(None, id, subdir=dir, **kwargs)
 
-    def _create_content(self):
-        content = super(DocRoot, self)._create_content()
-        variants = self.language_variants()
-        if len(variants) > 1:
-            selector = LanguageSelection(self, variants, self.language())
-            return Container(self, (selector, content))
-        else:
-            return content
 
         
