@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 """A simple Wiki formatter using the LCG framework."""
 
-import sys, getopt, codecs, lcg
+import sys, os, getopt, codecs, lcg
 
 def main():
     try:
@@ -32,6 +32,7 @@ def main():
     
     try:
         filename = args[0]
+        name, ext = os.path.splitext(filename)
         fh = codecs.open(filename, encoding=opt.get('--encoding', 'ascii'))
         try:
             text = ''.join(fh.readlines())
@@ -39,10 +40,13 @@ def main():
             fh.close()
     except IndexError:
         text = ''.join(sys.stdin.readlines())
-
-    n = lcg.WikiNode(text, language='en')
-    e = lcg.Exporter(stylesheet=opt.get('--stylesheet'), inlinestyles=True)
-    print e.page(n).encode('utf-8')
+        name = 'index'
+    node = lcg.WikiNode(name, text, language='en', subdir='.')
+    e = lcg.HtmlExporter(stylesheet=opt.get('--stylesheet'), inlinestyles=True)
+    if name:
+        e.export(node, '.')
+    else:
+        print e.page(node).encode('utf-8')
 
 def usage():
     import os
