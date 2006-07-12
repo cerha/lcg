@@ -37,8 +37,8 @@ _t.install(unicode=True)
 
 from util import *
 from resources import *
-from export import *
 from nodes import *
+from export import *
 from content import *
 import feed
 import wiki
