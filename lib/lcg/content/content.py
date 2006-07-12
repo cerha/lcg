@@ -544,14 +544,6 @@ class Section(SectionContainer):
     def _backref(self):
         return "backref-" + self.anchor()
         
-    def url(self, relative=False):
-        """Return the URL of the section relative to the course root."""
-        if relative:
-            base = ''
-        else:
-            base = self._parent.url()
-        return base + "#" + self.anchor()
-    
     def _header(self):
         if self._backref_used:
             href = "#"+self._backref()
@@ -560,7 +552,15 @@ class Section(SectionContainer):
         return _html.h(_html.link(self.title(), href, cls='backref',
                                   name=self.anchor()),
                  len(self._section_path()) + 1)+'\n'
-               
+
+    def url(self, relative=False):
+        """Return the URL of the section relative to the course root."""
+        if relative:
+            base = ''
+        else:
+            base = self._parent.url()
+        return base + "#" + self.anchor()
+           
     def export(self):
         return "\n".join((self._header(), super(Section, self).export()))
 
@@ -794,11 +794,11 @@ class LanguageSelection(Container):
     _CLASS = 'language-selection'
     _CONTENT_SEPARATOR = '\n'
 
-    def __init__(self, parent, languages, current,
-                 label=_('Choose your language:')):
-        assert current in languages, (current, languages)
+    def __init__(self, parent, label=_('Choose your language:')):
         self._label = label
-        pairs = [(lang, language_name(lang)) for lang in languages]
+        current = parent.current_language_variant()
+        pairs = [(lang, language_name(lang))
+                 for lang in parent.language_variants()]
         pairs.sort(lambda a,b: cmp(a[0], b[0]))
         self._targets = targets = []
         self._flags = flags = []
