@@ -35,6 +35,9 @@ class EurochanceNode(ContentNode):
         content = self.parse_wiki_file(filename, lang=ulang, macro=macro)
         return SectionContainer(self, content, lang=ulang)
         
+    def current_language_variant(self):
+        return self.root().users_language()
+        
     def meta(self):
         author = 'Lawton School S.L. (http://www.lawtonschool.com)'
         copyright = "Copyright (c) 2005-2006 Lawton School S.L. (content), "
@@ -52,12 +55,6 @@ class EurochanceNode(ContentNode):
             file = basename + '.mp3'
         return super(EurochanceNode, self).resource(cls, file, *args, **kwargs)
 
-    def output_file(self):
-        ulang = self.root().users_language()
-        if ulang:
-            return '.'.join((self.id(), self.root().users_language(), 'html'))
-        else:
-            return super(EurochanceNode, self).output_file()
 
     
 class Unit(EurochanceNode):
@@ -265,12 +262,16 @@ class EurochanceCourse(EurochanceNode):
             assert len(language) == len(users_language) == 2
             self._users_language = users_language
             self._unit_cls = IntermediateUnit
+            variants = [os.path.splitext(os.path.splitext(f)[0])[1][1:]
+                        for f in glob.glob(os.path.join(dir, 'intro.*.txt'))]
         else:
             self._users_language = None
             self._unit_cls = Unit
+            variants = ()
         super(EurochanceCourse, self).__init__(None, 'index', dir,
                                                language=language,
                                                secondary_language=language,
+                                               language_variants=variants,
                                                **kwargs)
 
     def users_language(self):
@@ -290,16 +291,10 @@ class EurochanceCourse(EurochanceNode):
         return dirs
 
     def _create_content(self):
-        content = (self._localized_wiki_content('intro'),
-                   TableOfContents(self, item=self, title=_("Table of Contents:")))
-        ulang = self._users_language
-        if ulang:
-            languages = [os.path.splitext(os.path.splitext(f)[0])[1][1:]
-                         for f in glob.glob(self._input_file('intro', lang='*'))]
-            return (LanguageSelection(self, languages, ulang),) + content
-        else:
-            return content
-        
+        return (self._localized_wiki_content('intro'),
+                TableOfContents(self, item=self,
+                                title=_("Table of Contents:")))
+
     def _create_children(self):
         units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d)
                  for i, d in enumerate(self._unit_dirs())]
@@ -311,27 +306,27 @@ class EurochanceCourse(EurochanceNode):
                          self._create_child(Help, 'help'),
                          self._create_child(CopyrightInfo, 'copyright')))
         return children
-    
-
 
     
-class EurochanceExporter(StaticExporter):
+class EurochanceExporter(HtmlStaticExporter):
     _INDEX_LABEL = _('Course Index')
-    def body(self, node):
+    
+    def _body(self, node):
         from lcg.export import _html
-        body = super(EurochanceExporter, self).body(node)
+        body = super(EurochanceExporter, self)._body(node)
         copyright = node.root().find_node('copyright')
         if copyright is not node:
             body += _html.div(Link(node, copyright).export(), cls='copyright')
         body += _html.div(_("Version %s")% node.root().version(), cls='version')
         return body
-            
-    
+
+ 
 class _Section(wiki.Parser._Section):
     def __init__(self, title, *args, **kwargs):
         title = title.replace('>>', '<span class="citation" lang="%s">' % 'de')
         title = title.replace('<<', '</span>')
         super(wiki.Parser._Section, self).__init__(title, *args, **kwargs)
+        
 # Just a quick hack...
 wiki.Parser._Section = _Section
 
