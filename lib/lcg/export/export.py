@@ -1,4 +1,4 @@
-# -*- coding: iso8859-2 -*-
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
@@ -21,77 +21,23 @@
 import os
 
 from lcg import *
-import _html
 
-    
 class Exporter(object):
-    DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
 
-    def __init__(self, stylesheet=None, inlinestyles=False):
-        """Initialize the exporter for a given 'ContentNode' instance."""
-        self._stylesheet = stylesheet
-        self._inlinestyles = inlinestyles
-
-    def _styles(self, node):
-        if self._inlinestyles:
-            return ['<style type="text/css">\n%s</style>' % s.get()
-                    for s in node.resources(Stylesheet)]
-        else:
-            return ['<link rel="stylesheet" type="text/css" href="%s">' % \
-                    s.url() for s in node.resources(Stylesheet)]
-            
-    def head(self, node):
-        if self._stylesheet is not None:
-            node.resource(Stylesheet, self._stylesheet)
-        import lcg
-        meta = node.meta() + \
-               (('generator',
-                 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
-        tags = ['<title>%s</title>' % node.title()] + \
-               ['<meta http-equiv="%s" content="%s">' % pair
-                for pair in (('Content-Type', 'text/html; charset=UTF-8'),
-                             ('Content-Script-Type', 'text/javascript'),
-                             ('Content-Language', node.language()))] + \
-               ['<meta name="%s" content="%s">' % pair for pair in meta] + \
-               ['<script language="Javascript" type="text/javascript"' + \
-                ' src="%s"></script>' % s.url()
-                for s in node.resources(Script)]
-        return '  '+'\n  '.join(tags + self._styles(node))
-
-    def _body_parts(self, node):
-        return ('<h1>%s</h1>' % node.title(),
-                _html.div(node.content().export(), 'content'))
+    def __init__(self):
+        pass
     
-    def body(self, node):
-        return "\n".join(self._body_parts(node))
-
-    def page(self, node):
-        if 'audio.js' in [r.url().split('/')[-1]
-                          for r in node.resources(Script)]:
-            clsid = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6"
-            hack = ('\n<object id="media_player" height="0" width="0"'
-		    ' classid="%s">' % clsid + '</object>')
-        else:
-            hack = ''
-        lines = (self.DOCTYPE, '',
-                 '<html>',
-                 '<head>',
-                 self.head(node),
-                 '</head>',
-                 '<body lang="%s">' % node.language(),
-                 self.body(node) + hack,
-                 '</body>',
-                 '</html>')
-        return "\n".join(lines)
-
-    
-    def export(self, node, directory):
+    def export(self, node):
         """Export the node and its children recursively."""
+    
+class FileExporter(object):
+
+    def export(self, node, directory):
         if not os.path.isdir(directory):
             os.makedirs(directory)
-        filename = os.path.join(directory, node.output_file())
+        filename = os.path.join(directory, self._output_file(node))
         file = open(filename, 'w')
-        file.write(self.page(node).encode('utf-8'))
+        file.write(self._page(node).encode('utf-8'))
         file.close()
         for r in node.resources():
             r.export(directory)
@@ -99,85 +45,131 @@ class Exporter(object):
             self.export(n, directory)
 
 
-class LinkExporter(object):
+class MarkupFormatter(object):
+    """Simple inline ascii markup formatter.
 
-    def backref(self, node):
-        # We can allow just one backref target on the page.  Links on other
-        # pages are not backreferenced.
-        # TODO: Must be reimplemented!
-        # if node is self._parent and not self._backref_used:
-        #     self._backref_used = True
-        #     return self._backref()
-        # else:
-        return None
-    
-    def _backref(self):
-        return "backref-" + self.anchor()
-        
-#     def url(self, relative=False):
-#         """Return the URL of the section relative to the course root."""
-#         if relative:
-#             base = ''
-#         else:
-#             base = self._parent.url()
-#         return base + "#" + self.anchor()
-    
-    def _header(self):
-        if self._backref_used:
-            href = "#"+self._backref()
+    This simple formatter can only format the markup within one block (ie. a
+    single paragraph or other non-structured piece of text).  Parsing the
+    higher level document structure (headings, paragraphs, bullet lists etc.)
+    is done on the LCG input.
+
+    """
+    _MARKUP = (('linebreak', '//'),
+               ('emphasize', ('/',  '/')),
+               ('strong',    ('\*', '\*')),
+               ('fixed',     ('=',  '=')),
+               ('underline', ('_',  '_')),
+               ('citation',  ('>>', '<<')),
+               ('quotation', ('``', "''")),
+               ('link', (r'\[(?:(?P<resource_cls>Resource|Image|Media):)?'
+                         r'(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
+                         r'(?:(?:\||\s+)(?P<title>[^\]]*))?\]')),
+               ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
+               ('email', r'\w[\w\-\.]*@\w[\w\-\.]+'),
+               ('comment', r'^#.*'),
+               ('dash', r'(^|(?<=\s))--($|(?=\s))'),
+               ('nbsp', '~'),
+               ('lt', '<'),
+               ('gt', '>'),
+               ('amp', '&'),
+               )
+    _HELPER_PATTERNS = ('href', 'anchor', 'title')
+
+    _FORMAT = {}
+
+    def __init__(self):
+        regexp = r"(?P<%s>\\*%s)"
+        pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
+                                regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
+        regexps = [isinstance(markup, types.StringType)
+                   and regexp % (type, markup)
+                   or pair_regexp % (type, markup[1], type, markup[0])
+                   for type, markup in self._MARKUP]
+        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')',
+                                 re.MULTILINE|re.UNICODE)
+        self._paired_on_output = [type for type, format in self._FORMAT.items()
+                                  if isinstance(format, types.TupleType)]
+
+    def _markup_handler(self, parent, match):
+        type = [key for key, m in match.groupdict().items()
+                if m and not key in self._HELPER_PATTERNS][0]
+        markup = match.group(type)
+        backslashes = markup.count('\\')
+        markup = markup[backslashes:]
+        prefix = backslashes / 2 * '\\'
+        if backslashes % 2:
+            return prefix + markup
+        # We need two variables (start and end), because both can be False for
+        # unpaired markup.
+        start = False
+        end = False
+        if type.endswith('_start'):
+            type = type[:-6]
+            start = True
+        elif type.endswith('_end'):
+            type = type[:-4]
+            end = True
+        if not start and self._open and type == self._open[-1]:
+            # Closing an open markup.
+            self._open.pop()
+            result = self._formatter(parent, type, match.groupdict(), close=True)
+        elif not end and not (start and type in self._open):
+            # Start markup or an unpaired markup.
+            if start:
+                self._open.append(type)
+            result = self._formatter(parent, type, match.groupdict())
         else:
-            href = None
-        return _html.h(_html.link(self.title(), href, cls='backref',
-                                  name=self.anchor()),
-                 len(self._section_path()) + 1)+'\n'
-               
-    def export(self):
-        return "\n".join((self._header(), super(Section, self).export()))
+            # Markup in an invalid context is just printed as is.
+            # This can be end markup, which was not opened or start markup,
+            # which was already opened.
+            result = markup
+        return prefix + result
 
-            
-class StaticExporter(Exporter):
-    """Export the content as a set of static web pages."""
-
-    _hotkey = {
-        'prev': '1',
-        'next': '3',
-        'up': '2',
-        'index': '4',
-        }
-
-    _INDEX_LABEL = None
-    
-    def head(self, node):
-        tags = ['<link rel="%s" href="%s" title="%s">' % \
-                (kind, n.url(), n.title())
-                for kind, n in (('start', node.root()), 
-                                ('prev', node.prev()),
-                                ('next', node.next()))
-                if n is not None and n is not node]
-        return '\n  '.join([super(StaticExporter, self).head(node)] + tags)
-             
-    def _body_parts(self, node):
-        parts = super(StaticExporter, self)._body_parts(node)
-        if len(node.root().linear()) > 1:
-            parts += ('<hr class="navigation">', self._navigation(node))
-        return parts
-
-    def _link(self, node, label=None, key=None):
-        if node is None: return _("None")
-        if label is None: label = node.title(brief=True)
-        return _html.link(label, node.url(), title=node.title(),
-                          hotkey=not key or self._hotkey[key])
-    
-    def _navigation(self, node):
-        nav = [_('Next') + ': ' + self._link(node.next(), key='next'),
-               _('Previous') + ': ' + self._link(node.prev(), key='prev')]
-        hidden = ''
-        if node is not node.root():
-            p = node.parent()
-            if p is not node.root():
-                nav.append(_("Up") + ': ' + self._link(p, key='up'))
+    def _formatter(self, parent, type, groups, close=False):
+        try:
+            formatter = getattr(self, '_'+type+'_formatter')
+        except AttributeError:
+            f = self._FORMAT[type]
+            return type in self._paired_on_output and f[close and 1 or 0] or f
+        return formatter(parent, close=close, **groups)
+        
+    def _link_formatter(self, parent, title=None, href=None, anchor=None,
+                        resource_cls=None, close=False):
+        node = None
+        if resource_cls:
+            cls = globals()[resource_cls]
+            resource = parent.resource(cls, href, fallback=False)
+            if resource:
+                return '<a href="%s">%s</a>' % (resource.url(), title or href)
             else:
-                hidden = "\n"+self._link(p, key='up', label='')
-            nav.append(self._link(node.root(), label=self._INDEX_LABEL,
-                                  key='index'))
-        return _html.div(' |\n'.join(nav) + hidden, 'navigation')
+                log("%s: Unknown resource: %s" % (parent.id(), href))
+        elif not href:
+            node = parent
+        elif href.find('@') == href.find('/') == -1:
+            node = parent.root().find_node(href)
+            if not node:
+                log("%s: Unknown node: %s" % (parent.id(), href))
+        target = node
+        if node and anchor:
+            target = node.find_section(anchor)
+            if target is None:
+                log("%s: Unknown section: %s:%s" %
+                    (parent.id(), node.id(), anchor))
+        if not target:
+            if anchor is not None:
+                href += '#'+anchor
+            target = Link.ExternalTarget(href, title or href)
+        return Link(parent, target, label=title).export()
+    
+    def format(self, parent, text):
+        self._open = []
+        result = re.sub(self._rules, lambda match:
+                        self._markup_handler(parent, match), text)
+        self._open.reverse()
+        x = self._open[:]
+        for type in x:
+            result += self._formatter(parent, type, close=True)
+        return result
+
+
+
