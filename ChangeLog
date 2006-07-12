@@ -1,3 +1,63 @@
+2006-07-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/wiki-formatter.py (main): `Exporter' -> `HtmlExporter'.
+	Print page to STDOUT if name not given.
+
+	* bin/lcgmake.py: `StaticExporter' -> `HtmlStaticExporter'.
+
+	* lib/lcg/export/html.py: New file.
+
+	* lib/lcg/export/__init__.py: Import also from the new `html' module.
+
+	* lib/lcg/__init__.py: Import order changed.
+
+	* lib/lcg/export/export.py (Exporter): All HTML-specific
+	functionality moved to the `HtmlExporter' in the new `html'
+	module.
+	(FileExporter): New class.
+	(MarkupFormatter): New class.
+
+	* lib/lcg/content/content.py (LanguageSelection.__init__):
+	Arguments `language' and `variants' removed.  Set them according
+	to parent.
+
+	* lib/lcg/eurochance.py (EurochanceNode.current_language_variant):
+	New method.
+	(output_file): Method removed.
+	(EurochanceCourse.__init__): Pass `language_variants' to the
+	parent constructor.
+	(EurochanceCourse._create_content): Nont add the `LanguageSelection'.
+	(EurochanceExporter): `StaticExporter' -> `HtmlStaticExporter'.
+	(EurochanceExporter.body): Renamed to `_body'.
+
+	* lib/lcg/nodes.py (ContentNode.__init__): Automatically add the
+	current language to `language_variants' if it's not already there.
+	Docstring updated.
+	(ContentNode.language_variants): Docstring added.
+	(ContentNode.current_language_variant): New method.
+	(ContentNode.output_file): Cache the name in a privat attribute.
+	(ContentNode.src_dir): Cache the dir in a privat attribute.
+	(DocNode.__init__): Don't pass `language_variants' to the parent
+	constructor, but rewrite `self._language_variants' afterwards,
+	when the `_input_file' method works.
+
+2006-07-11  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/eurochance.py (Unit.output_file): Method removed.
+	(EurochanceExporter): Derive from `HtmlStaticExporter'.
+	(EurochanceExporter.body): Renamed to `_body'.
+
+	* lib/lcg/nodes.py (ContentNode.__init__): New argument
+	`language_variants'.  The default value of `language' set to None.
+	(ContentNode.language_variants): New method.
+	(ContentNode.output_file): Append the language if more language
+	variants are present.
+	(DocNode.__init__): Make a list of available language_variants and
+	pass it to parent constructor.
+	(DocNode.language_variants): Method removed.
+	(DocNode.output_file): Method removed.
+	(DocRoot._create_content): Method removed.
+
 2006-06-19  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/ims.py (Module): File moved.
