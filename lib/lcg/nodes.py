@@ -75,8 +75,10 @@ class ContentNode(object):
           secondary_language -- secondary content language (used in citations)
             as a lowercase ISO 639-1 Alpha-2 language code.
             
-          language_variants -- tuple of other available language variants of
-            this node.  The tuple contains language codes as strings.
+          language_variants -- a sequence of all available language variants of
+            this node.  The sequence contains language codes as strings.  The
+            current language variant is added automatically to the list if it
+            is not already there.
             
           input_encoding -- The content read from source files is expected in
             the specified encoding (ASCII by default).  The output encoding is
@@ -87,11 +89,12 @@ class ContentNode(object):
         assert isinstance(id, types.StringType)
         assert subdir is None or isinstance(subdir, types.StringType)
         assert isinstance(hidden, types.BooleanType), hidden
-        assert isinstance(language, types.StringType) and \
-               len(language) == 2
+        assert language is None or \
+               isinstance(language, types.StringType) and \
+               len(language) == 2, repr(language)
         assert secondary_language is None or \
                isinstance(secondary_language, types.StringType) and \
-               len(secondary_language) == 2
+               len(secondary_language) == 2, repr(secondary_language)
         assert isinstance(input_encoding, types.StringType)
         codecs.lookup(input_encoding)
         self._parent = parent
@@ -100,7 +103,10 @@ class ContentNode(object):
         self._hidden = hidden
         self._language = language
         self._secondary_language = secondary_language
-        self._language_variants = language_variants
+        current = self.current_language_variant()
+        if current and current not in language_variants:
+            language_variants += (current,)
+        self._language_variants = tuple(language_variants)
         self._input_encoding = input_encoding
         self._resources = {}
         self._counters = {}
@@ -335,8 +341,20 @@ class ContentNode(object):
         return self._secondary_language
 
     def language_variants(self):
+        """Return the tuple of available language variants of this node.
+
+        The returned tuple consists of language codes including the language of
+        the current node.
+        
+        """
         return self._language_variants
         
+    def current_language_variant(self):
+        # This is in fact only here to allow a strange language setup in
+        # eurochance courses.  In other cases, 'self.language()' should
+        # directly determine the current language variant.
+        return self.language()
+
     def input_encoding(self):
         """Return the name of encoding expected in source files.
 
@@ -413,24 +431,33 @@ class ContentNode(object):
             return self._parent.subdir()
         else:
             return os.path.join(self._parent.subdir(), self._subdir)
-
+        
     def output_file(self):
         """Return full pathname of the output file relative to export dir."""
-        name = self.id()
-        if self.language() is not None \
-               and len(self.root().language_variants()) > 1:
-            name += '.'+self.language()
-        return name + '.html'
+        try:
+            name = self._output_file
+        except AttributeError:
+            name = self.id()
+            if self.current_language_variant() is not None \
+                   and len(self.language_variants()) > 1:
+                name += '.'+self.current_language_variant()
+            self._output_file = name = name + '.html'
+        return name
 
     def url(self):
         return self.output_file()
     
     def src_dir(self):
-        if self._parent is None:
-            return self._subdir
-        else:
-            return os.path.normpath(os.path.join(self.root().src_dir(),
-                                                 self.subdir()))
+        try:
+            dir = self._src_dir
+        except AttributeError:
+            if self._parent is None:
+                dir = self._subdir
+            else:
+                dir = os.path.normpath(os.path.join(self.root().src_dir(),
+                                                    self.subdir()))
+            self._src_dir = dir
+        return dir
     # Wiki-related methods
 
     def format_wiki_text(self, text):
@@ -547,7 +574,7 @@ class WikiNode(_WikiNode):
 class DocNode(_WikiNode):
     """Node of a Structured Text read from a source file."""
     
-    def __init__(self, parent, id, ext='txt', language=None, **kwargs):
+    def __init__(self, parent, id, ext='txt', **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -560,12 +587,10 @@ class DocNode(_WikiNode):
           
         """
         self._ext = ext
-        variants = [v for v in
-                    [os.path.splitext(os.path.splitext(f)[0])[1][1:]
-                     for f in glob.glob(self._input_file(id, lang='*'))]
-                    if v != language]
-        super(DocNode, self).__init__(parent, id,
-                                      language_variants=variants, **kwargs)
+        super(DocNode, self).__init__(parent, id, **kwargs)
+        variants = [os.path.splitext(os.path.splitext(f)[0])[1][1:]
+                    for f in glob.glob(self._input_file(id, lang='*'))]
+        self._language_variants = tuple(variants)
 
     def _source_text(self):
         return self._read_file(self._id, lang=self._language, ext=self._ext)
