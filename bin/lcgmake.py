@@ -50,7 +50,7 @@ def main():
         from lcg import hhp
         e = hhp.HhpExporter(stylesheet=opt['stylesheet'])
     else:
-        e = lcg.StaticExporter(stylesheet=opt['stylesheet'])
+        e = lcg.HtmlStaticExporter(stylesheet=opt['stylesheet'])
     e.export(doc, destination_dir)
 
 
