@@ -40,8 +40,8 @@ from resources import *
 from nodes import *
 from export import *
 from content import *
+from wiki import *
 import feed
-import wiki
 
 # Resolve cyclic dependencies.
 for module in (resources, content, export, nodes, feed, wiki):
