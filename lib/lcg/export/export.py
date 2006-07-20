@@ -51,7 +51,8 @@ class MarkupFormatter(object):
     This simple formatter can only format the markup within one block (ie. a
     single paragraph or other non-structured piece of text).  Parsing the
     higher level document structure (headings, paragraphs, bullet lists etc.)
-    is done on the LCG input.
+    is done on the LCG input.  Formatting the inline markup, on the other hand,
+    is done on LCG output (export).
 
     """
     _MARKUP = (('linebreak', '//'),
@@ -73,7 +74,7 @@ class MarkupFormatter(object):
                ('gt', '>'),
                ('amp', '&'),
                )
-    _HELPER_PATTERNS = ('href', 'anchor', 'title')
+    _HELPER_PATTERNS = ('href', 'anchor', 'title', 'resource_cls')
 
     _FORMAT = {}
 
@@ -134,7 +135,7 @@ class MarkupFormatter(object):
         return formatter(parent, close=close, **groups)
         
     def _link_formatter(self, parent, title=None, href=None, anchor=None,
-                        resource_cls=None, close=False):
+                        resource_cls=None, close=False, **kwargs):
         node = None
         if resource_cls:
             cls = globals()[resource_cls]
@@ -159,7 +160,9 @@ class MarkupFormatter(object):
             if anchor is not None:
                 href += '#'+anchor
             target = Link.ExternalTarget(href, title or href)
-        return Link(parent, target, label=title).export()
+        l = Link(target, label=title)
+        l.set_parent(parent)
+        return l.export(self)
     
     def format(self, parent, text):
         self._open = []
@@ -168,7 +171,7 @@ class MarkupFormatter(object):
         self._open.reverse()
         x = self._open[:]
         for type in x:
-            result += self._formatter(parent, type, close=True)
+            result += self._formatter(parent, type, {}, close=True)
         return result
 
 
