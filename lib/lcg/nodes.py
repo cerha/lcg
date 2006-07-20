@@ -111,14 +111,14 @@ class ContentNode(object):
         self._resources = {}
         self._counters = {}
         self._registered_children = []
-        self._wiki_parser = wiki.Parser(self)
-        self._wiki_formatter = wiki.Formatter(self)
+        self._parser = Parser()
         content = self._create_content()
         if isinstance(content, Content):
             self._content = content
         else:
             assert isinstance(content, (types.TupleType, types.ListType))
-            self._content = SectionContainer(self, content)
+            self._content = SectionContainer(content)
+        self._content.set_parent(self)
         self._children = self._create_children()
         if __debug__:
             for child in self._children:
@@ -194,9 +194,10 @@ class ContentNode(object):
 
     def _create_child(self, cls, *args, **kwargs):
         """Helper method to be used within '_create_children()'."""
-        kwargs.update({'language': self._language,
-                       'secondary_language': self._secondary_language,
-                       'input_encoding': self._input_encoding})
+        for k in ('language', 'secondary_language', 'language_variants',
+                  'input_encoding'):
+            if not kwargs.has_key(k):
+                kwargs[k] = getattr(self, '_'+k)
         return cls(self, *args, **kwargs)
     
     def _node_path(self, relative_to=None):
@@ -458,28 +459,22 @@ class ContentNode(object):
                                                     self.subdir()))
             self._src_dir = dir
         return dir
-    # Wiki-related methods
-
-    def format_wiki_text(self, text):
-        """Format text with wiki markup and return HTML."""
-        if text:
-            return self._wiki_formatter.format(text)
-        else:
-            return ''
     
+    # Wiki-related methods (TODO: Move somewhere else...)
+
     def parse_wiki_text(self, text, macro=False, globals=None):
         """Parse the text and return a sequence of content elements."""
         if macro:
             def mygettext(x):
                 return _(re.sub('\s*\n', ' ', x))
-            mp = wiki.MacroParser(substitution_provider=mygettext)
+            mp = MacroParser(substitution_provider=mygettext)
             if globals:
                 mp.add_globals(**globals)
             text = mp.parse(text)
-        return self._wiki_parser.parse(text)
+        return self._parser.parse(text)
     
-    def parse_wiki_file(self, name, ext='txt', lang=None,
-                        macro=False, globals=None):
+    def parse_wiki_file(self, name, ext='txt', lang=None, macro=False,
+                        globals=None):
         """Parse the file and return a sequence of content elements."""
         return self.parse_wiki_text(self._read_file(name, ext=ext, lang=lang),
                                     macro=macro, globals=globals)
@@ -537,7 +532,7 @@ class _WikiNode(ContentNode):
             s = sections[0]
             self._document_title = s.title()
             sections = s.content()
-        return SectionContainer(self, sections, toc_depth=0) 
+        return SectionContainer(sections, toc_depth=0) 
     
     def _title(self):
         return self._document_title
