@@ -361,8 +361,8 @@ class Exercise(Section):
             
         """
         title = _("Exercise %d") +": "+ self._NAME
-        super(Exercise, self).__init__(parent, title, Content(parent),
-                                       in_toc=False)
+        super(Exercise, self).__init__(title, Content(), in_toc=False)
+        self.set_parent(parent)
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
         assert instructions is None or \
@@ -432,10 +432,12 @@ class Exercise(Section):
             if escape:
                 text = re.sub('\[', '\\[', text)
             content = self._parent.parse_wiki_text(text)
-        return Container(self._parent, content)
+        container = Container(content)
+        container.set_parent(self._parent)
+        return container
     
     def _init_resources(self):
-        self._parent.resource(Script, 'audio.js')
+        self.parent().resource(Script, 'audio.js')
 
     # Class methods
         
@@ -497,12 +499,12 @@ class Exercise(Section):
                   t + '</form>')
         return '\n'.join(result)
 
-    def export(self):
+    def export(self, exporter):
         header = _html.div((self._header(),
                       _html.link(_("Exercise Help"), self._help_node.url(),
                                  target='help', cls='exercise-help-link')),
                            cls='exercise-header')
-        parts = [getattr(self, '_export_'+part)()
+        parts = [getattr(self, '_export_'+part)(exporter)
                  for part in self._EXPORT_ORDER or ('reading',
                                                     'explanation',
                                                     'instructions',
@@ -516,10 +518,10 @@ class Exercise(Section):
     def _wrap_exported_tasks(self, tasks):
         return "\n".join(tasks)
     
-    def _export_tasks(self):
-        exported = [self._export_task(t) for t in self._tasks]
+    def _export_tasks(self, exporter):
+        exported = [self._export_task(exporter, t) for t in self._tasks]
         if self._template:
-            exported = self._template.export() % tuple(exported)
+            exported = self._template.export(exporter) % tuple(exported)
         else:
             exported = self._wrap_exported_tasks(exported)
         if exported:
@@ -528,44 +530,45 @@ class Exercise(Section):
         else:
             return None
 
-    def _export_explanation(self):
+    def _export_explanation(self, exporter):
         if self._explanation is not None:
             return _("Explanation:") + \
-                   _html.div(self._explanation.export(), cls="explanation")
+                   _html.div(self._explanation.export(exporter),
+                             cls="explanation")
         else:
             return None
         
-    def _export_example(self):
+    def _export_example(self, exporter):
         if self._example is not None:
             return _("Example:") + \
-                   _html.div(self._example.export(), cls="example")
+                   _html.div(self._example.export(exporter), cls="example")
         else:
             return None
     
-    def _export_reading(self):
+    def _export_reading(self, exporter):
         if self._reading is not None:
-            return _html.div(self._reading_instructions.export(), cls="label")+\
-                   _html.div(self._reading.export(), cls="reading")
+            return _html.div(self._reading_instructions.export(exporter), cls="label")+\
+                   _html.div(self._reading.export(exporter), cls="reading")
         else:
             return None
     
-    def _export_instructions(self):
+    def _export_instructions(self, exporter):
         """Return the HTML formatted instructions for this type of exercise."""
         custom = self._custom_instructions
         if custom:
-            return custom.export()
+            return custom.export(exporter)
         else:
             default = self._instructions()
             return default and _html.p(default)
 
-    def _export_recording(self):
+    def _export_recording(self, exporter):
         if self._recording:
             return self._sound_controls(_("Recording:"), self._recording,
                                         self._transcript)
         else:
             return None
     
-    def _export_audio_version(self):
+    def _export_audio_version(self, exporter):
         if self._audio_version:
             label = self._AUDIO_VERSION_LABEL
             return self._sound_controls(label, self._audio_version,
@@ -577,8 +580,8 @@ class Exercise(Section):
     def _task_style_cls(self):
         return 'task %s-task' % camel_case_to_lower(self.__class__.__name__)
         
-    def _export_task(self, task):
-        parts = self._export_task_parts(task)
+    def _export_task(self, exporter, task):
+        parts = self._export_task_parts(exporter, task)
         if not isinstance(parts, (types.TupleType, types.ListType)):
             parts = [parts]
         else:
@@ -645,11 +648,12 @@ class _InteractiveExercise(Exercise):
     
     def _init_resources(self):
         super(_InteractiveExercise, self)._init_resources()
-        self._parent.resource(Script, 'exercises.js')
-        self._parent.resource(Script, 'audio.js')
+        parent = self.parent()
+        parent.resource(Script, 'exercises.js')
+        parent.resource(Script, 'audio.js')
         self._responses = {}
         for key, filename in self._RESPONSES:
-            media = self._parent.resource(SharedMedia, filename)
+            media = parent.resource(SharedMedia, filename)
             if not isinstance(media, (types.ListType, types.TupleType)):
                 media = (media,)
             self._responses[key] = tuple(media)
@@ -713,20 +717,20 @@ class _InteractiveExercise(Exercise):
         return b1 + lnk + b2
         
     def answer_sheet(self, parent):
-        self._answer_sheet_node = p = parent
+        self._answer_sheet_node = parent
         i = 0
         items = []
         for answer, comment in self._answer_sheet_items():
-            a = Anchor(p, self._answer_sheet_anchor(i), answer)
+            a = Anchor(self._answer_sheet_anchor(i), answer)
             if comment:
-                c = Paragraph(p, WikiText(p, comment))
-                items.append(Container(p, (a, c)))
+                c = Paragraph(WikiText(comment))
+                items.append(Container((a, c)))
             else:
                 items.append(a)
             i += 1
-        anchor = Anchor(p, self._answer_sheet_anchor())
-        answers = ItemizedList(p, items, type=ItemizedList.TYPE_NUMERIC)
-        return Container(p, (anchor, answers))
+        anchor = Anchor(self._answer_sheet_anchor())
+        answers = ItemizedList(items, type=ItemizedList.TYPE_NUMERIC)
+        return Container((anchor, answers))
 
     
 ################################################################################
@@ -775,8 +779,8 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         cls = super(_ChoiceBasedExercise, self)._task_style_cls()
         return cls + ' choice-based-task'
     
-    def _export_task_parts(self, task):
-        prompt = self._parent.format_wiki_text(task.prompt())
+    def _export_task_parts(self, exporter, task):
+        prompt = exporter.format_wiki_text(self.parent(), task.prompt())
         return (prompt, self._format_choices(task))
 
     
@@ -828,8 +832,9 @@ class GapFilling(_ChoiceBasedExercise):
                       "following sentences.")
 
 
-    def _export_task_parts(self, task):
-        prompt = self._parent.format_wiki_text(task.substitute_gap("\____"))
+    def _export_task_parts(self, exporter, task):
+        prompt = exporter.format_wiki_text(self.parent(),
+                                           task.substitute_gap("\____"))
         #return prompt.replace('%s', self._format_choices(task)) +'\n'
         return (prompt, self._format_choices(task))
     
@@ -870,10 +875,11 @@ class _FillInExercise(_InteractiveExercise):
         field += ''.join(controls)
         return field
     
-    def _export_task_parts(self, task):
-        prompt = self._parent.format_wiki_text(task.prompt())
+    def _export_task_parts(self, exporter, task):
+        prompt = exporter.format_wiki_text(self.parent(), task.prompt())
         if isinstance(task, MixedTextFillInTask):
-            text = task.text(self._make_field, self._parent.format_wiki_text)
+            formatter = lambda t: exporter.format_wiki_text(self.parent(), t)
+            text = task.text(self._make_field, formatter)
         else:
             text = self._make_field(task, task.answer())
         if not (isinstance(task, MixedTextFillInTask) and task.is_mixed()):
@@ -969,7 +975,7 @@ class Dictation(_FillInExercise):
     def _transcript_text(self):
         return self._tasks[0].answer()
 
-    def _export_task_parts(self, task):
+    def _export_task_parts(self, exporter, task):
         return '<textarea rows="10" cols="60"></textarea>'
         
     def _init_script(self):
@@ -996,8 +1002,8 @@ class _Cloze(_FillInExercise):
         else:
             return self._INSTRUCTIONS
 
-    def _export_task_parts(self, task):
-        formatter = self._parent.format_wiki_text
+    def _export_task_parts(self, exporter, task):
+        formatter = lambda t: exporter.format_wiki_text(self.parent(), t)
         return task.text(self._make_field, formatter)
 
 
@@ -1006,11 +1012,11 @@ class _ExposedCloze(_Cloze):
     _INSTRUCTIONS = _("Use the correct word or expression from the list below "
                       "to fill in the gaps in the sentences.")
 
-    def _export_instructions(self):
+    def _export_instructions(self, exporter):
         answers = self._answers()
         answers.sort()
-        instructions = super(_ExposedCloze, self)._export_instructions()
-        return instructions + _html.list(answers)
+        instr = super(_ExposedCloze, self)._export_instructions(exporter)
+        return instr + _html.list(answers)
 
     
 class NumberedCloze(_Cloze, _NumberedTasksExercise):
@@ -1050,9 +1056,9 @@ class Cloze(_Cloze):
                             size=max(4, len(text)+1), cls='fill-in-task')
         return field + self._answer_sheet_link(n-1)
 
-    def _export_task_parts(self, task):
+    def _export_task_parts(self, exporter, task):
         # The formatter here actually works as a parser and formatter.
-        formatter = lambda t: self._wiki_content(t).export()
+        formatter = lambda t: self._wiki_content(t).export(exporter)
         return task.text(self._make_field, formatter)
     
 class ExposedCloze(Cloze, _ExposedCloze):
