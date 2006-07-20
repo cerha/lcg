@@ -1,3 +1,156 @@
+2006-07-20  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/eurochance.py (EurochanceNode._localized_wiki_content)
+	(Unit._create_exercises, Unit._create_content)
+	(ExerciseHelp._create_content, VocabIndex._create_content)
+	(AnswerSheets._create_content, AnswerSheet._answer_sheets)
+	(AnswerSheet._create_content, Help._create_content)
+	(EurochanceCourse._create_content, EurochanceExporter._body):
+	Don't pass the `parent' argument to the constructors of generated
+	content elements.
+	(CourseIndex): Class removed.
+	(_Section): `wiki.Parser._Section' -> `Parser._Section'.
+
+	* lib/lcg/export/ims.py (IMSExporter._body_parts): Pass `self' to
+	the `export' method.
+
+	* lib/lcg/export/html.py (HtmlMarkupFormatter._citation_formatter)
+	(HtmlMarkupFormatter._uri_formatter)
+	(HtmlMarkupFormatter._email_formatter): Accept also all the
+	remaining arguments as **kwargs.
+	(HtmlMarkupFormatter._email_formatter)
+	(HtmlMarkupFormatter._uri_formatter): Pass `parent' to
+	`_link_formatter'.
+	(HtmlMarkupFormatter._citation_formatter): Use the `parent'
+	arguemnt instead of `self._parent'.
+	(HtmlExporter._export_section, HtmlExporter._body_parts): Pass
+	`self' to the `export' method.
+	(HtmlExporter.format_wiki_text): New method.
+	(HtmlExporter.page): Cosmetic change.
+
+	* lib/lcg/export/hhp.py (HhpExporter.__init__):
+	`lcg.wiki.Formatter' -> `lcg.HtmlMarkupFormatter'
+
+	* lib/lcg/export/export.py (MarkupFormatter): Docstring updated.
+	(MarkupFormatter._HELPER_PATTERNS): Added `resource_cls'.
+	(MarkupFormatter._link_formatter): Accept also all the remaining
+	arguments as kwargs.
+	(MarkupFormatter._link_formatter): Set the parent of the generated
+	`Link'.  Pass the exporter argument to its `export' method.
+	(MarkupFormatter.format): Pass an empty dict to `_formatter'.
+
+	* lib/lcg/content/exercises.py (Exercise.__init__): Don't pass
+	`parent' to parent class constructor.  Call
+	`self.set_parent(parent)' instead.
+	(Exercise.__init__): Pass `parent
+	(Exercise._wiki_content): Set the parent of the generated
+	`Container' explicitely.  Don't pass the `parent' to its
+	constructor.
+	(Exercise._init_resources, _InteractiveExercise._init_resources):
+	Use `self.parent()' instead of `self._parent'.
+	(Exercise.export): Accept the `exporter' argument.  Pass it to the
+	`_export_*' methods.
+	(Exercise._export_tasks, Exercise._export_explanation)
+	(Exercise._export_example, Exercise._export_reading)
+	(Exercise._export_instructions, Exercise._export_recording)
+	(Exercise._export_audio_version, Exercise._export_task)
+	(_ChoiceBasedExercise._export_task_parts)
+	(GapFilling._export_task_parts)
+	(_FillInExercise._export_task_parts)
+	(Dictation._export_task_parts, _Cloze._export_task_parts)
+	(_ExposedCloze._export_instructions, Cloze._export_task_parts):
+	Accept the `exporter' argument.
+	(Exercise._export_tasks, Exercise._export_explanation)
+	(Exercise._export_example, Exercise._export_reading)
+	(Exercise._export_instructions, Cloze._export_task_parts): Pass
+	the `exporter' argument to subsequent `export()' calls.
+	(_InteractiveExercise.answer_sheet): Don't pass the `parent'
+	argument to the constructors of generated content elements.
+
+	(_ChoiceBasedExercise._export_task_parts)
+	(GapFilling._export_task_parts)
+	(_FillInExercise._export_task_parts)
+	(_FillInExercise._export_task_parts, _Cloze._export_task_parts):
+	Use the `format_wiki_text' method of the exporter, not the parent.
+
+	* lib/lcg/content/content.py (Content): Docstring updated.
+	(Content.__init__, TextContent.__init__, Link.__init__)
+	(Anchor.__init__, InlineImage.__init__, Container.__init__)
+	(ItemizedList.__init__, Definition.__init__, Table.__init__)
+	(Field.__init__, SectionContainer.__init__, Section.__init__)
+	(TableOfContents.__init__, VocabList.__init__): Argument `parent'
+	omitted.  Don't pass it to parent constructor.
+	(VocabList.__init__): Docstring updated.
+	(Content.set_parent): New method.
+	(Content.parent): Return containter's parent if my parent was not
+	set.
+	(Content.lang): Don't fallback to parent's language.
+	(HorizontalSeparator.export, HorizontalSeparator.export)
+	(TextContent.export, WikiText.export, PreformattedText.export)
+	(Link.export, Anchor.export, InlineImage.export)
+	(Container.export, ItemizedList.export, Definition.export)
+	(Field.export, Section.export, TableOfNodes.export)
+	(VocabList.export, LanguageSelection.export): Take the `exporter'
+	argument.
+	(WikiText.export): Use the `format_wiki_text' method of the
+	exporter, not the parent.
+	(Container._exported_content): Take the `exporter' argument.
+	(Container._exported_content, Definition.export, Field.export)
+	(SectionContainer._exported_content, Section.export): Pass the
+	`exporter' argument to subcontent `export' methods.
+	(SectionContainer.__init__): Set the container of the
+	automatically generated `TableOfContents' to self explicitely.
+	(Section.backref, Section.url): Use `self.parent()' instead of
+	`self._parent'.
+	(TableOfNodes): New class.
+	(TableOfContents): Derive from `TableOfNodes'.  The 'item'
+	argument renamed to 'start'.
+	(TableOfContents._start_item): New method.
+	(TableOfNodes._export_title, TableOfNodes.export)
+	(TableOfNodes._make_toc): Moved to the parent class.
+	(TableOfNodes._make_toc): Use `self.parent()' instead of
+	`self._parent'.
+	(VocabSection.__init__, LanguageSelection.__init__): Don't pass
+	the `parent' arguent to the generated content elements.
+	(LanguageSelection.export): Comment out the radio button
+	implementation.
+
+	* lib/lcg/wiki.py (Formatter): Class removed / moved to the export
+	module.
+	(Parser): Docstring imporoved.
+	(Parser.__init__): Argument `parent' omitted.
+	(Parser._make_sections, Parser._parse_section_content)
+	(Parser._store_list_item)
+	(Parser._finish_list_item._Context.make_list)
+	(Parser._store_field, Parser._finish_field)
+	(Parser._store_definition, Parser._finish_definition)
+	(Parser._make_paragraph, Parser._make_table, Parser._make_toc)
+	(Parser._make_rule): Don't pass the `parent' argument to the
+	created `Content' elements'
+	(Parser._make_toc): Create either `TableOfNodes'
+	or`TableOfContents'.
+
+	* lib/lcg/nodes.py (ContentNode.__init__): Don't create
+	`self._wiki_formatter'.  `self._wiki_parser' -> `self._parser'.
+	(ContentNode.__init__): Don't pass the `parent' argument to the
+	constructor of generated `SectionContainer'.  Set the parent of
+	the created content.
+	(ContentNode._create_child): Only set the arguments, which are not
+	already present in `kwargs'.
+	(format_wiki_text): Method removed.
+	(ContentNode.parse_wiki_text): `wiki.MacroParser' ->
+	`MacroParser'.  `self._wiki_parser' -> `self._parser'.
+	(_WikiNode._create_content): Don't pass the `parent' argument to
+	the constructor of generated `SectionContainer'.
+
+	* lib/lcg/_test.py (ContentNode.check_misc)
+	(ContentNode.check_media): Pass the `id' to the `ContentNode'
+	constructor.
+	(ContentNode.check_media): Don't expect an exception.
+	(Parser): New class.
+
+	* lib/lcg/__init__.py: Import all from the `wiki' module.
+
 2006-07-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/wiki-formatter.py (main): `Exporter' -> `HtmlExporter'.
