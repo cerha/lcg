@@ -24,172 +24,14 @@ import re
 
 from lcg import *
 
-class Formatter(object):
-    """Simple Wiki markup formatter.
-
-    This simple Wiki formatter can only format the markup within one block (ie.
-    a single paragraph or other non-structured piece of text).
-
-    All the document structure (headings, paragraphs, bullet lists etc.) is
-    recognized by the 'Parser' class below.  Then only the contents of the
-    recognized structured elements can be formatter using this formatter (where
-    appropriate).
-
-    """
-    _MARKUP = (('linebreak', '//'),
-               ('emphasize', ('/',  '/')),
-               ('strong',    ('\*', '\*')),
-               ('fixed',     ('=',  '=')),
-               ('underline', ('_',  '_')),
-               ('citation',  ('>>', '<<')),
-               ('quotation', ('``', "''")),
-               ('link', (r'\[(?:(?P<resource>Resource|Image|Media):)?'
-                         r'(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
-                         r'(?:(?:\||\s+)(?P<title>[^\]]*))?\]')),
-               ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
-               ('email', r'\w[\w\-\.]*@\w[\w\-\.]+'),
-               ('comment', r'^#.*'),
-               ('dash', r'(^|(?<=\s))--($|(?=\s))'),
-               ('nbsp', '~'),
-               ('lt', '<'),
-               ('gt', '>'),
-               ('amp', '&'),
-               )
-    _HELPER_PATTERNS = ('href', 'anchor', 'title')
-    
-    _FORMAT = {'emphasize': ('<em>', '</em>'),
-               'strong': ('<strong>', '</strong>'),
-               'fixed': ('<tt>', '</tt>'),
-               'underline': ('<span class="underline">', '</span>'),
-               'citation': ('<span class="citation">', '</span>'),
-               'quotation': (u'“<span class="quotation">', u'</span>”'),
-               'comment': '',
-               'linebreak': '<br/>',
-               'dash': '&ndash;',
-               'nbsp': '&nbsp;',
-               'lt':   '&lt;',
-               'gt':   '&gt;',
-               'amp':  '&amp;',
-               }
-
-    def __init__(self, parent):
-        self._parent = parent
-        regexp = r"(?P<%s>\\*%s)"
-        pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
-                                regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
-        regexps = [isinstance(markup, types.StringType)
-                   and regexp % (type, markup)
-                   or pair_regexp % (type, markup[1], type, markup[0])
-                   for type, markup in self._MARKUP]
-        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')',
-                                 re.MULTILINE|re.UNICODE)
-        self._paired_on_output = [type for type, format in self._FORMAT.items()
-                                  if isinstance(format, types.TupleType)]
-
-    def _markup_handler(self, match):
-        type = [key for key, m in match.groupdict().items()
-                if m and not key in self._HELPER_PATTERNS][0]
-        markup = match.group(type)
-        backslashes = markup.count('\\')
-        markup = markup[backslashes:]
-        prefix = backslashes / 2 * '\\'
-        if backslashes % 2:
-            return prefix + markup
-        # We need two variables (start and end), because both can be False for
-        # unpaired markup.
-        start = False
-        end = False
-        if type.endswith('_start'):
-            type = type[:-6]
-            start = True
-        elif type.endswith('_end'):
-            type = type[:-4]
-            end = True
-        if not start and self._open and type == self._open[-1]:
-            # Closing an open markup.
-            self._open.pop()
-            result = self._formatter(type, match.groupdict(), close=True)
-        elif not end and not (start and type in self._open):
-            # Start markup or an unpaired markup.
-            if start:
-                self._open.append(type)
-            result = self._formatter(type, match.groupdict())
-        else:
-            # Markup in an invalid context is just printed as is.
-            # This can be end markup, which was not opened or start markup,
-            # which was already opened.
-            result = markup
-        return prefix + result
-
-    def _formatter(self, type, groups, close=False):
-        try:
-            formatter = getattr(self, '_'+type+'_formatter')
-        except AttributeError:
-            f = self._FORMAT[type]
-            return type in self._paired_on_output and f[close and 1 or 0] or f
-        return formatter(groups, close=close)
-        
-    def _link_formatter(self, groups, close=False):
-        title = groups.get('title')
-        href = groups.get('href')
-        anchor = groups.get('anchor')
-        resource_cls = groups.get('resource')
-        node = None
-        if resource_cls:
-            cls = globals()[resource_cls]
-            resource = self._parent.resource(cls, href, fallback=False)
-            if resource:
-                return '<a href="%s">%s</a>' % (resource.url(), title or href)
-            else:
-                log("%s: Unknown resource: %s" % (self._parent.id(), href))
-        elif not href:
-            node = self._parent
-        elif href.find('@') == href.find('/') == -1:
-            node = self._parent.root().find_node(href)
-            if not node:
-                log("%s: Unknown node: %s" % (self._parent.id(), href))
-        target = node
-        if node and anchor:
-            target = node.find_section(anchor)
-            if target is None:
-                log("%s: Unknown section: %s:%s" %
-                    (self._parent.id(), node.id(), anchor))
-        if not target:
-            if anchor is not None:
-                href += '#'+anchor
-            target = Link.ExternalTarget(href, title or href)
-        return Link(self._parent, target, label=title).export()
-    
-    def _citation_formatter(self, groups, close=False):
-        if not close:
-            lang = self._parent.secondary_language()
-            langattr = lang and ' lang="%s"' % lang or ''
-            return '<span%s class="citation">' % langattr
-        else:
-            return '</span>'
-    
-    def _uri_formatter(self, groups, close=False):
-        return self._link_formatter({'href': groups['uri'], 'title': None})
-
-    def _email_formatter(self, groups, close=False):
-        addr = groups['email']
-        return self._link_formatter({'href': 'mailto:'+addr, 'title': addr})
-
-    def format(self, text):
-        self._open = []
-        result = re.sub(self._rules, self._markup_handler, text)
-        self._open.reverse()
-        x = self._open[:]
-        for type in x:
-            result += self._formatter(type, {}, close=True)
-        return result
-        
-    
 class Parser(object):
     """Structured Wiki document parser.
 
     This parser parses the structure of the document and builds the
-    corresponding 'Content' element hierarchy.
+    corresponding 'Content' element hierarchy.  This parser doesn't care about
+    inline markup at all.  Only higher-level constructs are recognized here.
+    Formatting the inline markup is done by the 'MarkupFormatter' on LCG output
+    (as oposed to parsing, which is done on LCG input).
 
     """
     
@@ -251,8 +93,8 @@ class Parser(object):
         #    return "%s* %s\n%s" % ("  "*indent, self.title(), "".join(children))
             
         
-    def __init__(self, parent):
-        self._parent = parent
+    def __init__(self):
+        pass
 
     def _parse_sections(self, text):
         root = last = self._Section('__ROOT_SECTION__', None, 0)
@@ -278,7 +120,7 @@ class Parser(object):
         return self._make_sections(root)
 
     def _make_sections(self, section):
-        subsections = [Section(self._parent, s.title, self._make_sections(s),
+        subsections = [Section(s.title, self._make_sections(s),
                                anchor=s.anchor)
                        for s in section.children]
         if section.content is None:
@@ -295,7 +137,7 @@ class Parser(object):
                 break
             content += self._parse_blocks(text[:m.start()])
             pre = m.group(1) or m.group(2)
-            content.append(PreformattedText(self._parent, pre))
+            content.append(PreformattedText(pre))
             text = text[m.end():]
         return content
 
@@ -310,12 +152,11 @@ class Parser(object):
             return (text, 'paragraph', {})
 
     def _store_list_item(self, block, groups):
-        content = WikiText(self._parent, groups['content'])
+        content = WikiText(groups['content'])
         indent = re.sub(' {0,7}\t', 8*' ', groups['indent'])
         return (self._list_item_type(groups), len(indent), content)
         
     def _finish_list_item(self, stored):
-        parent = self._parent
         class _Context:
             def __init__(self, type, indent, content):
                 self.type = type
@@ -326,9 +167,9 @@ class Parser(object):
                 return (self.type, self.indent, self.content, self.items)
             def make_list(self):
                 #_log("**")
-                items = [len(i) > 1 and Container(parent, i) or i[0]
+                items = [len(i) > 1 and Container(i) or i[0]
                          for i in self.items]
-                self.content.append(ItemizedList(parent, items, type=self.type))
+                self.content.append(ItemizedList(items, type=self.type))
                 self.items = []
         result = []
         stack = [] # For storing the context between level changes.
@@ -360,24 +201,17 @@ class Parser(object):
         return result
 
     def _store_field(self, block, groups):
-        label = WikiText(self._parent, groups['label'])
-        content = WikiText(self._parent, groups['value'])
-        return (label, content)
+        return (WikiText(groups['label']), WikiText(groups['value']))
         
     def _finish_field(self, stored):
-        p = self._parent
-        fields = [Field(p, label, value) for label, value in stored]
-        return (FieldSet(p, fields),)
+        return (FieldSet([Field(label, value) for label, value in stored]),)
     
     def _store_definition(self, block, groups):
-        term = WikiText(self._parent, groups['term'])
-        content = WikiText(self._parent, groups['descr'])
-        return (term, content)
+        return (WikiText(groups['term']), WikiText(groups['descr']))
         
     def _finish_definition(self, stored):
-        p = self._parent
-        definitions = [Definition(p, term, descr) for term, descr in stored]
-        return (DefinitionList(p, definitions),)
+        definitions = [Definition(term, descr) for term, descr in stored]
+        return (DefinitionList(definitions),)
     
     def _parse_blocks(self, text):
         def finish(type, data):
@@ -407,22 +241,21 @@ class Parser(object):
         return content
 
     def _make_paragraph(self, block, groups):
-        return Paragraph(self._parent, WikiText(self._parent, block))
+        return Paragraph(WikiText(block))
     
     def _make_table(self, block, groups):
-        p = self._parent
-        return Table(p, [TableRow(p, [TableCell(p, WikiText(p, x.strip()))
-                                      for x in row.split('|')[1:-1]])
-                         for row in block.strip().splitlines()])
+        return Table([TableRow([TableCell(WikiText(x.strip()))
+                                for x in row.split('|')[1:-1]])
+                      for row in block.strip().splitlines()])
 
     def _make_toc(self, block, groups):
         title = groups['title']
-        item = groups['toctype'] == 'NTOC' and self._parent or None
+        cls = groups['toctype'] == 'NTOC' and TableOfNodes or TableOfContents
         d = groups['tocdepth'] and int(groups['tocdepth']) or 99
-        return TableOfContents(self._parent, item=item, title=title, depth=d)
+        return cls(title=title, depth=d)
 
     def _make_rule(self, block, groups):
-        return HorizontalSeparator(self._parent)
+        return HorizontalSeparator()
     
     def _list_item_type(self, groups):
         t = groups.get('type')
