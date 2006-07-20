@@ -53,26 +53,21 @@ class Content(object):
     consists of multiple 'Content' instances (elements).
 
     Each content element may be contained in another content element (see the
-    'Container' class) and thus they make a hierarchical structure.  All the
-    elements within this structure have the same parent 'ContentNode' instance
-    and through it are able to gather some context information and access other
-    objects (i.e. the resources).
+    'Container' class) and thus they make a hierarchical structure.
 
     """
     _ALLOWED_CONTAINER = None
     
-    def __init__(self, parent, lang=None):
+    def __init__(self, lang=None):
         """Initialize the instance.
 
         Arguments:
 
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
+          lang -- content language as an ISO 639-1 Alpha-2
+            language code (lowercase).
 
         """
-        assert isinstance(parent, ContentNode), \
-               "Not a 'ContentNode' instance: %s" % parent
-        self._parent = parent
+        self._parent = None
         self._container = None
         self._lang = lang
         
@@ -89,16 +84,25 @@ class Content(object):
         """
         return ()
         
-    def parent(self):
-        """Return the parent 'ContentNone' of this content element."""
-        return self._parent
-
     def set_container(self, container):
         if __debug__:
             cls = self._ALLOWED_CONTAINER or Container
             assert isinstance(container, cls), \
                    "Not a '%s' instance: %s" % (cls.__name__, container)
         self._container = container
+
+    def set_parent(self, node):
+        assert isinstance(node, ContentNode), \
+               "Not a 'ContentNode' instance: %s" % node
+        assert self._parent is None or self._parent is node, \
+               "Reparenting not allowed: %s -> %s" % (self._parent, node)
+        self._parent = node
+
+    def parent(self):
+        """Return the parent 'ContentNode' of this content element."""
+        parent = self._parent or self._container and self._container.parent()
+        assert parent is not None, "Parent unknown: %s" % self
+        return parent
 
     def _container_path(self):
         path = [self]
@@ -107,21 +111,17 @@ class Content(object):
         return tuple(path)
 
     def lang(self):
-        lang = self._lang
-        if lang is None and self._container is not None:
-            lang = self._container.lang()
-        if lang is None:
-            lang =  self._parent.language()
-        return lang
+        return self._lang or self._container and self._container.lang()
+         lang
 
-    def export(self):
+    def export(self, exporter):
         """Return the HTML formatted content as a string."""
         return ''
 
     
 class HorizontalSeparator(Content):
     
-    def export(self):
+    def export(self, exporter):
         """Return the HTML formatted content as a string."""
         return '<hr/>'
         
@@ -129,47 +129,48 @@ class HorizontalSeparator(Content):
 class TextContent(Content):
     """A simple piece of text."""
 
-    def __init__(self, parent, text, **kwargs):
+    def __init__(self, text, **kwargs):
         """Initialize the instance.
 
         Arguments:
 
-          parent -- same as in the parent class.
           text -- the actual text content of this element as a string.
           kwargs -- keyword arguemnts for parent class constructor.
 
         """
         assert isinstance(text, types.StringTypes), type(text)
-        super(TextContent, self).__init__(parent, **kwargs)
+        super(TextContent, self).__init__(**kwargs)
         self._text = text
 
     def __str__(self):
         text = self._text.strip()
-        sample = text.splitlines()[0][:10]
+        sample = text and text.splitlines()[0] or ''
+        if len(sample) > 10:
+            sample = sample[:10]
         if len(sample) < len(text):
             sample += '...'
         cls = self.__class__.__name__
         return '<%s at 0x%x text="%s">' % (cls, id(self), sample)
 
-    def export(self):
+    def export(self, exporter):
         return self._text
 
     
 class WikiText(TextContent):
     """Formatted text using a simple Wiki-based markup.
 
-    See 'wiki.Formatter' for more information about the formatting rules.
+    See 'MarkupFormatter' for more information about the formatting rules.
     
     """
         
-    def export(self):
-        return self._parent.format_wiki_text(self._text)
+    def export(self, exporter):
+        return exporter.format_wiki_text(self.parent(), self._text)
 
     
 class PreformattedText(TextContent):
     """Preformatted text."""
 
-    def export(self):
+    def export(self, exporter):
         from xml.sax import saxutils
         text = saxutils.escape(self._text)
         return '<pre class="lcg-preformatted-text">'+text+'</pre>'
@@ -190,16 +191,17 @@ class Link(TextContent):
         def descr(self):
             return self._descr
     
-    def __init__(self, parent, target, label=None):
-        assert isinstance(target, (Section, ContentNode, self.ExternalTarget))
+    def __init__(self, target, label=None):
+        assert isinstance(target, (Section, ContentNode,
+                                   self.ExternalTarget)), target
         self._target = target
-        super(Link, self).__init__(parent, label or '')
+        super(Link, self).__init__(label or '')
 
     def _descr(self):
         target = self._target
         if isinstance(target, (ContentNode, self.ExternalTarget)):
             descr = target.descr()
-        elif target.parent() is not self._parent:
+        elif target.parent() is not self.parent():
             # TODO: This hack removes any html from the section title (it is
             # used as an HTML attribute value).  But section titles should
             # probably rather not be allowed to contain html.
@@ -209,33 +211,33 @@ class Link(TextContent):
             descr = None
         return descr
     
-    def export(self):
+    def export(self, exporter):
         label = self._text or self._target.title()
         return _html.link(label, self._target.url(), title=self._descr())
 
 
 class Anchor(TextContent):
     """An anchor (target of a link)."""
-    def __init__(self, parent, anchor, text=''):
+    def __init__(self, anchor, text=''):
         assert isinstance(anchor, types.StringType)
         self._anchor = anchor
-        super(Anchor, self).__init__(parent, text)
+        super(Anchor, self).__init__(text)
 
     def anchor(self):
         return self._anchor
         
-    def export(self):
+    def export(self, exporter):
         return _html.link(self._text, None, name=self.anchor())
 
 
 class InlineImage(Content):
 
-    def __init__(self, parent, image):
+    def __init__(self, image):
         assert isinstance(image, Image)
         self._image = image
-        super(InlineImage, self).__init__(parent)
+        super(InlineImage, self).__init__()
 
-    def export(self):
+    def export(self, exporter):
         img = self._image
         return '<img alt="%s" src="%s" width="%d" height="%d" border="0"/>' % \
                (img.title() or '', img.url(), img.width(), img.height())
@@ -260,20 +262,18 @@ class Container(Content):
     _EXPORT_INLINE = False
     _CONTENT_SEPARATOR = ''
 
-    def __init__(self, parent, content, **kwargs):
+    def __init__(self, content, **kwargs):
         """Initialize the instance.
 
         Arguments:
         
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
           content -- the actual content wrapped into this container as a
             sequence of 'Content' instances in the order in which they should
             appear in the output.
           kwargs -- keyword arguemnts for parent class constructor.
 
         """
-        super(Container, self).__init__(parent, **kwargs)
+        super(Container, self).__init__(**kwargs)
         cls = self._ALLOWED_CONTENT
         if operator.isSequenceType(content):
             assert is_sequence_of(content, cls), \
@@ -289,15 +289,15 @@ class Container(Content):
     def content(self):
         return self._content
             
-    #def export(self):
-    #    return "".join([p.export() for p in self._content])
+    #def export(self, exporter):
+    #    return "".join([p.export(exporter) for p in self._content])
 
-    def _exported_content(self):
-        return [p.export() for p in self._content]
+    def _exported_content(self, exporter):
+        return [p.export(exporter) for p in self._content]
     
-    def export(self):
+    def export(self, exporter):
         tag = self._TAG
-        exported = self._exported_content()
+        exported = self._exported_content(exporter)
         attr = self._lang   and ' lang="%s"'  % self._lang  or ''
         attr += self._CLASS and ' class="%s"' % self._CLASS or ''
         attr += self._ATTR  and (' '+self._ATTR) or ''
@@ -323,29 +323,29 @@ class ItemizedList(Container):
     TYPE_ALPHA = 'ALPHA'
     TYPE_NUMERIC = 'NUMERIC'
     
-    def __init__(self, parent, content, type=TYPE_UNORDERED, **kwargs):
+    def __init__(self, content, type=TYPE_UNORDERED, **kwargs):
         assert type in (self.TYPE_UNORDERED,
                         self.TYPE_ALPHA,
                         self.TYPE_NUMERIC)
         self._type = type
-        super(ItemizedList, self).__init__(parent, content, **kwargs)
+        super(ItemizedList, self).__init__(content, **kwargs)
 
-    def export(self):
+    def export(self, exporter):
         o, s = {self.TYPE_UNORDERED: (False, None),
                 self.TYPE_NUMERIC: (True, None),
                 self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
-        items = [p.export() for p in self._content]
+        items = [p.export(exporter) for p in self._content]
         return _html.list(items, ordered=o, style=s, lang=self._lang)
 
     
 class Definition(Container):
     """A single definition pair for the 'DefinitionList'."""
     
-    def __init__(self, parent, term, description):
-        super(Definition, self).__init__(parent, (term, description))
+    def __init__(self, term, description):
+        super(Definition, self).__init__((term, description))
 
-    def export(self):
-        t, d = [c.export() for c in self._content]
+    def export(self, exporter):
+        t, d = [c.export(exporter) for c in self._content]
         return "<dt>%s</dt><dd>%s</dd>\n" % (t,d)
 
     
@@ -376,26 +376,26 @@ class Table(Container):
     _ALLOWED_CONTENT = TableRow
     _CONTENT_SEPARATOR = "\n"
 
-    def __init__(self, parent, content, title=None, **kwargs):
+    def __init__(self, content, title=None, **kwargs):
         assert title is None or isinstance(title, types.StringTypes)
         self._title = title
-        super(Table, self).__init__(parent, content, **kwargs)
+        super(Table, self).__init__(content, **kwargs)
         
-    def _exported_content(self):
+    def _exported_content(self, exporter):
         caption = self._title and "<caption>%s</caption>" % self._title or ''
-        return [caption] + super(Table, self)._exported_content()
+        return [caption] + super(Table, self)._exported_content(exporter)
 TableRow._ALLOWED_CONTAINER = Table
 
     
 class Field(Container):
     """A pair of label and a value for a FieldSet."""
     
-    def __init__(self, parent, label, value):
-        super(Field, self).__init__(parent, (label, value))
+    def __init__(self, label, value):
+        super(Field, self).__init__((label, value))
 
-    def export(self):
+    def export(self, exporter):
         f = '<tr><th align="left" valign="top">%s:</th><td>%s</td></tr>\n'
-        return f % tuple([c.export() for c in self._content])
+        return f % tuple([c.export(exporter) for c in self._content])
 
     
 class FieldSet(Table):
@@ -416,17 +416,17 @@ class SectionContainer(Container):
 
     """
 
-    def __init__(self, parent, content, toc_depth=99, **kwargs):
+    def __init__(self, content, toc_depth=99, **kwargs):
         """Initialize the instance.
 
         Arguments:
 
-          parent, content -- same as in the parent class.
+          content -- same as in the parent class.
           toc_depth -- the depth of local table of contents.  Corresponds to
             the same constructor argument of 'TableOfContents'.
 
         """
-        super(SectionContainer, self).__init__(parent, content, **kwargs)
+        super(SectionContainer, self).__init__(content, **kwargs)
         sections = []
         toc_sections = []
         already_has_toc = False
@@ -441,17 +441,19 @@ class SectionContainer(Container):
         if toc_depth > 0 and not already_has_toc and \
                (len(toc_sections) > 1 or len(toc_sections) == 1 and 
                 len([s for s in toc_sections[0].sections() if s.in_toc()])):
-            self._toc = TableOfContents(parent, self, title=_("Index:"),
+            self._toc = TableOfContents(self, title=_("Index:"),
                                         depth=toc_depth)
         else:
-            self._toc = Content(parent)
+            self._toc = Content()
+        self._toc.set_container(self)
+        
 
     def sections(self):
         return self._sections
     
-    def _exported_content(self):
-        exported = super(SectionContainer, self)._exported_content()
-        return [self._toc.export()] + exported
+    def _exported_content(self, exporter):
+        exported = super(SectionContainer, self)._exported_content(exporter)
+        return [self._toc.export(exporter)] + exported
     
     
 class Section(SectionContainer):
@@ -471,14 +473,12 @@ class Section(SectionContainer):
     """
     _ANCHOR_PREFIX = 'sec'
     
-    def __init__(self, parent, title, content, anchor=None, toc_depth=0,
+    def __init__(self, title, content, anchor=None, toc_depth=0,
                  in_toc=True, **kwargs):
         """Initialize the instance.
 
         Arguments:
 
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
           title -- section title as a string.
           content -- the actual content wrapped into this section as a
             sequence of 'Content' instances in the order in which they should
@@ -495,15 +495,14 @@ class Section(SectionContainer):
             to be included in the Table of Contents.
             
         """
-        assert isinstance(title, types.StringTypes)
-        assert isinstance(anchor, types.StringTypes) or anchor is None
-        assert isinstance(in_toc, types.BooleanType)
+        assert isinstance(title, types.StringTypes), title
+        assert isinstance(anchor, types.StringTypes) or anchor is None, anchor
+        assert isinstance(in_toc, types.BooleanType), in_toc
         self._title = title
         self._in_toc = in_toc
         self._anchor = anchor
         self._backref_used = False
-        super(Section, self).__init__(parent, content, toc_depth=toc_depth,
-                                      **kwargs)
+        super(Section, self).__init__(content, toc_depth=toc_depth, **kwargs)
         
 
     def _section_path(self):
@@ -535,7 +534,7 @@ class Section(SectionContainer):
     def backref(self, node):
         # We can allow just one backref target on the page.  Links on other
         # pages are not backreferenced.
-        if node is self._parent and not self._backref_used:
+        if node is self.parent() and not self._backref_used:
             self._backref_used = True
             return self._backref()
         else:
@@ -558,28 +557,22 @@ class Section(SectionContainer):
         if relative:
             base = ''
         else:
-            base = self._parent.url()
+            base = self.parent().url()
         return base + "#" + self.anchor()
            
-    def export(self):
-        return "\n".join((self._header(), super(Section, self).export()))
+    def export(self, exporter):
+        return "\n".join((self._header(),
+                          super(Section, self).export(exporter)))
 
-    
-class TableOfContents(Content):
-    """A contained Table of Contents."""
-    
-    def __init__(self, parent, item=None, title=None, depth=1, detailed=True):
+
+class TableOfNodes(Content):
+    """A Table of Contents which lists the node subtree of the current node."""
+
+    def __init__(self, title=None, depth=1, detailed=True):
         """Initialize the instance.
 
         Arguments:
 
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
-          item -- the place where to start in the content hierarchy tree.
-            'ContentNode' or 'Content' instances are allowed.  None means that
-            container should be used (a local Table of Contents).  See
-            'Section' documentation for more information how the content tree
-            is built.
           title -- the title of the TOC as a string.
           depth -- how deep in the hierarchy should we go.
           detailed -- A True (default) value means that the 'Content' hierarchy
@@ -587,30 +580,24 @@ class TableOfContents(Content):
             TOC.  False means to consider only 'ContentNode' hierarchy.
 
         """
-        super(TableOfContents, self).__init__(parent)
-        assert isinstance(item, (ContentNode, Content)) or \
-               is_sequence_of(item, Content) or item is None
+        super(TableOfNodes, self).__init__()
         assert title is None or isinstance(title, types.StringTypes)
         assert isinstance(depth, types.IntType)
         assert isinstance(detailed, types.BooleanType)
-        self._item = item
         self._title = title
         self._depth = depth
         self._detailed = detailed
                       
     def _export_title(self):
         return _html.strong(self._title)
+
+    def _start_item(self):
+        return self.parent()
         
-    def export(self):
-        item = self._item
-        if not item:
-            if isinstance(self._container, SectionContainer):
-                item = self._container
-            else:
-                item = self._parent
-        toc = self._make_toc(item, depth=self._depth)
+    def export(self, exporter):
+        toc = self._make_toc(self._start_item(), depth=self._depth)
         if self._title is not None:
-            #TODO: add a "skip" link.
+            #TODO: add a "skip" link?
             return _html.div((self._export_title(), toc),
                              cls="table-of-contents")
         else:
@@ -636,11 +623,39 @@ class TableOfContents(Content):
             if isinstance(i, Section):
                 if i.parent() is self.parent():
                     url = i.url(relative=True)
-                name = i.backref(self._parent)
+                name = i.backref(self.parent())
             links.append(_html.link(i.title(), url, name=name) + \
                          self._make_toc(i, indent=indent+4, depth=depth-1))
         return "\n" + _html.list(links, indent=indent) + "\n" + ' '*(indent-2)
 
+    
+class TableOfContents(TableOfNodes):
+    """A Table of Contents which lists the content subtree."""
+    
+    def __init__(self, start=None, **kwargs):
+        """Initialize the instance.
+        
+        Arguments:
+        
+          item -- the place where to start in the content hierarchy tree as a
+            'Content' instance.  None means to start at the container (a local
+            Table of Contents).  See 'Section' documentation for more
+            information how the content tree is built.
+            
+          **kwargs -- all other arguments are passed to parent class
+            constructor.
+        
+        """
+        assert isinstance(start, Content) or start is None
+        self._start_item_ = start
+        super(TableOfContents, self).__init__(**kwargs)
+        
+    def _start_item(self):
+        start_item = self._start_item_
+        if not start_item:
+            assert isinstance(self._container, SectionContainer)
+            start_item = self._container
+        return start_item
     
     
 class VocabItem(object):
@@ -704,7 +719,6 @@ class VocabItem(object):
 class VocabList(Content):
     """Vocabulary listing consisting of multiple 'VocabItem' instances."""
 
-    
     def __init__(self, parent, items, reverse=False):
         """Initialize the instance.
 
@@ -717,14 +731,14 @@ class VocabList(Content):
             printed in reversed order - translation first.
 
         """
-        super(VocabList, self).__init__(parent)
+        super(VocabList, self).__init__()
         assert is_sequence_of(items, VocabItem)
         assert isinstance(reverse, types.BooleanType)
         self._items = items
         self._reverse = reverse
         parent.resource(Script, 'audio.js')
 
-    def export(self):
+    def export(self, exporter):
         pairs = [(_html.speaking_text(i.word(), i.media()) +
                   (i.note() and " "+i.note() or ""),
                   _html.span(i.translation() or "???",
@@ -767,11 +781,11 @@ class VocabSection(Section):
         assert isinstance(reverse, types.BooleanType)
         subsections = [(t, i) for t, i in self._subsections(items) if i]
         if len(subsections) > 1:
-            c = [Section(parent, t, VocabList(parent, i, reverse=reverse))
+            c = [Section(t, VocabList(parent, i, reverse=reverse))
                  for t, i in subsections]
         else:
             c = VocabList(parent, subsections[0][1])
-        super(VocabSection, self).__init__(parent, title, c)
+        super(VocabSection, self).__init__(title, c)
 
     def _subsections(self, items):
         return ((_("Terms"),
@@ -810,16 +824,16 @@ class LanguageSelection(Container):
                 self._current = t
             targets.append(t)
             flag = parent.resource(Image, 'flags/%s.gif' % lang)
-            flags.append(InlineImage(parent, flag))
-        links = [Container(parent, (Link(parent, target), flag))
+            flags.append(InlineImage(flag))
+        links = [Container((Link(target), flag))
                  for target, flag in zip(targets, flags)]
-        content = [TextContent(parent, label)] + \
+        content = [TextContent(label)] + \
                   [i == len(links)-1 and link or \
-                   Container(parent, (link, TextContent(parent, ' |')))
+                   Container((link, TextContent(' |')))
                    for i, link in enumerate(links)]
-        super(LanguageSelection, self).__init__(parent, tuple(content))
+        super(LanguageSelection, self).__init__(tuple(content))
 
-    def export(self):
+    def export(self, exporter):
         #handler = "location.href = this.form.language.options[this.form.language.selectedIndex].value"
         #select = _html.form((_html.label(self._label, 'language-selection'),
         #                     _html.select('language',
@@ -829,14 +843,14 @@ class LanguageSelection(Container):
         #                                  selected=self._current.url()),
         #                     _html.button(_('Switch'), handler)),
         #                    cls='language-selection')
-        radio = _html.fieldset([_html.radio('language', value=t.url(), id=tid,
-                                            onclick="location.href = this.value",
-                                            checked=(self._current.url()==t.url())
-                                            ) + \
-                                _html.label(flag.export() + t.title(), tid)
-                                for t, tid, flag in
-                                [(t, t.url().replace('.','-'), f)
-                                 for t, f in zip(self._targets, self._flags)]],
-                               legend=self._label, cls='language-selection')
-        links = super(LanguageSelection, self).export()
+        #radio = _html.fieldset([_html.radio('language', value=t.url(), id=tid,
+        #                                    onclick="location.href = this.value",
+        #                                    checked=(self._current.url()==t.url())
+        #                                    ) + \
+        #                        _html.label(flag.export(exporter) + t.title(), tid)
+        #                        for t, tid, flag in
+        #                        [(t, t.url().replace('.','-'), f)
+        #                         for t, f in zip(self._targets, self._flags)]],
+        #                       legend=self._label, cls='language-selection')
+        links = super(LanguageSelection, self).export(exporter)
         return links #_html.script_write(radio, links)
