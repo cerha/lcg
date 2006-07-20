@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ tests = TestSuite()
 
 class ContentNode(unittest.TestCase):
     def check_misc(self):
-    	a = lcg.ContentNode(None, subdir='aaa')
-        b = lcg.ContentNode(a, subdir='bbb')
+    	a = lcg.ContentNode(None, 'a', subdir='aaa')
+        b = lcg.ContentNode(a, 'b', subdir='bbb')
         assert a.root() == b.root() == a
         assert a.src_dir() == 'aaa'
         assert b.src_dir() == os.path.join('aaa', 'bbb')
@@ -40,20 +40,37 @@ class ContentNode(unittest.TestCase):
         assert b.counter().next() == 1
 
     def check_media(self):
-    	a = lcg.ContentNode(None, 'aaa')
+    	a = lcg.ContentNode(None, 'a', subdir='aaa')
         m1 = a.resource(lcg.Media, 'sound1.ogg')
-        try:
-            m2 = a.resource(lcg.Media, 'sound2.ogg')
-        except AssertionError, e:
-            msg = "Resource file '%s' doesn't exist!" % \
-                  os.path.join('aaa', 'sound2.ogg')
-            assert e.args == (msg, ), e.args
+        m2 = a.resource(lcg.Media, 'sound2.ogg')
         r = a.resources(lcg.Media)
-        assert len(r) == 2 and m1 in r and m2 in r, a.resources(lcg.Media)
+        assert len(r) == 2 and m1 in r and m2 in r, r
 
 tests.add(ContentNode)
 
 
+class Parser(unittest.TestCase):
+    SIMPLE_TEXT = "Hallo, how are you?\n\n  * one\n  * two\n  * three\n"
+    SECTIONS = "= Main =\n== Sub1 ==\n== Sub2 ==\n=== SubSub1 ===\n== Sub3 =="
+    
+    def check_simple_text(self):
+        p = lcg.wiki.Parser()
+        c = p.parse(self.SIMPLE_TEXT)
+        assert len(c) == 2 and isinstance(c[0], lcg.Paragraph) and \
+               isinstance(c[1], lcg.ItemizedList), c
+
+    def check_sections(self):
+        p = lcg.wiki.Parser()
+        c = p.parse(self.SECTIONS)
+        assert len(c) == 1 and isinstance(c[0], lcg.Section), c
+        s = c[0].sections()
+        assert len(s) == 3 and isinstance(s[0], lcg.Section) and \
+               len(s[0].sections()) == 0 and len(s[1].sections()) == 1 and \
+               len(s[2].sections()) == 0, s
+        
+tests.add(Parser)
+
+        
 class SplittableText(unittest.TestCase):
     def check_it(self):
         import lcg.feed
