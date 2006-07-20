@@ -123,5 +123,5 @@ class IMSExporter(Exporter):
             manifest.write(directory)
 
     def _body_parts(self, node):
-        return (node.content().export(),)
+        return (node.content().export(self),)
         
