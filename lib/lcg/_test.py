@@ -54,13 +54,13 @@ class Parser(unittest.TestCase):
     SECTIONS = "= Main =\n== Sub1 ==\n== Sub2 ==\n=== SubSub1 ===\n== Sub3 =="
     
     def check_simple_text(self):
-        p = lcg.wiki.Parser()
+        p = lcg.Parser()
         c = p.parse(self.SIMPLE_TEXT)
         assert len(c) == 2 and isinstance(c[0], lcg.Paragraph) and \
                isinstance(c[1], lcg.ItemizedList), c
 
     def check_sections(self):
-        p = lcg.wiki.Parser()
+        p = lcg.Parser()
         c = p.parse(self.SECTIONS)
         assert len(c) == 1 and isinstance(c[0], lcg.Section), c
         s = c[0].sections()
