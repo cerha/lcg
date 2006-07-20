@@ -112,7 +112,6 @@ class Content(object):
 
     def lang(self):
         return self._lang or self._container and self._container.lang()
-         lang
 
     def export(self, exporter):
         """Return the HTML formatted content as a string."""
