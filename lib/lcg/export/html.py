@@ -37,20 +37,19 @@ class HtmlMarkupFormatter(MarkupFormatter):
                'amp':  '&amp;',
                }
     
-    def _citation_formatter(self, parent, close=False):
+    def _citation_formatter(self, parent, close=False, **kwargs):
         if not close:
-            lang = self._parent.secondary_language()
+            lang = parent.secondary_language()
             langattr = lang and ' lang="%s"' % lang or ''
             return '<span%s class="citation">' % langattr
         else:
             return '</span>'
     
-    def _uri_formatter(self, parent, uri, close=False):
-        return self._link_formatter(dict(href=uri, title=None))
+    def _uri_formatter(self, parent, uri, close=False, **kwargs):
+        return self._link_formatter(parent, href=uri, title=None)
 
-    def _email_formatter(self, parent, email, close=False):
-        return self._link_formatter(href='mailto:'+email, title=email)
-
+    def _email_formatter(self, parent, email, close=False, **kwargs):
+        return self._link_formatter(parent, href='mailto:'+email, title=email)
 
     
 class HtmlExporter(Exporter):
@@ -105,7 +104,7 @@ class HtmlExporter(Exporter):
                
     def _export_section(self):
         return "\n".join((self._section_header(),
-                          super(Section, self).export()))
+                          super(Section, self).export(self)))
 
     def _styles(self, node):
         if self._inlinestyles:
@@ -137,19 +136,26 @@ class HtmlExporter(Exporter):
         parts = ['<h1>%s</h1>' % node.title()]
         if node is node.root() and node.language_variants():
             import lcg
-            parts.append(lcg.LanguageSelection(node).export())
-        parts.append(_html.div(node.content().export(), 'content'))
+            parts.append(lcg.LanguageSelection(node).export(self))
+        parts.append(_html.div(node.content().export(self), 'content'))
         return parts
     
     def _body(self, node):
         return "\n".join(self._body_parts(node))
 
+    def format_wiki_text(self, parent, text):
+        """Format text with wiki markup and return HTML."""
+        if text:
+            return self._formatter.format(parent, text)
+        else:
+            return ''
+    
     def page(self, node):
         if 'audio.js' in [r.url().split('/')[-1]
                           for r in node.resources(Script)]:
-            clsid = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6"
             hack = ('\n<object id="media_player" height="0" width="0"'
-		    ' classid="%s">' % clsid + '</object>')
+		    ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">'
+                    '</object>')
         else:
             hack = ''
         lines = (self.DOCTYPE, '',
