@@ -33,7 +33,7 @@ class EurochanceNode(ContentNode):
     def _localized_wiki_content(self, filename, macro=False):
         ulang = self.root().users_language()
         content = self.parse_wiki_file(filename, lang=ulang, macro=macro)
-        return SectionContainer(self, content, lang=ulang)
+        return SectionContainer(content, lang=ulang)
         
     def current_language_variant(self):
         return self.root().users_language()
@@ -83,16 +83,14 @@ class Unit(EurochanceNode):
         text = self._read_file('exercises', comment='^#')
         splittable = SplittableText(text, input_file=filename)
         pieces = splittable.split(self._EXERCISE_SECTION_SPLITTER)
-        return [Section(self, title, feed.ExerciseFeeder(piece).feed(self))
+        return [Section(title, feed.ExerciseFeeder(piece).feed(self))
                 for title, piece in self._exercise_sections(pieces)]
 
     def _create_content(self):
-        aims = Section(self, _("Aims and Objectives"),
-                       self.parse_wiki_file('aims'))
+        aims = Section(_("Aims and Objectives"), self.parse_wiki_file('aims'))
         exercises = self._create_exercises()
-        checklist = Section(self, _("Checklist"),
-                            self.parse_wiki_file('checklist'))
-        return SectionContainer(self, (aims,) + tuple(exercises) + (checklist,))
+        checklist = Section(_("Checklist"), self.parse_wiki_file('checklist'))
+        return SectionContainer((aims,) + tuple(exercises) + (checklist,))
 
     
 class IntermediateUnit(Unit):
@@ -124,7 +122,7 @@ class IntermediateUnit(Unit):
         self.vocab = self._create_vocab()
         e = super(IntermediateUnit, self)._create_exercises()
         return (VocabSection(self, _("Vocabulary"), self.vocab),
-                Section(self, _("Exercises"), anchor='exercises', content=e))
+                Section(_("Exercises"), anchor='exercises', content=e))
 
     
 class Instructions(EurochanceNode):
@@ -155,7 +153,7 @@ class ExerciseHelp(EurochanceNode):
     def _create_content(self):
         g = dict(type=self._type, **self._type.typedict())
         content = self.parse_wiki_text(self._template, macro=True, globals=g)
-        return SectionContainer(self, content,
+        return SectionContainer(content,
                                 lang=self.root().users_language())
 
     def _title(self):
@@ -176,13 +174,6 @@ class _Index(EurochanceNode):
         super(_Index, self).__init__(parent, id, *args, **kwargs)
 
         
-class CourseIndex(_Index):
-    _TITLE = _("Detailed Course Index")
-
-    def _create_content(self):
-        return TableOfContents(self, item=self.parent(), depth=99)
-
-    
 class VocabIndex(_Index):
     _TITLE = _("Vocabulary Index")
 
@@ -201,15 +192,15 @@ class VocabIndex(_Index):
                  cmp(a.translation().lower(), b.translation().lower()))
         s = (VocabIndexSection(self, _("Ordered by the English term"), vocab),
              VocabIndexSection(self, _("Ordered by the translation"), rev,
-                          reverse=True))
-        return SectionContainer(self, s)
+                               reverse=True))
+        return SectionContainer(s)
 
     
 class AnswerSheets(_Index):
     _TITLE = _("Answer Sheets")
 
     def _create_content(self):
-        return TableOfContents(self, title=_("Table of Contents:"))
+        return TableOfNodes(title=_("Table of Contents:"))
     
     def _create_children(self):
         return [self._create_child(AnswerSheet, 'answers%02d' % (i+1), u)
@@ -226,7 +217,7 @@ class AnswerSheet(EurochanceNode):
         return _("Answer Sheet for %s") % self._unit.title(brief=True)
 
     def _answer_sheets(self, section):
-        return [Section(self, e.title(), e.answer_sheet(self))
+        return [Section(e.title(), e.answer_sheet(self))
                 for e in section.sections()
                 if isinstance(e, Exercise) and hasattr(e, 'answer_sheet')]
 
@@ -235,16 +226,16 @@ class AnswerSheet(EurochanceNode):
         if parent is None:
             # For the advanced course
             parent = self._unit
-        sections = [Section(self, sec.title(), self._answer_sheets(sec))
+        sections = [Section(sec.title(), self._answer_sheets(sec))
                     for sec in parent.sections()]
-        return SectionContainer(self, sections)
+        return SectionContainer(sections)
 
     
 class Help(EurochanceNode):
     _TITLE = _("Help Index")
 
     def _create_content(self):
-        return TableOfContents(self, title=_("Table of Contents:"))
+        return TableOfNodes(title=_("Table of Contents:"))
 
     def _create_children(self):
         lng = self.root().users_language() or self.language()
@@ -292,8 +283,7 @@ class EurochanceCourse(EurochanceNode):
 
     def _create_content(self):
         return (self._localized_wiki_content('intro'),
-                TableOfContents(self, item=self,
-                                title=_("Table of Contents:")))
+                TableOfNodes(title=_("Table of Contents:")))
 
     def _create_children(self):
         units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d)
@@ -316,17 +306,17 @@ class EurochanceExporter(HtmlStaticExporter):
         body = super(EurochanceExporter, self)._body(node)
         copyright = node.root().find_node('copyright')
         if copyright is not node:
-            body += _html.div(Link(node, copyright).export(), cls='copyright')
+            body += _html.div(Link(copyright).export(self), cls='copyright')
         body += _html.div(_("Version %s")% node.root().version(), cls='version')
         return body
 
  
-class _Section(wiki.Parser._Section):
+class _Section(Parser._Section):
     def __init__(self, title, *args, **kwargs):
         title = title.replace('>>', '<span class="citation" lang="%s">' % 'de')
         title = title.replace('<<', '</span>')
-        super(wiki.Parser._Section, self).__init__(title, *args, **kwargs)
+        super(Parser._Section, self).__init__(title, *args, **kwargs)
         
 # Just a quick hack...
-wiki.Parser._Section = _Section
+Parser._Section = _Section
 
