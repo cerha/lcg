@@ -114,7 +114,7 @@ class HhpExporter(Exporter):
         # We don't want XHTML tag syntax (<hr/>).
         lcg.HorizontalSeparator.export = lambda self_: '<hr>'
         # We want old HTML 'visial' tags.
-        lcg.wiki.Formatter._FORMAT['underline'] = ('<u>', '</u>')
+        lcg.HtmlMarkupFormatter._FORMAT['underline'] = ('<u>', '</u>')
         
 
     def export(self, node, directory):
