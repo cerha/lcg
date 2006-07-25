@@ -33,8 +33,38 @@ import textwrap
 from lcg import *
 
 _cache = {}
+_resources_by_parent = {}
 
-def resource(cls, parent, file, fallback=True, **kwargs):
+def _resource(parent, cls, file, kwargs, fallback=True):
+    if cls.SHARED:
+        src_dirs = ('',
+                    os.path.join(parent.root().src_dir(), cls.SUBDIR),
+                    os.path.join(config.default_resource_dir, cls.SUBDIR))
+    else:
+        src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
+    basename, ext = os.path.splitext(file)
+    altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
+    for d in src_dirs:
+        for src_file in [file] + altnames:
+            src_path = os.path.join(d, src_file)
+            if os.path.exists(src_path):
+                return cls(file, src_path, **kwargs)
+            elif src_path.find('*') != -1:
+                pathlist = glob.glob(src_path)
+                if pathlist:
+                    pathlist.sort()
+                    return [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
+                                path, **kwargs) for path in pathlist]
+    if fallback:
+        path = os.path.join(src_dirs[0], file)
+        result = cls(file, path, **kwargs)
+        if not result.ok():
+            log("Resource file not found:", file, src_dirs)
+    else:
+        result = None
+    return result
+
+def resource(parent, cls, file, fallback=True, **kwargs):
     """Return the resource instance for given ContentNode.
 
     Arguments:
@@ -70,41 +100,38 @@ def resource(cls, parent, file, fallback=True, **kwargs):
     key = (cls, file, tuple(kwargs.items()))
     global _cache
     try:
-        return _cache[key]
+        result = _cache[key]
     except KeyError:
-        if cls.SHARED:
-            src_dirs = ('',
-                        os.path.join(parent.root().src_dir(), cls.SUBDIR),
-                        os.path.join(config.default_resource_dir, cls.SUBDIR))
-        else:
-            src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
-        basename, ext = os.path.splitext(file)
-        altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
-        for d in src_dirs:
-            for src_file in [file] + altnames:
-                src_path = os.path.join(d, src_file)
-                if os.path.exists(src_path):
-                    result = cls(file, src_path, **kwargs)
-                    _cache[key] = result
-                    return result
-                elif src_path.find('*') != -1:
-                    pathlist = glob.glob(src_path)
-                    if pathlist:
-                        pathlist.sort()
-                        result = [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
-                                      path, **kwargs)
-                                  for path in pathlist]
-                        _cache[key] = result
-                        return result
-        if fallback:
-            result = cls(file, os.path.join(src_dirs[0], file), **kwargs)
+        result = _resource(parent, cls, file, kwargs, fallback=fallback)
+        if result is not None:
             _cache[key] = result
-            if not result.ok():
-                log("Resource file not found:", file, src_dirs)
-        else:
-            result = None
-        return result
-
+    global _resources_by_parent
+    try:
+        d = _resources_by_parent[parent]
+    except KeyError:
+        d = _resources_by_parent[parent] = {}
+    if isinstance(result, (tuple, list)):
+        for r in result:
+            d[r] = True
+    elif result is not None:
+        d[result] = True
+    return result
+    
+def resources(parent, cls=None):
+    """Return the list of all resources for given node.
+    
+    If cls is specified, only instances of given class are returned.
+    
+    """
+    global _resources_by_parent
+    d = _resources_by_parent.get(parent)
+    all = d and d.keys() or ()
+    if cls is not None:
+        return tuple([r for r in all if isinstance(r, cls)])
+    else:
+        return tuple(all)
+    
+    
 class Resource(object):
     """Generic resource class.
     
@@ -157,7 +184,7 @@ class Resource(object):
             dst_dir = os.path.join(self.SUBDIR, self._parent.id())
         return os.path.join(dst_dir, self._file)
             
-    def url(self):
+    def uri(self):
         return '/'.join(self._dst_path().split(os.path.sep))
 
     def name(self):
