@@ -25,10 +25,30 @@ data.  It can be used as an example of LCG usage.
 
 from lcg import *
 
-class EurochanceNode(ContentNode):
+class EurochanceNode(ContentNode, FileNodeMixin):
 
-    def _title(self):
+    _INHERITED_ARGS = ('language', 'secondary_language', 'input_encoding')
+    
+    def __init__(self, parent, id, subdir=None, input_encoding='ascii',
+                 **kwargs):
+        """Initialize the instance.
+
+
+        The other arguments are inherited from the parent class.
+          
+        """
+        FileNodeMixin.__init__(self, parent, subdir,
+                               input_encoding=input_encoding)
+        title = self._title_(brief_title=kwargs.get('brief_title'))
+        content = self._create_content()
+        super(EurochanceNode, self).__init__(parent, id, title=title,
+                                             content=content, **kwargs)
+
+    def _title_(self, brief_title=None):
         return self._TITLE
+
+    def _create_content(self):
+        pass
     
     def _localized_wiki_content(self, filename, macro=False):
         ulang = self.root().users_language()
@@ -60,11 +80,8 @@ class EurochanceNode(ContentNode):
 class Unit(EurochanceNode):
     _EXERCISE_SECTION_SPLITTER = re.compile(r"^==(?P<title>.+)?==+\s*$", re.M)
 
-    def _brief_title(self):
-        return _("Unit %d") % int(self._id[4:])
-
-    def _title(self):
-        return "%s: %s" % (self._brief_title(), self._read_file('title'))
+    def _title_(self, brief_title=None):
+        return "%s: %s" % (brief_title, self._read_file('title'))
     
     def _exercise_sections(self, split_result):
         title = ''
@@ -121,7 +138,7 @@ class IntermediateUnit(Unit):
     def _create_exercises(self):
         self.vocab = self._create_vocab()
         e = super(IntermediateUnit, self)._create_exercises()
-        return (VocabSection(self, _("Vocabulary"), self.vocab),
+        return (VocabSection(_("Vocabulary"), self.vocab),
                 Section(_("Exercises"), anchor='exercises', content=e))
 
     
@@ -156,7 +173,7 @@ class ExerciseHelp(EurochanceNode):
         return SectionContainer(content,
                                 lang=self.root().users_language())
 
-    def _title(self):
+    def _title_(self, brief_title=None):
         return _("Instructions for %s") % self._type.name()
 
 
@@ -190,8 +207,8 @@ class VocabIndex(_Index):
         vocab.sort(lambda a,b: cmp(a.word().lower(), b.word().lower()))
         rev.sort(lambda a,b:
                  cmp(a.translation().lower(), b.translation().lower()))
-        s = (VocabIndexSection(self, _("Ordered by the English term"), vocab),
-             VocabIndexSection(self, _("Ordered by the translation"), rev,
+        s = (VocabIndexSection(_("Ordered by the English term"), vocab),
+             VocabIndexSection(_("Ordered by the translation"), rev,
                                reverse=True))
         return SectionContainer(s)
 
@@ -213,7 +230,7 @@ class AnswerSheet(EurochanceNode):
         self._unit = unit
         super(AnswerSheet, self).__init__(parent, id, *args, **kwargs)
         
-    def _title(self):
+    def _title_(self, brief_title=None):
         return _("Answer Sheet for %s") % self._unit.title(brief=True)
 
     def _answer_sheets(self, section):
@@ -269,9 +286,11 @@ class EurochanceCourse(EurochanceNode):
         return self._users_language
 
     def version(self):
-        return self._read_file('version')
+        import time
+        timestamp = time.strftime("%Y-%m-%d %H:%M %Z")
+        return self._read_file('version') + ' (%s)' % timestamp  
         
-    def _title(self):
+    def _title_(self, brief_title=None):
         return self._read_file('title')
 
     def _unit_dirs(self):
@@ -286,7 +305,8 @@ class EurochanceCourse(EurochanceNode):
                 TableOfNodes(title=_("Table of Contents:")))
 
     def _create_children(self):
-        units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d)
+        units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d,
+                                    brief_title="Unit %d" % (i+1))
                  for i, d in enumerate(self._unit_dirs())]
         children = [self._create_child(Instructions, 'instructions')] + units
         if issubclass(self._unit_cls, IntermediateUnit):
@@ -300,16 +320,25 @@ class EurochanceCourse(EurochanceNode):
     
 class EurochanceExporter(HtmlStaticExporter):
     _INDEX_LABEL = _('Course Index')
+    _BODY_PARTS = ('heading',
+                   'language_selection',
+                   'content',
+                   'rule',
+                   'navigation',
+                   'copyright',
+                   'version',
+                   )
     
-    def _body(self, node):
-        from lcg.export import _html
-        body = super(EurochanceExporter, self)._body(node)
+    def _version(self, node):
+        return _("Version %s") % node.root().version()
+
+    def _copyright(self, node):
         copyright = node.root().find_node('copyright')
         if copyright is not node:
-            body += _html.div(Link(copyright).export(self), cls='copyright')
-        body += _html.div(_("Version %s")% node.root().version(), cls='version')
-        return body
-
+            return Link(copyright).export(self)
+        else:
+            return None
+            
  
 class _Section(Parser._Section):
     def __init__(self, title, *args, **kwargs):
