@@ -36,13 +36,15 @@ else:
 _t.install(unicode=True)
 
 from util import *
-from resources import *
 from nodes import *
-from export import *
+from resources import *
 from content import *
+from export import *
 from wiki import *
 import feed
 
+from export import _html
+
 # Resolve cyclic dependencies.
-for module in (resources, content, export, nodes, feed, wiki):
+for module in (resources, nodes, content, exercises, export, html, wiki, feed):
     module.__dict__.update(globals())                                                                                                                                                      
