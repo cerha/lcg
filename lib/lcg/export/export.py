@@ -78,7 +78,8 @@ class MarkupFormatter(object):
 
     _FORMAT = {}
 
-    def __init__(self):
+    def __init__(self, exporter):
+        self._exporter = exporter
         regexp = r"(?P<%s>\\*%s)"
         pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
                                 regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
@@ -134,36 +135,6 @@ class MarkupFormatter(object):
             return type in self._paired_on_output and f[close and 1 or 0] or f
         return formatter(parent, close=close, **groups)
         
-    def _link_formatter(self, parent, title=None, href=None, anchor=None,
-                        resource_cls=None, close=False, **kwargs):
-        node = None
-        if resource_cls:
-            cls = globals()[resource_cls]
-            resource = parent.resource(cls, href, fallback=False)
-            if resource:
-                return '<a href="%s">%s</a>' % (resource.url(), title or href)
-            else:
-                log("%s: Unknown resource: %s" % (parent.id(), href))
-        elif not href:
-            node = parent
-        elif href.find('@') == href.find('/') == -1:
-            node = parent.root().find_node(href)
-            if not node:
-                log("%s: Unknown node: %s" % (parent.id(), href))
-        target = node
-        if node and anchor:
-            target = node.find_section(anchor)
-            if target is None:
-                log("%s: Unknown section: %s:%s" %
-                    (parent.id(), node.id(), anchor))
-        if not target:
-            if anchor is not None:
-                href += '#'+anchor
-            target = Link.ExternalTarget(href, title or href)
-        l = Link(target, label=title)
-        l.set_parent(parent)
-        return l.export(self)
-    
     def format(self, parent, text):
         self._open = []
         result = re.sub(self._rules, lambda match:
