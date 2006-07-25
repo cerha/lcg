@@ -28,14 +28,11 @@ whole document is represented by a tree of content elements.  When the
 construction of the whole tree is finished, each element knows its ancestor
 (the container) and all the successors (sub-content) in the tree.
 
-All elements in one content tree are bound to one 'ContentNode'.  Please note
-the difference between the hierarchy of content within one node and the
-hierarchy of the nodes themselves.  The nodes represent distinct documents,
-whereas the content always belongs to one of the documents.
+The content hierarchy may be built independently, however you need to assign a
+content to a 'ContentNode' instance to be able to export it.
 
-Each content element is able to render itself on the output.  This is currently
-limited to HTML, however a possible transition to independent renderers was
-kept in mind, so it should be possible to allow also other output formats.
+Please note the difference between the hierarchy of content within one node and
+the hierarchy of the nodes themselves.
 
 """
 
@@ -48,12 +45,11 @@ import operator
 class Content(object):
     """Generic base class for all types of content.
 
-    One instance always makes a part of one document -- it cannot be split over
-    multiple output documents.  On the other hand, one document usually
-    consists of multiple 'Content' instances (elements).
-
-    Each content element may be contained in another content element (see the
-    'Container' class) and thus they make a hierarchical structure.
+    One instance always makes a part of one document/node -- it cannot be split
+    over multiple output nodes.  On the other hand, one node usually consists
+    of multiple 'Content' instances (elements).  Each content element may be
+    contained in another content element (see the 'Container' class) and thus
+    they make a hierarchical structure.
 
     """
     _ALLOWED_CONTAINER = None
@@ -179,12 +175,12 @@ class Link(TextContent):
     _HTML_TAG = re.compile(r'<[^>]+>')
     
     class ExternalTarget(object):
-        def __init__(self, url, title, descr=None):
-            self._url = url
+        def __init__(self, uri, title, descr=None):
+            self._uri = uri
             self._title = title
             self._descr = descr
-        def url(self):
-            return self._url
+        def uri(self):
+            return self._uri
         def title(self):
             return self._title
         def descr(self):
@@ -212,7 +208,8 @@ class Link(TextContent):
     
     def export(self, exporter):
         label = self._text or self._target.title()
-        return _html.link(label, self._target.url(), title=self._descr())
+        uri = exporter.uri(self._target)
+        return _html.link(label, uri, title=self._descr())
 
 
 class Anchor(TextContent):
@@ -239,7 +236,7 @@ class InlineImage(Content):
     def export(self, exporter):
         img = self._image
         return '<img alt="%s" src="%s" width="%d" height="%d" border="0"/>' % \
-               (img.title() or '', img.url(), img.width(), img.height())
+               (img.title() or '', img.uri(), img.width(), img.height())
 
 
 class Container(Content):
@@ -309,7 +306,6 @@ class Container(Content):
             result += "\n"
         return result
             
-
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
     _TAG = 'p'
@@ -451,8 +447,9 @@ class SectionContainer(Container):
         return self._sections
     
     def _exported_content(self, exporter):
-        exported = super(SectionContainer, self)._exported_content(exporter)
-        return [self._toc.export(exporter)] + exported
+        toc = self._toc.export(exporter)
+        sections = super(SectionContainer, self)._exported_content(exporter)
+        return [toc] + sections
     
     
 class Section(SectionContainer):
@@ -551,14 +548,6 @@ class Section(SectionContainer):
                                   name=self.anchor()),
                  len(self._section_path()) + 1)+'\n'
 
-    def url(self, relative=False):
-        """Return the URL of the section relative to the course root."""
-        if relative:
-            base = ''
-        else:
-            base = self.parent().url()
-        return base + "#" + self.anchor()
-           
     def export(self, exporter):
         return "\n".join((self._header(),
                           super(Section, self).export(exporter)))
@@ -594,7 +583,7 @@ class TableOfNodes(Content):
         return self.parent()
         
     def export(self, exporter):
-        toc = self._make_toc(self._start_item(), depth=self._depth)
+        toc = self._make_toc(exporter, self._start_item(), depth=self._depth)
         if self._title is not None:
             #TODO: add a "skip" link?
             return _html.div((self._export_title(), toc),
@@ -602,7 +591,7 @@ class TableOfNodes(Content):
         else:
             return toc
         
-    def _make_toc(self, item, indent=0, depth=1):
+    def _make_toc(self, exporter, item, indent=0, depth=1):
         if depth <= 0:
             return ''
         items = ()
@@ -617,14 +606,11 @@ class TableOfNodes(Content):
             return ''
         links = []
         for i in items:
-            url = i.url()
-            name = None
-            if isinstance(i, Section):
-                if i.parent() is self.parent():
-                    url = i.url(relative=True)
-                name = i.backref(self.parent())
-            links.append(_html.link(i.title(), url, name=name) + \
-                         self._make_toc(i, indent=indent+4, depth=depth-1))
+            uri = exporter.uri(i, relative_to=self.parent())
+            name = isinstance(i, Section) and i.backref(self.parent()) or None
+            links.append(_html.link(i.title(), uri, name=name) + \
+                         self._make_toc(exporter, i, indent=indent+4,
+                                        depth=depth-1))
         return "\n" + _html.list(links, indent=indent) + "\n" + ' '*(indent-2)
 
     
@@ -665,7 +651,7 @@ class VocabItem(object):
     ATTR_PHRASE = 'ATTR_PHRASE'
     """Special attribute indicating a phrase."""
     
-    def __init__(self, parent, word, note, translation, translation_language,
+    def __init__(self, media, word, note, translation, translation_language,
                  attr=None):
         """Initialize the instance.
         
@@ -681,10 +667,11 @@ class VocabItem(object):
             None.
           
         """
-        assert isinstance(word, types.UnicodeType)
-        assert isinstance(note, types.UnicodeType) or note is None
-        assert isinstance(translation, types.UnicodeType)
-        assert isinstance(translation_language, types.StringTypes) and \
+        assert isinstance(media, Media)
+        assert isinstance(word, unicode)
+        assert isinstance(note, unicode) or note is None
+        assert isinstance(translation, unicode)
+        assert isinstance(translation_language, str) and \
                len(translation_language) == 2
         assert attr in (None, self.ATTR_EXTENDED, self.ATTR_PHRASE)
         self._word = word
@@ -692,9 +679,7 @@ class VocabItem(object):
         self._translation = translation
         self._translation_language = translation_language
         self._attr = attr
-        filename = "item-%02d.mp3" % parent.counter(self.__class__).next()
-        path = os.path.join('vocabulary', filename)
-        self._media = parent.resource(Media, path)
+        self._media = media
 
     def word(self):
         return self._word
@@ -718,13 +703,11 @@ class VocabItem(object):
 class VocabList(Content):
     """Vocabulary listing consisting of multiple 'VocabItem' instances."""
 
-    def __init__(self, parent, items, reverse=False):
+    def __init__(self, items, reverse=False):
         """Initialize the instance.
 
         Arguments:
 
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
           items -- sequence of 'VocabItem' instances.
           reverse -- a boolean flag indicating, that the word pairs should be
             printed in reversed order - translation first.
@@ -735,7 +718,6 @@ class VocabList(Content):
         assert isinstance(reverse, types.BooleanType)
         self._items = items
         self._reverse = reverse
-        parent.resource(Script, 'audio.js')
 
     def export(self, exporter):
         pairs = [(_html.speaking_text(i.word(), i.media()) +
@@ -763,13 +745,11 @@ class VocabSection(Section):
     and the Phrases.
 
     """
-    def __init__(self, parent, title, items, reverse=False):
+    def __init__(self, title, items, reverse=False):
         """Initialize the instance.
 
         Arguments:
 
-          parent -- parent 'ContentNode' instance; the actual output document
-            this content element is part of.
           title -- The title of the section.
           items -- sequence of 'VocabItem' instances.
           reverse -- see the same constructor argument for `VocabList'.
@@ -780,10 +760,10 @@ class VocabSection(Section):
         assert isinstance(reverse, types.BooleanType)
         subsections = [(t, i) for t, i in self._subsections(items) if i]
         if len(subsections) > 1:
-            c = [Section(t, VocabList(parent, i, reverse=reverse))
+            c = [Section(t, VocabList(i, reverse=reverse))
                  for t, i in subsections]
         else:
-            c = VocabList(parent, subsections[0][1])
+            c = VocabList(subsections[0][1])
         super(VocabSection, self).__init__(title, c)
 
     def _subsections(self, items):
@@ -803,53 +783,4 @@ class VocabIndexSection(VocabSection):
                  [x for x in items if x.attr() is VocabItem.ATTR_PHRASE]))
 
     
-class LanguageSelection(Container):
-    _CLASS = 'language-selection'
-    _CONTENT_SEPARATOR = '\n'
 
-    def __init__(self, parent, label=_('Choose your language:')):
-        self._label = label
-        current = parent.current_language_variant()
-        pairs = [(lang, language_name(lang))
-                 for lang in parent.language_variants()]
-        pairs.sort(lambda a,b: cmp(a[0], b[0]))
-        self._targets = targets = []
-        self._flags = flags = []
-        for lang, name in pairs:
-            if lang == current:
-                name += ' ' + _('(*)') #_('(current)')
-            t = Link.ExternalTarget('index.%s.html'% lang, name)
-            if lang == current:
-                self._current = t
-            targets.append(t)
-            flag = parent.resource(Image, 'flags/%s.gif' % lang)
-            flags.append(InlineImage(flag))
-        links = [Container((Link(target), flag))
-                 for target, flag in zip(targets, flags)]
-        content = [TextContent(label)] + \
-                  [i == len(links)-1 and link or \
-                   Container((link, TextContent(' |')))
-                   for i, link in enumerate(links)]
-        super(LanguageSelection, self).__init__(tuple(content))
-
-    def export(self, exporter):
-        #handler = "location.href = this.form.language.options[this.form.language.selectedIndex].value"
-        #select = _html.form((_html.label(self._label, 'language-selection'),
-        #                     _html.select('language',
-        #                                  [(t.title(), t.url())
-        #                                   for t in self._targets],
-        #                                  id='language-selection',
-        #                                  selected=self._current.url()),
-        #                     _html.button(_('Switch'), handler)),
-        #                    cls='language-selection')
-        #radio = _html.fieldset([_html.radio('language', value=t.url(), id=tid,
-        #                                    onclick="location.href = this.value",
-        #                                    checked=(self._current.url()==t.url())
-        #                                    ) + \
-        #                        _html.label(flag.export(exporter) + t.title(), tid)
-        #                        for t, tid, flag in
-        #                        [(t, t.url().replace('.','-'), f)
-        #                         for t, f in zip(self._targets, self._flags)]],
-        #                       legend=self._label, cls='language-selection')
-        links = super(LanguageSelection, self).export(exporter)
-        return links #_html.script_write(radio, links)
