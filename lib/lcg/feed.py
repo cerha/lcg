@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -114,10 +114,11 @@ class VocabFeeder(SplittableTextFeeder):
         super(VocabFeeder, self).__init__(text, **kwargs)
     
     def feed(self, parent):
+        parent.resource(Script, 'audio.js')
         return self._process_pieces(self._text, self._LINE_SPLITTER,
-                                    self._item, parent)
+                                    self._item, parent, Counter(0))
 
-    def _item(self, line, parent):
+    def _item(self, line, parent, counter):
         if line.text().startswith("#"):
             if line.text().startswith("# phrases"):
                 self._attr = VocabItem.ATTR_PHRASE
@@ -136,7 +137,10 @@ class VocabFeeder(SplittableTextFeeder):
             word = word[:p].strip()
         else:
             note = None
-        return VocabItem(parent, word, note, translation,
+        filename = "item-%02d.mp3" % counter.next()
+        path = os.path.join('vocabulary', filename)
+        media = parent.resource(Media, path)
+        return VocabItem(media, word, note, translation,
                          self._translation_language, attr=attr)
     
     
