@@ -18,6 +18,7 @@
 
 """Exporter class which generates an IMS compliant package."""
 
+from lcg import *
 from lcg.export import *
 
 from xml.dom import minidom
@@ -31,9 +32,9 @@ class _Manifest:
 
     """
     
-    def __init__(self, course):
+    def __init__(self, exporter, course):
         """Initialize the manifest for a given 'Course'."""
-        
+        self._exporter = exporter
         uri = "http://www.imsglobal.org/xsd/imscp_v1p1"
         minidom = getDOMImplementation('minidom')
         self._document = document = minidom.createDocument(uri, 'manifest', '')        
@@ -73,11 +74,11 @@ class _Manifest:
         resource = self._append_xml_element(r, 'resource')
         self._set_xml_attr(resource, 'identifier', node.id())
         self._set_xml_attr(resource, 'type', 'webcontent')
-        self._set_xml_attr(resource, 'href', node.url())
+        self._set_xml_attr(resource, 'href', self._exporter.uri(node))
 
-        resources = [n.url() for n in node.resources()]
+        resources = [r.uri() for r in node.resources()]
         resources.sort()
-        for filename in (node.url(),) + tuple(resources):
+        for filename in (self._exporter.uri(node),) + tuple(resources):
             file = self._append_xml_element(resource, 'file')
             self._set_xml_attr(file, 'href', filename)
 
@@ -113,13 +114,13 @@ class _Manifest:
         fh.close()
 
         
-class IMSExporter(Exporter):
+class IMSExporter(HtmlExporter):
     """Export the content as an IMS package."""
    
     def export(self, node, directory):
         super(IMSExporter, self).export(node, directory)
         if node == node.root():
-            manifest = _Manifest(node)
+            manifest = _Manifest(self, node)
             manifest.write(directory)
 
     def _body_parts(self, node):
