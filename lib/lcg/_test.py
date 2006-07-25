@@ -21,31 +21,31 @@ import os
 import lcg
 
 class TestSuite(unittest.TestSuite):
+    
     def add(self, cls, prefix = 'check_'):
         tests = filter(lambda s: s[:len(prefix)] == prefix, dir(cls))
         self.addTest(unittest.TestSuite(map(cls, tests)))
 
 tests = TestSuite()
 
+
 class ContentNode(unittest.TestCase):
+    
     def check_misc(self):
-    	a = lcg.ContentNode(None, 'a', subdir='aaa')
-        b = lcg.ContentNode(a, 'b', subdir='bbb')
+    	a = lcg.ContentNode(None, 'a', content=lcg.TextContent("A"))
+        b = lcg.ContentNode(a, 'b', content=lcg.TextContent("B"))
+        assert a.id() == 'a'
         assert a.root() == b.root() == a
-        assert a.src_dir() == 'aaa'
-        assert b.src_dir() == os.path.join('aaa', 'bbb')
-        assert b.id() != a.id()
-        assert a.counter().next() == 1
-        assert a.counter().next() == 2
-        assert b.counter().next() == 1
 
     def check_media(self):
-    	a = lcg.ContentNode(None, 'a', subdir='aaa')
-        m1 = a.resource(lcg.Media, 'sound1.ogg')
-        m2 = a.resource(lcg.Media, 'sound2.ogg')
-        r = a.resources(lcg.Media)
-        assert len(r) == 2 and m1 in r and m2 in r, r
-
+    	a = lcg.ContentNode(None, 'a', content=lcg.TextContent("A"))
+        # TODO: This doesn.t work now.  Resourcesa now only work with
+        # file-based nodes.
+        #m1 = a.resource(lcg.Media, 'sound1.ogg')
+        #m2 = a.resource(lcg.Media, 'sound2.ogg')
+        #r = a.resources(lcg.Media)
+        #assert len(r) == 2 and m1 in r and m2 in r, r
+        
 tests.add(ContentNode)
 
 
