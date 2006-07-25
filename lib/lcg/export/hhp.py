@@ -23,15 +23,16 @@ browser (see http://www/wxwidgets.org for more information about wx Widgets).
 
 """
 
+from lcg import *
 from lcg.export import *
-import lcg
 
 import os
 
 class _MetaFile(object):
     _EXT = None
     
-    def __init__(self, root, charset='utf-8'):
+    def __init__(self, exporter, root, charset='utf-8'):
+        self._exporter = exporter
         self._root = root
         self._charset = charset
 
@@ -51,10 +52,11 @@ class _Contents(_MetaFile):
     _EXT = '.hhc'
     
     def _item(self, node, indent=''):
+        uri = self._exporter.uri(node)
         lines = ('<li>',
                  '  <object type="text/sitemap">',
                  '    <param name="Name" value="%s">' % node.title(),
-                 '    <param name="Local" value="%s">' % node.url(),
+                 '    <param name="Local" value="%s">' % uri,
                  '  </object>')
         return tuple([indent+'  '+line for line in lines])
     
@@ -85,8 +87,8 @@ class _Index(_Contents):
 class _Header(_MetaFile):
     _EXT = '.hhp'
 
-    def __init__(self, root, contents, index, **kwargs):
-        super(_Header, self).__init__(root, **kwargs)
+    def __init__(self, exporter, root, contents, index, **kwargs):
+        super(_Header, self).__init__(exporter, root, **kwargs)
         self._contents = contents
         self._index = index
             
@@ -98,7 +100,7 @@ class _Header(_MetaFile):
                 "Charset=%s" % self._charset)
 
         
-class HhpExporter(Exporter):
+class HhpExporter(HtmlExporter):
     
     def __init__(self, *args, **kwargs):
         super(HhpExporter, self).__init__(*args, **kwargs)
@@ -120,9 +122,9 @@ class HhpExporter(Exporter):
     def export(self, node, directory):
         super(HhpExporter, self).export(node, directory)
         if node == node.root():
-            contents = _Contents(node)
-            index = _Index(node)
-            header = _Header(node, contents, index)
+            contents = _Contents(self, node)
+            index = _Index(self, node)
+            header = _Header(self, node, contents, index)
             for metafile in (header, contents, index):
                 metafile.write(directory)
 
