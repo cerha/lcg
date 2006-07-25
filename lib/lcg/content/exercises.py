@@ -37,7 +37,6 @@ not able to render themselves.  They just hold the data.
 
 from lcg import *
 from lcg.content import *
-from lcg.export import _html
 
 import random
 import types
@@ -406,7 +405,7 @@ class Exercise(Section):
         else:
             if transcript is not None:
                 t = parent.resource(Transcript, transcript)
-                log("Transcript without a 'sound_file': %s", t.url())
+                log("Transcript without a 'sound_file': %s", t.uri())
             self._recording = None
             self._transcript = None
         if audio_version is not None:
@@ -480,14 +479,14 @@ class Exercise(Section):
         return self._INSTRUCTIONS
 
     def _play_button(self, media):
-        button = _html.button(_("Play"), "play_audio('%s')" % media.url(),
+        button = _html.button(_("Play"), "play_audio('%s')" % media.uri(),
                               cls='sound-control')
-        link = _html.link(_("Play"), media.url())
+        link = _html.link(_("Play"), media.uri())
         return _html.script_write(button, '[' + link + ']')
                   
     def _sound_controls(self, label, media, transcript=None, cls=None):
         if transcript is not None:
-            t = _html.link(_("show transcript"), transcript.url(),
+            t = _html.link(_("show transcript"), transcript.uri(),
                            target="transcript") + "\n"
         else:
             t = ""
@@ -501,7 +500,8 @@ class Exercise(Section):
 
     def export(self, exporter):
         header = _html.div((self._header(),
-                      _html.link(_("Exercise Help"), self._help_node.url(),
+                      _html.link(_("Exercise Help"),
+                                 exporter.uri(self._help_node),
                                  target='help', cls='exercise-help-link')),
                            cls='exercise-header')
         parts = [getattr(self, '_export_'+part)(exporter)
@@ -525,7 +525,7 @@ class Exercise(Section):
         else:
             exported = self._wrap_exported_tasks(exported)
         if exported:
-            return _html.form((exported, self._results()),
+            return _html.form((exported, self._results(exporter)),
                               name=self._form_name())
         else:
             return None
@@ -587,13 +587,14 @@ class Exercise(Section):
         else:
             parts = [p for p in parts if p is not None]
         if self._ANSWER_SHEET_LINK_PER_TASK:
-            parts.append(self._answer_sheet_link(self._tasks.index(task)))
+            parts.append(self._answer_sheet_link(exporter,
+                                                 self._tasks.index(task)))
         return _html.div(parts, cls=self._task_style_cls())
 
     def _task_name(self, task):
         return self._exercise_id() + '-t%d' % (self._tasks.index(task)+1)
 
-    def _results(self):
+    def _results(self, exporter):
         return ""
 
     def _init_script(self):
@@ -667,7 +668,7 @@ class _InteractiveExercise(Exercise):
 
     def _init_script(self):
         args = (_html.js_array(self._answers()),
-                _html.js_dict(dict([(key, [media.url() for media in values])
+                _html.js_dict(dict([(key, [media.uri() for media in values])
                                     for key, values
                                     in self._responses.items()])),
                 _html.js_dict(self._MESSAGES))
@@ -678,7 +679,7 @@ class _InteractiveExercise(Exercise):
         handler.init(form, %s);
         """ % (self._form_name(), self._FORM_HANDLER, ", ".join(args))
 
-    def _results(self):
+    def _results(self, exporter):
         field_id = lambda name: self._exercise_id() + '.' + name
         displays = [' '.join((_html.label(label, id=field_id(name)),
                               _html.field(name=name, size=50, readonly=True,
@@ -691,7 +692,8 @@ class _InteractiveExercise(Exercise):
         panel = _html.div((_html.div('<br/>'.join(displays), 'display'),
                            _html.div(buttons, 'buttons')), 'results')
         l = _html.p(_("See the %s to check your results.") %
-                    _html.link(_("answer sheet"), self._answer_sheet_url(),
+                    _html.link(_("answer sheet"),
+                               self._answer_sheet_uri(exporter),
                                target='help'))
         return _html.script_write(panel, l)
 
@@ -705,12 +707,12 @@ class _InteractiveExercise(Exercise):
         else:
             return "%s-a%d" % (a, index)
     
-    def _answer_sheet_url(self, index=None):
-        return self._answer_sheet_node.url() + "#" + \
+    def _answer_sheet_uri(self, exporter, index=None):
+        return exporter.uri(self._answer_sheet_node) + "#" + \
                self._answer_sheet_anchor(index)
 
-    def _answer_sheet_link(self, index):
-        lnk = _html.link('?', self._answer_sheet_url(index),
+    def _answer_sheet_link(self, exporter, index):
+        lnk = _html.link('?', self._answer_sheet_uri(exporter, index),
                          title=_("Show the answer sheet."),
                          target='help', cls='answer-sheet-link')
         b1, b2 = [_html.span(b, cls='hidden') for b in ('[', ']')]
@@ -752,7 +754,7 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
 
     def _non_js_choice_control(self, task, choice):
         media = self._response(choice.correct() and 'correct' or 'incorrect')
-        return _html.link(choice.answer(), media.url())
+        return _html.link(choice.answer(), media.uri())
     
     def _js_choice_control(self, task, choice):
         i = task.choices().index(choice)
@@ -982,7 +984,7 @@ class Dictation(_FillInExercise):
         init_script = super(Dictation, self)._init_script()
         if self._pieces:
             init_script += "handler.init_recordings(%s);" % \
-                           _html.js_array([m.url() for m in self._pieces])
+                           _html.js_array([m.uri() for m in self._pieces])
         return init_script
     
 
@@ -1045,7 +1047,7 @@ class Cloze(_Cloze):
         t = self._tasks[0]
         return zip(t.answers(), t.comments())
 
-    def _make_field(self, task, text):
+    def _make_field(self, exporter, task, text):
         try:
             counter = self._field_counter
         except AttributeError:
@@ -1054,12 +1056,13 @@ class Cloze(_Cloze):
         name = self._exercise_id() + '-f%d' % n
         field = _html.field(name=name,
                             size=max(4, len(text)+1), cls='fill-in-task')
-        return field + self._answer_sheet_link(n-1)
+        return field + self._answer_sheet_link(exporter, n-1)
 
     def _export_task_parts(self, exporter, task):
         # The formatter here actually works as a parser and formatter.
         formatter = lambda t: self._wiki_content(t).export(exporter)
-        return task.text(self._make_field, formatter)
+        make_field = lambda task, text: self._make_field(exporter, task, text)
+        return task.text(make_field, formatter)
     
 class ExposedCloze(Cloze, _ExposedCloze):
     pass
