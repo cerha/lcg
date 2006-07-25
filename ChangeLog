@@ -1,3 +1,156 @@
+2006-07-25  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content/exercises.py (Exercise.__init__)
+	(Exercise._play_button, Exercise._play_button)
+	(Exercise._sound_controls, Exercise.export)
+	(Exercise._export_tasks, _InteractiveExercise._init_script)
+	(_ChoiceBasedExercise._non_js_choice_control)
+	(Dictation._init_script): a
+	(_InteractiveExercise._answer_sheet_url): Renamed to
+	`_answer_sheet_uri'.  New argument `exporter'.
+	(_InteractiveExercise._answer_sheet_link): New argument
+	`exporter'.
+	(Exercise._results, _InteractiveExercise._results): New argument
+	exporter.
+	(_InteractiveExercise._results): `_answer_sheet_url()' ->
+	`_answer_sheet_uri()'.
+	(Exercise._export_task): Pass `exporter' to
+	`_answer_sheet_link()'.
+	(_FillInExercise._make_field): New argument `exporter'.
+	(Cloze._make_field): Pass `exporter' to `_answer_sheet_link()'.
+	(_Cloze._export_task_parts): Pass `exporter' to `_make_field()'.
+
+	* lib/lcg/export/ims.py (_Manifest.__init__): New argument `exporter'.
+	(_Manifest._create_item): Use the exporter to resolve URIs.
+	(IMSExporter): Derive from `HtmlExporter'.
+	(IMSExporter.export): Pass `self' to `_Manifest' constructor.
+
+	* lib/lcg/export/hhp.py (_MetaFile.__init__, _Header.__init__):
+	New arguemnt `exporter'.
+	(_Contents._item): Use the exporter to resolve URIs.
+	(HhpExporter): Derive from `HtmlExporter'.
+	(HhpExporter.export): Pass `self' to `_Index', `_Contents' and
+	`_Header' constructors.
+
+	* lib/lcg/export/html.py (HtmlMarkupFormatter._link_formatter):
+	New method /moved here from `MarkupFormatter'.
+	(HtmlExporter._BODY_PARTS: New constant.
+	(HtmlExporter.__init__): Pass `self' to the `HtmlMarkupFormatter'
+	constructor.
+	(HtmlExporter._output_file): New optional argument `lang'.  
+	(HtmlExporter._url): Method removed.
+	(HtmlExporter._node_uri): New method.
+	(HtmlExporter.uri): New method.
+	(HtmlExporter._head): Added the `Content-Style-Type' meta tag.
+	(HtmlExporter._styles, HtmlExporter._head)
+	(HtmlExporter.page, HtmlStaticExporter._head): `url' -> `uri'.
+	(HtmlExporter._body_parts): Iterate through `self._BODY_PARTS' and
+	wrap them into a div automatically.
+	(HtmlExporter._heading, HtmlExporter._language_selection) 
+	(HtmlExporter._content): New methods.
+	(HtmlStaticExporter._BODY_PARTS): New constant.
+	(HtmlStaticExporter._body_parts): Method removed.
+	(HtmlStaticExporter._link): Method removed.
+	(HtmlStaticExporter._rule): New method.
+	(HtmlStaticExporter._navigation.link): New function.
+	(HtmlStaticExporter._navigation): Use it.
+
+	* lib/lcg/export/export.py (MarkupFormatter.__init__): New
+	argument `exporter'.
+	(MarkupFormatter._link_formatter): Method removed.
+
+	* lib/lcg/content/content.py: Docstring updated.
+	(Content): Docstring updated.
+	(Link.ExternalTarget.__init__): Argument `url' renamed to `uri'.
+	(Link.ExternalTarget.url): Renamed to `uri'.
+	(Link.export): Use exporter's `uri()' method instead of target
+	`url' directly.
+	(Section.url): Method removed.
+	(TableOfNodes.export): Pass `exporter' to `_make_toc()'.
+	(TableOfNodes._make_toc): Accept the `exporter' as argument.  Use
+	exporter's `uri()' method instead of target `url' directly.
+	(VocabItem.__init__): New argument `media'.  Argument `parent'
+	removed.  Don't allocate the `Media' resource here.
+	(VocabList.__init__): Argument `parent' removed.  Don't allocate
+	the `Script' resource here.
+	(VocabSection.__init__): Argument `parent' removed.  Don't pass it
+	to `VocabList' constructor.
+	(LanguageSelection): Class removed.
+
+	* lib/lcg/eurochance.py (EurochanceNode): Derive from
+	`ContentNode' and `FileNodeMixin'.
+	(EurochanceNode._title): Method removed.
+	(EurochanceNode._create_content): New method.
+	(Unit._brief_title): -> `_brief_title_'.
+	(Unit._title, ExerciseHelp._title_, AnswerSheet._title_)
+	(EurochanceCourse._title_): -> `_title_'.
+	(IntermediateUnit._create_exercises): Don't pass `parent' to
+	`VocabSection'.
+	(VocabIndex._create_content): Don't pass `parent' to
+	`VocabIndexSection'.
+	(EurochanceCourse.version): Add a timestamp to the output..
+	(EurochanceExporter._BODY_PARTS): New constant.
+	(EurochanceExporter._version, EurochanceExporter._copyright): New methods.
+	(EurochanceExporter._body): Method removed.
+
+	* lib/lcg/nodes.py (ContentNode): Docstring updated.
+	(ContentNode._INHERITED_ARGS): New constant.
+	(ContentNode.__init__): New arguments `title', `brief_title',
+	`descr' and `content'.  Removed argument `input_encoding'.
+	(ContentNode._title, ContentNode._brief_title, ContentNode._descr)
+	(ContentNode._create_content): Methods removed.
+	(ContentNode._create_child): Use `_INHERITED_ARGS'.
+	(ContentNode._input_file, ContentNode._read_file)
+	(ContentNode.input_encoding, ContentNode.counter)
+	(ContentNode.url, ContentNode.output_file)
+	(ContentNode.parse_wiki_text, ContentNode.parse_wiki_file):
+	Methods removed.
+	(ContentNode.resources): Just return the result of the new
+	`resources()' function.
+	(WikiNodeMixin, FileNodeMixin): New classes.
+	(RootNode): Class removed.
+	(_WikiNode): Class removed.
+	(WikiNode): Derive from `ContentNode' and `WikiNodeMixin'.
+	(WikiNode._source_text, WikiNode._create_content)
+	(WikiNode._title): Methods removed.
+	(WikiNode._INHERITED_ARGS): New constant.
+	(WikiNode.__init__): Just pass the right arguments to the parent
+	constructor.
+	(DocNode): Derive from `ContentNode' and `FileNodeMixin'.
+	(DocNode.__init__): Just pass the right arguments to the parent
+	constructor.
+	(DocNode._source_text): Method removed.
+
+	* lib/lcg/_test.py (ContentNode.check_misc): Don't use the
+	`subdir' constructor argument.  Pass the `content' as constructor
+	argument.  Don't test file-related input methods.
+	(ContentNode.check_media): Temporarily commented out.
+
+	* lib/lcg/feed.py (VocabFeeder.feed): Allocate the `audio.js'
+	script from here.
+	(VocabFeeder.feed): Pass a counter to `self._process_pieces()'.
+	(VocabFeeder._item): Accept a counter as an argument.  Use it
+	to create the resource filename.  Allocate the `Media' resource
+	here and pass it to `VocabItem' constructor.
+
+	* lib/lcg/resources.py (_resources_by_parent): New variable.
+	(_resource): New function.
+	(resource): Use it.
+	(resources): New function.
+	(Resource.url): Renamed to `uri'.
+
+	* lib/lcg/export/_html.py (link): Argument `url' renamed to `uri'.
+	(speaking_text): `url' -> `uri'.
+
+	* lib/lcg/export/__init__.py: Don't resolve cyclic dependencies
+	here.
+
+	* lib/lcg/content/__init__.py: Don't resolve cyclic dependencies
+	here.
+
+	* lib/lcg/__init__.py: Resolve namespace dependencies of all files
+	here.  Import `_html' from `export'.
+
 2006-07-20  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/eurochance.py (EurochanceNode._localized_wiki_content)
