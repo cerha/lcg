@@ -76,13 +76,13 @@ def br(cls=None):
 def div(content, cls=None, lang=None):
     return _tag('div', (('class', cls), ('lang', lang)), content, concat='\n')
 
-def link(label, url, name=None, title=None, target=None, cls=None, hotkey=None):
+def link(label, uri, name=None, title=None, target=None, cls=None, hotkey=None):
     if hotkey:
         t = '(Alt-%s)' % hotkey
         title = title and title + ' ' + t or t
     if target:
         cls = (cls and cls+' ' or '') + 'external-link'
-    attr = (('href', url), ('name', name), ('title', title), ('target', target),
+    attr = (('href', uri), ('name', name), ('title', title), ('target', target),
             ('class', cls), ('accesskey', hotkey))
     return _tag('a', attr, label)
 
@@ -156,9 +156,9 @@ def select(name, options, onchange=None, selected=None, id=None):
 
 def speaking_text(text, media):
     id_ = 'text_%s' % id(media)
-    a1 = button(text, "play_audio('%s');" % media.url(),
+    a1 = button(text, "play_audio('%s');" % media.uri(),
                 cls='speaking-text')
-    a2 = link(text, media.url(), cls='speaking-text')
+    a2 = link(text, media.uri(), cls='speaking-text')
     return script_write(a1, a2)
 
 # JavaScript code generation.
