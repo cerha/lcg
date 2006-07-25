@@ -20,8 +20,4 @@ from export import *
 from html import *
 import ims
 import hhp
-from lcg import *
-
-for file in (export, html, ims, hhp):
-    file.__dict__.update(globals())
                                                                                                                                                       

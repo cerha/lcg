@@ -18,8 +18,3 @@
 
 from content import *
 from exercises import *
-
-# Resolve cyclic dependencies.
-for module in (content, exercises):
-    module.__dict__.update(globals())
-                                                                                                                                                      
