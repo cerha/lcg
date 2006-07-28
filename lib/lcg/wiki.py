@@ -269,6 +269,7 @@ class Parser(object):
             return ItemizedList.TYPE_NUMERIC
 
     def parse(self, text):
+        assert isinstance(text, (str, unicode)), text
         return self._parse_sections(re.sub("(?m)^#.*$", "", text))
 
 
@@ -318,7 +319,7 @@ class MacroParser(object):
             if self._substitution_provider is not None:
                 return self._substitution_provider(name)
             else:
-                log("Invalid substitution:" % name)
+                log("Invalid substitution:", name)
     
     def _substitute(self, text):
         return self._SUBSTITUTION_REGEX.sub(self._substitution, text)
