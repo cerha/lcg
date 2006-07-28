@@ -69,7 +69,7 @@ class Choice(object):
 
     """
     def __init__(self, answer, correct=False):
-        assert isinstance(answer, types.UnicodeType)
+        assert isinstance(answer, STRINGTYPES)
         assert isinstance(correct, types.BooleanType)
         self._answer = answer
         self._correct = correct
@@ -211,6 +211,7 @@ class MixedTextFillInTask(FillInTask):
         text = formatter(self._text.replace('[', '\['))
         return self._FIELD_MATCHER.sub(make_field, text)
 
+
     def plain_text(self):
         return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._text)
 
@@ -289,9 +290,9 @@ class Exercise(Section):
     _used_types = []
     _help_node = None
     
-    def __init__(self, parent, tasks, instructions=None, audio_version=None,
-                 sound_file=None, transcript=None, reading=None,
-                 explanation=None, example=None, template=None,
+    def __init__(self, parent, tasks, title=None, instructions=None,
+                 audio_version=None, sound_file=None, transcript=None,
+                 reading=None, explanation=None, example=None, template=None,
                  reading_instructions=None):
         """Initialize the instance.
 
@@ -301,6 +302,8 @@ class Exercise(Section):
             this content element is part of.
 
           tasks -- sequence of 'Task' instances related to this exercise.
+
+          title -- 
 
           instructions -- user supplied instructions.  This is a way how to
             include more specific instructions instead of default exercise
@@ -359,7 +362,8 @@ class Exercise(Section):
             '%' signs, which are not a part of a placeholder.
             
         """
-        title = _("Exercise %d") +": "+ self._NAME
+        assert title is None or isinstance(title, STRINGTYPES)
+        title = concat(_("Exercise %d"), ": ", title or self._NAME)
         super(Exercise, self).__init__(title, Content(), in_toc=False)
         self.set_parent(parent)
         if self.__class__ not in Exercise._used_types:
@@ -388,8 +392,10 @@ class Exercise(Section):
         self._reading = self._wiki_content(reading, allow_file=True,
                                            subdir='readings')
         if reading_instructions is None:
-            reading_instructions = self._READING_INSTRUCTIONS
-        self._reading_instructions = self._wiki_content(reading_instructions)
+            self._reading_instructions = self._READING_INSTRUCTIONS
+        else:
+            self._reading_instructions = \
+                                       self._wiki_content(reading_instructions)
         self._template = self._wiki_content(template, allow_file=True,
                                             subdir='templates')
         if sound_file is not None:
@@ -417,7 +423,7 @@ class Exercise(Section):
     def _wiki_content(self, text, allow_file=False, subdir=None, escape=False):
         if text is None:
             return None
-        assert isinstance(text, types.StringTypes)
+        assert isinstance(text, STRINGTYPES)
         if allow_file and len(text.splitlines()) == 1:
             name, ext = os.path.splitext(text)
             if subdir:
@@ -463,6 +469,10 @@ class Exercise(Section):
     
     # Instance methods
 
+    def _formatted_wiki_text(self, exporter, text):
+        return exporter.translate(exporter.format_wiki_text(self.parent(),
+                                                            text))
+
     def _check_tasks(self, tasks):
         return tasks
 
@@ -482,27 +492,26 @@ class Exercise(Section):
         button = _html.button(_("Play"), "play_audio('%s')" % media.uri(),
                               cls='sound-control')
         link = _html.link(_("Play"), media.uri())
-        return _html.script_write(button, '[' + link + ']')
+        return _html.script_write(button, concat('[', link, ']'))
                   
     def _sound_controls(self, label, media, transcript=None, cls=None):
+        content = [label,
+                   self._play_button(media),
+                   _html.script_write(_html.button(_("Stop"), 'stop_audio()'),
+                                      condition='document.media_player')]
         if transcript is not None:
-            t = _html.link(_("show transcript"), transcript.uri(),
-                           target="transcript") + "\n"
-        else:
-            t = ""
-        result = ('<form class="sound-control%s" action="#">%s\n' % \
-                  (cls and ' '+cls or '', label),
-                  self._play_button(media),
-                  _html.script_write(_html.button(_("Stop"), 'stop_audio()'),
-                                     condition='document.media_player'),
-                  t + '</form>')
-        return '\n'.join(result)
+            content.append(_html.link(_("show transcript"), transcript.uri(),
+                                      target="transcript"))
+        return _html.form(content,
+                          cls=("sound-control"+(cls and ' '+cls or '')))
 
     def export(self, exporter):
+        self._title = self._title.replace('%d', str(self.section_number()))
         header = _html.div((self._header(),
-                      _html.link(_("Exercise Help"),
-                                 exporter.uri(self._help_node),
-                                 target='help', cls='exercise-help-link')),
+                            _html.link(_("Exercise Help"),
+                                       exporter.uri(self._help_node),
+                                       target='help',
+                                       cls='exercise-help-link')),
                            cls='exercise-header')
         parts = [getattr(self, '_export_'+part)(exporter)
                  for part in self._EXPORT_ORDER or ('reading',
@@ -513,10 +522,11 @@ class Exercise(Section):
                                                     'example',
                                                     'tasks')]
         parts.append(_html.script(self._init_script()))
-        return "\n\n".join([x for x in [header]+parts if x is not None])
+        return concat([x for x in [header]+parts if x is not None],
+                      separator="\n\n")
 
     def _wrap_exported_tasks(self, tasks):
-        return "\n".join(tasks)
+        return concat(tasks, separator="\n")
     
     def _export_tasks(self, exporter):
         exported = [self._export_task(exporter, t) for t in self._tasks]
@@ -672,29 +682,31 @@ class _InteractiveExercise(Exercise):
                                     for key, values
                                     in self._responses.items()])),
                 _html.js_dict(self._MESSAGES))
-        return """
-        form = document.forms['%s'];
-        handler = new %s();
+        return concat("""
+        form = document.forms['""", self._form_name(), """'];
+        handler = new """, self._FORM_HANDLER, """();
         form.handler = handler;
-        handler.init(form, %s);
-        """ % (self._form_name(), self._FORM_HANDLER, ", ".join(args))
+        handler.init(form, """, concat(args, separator=", "), """);
+        """)
 
     def _results(self, exporter):
         field_id = lambda name: self._exercise_id() + '.' + name
-        displays = [' '.join((_html.label(label, id=field_id(name)),
-                              _html.field(name=name, size=50, readonly=True,
-                                          id=field_id(name))))
+        displays = [concat(_html.label(label, id=field_id(name)),
+                           _html.field(name=name, size=50, readonly=True,
+                                       id=field_id(name)),
+                           separator="\n")
                     for name, label in self._INDICATORS]
         buttons = [f(label, handler) for f, label, handler in
                    ((_html.button,_("Evaluate"),"this.form.handler.evaluate()"),
                     (_html.button,_('Fill'),    "this.form.handler.fill()"),
                     (_html.reset, _('Reset'),   "this.form.handler.reset()"))]
-        panel = _html.div((_html.div('<br/>'.join(displays), 'display'),
+        panel = _html.div((_html.div(concat(displays, separator='<br/>'),
+                                     'display'),
                            _html.div(buttons, 'buttons')), 'results')
-        l = _html.p(_("See the %s to check your results.") %
-                    _html.link(_("answer sheet"),
-                               self._answer_sheet_uri(exporter),
-                               target='help'))
+        l = _html.p(_("See the %s to check your results.", 
+                      _html.link(_("answer sheet"),
+                                 self._answer_sheet_uri(exporter),
+                                 target='help')))
         return _html.script_write(panel, l)
 
     def _answer_sheet_items(self):
@@ -716,7 +728,7 @@ class _InteractiveExercise(Exercise):
                          title=_("Show the answer sheet."),
                          target='help', cls='answer-sheet-link')
         b1, b2 = [_html.span(b, cls='hidden') for b in ('[', ']')]
-        return b1 + lnk + b2
+        return concat(b1, lnk, b2)
         
     def answer_sheet(self, parent):
         self._answer_sheet_node = parent
@@ -763,7 +775,7 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         ctrl = _html.radio(task_name , id=choice_id,
                            onclick="this.form.handler.eval_answer(this)", 
                            value=i, cls='answer-control')
-        return ctrl +' '+ _html.label(choice.answer(), choice_id)
+        return concat(ctrl, ' ', _html.label(choice.answer(), choice_id))
 
     def _choice_label(self, task, choice):
         return chr(ord('a') + task.choice_index(choice)) + '.&nbsp;'
@@ -771,7 +783,7 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
     def _format_choice(self, task, choice):
         ctrl = _html.script_write(self._js_choice_control(task, choice),
                                   self._non_js_choice_control(task, choice))
-        return self._choice_label(task, choice) + ctrl + '<br/>'
+        return concat(self._choice_label(task, choice), ctrl, '<br/>')
 
     def _format_choices(self, task):
         formatted = [self._format_choice(task, ch) for ch in task.choices()]
@@ -782,7 +794,7 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         return cls + ' choice-based-task'
     
     def _export_task_parts(self, exporter, task):
-        prompt = exporter.format_wiki_text(self.parent(), task.prompt())
+        prompt = self._formatted_wiki_text(exporter, task.prompt())
         return (prompt, self._format_choices(task))
 
     
@@ -835,7 +847,7 @@ class GapFilling(_ChoiceBasedExercise):
 
 
     def _export_task_parts(self, exporter, task):
-        prompt = exporter.format_wiki_text(self.parent(),
+        prompt = self._formatted_wiki_text(exporter,
                                            task.substitute_gap("\____"))
         #return prompt.replace('%s', self._format_choices(task)) +'\n'
         return (prompt, self._format_choices(task))
@@ -869,27 +881,27 @@ class _FillInExercise(_InteractiveExercise):
         return [('; '.join(t.answer().split('|')), t.comment())
                 for t in self._tasks if t.answer() is not None]
     
-    def _make_field(self, task, text):
+    def _make_field(self, exporter, task, text):
         name = self._task_name(task)
         field = _html.field(cls='fill-in-task', name=name, id=name,
                             size=max(4, len(text)+1))
         controls = [self._play_button(m) for m in task.media()]
-        field += ''.join(controls)
-        return field
+        return exporter.translate(concat(field, *controls))
     
     def _export_task_parts(self, exporter, task):
-        prompt = exporter.format_wiki_text(self.parent(), task.prompt())
+        prompt = self._formatted_wiki_text(exporter, task.prompt())
         if isinstance(task, MixedTextFillInTask):
-            formatter = lambda t: exporter.format_wiki_text(self.parent(), t)
-            text = task.text(self._make_field, formatter)
+            formatter = lambda t: self._formatted_wiki_text(exporter, t)
+            make_field = lambda task, text: self._make_field(exporter, task, text)
+            text = task.text(make_field, formatter)
         else:
-            text = self._make_field(task, task.answer())
+            text = self._make_field(exporter, task, task.answer())
         if not (isinstance(task, MixedTextFillInTask) and task.is_mixed()):
             # When the inputfield is emeded within the text, it is confusing to
             # have the prompt marked as a label.  Morover some screeen-readers
             # (JAWs) are confused too and present the task incorrectly.
             prompt = _html.label(prompt, self._task_name(task))
-        return self._TASK_FORMAT % (prompt, text)
+        return format(self._TASK_FORMAT, prompt, text)
                                
         
     
@@ -983,8 +995,10 @@ class Dictation(_FillInExercise):
     def _init_script(self):
         init_script = super(Dictation, self)._init_script()
         if self._pieces:
-            init_script += "handler.init_recordings(%s);" % \
-                           _html.js_array([m.uri() for m in self._pieces])
+            files = [m.uri() for m in self._pieces]
+            init_script = concat(init_script,
+                                 format("handler.init_recordings(%s);\n",
+                                        _html.js_array(files)))
         return init_script
     
 
@@ -1005,8 +1019,9 @@ class _Cloze(_FillInExercise):
             return self._INSTRUCTIONS
 
     def _export_task_parts(self, exporter, task):
-        formatter = lambda t: exporter.format_wiki_text(self.parent(), t)
-        return task.text(self._make_field, formatter)
+        formatter = lambda t: self._formatted_wiki_text(exporter, t)
+        make_field = lambda task, text: self._make_field(exporter, task, text)
+        return task.text(make_field, formatter)
 
 
 class _ExposedCloze(_Cloze):
@@ -1056,11 +1071,12 @@ class Cloze(_Cloze):
         name = self._exercise_id() + '-f%d' % n
         field = _html.field(name=name,
                             size=max(4, len(text)+1), cls='fill-in-task')
-        return field + self._answer_sheet_link(exporter, n-1)
+        result = concat(field, self._answer_sheet_link(exporter, n-1))
+        return exporter.translate(result)
 
     def _export_task_parts(self, exporter, task):
         # The formatter here actually works as a parser and formatter.
-        formatter = lambda t: self._wiki_content(t).export(exporter)
+        formatter = lambda t: exporter.translate(self._wiki_content(t).export(exporter))
         make_field = lambda task, text: self._make_field(exporter, task, text)
         return task.text(make_field, formatter)
     
