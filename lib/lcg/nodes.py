@@ -323,16 +323,14 @@ class WikiNodeMixin(object):
     def __init__(self):
         self._parser = Parser()
 
-    def parse_wiki_text(self, text, macro=False, globals=None):
+    def parse_wiki_text(self, text, macro=False, globals=None, subst=None):
         """Parse the text and return a sequence of content elements.
 
         This method is deprecated and should not be used.
 
         """
         if macro:
-            def mygettext(x):
-                return _(re.sub('\s*\n', ' ', x))
-            mp = MacroParser(substitution_provider=mygettext)
+            mp = MacroParser(substitution_provider=subst)
             if globals:
                 mp.add_globals(**globals)
             text = mp.parse(text)
@@ -401,14 +399,14 @@ class FileNodeMixin(WikiNodeMixin):
         return self._input_encoding
         
     def parse_wiki_file(self, name, ext='txt', lang=None, macro=False,
-                        globals=None):
+                        globals=None, subst=None):
         """Parse the file and return a sequence of content elements.
 
         This method is deprecated and should not be used.
 
         """
         return self.parse_wiki_text(self._read_file(name, ext=ext, lang=lang),
-                                    macro=macro, globals=globals)
+                                    macro=macro, globals=globals, subst=subst)
         
     def subdir(self):
         """Return this node's subdirectory name relative to the root node.
