@@ -28,38 +28,43 @@ We need something very simple and quite specific, so it is not worth using
 """
 
 import types
-from lcg.util import *
+from lcg import *
 
 def _attr(*pairs):
     attributes = []
     for attr, value in pairs:
         if value is None:
             continue
-        if isinstance(value, types.BooleanType):
+        elif isinstance(value, types.BooleanType):
             if not value:
                 continue
             string = attr
         else:
-            string = '%s="%s"' % (attr, value)
-        attributes.append(' ' + string)
-    return "".join(attributes)
+            if isinstance(value, int):
+                value = str(value)
+            string = concat(attr+'="', value, '"')
+        attributes.append(concat(' ', string))
+    return concat(*attributes)
 
-def _tag(tag, attr, content, concat=''):
-    start = '<%s%s>' % (tag, _attr(*attr))
+def _tag(tag, attr, content, newlines=False):
+    start = concat('<'+tag, _attr(*attr), '>')
     end = '</%s>' % tag
     if isinstance(content, (types.ListType, types.TupleType)):
         result = (start,) + tuple(content) + (end,)
     else:
         result = (start, content, end)
-    return concat.join(result)
+    return concat(result, separator=(newlines and "\n" or ""))
 
 # Some basic ones...
 
 def h(title, level=2):
-    return '<h%d>%s</h%d>' % (level, title, level)
+    return concat('<h%d>' % level, title, '</h%d>' % level)
     
 def strong(text):
-    return '<strong>%s</strong>' % text
+    return concat('<strong>', text, '</strong>')
+
+def pre(text, cls=None):
+    return _tag('pre', (('class', cls),), text)
 
 def span(text, cls=None, id=None, lang=None):
     attr = (('class', cls),
@@ -68,13 +73,16 @@ def span(text, cls=None, id=None, lang=None):
     return _tag('span', attr, text)
 
 def p(*content, **kwargs):
-    return _tag('p', (('class', kwargs.get('cls')),), content, concat='\n')
+    return _tag('p', (('class', kwargs.get('cls')),), content, newlines=True)
 
 def br(cls=None):
-    return '<br%s/>' % _attr(('class', cls),)
+    return concat('<br', _attr(('class', cls),), '/>')
+
+def hr(cls=None):
+    return concat('<hr', _attr(('class', cls),), '/>')
 
 def div(content, cls=None, lang=None):
-    return _tag('div', (('class', cls), ('lang', lang)), content, concat='\n')
+    return _tag('div', (('class', cls), ('lang', lang)), content, newlines=True)
 
 def link(label, uri, name=None, title=None, target=None, cls=None, hotkey=None):
     if hotkey:
@@ -92,19 +100,19 @@ def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
                  ('lang', lang),
                  ('class', cls))
     spaces = ' ' * indent
-    items = [spaces+"  <li>%s</li>" % i for i in items]
-    return "\n".join([spaces+"<"+tag+attr+">"] + items + [spaces+"</"+tag+">"])
+    items = [concat(spaces+"  <li>", i, "</li>") for i in items]
+    return concat(spaces+"<"+tag, attr, ">", items, spaces+"</"+tag+">")
 
 # Form controls
 
 def form(content, name=None, cls=None, action="#"):
     attr = (('name', name), ('action', action), ('class', cls))
-    return _tag('form', attr, content, concat="\n")
+    return _tag('form', attr, content, newlines=True)
 
 def fieldset(content, legend=None, cls=None):
     if legend:
         content = (_tag('legend', (), legend),) + tuple(content)
-    return _tag('fieldset', (('class', cls),), content, concat="\n")
+    return _tag('fieldset', (('class', cls),), content, newlines=True)
 
 def label(text, id, lang=None, cls=None):
     return _tag('label', (('for', id), ('lang', lang), ('class', cls)), text)
@@ -114,15 +122,16 @@ def _input(type, name=None, value=None, title=None, id=None,
     assert isinstance(checked, types.BooleanType)
     assert isinstance(readonly, types.BooleanType)
     assert not checked or type in ('radio', 'checkbox')
-    return '<input type="%s"%s />' % (type, _attr(('name', name),
-                                                    ('value', value),
-                                                    ('title', title),
-                                                    ('id', id),
-                                                    ('size', size),
-                                                    ('onclick', onclick),
-                                                    ('class', cls),
-                                                    ('checked', checked),
-                                                    ('readonly', readonly)))
+    attr = _attr(('name', name),
+                 ('value', value),
+                 ('title', title),
+                 ('id', id),
+                 ('size', size),
+                 ('onclick', onclick),
+                 ('class', cls),
+                 ('checked', checked),
+                 ('readonly', readonly))
+    return concat('<input type="%s"' % type, attr, ' />')
 
 def field(text='', name='', size=20, **kwargs):
     kwargs['cls'] = kwargs.has_key('cls') and 'text '+kwargs['cls'] or 'text'
@@ -150,7 +159,7 @@ def select(name, options, onchange=None, selected=None, id=None):
                  text)
             for text, value in options]
     attr = (('name', name), ('id', id), ('onchange', onchange))
-    return _tag('select', attr, opts, concat="\n")
+    return _tag('select', attr, opts, newlines=True)
 
 # Special controls
 
@@ -164,11 +173,12 @@ def speaking_text(text, media):
 # JavaScript code generation.
 
 def script(code, noscript=None):
-    noscript = noscript and '<noscript>'+ noscript +'</noscript>' or ''
+    noscript = noscript and \
+               concat('<noscript>', noscript, '</noscript>') or ''
     if code:
-        code = '<!--\n'+ code +' //-->\n'
-    return '<script type="text/javascript" language="Javascript">' + \
-           code +'</script>'+ noscript
+        code = concat('<!--\n', code, ' //-->\n')
+    return concat('<script type="text/javascript" language="Javascript">',
+                        code, '</script>', noscript)
 
 def script_write(content, noscript=None, condition=None):
     #return content
@@ -176,14 +186,16 @@ def script_write(content, noscript=None, condition=None):
     if content:
         c = content.replace('"','\\"').replace("'","\\'")
         c = c.replace('</', '<\\/').replace('\n','\\n')
-        content = 'document.write("'+ c +'");'
+        content = concat('document.write("', c, '");')
         if condition:
-            content = 'if ('+condition+') ' + content
+            content = concat('if (', condition, ') ', content)
     return script(content, noscript)
 
 def js_value(var):
     if isinstance(var, types.StringTypes):
-        return "'%s'" % var.replace("'", "\\'")
+        return "'" + var.replace("'", "\\'") + "'"
+    elif isinstance(var, (TranslatableText, Concatenation)):
+        return concat("'", var.replace("'", "\\'"), "'")
     elif isinstance(var, types.IntType):
         return str(var)
     elif isinstance(var, (types.ListType, types.TupleType)):
@@ -193,12 +205,14 @@ def js_value(var):
     
 def js_array(items):
     assert isinstance(items, (types.ListType, types.TupleType))
-    return '[' + ", ".join([js_value(i) for i in items]) + ']'
+    values = [js_value(i) for i in items]
+    return concat('[', concat(values, separator=", "), ']')
 
 def js_dict(items):
     assert isinstance(items, (types.ListType, types.TupleType, types.DictType))
     if isinstance(items, types.DictType):
         items = items.items()
     assert is_sequence_of(dict(items).keys(), types.StringType)
-    return '{'+ ", ".join(["'%s': %s" % (k, js_value(v)) for k,v in items]) +'}'
+    pairs = [concat("'%s': " % k, js_value(v)) for k,v in items]
+    return concat('{', concat(pairs, separator=", "), '}')
 
