@@ -118,11 +118,12 @@ class HorizontalSeparator(Content):
     
     def export(self, exporter):
         """Return the HTML formatted content as a string."""
-        return '<hr/>'
+        return _html.hr()
         
 
 class TextContent(Content):
     """A simple piece of text."""
+    _TEXT_TYPE = STRINGTYPES
 
     def __init__(self, text, **kwargs):
         """Initialize the instance.
@@ -133,15 +134,15 @@ class TextContent(Content):
           kwargs -- keyword arguemnts for parent class constructor.
 
         """
-        assert isinstance(text, types.StringTypes), type(text)
+        assert isinstance(text, self._TEXT_TYPE), text
         super(TextContent, self).__init__(**kwargs)
         self._text = text
 
     def __str__(self):
-        text = self._text.strip()
+        text = str(self._text).strip()
         sample = text and text.splitlines()[0] or ''
-        if len(sample) > 10:
-            sample = sample[:10]
+        if len(sample) > 20:
+            sample = sample[:20]
         if len(sample) < len(text):
             sample += '...'
         cls = self.__class__.__name__
@@ -157,6 +158,7 @@ class WikiText(TextContent):
     See 'MarkupFormatter' for more information about the formatting rules.
     
     """
+    _TEXT_TYPE = (str, unicode)
         
     def export(self, exporter):
         return exporter.format_wiki_text(self.parent(), self._text)
@@ -164,11 +166,12 @@ class WikiText(TextContent):
     
 class PreformattedText(TextContent):
     """Preformatted text."""
+    _TEXT_TYPE = (str, unicode)
 
     def export(self, exporter):
         from xml.sax import saxutils
         text = saxutils.escape(self._text)
-        return '<pre class="lcg-preformatted-text">'+text+'</pre>'
+        return _html.pre(text, cls="lcg-preformatted-text")
 
     
 class Link(TextContent):
@@ -201,7 +204,7 @@ class Link(TextContent):
             # used as an HTML attribute value).  But section titles should
             # probably rather not be allowed to contain html.
             section_title = self._HTML_TAG.sub('', target.title())
-            descr = "%s (%s)" % (section_title, target.parent().title())
+            descr = concat(section_title, " (", target.parent().title(), ")")
         else:
             descr = None
         return descr
@@ -301,7 +304,7 @@ class Container(Content):
             tag = 'div'
         if tag:
             exported = ['<%s>' % (tag+attr)] + exported + ['</%s>' % tag]
-        result = self._CONTENT_SEPARATOR.join(exported)
+        result = concat(exported, separator=self._CONTENT_SEPARATOR)
         if not self._EXPORT_INLINE:
             result += "\n"
         return result
@@ -491,7 +494,7 @@ class Section(SectionContainer):
             to be included in the Table of Contents.
             
         """
-        assert isinstance(title, types.StringTypes), title
+        assert isinstance(title, STRINGTYPES), title
         assert isinstance(anchor, types.StringTypes) or anchor is None, anchor
         assert isinstance(in_toc, types.BooleanType), in_toc
         self._title = title
@@ -510,10 +513,7 @@ class Section(SectionContainer):
     
     def title(self):
         """Return the section title as a string."""
-        title = self._title
-        if self._container is not None and title.find("%d") != -1:
-            title = title % self.section_number()
-        return title
+        return self._title
 
     def in_toc(self):
         """Return True if the section is supposed to appear in TOC."""
@@ -546,11 +546,11 @@ class Section(SectionContainer):
             href = None
         return _html.h(_html.link(self.title(), href, cls='backref',
                                   name=self.anchor()),
-                 len(self._section_path()) + 1)+'\n'
+                       len(self._section_path()) + 1)+'\n'
 
     def export(self, exporter):
-        return "\n".join((self._header(),
-                          super(Section, self).export(exporter)))
+        return concat(self._header(), super(Section, self).export(exporter),
+                      separator="\n")
 
 
 class TableOfNodes(Content):
@@ -569,7 +569,7 @@ class TableOfNodes(Content):
 
         """
         super(TableOfNodes, self).__init__()
-        assert title is None or isinstance(title, types.StringTypes)
+        assert title is None or isinstance(title, STRINGTYPES)
         assert isinstance(depth, types.IntType)
         assert isinstance(detailed, types.BooleanType)
         self._title = title
@@ -611,7 +611,8 @@ class TableOfNodes(Content):
             links.append(_html.link(i.title(), uri, name=name) + \
                          self._make_toc(exporter, i, indent=indent+4,
                                         depth=depth-1))
-        return "\n" + _html.list(links, indent=indent) + "\n" + ' '*(indent-2)
+        return concat("\n", _html.list(links, indent=indent), "\n",
+                      ' '*(indent-2))
 
     
 class TableOfContents(TableOfNodes):
@@ -727,15 +728,15 @@ class VocabList(Content):
                  for i in self._items]
         if self._reverse:
             pairs = [(b, a) for a,b in pairs]
-        t = ['<table class="vocab-list" title="%s" summary="%s">' % \
-             (_("Vocabulary Listing"),
-              _("The vocabulary is presented in a two-column table with a "
-                "term on the left and its translation on the right in each "
-                "row."))] + \
-            ['<tr><td scope="row">%s</td><td>%s</td></tr>' % pair
+        t = [format('<table class="vocab-list" title="%s" summary="%s">',
+                    _("Vocabulary Listing"),
+                    _("The vocabulary is presented in a two-column table "
+                      "with a term on the left and its translation on the "
+                      "right in each row."))] + \
+            [format('<tr><td scope="row">%s</td><td>%s</td></tr>', *pair)
              for pair in pairs] + \
-            ["</table>"]
-        return '\n'.join(t) + '\n'
+            ["</table>\n"]
+        return concat(t, separator='\n')
 
     
 class VocabSection(Section):
@@ -755,7 +756,7 @@ class VocabSection(Section):
           reverse -- see the same constructor argument for `VocabList'.
 
         """
-        assert isinstance(title, types.StringTypes)
+        assert isinstance(title, STRINGTYPES)
         assert is_sequence_of(items, VocabItem)
         assert isinstance(reverse, types.BooleanType)
         subsections = [(t, i) for t, i in self._subsections(items) if i]
