@@ -45,8 +45,66 @@ class ContentNode(unittest.TestCase):
         #m2 = a.resource(lcg.Media, 'sound2.ogg')
         #r = a.resources(lcg.Media)
         #assert len(r) == 2 and m1 in r and m2 in r, r
-        
+
 tests.add(ContentNode)
+
+class TranslatableText(unittest.TestCase):
+          
+    def check_it(self):
+        a = _("Version %s", "1.0")
+        b = "xxx"
+        c = a + b
+        assert isinstance(c, lcg.Concatenation), c
+        d = c + b
+        assert isinstance(d, lcg.Concatenation), d
+        try:
+            e = a + 1
+        except TypeError, e:
+            pass
+        assert isinstance(e, TypeError), e
+            
+    def check_concat(self):
+        a = lcg.concat(_("Version %s", "1.0") + 'xx', 'yy', separator="\n")
+        assert isinstance(a, lcg.Concatenation), a
+        items = a.items()
+        assert len(items) == 2, items
+        assert items[1] == ('xx\nyy'), items[1]
+        b = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
+        assert isinstance(b, lcg.Concatenation), b
+        items = b.items()
+        assert len(items) == 1, items
+        assert items[0] == ('a-b-c-d-e-f'), items[0]
+        
+    def check_replace(self):
+        a = _("Version %s", "xox") + '-yoy'
+        b = a.replace('o', '-')
+        c = b.replace('V', 'v')
+        assert isinstance(a, lcg.Concatenation), a
+        assert isinstance(b, lcg.Concatenation), b
+        assert isinstance(c, lcg.Concatenation), c
+        e = lcg.HtmlExporter(lang='en')
+        ax = e.translate(a)
+        bx = e.translate(b)
+        cx = e.translate(c)
+        assert ax == 'Version xox-yoy', ax
+        assert bx == 'Versi-n x-x-y-y', bx
+        assert cx == 'versi-n x-x-y-y', cx
+        
+    
+tests.add(TranslatableText)
+
+class HtmlExporter(unittest.TestCase):
+        
+    def check_translations(self):
+        #a = lcg.ContentNode(None, 'a', content=lcg.TextContent(_("A")))
+        e = lcg.HtmlExporter(lang='en')
+        a = e.translate(_("Version %s"))
+        assert a == 'Version %s', a
+        e = lcg.HtmlExporter(lang='cs')
+        b = e.translate(_("Version %s", "1.0"))
+        assert b == 'Verze 1.0', b
+
+tests.add(HtmlExporter)
 
 
 class Parser(unittest.TestCase):
