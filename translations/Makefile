@@ -1,5 +1,5 @@
 MO_FILES = $(patsubst %.po,%/LC_MESSAGES/lcg.mo,$(shell ls *.po))
-LCG_SOURCE_FILES = $(shell ls ../lib/lcg/*.py)
+LCG_SOURCE_FILES = $(shell find ../lib/lcg/ -name "*.py")
 
 .PHONY: all
 
