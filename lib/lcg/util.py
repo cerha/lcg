@@ -164,9 +164,8 @@ def positive_id(obj):
     return result
 
 
-
 def log(message, *args):
-    """Log a processing information to STDERR.
+    """Log a processing information.
 
     Arguments:
 
@@ -176,6 +175,8 @@ def log(message, *args):
       *args -- message arguments.  When formatting the message with these
         arguments doesn't succeed, the arguemnts are simply appended to the end
         of the message.
+
+    The logging is currently only written to STDERR.
 
     """
     if not isinstance(message, types.StringTypes):
@@ -191,6 +192,20 @@ def log(message, *args):
     if not message.endswith("\n"):
         message += "\n"
     sys.stderr.write("  "+message.encode('iso-8859-2'))
+
+def caller():
+    """Return the frame stack caller information formatted as a string.
+
+    Allows logging the frame stack information with simillar formatting as the
+    Python traceback.
+
+    For debugging purposes only. 
+
+    """
+    import inspect
+    frame = inspect.stack()[2]
+    code = frame[5] and ':\n    %s' % frame[5] or ''
+    return 'File "%s", line %d, in %s' % frame[1:4] + code
 
     
 _LANGUAGE_NAMES = {
@@ -252,3 +267,5 @@ def language_name(code):
     
     """
     return _LANGUAGE_NAMES[code]
+
+        
