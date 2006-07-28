@@ -17,9 +17,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""A generator for the Eurochance courses."""
+"""Eurochance language course generator."""
 
-import os
+import os, lcg
 from lcgmake import getoptions, usage
 
 OPTIONS = (
@@ -38,11 +38,6 @@ def main():
     source_dir, destination_dir = args
 
     lang = opt['lang']
-    if '-' in lang:
-        os.environ['LCG_LANGUAGE'] = lang[:2]
-    else:
-        os.environ['LCG_LANGUAGE'] = lang        
-    import lcg
     
     from lcg.eurochance import EurochanceCourse, EurochanceExporter
     c = EurochanceCourse(source_dir, language=lang, input_encoding='utf-8')
@@ -51,8 +46,9 @@ def main():
         exporter = lcg.ims.IMSExporter
     else:
         exporter = EurochanceExporter
-        
-    e = exporter(stylesheet=opt['stylesheet'])
+
+    e = exporter(lang=('-' in lang and lang[:2] or lang),
+                 stylesheet=opt['stylesheet'])
     e.export(c, destination_dir)
 
     

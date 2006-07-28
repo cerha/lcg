@@ -20,7 +20,7 @@
 """Simple and `quite' generic LCG generator."""
 
 import os
-import sys, getopt, os
+import sys, getopt, os, lcg
 
 OPTIONS = (
     ('language=', 'en', "The content language."),
@@ -37,20 +37,17 @@ def main():
     if opt is None or len(args) != 2:
         usage(OPTIONS)
     source_dir, destination_dir = args
-
-    os.environ['LCG_LANGUAGE'] = opt['language']
-    import lcg
     
     doc = lcg.DocRoot(source_dir, id=opt['root'], ext=opt['ext'],
                       language=opt['language'],
                       secondary_language=opt['secondary-language'],
                       input_encoding=opt['encoding'])
-    
     if opt['hhp']:
         from lcg import hhp
-        e = hhp.HhpExporter(stylesheet=opt['stylesheet'])
+        exporter = hhp.HhpExporter
     else:
-        e = lcg.HtmlStaticExporter(stylesheet=opt['stylesheet'])
+        exporter = lcg.HtmlStaticExporter
+    e = exporter(lang=opt['language'], stylesheet=opt['stylesheet'])
     e.export(doc, destination_dir)
 
 
