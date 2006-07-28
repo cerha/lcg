@@ -392,7 +392,7 @@ class Exercise(Section):
         self._reading = self._wiki_content(reading, allow_file=True,
                                            subdir='readings')
         if reading_instructions is None:
-            self._reading_instructions = self._READING_INSTRUCTIONS
+            self._reading_instructions = TextContent(self._READING_INSTRUCTIONS)
         else:
             self._reading_instructions = \
                                        self._wiki_content(reading_instructions)
@@ -529,9 +529,11 @@ class Exercise(Section):
         return concat(tasks, separator="\n")
     
     def _export_tasks(self, exporter):
-        exported = [self._export_task(exporter, t) for t in self._tasks]
+        exported = [exporter.translate(self._export_task(exporter, t))
+                    for t in self._tasks]
         if self._template:
-            exported = self._template.export(exporter) % tuple(exported)
+            template = exporter.translate(self._template.export(exporter))
+            exported = template % tuple(exported)
         else:
             exported = self._wrap_exported_tasks(exported)
         if exported:
@@ -557,7 +559,8 @@ class Exercise(Section):
     
     def _export_reading(self, exporter):
         if self._reading is not None:
-            return _html.div(self._reading_instructions.export(exporter), cls="label")+\
+            instructions = self._reading_instructions.export(exporter)
+            return _html.div(instructions, cls="label") + \
                    _html.div(self._reading.export(exporter), cls="reading")
         else:
             return None
