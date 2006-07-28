@@ -18,33 +18,32 @@
 
 """Course exporter."""
 
-import os
-
 from lcg import *
 
 class Exporter(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, lang=None):
+        import config, gettext
+        if lang and lang != 'en':
+            try:
+                t = gettext.translation('lcg', config.translation_dir, (lang,))
+            except IOError, e:
+                raise IOError(str(e)+", directory: '%s'" % \
+                              config.translation_dir)
+        else:
+            t = gettext.NullTranslations()
+        self._translation = t
+        
+    def translate(self, text):
+        if isinstance(text, (Concatenation, TranslatableText)):
+            return text.translate(self._translation.ugettext)
+        else:
+            return text
     
     def export(self, node):
         """Export the node and its children recursively."""
-    
-class FileExporter(object):
 
-    def export(self, node, directory):
-        if not os.path.isdir(directory):
-            os.makedirs(directory)
-        filename = os.path.join(directory, self._output_file(node))
-        file = open(filename, 'w')
-        file.write(self._page(node).encode('utf-8'))
-        file.close()
-        for r in node.resources():
-            r.export(directory)
-        for n in node.children():
-            self.export(n, directory)
-
-
+        
 class MarkupFormatter(object):
     """Simple inline ascii markup formatter.
 
@@ -125,7 +124,7 @@ class MarkupFormatter(object):
             # This can be end markup, which was not opened or start markup,
             # which was already opened.
             result = markup
-        return prefix + result
+        return prefix + self._exporter.translate(result)
 
     def _formatter(self, parent, type, groups, close=False):
         try:
