@@ -29,6 +29,7 @@ import shutil
 import codecs
 import glob
 import textwrap
+import config
 
 from lcg import *
 
