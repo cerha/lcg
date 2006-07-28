@@ -1,3 +1,150 @@
+2006-07-28  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/cs.po: Updated.
+
+	* translations/de.po: Updated.
+
+	* translations/es.po: Updated.
+
+	* translations/no.po: Updated.
+
+	* translations/sk.po: Updated.
+
+	* translations/Makefile (LCG_SOURCE_FILES): Use find to locate the
+	files recursively.
+
+	* Makefile: New file.
+
+	* bin/generate.py (main): Instead of setting `LCG_LANGUAGE' before
+	importing lcg, pass the `lang' argument to the exporter.
+
+	* bin/lcgmake.py (main): Instead of setting `LCG_LANGUAGE' before
+	importing lcg, pass the `lang' argument to the exporter.
+
+	* lib/lcg/eurochance.py (EurochanceNode): Added
+	`language_variants' to `_INHERITED_ARGS'.
+	(EurochanceNode.__init__): Initialize the `gettext' instance.
+	(EurochanceNode._localized_wiki_content)
+	(ExerciseHelp._create_content): Pass `self._gettext' a
+	substitution provider for the macro formatter..
+	(Unit._title_): Use `concat' for string concatenation.
+	(Unit._exercise_sections, ExerciseHelp._title_)
+	(AnswerSheet._title_, EurochanceCourse._create_children)
+	(EurochanceExporter._version): Pass format variables to `_()' to
+	allow delayed translation.
+	(IntermediateUnit._exercise_sections): Enumerate the sections and
+	supply the number within the section title.
+
+	* lib/lcg/content/exercises.py (Exercise.__init__): New argument
+	`title'.  Don't format the default reading instructions.
+	(Exercise.export): Replace the `%d' in title by the exercise
+	number within the section.
+	(Exercise._wiki_content): Assert to `STRINGTYPES' instead of
+	`types.StringTypes'.
+	(Exercise._formatted_wiki_text): New method.
+	(_ChoiceBasedExercise._export_task_parts)
+	(GapFilling._export_task_parts)
+	(_FillInExercise._export_task_parts)
+	(_FillInExercise._export_task_parts, _Cloze._export_task_parts):
+	Use it.
+	(Exercise._play_button, Exercise.export)
+	(Exercise._wrap_exported_tasks)
+	(_InteractiveExercise._init_script)
+	(_InteractiveExercise._results)
+	(_InteractiveExercise._answer_sheet_link)
+	(_ChoiceBasedExercise._js_choice_control)
+	(_ChoiceBasedExercise._format_choice)
+	(_FillInExercise._make_field): Use `concat' for string operations.
+	(Exercise._sound_controls): Use `_html.form'.
+	(_FillInExercise._make_field): New argument `exporter'.  Translate
+	the result.
+	(_Cloze._export_task_parts)
+	(_FillInExercise._export_task_parts): Pass `exporter' to
+	`_make_field'.
+	(_FillInExercise._export_task_parts): Use 'format' for formatting
+	the task.
+	(Cloze._make_field): Translate the result.
+	(Cloze._export_task_parts): Translate the `formatter' result.
+	(Exercise._export_tasks): Translate the exported tasks and the
+	template before putting them together.
+	(Exercise.__init__): Make `TextContent' out of the default reading
+	instructions.
+	(Exercise._export_reading): Cosmetic change.
+
+	* lib/lcg/export/html.py (HtmlExporter.__init__): Pass along the
+	parent class constructor arguents as kwargs.
+	(HtmlExporter._head, HtmlExporter._body, HtmlExporter._heading)
+	(HtmlExporter._language_selection, HtmlStaticExporter._head)
+	(HtmlStaticExporter._navigation, HtmlStaticExporter._navigation):
+	Use `concat' for string operations.
+	(HtmlExporter.page): Translate the result.
+	(HtmlStaticExporter): Don't derive from `FileExporter'.
+	(HtmlStaticExporter._navigation.link): Make difference between
+	None and an empty string for the `label' argument.
+
+	* lib/lcg/export/export.py (Exporter.__init__): New argument
+	`lang'.  Initialize the translations instance.
+	(FileExporter.export): Class removed.
+	(MarkupFormatter._markup_handler): Translate the `_formatter' output.
+
+	* lib/lcg/export/_html.py: Import everything from `lcg'.
+	(_attr): Convert integets to string explicitely.  Use `concat'
+	instead of string formatting and joining.
+	(_tag): Use `concat' instead of string formatting and joining.
+	Argument concat replaced by a boolean flag `newlines'.
+	(h): Use `concat' instead of string formatting.
+	(strong): Use `concat' instead of string formatting.
+	(pre): New function.
+	(p, div, form, fieldset, select): 'concat' -> `newlines'.
+	(br): Use `concat' instead of string formatting.
+	(hr): New function.
+	(list): Use `concat' instead of string addition and joining..
+	(_input): Use `concat' instead of string formatting.
+	(script): Use `concat' instead of string addition.
+	(script_write): Use `concat' instead of string addition.
+	(js_value): Use a special rule for `TranslatableText' and
+	`Concatenation' instances.
+	(js_array): Use `concat' instead of string addition.
+	(js_dict): Use `concat' instead of string addition.
+
+	* lib/lcg/content/content.py (HorizontalSeparator.export): Use
+	`_html.hr'.
+	(TextContent._TEXT_TYPE, WikiText._TEXT_TYPE)
+	(PreformattedText._TEXT_TYPE): New constants.
+	(TextContent.__init__): Use _TEXT_TYPE for the assertion.
+	(TextContent.__str__): Convert text to str first.
+	(PreformattedText.export): Use `_html.pre'.
+	(Link._descr): Use 'concat' instead of string formatting.
+	(Container.export): Use 'concat' instead of string join.
+	(Section.__init__): Assert to `STRINGTYPES' instead of
+	`types.StringTypes'.
+	(Section.title): Don't substitute the number here.
+	(Section.export): Use 'concat' instead of string join.
+	(Table.__init__): Assert to `STRINGTYPES' instead of
+	`types.StringTypes'.
+	(TableOfNodes._make_toc): Use 'concat' instead of string addition.
+	(VocabList.export): Use 'format' instead of string formatting.  Use
+	'concat' instead of string join.
+	(VocabSection.__init__): Assert to `STRINGTYPES' instead of
+	`types.StringTypes'.
+
+	* lib/lcg/wiki.py (MacroParser._substitution): Log message fixed.
+	(Parser.parse): Assertion added.
+
+	* lib/lcg/_test.py (TranslatableText): New test case.
+	(HtmlExporter): New test case.
+
+	* lib/lcg/__init__.py: Don't initialize gettext here.  Import the
+	new `i18n' module.
+
+	* lib/lcg/resources.py: Import` `config'.
+
+	* lib/lcg/util.py (caller): New function.
+
+	* lib/lcg/nodes.py (WikiNodeMixin.parse_wiki_text): New argument
+	`subst'.  Pass it to the macro parser without trying to supply the
+	supstitution provider here.
+
 2006-07-25  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content/exercises.py (Exercise.__init__)
