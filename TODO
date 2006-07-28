@@ -1,15 +1,13 @@
-Bugs:
+General:
 
- * OGG playback in MS Media Player.
+  * Better infrastructure for language versions (one instance generates all
+    available language versions).
 
-Required features:
+User interface:
 
- * Finish the IMS export.
-
-Optional Features:
-
- * Preloading sounds.
-
- * Punctuation insensitive evaluation?
-
- * Case insensitive evaluation?
+  * Generate transcripts in HTML (page titles etc.)
+  * Bookmark support.
+  * Fill-in exercises: Trimming the texts?
+  * Exposed cloze might support navigation between the tasks and the list.
+  * MSIE scrolls to the top of the page when the focus is moved to a relatively
+    positioned element (this doesn't matter for a blind user).

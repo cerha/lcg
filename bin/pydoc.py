@@ -18,4 +18,3 @@ import pydoc
 pydoc.visiblename = my_visiblename
 
 pydoc.cli()
-

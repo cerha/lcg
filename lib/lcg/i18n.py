@@ -259,6 +259,12 @@ concat = Concatenation
 
 See 'Concatenation' constructor for more information about the arguments."""
 
+#def concat(*args, **kwargs):
+#    result = Concatenation(*args, **kwargs)
+#    items = result.items()
+#    if len(items) == 1 and isinstance(items[0], (str, unicode)):
+#        return items[0]
+#    return result
 
 def format(text, *args):
     """A 'Concatenation' constructor for very simplified string formatting.
