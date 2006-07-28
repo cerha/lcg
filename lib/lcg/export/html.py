@@ -91,12 +91,12 @@ class HtmlExporter(Exporter):
                    )
     
     
-    def __init__(self, stylesheet=None, inlinestyles=False):
+    def __init__(self, stylesheet=None, inlinestyles=False, **kwargs):
         """Initialize the exporter for a given 'ContentNode' instance."""
         self._stylesheet = stylesheet
         self._inlinestyles = inlinestyles
         self._formatter = HtmlMarkupFormatter(self)
-        super(HtmlExporter, self).__init__()
+        super(HtmlExporter, self).__init__(**kwargs)
     
     def _backref(self, node, target):
         # We can allow just one backref target on the page.  Links on other
@@ -165,7 +165,7 @@ class HtmlExporter(Exporter):
         meta = node.meta() + \
                (('generator',
                  'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
-        tags = ['<title>%s</title>' % node.title()] + \
+        tags = [concat('<title>', node.title(), '</title>')] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', node.language()),
@@ -175,16 +175,17 @@ class HtmlExporter(Exporter):
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % s.uri()
                 for s in node.resources(Script)]
-        return '  '+'\n  '.join(tags + self._styles(node))
+        return concat('  ', concat(tags + self._styles(node), separator='\n  '))
 
     def _body(self, node):
         parts = [(getattr(self, '_'+part)(node), part.replace('_', '-'))
                  for part in self._BODY_PARTS]
-        return "\n".join([_html.div(part, cls=cls)
-                          for part, cls in parts if part is not None])
+        return concat([_html.div(part, cls=cls)
+                       for part, cls in parts if part is not None],
+                      separator="\n")
 
     def _heading(self, node):
-        return '<h1>%s</h1>' % node.title()
+        return concat('<h1>', node.title(), '</h1>')
 
     def _language_selection(self, node):
         #handler = "location.href = this.form.language.options[this.form.language.selectedIndex].value"
@@ -215,16 +216,17 @@ class HtmlExporter(Exporter):
         self._flags = flags = []
         for lang, name in pairs:
             if lang == current:
-                name += ' ' + _('(*)') #_('(current)')
+                name += ' (*)' #_('(current)')
             t = Link.ExternalTarget(self._node_uri(node, lang=lang), name)
             if lang == current:
                 self._current = t
             targets.append(t)
             #flag = node.resource(Image, 'flags/%s.gif' % lang)
             flags.append(None) #InlineImage(flag))
-        result = _('Choose your language:') + " " + \
-                 " |\n".join([Link(target).export(self) #+" "+ flag.export(self)
-                              for target, flag in zip(targets, flags)])
+        result = _("Choose your language:") + " " + \
+                 concat([Link(target).export(self) #+" "+ flag.export(self)
+                         for target, flag in zip(targets, flags)],
+                        separator=" |\n")
         return result
 
     def _content(self, node):
@@ -254,7 +256,7 @@ class HtmlExporter(Exporter):
                  self._body(node) + hack,
                  '</body>',
                  '</html>')
-        return "\n".join(lines)
+        return self.translate(concat(lines, separator="\n"))
     
     def export(self, node, directory):
         if not os.path.isdir(directory):
@@ -269,7 +271,7 @@ class HtmlExporter(Exporter):
             self.export(n, directory)
 
 
-class HtmlStaticExporter(HtmlExporter, FileExporter):
+class HtmlStaticExporter(HtmlExporter):
     """Export the content as a set of static web pages."""
 
     _hotkey = {
@@ -291,23 +293,27 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
                    )
     
     def _head(self, node):
-        tags = ['<link rel="%s" href="%s" title="%s">' % \
-                (kind, self.uri(n), n.title())
-                for kind, n in (('start', node.root()), 
-                                ('prev', node.prev()),
-                                ('next', node.next()))
-                if n is not None and n is not node]
-        return '\n  '.join([super(HtmlStaticExporter, self)._head(node)]+tags)
+        base = super(HtmlStaticExporter, self)._head(node)
+        additional = [format('<link rel="%s" href="%s" title="%s">',
+                             kind, self.uri(n), n.title())
+                      for kind, n in (('start', node.root()), 
+                                      ('prev', node.prev()),
+                                      ('next', node.next()))
+                      if n is not None and n is not node]
+        return concat(base, additional, separator='\n  ')
 
     def _rule(self, node):
         return '<hr class="hidden">'
     
     def _navigation(self, node):
         def link(node, label=None, key=None):
-            return node and _html.link(label or node.title(brief=True),
-                                       self.uri(node), title=node.title(),
-                                       hotkey=not key or self._hotkey[key]) \
-                                       or _("None")
+            if node:
+                if label is None:
+                    label = node.title(brief=True)
+                return  _html.link(label, self.uri(node), title=node.title(),
+                                   hotkey=not key or self._hotkey[key])
+            else:
+                return _("None")
         if len(node.root().linear()) <= 1:
             return None
         nav = [_('Next') + ': ' + link(node.next(), key='next'),
@@ -318,6 +324,6 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
             if p is not node.root():
                 nav.append(_("Up") + ': ' + link(p, key='up'))
             else:
-                hidden = "\n" + link(p, key='up', label='')
+                hidden = concat("\n", link(p, key='up', label=''))
             nav.append(link(node.root(), label=self._INDEX_LABEL, key='index'))
-        return ' |\n'.join(nav) + hidden
+        return concat(nav, separator=' |\n') + hidden
