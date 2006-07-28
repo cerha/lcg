@@ -27,10 +27,11 @@ from lcg import *
 
 class EurochanceNode(ContentNode, FileNodeMixin):
 
-    _INHERITED_ARGS = ('language', 'secondary_language', 'input_encoding')
+    _INHERITED_ARGS = ('language', 'secondary_language', 'language_variants',
+                       'input_encoding')
     
     def __init__(self, parent, id, subdir=None, input_encoding='ascii',
-                 **kwargs):
+                 brief_title=None, language=None, **kwargs):
         """Initialize the instance.
 
 
@@ -39,22 +40,31 @@ class EurochanceNode(ContentNode, FileNodeMixin):
         """
         FileNodeMixin.__init__(self, parent, subdir,
                                input_encoding=input_encoding)
-        title = self._title_(brief_title=kwargs.get('brief_title'))
+        if language is None or language == 'en':
+            self._gettext = lambda x: x
+        else:
+            import gettext
+            t = gettext.translation('lcg', config.translation_dir, (language,))
+            self._gettext = lambda x: t.ugettext(re.sub('\s*\n', ' ', x))
+        title = self._title_(brief_title=brief_title)
         content = self._create_content()
         super(EurochanceNode, self).__init__(parent, id, title=title,
-                                             content=content, **kwargs)
+                                             brief_title=brief_title,
+                                             content=content,
+                                             language=language, **kwargs)
 
     def _title_(self, brief_title=None):
         return self._TITLE
 
     def _create_content(self):
         pass
-    
+
     def _localized_wiki_content(self, filename, macro=False):
         ulang = self.root().users_language()
-        content = self.parse_wiki_file(filename, lang=ulang, macro=macro)
+        content = self.parse_wiki_file(filename, lang=ulang, macro=macro,
+                                       subst=self._gettext)
         return SectionContainer(content, lang=ulang)
-        
+    
     def current_language_variant(self):
         return self.root().users_language()
         
@@ -81,7 +91,7 @@ class Unit(EurochanceNode):
     _EXERCISE_SECTION_SPLITTER = re.compile(r"^==(?P<title>.+)?==+\s*$", re.M)
 
     def _title_(self, brief_title=None):
-        return "%s: %s" % (brief_title, self._read_file('title'))
+        return concat(brief_title, ": ", self._read_file('title'))
     
     def _exercise_sections(self, split_result):
         title = ''
@@ -89,7 +99,7 @@ class Unit(EurochanceNode):
         for x in split_result:
             if isinstance(x, SplittableText):
                 if x.text().strip():
-                    title = _("Section %d") % (len(pieces)+1)  + ": " + title
+                    title = _("Section %d", len(pieces)+1) + ": " + title
                     pieces.append((title, x))
             else:
                 title = x[0]
@@ -127,12 +137,12 @@ class IntermediateUnit(Unit):
         pieces = [p for p in pieces if isinstance(p, SplittableText)]
         assert len(pieces) == 5, \
                "5 sections expected! (%d found)" % len(pieces)
-        titles = [_("Section %d") +': '+ t 
-                  for t in (_("Vocabulary Practice"),
-                            _("Listening Comprehension"),
-                            _("General Comprehension"),
-                            _("Grammar Practice"),
-                            _("Consolidation"))]
+        titles = [_("Section %d", i+1) +': '+ t 
+                  for i, t in enumerate((_("Vocabulary Practice"),
+                                         _("Listening Comprehension"),
+                                         _("General Comprehension"),
+                                         _("Grammar Practice"),
+                                         _("Consolidation")))]
         return zip(titles, pieces)
     
     def _create_exercises(self):
@@ -169,12 +179,13 @@ class ExerciseHelp(EurochanceNode):
         
     def _create_content(self):
         g = dict(type=self._type, **self._type.typedict())
-        content = self.parse_wiki_text(self._template, macro=True, globals=g)
+        content = self.parse_wiki_text(self._template, macro=True, globals=g,
+                                       subst=self._gettext)
         return SectionContainer(content,
                                 lang=self.root().users_language())
 
     def _title_(self, brief_title=None):
-        return _("Instructions for %s") % self._type.name()
+        return _("Instructions for %s", self._type.name())
 
 
 class GrammarBank(EurochanceNode):
@@ -231,7 +242,7 @@ class AnswerSheet(EurochanceNode):
         super(AnswerSheet, self).__init__(parent, id, *args, **kwargs)
         
     def _title_(self, brief_title=None):
-        return _("Answer Sheet for %s") % self._unit.title(brief=True)
+        return _("Answer Sheet for %s", self._unit.title(brief=True))
 
     def _answer_sheets(self, section):
         return [Section(e.title(), e.answer_sheet(self))
@@ -306,7 +317,7 @@ class EurochanceCourse(EurochanceNode):
 
     def _create_children(self):
         units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d,
-                                    brief_title="Unit %d" % (i+1))
+                                    brief_title=_("Unit %d", i+1))
                  for i, d in enumerate(self._unit_dirs())]
         children = [self._create_child(Instructions, 'instructions')] + units
         if issubclass(self._unit_cls, IntermediateUnit):
@@ -330,7 +341,7 @@ class EurochanceExporter(HtmlStaticExporter):
                    )
     
     def _version(self, node):
-        return _("Version %s") % node.root().version()
+        return _("Version %s", node.root().version())
 
     def _copyright(self, node):
         copyright = node.root().find_node('copyright')
