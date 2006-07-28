@@ -18,22 +18,13 @@
 
 __version__ = '0.3.1'
 
-"""Learning Content Genarator.
+"""Learning Content Genarator."""
 
-Set the environment variable LCG_LANGUAGE to an ISO 639-1 Alpha-2 language code
-before importing this module to set the language used to lookup for the
-translations of the texts inserted by the LCG to the generated documents.
+from i18n import *
 
-"""
-
-import config, gettext, os
-
-_lang = os.environ.get('LCG_LANGUAGE')
-if _lang and _lang != 'en':
-    _t = gettext.translation('lcg', config.translation_dir, (_lang,))
-else:
-    _t = gettext.NullTranslations()
-_t.install(unicode=True)
+import __builtin__
+if not __builtin__.__dict__.has_key('_'):
+    __builtin__.__dict__['_'] = TranslatableText
 
 from util import *
 from nodes import *
@@ -46,5 +37,6 @@ import feed
 from export import _html
 
 # Resolve cyclic dependencies.
-for module in (resources, nodes, content, exercises, export, html, wiki, feed):
-    module.__dict__.update(globals())                                                                                                                                                      
+for module in (resources, nodes, content, exercises, export, html, wiki, feed,
+               i18n):
+    module.__dict__.update(globals())
