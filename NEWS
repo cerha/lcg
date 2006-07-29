@@ -4,10 +4,10 @@
 
 	Version 0.3.3
 
-	Added defered translation support to allow dynamic translation at the
-	export time.  This change lead to a major rewrite of the export part
-	and other internals, but should not lead to any incompatibilities
-	except those described below.
+	Added defered translation support to allow dynamic translation at
+	the export time.  This change lead to a major rewrite of the
+	export part and internal text processing, but should not lead to
+	any incompatibilities except those described below.
 
 	The output language is now not set using the `LCG_LANGUAGE' environment
 	variable (which only allowed to set the language once for one process),
@@ -32,11 +32,11 @@
 	`ContentNode' instance later.  In consequence, `Content' and all the
 	derived classes take no `parent' argument now.
 
-	Also much of the export related functionality was moved from the
+	Much of the export related functionality was moved from the
 	`ContentNode' class and some `Content' subclasses to the Exporter.
 
 	The import ralated functionality was also moved away from
-	`ContentNode' and concentrated into the derived classes.  This is an
+	`ContentNode' and concentrated into derived classes.  This is an
 	intemediate solution before creating a separate import layer.
 	
 
@@ -56,7 +56,7 @@
 	Some internal cleanup.
 	
 	* BUGFIX: Added a hack to prevent some MSIE versions from
-	displaying the Media Player window over the pagee text.
+	displaying the Media Player window over the page text.
 	
 	* BUGFIX: Include the navigation bar in the output only when there
 	is more than one page.
