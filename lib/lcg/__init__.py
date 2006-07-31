@@ -21,11 +21,6 @@ __version__ = '0.3.3'
 """Learning Content Genarator."""
 
 from i18n import *
-
-import __builtin__
-if not __builtin__.__dict__.has_key('_'):
-    __builtin__.__dict__['_'] = TranslatableText
-
 from util import *
 from nodes import *
 from resources import *
@@ -38,5 +33,5 @@ from export import _html
 
 # Resolve cyclic dependencies.
 for module in (resources, nodes, content, exercises, export, html, wiki, feed,
-               i18n):
+               i18n, util):
     module.__dict__.update(globals())
