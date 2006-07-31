@@ -29,6 +29,23 @@ allows us to decide for the output language at the export time.
 from lcg import *
 
 
+class TranslatableTextFactory(object):
+    """A helper for defining the `_' identifier bound to a certain domain.
+
+    You may define the `_' function as follows:
+
+      _ = TranslatableTextFactory('domain-name')
+
+    """
+    def __init__(self, domain='lcg'):
+        assert isinstance(domain, str), domain
+        self._domain = domain
+        
+    def __call__(self, *args, **kwargs):
+        kwargs['domain'] = self._domain
+        return TranslatableText(*args, **kwargs)
+    
+
 class TranslatableText(object):
     """Translatable string with a delayed translation.
 
@@ -69,14 +86,18 @@ class TranslatableText(object):
         
         """
         assert isinstance(text, (str, unicode)), (text, type(text))
-        self._transforms = transforms = kwargs.get('_transforms', ())
-        assert isinstance(transforms, tuple), transforms
-        if transforms:
-            del kwargs['_transforms']
-        assert not args or not kwargs, (text, args, kwargs)
         self._text = text
+        kwargs = self._init_kwargs(**kwargs)
+        assert not args or not kwargs, (text, args, kwargs)
         self._args = args
         self._kwargs = kwargs
+
+    def _init_kwargs(self, _transforms=(), domain='lcg', **kwargs):
+        assert isinstance(_transforms, tuple), _transforms
+        assert isinstance(domain, str), domain
+        self._transforms = _transforms
+        self._domain = domain
+        return kwargs
 
     def __str__(self):
         log("TranslatableText used in string context:", caller())
@@ -91,7 +112,7 @@ class TranslatableText(object):
 
         """
         transforms = self._transforms + (lambda x: x.replace(old, new),)
-        kwargs = dict(self._kwargs.items(), _transforms=transforms)
+        kwargs = dict(self._kwargs, _transforms=transforms, domain=self._domain)
         return TranslatableText(self._text, *self._args, **kwargs)
     
     def translate(self, gettext):
