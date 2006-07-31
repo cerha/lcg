@@ -1,3 +1,30 @@
+2006-07-31  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/i18n.py (TranslatableTextFactory): New class.
+	(TranslatableText._init_kwargs): New method.
+	(TranslatableText.__init__): Use it.
+	(TranslatableText.replace): Set the `domain' argument approprietaly.
+
+	* lib/lcg/export/html.py (_): Define explicitely.
+
+	* lib/lcg/content/exercises.py (_): Define explicitely.
+
+	* lib/lcg/util.py (_): Define explicitely.
+
+	* lib/lcg/eurochance.py (_): Define explicitely.
+
+	* lib/lcg/_test.py (TranslatableText.check_interpolation): New test.
+	(TranslatableText.check_addition): New test.
+	(TranslatableText.check_it): Test removed.
+	(TranslatableText.check_concatenation): Use `lcg.TranslatableText'
+	instead og `_'.
+	(TranslatableText.check_replace): Use `lcg.TranslatableText'
+	instead og `_'.
+	(HtmlExporter.check_translations): Set the `_' before using it.
+
+	* lib/lcg/__init__.py (__version__): Don't install the `_'
+	function into builtins.  Update identifiers also in `util'.
+
 2006-07-28  Tomas Cerha  <cerha@brailcom.org>
 
 	* NEWS: New file.
