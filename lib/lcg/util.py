@@ -28,6 +28,10 @@ import types
 import re
 import sys
 
+from lcg import *
+_ = TranslatableTextFactory('lcg')
+
+
 class SplittableText:
     """A piece of text which can be split keeping track of line numbers.
 

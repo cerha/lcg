@@ -25,6 +25,8 @@ data.  It can be used as an example of LCG usage.
 
 from lcg import *
 
+_ = TranslatableTextFactory('eurochance')
+
 class EurochanceNode(ContentNode, FileNodeMixin):
 
     _INHERITED_ARGS = ('language', 'secondary_language', 'language_variants',
