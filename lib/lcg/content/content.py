@@ -42,6 +42,8 @@ from lcg.export import _html
 import types
 import operator
 
+_ = TranslatableTextFactory('lcg')
+
 class Content(object):
     """Generic base class for all types of content.
 
