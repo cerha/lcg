@@ -50,8 +50,17 @@ tests.add(ContentNode)
 
 class TranslatableText(unittest.TestCase):
           
-    def check_it(self):
-        a = _("Version %s", "1.0")
+    def check_interpolation(self):
+        a = lcg.TranslatableText("Hi %s, say hello to %s.", "Joe", "Bob")
+        b = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.",
+                                 person1="Joe", person2="Bob")
+        c = a.translate(lambda x: x)
+        d = b.translate(lambda x: x)
+        assert c == "Hi Joe, say hello to Bob.", c
+        assert d == "Hi Joe, say hello to Bob.", d
+        
+    def check_addition(self):
+        a = lcg.TranslatableText("Version %s", "1.0")
         b = "xxx"
         c = a + b
         assert isinstance(c, lcg.Concatenation), c
@@ -63,8 +72,9 @@ class TranslatableText(unittest.TestCase):
             pass
         assert isinstance(e, TypeError), e
             
-    def check_concat(self):
-        a = lcg.concat(_("Version %s", "1.0") + 'xx', 'yy', separator="\n")
+    def check_concatenation(self):
+        a = lcg.concat(lcg.TranslatableText("Version %s", "1.0") + 'xx',
+                       'yy', separator="\n")
         assert isinstance(a, lcg.Concatenation), a
         items = a.items()
         assert len(items) == 2, items
@@ -76,7 +86,8 @@ class TranslatableText(unittest.TestCase):
         assert items[0] == ('a-b-c-d-e-f'), items[0]
         
     def check_replace(self):
-        a = _("Version %s", "xox") + '-yoy'
+        t = lcg.TranslatableText("Version %s", "xox")
+        a = t + '-yoy'
         b = a.replace('o', '-')
         c = b.replace('V', 'v')
         assert isinstance(a, lcg.Concatenation), a
@@ -96,7 +107,7 @@ tests.add(TranslatableText)
 class HtmlExporter(unittest.TestCase):
         
     def check_translations(self):
-        #a = lcg.ContentNode(None, 'a', content=lcg.TextContent(_("A")))
+        _ = lcg.TranslatableTextFactory('lcg')
         e = lcg.HtmlExporter(lang='en')
         a = e.translate(_("Version %s"))
         assert a == 'Version %s', a
