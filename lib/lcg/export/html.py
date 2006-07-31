@@ -20,6 +20,9 @@ from lcg import *
 from export import *
 import _html
 
+_ = TranslatableTextFactory('lcg')
+
+
 class HtmlMarkupFormatter(MarkupFormatter):
     
     _FORMAT = {'emphasize': ('<em>', '</em>'),
