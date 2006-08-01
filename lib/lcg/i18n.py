@@ -30,9 +30,9 @@ from lcg import *
 
 
 class TranslatableTextFactory(object):
-    """A helper for defining the `_' identifier bound to a certain domain.
+    """A helper for defining the '_' identifier bound to a certain domain.
 
-    You may define the `_' function as follows:
+    You may define the '_' function as follows:
 
       _ = TranslatableTextFactory('domain-name')
 
@@ -40,6 +40,10 @@ class TranslatableTextFactory(object):
     def __init__(self, domain='lcg'):
         assert isinstance(domain, str), domain
         self._domain = domain
+
+    def domain(self):
+        """Return the domain name as set in the constructor."""
+        return self._domain
         
     def __call__(self, *args, **kwargs):
         kwargs['domain'] = self._domain
@@ -315,3 +319,47 @@ def format(text, *args):
 #         assert not args or not kwargs, (text, args, kwargs)
 #         self._args = kwargs or args
 #         return self
+
+
+def source_files_by_domain(domain=None):
+    """Return the list of all LCG source files, which belong to given domain.
+
+    Arguments:
+
+      domain -- the name of the translation domain as a string.  This domain
+        corresponds to the 'domain' argument of the 'TranslatableTextFactory'
+        used within the source file to define the '_' identifier.  In no domain
+        is passed, a list of all LCG source files is returned.
+
+    The returned list contains full pathnames of the files as strings.
+
+    """
+    def find(searchpath):
+        result = []
+        for item in os.listdir(searchpath):
+            path = os.path.join(searchpath, item)
+            if os.path.isfile(path) and item.endswith('.py') \
+                   and item not in ('__init__.py', '_test.py'):
+                result.append(path)
+            elif os.path.isdir(path):
+                result.extend(find(path))
+        return result
+    files = find(os.path.dirname(__file__))
+    if domain is None:
+        return files
+    else:
+        result = []
+        for filename in files:
+            name = os.path.splitext(os.path.basename(filename))[0]
+            path = os.path.dirname(filename)
+            import imp
+            file, pathname, descr = imp.find_module(name, [path])
+            module = imp.load_module(name, file, pathname, descr)
+            if module.__dict__.has_key('_'):
+                x = module.__dict__['_']
+                if x.domain() == domain:
+                    result.append(filename)
+        return result
+
+if __name__ == '__main__':
+    print " ".join(source_files_by_domain(*sys.argv[1:]))
