@@ -17,8 +17,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 from lcg import *
-from export import *
-import _html
+from lcg.export import *
+from lcg.export import _html
 
 _ = TranslatableTextFactory('lcg')
 
