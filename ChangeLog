@@ -1,3 +1,40 @@
+2006-08-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/i18n.py: Print the result of `source_files_by_domain()'
+	called with command line arguments if the module is invoked from
+	command line.
+	(TranslatableTextFactory.domain): New method.
+	(source_files_by_domain): New function.
+
+	* lib/lcg/export/html.py: Import `lcg' submodules by their full name.
+
+	* translations/Makefile: Rewritten to support multiple
+	domains.
+
+	* translations/lcg.cs.po: New file.
+
+	* translations/lcg.de.po: New file.
+
+	* translations/lcg.es.po: New file.
+
+	* translations/lcg.no.po: New file.
+
+	* translations/lcg.sk.po: New file.
+
+	* translations/lcg-exercises.de.po: New file.
+
+	* translations/eurochance.de.po: New file.
+
+	* translations/cs.po: File removed.
+
+	* translations/de.po: File removed.
+	
+	* translations/es.po: File removed.
+
+	* translations/no.po: File removed.
+	
+	* translations/sk.po: File removed.
+	
 2006-07-31  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/i18n.py (TranslatableTextFactory): New class.
