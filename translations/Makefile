@@ -1,17 +1,24 @@
-MO_FILES = $(patsubst %.po,%/LC_MESSAGES/lcg.mo,$(shell ls *.po))
-LCG_SOURCE_FILES = $(shell find ../lib/lcg/ -name "*.py")
+domains := lcg lcg-exercises eurochance
+mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
 
-.PHONY: all
+include $(domains:%=%.d)
 
-all: $(MO_FILES)
+all: $(mo_files)
 
-%/LC_MESSAGES/lcg.mo: %.po %/LC_MESSAGES
-	msgfmt -v $< -o $@
-%/LC_MESSAGES: 
+%.d: $(shell python ../lib/lcg/i18n.py)
+	@echo "Updating rules for domain $*."
+	@echo -n "$*.pot: " >$@ && python ../lib/lcg/i18n.py $* >>$@
+	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" >>$@
+	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po" >>$@
+
+%/LC_MESSAGES:
 	mkdir -p $*/LC_MESSAGES/
 
-%.po: translations.pot
-	msgmerge --quiet --update $@ $< 
+%.mo:
+	msgfmt -v $< -o $@
 
-translations.pot: $(LCG_SOURCE_FILES)
-	xgettext $(LCG_SOURCE_FILES) -o translations.pot
+%.po:
+	msgmerge -q --update $@ $< && touch $@
+
+%.pot:
+	xgettext $^ -o $@
