@@ -1,0 +1,139 @@
+# LCG message translations
+# Copyright (C) 2004, 2005, 2006, Brailcom, o.p.s.
+# Tomas Cerha <cerha@brailcom.org>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-08-01 14:13+0200\n"
+"PO-Revision-Date: 2006-08-01 20:15+0200\n"
+"Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
+"Language-Team: German <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Section title
+#: ../lib/lcg/eurochance.py:104 ../lib/lcg/eurochance.py:142
+#, python-format
+msgid "Section %d"
+msgstr "Abschnitt %d"
+
+# Section title
+#: ../lib/lcg/eurochance.py:119
+msgid "Aims and Objectives"
+msgstr "Lernziele"
+
+# Section title
+#: ../lib/lcg/eurochance.py:121
+msgid "Checklist"
+msgstr "Checkliste"
+
+# Section title
+#: ../lib/lcg/eurochance.py:143
+msgid "Vocabulary Practice"
+msgstr "Vokabelübungen"
+
+# Section title
+#: ../lib/lcg/eurochance.py:144
+msgid "Listening Comprehension"
+msgstr "Hörverständnis"
+
+# Section title
+#: ../lib/lcg/eurochance.py:145
+msgid "General Comprehension"
+msgstr "Generelles Verständnis"
+
+# Section title
+#: ../lib/lcg/eurochance.py:146
+msgid "Grammar Practice"
+msgstr "Grammatikübungen"
+
+# Section title
+#: ../lib/lcg/eurochance.py:147
+msgid "Consolidation"
+msgstr "Festigung"
+
+# Section title
+#: ../lib/lcg/eurochance.py:153
+msgid "Vocabulary"
+msgstr "Vokabeln"
+
+# Section title
+#: ../lib/lcg/eurochance.py:154
+msgid "Exercises"
+msgstr "Übungen"
+
+# Page title
+#: ../lib/lcg/eurochance.py:159
+msgid "General Course Instructions"
+msgstr "Allgemeine Kursinformation"
+
+#: ../lib/lcg/eurochance.py:166
+msgid "Copyright and License Information"
+msgstr "Copyright- und Lizenzinformation"
+
+# Page title
+#: ../lib/lcg/eurochance.py:190
+#, python-format
+msgid "Instructions for %s"
+msgstr "Anleitung für %s"
+
+# Page title
+#: ../lib/lcg/eurochance.py:194
+msgid "Grammar Bank"
+msgstr "Grammatikteil"
+
+# Page title
+#: ../lib/lcg/eurochance.py:208
+msgid "Vocabulary Index"
+msgstr "Vokabelverzeichnis"
+
+# Section title (within the vocabulary index)
+#: ../lib/lcg/eurochance.py:223
+msgid "Ordered by the English term"
+msgstr "Englischer Ausdruck"
+
+# Section title (within the vocabulary index)
+#: ../lib/lcg/eurochance.py:224
+msgid "Ordered by the translation"
+msgstr "Übersetzung"
+
+# Page title
+#: ../lib/lcg/eurochance.py:230
+msgid "Answer Sheets"
+msgstr "Auflösungsteil"
+
+#: ../lib/lcg/eurochance.py:233 ../lib/lcg/eurochance.py:268
+#: ../lib/lcg/eurochance.py:318
+msgid "Table of Contents:"
+msgstr "Inhaltsverzeichnis:"
+
+# Page title
+#: ../lib/lcg/eurochance.py:247
+#, python-format
+msgid "Answer Sheet for %s"
+msgstr "Auflösungsteil für %s"
+
+# Page title
+#: ../lib/lcg/eurochance.py:265
+msgid "Help Index"
+msgstr "Hilfeverzeichnis"
+
+# Unit title
+#: ../lib/lcg/eurochance.py:322
+#, python-format
+msgid "Unit %d"
+msgstr "Lektion %d"
+
+# Navigation bar label (at the bottom of each page)
+#: ../lib/lcg/eurochance.py:335
+msgid "Course Index"
+msgstr "Kursindex"
+
+# Section title
+#: ../lib/lcg/eurochance.py:346
+#, python-format
+msgid "Version %s"
+msgstr "Version %s"
