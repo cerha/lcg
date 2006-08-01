@@ -7,9 +7,9 @@ all: $(mo_files)
 
 %.d: $(shell python ../lib/lcg/i18n.py)
 	@echo "Updating rules for domain $*."
-	@echo -n "$*.pot: " >$@ && python ../lib/lcg/i18n.py $* >>$@
-	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" >>$@
-	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po" >>$@
+	@echo -n "$*.pot: " > $@ && python ../lib/lcg/i18n.py $* >> $@
+	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" >> $@
+	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po" >> $@
 
 %/LC_MESSAGES:
 	mkdir -p $*/LC_MESSAGES/
