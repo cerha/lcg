@@ -20,6 +20,9 @@ import unittest
 import os
 import lcg
 
+_ = lcg.TranslatableTextFactory('test')
+
+
 class TestSuite(unittest.TestSuite):
     
     def add(self, cls, prefix = 'check_'):
@@ -27,7 +30,6 @@ class TestSuite(unittest.TestSuite):
         self.addTest(unittest.TestSuite(map(cls, tests)))
 
 tests = TestSuite()
-
 
 class ContentNode(unittest.TestCase):
     
@@ -54,8 +56,8 @@ class TranslatableText(unittest.TestCase):
         a = lcg.TranslatableText("Hi %s, say hello to %s.", "Joe", "Bob")
         b = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.",
                                  person1="Joe", person2="Bob")
-        c = a.translate(lambda x: x)
-        d = b.translate(lambda x: x)
+        c = a.translate(lcg.NullTranslator())
+        d = b.translate(lcg.NullTranslator())
         assert c == "Hi Joe, say hello to Bob.", c
         assert d == "Hi Joe, say hello to Bob.", d
         
@@ -93,27 +95,40 @@ class TranslatableText(unittest.TestCase):
         assert isinstance(a, lcg.Concatenation), a
         assert isinstance(b, lcg.Concatenation), b
         assert isinstance(c, lcg.Concatenation), c
-        e = lcg.HtmlExporter(lang='en')
-        ax = e.translate(a)
-        bx = e.translate(b)
-        cx = e.translate(c)
+        ax = a.translate(lcg.NullTranslator())
+        bx = b.translate(lcg.NullTranslator())
+        cx = c.translate(lcg.NullTranslator())
         assert ax == 'Version xox-yoy', ax
         assert bx == 'Versi-n x-x-y-y', bx
         assert cx == 'versi-n x-x-y-y', cx
-        
-    
+
 tests.add(TranslatableText)
 
+
+class TranslatableTextFactory(unittest.TestCase):
+
+    def check_domain(self):
+        a = _("Hi %s, say hello to %s.", _("Joe"), _("Bob"))
+        assert a.domain() == 'test'
+
+tests.add(TranslatableTextFactory)
+
+
+class GettextTranslator(unittest.TestCase):
+
+    def check_translate(self):
+        t = lcg.GettextTranslator(('cs',))
+        a = _("Hi %s, say hello to %s.", _("Joe"), _("Bob"))
+        b = t.translate(a)
+        assert b == "Ahoj Pepo, pozdravuj Bobika.", b
+        c = a.translate(t)
+        assert c == b, c
+
+tests.add(GettextTranslator)
+
+
 class HtmlExporter(unittest.TestCase):
-        
-    def check_translations(self):
-        _ = lcg.TranslatableTextFactory('lcg')
-        e = lcg.HtmlExporter(lang='en')
-        a = e.translate(_("Version %s"))
-        assert a == 'Version %s', a
-        e = lcg.HtmlExporter(lang='cs')
-        b = e.translate(_("Version %s", "1.0"))
-        assert b == 'Verze 1.0', b
+    pass
 
 tests.add(HtmlExporter)
 
