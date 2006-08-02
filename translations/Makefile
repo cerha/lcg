@@ -9,7 +9,7 @@ all: $(mo_files)
 	@echo "Updating rules for domain $*."
 	@echo -n "$*.pot: " > $@ && python ../lib/lcg/i18n.py $* >> $@
 	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" >> $@
-	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po" >> $@
+	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po %/LC_MESSAGES" >> $@
 
 %/LC_MESSAGES:
 	mkdir -p $*/LC_MESSAGES/
