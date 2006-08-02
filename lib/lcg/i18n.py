@@ -37,7 +37,7 @@ class TranslatableTextFactory(object):
       _ = TranslatableTextFactory('domain-name')
 
     """
-    def __init__(self, domain='lcg'):
+    def __init__(self, domain):
         assert isinstance(domain, str), domain
         self._domain = domain
 
@@ -46,7 +46,7 @@ class TranslatableTextFactory(object):
         return self._domain
         
     def __call__(self, *args, **kwargs):
-        kwargs['domain'] = self._domain
+        kwargs['_domain'] = self._domain
         return TranslatableText(*args, **kwargs)
     
 
@@ -96,17 +96,21 @@ class TranslatableText(object):
         self._args = args
         self._kwargs = kwargs
 
-    def _init_kwargs(self, _transforms=(), domain='lcg', **kwargs):
+    def _init_kwargs(self, _transforms=(), _domain=None, **kwargs):
         assert isinstance(_transforms, tuple), _transforms
-        assert isinstance(domain, str), domain
+        assert isinstance(_domain, (str)) or _domain is None, _domain
         self._transforms = _transforms
-        self._domain = domain
+        self._domain = _domain
         return kwargs
 
     def __str__(self):
         log("TranslatableText used in string context:", caller())
         return '[TranslatableText "%s"]' % self._text
 
+    def domain(self):
+        """Return the domain name bound to this instance."""
+        return self._domain
+        
     def replace(self, old, new):
         """Return a TranslatableText instance which replaces old by new.
 
@@ -116,18 +120,16 @@ class TranslatableText(object):
 
         """
         transforms = self._transforms + (lambda x: x.replace(old, new),)
-        kwargs = dict(self._kwargs, _transforms=transforms, domain=self._domain)
+        kwargs = dict(self._kwargs, _transforms=transforms,
+                      _domain=self._domain)
         return TranslatableText(self._text, *self._args, **kwargs)
     
-    def translate(self, gettext):
+    def translate(self, translator):
         """Return the translated and interpolated string.
         
         Arguments:
 
-          gettext -- a function of one argument (a string) returning the
-            translation of this string as a (unicode) string.  This is
-            typically the gettext/ugettext function of the Python gettext
-            module.
+          translator -- a 'Translator' instance.
 
         The returned string has all the format variables interpolated.  Also
         all values of the format variables are translated (using the same
@@ -138,12 +140,13 @@ class TranslatableText(object):
         didn't correspond to the format string.
 
         """
+        assert isinstance(translator, Translator)
         def translate(x):
             if isinstance(x, (Concatenation, TranslatableText)):
-                return x.translate(gettext)
+                return x.translate(translator)
             else:
                 return x
-        result = gettext(self._text)
+        result = translator.gettext(self._text, domain=self._domain)
         if self._args:
             result %= tuple([translate(arg) for arg in self._args])
         elif self._kwargs:
@@ -226,12 +229,6 @@ class Concatenation(object):
                             "'Concatenation' and '%s'" % type(other))
         return Concatenation((self, other))
         
-    def _translate(self, item, gettext):
-        if isinstance(item, TranslatableText):
-            return item.translate(gettext)
-        else:
-            return item
-
     def replace(self, old, new):
         """Apply the method to all items and return a new Concatenation.
 
@@ -257,21 +254,139 @@ class Concatenation(object):
         """
         return self._items
         
-    def translate(self, gettext):
+    def translate(self, translator):
         """Return the translated text as a string ot a unicode string.
 
         Arguments:
 
-          gettext -- the same as for 'TranslatableText.translate()'.
+          translator -- a 'Translator' instance.
 
-        If there was at least one unicode type argument, or if the 'gettext'
-        function returnes unicode values, the result will be a unicode type.
-        If all the input are plain strings, a plain string is returned.
+        If there was at least one unicode type argument, or if the 'translator'
+        returnes unicode values, the result will be a unicode type.  If all the
+        input are plain strings, a plain string is returned.
         
         """
-        translated = [self._translate(item, gettext) for item in self._items]
+        assert isinstance(translator, Translator)
+        translated = [translator.translate(item) for item in self._items]
         return ''.join(translated)
 
+
+class Translator(object):
+    """A generic translator of translatable objects.
+
+    A translator should be able to translate different translatable objects,
+    such as 'TranslatableText' and 'Concatenation' instances.  'Concatenation'
+    instances may actually contain 'TranslatableText' instances coming from
+    different domains and a translator should be able to deal with them.  This
+    is, however only a generic base class.  See 'GettextTranslator' or
+    'NullTranslator' for concrete implementations.
+
+    """
+
+    def __init__(self, languages, default_domain='lcg'):
+        """Initialize the instance.
+        
+        Arguments:
+
+          languages -- A list of target languages in the order of their
+            preference.  If multiple languages are specified, the later will be
+            used as fallbacks for the earlier, when trying to translate a
+            string.  Handling of language names depends on the derived class,
+            however in general, lowercase ISO 639-1 Alpha-2 language codes
+            should be always supported.  In any case, a sequence of strings is
+            expected.
+
+          default_domain -- the name of the default domain, used when the
+            translatable has no explicit domain defined.
+
+        """
+        assert isinstance(languages, (list, tuple)), languages
+        assert isinstance(default_domain, str), default_domain
+        self._languages = tuple(languages)
+        self._default_domain = default_domain
+
+    def gettext(self, text, domain=None):
+        """Return the translation of the string 'text' from given domain.
+
+        Arguments:
+
+          text -- the text to translate as a string or unicode instance.
+
+          domain -- the name of the domain, form which this text origins.
+
+        Returns a unicode string.
+        
+        """
+        pass
+
+    def translate(self, text):
+        """Return the translation of given translatable.
+
+        The argument may be a 'Concatenation', 'TranslatableText' or a plain
+        string or unicode instance.
+
+        Returns a string or unicode depending if there was a unicode type
+        within the input (as well as 'Concatenation.translate()'.
+        
+        """
+        if isinstance(text, (Concatenation, TranslatableText)):
+            return text.translate(self)
+        else:
+            return text
+        
+
+class NullTranslator(Translator):
+    """A translator which just returns identical strings as translations."""
+    def __init__(self):
+        super(NullTranslator, self).__init__(())
+    
+    def gettext(self, text, domain=None):
+        return text
+    
+    
+class GettextTranslator(Translator):
+    """Translator based on the GNU gettext interface."""
+    
+    def __init__(self, languages, path=None, **kwargs):
+        """Initialize the instance.
+
+          languages -- as in the parent class.
+
+          default_domain -- as in the parent class.
+
+          path -- a dictionary, which may assign an arbitrary directory to each
+            domain.  This directory should contain the locale subdirectories as
+            usual with GNU getext (eg. 'de/LC_MESSAGES/domain.mo').  If there
+            is no item for a domain, the directory defaults to
+            'config.translation_dir'.
+        
+        
+        """
+        super(GettextTranslator, self).__init__(languages, **kwargs)
+        assert isinstance(path, dict) or path is None, path
+        self._path = path or {}
+        self._cache = {}
+
+    def _gettext_instance(self, domain):
+        import gettext, config
+        if self._languages == ('en',):
+            return gettext.NullTranslations()
+        path = self._path.get(domain, config.translation_dir)
+        try:
+            return gettext.translation(domain, path, self._languages)
+        except IOError, e:
+            raise IOError(str(e)+", path: '%s', languages=%s" % \
+                          (path, self._languages))
+        
+    def gettext(self, text, domain=None):
+        domain = domain or self._default_domain
+        try:
+            t = self._cache[domain]
+        except KeyError:
+            t = self._cache[domain] = self._gettext_instance(domain)
+        return t.ugettext(text)
+        
+    
     
 STRINGTYPES = (str, unicode, TranslatableText, Concatenation)
 """This constant lists all types, which can represent text within LCG.
@@ -339,7 +454,7 @@ def source_files_by_domain(domain=None):
         for item in os.listdir(searchpath):
             path = os.path.join(searchpath, item)
             if os.path.isfile(path) and item.endswith('.py') \
-                   and item not in ('__init__.py', '_test.py'):
+                   and item not in ('__init__.py'):
                 result.append(path)
             elif os.path.isdir(path):
                 result.extend(find(path))
