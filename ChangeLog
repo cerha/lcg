@@ -1,3 +1,61 @@
+2006-08-02  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/generate.py (main): Pass a `GettextTranslator' instance to
+	the exporter constructor.
+
+	* bin/lcgmake.py (main): Pass a `GettextTranslator' instance to
+	the exporter constructor.
+
+	* lib/lcg/_test.py (_): Define as `TranslatableTextFactory'.
+	(TranslatableText.check_interpolation): Pass a `NullTranslator'
+	instance to `translate'.
+	(TranslatableText.check_replace): Pass a `NullTranslator'
+	instance to `translate'.  Dont use `HtmlExporter'.
+	(TranslatableTextFactory): New test case.
+	(GettextTranslator): New test case.
+	(HtmlExporter.check_translations): Test removed.
+
+	* lib/lcg/i18n.py (TranslatableTextFactory.__init__): Let the
+	`domain' argument be mandatory.
+	(TranslatableTextFactory.__call__): Set the `_domain' argument of
+	`TranslatableText', not `domain'.
+	(TranslatableText._init_kwargs): Argument `domain' renamed to
+	`_domain' and it's default value changed to None.
+	(TranslatableText.domain): New method.
+	(TranslatableText.replace): `domain' -> `_domain'.
+	(TranslatableText.translate): Argumnet `gettext' replaced by
+	`translator'.
+	(Concatenation._translate): Method removed.
+	(Concatenation.translate): Argumnet `gettext' replaced by
+	`translator'.
+	(Translator, NullTranslator, GettextTranslator): New classes.
+	(source_files_by_domain.find): Don't exclude `_test.py'.
+
+	* lib/lcg/export/export.py (Exporter.__init__): Argument `lang'
+	removed.  New argument `translator'.  Don't initialize the
+	`gettext' interface, just rely on the `translator'.
+	(Exporter.translate): Postpone the translation to the translator.
+
+	* lib/lcg/export/html.py (HtmlExporter.page): Return the text
+	untranslated.
+	(HtmlExporter.export): Translate the text returned by `page()'.
+
+	* translations/eurochance.de.po: Updated.
+
+	* translations/help.*.txt: Updated.
+
+	* lib/lcg/eurochance.py (EurochanceNode._GETTEXT_DOMAIN) 
+	(ExerciseHelp._GETTEXT_DOMAIN): Nová konstanta.
+	(EurochanceNode.__init__): Vyu¾ívej ji.  Loguj pøípadné
+	nepøelo¾ené texty.
+	(Instructions._DUMMY_TRANSLATIONS) 
+	(ExerciseHelp._DUMMY_TRANSLATIONS): Nové konstanty.
+
+	* translations/Makefile (%.d): The `%/LC_MESSAGES' directorty
+	added to the .mo file prerequisities.
+	(domains): Added `test'.
+	(all): Moved prior to the `include' directive.
+
 2006-08-01  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/i18n.py: Print the result of `source_files_by_domain()'
