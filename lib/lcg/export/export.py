@@ -22,27 +22,15 @@ from lcg import *
 
 class Exporter(object):
 
-    def __init__(self, lang=None):
-        import config, gettext
-        if lang and lang != 'en':
-            try:
-                t = gettext.translation('lcg', config.translation_dir, (lang,))
-            except IOError, e:
-                raise IOError(str(e)+", directory: '%s'" % \
-                              config.translation_dir)
-        else:
-            t = gettext.NullTranslations()
-        self._translation = t
-        
+    def __init__(self, translator=None):
+        self._translator = translator or NullTranslator()
+
     def translate(self, text):
-        if isinstance(text, (Concatenation, TranslatableText)):
-            return text.translate(self._translation.ugettext)
-        else:
-            return text
+        return self._translator.translate(text)
     
     def export(self, node):
         """Export the node and its children recursively."""
-
+    
         
 class MarkupFormatter(object):
     """Simple inline ascii markup formatter.
