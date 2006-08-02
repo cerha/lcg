@@ -46,9 +46,8 @@ def main():
         exporter = lcg.ims.IMSExporter
     else:
         exporter = EurochanceExporter
-
-    e = exporter(lang=('-' in lang and lang[:2] or lang),
-                 stylesheet=opt['stylesheet'])
+    t = lcg.GettextTranslator((('-' in lang and lang[:2] or lang),))
+    e = exporter(translator=t, stylesheet=opt['stylesheet'])
     e.export(c, destination_dir)
 
     

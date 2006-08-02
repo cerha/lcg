@@ -47,7 +47,8 @@ def main():
         exporter = hhp.HhpExporter
     else:
         exporter = lcg.HtmlStaticExporter
-    e = exporter(lang=opt['language'], stylesheet=opt['stylesheet'])
+    t = lcg.GettextTranslator((opt['language'],))
+    e = exporter(translator=t, stylesheet=opt['stylesheet'])
     e.export(doc, destination_dir)
 
 
