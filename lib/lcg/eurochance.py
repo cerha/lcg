@@ -28,6 +28,7 @@ from lcg import *
 _ = TranslatableTextFactory('eurochance')
 
 class EurochanceNode(ContentNode, FileNodeMixin):
+    _GETTEXT_DOMAIN = 'eurochance'
 
     _INHERITED_ARGS = ('language', 'secondary_language', 'language_variants',
                        'input_encoding')
@@ -46,8 +47,16 @@ class EurochanceNode(ContentNode, FileNodeMixin):
             self._gettext = lambda x: x
         else:
             import gettext
-            t = gettext.translation('lcg', config.translation_dir, (language,))
-            self._gettext = lambda x: t.ugettext(re.sub('\s*\n', ' ', x))
+            t = gettext.translation(self._GETTEXT_DOMAIN,
+                                    config.translation_dir, (language,))
+            def gettext(text):
+                text = re.sub('\s*\n', ' ', text)
+                result  = t.ugettext(text)
+                if text == result:
+                    log("Missing translation for '%s' in %s?" % \
+                        (text, self.__class__.__name__))
+                return result
+            self._gettext = gettext
         title = self._title_(brief_title=brief_title)
         content = self._create_content()
         super(EurochanceNode, self).__init__(parent, id, title=title,
@@ -158,6 +167,9 @@ class Instructions(EurochanceNode):
     """A general set of pre-course instructions."""
     _TITLE = _("General Course Instructions")
 
+    # A hack to provide translations for texts from other domains here.
+    _DUMMY_TRANSLATIONS = (_("Exercise Help"), _("Play"))
+    
     def _create_content(self):
         return self._localized_wiki_content('instructions', macro=True)
     
@@ -171,6 +183,10 @@ class CopyrightInfo(EurochanceNode):
     
 class ExerciseHelp(EurochanceNode):
     """Exercise instructions."""
+    _GETTEXT_DOMAIN = 'lcg-exercises'
+
+    # A hack to provide translations for texts from other domains here.
+    _DUMMY_TRANSLATIONS = (_("Answer Sheets"))
     
     def __init__(self, parent, id, type, template, *args, **kwargs):
         assert issubclass(type, Exercise)
@@ -183,8 +199,7 @@ class ExerciseHelp(EurochanceNode):
         g = dict(type=self._type, **self._type.typedict())
         content = self.parse_wiki_text(self._template, macro=True, globals=g,
                                        subst=self._gettext)
-        return SectionContainer(content,
-                                lang=self.root().users_language())
+        return SectionContainer(content, lang=self.root().users_language())
 
     def _title_(self, brief_title=None):
         return _("Instructions for %s", self._type.name())
