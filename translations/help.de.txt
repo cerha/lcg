@@ -210,14 +210,14 @@ Die Ergebnisfelder nach den Übungen zeigen Ihnen die folgenden Werte:
 
 #if issubclass(type, Dictation)
 
->>${Result}<<
+>>${Result:}<<
    Zeigt das Ergebnis der vorangegangenen Bewertung (Sie können Ihre Antworten
    auswerten, indem Sie die 'Enter'-Taste oder die Taste >>${Evaluate}<<
    drücken).
 
 #else
 
->>${Result}<<
+>>${Result:}<<
    Zeigt die Anzahl und den Prozentsatz der richtigen Antworten.  Das erste
    Zahlenpaar zeigt an, wie viele Antworten soeben richtig beantwortet wurden.
    Wenn Sie die Übungen wiederholen, zeigt Ihnen das zweite Zahlenpaar an, wie
@@ -225,7 +225,7 @@ Die Ergebnisfelder nach den Übungen zeigen Ihnen die folgenden Werte:
    Ergebnisse löschen und von vorne beginnen, drücken Sie auf die Taste
    >>${Reset}<< (zurücksetzen).
 
->>${Answered}<<
+>>${Answered:}<<
    Zeigt die Anzahl der bereits durchgeführten Aufgabenstellungen an.  Zum
    Beispiel: Das Ergebnis 4/10 bedeutet, dass Sie vier Aufgaben von zehn Fragen
    bereits beantwortet haben. Somit müssen Sie noch weitere sechs verbleibene
@@ -253,7 +253,7 @@ Das Bedienungsfeld nach jeder Übung beinhaltet folgende Tastenfelder:
 == Auflösungsteil == answer-sheets
 
 Im Auflösungsteil finden Sie alle richtigen Antworten zu den gesamten Übungen.
-Einen LINK zum >>${Answer Sheets}<< finden Sie im Inhaltsverzeichnis. Einfacher
+Einen LINK zum >>${answer sheet}<< finden Sie im Inhaltsverzeichnis. Einfacher
 ist es, wenn Sie in einem Übungsabschnitt am rechten Bildschirmrand auf das '?'
 (Fragezeichen)-Feld klicken und damit direkt in den entsprechenden Lösungsteil
 wechseln.

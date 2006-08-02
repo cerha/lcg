@@ -11,8 +11,8 @@ porovnat svou výslovnost s originálem.  Cvičení je proto čistě
 verbálně-poslechové, bez písemných úkolů.
 
 Pokud chcete své odpovědi porovnat s psaným textem, použijte textový přepis
-nahrávky (>>${transcript}<<).  Protože nejde o písemné cvičení, není možné Vaše
-výsledky vyhodnotit automaticky.
+nahrávky (odkaz >>${show transcript}<<).  Protože nejde o písemné cvičení, není
+možné Vaše výsledky vyhodnotit automaticky.
 
 #endif
 #if issubclass(type, Reading)
@@ -246,7 +246,7 @@ následující tlačítka:
 
 == Klíč odpovědí == answer-sheets
 
-Klíč (>>${Answer Sheets}<<) obsahuje správné odpovědi pro všechna cvičení.  Je
+Klíč (>>${answer sheet}<<) obsahuje správné odpovědi pro všechna cvičení.  Je
 dostupný z úvodní stránky kurzu.  Mnohem pohodlnější možností je však použít
 odkazu ve formě otazníku, který najdete za každým jednotlivým úkolem.  Tento
 odkaz vás přesune přímo na odpovídající správnou odpověď v klíči.

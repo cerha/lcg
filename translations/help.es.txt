@@ -239,7 +239,7 @@ siguientes:
 
 == Hojas de Respuestas == answer-sheets
 
-Las Hojas de Respuestas (>>${Answer Sheets}<<) contienen todas las respuestas
+Las Hojas de Respuestas (>>${answer sheet}<<) contienen todas las respuestas
 correctas de todos los ejercicios.  Puedes acceder a las Hojas de Respuesta
 desde el Indice del Curso, o para más comodidad puedes usar el enlace del signo
 de interrogación '?'  después de cada elemento del ejercicio. Este enlace te

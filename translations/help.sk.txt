@@ -12,8 +12,8 @@ vypracováva výhradne formou počúvania / ústnou formou a neobsahuje žiadne
 písomné úlohy.
 
 Ak si želáte porovnať Vaše odpovede s písaným textom, môžete použiť prepis
-záznamu. Keďže nejde o písomné cvičenie, Vaše výsledky nemôžu byť porovnané
-automaticky.
+záznamu (odkaz >>${show transcript}<<).  Keďže nejde o písomné cvičenie, Vaše
+výsledky nemôžu byť porovnané automaticky.
 
 #endif
 #if issubclass(type, Reading)

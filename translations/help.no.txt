@@ -233,7 +233,7 @@ Kontrollpanelet nedenfor oppgaven inneholder følgende knapper:
 
 == Svarark == svarark
 
-Svararket (>>${Answer Sheets}<<) inneholder alle de korrekte svarene for alle
+Svararket (>>${answer sheet}<<) inneholder alle de korrekte svarene for alle
 oppgavene. Du kan få tilgang til svararket fra kursindeksen, eller raskere ved
 å bruke "?"  (spørsmålstegn) lenken etter hver del. Denne lenken tar deg
 direkte til det korresponderende svaret i svararket.

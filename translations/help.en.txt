@@ -11,8 +11,8 @@ sentence and compare your pronunciation with the original.  Therefore the
 exercise is purely aural-oral, with no written tasks.
 
 If you wish to check your answers against the written text, you can use the
-transcript of the recording.  Since this is not a written exercise, your
-results cannot be checked automatically.
+transcript of the recording (the link >>${show transcript}<<).  Since this is
+not a written exercise, your results cannot be checked automatically.
 
 #endif
 #if issubclass(type, Reading)
@@ -240,7 +240,7 @@ The control panel below the exercise contains the following buttons:
 == Answer Sheets == answer-sheets
 
 The Answer Sheets contain all the correct answers for all the exercises.  You
-can access >>${Answer Sheets}<< from the Course Index, or more conveniently,
+can access an >>${answer sheet}<< from the Course Index, or more conveniently,
 you can use the '?'  (question mark) link after each task.  This link takes you
 directly to the corresponding answer in the Answer Sheet.
 
