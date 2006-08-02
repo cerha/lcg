@@ -1,9 +1,9 @@
-domains := lcg lcg-exercises eurochance
+domains := lcg lcg-exercises eurochance test
 mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
 
-include $(domains:%=%.d)
-
 all: $(mo_files)
+
+include $(domains:%=%.d)
 
 %.d: $(shell python ../lib/lcg/i18n.py)
 	@echo "Updating rules for domain $*."
