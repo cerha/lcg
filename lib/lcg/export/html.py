@@ -259,14 +259,14 @@ class HtmlExporter(Exporter):
                  self._body(node) + hack,
                  '</body>',
                  '</html>')
-        return self.translate(concat(lines, separator="\n"))
+        return concat(lines, separator="\n")
     
     def export(self, node, directory):
         if not os.path.isdir(directory):
             os.makedirs(directory)
         filename = os.path.join(directory, self._output_file(node))
         file = open(filename, 'w')
-        file.write(self.page(node).encode('utf-8'))
+        file.write(self.translate(self.page(node)).encode('utf-8'))
         file.close()
         for r in node.resources():
             r.export(directory)
