@@ -1,3 +1,17 @@
+2006-08-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/i18n.py (concat): New function replacing the `concat'
+	alias.  When the resulting `Concatenation' is a plain string,
+	return just this string (not a `Concatenation' instance.
+
+	* lib/lcg/export/_html.py (div): New argument `id'.
+	(map): New function.
+
+	* lib/lcg/export/html.py (HtmlExporter._parts): New method.
+	(HtmlExporter._part): New method.
+	(HtmlExporter.page): Instead of `_body', call `_parts' directly.
+	(HtmlExporter._body): Method removed.
+
 2006-08-02  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/generate.py (main): Pass a `GettextTranslator' instance to
