@@ -393,18 +393,23 @@ STRINGTYPES = (str, unicode, TranslatableText, Concatenation)
 
 It is mostly intended to be used for assertions."""
 
+def concat(*args, **kwargs):
+    """Concatenate the 'args' into a 'Concatenation' or a string.
 
-concat = Concatenation
-"""A shortcut for constructing 'Concatenation' instances.
+    This function has exactly the same effect as creating a 'Concatenation' by
+    calling its constructor.  All the arguments are the same.  The only
+    difference is, that when the whole concatenation is a plain Python string
+    (there were no translatable texts within the input), this string is
+    returned directly (without the surrounding 'Concatenation' instance).
 
-See 'Concatenation' constructor for more information about the arguments."""
+    See 'Concatenation' constructor for more information about the arguments.
 
-#def concat(*args, **kwargs):
-#    result = Concatenation(*args, **kwargs)
-#    items = result.items()
-#    if len(items) == 1 and isinstance(items[0], (str, unicode)):
-#        return items[0]
-#    return result
+    """
+    result = Concatenation(*args, **kwargs)
+    items = result.items()
+    if len(items) == 1 and isinstance(items[0], (str, unicode)):
+        return items[0]
+    return result
 
 def format(text, *args):
     """A 'Concatenation' constructor for very simplified string formatting.
