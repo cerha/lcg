@@ -81,8 +81,13 @@ def br(cls=None):
 def hr(cls=None):
     return concat('<hr', _attr(('class', cls),), '/>')
 
-def div(content, cls=None, lang=None):
-    return _tag('div', (('class', cls), ('lang', lang)), content, newlines=True)
+def div(content, id=None, cls=None, lang=None):
+    args = (('class', cls), ('id', id), ('lang', lang))
+    return _tag('div', args, content, newlines=True)
+
+def map(content, cls=None, lang=None, name=None, title=None):
+    args = (('class', cls), ('lang', lang), ('name', name), ('title', title))
+    return _tag('map', args, content, newlines=True)
 
 def link(label, uri, name=None, title=None, target=None, cls=None, hotkey=None):
     if hotkey:
