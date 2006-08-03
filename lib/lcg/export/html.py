@@ -180,13 +180,16 @@ class HtmlExporter(Exporter):
                 for s in node.resources(Script)]
         return concat('  ', concat(tags + self._styles(node), separator='\n  '))
 
-    def _body(self, node):
-        parts = [(getattr(self, '_'+part)(node), part.replace('_', '-'))
-                 for part in self._BODY_PARTS]
-        return concat([_html.div(part, cls=cls)
-                       for part, cls in parts if part is not None],
+    def _parts(self, node, parts):
+        x = [(getattr(self, '_'+part)(node), part.replace('_', '-'))
+             for part in parts]
+        return concat([self._part(part, name)
+                       for part, name in x if part is not None],
                       separator="\n")
-
+    
+    def _part(self, part, name):
+        return _html.div(part, cls=name)
+        
     def _heading(self, node):
         return concat('<h1>', node.title(), '</h1>')
 
@@ -226,7 +229,7 @@ class HtmlExporter(Exporter):
             targets.append(t)
             #flag = node.resource(Image, 'flags/%s.gif' % lang)
             flags.append(None) #InlineImage(flag))
-        result = _("Choose your language:") + " " + \
+        result = _("Choose your language:") + "\n" + \
                  concat([Link(target).export(self) #+" "+ flag.export(self)
                          for target, flag in zip(targets, flags)],
                         separator=" |\n")
@@ -256,7 +259,7 @@ class HtmlExporter(Exporter):
                  self._head(node),
                  '</head>',
                  '<body lang="%s">' % node.language(),
-                 self._body(node) + hack,
+                 self._parts(node, self._BODY_PARTS) + hack,
                  '</body>',
                  '</html>')
         return concat(lines, separator="\n")
