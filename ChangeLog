@@ -1,3 +1,21 @@
+2006-08-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py (TranslatableText.check_concatenation): Renamed
+	to `check_concat'.  Test also if string/unicode input is
+	preserved.
+	(GettextTranslator.check_translate): Pass single language to
+	`GettextTranslator'.
+
+	* lib/lcg/i18n.py (Translator.__init__): Method removed.
+	(NullTranslator.__init__): Method removed.
+	(GettextTranslator.__init__): Process all args here.  don't call
+	parent class constructor.  Take single 'lang' argument instead of
+	the list of languages.  New argument `fallback'.
+	(GettextTranslator._gettext_instance): Pass single language to
+	`gettext.translation'.  On error, return a `NullTranslation'
+	instance if `fallback' was passed to the constructor or if the
+	language is `en'.
+
 2006-08-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/i18n.py (concat): New function replacing the `concat'
