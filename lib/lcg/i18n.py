@@ -283,28 +283,6 @@ class Translator(object):
 
     """
 
-    def __init__(self, languages, default_domain='lcg'):
-        """Initialize the instance.
-        
-        Arguments:
-
-          languages -- A list of target languages in the order of their
-            preference.  If multiple languages are specified, the later will be
-            used as fallbacks for the earlier, when trying to translate a
-            string.  Handling of language names depends on the derived class,
-            however in general, lowercase ISO 639-1 Alpha-2 language codes
-            should be always supported.  In any case, a sequence of strings is
-            expected.
-
-          default_domain -- the name of the default domain, used when the
-            translatable has no explicit domain defined.
-
-        """
-        assert isinstance(languages, (list, tuple)), languages
-        assert isinstance(default_domain, str), default_domain
-        self._languages = tuple(languages)
-        self._default_domain = default_domain
-
     def gettext(self, text, domain=None):
         """Return the translation of the string 'text' from given domain.
 
@@ -333,50 +311,59 @@ class Translator(object):
             return text.translate(self)
         else:
             return text
-        
+
 
 class NullTranslator(Translator):
     """A translator which just returns identical strings as translations."""
-    def __init__(self):
-        super(NullTranslator, self).__init__(())
     
     def gettext(self, text, domain=None):
         return text
-    
-    
+
+
 class GettextTranslator(Translator):
     """Translator based on the GNU gettext interface."""
     
-    def __init__(self, languages, path=None, **kwargs):
+    def __init__(self, lang, path=None, default_domain='lcg', fallback=False):
         """Initialize the instance.
 
-          languages -- as in the parent class.
+        Arguments:
 
-          default_domain -- as in the parent class.
+          lang -- target language code as a string.
+
+          default_domain -- the name of the default domain, used when the
+            translatable has no explicit domain defined.
 
           path -- a dictionary, which may assign an arbitrary directory to each
             domain.  This directory should contain the locale subdirectories as
             usual with GNU getext (eg. 'de/LC_MESSAGES/domain.mo').  If there
             is no item for a domain, the directory defaults to
             'config.translation_dir'.
-        
+
+          fallback -- if true, the translator will silently use a null
+            translation in case the desired translation files is not found.
         
         """
-        super(GettextTranslator, self).__init__(languages, **kwargs)
+        assert isinstance(lang, str), lang
+        assert isinstance(default_domain, str), default_domain
         assert isinstance(path, dict) or path is None, path
+        assert isinstance(fallback, bool), fallback
+        self._lang = lang
+        self._default_domain = default_domain
+        self._fallback = fallback
         self._path = path or {}
         self._cache = {}
 
     def _gettext_instance(self, domain):
         import gettext, config
-        if self._languages == ('en',):
-            return gettext.NullTranslations()
         path = self._path.get(domain, config.translation_dir)
         try:
-            return gettext.translation(domain, path, self._languages)
+            return gettext.translation(domain, path, (self._lang,))
         except IOError, e:
-            raise IOError(str(e)+", path: '%s', languages=%s" % \
-                          (path, self._languages))
+            if self._fallback or self._lang == 'en':
+                # The original strings are in English, so it's ok if we don't
+                # find a MO file for them.
+                return gettext.NullTranslations()
+            raise IOError(str(e)+", path: '%s', lang: %s" % (path, self._lang))
         
     def gettext(self, text, domain=None):
         domain = domain or self._default_domain
