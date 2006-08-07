@@ -74,7 +74,7 @@ class TranslatableText(unittest.TestCase):
             pass
         assert isinstance(e, TypeError), e
             
-    def check_concatenation(self):
+    def check_concat(self):
         a = lcg.concat(lcg.TranslatableText("Version %s", "1.0") + 'xx',
                        'yy', separator="\n")
         assert isinstance(a, lcg.Concatenation), a
@@ -82,10 +82,11 @@ class TranslatableText(unittest.TestCase):
         assert len(items) == 2, items
         assert items[1] == ('xx\nyy'), items[1]
         b = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
-        assert isinstance(b, lcg.Concatenation), b
-        items = b.items()
-        assert len(items) == 1, items
-        assert items[0] == ('a-b-c-d-e-f'), items[0]
+        assert isinstance(b, str), b
+        assert b == 'a-b-c-d-e-f', b
+        c = lcg.concat('a', (u'b', 'c', 'd'), 'e', 'f', separator='-')
+        assert isinstance(c, unicode), c
+        assert c == 'a-b-c-d-e-f', c
         
     def check_replace(self):
         t = lcg.TranslatableText("Version %s", "xox")
@@ -117,7 +118,7 @@ tests.add(TranslatableTextFactory)
 class GettextTranslator(unittest.TestCase):
 
     def check_translate(self):
-        t = lcg.GettextTranslator(('cs',))
+        t = lcg.GettextTranslator('cs')
         a = _("Hi %s, say hello to %s.", _("Joe"), _("Bob"))
         b = t.translate(a)
         assert b == "Ahoj Pepo, pozdravuj Bobika.", b
