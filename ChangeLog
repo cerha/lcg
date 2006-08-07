@@ -1,5 +1,11 @@
 2006-08-07  Tomas Cerha  <cerha@brailcom.org>
 
+	* bin/lcgmake.py (main): Pass single language to
+	`GettextTranslator'.
+
+	* bin/generate.py (main): Pass single language to
+	`GettextTranslator'.
+
 	* lib/lcg/_test.py (TranslatableText.check_concatenation): Renamed
 	to `check_concat'.  Test also if string/unicode input is
 	preserved.
