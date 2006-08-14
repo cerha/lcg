@@ -103,6 +103,16 @@ class TranslatableText(unittest.TestCase):
         assert bx == 'Versi-n x-x-y-y', bx
         assert cx == 'versi-n x-x-y-y', cx
 
+    def check_string_context(self):
+        a = lcg.TranslatableText("Version %s", "1.0")
+        assert a == "Version 1.0"
+        b = lcg.TranslatableText("Info: %s", a)
+        assert b == "Info: Version 1.0"
+        c = lcg.concat("Info:", lcg.concat(a, '2006-08-14', separator=', '),
+                       ('Mon', '10:32'), separator=' ')
+        assert c == "Info: Version 1.0, 2006-08-14 Mon 10:32", c
+        
+        
 tests.add(TranslatableText)
 
 
