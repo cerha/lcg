@@ -50,17 +50,49 @@ class TranslatableTextFactory(object):
         return TranslatableText(*args, **kwargs)
     
 
-class TranslatableText(object):
+class TranslatableText(unicode):
     """Translatable string with a delayed translation.
 
-    This class is intended to become the '_' identifier.  Thus all strings
-    within the LCG code marked by the '_()' construct become 'TranslatableText'
-    instances.  They can be mixed with ordinary Python string or unicode
-    strings using the 'Concatenation' class defined below.  Then the exporter
-    is capable to translate all translatable strings within the content at one
-    place to any target language.
+    The instances of this class can be mixed with ordinary Python strings
+    (plain or unicode) strings using the 'Concatenation' class defined below.
+    Then the exporter is capable to translate all translatable strings within
+    the content at one place to the desired output language.
 
+    As oposed to the ordinary gettext mechanism, the delayed translation allows
+    us to build the content first and translate it afterwards.
+
+    IMPORTANT:
+
+    This class is derived from Python 'unicode' type.  Thus it behaves as an
+    ordinary Python string.  However, performing string operations, such as
+    concatenation with other python strings, formatting, etc, leads to the loss
+    of translation information.  In such a case the instance is unavoidably
+    converted to an ordinary unicode string by Python and translation can not
+    be performed anymore.  This is why there is the 'Concatenation' class,
+    which protects the 'TranslatableText' instance while allowing to mix it
+    with ordinary strings.
+
+    To preserve the 'TranslatableText' and 'Concatenation' instances, only the
+    following operations are permitted:
+
+      * concatenation using the 'concat' function defined below.
+      
+      * concatenation using the '+' operator when (and only when) the first
+        item in the addition is a 'TranslatableText' or 'Concatenation'
+        instance.
+
+      * replacement using the 'replace' method.
+
+      * simple ``formatting'' using the 'format' function defined below.
+    
     """
+    def __new__(cls, text, *args, **kwargs):
+        values = args or dict([(k,v) for k,v in kwargs.items()
+                               if not k.startswith('_')])
+        if values:
+            text %= values
+        return unicode.__new__(cls, text)
+
     def __init__(self, text, *args, **kwargs):
         """Initialize the instance.
 
@@ -72,7 +104,7 @@ class TranslatableText(object):
           
           kwargs -- named substitution arguments (see below).
 
-        If 'args' or 'kwargs' are passed, the 'text' is considered a formatting
+        If 'args' or 'kwargs' are passed, the 'text' is considered a format
         string and it will be automatically interpolated after translation.
         The interpolation must be done after the translation, because we need
         the base string, not the interpolated one for translation.  And because
@@ -86,26 +118,23 @@ class TranslatableText(object):
 
         Note, that only 'args' or only 'kwargs' may be passed (not both at
         once).  This depends whether you are using named variables in the
-        format string or just positional substitution.
+        format string or just positional substitution.  It is recommended to
+        use named format variables (with keyword arguments), especially when
+        there is more than one variable within the string.
         
         """
         assert isinstance(text, (str, unicode)), (text, type(text))
         self._text = text
-        kwargs = self._init_kwargs(**kwargs)
-        assert not args or not kwargs, (text, args, kwargs)
         self._args = args
-        self._kwargs = kwargs
+        self._init_kwargs(**kwargs)
+        assert not args or not self._kwargs, (text, args, self._kwargs)
 
     def _init_kwargs(self, _transforms=(), _domain=None, **kwargs):
         assert isinstance(_transforms, tuple), _transforms
         assert isinstance(_domain, (str)) or _domain is None, _domain
         self._transforms = _transforms
         self._domain = _domain
-        return kwargs
-
-    def __str__(self):
-        log("TranslatableText used in string context:", caller())
-        return '[TranslatableText "%s"]' % self._text
+        self._kwargs = kwargs
 
     def domain(self):
         """Return the domain name bound to this instance."""
@@ -156,20 +185,33 @@ class TranslatableText(object):
         return result
 
     def __add__(self, other):
-        if not isinstance(other, STRINGTYPES):
+        if not isinstance(other, (str, unicode)):
             raise TypeError("unsupported operand type(s) for +: '%s' and '%s'"
                             % (self.__class__.__name__,
                                other.__class__.__name__))
         return concat((self, other))
 
 
-class Concatenation(object):
+class Concatenation(unicode):
     """A concatenation of translatable and untranslatable text elements.
 
     Represents a block of text, where ordinary python strings, unicode strings
     and TranslatableText instances are concatenated to make the final text.
 
+    As well as with 'TranslatableText', using an instance of this class in a
+    string (or unicode) context leads to the loss of translation information.
+    See the documentation of 'TranslatableText' for more information.
+    
     """
+    def __new__(cls, *items, **kwargs):
+        sep = (lambda separator='': separator)(**kwargs)
+        def x(item):
+            if isinstance(item, (list, tuple)):
+                return sep.join(item)
+            else:
+                return item
+        return unicode.__new__(cls, sep.join([x(item) for item in items]))
+    
     def __init__(self, *items, **kwargs):
         """Initialize the instance.
 
@@ -203,8 +245,8 @@ class Concatenation(object):
                     append(array, p)
             else:
                 assert isinstance(item, (str, unicode, TranslatableText)), item
-                if isinstance(item, (str, unicode)) and array \
-                       and isinstance(array[-1], (str, unicode)):
+                if not isinstance(item, TranslatableText) and array \
+                       and not isinstance(array[-1], TranslatableText):
                     array[-1] +=  item
                 else:                
                     array.append(item)
@@ -219,15 +261,11 @@ class Concatenation(object):
             if i != last:
                 append(myitems, separator)
 
-    def __str__(self):
-        log("Concatenation used in string context:", caller())
-        return "[Concatenation %s]" % [unicode(item) for item in self._items]
-    
     def __add__(self, other):
-        if not isinstance(other, STRINGTYPES):
+        if not isinstance(other, (str, unicode)):
             raise TypeError("unsupported operand type(s) for +: "
                             "'Concatenation' and '%s'" % type(other))
-        return Concatenation((self, other))
+        return concat(self, other)
         
     def replace(self, old, new):
         """Apply the method to all items and return a new Concatenation.
@@ -238,7 +276,7 @@ class Concatenation(object):
         'TranslatableText.replace()' for more information.
 
         """
-        return Concatenation([item.replace(old, new) for item in self._items])
+        return concat([item.replace(old, new) for item in self._items])
 
     def items(self):
         """Return the list of items included in this concatenation.
@@ -374,12 +412,6 @@ class GettextTranslator(Translator):
         return t.ugettext(text)
         
     
-    
-STRINGTYPES = (str, unicode, TranslatableText, Concatenation)
-"""This constant lists all types, which can represent text within LCG.
-
-It is mostly intended to be used for assertions."""
-
 def concat(*args, **kwargs):
     """Concatenate the 'args' into a 'Concatenation' or a string.
 
@@ -394,7 +426,7 @@ def concat(*args, **kwargs):
     """
     result = Concatenation(*args, **kwargs)
     items = result.items()
-    if len(items) == 1 and isinstance(items[0], (str, unicode)):
+    if len(items) == 1 and not isinstance(items[0], TranslatableText):
         return items[0]
     return result
 
@@ -414,18 +446,11 @@ def format(text, *args):
 
        concat('Hi ', 'Bob', ', say hello to ', 'John', '.')
 
-    Of course, with plain strings this makes no sense, but when the
-    arguments are translatable texts...
+    Of course, with plain strings this makes no sense, but when the arguments
+    are translatable texts, the original instances are preserved.
 
     """
     return concat(reduce(lambda a,b: a+b, zip(text.split('%s'), args+('',))))
-
-
-#     def __new__(cls, text, *args, **kwargs):
-#         self = unicode.__new__(cls, text)
-#         assert not args or not kwargs, (text, args, kwargs)
-#         self._args = kwargs or args
-#         return self
 
 
 def source_files_by_domain(domain=None):
