@@ -125,7 +125,6 @@ class HorizontalSeparator(Content):
 
 class TextContent(Content):
     """A simple piece of text."""
-    _TEXT_TYPE = STRINGTYPES
 
     def __init__(self, text, **kwargs):
         """Initialize the instance.
@@ -136,7 +135,7 @@ class TextContent(Content):
           kwargs -- keyword arguemnts for parent class constructor.
 
         """
-        assert isinstance(text, self._TEXT_TYPE), text
+        assert isinstance(text, (str, unicode)), text
         super(TextContent, self).__init__(**kwargs)
         self._text = text
 
@@ -160,16 +159,12 @@ class WikiText(TextContent):
     See 'MarkupFormatter' for more information about the formatting rules.
     
     """
-    _TEXT_TYPE = (str, unicode)
-        
     def export(self, exporter):
         return exporter.format_wiki_text(self.parent(), self._text)
 
     
 class PreformattedText(TextContent):
     """Preformatted text."""
-    _TEXT_TYPE = (str, unicode)
-
     def export(self, exporter):
         from xml.sax import saxutils
         text = saxutils.escape(self._text)
@@ -496,7 +491,7 @@ class Section(SectionContainer):
             to be included in the Table of Contents.
             
         """
-        assert isinstance(title, STRINGTYPES), title
+        assert isinstance(title, (str, unicode)), title
         assert isinstance(anchor, types.StringTypes) or anchor is None, anchor
         assert isinstance(in_toc, types.BooleanType), in_toc
         self._title = title
@@ -571,7 +566,7 @@ class TableOfNodes(Content):
 
         """
         super(TableOfNodes, self).__init__()
-        assert title is None or isinstance(title, STRINGTYPES)
+        assert title is None or isinstance(title, (str, unicode))
         assert isinstance(depth, types.IntType)
         assert isinstance(detailed, types.BooleanType)
         self._title = title
@@ -758,7 +753,7 @@ class VocabSection(Section):
           reverse -- see the same constructor argument for `VocabList'.
 
         """
-        assert isinstance(title, STRINGTYPES)
+        assert isinstance(title, (str, unicode))
         assert is_sequence_of(items, VocabItem)
         assert isinstance(reverse, types.BooleanType)
         subsections = [(t, i) for t, i in self._subsections(items) if i]
