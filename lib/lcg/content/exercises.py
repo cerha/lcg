@@ -71,7 +71,7 @@ class Choice(object):
 
     """
     def __init__(self, answer, correct=False):
-        assert isinstance(answer, STRINGTYPES)
+        assert isinstance(answer, (str, unicode))
         assert isinstance(correct, types.BooleanType)
         self._answer = answer
         self._correct = correct
@@ -364,7 +364,7 @@ class Exercise(Section):
             '%' signs, which are not a part of a placeholder.
             
         """
-        assert title is None or isinstance(title, STRINGTYPES)
+        assert title is None or isinstance(title, (str, unicode))
         title = concat(_("Exercise %d"), ": ", title or self._NAME)
         super(Exercise, self).__init__(title, Content(), in_toc=False)
         self.set_parent(parent)
@@ -425,7 +425,7 @@ class Exercise(Section):
     def _wiki_content(self, text, allow_file=False, subdir=None, escape=False):
         if text is None:
             return None
-        assert isinstance(text, STRINGTYPES)
+        assert isinstance(text, (str, unicode))
         if allow_file and len(text.splitlines()) == 1:
             name, ext = os.path.splitext(text)
             if subdir:
@@ -706,8 +706,8 @@ class _InteractiveExercise(Exercise):
                     (_html.button,_('Fill'),    "this.form.handler.fill()"),
                     (_html.reset, _('Reset'),   "this.form.handler.reset()"))]
         panel = _html.div((_html.div(concat(displays, separator='<br/>'),
-                                     'display'),
-                           _html.div(buttons, 'buttons')), 'results')
+                                     cls='display'),
+                           _html.div(buttons, cls='buttons')), cls='results')
         l = _html.p(_("See the %s to check your results.", 
                       _html.link(_("answer sheet"),
                                  self._answer_sheet_uri(exporter),
@@ -792,7 +792,7 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
 
     def _format_choices(self, task):
         formatted = [self._format_choice(task, ch) for ch in task.choices()]
-        return _html.div(formatted, 'choices')
+        return _html.div(formatted, cls='choices')
 
     def _task_style_cls(self):
         cls = super(_ChoiceBasedExercise, self)._task_style_cls()
