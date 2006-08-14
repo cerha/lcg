@@ -222,17 +222,18 @@ class HtmlExporter(Exporter):
         self._flags = flags = []
         for lang, name in pairs:
             if lang == current:
-                name += ' (*)' #_('(current)')
+                name = concat(name, ' (*)') #_('(current)')
             t = Link.ExternalTarget(self._node_uri(node, lang=lang), name)
             if lang == current:
                 self._current = t
             targets.append(t)
             #flag = node.resource(Image, 'flags/%s.gif' % lang)
             flags.append(None) #InlineImage(flag))
-        result = _("Choose your language:") + "\n" + \
-                 concat([Link(target).export(self) #+" "+ flag.export(self)
-                         for target, flag in zip(targets, flags)],
-                        separator=" |\n")
+        result = concat(_("Choose your language:"), "\n",
+                        concat([Link(target).export(self)
+                                #+" "+ flag.export(self)
+                                for target, flag in zip(targets, flags)],
+                               separator=" |\n"))
         return result
 
     def _content(self, node):
