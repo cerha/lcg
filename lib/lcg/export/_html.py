@@ -110,8 +110,9 @@ def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
 
 # Form controls
 
-def form(content, name=None, cls=None, action="#"):
-    attr = (('name', name), ('action', action), ('class', cls))
+def form(content, name=None, cls=None, action="#", method=None):
+    attr = (('name', name), ('action', action), ('method', method),
+            ('class', cls))
     return _tag('form', attr, content, newlines=True)
 
 def fieldset(content, legend=None, cls=None):
@@ -123,9 +124,11 @@ def label(text, id, lang=None, cls=None):
     return _tag('label', (('for', id), ('lang', lang), ('class', cls)), text)
 
 def _input(type, name=None, value=None, title=None, id=None,
-           onclick=None, size=None, cls=None, readonly=False, checked=False):
+           onclick=None, size=None, cls=None, readonly=False, checked=False,
+           disabled=False):
     assert isinstance(checked, types.BooleanType)
     assert isinstance(readonly, types.BooleanType)
+    assert isinstance(disabled, types.BooleanType)
     assert not checked or type in ('radio', 'checkbox')
     attr = _attr(('name', name),
                  ('value', value),
@@ -135,12 +138,13 @@ def _input(type, name=None, value=None, title=None, id=None,
                  ('onclick', onclick),
                  ('class', cls),
                  ('checked', checked),
-                 ('readonly', readonly))
+                 ('readonly', readonly),
+                 ('disabled', disabled))
     return concat('<input type="%s"' % type, attr, ' />')
 
-def field(text='', name='', size=20, **kwargs):
+def field(value='', name='', size=20, **kwargs):
     kwargs['cls'] = kwargs.has_key('cls') and 'text '+kwargs['cls'] or 'text'
-    return _input('text', name=name, value=text, size=size, **kwargs)
+    return _input('text', name=name, value=value, size=size, **kwargs)
 
 def radio(name, **kwargs):
     return _input('radio', name=name, **kwargs)
@@ -155,6 +159,9 @@ def button(label, handler, cls=None, title=None):
 def reset(label, onclick=None, cls=None):
     return _input('reset', onclick=onclick, value=label, cls=cls)
 
+def submit(label, onclick=None, cls=None):
+    return _input('submit', onclick=onclick, value=label, cls=cls)
+
 def select(name, options, onchange=None, selected=None, id=None):
     assert selected is None or selected in [value for text, value in options],\
            (selected, options)
@@ -166,6 +173,18 @@ def select(name, options, onchange=None, selected=None, id=None):
     attr = (('name', name), ('id', id), ('onchange', onchange))
     return _tag('select', attr, opts, newlines=True)
 
+def checkbox(name, id=None, checked=False, disabled=False, cls=None):
+    return _input('checkbox', id=id, checked=checked, disabled=disabled,
+                  cls=cls)
+
+def textarea(name, value='', id=None, cls=None, rows=None, cols=None):
+    attr = (('name', name),
+            ('id', id),
+            ('rows', rows),
+            ('cols', cols),
+            ('class', cls))
+    return _tag('textarea', attr, value)
+    
 # Special controls
 
 def speaking_text(text, media):
