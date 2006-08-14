@@ -1,3 +1,51 @@
+2006-08-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/_html.py (form): New argument `method'.
+	(_input): New argument `disabled'.
+	(field): The first argument `text' renamed to `value'.
+	(submit, checkbox, textarea): New functions.
+
+	* lib/lcg/export/html.py (HtmlExporter._language_selection): Use
+	`concat', not string addition.
+	(HtmlExporter._language_selection): Use `concat', not string
+	addition.
+
+	* lib/lcg/content/exercises.py (Choice.__init__)
+	(Exercise.__init__, Exercise._wiki_content): Assert against str
+	and unicode, not STRINGTYPES.
+	(_ChoiceBasedExercise._format_choices)
+	(_InteractiveExercise._results): Pass the `cls' argument to
+	`_html.div' as a named argument, not positional.
+
+	* lib/lcg/content/content.py (TextContent._TEXT_TYPE)
+	(WikiText._TEXT_TYPE, PreformattedText._TEXT_TYPE): Constant
+	removed.
+	(Section.__init__, TableOfNodes.__init__, VocabSection.__init__):
+	Assert against str and unicode, not STRINGTYPES.
+
+	* lib/lcg/_test.py (TranslatableText.check_string_context): New
+	method.
+
+	* lib/lcg/i18n.py (TranslatableText, Concatenation): Derive from
+	Python `unicode' type.  Documentation added.
+	(TranslatableText.__new__, Concatenation.__new__): New methods.
+	(TranslatableText._init_kwargs): Ignore the return value or
+	`self._init_kwargs()'.
+	(TranslatableText.__str__): Metohd removed.
+	(TranslatableText.__add__): Don't use `STRINGTYPES'.  Compare just
+	to `str' and `unicode'.
+	(Concatenation.__init__.append): Compare to `TranslatableText'
+	explicitely.
+	(Concatenation.__str__): Method removed.
+	(Concatenation.__add__): Don't use `STRINGTYPES'.  Compare just to
+	`str' and `unicode'.
+	(Concatenation.__add__): Use `concat', not directly
+	`Concatenation'.
+	(Concatenation.replace): Use `concat', not directly
+	`Concatenation'.
+	(STRINGTYPES): Constant removed.
+	(concat): Compare to `TranslatableText' explicitely.
+
 2006-08-07  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/lcgmake.py (main): Pass single language to
