@@ -320,7 +320,7 @@ class ContentNode(object):
 class WikiNodeMixin(object):
     """Mix-in class for nodes read from a wiki text document."""
 
-    def __init__(self):
+    def _init(self):
         self._parser = Parser()
 
     def parse_wiki_text(self, text, macro=False, globals=None, subst=None):
@@ -340,7 +340,7 @@ class WikiNodeMixin(object):
 class FileNodeMixin(WikiNodeMixin):
     """Mix-in class for nodes read from input files."""
 
-    def __init__(self, parent, subdir=None, input_encoding='ascii'):
+    def _init(self, parent, subdir=None, input_encoding='ascii'):
         """Initialize the instance.
         
           subdir -- a directory name relative to parent's source directory.
@@ -357,7 +357,7 @@ class FileNodeMixin(WikiNodeMixin):
         codecs.lookup(input_encoding)
         self._input_encoding = input_encoding
         self._subdir = subdir
-        super(FileNodeMixin, self).__init__()
+        super(FileNodeMixin, self)._init()
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""
@@ -435,7 +435,7 @@ class FileNodeMixin(WikiNodeMixin):
         return dir
 
 
-class WikiNode(ContentNode, WikiNodeMixin):
+class WikiNode(ContentNode, FileNodeMixin):
     """Node read from a LCG Structured Text (wiki) document.
 
     The node's content is read from a Structured Text document.  The title of
@@ -454,7 +454,8 @@ class WikiNode(ContentNode, WikiNodeMixin):
     _INHERITED_ARGS = ('language', 'secondary_language', 'input_encoding')
     
     
-    def __init__(self, parent, id, text, title=None, **kwargs):
+    def __init__(self, parent, id, text, title=None, subdir=None,
+        input_encoding='ascii', **kwargs):
         """Initialize the instance.
         
         Arguments:
@@ -466,7 +467,8 @@ class WikiNode(ContentNode, WikiNodeMixin):
           The other arguments are inherited from the parent class.
           
         """
-        WikiNodeMixin.__init__(self)
+        FileNodeMixin._init(self, parent, subdir=subdir,
+                            input_encoding=input_encoding)
         sections = self.parse_wiki_text(text)
         if title is None:
             if len(sections) != 1 or not isinstance(sections[0], Section):
@@ -478,7 +480,7 @@ class WikiNode(ContentNode, WikiNodeMixin):
         super(WikiNode, self).__init__(parent, id, title=title,
                                        content=content, **kwargs)
     
-class DocNode(WikiNode, FileNodeMixin):
+class DocNode(WikiNode):
     """Node of a Structured Text read from a source file."""
     
     def __init__(self, parent, id, subdir=None, ext='txt',
@@ -494,14 +496,16 @@ class DocNode(WikiNode, FileNodeMixin):
           The other arguments are inherited from the parent class.
           
         """
-        FileNodeMixin.__init__(self, parent, subdir, input_encoding=input_encoding)
-        self._ext = ext
+        # This is in fact called once again in the parent constructor, but we
+        # need to initialize the things here.
+        FileNodeMixin._init(self, parent, subdir=subdir,
+                            input_encoding=input_encoding)
         variants = [os.path.splitext(os.path.splitext(f)[0])[1][1:]
                     for f in glob.glob(self._input_file(id, lang='*'))]
         text = self._read_file(id, lang=language, ext=ext)
         super(DocNode, self).__init__(parent, id, text, language=language,
-                                      language_variants=variants,
-                                      **kwargs)
+                                      language_variants=variants, subdir=subdir,
+                                      input_encoding=input_encoding, **kwargs)
 
         
 class DocChapter(DocNode):
