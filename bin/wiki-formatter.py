@@ -41,7 +41,7 @@ def main():
     except IndexError:
         text = ''.join(sys.stdin.readlines())
         name = 'index'
-    node = lcg.WikiNode(name, text, language='en', subdir='.')
+    node = lcg.WikiNode(None, name, text, language='en', subdir='.')
     e = lcg.HtmlExporter(stylesheet=opt.get('--stylesheet'), inlinestyles=True)
     if name:
         e.export(node, '.')
