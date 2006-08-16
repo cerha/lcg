@@ -1,3 +1,28 @@
+2006-08-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/_html.py (checkbox): New argument `readonly'.
+	(textarea): New argument `readonly'.
+
+	* bin/wiki-formatter.py (main): Pass `None' as the `parent'
+	argument to `WikiNode' constructor.
+
+	* lib/lcg/nodes.py (WikiNodeMixin.__init__): Pøejmenováno na
+	`_init'.
+	(FileNodeMixin.__init__): Pøejmenováno na `_init'.
+	(WikiNode): Inherit from `FileNodeMixin', not just
+	(WikiNode.__init__): `WikiNodeMixin.__init__' ->
+	`FileNodeMixin._init()'.
+	(DocNode): Derive just from `WikiNode'.
+	(DocNode.__init__): `FileNodeMixin.__init__' ->
+	`FileNodeMixin._init()'.
+	(DocNode.__init__): Pass also `FileNodeMixin._init' args to the
+	parent constructor.
+
+	`WikiNodeMixin'.
+	(WikiNode.__init__): Pass the `FileNodeMixin' constructor
+	its arguments.  The argument `parent' removed.
+	(FileNodeMixin._init): 
+
 2006-08-14  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/_html.py (form): New argument `method'.
