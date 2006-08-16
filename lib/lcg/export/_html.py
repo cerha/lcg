@@ -173,15 +173,17 @@ def select(name, options, onchange=None, selected=None, id=None):
     attr = (('name', name), ('id', id), ('onchange', onchange))
     return _tag('select', attr, opts, newlines=True)
 
-def checkbox(name, id=None, checked=False, disabled=False, cls=None):
+def checkbox(name, id=None, checked=False, disabled=False, readonly=False,
+             cls=None):
     return _input('checkbox', id=id, checked=checked, disabled=disabled,
-                  cls=cls)
+                  readonly=readonly, cls=cls)
 
-def textarea(name, value='', id=None, cls=None, rows=None, cols=None):
+def textarea(name, value='', id=None, rows=None, cols=None, readonly=False, cls=None):
     attr = (('name', name),
             ('id', id),
             ('rows', rows),
             ('cols', cols),
+            ('readonly', readonly),
             ('class', cls))
     return _tag('textarea', attr, value)
     
