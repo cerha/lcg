@@ -242,3 +242,6 @@ def js_dict(items):
     pairs = [concat("'%s': " % k, js_value(v)) for k,v in items]
     return concat('{', concat(pairs, separator=", "), '}')
 
+def escape(text):
+    from xml.sax import saxutils
+    return saxutils.escape(text)
