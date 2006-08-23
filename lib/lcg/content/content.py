@@ -166,9 +166,7 @@ class WikiText(TextContent):
 class PreformattedText(TextContent):
     """Preformatted text."""
     def export(self, exporter):
-        from xml.sax import saxutils
-        text = saxutils.escape(self._text)
-        return _html.pre(text, cls="lcg-preformatted-text")
+        return _html.pre(_html.escape(self._text), cls="lcg-preformatted-text")
 
     
 class Link(TextContent):
