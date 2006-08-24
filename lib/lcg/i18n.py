@@ -398,13 +398,14 @@ class GettextTranslator(Translator):
             return gettext.translation(domain, path, (self._lang,))
         except IOError, e:
             msg = str(e)+", path: '%s', lang: '%s'" % (path, self._lang)
-            if self._fallback:
-                log(msg)
-            elif self._lang != 'en':
+            if self._fallback or self._lang == 'en':
+                # The original strings are in English, so it's ok if we
+                # don't find a MO file for them.
+                if self._lang != 'en':
+                    log(msg)
+                return gettext.NullTranslations()
+            else:
                 raise IOError(msg)
-            # The original strings are in English, so it's ok if we don't
-            # find a MO file for them.
-            return gettext.NullTranslations()
         
     def gettext(self, text, domain=None):
         domain = domain or self._default_domain
