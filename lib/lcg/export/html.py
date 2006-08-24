@@ -87,12 +87,11 @@ class HtmlMarkupFormatter(MarkupFormatter):
     
 class HtmlExporter(Exporter):
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
-    
     _BODY_PARTS = ('heading',
                    'language_selection',
                    'content',
                    )
-    
+    _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     
     def __init__(self, stylesheet=None, inlinestyles=False, **kwargs):
         """Initialize the exporter for a given 'ContentNode' instance."""
@@ -215,26 +214,20 @@ class HtmlExporter(Exporter):
         if node is not node.root() or len(node.language_variants()) <= 1:
             return None
         current = node.current_language_variant()
-        pairs = [(lang, language_name(lang))
-                 for lang in node.language_variants()]
-        pairs.sort(lambda a,b: cmp(a[0], b[0]))
-        self._targets = targets = []
-        self._flags = flags = []
-        for lang, name in pairs:
+        languages = list(node.language_variants()[:])
+        languages.sort()
+        links = []
+        for lang in languages:
+            name = language_name(lang)
+            cls = None
             if lang == current:
-                name = concat(name, ' (*)') #_('(current)')
-            t = Link.ExternalTarget(self._node_uri(node, lang=lang), name)
-            if lang == current:
-                self._current = t
-            targets.append(t)
-            #flag = node.resource(Image, 'flags/%s.gif' % lang)
-            flags.append(None) #InlineImage(flag))
-        result = concat(_("Choose your language:"), "\n",
-                        concat([Link(target).export(self)
-                                #+" "+ flag.export(self)
-                                for target, flag in zip(targets, flags)],
-                               separator=" |\n"))
-        return result
+                name = concat(name, _html.span(' *', cls='hidden'))
+                cls = 'current'
+            uri = self._node_uri(node, lang=lang)
+            links.append(_html.link(name, uri, cls=cls))
+            #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
+        return concat(self._LANGUAGE_SELECTION_LABEL, "\n",
+                      concat(links, separator=" |\n"))
 
     def _content(self, node):
         return node.content().export(self)
