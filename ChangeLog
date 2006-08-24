@@ -1,3 +1,23 @@
+2006-08-24  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlExporter._LANGUAGE_SELECTION_LABEL):
+	New constant.
+	(HtmlExporter._language_selection): Use the constant.  Set the
+	link css 'class'.  Simplified.
+
+	* lib/lcg/util.py (_LANGUAGE_NAMES): All names uncommented.
+
+	* lib/lcg/i18n.py (GettextTranslator._gettext_instance): Log an
+	arror when the translation file was not found and fallback was set
+	to true.
+
+2006-08-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content/content.py (PreformattedText.export): Use
+	`_html.escape' instead of saxutils directly.
+
+	* lib/lcg/export/_html.py (escape): New function.
+
 2006-08-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/_html.py (checkbox): New argument `readonly'.

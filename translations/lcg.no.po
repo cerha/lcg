@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-01 19:16+0200\n"
+"POT-Creation-Date: 2006-08-24 08:44+0200\n"
 "PO-Revision-Date: 2006-08-01 20:22+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -14,72 +14,72 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/content/content.py:444
+#: ../lib/lcg/content/content.py:437
 msgid "Index:"
 msgstr ""
 
-#: ../lib/lcg/content/content.py:734
+#: ../lib/lcg/content/content.py:727
 msgid "Vocabulary Listing"
 msgstr ""
 
-#: ../lib/lcg/content/content.py:735
+#: ../lib/lcg/content/content.py:728
 msgid ""
 "The vocabulary is presented in a two-column table with a term on the left "
 "and its translation on the right in each row."
 msgstr ""
 
-#: ../lib/lcg/content/content.py:773 ../lib/lcg/content/content.py:783
+#: ../lib/lcg/content/content.py:766 ../lib/lcg/content/content.py:776
 msgid "Terms"
 msgstr ""
 
-#: ../lib/lcg/content/content.py:775 ../lib/lcg/content/content.py:785
+#: ../lib/lcg/content/content.py:768 ../lib/lcg/content/content.py:778
 msgid "Phrases"
 msgstr ""
 
-#: ../lib/lcg/content/content.py:777
+#: ../lib/lcg/content/content.py:770
 msgid "Extended vocabulary"
 msgstr ""
 
-#: ../lib/lcg/util.py:216
+#: ../lib/lcg/util.py:221
 msgid "Czech"
 msgstr "tsjekkisk"
 
-#: ../lib/lcg/util.py:217
+#: ../lib/lcg/util.py:222
 msgid "German"
 msgstr "tysk"
 
-#: ../lib/lcg/util.py:218
+#: ../lib/lcg/util.py:223
 msgid "English"
 msgstr "engelsk"
 
-#: ../lib/lcg/util.py:219
+#: ../lib/lcg/util.py:223
 msgid "Spanish"
 msgstr "spansk"
 
-#: ../lib/lcg/util.py:220
+#: ../lib/lcg/util.py:242
 msgid "Norwegian"
 msgstr "norsk"
 
-#: ../lib/lcg/util.py:221
+#: ../lib/lcg/util.py:249
 msgid "Slovak"
 msgstr "slovakisk"
 
-#: ../lib/lcg/export/html.py:229
+#: ../lib/lcg/export/html.py:94
 msgid "Choose your language:"
 msgstr "Velg språk:"
 
-#: ../lib/lcg/export/html.py:319
+#: ../lib/lcg/export/html.py:316
 msgid "None"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:322
+#: ../lib/lcg/export/html.py:319
 msgid "Next"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:323
+#: ../lib/lcg/export/html.py:320
 msgid "Previous"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:328
+#: ../lib/lcg/export/html.py:325
 msgid "Up"
 msgstr ""

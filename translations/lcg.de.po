@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-01 19:16+0200\n"
-"PO-Revision-Date: 2006-08-01 20:20+0200\n"
+"POT-Creation-Date: 2006-08-24 08:44+0200\n"
+"PO-Revision-Date: 2006-08-24 08:46+0200\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -15,16 +15,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # The table of contents...
-#: ../lib/lcg/content/content.py:444
+#: ../lib/lcg/content/content.py:437
 msgid "Index:"
 msgstr "Verzeichnis:"
 
 # Section title
-#: ../lib/lcg/content/content.py:734
+#: ../lib/lcg/content/content.py:727
 msgid "Vocabulary Listing"
 msgstr "Vokabelliste"
 
-#: ../lib/lcg/content/content.py:735
+#: ../lib/lcg/content/content.py:728
 msgid ""
 "The vocabulary is presented in a two-column table with a term on the left "
 "and its translation on the right in each row."
@@ -33,69 +33,70 @@ msgstr ""
 "das Originalwort und rechts daneben jeweils die Übersetzung."
 
 # The first part of vocabulary listing (the second is Phrases).
-#: ../lib/lcg/content/content.py:773 ../lib/lcg/content/content.py:783
+#: ../lib/lcg/content/content.py:766 ../lib/lcg/content/content.py:776
 msgid "Terms"
 msgstr "Begriffe"
 
 # The second part of vocabulary listing.
-#: ../lib/lcg/content/content.py:775 ../lib/lcg/content/content.py:785
+#: ../lib/lcg/content/content.py:768 ../lib/lcg/content/content.py:778
 msgid "Phrases"
 msgstr "Phrasen"
 
 # Section title
-#: ../lib/lcg/content/content.py:777
+#: ../lib/lcg/content/content.py:770
 msgid "Extended vocabulary"
 msgstr "Zusätzliche Vokabeln"
 
 # Title for Cloze
-#: ../lib/lcg/util.py:216
+#: ../lib/lcg/util.py:221
 msgid "Czech"
 msgstr "tschechisch"
 
-#: ../lib/lcg/util.py:217
+#: ../lib/lcg/util.py:222
 msgid "German"
 msgstr "deutsch"
 
-#: ../lib/lcg/util.py:218
+#: ../lib/lcg/util.py:223
 msgid "English"
 msgstr "englisch"
 
-#: ../lib/lcg/util.py:219
+#: ../lib/lcg/util.py:223
 msgid "Spanish"
 msgstr "spanisch"
 
-#: ../lib/lcg/util.py:220
+#: ../lib/lcg/util.py:242
 msgid "Norwegian"
 msgstr "norwegisch"
 
-#: ../lib/lcg/util.py:221
+#: ../lib/lcg/util.py:249
 msgid "Slovak"
 msgstr "slowakisch"
 
-#: ../lib/lcg/export/html.py:229
+#: ../lib/lcg/export/html.py:94
 msgid "Choose your language:"
 msgstr "Sprache wählen"
 
 # This label is actually not used.
-#: ../lib/lcg/export/html.py:319
+#: ../lib/lcg/export/html.py:316
 msgid "None"
 msgstr "Nichts"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:322
+#: ../lib/lcg/export/html.py:319
 msgid "Next"
 msgstr "weiter"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:323
+#: ../lib/lcg/export/html.py:320
 msgid "Previous"
 msgstr "vorhergehend"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:328
+#: ../lib/lcg/export/html.py:325
 msgid "Up"
 msgstr "hinauf"
 
 # The label for the display field with exercise results.
-#~ msgid "(current)"
-#~ msgstr "(aktuell)"
+#, fuzzy
+#~ msgid "current"
+#~ msgstr "aktuell"
