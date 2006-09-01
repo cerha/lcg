@@ -184,10 +184,11 @@ class Link(TextContent):
         def descr(self):
             return self._descr
     
-    def __init__(self, target, label=None):
+    def __init__(self, target, label=None, type=None):
         assert isinstance(target, (Section, ContentNode,
                                    self.ExternalTarget)), target
         self._target = target
+        self._type = type
         super(Link, self).__init__(label or '')
 
     def _descr(self):
@@ -207,7 +208,7 @@ class Link(TextContent):
     def export(self, exporter):
         label = self._text or self._target.title()
         uri = exporter.uri(self._target)
-        return _html.link(label, uri, title=self._descr())
+        return _html.link(label, uri, title=self._descr(), type=self._type)
 
 
 class Anchor(TextContent):
