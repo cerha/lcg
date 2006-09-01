@@ -1,3 +1,16 @@
+2006-09-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/util.py (language_name): Return the code if the name was
+	not found.
+
+	* lib/lcg/content/content.py (Link.__init__): New argument `type'.
+	(Link.export): Pass the `type'.
+
+	* lib/lcg/export/_html.py (link): New argument `type'.
+	(select): New arguments `disabled' and `readonly'.
+	(checkbox): New argument `value'.
+	(uri): New function.
+
 2006-08-24  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlExporter._LANGUAGE_SELECTION_LABEL):
