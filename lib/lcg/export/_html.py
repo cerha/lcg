@@ -89,14 +89,15 @@ def map(content, cls=None, lang=None, name=None, title=None):
     args = (('class', cls), ('lang', lang), ('name', name), ('title', title))
     return _tag('map', args, content, newlines=True)
 
-def link(label, uri, name=None, title=None, target=None, cls=None, hotkey=None):
+def link(label, uri, name=None, title=None, target=None, cls=None, hotkey=None,
+         type=None):
     if hotkey:
         t = '(Alt-%s)' % hotkey
         title = title and title + ' ' + t or t
     if target:
         cls = (cls and cls+' ' or '') + 'external-link'
-    attr = (('href', uri), ('name', name), ('title', title), ('target', target),
-            ('class', cls), ('accesskey', hotkey))
+    attr = (('type', type), ('href', uri), ('name', name), ('title', title),
+            ('target', target), ('class', cls), ('accesskey', hotkey))
     return _tag('a', attr, label)
 
 def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
@@ -162,7 +163,8 @@ def reset(label, onclick=None, cls=None):
 def submit(label, onclick=None, cls=None):
     return _input('submit', onclick=onclick, value=label, cls=cls)
 
-def select(name, options, onchange=None, selected=None, id=None):
+def select(name, options, onchange=None, selected=None, id=None,
+           disabled=False, readonly=False):
     assert selected is None or selected in [value for text, value in options],\
            (selected, options)
     opts = [_tag('option',
@@ -170,13 +172,14 @@ def select(name, options, onchange=None, selected=None, id=None):
                   ('selected', (value == selected))),
                  text)
             for text, value in options]
-    attr = (('name', name), ('id', id), ('onchange', onchange))
+    attr = (('name', name), ('id', id), ('onchange', onchange),
+            ('disabled', disabled), ('readonly', readonly))
     return _tag('select', attr, opts, newlines=True)
 
-def checkbox(name, id=None, checked=False, disabled=False, readonly=False,
-             cls=None):
-    return _input('checkbox', id=id, checked=checked, disabled=disabled,
-                  readonly=readonly, cls=cls)
+def checkbox(name, value=None, id=None, checked=False, disabled=False,
+             readonly=False, cls=None):
+    return _input('checkbox', name=name, value=value, id=id, checked=checked,
+                  disabled=disabled, readonly=readonly, cls=cls)
 
 def textarea(name, value='', id=None, rows=None, cols=None, readonly=False, cls=None):
     attr = (('name', name),
@@ -241,6 +244,9 @@ def js_dict(items):
     assert is_sequence_of(dict(items).keys(), types.StringType)
     pairs = [concat("'%s': " % k, js_value(v)) for k,v in items]
     return concat('{', concat(pairs, separator=", "), '}')
+
+def uri(base, **args):
+    return base + '?' + ';'.join(["%s=%s" % item for item in args.items()])
 
 def escape(text):
     from xml.sax import saxutils
