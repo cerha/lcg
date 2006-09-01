@@ -264,6 +264,9 @@ def language_name(code):
     The returned string is the name in English.
     
     """
-    return _LANGUAGE_NAMES[code]
+    try:
+        return _LANGUAGE_NAMES[code]
+    except KeyError:
+        return code
 
         
