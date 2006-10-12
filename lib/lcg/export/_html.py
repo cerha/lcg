@@ -189,6 +189,16 @@ def textarea(name, value='', id=None, rows=None, cols=None, readonly=False, cls=
             ('readonly', readonly),
             ('class', cls))
     return _tag('textarea', attr, value)
+
+def img(src, alt=None, width=None, height=None):
+    attr = (('src', src),
+            ('alt', alt),
+            ('width', width),
+            ('height', height),
+            ('border', 0),
+            )
+    return concat('<img', _attr(*attr), ' />')
+
     
 # Special controls
 
