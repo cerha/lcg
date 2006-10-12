@@ -40,6 +40,8 @@ class HtmlMarkupFormatter(MarkupFormatter):
                'amp':  '&amp;',
                }
     
+    _IMAGE_URI_MATCHER = re.compile(r'\.(jpe?g|png|gif)$', re.IGNORECASE)
+    
     def _citation_formatter(self, parent, close=False, **kwargs):
         if not close:
             lang = parent.secondary_language()
@@ -73,7 +75,10 @@ class HtmlMarkupFormatter(MarkupFormatter):
         if not target:
             if anchor is not None:
                 href += '#'+anchor
-            target = Link.ExternalTarget(href, title or href)
+            if self._IMAGE_URI_MATCHER.search(href):
+                return _html.img(href, alt=title)
+            else:
+                target = Link.ExternalTarget(href, title or href)
         l = Link(target, label=title)
         l.set_parent(parent)
         return l.export(self._exporter)
