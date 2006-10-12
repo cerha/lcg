@@ -56,7 +56,7 @@ class Parser(object):
                   r"(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)"),
                  ('definition',
                   r"(?P<term>\S[^\r\n]*)\r?\n" + \
-                  r"(?P<descr>([\t ]+[^\r\n]+\r?\n?)+)"),
+                  r"(?P<descr>([\t ]+[^\r\n\t ]+\r?\n?)+)"),
                  ('toc',
                   r"(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>N?TOC)(\((?P<tocdepth>\d+)\))?\@\s*"),
                  ('table',
