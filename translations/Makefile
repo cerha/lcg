@@ -1,13 +1,14 @@
 domains := lcg lcg-exercises eurochance test
 mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
+mkrules := ../lib/lcg/i18n.py
 
 all: $(mo_files)
 
 include $(domains:%=%.d)
 
-%.d: $(shell python ../lib/lcg/i18n.py)
+%.d: $(shell python $(mkrules))
 	@echo "Updating rules for domain $*."
-	@echo -n "$*.pot: " > $@ && python ../lib/lcg/i18n.py $* >> $@
+	@echo -n "$*.pot: " > $@ && python $(mkrules) $* >> $@
 	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" >> $@
 	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po %/LC_MESSAGES" >> $@
 

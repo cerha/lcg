@@ -1,3 +1,21 @@
+2006-10-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/wiki.py (Parser._MATCHERS): Don't allow an empty
+	description in definition list.
+
+	* lib/lcg/export/html.py (HtmlMarkupFormatter._IMAGE_URI_MATCHER):
+	New constant.
+	(HtmlMarkupFormatter._link_formatter): Format image links as
+	inline images.
+
+	* lib/lcg/export/_html.py (img): New function.
+
+	* lib/lcg/content/content.py (InlineImage.export): Use
+	`_html.img'.
+
+	* lib/lcg/i18n.py (source_files_by_domain): New mandatrory
+	argument `basedir'.
+
 2006-09-01  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/util.py (language_name): Return the code if the name was
