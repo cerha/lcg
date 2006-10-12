@@ -457,15 +457,18 @@ def format(text, *args):
     return concat(reduce(lambda a,b: a+b, zip(text.split('%s'), args+('',))))
 
 
-def source_files_by_domain(domain=None):
-    """Return the list of all LCG source files, which belong to given domain.
+def source_files_by_domain(basedir, domain=None):
+    """Return the list of all Python source files, which belong to given domain.
 
     Arguments:
 
+      basedir -- base directory where the source files are searched
+        recursively.
+    
       domain -- the name of the translation domain as a string.  This domain
         corresponds to the 'domain' argument of the 'TranslatableTextFactory'
         used within the source file to define the '_' identifier.  In no domain
-        is passed, a list of all LCG source files is returned.
+        is passed, a list of all Python source files is returned.
 
     The returned list contains full pathnames of the files as strings.
 
@@ -480,7 +483,7 @@ def source_files_by_domain(domain=None):
             elif os.path.isdir(path):
                 result.extend(find(path))
         return result
-    files = find(os.path.dirname(__file__))
+    files = find(basedir)
     if domain is None:
         return files
     else:
