@@ -234,8 +234,8 @@ class InlineImage(Content):
 
     def export(self, exporter):
         img = self._image
-        return '<img alt="%s" src="%s" width="%d" height="%d" border="0"/>' % \
-               (img.title() or '', img.uri(), img.width(), img.height())
+        return _html.img(img.uri(), alt=img.title(),
+                         width=img.width(), height=img.height())
 
 
 class Container(Content):
