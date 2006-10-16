@@ -1,3 +1,23 @@
+2006-10-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/lcg.cs.po (Module): Updated.
+
+	* translations/lcg.de.po (Module): Updated.
+
+	* translations/lcg.es.po (Module): Updated.
+
+	* translations/lcg.no.po (Module): Updated.
+
+	* translations/lcg.sk.po (Module): Updated.
+
+	* translations/Makefile: Pass the base directory to the i118
+	dpepndency script.
+
+	* lib/lcg/config.py (doc_dir): New variable.
+
+	* lib/lcg/util.py (_LANGUAGE_NAMES): Some more language names
+	translated.
+
 2006-10-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/wiki.py (Parser._MATCHERS): Don't allow an empty
