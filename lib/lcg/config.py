@@ -20,7 +20,7 @@
 
 import os
 
-lcg_dir = os.environ.get('LCGDIR', '/usr/share/lcg')
+lcg_dir = os.environ.get('LCGDIR', '/usr/local/share/lcg')
 
 default_resource_dir = os.path.join(lcg_dir, 'resources')
 
@@ -35,3 +35,7 @@ translation_dir = os.path.join(lcg_dir, 'translations')
 translated using a GNU gettext catalog.  This variable specifies the location
 where the compiled message catalogs are installed.  More precisely, it is the
 base directory, where the subdirectories for different languages reside."""
+
+doc_dir = os.path.join(lcg_dir, 'doc')
+
+"""The directory where lcg documentation source files can be found."""
