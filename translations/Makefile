@@ -1,6 +1,6 @@
 domains := lcg lcg-exercises eurochance test
 mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
-mkrules := ../lib/lcg/i18n.py
+mkrules := ../lib/lcg/i18n.py ../lib
 
 all: $(mo_files)
 
