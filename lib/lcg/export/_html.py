@@ -190,7 +190,7 @@ def textarea(name, value='', id=None, rows=None, cols=None, readonly=False, cls=
             ('class', cls))
     return _tag('textarea', attr, value)
 
-def img(src, alt=None, width=None, height=None):
+def img(src, alt='', width=None, height=None):
     attr = (('src', src),
             ('alt', alt),
             ('width', width),
