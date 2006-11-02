@@ -76,7 +76,7 @@ class HtmlMarkupFormatter(MarkupFormatter):
             if anchor is not None:
                 href += '#'+anchor
             if self._IMAGE_URI_MATCHER.search(href):
-                return _html.img(href, alt=title)
+                return _html.img(href, alt=title or '')
             else:
                 target = Link.ExternalTarget(href, title or href)
         l = Link(target, label=title)
