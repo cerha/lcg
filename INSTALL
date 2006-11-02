@@ -1,0 +1,30 @@
+Learning Content Generator Installation
+
+
+You need Python 2.3 or later to run LCG.  After downloading the package, you
+must add the LCG Python libraries somewhere to your Python path.  There are
+several ways to do that and it depends on your preference.  You may for example
+add the `lib' directory to your PYTHONPATH environment variable or link the
+directory `lib/lcg' from your package installation directory to your site
+packages directory (eg. `/usr/local/lib/python2.3/site-packages').
+
+If you downloaded LCG directly form CVS, you will also need to generate the
+locale data by running `make translations' in the package root directory.
+Obviously, you need to have GNU make on your system to do that.  If you
+downloaded a released version, you can omit this step.
+
+Finally you need to make LCG see it's resource files and translation data.
+Again, you have several choices.  The simplest way is to set the environment
+variable LCGDIR to your installation directory (where you unpacked the
+package).  LCG will search for the subdirectories `resources' and
+`translations' there.  The other option is to link these two directories from
+your installation directory to `/usr/local/share/lcg', which is the default
+LCGDIR.
+
+You should be all set now.  Try running `make test' (or `./lib/lcg/_test.py' if
+you don't have make).
+
+You may also want to generate LCG documentation by running `make doc'.
+
+If you want to use LCG directly, you will probably also link the script
+`bin/lcgmake.py' somewhere to `/usr/local/bin'.

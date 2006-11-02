@@ -1,3 +1,11 @@
+2006-11-02  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/_html.py (img): Set the default value of `alt' to
+	an empty string.
+
+	* lib/lcg/export/html.py (HtmlMarkupFormatter._link_formatter):
+	Supply an empty string as the alt tag if no title was specified.
+
 2006-10-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/lcg.cs.po (Module): Updated.
