@@ -1,30 +1,57 @@
-Learning Content Generator Installation
+Learning Content Generator Installation Instructions
 
+You need Python 2.3 or later to run LCG.  
 
-You need Python 2.3 or later to run LCG.  After downloading the package, you
-must add the LCG Python libraries somewhere to your Python path.  There are
-several ways to do that and it depends on your preference.  You may for example
-add the `lib' directory to your PYTHONPATH environment variable or link the
-directory `lib/lcg' from your package installation directory to your site
-packages directory (eg. `/usr/local/lib/python2.3/site-packages').
+The following instructions assume, that you have downloaded LCG and unpacked it
+somewhere on your system.  We will refer to the unpacked directory as `the
+installation directory'.  All the mentioned commands should be run from within
+this directory.
+
+First you need to add the LCG Python libraries somewhere to your Python path.
+The recommended approach is to link the library to your site packages
+directory.  On a typical unix/linux system this can be:
+
+ $ ln -s `pwd`/lib/lcg /usr/local/lib/python2.3/site-packages/lcg
+
+Replace `python2.3' with the Python version you use.
+
+Alternatively, you may add lcg to your PYTHONPATH environment variable:
+
+ $ export PYTHONPATH=`pwd`/lib
+
+Now you need to make LCG resource files and translation data visible to LCG.
+It is recommended to link (or copy) them to `/usr/local/share/lcg' directory as
+follows:
+
+ $ mkdir /usr/local/share/lcg
+ $ ln -s `pwd`/translations `pwd`/resources /usr/local/share/lcg/
+
+If this is not possible, set the environment variable LCGDIR to your
+installation directory before using LCG:
+
+ $ export LCGDIR=`pwd`
 
 If you downloaded LCG directly form CVS, you will also need to generate the
-locale data by running `make translations' in the package root directory.
-Obviously, you need to have GNU make on your system to do that.  If you
-downloaded a released version, you can omit this step.
+locale data by running:
 
-Finally you need to make LCG see it's resource files and translation data.
-Again, you have several choices.  The simplest way is to set the environment
-variable LCGDIR to your installation directory (where you unpacked the
-package).  LCG will search for the subdirectories `resources' and
-`translations' there.  The other option is to link these two directories from
-your installation directory to `/usr/local/share/lcg', which is the default
-LCGDIR.
+ $ make translations
+
+Obviously, you need to have GNU make on your system to do that.  Apart from
+make, you also need the GNU gettext package.  If you downloaded a released
+version, you can omit this step.
 
 You should be all set now.  Try running `make test' (or `./lib/lcg/_test.py' if
 you don't have make).
 
-You may also want to generate LCG documentation by running `make doc'.
+You may also want to generate LCG documentation by running:
+
+ $ make doc
 
 If you want to use LCG directly, you will probably also link the script
-`bin/lcgmake.py' somewhere to `/usr/local/bin'.
+`bin/lcgmake.py' somewhere to your path.
+ 
+ $ ln -s `pwd`/bin/lcgmake.py /usr/local/bin/lcgmake
+
+Note, that the recommended symlinked configuration is good when you checked LCG
+out of CVS.  In this case you can check out a newer version at any time and no
+further effort is needed to start using it.
