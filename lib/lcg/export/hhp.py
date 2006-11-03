@@ -96,7 +96,7 @@ class _Header(_MetaFile):
         return ("Contents file=%s" % self._contents.filename(),
                 "Index file=%s" % self._index.filename(),
                 "Title=%s" % self._root.title(),
-                "Default topic=%s" % self._root.url(),
+                "Default topic=%s" % self._exporter.uri(self._root),
                 "Charset=%s" % self._charset)
 
         
@@ -107,9 +107,10 @@ class HhpExporter(HtmlExporter):
         # We just want to make the following NASTY HACKS here, to influence the
         # export of some Conent elements.
         # We want to make a linebreak before any Table of Contents.
+        import lcg
         x = lcg.TableOfContents._export_title
         lcg.TableOfContents._export_title = lambda self_: '<br>' + x(self_)
-        # We want to prevent beckreferencing in section titles. 
+        # We want to prevent backreferencing in section titles.
         lcg.Section.backref = lambda s, n: None
         # We also want Tables with old HTML attributes.
         lcg.Table._ATTR = 'cellspacing="3" cellpadding="0"'
