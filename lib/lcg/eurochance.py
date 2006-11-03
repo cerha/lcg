@@ -30,10 +30,7 @@ _ = TranslatableTextFactory('eurochance')
 class EurochanceNode(ContentNode, FileNodeMixin):
     _GETTEXT_DOMAIN = 'eurochance'
 
-    _INHERITED_ARGS = ('language', 'secondary_language', 'language_variants',
-                       'input_encoding')
-    
-    def __init__(self, parent, id, subdir=None, input_encoding='ascii',
+    def __init__(self, parent, id, subdir=None, input_encoding=None,
                  brief_title=None, language=None, **kwargs):
         """Initialize the instance.
 
@@ -41,8 +38,8 @@ class EurochanceNode(ContentNode, FileNodeMixin):
         The other arguments are inherited from the parent class.
           
         """
-        FileNodeMixin.__init__(self, parent, subdir,
-                               input_encoding=input_encoding)
+        FileNodeMixin._init(self, parent, subdir,
+                            input_encoding=input_encoding)
         if language is None or language == 'en':
             self._gettext = lambda x: x
         else:
@@ -248,7 +245,7 @@ class AnswerSheets(_Index):
         return TableOfNodes(title=_("Table of Contents:"))
     
     def _create_children(self):
-        return [self._create_child(AnswerSheet, 'answers%02d' % (i+1), u)
+        return [AnswerSheet(self, 'answers%02d' % (i+1), u)
                 for i, u in enumerate(self._units)]
 
     
@@ -285,7 +282,7 @@ class Help(EurochanceNode):
     def _create_children(self):
         lng = self.root().users_language() or self.language()
         template = self._read_file('help', lang=lng, dir=config.translation_dir)
-        return [self._create_child(ExerciseHelp, 'help%02d'%(i+1), t, template)
+        return [ExerciseHelp(self, 'help%02d'%(i+1), t, template)
                 for i, t in enumerate(Exercise.used_types())]
 
     
@@ -333,16 +330,16 @@ class EurochanceCourse(EurochanceNode):
                 TableOfNodes(title=_("Table of Contents:")))
 
     def _create_children(self):
-        units = [self._create_child(self._unit_cls, 'unit%02d'%(i+1), subdir=d,
-                                    brief_title=_("Unit %d", i+1))
+        units = [self._unit_cls(self, 'unit%02d'%(i+1), subdir=d,
+                                brief_title=_("Unit %d", i+1))
                  for i, d in enumerate(self._unit_dirs())]
-        children = [self._create_child(Instructions, 'instructions')] + units
+        children = [Instructions(self, 'instructions')] + units
         if issubclass(self._unit_cls, IntermediateUnit):
-            children.extend((self._create_child(GrammarBank, 'grammar'),
-                             self._create_child(VocabIndex, 'vocab', units)))
-        children.extend((self._create_child(AnswerSheets, 'answers', units),
-                         self._create_child(Help, 'help'),
-                         self._create_child(CopyrightInfo, 'copyright')))
+            children.extend((GrammarBank(self, 'grammar'),
+                             VocabIndex(self, 'vocab', units)))
+        children.extend((AnswerSheets(self, 'answers', units),
+                         Help(self, 'help'),
+                         CopyrightInfo(self, 'copyright')))
         return children
 
     
