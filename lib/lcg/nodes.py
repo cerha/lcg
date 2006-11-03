@@ -48,8 +48,6 @@ class ContentNode(object):
     
     """
 
-    _INHERITED_ARGS = ('language', 'secondary_language', 'language_variants')
-
     def __init__(self, parent, id, title=None, brief_title=None, descr=None,
                  content=None, language=None, secondary_language=None,
                  language_variants=(), hidden=False):
@@ -109,6 +107,13 @@ class ContentNode(object):
         self._brief_title = brief_title or title
         self._descr = descr
         self._hidden = hidden
+        if parent:
+            if not language:
+                language = parent.language()
+            if not secondary_language:
+                secondary_language = parent.secondary_language()
+            if not language_variants:
+                language_variants = parent.language_variants()
         self._language = language
         self._secondary_language = secondary_language
         current_language = self.current_language_variant()
@@ -117,7 +122,8 @@ class ContentNode(object):
         self._language_variants = tuple(language_variants)
         self._registered_children = []
         if not isinstance(content, Content):
-            assert isinstance(content, (types.TupleType, types.ListType))
+            assert isinstance(content, (types.TupleType, types.ListType)), \
+                   content
             content = SectionContainer(content)
         content.set_parent(self)
         self._content = content
@@ -154,13 +160,6 @@ class ContentNode(object):
         """
         return ()
 
-    def _create_child(self, cls, *args, **kwargs):
-        """Helper method to be used within '_create_children()'."""
-        for k in self._INHERITED_ARGS:
-            if not kwargs.has_key(k):
-                kwargs[k] = getattr(self, '_'+k)
-        return cls(self, *args, **kwargs)
-    
     def _node_path(self, relative_to=None):
         """Return the path from root to this node as a sequence of nodes.
 
@@ -340,7 +339,7 @@ class WikiNodeMixin(object):
 class FileNodeMixin(WikiNodeMixin):
     """Mix-in class for nodes read from input files."""
 
-    def _init(self, parent, subdir=None, input_encoding='ascii'):
+    def _init(self, parent, subdir=None, input_encoding=None):
         """Initialize the instance.
         
           subdir -- a directory name relative to parent's source directory.
@@ -352,10 +351,12 @@ class FileNodeMixin(WikiNodeMixin):
 
         """
         assert subdir is None or isinstance(subdir, str)
-        assert isinstance(input_encoding, str)
+        assert input_encoding is None or isinstance(input_encoding, str) \
+               and codecs.lookup(input_encoding)
+        if not input_encoding and parent and isinstance(parent, FileNodeMixin):
+            input_encoding = parent.input_encoding()
         self._parent = parent
-        codecs.lookup(input_encoding)
-        self._input_encoding = input_encoding
+        self._input_encoding = input_encoding or 'ascii'
         self._subdir = subdir
         super(FileNodeMixin, self)._init()
 
@@ -451,9 +452,7 @@ class WikiNode(ContentNode, FileNodeMixin):
     'Exporter' class to dump a whole page.
     
     """
-    _INHERITED_ARGS = ('language', 'secondary_language', 'input_encoding')
-    
-    
+   
     def __init__(self, parent, id, text, title=None, subdir=None,
         input_encoding='ascii', **kwargs):
         """Initialize the instance.
@@ -484,7 +483,7 @@ class DocNode(WikiNode):
     """Node of a Structured Text read from a source file."""
     
     def __init__(self, parent, id, subdir=None, ext='txt',
-                 input_encoding='ascii', language=None, **kwargs):
+                 input_encoding=None, language=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -502,9 +501,11 @@ class DocNode(WikiNode):
                             input_encoding=input_encoding)
         variants = [os.path.splitext(os.path.splitext(f)[0])[1][1:]
                     for f in glob.glob(self._input_file(id, lang='*'))]
-        text = self._read_file(id, lang=language, ext=ext)
+        lang = lang=language or parent and parent.language()
+        text = self._read_file(id, lang=lang, ext=ext)
         super(DocNode, self).__init__(parent, id, text, language=language,
-                                      language_variants=variants, subdir=subdir,
+                                      language_variants=variants,
+                                      subdir=subdir,
                                       input_encoding=input_encoding, **kwargs)
 
         
@@ -558,7 +559,7 @@ class DocChapter(DocNode):
                     kwargs['subdir'] = name
                 else:
                     cls = DocNode
-                children.append(self._create_child(cls, name, **kwargs))
+                children.append(cls(self, name, **kwargs))
         return children
 
     
