@@ -119,7 +119,7 @@ class HtmlExporter(Exporter):
     def _output_file(self, node, lang=None):
         """Return full pathname of node's output file relative to export dir."""
         assert isinstance(node, ContentNode)
-        name = node.id()
+        name = node.id().replace(':', '-')
         if lang is None:
             lang = node.current_language_variant()
         if lang is not None and len(node.language_variants()) > 1:
