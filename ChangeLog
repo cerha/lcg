@@ -1,3 +1,32 @@
+2006-11-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlExporter._output_file): Replate
+	colons in id by hyphens.
+
+	* lib/lcg/export/hhp.py (_Header._lines): Use `Exporter.uri()'
+	instead of `ContentNode.uri()'.
+	
+
+	* lib/lcg/eurochance.py (EurochanceNode.__init__): Constant
+	removed.
+	(EurochanceNode.__init__): Default value od `input_encoding' set
+	to None.
+	(AnswerSheets._create_children, Help._create_children)
+	(EurochanceCourse._create_children): Call child constructor
+	directly instead of using `self._create_child'.
+
+	* lib/lcg/nodes.py (ContentNode._INHERITED_ARGS)
+	(WikiNode._INHERITED_ARGS): Constant removed.
+	(ContentNode.__init__): Use parent's `language',
+	`secondary_language' and `language_variants' as defaults.
+	(ContentNode._create_child): Method removed.
+	(FileNodeMixin._init): Default value od `input_encoding' set to
+	None.  If given value is None, set `self._input_encoding' to
+	`ascii'.
+	(DocNode.__init__): Default value od `input_encoding' set to None.
+	(DocChapter._create_children): Call child constructor directly
+	instead of using `self._create_child'.
+
 2006-11-02  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/_html.py (img): Set the default value of `alt' to
