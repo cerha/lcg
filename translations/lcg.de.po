@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-11-04 16:02+0100\n"
-"PO-Revision-Date: 2006-11-04 20:04+0100\n"
+"PO-Revision-Date: 2006-11-04 21:01+0100\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -34,9 +34,8 @@ msgid "Czech"
 msgstr "tschechisch"
 
 #: ../lib/lcg/util.py:222
-#, fuzzy
 msgid "Danish"
-msgstr "spanisch"
+msgstr ""
 
 #: ../lib/lcg/util.py:222
 msgid "German"
@@ -91,9 +90,8 @@ msgid "Norwegian"
 msgstr "norwegisch"
 
 #: ../lib/lcg/util.py:245
-#, fuzzy
 msgid "Polish"
-msgstr "englisch"
+msgstr ""
 
 #: ../lib/lcg/util.py:246
 msgid "Portuguese"
@@ -104,9 +102,8 @@ msgid "Slovak"
 msgstr "slowakisch"
 
 #: ../lib/lcg/util.py:251
-#, fuzzy
 msgid "Slovenian"
-msgstr "slowakisch"
+msgstr ""
 
 #: ../lib/lcg/util.py:253
 msgid "Swedish"
