@@ -1,3 +1,18 @@
+2006-11-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/Makefile: Gettext domain `lcg-exercises' changed to
+	`lcg-elearning'.
+
+	* translations/lcg-elearning.de.po: New file.
+	
+	* translations/lcg-exercises.de.po: File removed..
+
+	* lib/lcg/content/exercises.py (_): Gettext domain changed to
+	`lcg-elearning'.
+
+	* lib/lcg/content/content.py (VocabItem, VocabList, VocabSection) 
+	(VocabIndexSection): Classes moved to `vocap.py'.
+
 2006-11-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlExporter._output_file): Replate
