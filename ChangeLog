@@ -1,5 +1,17 @@
 2006-11-04  Tomas Cerha  <cerha@brailcom.org>
 
+	* translations/lcg.de.po: Updated.
+	
+	* translations/lcg.es.po: Updated.
+	
+	* translations/lcg.cs.po: Updated.
+	
+	* translations/lcg.sk.po: Updated.
+	
+	* translations/lcg.no.po: Updated.
+
+	* translations/lcg.pl.po: New file.
+
 	* translations/Makefile: Gettext domain `lcg-exercises' changed to
 	`lcg-elearning'.
 
