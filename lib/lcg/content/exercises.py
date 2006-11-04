@@ -42,7 +42,7 @@ import random
 import types
 import re
 
-_ = TranslatableTextFactory('lcg-exercises')
+_ = TranslatableTextFactory('lcg-elearning')
 
 ################################################################################
 ################################     Tasks     #################################
