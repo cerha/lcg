@@ -1,13 +1,14 @@
-# LCG message translations
+# Learning Content Generator
 # Copyright (C) 2006 Brailcom, o.p.s.
+# This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2006.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.1\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: 0.3\n"
+"Report-Msgid-Bugs-To: Tomas Cerha <cerha@brailcom.org>\n"
 "POT-Creation-Date: 2006-11-04 16:02+0100\n"
-"PO-Revision-Date: 2006-08-01 20:22+0200\n"
+"PO-Revision-Date: 2006-11-04 20:10+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
