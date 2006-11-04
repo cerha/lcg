@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-12 11:03+0200\n"
-"PO-Revision-Date: 2006-08-24 08:46+0200\n"
+"POT-Creation-Date: 2006-11-04 16:02+0100\n"
+"PO-Revision-Date: 2006-11-04 16:14+0100\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,34 +18,6 @@ msgstr ""
 #: ../lib/lcg/content/content.py:438
 msgid "Index:"
 msgstr "Verzeichnis:"
-
-# Section title
-#: ../lib/lcg/content/content.py:728
-msgid "Vocabulary Listing"
-msgstr "Vokabelliste"
-
-#: ../lib/lcg/content/content.py:729
-msgid ""
-"The vocabulary is presented in a two-column table with a term on the left "
-"and its translation on the right in each row."
-msgstr ""
-"Die Wörter sind in zwei Spalten aufgelistet; auf der linken Seite finden Sie "
-"das Originalwort und rechts daneben jeweils die Übersetzung."
-
-# The first part of vocabulary listing (the second is Phrases).
-#: ../lib/lcg/content/content.py:767 ../lib/lcg/content/content.py:777
-msgid "Terms"
-msgstr "Begriffe"
-
-# The second part of vocabulary listing.
-#: ../lib/lcg/content/content.py:769 ../lib/lcg/content/content.py:779
-msgid "Phrases"
-msgstr "Phrasen"
-
-# Section title
-#: ../lib/lcg/content/content.py:771
-msgid "Extended vocabulary"
-msgstr "Zusätzliche Vokabeln"
 
 #: ../lib/lcg/util.py:219
 msgid "Bulgarian"

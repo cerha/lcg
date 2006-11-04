@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-02 12:23+0200\n"
+"POT-Creation-Date: 2006-11-04 16:02+0100\n"
 "PO-Revision-Date: 2006-08-02 10:37+0200\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,134 +15,134 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # Section title
-#: ../lib/lcg/eurochance.py:113 ../lib/lcg/eurochance.py:151
+#: ../lib/lcg/eurochance.py:110 ../lib/lcg/eurochance.py:148
 #, python-format
 msgid "Section %d"
 msgstr "Abschnitt %d"
 
 # Section title
-#: ../lib/lcg/eurochance.py:128
+#: ../lib/lcg/eurochance.py:125
 msgid "Aims and Objectives"
 msgstr "Lernziele"
 
 # Section title
-#: ../lib/lcg/eurochance.py:130
+#: ../lib/lcg/eurochance.py:127
 msgid "Checklist"
 msgstr "Checkliste"
 
 # Section title
-#: ../lib/lcg/eurochance.py:152
+#: ../lib/lcg/eurochance.py:149
 msgid "Vocabulary Practice"
 msgstr "Vokabelübungen"
 
 # Section title
-#: ../lib/lcg/eurochance.py:153
+#: ../lib/lcg/eurochance.py:150
 msgid "Listening Comprehension"
 msgstr "Hörverständnis"
 
 # Section title
-#: ../lib/lcg/eurochance.py:154
+#: ../lib/lcg/eurochance.py:151
 msgid "General Comprehension"
 msgstr "Generelles Verständnis"
 
 # Section title
-#: ../lib/lcg/eurochance.py:155
+#: ../lib/lcg/eurochance.py:152
 msgid "Grammar Practice"
 msgstr "Grammatikübungen"
 
 # Section title
-#: ../lib/lcg/eurochance.py:156
+#: ../lib/lcg/eurochance.py:153
 msgid "Consolidation"
 msgstr "Festigung"
 
 # Section title
-#: ../lib/lcg/eurochance.py:162
+#: ../lib/lcg/eurochance.py:159
 msgid "Vocabulary"
 msgstr "Vokabeln"
 
 # Section title
-#: ../lib/lcg/eurochance.py:163
+#: ../lib/lcg/eurochance.py:160
 msgid "Exercises"
 msgstr "Übungen"
 
 # Page title
-#: ../lib/lcg/eurochance.py:168
+#: ../lib/lcg/eurochance.py:165
 msgid "General Course Instructions"
 msgstr "Allgemeine Kursinformation"
 
 # Section title
-#: ../lib/lcg/eurochance.py:171
+#: ../lib/lcg/eurochance.py:168
 msgid "Exercise Help"
 msgstr "Übunghilfe"
 
-#: ../lib/lcg/eurochance.py:171
+#: ../lib/lcg/eurochance.py:168
 msgid "Play"
 msgstr "Wiedergabe"
 
-#: ../lib/lcg/eurochance.py:178
+#: ../lib/lcg/eurochance.py:175
 msgid "Copyright and License Information"
 msgstr "Copyright- und Lizenzinformation"
 
 # Page title
-#: ../lib/lcg/eurochance.py:189 ../lib/lcg/eurochance.py:245
+#: ../lib/lcg/eurochance.py:186 ../lib/lcg/eurochance.py:242
 msgid "Answer Sheets"
 msgstr "Auflösungsteil"
 
 # Page title
-#: ../lib/lcg/eurochance.py:205
+#: ../lib/lcg/eurochance.py:202
 #, python-format
 msgid "Instructions for %s"
 msgstr "Anleitung für %s"
 
 # Page title
-#: ../lib/lcg/eurochance.py:209
+#: ../lib/lcg/eurochance.py:206
 msgid "Grammar Bank"
 msgstr "Grammatikteil"
 
 # Page title
-#: ../lib/lcg/eurochance.py:223
+#: ../lib/lcg/eurochance.py:220
 msgid "Vocabulary Index"
 msgstr "Vokabelverzeichnis"
 
 # Section title (within the vocabulary index)
-#: ../lib/lcg/eurochance.py:238
+#: ../lib/lcg/eurochance.py:235
 msgid "Ordered by the English term"
 msgstr "Englischer Ausdruck"
 
 # Section title (within the vocabulary index)
-#: ../lib/lcg/eurochance.py:239
+#: ../lib/lcg/eurochance.py:236
 msgid "Ordered by the translation"
 msgstr "Übersetzung"
 
-#: ../lib/lcg/eurochance.py:248 ../lib/lcg/eurochance.py:283
-#: ../lib/lcg/eurochance.py:333
+#: ../lib/lcg/eurochance.py:245 ../lib/lcg/eurochance.py:280
+#: ../lib/lcg/eurochance.py:330
 msgid "Table of Contents:"
 msgstr "Inhaltsverzeichnis:"
 
 # Page title
-#: ../lib/lcg/eurochance.py:262
+#: ../lib/lcg/eurochance.py:259
 #, python-format
 msgid "Answer Sheet for %s"
 msgstr "Auflösungsteil für %s"
 
 # Page title
-#: ../lib/lcg/eurochance.py:280
+#: ../lib/lcg/eurochance.py:277
 msgid "Help Index"
 msgstr "Hilfeverzeichnis"
 
 # Unit title
-#: ../lib/lcg/eurochance.py:337
+#: ../lib/lcg/eurochance.py:334
 #, python-format
 msgid "Unit %d"
 msgstr "Lektion %d"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/eurochance.py:350
+#: ../lib/lcg/eurochance.py:347
 msgid "Course Index"
 msgstr "Kursindex"
 
 # Section title
-#: ../lib/lcg/eurochance.py:361
+#: ../lib/lcg/eurochance.py:358
 #, python-format
 msgid "Version %s"
 msgstr "Version %s"
