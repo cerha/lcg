@@ -632,30 +632,6 @@ http://www.google.com/images/logo.gif
 If a link name is given, this name will be used as the ALT text for this image.
 
 
-==== Escaping ====
-
-You can avoid the special meaning of all the constructs described in this
-document by prefixing them with a backslash.
-
-*Example:*
-
-------
-Slashes are used for /emphasizing/, however sometimes you want them \/like
-here\/.  Double backslash must be used to force the \\/backslash/ itself in
-front of a murkup (anywhere else in the text, backslashes can be used freely).
-Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
-\\\\\*five*.
-------
-
-This will be presented as:
-
-Slashes are used for /emphasizing/, however sometimes you want them \/like
-here\/.  Double backslash must be used to force the \\/backslash/ itself in
-front of a murkup (anywhere else in the text, backslashes can be used freely).
-Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
-\\\\\*five*.
-
-
 ==== Special and Typographical Characters ====
 
 ===== Explicit line-break =====
@@ -725,6 +701,31 @@ He said: ``Who knows?''
 
 === Other features ===
 
+
+==== Escaping ====
+
+You can avoid the special meaning of all the constructs described in this
+document by prefixing them with a backslash.
+
+*Example:*
+
+------
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a murkup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+------
+
+This will be presented as:
+
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a murkup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+
+
 ==== Horizontal Lines ====
 
 Horizontal line can be made with 4 dashes on a separate line.
@@ -738,6 +739,7 @@ Horizontal line can be made with 4 dashes on a separate line.
 This will be presented as:
 
 ----
+
 
 ==== Comments ====
 
