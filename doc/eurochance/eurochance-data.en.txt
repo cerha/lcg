@@ -1,3 +1,7 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
 
 == Organization of the Input Data ==
 
@@ -41,32 +45,10 @@ intro.txt
   The file format is the [structured-text]
 
 grammar.txt
-  The data for the Grammar Bank as the [structured-text].
-  Obviously, this file is only needed for the Intermediate Course, since the
-  Advanced Course has no Grammar Bank.  See the following section for more
-  details about writing the Grammar Bank.
-
-==== Notes for Writing the Grammar Bank ====
-
-Within the contents of the Grammar Bank, there are often words or structures,
-which can be considered citations.  They can be recognised easily: Even after
-translating the grammar explanations into another language, these words or
-structures will still remain in English (or German for the German course).
-
-Example (with the citations in italics): 
-
-The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
-would<<) have only one form.  There are also short affirmative forms for
->>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
-
-The citations must be marked by surrounding them into double angle brackets
-like this: =\>>word\<<=.  The paragraph above would be written like this:
-
------
-The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
-would<<) have only one form.  There are also short affirmative forms for
->>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
------
+  The data for the Grammar Bank as the [structured-text].  Obviously, this file
+  is only needed for the Intermediate Course, since the Advanced Course has no
+  Grammar Bank.  See also [#notes-grammar] for specific advice on using the
+  generic constructs of the structured text format within the Grammar Bank.
 
 
 === Inside the Unit Directory ===
@@ -100,6 +82,66 @@ checklist.txt
   Source for the "Checklist" section as [structured-text].
 
 
-See the description of each LCG data format for more datails about the contents
-of the files.
+=== Notes for Writing the Grammar Bank === notes-grammar
 
+Within the contents of the Grammar Bank, there are often words or structures,
+which can be considered citations.  They can be recognised easily: Even after
+translating the grammar explanations into another language, these words or
+structures will still remain in English (or German for the German course).
+
+Example (with the citations in italics): 
+
+The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
+would<<) have only one form.  There are also short affirmative forms for
+>>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
+
+The citations must be marked by surrounding them into double angle brackets
+like this: =\>>word\<<=.  The paragraph above would be written like this:
+
+-----
+The modal auxiliary verbs (>>can, could, must, may, might, shall, should, will,
+would<<) have only one form.  There are also short affirmative forms for
+>>shall<< (>>'ll<<) >>will<< (>>'ll<<) and >>would<< (>>'d<<)
+-----
+
+=== Notes for Writing the Exercise files === notes-exercises
+
+Many exercise types use [structured-text] to format the exercise texts.  Here
+are a few practical tips how to use the structured text constructs within the
+exercises.
+
+Many exercises are based on a conversation.  These conversations may be written
+as [structured-text#field-sets].  Speaker's name must start the line and is
+enclosed in colons from both sides.  The spoken text follows.  When split over
+multiple lines, all the subsequent lines must be indented, until the next
+speaker name appears.
+
+*Example:*
+
+------
+:Granny: I thought you told me you'd already made up your mind to do
+         accountancy.
+:Emma:   I don't know. There are all kinds of other work in finance and I'm not
+         sure accounting would be too exciting.
+:Granny: Exciting? What you need is a good steady job and a good steady
+         boyfriend, my girl. Take my word for it.  Do your accounting course
+         then find a good job round here instead of traipsing off to the big
+         city. And here's your cup of tea.
+:Emma:   Oh, thanks. But Granny, there's more to life than getting married and
+	 having babies. And I want to see a bit of the world before I
+	 settle down. I've been thinking about private banking ...
+------
+
+This will be presented as:
+
+:Granny: I thought you told me you'd already made up your mind to do
+         accountancy.
+:Emma:   I don't know. There are all kinds of other work in finance and I'm not
+         sure accounting would be too exciting.
+:Granny: Exciting? What you need is a good steady job and a good steady
+         boyfriend, my girl. Take my word for it.  Do your accounting course
+         then find a good job round here instead of traipsing off to the big
+         city. And here's your cup of tea.
+:Emma:   Oh, thanks. But Granny, there's more to life than getting married and
+	 having babies. And I want to see a bit of the world before I
+	 settle down. I've been thinking about private banking ...
