@@ -1,6 +1,6 @@
-;;; lcg-mode.el -- Mode for editing LCG source files
+;;; lcg-mode.el -- Mode for editing LCG source exercise files
 
-;; Copyright (C) 2005 Tomas Cerha
+;; Copyright (C) 2005, 2006 Brailcom, o.p.s.
 
 ;; This file is not part of GNU Emacs.
 
@@ -19,19 +19,14 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 ;; MA 02111-1307, USA.
 
-;;; Commentary:
-
 ;; LCG is a Learning Content Generator.
 ;; See http://www.freebsoft.org/lcg.
 
 ;; This mode does some basic syntax highlighting for LCG exercise definition
 ;; files.
 
-;; * Startup
-
-;; To begin using lcg-mode, copy this file into your Emacs library path and add
+;; To start using lcg-mode, copy this file into your Emacs library path and add
 ;; this in your .emacs file:
-
 ;; (load-library "lcg-mode")
 
 (defvar lcg-mode-version "$Id"
