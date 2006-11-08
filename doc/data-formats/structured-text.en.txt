@@ -281,9 +281,8 @@ of the equation signs determines the level.
  This is a second section on the same level as the first one.
 ----- 
 
-It is /important/ to separate the equation marks from the title with a space
-and to avoid any other (even blank) characters after the final equation sign.
-Otherwise the section is not recognized.
+The space between the title and the equation marks is important.  Otherwise the
+section is not recognized.
 
 
 ==== Anchors ==== anchors

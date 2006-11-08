@@ -33,7 +33,6 @@ You can either put all the phrases together after a line containing a special
 comment "#phrases":
 
 -----
-Could you repeat that please? (phr.) :: ¿Podría repitir, por favor? 
 to switch off :: apagar
 tone :: señal
 yellow pages :: páginas amarillas
@@ -47,6 +46,6 @@ Optionally a phrase can be marked using the ``(phr.)'' note at the end of the
 phrase like that:
 
 -----
-Could you repeat that please? :: ¿Podría repitir, por favor? 
+Could you repeat that please? (phr.) :: ¿Podría repitir, por favor? 
 -----
 
