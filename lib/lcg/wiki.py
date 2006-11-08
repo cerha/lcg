@@ -48,6 +48,8 @@ class Parser(object):
     _SPLITTER_RE = re.compile(r"\r?\n(?:(?:\s*\r?\n)+|(?=(?:[\t ]+" +
                               _LIST_MARKER +"[\t ]|:[^:]*\S:\s+)))")
 
+    _COMMENT_MATCHER = re.compile("^#[^\n]*(\n|$)", re.MULTILINE)
+
     _MATCHERS = (('list_item',
                   r"(?P<indent>[\t ]+)(?P<type>" + _LIST_MARKER + ")[\t ]+" + \
                   r"(?P<content>.+)"),
@@ -235,13 +237,19 @@ class Parser(object):
                 else:
                     unfinished = (type, [data])
             else:
-                content.append(getattr(self, '_make_'+type)(block, groups))
+                element = getattr(self, '_make_'+type)(block, groups)
+                if element is not None:
+                    content.append(element)
         if unfinished:
             content.extend(finish(*unfinished))
         return content
 
     def _make_paragraph(self, block, groups):
-        return Paragraph(WikiText(block))
+        text = self._COMMENT_MATCHER.sub("", block).strip()
+        if text:
+            return Paragraph(WikiText(text))
+        else:
+            return None
     
     def _make_table(self, block, groups):
         return Table([TableRow([TableCell(WikiText(x.strip()))
@@ -270,7 +278,7 @@ class Parser(object):
 
     def parse(self, text):
         assert isinstance(text, (str, unicode)), text
-        return self._parse_sections(re.sub("(?m)^#.*$", "", text))
+        return self._parse_sections(text)
 
 
 class MacroParser(object):
