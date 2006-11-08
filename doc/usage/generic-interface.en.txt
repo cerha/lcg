@@ -16,6 +16,12 @@ the corresponding content hierarchy is built in the computer memory in an
 independent internal representation.  Then this model is exported into one of
 the supported output formats.
 
+An important restriction of the Generic Interface is that all source files are
+supposed to be in the [structured-text] format.  This format is the most
+generic one, so in most cases it is ok, but if you want to use LCG's other
+features, such as generating interactive exercises for e-learning applications,
+you will have to use the [custom-interface].
+
 Index: @TOC@
 
 
@@ -74,10 +80,10 @@ any node using it's id, without caring where in the hierarchy it is located.
 
 === File and Directory Name Restrictions === names
 
-A valid source directory name is any name, which doesn't begin with a dot or an
-underscore.  Also 'CVS' directories are ignored.
+A valid /source directory/ name is any name, which doesn't begin with a dot or
+an underscore.  Also 'CVS' directories are ignored.
 
-A valid source file must have the source file suffix.  This is '.txt' by
+A valid /source file/ must have the source file suffix.  This is '.txt' by
 default, but any other suffix can be passed (see [#run]).  Filenames beginning
 with a dot, an underscore and ending with a tilde are ignored.
 
@@ -100,7 +106,7 @@ Empty lines and lines beginning with a hash ('#') are ignored.
 If you specify a language, when running LCG, the LCG will try to locate the
 input file variant, which matches given language.  Language is specified using
 an ISO 639-1 Alpha-2 language code.  The matching input file will have the
-corresponding suffix, before the file type syffix.  Thus for example
+corresponding suffix, before the file type suffix.  Thus for example
 'index.en.txt' is the prefered input file for the node 'index'.  When no such
 file exists, the file 'index.txt' is used.
 
