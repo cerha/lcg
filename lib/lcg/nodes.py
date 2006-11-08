@@ -439,12 +439,6 @@ class FileNodeMixin(WikiNodeMixin):
 class WikiNode(ContentNode, FileNodeMixin):
     """Node read from a LCG Structured Text (wiki) document.
 
-    The node's content is read from a Structured Text document.  The title of
-    the top-level section within the document will be used as node's title when
-    the `title' constructor argument is not passed.  Thus it is required, that
-    the document contains just one top-level section, when no title is passed.
-    If not, an exception will be raised.
-    
     You simply instantiate this node (passing a string of Structured Text as a
     constructor argument) and the text is parsed and a hierarchy of 'Content'
     elements representing the document is built.  Then you can access the
@@ -461,7 +455,11 @@ class WikiNode(ContentNode, FileNodeMixin):
         
           text -- the wiki-formatted text as a unicode string.
 
-          title -- 
+          title -- Node title as a string or None.  If None, the title of the
+            node is determined from the top-level section of the document.
+            Thus it is required, that the document contains just one top-level
+            section, when no title is passed.  If not, an exception will be
+            raised.
 
           The other arguments are inherited from the parent class.
           
