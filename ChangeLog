@@ -1,3 +1,24 @@
+2006-11-08  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/data-formats/structured-text.cs.txt: New file (translation).
+
+	* doc/data-formats/formatting.en.txt: File removed.
+
+	* lib/lcg/wiki.py (Parser._MATCHERS, Parser._make_toc): Allow the
+	`@TON@' macro for table ov nodes.
+	(Parser._COMMENT_MATCHER): New constant.
+	(Parser._parse_blocks): Append the created element only if it's
+	not None.
+	(Parser._make_paragraph): Remove comments from the text.  If
+	nothing remains, return None.
+	(Parser.parse): Don't remove comments here.
+
+	* doc/usage/generic-interface.en.txt: Minor updates and fixes.
+
+2006-11-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* structured-text-mode.el: New file.
+
 2006-11-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/lcg.de.po: Updated.

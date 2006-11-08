@@ -295,7 +295,7 @@ have branches in one region or country; large international banks have
 -----
 
 This example uses the Field-set construct to format the conversation.  See the
-[formatting] for more details.
+[structured-text] for more details.
 
 It is recommended to use a cloze in a combination with a recording, so that the
 user's goal is to fill in the exactly same words as he has heard before.  In
