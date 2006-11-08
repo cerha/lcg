@@ -58,7 +58,7 @@ class Parser(object):
                   r"(?P<term>\S[^\r\n]*)\r?\n" + \
                   r"(?P<descr>([\t ]+[^\r\n\t ]+\r?\n?)+)"),
                  ('toc',
-                  r"(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>N?TOC)(\((?P<tocdepth>\d+)\))?\@\s*"),
+                  r"(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>(N?TOC|TON))(\((?P<tocdepth>\d+)\))?\@\s*"),
                  ('table',
                   r"((\|[^\r\n\|]*)+\|\s*)+"),
                  ('rule',
@@ -250,7 +250,7 @@ class Parser(object):
 
     def _make_toc(self, block, groups):
         title = groups['title']
-        cls = groups['toctype'] == 'NTOC' and TableOfNodes or TableOfContents
+        cls = groups['toctype'] in ('TON', 'NTOC') and TableOfNodes or TableOfContents
         d = groups['tocdepth'] and int(groups['tocdepth']) or 99
         return cls(title=title, depth=d)
 
