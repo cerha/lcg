@@ -33,16 +33,16 @@ readable and editable without any particular software tool.  Just a simple text
 editor can do the job.  This makes it totally portable and accessible.  A
 number of different target formats may be generated from one source.
 
-#Nepochopení a nerespektování základního principu oddělení logické a
-#prezentační stránky dokumentu může u uživatelů zvyklých formátovat dokumenty
-#vizuálně vést až k jisté počáteční frustraci, ale jakmile si zvyknete na to,
-#že vaším úkolem je text jen vhodně označit a způsob jeho prezentace přenecháte
-#počítači, zjistíte, že vás tento způsob práce nesvazuje, ale naopak
-#osvobozuje.  Můžete se plně věnovat obsahové stránce dokumentu a o prezentaci
-#se staráte jen minimálně.  To se ovšem neobejde bez znalosti zákonitostí,
-#podle kterých počítač jednotlivé logické celky v textu rozeznává.  Proto se
-#nyní věnujme vysvětlení všech často používaných konstrukcí.
-
+Misunderstanding or not respecting the fundamental principal of separation of
+the logical and the presentational aspect of the document may lead to an
+initial frustration for users, who are used to format documents visually,
+however once you get used to the fact that your only goal is to mark the text
+up properly and you leave all the job of choosing the right presentation to the
+computer, you discover it does not restrict you, but it gives you more freedom.
+You can fully concentrate on the content itself and don't care too much of its
+presentation.  This, however, would not work without your knowledge of the
+rules used for recognizing different logical elements of the document.  So we
+will explain the most important constructs now.
 
 
 == Brief Overview of Most Important Constructs == overview
@@ -103,14 +103,14 @@ of separate items.  Each item is marked by an asterisk and must be indented.
 ------
  * cat
  * dog
- * hampster
+ * hamster
 ------
 
 This will be presented as:
 
  * cat
  * dog
- * hampster
+ * hamster
 
 Bullet lists can be nested, you can also make ordered lists etc.  More details
 can be found in the [#bullet-lists] and [#ordered-lists].
@@ -174,7 +174,7 @@ See [#field-sets] for a detailed syntax description.
 
 Links are hypertext references to other documents or sections within them.
 They are written using square brackets.  Each link has its target and may have
-an explicit name (if not defined, the system wil ltry to gind out the name
+an explicit name (if not defined, the system will try to find out the name
 automatically).  The target is the first part of the text within brackets, the
 name may follow after a space.  Certain kinds of targets are recognized
 automatically and thus don't require the square brackets.
@@ -202,39 +202,40 @@ Resulting links:
 See [#links] for more details.
 
 
-#== General recommendations ==
-#
-# * Seznamte se s podporovanými konstrukcemi a využívejte vždy ty, které se pro
-#   daný účel nejlépe hodí.  Skoro vše se sice dá napsat jako jeden dlouhý
-#   odstavec textu, ale využitím prvků, jako jsou odrážkové seznamy, seznamy
-#   definic apod. lze text podstatně zpřehlednit a odlehčit.  Také uživatelům
-#   zpřístupňujících technologií tím výrazně usnadňujete orientaci a navigaci.
-#
-# * Nikdy nezneužívejte žádnou logickou konstrukci čistě k dosažení určitých
-#   prezentačních vlastností (typu nebo velikosti písma, odsazení apod), pokud
-#   daný obsah neodpovídá logickému určení této konstrukce.  Zkuste se znovu
-#   zamyslet nad strukturou informací a zvolit jednu z podporovaných možností.
-#
-# * Tabulky používejte pouze v případě, že žádný jiný způsob vyjádření není
-#   vhodný a že se skutečně jedná o tabulková data.  Často lze tabulku vyjádřit
-#   například i pomocí vnořených seznamů.  Tato forma může být mnohdy vhodnější
-#   pro uživatele zpřístupňujících technologií.
-# 
-# * V maximální míře využívejte hypertextové provázání jednotlivých dokumentů
-#   (stránek) a kapitol.  Více viz [#links].
-# 
-# * Pokud se některé informace opakují na více místech, oddělte je do samostatné
-#   jednotky (kapitoly, dokumentu), na kterou se potom můžete odkazovat.
-# 
-# * Vyvarujte se dlouhých souvětí.  Krátké a jasné věty se mnohem lépe čtou.
-#
-# * Nezneužívejte možností zvýrazňování textu.  Text hýřící se mnoha druhy písma
-#   přestává být přehledný.
+== General recommendations ==
 
+  * Get familiar with the available constructs and always use those, which
+    best fit given purpose.  Nearly everything can be written down as one long
+    paragraph of text, but using the constructs, such as bullet lists,
+    definition lists etc. can make the text much better readable.  You will
+    also greatly simplify the orientation and navigation for users of assistive
+    technologies.
 
+  * Never miss-use any logical construct just to achieve it's presentational
+    properties (such as font size or type, indentation etc.) unless it really
+    fits logically.  Try to re-consider the logical structure of the
+    information if you can't find a suitable construct.
+
+  * Use tables only if there is no other means to express the information and
+    only when it really is tabular data.  It is, for example, often possible to
+    express the same information by nested lists instead of tables.  This form
+    may be often more accessible to the users of assistive technologies.
+
+  * Use hypertext links as much as possible to simplify navigation between
+    documents and their sections.  See [#links] for more information.
+
+  * Whenever there is some information repeated at different places, detach it
+    to a separate document/section and link to it from those places.
+
+  * Avoid long sentences.  Short, simple and clear sentences are much better
+    readable.
+
+  * Don't overuse text emphasizing.  A document blazing with many different font
+    sizes and styles is hard to read.
 
 ###############################################################################
 ###############################################################################
+
 
 == Detailed Structured Text Formatting Manual == complete-manual
  
@@ -569,7 +570,7 @@ Link categories: @TOC@
 Local links lead to another document withing the hierarchy, or another section
 within the same document.  Documents are referenced by their identifier,
 sections by their anchor names (see [#anchors] for more details) prefixed with
-a hash.  A section of another document must be also preceeded by that
+a hash.  A section of another document must be also preceded by that
 document's identifier.
 
 *Example:*
@@ -606,11 +607,11 @@ square brackets are not necessary, unless you want to give the link a more
 descriptive name.  Also e-mail addresses automatically become links.
 
 ------
-The adddress http://www.gnu.org is the [http://www.gnu.org GNU homepage].
+The address http://www.gnu.org is the [http://www.gnu.org GNU homepage].
 Contact bill@microsoft.com for more information.
 ------
 
-The adddress http://www.gnu.org is the [http://www.gnu.org GNU homepage].
+The address http://www.gnu.org is the [http://www.gnu.org GNU homepage].
 Contact bill@microsoft.com for more information.
 
 
@@ -711,7 +712,7 @@ document by prefixing them with a backslash.
 ------
 Slashes are used for /emphasizing/, however sometimes you want them \/like
 here\/.  Double backslash must be used to force the \\/backslash/ itself in
-front of a murkup (anywhere else in the text, backslashes can be used freely).
+front of a markup (anywhere else in the text, backslashes can be used freely).
 Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
 \\\\\*five*.
 ------
@@ -720,7 +721,7 @@ This will be presented as:
 
 Slashes are used for /emphasizing/, however sometimes you want them \/like
 here\/.  Double backslash must be used to force the \\/backslash/ itself in
-front of a murkup (anywhere else in the text, backslashes can be used freely).
+front of a markup (anywhere else in the text, backslashes can be used freely).
 Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
 \\\\\*five*.
 
