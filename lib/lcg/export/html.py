@@ -79,6 +79,10 @@ class HtmlMarkupFormatter(MarkupFormatter):
                 return _html.img(href, alt=title or '')
             else:
                 target = Link.ExternalTarget(href, title or href)
+        if title:
+            maybeimg = title.split(' ')[0]
+            if self._IMAGE_URI_MATCHER.search(maybeimg):
+                title = _html.img(maybeimg, alt=title[len(maybeimg)+1:] or '')
         l = Link(target, label=title)
         l.set_parent(parent)
         return l.export(self._exporter)
@@ -165,6 +169,10 @@ class HtmlExporter(Exporter):
             return ['<link rel="stylesheet" type="text/css" href="%s">' % \
                     s.uri() for s in node.resources(Stylesheet)]
             
+    def _title(self, node):
+        config = node.config()
+        return config.site_title + ' - ' + node.title()
+    
     def _head(self, node):
         if self._stylesheet is not None:
             r = node.resource(Stylesheet, self._stylesheet)
@@ -172,7 +180,7 @@ class HtmlExporter(Exporter):
         meta = node.meta() + \
                (('generator',
                  'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
-        tags = [concat('<title>', node.title(), '</title>')] + \
+        tags = [concat('<title>', self._title(node), '</title>')] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', node.language()),
