@@ -1,3 +1,10 @@
+2006-11-11  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlExporter._title): New method.
+	(HtmlExporter._head): Vyu¾ívej ji.
+	(HtmlMarkupFormatter._link_formatter): If there is an image name
+	within the link title, let the link be this image.
+
 2006-11-08  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/lcg.pl.po: Updated.

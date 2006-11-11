@@ -3,7 +3,6 @@
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
-
 = Strukturovaný text =
 
 Tento dokument popisuje formát strukturovaného textu používaného v rámci
@@ -565,36 +564,38 @@ Můžete používat /zvýrazněný text/, *silně zvýrazněný text*, _podtrže
 
 ==== Odkazy ==== links
 
-Links can be used to refer to other documents, web addresses, sections etc.
-They are marked by square brackets.  The first part of the text in the brackets
-is the link target.  The target can be optionally followed by a space and a
-link name.  Depending on the type of the link target, we recognize several
-kinds of links.
+Odkazy umožňují hypertextové provázání dokumentů a jejich částí.  Zapisují se
+pomocí hranatých závorek.  Každý odkaz má svůj cíl a může mít i explicitní
+název (pokud není určen, pokusí se systém název doplnit automaticky).  Cíl je
+první část textu uvnitř závorek a název může následovat za první mezerou.
+Některé typy odkazů jsou rozpoznány automaticky, takže hranaté závorky nejsou
+potřeba.
 
-Link categories: @TOC@
+Podle druhu cíle odkazu rozeznáváme několik typů odkazů:
+
+Typy odakzů: @TOC@
 
 
 ===== Místní odkazy =====
 
-Local links lead to another document withing the hierarchy, or another section
-within the same document.  Documents are referenced by their identifier,
-sections by their anchor names (see [#anchors] for more details) prefixed with
-a hash.  A section of another document must be also preceeded by that
-document's identifier.
+Místní odkazy odkazují na jiné dokumenty v rámci jedné publikace nebo na
+konkrétní kapitoly.  Dokumenty jsou odkaznvány prostřednictvím svých
+identifikátorů, kapitoly prostřednictvím kotev (více viz [#anchors]).  Kotvu v
+odkazu uvodíme mřížkou.  Pokud jde o kotvu v rámci jiného dokumentu, před
+mřížku ještě připojíme jeho identifikátor.
 
 *Příklad:*
 
 ------
-Read the [intro].  See also [#anchors].
+Přečtěte si [intro].  Více viz [#anchors].
 ------
 
 Toto bude zobrazeno jako:
 
-Read the [intro].  See also [#anchors].
+Přečtěte si [intro].  Více viz [#anchors].
 
-The title of the referenced document or section becomes the name of the link
-automatically.  You can also supply a different name within the brackets
-explicitly.
+Název odkazovaného dokumentu nebo kapitoly je automaticky doplněn jako název
+odkazu.  Můžete však také určit jiný název, tím že jej uvedete v závorkách.
 
 *Příklad:*
 
@@ -715,24 +716,29 @@ potlačit pomocí zpětného lomítka.
 *Příklad:*
 
 ------
-Slashes are used for /emphasizing/, however sometimes you want them \/like
-here\/.  Double backslash must be used to force the \\/backslash/ itself in
-front of a murkup (anywhere else in the text, backslashes can be used freely).
-Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
-\\\\\*five*.
+
+Lomítka jsou běžně používána pro /zvýraznění/, nicméně někdy chcete právě
+lomítka, jako \/např. zde\/.  Dvojité zpětné lomítko může být použito před
+řídícím znakem pokud skutečně chceme zobrazit právě \\/zpětné lomítko/
+(kdekoliv jinde v textu mohou být zpětná lomítka používána bez omezení).  Další
+příklady použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čtyři*
+\\\\\*pět*.
+
 ------
 
 Toto bude zobrazeno jako:
 
-Lomítka jsou běžně používána pro /zvýraznění/, nicméně někdy můžeme chtít
-prostě zobrazit tato lomítka \/jako zde\/.  Double backslash must be used to force
-the \\/backslash/ itself in front of a murkup (anywhere else in the text,
-backslashes can be used freely).  Other backslash combination examples: \*one*
-\\*two* \\\*three* \\\\*four* \\\\\*five*.
+Lomítka jsou běžně používána pro /zvýraznění/, nicméně někdy chcete právě
+lomítka, jako \/např. zde\/.  Dvojité zpětné lomítko může být použito před
+řídícím znakem pokud skutečně chceme zobrazit právě \\/zpětné lomítko/
+(kdekoliv jinde v textu mohou být zpětná lomítka používána bez omezení).  Další
+příklady použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čtyři*
+\\\\\*pět*.
+
 
 ==== Horizontální čára ====
 
-Horizontal line can be made with 4 dashes on a separate line.
+Horizontální čáru uděláme jako čtyři pomlčky na samostatné řádce.
 
 *Příklad:*
 
@@ -746,20 +752,20 @@ Toto bude zobrazeno jako:
 
 ==== Komentáře ====
 
-You can comment out any text with '# ' at the beginning of a line.  This will
-make the text invisible on output media (e.g. by making it an HTML comment in
-the HTML output):
+Můžete „zakomentovat“ libovolný text pomocí křížku „#“ na začátku řádky.  Tím
+vyřadíme danou řádku z dalšího zpracování a řádka se tedy na výstupu vůbec
+neobjeví.
 
 ------
- The first line.
- # These lines have been 
- # commented out.
- The last line.
+ První řádek.
+ # Tyto dva řádky
+ # jsou „zakomentovány“.
+ Poslední řádek.
 ------
 
 Toto bude zobrazeno jako:
 
-The first line.
-# These lines have been 
-# commented out
-The last line.
+První řádek.
+# Tyto dva řádky
+# jsou „zakomentovány“.
+Poslední řádek.
