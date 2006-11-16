@@ -60,8 +60,11 @@ def _tag(tag, attr, content, newlines=False):
 def h(title, level=2):
     return concat('<h%d>' % level, title, '</h%d>' % level)
     
-def strong(text):
-    return concat('<strong>', text, '</strong>')
+def strong(text, cls=None, id=None, lang=None):
+    attr = (('class', cls),
+            ('lang', lang),
+            ('id', id))
+    return _tag('strong', attr, text)
 
 def pre(text, cls=None):
     return _tag('pre', (('class', cls),), text)
