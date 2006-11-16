@@ -1,3 +1,11 @@
+2006-11-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/_html.py (strong): New arguments `cls', `id' and
+	`lang'.
+
+	* lib/lcg/export/html.py (HtmlExporter._title): A copy/paste bug
+	fixed.
+
 2006-11-11  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlExporter._title): New method.

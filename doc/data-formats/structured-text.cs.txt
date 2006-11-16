@@ -51,6 +51,8 @@ Následující text obsahuje pouze stručnou a odlehčenou formu popisu
 nejdůležitějších konstrukcí.  Detailní popis všech konstrukcí a jejich možností
 naleznete v druhé části tohoto dokumentu nazvané [#complete-manual].
 
+Obsah: @TOC@
+
 
 === Odstavce ===
 
