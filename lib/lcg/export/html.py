@@ -170,8 +170,7 @@ class HtmlExporter(Exporter):
                     s.uri() for s in node.resources(Stylesheet)]
             
     def _title(self, node):
-        config = node.config()
-        return config.site_title + ' - ' + node.title()
+        return node.title()
     
     def _head(self, node):
         if self._stylesheet is not None:
