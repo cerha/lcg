@@ -186,11 +186,14 @@ class TranslatableText(unicode):
 
     def __add__(self, other):
         if not isinstance(other, (str, unicode)):
-            raise TypeError("unsupported operand type(s) for +: '%s' and '%s'"
-                            % (self.__class__.__name__,
-                               other.__class__.__name__))
+            return NotImplemented
         return concat((self, other))
 
+    def __radd__(self, other):
+        if not isinstance(other, (str, unicode)):
+            return NotImplemented
+        return concat((other, self))
+    
 
 class Concatenation(unicode):
     """A concatenation of translatable and untranslatable text elements.
@@ -263,9 +266,13 @@ class Concatenation(unicode):
 
     def __add__(self, other):
         if not isinstance(other, (str, unicode)):
-            raise TypeError("unsupported operand type(s) for +: "
-                            "'Concatenation' and '%s'" % type(other))
+            return NotImplemented
         return concat(self, other)
+        
+    def __radd__(self, other):
+        if not isinstance(other, (str, unicode)):
+            return NotImplemented
+        return concat(other, self)
         
     def replace(self, old, new):
         """Apply the method to all items and return a new Concatenation.
