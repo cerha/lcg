@@ -66,8 +66,15 @@ class TranslatableText(unittest.TestCase):
         b = "xxx"
         c = a + b
         assert isinstance(c, lcg.Concatenation), c
+        assert c == "Version 1.0xxx", c
         d = c + b
         assert isinstance(d, lcg.Concatenation), d
+        e = b + a
+        assert isinstance(e, lcg.Concatenation), e
+        assert e == "xxxVersion 1.0", e
+        f = b + c
+        assert isinstance(f, lcg.Concatenation), f
+        assert f == "xxxVersion 1.0xxx", f
         try:
             e = a + 1
         except TypeError, e:
