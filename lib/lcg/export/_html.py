@@ -128,8 +128,8 @@ def label(text, id, lang=None, cls=None):
     return _tag('label', (('for', id), ('lang', lang), ('class', cls)), text)
 
 def _input(type, name=None, value=None, title=None, id=None,
-           onclick=None, size=None, cls=None, readonly=False, checked=False,
-           disabled=False):
+           onclick=None, size=None, maxlength=None, cls=None, readonly=False,
+           checked=False, disabled=False):
     assert isinstance(checked, types.BooleanType)
     assert isinstance(readonly, types.BooleanType)
     assert isinstance(disabled, types.BooleanType)
@@ -139,6 +139,7 @@ def _input(type, name=None, value=None, title=None, id=None,
                  ('title', title),
                  ('id', id),
                  ('size', size),
+                 ('maxlength', maxlength),
                  ('onclick', onclick),
                  ('class', cls),
                  ('checked', checked),
