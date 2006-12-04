@@ -1,3 +1,19 @@
+2006-12-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/__init__.py (__version__): Changed to 0.3.4.
+
+	* lib/lcg/_test.py (TranslatableText.check_addition): Test also
+	reverse order of arguments.
+
+	* lib/lcg/i18n.py (TranslatableText.__radd__): New method.
+	(Concatenation.__radd__): New method.
+	(TranslatableText.__add__, Concatenation.__add__): Return
+	`NotImplemented' instead of raising an TypeError.
+
+	* lib/lcg/export/_html.py (_input): New argument `maxlength'
+
+	* doc/data-formats/structured-text.pl.txt: New file.
+
 2006-11-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/_html.py (strong): New arguments `cls', `id' and
@@ -65,7 +81,7 @@
 
 2006-11-03  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/export/html.py (HtmlExporter._output_file): Replate
+	* lib/lcg/export/html.py (HtmlExporter._output_file): Replace
 	colons in id by hyphens.
 
 	* lib/lcg/export/hhp.py (_Header._lines): Use `Exporter.uri()'
@@ -329,11 +345,10 @@
 	* translations/help.*.txt: Updated.
 
 	* lib/lcg/eurochance.py (EurochanceNode._GETTEXT_DOMAIN) 
-	(ExerciseHelp._GETTEXT_DOMAIN): Nová konstanta.
-	(EurochanceNode.__init__): Vyu¾ívej ji.  Loguj pøípadné
-	nepøelo¾ené texty.
+	(ExerciseHelp._GETTEXT_DOMAIN): New constant.
+	(EurochanceNode.__init__): Use it.  Log untranslated texts.
 	(Instructions._DUMMY_TRANSLATIONS) 
-	(ExerciseHelp._DUMMY_TRANSLATIONS): Nové konstanty.
+	(ExerciseHelp._DUMMY_TRANSLATIONS): New constants.
 
 	* translations/Makefile (%.d): The `%/LC_MESSAGES' directorty
 	added to the .mo file prerequisities.
