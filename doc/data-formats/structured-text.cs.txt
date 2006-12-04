@@ -475,39 +475,43 @@ Wiking
 
 ==== Sledy položek ==== field-sets
 
-Field-sets can be used for generic two-column tabular data, where the first
-column is the label and the second column is the corresponding value.  The
-label is marked with colons from both sides.  Values can be multi-line, but
-must be indented properly.
+Sledy položek mohou být obecně použity pro zápis datových dvojic, kde první
+položka každé dvojice je název a druhá položka je odpovídající hodnota.
+Název je z obou stran obklopen dojtečkami.  Hodnoty mohou být víceřádkové,
+pokud jsou správně odsazeny.
+
+*Příklad:*
 
 ------
-:Birth Date: 1975-08-30
-:Address:
-   38 Ocean View Dr. //
-   Laguna Beach
-:Occupation: Oil Magnate
+:Datum narození: 30.8. 1975
+:Adresa:
+   Důlní 23//
+   Ostrava
+:Povolání: Uhlobaron
 ------
 
-:Birth Date: 1975-08-30
-:Address:
-   38 Ocean View Dr. //
-   Laguna Beach
-:Occupation: Oil Magnate
+Toto bude zobrazeno jako:
+
+:Datum narození: 30.8. 1975
+:Adresa:
+   Důlní 23//
+   Ostrava
+:Povolání: Uhlobaron
 
 
 ==== Předformátovaný text ==== preformatted-text
 
-You can mark a block of text as a preformatted text by surrounding it by lines
-of five or more dashes.
-
-No further formatting is then applied to the preformatted text.  It is rendered
-as it appears in the source document.
+Pokud text obklopíte shora i sdola řádkem o pěti a více pomlčkách, je vše
+uvnitř tohoto bloku považováno za předformátovaná text.  Tento text nebude dále
+formátován, ale bude ponecháno jeho původní formátování, včetně všech mezer,
+řádkových zlomů a odsazení.  Text je zkrátka zobrazen přesně tak, jak je
+zapsán.
 
 *Příklad:*
 
 ------
  ------
-  foo   bar
+  bla   bla
    x     y
    1     2
  ------
@@ -516,40 +520,40 @@ as it appears in the source document.
 Toto bude zobrazeno jako:
 
 ------
- foo   bar
+ bla   bla
   x     y
   1     2
 ------
 
-All the examples in this manual are written as preformatted text.
+Všechny příklady v tomto návodu jsou zapsány jako předformátovaný text.
 
 
 ==== Tabulky ====
 
-You can make simple tables with constant number of cells per row.  Each row is
-on one line and pipe characters are used to separate the cells.  The line must
-also begin and end with a pipe character.
+Můžete vytvářet také jednoduché pravidelné tabulky se shodným počtem buněk v
+každém řádku.  Každý řádek tabulky je jeden řádek vstupního textu.  K oddělení
+buňek je používán znak svislé čáry „|“.  Tento znak také označuje začátek a
+konec řádku tabulky.
 
 
 *Příklad:*
 
 ------
-|        | Dick   | Jane |
-| height | 72"    | 65"  |
-| weight | 130lbs | 150lbs |
+|       | Pavel  | Jana  |
+| výška | 189cm  | 164cm |
+| váha  |  73kg  |  78kg |
 ------
 
-|        | Dick   | Jane |
-| height | 72"    | 65"  |
-| weight | 130lbs | 150lbs |
+|       | Pavel  | Jana  |
+| výška | 189cm  | 164cm |
+| váha  |  73kg  |  78kg |
 
 
 === Řádkové konstrukce === inline-constructs
 
-Inline constructs are used inside blocks of text.  They don't influence the
-document structure, but they allow you to use different kinds of elements
-within blocks.
-
+Řádkové konstrukce jsou využívány uvnitř jednotlivých bloků textu.  Neovlivňují
+vlastní strukturu dokumentu, ale umožňují používání různých prvků v rámci
+textových bloků.
 
 ==== Zvýrazňování textu ====
 
@@ -647,70 +651,71 @@ Pokud je určen název, bude použit jako ALT text tohoto obrázku.
 
 ===== Vynucený řádkový zlom =====
 
-Two slashes force a line-break:
+Dvě lomítka vynutí řádkový zlom:
 
 ------
-This sentence will break//in the middle.
+Tato věta bude // uprostřed zalomena.
 ------
 
-This sentence will break//in the middle.
+Tato věta bude // uprostřed zalomena.
 
 ===== Nedělitelná mezera =====
 
-The line-breaks are inserted automatically, when the paragraph is formatted to
-fit the output media.  However, you sometimes don't want a line-break in a
-certain place.  You can use a tilde =\~= instead of a space in such
-cases.
+Při zobrazení výsledného dokumentu jsou řádkové zlomy vytvářeny automaticky
+tak, aby šířka textu odpovídala šířce výstupního média.  To ovšem může někdy
+vést k tomu, že je řádka zalomena v místě, kde to není vhodné.  V češtině je to
+napříklas po jednpísmenné předložce či spojce, která by tak zůstala na konci
+řádku.  Proto je možně na určených místech zlom zakázat.  Namísto mezery
+zapište vlnku „\~“.  Ta bude na výstupu nahrazena nedělitoenou mezerou.
 
 *Příklad:*
 
 ------
-We can forbid a line-break between the first and second name of
-Richard~Stallman, but we must prefix the tilde with a backslash, when
-we need to write the shell command 'cd \~'.
+Třešně a~višně.
+Dlouhý~nedělitelný~text~může~způsobit~problémy~s~formátováním~odstavce~pokud~je~např.~zobrazen~v~malém~okně~prohlížeče.
 ------
 
 Toto bude zobrazeno jako:
 
-We can forbid a line-break between the first and second name of
-Richard~Stallman, but we must prefix the tilde with a backslash, when
-we need to write the shell command 'cd \~'.
+Třešně a~višně.
+Dlouhý~nedělitelný~text~může~způsobit~problémy~s~formátováním~odstavce~pokud~je~např.~zobrazen~v~malém~okně~prohlížeče.
 
+O tom, jak zamezit interpretaci vlnky jako nedělitelné mezery a zobrazit
+přímo vlnku, se dozvíte v kapitole [#escape].
 
 ===== Dlouhá pomlčka =====
 
-Double dash (two minus signs) produce a long dash on the output
+Dvojitá pomlčka (znak mínus) bude na výstupu nahrazena dlouhou pomlčkou.
 
 *Příklad:*
 
 ------
-LCG -- highway to excellence.
+LCG -- dálnice k dokonalosti
 ------
 
 Toto bude zobrazeno jako:
 
-LCG -- highway to excellence.
+LCG -- dálnice k dokonalosti
 
 
 ==== Citace ====
 
-Quotation begins with two reverse apostrophes and ends with two single
-apostrophes.
+Citace začíná dvěma zpětnými apostrofy a končí dvěma obyčejnými apostrofy.
 
 *Příklad:*
 
 ------
-He said: ``Who knows?''
+Řekl: ``Kdo ví.''
 ------
 
 Toto bude zobrazeno jako:
 
-He said: ``Who knows?''
+Řekl: ``Kdo ví.''
 
 
 === Další vlastnosti ===
 
-==== Potlačování speciálního významu zápisu ====
+==== Potlačování speciálního významu zápisu ==== escape
 
 Interpretaci speciálního významu libovolné zde popsané konstrukce můžete
 potlačit pomocí zpětného lomítka.
