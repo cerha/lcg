@@ -19,9 +19,6 @@ tags:
 install: translations $(SHARE)/lcg
 	cp -ruv doc resources translations $(SHARE)/lcg
 	cp -ruv lib/lcg $(LIB)
-	@# Create the *.pyc and *.pyo files
-	PYTHONPATH=$(LIB) python -c "import lcg"
-	PYTHONPATH=$(LIB) python -OO -c "import lcg"
 
 uninstall:
 	rm -rf $(SHARE)/lcg
@@ -34,13 +31,16 @@ version := $(shell echo 'import lcg; print lcg.__version__' | python)
 dir := lcg-$(version)
 file := lcg-$(version).tar.gz
 
+compile:
+	python -c "import compileall; compileall.compile_dir('lib')"
+
 release: translations
 	@ln -s .. releases/$(dir)
 	@if [ -e releases/$(file) ]; then \
 	   echo "Removing old file $(file)"; rm releases/$(file); fi
 	@echo "Generating $(file)..."
 	@(cd releases; tar --exclude "CVS" --exclude "*~" --exclude "#*" \
-	     --exclude ".#*" --exclude "*.pyc" --exclude "*.pyo" \
+	     --exclude ".#*" --exclude "*.pyo" \
 	     --exclude .cvsignore --exclude html --exclude releases \
 	     -czhf $(file) $(dir))
 	@rm releases/$(dir)
