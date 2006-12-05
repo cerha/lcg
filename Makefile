@@ -41,6 +41,6 @@ release: translations
 	@echo "Generating $(file)..."
 	@(cd releases; tar --exclude "CVS" --exclude "*~" --exclude "#*" \
 	     --exclude ".#*" --exclude "*.pyc" --exclude "*.pyo" \
-	     --exclude html --exclude releases \
+	     --exclude .cvsignore --exclude html --exclude releases \
 	     -czhf $(file) $(dir))
 	@rm releases/$(dir)
