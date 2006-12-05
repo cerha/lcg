@@ -1,3 +1,7 @@
+2006-12-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* Makefile (install): Install also the user tools.
+
 2006-12-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/__init__.py (__version__): Changed to 0.3.4.
