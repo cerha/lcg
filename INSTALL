@@ -2,56 +2,68 @@ Learning Content Generator Installation Instructions
 
 You need Python 2.3 or later to run LCG.  
 
-The following instructions assume, that you have downloaded LCG and unpacked it
-somewhere on your system.  We will refer to the unpacked directory as `the
-installation directory'.  All the mentioned commands should be run from within
-this directory.
+The simplest installation can be done using the provided Makefile.  Just run
+"make install" within the package root directory.  Feel free to edit the
+Makefile and setup your own installation paths.
 
-First you need to add the LCG Python libraries somewhere to your Python path.
+You can also setup LCG manually.  This is recommended when you checked LCG out
+of CVS and want to run the CVS version directly.  You will be able to check out
+a newer version at any time and this new version will be used automatically.
+The commands mentioned below should all be run from within the package root
+directory.
+
+The procedure has the following steps:
+	
+  1. Generate locale data.
+  2. Add LCG Python libraries somewhere to your Python path.
+  3. Install LCG shared data to a known place.
+  4. Install the user tools (optional)
+
+
+== Generate locale data ==
+
+If you downloaded LCG directly form CVS, you will need to generate locale data.
+If you downloaded a released version, you can omit this step.  If you plan to
+update your installation from CVS, you will need to repeat this step after each
+update.  Run the following command to generate the locale data:
+
+ $ make translations
+
+Obviously, you need to have GNU make on your system to do that.  Apart from
+make, you also need the GNU gettext package.
+
+
+== Add LCG libraries to your Python path ==
+
 The recommended approach is to link the library to your site packages
 directory.  On a typical unix/linux system this can be:
 
- $ ln -s `pwd`/lib/lcg /usr/local/lib/python2.3/site-packages/lcg
+ $ ln -s `pwd`/lib/lcg /usr/local/lib/python2.4/site-packages/lcg
 
-Replace `python2.3' with the Python version you use.
+Replace `python2.4' with the Python version you use.
 
 Alternatively, you may add lcg to your PYTHONPATH environment variable:
 
  $ export PYTHONPATH=`pwd`/lib
 
-Now you need to make LCG resource files and translation data visible to LCG.
-It is recommended to link (or copy) them to `/usr/local/share/lcg' directory as
-follows:
+
+== Install LCG shared data ==
+
+It is recommended to link (or copy) the shared directories to
+`/usr/local/share/lcg' as follows:
 
  $ mkdir /usr/local/share/lcg
- $ ln -s `pwd`/translations `pwd`/resources /usr/local/share/lcg/
+ $ ln -s `pwd`/doc `pwd`/translations `pwd`/resources /usr/local/share/lcg/
 
 If this is not possible, set the environment variable LCGDIR to your
-installation directory before using LCG:
+LCG installation directory before using LCG:
 
  $ export LCGDIR=`pwd`
 
-If you downloaded LCG directly form CVS, you will also need to generate the
-locale data by running:
-
- $ make translations
-
-Obviously, you need to have GNU make on your system to do that.  Apart from
-make, you also need the GNU gettext package.  If you downloaded a released
-version, you can omit this step.
-
-You should be all set now.  Try running `make test' (or `./lib/lcg/_test.py' if
-you don't have make).
-
-You may also want to generate LCG documentation by running:
-
- $ make doc
+== Install user tools ==
 
 If you want to use LCG directly, you will probably also link the script
-`bin/lcgmake.py' somewhere to your path.
+`bin/lcgmake.py' somewhere to your path.   For example:
  
  $ ln -s `pwd`/bin/lcgmake.py /usr/local/bin/lcgmake
 
-Note, that the recommended symlinked configuration is good when you checked LCG
-out of CVS.  In this case you can check out a newer version at any time and no
-further effort is needed to start using it.

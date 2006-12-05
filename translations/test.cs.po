@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"Report-Msgid-Bugs-To: Tomas Cerha <cerha@brailcom.org>\n"
-"POT-Creation-Date: 2006-08-23 21:57+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-12-05 14:34+0100\n"
 "PO-Revision-Date: 2006-11-04 20:13+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -15,15 +15,15 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/_test.py:122 ../lib/lcg/_test.py:132
+#: ../lib/lcg/_test.py:129 ../lib/lcg/_test.py:139
 #, python-format
 msgid "Hi %s, say hello to %s."
 msgstr "Ahoj %s, pozdravuj %s."
 
-#: ../lib/lcg/_test.py:122 ../lib/lcg/_test.py:132
+#: ../lib/lcg/_test.py:129 ../lib/lcg/_test.py:139
 msgid "Joe"
 msgstr "Pepo"
 
-#: ../lib/lcg/_test.py:122 ../lib/lcg/_test.py:132
+#: ../lib/lcg/_test.py:129 ../lib/lcg/_test.py:139
 msgid "Bob"
 msgstr "Bobika"

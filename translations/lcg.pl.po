@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-11-08 15:57+0100\n"
+"POT-Creation-Date: 2006-12-05 14:34+0100\n"
 "PO-Revision-Date: 2006-11-04 21:57+0100\n"
 "Last-Translator: Pawel Loba <ploba@rogers.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -111,22 +111,22 @@ msgstr "Szwedzki"
 msgid "Turkish"
 msgstr "Turecki"
 
-#: ../lib/lcg/export/html.py:99
+#: ../lib/lcg/export/html.py:103
 msgid "Choose your language:"
 msgstr "Wybierz jêzyk:"
 
-#: ../lib/lcg/export/html.py:321
+#: ../lib/lcg/export/html.py:328
 msgid "None"
 msgstr "¯aden"
 
-#: ../lib/lcg/export/html.py:324
+#: ../lib/lcg/export/html.py:331
 msgid "Next"
 msgstr "Dalej"
 
-#: ../lib/lcg/export/html.py:325
+#: ../lib/lcg/export/html.py:332
 msgid "Previous"
 msgstr "Wstecz"
 
-#: ../lib/lcg/export/html.py:330
+#: ../lib/lcg/export/html.py:337
 msgid "Up"
 msgstr "Wgórê"
