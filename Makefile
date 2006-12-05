@@ -1,5 +1,8 @@
+# You may edit the paths below to suit your needs.
 LIB = /usr/local/lib/python2.4/site-packages
 SHARE = /usr/local/share
+BIN = /usr/local/bin
+
 
 .PHONY: translations doc test
 
@@ -19,10 +22,12 @@ tags:
 install: translations $(SHARE)/lcg
 	cp -ruv doc resources translations $(SHARE)/lcg
 	cp -ruv lib/lcg $(LIB)
+	cp -u bin/lcgmake.py $(BIN)/lcgmake
 
 uninstall:
 	rm -rf $(SHARE)/lcg
 	rm -rf $(LIB)/lcg
+	cp -f $(BIN)/lcgmake
 
 $(SHARE)/lcg:
 	mkdir $(SHARE)/lcg
