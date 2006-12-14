@@ -337,5 +337,6 @@ class HtmlStaticExporter(HtmlExporter):
                 nav.append(_("Up") + ': ' + link(p, key='up'))
             else:
                 hidden = concat("\n", link(p, key='up', label=''))
-            nav.append(link(node.root(), label=self._INDEX_LABEL, key='index'))
+            nav.append(_("Top") + ': ' + link(node.root(), key='index',
+                                              label=self._INDEX_LABEL))
         return concat(nav, separator=' |\n') + hidden
