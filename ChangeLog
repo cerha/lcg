@@ -1,3 +1,24 @@
+2006-12-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/data-formats/structured-text.pl.txt: 'TON' -> `NodeIndex'.
+
+	* doc/data-formats/structured-text.en.txt: 'TON' -> `NodeIndex'.
+
+	* doc/data-formats/structured-text.cs.txt: 'TON' -> `NodeIndex'.
+
+	* lib/lcg/eurochance.py (AnswerSheets._create_content)
+	(Help._create_content, EurochanceCourse._create_content):
+	`TableOfNodes' -> `NodeIndex'.
+
+	* lib/lcg/wiki.py (Parser._MATCHERS): The 'TON' macro renamed to
+	`NodeIndex'.
+	(Parser._make_toc): Respect the name changes.
+
+	* lib/lcg/content/content.py (TableOfNodes): Renamed to `NodeIndex'.
+
+	* lib/lcg/export/_html.py (uri): Process also positional arguments
+	as key/value pairs.
+
 2006-12-05  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile (install): Install also the user tools.
