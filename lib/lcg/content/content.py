@@ -549,7 +549,7 @@ class Section(SectionContainer):
                       separator="\n")
 
 
-class TableOfNodes(Content):
+class NodeIndex(Content):
     """A Table of Contents which lists the node subtree of the current node."""
 
     def __init__(self, title=None, depth=1, detailed=True):
@@ -558,13 +558,15 @@ class TableOfNodes(Content):
         Arguments:
 
           title -- the title of the TOC as a string.
+          
           depth -- how deep in the hierarchy should we go.
+          
           detailed -- A True (default) value means that the 'Content' hierarchy
             within the leave nodes of the node tree will be included in the
             TOC.  False means to consider only 'ContentNode' hierarchy.
 
         """
-        super(TableOfNodes, self).__init__()
+        super(NodeIndex, self).__init__()
         assert title is None or isinstance(title, (str, unicode))
         assert isinstance(depth, types.IntType)
         assert isinstance(detailed, types.BooleanType)
@@ -611,7 +613,7 @@ class TableOfNodes(Content):
                       ' '*(indent-2))
 
     
-class TableOfContents(TableOfNodes):
+class TableOfContents(NodeIndex):
     """A Table of Contents which lists the content subtree."""
     
     def __init__(self, start=None, **kwargs):
