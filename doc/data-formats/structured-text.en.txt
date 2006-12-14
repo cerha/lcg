@@ -322,7 +322,7 @@ The TOC at the beginning of the [#complete-manual] was made the same way.
 
 =@TOC@= is used to list sections within one document.  You may also wish to
 list documents of the document hierarchy.  This can be done by using the
-=@TON@= macro (Table of Nodes).  The syntax is the same.
+=@NodeIndex@= macro.  The syntax is the same.
 
 The Tables of Content are hierarchical by default.  You may wish to /restrict
 the depth/ of the hierarchy.  This can be done by supplying a number in round

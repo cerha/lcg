@@ -322,7 +322,7 @@ použito.  To znamená že je možné vytvářet také lokální rejstříky pro
 Obsah na začátku kapitoly [#complete-manual] byl vytvořen stejným způsobem.
 
 =@TOC@= vytváří rejstřík kapitol v rámci jednoho dokumentu.  Kromě toho je
-možné použít také makro =@TON@= (Table of Nodes), které vytvoří rejstřík
+možné použít také makro =@NodeIndex@=, které vytvoří rejstřík
 dokumnetů v rámci jejich struktury (tam, kde je LCG použito ke zpracování
 celých struktur dokumentů)
 

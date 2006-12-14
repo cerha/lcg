@@ -321,10 +321,10 @@ lokalny spis treści dla danej podsekcji.
 
 Makro TOC na początku [#complete-manual] było utworzone właśnie w ten sposób.
 
-=@TOC@= jest używane do listowania sekcji w ramach danego dokumentu.  Jeśli 
-chcesz, możesz wylistować dokumenty zawarte w hierarchii dokumentów.  Można to 
-zrobić przy użyciu makro =@TON@= (spis lokacji wiążących).  Składnia jest taka 
-sama.
+=@TOC@= jest używane do listowania sekcji w ramach danego dokumentu.  Jeśli
+chcesz, możesz wylistować dokumenty zawarte w hierarchii dokumentów.  Można to
+zrobić przy użyciu makro =@NodeIndex@=.  Składnia jest
+taka sama.
 
 Spis treści ma charakter hierarchiczny.  Możesz /zawęzić poziom/ tej hierarchii.
 Można to zrobić dokładając cyfrę zamkniętą w nawiasach, co wygląda tak:
