@@ -242,7 +242,7 @@ class AnswerSheets(_Index):
     _TITLE = _("Answer Sheets")
 
     def _create_content(self):
-        return TableOfNodes(title=_("Table of Contents:"))
+        return NodeIndex(title=_("Table of Contents:"))
     
     def _create_children(self):
         return [AnswerSheet(self, 'answers%02d' % (i+1), u)
@@ -277,7 +277,7 @@ class Help(EurochanceNode):
     _TITLE = _("Help Index")
 
     def _create_content(self):
-        return TableOfNodes(title=_("Table of Contents:"))
+        return NodeIndex(title=_("Table of Contents:"))
 
     def _create_children(self):
         lng = self.root().users_language() or self.language()
@@ -327,7 +327,7 @@ class EurochanceCourse(EurochanceNode):
 
     def _create_content(self):
         return (self._localized_wiki_content('intro'),
-                TableOfNodes(title=_("Table of Contents:")))
+                NodeIndex(title=_("Table of Contents:")))
 
     def _create_children(self):
         units = [self._unit_cls(self, 'unit%02d'%(i+1), subdir=d,
