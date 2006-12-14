@@ -94,9 +94,8 @@ def map(content, cls=None, lang=None, name=None, title=None):
 
 def link(label, uri, name=None, title=None, target=None, cls=None, hotkey=None,
          type=None):
-    if hotkey:
-        t = '(Alt-%s)' % hotkey
-        title = title and title + ' ' + t or t
+    if hotkey and title:
+        title += ' (%s)' % hotkey
     if target:
         cls = (cls and cls+' ' or '') + 'external-link'
     attr = (('type', type), ('href', uri), ('name', name), ('title', title),
@@ -259,8 +258,12 @@ def js_dict(items):
     pairs = [concat("'%s': " % k, js_value(v)) for k,v in items]
     return concat('{', concat(pairs, separator=", "), '}')
 
-def uri(base, **args):
-    return base + '?' + ';'.join(["%s=%s" % item for item in args.items()])
+def uri(base, *args, **kwargs):
+    args += tuple(kwargs.items())
+    if args:
+        return base + '?' + ';'.join(["%s=%s" % item for item in args])
+    else:
+        return base
 
 def escape(text):
     from xml.sax import saxutils
