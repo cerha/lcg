@@ -126,17 +126,21 @@ def fieldset(content, legend=None, cls=None):
 def label(text, id, lang=None, cls=None):
     return _tag('label', (('for', id), ('lang', lang), ('class', cls)), text)
 
-def _input(type, name=None, value=None, title=None, id=None,
+def _input(type, name=None, value=None, title=None, id=None, tabindex=None,
            onclick=None, size=None, maxlength=None, cls=None, readonly=False,
            checked=False, disabled=False):
-    assert isinstance(checked, types.BooleanType)
-    assert isinstance(readonly, types.BooleanType)
-    assert isinstance(disabled, types.BooleanType)
+    assert isinstance(type, str)
+    assert isinstance(checked, bool)
+    assert isinstance(readonly, bool)
+    assert isinstance(disabled, bool)
     assert not checked or type in ('radio', 'checkbox')
-    attr = _attr(('name', name),
+    assert tabindex is None or isinstance(tabindex, int)
+    attr = _attr(('type', type),
+                 ('name', name),
                  ('value', value),
                  ('title', title),
                  ('id', id),
+                 ('tabindex', tabindex),
                  ('size', size),
                  ('maxlength', maxlength),
                  ('onclick', onclick),
@@ -144,11 +148,12 @@ def _input(type, name=None, value=None, title=None, id=None,
                  ('checked', checked),
                  ('readonly', readonly),
                  ('disabled', disabled))
-    return concat('<input type="%s"' % type, attr, ' />')
+    return concat('<input', attr, ' />')
 
-def field(value='', name='', size=20, **kwargs):
-    kwargs['cls'] = kwargs.has_key('cls') and 'text '+kwargs['cls'] or 'text'
-    return _input('text', name=name, value=value, size=size, **kwargs)
+def field(value='', name='', size=20, password=False, **kwargs):
+    type = password and 'password' or 'text'
+    kwargs['cls'] = kwargs.has_key('cls') and type+' '+kwargs['cls'] or type
+    return _input(type, name=name, value=value, size=size, **kwargs)
 
 def radio(name, **kwargs):
     return _input('radio', name=name, **kwargs)
