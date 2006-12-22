@@ -1,0 +1,148 @@
+# Learning Content Generator
+# Copyright (C) 2005, 2006 Brailcom, o.p.s.
+# This file is distributed under the same license as the LCG package.
+# Tomas Cerha <cerha@brailcom.org>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-12-22 21:46+0100\n"
+"PO-Revision-Date: 2006-12-22 22:11+0100\n"
+"Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
+"Language-Team: Norwegian <no@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/lcg/util.py:219
+msgid "Bulgarian"
+msgstr ""
+
+#: ../lib/lcg/util.py:221
+msgid "Catalan"
+msgstr ""
+
+#: ../lib/lcg/util.py:221
+msgid "Czech"
+msgstr "tsjekkisk"
+
+#: ../lib/lcg/util.py:222
+msgid "Danish"
+msgstr "dansk"
+
+#: ../lib/lcg/util.py:222
+msgid "German"
+msgstr "tysk"
+
+#: ../lib/lcg/util.py:223
+msgid "Greek"
+msgstr ""
+
+#: ../lib/lcg/util.py:223
+msgid "English"
+msgstr "engelsk"
+
+#: ../lib/lcg/util.py:223
+msgid "Spanish"
+msgstr "spansk"
+
+#: ../lib/lcg/util.py:224
+msgid "Estonian"
+msgstr ""
+
+#: ../lib/lcg/util.py:225
+msgid "Finnish"
+msgstr "finsk"
+
+#: ../lib/lcg/util.py:226
+msgid "French"
+msgstr ""
+
+#: ../lib/lcg/util.py:228
+msgid "Irish"
+msgstr ""
+
+#: ../lib/lcg/util.py:231
+msgid "Hungarian"
+msgstr ""
+
+#: ../lib/lcg/util.py:233
+msgid "Icelandic"
+msgstr ""
+
+#: ../lib/lcg/util.py:233
+msgid "Italian"
+msgstr ""
+
+#: ../lib/lcg/util.py:243
+msgid "Dutch"
+msgstr ""
+
+#: ../lib/lcg/util.py:243
+msgid "Norwegian"
+msgstr "norsk"
+
+#: ../lib/lcg/util.py:245
+msgid "Polish"
+msgstr "polsk"
+
+#: ../lib/lcg/util.py:246
+msgid "Portuguese"
+msgstr ""
+
+#: ../lib/lcg/util.py:251
+msgid "Slovak"
+msgstr "slovakisk"
+
+#: ../lib/lcg/util.py:251
+msgid "Slovenian"
+msgstr "slovensk"
+
+#: ../lib/lcg/util.py:253
+msgid "Swedish"
+msgstr ""
+
+#: ../lib/lcg/util.py:257
+msgid "Turkish"
+msgstr ""
+
+#: ../lib/lcg/util.py:278
+msgid "%Y-%m-%d"
+msgstr "%d.%m.%Y"
+
+#: ../lib/lcg/util.py:279
+msgid "%H:%M"
+msgstr "%H.%M"
+
+#: ../lib/lcg/util.py:280
+msgid "%H:%M:%S"
+msgstr "%H.%M.%S"
+
+#: ../lib/lcg/util.py:281
+msgid "Mon"
+msgstr "ma"
+
+#: ../lib/lcg/util.py:281
+msgid "Tue"
+msgstr "ti"
+
+#: ../lib/lcg/util.py:281
+msgid "Wed"
+msgstr "on"
+
+#: ../lib/lcg/util.py:281
+msgid "Thu"
+msgstr "to"
+
+#: ../lib/lcg/util.py:281
+msgid "Fri"
+msgstr "fr"
+
+#: ../lib/lcg/util.py:282
+msgid "Sat"
+msgstr "lø"
+
+#: ../lib/lcg/util.py:282
+msgid "Sun"
+msgstr "sø"
