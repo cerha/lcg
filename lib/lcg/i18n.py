@@ -28,6 +28,7 @@ allows us to decide for the output language at the export time.
 
 from lcg import *
 
+import re, datetime
 
 class TranslatableTextFactory(object):
     """A helper for defining the '_' identifier bound to a certain domain.
@@ -50,7 +51,40 @@ class TranslatableTextFactory(object):
         return TranslatableText(*args, **kwargs)
     
 
-class TranslatableText(unicode):
+class Localizable(unicode):
+    """Common superclass of all localizable classes.
+
+    This class is derived from Python 'unicode' type.  Thus it behaves as an
+    ordinary Python string.  However, performing string operations, such as
+    string formatting, substitution, etc leads to the loss of translation
+    information.  In such a case the instance is unavoidably converted to an
+    ordinary unicode string by Python and translation can not be performed
+    anymore.  This is why there is the 'Concatenation' class, which protects
+    the 'TranslatableText' instance while allowing to mix it with ordinary
+    strings.
+
+    To preserve the 'Localizable' instances, only the following operations are
+    permitted:
+
+      * concatenation using the 'concat' function defined below.
+      
+      * concatenation using the '+' operator with other string, unicode,
+        'TranslatableText' or 'Concatenation' instances.
+
+    """
+
+    def __add__(self, other):
+        if not isinstance(other, (str, unicode)):
+            return NotImplemented
+        return concat((self, other))
+
+    def __radd__(self, other):
+        if not isinstance(other, (str, unicode)):
+            return NotImplemented
+        return concat((other, self))
+
+    
+class TranslatableText(Localizable):
     """Translatable string with a delayed translation.
 
     The instances of this class can be mixed with ordinary Python strings
@@ -61,29 +95,15 @@ class TranslatableText(unicode):
     As oposed to the ordinary gettext mechanism, the delayed translation allows
     us to build the content first and translate it afterwards.
 
-    IMPORTANT:
-
-    This class is derived from Python 'unicode' type.  Thus it behaves as an
-    ordinary Python string.  However, performing string operations, such as
-    concatenation with other python strings, formatting, etc, leads to the loss
-    of translation information.  In such a case the instance is unavoidably
-    converted to an ordinary unicode string by Python and translation can not
-    be performed anymore.  This is why there is the 'Concatenation' class,
-    which protects the 'TranslatableText' instance while allowing to mix it
-    with ordinary strings.
-
-    To preserve the 'TranslatableText' and 'Concatenation' instances, only the
-    following operations are permitted:
-
-      * concatenation using the 'concat' function defined below.
-      
-      * concatenation using the '+' operator when (and only when) the first
-        item in the addition is a 'TranslatableText' or 'Concatenation'
-        instance.
+    Instances must be treated cerefully to prevent losing the translation
+    information as described in 'Localizable' class documentation.  In addition
+    to the safe operations described there, the following two operations are
+    also safe on this class.
 
       * replacement using the 'replace' method.
 
       * simple ``formatting'' using the 'format' function defined below.
+
     
     """
     def __new__(cls, text, *args, **kwargs):
@@ -184,22 +204,47 @@ class TranslatableText(unicode):
             result = transform(result)
         return result
 
-    def __add__(self, other):
-        if not isinstance(other, (str, unicode)):
-            return NotImplemented
-        return concat((self, other))
 
-    def __radd__(self, other):
-        if not isinstance(other, (str, unicode)):
-            return NotImplemented
-        return concat((other, self))
+class LocalizableDateTime(Localizable):
+    """Date/time string which can be converted to a localized format.
     
+    See the rules in 'Localizable' class documentation for more information
+    about mixing instances of this class with other strings.
+    
+    """
+    _RE = re.compile(r'^(\d\d\d\d)-(\d\d)-(\d\d)(?: (\d\d):(\d\d)(?::(\d\d))?)?$')
 
-class Concatenation(unicode):
+    def __new__(cls, text, **kwargs):
+        return unicode.__new__(cls, text)
+    
+    def __init__(self, string, show_weekday=False, show_time=None):
+        super(LocalizableDateTime, self).__init__(string)
+        m = self._RE.match(string)
+        if not m:
+            raise Exception("Invalid date/time format", self)
+        numbers = [int(n) for n in m.groups() if n is not None]
+        self._datetime = datetime.datetime(*numbers)
+        self._show_weekday = show_weekday
+        self._show_time = show_time is None and len(numbers) > 3 or show_time
+        self._show_seconds = len(numbers) > 5
+    
+    def format(self, date='%Y-%m-%d', time='%H:%M', exact_time='%H:%M:%S',
+               weekdays=('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')):
+        format = date
+        if self._show_time:
+            tf = self._show_seconds and exact_time or time
+            format += ' ' + tf
+        result = self._datetime.strftime(format)
+        if self._show_weekday:
+            result = weekdays[self._datetime.weekday()] + ' ' + result
+        return result
+
+    
+class Concatenation(Localizable):
     """A concatenation of translatable and untranslatable text elements.
 
     Represents a block of text, where ordinary python strings, unicode strings
-    and TranslatableText instances are concatenated to make the final text.
+    and 'Localizable' instances are concatenated to make the final text.
 
     As well as with 'TranslatableText', using an instance of this class in a
     string (or unicode) context leads to the loss of translation information.
@@ -223,8 +268,7 @@ class Concatenation(unicode):
           items -- any number of items may be specified as positional
             arguments.  All these arguments are used to make the final text in
             concatenation.  Each item may be a string, a unicode string, a
-            'TranslatableText' instance, a 'Concatenation' instance, tuple or
-            list.  
+            'Localizable' instance, a 'Concatenation' instance, tuple or list.
  
           separator -- this optional argument may be a string or a unicode
             string.  If specified, the items will be concatenated using this
@@ -247,9 +291,9 @@ class Concatenation(unicode):
                 for p in item.items():
                     append(array, p)
             else:
-                assert isinstance(item, (str, unicode, TranslatableText)), item
-                if not isinstance(item, TranslatableText) and array \
-                       and not isinstance(array[-1], TranslatableText):
+                assert isinstance(item, (str, unicode)), item
+                if not isinstance(item, Localizable) and array \
+                       and not isinstance(array[-1], Localizable):
                     array[-1] +=  item
                 else:                
                     array.append(item)
@@ -263,16 +307,6 @@ class Concatenation(unicode):
             append(myitems, item)
             if i != last:
                 append(myitems, separator)
-
-    def __add__(self, other):
-        if not isinstance(other, (str, unicode)):
-            return NotImplemented
-        return concat(self, other)
-        
-    def __radd__(self, other):
-        if not isinstance(other, (str, unicode)):
-            return NotImplemented
-        return concat(other, self)
         
     def replace(self, old, new):
         """Apply the method to all items and return a new Concatenation.
@@ -294,7 +328,7 @@ class Concatenation(unicode):
         be, however, internally merged or otherwise reorganized.
 
         The items returned byt this method are always either strings, unicode
-        strings or 'TranslatableText' instances.
+        strings, 'TranslatableText' or 'LocalizableDateTime' instances.
         
         """
         return self._items
@@ -320,13 +354,16 @@ class Translator(object):
     """A generic translator of translatable objects.
 
     A translator should be able to translate different translatable objects,
-    such as 'TranslatableText' and 'Concatenation' instances.  'Concatenation'
-    instances may actually contain 'TranslatableText' instances coming from
-    different domains and a translator should be able to deal with them.  This
-    is, however only a generic base class.  See 'GettextTranslator' or
-    'NullTranslator' for concrete implementations.
+    such as 'TranslatableText' and 'Concatenation' instances.  Also
+    'LocalizableDateTime' instances will be formatted to a proper output
+    format.  'Concatenation' instances may contain 'TranslatableText' instances
+    coming from different domains and a translator should be able to deal with
+    them.  This is, however only a generic base class.  See 'GettextTranslator'
+    or 'NullTranslator' for concrete implementations.
 
     """
+    def __init__(self):
+        self._datetime_formats = datetime_formats(self)
 
     def gettext(self, text, domain=None):
         """Return the translation of the string 'text' from given domain.
@@ -345,8 +382,8 @@ class Translator(object):
     def translate(self, text):
         """Return the translation of given translatable.
 
-        The argument may be a 'Concatenation', 'TranslatableText' or a plain
-        string or unicode instance.
+        The argument may be a 'Localizable' instance or a plain or unicode
+        string instance.
 
         Returns a string or unicode depending if there was a unicode type
         within the input (as well as 'Concatenation.translate()'.
@@ -354,6 +391,9 @@ class Translator(object):
         """
         if isinstance(text, (Concatenation, TranslatableText)):
             return text.translate(self)
+        elif isinstance(text, LocalizableDateTime) \
+                 and self._datetime_formats is not None:
+            return text.format(**self._datetime_formats)
         else:
             return text
 
@@ -397,6 +437,7 @@ class GettextTranslator(Translator):
         self._fallback = fallback
         self._path = path or {}
         self._cache = {}
+        super(GettextTranslator,self).__init__()
 
     def _gettext_instance(self, domain):
         import gettext, config
