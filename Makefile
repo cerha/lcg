@@ -19,7 +19,7 @@ tags:
 	rm -f TAGS
 	find -name '*.py' -not -name '_test.py' | xargs etags --append --regex='/^[ \t]+def[ \t]+\([a-zA-Z_0-9]+\)/\1/'
 
-install: translations $(SHARE)/lcg
+install: $(SHARE)/lcg
 	cp -ruv doc resources translations $(SHARE)/lcg
 	cp -ruv lib/lcg $(LIB)
 	cp -u bin/lcgmake.py $(BIN)/lcgmake
@@ -39,7 +39,7 @@ file := lcg-$(version).tar.gz
 compile:
 	python -c "import compileall; compileall.compile_dir('lib')"
 
-release: translations
+release: compile translations
 	@ln -s .. releases/$(dir)
 	@if [ -e releases/$(file) ]; then \
 	   echo "Removing old file $(file)"; rm releases/$(file); fi
