@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-12-05 14:34+0100\n"
-"PO-Revision-Date: 2006-11-04 21:01+0100\n"
+"POT-Creation-Date: 2006-12-22 17:12+0100\n"
+"PO-Revision-Date: 2006-12-22 22:21+0100\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,99 +19,6 @@ msgstr ""
 #: ../lib/lcg/content/content.py:438
 msgid "Index:"
 msgstr "Verzeichnis:"
-
-#: ../lib/lcg/util.py:219
-msgid "Bulgarian"
-msgstr ""
-
-#: ../lib/lcg/util.py:221
-msgid "Catalan"
-msgstr ""
-
-# Title for Cloze
-#: ../lib/lcg/util.py:221
-msgid "Czech"
-msgstr "tschechisch"
-
-#: ../lib/lcg/util.py:222
-msgid "Danish"
-msgstr ""
-
-#: ../lib/lcg/util.py:222
-msgid "German"
-msgstr "deutsch"
-
-#: ../lib/lcg/util.py:223
-msgid "Greek"
-msgstr ""
-
-#: ../lib/lcg/util.py:223
-msgid "English"
-msgstr "englisch"
-
-#: ../lib/lcg/util.py:223
-msgid "Spanish"
-msgstr "spanisch"
-
-#: ../lib/lcg/util.py:224
-msgid "Estonian"
-msgstr ""
-
-#: ../lib/lcg/util.py:225
-msgid "Finnish"
-msgstr ""
-
-#: ../lib/lcg/util.py:226
-msgid "French"
-msgstr ""
-
-#: ../lib/lcg/util.py:228
-msgid "Irish"
-msgstr ""
-
-#: ../lib/lcg/util.py:231
-msgid "Hungarian"
-msgstr ""
-
-#: ../lib/lcg/util.py:233
-msgid "Icelandic"
-msgstr ""
-
-#: ../lib/lcg/util.py:233
-msgid "Italian"
-msgstr ""
-
-#: ../lib/lcg/util.py:243
-msgid "Dutch"
-msgstr ""
-
-#: ../lib/lcg/util.py:243
-msgid "Norwegian"
-msgstr "norwegisch"
-
-#: ../lib/lcg/util.py:245
-msgid "Polish"
-msgstr ""
-
-#: ../lib/lcg/util.py:246
-msgid "Portuguese"
-msgstr ""
-
-#: ../lib/lcg/util.py:251
-msgid "Slovak"
-msgstr "slowakisch"
-
-#: ../lib/lcg/util.py:251
-msgid "Slovenian"
-msgstr ""
-
-#: ../lib/lcg/util.py:253
-msgid "Swedish"
-msgstr ""
-
-#: ../lib/lcg/util.py:257
-msgid "Turkish"
-msgstr ""
 
 #: ../lib/lcg/export/html.py:103
 msgid "Choose your language:"
@@ -137,7 +44,6 @@ msgstr "vorhergehend"
 msgid "Up"
 msgstr "hinauf"
 
-# The label for the display field with exercise results.
-#, fuzzy
-#~ msgid "current"
-#~ msgstr "aktuell"
+#: ../lib/lcg/export/html.py:340
+msgid "Top"
+msgstr ""
