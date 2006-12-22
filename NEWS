@@ -9,9 +9,11 @@
 	
 	Improved HTML generation features.
 
-	Many new features in the internationalization API.  Most notably
-	the `TranslatableText' and `Concatenation' classes are now unicode
-	subclasses.  See the API documentation for more details.
+	Many new features in the internationalization API.  There is a new
+	`LocalizableDateTime' class for locale specific date/time
+	conversions.  `TranslatableText' and `Concatenation' classes are
+	now unicode subclasses.  See the API documentation for more
+	details.
 
 	Most of the export related functionality was now moved to the
 	exporter classes from the content classes.  This increases

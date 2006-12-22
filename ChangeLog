@@ -1,3 +1,47 @@
+2006-12-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py (LocalizableDateTime): New test.
+
+	* lib/lcg/i18n.py (Localizable): New class.
+	(TranslatableText, Concatenation): Derive from `Localizable'.
+	Updated docstrings.
+	(TranslatableText.__add__, TranslatableText.__radd__)
+	(Concatenation.__add__, Concatenation.__radd__): Methods removed.
+	(LocalizableDateTime): New class.
+	(Translator.__init__): New methods.
+	(Translator.translate): Format `LocalizableDateTime' instances.
+
+	* lib/lcg/util.py (_): Domain set to `lcg-locale'.
+	(datetime_formats): New function.
+
+	* translations/Makefile: Added domain `lcg-locale'.
+
+	* translations/lcg.cs.po: Updated.
+
+	* translations/lcg.de.po: Updated.
+
+	* translations/lcg.es.po: Updated.
+
+	* translations/lcg.no.po: Updated.
+
+	* translations/lcg.pl.po: Updated.
+
+	* translations/lcg.sk.po: Updated.
+
+	* translations/lcg-locale.sk.po: New file.
+
+	* translations/lcg-locale.no.po: New file.
+
+	* translations/lcg-locale.de.po: New file.
+
+	* translations/lcg-locale.cs.po: New file.
+	
+	* translations/lcg-locale.en.po: New file.
+
+	* translations/lcg-locale.es.po: New file.
+	
+	* translations/lcg-locale.pl.po: New file.
+
 2006-12-21  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/_html.py (_input): New argument `tabindex'.
