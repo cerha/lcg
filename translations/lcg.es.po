@@ -2,6 +2,7 @@
 # Copyright (C) 2006 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2006.
+# The give some hints about the context of each message.
 #
 msgid ""
 msgstr ""
@@ -15,6 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+# Index of sections (table of contents)
 #: ../lib/lcg/content/content.py:438
 msgid "Index:"
 msgstr "Contenido:"
@@ -23,22 +25,27 @@ msgstr "Contenido:"
 msgid "Choose your language:"
 msgstr "Escoja el idioma:"
 
+# For exapmle "Next: None".
 #: ../lib/lcg/export/html.py:328
 msgid "None"
 msgstr ""
 
+# Link to the next page.
 #: ../lib/lcg/export/html.py:331
 msgid "Next"
 msgstr ""
 
+# Link to the previous page.
 #: ../lib/lcg/export/html.py:332
 msgid "Previous"
 msgstr ""
 
+# Link to the parent page in the hierarchy.
 #: ../lib/lcg/export/html.py:337
 msgid "Up"
 msgstr ""
 
+# Link to the top level page in the hierarchy.
 #: ../lib/lcg/export/html.py:340
 msgid "Top"
 msgstr ""
