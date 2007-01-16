@@ -59,14 +59,14 @@ The following rules apply:
     each file or directory found in the source directory, which has a
     suitable name (see [#names]).
 
-  * A file represents a leave node (it has no chldren).  The node's id is the
+  * A file represents a leave node (it has no children).  The node's id is the
     base name of this file.  Node's content is read from the file in the
     [structured-text] format.  When multiple language variants of the file
     exist, [#language-selection] is performed.
 
   * A directory represents a node with children.  The node's id is the name of
     this directory.  The node's content is read from the file of the same name
-    within this directory, plus the suffix (eg. =intro/intro.txt=).  All other
+    within this directory, plus the suffix (e.g. =intro/intro.txt=).  All other
     files and directories within the directory are child nodes of this node.
     The process starts recursively as for the root node.
 
@@ -107,7 +107,7 @@ If you specify a language, when running LCG, the LCG will try to locate the
 input file variant, which matches given language.  Language is specified using
 an ISO 639-1 Alpha-2 language code.  The matching input file will have the
 corresponding suffix, before the file type suffix.  Thus for example
-'index.en.txt' is the prefered input file for the node 'index'.  When no such
+'index.en.txt' is the preferred input file for the node 'index'.  When no such
 file exists, the file 'index.txt' is used.
 
 
