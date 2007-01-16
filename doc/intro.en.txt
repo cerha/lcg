@@ -9,7 +9,7 @@ The Learning Content Generator (LCG) is a computer program designed to process
 structured textual and multimedia data and produce an output presentation which
 is suitable for use in an on-line or off-line learning environment.
 
-The term ``learning environment'' should be undersood as general as it stands.
+The term ``learning environment'' should be understood as general as it stands.
 Currently the following output formats are supported:
 
   * Static HTML (a set of hyperlinked pages for off-line use)
@@ -40,5 +40,5 @@ LCG also handles documents in /multiple languages/ correctly.  It is able to
 manage several language versions of one document, as well as intermix more
 languages in one document.
 
-LCG is a /Free Software/ distributed under the terms of GNU General Pyblic
+LCG is a /Free Software/ distributed under the terms of GNU General Public
 License.
