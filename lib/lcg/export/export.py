@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class MarkupFormatter(object):
                ('quotation', ('``', "''")),
                ('link', (r'\[(?:(?P<resource_cls>Resource|Image|Media):)?'
                          r'(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
-                         r'(?:(?:\||\s+)(?P<title>[^\]]*))?\]')),
+                         r'(?:(?:\||\s+)(?P<label>[^\]]*))?\]')),
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]+'),
                ('comment', r'^#.*'),
@@ -61,7 +61,7 @@ class MarkupFormatter(object):
                ('gt', '>'),
                ('amp', '&'),
                )
-    _HELPER_PATTERNS = ('href', 'anchor', 'title', 'resource_cls')
+    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'resource_cls')
 
     _FORMAT = {}
 
