@@ -12,6 +12,8 @@
 	* lib/lcg/export/export.py (MarkupFormatter._MARKUP): Link group
 	`title' renamed to `label'.
 	(MarkupFormatter._MARKUP): `title' -> `label'
+	(MarkupFormatter._MARKUP): Require a letter at the end of email
+	address.
 
 	* lib/lcg/export/_html.py (list): Add newlines.
 	(img): New argument `cls'.
