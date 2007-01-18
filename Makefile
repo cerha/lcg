@@ -32,9 +32,9 @@ uninstall:
 $(SHARE)/lcg:
 	mkdir $(SHARE)/lcg
 
-version := $(shell echo 'import lcg; print lcg.__version__' | python)
-dir := lcg-$(version)
-file := lcg-$(version).tar.gz
+version = $(shell echo 'import lcg; print lcg.__version__' | python)
+dir = lcg-$(version)
+file = lcg-$(version).tar.gz
 
 compile:
 	python -c "import compileall; compileall.compile_dir('lib')"
