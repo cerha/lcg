@@ -53,7 +53,7 @@ class MarkupFormatter(object):
                          r'(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
                          r'(?:(?:\||\s+)(?P<label>[^\]]*))?\]')),
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
-               ('email', r'\w[\w\-\.]*@\w[\w\-\.]+'),
+               ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
                ('comment', r'^#.*'),
                ('dash', r'(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'),
