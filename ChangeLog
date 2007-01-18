@@ -1,3 +1,21 @@
+2007-01-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlMarkupFormatter._BLANK_MATCHER): New
+	constant.
+	(HtmlMarkupFormatter._maybe_image): New method.
+	(HtmlMarkupFormatter._link_formatter): Arg. `title' -> `label'.
+	Use `_maybe_image()'.  Use `_BLANK_MATCHER' to find an image in
+	the label.
+	(HtmlMarkupFormatter._uri_formatter) 
+	(HtmlMarkupFormatter._email_formatter): `title' -> `label'.
+
+	* lib/lcg/export/export.py (MarkupFormatter._MARKUP): Link group
+	`title' renamed to `label'.
+	(MarkupFormatter._MARKUP): `title' -> `label'
+
+	* lib/lcg/export/_html.py (list): Add newlines.
+	(img): New argument `cls'.
+
 2006-12-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile (install): Don't depend on `translations'.
