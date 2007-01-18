@@ -1,6 +1,6 @@
 # -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -108,8 +108,8 @@ def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
                  ('lang', lang),
                  ('class', cls))
     spaces = ' ' * indent
-    items = [concat(spaces+"  <li>", i, "</li>") for i in items]
-    return concat(spaces+"<"+tag, attr, ">", items, spaces+"</"+tag+">")
+    items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
+    return concat(spaces+"<"+tag, attr, ">\n", items, spaces+"</"+tag+">\n")
 
 # Form controls
 
@@ -198,12 +198,13 @@ def textarea(name, value='', id=None, rows=None, cols=None, readonly=False, cls=
             ('class', cls))
     return _tag('textarea', attr, value)
 
-def img(src, alt='', width=None, height=None):
+def img(src, alt='', width=None, height=None, cls=None):
     attr = (('src', src),
             ('alt', alt),
             ('width', width),
             ('height', height),
             ('border', 0),
+            ('class', cls),
             )
     return concat('<img', _attr(*attr), ' />')
 
