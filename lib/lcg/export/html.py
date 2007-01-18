@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,9 @@ class HtmlMarkupFormatter(MarkupFormatter):
                'amp':  '&amp;',
                }
     
-    _IMAGE_URI_MATCHER = re.compile(r'\.(jpe?g|png|gif)$', re.IGNORECASE)
+    _BLANK_MATCHER = re.compile('\s+')
+    _IMAGE_URI_MATCHER = re.compile(r'^([\w\d_./-]+)\.(jpe?g|png|gif)$',
+                                    re.IGNORECASE)
     
     def _citation_formatter(self, parent, close=False, **kwargs):
         if not close:
@@ -49,15 +51,23 @@ class HtmlMarkupFormatter(MarkupFormatter):
             return '<span%s class="citation">' % langattr
         else:
             return '</span>'
-    
-    def _link_formatter(self, parent, title=None, href=None, anchor=None,
+
+    def _maybe_image(self, uri, alt=None):
+        # Return formatted image if uri is an image uri or None
+        match = self._IMAGE_URI_MATCHER.match(uri)
+        if not match:
+            return None
+        cls = match.group(1).split('/')[-1].replace('.','-')
+        return _html.img(uri, alt=alt or '', cls=cls)
+
+    def _link_formatter(self, parent, label=None, href=None, anchor=None,
                         resource_cls=None, close=False, **kwargs):
         node = None
         if resource_cls:
             cls = globals()[resource_cls]
             resource = parent.resource(cls, href, fallback=False)
             if resource:
-                return '<a href="%s">%s</a>' % (resource.uri(), title or href)
+                return '<a href="%s">%s</a>' % (resource.uri(), label or href)
             else:
                 log("%s: Unknown resource: %s" % (parent.id(), href))
         elif not href:
@@ -75,23 +85,28 @@ class HtmlMarkupFormatter(MarkupFormatter):
         if not target:
             if anchor is not None:
                 href += '#'+anchor
-            if self._IMAGE_URI_MATCHER.search(href):
-                return _html.img(href, alt=title or '')
+            img = self._maybe_image(href, label)
+            if img:
+                return img
             else:
-                target = Link.ExternalTarget(href, title or href)
-        if title:
-            maybeimg = title.split(' ')[0]
-            if self._IMAGE_URI_MATCHER.search(maybeimg):
-                title = _html.img(maybeimg, alt=title[len(maybeimg)+1:] or '')
-        l = Link(target, label=title)
+                target = Link.ExternalTarget(href, label or href)
+        if label:
+            parts = self._BLANK_MATCHER.split(label, maxsplit=1)
+            alt = len(parts) == 2 and parts[1] or ''
+            img = self._maybe_image(parts[0], alt)
+            if img:
+                label = img
+                if isinstance(target, Link.ExternalTarget):
+                    target = Link.ExternalTarget(href, alt, descr=alt)
+        l = Link(target, label=label)
         l.set_parent(parent)
         return l.export(self._exporter)
     
     def _uri_formatter(self, parent, uri, close=False, **kwargs):
-        return self._link_formatter(parent, href=uri, title=None)
+        return self._link_formatter(parent, href=uri, label=None)
 
     def _email_formatter(self, parent, email, close=False, **kwargs):
-        return self._link_formatter(parent, href='mailto:'+email, title=email)
+        return self._link_formatter(parent, href='mailto:'+email, label=email)
 
     
 class HtmlExporter(Exporter):
