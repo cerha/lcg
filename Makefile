@@ -32,6 +32,16 @@ uninstall:
 $(SHARE)/lcg:
 	mkdir $(SHARE)/lcg
 
+cvs-install: compile translations $(SHARE)/lcg
+	ln -s $(CURDIR)/lib/lcg $(LIB)/lcg
+	ln -s $(CURDIR)/doc $(CURDIR)/translations $(CURDIR)/resources $(SHARE)/lcg
+	ln -s $(CURDIR)/bin/lcgmake.py $(BIN)/lcgmake
+
+cvs-update: do-cvs-update compile translations
+
+do-cvs-update:
+	cvs update
+
 version = $(shell echo 'import lcg; print lcg.__version__' | python)
 dir = lcg-$(version)
 file = lcg-$(version).tar.gz
