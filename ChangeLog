@@ -1,5 +1,17 @@
 2007-02-02  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/*.py: Removed unnecessary `coding' line.
+	
+	* lib/lcg/util.py: Don't import `types'.
+
+	* lib/lcg/__init__.py (__version__): Also update the namespace of
+	`vocab'.
+
+	* lib/lcg/content/__init__.py (Module): Import also `vocab'.
+
+	* lib/lcg/export/export.py (MarkupFormatter.__init__): Use `str'
+	and `tuple' instead of `type.StringType' and `type.TupleType'.
+
 	* translations/Makefile (clean): New target.
 
 	* INSTALL: Rewritten.
