@@ -1,5 +1,7 @@
 2007-02-02  Tomas Cerha  <cerha@brailcom.org>
 
+	* translations/Makefile (clean): New target.
+
 	* INSTALL: Rewritten.
 
 	* Makefile (cvs-install, cvs-update): New targets.
