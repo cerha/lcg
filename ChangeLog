@@ -1,3 +1,9 @@
+2007-02-02  Tomas Cerha  <cerha@brailcom.org>
+
+	* INSTALL: Rewritten.
+
+	* Makefile (cvs-install, cvs-update): New targets.
+
 2007-01-18  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlMarkupFormatter._BLANK_MATCHER): New
