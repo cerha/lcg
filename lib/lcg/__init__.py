@@ -1,6 +1,6 @@
-# -*- coding: iso8859-2 -*-
+# Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ import feed
 from export import _html
 
 # Resolve cyclic dependencies.
-for module in (resources, nodes, content, exercises, export, html, wiki, feed,
-               i18n, util):
+
+for module in (resources, nodes, content, exercises, vocab, export, html, wiki,
+               feed, i18n, util):
+    
     module.__dict__.update(globals())

@@ -1,8 +1,6 @@
-# -*- coding: iso8859-2 -*-
-#
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +19,7 @@
 """Specific content elements for vocabulary lists in language courses."""
 
 from lcg import *
+from lcg.content import *
 from lcg.export import _html
 
 _ = TranslatableTextFactory('lcg-elearning')

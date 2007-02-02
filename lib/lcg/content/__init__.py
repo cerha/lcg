@@ -1,4 +1,4 @@
-# -*- coding: iso8859-2 -*-
+# Author: Tomas Cerha <cerha@brailcom.org>
 #
 # Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
 #
@@ -18,3 +18,4 @@
 
 from content import *
 from exercises import *
+from vocab import *

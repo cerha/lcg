@@ -1,5 +1,3 @@
-# -*- coding: iso8859-2 -*-
-#
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
 # Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
@@ -24,7 +22,6 @@ import glob
 import os
 import string
 import operator
-import types
 import re
 import sys
 
@@ -66,8 +63,8 @@ class SplittableText:
             care about this argument.  
 
         """
-        assert isinstance(text, types.StringTypes)
-        assert isinstance(firstline, types.IntType)
+        assert isinstance(text, (str, unicode))
+        assert isinstance(firstline, int)
         self._text = text
         self._firstline = firstline
         self._input_file = input_file
@@ -183,7 +180,7 @@ def log(message, *args):
     The logging is currently only written to STDERR.
 
     """
-    if not isinstance(message, types.StringTypes):
+    if not isinstance(message, (str, unicode)):
         message = unicode(message)
     try:
         message %= args
