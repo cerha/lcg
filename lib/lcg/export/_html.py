@@ -113,9 +113,9 @@ def list(items, indent=0, ordered=False, style=None, cls=None, lang=None):
 
 # Form controls
 
-def form(content, name=None, cls=None, action="#", method=None):
+def form(content, name=None, cls=None, action="#", method=None, enctype=None):
     attr = (('name', name), ('action', action), ('method', method),
-            ('class', cls))
+            ('enctype', enctype), ('class', cls))
     return _tag('form', attr, content, newlines=True)
 
 def fieldset(content, legend=None, cls=None):
@@ -150,10 +150,14 @@ def _input(type, name=None, value=None, title=None, id=None, tabindex=None,
                  ('disabled', disabled))
     return concat('<input', attr, ' />')
 
-def field(value='', name='', size=20, password=False, **kwargs):
+def field(value='', name='', size=20, password=False, cls=None, **kwargs):
     type = password and 'password' or 'text'
-    kwargs['cls'] = kwargs.has_key('cls') and type+' '+kwargs['cls'] or type
+    kwargs['cls'] = type + (cls and ' '+cls or '')
     return _input(type, name=name, value=value, size=size, **kwargs)
+
+def upload(name, size=50, cls=None, **kwargs):
+    cls = 'upload' + (cls and ' '+cls or '')
+    return _input('file', name=name, size=size, cls=cls, **kwargs)
 
 def radio(name, **kwargs):
     return _input('radio', name=name, **kwargs)
