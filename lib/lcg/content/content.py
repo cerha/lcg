@@ -54,7 +54,7 @@ class Content(object):
     """
     _ALLOWED_CONTAINER = None
     
-    def __init__(self, lang=None):
+    def __init__(self, lang=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -66,6 +66,7 @@ class Content(object):
         self._parent = None
         self._container = None
         self._lang = lang
+        super(Content, self).__init__(**kwargs)
         
     def sections(self):
         """Return the contained sections as a sequence of 'Section' instances.
