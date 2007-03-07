@@ -38,7 +38,6 @@ from lcg import *
 from lcg.export import _html
 
 import types
-import operator
 
 _ = TranslatableTextFactory('lcg')
 
@@ -269,7 +268,7 @@ class Container(Content):
         """
         super(Container, self).__init__(**kwargs)
         cls = self._ALLOWED_CONTENT
-        if operator.isSequenceType(content):
+        if isinstance(content, (list, tuple)):
             assert is_sequence_of(content, cls), \
                    "Not a '%s' instances sequence: %s" % (cls.__name__, content)
             self._content = tuple(content)
@@ -641,3 +640,58 @@ class TableOfContents(NodeIndex):
         return start_item
     
     
+# Convenience functions for simple content construction.
+
+def coerce(content):
+    """Coerce the argument into an LCG content element.
+
+    If the argument is a sequence, a 'Container' of all items is returned.
+    Moreover each item is coerced as-well.  It the argument is a string, it is
+    turned into a 'TextContent' instance and if it is a 'Content' element, it
+    is returned as is.  Any other argument raises AssertionError.
+
+    """
+    if isinstance(content, (list, tuple)):
+        return Container([coerce(item) for item in content])
+    elif isinstance(content, (str, unicode)):
+        return TextContent(content)
+    else:
+        assert isinstance(content, Content)
+        return content
+    
+def link(target, label=None, type=None, descr=None):
+    """Return a 'Link' instance.
+
+    Arguments:
+      target
+
+
+    """
+    if isinstance(target, (str, unicode)):
+        assert label is not None
+        target = Link.ExternalTarget(target, label, descr=descr)
+        label = None
+    else:
+        assert descr is None
+        assert isinstance(target, (ContentNode, Section, Link.ExternalTarget))
+    return Link(target, label=label, type=type)
+    
+def dl(items):
+    """Create a 'DefinitionList' from a sequence of (TERM, DESCRIPTION) pairs.
+
+    Each term and definition in the sequence is coerced and the pair is
+    automatically turned into a 'Definition' instance.
+
+    """
+    return DefinitionList([Definition(coerce(term), coerce(descr))
+                           for term, descr in items])
+
+def ul(items):
+    """Create an 'ItemizedList' by coercing given sequence of items."""
+    return ItemizedList([coerce(item) for item in items])
+
+def p(*items):
+    """Create a 'Paragraph' by coercing all arguments."""
+    return Paragraph([coerce(item) for item in items])
+
+
