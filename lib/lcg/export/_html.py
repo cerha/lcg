@@ -202,11 +202,12 @@ def textarea(name, value='', id=None, rows=None, cols=None, readonly=False, cls=
             ('class', cls))
     return _tag('textarea', attr, value)
 
-def img(src, alt='', width=None, height=None, cls=None):
+def img(src, alt='', width=None, height=None, align=None, cls=None):
     attr = (('src', src),
             ('alt', alt),
             ('width', width),
             ('height', height),
+            ('align', align),
             ('border', 0),
             ('class', cls),
             )
