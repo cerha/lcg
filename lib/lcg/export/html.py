@@ -43,8 +43,9 @@ class HtmlMarkupFormatter(MarkupFormatter):
                }
     
     _BLANK_MATCHER = re.compile('\s+')
-    _IMAGE_URI_MATCHER = re.compile(r'^([\w\d_./-]+)\.(jpe?g|png|gif)$',
-                                    re.IGNORECASE)
+    _IMAGE_URI_MATCHER = re.compile(r'^(?P<align>[<>])?(?P<name>'
+                                    '(?P<basename>[\w\d_./-]+)\.'
+                                    '(jpe?g|png|gif))$', re.IGNORECASE)
     
     def _citation_formatter(self, parent, close=False, **kwargs):
         if not close:
@@ -59,8 +60,10 @@ class HtmlMarkupFormatter(MarkupFormatter):
         match = self._IMAGE_URI_MATCHER.match(uri)
         if not match:
             return None
-        cls = match.group(1).split('/')[-1].replace('.','-')
-        return _html.img(uri, alt=alt or '', cls=cls)
+        uri = match.group('name')
+        cls = match.group('basename').split('/')[-1].replace('.','-')
+        align = {'>': 'right', '<': 'left'}.get(match.group('align'))
+        return _html.img(uri, alt=alt or '', align=align, cls=cls)
 
     def _link_formatter(self, parent, label=None, href=None, anchor=None,
                         resource_cls=None, close=False, **kwargs):
