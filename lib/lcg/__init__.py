@@ -29,8 +29,6 @@ from export import *
 from wiki import *
 import feed
 
-from export import _html
-
 # Resolve cyclic dependencies.
 
 for module in (resources, nodes, content, exercises, vocab, export, html, wiki,
