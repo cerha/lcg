@@ -35,9 +35,6 @@ the hierarchy of the nodes themselves.
 """
 
 from lcg import *
-from lcg.export import _html
-
-import types
 
 _ = TranslatableTextFactory('lcg')
 
@@ -118,7 +115,7 @@ class HorizontalSeparator(Content):
     
     def export(self, exporter):
         """Return the HTML formatted content as a string."""
-        return _html.hr()
+        return exporter.generator().hr()
         
 
 class TextContent(Content):
@@ -158,13 +155,14 @@ class WikiText(TextContent):
     
     """
     def export(self, exporter):
-        return exporter.format_wiki_text(self.parent(), self._text)
+        return exporter.format(self.parent(), self._text)
 
     
 class PreformattedText(TextContent):
     """Preformatted text."""
     def export(self, exporter):
-        return _html.pre(_html.escape(self._text), cls="lcg-preformatted-text")
+        g = exporter.generator()
+        return g.pre(g.escape(self._text), cls="lcg-preformatted-text")
 
     
 class Link(TextContent):
@@ -206,13 +204,14 @@ class Link(TextContent):
     def export(self, exporter):
         label = self._text or self._target.title()
         uri = exporter.uri(self._target)
-        return _html.link(label, uri, title=self._descr(), type=self._type)
+        g = exporter.generator()
+        return g.link(label, uri, title=self._descr(), type=self._type)
 
 
 class Anchor(TextContent):
     """An anchor (target of a link)."""
     def __init__(self, anchor, text=''):
-        assert isinstance(anchor, types.StringType)
+        assert isinstance(anchor, str)
         self._anchor = anchor
         super(Anchor, self).__init__(text)
 
@@ -220,7 +219,7 @@ class Anchor(TextContent):
         return self._anchor
         
     def export(self, exporter):
-        return _html.link(self._text, None, name=self.anchor())
+        return exporter.generator().link(self._text, None, name=self.anchor())
 
 
 class InlineImage(Content):
@@ -232,8 +231,8 @@ class InlineImage(Content):
 
     def export(self, exporter):
         img = self._image
-        return _html.img(img.uri(), alt=img.title(),
-                         width=img.width(), height=img.height())
+        return exporter.generator().img(img.uri(), alt=img.title(),
+                                        width=img.width(), height=img.height())
 
 
 class Container(Content):
@@ -327,7 +326,7 @@ class ItemizedList(Container):
                 self.TYPE_NUMERIC: (True, None),
                 self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
         items = [p.export(exporter) for p in self._content]
-        return _html.list(items, ordered=o, style=s, lang=self._lang)
+        return exporter.generator().list(items, ordered=o, style=s, lang=self._lang)
 
     
 class Definition(Container):
@@ -369,7 +368,7 @@ class Table(Container):
     _CONTENT_SEPARATOR = "\n"
 
     def __init__(self, content, title=None, **kwargs):
-        assert title is None or isinstance(title, types.StringTypes)
+        assert title is None or isinstance(title, (str, unicode))
         self._title = title
         super(Table, self).__init__(content, **kwargs)
         
@@ -489,8 +488,8 @@ class Section(SectionContainer):
             
         """
         assert isinstance(title, (str, unicode)), title
-        assert isinstance(anchor, types.StringTypes) or anchor is None, anchor
-        assert isinstance(in_toc, types.BooleanType), in_toc
+        assert isinstance(anchor, (str, unicode)) or anchor is None, anchor
+        assert isinstance(in_toc, bool), in_toc
         self._title = title
         self._in_toc = in_toc
         self._anchor = anchor
@@ -533,17 +532,19 @@ class Section(SectionContainer):
     def _backref(self):
         return "backref-" + self.anchor()
         
-    def _header(self):
+    def _header(self, exporter):
         if self._backref_used:
             href = "#"+self._backref()
         else:
             href = None
-        return _html.h(_html.link(self.title(), href, cls='backref',
-                                  name=self.anchor()),
-                       len(self._section_path()) + 1)+'\n'
+        g = exporter.generator()
+        return g.h(g.link(self.title(), href, cls='backref',
+                          name=self.anchor()),
+                   len(self._section_path()) + 1)+'\n'
 
     def export(self, exporter):
-        return concat(self._header(), super(Section, self).export(exporter),
+        return concat(self._header(exporter),
+                      super(Section, self).export(exporter),
                       separator="\n")
 
 
@@ -566,14 +567,14 @@ class NodeIndex(Content):
         """
         super(NodeIndex, self).__init__()
         assert title is None or isinstance(title, (str, unicode))
-        assert isinstance(depth, types.IntType)
-        assert isinstance(detailed, types.BooleanType)
+        assert isinstance(depth, int)
+        assert isinstance(detailed, bool)
         self._title = title
         self._depth = depth
         self._detailed = detailed
                       
-    def _export_title(self):
-        return _html.strong(self._title)
+    def _export_title(self, exporter):
+        return exporter.generator().strong(self._title)
 
     def _start_item(self):
         return self.parent()
@@ -582,19 +583,21 @@ class NodeIndex(Content):
         toc = self._make_toc(exporter, self._start_item(), depth=self._depth)
         if self._title is not None:
             #TODO: add a "skip" link?
-            return _html.div((self._export_title(), toc),
-                             cls="table-of-contents")
+            return exporter.generator().div((self._export_title(exporter),
+                                             toc),
+                                            cls="table-of-contents")
         else:
             return toc
         
     def _make_toc(self, exporter, item, indent=0, depth=1):
+        g = exporter.generator()
         if depth <= 0:
             return ''
         items = ()
         if isinstance(item, ContentNode):
             items = [node for node in item.children() if not node.hidden()]
         if len(items) == 0 and self._detailed:
-            if isinstance(item, (types.ListType, types.TupleType)):
+            if isinstance(item, (tuple, list)):
                 items = item
             else:
                 items = [s for s in item.sections() if s.in_toc()]
@@ -604,11 +607,10 @@ class NodeIndex(Content):
         for i in items:
             uri = exporter.uri(i, relative_to=self.parent())
             name = isinstance(i, Section) and i.backref(self.parent()) or None
-            links.append(_html.link(i.title(), uri, name=name) + \
+            links.append(g.link(i.title(), uri, name=name) + \
                          self._make_toc(exporter, i, indent=indent+4,
                                         depth=depth-1))
-        return concat("\n", _html.list(links, indent=indent), "\n",
-                      ' '*(indent-2))
+        return concat("\n", g.list(links, indent=indent), "\n", ' '*(indent-2))
 
     
 class TableOfContents(NodeIndex):
@@ -646,13 +648,15 @@ def coerce(content):
     """Coerce the argument into an LCG content element.
 
     If the argument is a sequence, a 'Container' of all items is returned.
-    Moreover each item is coerced as-well.  It the argument is a string, it is
-    turned into a 'TextContent' instance and if it is a 'Content' element, it
-    is returned as is.  Any other argument raises AssertionError.
+    Moreover each item is coerced as-well and 'None' items are omitted.  It the
+    argument is a string, it is turned into a 'TextContent' instance and if it
+    is a 'Content' element, it is returned as is.  Any other argument raises
+    AssertionError.
 
     """
     if isinstance(content, (list, tuple)):
-        return Container([coerce(item) for item in content])
+        return Container([coerce(item)
+                          for item in content if item is not None])
     elif isinstance(content, (str, unicode)):
         return TextContent(content)
     else:
@@ -694,4 +698,12 @@ def p(*items):
     """Create a 'Paragraph' by coercing all arguments."""
     return Paragraph([coerce(item) for item in items])
 
-
+def join(items, separator=' '):
+    """Coerce all items and put the coerced separator in between them."""
+    sep = coerce(separator)
+    result = []
+    for item in items:
+        if result:
+            result.append(sep)
+        result.append(coerce(item))
+    return coerce(result)
