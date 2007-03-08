@@ -20,7 +20,6 @@
 
 from lcg import *
 from lcg.content import *
-from lcg.export import _html
 
 _ = TranslatableTextFactory('lcg-elearning')
 
@@ -101,10 +100,11 @@ class VocabList(Content):
         self._reverse = reverse
 
     def export(self, exporter):
-        pairs = [(_html.speaking_text(i.word(), i.media()) +
+        g = exporter.generator()
+        pairs = [(g.speaking_text(i.word(), i.media()) +
                   (i.note() and " "+i.note() or ""),
-                  _html.span(i.translation() or "???",
-                             lang=i.translation_language()))
+                  g.span(i.translation() or "???",
+                         lang=i.translation_language()))
                  for i in self._items]
         if self._reverse:
             pairs = [(b, a) for a,b in pairs]
