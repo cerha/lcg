@@ -20,17 +20,12 @@
 
 from lcg import *
 
-class Exporter(object):
-
-    def __init__(self, translator=None):
-        self._translator = translator or NullTranslator()
-
-    def translate(self, text):
-        return self._translator.translate(text)
+        
+class Generator(object):
     
-    def export(self, node):
-        """Export the node and its children recursively."""
-    
+    def __init__(self, exporter):
+        self._exporter = exporter
+        
         
 class MarkupFormatter(object):
     """Simple inline ascii markup formatter.
@@ -133,4 +128,30 @@ class MarkupFormatter(object):
         return result
 
 
+
+class Exporter(object):
+
+    _GENERATOR = Generator
+    _FORMATTER = MarkupFormatter
+    
+    def __init__(self, translator=None):
+        self._translator = translator or NullTranslator()
+        self._generator = self._GENERATOR(self)
+        self._formatter = self._FORMATTER(self)
+
+    def translate(self, text):
+        return self._translator.translate(text)
+    
+    def generator(self):
+        return self._generator
+
+    def format(self, parent, text):
+        """Format formatted text using the current formatter."""
+        if text:
+            return self._formatter.format(parent, text)
+        else:
+            return ''
+    
+    def export(self, node):
+        """Export the node and its children recursively."""
 
