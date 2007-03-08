@@ -20,12 +20,276 @@
 
 from lcg import *
 from lcg.export import *
-from lcg.export import _html
 
 _ = TranslatableTextFactory('lcg')
 
+class HtmlGenerator(Generator):
 
-class HtmlMarkupFormatter(MarkupFormatter):
+    def _attr(self, *pairs):
+        attributes = []
+        for attr, value in pairs:
+            if value is None:
+                continue
+            elif isinstance(value, types.BooleanType):
+                if not value:
+                    continue
+                string = attr
+            else:
+                if isinstance(value, int):
+                    value = str(value)
+                string = concat(attr+'="', value, '"')
+            attributes.append(concat(' ', string))
+        return concat(*attributes)
+     
+    def _tag(self, tag, attr, content, newlines=False):
+        start = concat('<'+tag, self._attr(*attr), '>')
+        end = '</%s>' % tag
+        if isinstance(content, (types.ListType, types.TupleType)):
+            result = (start,) + tuple(content) + (end,)
+        else:
+            result = (start, content, end)
+        return concat(result, separator=(newlines and "\n" or ""))
+     
+    def _input(self, type, name=None, value=None, title=None, id=None,
+               tabindex=None, onclick=None, size=None, maxlength=None,
+               cls=None, readonly=False, checked=False, disabled=False):
+        assert isinstance(type, str)
+        assert isinstance(checked, bool)
+        assert isinstance(readonly, bool)
+        assert isinstance(disabled, bool)
+        assert not checked or type in ('radio', 'checkbox')
+        assert tabindex is None or isinstance(tabindex, int)
+        attr = self._attr(('type', type),
+                          ('name', name),
+                          ('value', value),
+                          ('title', title),
+                          ('id', id),
+                          ('tabindex', tabindex),
+                          ('size', size),
+                          ('maxlength', maxlength),
+                          ('onclick', onclick),
+                          ('class', cls),
+                          ('checked', checked),
+                          ('readonly', readonly),
+                          ('disabled', disabled))
+        return concat('<input', attr, ' />')
+
+    # Generic constructs
+     
+    def h(self, title, level=2):
+        return concat('<h%d>' % level, title, '</h%d>' % level)
+        
+    def strong(self, text, cls=None, id=None, lang=None):
+        attr = (('class', cls),
+                ('lang', lang),
+                ('id', id))
+        return self._tag('strong', attr, text)
+     
+    def pre(self, text, cls=None):
+        return self._tag('pre', (('class', cls),), text)
+     
+    def p(self, *content, **kwargs):
+        return self._tag('p', (('class', kwargs.get('cls')),), content,
+                         newlines=True)
+     
+    def br(self, cls=None):
+        return concat('<br', self._attr(('class', cls),), '/>')
+     
+    def hr(self, cls=None):
+        return concat('<hr', self._attr(('class', cls),), '/>')
+     
+    def link(self, label, uri, name=None, title=None, target=None, cls=None,
+             hotkey=None,
+             type=None):
+        if hotkey and title:
+            title += ' (%s)' % hotkey
+        if target:
+            cls = (cls and cls+' ' or '') + 'external-link'
+        attr = (('type', type), ('href', uri), ('name', name),
+                ('title', title), ('target', target), ('class', cls),
+                ('accesskey', hotkey))
+        return self._tag('a', attr, label)
+     
+    def list(self, items, indent=0, ordered=False, style=None, cls=None,
+             lang=None):
+        tag = ordered and 'ol' or 'ul'
+        attr = self._attr(('style', style and 'list-style-type: %s' % style),
+                          ('lang', lang),
+                          ('class', cls))
+        spaces = ' ' * indent
+        items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
+        return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">\n")
+     
+    def img(self, src, alt='', width=None, height=None, align=None, cls=None):
+        attr = (('src', src),
+                ('alt', alt),
+                ('width', width),
+                ('height', height),
+                ('align', align),
+                ('border', 0),
+                ('class', cls),
+                )
+        return concat('<img', self._attr(*attr), ' />')
+
+    def escape(self, text):
+        from xml.sax import saxutils
+        return saxutils.escape(text)
+
+    # HTML specific...
+    
+    def span(self, text, cls=None, id=None, lang=None):
+        attr = (('class', cls),
+                ('lang', lang),
+                ('id', id))
+        return self._tag('span', attr, text)
+     
+    def div(self, content, id=None, cls=None, lang=None):
+        args = (('class', cls), ('id', id), ('lang', lang))
+        return self._tag('div', args, content, newlines=True)
+     
+    def map(self, content, cls=None, lang=None, name=None, title=None):
+        args = (('class', cls), ('lang', lang), ('name', name),
+                ('title', title))
+        return self._tag('map', args, content, newlines=True)
+
+    def uri(self, base, *args, **kwargs):
+        args += tuple(kwargs.items())
+        if args:
+            return base + '?' + ';'.join(["%s=%s" % item for item in args])
+        else:
+            return base
+     
+    # Form controls
+     
+    def form(self, content, name=None, cls=None, action="#", method=None,
+             enctype=None):
+        attr = (('name', name), ('action', action), ('method', method),
+                ('enctype', enctype), ('class', cls))
+        return self._tag('form', attr, content, newlines=True)
+     
+    def fieldset(self, content, legend=None, cls=None):
+        if legend:
+            content = (self._tag('legend', (), legend),) + tuple(content)
+        return self._tag('fieldset', (('class', cls),), content, newlines=True)
+     
+    def label(self, text, id, lang=None, cls=None):
+        attr = (('for', id), ('lang', lang), ('class', cls))
+        return self._tag('label', attr, text)
+     
+    def field(self, value='', name='', size=20, password=False, cls=None,
+              **kwargs):
+        type = password and 'password' or 'text'
+        kwargs['cls'] = type + (cls and ' '+cls or '')
+        return self._input(type, name=name, value=value, size=size, **kwargs)
+     
+    def upload(self, name, size=50, cls=None, **kwargs):
+        cls = 'upload' + (cls and ' '+cls or '')
+        return self._input('file', name=name, size=size, cls=cls, **kwargs)
+     
+    def radio(self, name, **kwargs):
+        return self._input('radio', name=name, **kwargs)
+     
+    def hidden(self, name, value):
+        return self._input('hidden', name=name, value=value)
+     
+    def button(self, label, handler, cls=None, title=None):
+        cls = cls and 'button ' + cls or 'button'
+        return self._input('button', value=label, onclick=handler, cls=cls,
+                           title=title)
+     
+    def reset(self, label, onclick=None, cls=None):
+        return self._input('reset', onclick=onclick, value=label, cls=cls)
+     
+    def submit(self, label, onclick=None, cls=None):
+        return self._input('submit', onclick=onclick, value=label, cls=cls)
+     
+    def select(self, name, options, onchange=None, selected=None, id=None,
+               disabled=False, readonly=False):
+        assert selected is None or \
+               selected in [value for text, value in options], \
+               (selected, options)
+        opts = [self._tag('option',
+                          (('value', value),
+                           ('selected', (value == selected))),
+                          text)
+                for text, value in options]
+        attr = (('name', name), ('id', id), ('onchange', onchange),
+                ('disabled', disabled), ('readonly', readonly))
+        return self._tag('select', attr, opts, newlines=True)
+     
+    def checkbox(self, name, value=None, id=None, checked=False,
+                 disabled=False, readonly=False, cls=None):
+        return self._input('checkbox', name=name, value=value, id=id,
+                           checked=checked, disabled=disabled,
+                           readonly=readonly, cls=cls)
+     
+    def textarea(self, name, value='', id=None, rows=None, cols=None,
+                 readonly=False, cls=None):
+        attr = (('name', name),
+                ('id', id),
+                ('rows', rows),
+                ('cols', cols),
+                ('readonly', readonly),
+                ('class', cls))
+        return self._tag('textarea', attr, value)
+     
+    # Special controls
+     
+    def speaking_text(self, text, media):
+        id_ = 'text_%s' % id(media)
+        a1 = self.button(text, "play_audio('%s');" % media.uri(),
+                         cls='speaking-text')
+        a2 = self.link(text, media.uri(), cls='speaking-text')
+        return self.script_write(a1, a2)
+     
+    # JavaScript code generation.
+     
+    def script(self, code, noscript=None):
+        noscript = noscript and \
+                   concat('<noscript>', noscript, '</noscript>') or ''
+        if code:
+            code = concat('<!--\n', code, ' //-->\n')
+        return concat('<script type="text/javascript" language="Javascript">',
+                            code, '</script>', noscript)
+     
+    def script_write(self, content, noscript=None, condition=None):
+        #return content
+        #return noscript
+        if content:
+            c = content.replace('"','\\"').replace("'","\\'")
+            c = c.replace('</', '<\\/').replace('\n','\\n')
+            content = concat('document.write("', c, '");')
+            if condition:
+                content = concat('if (', condition, ') ', content)
+        return self.script(content, noscript)
+     
+    def js_value(self, var):
+        if isinstance(var, types.StringTypes):
+            return "'" + var.replace("'", "\\'") + "'"
+        elif isinstance(var, (TranslatableText, Concatenation)):
+            return concat("'", var.replace("'", "\\'"), "'")
+        elif isinstance(var, types.IntType):
+            return str(var)
+        elif isinstance(var, (types.ListType, types.TupleType)):
+            return self.js_array(var)
+        else:
+            raise Exception("Invalid type for JavaScript conversion:", var)
+        
+    def js_array(self, items):
+        assert isinstance(items, (types.ListType, types.TupleType))
+        values = [self.js_value(i) for i in items]
+        return concat('[', concat(values, separator=", "), ']')
+     
+    def js_dict(self, items):
+        assert isinstance(items, (types.ListType, types.TupleType, types.DictType))
+        if isinstance(items, types.DictType):
+            items = items.items()
+        assert is_sequence_of(dict(items).keys(), types.StringType)
+        pairs = [concat("'%s': " % k, self.js_value(v)) for k,v in items]
+        return concat('{', concat(pairs, separator=", "), '}')
+     
+
+class HtmlFormatter(MarkupFormatter):
     
     _FORMAT = {'emphasize': ('<em>', '</em>'),
                'strong': ('<strong>', '</strong>'),
@@ -63,7 +327,8 @@ class HtmlMarkupFormatter(MarkupFormatter):
         uri = match.group('name')
         cls = match.group('basename').split('/')[-1].replace('.','-')
         align = {'>': 'right', '<': 'left'}.get(match.group('align'))
-        return _html.img(uri, alt=alt or '', align=align, cls=cls)
+        g = self._exporter.generator()
+        return g.img(uri, alt=alt or '', align=align, cls=cls)
 
     def _link_formatter(self, parent, label=None, href=None, anchor=None,
                         resource_cls=None, close=False, **kwargs):
@@ -116,6 +381,10 @@ class HtmlMarkupFormatter(MarkupFormatter):
     
 class HtmlExporter(Exporter):
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
+
+    _GENERATOR = HtmlGenerator
+    _FORMATTER = HtmlFormatter
+    
     _BODY_PARTS = ('heading',
                    'language_selection',
                    'content',
@@ -123,25 +392,13 @@ class HtmlExporter(Exporter):
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     
     def __init__(self, stylesheet=None, inlinestyles=False, **kwargs):
-        """Initialize the exporter for a given 'ContentNode' instance."""
+        """Initialize the exporter."""
+        super(HtmlExporter, self).__init__(**kwargs)
         self._stylesheet = stylesheet
         self._inlinestyles = inlinestyles
-        self._formatter = HtmlMarkupFormatter(self)
-        super(HtmlExporter, self).__init__(**kwargs)
-    
-    def _backref(self, node, target):
-        # We can allow just one backref target on the page.  Links on other
-        # pages are not backreferenced.
-        return None
-        
-        if node is target.parent() and not self._backref_used.has_key(target):
-            self._backref_used[target] = True
-            return "backref-" + target.anchor()
-        else:
-            return None
     
     def _output_file(self, node, lang=None):
-        """Return full pathname of node's output file relative to export dir."""
+        """Return the pathname of node's output file relative to export dir."""
         assert isinstance(node, ContentNode)
         name = node.id().replace(':', '-')
         if lang is None:
@@ -168,19 +425,6 @@ class HtmlExporter(Exporter):
         else:
             raise Exception("Invalid URI target:", target)
     
-    def _section_header(self):
-        if self._backref_used[target]:
-            href = "#"+self._backref()
-        else:
-            href = None
-        return _html.h(_html.link(self.title(), href, cls='backref',
-                                  name=self.anchor()),
-                           len(self._section_path())+1)+'\n'
-               
-    def _export_section(self):
-        return "\n".join((self._section_header(),
-                          super(Section, self).export(self)))
-
     def _styles(self, node):
         if self._inlinestyles:
             return ['<style type="text/css">\n%s</style>' % s.get()
@@ -219,30 +463,32 @@ class HtmlExporter(Exporter):
                       separator="\n")
     
     def _part(self, part, name):
-        return _html.div(part, cls=name)
+        return self._generator.div(part, cls=name)
         
     def _heading(self, node):
-        return concat('<h1>', node.title(), '</h1>')
+        return self._generator.h(node.title(), level=1)
 
     def _language_selection(self, node):
-        #handler = "location.href = this.form.language.options[this.form.language.selectedIndex].value"
-        #select = _html.form((_html.label(self._label, 'language-selection'),
-        #                     _html.select('language',
-        #                                  [(t.title(), t.url())
-        #                                   for t in self._targets],
-        #                                  id='language-selection',
-        #                                  selected=self._current.url()),
-        #                     _html.button(_('Switch'), handler)),
-        #                    cls='language-selection')
-        #radio = _html.fieldset([_html.radio('language', value=t.url(), id=tid,
-        #                                    onclick="location.href = this.value",
-        #                                    checked=(self._current.url()==t.url())
-        #                                    ) + \
-        #                        _html.label(flag.export(exporter) + t.title(), tid)
-        #                        for t, tid, flag in
-        #                        [(t, t.url().replace('.','-'), f)
-        #                         for t, f in zip(self._targets, self._flags)]],
-        #                       legend=self._label, cls='language-selection')
+        g = self._generator
+        #handler = ("location.href = this.form.language.options"
+        #           "[this.form.language.selectedIndex].value")
+        #select = g.form((g.label(self._label, 'language-selection'),
+        #                 g.select('language',
+        #                          [(t.title(), t.url())
+        #                           for t in self._targets],
+        #                          id='language-selection',
+        #                          selected=self._current.url()),
+        #                 g.button(_('Switch'), handler)),
+        #                cls='language-selection')
+        #radio = g.fieldset([g.radio('language', value=t.url(), id=tid,
+        #                            onclick="location.href = this.value",
+        #                            checked=(self._current.url()==t.url())
+        #                            ) + \
+        #                    g.label(flag.export(exporter) + t.title(), tid)
+        #                    for t, tid, flag in
+        #                    [(t, t.url().replace('.','-'), f)
+        #                     for t, f in zip(self._targets, self._flags)]],
+        #                   legend=self._label, cls='language-selection')
         if node is not node.root() or len(node.language_variants()) <= 1:
             return None
         current = node.current_language_variant()
@@ -253,23 +499,16 @@ class HtmlExporter(Exporter):
             name = language_name(lang)
             cls = None
             if lang == current:
-                name = concat(name, _html.span(' *', cls='hidden'))
+                name = concat(name, g.span(' *', cls='hidden'))
                 cls = 'current'
             uri = self._node_uri(node, lang=lang)
-            links.append(_html.link(name, uri, cls=cls))
+            links.append(g.link(name, uri, cls=cls))
             #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
         return concat(self._LANGUAGE_SELECTION_LABEL, "\n",
                       concat(links, separator=" |\n"))
 
     def _content(self, node):
         return node.content().export(self)
-    
-    def format_wiki_text(self, parent, text):
-        """Format text with wiki markup and return HTML."""
-        if text:
-            return self._formatter.format(parent, text)
-        else:
-            return ''
     
     def page(self, node):
         if 'audio.js' in [r.uri().split('/')[-1]
@@ -338,12 +577,13 @@ class HtmlStaticExporter(HtmlExporter):
         return '<hr class="hidden">'
     
     def _navigation(self, node):
+        g = self._generator
         def link(node, label=None, key=None):
             if node:
                 if label is None:
                     label = node.title(brief=True)
-                return  _html.link(label, self.uri(node), title=node.title(),
-                                   hotkey=not key or self._hotkey[key])
+                return g.link(label, self.uri(node), title=node.title(),
+                              hotkey=not key or self._hotkey[key])
             else:
                 return _("None")
         if len(node.root().linear()) <= 1:
