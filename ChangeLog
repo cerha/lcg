@@ -1,4 +1,29 @@
+2007-03-08  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/__init__.py: Don't import `_html'.
+
+	* lib/lcg/export/html.py: Implement an HTML generator.
+
+	* lib/lcg/export/_html.py: Removed.
+
+	* lib/lcg/content/exercises.py: Use generator instead of the
+	`_html' module.
+
+	* lib/lcg/export/export.py: Define a generic generator and
+	instantiate one automatically in `Exporter' constructor.
+
+	* lib/lcg/content/vocab.py: Use generator instead of the `_html'
+	module.
+
+	* lib/lcg/content/content.py: Use generator instead of the `_html'
+	module.
+
 2007-03-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Added support for image allignment
+	markup.
+
+	* lib/lcg/export/_html.py: Support the `align' argument for `img()'.
 
 	* lib/lcg/content/content.py: New functions for convenient content
 	creation.
