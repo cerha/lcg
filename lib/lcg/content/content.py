@@ -164,49 +164,6 @@ class PreformattedText(TextContent):
         g = exporter.generator()
         return g.pre(g.escape(self._text), cls="lcg-preformatted-text")
 
-    
-class Link(TextContent):
-    _HTML_TAG = re.compile(r'<[^>]+>')
-    
-    class ExternalTarget(object):
-        def __init__(self, uri, title, descr=None):
-            self._uri = uri
-            self._title = title
-            self._descr = descr
-        def uri(self):
-            return self._uri
-        def title(self):
-            return self._title
-        def descr(self):
-            return self._descr
-    
-    def __init__(self, target, label=None, type=None):
-        assert isinstance(target, (Section, ContentNode,
-                                   self.ExternalTarget)), target
-        self._target = target
-        self._type = type
-        super(Link, self).__init__(label or '')
-
-    def _descr(self):
-        target = self._target
-        if isinstance(target, (ContentNode, self.ExternalTarget)):
-            descr = target.descr()
-        elif target.parent() is not self.parent():
-            # TODO: This hack removes any html from the section title (it is
-            # used as an HTML attribute value).  But section titles should
-            # probably rather not be allowed to contain html.
-            section_title = self._HTML_TAG.sub('', target.title())
-            descr = concat(section_title, " (", target.parent().title(), ")")
-        else:
-            descr = None
-        return descr
-    
-    def export(self, exporter):
-        label = self._text or self._target.title()
-        uri = exporter.uri(self._target)
-        g = exporter.generator()
-        return g.link(label, uri, title=self._descr(), type=self._type)
-
 
 class Anchor(TextContent):
     """An anchor (target of a link)."""
@@ -223,16 +180,26 @@ class Anchor(TextContent):
 
 
 class InlineImage(Content):
-
-    def __init__(self, image):
-        assert isinstance(image, Image)
+    LEFT = 'left'
+    RIGHT = 'right'
+    
+    def __init__(self, image, align=None, title=None, name=None):
+        assert isinstance(image, Image), image
+        assert align in (None, self.LEFT, self.RIGHT), align
+        assert title is None or isinstance(title, (str, unicode)), title
+        assert name is None or isinstance(name, (str, unicode)), name
         self._image = image
+        self._align = align
+        self._title = title
+        self._name = name
         super(InlineImage, self).__init__()
 
     def export(self, exporter):
         img = self._image
-        return exporter.generator().img(img.uri(), alt=img.title(),
-                                        width=img.width(), height=img.height())
+        kwargs = dict(alt=self._title or img.title() or '', descr=img.descr(),
+                      align=self._align, cls=self._name,
+                      width=img.width(), height=img.height())
+        return exporter.generator().img(img.uri(), **kwargs)
 
 
 class Container(Content):
@@ -285,7 +252,7 @@ class Container(Content):
     #    return "".join([p.export(exporter) for p in self._content])
 
     def _exported_content(self, exporter):
-        return [p.export(exporter) for p in self._content]
+        return [c.export(exporter) for c in self._content]
     
     def export(self, exporter):
         tag = self._TAG
@@ -301,7 +268,8 @@ class Container(Content):
         if not self._EXPORT_INLINE:
             result += "\n"
         return result
-            
+
+
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
     _TAG = 'p'
@@ -641,6 +609,58 @@ class TableOfContents(NodeIndex):
             start_item = self._container
         return start_item
     
+
+class Link(Container):
+    _HTML_TAG = re.compile(r'<[^>]+>')
+    
+    class ExternalTarget(object):
+        def __init__(self, uri, title, descr=None):
+            self._uri = uri
+            self._title = title
+            self._descr = descr
+        def uri(self):
+            return self._uri
+        def title(self):
+            return self._title
+        def descr(self):
+            return self._descr
+    
+    def __init__(self, target, label=None, type=None):
+        assert isinstance(target, (Section, ContentNode, self.ExternalTarget,
+                                   Resource)), target
+        assert type is None or isinstance(type, (str, unicode)), type
+        assert label is None or \
+               isinstance(label, (str, unicode, InlineImage)), label
+        if label is None:
+            label = target.title()
+        if isinstance(label, (str, unicode)):
+            content = (TextContent(label),)
+        else:
+            content = (label)
+        self._target = target
+        self._type = type
+        super(Link, self).__init__(content)
+
+    def _descr(self):
+        target = self._target
+        if isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
+            descr = target.descr()
+        elif target.parent() is not self.parent():
+            # TODO: This hack removes any html from the section title (it is
+            # used as an HTML attribute value).  But section titles should
+            # probably rather not be allowed to contain html.
+            section_title = self._HTML_TAG.sub('', target.title())
+            descr = concat(section_title, " (", target.parent().title(), ")")
+        else:
+            descr = None
+        return descr
+    
+    def export(self, exporter):
+        label = ''.join(self._exported_content(exporter))
+        uri = exporter.uri(self._target)
+        g = exporter.generator()
+        return g.link(label, uri, title=self._descr(), type=self._type)
+
     
 # Convenience functions for simple content construction.
 
@@ -677,7 +697,8 @@ def link(target, label=None, type=None, descr=None):
         label = None
     else:
         assert descr is None
-        assert isinstance(target, (ContentNode, Section, Link.ExternalTarget))
+        assert isinstance(target, (ContentNode, Section, Link.ExternalTarget,
+                                   Resource))
     return Link(target, label=label, type=type)
     
 def dl(items):
