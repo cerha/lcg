@@ -44,9 +44,10 @@ class MarkupFormatter(object):
                ('underline', ('_',  '_')),
                ('citation',  ('>>', '<<')),
                ('quotation', ('``', "''")),
-               ('link', (r'\[(?:(?P<resource_cls>Resource|Image|Media):)?'
-                         r'(?P<href>[^\]\|\#\s]*)(?:#(?P<anchor>[^\]\|\s]*))?'
-                         r'(?:(?:\||\s+)(?P<label>[^\]]*))?\]')),
+               ('link', (r'\[(?:(?P<xresource>Resource):)?'
+                         r'(?P<href>[^\[\]\|\#\s]*)'
+                         r'(?:#(?P<anchor>[^\[\]\|\s]*))?'
+                         r'(?:(?:\||\s+)(?P<label>[^\[\]]*))?\]')),
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
                ('comment', r'^#.*'),
@@ -56,7 +57,7 @@ class MarkupFormatter(object):
                ('gt', '>'),
                ('amp', '&'),
                )
-    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'resource_cls')
+    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'xresource')
 
     _FORMAT = {}
 
@@ -153,5 +154,5 @@ class Exporter(object):
             return ''
     
     def export(self, node):
-        """Export the node and its children recursively."""
+        """Return the exported node as a string."""
 
