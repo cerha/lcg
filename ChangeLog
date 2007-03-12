@@ -1,5 +1,8 @@
 2007-03-12  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/content/exercises.py: Omit Answer sheet and Help links
+	if their nodes were not set.
+
 	* bin/lcgmake.py: Respect the changes in the `Exporter' interface.
 
 	* bin/generate.py: Respect the changes in the `Exporter'
