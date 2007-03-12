@@ -1,3 +1,27 @@
+2007-03-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/lcgmake.py: Respect the changes in the `Exporter' interface.
+
+	* bin/generate.py: Respect the changes in the `Exporter'
+	interface.
+
+	* lib/lcg/export/html.py: Improved support for `Resource' links in
+	the formatter.  Changes in the `Exporter' interface.
+
+	* lib/lcg/resources.py: Completely rewritten to support flexible
+	resource construction.  Old resource classes which are bound to
+	files were renamed to `X*' to make the distinction now and allow
+	their complete replacement in the future.
+
+	* lib/lcg/wiki.py: Renamed to `parse.py'.
+
+	* lib/lcg/export/export.py: Don't support explicit resource type
+	specification in link.
+
+	* lib/lcg/content/content.py: Allow an `InlineImage' to
+	be a `Link' label.  Alignment and other options for
+	`InlineImage'.  `Resource' as a `Link' target.
+
 2007-03-08  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/__init__.py: Don't import `_html'.
