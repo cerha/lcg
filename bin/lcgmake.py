@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: iso8859-2 -*-
 #
-# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,7 +48,7 @@ def main():
         exporter = lcg.HtmlStaticExporter
     t = lcg.GettextTranslator(opt['language'])
     e = exporter(translator=t, stylesheet=opt['stylesheet'])
-    e.export(doc, destination_dir)
+    e.dump(doc, destination_dir)
 
 
 def getoptions(optspec):
