@@ -43,7 +43,7 @@ class ContentNode(unittest.TestCase):
 
     def check_media(self):
     	a = lcg.ContentNode(None, 'a', content=lcg.TextContent("A"))
-        # TODO: This doesn.t work now.  Resourcesa now only work with
+        # TODO: This doesn.t work now.  Resources now only work with
         # file-based nodes.
         #m1 = a.resource(lcg.Media, 'sound1.ogg')
         #m2 = a.resource(lcg.Media, 'sound2.ogg')
