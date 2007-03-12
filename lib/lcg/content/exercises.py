@@ -289,6 +289,7 @@ class Exercise(Section):
 
     _used_types = []
     _help_node = None
+    _answer_sheet_node = None
     
     def __init__(self, parent, tasks, title=None, instructions=None,
                  audio_version=None, sound_file=None, transcript=None,
@@ -508,12 +509,11 @@ class Exercise(Section):
     def export(self, exporter):
         g = exporter.generator()
         self._title = self._title.replace('%d', str(self.section_number()))
-        header = g.div((self._header(exporter),
-                        g.link(_("Exercise Help"),
-                               exporter.uri(self._help_node),
-                               target='help',
-                               cls='exercise-help-link')),
-                       cls='exercise-header')
+        h = [self._header(exporter)]
+        if self._help_node is not None:
+            h.append(g.link(_("Exercise Help"), exporter.uri(self._help_node),
+                            target='help', cls='exercise-help-link')),
+        header = g.div(h, cls='exercise-header')
         parts = [getattr(self, '_export_'+part)(exporter)
                  for part in self._EXPORT_ORDER or ('reading',
                                                     'explanation',
@@ -711,10 +711,13 @@ class _InteractiveExercise(Exercise):
         panel = g.div((g.div(concat(displays, separator='<br/>'),
                              cls='display'),
                        g.div(buttons, cls='buttons')), cls='results')
-        l = g.p(_("See the %s to check your results.", 
-                  g.link(_("answer sheet"),
-                         self._answer_sheet_uri(exporter),
-                         target='help')))
+        if self._answer_sheet_node is not None:
+            l = g.p(_("See the %s to check your results.", 
+                      g.link(_("answer sheet"),
+                             self._answer_sheet_uri(exporter),
+                             target='help')))
+        else:
+            l = None
         return g.script_write(panel, l)
 
     def _answer_sheet_items(self):
@@ -732,10 +735,12 @@ class _InteractiveExercise(Exercise):
                self._answer_sheet_anchor(index)
 
     def _answer_sheet_link(self, exporter, index):
+        if self._answer_sheet_node is None:
+            return ''
         g = exporter.generator()
         lnk = g.link('?', self._answer_sheet_uri(exporter, index),
-                         title=_("Show the answer sheet."),
-                         target='help', cls='answer-sheet-link')
+                     title=_("Show the answer sheet."),
+                     target='help', cls='answer-sheet-link')
         b1, b2 = [g.span(b, cls='hidden') for b in ('[', ']')]
         return concat(b1, lnk, b2)
         
