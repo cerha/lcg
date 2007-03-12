@@ -120,9 +120,11 @@ class HtmlGenerator(Generator):
         items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
         return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">\n")
      
-    def img(self, src, alt='', width=None, height=None, align=None, cls=None):
+    def img(self, src, alt='', width=None, height=None, align=None,
+            descr=None, cls=None):
         attr = (('src', src),
                 ('alt', alt),
+                ('longdesc', descr),
                 ('width', width),
                 ('height', height),
                 ('align', align),
@@ -310,7 +312,8 @@ class HtmlFormatter(MarkupFormatter):
     _IMAGE_URI_MATCHER = re.compile(r'^(?P<align>[<>])?(?P<name>'
                                     '(?P<basename>[\w\d_./-]+)\.'
                                     '(jpe?g|png|gif))$', re.IGNORECASE)
-    
+    _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
+
     def _citation_formatter(self, parent, close=False, **kwargs):
         if not close:
             lang = parent.secondary_language()
@@ -319,58 +322,73 @@ class HtmlFormatter(MarkupFormatter):
         else:
             return '</span>'
 
-    def _maybe_image(self, uri, alt=None):
-        # Return formatted image if uri is an image uri or None
+    def _match_image(self, uri):
         match = self._IMAGE_URI_MATCHER.match(uri)
-        if not match:
-            return None
-        uri = match.group('name')
-        cls = match.group('basename').split('/')[-1].replace('.','-')
-        align = {'>': 'right', '<': 'left'}.get(match.group('align'))
-        g = self._exporter.generator()
-        return g.img(uri, alt=alt or '', align=align, cls=cls)
+        if match:
+            uri = match.group('name')
+            name = match.group('basename').split('/')[-1].replace('.','-')
+            align = self._IMAGE_ALIGN_MAPPING.get(match.group('align'))
+            return True, uri, dict(name=name, align=align)
+        return False, uri, {}
+        
+    def _find_resource(self, parent, cls, filename, label, fallback=False,
+                       **imgargs):
+        result = parent.resource(cls, filename, fallback=False)
+        if not result and fallback:
+            if issubclass(cls, XResource):
+                result = resource(parent, cls, filename, fallback=True,
+                                  title=label)
+            else:
+                log("%s: Unknown resource: %s: %s" %
+                    (parent.id(), cls.__name__, filename))
+                result = cls(filename, title=label)
+        if result:
+            title = label or result.title()
+            if isinstance(result, Image):
+                return InlineImage(result, title=title, **imgargs)
+            else:
+                return Link(result, label=title)
+        return None
 
     def _link_formatter(self, parent, label=None, href=None, anchor=None,
-                        resource_cls=None, close=False, **kwargs):
+                        close=False, xresource=None, **kwargs):
         node = None
-        if resource_cls:
-            cls = globals()[resource_cls]
-            resource = parent.resource(cls, href, fallback=False)
-            if resource:
-                return '<a href="%s">%s</a>' % (resource.uri(), label or href)
-            else:
-                log("%s: Unknown resource: %s" % (parent.id(), href))
-        elif not href:
-            node = parent
-        elif href.find('@') == href.find('/') == -1:
-            node = parent.root().find_node(href)
-            if not node:
-                log("%s: Unknown node: %s" % (parent.id(), href))
-        target = node
-        if node and anchor:
-            target = node.find_section(anchor)
-            if target is None:
-                log("%s: Unknown section: %s:%s" %
-                    (parent.id(), node.id(), anchor))
-        if not target:
-            if anchor is not None:
-                href += '#'+anchor
-            img = self._maybe_image(href, label)
-            if img:
-                return img
-            else:
+        result = None
+        if href and not anchor:
+            is_image, href, imgargs = self._match_image(href)
+            cls = is_image and Image or xresource and XResource or Resource
+            result = self._find_resource(parent, cls, href, label,
+                                         fallback=is_image or xresource,
+                                         **imgargs)
+        if not result:
+            if not href:
+                node = parent
+            elif href.find('@') == href.find('/') == -1:
+                node = parent.root().find_node(href)
+                if not node:
+                    log("%s: Unknown node: %s" % (parent.id(), href))
+            target = node
+            if node and anchor:
+                target = node.find_section(anchor)
+                if target is None:
+                    log("%s: Unknown section: %s:%s" %
+                        (parent.id(), node.id(), anchor))
+            if not target:
+                if anchor is not None:
+                    href += '#'+anchor
                 target = Link.ExternalTarget(href, label or href)
-        if label:
-            parts = self._BLANK_MATCHER.split(label, maxsplit=1)
-            alt = len(parts) == 2 and parts[1] or ''
-            img = self._maybe_image(parts[0], alt)
-            if img:
-                label = img
-                if isinstance(target, Link.ExternalTarget):
-                    target = Link.ExternalTarget(href, alt, descr=alt)
-        l = Link(target, label=label)
-        l.set_parent(parent)
-        return l.export(self._exporter)
+            if label:
+                parts = self._BLANK_MATCHER.split(label, maxsplit=1)
+                is_image, uri, imgargs = self._match_image(parts[0])
+                if is_image:
+                    title = len(parts) == 2 and parts[1] or None
+                    label = self._find_resource(parent, Image, uri, title,
+                                                fallback=True, **imgargs)
+                    #if isinstance(target, Link.ExternalTarget):
+                    #    target = Link.ExternalTarget(href, alt, descr=alt)
+            result = Link(target, label=label)
+        result.set_parent(parent)
+        return result.export(self._exporter)
     
     def _uri_formatter(self, parent, uri, close=False, **kwargs):
         return self._link_formatter(parent, href=uri, label=None)
@@ -438,7 +456,7 @@ class HtmlExporter(Exporter):
     
     def _head(self, node):
         if self._stylesheet is not None:
-            r = node.resource(Stylesheet, self._stylesheet)
+            node.resource(XStylesheet, self._stylesheet)
         import lcg
         meta = node.meta() + \
                (('generator',
@@ -510,7 +528,7 @@ class HtmlExporter(Exporter):
     def _content(self, node):
         return node.content().export(self)
     
-    def page(self, node):
+    def export(self, node):
         if 'audio.js' in [r.uri().split('/')[-1]
                           for r in node.resources(Script)]:
             hack = ('\n<object id="media_player" height="0" width="0"'
@@ -529,18 +547,6 @@ class HtmlExporter(Exporter):
                  '</html>')
         return concat(lines, separator="\n")
     
-    def export(self, node, directory):
-        if not os.path.isdir(directory):
-            os.makedirs(directory)
-        filename = os.path.join(directory, self._output_file(node))
-        file = open(filename, 'w')
-        file.write(self.translate(self.page(node)).encode('utf-8'))
-        file.close()
-        for r in node.resources():
-            r.export(directory)
-        for n in node.children():
-            self.export(n, directory)
-
 
 class HtmlStaticExporter(HtmlExporter):
     """Export the content as a set of static web pages."""
@@ -600,3 +606,17 @@ class HtmlStaticExporter(HtmlExporter):
             nav.append(_("Top") + ': ' + link(node.root(), key='index',
                                               label=self._INDEX_LABEL))
         return concat(nav, separator=' |\n') + hidden
+
+
+    def dump(self, node, directory):
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+        filename = os.path.join(directory, self._output_file(node))
+        file = open(filename, 'w')
+        file.write(self.translate(self.export(node)).encode('utf-8'))
+        file.close()
+        for r in node.resources():
+            r.export(directory)
+        for n in node.children():
+            self.dump(n, directory)
+            
