@@ -33,108 +33,73 @@ import config
 
 from lcg import *
 
-_cache = {}
-_resources_by_parent = {}
 
-def _resource(parent, cls, file, kwargs, fallback=True):
-    if cls.SHARED:
-        src_dirs = ('',
-                    os.path.join(parent.root().src_dir(), cls.SUBDIR),
-                    os.path.join(config.default_resource_dir, cls.SUBDIR))
-    else:
-        src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
-    basename, ext = os.path.splitext(file)
-    altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
-    for d in src_dirs:
-        for src_file in [file] + altnames:
-            src_path = os.path.join(d, src_file)
-            if os.path.exists(src_path):
-                return cls(file, src_path, **kwargs)
-            elif src_path.find('*') != -1:
-                pathlist = glob.glob(src_path)
-                if pathlist:
-                    pathlist.sort()
-                    return [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
-                                path, **kwargs) for path in pathlist]
-    if fallback:
-        path = os.path.join(src_dirs[0], file)
-        result = cls(file, path, **kwargs)
-        if not result.ok():
-            log("Resource file not found:", file, src_dirs)
-    else:
-        result = None
-    return result
-
-def resource(parent, cls, file, fallback=True, **kwargs):
-    """Return the resource instance for given ContentNode.
-
-    Arguments:
-
-       cls -- resource class.
-       parent -- the ContentNone instance, for which the resource is allocated.
-       file -- filename of the resource.
-       fallback -- if True, a valid 'Resource' instance will be returned even if
-          the resource file doesn't exist.  The problem will be logged, but the
-          program will continue as if the resource was there.  If False, None
-          is returned when the resource file doesn't exist.
-       kwargs -- additional constructor arguments.
-
-    The possible source directories are first searched for the input file:
-
-      * For shared resource types this is the current working directory, course
-        root directory and than LCG default resource directory
-        ('config.default_resource_dir') in the subdirectory given by the
-        resource type.
-
-      * For other resource types the source files are always expected in parent
-        node's source directory ('ContentNode.src_dir()').
-    
-    The instances are cached.  Use this function instead of creating the
-    instances directly.
-
-    """
-    assert issubclass(cls, Resource)
-    assert isinstance(parent, ContentNode), \
-           "Not a 'ContentNode' instance: %s" % parent
-    if not cls.SHARED:
-        kwargs['parent'] = parent
-    key = (cls, file, tuple(kwargs.items()))
-    global _cache
-    try:
-        result = _cache[key]
-    except KeyError:
-        result = _resource(parent, cls, file, kwargs, fallback=fallback)
-        if result is not None:
-            _cache[key] = result
-    global _resources_by_parent
-    try:
-        d = _resources_by_parent[parent]
-    except KeyError:
-        d = _resources_by_parent[parent] = {}
-    if isinstance(result, (tuple, list)):
-        for r in result:
-            d[r] = True
-    elif result is not None:
-        d[result] = True
-    return result
-    
-def resources(parent, cls=None):
-    """Return the list of all resources for given node.
-    
-    If cls is specified, only instances of given class are returned.
-    
-    """
-    global _resources_by_parent
-    d = _resources_by_parent.get(parent)
-    all = d and d.keys() or ()
-    if cls is not None:
-        return tuple([r for r in all if isinstance(r, cls)])
-    else:
-        return tuple(all)
-    
-    
 class Resource(object):
-    """Generic resource class.
+    """Generic resource class."""
+    
+    def __init__(self, file, title=None, descr=None, uri=None, **kwargs):
+        super(Resource, self).__init__(**kwargs)
+        assert isinstance(file, (str, unicode)), file
+        assert title is None or isinstance(title, (str, unicode)), title
+        assert descr is None or isinstance(descr, (str, unicode)), descr
+        self._file = file
+        self._title = title
+        self._descr = descr
+        self._uri = uri or file
+                 
+    def file(self):
+        return self._file
+        
+    def descr(self):
+        return self._descr
+        
+    def title(self):
+        return self._title
+            
+        self._title = title
+        self._descr = descr
+
+    def uri(self):
+        return self._uri
+
+
+class Image(Resource):
+    """An image resource."""
+
+    def __init__(self, file, width=None, height=None, **kwargs):
+        super(Image, self).__init__(file, **kwargs)
+        #if width is None or height is None:
+        #    import Image as Img
+        #    img = Img.open(self._src_path)
+        #    width, height = img.size
+        self._width = width
+        self._height = height
+        
+    def width(self):
+        return self._width
+        
+    def height(self):
+        return self._height
+    
+
+class Stylesheet(Resource):
+    """A cascading style-sheet."""
+    pass
+
+# ==============================================================================
+# IMPORTANT: The classes below are here just for backwards compatibility.  LCG
+# was initially only operating on files, thus the instances of resources were
+# bound to files and were able to read/write themselves from/to the files.  The
+# current model, however, doesn't presume that the resources exist in files and
+# thus the new classes defined above only define resource properties and their
+# construction and export is left to other components.  The code below should
+# be removed -- the resource construction from input files should be
+# implemented in a separate layer (which also constructs the content itself)
+# and export should be left to the exporter.
+# ==============================================================================
+
+class XResource(Resource):
+    """Extended resource class.
     
     Instances should not be constructed directly.  Use the
     'ContentNode.resource()' method instead.
@@ -156,7 +121,7 @@ class Resource(object):
     searched with the same baseneme and all the extensions listed here.  An
     appropriate conversion is possible within the '_export()' method."""
     
-    def __init__(self, file, src_path, parent=None, raise_error=False):
+    def __init__(self, file, src_path, parent=None, raise_error=False, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -170,8 +135,8 @@ class Resource(object):
             types which are not shared.
 
         """
+        super(XResource, self).__init__(file, **kwargs)
         assert self.SHARED and parent is None or isinstance(parent, ContentNode)
-        self._file = file
         self._src_path = src_path
         self._parent = parent
 
@@ -191,6 +156,15 @@ class Resource(object):
     def name(self):
         return "%s_%s" % (self.__class__.__name__.lower(), id(self))
 
+            
+    def _additional_export_condition(self):
+        return False
+
+    def _export(self, infile, outfile):
+        if os.path.exists(infile): 
+            shutil.copyfile(infile, outfile)
+            log("%s: file copied.", outfile)
+
     def export(self, dir):
         infile = self._src_path
         outfile = os.path.join(dir, self._dst_path())
@@ -202,14 +176,6 @@ class Resource(object):
                 os.makedirs(os.path.dirname(outfile))
             self._export(infile, outfile)
             
-    def _additional_export_condition(self):
-        return False
-
-    def _export(self, infile, outfile):
-        if os.path.exists(infile): 
-            shutil.copyfile(infile, outfile)
-            log("%s: file copied.", outfile)
-            
     def get(self):
         fh = open(self._src_path)
         data = fh.read()
@@ -218,7 +184,7 @@ class Resource(object):
             
 
         
-class Media(Resource):
+class Media(XResource):
     """A media object used within the content."""
     SUBDIR = 'media'
     SHARED = False
@@ -257,46 +223,26 @@ class Media(Resource):
             raise IOError("Subprocess returned a non-zero exit status.")
         
 
+
+        
 class SharedMedia(Media):
+    """A shared media object."""
     SHARED = True
     
 
-class Script(Resource):
-    """A script object used within the content."""
+class Script(XResource):
+    """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'
 
     
-class Stylesheet(Resource):
+class XStylesheet(XResource):
     """A stylesheet used within the content."""
     SUBDIR = 'css'
 
     
-class Image(Resource):
-    """An image used within the content."""
-    SUBDIR = 'images'
-
-    def __init__(self, file, src_path, title=None, **kwargs):
-        assert title is None or isinstance(title, types.StringTypes)
-        self._title = title
-        super(Image, self).__init__(file, src_path, **kwargs)
-        import Image as Img
-        im = Img.open(self._src_path)
-        self._width, self._height = im.size
-        
-    def title(self):
-        return self._title
-    
-    def width(self):
-        return self._width
-        
-    def height(self):
-        return self._height
-
-    
-class Transcript(Resource):
+class Transcript(XResource):
     """A textual transcript of a recording ."""
     SUBDIR = 'transcripts'
-    SHARED = False
 
     def __init__(self, file, src_path, text=None, input_encoding='utf-8',
                  **kwargs):
@@ -339,4 +285,122 @@ class Transcript(Resource):
             output.write(text.replace('\n', '\r\n').encode('utf-8'))
         finally:
             output.close()
-            
+    
+
+# ==============================================================================
+# ==============================================================================
+          
+class ResourceProvider(object):
+    
+    _cache = {}
+    _resources_by_parent = {}
+
+    _SHARED = (SharedMedia, Script)
+    """Indicates that the file may be shared by multiple nodes (is not located
+    within the node-specific subdirectory, but rather in a course-wide resource
+    directory)."""
+
+    def __init__(self, default_dir):
+        self._default_dir = default_dir
+
+    def _resource(self, parent, cls, file, kwargs, fallback=True):
+        if cls.SHARED:
+            src_dirs = ('',
+                        os.path.join(parent.root().src_dir(), cls.SUBDIR),
+                        os.path.join(self._default_dir, cls.SUBDIR))
+        else:
+            src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
+        basename, ext = os.path.splitext(file)
+        altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
+        for d in src_dirs:
+            for src_file in [file] + altnames:
+                src_path = os.path.join(d, src_file)
+                if os.path.exists(src_path):
+                    return cls(file, src_path, **kwargs)
+                elif src_path.find('*') != -1:
+                    pathlist = glob.glob(src_path)
+                    if pathlist:
+                        pathlist.sort()
+                        return [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
+                                    path, **kwargs) for path in pathlist]
+        if fallback:
+            path = os.path.join(src_dirs[0], file)
+            result = cls(file, path, **kwargs)
+            if not result.ok():
+                log("Resource file not found:", file, src_dirs)
+        else:
+            result = None
+        return result
+
+    def resource(self, parent, cls, file, fallback=True, **kwargs):
+        """Return the resource instance for given ContentNode.
+
+        Arguments:
+
+          cls -- resource class.
+          parent -- the ContentNone instance, for which the resource is
+            allocated.
+          file -- filename of the resource.
+          fallback -- if True, a valid 'Resource' instance will be returned
+            even if the resource file doesn't exist.  The problem will be
+            logged, but the program will continue as if the resource was there.
+            If False, None is returned when the resource file doesn't exist.
+          kwargs -- additional constructor arguments.
+
+        The possible source directories are first searched for the input file:
+
+        * For shared resource types this is the current working directory,
+          course root directory and than LCG default resource directory
+          ('config.default_resource_dir') in the subdirectory given by the
+          resource type.
+
+        * For other resource types the source files are always expected in
+          parent node's source directory ('ContentNode.src_dir()').
+    
+        The instances are cached.  Use this function instead of creating the
+        instances directly.
+
+        """
+        assert issubclass(cls, Resource)
+        assert isinstance(parent, ContentNode), \
+               "Not a 'ContentNode' instance: %s" % parent
+        if not issubclass(cls, XResource):
+            return fallback and cls(file, **kwargs) or None
+        if not cls.SHARED:
+            kwargs['parent'] = parent
+        key = (cls, file, tuple(kwargs.items()))
+        try:
+            result = self._cache[key]
+        except KeyError:
+            result = self._resource(parent, cls, file, kwargs,
+                                    fallback=fallback)
+            if result is not None:
+                self._cache[key] = result
+        try:
+            d = self._resources_by_parent[parent]
+        except KeyError:
+            d = self._resources_by_parent[parent] = {}
+        if isinstance(result, (tuple, list)):
+            for r in result:
+                d[r] = True
+        elif result is not None:
+            d[result] = True
+        return result
+    
+    def resources(self, parent, cls=None):
+        """Return the list of all resources for given node.
+        
+        If cls is specified, only instances of given class are returned.
+        
+        """
+        d = self._resources_by_parent.get(parent)
+        all = d and d.keys() or ()
+        if cls is not None:
+            return tuple([r for r in all if isinstance(r, cls)])
+        else:
+            return tuple(all)
+    
+        
+_provider = ResourceProvider(config.default_resource_dir)
+resource = _provider.resource
+resources = _provider.resources
