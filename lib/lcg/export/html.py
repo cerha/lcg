@@ -384,8 +384,8 @@ class HtmlFormatter(MarkupFormatter):
                     title = len(parts) == 2 and parts[1] or None
                     label = self._find_resource(parent, Image, uri, title,
                                                 fallback=True, **imgargs)
-                    #if isinstance(target, Link.ExternalTarget):
-                    #    target = Link.ExternalTarget(href, alt, descr=alt)
+                    if isinstance(target, Link.ExternalTarget):
+                        target = Link.ExternalTarget(href, title, descr=title)
             result = Link(target, label=label)
         result.set_parent(parent)
         return result.export(self._exporter)
