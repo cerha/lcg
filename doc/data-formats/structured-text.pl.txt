@@ -1,7 +1,7 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Wszystkie prawa zastrzeżone (c) 2005, 2006 Brailcom, o.p.s.
-# Fragment dokumentacji LCG.
-# Zapoznaj się z plikiem index.en.txt odnośnie zasad kopiowania.
+# Copyright (c) 2005, 2006, 2007 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
 
 = Tekst strukturalny =
 
