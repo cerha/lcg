@@ -235,7 +235,7 @@ class Script(XResource):
     SUBDIR = 'scripts'
 
     
-class XStylesheet(XResource):
+class XStylesheet(XResource, Stylesheet):
     """A stylesheet used within the content."""
     SUBDIR = 'css'
 
