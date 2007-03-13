@@ -31,7 +31,7 @@ import feed
 
 # Resolve cyclic dependencies.
 
-for module in (resources, nodes, content, exercises, vocab, export, html, wiki,
+for module in (resources, nodes, content, exercises, vocab, export, html, parse,
                feed, i18n, util):
     
     module.__dict__.update(globals())
