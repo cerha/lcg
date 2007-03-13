@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005, 2006 Brailcom, o.p.s.
+# Copyright (c) 2005, 2006, 2007 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -20,7 +20,7 @@ files/ from this point of view.  They are called /resources/ in this manual.
 To include such files, you usually refer to them from the source files, so you
 will also find the relavant information in the later sections.
 
-The following data formats are being used: @NTOC(1)@
+The following data formats are being used: @NodeIndex(1)@
 
 
 
