@@ -26,7 +26,7 @@ from nodes import *
 from resources import *
 from content import *
 from export import *
-from wiki import *
+from parse import *
 import feed
 
 # Resolve cyclic dependencies.
