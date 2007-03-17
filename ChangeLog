@@ -1,3 +1,13 @@
+2007-03-17  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/util.py (log): Flush.
+
+	* lib/lcg/content/content.py (Link.export): Use `concat' instead
+	of string `join'.
+
+	* lib/lcg/export/html.py (HtmlGenerator.sup, HtmlGenerator.sub):
+	New methods.
+
 2007-03-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/resources.py: Derive `XStylesheet' from `Stylesheet'.
