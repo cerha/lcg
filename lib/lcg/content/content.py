@@ -656,7 +656,7 @@ class Link(Container):
         return descr
     
     def export(self, exporter):
-        label = ''.join(self._exported_content(exporter))
+        label = concat(self._exported_content(exporter))
         uri = exporter.uri(self._target)
         g = exporter.generator()
         return g.link(label, uri, title=self._descr(), type=self._type)
