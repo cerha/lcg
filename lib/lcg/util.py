@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -193,6 +193,7 @@ def log(message, *args):
     if not message.endswith("\n"):
         message += "\n"
     sys.stderr.write("  "+message.encode('iso-8859-2'))
+    sys.stderr.flush()
 
 def caller():
     """Return the frame stack caller information formatted as a string.
