@@ -98,6 +98,12 @@ class HtmlGenerator(Generator):
     def hr(self, cls=None):
         return concat('<hr', self._attr(('class', cls),), '/>')
      
+    def sup(self, text, cls=None):
+        return self._tag('sup', (('class', cls),), text)
+    
+    def sub(self, text, cls=None):
+        return self._tag('sub', (('class', cls),), text)
+    
     def link(self, label, uri, name=None, title=None, target=None, cls=None,
              hotkey=None,
              type=None):
