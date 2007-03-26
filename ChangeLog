@@ -1,3 +1,9 @@
+2007-03-26  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/hhp.py (Module): Use a custom formatter.
+
+	* lib/lcg/export/html.py: Separate file dump into a mix-in class.
+
 2007-03-17  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/util.py (log): Flush.
