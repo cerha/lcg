@@ -99,9 +99,14 @@ class _Header(_MetaFile):
                 "Default topic=%s" % self._exporter.uri(self._root),
                 "Charset=%s" % self._charset)
 
-        
-class HhpExporter(HtmlExporter):
+
+class HhpHtmlFormatter(HtmlFormatter):
+    _FORMAT = dict(HtmlFormatter._FORMAT, underline=('<u>', '</u>'))
     
+    
+class HhpExporter(HtmlExporter, FileExporter):
+    _FORMATTER = HhpHtmlFormatter
+
     def __init__(self, *args, **kwargs):
         super(HhpExporter, self).__init__(*args, **kwargs)
         # We just want to make the following NASTY HACKS here, to influence the
@@ -109,19 +114,17 @@ class HhpExporter(HtmlExporter):
         # We want to make a linebreak before any Table of Contents.
         import lcg
         x = lcg.TableOfContents._export_title
-        lcg.TableOfContents._export_title = lambda self_: '<br>' + x(self_)
+        lcg.TableOfContents._export_title = lambda s, e: '<br>' + x(s, e)
         # We want to prevent backreferencing in section titles.
         lcg.Section.backref = lambda s, n: None
         # We also want Tables with old HTML attributes.
         lcg.Table._ATTR = 'cellspacing="3" cellpadding="0"'
         # We don't want XHTML tag syntax (<hr/>).
-        lcg.HorizontalSeparator.export = lambda self_: '<hr>'
-        # We want old HTML 'visial' tags.
-        lcg.HtmlMarkupFormatter._FORMAT['underline'] = ('<u>', '</u>')
+        lcg.HorizontalSeparator.export = lambda s, e: '<hr>'
         
 
-    def export(self, node, directory):
-        super(HhpExporter, self).export(node, directory)
+    def dump(self, node, directory):
+        super(HhpExporter, self).dump(node, directory)
         if node == node.root():
             contents = _Contents(self, node)
             index = _Index(self, node)
