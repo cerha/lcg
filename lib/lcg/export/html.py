@@ -552,9 +552,26 @@ class HtmlExporter(Exporter):
                  '</body>',
                  '</html>')
         return concat(lines, separator="\n")
-    
 
-class HtmlStaticExporter(HtmlExporter):
+
+class FileExporter(object):
+    """Mix-in class exporting content into files."""
+    
+    def dump(self, node, directory):
+        """Save the node's content and resources into files recursively."""
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+        filename = os.path.join(directory, self._output_file(node))
+        file = open(filename, 'w')
+        file.write(self.translate(self.export(node)).encode('utf-8'))
+        file.close()
+        for r in node.resources():
+            r.export(directory)
+        for n in node.children():
+            self.dump(n, directory)
+
+
+class HtmlStaticExporter(HtmlExporter, FileExporter):
     """Export the content as a set of static web pages."""
 
     _hotkey = {
@@ -614,15 +631,4 @@ class HtmlStaticExporter(HtmlExporter):
         return concat(nav, separator=' |\n') + hidden
 
 
-    def dump(self, node, directory):
-        if not os.path.isdir(directory):
-            os.makedirs(directory)
-        filename = os.path.join(directory, self._output_file(node))
-        file = open(filename, 'w')
-        file.write(self.translate(self.export(node)).encode('utf-8'))
-        file.close()
-        for r in node.resources():
-            r.export(directory)
-        for n in node.children():
-            self.dump(n, directory)
             
