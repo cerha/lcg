@@ -1,5 +1,8 @@
 2007-04-02  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/i18n.py: Handle also localizable dates used as
+	translatable text substitution arguments.
+
 	* lib/lcg/export/html.py (HtmlStaticExporter): Print navigation
 	rules only if navigation is needed.
 
