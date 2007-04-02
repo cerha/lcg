@@ -189,8 +189,8 @@ class TranslatableText(Localizable):
         """
         assert isinstance(translator, Translator)
         def translate(x):
-            if isinstance(x, (Concatenation, TranslatableText)):
-                return x.translate(translator)
+            if isinstance(x, Localizable):
+                return translator.translate(x)
             else:
                 return x
         result = translator.gettext(self._text, domain=self._domain)
