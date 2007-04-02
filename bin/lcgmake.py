@@ -26,6 +26,7 @@ OPTIONS = (
     ('secondary-language=', None, "Secondary content language (citations)."),
     ('encoding=', 'utf-8', "Input encoding (output encoding is always utf-8)"),
     ('stylesheet=', None, "Filename of the stylesheet to use."),
+    ('inline-styles', False, "Embed styles into the HTML pages."),
     ('ext=', 'txt', "Extension of the source files."),
     ('root=', 'index', "Filename of the root document."),
     ('hhp', False, "generate a MS HTML Help Workshop package."),
@@ -47,7 +48,8 @@ def main():
     else:
         exporter = lcg.HtmlStaticExporter
     t = lcg.GettextTranslator(opt['language'])
-    e = exporter(translator=t, stylesheet=opt['stylesheet'])
+    e = exporter(translator=t, stylesheet=opt['stylesheet'],
+                 inlinestyles=opt['inline-styles'])
     e.dump(doc, destination_dir)
 
 
