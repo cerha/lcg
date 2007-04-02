@@ -603,9 +603,13 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
         return concat(base, additional, separator='\n  ')
 
     def _rule(self, node):
+        if len(node.root().linear()) <= 1:
+            return None
         return '<hr class="hidden">'
     
     def _navigation(self, node):
+        if len(node.root().linear()) <= 1:
+            return None
         g = self._generator
         def link(node, label=None, key=None):
             if node:
@@ -615,8 +619,6 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
                               hotkey=not key or self._hotkey[key])
             else:
                 return _("None")
-        if len(node.root().linear()) <= 1:
-            return None
         nav = [_('Next') + ': ' + link(node.next(), key='next'),
                _('Previous') + ': ' + link(node.prev(), key='prev')]
         hidden = ''
