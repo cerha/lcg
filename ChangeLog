@@ -1,5 +1,7 @@
 2007-04-02  Tomas Cerha  <cerha@brailcom.org>
 
+	* bin/lcgmake.py: New command line option `inline-styles'.
+
 	* lib/lcg/i18n.py: Handle also localizable dates used as
 	translatable text substitution arguments.
 
