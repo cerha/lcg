@@ -1,3 +1,7 @@
+2007-04-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content/content.py (link): Improved docstring and assertion.
+
 2007-04-02  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/lcgmake.py: New command line option `inline-styles'.
