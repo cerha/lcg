@@ -687,18 +687,26 @@ def link(target, label=None, type=None, descr=None):
     """Return a 'Link' instance.
 
     Arguments:
-      target
 
+      target -- link target.  It can be a direct URI as a string or unicode
+        instance or any referable content element, such as 'Section',
+        'ContentNode', 'Resource' or 'Link.ExternalTarget'.
+      label -- link labe is mandatory when the target is a direct URI (string
+        or unicode) and optional for LCG content element targets.  In this case
+        it just overrides the default title of the refered object.
+      type -- mime type specification of the refered object.
+      descr -- additional description of the link target.  Only applicable when
+        the link target is a direct URI.
 
     """
+    assert isinstance(target, (str, unicode, ContentNode, Section,
+                               Link.ExternalTarget, Resource)), target
     if isinstance(target, (str, unicode)):
         assert label is not None
         target = Link.ExternalTarget(target, label, descr=descr)
         label = None
     else:
         assert descr is None
-        assert isinstance(target, (ContentNode, Section, Link.ExternalTarget,
-                                   Resource))
     return Link(target, label=label, type=type)
     
 def dl(items):
