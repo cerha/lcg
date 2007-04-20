@@ -680,7 +680,7 @@ def coerce(content):
     elif isinstance(content, (str, unicode)):
         return TextContent(content)
     else:
-        assert isinstance(content, Content)
+        assert isinstance(content, Content), ('Invalid content', content,)
         return content
     
 def link(target, label=None, type=None, descr=None):
