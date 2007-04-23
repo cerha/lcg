@@ -105,8 +105,7 @@ class HtmlGenerator(Generator):
         return self._tag('sub', (('class', cls),), text)
     
     def link(self, label, uri, name=None, title=None, target=None, cls=None,
-             hotkey=None,
-             type=None):
+             hotkey=None, type=None):
         if hotkey and title:
             title += ' (%s)' % hotkey
         if target:
@@ -124,7 +123,7 @@ class HtmlGenerator(Generator):
                           ('class', cls))
         spaces = ' ' * indent
         items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
-        return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">\n")
+        return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">")
      
     def img(self, src, alt='', width=None, height=None, align=None,
             descr=None, cls=None):

@@ -1,3 +1,7 @@
+2007-04-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (Module): Minor formatting improvements.
+
 2007-04-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content/content.py (link): Improved docstring and assertion.
