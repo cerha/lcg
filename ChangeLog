@@ -1,6 +1,10 @@
 2007-04-23  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/export/html.py (Module): Minor formatting improvements.
+	* lib/lcg/content/content.py (NodeIndex): Allow passing explicit top node.
+	Support node descriptions as link titles.  Mark the current node
+	by a css class.
+
+	* lib/lcg/export/html.py: Minor formatting improvements.
 
 2007-04-13  Tomas Cerha  <cerha@brailcom.org>
 

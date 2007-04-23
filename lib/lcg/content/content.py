@@ -519,41 +519,46 @@ class Section(SectionContainer):
 class NodeIndex(Content):
     """A Table of Contents which lists the node subtree of the current node."""
 
-    def __init__(self, title=None, depth=1, detailed=True):
+    def __init__(self, title=None, node=None, depth=1, detailed=True):
         """Initialize the instance.
 
         Arguments:
 
           title -- the title of the TOC as a string.
+
+          node -- allows to pass the top level node where the index starts.  When None, the parent
+            node of the element is used.
           
           depth -- how deep in the hierarchy should we go.
           
-          detailed -- A True (default) value means that the 'Content' hierarchy
-            within the leave nodes of the node tree will be included in the
-            TOC.  False means to consider only 'ContentNode' hierarchy.
+          detailed -- A True (default) value means that the 'Content' hierarchy within the leave
+            nodes of the node tree will be included in the index.  False means to consider only
+            'ContentNode' hierarchy.
 
         """
         super(NodeIndex, self).__init__()
         assert title is None or isinstance(title, (str, unicode))
+        assert node is None or isinstance(node, ContentNode)
         assert isinstance(depth, int)
         assert isinstance(detailed, bool)
         self._title = title
+        self._node = node
         self._depth = depth
         self._detailed = detailed
                       
     def _export_title(self, exporter):
-        return exporter.generator().strong(self._title)
+        g = exporter.generator()
+        return g.div(g.strong(self._title), cls='title')
 
     def _start_item(self):
-        return self.parent()
+        return self._node or self.parent()
         
     def export(self, exporter):
         toc = self._make_toc(exporter, self._start_item(), depth=self._depth)
         if self._title is not None:
             #TODO: add a "skip" link?
-            return exporter.generator().div((self._export_title(exporter),
-                                             toc),
-                                            cls="table-of-contents")
+            g = exporter.generator()
+            return g.div((self._export_title(exporter), toc), cls="table-of-contents")
         else:
             return toc
         
@@ -572,12 +577,14 @@ class NodeIndex(Content):
         if len(items) == 0:
             return ''
         links = []
+        parent = self.parent()
         for i in items:
-            uri = exporter.uri(i, relative_to=self.parent())
-            name = isinstance(i, Section) and i.backref(self.parent()) or None
-            links.append(g.link(i.title(), uri, name=name) + \
-                         self._make_toc(exporter, i, indent=indent+4,
-                                        depth=depth-1))
+            uri = exporter.uri(i, relative_to=parent)
+            name = isinstance(i, Section) and i.backref(parent) or None
+            title = isinstance(i, ContentNode) and i.descr() or None
+            cls = i is parent and 'current' or None
+            links.append(g.link(i.title(), uri, title=title, name=name, cls=cls) + \
+                         self._make_toc(exporter, i, indent=indent+4, depth=depth-1))
         return concat("\n", g.list(links, indent=indent), "\n", ' '*(indent-2))
 
     
