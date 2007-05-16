@@ -329,7 +329,7 @@ TableCell._ALLOWED_CONTAINER = TableRow
     
         
 class Table(Container):
-    """One row in a table."""
+    """Table containing rows and cells."""
     _TAG = 'table'
     _CLASS = 'lcg-table'
     _ALLOWED_CONTENT = TableRow
