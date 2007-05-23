@@ -27,6 +27,7 @@ from resources import *
 from content import *
 from export import *
 from parse import *
+from read import *
 import feed
 
 # Resolve cyclic dependencies.

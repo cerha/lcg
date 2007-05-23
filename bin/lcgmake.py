@@ -37,11 +37,13 @@ def main():
     if opt is None or len(args) != 2:
         usage(OPTIONS)
     source_dir, destination_dir = args
+
+    reader = lcg.DocDirReader(id=opt['root'], dir=source_dir, ext=opt['ext'],
+                              language=opt['language'],
+                              secondary_language=opt['secondary-language'],
+                              encoding=opt['encoding'])
+    doc = reader.build()
     
-    doc = lcg.DocRoot(source_dir, id=opt['root'], ext=opt['ext'],
-                      language=opt['language'],
-                      secondary_language=opt['secondary-language'],
-                      input_encoding=opt['encoding'])
     if opt['hhp']:
         from lcg import hhp
         exporter = hhp.HhpExporter

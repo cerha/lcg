@@ -1,3 +1,20 @@
+2007-05-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/lcgmake.py: Use the reader interface to construct the
+	publication.
+
+	* lib/lcg/__init__.py: Added the `read' module.
+
+	* lib/lcg/resources.py: New `ResourceProvider' interface implemented.
+
+	* lib/lcg/nodes.py: Definitely got rid of all the stuff related to
+	reading the structure from input files etc (moved to the new
+	module `read.py').
+
+	* lib/lcg/read.py: New file.
+
+	* doc/intro.en.txt: Updated.
+
 2007-04-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content/content.py (NodeIndex): Allow passing explicit top node.

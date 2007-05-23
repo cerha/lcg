@@ -18,9 +18,8 @@
 
 """Representation of external resources.
 
-Any 'ContentNode' (or more often a piece of 'Content' within it) can depend on
-several external resources.  They are maintained by parent 'ContentNode' so
-that the node is able to keep track of all the resources it depends on.
+Any 'ContentNode' (or more often a piece of 'Content' within it) can depend on several external
+resources.  The resources are maintained by a 'ResourceProvider' instance for each node.
     
 """
 
@@ -86,6 +85,68 @@ class Stylesheet(Resource):
     """A cascading style-sheet."""
     pass
 
+
+class ResourceProvider(object):
+    """An abstract base class for different resource provider implementations.
+
+    The public methods defined here form the mandatory resource provider interface.
+    
+    """
+
+    def resources(self, cls=None):
+        """Return the list of all resources this node depends on.
+
+        The optional argument 'cls' allows restriction of the returned resources by their type
+        (class).
+        
+        """
+        return ()
+        
+    def resource(self, cls, file, fallback=True, **kwargs):
+        """Get the resource instance by its type and relative filename.
+
+        Arguments:
+        
+          cls -- resource class.
+          
+          file -- filename of the resource.
+            
+          fallback -- if True, a valid 'Resource' instance will be returned even if the resource
+            file doesn't exist.  The problem will be logged, but the program will continue as if
+            the resource was there.  If False, None is returned when the resource file doesn't
+            exist.
+
+          kwargs -- resource specific constructor arguments.
+
+        """
+        return None
+    
+
+class StaticResourceProvider(object):
+    """Provides resources from a static list passed to the constructor.
+
+    This resource provider is practical when the list of resources is already known in the
+    construction time.  It may be for example read from a database etc.
+    
+    """
+
+    def __init__(self, resources):
+        self._resources = resources
+        self._dict = None
+
+    def resources(self, cls=None):
+        if cls is not None:
+            return [r for r in self._resources if isinstance(r, cls)]
+        else:
+            return self._resources
+        
+    def resource(self, cls, file, fallback=False):
+        if self._dict is None:
+            self._dict = dict([(r.file(), r) for r in self._resources])
+        resource = self._dict.get(file) or cls(file)
+        return isinstance(resource, cls) and resource or None
+
+
 # ==============================================================================
 # IMPORTANT: The classes below are here just for backwards compatibility.  LCG
 # was initially only operating on files, thus the instances of resources were
@@ -121,24 +182,23 @@ class XResource(Resource):
     searched with the same baseneme and all the extensions listed here.  An
     appropriate conversion is possible within the '_export()' method."""
     
-    def __init__(self, file, src_path, parent=None, raise_error=False, **kwargs):
+    def __init__(self, file, src_path, subdir=None, raise_error=False, **kwargs):
         """Initialize the instance.
 
         Arguments:
 
           file -- name of the resource file.
-          src_path -- source file path.  This is an absolut filename of the
-            source file.  The filename of the source file must not necessarily
-            be the same as 'file'.  For examlpe a conversion may be involved
-            (depending on particular 'Resource' subclass).
-          parent -- parent node.  This argument is only needed for the resource
+          src_path -- source file path.  This is an absolut filename of the source file.  The
+            filename of the source file must not necessarily be the same as 'file'.  For examlpe a
+            conversion may be involved (depending on particular 'Resource' subclass).
+          subdir -- Destination subdirectory name.  This argument is only needed for the resource
             types which are not shared.
 
         """
         super(XResource, self).__init__(file, **kwargs)
-        assert self.SHARED and parent is None or isinstance(parent, ContentNode)
+        assert self.SHARED and subdir is None or isinstance(subdir, str)
         self._src_path = src_path
-        self._parent = parent
+        self._subdir = subdir
 
     def ok(self):
         return os.path.exists(self._src_path)
@@ -147,7 +207,7 @@ class XResource(Resource):
         if self.SHARED:
             dst_dir = self.SUBDIR
         else:
-            dst_dir = os.path.join(self.SUBDIR, self._parent.id())
+            dst_dir = os.path.join(self.SUBDIR, self._subdir)
         return os.path.join(dst_dir, self._file)
             
     def uri(self):
@@ -182,7 +242,6 @@ class XResource(Resource):
         fh.close()
         return data
             
-
         
 class Media(XResource):
     """A media object used within the content."""
@@ -190,12 +249,12 @@ class Media(XResource):
     SHARED = False
     ALT_SRC_EXTENSIONS = ('.wav',)
 
-    def __init__(self, file, src_path, parent=None):
+    def __init__(self, file, src_path, subdir=None):
         for f in (file, src_path):
             basename, ext = os.path.splitext(f)
             assert ext in ('.ogg','.mp3','.wav'), \
                    "Unsupported media type: %s" % ext
-        super(Media, self).__init__(file, src_path, parent=parent)
+        super(Media, self).__init__(file, src_path, subdir=subdir)
 
     def _export(self, infile, outfile):
         input_format = os.path.splitext(infile)[1].upper()[1:]
@@ -221,8 +280,6 @@ class Media(XResource):
         command = cmd.replace('%infile', infile).replace('%outfile', outfile)
         if os.system(command):
             raise IOError("Subprocess returned a non-zero exit status.")
-        
-
 
         
 class SharedMedia(Media):
@@ -278,8 +335,7 @@ class Transcript(XResource):
         else:
             return
         text = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE') + \
-               "\n\n".join([textwrap.fill(x)
-                            for x in text.replace("\r\n", "\n").split("\n\n")])
+               "\n\n".join([textwrap.fill(x) for x in text.replace("\r\n", "\n").split("\n\n")])
         output = open(outfile, 'w')
         try:
             output.write(text.replace('\n', '\r\n').encode('utf-8'))
@@ -289,30 +345,27 @@ class Transcript(XResource):
 
 # ==============================================================================
 # ==============================================================================
-          
-class ResourceProvider(object):
-    
+
+class _FileResourceProvider(ResourceProvider):
+    """Resource provider reading the resources from filesystem."""
+
     _cache = {}
-    _resources_by_parent = {}
 
-    _SHARED = (SharedMedia, Script)
-    """Indicates that the file may be shared by multiple nodes (is not located
-    within the node-specific subdirectory, but rather in a course-wide resource
-    directory)."""
-
-    def __init__(self, default_dir):
-        self._default_dir = default_dir
-
-    def _resource(self, parent, cls, file, kwargs, fallback=True):
+    def __init__(self, dirs, dst_subdir=None):
+        assert isinstance(dirs, (list, tuple))
+        self._dirs = dirs
+        self._dst_subdir = dst_subdir
+        super(_FileResourceProvider, self).__init__()
+        
+    def _resource(self, cls, file, fallback=True, **kwargs):
+        dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs]
         if cls.SHARED:
-            src_dirs = ('',
-                        os.path.join(parent.root().src_dir(), cls.SUBDIR),
-                        os.path.join(self._default_dir, cls.SUBDIR))
+            dirs = [''] + dirs
         else:
-            src_dirs = (os.path.join(parent.src_dir(), cls.SUBDIR), )
+            kwargs = dict(subdir=self._dst_subdir)
         basename, ext = os.path.splitext(file)
         altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
-        for d in src_dirs:
+        for d in dirs:
             for src_file in [file] + altnames:
                 src_path = os.path.join(d, src_file)
                 if os.path.exists(src_path):
@@ -324,83 +377,77 @@ class ResourceProvider(object):
                         return [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
                                     path, **kwargs) for path in pathlist]
         if fallback:
-            path = os.path.join(src_dirs[0], file)
+            path = os.path.join(dirs[0], file)
             result = cls(file, path, **kwargs)
             if not result.ok():
-                log("Resource file not found:", file, src_dirs)
+                log("Resource file not found:", file, dirs)
         else:
             result = None
         return result
 
-    def resource(self, parent, cls, file, fallback=True, **kwargs):
-        """Return the resource instance for given ContentNode.
-
-        Arguments:
-
-          cls -- resource class.
-          parent -- the ContentNone instance, for which the resource is
-            allocated.
-          file -- filename of the resource.
-          fallback -- if True, a valid 'Resource' instance will be returned
-            even if the resource file doesn't exist.  The problem will be
-            logged, but the program will continue as if the resource was there.
-            If False, None is returned when the resource file doesn't exist.
-          kwargs -- additional constructor arguments.
-
-        The possible source directories are first searched for the input file:
-
-        * For shared resource types this is the current working directory,
-          course root directory and than LCG default resource directory
-          ('config.default_resource_dir') in the subdirectory given by the
-          resource type.
-
-        * For other resource types the source files are always expected in
-          parent node's source directory ('ContentNode.src_dir()').
-    
-        The instances are cached.  Use this function instead of creating the
-        instances directly.
-
-        """
-        assert issubclass(cls, Resource)
-        assert isinstance(parent, ContentNode), \
-               "Not a 'ContentNode' instance: %s" % parent
-        if not issubclass(cls, XResource):
-            return fallback and cls(file, **kwargs) or None
-        if not cls.SHARED:
-            kwargs['parent'] = parent
+    def resource(self, cls, file, fallback=True, **kwargs):
         key = (cls, file, tuple(kwargs.items()))
         try:
             result = self._cache[key]
         except KeyError:
-            result = self._resource(parent, cls, file, kwargs,
-                                    fallback=fallback)
-            if result is not None:
-                self._cache[key] = result
-        try:
-            d = self._resources_by_parent[parent]
-        except KeyError:
-            d = self._resources_by_parent[parent] = {}
-        if isinstance(result, (tuple, list)):
-            for r in result:
-                d[r] = True
-        elif result is not None:
-            d[result] = True
+            result = self._resource(cls, file, fallback=fallback, **kwargs)
+            self._cache[key] = result
+        return result
+
+
+class SharedFileResourceProvider(_FileResourceProvider):
+    """Provides resources shared by multiple nodes."""
+    
+    def __init__(self, root_dir):
+        dirs = (root_dir, config.default_resource_dir)
+        super(SharedFileResourceProvider, self).__init__(dirs)
+
+    def resource(self, *args, **kwargs):
+        return self._resource(*args, **kwargs)
+    
+        
+class FileResourceProvider(_FileResourceProvider):
+    """Provides resources read from files.
+    
+    The possible source directories are first searched for the input file:
+
+      * For shared resource types this is the current working directory, course root directory
+        and than LCG default resource directory ('config.default_resource_dir') in the
+        subdirectory given by the resource type.
+
+      * For other resource types the source files are always expected in source directory (as
+        specified by the constructor argument `dir').
+    
+    """
+
+    _resources = []
+    
+    def __init__(self, src_dir, dst_subdir, shared_resource_provider):
+        self._shared_resource_provider = shared_resource_provider
+        super(FileResourceProvider, self).__init__((src_dir,), dst_subdir=dst_subdir)
+        
+    def _resource(self, cls, *args, **kwargs):
+        assert issubclass(cls, Resource), cls
+        if not issubclass(cls, XResource):
+            return kwargs.get('fallback') and cls(file, **kwargs) or None
+        if cls.SHARED:
+            result = self._shared_resource_provider.resource(cls, *args, **kwargs)
+        else:
+            result = super(FileResourceProvider, self)._resource(cls, *args, **kwargs)
+        if result is not None:
+            if isinstance(result, (tuple, list)):
+                resources = result
+            else:
+                resources = (result,)
+            for r in resources:
+                if r not in self._resources:
+                    self._resources.append(r)
         return result
     
-    def resources(self, parent, cls=None):
-        """Return the list of all resources for given node.
-        
-        If cls is specified, only instances of given class are returned.
-        
-        """
-        d = self._resources_by_parent.get(parent)
-        all = d and d.keys() or ()
+    def resources(self, cls=None):
         if cls is not None:
-            return tuple([r for r in all if isinstance(r, cls)])
+            return tuple([r for r in self._resources if isinstance(r, cls)])
         else:
-            return tuple(all)
+            return tuple(self._resources)
+
     
-        
-_provider = ResourceProvider(config.default_resource_dir)
-resource = _provider.resource
-resources = _provider.resources
