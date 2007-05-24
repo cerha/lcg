@@ -1,5 +1,7 @@
 2007-05-24  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/nodes.py (ContentNode._node_path): Renamed to `path()'.
+
 	* lib/lcg/content/content.py (NodeIndex): Improved current node recognition.
 
 2007-05-23  Tomas Cerha  <cerha@brailcom.org>

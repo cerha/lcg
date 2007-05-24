@@ -124,18 +124,6 @@ class ContentNode(object):
         assert isinstance(node, ContentNode)
         assert self._parent is None
         self._parent = node
-        
-    def _node_path(self, relative_to=None):
-        """Return the path from root to this node as a sequence of nodes.
-
-        When the optional argument `relative_to' is specified, the returned
-        path is relative to this node, when it exists in the path.
-        
-        """
-        if self._parent is None or self._parent is relative_to:
-            return (self,)
-        else:
-            return self._parent._node_path(relative_to=relative_to) + (self,)
 
     # Public methods
 
@@ -203,6 +191,18 @@ class ContentNode(object):
             return self
         else:
             return self._parent.root()
+
+    def path(self, relative_to=None):
+        """Return the path from root to this node as a sequence of nodes.
+
+        When the optional argument `relative_to' is specified, the returned
+        path is relative to this node, when it exists in the path.
+        
+        """
+        if self._parent is None or self._parent is relative_to:
+            return (self,)
+        else:
+            return self._parent.path(relative_to=relative_to) + (self,)
         
     def linear(self):
         """Return the linearized subtree of this node as a list."""
