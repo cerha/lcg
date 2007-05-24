@@ -1,3 +1,7 @@
+2007-05-24  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content/content.py (NodeIndex): Improved current node recognition.
+
 2007-05-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/lcgmake.py: Use the reader interface to construct the
