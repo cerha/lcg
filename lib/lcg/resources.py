@@ -143,8 +143,12 @@ class StaticResourceProvider(object):
     def resource(self, cls, file, fallback=False):
         if self._dict is None:
             self._dict = dict([(r.file(), r) for r in self._resources])
-        resource = self._dict.get(file) or cls(file)
-        return isinstance(resource, cls) and resource or None
+        resource = self._dict.get(file)
+        if not isinstance(resource, cls):
+            resource = None
+        if resource is None and fallback:
+            resource = cls(file)
+        return resource
 
 
 # ==============================================================================

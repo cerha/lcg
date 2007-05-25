@@ -336,16 +336,14 @@ class HtmlFormatter(MarkupFormatter):
             return True, uri, dict(name=name, align=align)
         return False, uri, {}
         
-    def _find_resource(self, parent, cls, filename, label, fallback=False,
-                       **imgargs):
+    def _find_resource(self, parent, cls, filename, label, fallback=False, **imgargs):
         result = parent.resource(cls, filename, fallback=False)
         if not result and fallback:
             if issubclass(cls, XResource):
                 result = resource(parent, cls, filename, fallback=True,
                                   title=label)
             else:
-                log("%s: Unknown resource: %s: %s" %
-                    (parent.id(), cls.__name__, filename))
+                log("%s: Unknown resource: %s: %s" % (parent.id(), cls.__name__, filename))
                 result = cls(filename, title=label)
         if result:
             title = label or result.title()
@@ -362,9 +360,8 @@ class HtmlFormatter(MarkupFormatter):
         if href and not anchor:
             is_image, href, imgargs = self._match_image(href)
             cls = is_image and Image or xresource and XResource or Resource
-            result = self._find_resource(parent, cls, href, label,
-                                         fallback=is_image or xresource,
-                                         **imgargs)
+            fallback = bool(is_image or xresource)
+            result = self._find_resource(parent, cls, href, label, fallback=fallback, **imgargs)
         if not result:
             if not href:
                 node = parent
@@ -387,8 +384,7 @@ class HtmlFormatter(MarkupFormatter):
                 is_image, uri, imgargs = self._match_image(parts[0])
                 if is_image:
                     title = len(parts) == 2 and parts[1] or None
-                    label = self._find_resource(parent, Image, uri, title,
-                                                fallback=True, **imgargs)
+                    label = self._find_resource(parent, Image, uri, title, fallback=True, **imgargs)
                     if isinstance(target, Link.ExternalTarget):
                         target = Link.ExternalTarget(href, title, descr=title)
             result = Link(target, label=label)

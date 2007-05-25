@@ -635,11 +635,9 @@ class Link(Container):
             return self._descr
     
     def __init__(self, target, label=None, type=None):
-        assert isinstance(target, (Section, ContentNode, self.ExternalTarget,
-                                   Resource)), target
+        assert isinstance(target, (Section, ContentNode, self.ExternalTarget, Resource)), target
         assert type is None or isinstance(type, (str, unicode)), type
-        assert label is None or \
-               isinstance(label, (str, unicode, InlineImage)), label
+        assert label is None or isinstance(label, (str, unicode, InlineImage)), label
         if label is None:
             label = target.title()
         if isinstance(label, (str, unicode)):
