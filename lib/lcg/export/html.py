@@ -508,7 +508,7 @@ class HtmlExporter(Exporter):
         #                    [(t, t.url().replace('.','-'), f)
         #                     for t, f in zip(self._targets, self._flags)]],
         #                   legend=self._label, cls='language-selection')
-        if node is not node.root() or len(node.language_variants()) <= 1:
+        if len(node.language_variants()) <= 1:
             return None
         current = node.current_language_variant()
         languages = list(node.language_variants()[:])
@@ -523,8 +523,8 @@ class HtmlExporter(Exporter):
             uri = self._node_uri(node, lang=lang)
             links.append(g.link(name, uri, cls=cls))
             #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
-        return concat(self._LANGUAGE_SELECTION_LABEL, "\n",
-                      concat(links, separator=" |\n"))
+        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None, name='language-selection'),
+                      "\n", concat(links, separator=" |\n"))
 
     def _content(self, node):
         return node.content().export(self)
@@ -597,6 +597,12 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
                       if n is not None and n is not node]
         return concat(base, additional, separator='\n  ')
 
+    def _language_selection(self, node):
+        if node is not node.root():
+            return None
+        else:
+            return super(HtmlStaticExporter, self)._language_selection(node)
+        
     def _rule(self, node):
         if len(node.root().linear()) <= 1:
             return None

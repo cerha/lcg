@@ -1,3 +1,8 @@
+2007-06-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Language selection anchor added.
+	Generate language selection for all nodes by default.
+
 2007-05-25  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Cosmetic changes.
