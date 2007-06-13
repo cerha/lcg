@@ -154,9 +154,8 @@ class HtmlGenerator(Generator):
         args = (('class', cls), ('id', id), ('lang', lang))
         return self._tag('div', args, content, newlines=True)
      
-    def map(self, content, cls=None, lang=None, name=None, title=None):
-        args = (('class', cls), ('lang', lang), ('name', name),
-                ('title', title))
+    def map(self, content, name=None, title=None, lang=None, id=None, cls=None):
+        args = (('name', name), ('title', title), ('lang', lang), ('id', id), ('class', cls))
         return self._tag('map', args, content, newlines=True)
 
     def uri(self, base, *args, **kwargs):
@@ -475,14 +474,19 @@ class HtmlExporter(Exporter):
         return concat('  ', concat(tags + self._styles(node), separator='\n  '))
 
     def _parts(self, node, parts):
-        x = [(getattr(self, '_'+part)(node), part.replace('_', '-'))
-             for part in parts]
-        return concat([self._part(part, name)
-                       for part, name in x if part is not None],
-                      separator="\n")
+        result = []
+        for name in parts:
+            content = self._part(name, node)
+            if content is not None:
+                result.append(content)
+        return concat(result, separator="\n")
     
-    def _part(self, part, name):
-        return self._generator.div(part, cls=name)
+    def _part(self, name, node):
+        content = getattr(self, '_'+name)(node)
+        if content is not None:
+            return self._generator.div(name, cls=name.replace('_', '-'))
+        else:
+            return None
         
     def _heading(self, node):
         return self._generator.h(node.title(), level=1)
@@ -517,11 +521,11 @@ class HtmlExporter(Exporter):
         for lang in languages:
             name = language_name(lang)
             cls = None
+            sign = ''
             if lang == current:
-                name = concat(name, g.span(' *', cls='hidden'))
+                sign = g.span(' *', cls='hidden')
                 cls = 'current'
-            uri = self._node_uri(node, lang=lang)
-            links.append(g.link(name, uri, cls=cls))
+            links.append(g.link(name, self._node_uri(node, lang=lang), cls=cls)+sign)
             #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
         return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None, name='language-selection'),
                       "\n", concat(links, separator=" |\n"))
