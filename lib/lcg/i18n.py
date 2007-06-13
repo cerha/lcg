@@ -170,7 +170,10 @@ class TranslatableText(Localizable):
         kwargs = dict(self._kwargs, _transforms=transforms,
                       _domain=self._domain)
         return TranslatableText(self._text, *self._args, **kwargs)
-    
+
+    def _translate(self, translator):
+        return translator.gettext(self._text, domain=self._domain)
+
     def translate(self, translator):
         """Return the translated and interpolated string.
         
@@ -193,7 +196,7 @@ class TranslatableText(Localizable):
                 return translator.translate(x)
             else:
                 return x
-        result = translator.gettext(self._text, domain=self._domain)
+        result = self._translate(translator)
         if self._args:
             result %= tuple([translate(arg) for arg in self._args])
         elif self._kwargs:
@@ -203,6 +206,31 @@ class TranslatableText(Localizable):
         return result
 
 
+class SelfTranslatableText(TranslatableText):
+    """Translatable string capable of self-translation.
+
+    The translations of this string are pre-defined by passing them as a constructor argument.  The
+    instance than translates itself -- the translator is only used to find out the target language.
+
+    As oposed to the translator-based translation, which uses translation catalogs, this class is
+    handy when the translation string is part of application data, rather than application
+    definition -- for example when the translated term and its translations are user defined
+    strings stored in a database.
+
+    Additional constructor arguments:
+
+      translations -- a dictionary of translations keyed by a language code.
+
+    """
+    def _init_kwargs(self, translations=None, **kwargs):
+        assert isinstance(translations, dict), translations
+        self._translations = translations
+        super(SelfTranslatableText, self)._init_kwargs(**kwargs)
+
+    def _translate(self, translator):
+        return self._translations.get(translator.lang(), self._text)
+        
+    
 class LocalizableDateTime(Localizable):
     """Date/time string which can be converted to a localized format.
     
@@ -356,12 +384,18 @@ class Translator(object):
     'LocalizableDateTime' instances will be formatted to a proper output
     format.  'Concatenation' instances may contain 'TranslatableText' instances
     coming from different domains and a translator should be able to deal with
-    them.  This is, however only a generic base class.  See 'GettextTranslator'
+    them.
+
+    This is class only defines the basic tr.  See 'GettextTranslator'
     or 'NullTranslator' for concrete implementations.
 
     """
     def __init__(self):
         self._datetime_formats = datetime_formats(self)
+        
+    def lang(self):
+        """Return the target language of this translator."""
+        return None
 
     def gettext(self, text, domain=None):
         """Return the translation of the string 'text' from given domain.
@@ -402,7 +436,7 @@ class NullTranslator(Translator):
     def gettext(self, text, domain=None):
         return text
 
-
+    
 class GettextTranslator(Translator):
     """Translator based on the GNU gettext interface."""
     
@@ -413,17 +447,16 @@ class GettextTranslator(Translator):
 
           lang -- target language code as a string.
 
-          default_domain -- the name of the default domain, used when the
-            translatable has no explicit domain defined.
+          default_domain -- the name of the default domain, used when the translatable has no
+            explicit domain defined.
 
-          path -- a dictionary, which may assign an arbitrary directory to each
-            domain.  This directory should contain the locale subdirectories as
-            usual with GNU getext (eg. 'de/LC_MESSAGES/domain.mo').  If there
-            is no item for a domain, the directory defaults to
-            'config.translation_dir'.
+          path -- a dictionary, which may assign an arbitrary directory to each domain.  This
+            directory should contain the locale subdirectories as usual with GNU getext
+            (eg. 'de/LC_MESSAGES/domain.mo').  If there is no item for a domain, the directory
+            defaults to 'config.translation_dir'.
 
-          fallback -- if true, the translator will silently use a null
-            translation in case the desired translation files is not found.
+          fallback -- if true, the translator will silently use a null translation in case the
+            desired translation files are not found.
         
         """
         assert isinstance(lang, str), lang
@@ -437,6 +470,9 @@ class GettextTranslator(Translator):
         self._cache = {}
         super(GettextTranslator,self).__init__()
 
+    def lang(self):
+        return self._lang
+    
     def _gettext_instance(self, domain):
         import gettext, config
         path = self._path.get(domain, config.translation_dir)

@@ -36,13 +36,13 @@ tests = TestSuite()
 class ContentNode(unittest.TestCase):
     
     def check_misc(self):
-    	a = lcg.ContentNode(None, 'a', content=lcg.TextContent("A"))
-        b = lcg.ContentNode(a, 'b', content=lcg.TextContent("B"))
+        b = lcg.ContentNode('b', content=lcg.TextContent("B"))
+    	a = lcg.ContentNode('a', content=lcg.TextContent("A"), children=(b,))
         assert a.id() == 'a'
         assert a.root() == b.root() == a
 
     def check_media(self):
-    	a = lcg.ContentNode(None, 'a', content=lcg.TextContent("A"))
+    	a = lcg.ContentNode('a', content=lcg.TextContent("A"))
         # TODO: This doesn.t work now.  Resources now only work with
         # file-based nodes.
         #m1 = a.resource(lcg.Media, 'sound1.ogg')
@@ -120,9 +120,22 @@ class TranslatableText(unittest.TestCase):
         c = lcg.concat("Info:", lcg.concat(a, '2006-08-14', separator=', '),
                        ('Mon', '10:32'), separator=' ')
         assert c == "Info: Version 1.0, 2006-08-14 Mon 10:32", c
-        
-        
+
 tests.add(TranslatableText)
+        
+class SelfTranslatableText(unittest.TestCase):
+          
+    def check_interpolation(self):
+        a = lcg.SelfTranslatableText("Hi %(person1)s, say hello to %(person2)s.",
+                                     person1="Joe", person2="Ann",
+                                     translations={'cs':
+                                                   "Ahoj %(person1)s, pozdravuj %(person2)s."})
+        b = a.translate(lcg.NullTranslator())
+        c = a.translate(lcg.GettextTranslator('cs'))
+        assert b == "Hi Joe, say hello to Ann.", b
+        assert c == "Ahoj Joe, pozdravuj Ann.", c
+        
+tests.add(SelfTranslatableText)
 
 class LocalizableDateTime(unittest.TestCase):
 

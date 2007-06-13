@@ -1,3 +1,14 @@
+2007-06-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlGenerator): Allow css class setting
+	for generated parts.
+	(HtmlGenerator.map): New argument `id'.
+
+	* lib/lcg/_test.py: Updated.
+
+	* lib/lcg/i18n.py: Added support for translatable text with predefined
+	translations (capable of self-translation).
+
 2007-06-01  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Language selection anchor added.
