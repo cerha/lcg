@@ -1,3 +1,7 @@
+2007-06-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Fixed broken `div' export.
+
 2007-06-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator): Allow css class setting

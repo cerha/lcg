@@ -484,7 +484,7 @@ class HtmlExporter(Exporter):
     def _part(self, name, node):
         content = getattr(self, '_'+name)(node)
         if content is not None:
-            return self._generator.div(name, cls=name.replace('_', '-'))
+            return self._generator.div(content, cls=name.replace('_', '-'))
         else:
             return None
         
