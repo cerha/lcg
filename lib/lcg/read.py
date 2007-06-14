@@ -242,18 +242,22 @@ class DocDirReader(DocFileReader):
                     import imp
                     file, path, descr = imp.find_module(name, [dir])
                     m = imp.load_module(name, file, path, descr)
-                    cls = m.IndexNode
+                    if hasattr(m, 'IndexNode'):
+                        # Just for backwards compatibility
+                        reader = m.IndexNode
+                    else:
+                        reader = m.Reader
                 else:
                     subdir = os.path.join(dir, name)
                     if os.path.isdir(subdir):
                         dir = subdir
-                        cls = DocDirReader
+                        reader = DocDirReader
                     else:
-                        cls = DocFileReader
+                        reader = DocFileReader
                 kwargs = dict(id=name, parent=self, hidden=hidden)
-                if issubclass(cls, FileReader):
+                if issubclass(reader, FileReader):
                     kwargs = dict(dir=dir, encoding=self._encoding, **kwargs)
-                children.append(cls(**kwargs))
+                children.append(reader(**kwargs))
         return children
 
     
