@@ -61,6 +61,9 @@ class Reader(object):
     def _create_children(self):
         return ()
 
+    def id(self):
+        return self._id
+    
     def parent(self):
         return self._parent
     
@@ -247,7 +250,10 @@ class DocDirReader(DocFileReader):
                         cls = DocDirReader
                     else:
                         cls = DocFileReader
-                children.append(cls(dir=dir, id=name, parent=self, hidden=hidden))
+                kwargs = dict(id=name, parent=self, hidden=hidden)
+                if issubclass(cls, FileReader):
+                    kwargs = dict(dir=dir, encoding=self._encoding, **kwargs)
+                children.append(cls(**kwargs))
         return children
 
     

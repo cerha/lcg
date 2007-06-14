@@ -671,21 +671,30 @@ class Link(Container):
     
 # Convenience functions for simple content construction.
 
-def coerce(content):
+def coerce(content, formatted=False):
     """Coerce the argument into an LCG content element.
 
-    If the argument is a sequence, a 'Container' of all items is returned.
-    Moreover each item is coerced as-well and 'None' items are omitted.  It the
-    argument is a string, it is turned into a 'TextContent' instance and if it
-    is a 'Content' element, it is returned as is.  Any other argument raises
-    AssertionError.
+    Arguments:
+
+      content -- can be a sequence, string or a Content instance.  A sequence is turned to a
+        'Container' of the items.  Moreover each item is coerced recursively and 'None' items are
+        omitted.  A string is turned into a 'TextContent' or 'WikiText' instance according to the
+        'formatted' argument.  A 'Content' instance is returned as is.  Any other argument raises
+        AssertionError.
+        
+      formatted -- a boolean flag indicating that strings should be treated as formatted, so
+        'WikiText' is used instead of plain 'TextContent'.  Applies recursively if a sequence is
+        passed as the 'content' argument.
 
     """
     if isinstance(content, (list, tuple)):
-        return Container([coerce(item)
+        return Container([coerce(item, formatted=formatted)
                           for item in content if item is not None])
     elif isinstance(content, (str, unicode)):
-        return TextContent(content)
+        if formatted:
+            return WikiText(content)
+        else:
+            return TextContent(content)
     else:
         assert isinstance(content, Content), ('Invalid content', content,)
         return content
@@ -716,23 +725,33 @@ def link(target, label=None, type=None, descr=None):
         assert descr is None
     return Link(target, label=label, type=type)
     
-def dl(items):
+def dl(items, formatted=False):
     """Create a 'DefinitionList' from a sequence of (TERM, DESCRIPTION) pairs.
 
-    Each term and definition in the sequence is coerced and the pair is
-    automatically turned into a 'Definition' instance.
+    Each term and description in the sequence is coerced and the pair is automatically turned into
+    a 'Definition' instance.  The 'formatted' argument only applies to the description.
 
     """
-    return DefinitionList([Definition(coerce(term), coerce(descr))
+    return DefinitionList([Definition(coerce(term), coerce(descr, formatted=formatted))
                            for term, descr in items])
 
-def ul(items):
+def ul(items, formatted=False):
     """Create an 'ItemizedList' by coercing given sequence of items."""
-    return ItemizedList([coerce(item) for item in items])
+    return ItemizedList([coerce(item, formatted=formatted) for item in items])
 
-def p(*items):
+def fieldset(pairs, title=None, formatted=False):
+    """Create a 'FieldSet' out of given sequence of (LABEL, VALUE) pairs.
+
+    Both label and value are coerced.  The 'formatted' argument only applies to the value.
+    
+    """
+    fields = [Field(coerce(label), coerce(value, formatted=formatted))
+              for label, value in pairs]
+    return FieldSet(fields, title=title)
+
+def p(*items, **kwargs):
     """Create a 'Paragraph' by coercing all arguments."""
-    return Paragraph([coerce(item) for item in items])
+    return Paragraph([coerce(item, **kwargs) for item in items])
 
 def join(items, separator=' '):
     """Coerce all items and put the coerced separator in between them."""
