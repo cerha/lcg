@@ -1,7 +1,8 @@
 2007-06-14  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/read.py: Pass the file related arguments only when the
-	child reader is a `FileReader'.
+	child reader is a `FileReader'.  Expect a 'Reader' in a python
+	source file, not an 'IndexNode'.
 
 	* lib/lcg/content/content.py: New features in content
 	construuction convenience functions.
