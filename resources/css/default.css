@@ -18,7 +18,10 @@ h7,h8,h9 { font-size: 1.1em; }
 
 a:link, a:visited { color: #04b; }
 a:hover, .speaking-text:hover { color: #f60; }
-a.backref { text-decoration: none; color: #000; }
+a.backref, a:link.backref { 
+    color: #000 !important; /* important needed for MSIE */
+    text-decoration: none;
+}
 
 .hidden { display: none; }
 
