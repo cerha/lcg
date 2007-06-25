@@ -1,3 +1,15 @@
+2007-06-25  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/lcg-formatter.py: New file.
+
+	* bin/wiki-formatter.py: File removed.
+
+	* bin/generate.py: File removed.
+
+	* bin/pydoc.py: File removed.
+
+	* lib/lcg/eurochance.py: File removed.
+
 2007-06-14  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/read.py: Pass the file related arguments only when the
