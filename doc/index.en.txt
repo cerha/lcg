@@ -2,7 +2,7 @@
 
 = LCG Documentation =
 
-Copyright (c) 2005, 2006 Brailcom, o.p.s.
+Copyright (c) 2005-2007 Brailcom, o.p.s.
 
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.2 or any later version
@@ -16,5 +16,4 @@ in the section [fdl].
 
 == Appendices ==
 
- * [eurochance]
  * [fdl]

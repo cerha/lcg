@@ -1,5 +1,12 @@
 2007-06-25  Tomas Cerha  <cerha@brailcom.org>
 
+	* doc/index.en.txt: Removed references to the Eurochance related docs.
+
+	* doc/usage/custom-interface.en.txt: Removed references to the
+	Eurochance related docs.
+
+	* doc/eurochance/*: Removed.
+	
 	* bin/lcg-formatter.py: New file.
 
 	* bin/wiki-formatter.py: File removed.
