@@ -1,44 +1,43 @@
 # Learning Content Generator
-# Copyright (C) 2005, 2006 Brailcom, o.p.s.
+# Copyright (C) 2005-2007 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-12-22 17:12+0100\n"
-"PO-Revision-Date: 2006-12-22 21:41+0100\n"
+"POT-Creation-Date: 2007-06-25 09:34+0200\n"
+"PO-Revision-Date: 2007-06-25 10:33+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/content/content.py:438
+#: ../lib/lcg/content/content.py:403
 msgid "Index:"
 msgstr "Obsah"
 
-#: ../lib/lcg/export/html.py:103
+#: ../lib/lcg/export/html.py:410
 msgid "Choose your language:"
 msgstr "Zvolte jazyk:"
 
-#: ../lib/lcg/export/html.py:328
+#: ../lib/lcg/export/html.py:626
 msgid "None"
 msgstr "není"
 
-#: ../lib/lcg/export/html.py:331
+#: ../lib/lcg/export/html.py:627
 msgid "Next"
 msgstr "Dal¹í"
 
-#: ../lib/lcg/export/html.py:332
+#: ../lib/lcg/export/html.py:628
 msgid "Previous"
 msgstr "Pøedchozí"
 
-#: ../lib/lcg/export/html.py:337
+#: ../lib/lcg/export/html.py:633
 msgid "Up"
 msgstr "Nahoru"
 
-#: ../lib/lcg/export/html.py:340
+#: ../lib/lcg/export/html.py:636
 msgid "Top"
 msgstr "Nejvy¹¹í"
