@@ -1,4 +1,4 @@
-domains := lcg lcg-locale lcg-elearning eurochance test
+domains := lcg lcg-locale lcg-elearning test
 mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
 mkrules := ../lib/lcg/i18n.py ../lib
 
