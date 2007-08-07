@@ -7,7 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"POT-Creation-Date: 2007-06-25 09:34+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-07 21:03+0200\n"
 "PO-Revision-Date: 2007-06-25 10:32+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -25,26 +26,20 @@ msgid "Choose your language:"
 msgstr "Escoja el idioma:"
 
 # For exapmle "Next: None".
-#: ../lib/lcg/export/html.py:626
+#: ../lib/lcg/export/html.py:637
 msgid "None"
 msgstr ""
 
+#: ../lib/lcg/export/html.py:638
+msgid "You are here:"
+msgstr ""
+
 # Link to the next page.
-#: ../lib/lcg/export/html.py:627
+#: ../lib/lcg/export/html.py:640
 msgid "Next"
 msgstr ""
 
 # Link to the previous page.
-#: ../lib/lcg/export/html.py:628
+#: ../lib/lcg/export/html.py:641
 msgid "Previous"
-msgstr ""
-
-# Link to the parent page in the hierarchy.
-#: ../lib/lcg/export/html.py:633
-msgid "Up"
-msgstr ""
-
-# Link to the top level page in the hierarchy.
-#: ../lib/lcg/export/html.py:636
-msgid "Top"
 msgstr ""
