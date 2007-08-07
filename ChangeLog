@@ -1,6 +1,21 @@
 2007-08-07  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/resources.py (FileResourceProvider._resource): Fallback
+	resource constructor arguments fixed.
+	(SharedFileResourceProvider): Renamed to `SharedResourceProvider'.
+
+	* lib/lcg/read.py: Use `SharedResourceProvider' for all readers by
+	default.
+
+	* lib/lcg/_test.py (TranslatableTextFactory.check_domain)
+	(check_translate): Use named arguments in translation strings.
+
+	* bin/lcg-formatter.py (main): `SharedFileResourceProvider' ->
+	`SharedResourceProvider'.
+
 	* lib/lcg/export/html.py (HtmlGenerator.span): New argument `style'.
+	(HtmlStaticExporter._navigation): Use breadcrumb navigation
+	instead of `Up' and `Top' links.
 
 2007-06-25  Tomas Cerha  <cerha@brailcom.org>
 
