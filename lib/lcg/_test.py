@@ -170,7 +170,7 @@ tests.add(LocalizableDateTime)
 class TranslatableTextFactory(unittest.TestCase):
 
     def check_domain(self):
-        a = _("Hi %s, say hello to %s.", _("Joe"), _("Bob"))
+        a = _("Hi %(name1)s, say hello to %(name2)s.", name1=_("Joe"), name2=_("Bob"))
         assert a.domain() == 'test'
 
 tests.add(TranslatableTextFactory)
@@ -180,7 +180,7 @@ class GettextTranslator(unittest.TestCase):
 
     def check_translate(self):
         t = lcg.GettextTranslator('cs')
-        a = _("Hi %s, say hello to %s.", _("Joe"), _("Bob"))
+        a = _("Hi %(name1)s, say hello to %(name2)s.", name1=_("Joe"), name2=_("Bob"))
         b = t.translate(a)
         assert b == "Ahoj Pepo, pozdravuj Bobika.", b
         c = a.translate(t)
