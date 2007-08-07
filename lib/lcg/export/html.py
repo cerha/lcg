@@ -144,10 +144,11 @@ class HtmlGenerator(Generator):
 
     # HTML specific...
     
-    def span(self, text, cls=None, id=None, lang=None):
-        attr = (('class', cls),
+    def span(self, text, cls=None, id=None, lang=None, style=None):
+        attr = (('id', id),
                 ('lang', lang),
-                ('id', id))
+                ('class', cls),
+                ('style', style))
         return self._tag('span', attr, text)
      
     def div(self, content, id=None, cls=None, lang=None):
