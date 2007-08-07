@@ -6,23 +6,27 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"POT-Creation-Date: 2006-12-22 21:22+0100\n"
-"PO-Revision-Date: 2007-06-25 10:29+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-07 21:05+0200\n"
+"PO-Revision-Date: 2007-08-07 21:11+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/_test.py:158 ../lib/lcg/_test.py:168
-#, python-format
-msgid "Hi %s, say hello to %s."
-msgstr "Ahoj %s, pozdravuj %s."
-
-#: ../lib/lcg/_test.py:158 ../lib/lcg/_test.py:168
+#: ../lib/lcg/_test.py:173 ../lib/lcg/_test.py:183
 msgid "Joe"
 msgstr "Pepo"
 
-#: ../lib/lcg/_test.py:158 ../lib/lcg/_test.py:168
+#: ../lib/lcg/_test.py:173 ../lib/lcg/_test.py:183
 msgid "Bob"
 msgstr "Bobika"
+
+#: ../lib/lcg/_test.py:173 ../lib/lcg/_test.py:183
+#, python-format
+msgid "Hi %(name1)s, say hello to %(name2)s."
+msgstr "Ahoj %(name1)s, pozdravuj %(name2)s."
+
+#~ msgid "Hi %s, say hello to %s."
+#~ msgstr "Ahoj %s, pozdravuj %s."
