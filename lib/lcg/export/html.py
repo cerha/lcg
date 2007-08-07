@@ -354,14 +354,13 @@ class HtmlFormatter(MarkupFormatter):
         return None
 
     def _link_formatter(self, parent, label=None, href=None, anchor=None,
-                        close=False, xresource=None, **kwargs):
+                        close=False, **kwargs):
         node = None
         result = None
         if href and not anchor:
             is_image, href, imgargs = self._match_image(href)
-            cls = is_image and Image or xresource and XResource or Resource
-            fallback = bool(is_image or xresource)
-            result = self._find_resource(parent, cls, href, label, fallback=fallback, **imgargs)
+            cls = is_image and Image or Resource
+            result = self._find_resource(parent, cls, href, label, fallback=is_image, **imgargs)
         if not result:
             if not href:
                 node = parent
@@ -614,29 +613,31 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
         return '<hr class="hidden">'
     
     def _navigation(self, node):
-        if len(node.root().linear()) <= 1:
+        root = node.root()
+        if len(root.linear()) <= 1:
             return None
         g = self._generator
+        parent = node.parent()
         def link(node, label=None, key=None):
             if node:
+                hidden = ''
                 if label is None:
                     label = node.title(brief=True)
+                if not key:
+                    if node == root:
+                        key = 'index'
+                        if node == parent:
+                            hidden = g.link('', self.uri(node),
+                                            hotkey=self._hotkey['up'], cls='hidden')
+                    elif node == parent:
+                        key = 'up'
                 return g.link(label, self.uri(node), title=node.title(),
-                              hotkey=not key or self._hotkey[key])
+                              hotkey=key and self._hotkey[key]) + hidden
             else:
                 return _("None")
+        breadcrumbs = g.div(_("You are here:") +' '+ \
+                            concat([link(n) for n in node.path()], separator=' / '))
         nav = [_('Next') + ': ' + link(node.next(), key='next'),
                _('Previous') + ': ' + link(node.prev(), key='prev')]
-        hidden = ''
-        if node is not node.root():
-            p = node.parent()
-            if p is not node.root():
-                nav.append(_("Up") + ': ' + link(p, key='up'))
-            else:
-                hidden = concat("\n", link(p, key='up', label=''))
-            nav.append(_("Top") + ': ' + link(node.root(), key='index',
-                                              label=self._INDEX_LABEL))
-        return concat(nav, separator=' |\n') + hidden
-
-
+        return breadcrumbs + concat(nav, separator=' |\n')
             
