@@ -36,18 +36,18 @@ from lcg import *
 class Resource(object):
     """Generic resource class."""
     
-    def __init__(self, file, title=None, descr=None, uri=None, **kwargs):
+    def __init__(self, filename, title=None, descr=None, uri=None, **kwargs):
         super(Resource, self).__init__(**kwargs)
-        assert isinstance(file, (str, unicode)), file
+        assert isinstance(filename, (str, unicode)), filename
         assert title is None or isinstance(title, (str, unicode)), title
         assert descr is None or isinstance(descr, (str, unicode)), descr
-        self._file = file
+        self._filename = filename
         self._title = title
         self._descr = descr
-        self._uri = uri or file
+        self._uri = uri or filename
                  
-    def file(self):
-        return self._file
+    def filename(self):
+        return self._filename
         
     def descr(self):
         return self._descr
@@ -65,8 +65,8 @@ class Resource(object):
 class Image(Resource):
     """An image resource."""
 
-    def __init__(self, file, width=None, height=None, **kwargs):
-        super(Image, self).__init__(file, **kwargs)
+    def __init__(self, filename, width=None, height=None, **kwargs):
+        super(Image, self).__init__(filename, **kwargs)
         #if width is None or height is None:
         #    import Image as Img
         #    img = Img.open(self._src_path)
@@ -102,14 +102,14 @@ class ResourceProvider(object):
         """
         return ()
         
-    def resource(self, cls, file, fallback=True, **kwargs):
+    def resource(self, cls, filename, fallback=True, **kwargs):
         """Get the resource instance by its type and relative filename.
 
         Arguments:
         
           cls -- resource class.
           
-          file -- filename of the resource.
+          filename -- filename of the resource.
             
           fallback -- if True, a valid 'Resource' instance will be returned even if the resource
             file doesn't exist.  The problem will be logged, but the program will continue as if
@@ -140,14 +140,14 @@ class StaticResourceProvider(object):
         else:
             return self._resources
         
-    def resource(self, cls, file, fallback=False):
+    def resource(self, cls, filename, fallback=False):
         if self._dict is None:
-            self._dict = dict([(r.file(), r) for r in self._resources])
-        resource = self._dict.get(file)
+            self._dict = dict([(r.filename(), r) for r in self._resources])
+        resource = self._dict.get(filename)
         if not isinstance(resource, cls):
             resource = None
         if resource is None and fallback:
-            resource = cls(file)
+            resource = cls(filename)
         return resource
 
 
@@ -212,7 +212,7 @@ class XResource(Resource):
             dst_dir = self.SUBDIR
         else:
             dst_dir = os.path.join(self.SUBDIR, self._subdir)
-        return os.path.join(dst_dir, self._file)
+        return os.path.join(dst_dir, self._filename)
             
     def uri(self):
         return '/'.join(self._dst_path().split(os.path.sep))
@@ -399,12 +399,16 @@ class _FileResourceProvider(ResourceProvider):
         return result
 
 
-class SharedFileResourceProvider(_FileResourceProvider):
+class SharedResourceProvider(_FileResourceProvider):
     """Provides resources shared by multiple nodes."""
     
-    def __init__(self, root_dir):
-        dirs = (root_dir, config.default_resource_dir)
-        super(SharedFileResourceProvider, self).__init__(dirs)
+    def __init__(self, root_dir=None):
+        if root_dir is not None:
+            dirs = (root_dir,)
+        else:
+            dirs = ()
+        dirs += (config.default_resource_dir,)
+        super(SharedResourceProvider, self).__init__(dirs)
 
     def resource(self, *args, **kwargs):
         return self._resource(*args, **kwargs)
@@ -433,7 +437,7 @@ class FileResourceProvider(_FileResourceProvider):
     def _resource(self, cls, *args, **kwargs):
         assert issubclass(cls, Resource), cls
         if not issubclass(cls, XResource):
-            return kwargs.get('fallback') and cls(file, **kwargs) or None
+            return kwargs.get('fallback') and cls(*args, **kwargs) or None
         if cls.SHARED:
             result = self._shared_resource_provider.resource(cls, *args, **kwargs)
         else:
