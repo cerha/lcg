@@ -53,6 +53,7 @@ class Reader(object):
         self._root = root
         self._language = kwargs.get('language')
         kwargs['id'] = id
+        kwargs['resource_provider'] = self._resource_provider()
         self._kwargs = kwargs
         
     def _create_content(self):
@@ -60,6 +61,12 @@ class Reader(object):
         
     def _create_children(self):
         return ()
+
+    def _resource_provider(self):
+        if self is self._root:
+            return SharedResourceProvider()
+        else:
+            return self._root.resource_provider()
 
     def id(self):
         return self._id
@@ -69,6 +76,9 @@ class Reader(object):
     
     def language(self):
         return self._language
+
+    def resource_provider(self):
+        return self._kwargs['resource_provider']
     
     def build(self):
         content = self._create_content()
@@ -79,20 +89,23 @@ class Reader(object):
 class FileReader(Reader):
     
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
-        super(FileReader, self).__init__(id, **kwargs)
         assert isinstance(dir, str)
         assert encoding is None or isinstance(encoding, str) \
                and codecs.lookup(encoding)
         self._dir = os.path.normpath(dir)
+        super(FileReader, self).__init__(id, **kwargs)
         if not encoding and self._parent and isinstance(self._parent, FileReader):
             encoding = self._parent.encoding()
         self._encoding = encoding or 'ascii'
+
+    def _resource_provider(self):
         if self is self._root:
-            self._shared_resource_provider = p = SharedFileResourceProvider(dir)
-        else:
+            p = self._shared_resource_provider = SharedResourceProvider(self._dir)
+        elif isinstance(self._root, FileReader):
             p = self._root._shared_resource_provider
-        self._kwargs['resource_provider'] = FileResourceProvider(self._dir, self._root.dir(),
-                                                                 shared_resource_provider=p)
+        else:
+            p = self._root.resource_provider()
+        return FileResourceProvider(self._dir, self._root.dir(), shared_resource_provider=p)
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""
