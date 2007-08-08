@@ -637,7 +637,7 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
                 return _("None")
         breadcrumbs = g.div(_("You are here:") +' '+ \
                             concat([link(n) for n in node.path()], separator=' / '))
-        nav = [_('Next') + ': ' + link(node.next(), key='next'),
-               _('Previous') + ': ' + link(node.prev(), key='prev')]
-        return breadcrumbs + concat(nav, separator=' |\n')
+        nav = [g.span(_('Next') + ': ' + link(node.next(), key='next'), cls='next'),
+               g.span(_('Previous') + ': ' + link(node.prev(), key='prev'), cls='prev')]
+        return breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator'))
             

@@ -32,7 +32,13 @@ div.navigation {
     border-width: 1px 0;
     background: #e8ecf0;
 }
-div.navigation a, div.copyright a { text-decoration: none; }
+div.navigation span.separator { 
+    display: none;
+}
+div.navigation span.next { 
+    float: right;
+}
+/* div.navigation a, div.copyright a { text-decoration: none; } */
 hr.navigation { display: none; }
 
 div.copyright { 
@@ -97,7 +103,7 @@ div.table-of-contents {
     padding: 3pt;
     clear: both;
 }
-div.table-of-contents a { text-decoration: none; }
+/* div.table-of-contents a { text-decoration: none; } */
 div.table-of-contents ul { 
     margin-top: 3pt;
     margin-bottom: 0;
