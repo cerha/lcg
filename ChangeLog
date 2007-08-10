@@ -1,3 +1,11 @@
+2007-08-10  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/util.py (unindent_docstring): New method.
+
+	* lib/lcg/read.py (Reader): Allow derived classes to easilly
+	define static node constructor arguments using the new constant
+	`_DEFAULTS'
+
 2007-08-08  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlStaticExporter._navigation):
