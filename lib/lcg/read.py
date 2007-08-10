@@ -32,6 +32,7 @@ from lcg import *
 
 class Reader(object):
     _INHERIT = ('language', 'secondary_language', 'language_variants')
+    _DEFAULTS = {}
     
     def __init__(self, id, parent=None, **kwargs):
         """
@@ -40,6 +41,7 @@ class Reader(object):
         super(Reader, self).__init__()
         self._id = id
         self._parent = parent
+        kwargs.update(self._DEFAULTS)
         if parent is not None:
             pkwargs = parent._kwargs
             for arg in self._INHERIT:
@@ -179,7 +181,7 @@ class StructuredTextReader(FileReader):
         sections = self._parse_source_text(self._source_text())
         if self._kwargs.get('title') is None:
             if len(sections) != 1 or not isinstance(sections[0], Section):
-                raise Exception("The document has no top-level section:", id)
+                raise Exception("The document has no top-level section:", self._id)
             s = sections[0]
             self._kwargs['title'] = s.title()
             sections = s.content()
