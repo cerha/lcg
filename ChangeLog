@@ -1,3 +1,8 @@
+2007-08-17  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlGenerator.submit): New argument `value'.
+	(HtmlExporter._language_selection): Anchor name changed.
+
 2007-08-10  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/util.py (unindent_docstring): New method.

@@ -207,8 +207,15 @@ class HtmlGenerator(Generator):
     def reset(self, label, onclick=None, cls=None):
         return self._input('reset', onclick=onclick, value=label, cls=cls)
      
-    def submit(self, label, onclick=None, cls=None):
-        return self._input('submit', onclick=onclick, value=label, cls=cls)
+    def submit(self, label, name=None, value=None, onclick=None, cls=None, disabled=False):
+        if value is None:
+            return self._input('submit', onclick=onclick, value=label, name=name, cls=cls,
+                               disabled=disabled)
+        else:
+            attr = (('onclick', onclick), ('value', value), ('name', name), ('cls', cls),
+                    ('disabled', disabled))
+            return self._tag('button', attr, label)
+            
      
     def select(self, name, options, onchange=None, selected=None, id=None,
                disabled=False, readonly=False):
@@ -257,7 +264,7 @@ class HtmlGenerator(Generator):
         if code:
             code = concat('<!--\n', code, ' //-->\n')
         return concat('<script type="text/javascript" language="Javascript">',
-                            code, '</script>', noscript)
+                      code, '</script>', noscript)
      
     def script_write(self, content, noscript=None, condition=None):
         #return content
@@ -527,9 +534,10 @@ class HtmlExporter(Exporter):
                 cls = 'current'
             links.append(g.link(name, self._node_uri(node, lang=lang), cls=cls)+sign)
             #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
-        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None, name='language-selection'),
+        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
+                             name='language-selection-anchor'),
                       "\n", concat(links, separator=" |\n"))
-
+    
     def _content(self, node):
         return node.content().export(self)
     
