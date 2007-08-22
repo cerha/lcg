@@ -482,11 +482,10 @@ class Section(SectionContainer):
     
     def anchor(self):
         """Return the anchor name for this section."""
-        if self._anchor is not None:
-            return self._anchor
-        else:
+        if self._anchor is None:
             numbers = [str(x.section_number()) for x in self._section_path()]
-            return self._ANCHOR_PREFIX + '.'.join(numbers)
+            self._anchor = self._ANCHOR_PREFIX + '.'.join(numbers)
+        return self._anchor
         
     def backref(self, node):
         # We can allow just one backref target on the page.  Links on other
@@ -511,9 +510,9 @@ class Section(SectionContainer):
                    len(self._section_path()) + 1)+'\n'
 
     def export(self, exporter):
-        return concat(self._header(exporter),
-                      super(Section, self).export(exporter),
-                      separator="\n")
+        g = exporter.generator()
+        return g.div((self._header(exporter), super(Section, self).export(exporter)),
+                     id='section-' + self.anchor())
 
 
 class NodeIndex(Content):

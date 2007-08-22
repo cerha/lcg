@@ -1,3 +1,11 @@
+2007-08-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content/content.py: Wrap exported sections into divs
+	named by the section id.
+
+	* lib/lcg/i18n.py: Added support for setting translation source
+	language.
+
 2007-08-17  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator.submit): New argument `value'.
