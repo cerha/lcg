@@ -201,20 +201,19 @@ class HtmlGenerator(Generator):
      
     def button(self, label, handler, cls=None, title=None):
         cls = cls and 'button ' + cls or 'button'
-        return self._input('button', value=label, onclick=handler, cls=cls,
-                           title=title)
+        return self._input('button', value=label, onclick=handler, cls=cls, title=title)
      
-    def reset(self, label, onclick=None, cls=None):
-        return self._input('reset', onclick=onclick, value=label, cls=cls)
+    def reset(self, label, onclick=None, cls=None, title=None):
+        return self._input('reset', title=title, onclick=onclick, value=label, cls=cls)
      
-    def submit(self, label, name=None, value=None, onclick=None, cls=None, disabled=False):
+    def submit(self, label, name=None, value=None, onclick=None, cls=None, disabled=False,
+               title=None):
+        attr = (('onclick', onclick), ('name', name), ('cls', cls),
+                ('disabled', disabled), ('title', title))
         if value is None:
-            return self._input('submit', onclick=onclick, value=label, name=name, cls=cls,
-                               disabled=disabled)
+            return self._input('submit', value=label, **dict(attr))
         else:
-            attr = (('onclick', onclick), ('value', value), ('name', name), ('cls', cls),
-                    ('disabled', disabled))
-            return self._tag('button', attr, label)
+            return self._tag('button', attr + (('value', value),) , label)
             
      
     def select(self, name, options, onchange=None, selected=None, id=None,
