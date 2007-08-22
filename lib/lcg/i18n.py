@@ -36,17 +36,20 @@ class TranslatableTextFactory(object):
       _ = TranslatableTextFactory('domain-name')
 
     """
-    def __init__(self, domain):
+    def __init__(self, domain, origin='en'):
         assert isinstance(domain, str), domain
+        assert isinstance(origin, str), origin
         self._domain = domain
+        self._origin = origin
 
     def domain(self):
         """Return the domain name as set in the constructor."""
         return self._domain
         
-    def __call__(self, *args, **kwargs):
+    def __call__(self, text, *args, **kwargs):
         kwargs['_domain'] = self._domain
-        return TranslatableText(*args, **kwargs)
+        kwargs['_origin'] = self._origin
+        return TranslatableText(text, *args, **kwargs)
     
 
 class Localizable(unicode):
@@ -147,11 +150,13 @@ class TranslatableText(Localizable):
         self._init_kwargs(**kwargs)
         assert not args or not self._kwargs, (text, args, self._kwargs)
 
-    def _init_kwargs(self, _transforms=(), _domain=None, **kwargs):
+    def _init_kwargs(self, _transforms=(), _domain=None, _origin='en', **kwargs):
         assert isinstance(_transforms, tuple), _transforms
         assert isinstance(_domain, (str)) or _domain is None, _domain
+        assert isinstance(_origin, (str)), _origin
         self._transforms = _transforms
         self._domain = _domain
+        self._origin = _origin
         self._kwargs = kwargs
 
     def domain(self):
@@ -168,11 +173,11 @@ class TranslatableText(Localizable):
         """
         transforms = self._transforms + (lambda x: x.replace(old, new),)
         kwargs = dict(self._kwargs, _transforms=transforms,
-                      _domain=self._domain)
+                      _domain=self._domain, _origin=self._origin)
         return TranslatableText(self._text, *self._args, **kwargs)
 
     def _translate(self, translator):
-        return translator.gettext(self._text, domain=self._domain)
+        return translator.gettext(self._text, domain=self._domain, origin=self._origin)
 
     def translate(self, translator):
         """Return the translated and interpolated string.
@@ -397,7 +402,7 @@ class Translator(object):
         """Return the target language of this translator."""
         return None
 
-    def gettext(self, text, domain=None):
+    def gettext(self, text, domain=None, origin=None):
         """Return the translation of the string 'text' from given domain.
 
         Arguments:
@@ -433,7 +438,7 @@ class Translator(object):
 class NullTranslator(Translator):
     """A translator which just returns identical strings as translations."""
     
-    def gettext(self, text, domain=None):
+    def gettext(self, text, domain=None, origin=None):
         return text
 
     
@@ -473,28 +478,27 @@ class GettextTranslator(Translator):
     def lang(self):
         return self._lang
     
-    def _gettext_instance(self, domain):
+    def _gettext_instance(self, domain, origin):
         import gettext, config
         path = self._path.get(domain, config.translation_dir)
         try:
             return gettext.translation(domain, path, (self._lang,))
         except IOError, e:
-            msg = str(e)+", path: '%s', lang: '%s'" % (path, self._lang)
-            if self._fallback or self._lang == 'en':
-                # The original strings are in English, so it's ok if we
-                # don't find a MO file for them.
-                if self._lang != 'en':
+            # The MO file was not found.
+            msg = str(e)+", path: '%s', lang: '%s', origin: '%s'" % (path, self._lang, origin)
+            if self._fallback or self._lang == origin:
+                if self._lang != origin:
                     log(msg)
                 return gettext.NullTranslations()
             else:
                 raise IOError(msg)
         
-    def gettext(self, text, domain=None):
+    def gettext(self, text, domain=None, origin=None):
         domain = domain or self._default_domain
         try:
-            t = self._cache[domain]
+            t = self._cache[(domain, origin)]
         except KeyError:
-            t = self._cache[domain] = self._gettext_instance(domain)
+            t = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
         return t.ugettext(text)
         
     
