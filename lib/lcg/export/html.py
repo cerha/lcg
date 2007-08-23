@@ -162,7 +162,7 @@ class HtmlGenerator(Generator):
     def uri(self, base, *args, **kwargs):
         args += tuple(kwargs.items())
         if args:
-            return base + '?' + ';'.join(["%s=%s" % item for item in args])
+            return base + '?' + ';'.join(["%s=%s" % (k,v) for k,v in args if v is not None])
         else:
             return base
      

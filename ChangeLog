@@ -1,3 +1,8 @@
+2007-08-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlGenerator.uri): Ignore arguments
+	with None value.
+
 2007-08-22  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Allow `title' for `submit' and `reset'
