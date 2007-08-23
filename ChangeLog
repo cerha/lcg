@@ -1,5 +1,7 @@
 2007-08-23  Tomas Cerha  <cerha@brailcom.org>
 
+	* Makefile: Run cvs update with -dP.
+
 	* lib/lcg/export/html.py (HtmlGenerator.uri): Ignore arguments
 	with None value.
 
