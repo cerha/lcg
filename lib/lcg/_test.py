@@ -58,10 +58,14 @@ class TranslatableText(unittest.TestCase):
         a = lcg.TranslatableText("Hi %s, say hello to %s.", "Joe", "Bob")
         b = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.",
                                  person1="Joe", person2="Bob")
-        c = a.translate(lcg.NullTranslator())
-        d = b.translate(lcg.NullTranslator())
-        assert c == "Hi Joe, say hello to Bob.", c
-        assert d == "Hi Joe, say hello to Bob.", d
+        c0 = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.")
+        c = c0.interpolate(lambda key: '-'+key+'-')
+        a1 = a.translate(lcg.NullTranslator())
+        b1 = b.translate(lcg.NullTranslator())
+        c1 = c.translate(lcg.NullTranslator())
+        assert a1 == "Hi Joe, say hello to Bob.", a1
+        assert b1 == "Hi Joe, say hello to Bob.", b1
+        assert c1 == "Hi -person1-, say hello to -person2-.", c1
         
     def check_addition(self):
         a = lcg.TranslatableText("Version %s", "1.0")
@@ -126,14 +130,20 @@ tests.add(TranslatableText)
 class SelfTranslatableText(unittest.TestCase):
           
     def check_interpolation(self):
-        a = lcg.SelfTranslatableText("Hi %(person1)s, say hello to %(person2)s.",
-                                     person1="Joe", person2="Ann",
-                                     translations={'cs':
-                                                   "Ahoj %(person1)s, pozdravuj %(person2)s."})
+        text = "Hi %(person1)s, say hello to %(person2)s."
+        translations = {'cs': "Ahoj %(person1)s, pozdravuj %(person2)s."}
+        a = lcg.SelfTranslatableText(text, person1="Joe", person2="Ann", translations=translations)
+        a2 = lcg.SelfTranslatableText(text, translations=translations)
+        a3 = a2.interpolate(lambda key: '-'+key+'-')
         b = a.translate(lcg.NullTranslator())
         c = a.translate(lcg.GettextTranslator('cs'))
         assert b == "Hi Joe, say hello to Ann.", b
         assert c == "Ahoj Joe, pozdravuj Ann.", c
+        b2 = a3.translate(lcg.NullTranslator())
+        c2 = a3.translate(lcg.GettextTranslator('cs'))
+        assert b2 == "Hi -person1-, say hello to -person2-.", b2
+        assert c2 == "Ahoj -person1-, pozdravuj -person2-.", c2
+        
         
 tests.add(SelfTranslatableText)
 

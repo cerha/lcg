@@ -1,3 +1,11 @@
+2007-08-27  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py: Added tests for function based variable
+	interpolation.
+
+	* lib/lcg/i18n.py: Added support for variable interpolation using
+	a function.
+
 2007-08-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile: Run cvs update with -dP.

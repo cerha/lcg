@@ -107,9 +107,18 @@ class TranslatableText(Localizable):
 
     
     """
+    _RESERVED_ARGS = ()
+    
+    class _Interpolator(object):
+        def __init__(self, interpole, translate):
+            self._interpole = interpole
+            self._translate = translate
+        def __getitem__(self, key):
+            return self._translate(self._interpole(str(key)))
+    
     def __new__(cls, text, *args, **kwargs):
         values = args or dict([(k,v) for k,v in kwargs.items()
-                               if not k.startswith('_')])
+                               if not k.startswith('_') and not k in cls._RESERVED_ARGS])
         if values:
             text %= values
         return unicode.__new__(cls, text)
@@ -150,21 +159,44 @@ class TranslatableText(Localizable):
         self._init_kwargs(**kwargs)
         assert not args or not self._kwargs, (text, args, self._kwargs)
 
-    def _init_kwargs(self, _transforms=(), _domain=None, _origin='en', **kwargs):
+    def _init_kwargs(self, _transforms=(), _domain=None, _origin='en', _interpolate=None,
+                     **kwargs):
         assert isinstance(_transforms, tuple), _transforms
         assert isinstance(_domain, (str)) or _domain is None, _domain
         assert isinstance(_origin, (str)), _origin
+        assert _interpolate is None or callable(_interpolate), _interpolate
         self._transforms = _transforms
         self._domain = _domain
         self._origin = _origin
+        self._interpolate = _interpolate
         self._kwargs = kwargs
 
+    def _clone_kwargs(self):
+        return dict(self._kwargs, _domain=self._domain, _origin=self._origin,
+                    _transforms=self._transforms, _interpolate=self._interpolate)
+    
+    def _clone(self, **kwargs):
+        kwargs = dict(self._clone_kwargs(), **kwargs)
+        return self.__class__(self._text, *self._args, **kwargs)
+        
     def domain(self):
         """Return the domain name bound to this instance."""
         return self._domain
         
+    def interpolate(self, func):
+        """Return a new TranslatableText instance using given interpolation function.
+
+        The intrpolation is not performed immediately.  It is left to translation time and also
+        translation of the interpolated arguments is performed.  The function passed to this method
+        must take one argument -- the interpolation variable name -- and return a string.  The
+        original instance must be created without any interpolation arguments passed to the
+        constructor if you want to call this method on it.
+
+        """
+        return self._clone(_interpolate=func)
+        
     def replace(self, old, new):
-        """Return a TranslatableText instance which replaces old by new.
+        """Return a new TranslatableText instance which replaces 'old' by 'new'.
 
         This is the analogy of the string method of the same name and
         arguments.  Here the replacement is left after the translation and
@@ -172,9 +204,7 @@ class TranslatableText(Localizable):
 
         """
         transforms = self._transforms + (lambda x: x.replace(old, new),)
-        kwargs = dict(self._kwargs, _transforms=transforms,
-                      _domain=self._domain, _origin=self._origin)
-        return TranslatableText(self._text, *self._args, **kwargs)
+        return self._clone(_transforms=transforms)
 
     def _translate(self, translator):
         return translator.gettext(self._text, domain=self._domain, origin=self._origin)
@@ -204,6 +234,8 @@ class TranslatableText(Localizable):
         result = self._translate(translator)
         if self._args:
             result %= tuple([translate(arg) for arg in self._args])
+        elif self._interpolate:
+            result %= self._Interpolator(self._interpolate, translate)
         elif self._kwargs:
             result %= dict([(k, translate(v)) for k, v in self._kwargs.items()])
         for transform in self._transforms:
@@ -227,11 +259,17 @@ class SelfTranslatableText(TranslatableText):
       translations -- a dictionary of translations keyed by a language code.
 
     """
+    _RESERVED_ARGS = ('translations',)
+    
     def _init_kwargs(self, translations=None, **kwargs):
         assert isinstance(translations, dict), translations
         self._translations = translations
         super(SelfTranslatableText, self)._init_kwargs(**kwargs)
 
+    def _clone_kwargs(self):
+        return dict(super(SelfTranslatableText, self)._clone_kwargs(),
+                    translations=self._translations)
+    
     def _translate(self, translator):
         return self._translations.get(translator.lang(), self._text)
         
@@ -312,7 +350,6 @@ class Concatenation(Localizable):
             of the items.  Thus, sequences behave like being unpacked.  If you
             want to prevent sequences from being unpacked, just pack them into
             a 'Concatenation'.
-            
             
         """
         
