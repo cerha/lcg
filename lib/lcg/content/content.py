@@ -699,7 +699,7 @@ class Title(Content):
         else:
             item = parent.find_section(id)
             if not item:
-                item = parent.find_node(id)
+                item = parent.root().find_node(id)
             if not item:
                 return id
         return item.title()
