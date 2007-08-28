@@ -1,3 +1,8 @@
+2007-08-28  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/i18n.py: Translate also the default text of
+	'SelfTranslatableText' instance.
+
 2007-08-27  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/_test.py: Added tests for function based variable
