@@ -271,7 +271,7 @@ class SelfTranslatableText(TranslatableText):
                     translations=self._translations)
     
     def _translate(self, translator):
-        return self._translations.get(translator.lang(), self._text)
+        return self._translations.get(translator.lang(), translator.translate(self._text))
         
     
 class LocalizableDateTime(Localizable):
