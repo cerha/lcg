@@ -1,5 +1,7 @@
 2007-08-28  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/content/content.py (Title): New class.
+
 	* lib/lcg/i18n.py: Translate also the default text of
 	'SelfTranslatableText' instance.
 

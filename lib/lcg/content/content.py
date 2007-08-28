@@ -218,7 +218,7 @@ class Container(Content):
     _ATTR = None
     _CLASS = None
     _ALLOWED_CONTENT = Content
-    _EXPORT_INLINE = False
+    _EXPORT_INLINE = True
     _CONTENT_SEPARATOR = ''
 
     def __init__(self, content, **kwargs):
@@ -272,11 +272,13 @@ class Container(Content):
 
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
+    _EXPORT_INLINE = False
     _TAG = 'p'
 
     
 class ItemizedList(Container):
     """An itemized list."""
+    _EXPORT_INLINE = False
 
     TYPE_UNORDERED = 'UNORDERED'
     TYPE_ALPHA = 'ALPHA'
@@ -312,19 +314,20 @@ class DefinitionList(Container):
     """A list of definitions."""
     _TAG = 'dl'
     _ALLOWED_CONTENT = Definition
+    _EXPORT_INLINE = False
 Definition._ALLOWED_CONTAINER = DefinitionList
 
     
 class TableCell(Container):
     """One cell in a table."""
     _TAG = 'td'
-    _EXPORT_INLINE = True
 
     
 class TableRow(Container):
     """One row in a table."""
     _TAG = 'tr'
     _ALLOWED_CONTENT = TableCell
+    _EXPORT_INLINE = False
 TableCell._ALLOWED_CONTAINER = TableRow
     
         
@@ -334,6 +337,7 @@ class Table(Container):
     _CLASS = 'lcg-table'
     _ALLOWED_CONTENT = TableRow
     _CONTENT_SEPARATOR = "\n"
+    _EXPORT_INLINE = False
 
     def __init__(self, content, title=None, **kwargs):
         assert title is None or isinstance(title, (str, unicode))
@@ -348,6 +352,7 @@ TableRow._ALLOWED_CONTAINER = Table
     
 class Field(Container):
     """A pair of label and a value for a FieldSet."""
+    _EXPORT_INLINE = False
     
     def __init__(self, label, value):
         super(Field, self).__init__((label, value))
@@ -374,6 +379,7 @@ class SectionContainer(Container):
     method to allow building a global `TableOfContents'.
 
     """
+    _EXPORT_INLINE = False
 
     def __init__(self, content, toc_depth=99, **kwargs):
         """Initialize the instance.
@@ -666,6 +672,37 @@ class Link(Container):
         uri = exporter.uri(self._target)
         g = exporter.generator()
         return g.link(label, uri, title=self._descr(), type=self._type)
+
+
+class Title(Content):
+    """Inline element, which is substituted by the title of the requested item in export time.
+
+    It may not be possible to find out what is the title of the current node or some other element
+    in the time of content construction.  So this symbolic element may be used to refer to the item
+    an it will be simply replaced by the title text in export time.
+
+    The constructor argument 'id' may be used to refer to the required item.  It may be a section
+    id in the current page or an identifier of another node.  The default value (None) refers to
+    the title of the current node.  If the iteme refered by id can not be found, the id itself is
+    used for substitution.
+
+    """
+    def __init__(self, id=None):
+        super(Title, self).__init__()
+        self._id = id
+        
+    def export(self, exporter):
+        id = self._id
+        parent = self.parent()
+        if id is None:
+            item = parent
+        else:
+            item = parent.find_section(id)
+            if not item:
+                item = parent.find_node(id)
+            if not item:
+                return id
+        return item.title()
 
     
 # Convenience functions for simple content construction.
