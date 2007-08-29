@@ -221,7 +221,7 @@ class DocDirReader(DocFileReader):
     source directory.  See the documentation of 'DocRoot' for more information.
 
     """
-    
+
     def _list_dir(self, dir, indexfile='_index.txt'):
         def listdir(dir, exclude=()):
             items = []
@@ -252,27 +252,34 @@ class DocDirReader(DocFileReader):
         children = []
         for name, hidden in self._list_dir(self._dir):
             if name not in (self._id, 'resources'):
-                dir = self._dir
-                if os.path.isfile(self._input_file(name, ext='py')):
-                    import imp
-                    file, path, descr = imp.find_module(name, [dir])
-                    m = imp.load_module(name, file, path, descr)
-                    if hasattr(m, 'IndexNode'):
-                        # Just for backwards compatibility
-                        reader = m.IndexNode
-                    else:
-                        reader = m.Reader
-                else:
-                    subdir = os.path.join(dir, name)
-                    if os.path.isdir(subdir):
-                        dir = subdir
-                        reader = DocDirReader
-                    else:
-                        reader = DocFileReader
-                kwargs = dict(id=name, parent=self, hidden=hidden)
-                if issubclass(reader, FileReader):
-                    kwargs = dict(dir=dir, encoding=self._encoding, **kwargs)
-                children.append(reader(**kwargs))
+                children.append(reader(self._dir, name, encoding=self._encoding,
+                                       hidden=hidden, parent=self, **kwargs))
         return children
 
     
+def reader(dir, name, encoding=None, ext='txt', **kwargs):
+    """Create an instance of sensible reader class for given input directory and document name.
+
+    All the keyword arguments are passed to the reader, if they make sense to it.
+
+    """
+    import imp
+    try:
+        file, path, descr = imp.find_module(name, [dir])
+    except ImportError:
+        subdir = os.path.join(dir, name)
+        if os.path.isdir(subdir):
+            dir = subdir
+            cls = DocDirReader
+        else:
+            cls = DocFileReader
+    else:
+        m = imp.load_module(name, file, path, descr)
+        if hasattr(m, 'IndexNode'):
+            # Just for backwards compatibility
+            cls = m.IndexNode
+        else:
+            cls = m.Reader
+    if issubclass(cls, FileReader):
+        kwargs = dict(kwargs, dir=dir, encoding=encoding, ext=ext)
+    return cls(name, **kwargs)

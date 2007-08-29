@@ -496,7 +496,7 @@ class Section(SectionContainer):
     def backref(self, node):
         # We can allow just one backref target on the page.  Links on other
         # pages are not backreferenced.
-        if node is self.parent() and not self._backref_used:
+        if node is self.parent() and not self._backref_used and config.allow_backref:
             self._backref_used = True
             return self._backref()
         else:
@@ -704,6 +704,10 @@ class Title(Content):
                 return id
         return item.title()
 
+
+class NoneContent(Content):
+    def export(self, exporter):
+        return ''
     
 # Convenience functions for simple content construction.
 
@@ -723,6 +727,7 @@ def coerce(content, formatted=False):
         passed as the 'content' argument.
 
     """
+    assert isinstance(formatted, bool)
     if isinstance(content, (list, tuple)):
         return Container([coerce(item, formatted=formatted)
                           for item in content if item is not None])

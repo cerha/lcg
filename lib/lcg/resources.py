@@ -362,13 +362,17 @@ class _FileResourceProvider(ResourceProvider):
         super(_FileResourceProvider, self).__init__()
         
     def _resource(self, cls, file, fallback=True, **kwargs):
-        dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs]
-        if cls.SHARED:
+        dirs = [issubclass(cls, XResource) and os.path.join(dir, cls.SUBDIR) or dir
+                for dir in self._dirs]
+        if issubclass(cls, XResource) and cls.SHARED:
             dirs = [''] + dirs
         else:
             kwargs = dict(subdir=self._dst_subdir)
         basename, ext = os.path.splitext(file)
-        altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
+        if issubclass(cls, XResource):
+            altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
+        else:
+            altnames = []
         for d in dirs:
             for src_file in [file] + altnames:
                 src_path = os.path.join(d, src_file)

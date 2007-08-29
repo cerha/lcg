@@ -37,11 +37,9 @@ def main():
     if opt is None or len(args) != 2:
         usage(OPTIONS)
     source_dir, destination_dir = args
-
-    reader = lcg.DocDirReader(id=opt['root'], dir=source_dir, ext=opt['ext'],
-                              language=opt['language'],
-                              secondary_language=opt['secondary-language'],
-                              encoding=opt['encoding'])
+    reader = lcg.reader(source_dir, opt['root'], ext=opt['ext'],
+                        language=opt['language'], secondary_language=opt['secondary-language'],
+                        encoding=opt['encoding'])
     doc = reader.build()
     
     if opt['hhp']:
@@ -97,4 +95,10 @@ def usage(optspec):
 
     
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        raise
+    except:
+        import cgitb
+        sys.stderr.write(cgitb.text(sys.exc_info()))

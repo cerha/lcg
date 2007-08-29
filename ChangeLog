@@ -1,3 +1,20 @@
+2007-08-29  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/resources.py (_FileResourceProvider._resource): Handle
+	also new style Resource classes.
+
+	* bin/lcgmake.py: Print detailed tracebacks.  Use the new `reader'
+	function to allow python reader as the root reader.
+
+	* lib/lcg/read.py (reader): New function. 
+	(DocDirReader._create_children): Use it.
+
+	* lib/lcg/config.py (allow_backref): New option.
+
+	* lib/lcg/content/content.py (Section.backref): Check 'config.allow_backref'.
+	(link): Added assertion.
+	(NoneContent): New class.
+
 2007-08-28  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content/content.py (Title): New class.
