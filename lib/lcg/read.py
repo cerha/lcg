@@ -253,11 +253,11 @@ class DocDirReader(DocFileReader):
         for name, hidden in self._list_dir(self._dir):
             if name not in (self._id, 'resources'):
                 children.append(reader(self._dir, name, encoding=self._encoding,
-                                       hidden=hidden, parent=self, **kwargs))
+                                       hidden=hidden, parent=self))
         return children
 
     
-def reader(dir, name, encoding=None, ext='txt', **kwargs):
+def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, **kwargs):
     """Create an instance of sensible reader class for given input directory and document name.
 
     All the keyword arguments are passed to the reader, if they make sense to it.
@@ -267,12 +267,15 @@ def reader(dir, name, encoding=None, ext='txt', **kwargs):
     try:
         file, path, descr = imp.find_module(name, [dir])
     except ImportError:
-        subdir = os.path.join(dir, name)
-        if os.path.isdir(subdir):
-            dir = subdir
+        if parent is None:
             cls = DocDirReader
         else:
-            cls = DocFileReader
+            subdir = os.path.join(dir, name)
+            if os.path.isdir(subdir):
+                dir = subdir
+                cls = DocDirReader
+            else:
+                cls = DocFileReader
     else:
         m = imp.load_module(name, file, path, descr)
         if hasattr(m, 'IndexNode'):
@@ -281,5 +284,7 @@ def reader(dir, name, encoding=None, ext='txt', **kwargs):
         else:
             cls = m.Reader
     if issubclass(cls, FileReader):
-        kwargs = dict(kwargs, dir=dir, encoding=encoding, ext=ext)
-    return cls(name, **kwargs)
+        kwargs = dict(kwargs, dir=dir, encoding=encoding)
+        if issubclass(cls, DocFileReader):
+            kwargs['ext'] = ext
+    return cls(name, parent=parent, **kwargs)
