@@ -26,29 +26,27 @@ _ = TranslatableTextFactory('lcg')
 class HtmlGenerator(Generator):
 
     def _attr(self, *pairs):
-        attributes = []
+        result = ''
         for attr, value in pairs:
-            if value is None:
+            if value is None or value is False:
                 continue
-            elif isinstance(value, types.BooleanType):
-                if not value:
-                    continue
-                string = attr
+            elif value is True:
+                result += ' ' + attr
             else:
                 if isinstance(value, int):
                     value = str(value)
-                string = concat(attr+'="', value, '"')
-            attributes.append(concat(' ', string))
-        return concat(*attributes)
+                result += ' ' + attr + '="' + value + '"'
+        return result
      
     def _tag(self, tag, attr, content, newlines=False):
-        start = concat('<'+tag, self._attr(*attr), '>')
-        end = '</%s>' % tag
+        start = '<' + tag + self._attr(*attr) + '>'
+        end = '</' + tag + '>'
+        separator = newlines and "\n" or ""
         if isinstance(content, (types.ListType, types.TupleType)):
             result = (start,) + tuple(content) + (end,)
         else:
             result = (start, content, end)
-        return concat(result, separator=(newlines and "\n" or ""))
+        return concat(result, separator=separator)
      
     def _input(self, type, name=None, value=None, title=None, id=None,
                tabindex=None, onclick=None, size=None, maxlength=None,
@@ -77,26 +75,13 @@ class HtmlGenerator(Generator):
     # Generic constructs
      
     def h(self, title, level=2):
-        return concat('<h%d>' % level, title, '</h%d>' % level)
+        return self._tag('h%d' % level, (), title)
         
     def strong(self, text, cls=None, id=None, lang=None):
-        attr = (('class', cls),
-                ('lang', lang),
-                ('id', id))
-        return self._tag('strong', attr, text)
+        return self._tag('strong', (('class', cls), ('lang', lang), ('id', id)), text)
      
     def pre(self, text, cls=None):
         return self._tag('pre', (('class', cls),), text)
-     
-    def p(self, *content, **kwargs):
-        return self._tag('p', (('class', kwargs.get('cls')),), content,
-                         newlines=True)
-     
-    def br(self, cls=None):
-        return concat('<br', self._attr(('class', cls),), '/>')
-     
-    def hr(self, cls=None):
-        return concat('<hr', self._attr(('class', cls),), '/>')
      
     def sup(self, text, cls=None):
         return self._tag('sup', (('class', cls),), text)
@@ -104,6 +89,15 @@ class HtmlGenerator(Generator):
     def sub(self, text, cls=None):
         return self._tag('sub', (('class', cls),), text)
     
+    def p(self, *content, **kwargs):
+        return self._tag('p', (('class', kwargs.get('cls')),), content, newlines=True)
+     
+    def br(self, cls=None):
+        return concat('<br', self._attr(('class', cls),), '/>')
+     
+    def hr(self, cls=None):
+        return concat('<hr', self._attr(('class', cls),), '/>')
+     
     def link(self, label, uri, name=None, title=None, target=None, cls=None,
              hotkey=None, type=None):
         if hotkey and title:
@@ -125,8 +119,7 @@ class HtmlGenerator(Generator):
         items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
         return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">")
      
-    def img(self, src, alt='', width=None, height=None, align=None,
-            descr=None, cls=None):
+    def img(self, src, alt='', width=None, height=None, align=None, descr=None, cls=None):
         attr = (('src', src),
                 ('alt', alt),
                 ('longdesc', descr),
@@ -136,7 +129,7 @@ class HtmlGenerator(Generator):
                 ('border', 0),
                 ('class', cls),
                 )
-        return concat('<img', self._attr(*attr), ' />')
+        return '<img' + self._attr(*attr) + ' />'
 
     def escape(self, text):
         from xml.sax import saxutils
@@ -145,15 +138,12 @@ class HtmlGenerator(Generator):
     # HTML specific...
     
     def span(self, text, cls=None, id=None, lang=None, style=None):
-        attr = (('id', id),
-                ('lang', lang),
-                ('class', cls),
-                ('style', style))
+        attr = (('id', id), ('lang', lang), ('class', cls), ('style', style))
         return self._tag('span', attr, text)
      
     def div(self, content, id=None, cls=None, lang=None):
-        args = (('class', cls), ('id', id), ('lang', lang))
-        return self._tag('div', args, content, newlines=True)
+        attr = (('class', cls), ('id', id), ('lang', lang))
+        return self._tag('div', attr, content, newlines=True)
      
     def map(self, content, name=None, title=None, lang=None, id=None, cls=None):
         args = (('name', name), ('title', title), ('lang', lang), ('id', id), ('class', cls))
@@ -258,12 +248,11 @@ class HtmlGenerator(Generator):
     # JavaScript code generation.
      
     def script(self, code, noscript=None):
-        noscript = noscript and \
-                   concat('<noscript>', noscript, '</noscript>') or ''
+        noscript = noscript and ('<noscript>' + noscript + '</noscript>') or ''
         if code:
-            code = concat('<!--\n', code, ' //-->\n')
-        return concat('<script type="text/javascript" language="Javascript">',
-                      code, '</script>', noscript)
+            code = '<!--\n' + code + ' //-->\n'
+        return '<script type="text/javascript" language="Javascript">' + \
+                   code + '</script>' + noscript
      
     def script_write(self, content, noscript=None, condition=None):
         #return content
@@ -271,16 +260,16 @@ class HtmlGenerator(Generator):
         if content:
             c = content.replace('"','\\"').replace("'","\\'")
             c = c.replace('</', '<\\/').replace('\n','\\n')
-            content = concat('document.write("', c, '");')
+            content = 'document.write("' + c + '");'
             if condition:
-                content = concat('if (', condition, ') ', content)
+                content = 'if (' + condition + ') ' + content
         return self.script(content, noscript)
      
     def js_value(self, var):
         if isinstance(var, types.StringTypes):
             return "'" + var.replace("'", "\\'") + "'"
         elif isinstance(var, (TranslatableText, Concatenation)):
-            return concat("'", var.replace("'", "\\'"), "'")
+            return "'" + var.replace("'", "\\'") + "'"
         elif isinstance(var, types.IntType):
             return str(var)
         elif isinstance(var, (types.ListType, types.TupleType)):
