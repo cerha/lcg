@@ -39,7 +39,7 @@ class ContentNode(object):
 
     def __init__(self, id, title=None, brief_title=None, descr=None, language=None,
                  secondary_language=None, language_variants=(), content=None, children=(),
-                 hidden=False, resource_provider=None):
+                 hidden=False, active=True, resource_provider=None):
         """Initialize the instance.
 
         Arguments:
@@ -72,7 +72,11 @@ class ContentNode(object):
             
           hidden -- a boolean flag indicating, that this node should not appear in the
             automatically generated Indexes (Tables of Contents).  Such a node will usually be
-            referenced explicitely.
+            refered explicitely.
+
+          active -- a boolean flag indicating, that this node is active.  Usage of this flag may be
+            application specific and there is currently no difference in behavior of LCG in respect
+            to this flag, except for marking the links by css class 'inactive' on export.
 
           resource_provider -- a 'ResourceProvider' instance or None.  This provider handles
             all resources used within this node.
@@ -81,6 +85,7 @@ class ContentNode(object):
         """
         assert isinstance(id, str), repr(id)
         assert isinstance(hidden, bool), hidden
+        assert isinstance(active, bool), active
         assert language is None or isinstance(language, str) and \
                len(language) == 2, repr(language)
         assert secondary_language is None or \
@@ -93,6 +98,7 @@ class ContentNode(object):
         self._brief_title = brief_title or title
         self._descr = descr
         self._hidden = hidden
+        self._active = active
         self._language = language
         self._secondary_language = secondary_language
         current_language = self.current_language_variant()
@@ -151,6 +157,10 @@ class ContentNode(object):
     def hidden(self):
         """Return True if this is a hidden node (should not appear in TOC)."""
         return self._hidden
+        
+    def active(self):
+        """Return the value of the 'active' flag as passed in the constructor.."""
+        return self._active
         
     def children(self):
         """Return the list of all subordinate nodes as a tuple."""

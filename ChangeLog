@@ -1,3 +1,12 @@
+2007-09-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/nodes.py (ContentNode): Added the `active' flag.
+
+	* lib/lcg/content/content.py (NodeIndex): Use `inactive' css class
+	for inactive nodes.
+
+	* lib/lcg/export/html.py: Misc. optimizations.
+
 2007-08-31  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/read.py: Fixed bugs in latest chenges.

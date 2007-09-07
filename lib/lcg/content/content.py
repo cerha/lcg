@@ -588,8 +588,13 @@ class NodeIndex(Content):
         for i in items:
             uri = exporter.uri(i, relative_to=parent)
             name = isinstance(i, Section) and i.backref(parent) or None
-            title = isinstance(i, ContentNode) and i.descr() or None
             cls = i is current and 'current' or None
+            if isinstance(i, ContentNode):
+                title = i.descr()
+                if not i.active():
+                    cls = (cls and cls + ' ' or '') + 'inactive'
+            else:
+                title = None
             links.append(g.link(i.title(), uri, title=title, name=name, cls=cls) + \
                          self._make_toc(exporter, i, indent=indent+4, depth=depth-1))
         return concat("\n", g.list(links, indent=indent), "\n", ' '*(indent-2))
