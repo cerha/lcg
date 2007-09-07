@@ -5,7 +5,8 @@
 	* lib/lcg/content/content.py (NodeIndex): Use `inactive' css class
 	for inactive nodes.
 
-	* lib/lcg/export/html.py: Misc. optimizations.
+	* lib/lcg/export/html.py: Misc. optimizations.  
+	(fieldset): Argument order changed.
 
 2007-08-31  Tomas Cerha  <cerha@brailcom.org>
 

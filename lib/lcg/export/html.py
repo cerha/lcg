@@ -164,9 +164,8 @@ class HtmlGenerator(Generator):
                 ('enctype', enctype), ('class', cls))
         return self._tag('form', attr, content, newlines=True)
      
-    def fieldset(self, content, legend=None, cls=None):
-        if legend:
-            content = (self._tag('legend', (), legend),) + tuple(content)
+    def fieldset(self, legend, content, cls=None):
+        content = (self._tag('legend', (), legend or ''),) + tuple(content)
         return self._tag('fieldset', (('class', cls),), content, newlines=True)
      
     def label(self, text, id, lang=None, cls=None):
@@ -498,7 +497,8 @@ class HtmlExporter(Exporter):
         #                          selected=self._current.url()),
         #                 g.button(_('Switch'), handler)),
         #                cls='language-selection')
-        #radio = g.fieldset([g.radio('language', value=t.url(), id=tid,
+        #radio = g.fieldset(self._label,
+        #                   [g.radio('language', value=t.url(), id=tid,
         #                            onclick="location.href = this.value",
         #                            checked=(self._current.url()==t.url())
         #                            ) + \
@@ -506,7 +506,7 @@ class HtmlExporter(Exporter):
         #                    for t, tid, flag in
         #                    [(t, t.url().replace('.','-'), f)
         #                     for t, f in zip(self._targets, self._flags)]],
-        #                   legend=self._label, cls='language-selection')
+        #                   cls='language-selection')
         if len(node.language_variants()) <= 1:
             return None
         current = node.current_language_variant()
@@ -538,11 +538,11 @@ class HtmlExporter(Exporter):
         else:
             hack = ''
         lines = (self.DOCTYPE, '',
-                 '<html>',
+                 '<html lang="%s">' % node.language(),
                  '<head>',
                  self._head(node),
                  '</head>',
-                 '<body lang="%s">' % node.language(),
+                 '<body>',
                  self._parts(node, self._BODY_PARTS) + hack,
                  '</body>',
                  '</html>')
