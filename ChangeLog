@@ -1,3 +1,8 @@
+2007-09-11  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/export.py (MarkupFormatter._markup_handler):
+	Don't perform translation here.
+
 2007-09-07  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/nodes.py (ContentNode): Added the `active' flag.

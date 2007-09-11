@@ -108,7 +108,7 @@ class MarkupFormatter(object):
             # This can be end markup, which was not opened or start markup,
             # which was already opened.
             result = markup
-        return prefix + self._exporter.translate(result)
+        return prefix + result
 
     def _formatter(self, parent, type, groups, close=False):
         try:
@@ -120,8 +120,7 @@ class MarkupFormatter(object):
         
     def format(self, parent, text):
         self._open = []
-        result = re.sub(self._rules, lambda match:
-                        self._markup_handler(parent, match), text)
+        result = re.sub(self._rules, lambda match: self._markup_handler(parent, match), text)
         self._open.reverse()
         x = self._open[:]
         for type in x:
