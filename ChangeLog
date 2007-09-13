@@ -1,3 +1,7 @@
+2007-09-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlGenerator.noscript): New method.
+
 2007-09-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/parse.py: Tolerate whitespace at the end of definition

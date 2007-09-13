@@ -247,11 +247,14 @@ class HtmlGenerator(Generator):
     # JavaScript code generation.
      
     def script(self, code, noscript=None):
-        noscript = noscript and ('<noscript>' + noscript + '</noscript>') or ''
+        noscript = noscript and self.noscript(noscript) or ''
         if code:
             code = '<!--\n' + code + ' //-->\n'
         return '<script type="text/javascript" language="Javascript">' + \
                    code + '</script>' + noscript
+    
+    def noscript(self, content):
+        return self._tag('noscript', (), content)
      
     def script_write(self, content, noscript=None, condition=None):
         #return content
