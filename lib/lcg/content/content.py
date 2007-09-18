@@ -680,8 +680,6 @@ class Link(Container):
     
     def export(self, exporter):
         label = concat(self._exported_content(exporter))
-        if isinstance(label, Concatenation):
-            log("***", label, label.items()[0]._translations)
         uri = exporter.uri(self._target)
         g = exporter.generator()
         return g.link(label, uri, title=self._descr(), type=self._type)
