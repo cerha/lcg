@@ -589,15 +589,21 @@ class NodeIndex(Content):
             uri = exporter.uri(i, relative_to=parent)
             name = isinstance(i, Section) and i.backref(parent) or None
             cls = i is current and 'current' or None
+            descr = None
             if isinstance(i, ContentNode):
-                title = i.descr()
+                descr = i.descr()
                 if not i.active():
                     cls = (cls and cls + ' ' or '') + 'inactive'
-            else:
-                title = None
-            links.append(g.link(i.title(), uri, title=title, name=name, cls=cls) + \
+            links.append(g.link(i.title(), uri, title=descr, name=name, cls=cls) + \
+                         #(descr is not None and (' ... ' + descr) or '-') + \
                          self._make_toc(exporter, i, indent=indent+4, depth=depth-1))
         return concat("\n", g.list(links, indent=indent), "\n", ' '*(indent-2))
+
+
+class RootIndex(NodeIndex):
+    
+    def _start_item(self):
+        return self.parent().root()
 
     
 class TableOfContents(NodeIndex):
@@ -674,6 +680,8 @@ class Link(Container):
     
     def export(self, exporter):
         label = concat(self._exported_content(exporter))
+        if isinstance(label, Concatenation):
+            log("***", label, label.items()[0]._translations)
         uri = exporter.uri(self._target)
         g = exporter.generator()
         return g.link(label, uri, title=self._descr(), type=self._type)
