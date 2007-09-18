@@ -62,8 +62,7 @@ class ContentNode(object):
             639-1 Alpha-2 language code.
             
           language_variants -- a sequence of all available language variants of this node.  The
-            sequence contains language codes as strings.  The current language variant is added
-            automatically to the list if it is not already there.
+            sequence contains language codes as strings.  
 
           content -- a content element hierarchy.  This is the actual content of this node.  The
             value can be a `Content' instance or a sequence of `Content' instances.
@@ -101,9 +100,6 @@ class ContentNode(object):
         self._active = active
         self._language = language
         self._secondary_language = secondary_language
-        current_language = self.current_language_variant()
-        if current_language and current_language not in language_variants:
-            language_variants += (current_language,)
         self._language_variants = tuple(language_variants)
         if isinstance(content, (tuple, list)):
             content = SectionContainer(content)
