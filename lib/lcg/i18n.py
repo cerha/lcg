@@ -413,9 +413,7 @@ class Concatenation(Localizable):
         input are plain strings, a plain string is returned.
         
         """
-        assert isinstance(translator, Translator)
-        translated = [translator.translate(item) for item in self._items]
-        return ''.join(translated)
+        return ''.join([translator.translate(item) for item in self._items])
 
 
 class Translator(object):
@@ -465,8 +463,7 @@ class Translator(object):
         """
         if isinstance(text, (Concatenation, TranslatableText)):
             return text.translate(self)
-        elif isinstance(text, LocalizableDateTime) \
-                 and self._datetime_formats is not None:
+        elif isinstance(text, LocalizableDateTime) and self._datetime_formats is not None:
             return text.format(**self._datetime_formats)
         else:
             return text
