@@ -1,3 +1,15 @@
+2007-09-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content/content.py (RootIndex): New class.
+
+	* lib/lcg/export/export.py (MarkupFormatter.format): Preserve
+	translatable text instances within formatter output.
+
+	* lib/lcg/export/html.py (HtmlGenerator.select): New argument `title'.
+
+	* lib/lcg/nodes.py (ContentNode.__init__): Don't add current language to
+	`language_variants'.
+
 2007-09-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator.noscript): New method.

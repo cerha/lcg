@@ -120,12 +120,17 @@ class MarkupFormatter(object):
         
     def format(self, parent, text):
         self._open = []
-        result = re.sub(self._rules, lambda match: self._markup_handler(parent, match), text)
+        result = []
+        pos = 0
+        for match in self._rules.finditer(text):
+            result.extend((text[pos:match.start()], self._markup_handler(parent, match)))
+            pos = match.end()
+        result.append(text[pos:])
         self._open.reverse()
         x = self._open[:]
         for type in x:
-            result += self._formatter(parent, type, {}, close=True)
-        return result
+            result.append(self._formatter(parent, type, {}, close=True))
+        return concat(result)
 
 
 
