@@ -204,18 +204,14 @@ class HtmlGenerator(Generator):
         else:
             return self._tag('button', attr + (('value', value),) , label)
             
-     
-    def select(self, name, options, onchange=None, selected=None, id=None,
+    def select(self, name, options, onchange=None, selected=None, id=None, title=None,
                disabled=False, readonly=False):
         assert selected is None or \
                selected in [value for text, value in options], \
                (selected, options)
-        opts = [self._tag('option',
-                          (('value', value),
-                           ('selected', (value == selected))),
-                          text)
+        opts = [self._tag('option', (('value', value), ('selected', (value == selected))), text)
                 for text, value in options]
-        attr = (('name', name), ('id', id), ('onchange', onchange),
+        attr = (('name', name), ('id', id), ('title', title), ('onchange', onchange),
                 ('disabled', disabled), ('readonly', readonly))
         return self._tag('select', attr, opts, newlines=True)
      
