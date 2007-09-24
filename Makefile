@@ -35,19 +35,21 @@ $(SHARE)/lcg:
 cvs-install: compile translations link-lib link-bin link-share
 
 link-lib:
+	@if [ -d $(LIB)/lcg ]; then echo "$(LIB)/lcg already exists!"; \
+	else echo "Linking LCG libraries to $(LIB)/lcg"; \
+	ln -s $(CURDIR)/lib/lcg $(LIB)/lcg; fi
+
+link-bin:
 	@if [ -f $(BIN)/lcg-make ]; then echo "$(BIN)/lcg-make already exists!"; \
 	else echo "Linking LCG make to $(BIN)/lcg-make"; \
 	ln -s $(CURDIR)/bin/lcgmake.py $(BIN)/lcg-make; fi
-
-link-bin:
-	@if [ -d $(LIB)/lcg ]; then echo "$(LIB)/lcg already exists!"; \
-	else echo "Linking LCG libraries to $(LIB)/lcg"; ln -s $(CURDIR)/lib/lcg $(LIB)/lcg; fi
 
 link-share: link-share-doc link-share-translations link-share-resources
 
 link-share-%: $(SHARE)/lcg
 	@if [ -d $(SHARE)/lcg/$* ]; then echo "$(SHARE)/lcg/$* already exists!"; \
-	else echo "Linking $* to $(SHARE)/lcg"; ln -s $(CURDIR)/$* $(SHARE)/lcg; fi
+	else echo "Linking $* to $(SHARE)/lcg"; \
+	ln -s $(CURDIR)/$* $(SHARE)/lcg; fi
 
 cvs-update: do-cvs-update compile translations
 
