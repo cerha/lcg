@@ -131,6 +131,9 @@ class HtmlGenerator(Generator):
                 )
         return '<img' + self._attr(*attr) + ' />'
 
+    def abbr(self, term, title=None):
+        return self._tag('abbr', (('title', title),), term)
+
     def escape(self, text):
         from xml.sax import saxutils
         return saxutils.escape(text)
