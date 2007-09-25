@@ -1,8 +1,10 @@
-# You may edit the paths below to suit your needs.
-LIB = /usr/local/lib/python2.4/site-packages
+# Edit the paths below to suit your needs.
+LIB = /usr/local/lib/python%d.%d/site-packages
 SHARE = /usr/local/share
 BIN = /usr/local/bin
 
+lib := $(shell python -c 'import sys; print "$(LIB)".find("%d") != -1 and \
+	                 "$(LIB)" % sys.version_info[:2] or "$(LIB)"')
 
 .PHONY: translations doc test
 
@@ -19,25 +21,29 @@ tags:
 	rm -f TAGS
 	find -name '*.py' -not -name '_test.py' | xargs etags --append --regex='/^[ \t]+def[ \t]+\([a-zA-Z_0-9]+\)/\1/'
 
-install: $(SHARE)/lcg
+check-lib:
+	@echo -e "import sys\nif '$(lib)' not in sys.path: sys.exit(1)" \
+	| python || echo 'WARNING: $(lib) not in Python path!'
+
+install: check-lib $(SHARE)/lcg
 	cp -ruv doc resources translations $(SHARE)/lcg
-	cp -ruv lib/lcg $(LIB)
+	cp -ruv lib/lcg $(lib)
 	cp -u bin/lcgmake.py $(BIN)/lcgmake
 
 uninstall:
 	rm -rf $(SHARE)/lcg
-	rm -rf $(LIB)/lcg
+	rm -rf $(lib)/lcg
 	cp -f $(BIN)/lcgmake
 
 $(SHARE)/lcg:
 	mkdir $(SHARE)/lcg
 
-cvs-install: compile translations link-lib link-bin link-share
+cvs-install: check-lib compile translations link-lib link-bin link-share
 
 link-lib:
-	@if [ -d $(LIB)/lcg ]; then echo "$(LIB)/lcg already exists!"; \
-	else echo "Linking LCG libraries to $(LIB)/lcg"; \
-	ln -s $(CURDIR)/lib/lcg $(LIB)/lcg; fi
+	@if [ -d $(lib)/lcg ]; then echo "$(lib)/lcg already exists!"; \
+	else echo "Linking LCG libraries to $(lib)/lcg"; \
+	ln -s $(CURDIR)/lib/lcg $(lib)/lcg; fi
 
 link-bin:
 	@if [ -f $(BIN)/lcg-make ]; then echo "$(BIN)/lcg-make already exists!"; \
