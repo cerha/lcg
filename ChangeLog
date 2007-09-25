@@ -1,5 +1,7 @@
 2007-09-25  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/export/html.py (HtmlGenerator.abbr): New method.
+
 	* Makefile: Check python path before installation.
 
 2007-09-24  Tomas Cerha  <cerha@brailcom.org>
