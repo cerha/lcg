@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-07 21:03+0200\n"
+"POT-Creation-Date: 2007-09-26 08:51+0200\n"
 "PO-Revision-Date: 2007-06-25 10:31+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Norwegian <no@li.org>\n"
@@ -15,26 +15,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/content/content.py:403
+#: ../lib/lcg/content/content.py:409
 msgid "Index:"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:410
+#: ../lib/lcg/export/html.py:406
 msgid "Choose your language:"
 msgstr "Velg språk:"
 
-#: ../lib/lcg/export/html.py:637
+#: ../lib/lcg/export/html.py:635
 msgid "None"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:638
+#: ../lib/lcg/export/html.py:636
 msgid "You are here:"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:640
+#: ../lib/lcg/export/html.py:638
 msgid "Next"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:641
+#: ../lib/lcg/export/html.py:639
 msgid "Previous"
 msgstr ""
