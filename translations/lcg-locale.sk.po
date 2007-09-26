@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "POT-Creation-Date: 2007-06-25 09:34+0200\n"
-"PO-Revision-Date: 2007-06-25 10:32+0200\n"
+"PO-Revision-Date: 2007-09-26 10:29+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -97,9 +97,8 @@ msgid "Slovak"
 msgstr "slovenèina"
 
 #: ../lib/lcg/util.py:249
-#, fuzzy
 msgid "Slovenian"
-msgstr "slovenèina"
+msgstr ""
 
 #: ../lib/lcg/util.py:251
 msgid "Swedish"
@@ -127,7 +126,7 @@ msgstr "Po"
 
 #: ../lib/lcg/util.py:279
 msgid "Tue"
-msgstr "Ut"
+msgstr "Út"
 
 #: ../lib/lcg/util.py:279
 msgid "Wed"

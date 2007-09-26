@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-07 21:03+0200\n"
-"PO-Revision-Date: 2007-08-07 21:10+0200\n"
+"POT-Creation-Date: 2007-09-26 08:51+0200\n"
+"PO-Revision-Date: 2007-09-26 10:26+0200\n"
 "Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,29 +16,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # The table of contents...
-#: ../lib/lcg/content/content.py:403
+#: ../lib/lcg/content/content.py:409
 msgid "Index:"
 msgstr "Verzeichnis:"
 
-#: ../lib/lcg/export/html.py:410
+#: ../lib/lcg/export/html.py:406
 msgid "Choose your language:"
-msgstr "Sprache wählen"
+msgstr "Sprache wählen:"
 
 # This label is actually not used.
-#: ../lib/lcg/export/html.py:637
+#: ../lib/lcg/export/html.py:635
 msgid "None"
 msgstr "Nichts"
 
-#: ../lib/lcg/export/html.py:638
+#: ../lib/lcg/export/html.py:636
 msgid "You are here:"
 msgstr "Sie sind hier:"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:640
+#: ../lib/lcg/export/html.py:638
 msgid "Next"
 msgstr "weiter"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:641
+#: ../lib/lcg/export/html.py:639
 msgid "Previous"
 msgstr "vorhergehend"
