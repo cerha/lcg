@@ -608,17 +608,35 @@ def source_files_by_domain(basedir, domain=None):
         return files
     else:
         result = []
+        import imp, lcg
         for filename in files:
             name = os.path.splitext(os.path.basename(filename))[0]
             path = os.path.dirname(filename)
-            import imp
             file, pathname, descr = imp.find_module(name, [path])
             module = imp.load_module(name, file, pathname, descr)
             if module.__dict__.has_key('_'):
                 x = module.__dict__['_']
-                if x.domain() == domain:
+                if isinstance(x, lcg.TranslatableTextFactory) and x.domain() == domain:
                     result.append(filename)
         return result
 
 if __name__ == '__main__':
-    print " ".join(source_files_by_domain(*sys.argv[1:]))
+    """Get the list of all Python source files within a directory:
+
+      python -m lcg/i18n directory
+
+    Get the list of all source files which define the '_' operator as a 'TranslatableTextFactory'
+    for a particular domain:
+
+      python -m lcg/i18n directory domain
+
+    This is mainly useful for generating Makefile dependencies.  See 'source_files_by_domain()' for
+    more details.
+
+    """
+    assert len(sys.argv) in (2, 3), \
+           "Usage: python -m lcg/i18n directory [domain]"
+    directory = sys.argv[1]
+    domain = len(sys.argv) == 3 and sys.argv[2] or None
+    sys.path.append(directory)
+    print " ".join(source_files_by_domain(directory, domain=domain))

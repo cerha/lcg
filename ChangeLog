@@ -1,3 +1,8 @@
+2007-09-26  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/i18n.py: Make the module executable by 
+	`python -m lcg/i18n ...'
+
 2007-09-25  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator.abbr): New method.
