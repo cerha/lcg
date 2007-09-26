@@ -60,7 +60,7 @@ link-share-%: $(SHARE)/lcg
 cvs-update: do-cvs-update compile translations
 
 do-cvs-update:
-	cvs update -dP
+	cvs update -dPC
 
 version = $(shell echo 'import lcg; print lcg.__version__' | python)
 dir = lcg-$(version)

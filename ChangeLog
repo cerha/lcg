@@ -2,7 +2,8 @@
 
 	* translations/Makefile: Get source files using 
 	`python -m lcg/i18n ...'
-
+	(cvs-update): Overwrite locally modified files.
+	
 	* lib/lcg/i18n.py: Make the module executable by 
 	`python -m lcg/i18n ...'
 
