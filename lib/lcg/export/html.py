@@ -134,6 +134,20 @@ class HtmlGenerator(Generator):
     def abbr(self, term, title=None):
         return self._tag('abbr', (('title', title),), term)
 
+    def th(self, content, colspan=None, width=None, align=None, valign=None, cls=None, style=None):
+        attr = (('colspan', colspan), ('width', width), ('align', align), ('vlign', align),
+                ('class', cls), ('style', style))
+        return self._tag('th', attr, content)
+    
+    def td(self, content, colspan=None, width=None, align=None, valign=None, cls=None, style=None):
+        attr = (('colspan', colspan), ('width', width), ('align', align), ('vlign', align),
+                ('class', cls), ('style', style))
+        return self._tag('td', attr, content)
+    
+    def tr(self, content, cls=None, style=None):
+        attr = (('class', cls), ('style', style))
+        return self._tag('tr', attr, content)
+
     def escape(self, text):
         from xml.sax import saxutils
         return saxutils.escape(text)
