@@ -294,12 +294,3 @@ def language_name(code):
     except KeyError:
         return code
 
-def datetime_formats(translator):
-    tt = TranslatableTextFactory('lcg-locale')
-    def _(x):
-        return tt(x).translate(translator)
-    return {'date': str(_('%Y-%m-%d')),
-            'time': str(_('%H:%M')),
-            'exact_time': str(_('%H:%M:%S')),
-            'weekdays': (_('Mon'), _('Tue'), _('Wed'), _('Thu'), _('Fri'),
-                         _('Sat'), _('Sun'))}

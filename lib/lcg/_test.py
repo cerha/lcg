@@ -154,13 +154,13 @@ class LocalizableDateTime(unittest.TestCase):
         d2 = lcg.LocalizableDateTime("2006-12-21 02:43", show_time=False)
         d3 = lcg.LocalizableDateTime("2006-12-21 02:43")
         d4 = lcg.LocalizableDateTime("2006-12-21 18:43:32", show_weekday=True)
-        f = d1.format("%d.%m.%Y")
+        f = d1.format(lcg.GettextTranslator('cs').locale_data())
         assert f == "21.12.2006", f
-        formats = lcg.datetime_formats(lcg.GettextTranslator('en'))
-        f1 = d1.format(**formats)
-        f2 = d2.format(**formats)
-        f3 = d3.format(**formats)
-        f4 = d4.format(**formats)
+        data = lcg.GettextTranslator('en').locale_data()
+        f1 = d1.format(data)
+        f2 = d2.format(data)
+        f3 = d3.format(data)
+        f4 = d4.format(data)
         assert f1 == "12/21/2006", f1
         assert f2 == "12/21/2006", f2
         assert f3 == "12/21/2006 02:43 AM", f3

@@ -1,3 +1,18 @@
+2007-10-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py (LocalizableDateTime.check_format): Updated.
+
+	* lib/lcg/util.py (datetime_formats): Function removed.
+
+	* lib/lcg/i18n.py 
+	(LocaleData): New class.
+	(Translator.locale_data): New method.
+	(Translator.translate): Pass locale data to `format()'.
+	(Translator.__init__): Initialize locale data, not `datetime_formats'.
+	(LocalizableDateTime.format): Use locale data, not `datetime_formats'.
+
+	(format): Expect Loc
+
 2007-10-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator.th, HtmlGenerator.td)

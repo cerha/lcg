@@ -73,7 +73,6 @@ class Localizable(unicode):
         'TranslatableText' or 'Concatenation' instances.
 
     """
-
     def __add__(self, other):
         if not isinstance(other, (str, unicode)):
             return NotImplemented
@@ -297,18 +296,16 @@ class LocalizableDateTime(Localizable):
         self._show_time = show_time is None and len(numbers) > 3 or show_time
         self._show_seconds = len(numbers) > 5
     
-    def format(self, date='%Y-%m-%d', time='%H:%M', exact_time='%H:%M:%S',
-               weekdays=('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')):
-        format = date
+    def format(self, data):
+        format = data.date_format
         if self._show_time:
-            tf = self._show_seconds and exact_time or time
-            format += ' ' + tf
+            format += ' '+ (self._show_seconds and data.exact_time_format or data.time_format)
         result = self._datetime.strftime(format)
         if self._show_weekday:
-            result = weekdays[self._datetime.weekday()] + ' ' + result
+            result = data.weekdays[self._datetime.weekday()] + ' ' + result
         return result
 
-    
+
 class Concatenation(Localizable):
     """A concatenation of translatable and untranslatable text elements.
 
@@ -431,7 +428,7 @@ class Translator(object):
 
     """
     def __init__(self):
-        self._datetime_formats = datetime_formats(self)
+        self._locale_data = LocaleData(self)
         
     def lang(self):
         """Return the target language of this translator."""
@@ -451,6 +448,9 @@ class Translator(object):
         """
         pass
 
+    def locale_data(self):
+        return self._locale_data
+
     def translate(self, text):
         """Return the translation of given translatable.
 
@@ -463,8 +463,8 @@ class Translator(object):
         """
         if isinstance(text, (Concatenation, TranslatableText)):
             return text.translate(self)
-        elif isinstance(text, LocalizableDateTime) and self._datetime_formats is not None:
-            return text.format(**self._datetime_formats)
+        elif isinstance(text, Localizable):
+            return text.format(self._locale_data)
         else:
             return text
 
@@ -534,8 +534,37 @@ class GettextTranslator(Translator):
         except KeyError:
             t = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
         return t.ugettext(text)
-        
+
     
+_ = TranslatableTextFactory('lcg-locale')
+
+class LocaleData(object):
+    date_format = _('%Y-%m-%d')
+    time_format = _('%H:%M')
+    exact_time_format = _('%H:%M:%S')
+    weekdays = (_('Mon'), _('Tue'), _('Wed'), _('Thu'), _('Fri'), _('Sat'), _('Sun'))
+    negative_sign = '-'
+    positive_sign = ''
+    decimal_point = '.'
+    thousands_sep = ','
+    grouping = (3,)
+    mon_decimal_point = None
+    mon_thousands_sep = None 
+    mon_grouping = None
+ 
+    def __init__(self, translator):
+        self.date_format = str(translator.translate(self.date_format))
+        self.time_format = str(translator.translate(self.time_format))
+        self.exact_time_format = str(translator.translate(self.exact_time_format))
+        self.weekdays = tuple([translator.translate(day) for day in self.weekdays])
+        if self.mon_decimal_point is None:
+            self.mon_decimal_point = self.decimal_point
+        if self.mon_thousands_sep is None:
+            self.mon_thousands_sep = self.thousands_sep
+        if self.mon_grouping is None:
+            self.mon_grouping = self.grouping
+            
+
 def concat(*args, **kwargs):
     """Concatenate the 'args' into a 'Concatenation' or a string.
 
@@ -619,6 +648,7 @@ def source_files_by_domain(basedir, domain=None):
                 if isinstance(x, lcg.TranslatableTextFactory) and x.domain() == domain:
                     result.append(filename)
         return result
+
 
 if __name__ == '__main__':
     """Get the list of all Python source files within a directory:
