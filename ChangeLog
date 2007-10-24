@@ -1,3 +1,12 @@
+2007-10-24  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/parse.py (Parser._make_toc): Use `None' as default
+	`depth'.
+
+	* lib/lcg/content/content.py (NodeIndex, TableOfContents): Take
+	`depth=None' as unlimited.  Default `depth' changed to `None'.
+	(NodeIndex): Default value of `detailed' changed to `False'.
+
 2007-10-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/_test.py (LocalizableDateTime.check_format): Updated.

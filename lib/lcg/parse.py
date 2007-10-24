@@ -259,7 +259,7 @@ class Parser(object):
     def _make_toc(self, block, groups):
         title = groups['title']
         cls = groups['toctype'] in ('NodeIndex', 'NTOC') and NodeIndex or TableOfContents
-        d = groups['tocdepth'] and int(groups['tocdepth']) or 99
+        d = groups['tocdepth'] and int(groups['tocdepth']) or None
         return cls(title=title, depth=d)
 
     def _make_rule(self, block, groups):

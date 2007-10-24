@@ -523,7 +523,7 @@ class Section(SectionContainer):
 class NodeIndex(Content):
     """A Table of Contents which lists the node subtree of the current node."""
 
-    def __init__(self, title=None, node=None, depth=1, detailed=False):
+    def __init__(self, title=None, node=None, depth=None, detailed=False):
         """Initialize the instance.
 
         Arguments:
@@ -610,7 +610,7 @@ class RootIndex(NodeIndex):
 class TableOfContents(NodeIndex):
     """A Table of Contents which lists the content subtree."""
     
-    def __init__(self, start=None, title=None, depth=1):
+    def __init__(self, start=None, title=None, depth=None):
         """Initialize the instance.
         
         Arguments:
