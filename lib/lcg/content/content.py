@@ -381,14 +381,14 @@ class SectionContainer(Container):
     """
     _EXPORT_INLINE = False
 
-    def __init__(self, content, toc_depth=99, **kwargs):
+    def __init__(self, content, toc_depth=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
 
           content -- same as in the parent class.
-          toc_depth -- the depth of local table of contents.  Corresponds to
-            the same constructor argument of 'TableOfContents'.
+          toc_depth -- the depth of local table of contents.  Corresponds to the 'depth' argument
+            of 'TableOfContents' constructor.
 
         """
         super(SectionContainer, self).__init__(content, **kwargs)
@@ -403,11 +403,10 @@ class SectionContainer(Container):
                 if s.in_toc():
                     toc_sections.append(s)
         self._sections = sections
-        if toc_depth > 0 and not already_has_toc and \
+        if toc_depth is None or toc_depth > 0 and not already_has_toc and \
                (len(toc_sections) > 1 or len(toc_sections) == 1 and 
                 len([s for s in toc_sections[0].sections() if s.in_toc()])):
-            self._toc = TableOfContents(self, title=_("Index:"),
-                                        depth=toc_depth)
+            self._toc = TableOfContents(self, _("Index:"), depth=toc_depth)
         else:
             self._toc = Content()
         self._toc.set_container(self)
@@ -524,17 +523,17 @@ class Section(SectionContainer):
 class NodeIndex(Content):
     """A Table of Contents which lists the node subtree of the current node."""
 
-    def __init__(self, title=None, node=None, depth=1, detailed=True):
+    def __init__(self, title=None, node=None, depth=1, detailed=False):
         """Initialize the instance.
 
         Arguments:
 
-          title -- the title of the TOC as a string.
+          title -- the title of the index as a string.
 
           node -- allows to pass the top level node where the index starts.  When None, the parent
             node of the element is used.
           
-          depth -- how deep in the hierarchy should we go.
+          depth -- hierarchy depth limit as an integer or None for unlimited depth.
           
           detailed -- A True (default) value means that the 'Content' hierarchy within the leave
             nodes of the node tree will be included in the index.  False means to consider only
@@ -544,7 +543,7 @@ class NodeIndex(Content):
         super(NodeIndex, self).__init__()
         assert title is None or isinstance(title, (str, unicode))
         assert node is None or isinstance(node, ContentNode)
-        assert isinstance(depth, int)
+        assert depth is None or isinstance(depth, int)
         assert isinstance(detailed, bool)
         self._title = title
         self._node = node
@@ -569,8 +568,10 @@ class NodeIndex(Content):
         
     def _make_toc(self, exporter, item, indent=0, depth=1):
         g = exporter.generator()
-        if depth <= 0:
-            return ''
+        if depth is not None:
+            if depth <= 0:
+                return ''
+            depth -= 1 # Decrease for further calls.
         items = ()
         if isinstance(item, ContentNode):
             items = [node for node in item.children() if not node.hidden()]
@@ -596,7 +597,7 @@ class NodeIndex(Content):
                     cls = (cls and cls + ' ' or '') + 'inactive'
             links.append(g.link(i.title(), uri, title=descr, name=name, cls=cls) + \
                          #(descr is not None and (' ... ' + descr) or '-') + \
-                         self._make_toc(exporter, i, indent=indent+4, depth=depth-1))
+                         self._make_toc(exporter, i, indent=indent+4, depth=depth))
         return concat("\n", g.list(links, indent=indent), "\n", ' '*(indent-2))
 
 
@@ -609,23 +610,21 @@ class RootIndex(NodeIndex):
 class TableOfContents(NodeIndex):
     """A Table of Contents which lists the content subtree."""
     
-    def __init__(self, start=None, **kwargs):
+    def __init__(self, start=None, title=None, depth=1):
         """Initialize the instance.
         
         Arguments:
         
-          item -- the place where to start in the content hierarchy tree as a
-            'Content' instance.  None means to start at the container (a local
-            Table of Contents).  See 'Section' documentation for more
-            information how the content tree is built.
+          item -- the place where to start in the content hierarchy tree as a 'Content' instance.
+            None means to start at the container (a local Table of Contents).  See 'Section'
+            documentation for more information how the content tree is built.
             
-          **kwargs -- all other arguments are passed to parent class
-            constructor.
+          All other arguments have the same meaning as in the parent class constructor.
         
         """
         assert isinstance(start, Content) or start is None
         self._start_item_ = start
-        super(TableOfContents, self).__init__(**kwargs)
+        super(TableOfContents, self).__init__(title=title, detailed=True, depth=depth)
         
     def _start_item(self):
         start_item = self._start_item_
