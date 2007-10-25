@@ -3,6 +3,9 @@
 	* lib/lcg/export/html.py (HtmlGenerator.table)
 	(HtmlGenerator.thead, HtmlGenerator.tfoot, HtmlGenerator.tbody):
 	New methods.
+	(HtmlGenerator.img): New argument `border'.
+	(HtmlExporter._language_selection): Added generic support for
+	language images in derived classes.
 
 2007-10-24  Tomas Cerha  <cerha@brailcom.org>
 
