@@ -42,7 +42,7 @@ class HtmlGenerator(Generator):
         start = '<' + tag + self._attr(*attr) + '>'
         end = '</' + tag + '>'
         separator = newlines and "\n" or ""
-        if isinstance(content, (types.ListType, types.TupleType)):
+        if isinstance(content, (tuple, list)):
             result = (start,) + tuple(content) + (end,)
         else:
             result = (start, content, end)
@@ -148,11 +148,21 @@ class HtmlGenerator(Generator):
         attr = (('class', cls), ('style', style))
         return self._tag('tr', attr, content)
 
-    def table(self, content, border=None, cellspacing=None, cellpadding=None, cls=None, style=None):
-        attr = (('border', border), ('class', cls), ('style', style),
-                ('cellspacing', cellspacing), ('cellpadding', cellpadding))
-        return self._tag('table', attr, content)
+    def table(self, content, border=None, cellspacing=None, cellpadding=None, width=None,
+              cls=None, style=None):
+        attr = (('border', border), ('cellspacing', cellspacing), ('cellpadding', cellpadding),
+                ('width', width), ('class', cls), ('style', style))
+        return self._tag('table', attr, content, newlines=True)
 
+    def thead(self, content):
+        return self._tag('thead', (), content)
+    
+    def tfoot(self, content):
+        return self._tag('tfoot', (), content)
+    
+    def tbody(self, content):
+        return self._tag('tbody', (), content, newlines=True)
+    
     def escape(self, text):
         from xml.sax import saxutils
         return saxutils.escape(text)

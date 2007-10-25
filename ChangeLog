@@ -1,6 +1,8 @@
 2007-10-25  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/export/html.py (HtmlGenerator.table): New method.
+	* lib/lcg/export/html.py (HtmlGenerator.table)
+	(HtmlGenerator.thead, HtmlGenerator.tfoot, HtmlGenerator.tbody):
+	New methods.
 
 2007-10-24  Tomas Cerha  <cerha@brailcom.org>
 
