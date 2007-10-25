@@ -119,14 +119,15 @@ class HtmlGenerator(Generator):
         items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
         return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">")
      
-    def img(self, src, alt='', width=None, height=None, align=None, descr=None, cls=None):
+    def img(self, src, alt='', border=0, width=None, height=None, align=None, descr=None,
+            cls=None):
         attr = (('src', src),
                 ('alt', alt),
                 ('longdesc', descr),
                 ('width', width),
                 ('height', height),
                 ('align', align),
-                ('border', 0),
+                ('border', border),
                 ('class', cls),
                 )
         return '<img' + self._attr(*attr) + ' />'
@@ -545,17 +546,24 @@ class HtmlExporter(Exporter):
         languages.sort()
         links = []
         for lang in languages:
-            name = language_name(lang)
-            cls = None
-            sign = ''
+            label = language_name(lang)
             if lang == current:
                 sign = g.span(' *', cls='hidden')
                 cls = 'current'
-            links.append(g.link(name, self._node_uri(node, lang=lang), cls=cls)+sign)
-            #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
+            else:
+                sign = ''
+                cls = None
+            image = self._language_selection_image(lang)
+            if image:
+                label = g.img(image, alt=label, border=None)
+            links.append(g.link(label, self._node_uri(node, lang=lang), cls=cls)+sign)
         return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
                              name='language-selection-anchor'),
-                      "\n", concat(links, separator=" |\n"))
+                      "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
+
+    def _language_selection_image(self, lang):
+        #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
+        return None
     
     def _content(self, node):
         return node.content().export(self)
