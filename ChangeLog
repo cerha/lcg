@@ -1,3 +1,7 @@
+2007-10-25  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlGenerator.table): New method.
+
 2007-10-24  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/parse.py (Parser._make_toc): Use `None' as default

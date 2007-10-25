@@ -148,6 +148,11 @@ class HtmlGenerator(Generator):
         attr = (('class', cls), ('style', style))
         return self._tag('tr', attr, content)
 
+    def table(self, content, border=None, cellspacing=None, cellpadding=None, cls=None, style=None):
+        attr = (('border', border), ('class', cls), ('style', style),
+                ('cellspacing', cellspacing), ('cellpadding', cellpadding))
+        return self._tag('table', attr, content)
+
     def escape(self, text):
         from xml.sax import saxutils
         return saxutils.escape(text)
