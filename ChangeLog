@@ -1,3 +1,14 @@
+2007-10-29  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Don't use `ContentNode.meta()', but
+	allow meta tags customization in derived class.
+
+	* lib/lcg/export/export.py (MarkupFormatter): Added support for
+	variable substitution.
+
+	* lib/lcg/nodes.py (ContentNode): New option and access method
+	`globals'.  The method `meta()' removed.
+
 2007-10-25  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator.table)

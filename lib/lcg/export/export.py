@@ -50,6 +50,8 @@ class MarkupFormatter(object):
                          r'(?:(?:\||\s+)(?P<label>[^\[\]]*))?\]')),
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
+               ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
+                                 "|\{[^\}]+\})")),
                ('comment', r'^#.*'),
                ('dash', r'(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'),
@@ -57,7 +59,7 @@ class MarkupFormatter(object):
                ('gt', '>'),
                ('amp', '&'),
                )
-    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'xresource')
+    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'xresource', 'subst')
 
     _FORMAT = {}
 
@@ -110,6 +112,22 @@ class MarkupFormatter(object):
             result = markup
         return prefix + result
 
+    def _substitution_formatter(self, parent, subst, **kwargs):
+        # get the substitution value for _SUBSTITUTION_REGEX match
+        if subst.startswith('{') and subst.endswith('}'):
+            text = subst[1:-1]
+        else:
+            text = subst
+        if not text:
+            return '$' + subst
+        result = parent.globals()
+        for name in text.split('.'):
+            try:
+                result = result[name]
+            except KeyError:
+                return '$' + subst
+        return str(result)
+
     def _formatter(self, parent, type, groups, close=False):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
@@ -131,7 +149,6 @@ class MarkupFormatter(object):
         for type in x:
             result.append(self._formatter(parent, type, {}, close=True))
         return concat(result)
-
 
 
 class Exporter(object):

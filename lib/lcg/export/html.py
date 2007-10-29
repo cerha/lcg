@@ -479,21 +479,21 @@ class HtmlExporter(Exporter):
             
     def _title(self, node):
         return node.title()
+
+    def _meta(self, node):
+        import lcg
+        return (('generator', 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
     
     def _head(self, node):
         if self._stylesheet is not None:
             node.resource(XStylesheet, self._stylesheet)
-        import lcg
-        meta = node.meta() + \
-               (('generator',
-                 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
         tags = [concat('<title>', self._title(node), '</title>')] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', node.language()),
                              ('Content-Script-Type', 'text/javascript'),
                              ('Content-Style-Type', 'text/css'))] + \
-               ['<meta name="%s" content="%s">' % pair for pair in meta] + \
+               ['<meta name="%s" content="%s">' % pair for pair in self._meta(node)] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % s.uri()
                 for s in node.resources(Script)]

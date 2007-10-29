@@ -39,7 +39,7 @@ class ContentNode(object):
 
     def __init__(self, id, title=None, brief_title=None, descr=None, language=None,
                  secondary_language=None, language_variants=(), content=None, children=(),
-                 hidden=False, active=True, resource_provider=None):
+                 hidden=False, active=True, resource_provider=None, globals=None):
         """Initialize the instance.
 
         Arguments:
@@ -79,7 +79,11 @@ class ContentNode(object):
 
           resource_provider -- a 'ResourceProvider' instance or None.  This provider handles
             all resources used within this node.
-        
+
+          globals -- node global variables as a dictionary keyed by variable names.  The variables
+            are allowed to contain nested dictionaries.  The variables are used for substitution
+            within `MarkupFormatter', but they may be also used for other purposes depending on the
+            application.
             
         """
         assert isinstance(id, str), repr(id)
@@ -111,6 +115,7 @@ class ContentNode(object):
             child._set_parent(self)
         self._children = children
         self._resource_provider = resource_provider
+        self._globals = globals or {}
         #if __debug__:
         #    seen = {}
         #    for n in self.linear():
@@ -264,9 +269,9 @@ class ContentNode(object):
         # directly determine the current language variant.
         return self.language()
 
-    def meta(self):
-        """Return the meta data as a tuple of (name, value) pairs."""
-        return ()
+    def globals(self):
+        """Return the node variables as a dictionary keyed by variable names."""
+        return self._globals
     
     def resources(self, cls=None):
         """Return the list of all resources this node depends on.
