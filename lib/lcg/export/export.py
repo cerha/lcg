@@ -126,7 +126,9 @@ class MarkupFormatter(object):
                 result = result[name]
             except KeyError:
                 return '$' + subst
-        return str(result)
+        if not isinstance(result, Localizable):
+            result = str(result)
+        return result
 
     def _formatter(self, parent, type, groups, close=False):
         try:
