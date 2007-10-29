@@ -123,7 +123,7 @@ class MarkupFormatter(object):
         result = parent.globals()
         for name in text.split('.'):
             try:
-                result = result[name]
+                result = result[str(name)]
             except KeyError:
                 return '$' + subst
         if not isinstance(result, Localizable):
