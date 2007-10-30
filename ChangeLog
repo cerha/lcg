@@ -1,5 +1,13 @@
 2007-10-30  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/media/responses/c02.mp3: File removed.
+
+	* resources/media/responses/c04.mp3: File removed.
+
+	* resources/media/responses/i01.mp3: File removed.
+
+	* resources/media/responses/i05.mp3: File removed.
+
 	* translations/lcg.cs.po: Language name translation from `lcg-locale' moved here.
 
 	* translations/lcg.de.po: Language name translation from `lcg-locale' moved here.
@@ -439,7 +447,7 @@
 	* lib/lcg/__init__.py (__version__): Also update the namespace of
 	`vocab'.
 
-	* lib/lcg/content/__init__.py (Module): Import also `vocab'.
+	* lib/lcg/content/__init__.py: Import also `vocab'.
 
 	* lib/lcg/export/export.py (MarkupFormatter.__init__): Use `str'
 	and `tuple' instead of `type.StringType' and `type.TupleType'.
