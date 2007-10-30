@@ -21,6 +21,7 @@ __version__ = '0.3.5'
 """Learning Content Genarator."""
 
 from i18n import *
+from locales import *
 from util import *
 from nodes import *
 from resources import *

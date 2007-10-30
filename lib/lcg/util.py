@@ -26,7 +26,8 @@ import re
 import sys
 
 from lcg import *
-_ = TranslatableTextFactory('lcg-locale')
+_ = TranslatableTextFactory('lcg')
+
 
 
 class SplittableText:

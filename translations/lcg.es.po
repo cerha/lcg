@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-26 08:51+0200\n"
-"PO-Revision-Date: 2007-06-25 10:32+0200\n"
+"POT-Creation-Date: 2007-10-30 08:51+0100\n"
+"PO-Revision-Date: 2007-10-30 08:54+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -21,25 +21,117 @@ msgstr ""
 msgid "Index:"
 msgstr "Contenido:"
 
-#: ../lib/lcg/export/html.py:406
+#: ../lib/lcg/util.py:243
+msgid "Bulgarian"
+msgstr "búlgaro"
+
+#: ../lib/lcg/util.py:245
+msgid "Catalan"
+msgstr "catalán"
+
+#: ../lib/lcg/util.py:245
+msgid "Czech"
+msgstr "checo"
+
+#: ../lib/lcg/util.py:246
+msgid "Danish"
+msgstr "danés"
+
+#: ../lib/lcg/util.py:246
+msgid "German"
+msgstr "alemán"
+
+#: ../lib/lcg/util.py:247
+msgid "Greek"
+msgstr "griego"
+
+#: ../lib/lcg/util.py:247
+msgid "English"
+msgstr "inglés"
+
+#: ../lib/lcg/util.py:247
+msgid "Spanish"
+msgstr "espanol"
+
+#: ../lib/lcg/util.py:248
+msgid "Estonian"
+msgstr "estonio"
+
+#: ../lib/lcg/util.py:249
+msgid "Finnish"
+msgstr "finlandés"
+
+#: ../lib/lcg/util.py:250
+msgid "French"
+msgstr "francés"
+
+#: ../lib/lcg/util.py:252
+msgid "Irish"
+msgstr "irlandés"
+
+#: ../lib/lcg/util.py:255
+msgid "Hungarian"
+msgstr "húngaro"
+
+#: ../lib/lcg/util.py:257
+msgid "Icelandic"
+msgstr "islandés"
+
+#: ../lib/lcg/util.py:257
+msgid "Italian"
+msgstr "italiano"
+
+#: ../lib/lcg/util.py:267
+msgid "Dutch"
+msgstr "holandés"
+
+#: ../lib/lcg/util.py:267
+msgid "Norwegian"
+msgstr "noruego"
+
+#: ../lib/lcg/util.py:269
+msgid "Polish"
+msgstr "polaco"
+
+#: ../lib/lcg/util.py:270
+msgid "Portuguese"
+msgstr "portugués"
+
+#: ../lib/lcg/util.py:275
+msgid "Slovak"
+msgstr "eslovaco"
+
+#: ../lib/lcg/util.py:275
+msgid "Slovenian"
+msgstr "esloveno"
+
+#: ../lib/lcg/util.py:277
+msgid "Swedish"
+msgstr "sueco"
+
+#: ../lib/lcg/util.py:281
+msgid "Turkish"
+msgstr "turco"
+
+#: ../lib/lcg/export/html.py:436
 msgid "Choose your language:"
 msgstr "Escoja el idioma:"
 
 # For exapmle "Next: None".
-#: ../lib/lcg/export/html.py:635
+#: ../lib/lcg/export/html.py:672
 msgid "None"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:636
+#: ../lib/lcg/export/html.py:673
 msgid "You are here:"
 msgstr ""
 
 # Link to the next page.
-#: ../lib/lcg/export/html.py:638
+#: ../lib/lcg/export/html.py:675
 msgid "Next"
 msgstr ""
 
 # Link to the previous page.
-#: ../lib/lcg/export/html.py:639
+#: ../lib/lcg/export/html.py:676
 msgid "Previous"
 msgstr ""

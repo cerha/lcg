@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-26 08:51+0200\n"
-"PO-Revision-Date: 2007-08-07 21:13+0200\n"
+"POT-Creation-Date: 2007-10-30 08:51+0100\n"
+"PO-Revision-Date: 2007-10-30 09:02+0100\n"
 "Last-Translator: Pawel Loba <ploba@rogers.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,22 +19,114 @@ msgstr ""
 msgid "Index:"
 msgstr "Indeks:"
 
-#: ../lib/lcg/export/html.py:406
+#: ../lib/lcg/util.py:243
+msgid "Bulgarian"
+msgstr "Bu³garski"
+
+#: ../lib/lcg/util.py:245
+msgid "Catalan"
+msgstr "Kataloñski"
+
+#: ../lib/lcg/util.py:245
+msgid "Czech"
+msgstr "Czeski"
+
+#: ../lib/lcg/util.py:246
+msgid "Danish"
+msgstr "Duñski"
+
+#: ../lib/lcg/util.py:246
+msgid "German"
+msgstr "Niemiecki"
+
+#: ../lib/lcg/util.py:247
+msgid "Greek"
+msgstr "Grecki"
+
+#: ../lib/lcg/util.py:247
+msgid "English"
+msgstr "Angielski"
+
+#: ../lib/lcg/util.py:247
+msgid "Spanish"
+msgstr "Hiszpañski"
+
+#: ../lib/lcg/util.py:248
+msgid "Estonian"
+msgstr "Estoñski"
+
+#: ../lib/lcg/util.py:249
+msgid "Finnish"
+msgstr "Fiñski"
+
+#: ../lib/lcg/util.py:250
+msgid "French"
+msgstr "Francuski"
+
+#: ../lib/lcg/util.py:252
+msgid "Irish"
+msgstr "Irlandzki"
+
+#: ../lib/lcg/util.py:255
+msgid "Hungarian"
+msgstr "Wêgierski"
+
+#: ../lib/lcg/util.py:257
+msgid "Icelandic"
+msgstr "Islandzki"
+
+#: ../lib/lcg/util.py:257
+msgid "Italian"
+msgstr "W³oski"
+
+#: ../lib/lcg/util.py:267
+msgid "Dutch"
+msgstr "Holenderski"
+
+#: ../lib/lcg/util.py:267
+msgid "Norwegian"
+msgstr "Norweski"
+
+#: ../lib/lcg/util.py:269
+msgid "Polish"
+msgstr "Polski"
+
+#: ../lib/lcg/util.py:270
+msgid "Portuguese"
+msgstr "Portugalski"
+
+#: ../lib/lcg/util.py:275
+msgid "Slovak"
+msgstr "S³owacki"
+
+#: ../lib/lcg/util.py:275
+msgid "Slovenian"
+msgstr "S³oweñski"
+
+#: ../lib/lcg/util.py:277
+msgid "Swedish"
+msgstr "Szwedzki"
+
+#: ../lib/lcg/util.py:281
+msgid "Turkish"
+msgstr "Turecki"
+
+#: ../lib/lcg/export/html.py:436
 msgid "Choose your language:"
 msgstr "Wybierz jêzyk:"
 
-#: ../lib/lcg/export/html.py:635
+#: ../lib/lcg/export/html.py:672
 msgid "None"
 msgstr "¯aden"
 
-#: ../lib/lcg/export/html.py:636
+#: ../lib/lcg/export/html.py:673
 msgid "You are here:"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:638
+#: ../lib/lcg/export/html.py:675
 msgid "Next"
 msgstr "Dalej"
 
-#: ../lib/lcg/export/html.py:639
+#: ../lib/lcg/export/html.py:676
 msgid "Previous"
 msgstr "Wstecz"

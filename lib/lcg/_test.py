@@ -126,7 +126,7 @@ class TranslatableText(unittest.TestCase):
         assert c == "Info: Version 1.0, 2006-08-14 Mon 10:32", c
 
 tests.add(TranslatableText)
-        
+
 class SelfTranslatableText(unittest.TestCase):
           
     def check_interpolation(self):
@@ -143,7 +143,6 @@ class SelfTranslatableText(unittest.TestCase):
         c2 = a3.translate(lcg.GettextTranslator('cs'))
         assert b2 == "Hi -person1-, say hello to -person2-.", b2
         assert c2 == "Ahoj -person1-, pozdravuj -person2-.", c2
-        
         
 tests.add(SelfTranslatableText)
 
@@ -174,7 +173,6 @@ class LocalizableDateTime(unittest.TestCase):
         t = c.translate(lcg.GettextTranslator('cs'))
         assert t == "Date is: 30.01.2006", t
 
-        
 tests.add(LocalizableDateTime)
 
 class TranslatableTextFactory(unittest.TestCase):
@@ -184,6 +182,27 @@ class TranslatableTextFactory(unittest.TestCase):
         assert a.domain() == 'test'
 
 tests.add(TranslatableTextFactory)
+
+class Monetary(unittest.TestCase):
+
+    def check_format(self):
+        a = lcg.Monetary(8975.5)
+        a1 = lcg.Translator().translate(a)
+        a2 = lcg.Translator('cs').translate(a)
+        a3 = lcg.Translator('en').translate(a)
+        assert a1 == '8975.50', a1
+        assert a2 == u'8\xa0975,50', a2
+        assert a3 == '8,975.50', a3
+    
+    def check_precision(self):
+        a = lcg.Monetary(8975.5, precision=0)
+        b = lcg.Monetary(8975.5, precision=3)
+        a1 = lcg.Translator().translate(a)
+        b1 = lcg.Translator().translate(b)
+        assert a1 == '8976', a1
+        assert b1 == '8975.500', b1
+    
+tests.add(Monetary)
 
 
 class GettextTranslator(unittest.TestCase):

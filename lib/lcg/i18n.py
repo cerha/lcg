@@ -306,6 +306,75 @@ class LocalizableDateTime(Localizable):
         return result
 
 
+class Float(Localizable):
+    """Localizable float number."""
+    
+    def __new__(cls, value, precision=None):
+        if precision is None:
+            format = '%f'
+        else:
+            format = '%%.%df' % precision
+        return unicode.__new__(cls, format % value)
+
+    def __init__(self, value, precision=None):
+        self._value = value
+        if precision is None:
+            self._format = '%f'
+        else:
+            self._format = '%%.%df' % precision
+
+    def _locales(self, data):
+        return data.decimal_point, data.grouping, data.thousands_sep
+    
+    def _group(self, grouping, thousands_sep, string):
+        if not grouping or not thousands_sep:
+            return string
+        result=""
+        while string and grouping:
+            if grouping[0] == -1:
+                break
+            elif grouping[0] != 0:
+                #process last group
+                group = grouping[0]
+                grouping = grouping[1:]
+            if result:
+                result = string[-group:] + thousands_sep + result
+            else:
+                result = string[-group:]
+            string = string[:-group]
+            if len(string) == 1 and string[0] not in "0123456789":
+                # the leading string is only a sign
+                return string + result
+        if not result:
+            return string
+        if string:
+            result = string + thousands_sep + result
+        return result
+      
+    def format(self, data):
+        formatted = self._format % self._value
+        if formatted.find('.') == -1:
+            pre, post = formatted, None
+        else:
+            pre, post = formatted.split(".")
+        decimal_point, grouping, thousands_sep = self._locales(data)
+        pre = self._group(grouping, thousands_sep, pre)
+        if post:
+            return pre + decimal_point + post
+        else:
+            return pre
+
+            
+class Monetary(Float):
+    """Localizable monetary amount."""
+    
+    def __init__(self, value, precision=2):
+        super(Monetary, self).__init__(value, precision=precision)
+
+    def _locales(self, data):
+        return data.mon_decimal_point, data.mon_grouping, data.mon_thousands_sep
+
+
 class Concatenation(Localizable):
     """A concatenation of translatable and untranslatable text elements.
 
@@ -427,12 +496,13 @@ class Translator(object):
     or 'NullTranslator' for concrete implementations.
 
     """
-    def __init__(self):
-        self._locale_data = LocaleData(self)
+    def __init__(self, lang=None):
+        self._lang = lang
+        self._locale_data = globals().get('LocaleData_'+(lang or ''), LocaleData)()
         
     def lang(self):
         """Return the target language of this translator."""
-        return None
+        return self._lang
 
     def gettext(self, text, domain=None, origin=None):
         """Return the translation of the string 'text' from given domain.
@@ -502,16 +572,12 @@ class GettextTranslator(Translator):
         assert isinstance(default_domain, str), default_domain
         assert isinstance(path, dict) or path is None, path
         assert isinstance(fallback, bool), fallback
-        self._lang = lang
         self._default_domain = default_domain
         self._fallback = fallback
         self._path = path or {}
         self._cache = {}
-        super(GettextTranslator,self).__init__()
+        super(GettextTranslator, self).__init__(lang)
 
-    def lang(self):
-        return self._lang
-    
     def _gettext_instance(self, domain, origin):
         import gettext, config
         path = self._path.get(domain, config.translation_dir)
@@ -535,36 +601,7 @@ class GettextTranslator(Translator):
             t = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
         return t.ugettext(text)
 
-    
-_ = TranslatableTextFactory('lcg-locale')
-
-class LocaleData(object):
-    date_format = _('%Y-%m-%d')
-    time_format = _('%H:%M')
-    exact_time_format = _('%H:%M:%S')
-    weekdays = (_('Mon'), _('Tue'), _('Wed'), _('Thu'), _('Fri'), _('Sat'), _('Sun'))
-    negative_sign = '-'
-    positive_sign = ''
-    decimal_point = '.'
-    thousands_sep = ','
-    grouping = (3,)
-    mon_decimal_point = None
-    mon_thousands_sep = None 
-    mon_grouping = None
- 
-    def __init__(self, translator):
-        self.date_format = str(translator.translate(self.date_format))
-        self.time_format = str(translator.translate(self.time_format))
-        self.exact_time_format = str(translator.translate(self.exact_time_format))
-        self.weekdays = tuple([translator.translate(day) for day in self.weekdays])
-        if self.mon_decimal_point is None:
-            self.mon_decimal_point = self.decimal_point
-        if self.mon_thousands_sep is None:
-            self.mon_thousands_sep = self.thousands_sep
-        if self.mon_grouping is None:
-            self.mon_grouping = self.grouping
-            
-
+        
 def concat(*args, **kwargs):
     """Concatenate the 'args' into a 'Concatenation' or a string.
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-26 08:51+0200\n"
-"PO-Revision-Date: 2007-09-26 10:23+0200\n"
+"POT-Creation-Date: 2007-10-30 08:51+0100\n"
+"PO-Revision-Date: 2007-10-30 08:44+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,22 +19,146 @@ msgstr ""
 msgid "Index:"
 msgstr "Obsah:"
 
-#: ../lib/lcg/export/html.py:406
+#: ../lib/lcg/util.py:243
+msgid "Bulgarian"
+msgstr ""
+
+#: ../lib/lcg/util.py:245
+msgid "Catalan"
+msgstr ""
+
+#: ../lib/lcg/util.py:245
+msgid "Czech"
+msgstr "èe¹tina"
+
+#: ../lib/lcg/util.py:246
+#, fuzzy
+msgid "Danish"
+msgstr "¹panielèina"
+
+#: ../lib/lcg/util.py:246
+msgid "German"
+msgstr "nemèina"
+
+#: ../lib/lcg/util.py:247
+msgid "Greek"
+msgstr ""
+
+#: ../lib/lcg/util.py:247
+msgid "English"
+msgstr "angliètina"
+
+#: ../lib/lcg/util.py:247
+msgid "Spanish"
+msgstr "¹panielèina"
+
+#: ../lib/lcg/util.py:248
+msgid "Estonian"
+msgstr ""
+
+#: ../lib/lcg/util.py:249
+#, fuzzy
+msgid "Finnish"
+msgstr "¹panielèina"
+
+#: ../lib/lcg/util.py:250
+msgid "French"
+msgstr ""
+
+#: ../lib/lcg/util.py:252
+msgid "Irish"
+msgstr ""
+
+#: ../lib/lcg/util.py:255
+msgid "Hungarian"
+msgstr ""
+
+#: ../lib/lcg/util.py:257
+msgid "Icelandic"
+msgstr ""
+
+#: ../lib/lcg/util.py:257
+msgid "Italian"
+msgstr "taliansky"
+
+#: ../lib/lcg/util.py:267
+msgid "Dutch"
+msgstr ""
+
+#: ../lib/lcg/util.py:267
+msgid "Norwegian"
+msgstr "nórèina"
+
+#: ../lib/lcg/util.py:269
+msgid "Polish"
+msgstr "poµèina"
+
+#: ../lib/lcg/util.py:270
+msgid "Portuguese"
+msgstr ""
+
+#: ../lib/lcg/util.py:275
+msgid "Slovak"
+msgstr "slovenèina"
+
+#: ../lib/lcg/util.py:275
+msgid "Slovenian"
+msgstr ""
+
+#: ../lib/lcg/util.py:277
+msgid "Swedish"
+msgstr ""
+
+#: ../lib/lcg/util.py:281
+msgid "Turkish"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:436
 msgid "Choose your language:"
 msgstr "Zvoµte si jazyk:"
 
-#: ../lib/lcg/export/html.py:635
+#: ../lib/lcg/export/html.py:672
 msgid "None"
 msgstr "nieje"
 
-#: ../lib/lcg/export/html.py:636
+#: ../lib/lcg/export/html.py:673
 msgid "You are here:"
 msgstr "Nachádzate sa:"
 
-#: ../lib/lcg/export/html.py:638
+#: ../lib/lcg/export/html.py:675
 msgid "Next"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:639
+#: ../lib/lcg/export/html.py:676
 msgid "Previous"
 msgstr ""
+
+#~ msgid "%Y-%m-%d"
+#~ msgstr "%d.%m.%Y"
+
+#~ msgid "%H:%M"
+#~ msgstr "%H:%M"
+
+#~ msgid "%H:%M:%S"
+#~ msgstr "%H:%M:%S"
+
+#~ msgid "Mon"
+#~ msgstr "Po"
+
+#~ msgid "Tue"
+#~ msgstr "Ut"
+
+#~ msgid "Wed"
+#~ msgstr "St"
+
+#~ msgid "Thu"
+#~ msgstr "©t"
+
+#~ msgid "Fri"
+#~ msgstr "Pi"
+
+#~ msgid "Sat"
+#~ msgstr "So"
+
+#~ msgid "Sun"
+#~ msgstr "Ne"

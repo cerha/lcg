@@ -1,3 +1,44 @@
+2007-10-30  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/lcg.cs.po: Language name translation from `lcg-locale' moved here.
+
+	* translations/lcg.de.po: Language name translation from `lcg-locale' moved here.
+
+	* translations/lcg.es.po: Language name translation from `lcg-locale' moved here.
+
+	* translations/lcg.no.po: Language name translation from `lcg-locale' moved here.
+
+	* translations/lcg.pl.po: Language name translation from `lcg-locale' moved here.
+
+	* translations/lcg.sk.po: Language name translation from `lcg-locale' moved here.
+
+	* translations/lcg-locale.cs.po: File removed.
+
+	* translations/lcg-locale.de.po: File removed.
+
+	* translations/lcg-locale.en.po: File removed.
+
+	* translations/lcg-locale.es.po: File removed.
+
+	* translations/lcg-locale.no.po: File removed.
+
+	* translations/lcg-locale.pl.po: File removed.
+
+	* translations/lcg-locale.sk.po: File removed.
+
+	* lib/lcg/locales.py: New file.
+	
+	* lib/lcg/util.py: Translation domain changed to `lcg'.
+
+	* lib/lcg/_test.py (Monetary): New test.
+
+	* lib/lcg/__init__.py: Import `locales'.
+
+	* lib/lcg/i18n.py (Float, Monetary): New localizable types.
+	(LocaleData): Class moved to the new module `locales'.
+
+	* lib/lcg/locales.py: New file.
+
 2007-10-29  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Don't use `ContentNode.meta()', but
@@ -306,7 +347,7 @@
 
 2007-03-26  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/export/hhp.py (Module): Use a custom formatter.
+	* lib/lcg/export/hhp.py: Use a custom formatter.
 
 	* lib/lcg/export/html.py: Separate file dump into a mix-in class.
 
