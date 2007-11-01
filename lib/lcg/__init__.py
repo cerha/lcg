@@ -20,6 +20,8 @@ __version__ = '0.3.5'
 
 """Learning Content Genarator."""
 
+from xml.sax import saxutils
+
 from i18n import *
 from locales import *
 from util import *
@@ -33,7 +35,5 @@ import feed
 
 # Resolve cyclic dependencies.
 
-for module in (resources, nodes, content, exercises, vocab, export, html, parse,
-               feed, i18n, util):
-    
+for module in (resources, nodes, content, exercises, vocab, export, html, parse, feed, i18n, util):
     module.__dict__.update(globals())

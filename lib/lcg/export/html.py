@@ -165,7 +165,6 @@ class HtmlGenerator(Generator):
         return self._tag('tbody', (), content, newlines=True)
     
     def escape(self, text):
-        from xml.sax import saxutils
         return saxutils.escape(text)
 
     # HTML specific...
