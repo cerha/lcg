@@ -263,12 +263,6 @@ class ContentNode(object):
         """
         return self._language_variants
         
-    def current_language_variant(self):
-        # This is in fact only here to allow a strange language setup in
-        # eurochance courses.  In other cases, 'self.language()' should
-        # directly determine the current language variant.
-        return self.language()
-
     def globals(self):
         """Return the node variables as a dictionary keyed by variable names."""
         return self._globals

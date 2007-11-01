@@ -445,7 +445,7 @@ class HtmlExporter(Exporter):
         assert isinstance(node, ContentNode)
         name = node.id().replace(':', '-')
         if lang is None:
-            lang = node.current_language_variant()
+            lang = node.language()
         if lang is not None and len(node.language_variants()) > 1:
             name += '.'+lang
         return name + '.html'
@@ -540,13 +540,12 @@ class HtmlExporter(Exporter):
         #                   cls='language-selection')
         if len(node.language_variants()) <= 1:
             return None
-        current = node.current_language_variant()
         languages = list(node.language_variants()[:])
         languages.sort()
         links = []
         for lang in languages:
             label = language_name(lang)
-            if lang == current:
+            if lang == node.language():
                 sign = g.span(' *', cls='hidden')
                 cls = 'current'
             else:
