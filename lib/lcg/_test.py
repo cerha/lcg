@@ -246,25 +246,6 @@ class Parser(unittest.TestCase):
 tests.add(Parser)
 
         
-class SplittableText(unittest.TestCase):
-    def check_it(self):
-        import lcg.feed
-        def check(matcher, lines):
-            piece = lcg.SplittableText("\n".join(lines))
-            for p in piece.split(matcher):
-                a = p.text().splitlines()[0] # first line of this part's text
-                b = lines[p.firstline()-1] # the line from the source sequence
-                assert a == b, (a, b)
-        check(lcg.feed.ExerciseFeeder._EXERCISE_SPLITTER,
-              ("bla"," ", "----","",
-               "ehm","","","","","----","",
-               "\t", "xxx","yyy", ""))
-        check(lcg.feed.ExerciseFeeder._BLANK_LINE_SPLITTER,
-              ("", "bla","", "", "\t \t","",
-               "ehm"," ",
-               "xxx","yyy", "\t"))
-        
-tests.add(SplittableText)
 
 
 def get_tests():
