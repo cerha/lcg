@@ -3,7 +3,7 @@
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
-= Strukturovaný text =
+= Příručka formátování strukturovaného textu =
 
 Tento dokument popisuje formát strukturovaného textu používaného v rámci
 [http://www.freebsoft.org/lcg LCG].

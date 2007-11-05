@@ -3,7 +3,7 @@
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
-= Structured Text =
+= Structured Text Formatting Manual =
 
 This document describes the Structured Text format used by the
 [http://www.freebsoft.org/lcg LCG].
@@ -590,14 +590,12 @@ explicitly.
 *Example:*
 
 -----
-The chapter [exercises#exercise-types] describes the 
-[exercises#exercise-types Types of Exercises].
+Learn more about [#links using links].
 -----
 
 This will be presented as:
 
-The chapter [exercises#exercise-types] describes the 
-[exercises#exercise-types Types of Exercises].
+Learn more about [#links using links].
 
 
 ===== External Links =====

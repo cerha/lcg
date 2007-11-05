@@ -15,11 +15,11 @@ the corresponding content hierarchy is built in the computer memory in an
 independent internal representation.  Then this model is exported into one of
 the supported output formats.
 
-The input files are either the actual source documents in the [structured-text]
-format or Python files, which may be used for document content construction by
-reading the source data from any imaginable source in any possible format.
-This makes usage very versatile, however requires some programming and
-knowledge of LCG APIs.
+The input files are either the actual source documents in the Structured Text
+format (see [structured-text]) or Python files, which may be used for document
+content construction by reading the source data from any imaginable source in
+any possible format.  This makes usage very versatile, however requires some
+programming and knowledge of LCG APIs.
 
 
 Index: @TOC@
@@ -61,8 +61,9 @@ The following rules apply:
 
   * A file represents a leave node (it has no children).  The node's id is the
     base name of this file.  Node's content is read from the file in the
-    [structured-text] format.  When multiple language variants of the file
-    exist, [#language-selection] is performed.
+    Structured Text format.  When multiple language variants of the file exist,
+    [#language-selection] is performed.  See [structured-text] for details
+    about the input format.
 
   * A directory represents a node with children.  The node's id is the name of
     this directory.  The node's content is read from the file of the same name
