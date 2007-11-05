@@ -1,5 +1,11 @@
 2007-11-05  Tomas Cerha  <cerha@brailcom.org>
 
+	* doc/usage/usage.en.txt: Updated.
+
+	* doc/data-formats/structured-text.cs.txt: Updated.
+
+	* doc/data-formats/structured-text.en.txt: Updated.
+
 	* lib/lcg/i18n.py (Float): Renamed to `Decimal'.
 
 	* lcg-mode.el: Moved to the `eurochance' project.
