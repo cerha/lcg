@@ -306,8 +306,8 @@ class LocalizableDateTime(Localizable):
         return result
 
 
-class Float(Localizable):
-    """Localizable float number."""
+class Decimal(Localizable):
+    """Localizable decimal number."""
     
     def __new__(cls, value, precision=None):
         if precision is None:
@@ -365,7 +365,7 @@ class Float(Localizable):
             return pre
 
             
-class Monetary(Float):
+class Monetary(Decimal):
     """Localizable monetary amount."""
     
     def __init__(self, value, precision=2):
