@@ -37,6 +37,7 @@ def main():
     if opt is None or len(args) != 2:
         usage(OPTIONS)
     source_dir, destination_dir = args
+    
     reader = lcg.reader(source_dir, opt['root'], ext=opt['ext'],
                         language=opt['language'], secondary_language=opt['secondary-language'],
                         encoding=opt['encoding'])
@@ -98,6 +99,8 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
+        raise
+    except SystemExit:
         raise
     except:
         import cgitb
