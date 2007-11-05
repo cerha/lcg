@@ -61,7 +61,6 @@ class LocaleData(object):
 
 class LocaleData_cs(LocaleData):
     date_format = "%d.%m.%Y"
-    exact_time_format = "%H:%M:%S"
     weekdays = (u"Po", u"Út", u"St", u"Čt", u"Pá", u"So", u"Ne")
     decimal_point = ','
     thousands_sep = u'\xa0'
@@ -96,4 +95,5 @@ class LocaleData_pl(LocaleData):
 class LocaleData_sk(LocaleData):
     date_format = "%d.%m.%Y"
     weekdays = (u"Po", u"Ut", u"St", u"Št", u"Pi", u"So", u"Ne")
+    decimal_point = ','
     thousands_sep = u'\xa0'
