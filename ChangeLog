@@ -1,5 +1,11 @@
 2007-11-05  Tomas Cerha  <cerha@brailcom.org>
 
+	* lcg-mode.el: Moved to the `eurochance' project.
+
+	* resources/scripts/audio.js: Moved to the `eurochance' project.
+
+	* resources/scripts/exercises.js: Moved to the `eurochance' project.
+
 	* lib/lcg/_test.py (SplittableText): Test removed.
 
 	* doc/data-formats/data-formats.en.txt: Updated.
