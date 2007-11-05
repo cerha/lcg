@@ -31,9 +31,8 @@ from content import *
 from export import *
 from parse import *
 from read import *
-import feed
 
 # Resolve cyclic dependencies.
 
-for module in (resources, nodes, content, exercises, vocab, export, html, parse, feed, i18n, util):
+for module in (resources, nodes, content, export, html, parse, i18n, util):
     module.__dict__.update(globals())
