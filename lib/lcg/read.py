@@ -111,7 +111,8 @@ class FileReader(Reader):
             p = self._root._shared_resource_provider_
         else:
             p = self._root.resource_provider()
-        return FileResourceProvider(self._dir, self._root.dir(), shared_resource_provider=p)
+        subdir = os.path.normpath(self._dir)[len(os.path.normpath(self._root.dir()))+len(os.sep):]
+        return FileResourceProvider(self._dir, subdir, shared_resource_provider=p)
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""

@@ -3,7 +3,10 @@
 	* lib/lcg/resources.py (SharedResourceProvider.__init__): Expect a
 	sequence of input directories as an argument.
 
-	* lib/lcg/read.py (FileReader._shared_resource_provider): New method.
+	* lib/lcg/read.py (FileReader._shared_resource_provider): New
+	method.
+	(FileReader._resource_provider): Pass the correct output
+	subdirectory to `FileResourceProvider'.
 
 	* resources/css/default.css: Exercise styles removed.
 
