@@ -5,22 +5,20 @@
 
 = Input Data Formats =
 
-To be able to process the input data with a computer program (the LCG) we must
-define a set of rules how this data are represented.  This chapter describes
-the data formats currently used by the LCG.
+Documents on LCG input must either respect the format defined by LCG or you
+must write an extension which parses your data and converts it to the internal
+LCG representation.  
 
-All LCG source files are text files.  Thus you can edit them using any text
-editor.  A simple editor, such as Notepad in MS Windows should do the job.  LCG
-accepts UTF-8 as the default encoding of the source data, so you should be able
-to save your files in this encoding.
+Please note, that you can also use images, sound and video files, scripts,
+stylesheets and other media within your content, but these are not considered
+/source files/ from this point of view.  They are called /resources/ in this
+manual.  To include a resource, you usually refer to it from your source file,
+so you will also find the relavant information in the later sections.
 
-LCG also supports other data types within the content, such as sound and video
-files, images, scripts, stylesheets etc., but these are not considered /source
-files/ from this point of view.  They are called /resources/ in this manual.
-To include such files, you usually refer to them from the source files, so you
-will also find the relavant information in the later sections.
+The following chapter describes structured text format defined by LCG:
 
-The following data formats are being used: @NodeIndex(1)@
+  * [structured-text]
+
 
 
 
