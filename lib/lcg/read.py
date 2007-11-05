@@ -102,7 +102,7 @@ class FileReader(Reader):
 
     def _shared_resource_provider(self):
         # To be overriden...
-        return SharedResourceProvider(self._dir) 
+        return SharedResourceProvider((self._dir,)) 
         
     def _resource_provider(self):
         if self is self._root:

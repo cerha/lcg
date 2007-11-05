@@ -406,13 +406,8 @@ class _FileResourceProvider(ResourceProvider):
 class SharedResourceProvider(_FileResourceProvider):
     """Provides resources shared by multiple nodes."""
     
-    def __init__(self, root_dir=None):
-        if root_dir is not None:
-            dirs = (root_dir,)
-        else:
-            dirs = ()
-        dirs += (config.default_resource_dir,)
-        super(SharedResourceProvider, self).__init__(dirs)
+    def __init__(self, dirs):
+        super(SharedResourceProvider, self).__init__(tuple(dirs) + (config.default_resource_dir,))
 
     def resource(self, *args, **kwargs):
         return self._resource(*args, **kwargs)

@@ -1,5 +1,12 @@
 2007-11-05  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/resources.py (SharedResourceProvider.__init__): Expect a
+	sequence of input directories as an argument.
+
+	* lib/lcg/read.py (FileReader._shared_resource_provider): New method.
+
+	* resources/css/default.css: Exercise styles removed.
+
 	* doc/usage/usage.en.txt: Updated.
 
 	* doc/data-formats/structured-text.cs.txt: Updated.

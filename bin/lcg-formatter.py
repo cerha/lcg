@@ -48,8 +48,7 @@ def main():
         s = sections[0]
         title = s.title()
         sections = s.content()
-    rp = lcg.FileResourceProvider('.', '.',
-                                  lcg.SharedResourceProvider('.'))
+    rp = lcg.FileResourceProvider('.', '.', lcg.SharedResourceProvider(('.',)))
     node = lcg.ContentNode(name, title=title, language='en',
                            content=lcg.SectionContainer(sections),
                            resource_provider=rp)
