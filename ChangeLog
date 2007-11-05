@@ -1,5 +1,7 @@
 2007-11-05  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/i18n.py (Float): Renamed to `Decimal'.
+
 	* lcg-mode.el: Moved to the `eurochance' project.
 
 	* resources/scripts/audio.js: Moved to the `eurochance' project.
