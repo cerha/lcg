@@ -100,11 +100,15 @@ class FileReader(Reader):
             encoding = self._parent.encoding()
         self._encoding = encoding or 'ascii'
 
+    def _shared_resource_provider(self):
+        # To be overriden...
+        return SharedResourceProvider(self._dir) 
+        
     def _resource_provider(self):
         if self is self._root:
-            p = self._shared_resource_provider = SharedResourceProvider(self._dir)
+            p = self._shared_resource_provider_ = self._shared_resource_provider()
         elif isinstance(self._root, FileReader):
-            p = self._root._shared_resource_provider
+            p = self._root._shared_resource_provider_
         else:
             p = self._root.resource_provider()
         return FileResourceProvider(self._dir, self._root.dir(), shared_resource_provider=p)
