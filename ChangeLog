@@ -1,3 +1,50 @@
+2007-11-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py (SplittableText): Test removed.
+
+	* doc/data-formats/data-formats.en.txt: Updated.
+
+	* doc/data-formats/exercises.en.txt: Moved to the `eurochance' project.
+
+	* doc/data-formats/plain-text.en.txt: Moved to the `eurochance' project.
+
+	* doc/data-formats/vocabulary.en.txt: Moved to the `eurochance' project.
+
+	* doc/data-formats/_index.txt: File removed.
+
+	* translations/help.cs.txt: Moved to the `eurochance' project.
+
+	* translations/help.de.txt: Moved to the `eurochance' project.
+
+	* translations/help.en.txt: Moved to the `eurochance' project.
+
+	* translations/help.es.txt: Moved to the `eurochance' project.
+
+	* translations/help.no.txt: Moved to the `eurochance' project.
+
+	* translations/help.sk.txt: Moved to the `eurochance' project.
+
+	* translations/lcg-elearning.de.po: Moved to the `eurochance' project.
+
+	* lib/lcg/export/html.py (HtmlStaticExporter._INDEX_LABEL): Unused
+	constant removed.
+
+	* lib/lcg/__init__.py: Updated.
+
+	* bin/lcgmake.py: Don't print traceback on `SystemExit'.
+
+	* lib/lcg/content/__init__.py: File removed.
+
+	* lib/lcg/locales.py (LocaleData_sk.decimal_point): Added.
+
+	* lib/lcg/feed.py: Moved to the `eurochance' project.
+
+	* lib/lcg/content/content.py: Moved to `lib/lcg/content.py'.
+
+	* lib/lcg/content/exercises.py: Moved to the `eurochance' project.
+
+	* lib/lcg/content/vocab.py: Moved to the `eurochance' project.
+
 2007-11-01  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlExporter._output_file)
