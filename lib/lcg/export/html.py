@@ -613,8 +613,6 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
         'index': '4',
         }
 
-    _INDEX_LABEL = None
-
     _BODY_PARTS = ('navigation',
                    'rule',
                    'heading',
