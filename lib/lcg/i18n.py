@@ -559,10 +559,10 @@ class GettextTranslator(Translator):
           default_domain -- the name of the default domain, used when the translatable has no
             explicit domain defined.
 
-          path -- a dictionary, which may assign an arbitrary directory to each domain.  This
-            directory should contain the locale subdirectories as usual with GNU getext
-            (eg. 'de/LC_MESSAGES/domain.mo').  If there is no item for a domain, the directory
-            defaults to 'config.translation_dir'.
+          path -- a sequence of directory names to search for translations.  If None, the directory
+            'config.translation_dir' is used.  The listed directories should contain the locale
+            subdirectories as usual with GNU getext (eg. 'de/LC_MESSAGES/domain.mo', where 'de' is
+            the language code and 'domain' is the translation domain name).
 
           fallback -- if true, the translator will silently use a null translation in case the
             desired translation files are not found.
@@ -570,28 +570,33 @@ class GettextTranslator(Translator):
         """
         assert isinstance(lang, str), lang
         assert isinstance(default_domain, str), default_domain
-        assert isinstance(path, dict) or path is None, path
+        assert isinstance(path, (list, tuple)) or path is None, path
         assert isinstance(fallback, bool), fallback
         self._default_domain = default_domain
         self._fallback = fallback
-        self._path = path or {}
+        if path is None:
+            path = (config.translation_dir,)
+        else:
+            path = tuple(path)
+        self._path = path
         self._cache = {}
         super(GettextTranslator, self).__init__(lang)
 
     def _gettext_instance(self, domain, origin):
         import gettext, config
-        path = self._path.get(domain, config.translation_dir)
-        try:
-            return gettext.translation(domain, path, (self._lang,))
-        except IOError, e:
-            # The MO file was not found.
-            msg = str(e)+", path: '%s', lang: '%s', origin: '%s'" % (path, self._lang, origin)
-            if self._fallback or self._lang == origin:
-                if self._lang != origin:
-                    log(msg)
-                return gettext.NullTranslations()
-            else:
-                raise IOError(msg)
+        for dir in self._path:
+            try:
+                return gettext.translation(domain, dir, (self._lang,))
+            except IOError, e:
+                continue
+        # The MO file was not found.
+        msg = str(e)+", path: %r, lang: %r, origin: %r" % (self._path, self._lang, origin)
+        if self._fallback or self._lang == origin:
+            if self._lang != origin:
+                log(msg)
+            return gettext.NullTranslations()
+        else:
+            raise IOError(msg)
         
     def gettext(self, text, domain=None, origin=None):
         domain = domain or self._default_domain
