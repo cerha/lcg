@@ -135,5 +135,5 @@ other source files.
 Launch =lcgmake= with the =--help= argument to see the supported options:
 
 -----
-lcgmake.py --help
+lcgmake --help
 -----
