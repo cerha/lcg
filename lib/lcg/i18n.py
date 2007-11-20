@@ -590,7 +590,8 @@ class GettextTranslator(Translator):
             except IOError, e:
                 continue
         # The MO file was not found.
-        msg = str(e)+", path: %r, lang: %r, origin: %r" % (self._path, self._lang, origin)
+        msg = "No translation file found: domain=%r, path=%r, lang=%r, origin=%r" % \
+              (domain, self._path, self._lang, origin)
         if self._fallback or self._lang == origin:
             if self._lang != origin:
                 log(msg)
