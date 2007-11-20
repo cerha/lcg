@@ -1,0 +1,760 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006, 2007 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Structured Text Formatting Manual =
+
+This document describes the Structured Text format used by the
+[http://www.freebsoft.org/lcg LCG].
+
+Table of Contents: @TOC(1)@
+
+
+== Introduction == intro
+
+Structured text is a very simple and straightforward set of rules how to format
+a plain text document.  The formatting allows to mark the logical structure of
+sections, paragraphs, bullet lists etc.
+
+The constructs mostly have a semantical, not presentational nature.  This means
+that we should not decide based on the intended appearance of the content, but
+it's semantical meaning.  For example we don't use a heading, because we want a
+large font in bold, but because it is the title of following logical section of
+the document.
+
+Presentational properties of particular logical elements can be systematically
+changed using style sheets.  Thus they are completely independent of the
+content itself.  This is on of the major preconditions for the consistence of
+the final document and a smooth user experience.
+
+Another advantage of this approach is that the document source stays easily
+readable and editable without any particular software tool.  Just a simple text
+editor can do the job.  This makes it totally portable and accessible.  A
+number of different target formats may be generated from one source.
+
+Misunderstanding or not respecting the fundamental principal of separation of
+the logical and the presentational aspect of the document may lead to an
+initial frustration for users, who are used to format documents visually,
+however once you get used to the fact that your only goal is to mark the text
+up properly and you leave all the job of choosing the right presentation to the
+computer, you discover it does not restrict you, but it gives you more freedom.
+You can fully concentrate on the content itself and don't care too much of its
+presentation.  This, however, would not work without your knowledge of the
+rules used for recognizing different logical elements of the document.  So we
+will explain the most important constructs now.
+
+
+== Brief Overview of Most Important Constructs == overview
+
+The following section contains only a brief and simplified description of the
+most important constructs.  You will find a complete description of all
+supported constructs in the second part of this document called
+[#complete-manual].
+
+Table of Contents: @TOC@
+
+
+=== Paragraphs ===
+
+A paragraph is each continual block of text.  Whenever you leave a blank line,
+you start a new paragraph.  The line-breaks within the paragraph are ignored,
+since the paragraph will be reformatted to fit the output media (i.e. browser
+window).
+
+=== Sections ===
+
+Sections let you create an additional logical structure within the text
+content.  The section hierarchy can be listed in a Table of Contents, which
+allows easy navigation within this hierarchy (similarly as in this manual).
+
+A section starts with a sections header.  The header is marked by a section
+title surrounded by equation signs.  The number of the
+equation signs determines the level.
+	 
+*Example:*
+
+------
+ = Main Heading =
+
+ Top level content.
+
+ == First Section ==
+
+ This paragraph belongs to the first section.
+
+ === Subsection of the First Section ===
+
+ This text belongs to the subsection.
+
+ == Second Section ==
+
+ This is a second section on the same level as the first one.
+----- 
+
+
+=== Bullet Lists ===
+
+Bullet lists should be used whenever the content can be split into a sequence
+of separate items.  Each item is marked by an asterisk and must be indented.
+
+*Example:*
+
+------
+ * cat
+ * dog
+ * hamster
+------
+
+This will be presented as:
+
+ * cat
+ * dog
+ * hamster
+
+Bullet lists can be nested, you can also make ordered lists etc.  More details
+can be found in the [#bullet-lists] and [#ordered-lists].
+
+=== Definition Lists ===
+
+Definition lists are useful for writing down a series of terms or expressions
+and their corresponding descriptions.  You write them down by indenting the
+description following immediately after the term.
+
+*Example:*
+
+------
+Learning Content Generator (LCG)
+  LCG is a software tool able to process structured textual and multimedia data
+  and produce an output presentation which is suitable for use in an on-line or
+  off-line learning environment.
+
+Wiking
+  Wiking is an accessible content management system written on top of the Pytis
+  toolkit and LCG.
+------
+
+This will be presented as:
+
+Learning Content Generator (LCG)
+  LCG is a software tool able to process structured textual and multimedia data
+  and produce an output presentation which is suitable for use in an on-line or
+  off-line learning environment.
+
+Wiking
+  Wiking is an accessible content management system written on top of the Pytis
+  toolkit and LCG.
+
+See [#definition-lists] for a detailed syntax description.
+
+=== Field-sets ===
+
+In general, a field-set can be used to represent any logically paired data set.
+They are similar to definition lists, but they are more suitable for
+label/value type of pairs (rather than term/description).
+
+*Example:*
+
+------
+:Phone:   254 354 645
+:Fax:     254 354 648
+:e-mail:  info@yourdomain.com
+------
+
+This will be presented as:
+
+:Phone:   254 354 645
+:Fax:     254 354 648
+:e-mail:  info@yourdomain.com
+
+See [#field-sets] for a detailed syntax description.
+
+
+=== Links ===
+
+Links are hypertext references to other documents or sections within them.
+They are written using square brackets.  Each link has its target and may have
+an explicit name (if not defined, the system will try to find out the name
+automatically).  The target is the first part of the text within brackets, the
+name may follow after a space.  Certain kinds of targets are recognized
+automatically and thus don't require the square brackets.
+
+*Examples*:
+
+-----
+ * Link to another document: [intro]
+ * Link to another section of the same document: [#bullet-lists]
+ * This link with an explicit name: [#bullet-lists Section about Bullet Lists]
+ * External link: [http://www.freebsoft.org Free(b)soft laboratory]
+ * Unnamed external links: http://www.gnu.org
+ * Email address: yourname@yourdomain.com
+-----
+
+Resulting links:
+
+ * Link to another document: [intro]
+ * Link to another section of the same document: [#bullet-lists]
+ * The same link with an explicit name: [#bullet-lists Section about Bullets]
+ * External link: [http://www.freebsoft.org Free(b)soft laboratory]
+ * Unnamed external links: http://www.gnu.org
+ * Email address: yourname@yourdomain.com
+
+See [#links] for more details.
+
+
+== General recommendations ==
+
+  * Get familiar with the available constructs and always use those, which
+    best fit given purpose.  Nearly everything can be written down as one long
+    paragraph of text, but using the constructs, such as bullet lists,
+    definition lists etc. can make the text much better readable.  You will
+    also greatly simplify the orientation and navigation for users of assistive
+    technologies.
+
+  * Never miss-use any logical construct just to achieve it's presentational
+    properties (such as font size or type, indentation etc.) unless it really
+    fits logically.  Try to re-consider the logical structure of the
+    information if you can't find a suitable construct.
+
+  * Use tables only if there is no other means to express the information and
+    only when it really is tabular data.  It is, for example, often possible to
+    express the same information by nested lists instead of tables.  This form
+    may be often more accessible to the users of assistive technologies.
+
+  * Use hypertext links as much as possible to simplify navigation between
+    documents and their sections.  See [#links] for more information.
+
+  * Whenever there is some information repeated at different places, detach it
+    to a separate document/section and link to it from those places.
+
+  * Avoid long sentences.  Short, simple and clear sentences are much better
+    readable.
+
+  * Don't overuse text emphasizing.  A document blazing with many different font
+    sizes and styles is hard to read.
+
+###############################################################################
+###############################################################################
+
+
+== Detailed Structured Text Formatting Manual == complete-manual
+ 
+This section describes all the supported constructs and their syntax in depth.
+See the [#overview] for a simplified description.
+
+Table of Contents: @TOC@
+
+=== Block Constructs ===
+
+Block (or structural) constructs influence the document structure.  They
+usually work with blocks of text.  [#inline-constructs], on the other hand, are
+used within these blocks.
+
+==== Sections ====
+
+As described in the [#overview], sections form a hierarchical structure of the
+document.
+
+Section headings are marked by equation characters at the beginning and end of
+the line.  The text between the equation signs is a section title.  The number
+of the equation signs determines the level.
+
+*Example:*
+
+------
+ = Main Heading =
+
+ Everything after the section heading belongs to this section, until another
+ section heading is found.  Any number of paragraphs or other constructs can be
+ used within the text of a section.
+
+ == First Section ==
+
+ Since the heading has more equation signs than the previous one, this section
+ logically belongs to the previous section in the hierarchy.
+
+ === Subsection of the First Section ===
+
+ This text belongs to the subsection.
+
+ == Second Section ==
+
+ This is a second section on the same level as the first one.
+----- 
+
+The space between the title and the equation marks is important.  Otherwise the
+section is not recognized.
+
+
+==== Anchors ==== anchors
+
+Additionally an anchor name can be defined for each section heading.  The
+anchor can consist of alpha-numerical characters, underscores and dashes and is
+written at the end of the heading line separated with at least one blank
+character (space).
+
+-----
+ == Introduction == intro
+-----
+
+An anchor can be used to refer to the section.  The link \[#intro], for
+example, will refer to the above section header and the full section title will
+be supplied as the link name (see [#links] for more details).
+
+
+==== Tables of Contents ==== toc
+
+Table of contents is a hierarchical list of all sections within a document or
+it's part.  It can be included in the document using the =@TOC@= macro.
+
+*Example:*
+
+-----
+Table of Contents: @TOC@
+-----
+
+This source line will be replaced with the table of contents.  The text before
+the colon is used for the caption and the TOC includes all the subsections of
+the section, within which the macro is used.  This means you can also create
+local tables of contents in particular subsections.
+
+The TOC at the beginning of the [#complete-manual] was made the same way.
+
+=@TOC@= is used to list sections within one document.  You may also wish to
+list documents of the document hierarchy.  This can be done by using the
+=@NodeIndex@= macro.  The syntax is the same.
+
+The Tables of Content are hierarchical by default.  You may wish to /restrict
+the depth/ of the hierarchy.  This can be done by supplying a number in round
+brackets, such as:
+
+-----
+Index: @TOC(1)@
+-----
+
+This will list just the top level sections without their subsections.  The TOC
+at the top of this document was made the same way.
+
+
+==== Bullet Lists ==== bullet-lists
+
+Bullet lists are marked by an asterisk (or optionally a minus sign) at the
+beginning of each item.  The indentation determines the level (lists can be
+nested).  
+
+*Example:*
+
+------
+ * cats
+   - black
+   - white
+   - other
+ * dogs
+   * big
+   * little
+ * frogs
+------
+
+This will be presented as:
+
+ * cats
+   - black
+   - white
+   - other
+ * dogs
+   * big
+   * little
+ * frogs
+
+
+==== Ordered Lists ==== ordered-lists
+
+Ordered lists work like [#bullet-lists] but you use a number or a letter with a
+period (or round brackets) instead of an asterisk.
+
+*Example:*
+
+------
+ * General rules:
+   1. Each item must be indented by at least one space character.
+   2. Longer item texts can be split over multiple lines, provided
+      that they are indented properly.
+   3. Tabs and spaces can be used for indentation, but tab is always considered
+      8 characters wide, so you may have problems when your editor sets the tab
+      width differently (then converting tabs to spaces is recommended).
+
+   4. Empty lines between the list items are optional and have no effect on the
+      output.  That's just a matter of your preference.
+
+ * Rules for ordered lists:
+   0. The numbers in the source document are ignored, since the output numbers
+      are automatically generated.  Thus you are free to mark all items with
+      zero, for example, or you can use real order numbers if you prefer.
+   0. You can also use letters for alphabetically ordered lists.
+ * Intermixing different kinds of lists:
+   a) There are basically three different kinds of lists:
+      (1) unordered
+      (2) numerically ordered
+      (3) alpha-ordered
+   b) Whenever you switch from one kind to another (at the same indentation
+      level), the previous list is finished and ordering starts from the
+      beginning.
+   c. It does not matter, whether you use a dot or brackets in the source
+      text.  The output style of each list kind is given by the style sheet.
+------
+
+This will be presented as:
+
+ * General rules:
+   1. Each item must be indented by at least one space character.
+   2. Longer item texts can be split over multiple lines, provided
+      that they are indented properly.
+   3. Tabs and spaces can be used for indentation, but tab is always considered
+      8 characters wide, so you may have problems when your editor sets the tab
+      width differently (then converting tabs to spaces is recommended).
+
+   4. Empty lines between the list items are optional and have no effect on the
+      output.  That's just a matter of your preference.
+
+ * Rules for ordered lists:
+   0. The numbers in the source document are ignored, since the output numbers
+      are automatically generated.  Thus you are free to mark all items with
+      zero, for example, or you can use real order numbers if you prefer.
+   0. You can also use letters for alphabetically ordered lists.
+ * Intermixing different kinds of lists:
+   a) There are basically three different kinds of lists:
+      (1) unordered
+      (2) numerically ordered
+      (3) alpha-ordered
+   b) Whenever you switch from one kind to another (at the same indentation
+      level), the previous list is finished and ordering starts from the
+      beginning.
+   c. It does not matter, whether you use a dot or brackets in the source
+      text.  The output style of each list kind is given by the style sheet.
+
+
+==== Definition Lists ==== definition-lists
+
+Definition lists are useful for writing down a series of terms or expressions
+and their corresponding descriptions.  The term/description pairs are separated
+by blank lines from each other.
+
+*Example*:
+
+------
+Term syntax
+   Definition term is a one line text immediately followed by a description.
+
+Description syntax 
+   Definition description follows immediately after the term and is indented by
+   one or more spaces.  Multiple lines are allowed as long as they are all
+   indented.
+------
+
+This will be presented as:
+
+Term syntax
+   Definition term is a one line text immediately followed by a description.
+
+Description syntax 
+   Definition description follows immediately after the term and is indented by
+   one or more spaces.  Multiple lines are allowed as long as they are all
+   indented.
+
+
+
+==== Field-sets ==== field-sets
+
+Field-sets can be used for generic two-column tabular data, where the first
+column is the label and the second column is the corresponding value.  The
+label is marked with colons from both sides.  Values can be multi-line, but
+must be indented properly.
+
+------
+:Birth Date: 1975-08-30
+:Address:
+   38 Ocean View Dr. //
+   Laguna Beach
+:Occupation: Oil Magnate
+------
+
+:Birth Date: 1975-08-30
+:Address:
+   38 Ocean View Dr. //
+   Laguna Beach
+:Occupation: Oil Magnate
+
+
+==== Preformatted Text ==== preformatted-text
+
+You can mark a block of text as a preformatted text by surrounding it by lines
+of five or more dashes.
+
+No further formatting is then applied to the preformatted text.  It is rendered
+as it appears in the source document.
+
+*Example:*
+
+------
+ ------
+  foo   bar
+   x     y
+   1     2
+ ------
+------
+
+This will be presented as:
+
+------
+ foo   bar
+  x     y
+  1     2
+------
+
+All the examples in this manual are written as preformatted text.
+
+
+==== Tables ====
+
+You can make simple tables with constant number of cells per row.  Each row is
+on one line and pipe characters are used to separate the cells.  The line must
+also begin and end with a pipe character.
+
+
+*Example:*
+
+------
+|        | Dick   | Jane |
+| height | 72"    | 65"  |
+| weight | 130lbs | 150lbs |
+------
+
+|        | Dick   | Jane |
+| height | 72"    | 65"  |
+| weight | 130lbs | 150lbs |
+
+
+=== Inline Constructs === inline-constructs
+
+Inline constructs are used inside blocks of text.  They don't influence the
+document structure, but they allow you to use different kinds of elements
+within blocks.
+
+
+==== Text Emphasizing ====
+
+You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
+/*or their _combinations_*/.
+
+The source code for the paragraph above looks like:
+
+-----
+You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
+/*or their _combinations_*/.
+-----
+
+
+==== Links ==== links
+
+Links can be used to refer to other documents, web addresses, sections etc.
+They are marked by square brackets.  The first part of the text in the brackets
+is the link target.  The target can be optionally followed by a space and a
+link name.  Depending on the type of the link target, we recognize several
+kinds of links.
+
+Link categories: @TOC@
+
+
+===== Local Links =====
+
+Local links lead to another document withing the hierarchy, or another section
+within the same document.  Documents are referenced by their identifier,
+sections by their anchor names (see [#anchors] for more details) prefixed with
+a hash.  A section of another document must be also preceded by that
+document's identifier.
+
+*Example:*
+
+------
+Read the [intro].  See also [#anchors].
+------
+
+This will be presented as:
+
+Read the [intro].  See also [#anchors].
+
+The title of the referenced document or section becomes the name of the link
+automatically.  You can also supply a different name within the brackets
+explicitly.
+
+*Example:*
+
+-----
+Learn more about [#links using links].
+-----
+
+This will be presented as:
+
+Learn more about [#links using links].
+
+
+===== External Links =====
+
+External links beginning with '\http://', are recognized automatically, so the
+square brackets are not necessary, unless you want to give the link a more
+descriptive name.  Also e-mail addresses automatically become links.
+
+------
+The address http://www.gnu.org is the [http://www.gnu.org GNU homepage].
+Contact bill@microsoft.com for more information.
+------
+
+The address http://www.gnu.org is the [http://www.gnu.org GNU homepage].
+Contact bill@microsoft.com for more information.
+
+
+===== Images =====
+
+Any link pointing to an image will display the image in-line.
+
+*Example:*
+
+------
+http://www.google.com/images/logo.gif 
+------
+
+This will be presented as:
+
+http://www.google.com/images/logo.gif
+
+If a link name is given, this name will be used as the ALT text for this image.
+
+
+==== Special and Typographical Characters ====
+
+===== Explicit line-break =====
+
+Two slashes force a line-break:
+
+------
+This sentence will break//in the middle.
+------
+
+This sentence will break//in the middle.
+
+===== Non-breakable Space =====
+
+The line-breaks are inserted automatically, when the paragraph is formatted to
+fit the output media.  However, you sometimes don't want a line-break in a
+certain place.  You can use a tilde =\~= instead of a space in such
+cases.
+
+*Example:*
+
+------
+We can forbid a line-break between the first and second name of
+Richard~Stallman, but we must prefix the tilde with a backslash, when
+we need to write the shell command 'cd \~'.
+------
+
+This will be presented as:
+
+We can forbid a line-break between the first and second name of
+Richard~Stallman, but we must prefix the tilde with a backslash, when
+we need to write the shell command 'cd \~'.
+
+
+===== Long Dash =====
+
+Double dash (two minus signs) produce a long dash on the output
+
+*Example:*
+
+------
+LCG -- highway to excellence.
+------
+
+This will be presented as:
+
+LCG -- highway to excellence.
+
+#==== Citations ====
+
+
+==== Quotations ====
+
+Quotation begins with two reverse apostrophes and ends with two single
+apostrophes.
+
+*Example:*
+
+------
+He said: ``Who knows?''
+------
+
+This will be presented as:
+
+He said: ``Who knows?''
+
+
+=== Other features ===
+
+
+==== Escaping ====
+
+You can avoid the special meaning of all the constructs described in this
+document by prefixing them with a backslash.
+
+*Example:*
+
+------
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a markup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+------
+
+This will be presented as:
+
+Slashes are used for /emphasizing/, however sometimes you want them \/like
+here\/.  Double backslash must be used to force the \\/backslash/ itself in
+front of a markup (anywhere else in the text, backslashes can be used freely).
+Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+
+
+==== Horizontal Lines ====
+
+Horizontal line can be made with 4 dashes on a separate line.
+
+*Example:*
+
+------
+----
+------
+
+This will be presented as:
+
+----
+
+
+==== Comments ====
+
+You can comment out any text with '# ' at the beginning of a line.  This will
+make the text invisible on output media (e.g. by making it an HTML comment in
+the HTML output):
+
+------
+ The first line.
+ # These lines have been 
+ # commented out.
+ The last line.
+------
+
+This will be presented as:
+
+The first line.
+# These lines have been 
+# commented out
+The last line.
