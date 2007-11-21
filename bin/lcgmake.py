@@ -22,13 +22,13 @@ import os
 import sys, getopt, os, lcg
 
 OPTIONS = (
-    ('language=', 'en', "The content language."),
-    ('secondary-language=', None, "Secondary content language (citations)."),
     ('encoding=', 'utf-8', "Input encoding (output encoding is always utf-8)"),
-    ('stylesheet=', None, "Filename of the stylesheet to use."),
+    ('stylesheet=', 'default.css', "Filename of the stylesheet to use."),
     ('inline-styles', False, "Embed styles into the HTML pages."),
     ('ext=', 'txt', "Extension of the source files."),
     ('root=', 'index', "Filename of the root document."),
+    ('translations=', None, "Colon separated list of translation directories."),
+    ('sec-lang=', None, "Secondary content language (citations)."),
     ('hhp', False, "generate a MS HTML Help Workshop package."),
     )
 
@@ -38,9 +38,7 @@ def main():
         usage(OPTIONS)
     source_dir, destination_dir = args
     
-    reader = lcg.reader(source_dir, opt['root'], ext=opt['ext'],
-                        language=opt['language'], secondary_language=opt['secondary-language'],
-                        encoding=opt['encoding'])
+    reader = lcg.reader(source_dir, opt['root'], ext=opt['ext'], encoding=opt['encoding'])
     doc = reader.build()
     
     if opt['hhp']:
@@ -48,10 +46,14 @@ def main():
         exporter = hhp.HhpExporter
     else:
         exporter = lcg.HtmlStaticExporter
-    t = lcg.GettextTranslator(opt['language'])
-    e = exporter(translator=t, stylesheet=opt['stylesheet'],
-                 inlinestyles=opt['inline-styles'])
-    e.dump(doc, destination_dir)
+        
+    translations = (lcg.config.translation_dir,)
+    if opt['translations']:
+        translations += tuple([os.path.abspath(d) for d in opt['translations'].split(':')])
+    
+    e = exporter(stylesheet=opt['stylesheet'], inlinestyles=opt['inline-styles'],
+                 translations=translations)
+    e.dump(doc, destination_dir, sec_lang=opt['sec-lang'])
 
 
 def getoptions(optspec):
@@ -102,6 +104,9 @@ if __name__ == "__main__":
         raise
     except SystemExit:
         raise
-    except:
+    except Exception, e:
         import cgitb
-        sys.stderr.write(cgitb.text(sys.exc_info()))
+        try:
+            sys.stderr.write(cgitb.text(sys.exc_info()))
+        except:
+            raise e

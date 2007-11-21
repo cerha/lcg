@@ -1,3 +1,61 @@
+2007-11-21  Tomas Cerha  <cerha@brailcom.org>
+
+	* Makefile: Don't pass the explicit stylesheet to `lcgmake'.
+
+	* NEWS: Updated.
+
+	* bin/lcgmake.py: Respect the changes in underlying the APIs.  Use
+	the stylesheet `default.css' by default.
+
+	* bin/lcg-formatter.py: Respect the changes in the underlying
+	APIs.  Minor improvements and documentation updates.
+
+	* lib/lcg/export/export.py (Exporter.Context): New class.
+	(Generator, MarkupFormatter, Exporter): Pass along the
+	`Exporter.Context' instance instead of the exporter itself.
+
+	* lib/lcg/export/html.py (HtmlGenerator.td): New argument 'scope'.
+	(HtmlGenerator.table): New argument 'summary'.
+	(HtmlExporter): Respect the changes on node API.
+	(HtmlExporter, HtmlFormatter): Expect exporter context in all
+	methods.
+
+	* lib/lcg/_test.py: Updated.
+	
+	* lib/lcg/util.py (SplittableText, Counter): Classes removed.
+
+	* lib/lcg/resources.py: Minor fixes.
+
+	* lib/lcg/read.py: Major API cleanup and documentation.
+
+	* lib/lcg/nodes.py (ContentNode): The constructor argument and
+	method `language_variants' renamed to `variants'.  Constructor
+	arguments and methods `language' and `secondary_language' removed.
+
+	* lib/lcg/content.py: Expect exporter context in all `export()'
+	methods, not the exporter directly.
+	(SectionContainer): Generate the index in export time.
+	(ContentVariants): New class.
+
+2007-11-20  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/_index.txt: Updated.
+
+	* doc/usage/usage.en.txt: Updated.
+
+	* doc/data-formats/data-formats.en.txt: File removed.
+
+	* doc/data-formats/structured-text.cs.txt: Moved directly to `doc'.
+
+	* doc/data-formats/structured-text.en.txt: Moved directly to `doc'.
+
+	* doc/data-formats/structured-text.pl.txt: Moved directly to `doc'.
+
+	* lib/lcg/i18n.py (GettextTranslator): Use the translation path as
+	a sequence to search for translations, not as a dictionary.
+
+	* translations/help.txt: File removed.
+
 2007-11-05  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/resources.py (SharedResourceProvider.__init__): Expect a

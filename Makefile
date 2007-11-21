@@ -9,7 +9,7 @@ lib := $(shell python -c 'import sys; print "$(LIB)".find("%d") != -1 and \
 .PHONY: translations doc test
 
 doc:
-	LCGDIR=. bin/lcgmake.py --stylesheet=default.css doc html
+	LCGDIR=. bin/lcgmake.py doc html
 
 translations:
 	make -C translations

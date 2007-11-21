@@ -353,12 +353,11 @@ class Transcript(XResource):
 class _FileResourceProvider(ResourceProvider):
     """Resource provider reading the resources from filesystem."""
 
-    _cache = {}
-
     def __init__(self, dirs, dst_subdir=None):
         assert isinstance(dirs, (list, tuple))
         self._dirs = dirs
         self._dst_subdir = dst_subdir
+        self._cache = {}
         super(_FileResourceProvider, self).__init__()
         
     def _resource(self, cls, file, fallback=True, **kwargs):
@@ -402,16 +401,18 @@ class _FileResourceProvider(ResourceProvider):
             self._cache[key] = result
         return result
 
+    def resources(self, cls=None):
+        if cls is None:
+            cls = Resource
+        return tuple([r for r in self._cache.values() if isinstance(r, cls)])
+        
 
 class SharedResourceProvider(_FileResourceProvider):
     """Provides resources shared by multiple nodes."""
     
     def __init__(self, dirs=()):
         super(SharedResourceProvider, self).__init__(tuple(dirs) + (config.default_resource_dir,))
-
-    def resource(self, *args, **kwargs):
-        return self._resource(*args, **kwargs)
-    
+        
         
 class FileResourceProvider(_FileResourceProvider):
     """Provides resources read from files.
@@ -426,10 +427,9 @@ class FileResourceProvider(_FileResourceProvider):
         specified by the constructor argument `dir').
     
     """
-
-    _resources = []
     
     def __init__(self, src_dir, dst_subdir, shared_resource_provider):
+        self._resources = []
         self._shared_resource_provider = shared_resource_provider
         super(FileResourceProvider, self).__init__((src_dir,), dst_subdir=dst_subdir)
         
@@ -441,20 +441,6 @@ class FileResourceProvider(_FileResourceProvider):
             result = self._shared_resource_provider.resource(cls, *args, **kwargs)
         else:
             result = super(FileResourceProvider, self)._resource(cls, *args, **kwargs)
-        if result is not None:
-            if isinstance(result, (tuple, list)):
-                resources = result
-            else:
-                resources = (result,)
-            for r in resources:
-                if r not in self._resources:
-                    self._resources.append(r)
         return result
-    
-    def resources(self, cls=None):
-        if cls is not None:
-            return tuple([r for r in self._resources if isinstance(r, cls)])
-        else:
-            return tuple(self._resources)
 
     

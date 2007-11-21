@@ -22,8 +22,8 @@ import sys, os, getopt, codecs, lcg
 
 def main():
     try:
-        optlist, args = getopt.getopt(sys.argv[1:], '',
-                                      ('encoding=', 'title=', 'stylesheet='))
+        optlist, args = getopt.getopt(sys.argv[1:], '', ('lang=', 'title=', 'encoding=',
+                                                         'stylesheet='))
         opt = dict(optlist)
     except getopt.GetoptError:
         usage()
@@ -39,7 +39,7 @@ def main():
             fh.close()
     except IndexError:
         text = ''.join(sys.stdin.readlines())
-        name = 'index'
+        name = None
     title = opt.get('--title')
     sections = lcg.Parser().parse(text)
     if title is None:
@@ -49,32 +49,37 @@ def main():
         title = s.title()
         sections = s.content()
     rp = lcg.FileResourceProvider('.', '.', lcg.SharedResourceProvider(('.',)))
-    node = lcg.ContentNode(name, title=title, language='en',
-                           content=lcg.SectionContainer(sections),
+    node = lcg.ContentNode(name or 'index', title=title, content=lcg.SectionContainer(sections),
                            resource_provider=rp)
-    e = lcg.HtmlStaticExporter(stylesheet=opt.get('--stylesheet'),
-                               inlinestyles=True)
+    e = lcg.HtmlStaticExporter(stylesheet=opt.get('--stylesheet','default.css'), inlinestyles=True)
+    context = e.context(node, opt.get('--lang'))
+    result = context.translate(e.export(context)).encode('utf-8')
     if name:
-        e.dump(node, '.')
+        file = open(name +'.html', 'w')
+        file.write(result)
+        file.close()
     else:
-        print e.export(node).encode('utf-8')
+        print result
 
 def usage():
     import os
-    help = """Wiki to HTML formatter.
+    help = """LCG Structured Text to HTML formatter.
     
-    Usage: %s [options] file
+    Usage: %s [options] [file]
 
     Options:
     
-      --encoding   ... the input encoding.  
+      --encoding   ... the input encoding
       --title      ... document title (can be also defined as a top level
-                       section within the document.  
-      --stylesheet ... the filename of the stylesheet to be included in the
-                       resulting HTML document
-                       
-    If no input file is specified, STDIN is used.  The HTML document is printed
-    on STDOUT.  The output encoding is always UTF-8.
+                       section within the document
+      --lang       ... output language for generated strings (iso code)
+      --stylesheet ... the filename of the stylesheet to use
+                       (LCG default style is used if undefined) 
+
+    The output is written to the file of the same name as the input file,
+    only the extension is changed to '.html'.  If no input file is
+    specified, source text is read from STDIN and the result is printed
+    to STDOUT.  The output encoding is always UTF-8.
     """ % os.path.split(sys.argv[0])[-1]
     sys.stderr.write(help.replace("\n    ", "\n"))
 

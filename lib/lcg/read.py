@@ -16,12 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""Tools for building the 'ContentNode' hierarchy.
-
-This module provides classes which implement reading LCG document hierarchies from different
-sources, such as files and directories.
-
-"""
+"""Tools for building the LCG 'ContentNode' hierarchy."""
 
 import os
 import codecs
@@ -31,38 +26,70 @@ from lcg import *
 
 
 class Reader(object):
-    _INHERIT = ('language', 'secondary_language', 'language_variants')
-    _DEFAULTS = {}
-    
-    def __init__(self, id, parent=None, **kwargs):
-        """
+    """LCG content hierarchy reader.
+
+    Readers provide a generic interface for building the LCG content hierarchy.  Derived classes
+    may implement reading the data from different sources, such as files and directories, databases
+    or python source files.
+
+    Reader instances are created hierarchically, matching the content node hierarchy, but the major
+    difference is that the nodes are constructed from bottom up (the leave nodes must be
+    instantiated first), while readers from the top (reader of the root node first).
+
+    The 'build()' method of the reader invokes the recursive process of building the complete
+    hierarchy and the corresponding 'ContentNode' instances.
+
+    Except for the arguments 'id' and 'hidden', which are passed to 'Reader' constructor, all the
+    remaining 'ContentNode' constructor arguments are read by the reader from the data source.
+    Just override the corresponding method, such as '_title()' for the 'title' argument, etc.
+
+    """
+    def __init__(self, id, parent=None, hidden=False):
+        """Initialize the instance.
+
+        Arguments:
+
+          id -- node identifier
+          parent -- parent 'Reader' instance in the hierarchy
+          hidden -- boolean flag passed to the created 'ContentNode' constructor
 
         """
         super(Reader, self).__init__()
         self._id = id
         self._parent = parent
-        kwargs.update(self._DEFAULTS)
+        self._hidden = hidden
         if parent is not None:
-            pkwargs = parent._kwargs
-            for arg in self._INHERIT:
-                if not kwargs.has_key(arg) and pkwargs.has_key(arg):
-                    kwargs[arg] = pkwargs[arg]
             root = parent
             while root.parent() is not None:
                 root = root.parent()
         else:
             root = self
         self._root = root
-        self._language = kwargs.get('language')
-        kwargs['id'] = id
-        kwargs['resource_provider'] = self._resource_provider()
-        self._kwargs = kwargs
+        self._resource_provider_ = self._resource_provider()
         
-    def _create_content(self):
+    def _title(self):
+        return None
+    
+    def _brief_title(self):
+        return None
+    
+    def _descr(self):
+        return None
+    
+    def _content(self):
         return None
         
-    def _create_children(self):
+    def _children(self):
         return ()
+
+    def _variants(self):
+        if self._parent is not None:
+            return self._parent._variants_
+        else:
+            return ()
+
+    def _globals(self):
+        return {}
 
     def _resource_provider(self):
         if self is self._root:
@@ -76,16 +103,17 @@ class Reader(object):
     def parent(self):
         return self._parent
     
-    def language(self):
-        return self._language
-
     def resource_provider(self):
-        return self._kwargs['resource_provider']
-    
+        return self._resource_provider_
+
     def build(self):
-        content = self._create_content()
-        children = [child.build() for child in self._create_children()]
-        return ContentNode(content=content, children=children, **self._kwargs)
+        """Build hierarchy of 'ContentNode' instances and return the root node."""
+        self._variants_ = variants = self._variants()
+        return ContentNode(id=self._id, title=self._title(), brief_title=self._brief_title(),
+                           descr=self._descr(), variants=variants, content=self._content(), 
+                           children=[child.build() for child in self._children()],
+                           resource_provider=self._resource_provider_,
+                           globals=self._globals(), hidden=self._hidden)
     
         
 class FileReader(Reader):
@@ -111,7 +139,9 @@ class FileReader(Reader):
             p = self._root._shared_resource_provider_
         else:
             p = self._root.resource_provider()
-        subdir = os.path.normpath(self._dir)[len(os.path.normpath(self._root.dir()))+len(os.sep):]
+        d1, d2 = os.path.normpath(self._dir), os.path.normpath(self._root.dir())
+        assert d1.startswith(d2), (d1, d2)
+        subdir = d1[len(d2)+len(os.sep):]
         return FileResourceProvider(self._dir, subdir, shared_resource_provider=p)
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
@@ -127,8 +157,9 @@ class FileReader(Reader):
         filename = self._input_file(name, ext=ext, lang=lang, dir=dir)
         if lang is not None and not os.path.exists(filename):
             filename2 = self._input_file(name, ext=ext, dir=dir)
-            log("File '%s' not found. Trying '%s' instead.", filename,filename2)
-            filename = filename2
+            if os.path.exists(filename2):
+                log("File '%s' not found. Using '%s' instead.", filename, filename2)
+                filename = filename2
         fh = codecs.open(filename, encoding=self._encoding)
         try:
             lines = fh.readlines()
@@ -170,28 +201,42 @@ class StructuredTextReader(FileReader):
         self._parser = Parser()
         super(StructuredTextReader, self).__init__(*args, **kwargs)
 
-    def _source_text(self):
+    def _source_text(self, lang):
         return None
         
-    def _parse_source_text(self, text, macro=False, globals=None, subst=None):
-        """Parse the text and return a sequence of content elements."""
-        if macro:
-            mp = MacroParser(substitution_provider=subst)
-            if globals:
-                mp.add_globals(**globals)
-            text = mp.parse(text)
+    def _parse_text(self, text):
         return self._parser.parse(text)
+
+    def _document(self, text):
+        sections = self._parse_text(text)
+        if len(sections) != 1 or not isinstance(sections[0], Section):
+            raise Exception("The document has no top-level section:", self._id)
+        s = sections[0]
+        title = s.title()
+        sections = s.content()
+        return title, SectionContainer(sections, toc_depth=0)
+
+    def _title(self):
+        # This method is called first, so we read the document here and store the content for later
+        # use.
+        variants = self._variants_
+        if len(variants) <= 1:
+            lang = variants and variants[0] or None
+            title, content = self._document(self._source_text(lang))
+        else:
+            titles = {}
+            content_variants = []
+            for lang in variants:
+                titles[lang], c = self._document(self._source_text(lang))
+                content_variants.append((lang, c))
+            title = SelfTranslatableText(self._id, translations=titles)
+            content = ContentVariants(content_variants)
+        self._content_ = content
+        return title
     
-    def _create_content(self):
-        sections = self._parse_source_text(self._source_text())
-        if self._kwargs.get('title') is None:
-            if len(sections) != 1 or not isinstance(sections[0], Section):
-                raise Exception("The document has no top-level section:", self._id)
-            s = sections[0]
-            self._kwargs['title'] = s.title()
-            sections = s.content()
-        return SectionContainer(sections, toc_depth=0)
-    
+    def _content(self):
+        return self._content_
+
     
 class DocFileReader(StructuredTextReader):
     """Node of a Structured Text read from a source file."""
@@ -201,22 +246,24 @@ class DocFileReader(StructuredTextReader):
 
         Arguments:
         
-          ext -- the extension of the input file ('txt' by default).  The
-            complete filename is the node's id, an optional language extension
-            and this extension.
+          ext -- the extension of the input file ('txt' by default).  The complete filename is the
+            node's id, an optional language extension and this extension.
 
           The other arguments are inherited from the parent class.
           
         """
         self._ext = ext
         super(DocFileReader, self).__init__(id, **kwargs)
-        if not self._kwargs.get('language_variants'):
-            variants = [os.path.splitext(os.path.splitext(f)[0])[1][1:]
-                        for f in glob.glob(self._input_file(self._id, lang='*', ext=self._ext))]
-            self._kwargs['language_variants'] = variants
+
+    def _variants(self):
+        if self._parent is not None:
+            return self._parent._variants_
+        else:
+            return tuple([os.path.splitext(os.path.splitext(f)[0])[1][1:]
+                          for f in glob.glob(self._input_file(self._id, lang='*', ext=self._ext))])
     
-    def _source_text(self):
-        return self._read_file(self._id, lang=self._language, ext=self._ext)
+    def _source_text(self, lang):
+        return self._read_file(self._id, lang=lang, ext=self._ext)
         
     
 class DocDirReader(DocFileReader):
@@ -247,13 +294,12 @@ class DocDirReader(DocFileReader):
         except IOError:
             return [(item, False) for item in listdir(dir)]
         else:
-            items = [item for item in [line.strip()
-                                       for line in index.readlines()]
+            items = [item for item in [line.strip() for line in index.readlines()]
                      if item != '' and not item.startswith('#')]
             hidden = listdir(dir, exclude=items)
             return [(x, False) for x in items] + [(x, True) for x in hidden]
 
-    def _create_children(self):
+    def _children(self):
         children = []
         for name, hidden in self._list_dir(self._dir):
             if name not in (self._id, 'resources'):

@@ -1,5 +1,20 @@
 -*- mode: change-log -*-
 
+2007-11-05  Tomas Cerha  <cerha@brailcom.org>
+
+	Version 0.3.6
+
+	Removed all files specific to e-learning (exercises etc.).
+
+	New i18n classes for locale-formatted decimal and monetary
+	amounts.
+
+	New interface for locale data definition.
+
+	`Reader' API cleaning and stabilization.
+
+	Generate all language variants in one pass.
+
 2007-08-10  Tomas Cerha  <cerha@brailcom.org>
 
 	Version 0.3.5

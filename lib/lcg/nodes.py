@@ -37,9 +37,8 @@ class ContentNode(object):
     
     """
 
-    def __init__(self, id, title=None, brief_title=None, descr=None, language=None,
-                 secondary_language=None, language_variants=(), content=None, children=(),
-                 hidden=False, active=True, resource_provider=None, globals=None):
+    def __init__(self, id, title=None, brief_title=None, descr=None, variants=(), content=None,
+                 children=(), hidden=False, active=True, resource_provider=None, globals=None):
         """Initialize the instance.
 
         Arguments:
@@ -55,14 +54,8 @@ class ContentNode(object):
           descr -- a short textual description of this node (as a uni code string).  Additional
             information, which may determine the content of the node in addition to the title.
           
-          language -- content language as a lowercase ISO 639-1 Alpha-2
-            language code.
-            
-          secondary_language -- secondary content language (used in citations) as a lowercase ISO
-            639-1 Alpha-2 language code.
-            
-          language_variants -- a sequence of all available language variants of this node.  The
-            sequence contains language codes as strings.  
+          variants -- a sequence of all available language variants of this node.  The
+            sequence contains lowercase ISO 639-1 Alpha-2 language codes as strings.  
 
           content -- a content element hierarchy.  This is the actual content of this node.  The
             value can be a `Content' instance or a sequence of `Content' instances.
@@ -89,12 +82,7 @@ class ContentNode(object):
         assert isinstance(id, str), repr(id)
         assert isinstance(hidden, bool), hidden
         assert isinstance(active, bool), active
-        assert language is None or isinstance(language, str) and \
-               len(language) == 2, repr(language)
-        assert secondary_language is None or \
-               isinstance(secondary_language, str) and \
-               len(secondary_language) == 2, repr(secondary_language)
-        assert isinstance(language_variants, (list, tuple))
+        assert isinstance(variants, (list, tuple))
         self._id = id
         self._parent = None #parent
         self._title = title or brief_title or id
@@ -102,9 +90,7 @@ class ContentNode(object):
         self._descr = descr
         self._hidden = hidden
         self._active = active
-        self._language = language
-        self._secondary_language = secondary_language
-        self._language_variants = tuple(language_variants)
+        self._variants = tuple(variants)
         if isinstance(content, (tuple, list)):
             content = SectionContainer(content)
         assert isinstance(content, Content), content
@@ -170,20 +156,20 @@ class ContentNode(object):
     def content(self):
         return self._content
     
-    def sections(self):
+    def sections(self, context):
         """Return all the top-level sections within this node's content."""
-        return self._content.sections()
+        return self._content.sections(context)
     
-    def find_section(self, anchor):
+    def find_section(self, anchor, context):
         def find(anchor, sections):
             for s in sections:
                 if s.anchor() == anchor:
                     return s
-                found = find(anchor, s.sections())
+                found = find(anchor, s.sections(context))
                 if found:
                     return found
             return None
-        return find(anchor, self.sections())
+        return find(anchor, self.sections(context))
 
     def find_node(self, id):
         def find(id, node):
@@ -246,22 +232,14 @@ class ContentNode(object):
         """
         return self._children.index(node)
 
-    def language(self):
-        """Return the content language as an ISO 639-1 Alpha-2 code."""
-        return self._language
-
-    def secondary_language(self):
-        """Return the secondary language as an ISO 639-1 Alpha-2 code."""
-        return self._secondary_language
-
-    def language_variants(self):
+    def variants(self):
         """Return the tuple of available language variants of this node.
 
         The returned tuple consists of language codes including the language of
         the current node.
         
         """
-        return self._language_variants
+        return self._variants
         
     def globals(self):
         """Return the node variables as a dictionary keyed by variable names."""

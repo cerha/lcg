@@ -22,9 +22,7 @@ from lcg import *
 
         
 class Generator(object):
-    
-    def __init__(self, exporter):
-        self._exporter = exporter
+    pass
         
         
 class MarkupFormatter(object):
@@ -63,8 +61,7 @@ class MarkupFormatter(object):
 
     _FORMAT = {}
 
-    def __init__(self, exporter):
-        self._exporter = exporter
+    def __init__(self):
         regexp = r"(?P<%s>\\*%s)"
         pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
                                 regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
@@ -77,7 +74,7 @@ class MarkupFormatter(object):
         self._paired_on_output = [type for type, format in self._FORMAT.items()
                                   if isinstance(format, tuple)]
 
-    def _markup_handler(self, parent, match):
+    def _markup_handler(self, context, match):
         type = [key for key, m in match.groupdict().items()
                 if m and not key in self._HELPER_PATTERNS][0]
         markup = match.group(type)
@@ -99,12 +96,12 @@ class MarkupFormatter(object):
         if not start and self._open and type == self._open[-1]:
             # Closing an open markup.
             self._open.pop()
-            result = self._formatter(parent, type, match.groupdict(), close=True)
+            result = self._formatter(context, type, match.groupdict(), close=True)
         elif not end and not (start and type in self._open):
             # Start markup or an unpaired markup.
             if start:
                 self._open.append(type)
-            result = self._formatter(parent, type, match.groupdict())
+            result = self._formatter(context, type, match.groupdict())
         else:
             # Markup in an invalid context is just printed as is.
             # This can be end markup, which was not opened or start markup,
@@ -112,7 +109,7 @@ class MarkupFormatter(object):
             result = markup
         return prefix + result
 
-    def _substitution_formatter(self, parent, subst, **kwargs):
+    def _substitution_formatter(self, context, subst, **kwargs):
         # get the substitution value for _SUBSTITUTION_REGEX match
         if subst.startswith('{') and subst.endswith('}'):
             text = subst[1:-1]
@@ -120,7 +117,7 @@ class MarkupFormatter(object):
             text = subst
         if not text:
             return '$' + subst
-        result = parent.globals()
+        result = context.node().globals()
         for name in text.split('.'):
             try:
                 result = result[str(name)]
@@ -130,52 +127,83 @@ class MarkupFormatter(object):
             result = str(result)
         return result
 
-    def _formatter(self, parent, type, groups, close=False):
+    def _formatter(self, context, type, groups, close=False):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
         except AttributeError:
             f = self._FORMAT[type]
             return type in self._paired_on_output and f[close and 1 or 0] or f
-        return formatter(parent, close=close, **groups)
+        return formatter(context, close=close, **groups)
         
-    def format(self, parent, text):
+    def format(self, context, text):
         self._open = []
         result = []
         pos = 0
         for match in self._rules.finditer(text):
-            result.extend((text[pos:match.start()], self._markup_handler(parent, match)))
+            result.extend((text[pos:match.start()], self._markup_handler(context, match)))
             pos = match.end()
         result.append(text[pos:])
         self._open.reverse()
         x = self._open[:]
         for type in x:
-            result.append(self._formatter(parent, type, {}, close=True))
+            result.append(self._formatter(context, type, {}, close=True))
         return concat(result)
 
 
 class Exporter(object):
 
-    _GENERATOR = Generator
-    _FORMATTER = MarkupFormatter
-    
-    def __init__(self, translator=None):
-        self._translator = translator or NullTranslator()
-        self._generator = self._GENERATOR(self)
-        self._formatter = self._FORMATTER(self)
+    Generator = Generator
+    Formatter = MarkupFormatter
 
-    def translate(self, text):
-        return self._translator.translate(text)
-    
-    def generator(self):
-        return self._generator
+    class Context(object):
+        def __init__(self, exporter, generator, formatter, translator, node, sec_lang=None):
+            self._exporter = exporter
+            self._generator = generator
+            self._formatter = formatter
+            self._translator = translator
+            self._node = node
+            self._sec_lang = sec_lang
+            
+        def exporter(self):
+            return self._exporter
+        
+        def generator(self):
+            return self._generator
+        
+        def formatter(self):
+            return self._formatter
+        
+        def lang(self):
+            return self._translator.lang()
 
-    def format(self, parent, text):
-        """Format formatted text using the current formatter."""
-        if text:
-            return self._formatter.format(parent, text)
+        def sec_lang(self):
+            return self._sec_lang
+    
+        def node(self):
+            return self._node
+            
+        def translate(self, text):
+            return self._translator.translate(text)
+
+    def __init__(self, translations=()):
+        self._generator = self.Generator()
+        self._formatter = self.Formatter()
+        self._translations = translations
+        self._translators = {}
+
+    def _translator(self, lang):
+        return GettextTranslator(lang, path=self._translations)
+
+    def context(self, node, lang, sec_lang=None):
+        if lang is None:
+            translator = NullTranslator()
         else:
-            return ''
-    
-    def export(self, node):
-        """Return the exported node as a string."""
+            try:
+                translator = self._translators[lang]
+            except KeyError:
+                translator = self._translators[lang] = self._translator(lang)
+        return self.Context(self, self._generator, self._formatter, translator, node, sec_lang)
 
+    def export(self, context):
+        """Return the exported node as a string."""
+        pass

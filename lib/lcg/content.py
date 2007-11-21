@@ -64,7 +64,7 @@ class Content(object):
         self._lang = lang
         super(Content, self).__init__(**kwargs)
         
-    def sections(self):
+    def sections(self, context):
         """Return the contained sections as a sequence of 'Section' instances.
 
         This method allows creation of tables of contents and introspection of
@@ -80,8 +80,7 @@ class Content(object):
     def set_container(self, container):
         if __debug__:
             cls = self._ALLOWED_CONTAINER or Container
-            assert isinstance(container, cls), \
-                   "Not a '%s' instance: %s" % (cls.__name__, container)
+            assert isinstance(container, cls), "Not a '%s' instance: %s" % (cls.__name__,container)
         self._container = container
 
     def set_parent(self, node):
@@ -106,16 +105,16 @@ class Content(object):
     def lang(self):
         return self._lang or self._container and self._container.lang()
 
-    def export(self, exporter):
+    def export(self, context):
         """Return the HTML formatted content as a string."""
         return ''
 
     
 class HorizontalSeparator(Content):
     
-    def export(self, exporter):
+    def export(self, context):
         """Return the HTML formatted content as a string."""
-        return exporter.generator().hr()
+        return context.generator().hr()
         
 
 class TextContent(Content):
@@ -144,7 +143,7 @@ class TextContent(Content):
         cls = self.__class__.__name__
         return '<%s at 0x%x text="%s">' % (cls, id(self), sample)
 
-    def export(self, exporter):
+    def export(self, context):
         return self._text
 
     
@@ -154,14 +153,14 @@ class WikiText(TextContent):
     See 'MarkupFormatter' for more information about the formatting rules.
     
     """
-    def export(self, exporter):
-        return exporter.format(self.parent(), self._text)
+    def export(self, context):
+        return self._text and context.formatter().format(context, self._text) or ''
 
     
 class PreformattedText(TextContent):
     """Preformatted text."""
-    def export(self, exporter):
-        g = exporter.generator()
+    def export(self, context):
+        g = context.generator()
         return g.pre(g.escape(self._text), cls="lcg-preformatted-text")
 
 
@@ -175,8 +174,8 @@ class Anchor(TextContent):
     def anchor(self):
         return self._anchor
         
-    def export(self, exporter):
-        return exporter.generator().link(self._text, None, name=self.anchor())
+    def export(self, context):
+        return context.generator().link(self._text, None, name=self.anchor())
 
 
 class InlineImage(Content):
@@ -194,12 +193,12 @@ class InlineImage(Content):
         self._name = name
         super(InlineImage, self).__init__()
 
-    def export(self, exporter):
+    def export(self, context):
         img = self._image
         kwargs = dict(alt=self._title or img.title() or '', descr=img.descr(),
                       align=self._align, cls=self._name,
                       width=img.width(), height=img.height())
-        return exporter.generator().img(img.uri(), **kwargs)
+        return context.generator().img(img.uri(), **kwargs)
 
 
 class Container(Content):
@@ -248,15 +247,15 @@ class Container(Content):
     def content(self):
         return self._content
             
-    #def export(self, exporter):
-    #    return "".join([p.export(exporter) for p in self._content])
+    #def export(self, context):
+    #    return "".join([p.export(context) for p in self._content])
 
-    def _exported_content(self, exporter):
-        return [c.export(exporter) for c in self._content]
+    def _exported_content(self, context):
+        return [c.export(context) for c in self._content]
     
-    def export(self, exporter):
+    def export(self, context):
         tag = self._TAG
-        exported = self._exported_content(exporter)
+        exported = self._exported_content(context)
         attr = self._lang   and ' lang="%s"'  % self._lang  or ''
         attr += self._CLASS and ' class="%s"' % self._CLASS or ''
         attr += self._ATTR  and (' '+self._ATTR) or ''
@@ -291,12 +290,12 @@ class ItemizedList(Container):
         self._type = type
         super(ItemizedList, self).__init__(content, **kwargs)
 
-    def export(self, exporter):
+    def export(self, context):
         o, s = {self.TYPE_UNORDERED: (False, None),
                 self.TYPE_NUMERIC: (True, None),
                 self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
-        items = [p.export(exporter) for p in self._content]
-        return exporter.generator().list(items, ordered=o, style=s, lang=self._lang)
+        items = [p.export(context) for p in self._content]
+        return context.generator().list(items, ordered=o, style=s, lang=self._lang)
 
     
 class Definition(Container):
@@ -305,8 +304,8 @@ class Definition(Container):
     def __init__(self, term, description):
         super(Definition, self).__init__((term, description))
 
-    def export(self, exporter):
-        t, d = [c.export(exporter) for c in self._content]
+    def export(self, context):
+        t, d = [c.export(context) for c in self._content]
         return "<dt>%s</dt><dd>%s</dd>\n" % (t,d)
 
     
@@ -344,9 +343,9 @@ class Table(Container):
         self._title = title
         super(Table, self).__init__(content, **kwargs)
         
-    def _exported_content(self, exporter):
+    def _exported_content(self, context):
         caption = self._title and "<caption>%s</caption>" % self._title or ''
-        return [caption] + super(Table, self)._exported_content(exporter)
+        return [caption] + super(Table, self)._exported_content(context)
 TableRow._ALLOWED_CONTAINER = Table
 
     
@@ -357,9 +356,9 @@ class Field(Container):
     def __init__(self, label, value):
         super(Field, self).__init__((label, value))
 
-    def export(self, exporter):
+    def export(self, context):
         f = '<tr><th align="left" valign="top">%s:</th><td>%s</td></tr>\n'
-        return f % tuple([c.export(exporter) for c in self._content])
+        return f % tuple([c.export(context) for c in self._content])
 
     
 class FieldSet(Table):
@@ -391,34 +390,28 @@ class SectionContainer(Container):
             of 'TableOfContents' constructor.
 
         """
+        self._toc_depth = toc_depth
         super(SectionContainer, self).__init__(content, **kwargs)
-        sections = []
-        toc_sections = []
-        already_has_toc = False
-        for s in self._content:
-            if isinstance(s, TableOfContents) and not sections:
-                already_has_toc = True
-            elif isinstance(s, Section):
-                sections.append(s)
-                if s.in_toc():
-                    toc_sections.append(s)
-        self._sections = sections
-        if toc_depth is None or toc_depth > 0 and not already_has_toc and \
-               (len(toc_sections) > 1 or len(toc_sections) == 1 and 
-                len([s for s in toc_sections[0].sections() if s.in_toc()])):
-            self._toc = TableOfContents(self, _("Index:"), depth=toc_depth)
-        else:
-            self._toc = Content()
-        self._toc.set_container(self)
-        
 
-    def sections(self):
-        return self._sections
+    def sections(self, context):
+        return [c for c in self._content if isinstance(c, Section)]
     
-    def _exported_content(self, exporter):
-        toc = self._toc.export(exporter)
-        sections = super(SectionContainer, self)._exported_content(exporter)
-        return [toc] + sections
+    def _exported_content(self, context):
+        result = super(SectionContainer, self)._exported_content(context)
+        toc_sections = []
+        for c in self._content:
+            if isinstance(c, TableOfContents) and not toc_sections:
+                return result
+            if isinstance(c, Section) and c.in_toc():
+                toc_sections.append(c)
+        if self._toc_depth is None or self._toc_depth > 0 and not already_has_toc and \
+               (len(toc_sections) > 1 or len(toc_sections) == 1 and 
+                len([s for s in toc_sections[0].sections(context) if s.in_toc()])):
+            toc = TableOfContents(self, _("Index:"), depth=self._toc_depth)
+            toc.set_container(self)
+            toc.set_parent(self.parent())
+            result = [toc.export(context)] + result
+        return result
     
     
 class Section(SectionContainer):
@@ -475,7 +468,7 @@ class Section(SectionContainer):
     
     def section_number(self):
         """Return the number of this section within it's container as int."""
-        return list(self._container.sections()).index(self) + 1
+        return list(self._container.sections(None)).index(self) + 1
     
     def title(self):
         """Return the section title as a string."""
@@ -504,19 +497,19 @@ class Section(SectionContainer):
     def _backref(self):
         return "backref-" + self.anchor()
         
-    def _header(self, exporter):
+    def _header(self, context):
         if self._backref_used:
             href = "#"+self._backref()
         else:
             href = None
-        g = exporter.generator()
+        g = context.generator()
         return g.h(g.link(self.title(), href, cls='backref',
                           name=self.anchor()),
                    len(self._section_path()) + 1)+'\n'
 
-    def export(self, exporter):
-        g = exporter.generator()
-        return g.div((self._header(exporter), super(Section, self).export(exporter)),
+    def export(self, context):
+        g = context.generator()
+        return g.div((self._header(context), super(Section, self).export(context)),
                      id='section-' + self.anchor())
 
 
@@ -550,24 +543,24 @@ class NodeIndex(Content):
         self._depth = depth
         self._detailed = detailed
                       
-    def _export_title(self, exporter):
-        g = exporter.generator()
+    def _export_title(self, context):
+        g = context.generator()
         return g.div(g.strong(self._title), cls='title')
 
     def _start_item(self):
         return self._node or self.parent()
         
-    def export(self, exporter):
-        toc = self._make_toc(exporter, self._start_item(), depth=self._depth)
+    def export(self, context):
+        toc = self._make_toc(context, self._start_item(), depth=self._depth)
         if self._title is not None:
             #TODO: add a "skip" link?
-            g = exporter.generator()
-            return g.div((self._export_title(exporter), toc), cls="table-of-contents")
+            g = context.generator()
+            return g.div((self._export_title(context), toc), cls="table-of-contents")
         else:
             return toc
         
-    def _make_toc(self, exporter, item, indent=0, depth=1):
-        g = exporter.generator()
+    def _make_toc(self, context, item, indent=0, depth=1):
+        g = context.generator()
         if depth is not None:
             if depth <= 0:
                 return ''
@@ -579,7 +572,7 @@ class NodeIndex(Content):
             if isinstance(item, (tuple, list)):
                 items = item
             else:
-                items = [s for s in item.sections() if s.in_toc()]
+                items = [s for s in item.sections(context) if s.in_toc()]
         if len(items) == 0:
             return ''
         links = []
@@ -587,7 +580,7 @@ class NodeIndex(Content):
         while current is not None and current.hidden():
             current = current.parent()
         for i in items:
-            uri = exporter.uri(i, relative_to=parent)
+            uri = context.exporter().uri(context, i, relative_to=parent)
             name = isinstance(i, Section) and i.backref(parent) or None
             cls = i is current and 'current' or None
             descr = None
@@ -597,7 +590,7 @@ class NodeIndex(Content):
                     cls = (cls and cls + ' ' or '') + 'inactive'
             links.append(g.link(i.title(), uri, title=descr, name=name, cls=cls) + \
                          #(descr is not None and (' ... ' + descr) or '-') + \
-                         self._make_toc(exporter, i, indent=indent+4, depth=depth))
+                         self._make_toc(context, i, indent=indent+4, depth=depth))
         return concat("\n", g.list(links, indent=indent), "\n", ' '*(indent-2))
 
 
@@ -677,11 +670,10 @@ class Link(Container):
             descr = None
         return descr
     
-    def export(self, exporter):
-        label = concat(self._exported_content(exporter))
-        uri = exporter.uri(self._target)
-        g = exporter.generator()
-        return g.link(label, uri, title=self._descr(), type=self._type)
+    def export(self, context):
+        label = concat(self._exported_content(context))
+        uri = context.exporter().uri(context, self._target)
+        return context.generator().link(label, uri, title=self._descr(), type=self._type)
 
 
 class Title(Content):
@@ -701,23 +693,58 @@ class Title(Content):
         super(Title, self).__init__()
         self._id = id
         
-    def export(self, exporter):
-        id = self._id
+    def export(self, context):
         parent = self.parent()
-        if id is None:
+        if self._id is None:
             item = parent
         else:
-            item = parent.find_section(id)
+            item = parent.find_section(self._id, context)
             if not item:
-                item = parent.root().find_node(id)
+                item = parent.root().find_node(self._id)
             if not item:
-                return id
+                return self._id
         return item.title()
 
 
 class NoneContent(Content):
-    def export(self, exporter):
+    def export(self, context):
         return ''
+
+
+class ContentVariants(Container):
+    """Container of multiple language variants of the same content.
+
+    This implements one of two LCG methods for creating multilingual documents.  The second method
+    uses 'TranslatableText' within the content and is mostly useful for content, which has the
+    identical structure in all language variants, only the user visible texts are translated.
+    'ContentVariants', on the other hand, allow you to include a completely arbitrary subcontent
+    for each language within one document.  Only the relevant variant is used in export time (when
+    the target language is already known).
+
+    """
+    def __init__(self, variants):
+        """Initialize the instance.
+        
+        Arguments:
+        
+          variants -- a sequence of pairs (LANG, CONTENT), where LANG is the ISO 639-1 Alpha-2
+            language code and CONTENT is the actual content variant for this language as a
+            'Content' instance or a sequence of 'Content' instances.
+            
+        """
+        self._variants = {}
+        for lang, content in variants:
+            if isinstance(content, (list, tuple)): 
+                content = SectionContainer(content)
+            self._variants[lang] = content
+        super(ContentVariants, self).__init__(self._variants.values())
+
+    def sections(self, context):
+        return self._variants[context.lang()].sections(context)
+        
+    def export(self, context):
+        return self._variants[context.lang()].export(context)
+    
     
 # Convenience functions for simple content construction.
 

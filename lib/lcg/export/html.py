@@ -140,18 +140,20 @@ class HtmlGenerator(Generator):
                 ('class', cls), ('style', style))
         return self._tag('th', attr, content)
     
-    def td(self, content, colspan=None, width=None, align=None, valign=None, cls=None, style=None):
+    def td(self, content, colspan=None, width=None, align=None, valign=None, cls=None, style=None,
+           scope=None):
         attr = (('colspan', colspan), ('width', width), ('align', align), ('valign', valign),
-                ('class', cls), ('style', style))
+                ('class', cls), ('style', style), ('scope', scope))
         return self._tag('td', attr, content)
     
     def tr(self, content, cls=None, style=None):
         attr = (('class', cls), ('style', style))
         return self._tag('tr', attr, content)
 
-    def table(self, content, border=None, cellspacing=None, cellpadding=None, width=None,
-              cls=None, style=None):
-        attr = (('border', border), ('cellspacing', cellspacing), ('cellpadding', cellpadding),
+    def table(self, content, title=None, summary=None, border=None, cellspacing=None,
+              cellpadding=None, width=None, cls=None, style=None):
+        attr = (('title', title), ('summary', summary), ('border', border),
+                ('cellspacing', cellspacing), ('cellpadding', cellpadding),
                 ('width', width), ('class', cls), ('style', style))
         return self._tag('table', attr, content, newlines=True)
 
@@ -344,9 +346,9 @@ class HtmlFormatter(MarkupFormatter):
                                     '(jpe?g|png|gif))$', re.IGNORECASE)
     _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
 
-    def _citation_formatter(self, parent, close=False, **kwargs):
+    def _citation_formatter(self, context, close=False, **kwargs):
         if not close:
-            lang = parent.secondary_language()
+            lang = context.sec_lang()
             langattr = lang and ' lang="%s"' % lang or ''
             return '<span%s class="citation">' % langattr
         else:
@@ -361,14 +363,13 @@ class HtmlFormatter(MarkupFormatter):
             return True, uri, dict(name=name, align=align)
         return False, uri, {}
         
-    def _find_resource(self, parent, cls, filename, label, fallback=False, **imgargs):
-        result = parent.resource(cls, filename, fallback=False)
+    def _find_resource(self, node, cls, filename, label, fallback=False, **imgargs):
+        result = node.resource(cls, filename, fallback=False)
         if not result and fallback:
             if issubclass(cls, XResource):
-                result = resource(parent, cls, filename, fallback=True,
-                                  title=label)
+                result = resource(node, cls, filename, fallback=True, title=label)
             else:
-                log("%s: Unknown resource: %s: %s" % (parent.id(), cls.__name__, filename))
+                log("%s: Unknown resource: %s: %s" % (node.id(), cls.__name__, filename))
                 result = cls(filename, title=label)
         if result:
             title = label or result.title()
@@ -378,10 +379,10 @@ class HtmlFormatter(MarkupFormatter):
                 return Link(result, label=title)
         return None
 
-    def _link_formatter(self, parent, label=None, href=None, anchor=None,
-                        close=False, **kwargs):
+    def _link_formatter(self, context, label=None, href=None, anchor=None, close=False, **kwargs):
         node = None
         result = None
+        parent = context.node()
         if href and not anchor:
             is_image, href, imgargs = self._match_image(href)
             cls = is_image and Image or Resource
@@ -395,7 +396,7 @@ class HtmlFormatter(MarkupFormatter):
                     log("%s: Unknown node: %s" % (parent.id(), href))
             target = node
             if node and anchor:
-                target = node.find_section(anchor)
+                target = node.find_section(anchor, context)
                 if target is None:
                     log("%s: Unknown section: %s:%s" %
                         (parent.id(), node.id(), anchor))
@@ -413,20 +414,20 @@ class HtmlFormatter(MarkupFormatter):
                         target = Link.ExternalTarget(href, title, descr=title)
             result = Link(target, label=label)
         result.set_parent(parent)
-        return result.export(self._exporter)
+        return result.export(context)
     
-    def _uri_formatter(self, parent, uri, close=False, **kwargs):
-        return self._link_formatter(parent, href=uri, label=None)
+    def _uri_formatter(self, context, uri, close=False, **kwargs):
+        return self._link_formatter(context, href=uri, label=None)
 
-    def _email_formatter(self, parent, email, close=False, **kwargs):
-        return self._link_formatter(parent, href='mailto:'+email, label=email)
+    def _email_formatter(self, context, email, close=False, **kwargs):
+        return self._link_formatter(context, href='mailto:'+email, label=email)
 
     
 class HtmlExporter(Exporter):
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
 
-    _GENERATOR = HtmlGenerator
-    _FORMATTER = HtmlFormatter
+    Generator = HtmlGenerator
+    Formatter = HtmlFormatter
     
     _BODY_PARTS = ('heading',
                    'language_selection',
@@ -440,84 +441,86 @@ class HtmlExporter(Exporter):
         self._stylesheet = stylesheet
         self._inlinestyles = inlinestyles
     
-    def _output_file(self, node, lang=None):
+    def _output_file(self, context, node, lang=None):
         """Return the pathname of node's output file relative to export dir."""
-        assert isinstance(node, ContentNode)
         name = node.id().replace(':', '-')
         if lang is None:
-            lang = node.language()
-        if lang is not None and len(node.language_variants()) > 1:
+            lang = context.lang()
+        if lang is not None and len(node.variants()) > 1:
             name += '.'+lang
         return name + '.html'
 
-    def _node_uri(self, node, lang=None):
-        return self._output_file(node, lang=lang)
+    def _node_uri(self, context, node, lang=None):
+        return self._output_file(context, node, lang=lang)
 
-    def uri(self, target, relative_to=None):
+    def uri(self, context, target, relative_to=None):
         """Return the URI of the target as string."""
         if isinstance(target, ContentNode):
-            return self._node_uri(target)
+            return self._node_uri(context, target)
         elif isinstance(target, Section):
             if relative_to is not None and relative_to is target.parent():
                 base = ''
             else:
-                base = self.uri(target.parent())
+                base = self.uri(context, target.parent())
             return base + "#" + target.anchor()
         elif isinstance(target, (Link.ExternalTarget, Resource)):
             return target.uri()
         else:
             raise Exception("Invalid URI target:", target)
     
-    def _styles(self, node):
+    def _styles(self, context):
         if self._inlinestyles:
             return ['<style type="text/css">\n%s</style>' % s.get()
-                    for s in node.resources(Stylesheet)]
+                    for s in context.node().resources(Stylesheet)]
         else:
             return ['<link rel="stylesheet" type="text/css" href="%s">' % \
-                    s.uri() for s in node.resources(Stylesheet)]
+                    s.uri() for s in context.node().resources(Stylesheet)]
             
     def _title(self, node):
         return node.title()
 
-    def _meta(self, node):
+    def _meta(self, context):
         import lcg
         return (('generator', 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
     
-    def _head(self, node):
+    def _head(self, context):
+        node = context.node()
         if self._stylesheet is not None:
             node.resource(XStylesheet, self._stylesheet)
         tags = [concat('<title>', self._title(node), '</title>')] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
-                             ('Content-Language', node.language()),
+                             ('Content-Language', context.lang()),
                              ('Content-Script-Type', 'text/javascript'),
                              ('Content-Style-Type', 'text/css'))] + \
-               ['<meta name="%s" content="%s">' % pair for pair in self._meta(node)] + \
+               ['<meta name="%s" content="%s">' % pair for pair in self._meta(context)] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % s.uri()
                 for s in node.resources(Script)]
-        return concat('  ', concat(tags + self._styles(node), separator='\n  '))
+        return concat('  ', concat(tags + self._styles(context), separator='\n  '))
 
-    def _parts(self, node, parts):
+    def _parts(self, context, parts):
         result = []
         for name in parts:
-            content = self._part(name, node)
+            content = self._part(name, context)
             if content is not None:
                 result.append(content)
         return concat(result, separator="\n")
     
-    def _part(self, name, node):
-        content = getattr(self, '_'+name)(node)
+    def _part(self, name, context):
+        content = getattr(self, '_'+name)(context)
         if content is not None:
             return self._generator.div(content, cls=name.replace('_', '-'))
         else:
             return None
         
-    def _heading(self, node):
-        return self._generator.h(node.title(), level=1)
+    def _heading(self, context):
+        return self._generator.h(context.node().title(), level=1)
 
-    def _language_selection(self, node):
-        g = self._generator
+    def _language_selection(self, context):
+        g = context.generator()
+        node = context.node()
+        variants = list(node.variants())
         #handler = ("location.href = this.form.language.options"
         #           "[this.form.language.selectedIndex].value")
         #select = g.form((g.label(self._label, 'language-selection'),
@@ -533,19 +536,18 @@ class HtmlExporter(Exporter):
         #                            onclick="location.href = this.value",
         #                            checked=(self._current.url()==t.url())
         #                            ) + \
-        #                    g.label(flag.export(exporter) + t.title(), tid)
+        #                    g.label(flag.export(context) + t.title(), tid)
         #                    for t, tid, flag in
         #                    [(t, t.url().replace('.','-'), f)
         #                     for t, f in zip(self._targets, self._flags)]],
         #                   cls='language-selection')
-        if len(node.language_variants()) <= 1:
+        if len(variants) <= 1:
             return None
-        languages = list(node.language_variants()[:])
-        languages.sort()
+        variants.sort()
         links = []
-        for lang in languages:
+        for lang in variants:
             label = language_name(lang)
-            if lang == node.language():
+            if lang == context.lang():
                 sign = g.span(' *', cls='hidden')
                 cls = 'current'
             else:
@@ -554,7 +556,7 @@ class HtmlExporter(Exporter):
             image = self._language_selection_image(lang)
             if image:
                 label = g.img(image, alt=label, border=None)
-            links.append(g.link(label, self._node_uri(node, lang=lang), cls=cls)+sign)
+            links.append(g.link(label, self._node_uri(context, node, lang=lang), cls=cls)+sign)
         return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
                              name='language-selection-anchor'),
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
@@ -563,24 +565,23 @@ class HtmlExporter(Exporter):
         #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
         return None
     
-    def _content(self, node):
-        return node.content().export(self)
+    def _content(self, context):
+        return context.node().content().export(context)
     
-    def export(self, node):
-        if 'audio.js' in [r.uri().split('/')[-1]
-                          for r in node.resources(Script)]:
+    def export(self, context):
+        if 'audio.js' in [r.uri().split('/')[-1] for r in context.node().resources(Script)]:
             hack = ('\n<object id="media_player" height="0" width="0"'
 		    ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">'
                     '</object>')
         else:
             hack = ''
         lines = (self.DOCTYPE, '',
-                 '<html lang="%s">' % node.language(),
+                 '<html lang="%s">' % context.lang(),
                  '<head>',
-                 self._head(node),
+                 self._head(context),
                  '</head>',
                  '<body>',
-                 self._parts(node, self._BODY_PARTS) + hack,
+                 self._parts(context, self._BODY_PARTS) + hack,
                  '</body>',
                  '</html>')
         return concat(lines, separator="\n")
@@ -589,18 +590,20 @@ class HtmlExporter(Exporter):
 class FileExporter(object):
     """Mix-in class exporting content into files."""
     
-    def dump(self, node, directory):
+    def dump(self, node, directory, sec_lang=None):
         """Save the node's content and resources into files recursively."""
         if not os.path.isdir(directory):
             os.makedirs(directory)
-        filename = os.path.join(directory, self._output_file(node))
-        file = open(filename, 'w')
-        file.write(self.translate(self.export(node)).encode('utf-8'))
-        file.close()
+        for lang in node.variants() or (None,):
+            context = self.context(node, lang, sec_lang=sec_lang)
+            filename = os.path.join(directory, self._output_file(context, node))
+            file = open(filename, 'w')
+            file.write(context.translate(self.export(context)).encode('utf-8'))
+            file.close()
         for r in node.resources():
             r.export(directory)
         for n in node.children():
-            self.dump(n, directory)
+            self.dump(n, directory, sec_lang=sec_lang)
 
 
 class HtmlStaticExporter(HtmlExporter, FileExporter):
@@ -622,47 +625,49 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
                    'navigation',
                    )
     
-    def _head(self, node):
-        base = super(HtmlStaticExporter, self)._head(node)
+    def _head(self, context):
+        base = super(HtmlStaticExporter, self)._head(context)
+        node = context.node()
         additional = [format('<link rel="%s" href="%s" title="%s">',
-                             kind, self.uri(n), n.title())
+                             kind, self.uri(context, n), n.title())
                       for kind, n in (('start', node.root()), 
                                       ('prev', node.prev()),
                                       ('next', node.next()))
                       if n is not None and n is not node]
         return concat(base, additional, separator='\n  ')
 
-    def _language_selection(self, node):
-        if node is not node.root():
+    def _language_selection(self, context):
+        if context.node() is not context.node().root():
             return None
         else:
-            return super(HtmlStaticExporter, self)._language_selection(node)
+            return super(HtmlStaticExporter, self)._language_selection(context)
         
-    def _rule(self, node):
-        if len(node.root().linear()) <= 1:
+    def _rule(self, context):
+        if len(context.node().root().linear()) <= 1:
             return None
         return '<hr class="hidden">'
     
-    def _navigation(self, node):
+    def _navigation(self, context):
+        node = context.node()
         root = node.root()
         if len(root.linear()) <= 1:
             return None
         g = self._generator
         parent = node.parent()
-        def link(node, label=None, key=None):
-            if node:
+        def link(target, label=None, key=None):
+            if target:
                 hidden = ''
                 if label is None:
-                    label = node.title(brief=True)
+                    label = target.title(brief=True)
                 if not key:
-                    if node == root:
+                    if target == root:
                         key = 'index'
-                        if node == parent:
-                            hidden = g.link('', self.uri(node),
+                        if target == parent:
+                            hidden = g.link('', self.uri(context, target),
                                             hotkey=self._hotkey['up'], cls='hidden')
-                    elif node == parent:
+                    elif target == parent:
                         key = 'up'
-                return g.link(label, self.uri(node), title=node.title(),
+                return g.link(label, self.uri(context, target), title=target.title(),
                               hotkey=key and self._hotkey[key]) + hidden
             else:
                 return _("None")

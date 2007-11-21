@@ -238,10 +238,10 @@ class Parser(unittest.TestCase):
         p = lcg.Parser()
         c = p.parse(self.SECTIONS)
         assert len(c) == 1 and isinstance(c[0], lcg.Section), c
-        s = c[0].sections()
+        s = c[0].sections(None)
         assert len(s) == 3 and isinstance(s[0], lcg.Section) and \
-               len(s[0].sections()) == 0 and len(s[1].sections()) == 1 and \
-               len(s[2].sections()) == 0, s
+               len(s[0].sections(None)) == 0 and len(s[1].sections(None)) == 1 and \
+               len(s[2].sections(None)) == 0, s
         
 tests.add(Parser)
 
