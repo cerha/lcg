@@ -46,7 +46,6 @@ div.navigation span.separator {
 div.navigation span.next { 
     float: right;
 }
-/* div.navigation a, div.copyright a { text-decoration: none; } */
 hr.navigation { display: none; }
 
 div.copyright { 
@@ -107,13 +106,9 @@ div.table-of-contents ul {
 .underline { 
     text-decoration: underline;
 }
-dt .citation { 
-    font-style: normal;
-}
-dt em { 
-    font-weight: normal;
-}
 dl dt {
     font-weight: bold;
 }
-
+dl dt .citation { 
+    font-style: normal;
+}
