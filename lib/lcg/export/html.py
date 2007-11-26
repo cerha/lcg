@@ -363,7 +363,7 @@ class HtmlFormatter(MarkupFormatter):
             return True, uri, dict(name=name, align=align)
         return False, uri, {}
         
-    def _find_resource(self, node, cls, filename, label, fallback=False, **imgargs):
+    def _find_resource(self, node, cls, filename, label, descr, fallback=False, **imgargs):
         result = node.resource(cls, filename, fallback=False)
         if not result and fallback:
             if issubclass(cls, XResource):
@@ -379,14 +379,15 @@ class HtmlFormatter(MarkupFormatter):
                 return Link(result, label=title)
         return None
 
-    def _link_formatter(self, context, label=None, href=None, anchor=None, close=False, **kwargs):
+    def _link_formatter(self, context, label=None, href=None, anchor=None, descr=None, **kwargs):
         node = None
         result = None
         parent = context.node()
         if href and not anchor:
             is_image, href, imgargs = self._match_image(href)
             cls = is_image and Image or Resource
-            result = self._find_resource(parent, cls, href, label, fallback=is_image, **imgargs)
+            result = self._find_resource(parent, cls, href, label, descr, fallback=is_image,
+                                         **imgargs)
         if not result:
             if not href:
                 node = parent
@@ -409,10 +410,11 @@ class HtmlFormatter(MarkupFormatter):
                 is_image, uri, imgargs = self._match_image(parts[0])
                 if is_image:
                     title = len(parts) == 2 and parts[1] or None
-                    label = self._find_resource(parent, Image, uri, title, fallback=True, **imgargs)
+                    label = self._find_resource(parent, Image, uri, title, descr, fallback=True,
+                                                **imgargs)
                     if isinstance(target, Link.ExternalTarget):
                         target = Link.ExternalTarget(href, title, descr=title)
-            result = Link(target, label=label)
+            result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
         return result.export(context)
     

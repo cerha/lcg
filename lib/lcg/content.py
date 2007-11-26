@@ -305,8 +305,8 @@ class Definition(Container):
         super(Definition, self).__init__((term, description))
 
     def export(self, context):
-        t, d = [c.export(context) for c in self._content]
-        return "<dt>%s</dt><dd>%s</dd>\n" % (t,d)
+        dt, dd = [c.export(context) for c in self._content]
+        return "<dt>"+ dt +"</dt><dd>"+ dd +"</dd>\n"
 
     
 class DefinitionList(Container):
@@ -404,7 +404,7 @@ class SectionContainer(Container):
                 return result
             if isinstance(c, Section) and c.in_toc():
                 toc_sections.append(c)
-        if self._toc_depth is None or self._toc_depth > 0 and not already_has_toc and \
+        if (self._toc_depth is None or self._toc_depth > 0) and \
                (len(toc_sections) > 1 or len(toc_sections) == 1 and 
                 len([s for s in toc_sections[0].sections(context) if s.in_toc()])):
             toc = TableOfContents(self, _("Index:"), depth=self._toc_depth)
@@ -503,8 +503,7 @@ class Section(SectionContainer):
         else:
             href = None
         g = context.generator()
-        return g.h(g.link(self.title(), href, cls='backref',
-                          name=self.anchor()),
+        return g.h(g.link(self.title(), href, cls='backref', name=self.anchor()),
                    len(self._section_path()) + 1)+'\n'
 
     def export(self, context):
@@ -642,10 +641,12 @@ class Link(Container):
         def descr(self):
             return self._descr
     
-    def __init__(self, target, label=None, type=None):
+    def __init__(self, target, label=None, descr=None, type=None):
         assert isinstance(target, (Section, ContentNode, self.ExternalTarget, Resource)), target
-        assert type is None or isinstance(type, (str, unicode)), type
+                                   #unicode, str)), target
         assert label is None or isinstance(label, (str, unicode, InlineImage)), label
+        assert descr is None or isinstance(descr, (str, unicode)), descr
+        assert type is None or isinstance(type, (str, unicode)), type
         if label is None:
             label = target.title()
         if isinstance(label, (str, unicode)):
@@ -653,12 +654,17 @@ class Link(Container):
         else:
             content = (label)
         self._target = target
+        self._descr = descr
         self._type = type
         super(Link, self).__init__(content)
 
-    def _descr(self):
+    def export(self, context):
         target = self._target
-        if isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
+        #if isinstance(target, (str, unicode)):
+        #    target = self.parent().find_section(target, context)
+        if self._descr is not None:
+            descr = self._descr
+        elif isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
             descr = target.descr()
         elif target.parent() is not self.parent():
             # TODO: This hack removes any html from the section title (it is
@@ -668,12 +674,9 @@ class Link(Container):
             descr = concat(section_title, " (", target.parent().title(), ")")
         else:
             descr = None
-        return descr
-    
-    def export(self, context):
         label = concat(self._exported_content(context))
-        uri = context.exporter().uri(context, self._target)
-        return context.generator().link(label, uri, title=self._descr(), type=self._type)
+        uri = context.exporter().uri(context, target)
+        return context.generator().link(label, uri, title=descr, type=self._type)
 
 
 class Title(Content):

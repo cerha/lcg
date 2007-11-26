@@ -1,3 +1,15 @@
+2007-11-26  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/export.py (MarkupFormatter): Allow explicit link
+	description in the markup.
+
+	* lib/lcg/export/html.py (HtmlFormatter._link_formatter): Handle
+	explicit link description in the markup.
+
+	* lib/lcg/content.py (SectionContainer._exported_content): TOC
+	generation condition fixed.
+	(Link): Allow passing explicit `descr' to the constructor.
+
 2007-11-21  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile: Don't pass the explicit stylesheet to `lcgmake'.

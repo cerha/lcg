@@ -42,10 +42,12 @@ class MarkupFormatter(object):
                ('underline', ('_',  '_')),
                ('citation',  ('>>', '<<')),
                ('quotation', ('``', "''")),
-               ('link', (r'\[(?:(?P<xresource>Resource):)?'
+               ('link', (r'\['
                          r'(?P<href>[^\[\]\|\#\s]*)'
                          r'(?:#(?P<anchor>[^\[\]\|\s]*))?'
-                         r'(?:(?:\||\s+)(?P<label>[^\[\]]*))?\]')),
+                         r'(?:(?:\s*\|\s*|\s+)(?P<label>[^\[\]\|]*))?'
+                         r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'
+                         r'\]')),
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
                ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
@@ -57,7 +59,7 @@ class MarkupFormatter(object):
                ('gt', '>'),
                ('amp', '&'),
                )
-    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'xresource', 'subst')
+    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'descr', 'subst')
 
     _FORMAT = {}
 
