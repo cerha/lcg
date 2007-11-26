@@ -281,11 +281,12 @@ class LocalizableDateTime(Localizable):
     
     """
     _RE = re.compile(r'^(\d\d\d\d)-(\d\d)-(\d\d)(?: (\d\d):(\d\d)(?::(\d\d))?)?$')
+    _LEADING_ZEROS = re.compile(r'(?<!\d)0+')
 
     def __new__(cls, text, **kwargs):
         return unicode.__new__(cls, text)
     
-    def __init__(self, string, show_weekday=False, show_time=None):
+    def __init__(self, string, show_weekday=False, show_time=None, leading_zeros=True):
         super(LocalizableDateTime, self).__init__(string)
         m = self._RE.match(string)
         if not m:
@@ -293,14 +294,17 @@ class LocalizableDateTime(Localizable):
         numbers = [int(n) for n in m.groups() if n is not None]
         self._datetime = datetime.datetime(*numbers)
         self._show_weekday = show_weekday
+        self._leading_zeros = leading_zeros
         self._show_time = show_time is None and len(numbers) > 3 or show_time
         self._show_seconds = len(numbers) > 5
     
     def format(self, data):
-        format = data.date_format
+        result = self._datetime.strftime(data.date_format)
+        if not self._leading_zeros:
+            result = self._LEADING_ZEROS.sub('', result)
         if self._show_time:
-            format += ' '+ (self._show_seconds and data.exact_time_format or data.time_format)
-        result = self._datetime.strftime(format)
+            time_format = (self._show_seconds and data.exact_time_format or data.time_format)
+            result += ' '+ self._datetime.strftime(time_format)
         if self._show_weekday:
             result = data.weekdays[self._datetime.weekday()] + ' ' + result
         return result

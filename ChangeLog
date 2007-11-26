@@ -1,5 +1,8 @@
 2007-11-26  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/i18n.py (LocalizableDateTime): Added support for
+	suppressing leading zeros in the formatted date.
+
 	* lib/lcg/export/export.py (MarkupFormatter): Allow explicit link
 	description in the markup.
 
