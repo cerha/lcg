@@ -1,5 +1,7 @@
 2007-11-26  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/css/default.css: Minor fix.
+
 	* lib/lcg/i18n.py (LocalizableDateTime): Added support for
 	suppressing leading zeros in the formatted date.
 
