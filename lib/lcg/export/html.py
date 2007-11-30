@@ -39,14 +39,14 @@ class HtmlGenerator(Generator):
         return result
      
     def _tag(self, tag, attr, content, newlines=False):
-        start = '<' + tag + self._attr(*attr) + '>'
-        end = '</' + tag + '>'
         separator = newlines and "\n" or ""
+        start = '<' + tag + self._attr(*attr) + '>' + separator
+        end = '</' + tag + '>' + separator
         if isinstance(content, (tuple, list)):
-            result = (start,) + tuple(content) + (end,)
-        else:
-            result = (start, content, end)
-        return concat(result, separator=separator)
+            content = concat(content, separator=separator)
+        if newlines and not content.endswith('\n'):
+            end = separator + end
+        return concat(start, content, end)
      
     def _input(self, type, name=None, value=None, title=None, id=None,
                tabindex=None, onclick=None, size=None, maxlength=None,
@@ -75,13 +75,13 @@ class HtmlGenerator(Generator):
     # Generic constructs
      
     def h(self, title, level=2):
-        return self._tag('h%d' % level, (), title)
+        return self._tag('h%d' % level, (), title) + '\n'
         
     def strong(self, text, cls=None, id=None, lang=None):
         return self._tag('strong', (('class', cls), ('lang', lang), ('id', id)), text)
      
     def pre(self, text, cls=None):
-        return self._tag('pre', (('class', cls),), text)
+        return self._tag('pre', (('class', cls),), text, newlines=True)
      
     def sup(self, text, cls=None):
         return self._tag('sup', (('class', cls),), text)
@@ -98,8 +98,8 @@ class HtmlGenerator(Generator):
     def hr(self, cls=None):
         return concat('<hr', self._attr(('class', cls),), '/>')
      
-    def link(self, label, uri, name=None, title=None, target=None, cls=None,
-             hotkey=None, type=None):
+    def link(self, label, uri, name=None, title=None, target=None, cls=None, hotkey=None,
+             type=None):
         if hotkey and title:
             title += ' (%s)' % hotkey
         if target:
@@ -108,16 +108,15 @@ class HtmlGenerator(Generator):
                 ('title', title), ('target', target), ('class', cls),
                 ('accesskey', hotkey))
         return self._tag('a', attr, label)
-     
-    def list(self, items, indent=0, ordered=False, style=None, cls=None,
-             lang=None):
+
+    def list(self, items, indent=0, ordered=False, style=None, cls=None, lang=None):
         tag = ordered and 'ol' or 'ul'
         attr = self._attr(('style', style and 'list-style-type: %s' % style),
                           ('lang', lang),
                           ('class', cls))
         spaces = ' ' * indent
         items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
-        return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">")
+        return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">\n")
      
     def img(self, src, alt='', border=0, width=None, height=None, align=None, descr=None,
             cls=None):
@@ -146,15 +145,15 @@ class HtmlGenerator(Generator):
                 ('class', cls), ('style', style), ('scope', scope))
         return self._tag('td', attr, content)
     
-    def tr(self, content, cls=None, style=None):
-        attr = (('class', cls), ('style', style))
+    def tr(self, content, cls=None, style=None, lang=None):
+        attr = (('class', cls), ('style', style), ('lang', lang))
         return self._tag('tr', attr, content)
 
     def table(self, content, title=None, summary=None, border=None, cellspacing=None,
-              cellpadding=None, width=None, cls=None, style=None):
+              cellpadding=None, width=None, cls=None, style=None, lang=None):
         attr = (('title', title), ('summary', summary), ('border', border),
                 ('cellspacing', cellspacing), ('cellpadding', cellpadding),
-                ('width', width), ('class', cls), ('style', style))
+                ('width', width), ('class', cls), ('style', style), ('lang', lang))
         return self._tag('table', attr, content, newlines=True)
 
     def thead(self, content):
@@ -508,7 +507,7 @@ class HtmlExporter(Exporter):
             content = self._part(name, context)
             if content is not None:
                 result.append(content)
-        return concat(result, separator="\n")
+        return concat(result)
     
     def _part(self, name, context):
         content = getattr(self, '_'+name)(context)
