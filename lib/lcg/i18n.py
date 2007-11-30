@@ -457,6 +457,14 @@ class Concatenation(Localizable):
         """
         return concat([item.replace(old, new) for item in self._items])
 
+    def startswith(self, *args, **kwargs):
+        """Return the result of 'startswidth()' call the method on the first item."""
+        return self._items[0].startswith(*args, **kwargs)
+
+    def endswith(self, *args, **kwargs):
+        """Return the result of 'endwidth()' call the method on the last item."""
+        return self._items[-1].endswith(*args, **kwargs)
+
     def items(self):
         """Return the list of items included in this concatenation.
 
