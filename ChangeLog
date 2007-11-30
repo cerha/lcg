@@ -1,5 +1,7 @@
 2007-12-01  Tomas Cerha  <cerha@brailcom.org>
 
+	* bin/lcgmake.py: Ignore stylesheet settings for the HHP output.
+
 	* doc/structured-text.cs.txt: Updated.
 
 	* doc/structured-text.en.txt: Updated.

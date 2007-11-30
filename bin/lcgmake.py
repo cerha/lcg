@@ -41,19 +41,19 @@ def main():
     reader = lcg.reader(source_dir, opt['root'], ext=opt['ext'], encoding=opt['encoding'])
     doc = reader.build()
     
-    if opt['hhp']:
-        from lcg import hhp
-        exporter = hhp.HhpExporter
-    else:
-        exporter = lcg.HtmlStaticExporter
-        
     translations = (lcg.config.translation_dir,)
     if opt['translations']:
         translations += tuple([os.path.abspath(d) for d in opt['translations'].split(':')])
-    
-    e = exporter(stylesheet=opt['stylesheet'], inlinestyles=opt['inline-styles'],
-                 translations=translations)
-    e.dump(doc, destination_dir, sec_lang=opt['sec-lang'])
+
+    if opt['hhp']:
+        from lcg import hhp
+        exporter = hhp.HhpExporter(translations=translations)
+    else:
+        exporter = lcg.HtmlStaticExporter(stylesheet=opt['stylesheet'],
+                                          inlinestyles=opt['inline-styles'],
+                                          translations=translations)
+        
+    exporter.dump(doc, destination_dir, sec_lang=opt['sec-lang'])
 
 
 def getoptions(optspec):
