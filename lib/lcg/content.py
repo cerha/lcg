@@ -147,14 +147,20 @@ class TextContent(Content):
         return self._text
 
     
-class WikiText(TextContent):
-    """Formatted text using a simple Wiki-based markup.
+class FormattedText(TextContent):
+    """Formatted text using a simple wiki-based markup.
 
     See 'MarkupFormatter' for more information about the formatting rules.
     
     """
     def export(self, context):
-        return self._text and context.formatter().format(context, self._text) or ''
+        if self._text:
+            return context.formatter().format(context, context.translate(self._text))
+        else:
+            return ''
+
+# Backwards compatibility alias.        
+WikiText = FormattedText
 
     
 class PreformattedText(TextContent):
@@ -758,13 +764,13 @@ def coerce(content, formatted=False):
 
       content -- can be a sequence, string or a Content instance.  A sequence is turned to a
         'Container' of the items.  Moreover each item is coerced recursively and 'None' items are
-        omitted.  A string is turned into a 'TextContent' or 'WikiText' instance according to the
-        'formatted' argument.  A 'Content' instance is returned as is.  Any other argument raises
-        AssertionError.
+        omitted.  A string is turned into a 'TextContent' or 'FormattedText' instance according to
+        the 'formatted' argument.  A 'Content' instance is returned as is.  Any other argument
+        raises AssertionError.
         
       formatted -- a boolean flag indicating that strings should be treated as formatted, so
-        'WikiText' is used instead of plain 'TextContent'.  Applies recursively if a sequence is
-        passed as the 'content' argument.
+        'FormattedText' is used instead of plain 'TextContent'.  Applies recursively if a sequence
+        is passed as the 'content' argument.
 
     """
     assert isinstance(formatted, bool)
@@ -773,13 +779,13 @@ def coerce(content, formatted=False):
                           for item in content if item is not None])
     elif isinstance(content, (str, unicode)):
         if formatted:
-            return WikiText(content)
+            return FormattedText(content)
         else:
             return TextContent(content)
     else:
         assert isinstance(content, Content), ('Invalid content', content,)
         return content
-    
+
 def link(target, label=None, type=None, descr=None):
     """Return a 'Link' instance.
 
