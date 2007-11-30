@@ -726,17 +726,26 @@ Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
 
 ==== Horizontal Lines ====
 
-Horizontal line can be made with 4 dashes on a separate line.
+Horizontal line can be made with 4 dashes on a separate line surrounded by
+blank lines.
 
 *Example:*
 
 ------
+Above
+
 ----
+
+Below
 ------
 
 This will be presented as:
 
+Above
+
 ----
+
+Below
 
 
 ==== Comments ====

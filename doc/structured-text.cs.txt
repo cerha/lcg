@@ -745,17 +745,26 @@ příklady použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čty�
 
 ==== Horizontální čára ====
 
-Horizontální čáru uděláme jako čtyři pomlčky na samostatné řádce.
+Horizontální čáru uděláme jako čtyři pomlčky na samostatné řádce obklopené
+prázdnými řádkami.
 
 *Příklad:*
 
 ------
+Nad
+
 ----
+
+Pod
 ------
 
 Toto bude zobrazeno jako:
 
+Nad
+
 ----
+
+Pod
 
 ==== Komentáře ====
 

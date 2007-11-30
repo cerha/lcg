@@ -1,3 +1,37 @@
+2007-12-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/structured-text.cs.txt: Updated.
+
+	* doc/structured-text.en.txt: Updated.
+
+	* lib/lcg/export/hhp.py: Pass export context to index file
+	generators.
+	(HhpExporter.Generator): New class.
+	(HhpExporter.__init__): Method removed.  Implement all tweaks
+	within the generator.
+
+	* lib/lcg/content.py (NodeIndex._make_toc): Omit final newline.
+	(NodeIndex._export_title): Method removed.
+	(Container.export, Paragraph.export, DefinitionList.export)
+	(TableRow.export, Table.export, Field.export, FieldSet.export):
+	Implemented using the generator.
+	(Section._header): Omit final newline.
+	(TableCell): Class removed.
+	(TableRow): Contain cell content directly.
+
+	* lib/lcg/parse.py (Parser._make_table): Omit `TableCell'
+	container.
+	(Parser._PRE_BLOCK_RE): Exclude the initial newline from the
+	group.  Old syntax disabled.
+
+	* lib/lcg/i18n.py (Concatenation.startswith)
+	(Concatenation.endswith): New methods.
+
+	* lib/lcg/export/html.py (HtmlGenerator.tr): New argument `lang'.
+	(HtmlGenerator._tag): Insert newlines smartly.
+	(HtmlGenerator.h, HtmlGenerator.pre): Insert newlines.
+	(HtmlExporter._parts): Don't insert newlines between pargs.
+
 2007-11-30  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/__init__.py: Import `urllib'.
