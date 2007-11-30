@@ -165,6 +165,7 @@ WikiText = FormattedText
     
 class PreformattedText(TextContent):
     """Preformatted text."""
+    
     def export(self, context):
         g = context.generator()
         return g.pre(g.escape(self._text), cls="lcg-preformatted-text")
@@ -219,12 +220,7 @@ class Container(Content):
     hierarchy.
 
     """
-    _TAG = None
-    _ATTR = None
-    _CLASS = None
     _ALLOWED_CONTENT = Content
-    _EXPORT_INLINE = True
-    _CONTENT_SEPARATOR = ''
 
     def __init__(self, content, **kwargs):
         """Initialize the instance.
@@ -253,37 +249,25 @@ class Container(Content):
     def content(self):
         return self._content
             
-    #def export(self, context):
-    #    return "".join([p.export(context) for p in self._content])
-
     def _exported_content(self, context):
         return [c.export(context) for c in self._content]
-    
+
     def export(self, context):
-        tag = self._TAG
-        exported = self._exported_content(context)
-        attr = self._lang   and ' lang="%s"'  % self._lang  or ''
-        attr += self._CLASS and ' class="%s"' % self._CLASS or ''
-        attr += self._ATTR  and (' '+self._ATTR) or ''
-        if attr and not tag:
-            tag = 'div'
-        if tag:
-            exported = ['<%s>' % (tag+attr)] + exported + ['</%s>' % tag]
-        result = concat(exported, separator=self._CONTENT_SEPARATOR)
-        if not self._EXPORT_INLINE:
-            result += "\n"
+        result = concat(self._exported_content(context))
+        if self._lang is not None:
+            result = context.generator().div(result, lang=self._lang)
         return result
 
 
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
-    _EXPORT_INLINE = False
-    _TAG = 'p'
+
+    def export(self, context):
+        return context.generator().p(concat(self._exported_content(context)), lang=self._lang)
 
     
 class ItemizedList(Container):
     """An itemized list."""
-    _EXPORT_INLINE = False
 
     TYPE_UNORDERED = 'UNORDERED'
     TYPE_ALPHA = 'ALPHA'
@@ -300,7 +284,7 @@ class ItemizedList(Container):
         o, s = {self.TYPE_UNORDERED: (False, None),
                 self.TYPE_NUMERIC: (True, None),
                 self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
-        items = [p.export(context) for p in self._content]
+        items = self._exported_content(context)
         return context.generator().list(items, ordered=o, style=s, lang=self._lang)
 
     
@@ -311,47 +295,43 @@ class Definition(Container):
         super(Definition, self).__init__((term, description))
 
     def export(self, context):
-        dt, dd = [c.export(context) for c in self._content]
+        dt, dd = self._exported_content(context)
         return "<dt>"+ dt +"</dt><dd>"+ dd +"</dd>\n"
 
     
 class DefinitionList(Container):
     """A list of definitions."""
-    _TAG = 'dl'
     _ALLOWED_CONTENT = Definition
-    _EXPORT_INLINE = False
-Definition._ALLOWED_CONTAINER = DefinitionList
 
+    def export(self, context):
+        return concat(['<dl>\n'] + self._exported_content(context) + ['</dl>\n'])
     
-class TableCell(Container):
-    """One cell in a table."""
-    _TAG = 'td'
+Definition._ALLOWED_CONTAINER = DefinitionList
 
     
 class TableRow(Container):
     """One row in a table."""
-    _TAG = 'tr'
-    _ALLOWED_CONTENT = TableCell
-    _EXPORT_INLINE = False
-TableCell._ALLOWED_CONTAINER = TableRow
     
+    def export(self, context):
+        g = context.generator()
+        return g.tr([g.td(c) for c in self._exported_content(context)], lang=self._lang)
         
 class Table(Container):
     """Table containing rows and cells."""
-    _TAG = 'table'
-    _CLASS = 'lcg-table'
     _ALLOWED_CONTENT = TableRow
-    _CONTENT_SEPARATOR = "\n"
-    _EXPORT_INLINE = False
 
     def __init__(self, content, title=None, **kwargs):
         assert title is None or isinstance(title, (str, unicode))
         self._title = title
         super(Table, self).__init__(content, **kwargs)
         
-    def _exported_content(self, context):
-        caption = self._title and "<caption>%s</caption>" % self._title or ''
-        return [caption] + super(Table, self)._exported_content(context)
+    def export(self, context):
+        g = context.generator()
+        rows = self._exported_content(context)
+        if self._title:
+            rows = ["<caption>"+ self._title +"</caption>"] + rows
+        return g.table(rows, cls='lcg-table')
+    
 TableRow._ALLOWED_CONTAINER = Table
 
     
@@ -363,14 +343,19 @@ class Field(Container):
         super(Field, self).__init__((label, value))
 
     def export(self, context):
-        f = '<tr><th align="left" valign="top">%s:</th><td>%s</td></tr>\n'
-        return f % tuple([c.export(context) for c in self._content])
+        g = context.generator()
+        label, value = self._exported_content(context)
+        return g.tr((g.td(label, align="left", valign="top"), g.td(value)))
 
     
 class FieldSet(Table):
     """A list of label, value pairs (fields)."""
-    _CLASS = 'lcg-fieldset'
     _ALLOWED_CONTENT = Field
+
+    def export(self, context):
+        g = context.generator()
+        return g.table(self._exported_content(context), lang=self._lang, cls='lcg-fieldset')
+    
 Field._ALLOWED_CONTAINER = FieldSet
 
     
@@ -510,7 +495,7 @@ class Section(SectionContainer):
             href = None
         g = context.generator()
         return g.h(g.link(self.title(), href, cls='backref', name=self.anchor()),
-                   len(self._section_path()) + 1)+'\n'
+                   len(self._section_path()) + 1)
 
     def export(self, context):
         g = context.generator()
@@ -548,10 +533,6 @@ class NodeIndex(Content):
         self._depth = depth
         self._detailed = detailed
                       
-    def _export_title(self, context):
-        g = context.generator()
-        return g.div(g.strong(self._title), cls='title')
-
     def _start_item(self):
         return self._node or self.parent()
         
@@ -560,7 +541,7 @@ class NodeIndex(Content):
         if self._title is not None:
             #TODO: add a "skip" link?
             g = context.generator()
-            return g.div((self._export_title(context), toc), cls="table-of-contents")
+            return g.div((g.div(g.strong(self._title), cls='title'), toc), cls='table-of-contents')
         else:
             return toc
         
@@ -596,7 +577,7 @@ class NodeIndex(Content):
             links.append(g.link(i.title(), uri, title=descr, name=name, cls=cls) + \
                          #(descr is not None and (' ... ' + descr) or '-') + \
                          self._make_toc(context, i, indent=indent+4, depth=depth))
-        return concat("\n", g.list(links, indent=indent), "\n", ' '*(indent-2))
+        return concat("\n", g.list(links, indent=indent), ' '*(indent-2))
 
 
 class RootIndex(NodeIndex):

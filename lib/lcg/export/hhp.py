@@ -31,16 +31,15 @@ import os
 class _MetaFile(object):
     _EXT = None
     
-    def __init__(self, exporter, root, charset='utf-8'):
-        self._exporter = exporter
-        self._root = root
+    def __init__(self, context, charset='utf-8'):
+        self._context = context
         self._charset = charset
 
     def _lines(self):
         return ()
 
     def filename(self):
-        return self._root.id() + self._EXT
+        return self._context.node().id() + self._EXT
     
     def write(self, directory):
         file = open(os.path.join(directory, self.filename()), 'w')
@@ -52,7 +51,7 @@ class _Contents(_MetaFile):
     _EXT = '.hhc'
     
     def _item(self, node, indent=''):
-        uri = self._exporter.uri(node)
+        uri = self._context.exporter().uri(self._context, node)
         lines = ('<li>',
                  '  <object type="text/sitemap">',
                  '    <param name="Name" value="%s">' % node.title(),
@@ -61,7 +60,7 @@ class _Contents(_MetaFile):
         return tuple([indent+'  '+line for line in lines])
     
     def _lines(self, node=None, indent=''):
-        node = node or self._root
+        node = node or self._context.node()
         lines = ()
         children = node.children()
         if children:
@@ -78,7 +77,7 @@ class _Index(_Contents):
 
     def _lines(self):
         lines = ("<ul>",)
-        for n in self._root.linear():
+        for n in self._context.node().linear():
             lines += self._item(n)
         lines += ("</ul>", )
         return lines
@@ -87,48 +86,54 @@ class _Index(_Contents):
 class _Header(_MetaFile):
     _EXT = '.hhp'
 
-    def __init__(self, exporter, root, contents, index, **kwargs):
-        super(_Header, self).__init__(exporter, root, **kwargs)
+    def __init__(self, context, contents, index, **kwargs):
+        super(_Header, self).__init__(context, **kwargs)
         self._contents = contents
         self._index = index
             
     def _lines(self):
         return ("Contents file=%s" % self._contents.filename(),
                 "Index file=%s" % self._index.filename(),
-                "Title=%s" % self._root.title(),
-                "Default topic=%s" % self._exporter.uri(self._root),
+                "Title=%s" % self._context.node().title(),
+                "Default topic=%s" % self._context.exporter().uri(self._context,
+                                                                  self._context.node()),
                 "Charset=%s" % self._charset)
 
 
-class HhpHtmlFormatter(HtmlFormatter):
-    _FORMAT = dict(HtmlFormatter._FORMAT, underline=('<u>', '</u>'))
     
     
 class HhpExporter(HtmlExporter, FileExporter):
-    _FORMATTER = HhpHtmlFormatter
-
-    def __init__(self, *args, **kwargs):
-        super(HhpExporter, self).__init__(*args, **kwargs)
-        # We just want to make the following NASTY HACKS here, to influence the
-        # export of some Conent elements.
-        # We want to make a linebreak before any Table of Contents.
-        import lcg
-        x = lcg.TableOfContents._export_title
-        lcg.TableOfContents._export_title = lambda s, e: '<br>' + x(s, e)
-        # We want to prevent backreferencing in section titles.
-        lcg.Section.backref = lambda s, n: None
-        # We also want Tables with old HTML attributes.
-        lcg.Table._ATTR = 'cellspacing="3" cellpadding="0"'
-        # We don't want XHTML tag syntax (<hr/>).
-        lcg.HorizontalSeparator.export = lambda s, e: '<hr>'
+    
+    class Formatter(HtmlFormatter):
+        _FORMAT = dict(HtmlFormatter._FORMAT, underline=('<u>', '</u>'))
         
+    class Generator(HtmlGenerator):
+        def hr(self, **kwargs):
+            # We don't want XHTML tag syntax (<hr/>).
+            return '<hr>'
 
-    def dump(self, node, directory):
-        super(HhpExporter, self).dump(node, directory)
+        def table(self, content, cls=None, **kwargs):
+            if cls == 'lcg-table':
+                kwargs = dict(kwargs, cellspacing=3, cellpadding=0)
+            return super(HhpExporter.Generator, self).table(content, cls=cls, **kwargs)
+        
+        def link(self, label, uri, cls=None, **kwargs):
+            if cls == 'backref':
+                uri = None
+            return super(HhpExporter.Generator, self).link(label, uri, cls=cls, **kwargs)
+
+        def div(self, content, cls=None, **kwargs):
+            if cls == 'table-of-contents':
+                content = ('<br>',) + content
+            return super(HhpExporter.Generator, self).div(content, cls=cls, **kwargs)
+        
+    def dump(self, node, directory, sec_lang=None):
+        super(HhpExporter, self).dump(node, directory, sec_lang=sec_lang)
         if node == node.root():
-            contents = _Contents(self, node)
-            index = _Index(self, node)
-            header = _Header(self, node, contents, index)
+            context = self.context(node, None)
+            contents = _Contents(context)
+            index = _Index(context)
+            header = _Header(context, contents, index)
             for metafile in (header, contents, index):
                 metafile.write(directory)
 

@@ -39,9 +39,7 @@ class Parser(object):
                              r"(?:[\t ]+(?:\*|(?P<anchor>[\w\d_-]+)))?\s*$",
                              re.MULTILINE)
 
-    _PRE_BLOCK_RE = re.compile(r"^(?:\{\{\{\s*$(.*?)^\}\}\}\s*$" + 
-                               r"|-----+\s*$(.*?)^-----+)\s*$",
-                               re.DOTALL|re.MULTILINE)
+    _PRE_BLOCK_RE = re.compile(r"^-----+[ \t]*\r?\n(.*?)^-----+\s*$", re.DOTALL|re.MULTILINE)
 
     _LIST_MARKER = r"\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.))"
 
@@ -138,8 +136,7 @@ class Parser(object):
                 content += self._parse_blocks(text)
                 break
             content += self._parse_blocks(text[:m.start()])
-            pre = m.group(1) or m.group(2)
-            content.append(PreformattedText(pre))
+            content.append(PreformattedText(m.group(1)))
             text = text[m.end():]
         return content
 
@@ -252,8 +249,7 @@ class Parser(object):
             return None
     
     def _make_table(self, block, groups):
-        return Table([TableRow([TableCell(WikiText(x.strip()))
-                                for x in row.split('|')[1:-1]])
+        return Table([TableRow([WikiText(x.strip()) for x in row.split('|')[1:-1]])
                       for row in block.strip().splitlines()])
 
     def _make_toc(self, block, groups):
