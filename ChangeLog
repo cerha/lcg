@@ -1,3 +1,11 @@
+2007-11-30  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/__init__.py: Import `urllib'.
+
+	* lib/lcg/export/html.py (HtmlGenerator.uri): Escape the generated URI.
+
+	* lib/lcg/content.py (WikiText): Renamed to `FormattedText'.
+
 2007-11-26  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: Minor fix.

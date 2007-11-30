@@ -21,6 +21,7 @@ __version__ = '0.3.5'
 """Learning Content Genarator."""
 
 from xml.sax import saxutils
+import urllib
 
 from i18n import *
 from locales import *

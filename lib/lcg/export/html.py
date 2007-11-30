@@ -184,11 +184,12 @@ class HtmlGenerator(Generator):
         return self._tag('map', args, content, newlines=True)
 
     def uri(self, base, *args, **kwargs):
-        args += tuple(kwargs.items())
-        if args:
-            return base + '?' + ';'.join(["%s=%s" % (k,v) for k,v in args if v is not None])
-        else:
-            return base
+        uri = urllib.quote(base.encode('utf-8'))
+        query = ';'.join([k +'='+ urllib.quote(unicode(v).encode('utf-8'))
+                          for k,v in args + tuple(kwargs.items()) if v is not None])
+        if query:
+            uri += '?' + query
+        return uri
      
     # Form controls
      
