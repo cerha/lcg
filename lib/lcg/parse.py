@@ -105,8 +105,7 @@ class Parser(object):
                 break
             last.content = self._parse_section_content(text[:m.start()])
             text = text[m.end():]
-            this = self._Section(m.group('title'), m.group('anchor'),
-                                 len(m.group('level')))
+            this = self._Section(m.group('title'), m.group('anchor'), len(m.group('level')))
             if last.level < this.level:
                 parent = last
             elif last.level == this.level:
@@ -120,8 +119,7 @@ class Parser(object):
         return self._make_sections(root)
 
     def _make_sections(self, section):
-        subsections = [Section(s.title, self._make_sections(s),
-                               anchor=s.anchor)
+        subsections = [Section(s.title, self._make_sections(s), anchor=s.anchor)
                        for s in section.children]
         if section.content is None:
             return subsections

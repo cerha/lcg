@@ -67,12 +67,10 @@ class MarkupFormatter(object):
         regexp = r"(?P<%s>\\*%s)"
         pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
                                 regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
-        regexps = [isinstance(markup, str)
-                   and regexp % (type, markup)
+        regexps = [isinstance(markup, str) and regexp % (type, markup)
                    or pair_regexp % (type, markup[1], type, markup[0])
                    for type, markup in self._MARKUP]
-        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')',
-                                 re.MULTILINE|re.UNICODE)
+        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')', re.MULTILINE|re.UNICODE)
         self._paired_on_output = [type for type, format in self._FORMAT.items()
                                   if isinstance(format, tuple)]
 
