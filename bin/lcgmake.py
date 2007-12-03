@@ -29,7 +29,9 @@ OPTIONS = (
     ('root=', 'index', "Filename of the root document."),
     ('translations=', None, "Colon separated list of translation directories."),
     ('sec-lang=', None, "Secondary content language (citations)."),
+    ('html', False, "generate static HTML files (default)."),
     ('hhp', False, "generate a MS HTML Help Workshop package."),
+    ('ims', False, "generate an IMS package."),
     )
 
 def main():
@@ -37,6 +39,15 @@ def main():
     if opt is None or len(args) != 2:
         usage(OPTIONS)
     source_dir, destination_dir = args
+
+    formats = [k for k in ('html', 'ims', 'hhp') if opt[k]]
+    if not formats:
+        output_format = 'html'
+    elif len(formats) > 1:
+        lcg.log("Select just one output format!")
+        sys.exit()
+    else:
+        output_format = formats[0]
     
     reader = lcg.reader(source_dir, opt['root'], ext=opt['ext'], encoding=opt['encoding'])
     doc = reader.build()
@@ -45,15 +56,18 @@ def main():
     if opt['translations']:
         translations += tuple([os.path.abspath(d) for d in opt['translations'].split(':')])
 
-    if opt['hhp']:
+    if output_format == 'hhp':
         from lcg import hhp
-        exporter = hhp.HhpExporter(translations=translations)
+        exporter = hhp.HhpExporter
+    elif output_format == 'ims':
+        from lcg import ims
+        exporter = ims.IMSExporter
     else:
-        exporter = lcg.HtmlStaticExporter(stylesheet=opt['stylesheet'],
-                                          inlinestyles=opt['inline-styles'],
-                                          translations=translations)
+        exporter = lcg.HtmlStaticExporter
+    e = exporter(stylesheet=opt['stylesheet'], inlinestyles=opt['inline-styles'],
+                 translations=translations)
         
-    exporter.dump(doc, destination_dir, sec_lang=opt['sec-lang'])
+    e.dump(doc, destination_dir, sec_lang=opt['sec-lang'])
 
 
 def getoptions(optspec):
@@ -80,7 +94,7 @@ def dumpoptions(optspec, width=80, indent=3):
     for option, default, descr in optspec:
         if option.endswith('='):
             option += '<value>'
-        descr += "  Default is %r." % default
+            descr += "  Default is %r." % default
         maxlen = max(maxlen, len(option))
         options.append((option, descr))
     spacer = ' '*(maxlen+7+indent)
