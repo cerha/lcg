@@ -113,7 +113,6 @@ class Content(object):
 class HorizontalSeparator(Content):
     
     def export(self, context):
-        """Return the HTML formatted content as a string."""
         return context.generator().hr()
         
 
@@ -654,11 +653,7 @@ class Link(Container):
         elif isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
             descr = target.descr()
         elif target.parent() is not self.parent():
-            # TODO: This hack removes any html from the section title (it is
-            # used as an HTML attribute value).  But section titles should
-            # probably rather not be allowed to contain html.
-            section_title = self._HTML_TAG.sub('', target.title())
-            descr = concat(section_title, " (", target.parent().title(), ")")
+            descr = concat(target.title(), " (", target.parent().title(), ")")
         else:
             descr = None
         label = concat(self._exported_content(context))
