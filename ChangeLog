@@ -1,5 +1,11 @@
 2007-12-03  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/export/html.py (HtmlGenerator.td, HtmlGenerator.form):
+	New argument `lang'.
+
+	* lib/lcg/i18n.py (Concatenation.startswith)
+	(Concatenation.endswith): Handle the case of no items.
+
 	* lib/lcg/export/export.py: Cosmetic changes.
 
 	* lib/lcg/parse.py: Cosmetic changes.
