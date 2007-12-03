@@ -1,5 +1,11 @@
 2007-12-03  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/export/export.py: Cosmetic changes.
+
+	* lib/lcg/parse.py: Cosmetic changes.
+
+	* lib/lcg/content.py (Link.export): Removed old hack.
+
 	* bin/lcgmake.py: IMS output option added.
 
 	* lib/lcg/export/ims.py: IMS output made to work after not being

@@ -118,9 +118,12 @@ if __name__ == "__main__":
         raise
     except SystemExit:
         raise
-    except Exception, e:
-        import cgitb
+    except:
+        einfo = sys.exc_info()
         try:
-            sys.stderr.write(cgitb.text(sys.exc_info()))
-        except:
-            raise e
+            import cgitb
+            sys.stderr.write(cgitb.text(einfo))
+        except Exception, e:
+            sys.stderr.write("Unable to generate detailed traceback: "+ str(e) +"\n")
+            import traceback
+            traceback.print_exception(*einfo)
