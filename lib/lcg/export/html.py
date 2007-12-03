@@ -140,9 +140,9 @@ class HtmlGenerator(Generator):
         return self._tag('th', attr, content)
     
     def td(self, content, colspan=None, width=None, align=None, valign=None, cls=None, style=None,
-           scope=None):
+           scope=None, lang=None):
         attr = (('colspan', colspan), ('width', width), ('align', align), ('valign', valign),
-                ('class', cls), ('style', style), ('scope', scope))
+                ('class', cls), ('style', style), ('scope', scope), ('lang', lang))
         return self._tag('td', attr, content)
     
     def tr(self, content, cls=None, style=None, lang=None):
@@ -193,9 +193,9 @@ class HtmlGenerator(Generator):
     # Form controls
      
     def form(self, content, name=None, cls=None, action="#", method=None,
-             enctype=None):
+             enctype=None, lang=None):
         attr = (('name', name), ('action', action), ('method', method),
-                ('enctype', enctype), ('class', cls))
+                ('enctype', enctype), ('class', cls), ('lang', lang))
         return self._tag('form', attr, content, newlines=True)
      
     def fieldset(self, legend, content, cls=None):
