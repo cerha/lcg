@@ -28,64 +28,58 @@ import os, codecs
 class _Manifest:
     """IMS manifest is a collection of information about all files in a package.
 
-    It defines the structure and dependencies of the content material.
+    It defines the structure and dependencies of the content.
 
     """
     
-    def __init__(self, exporter, course):
-        """Initialize the manifest for a given 'Course'."""
-        self._exporter = exporter
+    def __init__(self, context):
+        """Initialize the manifest for given root node export context."""
+        self._context = context
         uri = "http://www.imsglobal.org/xsd/imscp_v1p1"
         minidom = getDOMImplementation('minidom')
         self._document = document = minidom.createDocument(uri, 'manifest', '')        
         self._manifest = manifest = document.firstChild
-            
-        # add namespace attributes
-        self._set_xml_attr(manifest, 'xmlns',
-                           'http://www.imsglobal.org/xsd/imscp_v1p1')
+        # Namespace
+        self._set_xml_attr(manifest, 'xmlns', 'http://www.imsglobal.org/xsd/imscp_v1p1')
         # Metadata
         metadata = self._append_xml_element(manifest, 'metadata')
-
         self._append_xml_text(metadata, 'schema', 'IMS Content')
         self._append_xml_text(metadata, 'schemaversion', '1.1.3')
-
         # Organisations
         organisations = self._append_xml_element(manifest, 'organizations')
         self._set_xml_attr(organisations, 'default', 'TOC1')
-
         o = self._append_xml_element(organisations, 'organization')
         self._set_xml_attr(o, 'identifier', 'TOC1')
         self._set_xml_attr(o, 'structure',  'hierachical')
-
-        self._append_xml_text(o, 'title', course.title())
-
+        # Title
+        self._append_xml_text(o, 'title', context.node().title())
         # Resources
         resources = self._append_xml_element(manifest, 'resources')
-        
-        for child in course.children():
-            self._create_item(o, resources, child)
+        # Hierarchy
+        for node in context.node().children():
+            self._create_item(o, resources, node)
 
-    def _create_item(self, o, r, node):
+    def _create_item(self, o, resources, node):
         item = self._append_xml_element(o, 'item')
+        exporter = self._context.exporter()
         self._set_xml_attr(item, 'identifier', 'toc-' + node.id())
         self._set_xml_attr(item, 'identifierref', node.id())
         self._append_xml_text(item, 'title', node.title())
 
-        resource = self._append_xml_element(r, 'resource')
+        resource = self._append_xml_element(resources, 'resource')
         self._set_xml_attr(resource, 'identifier', node.id())
         self._set_xml_attr(resource, 'type', 'webcontent')
-        self._set_xml_attr(resource, 'href', self._exporter.uri(node))
+        self._set_xml_attr(resource, 'href', exporter.uri(self._context, node))
 
-        resources = [r.uri() for r in node.resources()]
-        resources.sort()
-        for filename in (self._exporter.uri(node),) + tuple(resources):
+        files = sorted([r.uri() for r in node.resources()])
+        for filename in (exporter.uri(self._context, node),) + tuple(files):
             file = self._append_xml_element(resource, 'file')
             self._set_xml_attr(file, 'href', filename)
 
-        for child in node.children():
-            self._create_item(item, r, child)
-
-    # Some xml helper methods.
+        for node in node.children():
+            self._create_item(item, resources, node)
+            
+    # XML helper methods.
     
     def _set_xml_attr(self, node, key, value):
         attr = self._document.createAttribute(key)
@@ -114,15 +108,15 @@ class _Manifest:
         fh.close()
 
         
-class IMSExporter(HtmlExporter):
+class IMSExporter(HtmlExporter, FileExporter):
     """Export the content as an IMS package."""
    
-    def export(self, node, directory):
-        super(IMSExporter, self).export(node, directory)
+    def dump(self, node, directory, **kwargs):
+        super(IMSExporter, self).dump(node, directory, **kwargs)
         if node == node.root():
-            manifest = _Manifest(self, node)
+            manifest = _Manifest(self.context(node, None))
             manifest.write(directory)
 
-    def _body_parts(self, node):
-        return (node.content().export(self),)
+    def _body_parts(self, context):
+        return (context.node().content().export(context),)
         
