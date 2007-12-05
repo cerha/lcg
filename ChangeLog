@@ -1,5 +1,17 @@
 2007-12-05  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/images/flags/cs.gif: File removed.
+
+	* resources/images/flags/de.gif: File removed.
+
+	* resources/images/flags/en.gif: File removed.
+
+	* resources/images/flags/es.gif: File removed.
+
+	* resources/images/flags/no.gif: File removed.
+
+	* resources/images/flags/sk.gif: File removed.
+
 	* lib/lcg/export/html.py (HtmlGenerator): Tag generation reworked
 	to automatically support common attributes for all tags and
 	simplify particular tag methods.
