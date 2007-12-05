@@ -18,6 +18,8 @@
 	(HtmlExporter._head): Generate links to language variants.
 	(HtmlStaticExporter._head): Add hierarchical links to `top' and
 	`parent'.
+	(HtmlExporter._language_selection): Pass `context' to
+	`_language_selection_image()'.
 
 	* lib/lcg/i18n.py (format): Function removed.
 

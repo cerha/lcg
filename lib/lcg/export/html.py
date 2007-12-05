@@ -506,7 +506,7 @@ class HtmlExporter(Exporter):
             else:
                 sign = ''
                 cls = None
-            image = self._language_selection_image(lang)
+            image = self._language_selection_image(context, lang)
             if image:
                 label = g.img(image, alt=label, border=None)
             links.append(g.link(label, self._node_uri(context, node, lang=lang), cls=cls)+sign)
@@ -514,8 +514,8 @@ class HtmlExporter(Exporter):
                              name='language-selection-anchor'),
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 
-    def _language_selection_image(self, lang):
-        #flag = InlineImage(node.resource(Image, 'flags/%s.gif' % lang))
+    def _language_selection_image(self, context, lang):
+        #flag = context.node().resource(Image, 'flags/%s.gif' % lang)
         return None
     
     def _content(self, context):
