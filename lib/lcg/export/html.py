@@ -27,8 +27,8 @@ class HtmlGenerator(Generator):
 
     def _attr(self, valid, **kwargs):
         result = ''
-        if kwargs.get('lang'):
-            kwargs['style'] = 'color: red;' + (kwargs.get('style') or '')
+        #if kwargs.get('lang'):
+        #    kwargs['style'] = 'color: red;' + (kwargs.get('style') or '')
         for name in valid + ('id', 'lang', 'cls', 'style'):
             if not kwargs:
                 break
