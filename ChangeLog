@@ -1,3 +1,14 @@
+2007-12-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlGenerator): Tag generation reworked
+	to automatically support common attributes for all tags and
+	simplify particular tag methods.
+	(HtmlExporter._head): Generate links to language variants.
+	(HtmlStaticExporter._head): Add hierarchical links to `top' and
+	`parent'.
+
+	* lib/lcg/i18n.py (format): Function removed.
+
 2007-12-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator.td, HtmlGenerator.form):
