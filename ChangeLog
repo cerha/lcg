@@ -20,6 +20,9 @@
 	`parent'.
 	(HtmlExporter._language_selection): Pass `context' to
 	`_language_selection_image()'.
+	(HtmlExporter._LANGUAGE_SELECTION_COMBINED): New attribute.
+	(HtmlExporter._language_selection): Pass `context' to
+	`_language_selection_image()'.  Allow image and label combination.
 
 	* lib/lcg/i18n.py (format): Function removed.
 

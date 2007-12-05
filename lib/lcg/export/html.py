@@ -384,6 +384,7 @@ class HtmlExporter(Exporter):
                    'content',
                    )
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
+    _LANGUAGE_SELECTION_COMBINED = False
     
     def __init__(self, stylesheet=None, inlinestyles=False, **kwargs):
         """Initialize the exporter."""
@@ -474,26 +475,6 @@ class HtmlExporter(Exporter):
         g = context.generator()
         node = context.node()
         variants = list(node.variants())
-        #handler = ("location.href = this.form.language.options"
-        #           "[this.form.language.selectedIndex].value")
-        #select = g.form((g.label(self._label, 'language-selection'),
-        #                 g.select('language',
-        #                          [(t.title(), t.url())
-        #                           for t in self._targets],
-        #                          id='language-selection',
-        #                          selected=self._current.url()),
-        #                 g.button(_('Switch'), handler)),
-        #                cls='language-selection')
-        #radio = g.fieldset(self._label,
-        #                   [g.radio('language', value=t.url(), id=tid,
-        #                            onclick="location.href = this.value",
-        #                            checked=(self._current.url()==t.url())
-        #                            ) + \
-        #                    g.label(flag.export(context) + t.title(), tid)
-        #                    for t, tid, flag in
-        #                    [(t, t.url().replace('.','-'), f)
-        #                     for t, f in zip(self._targets, self._flags)]],
-        #                   cls='language-selection')
         if len(variants) <= 1:
             return None
         variants.sort()
@@ -508,14 +489,17 @@ class HtmlExporter(Exporter):
                 cls = None
             image = self._language_selection_image(context, lang)
             if image:
-                label = g.img(image, alt=label, border=None)
+                if self._LANGUAGE_SELECTION_COMBINED:
+                    label += g.img(image, border=None)
+                else:
+                    label = g.img(image, alt=label, border=None)
             links.append(g.link(label, self._node_uri(context, node, lang=lang), cls=cls)+sign)
         return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
                              name='language-selection-anchor'),
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 
     def _language_selection_image(self, context, lang):
-        #flag = context.node().resource(Image, 'flags/%s.gif' % lang)
+        #return context.node().resource(Image, 'flags/%s.gif' % lang).uri()
         return None
     
     def _content(self, context):
