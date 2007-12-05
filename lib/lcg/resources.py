@@ -300,6 +300,9 @@ class XStylesheet(XResource, Stylesheet):
     """A stylesheet used within the content."""
     SUBDIR = 'css'
 
+class XImage(XResource, Image):
+    SUBDIR = 'images'
+
     
 class Transcript(XResource):
     """A textual transcript of a recording ."""
