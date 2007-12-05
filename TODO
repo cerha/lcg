@@ -1,5 +1,1 @@
 
-  * Better infrastructure for language versions (one instance generates all
-    available language versions).
-
-  * Use generator within all content export methods.
