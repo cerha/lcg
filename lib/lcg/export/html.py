@@ -25,162 +25,118 @@ _ = TranslatableTextFactory('lcg')
 
 class HtmlGenerator(Generator):
 
-    def _attr(self, *pairs):
+    def _attr(self, valid, **kwargs):
         result = ''
-        for attr, value in pairs:
+        if kwargs.get('lang'):
+            kwargs['style'] = 'color: red;' + (kwargs.get('style') or '')
+        for name in valid + ('id', 'lang', 'cls', 'style'):
+            if not kwargs:
+                break
+            value = kwargs.pop(name, None)
+            if name == 'cls':
+                name = 'class'
             if value is None or value is False:
                 continue
             elif value is True:
-                result += ' ' + attr
+                result += ' ' + name
             else:
                 if isinstance(value, int):
                     value = str(value)
-                result += ' ' + attr + '="' + value + '"'
+                result += ' ' + name + '="' + value + '"'
+        assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
-     
-    def _tag(self, tag, attr, content, newlines=False):
-        separator = newlines and "\n" or ""
-        start = '<' + tag + self._attr(*attr) + '>' + separator
+
+    def _tag(self, tag, content, _attributes=(), _newlines=False, **kwargs):
+        separator = _newlines and "\n" or ""
+        start = '<' + tag + self._attr(_attributes, **kwargs) + '>' + separator
         end = '</' + tag + '>' + separator
         if isinstance(content, (tuple, list)):
             content = concat(content, separator=separator)
-        if newlines and not content.endswith('\n'):
+        if _newlines and not content.endswith('\n'):
             end = separator + end
         return concat(start, content, end)
      
-    def _input(self, type, name=None, value=None, title=None, id=None,
-               tabindex=None, onclick=None, size=None, maxlength=None,
-               cls=None, readonly=False, checked=False, disabled=False):
-        assert isinstance(type, str)
-        assert isinstance(checked, bool)
-        assert isinstance(readonly, bool)
-        assert isinstance(disabled, bool)
-        assert not checked or type in ('radio', 'checkbox')
-        assert tabindex is None or isinstance(tabindex, int)
-        attr = self._attr(('type', type),
-                          ('name', name),
-                          ('value', value),
-                          ('title', title),
-                          ('id', id),
-                          ('tabindex', tabindex),
-                          ('size', size),
-                          ('maxlength', maxlength),
-                          ('onclick', onclick),
-                          ('class', cls),
-                          ('checked', checked),
-                          ('readonly', readonly),
-                          ('disabled', disabled))
-        return concat('<input', attr, ' />')
+    def _input(self, type, _attr=(), **kwargs):
+        attr = ('type', 'name', 'value', 'title', 'tabindex', 'size', 'maxlength', 'onclick',
+                'readonly', 'disabled')
+        return concat('<input', self._attr(attr + _attr, type=type, **kwargs), ' />')
 
     # Generic constructs
      
-    def h(self, title, level=2):
-        return self._tag('h%d' % level, (), title) + '\n'
+    def h(self, title, level, **kwargs):
+        return self._tag('h%d' % level, title, **kwargs) + '\n'
         
-    def strong(self, text, cls=None, id=None, lang=None):
-        return self._tag('strong', (('class', cls), ('lang', lang), ('id', id)), text)
+    def strong(self, text, **kwargs):
+        return self._tag('strong', text, **kwargs)
      
-    def pre(self, text, cls=None):
-        return self._tag('pre', (('class', cls),), text, newlines=True)
+    def pre(self, text, **kwargs):
+        return self._tag('pre', text, _newlines=True, **kwargs)
      
-    def sup(self, text, cls=None):
-        return self._tag('sup', (('class', cls),), text)
+    def sup(self, text, **kwargs):
+        return self._tag('sup', text, **kwargs)
     
-    def sub(self, text, cls=None):
-        return self._tag('sub', (('class', cls),), text)
+    def sub(self, text, **kwargs):
+        return self._tag('sub', text, **kwargs)
     
     def p(self, *content, **kwargs):
-        return self._tag('p', (('class', kwargs.get('cls')),), content, newlines=True)
+        return self._tag('p', content, _newlines=True, **kwargs)
      
-    def br(self, cls=None):
-        return concat('<br', self._attr(('class', cls),), '/>')
+    def br(self, **kwargs):
+        return concat('<br', self._attr((), **kwargs), '/>')
      
-    def hr(self, cls=None):
-        return concat('<hr', self._attr(('class', cls),), '/>')
+    def hr(self, **kwargs):
+        return concat('<hr', self._attr((), **kwargs), '/>')
      
-    def link(self, label, uri, name=None, title=None, target=None, cls=None, hotkey=None,
-             type=None):
+    def link(self, label, uri, title=None, target=None, hotkey=None, cls=None, **kwargs):
         if hotkey and title:
             title += ' (%s)' % hotkey
         if target:
             cls = (cls and cls+' ' or '') + 'external-link'
-        attr = (('type', type), ('href', uri), ('name', name),
-                ('title', title), ('target', target), ('class', cls),
-                ('accesskey', hotkey))
-        return self._tag('a', attr, label)
+        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey')
+        return self._tag('a', label, attr, href=uri, title=title, target=target,
+                         accesskey=hotkey, cls=cls, **kwargs)
 
-    def list(self, items, indent=0, ordered=False, style=None, cls=None, lang=None):
+    def list(self, items, indent=0, ordered=False, style=None, **kwargs):
         tag = ordered and 'ol' or 'ul'
-        attr = self._attr(('style', style and 'list-style-type: %s' % style),
-                          ('lang', lang),
-                          ('class', cls))
+        attr = self._attr((), style=(style and 'list-style-type: %s' % style), **kwargs)
         spaces = ' ' * indent
-        items = [concat(spaces+"  <li>", i, "</li>\n") for i in items]
-        return concat(spaces+"<"+tag, attr,">\n", items, spaces+"</"+tag+">\n")
+        items = [concat(spaces+'  <li>', i, '</li>\n') for i in items]
+        return concat(spaces +'<'+ tag, attr, '>\n', items, spaces +'</'+ tag +'>\n')
      
-    def img(self, src, alt='', border=0, width=None, height=None, align=None, descr=None,
-            cls=None):
-        attr = (('src', src),
-                ('alt', alt),
-                ('longdesc', descr),
-                ('width', width),
-                ('height', height),
-                ('align', align),
-                ('border', border),
-                ('class', cls),
-                )
-        return '<img' + self._attr(*attr) + ' />'
+    def img(self, src, alt='', border=0, descr=None, **kwargs):
+        attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
+        return '<img'+ self._attr(attr, src=src, alt=alt, longdesc=descr, border=border,
+                                  **kwargs) +' />'
 
-    def abbr(self, term, title=None):
-        return self._tag('abbr', (('title', title),), term)
+    def abbr(self, term, **kwargs):
+        return self._tag('abbr', term, ('title',), **kwargs)
 
-    def th(self, content, colspan=None, width=None, align=None, valign=None, cls=None, style=None):
-        attr = (('colspan', colspan), ('width', width), ('align', align), ('valign', valign),
-                ('class', cls), ('style', style))
-        return self._tag('th', attr, content)
+    def th(self, content, **kwargs):
+        return self._tag('th', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
     
-    def td(self, content, colspan=None, width=None, align=None, valign=None, cls=None, style=None,
-           scope=None, lang=None):
-        attr = (('colspan', colspan), ('width', width), ('align', align), ('valign', valign),
-                ('class', cls), ('style', style), ('scope', scope), ('lang', lang))
-        return self._tag('td', attr, content)
+    def td(self, content, **kwargs):
+        return self._tag('td', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
     
-    def tr(self, content, cls=None, style=None, lang=None):
-        attr = (('class', cls), ('style', style), ('lang', lang))
-        return self._tag('tr', attr, content)
+    def tr(self, content, **kwargs):
+        return self._tag('tr', content, **kwargs)
 
-    def table(self, content, title=None, summary=None, border=None, cellspacing=None,
-              cellpadding=None, width=None, cls=None, style=None, lang=None):
-        attr = (('title', title), ('summary', summary), ('border', border),
-                ('cellspacing', cellspacing), ('cellpadding', cellpadding),
-                ('width', width), ('class', cls), ('style', style), ('lang', lang))
-        return self._tag('table', attr, content, newlines=True)
+    def table(self, content, **kwargs):
+        attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
+        return self._tag('table', content, attr, _newlines=True, **kwargs)
 
     def thead(self, content):
-        return self._tag('thead', (), content)
+        return self._tag('thead', content)
     
     def tfoot(self, content):
-        return self._tag('tfoot', (), content)
+        return self._tag('tfoot', content)
     
     def tbody(self, content):
-        return self._tag('tbody', (), content, newlines=True)
+        return self._tag('tbody', content, _newlines=True)
+    
+    # HTML specific...
     
     def escape(self, text):
         return saxutils.escape(text)
-
-    # HTML specific...
-    
-    def span(self, text, cls=None, id=None, lang=None, style=None):
-        attr = (('id', id), ('lang', lang), ('class', cls), ('style', style))
-        return self._tag('span', attr, text)
-     
-    def div(self, content, id=None, cls=None, lang=None):
-        attr = (('class', cls), ('id', id), ('lang', lang))
-        return self._tag('div', attr, content, newlines=True)
-     
-    def map(self, content, name=None, title=None, lang=None, id=None, cls=None):
-        args = (('name', name), ('title', title), ('lang', lang), ('id', id), ('class', cls))
-        return self._tag('map', args, content, newlines=True)
 
     def uri(self, base, *args, **kwargs):
         uri = urllib.quote(base.encode('utf-8'))
@@ -190,80 +146,72 @@ class HtmlGenerator(Generator):
             uri += '?' + query
         return uri
      
+    def span(self, text, **kwargs):
+        return self._tag('span', text, **kwargs)
+     
+    def div(self, content, **kwargs):
+        return self._tag('div', content, _newlines=True, **kwargs)
+     
+    def map(self, content, **kwargs):
+        return self._tag('map', content, ('name', 'title'), _newlines=True, **kwargs)
+
     # Form controls
      
-    def form(self, content, name=None, cls=None, action="#", method=None,
-             enctype=None, lang=None):
-        attr = (('name', name), ('action', action), ('method', method),
-                ('enctype', enctype), ('class', cls), ('lang', lang))
-        return self._tag('form', attr, content, newlines=True)
+    def form(self, content, action="#", **kwargs):
+        attr = ('name', 'action', 'method', 'enctype')
+        return self._tag('form', content, attr, _newlines=True, action=action, **kwargs)
      
-    def fieldset(self, legend, content, cls=None):
-        content = (self._tag('legend', (), legend or ''),) + tuple(content)
-        return self._tag('fieldset', (('class', cls),), content, newlines=True)
+    def fieldset(self, legend, content, **kwargs):
+        content = (self._tag('legend', legend or ''),) + tuple(content)
+        return self._tag('fieldset', content, _newlines=True, **kwargs)
      
-    def label(self, text, id, lang=None, cls=None):
-        attr = (('for', id), ('lang', lang), ('class', cls))
-        return self._tag('label', attr, text)
+    def label(self, text, id, **kwargs):
+        kwargs['for'] = id
+        return self._tag('label', text, ('for',), **kwargs)
      
-    def field(self, value='', name='', size=20, password=False, cls=None,
-              **kwargs):
+    def field(self, value='', name='', size=20, password=False, cls=None, **kwargs):
         type = password and 'password' or 'text'
-        kwargs['cls'] = type + (cls and ' '+cls or '')
-        return self._input(type, name=name, value=value, size=size, **kwargs)
+        cls = type + (cls and ' '+cls or '')
+        return self._input(type, name=name, value=value, size=size, cls=cls, **kwargs)
      
     def upload(self, name, size=50, cls=None, **kwargs):
         cls = 'upload' + (cls and ' '+cls or '')
         return self._input('file', name=name, size=size, cls=cls, **kwargs)
      
     def radio(self, name, **kwargs):
-        return self._input('radio', name=name, **kwargs)
+        return self._input('radio', ('checked',), name=name, **kwargs)
      
     def hidden(self, name, value):
         return self._input('hidden', name=name, value=value)
      
-    def button(self, label, handler, cls=None, title=None):
+    def button(self, label, handler, cls=None, **kwargs):
         cls = cls and 'button ' + cls or 'button'
-        return self._input('button', value=label, onclick=handler, cls=cls, title=title)
+        return self._input('button', value=label, onclick=handler, cls=cls, **kwargs)
      
     def reset(self, label, onclick=None, cls=None, title=None):
         return self._input('reset', title=title, onclick=onclick, value=label, cls=cls)
      
-    def submit(self, label, name=None, value=None, onclick=None, cls=None, disabled=False,
-               title=None):
-        attr = (('onclick', onclick), ('name', name), ('cls', cls),
-                ('disabled', disabled), ('title', title))
+    def submit(self, label, value=None, **kwargs):
         if value is None:
-            return self._input('submit', value=label, **dict(attr))
+            return self._input('submit', value=label, **kwargs)
         else:
-            return self._tag('button', attr + (('value', value),) , label)
+            attr = ('value', 'onclick' 'name', 'cls', 'disabled', 'title')
+            return self._tag('button', label, attr, value=value, **kwargs)
             
-    def select(self, name, options, onchange=None, selected=None, id=None, title=None,
-               disabled=False, readonly=False):
-        assert selected is None or \
-               selected in [value for text, value in options], \
-               (selected, options)
-        opts = [self._tag('option', (('value', value), ('selected', (value == selected))), text)
+    def select(self, name, options, selected=None, **kwargs):
+        assert selected is None or selected in [v for text, v in options], (selected, options)
+        opts = [self._tag('option', text, ('value', 'selected'),
+                          value=value, selected=(value == selected))
                 for text, value in options]
-        attr = (('name', name), ('id', id), ('title', title), ('onchange', onchange),
-                ('disabled', disabled), ('readonly', readonly))
-        return self._tag('select', attr, opts, newlines=True)
+        attr = ('name', 'title', 'onchange', 'disabled', 'readonly')
+        return self._tag('select', opts, attr, _newlines=True, name=name, **kwargs)
      
-    def checkbox(self, name, value=None, id=None, checked=False,
-                 disabled=False, readonly=False, cls=None):
-        return self._input('checkbox', name=name, value=value, id=id,
-                           checked=checked, disabled=disabled,
-                           readonly=readonly, cls=cls)
+    def checkbox(self, name, **kwargs):
+        return self._input('checkbox', ('checked',), name=name, **kwargs)
      
-    def textarea(self, name, value='', id=None, rows=None, cols=None,
-                 readonly=False, cls=None):
-        attr = (('name', name),
-                ('id', id),
-                ('rows', rows),
-                ('cols', cols),
-                ('readonly', readonly),
-                ('class', cls))
-        return self._tag('textarea', attr, value)
+    def textarea(self, name, value='', **kwargs):
+        attr = ('name', 'rows', 'cols', 'readonly')
+        return self._tag('textarea', value, attr, name=name, **kwargs)
      
     # Special controls
      
@@ -284,7 +232,7 @@ class HtmlGenerator(Generator):
                    code + '</script>' + noscript
     
     def noscript(self, content):
-        return self._tag('noscript', (), content)
+        return self._tag('noscript', content)
      
     def script_write(self, content, noscript=None, condition=None):
         #return content
@@ -496,6 +444,9 @@ class HtmlExporter(Exporter):
                              ('Content-Script-Type', 'text/javascript'),
                              ('Content-Style-Type', 'text/css'))] + \
                ['<meta name="%s" content="%s">' % pair for pair in self._meta(context)] + \
+               ['<link rel="alternate" lang="%s" href="%s">' % \
+                (lang, self._node_uri(context, node, lang=lang))
+                for lang in node.variants() if lang != context.lang()] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % s.uri()
                 for s in node.resources(Script)]
@@ -630,11 +581,12 @@ class HtmlStaticExporter(HtmlExporter, FileExporter):
     def _head(self, context):
         base = super(HtmlStaticExporter, self)._head(context)
         node = context.node()
-        additional = [format('<link rel="%s" href="%s" title="%s">',
-                             kind, self.uri(context, n), n.title())
-                      for kind, n in (('start', node.root()), 
+        additional = [concat('<link rel="%s" href="%s" title="' % (kind, self.uri(context, n)),
+                             n.title() ,'">')
+                      for kind, n in (('top', node.root()), 
                                       ('prev', node.prev()),
-                                      ('next', node.next()))
+                                      ('next', node.next()),
+                                      ('parent', node.parent()))
                       if n is not None and n is not node]
         return concat(base, additional, separator='\n  ')
 

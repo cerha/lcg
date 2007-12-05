@@ -638,28 +638,6 @@ def concat(*args, **kwargs):
         return items[0]
     return result
 
-def format(text, *args):
-    """A 'Concatenation' constructor for very simplified string formatting.
-
-    This function allows to construct a Concatenation using a format-like
-    construct.  It is however very limited.  The ONLY suported format is '%s'
-    and only positional arguments are converted.  It, however, becomes handy
-    in certain cases.
-
-    Example:
-
-       format('Hi %s, say hello to %s.', 'Bob', 'John')
-
-    This is the same like:
-
-       concat('Hi ', 'Bob', ', say hello to ', 'John', '.')
-
-    Of course, with plain strings this makes no sense, but when the arguments
-    are translatable texts, the original instances are preserved.
-
-    """
-    return concat(reduce(lambda a,b: a+b, zip(text.split('%s'), args+('',))))
-
 
 def source_files_by_domain(basedir, domain=None):
     """Return the list of all Python source files, which belong to given domain.
