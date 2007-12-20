@@ -1,5 +1,8 @@
 2007-12-20  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/util.py (log): Replace undisplayable characters on
+	output.
+
 	* translations/lcg.de.po: Translations updated.
 
 	* translations/lcg.sk.po: Translations updated.

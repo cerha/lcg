@@ -116,7 +116,7 @@ def log(message, *args):
         message += ', '.join([unicode(a) for a in args])
     if not message.endswith("\n"):
         message += "\n"
-    sys.stderr.write("  "+message.encode('iso-8859-2'))
+    sys.stderr.write("  "+message.encode('iso-8859-2', 'replace'))
     sys.stderr.flush()
 
 def caller():
