@@ -7,130 +7,130 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-10-30 08:51+0100\n"
-"PO-Revision-Date: 2007-10-30 08:53+0100\n"
-"Last-Translator: Michaela Meier <michaela.meier@bfi-stmk.at>\n"
+"POT-Creation-Date: 2007-12-20 09:56+0100\n"
+"PO-Revision-Date: 2007-12-19 15:19+0100\n"
+"Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# The table of contents...
-#: ../lib/lcg/content/content.py:409
-msgid "Index:"
-msgstr "Verzeichnis:"
-
-#: ../lib/lcg/util.py:243
+#: ../lib/lcg/util.py:141
 msgid "Bulgarian"
 msgstr "bulgarisch"
 
-#: ../lib/lcg/util.py:245
+#: ../lib/lcg/util.py:143
 msgid "Catalan"
 msgstr "katalanisch"
 
-#: ../lib/lcg/util.py:245
+#: ../lib/lcg/util.py:143
 msgid "Czech"
 msgstr "tschechisch"
 
-#: ../lib/lcg/util.py:246
+#: ../lib/lcg/util.py:144
 msgid "Danish"
-msgstr "d√§nisch"
+msgstr "d‰nisch"
 
-#: ../lib/lcg/util.py:246
+#: ../lib/lcg/util.py:144
 msgid "German"
 msgstr "deutsch"
 
-#: ../lib/lcg/util.py:247
+#: ../lib/lcg/util.py:145
 msgid "Greek"
 msgstr "griechisch"
 
-#: ../lib/lcg/util.py:247
+#: ../lib/lcg/util.py:145
 msgid "English"
 msgstr "englisch"
 
-#: ../lib/lcg/util.py:247
+#: ../lib/lcg/util.py:145
 msgid "Spanish"
 msgstr "spanisch"
 
-#: ../lib/lcg/util.py:248
+#: ../lib/lcg/util.py:146
 msgid "Estonian"
 msgstr "estnisch"
 
-#: ../lib/lcg/util.py:249
+#: ../lib/lcg/util.py:147
 msgid "Finnish"
 msgstr "finnisch"
 
-#: ../lib/lcg/util.py:250
+#: ../lib/lcg/util.py:148
 msgid "French"
-msgstr "franz√∂sisch"
+msgstr "franz‰sisch"
 
-#: ../lib/lcg/util.py:252
+#: ../lib/lcg/util.py:150
 msgid "Irish"
 msgstr "irisch"
 
-#: ../lib/lcg/util.py:255
+#: ../lib/lcg/util.py:153
 msgid "Hungarian"
 msgstr "ungarisch"
 
-#: ../lib/lcg/util.py:257
+#: ../lib/lcg/util.py:155
 msgid "Icelandic"
 msgstr "isl√§ndisch"
 
-#: ../lib/lcg/util.py:257
+#: ../lib/lcg/util.py:155
 msgid "Italian"
 msgstr "italienisch"
 
-#: ../lib/lcg/util.py:267
+#: ../lib/lcg/util.py:165
 msgid "Dutch"
-msgstr "niederl√§ndisch"
+msgstr "niederl‰ndisch"
 
-#: ../lib/lcg/util.py:267
+#: ../lib/lcg/util.py:165
 msgid "Norwegian"
 msgstr "norwegisch"
 
-#: ../lib/lcg/util.py:269
+#: ../lib/lcg/util.py:167
 msgid "Polish"
 msgstr "polnisch"
 
-#: ../lib/lcg/util.py:270
+#: ../lib/lcg/util.py:168
 msgid "Portuguese"
 msgstr "portugiesisch"
 
-#: ../lib/lcg/util.py:275
+#: ../lib/lcg/util.py:173
 msgid "Slovak"
 msgstr "slowakisch"
 
-#: ../lib/lcg/util.py:275
+#: ../lib/lcg/util.py:173
 msgid "Slovenian"
 msgstr "slowenisch"
 
-#: ../lib/lcg/util.py:277
+#: ../lib/lcg/util.py:175
 msgid "Swedish"
 msgstr "schwedisch"
 
-#: ../lib/lcg/util.py:281
+#: ../lib/lcg/util.py:179
 msgid "Turkish"
-msgstr "t√ºrkisch"
+msgstr "t¸rkisch"
 
-#: ../lib/lcg/export/html.py:436
+#: ../lib/lcg/export/html.py:386
 msgid "Choose your language:"
 msgstr "Sprache w‰hlen:"
 
 # This label is actually not used.
-#: ../lib/lcg/export/html.py:672
+#: ../lib/lcg/export/html.py:611
 msgid "None"
 msgstr "Nichts"
 
-#: ../lib/lcg/export/html.py:673
+#: ../lib/lcg/export/html.py:612
 msgid "You are here:"
 msgstr "Sie sind hier:"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:675
+#: ../lib/lcg/export/html.py:614
 msgid "Next"
 msgstr "weiter"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:676
+#: ../lib/lcg/export/html.py:615
 msgid "Previous"
 msgstr "vorhergehend"
+
+# The table of contents...
+#: ../lib/lcg/content.py:400
+msgid "Index:"
+msgstr "Verzeichnis:"
