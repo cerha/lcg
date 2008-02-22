@@ -1,3 +1,17 @@
+2008-02-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py (HtmlGenerator.select): Added support for
+	option groups.
+	(HtmlFormatter._IMAGE_URI_MATCHER): Allow commas in filenames.
+	(HtmlExporter._title, HtmlExporter._head): Pass `context' to
+	`_title()', not `node'.
+
+	* lib/lcg/export/export.py (Exporter._translator): Set `fallback'
+	to True to prevent exceptions when the translation file does not
+	exist.
+	(Context, Exporter.context): Added support for context
+	extensibility.
+
 2007-12-20  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/util.py (log): Replace undisplayable characters on
