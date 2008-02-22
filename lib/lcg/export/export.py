@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004-2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -156,12 +156,15 @@ class Exporter(object):
     Formatter = MarkupFormatter
 
     class Context(object):
-        def __init__(self, exporter, generator, formatter, translator, node, sec_lang=None):
+        def __init__(self, exporter, generator, formatter, translator, node, **kwargs):
             self._exporter = exporter
             self._generator = generator
             self._formatter = formatter
             self._translator = translator
             self._node = node
+            self._init_kwargs(**kwargs)
+
+        def _init_kwargs(self, sec_lang=None):
             self._sec_lang = sec_lang
             
         def exporter(self):
@@ -192,9 +195,9 @@ class Exporter(object):
         self._translators = {}
 
     def _translator(self, lang):
-        return GettextTranslator(lang, path=self._translations)
+        return GettextTranslator(lang, path=self._translations, fallback=True)
 
-    def context(self, node, lang, sec_lang=None):
+    def context(self, node, lang, **kwargs):
         if lang is None:
             translator = NullTranslator()
         else:
@@ -202,7 +205,7 @@ class Exporter(object):
                 translator = self._translators[lang]
             except KeyError:
                 translator = self._translators[lang] = self._translator(lang)
-        return self.Context(self, self._generator, self._formatter, translator, node, sec_lang)
+        return self.Context(self, self._generator, self._formatter, translator, node, **kwargs)
 
     def export(self, context):
         """Return the exported node as a string."""
