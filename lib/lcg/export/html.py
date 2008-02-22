@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004-2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -199,10 +199,16 @@ class HtmlGenerator(Generator):
             return self._tag('button', label, attr, value=value, **kwargs)
             
     def select(self, name, options, selected=None, **kwargs):
-        assert selected is None or selected in [v for text, v in options], (selected, options)
-        opts = [self._tag('option', text, ('value', 'selected'),
-                          value=value, selected=(value == selected))
-                for text, value in options]
+        assert selected is None or selected in [x[1] for x in options], (selected, options)
+        def opt(label, value, enabled=True, cls=None):
+            if isinstance(value, (list, tuple)):
+                return self._tag('optgroup', [opt(*x) for x in value], ('label',), label=label,
+                                 _newlines=True)
+            else:
+                return self._tag('option', label, ('value', 'selected', 'disabled'),
+                                 value=value, selected=(value == selected), disabled=not enabled,
+                                 cls=not enabled and (cls and cls+' ' or '')+'disabled' or cls)
+        opts = [opt(*x) for x in options]
         attr = ('name', 'title', 'onchange', 'disabled', 'readonly')
         return self._tag('select', opts, attr, _newlines=True, name=name, **kwargs)
      
@@ -221,15 +227,14 @@ class HtmlGenerator(Generator):
                          cls='speaking-text')
         a2 = self.link(text, media.uri(), cls='speaking-text')
         return self.script_write(a1, a2)
-     
+
     # JavaScript code generation.
      
     def script(self, code, noscript=None):
-        noscript = noscript and self.noscript(noscript) or ''
-        if code:
-            code = '<!--\n' + code + ' //-->\n'
-        return '<script type="text/javascript" language="Javascript">' + \
-                   code + '</script>' + noscript
+        return '<script type="text/javascript" language="Javascript">'+ \
+               (code and '<!--\n' + code + ' //-->\n' or '') + \
+               '</script>' + \
+               (noscript and self.noscript(noscript) or '')
     
     def noscript(self, content):
         return self._tag('noscript', content)
@@ -290,7 +295,7 @@ class HtmlFormatter(MarkupFormatter):
     
     _BLANK_MATCHER = re.compile('\s+')
     _IMAGE_URI_MATCHER = re.compile(r'^(?P<align>[<>])?(?P<name>'
-                                    '(?P<basename>[\w\d_./-]+)\.'
+                                    '(?P<basename>[\w\d_.,/-]+)\.'
                                     '(jpe?g|png|gif))$', re.IGNORECASE)
     _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
 
@@ -374,6 +379,7 @@ class HtmlFormatter(MarkupFormatter):
 
     
 class HtmlExporter(Exporter):
+    #DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
     DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
 
     Generator = HtmlGenerator
@@ -427,8 +433,8 @@ class HtmlExporter(Exporter):
             return ['<link rel="stylesheet" type="text/css" href="%s">' % \
                     s.uri() for s in context.node().resources(Stylesheet)]
             
-    def _title(self, node):
-        return node.title()
+    def _title(self, context):
+        return context.node().title()
 
     def _meta(self, context):
         import lcg
@@ -438,7 +444,7 @@ class HtmlExporter(Exporter):
         node = context.node()
         if self._stylesheet is not None:
             node.resource(XStylesheet, self._stylesheet)
-        tags = [concat('<title>', self._title(node), '</title>')] + \
+        tags = [concat('<title>', self._title(context), '</title>')] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', context.lang()),
