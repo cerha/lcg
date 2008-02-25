@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -83,6 +83,11 @@ class Image(Resource):
 
 class Stylesheet(Resource):
     """A cascading style-sheet."""
+    pass
+
+
+class Script(Resource):
+    """A java/ecma/... script object used within the content."""
     pass
 
 
@@ -291,7 +296,7 @@ class SharedMedia(Media):
     SHARED = True
     
 
-class Script(XResource):
+class XScript(XResource, Script):
     """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'
 

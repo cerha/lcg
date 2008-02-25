@@ -1,7 +1,10 @@
 2008-02-25  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/resources.py (Script): Don't derive from Xresource.
+	(XScript): New class.
+
 	* lib/lcg/export/html.py (FileExporter): Pass the output directory
-	through the export context.
+	through the export context.  Media player hack removed.
 
 2008-02-22  Tomas Cerha  <cerha@brailcom.org>
 
