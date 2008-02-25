@@ -532,24 +532,36 @@ class HtmlExporter(Exporter):
 
 class FileExporter(object):
     """Mix-in class exporting content into files."""
+
+    class Context(Exporter.Context):
+        def _init_kwargs(self, directory=None, **kwargs):
+            assert isinstance(directory, str)
+            self._directory = directory
+            super(FileExporter.Context, self)._init_kwargs(**kwargs)
+            
+        def directory(self):
+            return self._directory
+
+    def _write_file(self, filename, content):
+        file = open(filename, 'w')
+        file.write(content.encode('utf-8'))
+        file.close()
     
     def dump(self, node, directory, sec_lang=None):
         """Save the node's content and resources into files recursively."""
         if not os.path.isdir(directory):
             os.makedirs(directory)
         for lang in node.variants() or (None,):
-            context = self.context(node, lang, sec_lang=sec_lang)
+            context = self.context(node, lang, directory=directory, sec_lang=sec_lang)
             filename = os.path.join(directory, self._output_file(context, node))
-            file = open(filename, 'w')
-            file.write(context.translate(self.export(context)).encode('utf-8'))
-            file.close()
+            self._write_file(filename, context.translate(self.export(context)))
         for r in node.resources():
             r.export(directory)
         for n in node.children():
             self.dump(n, directory, sec_lang=sec_lang)
 
 
-class HtmlStaticExporter(HtmlExporter, FileExporter):
+class HtmlStaticExporter(FileExporter, HtmlExporter):
     """Export the content as a set of static web pages."""
 
     _hotkey = {
