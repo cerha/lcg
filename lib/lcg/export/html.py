@@ -512,19 +512,13 @@ class HtmlExporter(Exporter):
         return context.node().content().export(context)
     
     def export(self, context):
-        if 'audio.js' in [r.uri().split('/')[-1] for r in context.node().resources(Script)]:
-            hack = ('\n<object id="media_player" height="0" width="0"'
-		    ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6">'
-                    '</object>')
-        else:
-            hack = ''
         lines = (self.DOCTYPE, '',
                  '<html lang="%s">' % context.lang(),
                  '<head>',
                  self._head(context),
                  '</head>',
                  '<body>',
-                 self._parts(context, self._BODY_PARTS) + hack,
+                 self._parts(context, self._BODY_PARTS),
                  '</body>',
                  '</html>')
         return concat(lines, separator="\n")
