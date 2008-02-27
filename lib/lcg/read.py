@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ class Reader(object):
             root = self
         self._root = root
         self._resource_provider_ = self._resource_provider()
+        self._variants_ = None
         
     def _title(self):
         return None
@@ -83,8 +84,9 @@ class Reader(object):
         return ()
 
     def _variants(self):
+        # This Method is meant to be overriden in derived classes.
         if self._parent is not None:
-            return self._parent._variants_
+            return self._parent.variants()
         else:
             return ()
 
@@ -102,13 +104,19 @@ class Reader(object):
     
     def parent(self):
         return self._parent
+
+    def variants(self):
+        if self._variants_ is None:
+            # Available variants are read in build time.
+            self._variants_ = self._variants()
+        return self._variants_
     
     def resource_provider(self):
         return self._resource_provider_
 
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""
-        self._variants_ = variants = self._variants()
+        variants = self.variants()
         return ContentNode(id=self._id, title=self._title(), brief_title=self._brief_title(),
                            descr=self._descr(), variants=variants, content=self._content(), 
                            children=[child.build() for child in self._children()],
@@ -219,7 +227,7 @@ class StructuredTextReader(FileReader):
     def _title(self):
         # This method is called first, so we read the document here and store the content for later
         # use.
-        variants = self._variants_
+        variants = self.variants()
         if len(variants) <= 1:
             lang = variants and variants[0] or None
             title, content = self._document(self._source_text(lang))
@@ -257,7 +265,7 @@ class DocFileReader(StructuredTextReader):
 
     def _variants(self):
         if self._parent is not None:
-            return self._parent._variants_
+            return self._parent.variants()
         else:
             return tuple([os.path.splitext(os.path.splitext(f)[0])[1][1:]
                           for f in glob.glob(self._input_file(self._id, lang='*', ext=self._ext))])
