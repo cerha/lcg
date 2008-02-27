@@ -2,7 +2,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,9 +45,9 @@ class ContentNode(unittest.TestCase):
     	a = lcg.ContentNode('a', content=lcg.TextContent("A"))
         # TODO: This doesn.t work now.  Resources now only work with
         # file-based nodes.
-        #m1 = a.resource(lcg.Media, 'sound1.ogg')
-        #m2 = a.resource(lcg.Media, 'sound2.ogg')
-        #r = a.resources(lcg.Media)
+        #m1 = a.resource(lcg.XMedia, 'sound1.ogg')
+        #m2 = a.resource(lcg.XMedia, 'sound2.ogg')
+        #r = a.resources(lcg.XMedia)
         #assert len(r) == 2 and m1 in r and m2 in r, r
 
 tests.add(ContentNode)

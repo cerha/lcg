@@ -36,8 +36,8 @@ from lcg import *
 class Resource(object):
     """Generic resource class."""
     
-    def __init__(self, filename, title=None, descr=None, uri=None, **kwargs):
-        super(Resource, self).__init__(**kwargs)
+    def __init__(self, filename, title=None, descr=None, uri=None):
+        super(Resource, self).__init__()
         assert isinstance(filename, (str, unicode)), filename
         assert title is None or isinstance(title, (str, unicode)), title
         assert descr is None or isinstance(descr, (str, unicode)), descr
@@ -89,6 +89,9 @@ class Stylesheet(Resource):
 class Script(Resource):
     """A java/ecma/... script object used within the content."""
     pass
+
+class Media(Resource):
+    """Media file, such as audio or video."""
 
 
 class ResourceProvider(object):
@@ -180,18 +183,13 @@ class XResource(Resource):
     """The subdirectory, where the resource files are both searched on input
     and stored on output."""
 
-    SHARED = True
-    """A boolean flag indicating that the file may be shared by multiple nodes
-    (is not located within the node-specific subdirectory, but rather in a
-    course-wide resource directory)."""
-
     ALT_SRC_EXTENSIONS = ()
     """A list of alternative source file extensions.  When the input file of
     the same name as passed to the constructor does not exist, other files are
     searched with the same baseneme and all the extensions listed here.  An
     appropriate conversion is possible within the '_export()' method."""
     
-    def __init__(self, file, src_path, subdir=None, raise_error=False, **kwargs):
+    def __init__(self, file, src_path, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -200,24 +198,16 @@ class XResource(Resource):
           src_path -- source file path.  This is an absolut filename of the source file.  The
             filename of the source file must not necessarily be the same as 'file'.  For examlpe a
             conversion may be involved (depending on particular 'Resource' subclass).
-          subdir -- Destination subdirectory name.  This argument is only needed for the resource
-            types which are not shared.
-
+            
         """
         super(XResource, self).__init__(file, **kwargs)
-        assert self.SHARED and subdir is None or isinstance(subdir, str)
         self._src_path = src_path
-        self._subdir = subdir
 
     def ok(self):
         return os.path.exists(self._src_path)
 
     def _dst_path(self):
-        if self.SHARED:
-            dst_dir = self.SUBDIR
-        else:
-            dst_dir = os.path.join(self.SUBDIR, self._subdir)
-        return os.path.join(dst_dir, self._filename)
+        return os.path.join(self.SUBDIR, self._filename)
             
     def uri(self):
         return '/'.join(self._dst_path().split(os.path.sep))
@@ -252,24 +242,22 @@ class XResource(Resource):
         return data
             
         
-class Media(XResource):
+class XMedia(XResource, Media):
     """A media object used within the content."""
     SUBDIR = 'media'
-    SHARED = False
     ALT_SRC_EXTENSIONS = ('.wav',)
 
-    def __init__(self, file, src_path, subdir=None):
+    def __init__(self, file, src_path):
         for f in (file, src_path):
             basename, ext = os.path.splitext(f)
-            assert ext in ('.ogg','.mp3','.wav'), \
-                   "Unsupported media type: %s" % ext
-        super(Media, self).__init__(file, src_path, subdir=subdir)
+            assert ext in ('.ogg','.mp3','.wav'), "Unsupported media type: %s" % ext
+        super(XMedia, self).__init__(file, src_path)
 
     def _export(self, infile, outfile):
         input_format = os.path.splitext(infile)[1].upper()[1:]
         output_format = os.path.splitext(outfile)[1].upper()[1:]
         if input_format == output_format:
-            return super(Media, self)._export(infile, outfile)
+            return super(XMedia, self)._export(infile, outfile)
         elif input_format != 'WAV':
             raise Exception("Unsupported conversion: %s -> %s" % \
                             (input_format, output_format))
@@ -291,11 +279,6 @@ class Media(XResource):
             raise IOError("Subprocess returned a non-zero exit status.")
 
         
-class SharedMedia(Media):
-    """A shared media object."""
-    SHARED = True
-    
-
 class XScript(XResource, Script):
     """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'
@@ -309,7 +292,7 @@ class XImage(XResource, Image):
     SUBDIR = 'images'
 
     
-class Transcript(XResource):
+class XTranscript(XResource):
     """A textual transcript of a recording ."""
     SUBDIR = 'transcripts'
 
@@ -326,7 +309,7 @@ class Transcript(XResource):
         """
         self._text = text
         self._input_encoding = input_encoding
-        super(Transcript, self).__init__(file, src_path, **kwargs)
+        super(XTranscript, self).__init__(file, src_path, **kwargs)
 
     def ok(self):
         return os.path.exists(self._src_path) or self._text is not None
@@ -358,28 +341,32 @@ class Transcript(XResource):
 # ==============================================================================
 # ==============================================================================
 
-class _FileResourceProvider(ResourceProvider):
-    """Resource provider reading the resources from filesystem."""
+class FileResourceProvider(ResourceProvider):
+    """Provides resources read from files.
+    
+    The possible source directories are first searched for the input file:
 
-    def __init__(self, dirs, dst_subdir=None):
+      * the directory passed as the 'searchdir' argument to the 'resource()' method call,
+      * all directories passed as the 'dirs' argument to the provider constructor,
+      * default resource directory ('config.default_resource_dir').
+
+    """
+    def __init__(self, dirs):
         assert isinstance(dirs, (list, tuple))
-        self._dirs = dirs
-        self._dst_subdir = dst_subdir
+        self._dirs = tuple(dirs)
         self._cache = {}
-        super(_FileResourceProvider, self).__init__()
+        super(FileResourceProvider, self).__init__()
         
-    def _resource(self, cls, file, fallback=True, **kwargs):
-        dirs = [issubclass(cls, XResource) and os.path.join(dir, cls.SUBDIR) or dir
-                for dir in self._dirs]
-        if issubclass(cls, XResource) and cls.SHARED:
-            dirs = [''] + dirs
-        else:
-            kwargs = dict(subdir=self._dst_subdir)
+    def _resource(self, cls, file, fallback=True, searchdir=None, **kwargs):
+        if not issubclass(cls, XResource):
+            assert issubclass(cls, Resource), cls
+            return fallback and cls(*args, **kwargs) or None
+        dirs = [os.path.join(dir, cls.SUBDIR) for dir in
+                self._dirs + (config.default_resource_dir,)]
+        if searchdir is not None:
+            dirs.insert(0, searchdir)
         basename, ext = os.path.splitext(file)
-        if issubclass(cls, XResource):
-            altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
-        else:
-            altnames = []
+        altnames = [basename+e for e in cls.ALT_SRC_EXTENSIONS if e != ext]
         for d in dirs:
             for src_file in [file] + altnames:
                 src_path = os.path.join(d, src_file)
@@ -392,63 +379,32 @@ class _FileResourceProvider(ResourceProvider):
                         return [cls(os.path.splitext(path[len(d)+1:])[0]+ext,
                                     path, **kwargs) for path in pathlist]
         if fallback:
-            path = os.path.join(dirs[0], file)
-            result = cls(file, path, **kwargs)
+            result = cls(file, file, **kwargs)
             if not result.ok():
                 log("Resource file not found:", file, dirs)
         else:
             result = None
         return result
 
-    def resource(self, cls, file, fallback=True, **kwargs):
+    def resource(self, cls, file, fallback=True, searchdir=None, **kwargs):
         key = (cls, file, tuple(kwargs.items()))
         try:
             result = self._cache[key]
         except KeyError:
-            result = self._resource(cls, file, fallback=fallback, **kwargs)
+            result = self._resource(cls, file, fallback=fallback, searchdir=searchdir, **kwargs)
             self._cache[key] = result
         return result
 
     def resources(self, cls=None):
         if cls is None:
             cls = Resource
-        return tuple([r for r in self._cache.values() if isinstance(r, cls)])
-        
-
-class SharedResourceProvider(_FileResourceProvider):
-    """Provides resources shared by multiple nodes."""
-    
-    def __init__(self, dirs=()):
-        super(SharedResourceProvider, self).__init__(tuple(dirs) + (config.default_resource_dir,))
-        
-        
-class FileResourceProvider(_FileResourceProvider):
-    """Provides resources read from files.
-    
-    The possible source directories are first searched for the input file:
-
-      * For shared resource types this is the current working directory, course root directory
-        and than LCG default resource directory ('config.default_resource_dir') in the
-        subdirectory given by the resource type.
-
-      * For other resource types the source files are always expected in source directory (as
-        specified by the constructor argument `dir').
-    
-    """
-    
-    def __init__(self, src_dir, dst_subdir, shared_resource_provider):
-        self._resources = []
-        self._shared_resource_provider = shared_resource_provider
-        super(FileResourceProvider, self).__init__((src_dir,), dst_subdir=dst_subdir)
-        
-    def _resource(self, cls, *args, **kwargs):
-        assert issubclass(cls, Resource), cls
-        if not issubclass(cls, XResource):
-            return kwargs.get('fallback') and cls(*args, **kwargs) or None
-        if cls.SHARED:
-            result = self._shared_resource_provider.resource(cls, *args, **kwargs)
-        else:
-            result = super(FileResourceProvider, self)._resource(cls, *args, **kwargs)
+        result = []
+        for r in self._cache.values():
+            if isinstance(r, (list, tuple)):
+                for rr in r:
+                    if isinstance(rr, cls):
+                        result.append(rr)
+            elif isinstance(r, cls):
+                result.append(r)
         return result
-
     

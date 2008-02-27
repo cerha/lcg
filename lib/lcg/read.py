@@ -62,10 +62,12 @@ class Reader(object):
             root = parent
             while root.parent() is not None:
                 root = root.parent()
+            resource_provider = root.resource_provider()
         else:
             root = self
+            resource_provider = self._resource_provider()
         self._root = root
-        self._resource_provider_ = self._resource_provider()
+        self._resource_provider_ = resource_provider
         self._variants_ = None
         
     def _title(self):
@@ -94,10 +96,8 @@ class Reader(object):
         return {}
 
     def _resource_provider(self):
-        if self is self._root:
-            return SharedResourceProvider()
-        else:
-            return self._root.resource_provider()
+        # To be overriden
+        return ResourceProvider()
 
     def id(self):
         return self._id
@@ -136,21 +136,8 @@ class FileReader(Reader):
             encoding = self._parent.encoding()
         self._encoding = encoding or 'ascii'
 
-    def _shared_resource_provider(self):
-        # To be overriden...
-        return SharedResourceProvider((self._dir,)) 
-        
     def _resource_provider(self):
-        if self is self._root:
-            p = self._shared_resource_provider_ = self._shared_resource_provider()
-        elif isinstance(self._root, FileReader):
-            p = self._root._shared_resource_provider_
-        else:
-            p = self._root.resource_provider()
-        d1, d2 = os.path.normpath(self._dir), os.path.normpath(self._root.dir())
-        assert d1.startswith(d2), (d1, d2)
-        subdir = d1[len(d2)+len(os.sep):]
-        return FileResourceProvider(self._dir, subdir, shared_resource_provider=p)
+        return FileResourceProvider((self._dir,))
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""
