@@ -1,6 +1,12 @@
 2008-02-27  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/read.py: Minor fix.
+	* lib/lcg/_test.py: Resource processing simplified.
+
+	* lib/lcg/nodes.py: Resource processing simplified.
+
+	* lib/lcg/resources.py: Resource processing simplified.
+
+	* lib/lcg/read.py: Resource processing simplified.
 
 	* lib/lcg/content.py (ol): New function.
 
