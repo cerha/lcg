@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -801,6 +801,11 @@ def dl(items, formatted=False):
 def ul(items, formatted=False):
     """Create an 'ItemizedList' by coercing given sequence of items."""
     return ItemizedList([coerce(item, formatted=formatted) for item in items])
+
+def ol(items, formatted=False, alpha=False):
+    """Create an 'ItemizedList' by coercing given sequence of items."""
+    return ItemizedList([coerce(item, formatted=formatted) for item in items],
+                        type=(alpha and ItemizedList.TYPE_ALPHA or ItemizedList.TYPE_NUMERIC))
 
 def fieldset(pairs, title=None, formatted=False):
     """Create a 'FieldSet' out of given sequence of (LABEL, VALUE) pairs.
