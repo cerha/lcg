@@ -162,7 +162,8 @@ class HtmlGenerator(Generator):
         return self._tag('form', content, attr, _newlines=True, action=action, **kwargs)
      
     def fieldset(self, legend, content, **kwargs):
-        content = (self._tag('legend', legend or ''),) + tuple(content)
+        content = (self._tag('legend', legend or '', cls=(not legend and 'empty' or None)),) +\
+                   tuple(content)
         return self._tag('fieldset', content, _newlines=True, **kwargs)
      
     def label(self, text, id, **kwargs):
