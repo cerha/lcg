@@ -1,3 +1,9 @@
+2008-03-06  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py (LocalizableTime): New test.
+
+	* lib/lcg/i18n.py (LocalizableTime): New class.
+
 2008-02-29  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator.fieldset): Add automatic
