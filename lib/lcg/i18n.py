@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -308,6 +308,29 @@ class LocalizableDateTime(Localizable):
         if self._show_weekday:
             result = data.weekdays[self._datetime.weekday()] + ' ' + result
         return result
+
+
+class LocalizableTime(Localizable):
+    """Time string which can be converted to a localized format.
+    
+    See the rules in 'Localizable' class documentation for more information
+    about mixing instances of this class with other strings.
+    
+    """
+    _RE = re.compile(r'^(\d\d):(\d\d)(?::(\d\d))?$')
+
+    def __init__(self, string):
+        super(LocalizableTime, self).__init__(string)
+        m = self._RE.match(string)
+        if not m:
+            raise Exception("Invalid time format", self)
+        numbers = [int(n) for n in m.groups() if n is not None]
+        self._time = datetime.time(*numbers)
+        self._show_seconds = len(numbers) > 2
+    
+    def format(self, data):
+        time_format = (self._show_seconds and data.exact_time_format or data.time_format)
+        return self._time.strftime(time_format)
 
 
 class Decimal(Localizable):

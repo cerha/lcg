@@ -175,6 +175,23 @@ class LocalizableDateTime(unittest.TestCase):
 
 tests.add(LocalizableDateTime)
 
+class LocalizableTime(unittest.TestCase):
+
+    def check_format(self):
+        t1 = lcg.LocalizableTime("02:43")
+        t2 = lcg.LocalizableTime("18:43:32")
+        t1cs = t1.format(lcg.GettextTranslator('cs').locale_data())
+        t2cs = t2.format(lcg.GettextTranslator('cs').locale_data())
+        t1no = t1.format(lcg.GettextTranslator('no').locale_data())
+        t2no = t2.format(lcg.GettextTranslator('no').locale_data())
+        assert t1cs == "02:43", t1cs
+        assert t2cs == "18:43:32", t2cs
+        assert t1no == "02.43", t1no
+        assert t2no == "18.43.32", t2no
+
+tests.add(LocalizableTime)
+
+
 class TranslatableTextFactory(unittest.TestCase):
 
     def check_domain(self):
