@@ -18,7 +18,7 @@
 
 """Document structure abstraction.
 
-The complete LCG publication typically consists of multiple documents which form a hiararchy.  See
+The complete LCG publication typically consists of multiple documents which form a hierarchy.  See
 the module 'content' for classes representing the content hierarchy within one document.  Each
 document in the hierarchy is represented by a single 'ContentNode' instance (defined below).
 

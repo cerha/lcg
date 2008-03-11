@@ -26,7 +26,7 @@ class Generator(object):
         
         
 class MarkupFormatter(object):
-    """Simple inline ascii markup formatter.
+    """Simple inline ASCII markup formatter.
 
     This simple formatter can only format the markup within one block (ie. a
     single paragraph or other non-structured piece of text).  Parsing the
