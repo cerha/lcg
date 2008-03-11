@@ -601,14 +601,14 @@ class HtmlStaticExporter(FileExporter, HtmlExporter):
     def _top_navigation(self, context):
         nav = self._navigation(context)
         if nav:
-            return g.div(nav, cls='navigation') + '<hr class="hidden">\n'
+            self._generator.div(nav, cls='navigation') + '<hr class="hidden">\n'
         else:
             return None
 
     def _bottom_navigation(self, context):
         nav = self._navigation(context)
         if nav:
-            return '<hr class="hidden">\n' + g.div(nav, cls='navigation')
+            return '<hr class="hidden">\n' + self._generator.div(nav, cls='navigation')
         else:
             return None
         
