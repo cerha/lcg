@@ -2,10 +2,6 @@ html, body {
     background: #fff;
     font-family: sans-serif;
 }
-div.content { 
-    margin-bottom: 1.6em;
-}
-
 h1 { font-size: 2.0em; }
 h2 { font-size: 1.8em; }
 h3 { font-size: 1.6em; }
@@ -25,16 +21,27 @@ a.backref, a:link.backref {
 
 /* Exporter generated parts */
 
-.language-selection { 
+#language-selection { 
     border: 0px solid #c8ccd0;
     font-size: 0.9em;
     padding: 0.2em;
     border-top-width: 1px;
     text-align: right;
 }
-.language-selection img { 
+#language-selection img { 
     margin: 0 0.2em;
 }
+#content { 
+    margin-bottom: 1.6em;
+}
+#copyright { 
+    font-size: 0.8em;
+    float: right;
+}
+#version { 
+    font-size: 0.8em;
+}
+
 div.navigation { 
     border: solid #b8bcc0;
     border-width: 1px 0;
@@ -48,13 +55,6 @@ div.navigation span.next {
 }
 hr.navigation { display: none; }
 
-div.copyright { 
-    font-size: 0.8em;
-    float: right;
-}
-div.version { 
-    font-size: 0.8em;
-}
 
 /* Generic content elements */
 

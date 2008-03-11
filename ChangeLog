@@ -1,3 +1,14 @@
+2008-03-11  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/css/default.css: Style parts by `id', not `class'.
+
+	* lib/lcg/export/html.py (HtmlGenerator.js_value): Added support
+	for None and boolean types.
+	(HtmlGenerator.js_args): New method.
+	(HtmlExporter): Export parts with `id', not just `class'.
+
+	* lib/lcg/resources.py (XFlash): New class.
+
 2008-03-06  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/_test.py (LocalizableTime): New test.

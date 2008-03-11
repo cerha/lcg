@@ -601,14 +601,14 @@ class HtmlStaticExporter(FileExporter, HtmlExporter):
     def _top_navigation(self, context):
         nav = self._navigation(context)
         if nav:
-            return nav + '<hr class="hidden">\n'
+            return g.div(nav, cls='navigation') + '<hr class="hidden">\n'
         else:
             return None
 
     def _bottom_navigation(self, context):
         nav = self._navigation(context)
         if nav:
-            return '<hr class="hidden">\n' + nav
+            return '<hr class="hidden">\n' + g.div(nav, cls='navigation')
         else:
             return None
         
@@ -640,6 +640,6 @@ class HtmlStaticExporter(FileExporter, HtmlExporter):
                             concat([link(n) for n in node.path()], separator=' / '))
         nav = [g.span(_('Next') + ': ' + link(node.next(), key='next'), cls='next'),
                g.span(_('Previous') + ': ' + link(node.prev(), key='prev'), cls='prev')]
-        return g.div(breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator')),
-                     cls='navigation')
+        return breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator'))
+
             
