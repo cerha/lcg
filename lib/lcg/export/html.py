@@ -224,8 +224,7 @@ class HtmlGenerator(Generator):
      
     def speaking_text(self, text, media):
         id_ = 'text_%s' % id(media)
-        a1 = self.button(text, "play_audio('%s');" % media.uri(),
-                         cls='speaking-text')
+        a1 = self.button(text, "play_audio('%s');" % media.uri(), cls='speaking-text')
         a2 = self.link(text, media.uri(), cls='speaking-text')
         return self.script_write(a1, a2)
 
@@ -252,29 +251,37 @@ class HtmlGenerator(Generator):
         return self.script(content, noscript)
      
     def js_value(self, var):
-        if isinstance(var, types.StringTypes):
+        if var is None:
+            return 'null'
+        elif isinstance(var, (str, unicode)):
             return "'" + var.replace("'", "\\'") + "'"
-        elif isinstance(var, (TranslatableText, Concatenation)):
-            return "'" + var.replace("'", "\\'") + "'"
-        elif isinstance(var, types.IntType):
+        elif isinstance(var, bool):
+            return (var and 'true' or 'false')
+        elif isinstance(var, int):
             return str(var)
-        elif isinstance(var, (types.ListType, types.TupleType)):
+        elif isinstance(var, (tuple, list)):
             return self.js_array(var)
+        elif isinstance(var, dict):
+            return self.js_dict(var)
         else:
             raise Exception("Invalid type for JavaScript conversion:", var)
         
     def js_array(self, items):
-        assert isinstance(items, (types.ListType, types.TupleType))
+        assert isinstance(items, (tuple, list))
         values = [self.js_value(i) for i in items]
         return concat('[', concat(values, separator=", "), ']')
      
     def js_dict(self, items):
-        assert isinstance(items, (types.ListType, types.TupleType, types.DictType))
-        if isinstance(items, types.DictType):
+        if isinstance(items, dict):
             items = items.items()
+        else:
+            assert isinstance(items, (tuple, list))
         assert is_sequence_of(dict(items).keys(), types.StringType)
         pairs = [concat("'%s': " % k, self.js_value(v)) for k,v in items]
         return concat('{', concat(pairs, separator=", "), '}')
+     
+    def js_args(self, *args):
+        return concat([self.js_value(arg) for arg in args], separator=", ")
      
 
 class HtmlFormatter(MarkupFormatter):
@@ -471,7 +478,7 @@ class HtmlExporter(Exporter):
     def _part(self, name, context):
         content = getattr(self, '_'+name)(context)
         if content is not None:
-            return self._generator.div(content, cls=name.replace('_', '-'))
+            return self._generator.div(content, id=name.replace('_', '-'))
         else:
             return None
         
@@ -566,13 +573,11 @@ class HtmlStaticExporter(FileExporter, HtmlExporter):
         'index': '4',
         }
 
-    _BODY_PARTS = ('navigation',
-                   'rule',
+    _BODY_PARTS = ('top_navigation',
                    'heading',
                    'language_selection',
                    'content',
-                   'rule',
-                   'navigation',
+                   'bottom_navigation',
                    )
     
     def _head(self, context):
@@ -593,11 +598,20 @@ class HtmlStaticExporter(FileExporter, HtmlExporter):
         else:
             return super(HtmlStaticExporter, self)._language_selection(context)
         
-    def _rule(self, context):
-        if len(context.node().root().linear()) <= 1:
+    def _top_navigation(self, context):
+        nav = self._navigation(context)
+        if nav:
+            return nav + '<hr class="hidden">\n'
+        else:
             return None
-        return '<hr class="hidden">'
-    
+
+    def _bottom_navigation(self, context):
+        nav = self._navigation(context)
+        if nav:
+            return '<hr class="hidden">\n' + nav
+        else:
+            return None
+        
     def _navigation(self, context):
         node = context.node()
         root = node.root()
@@ -626,5 +640,6 @@ class HtmlStaticExporter(FileExporter, HtmlExporter):
                             concat([link(n) for n in node.path()], separator=' / '))
         nav = [g.span(_('Next') + ': ' + link(node.next(), key='next'), cls='next'),
                g.span(_('Previous') + ': ' + link(node.prev(), key='prev'), cls='prev')]
-        return breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator'))
+        return g.div(breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator')),
+                     cls='navigation')
             
