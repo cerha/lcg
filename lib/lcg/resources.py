@@ -279,18 +279,17 @@ class XMedia(XResource, Media):
             raise IOError("Subprocess returned a non-zero exit status.")
 
         
-class XScript(XResource, Script):
-    """A java/ecma/... script object used within the content."""
-    SUBDIR = 'scripts'
-
-    
 class XStylesheet(XResource, Stylesheet):
-    """A stylesheet used within the content."""
     SUBDIR = 'css'
 
 class XImage(XResource, Image):
     SUBDIR = 'images'
 
+class XScript(XResource, Script):
+    SUBDIR = 'scripts'
+
+class XFlash(XResource):
+    SUBDIR = 'flash'
     
 class XTranscript(XResource):
     """A textual transcript of a recording ."""
