@@ -1,3 +1,15 @@
+2008-03-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/util.py (_LANGUAGE_NAMES): Few more languages marked for
+	translation.
+
+	* lib/lcg/resources.py (Flash): New class.
+
+	* lib/lcg/read.py (FileReader._read_file): New argument `fallback_lang'.
+
+	* lib/lcg/export/html.py (HtmlGenerator.js_value): Escape HTML
+	tags in strings.
+
 2008-03-11  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: Style parts by `id', not `class'.
