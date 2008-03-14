@@ -147,11 +147,11 @@ class FileReader(Reader):
             dir = self._dir
         return os.path.join(dir, name + '.' + ext)
         
-    def _read_file(self, name, ext='txt', comment=None, dir=None, lang=None):
-        """Return all the text read from the source file."""
+    def _read_file(self, name, ext='txt', comment=None, dir=None, lang=None, fallback_lang=None):
+        """Return the text read from the source file."""
         filename = self._input_file(name, ext=ext, lang=lang, dir=dir)
         if lang is not None and not os.path.exists(filename):
-            filename2 = self._input_file(name, ext=ext, dir=dir)
+            filename2 = self._input_file(name, ext=ext, lang=fallback_lang, dir=dir)
             if os.path.exists(filename2):
                 log("File '%s' not found. Using '%s' instead.", filename, filename2)
                 filename = filename2
