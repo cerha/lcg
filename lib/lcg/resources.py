@@ -83,17 +83,17 @@ class Image(Resource):
 
 class Stylesheet(Resource):
     """A cascading style-sheet."""
-    pass
-
 
 class Script(Resource):
     """A java/ecma/... script object used within the content."""
-    pass
 
 class Media(Resource):
     """Media file, such as audio or video."""
 
+class Flash(Resource):
+    """Adobe/Macromedia Flash object."""
 
+    
 class ResourceProvider(object):
     """An abstract base class for different resource provider implementations.
 
@@ -288,7 +288,7 @@ class XImage(XResource, Image):
 class XScript(XResource, Script):
     SUBDIR = 'scripts'
 
-class XFlash(XResource):
+class XFlash(XResource, Flash):
     SUBDIR = 'flash'
     
 class XTranscript(XResource):
