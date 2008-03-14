@@ -1,5 +1,5 @@
 # Learning Content Generator
-# Copyright (C) 2005-2007 Brailcom, o.p.s.
+# Copyright (C) 2005-2008 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2005.
 #
@@ -7,126 +7,206 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-10-30 08:51+0100\n"
-"PO-Revision-Date: 2007-10-30 08:55+0100\n"
+"POT-Creation-Date: 2008-03-13 16:24+0100\n"
+"PO-Revision-Date: 2008-03-14 17:03+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/content/content.py:409
-msgid "Index:"
-msgstr "Obsah:"
+#: ../lib/lcg/util.py:138
+msgid "Afrikaans"
+msgstr "afrikán¹tina"
 
-#: ../lib/lcg/util.py:243
+#: ../lib/lcg/util.py:139
+msgid "Arabic"
+msgstr "arab¹tina"
+
+#: ../lib/lcg/util.py:141
 msgid "Bulgarian"
 msgstr "bulhar¹tina"
 
-#: ../lib/lcg/util.py:245
+#: ../lib/lcg/util.py:143
 msgid "Catalan"
 msgstr "katalán¹tina"
 
-#: ../lib/lcg/util.py:245
+#: ../lib/lcg/util.py:143
+msgid "Corsican"
+msgstr "korsiètina"
+
+#: ../lib/lcg/util.py:143
 msgid "Czech"
 msgstr "èe¹tina"
 
-#: ../lib/lcg/util.py:246
+#: ../lib/lcg/util.py:144
 msgid "Danish"
 msgstr "dán¹tina"
 
-#: ../lib/lcg/util.py:246
+#: ../lib/lcg/util.py:144
 msgid "German"
 msgstr "nìmèina"
 
-#: ../lib/lcg/util.py:247
+#: ../lib/lcg/util.py:145
 msgid "Greek"
 msgstr "øeètina"
 
-#: ../lib/lcg/util.py:247
+#: ../lib/lcg/util.py:145
 msgid "English"
 msgstr "angliètina"
 
-#: ../lib/lcg/util.py:247
+#: ../lib/lcg/util.py:145
 msgid "Spanish"
 msgstr "¹panìl¹tina"
 
-#: ../lib/lcg/util.py:248
+#: ../lib/lcg/util.py:146
 msgid "Estonian"
 msgstr "eston¹tina"
 
-#: ../lib/lcg/util.py:249
+#: ../lib/lcg/util.py:146
+msgid "Basque"
+msgstr "baskit¹tina"
+
+#: ../lib/lcg/util.py:147
 msgid "Finnish"
 msgstr "fin¹tina"
 
-#: ../lib/lcg/util.py:250
+#: ../lib/lcg/util.py:148
 msgid "French"
 msgstr "fracouz¹tina"
 
-#: ../lib/lcg/util.py:252
+#: ../lib/lcg/util.py:150
 msgid "Irish"
 msgstr "ir¹tina"
 
-#: ../lib/lcg/util.py:255
+#: ../lib/lcg/util.py:150
+msgid "Galician"
+msgstr "galicij¹tina"
+
+#: ../lib/lcg/util.py:152
+msgid "Hindi"
+msgstr "hind¹tina"
+
+#: ../lib/lcg/util.py:152
+msgid "Croatian"
+msgstr "chorvat¹tina"
+
+#: ../lib/lcg/util.py:153
 msgid "Hungarian"
 msgstr "maïar¹tina"
 
-#: ../lib/lcg/util.py:257
+#: ../lib/lcg/util.py:155
 msgid "Icelandic"
 msgstr "island¹tina"
 
-#: ../lib/lcg/util.py:257
+#: ../lib/lcg/util.py:155
 msgid "Italian"
 msgstr "ital¹tina"
 
-#: ../lib/lcg/util.py:267
+#: ../lib/lcg/util.py:156
+msgid "Japanese"
+msgstr "jopon¹tina"
+
+#: ../lib/lcg/util.py:157
+msgid "Georgian"
+msgstr "gruzín¹tina"
+
+#: ../lib/lcg/util.py:158
+msgid "Korean"
+msgstr "korej¹tina"
+
+#: ../lib/lcg/util.py:158
+msgid "Kurdish"
+msgstr "kurd¹tina"
+
+#: ../lib/lcg/util.py:162
+msgid "Macedonian"
+msgstr "makedon¹tina"
+
+#: ../lib/lcg/util.py:163
+msgid "Moldavian"
+msgstr "moldav¹tina"
+
+#: ../lib/lcg/util.py:165
 msgid "Dutch"
 msgstr "dán¹tina"
 
-#: ../lib/lcg/util.py:267
+#: ../lib/lcg/util.py:165
 msgid "Norwegian"
 msgstr "nor¹tina"
 
-#: ../lib/lcg/util.py:269
+#: ../lib/lcg/util.py:167
 msgid "Polish"
 msgstr "pol¹tina"
 
-#: ../lib/lcg/util.py:270
+#: ../lib/lcg/util.py:168
 msgid "Portuguese"
 msgstr "portugal¹tina"
 
-#: ../lib/lcg/util.py:275
+#: ../lib/lcg/util.py:170
+msgid "Romanian"
+msgstr "rumun¹tina"
+
+#: ../lib/lcg/util.py:173
 msgid "Slovak"
 msgstr "sloven¹tina"
 
-#: ../lib/lcg/util.py:275
+#: ../lib/lcg/util.py:173
 msgid "Slovenian"
 msgstr "slovin¹tina"
 
-#: ../lib/lcg/util.py:277
+#: ../lib/lcg/util.py:174
+msgid "Albanian"
+msgstr "albán¹tina"
+
+#: ../lib/lcg/util.py:174
+msgid "Serbian"
+msgstr "srb¹tina"
+
+#: ../lib/lcg/util.py:175
 msgid "Swedish"
 msgstr "¹véd¹tina"
 
-#: ../lib/lcg/util.py:281
+#: ../lib/lcg/util.py:177
+msgid "Thai"
+msgstr "thai¹tina"
+
+#: ../lib/lcg/util.py:179
 msgid "Turkish"
 msgstr "tureètina"
 
-#: ../lib/lcg/export/html.py:436
+#: ../lib/lcg/util.py:180
+msgid "Ukrainian"
+msgstr "ukrain¹tina"
+
+#: ../lib/lcg/util.py:182
+msgid "Yiddish"
+msgstr "jidi¹"
+
+#: ../lib/lcg/util.py:182
+msgid "Chinese"
+msgstr "èín¹tina"
+
+#: ../lib/lcg/content.py:400
+msgid "Index:"
+msgstr "Obsah:"
+
+#: ../lib/lcg/export/html.py:400
 msgid "Choose your language:"
 msgstr "Zvolte jazyk:"
 
-#: ../lib/lcg/export/html.py:672
+#: ../lib/lcg/export/html.py:638
 msgid "None"
 msgstr "není"
 
-#: ../lib/lcg/export/html.py:673
+#: ../lib/lcg/export/html.py:639
 msgid "You are here:"
 msgstr "Nacházíte se zde:"
 
-#: ../lib/lcg/export/html.py:675
+#: ../lib/lcg/export/html.py:641
 msgid "Next"
 msgstr "Dal¹í"
 
-#: ../lib/lcg/export/html.py:676
+#: ../lib/lcg/export/html.py:642
 msgid "Previous"
 msgstr "Pøedchozí"
