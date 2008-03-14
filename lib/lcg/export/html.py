@@ -254,7 +254,7 @@ class HtmlGenerator(Generator):
         if var is None:
             return 'null'
         elif isinstance(var, (str, unicode)):
-            return "'" + var.replace("'", "\\'") + "'"
+            return "'" + var.replace("'", "\\'").replace('</', '<\\/').replace('\n','\\n') + "'"
         elif isinstance(var, bool):
             return (var and 'true' or 'false')
         elif isinstance(var, int):
