@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -135,51 +135,51 @@ def caller():
 
     
 _LANGUAGE_NAMES = {
-    'aa':'Afar', 'ab':'Abkhazian', 'af':'Afrikaans',
-    'am':'Amharic', 'ar':'Arabic', 'as':'Assamese', 'ay':'Aymara',
+    'aa':'Afar', 'ab':'Abkhazian', 'af':_('Afrikaans'),
+    'am':'Amharic', 'ar':_('Arabic'), 'as':'Assamese', 'ay':'Aymara',
     'az':'Azerbaijani',
     'ba':'Bashkir', 'be':'Byelorussian', 'bg':_('Bulgarian'), 'bh':'Bihari',
     'bi':'Bislama', 'bn':'Bengali', 'bo':'Tibetan', 'br':'Breton',
-    'ca':_('Catalan'), 'co':'Corsican', 'cs':_('Czech'), 'cy':'Welsh',
+    'ca':_('Catalan'), 'co':_('Corsican'), 'cs':_('Czech'), 'cy':'Welsh',
     'da':_('Danish'), 'de':_('German'), 'dz':'Bhutani',
     'el':_('Greek'), 'en':_('English'), 'eo':'Esperanto', 'es':_('Spanish'),
-    'et':_('Estonian'), 'eu':'Basque',
+    'et':_('Estonian'), 'eu':_('Basque'),
     'fa':'Persian', 'fi':_('Finnish'), 'fj':'Fiji', 'fo':'Faroese',
     'fr':_('French'),
     'fy':'Frisian',
-    'ga':_('Irish'), 'gd':'Scots Gaelic', 'gl':'Galician', 'gn':'Guarani',
+    'ga':_('Irish'), 'gd':'Scots Gaelic', 'gl':_('Galician'), 'gn':'Guarani',
     'gu':'Gujarati',
-    'ha':'Hausa', 'he':'Hebrew', 'hi':'Hindi', 'hr':'Croatian',
+    'ha':'Hausa', 'he':'Hebrew', 'hi':_('Hindi'), 'hr':_('Croatian'),
     'hu':_('Hungarian'), 'hy':'Armenian',
     'ia':'Interlingua', 'id':'Indonesian', 'ie':'Interlingue', 'ik':'Inupiak',
     'is':_('Icelandic'), 'it':_('Italian'), 'iu':'Inuktitut',
-    'ja':'Japanese', 'jw':'Javanese',
-    'ka':'Georgian', 'kk':'Kazakh', 'kl':'Greenlandic', 'km':'Cambodian',
-    'kn':'Kannada', 'ko':'Korean', 'ks':'Kashmiri', 'ku':'Kurdish',
+    'ja':_('Japanese'), 'jw':'Javanese',
+    'ka':_('Georgian'), 'kk':'Kazakh', 'kl':'Greenlandic', 'km':'Cambodian',
+    'kn':'Kannada', 'ko':_('Korean'), 'ks':'Kashmiri', 'ku':_('Kurdish'),
     'ky':'Kirghiz',
     'la':'Latin', 'ln':'Lingala', 'lo':'Laothian', 'lt':'Lithuanian',
     'lv':'Latvian, Lettish',
-    'mg':'Malagasy', 'mi':'Maori', 'mk':'Macedonian', 'ml':'Malayalam',
-    'mn':'Mongolian', 'mo':'Moldavian', 'mr':'Marathi', 'ms':'Malay',
+    'mg':'Malagasy', 'mi':'Maori', 'mk':_('Macedonian'), 'ml':'Malayalam',
+    'mn':'Mongolian', 'mo':_('Moldavian'), 'mr':'Marathi', 'ms':'Malay',
     'mt':'Maltese', 'my':'Burmese',
     'na':'Nauru', 'ne':'Nepali', 'nl':_('Dutch'), 'no':_('Norwegian'),
     'oc':'Occitan', 'om':'(Afan) Oromo', 'or':'Oriya',
     'pa':'Punjabi', 'pl':_('Polish'), 'ps':'Pashto, Pushto',
     'pt':_('Portuguese'),
     'qu':'Quechua',
-    'rm':'Rhaeto-Romance', 'rn':'Kirundi', 'ro':'Romanian', 'ru':('Russian'),
+    'rm':'Rhaeto-Romance', 'rn':'Kirundi', 'ro':_('Romanian'), 'ru':('Russian'),
     'rw':'Kinyarwanda',
     'sa':'Sanskrit', 'sd':'Sindhi', 'sg':'Sangho', 'sh':'Serbo-Croatian',
     'si':'Sinhalese', 'sk':_('Slovak'), 'sl':_('Slovenian'), 'sm':'Samoan',
-    'sn':'Shona', 'so':'Somali', 'sq':'Albanian', 'sr':'Serbian',
+    'sn':'Shona', 'so':'Somali', 'sq':_('Albanian'), 'sr':_('Serbian'),
     'ss':'Siswati', 'st':'Sesotho', 'su':'Sundanese', 'sv':_('Swedish'),
     'sw':'Swahili',
-    'ta':'Tamil', 'te':'Telugu', 'tg':'Tajik', 'th':'Thai', 'ti':'Tigrinya',
+    'ta':'Tamil', 'te':'Telugu', 'tg':'Tajik', 'th':_('Thai'), 'ti':'Tigrinya',
     'tk':'Turkmen', 'tl':'Tagalog', 'tn':'Setswana', 'to':'Tonga',
     'tr':_('Turkish'), 'ts':'Tsonga', 'tt':'Tatar', 'tw':'Twi',
-    'ug':'Uighur', 'uk':'Ukrainian', 'ur':'Urdu', 'uz':'Uzbek',
+    'ug':'Uighur', 'uk':_('Ukrainian'), 'ur':'Urdu', 'uz':'Uzbek',
     'vi':'Vietnamese', 'vo':'Volapuk', 'wo':'Wolof', 'xh':'Xhosa',
-    'yi':'Yiddish', 'yo':'Yoruba', 'za':'Zhuang', 'zh':'Chinese', 'zu':'Zulu'
+    'yi':_('Yiddish'), 'yo':'Yoruba', 'za':'Zhuang', 'zh':_('Chinese'), 'zu':'Zulu'
 }
 
 def language_name(code):
