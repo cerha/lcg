@@ -217,7 +217,7 @@ class HtmlGenerator(Generator):
         return self._input('checkbox', ('checked',), name=name, **kwargs)
      
     def textarea(self, name, value='', **kwargs):
-        attr = ('name', 'rows', 'cols', 'readonly')
+        attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
         return self._tag('textarea', value, attr, name=name, **kwargs)
      
     # Special controls
