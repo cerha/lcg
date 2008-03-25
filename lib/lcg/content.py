@@ -751,8 +751,16 @@ def coerce(content, formatted=False):
     """
     assert isinstance(formatted, bool)
     if isinstance(content, (list, tuple)):
-        return Container([coerce(item, formatted=formatted)
-                          for item in content if item is not None])
+        container = Container
+        items = []
+        for item in content:
+            if item is not None:
+                if isinstance(item, Section):
+                    container = SectionContainer
+                elif not isinstance(item, Content):
+                    item = coerce(item, formatted=formatted)
+                items.append(item)
+        return container(items)
     elif isinstance(content, (str, unicode)):
         if formatted:
             return FormattedText(content)
