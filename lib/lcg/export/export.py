@@ -16,15 +16,232 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""Course exporter."""
+"""Framework for exporting structured content into output formats.
+
+The framework consists of the following parts:
+
+  'Generator' :: 
+
+  'MarkupFormatter' :: 
+
+  'Exporter' :: This is the top exporting class that exports structured text
+    into the output format.
+
+See documentation of the particular classes for more details.
+
+"""
 
 from lcg import *
 
         
 class Generator(object):
-    pass
+
+    # Basic utilitites
+
+    def escape(self, text, **kwargs):
+        """Escape 'text' for the output format and return the resulting string.
+
+        In this class the method returns value of 'text'.
         
+        """
+        return text
+
+    # Text styles
+
+    def pre(self, text, **kwargs):
+        """Return 'text' in a verbatim form.
+
+        In this class the method returns value of 'text'.
         
+        """
+        return text
+
+    def strong(self, text, **kwargs):
+        """Return exported 'text' emphasized.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+     
+    def sup(self, text, **kwargs):
+        """Return exported 'text' as a superscript.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+    
+    def sub(self, text, **kwargs):
+        """Return exported 'text' as a subscript.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+
+    # Sectioning
+
+    def h(self, title, level, **kwargs):
+        """Return heading.
+
+        Arguments:
+
+          title -- exported title of the heading
+          level -- level of the heading as a positive integer; the highest
+            level is 1
+
+        In this class the method returns value of 'title'.
+        
+        """
+        return title
+    
+    def list(self, items, **kwargs):
+        """Return list of 'items'.
+
+        Arguments:
+
+          items -- sequence of previously exported objects
+        
+        In this class method returns concatenation of 'items' elements.
+
+        """
+        return concat(items)
+    
+    def p(self, *content, **kwargs):
+        """Return a single paragraph of exported 'content'.
+
+        In this class the method returns concatenation of 'content' elements.
+        
+        """
+        return concat(content)
+
+    def div(self, content, **kwargs):
+        """Return a separated exported 'content'.
+
+        Arguments:
+
+          content -- sequence of previously exported objects
+
+        In this class the method returns concatenation of 'content' elements.
+
+        """
+        return concat(content)
+    
+    def br(self, **kwargs):
+        """Return a newline separator.
+
+        In this class the method returns a new line character.
+        
+        """
+        return '\n'
+
+    def hr(self, **kwargs):
+        """Return a horizontal separator.
+
+        In this class the method returns a form feed character.
+
+        """
+        return '\f'
+
+    # Links and images
+    
+    def link(self, label, uri, **kwargs):
+        """Return link with 'label' and pointing to 'uri'.
+
+        Arguments:
+
+          label -- exported content of the link
+          uri -- the target URI as a string
+
+        In this class the method returns value of 'label'.
+        
+        """
+        if label:
+            return label + '(' + uri + ')'
+        else:
+            return uri
+
+    def img(src, **kwargs):
+        """Return image stored at 'src' URI.
+
+        Arguments:
+
+          src -- URI (as a string) where the image is stored
+
+        In this class the method returns text of 'src'.
+
+        """
+        return src
+
+    # Tables
+
+    def table(self, content, **kwargs):
+        """Return table consisting of 'content' rows.
+
+        Arguments:
+
+          content -- sequence of rows previously formatted by the 'tr' method
+
+        In this class the method returns concatenation of 'content' elements.
+
+        """
+        return concat(content)
+
+    def thead(self, content, **kwargs):
+        """Return table heading with formatted 'content'.
+
+        In this class the method returns value of 'content'.
+
+        """
+        return content
+    
+    def tbody(self, content, **kwargs):
+        """Return formatted 'content' of a table.
+
+        In this class the method returns value of 'content'.
+
+        """
+        return content
+    
+    def tfoot(self, content, **kwargs):
+        """Return table footer with formatted 'content'.
+
+        In this class the method returns value of 'content'.
+
+        """
+        return content
+    
+    def tr(self, content, **kwargs):
+        """Return table row containing 'content' cells.
+
+        Arguments:
+
+          content -- sequence of content previously formatted by the 'td' method
+
+        In this class the method returns concatenation of 'content' elements.
+
+        """
+        return concat(content)
+    
+    def td(self, content, **kwargs):
+        """Return 'content' of a single table cell.
+        
+        In this class the method returns value of 'content'.
+        
+        """
+        return content
+    
+    def th(self, content, **kwargs):
+        """Return 'content' of a single table heading cell.
+        
+        In this class the method calls 'td' with the same arguments and returns
+        the result.
+        
+        """
+        return self.td(content, **kwargs)
+
+
 class MarkupFormatter(object):
     """Simple inline ASCII markup formatter.
 
@@ -61,7 +278,14 @@ class MarkupFormatter(object):
                )
     _HELPER_PATTERNS = ('href', 'anchor', 'label', 'descr', 'subst')
 
-    _FORMAT = {}
+    _FORMAT = {'linebreak': '\n',
+               'comment': '',
+               'dash': '--',
+               'nbsp': u' ',
+               'lt':   '<',
+               'gt':   '>',
+               'amp':  '&',
+               }
 
     def __init__(self):
         regexp = r"(?P<%s>\\*%s)"
@@ -131,8 +355,8 @@ class MarkupFormatter(object):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
         except AttributeError:
-            f = self._FORMAT[type]
-            return type in self._paired_on_output and f[close and 1 or 0] or f
+            f = self._FORMAT.get(type, '')
+            return type in self._paired_on_output and f and f[close and 1 or 0] or f
         return formatter(context, close=close, **groups)
         
     def format(self, context, text):
@@ -151,11 +375,24 @@ class MarkupFormatter(object):
 
 
 class Exporter(object):
+    """Transforming structured content objects to various output formats.
+
+    This class is a base class of all transformers.  It provides basic
+    exporting framework to be extended and customized for particular kinds of
+    outputs.  When defining a real exporter you should assign the 'Generator'
+    and 'Formatter' attributes to corresponding utility classes.  The exporter
+    instantiates and uses them as needed.
+
+    The exporting process itself is run by subsequent calls of methods
+    'context' and 'export'.
+    
+    """
 
     Generator = Generator
     Formatter = MarkupFormatter
 
     class Context(object):
+        """Storage class containing complete data necessary for export."""
         def __init__(self, exporter, generator, formatter, translator, node, **kwargs):
             self._exporter = exporter
             self._generator = generator
@@ -197,7 +434,46 @@ class Exporter(object):
     def _translator(self, lang):
         return GettextTranslator(lang, path=self._translations, fallback=True)
 
+    def _uri_document(self, context, target, **kwargs):
+        return target.id()
+
+    def _uri_section(self, context, target, **kwargs):
+        return '#' + target.anchor()
+
+    def _uri_external(self, context, target, **kwargs):
+        return target.uri()
+    
+    def uri(self, context, target, **kwargs):
+        """Return the URI of the target as string.
+
+        Arguments:
+
+          context -- exporting object created in the 'context' method and
+            propagated from the 'export' method
+          target -- URI target that can be one of: document ('ContentNode'
+            instance), section ('Section' instance), external target
+            ('Link.ExternalTarget' or 'Resource' instance)
+
+        """
+        if isinstance(target, ContentNode):
+            method = self._uri_document
+        elif isinstance(target, Section):
+            method = self._uri_section
+        elif isinstance(target, (Link.ExternalTarget, Resource)):
+            method = self._uri_exernal
+        else:
+            raise Exception("Invalid URI target:", target)
+        return method(context, target, **kwargs)
+
     def context(self, node, lang, **kwargs):
+        """Return context to be used as an argument to the 'export' method.
+
+        Arguments:
+
+          node -- 'Content' instance to be exported
+          lang -- ???
+          
+        """
         if lang is None:
             translator = NullTranslator()
         else:
@@ -207,6 +483,29 @@ class Exporter(object):
                 translator = self._translators[lang] = self._translator(lang)
         return self.Context(self, self._generator, self._formatter, translator, node, **kwargs)
 
+    def _initialize(self, context):
+        return ''
+
+    def _finalize(self, context):
+        return ''
+    
     def export(self, context):
-        """Return the exported node as a string."""
+        """Export the object represented by 'context' and return the corresponding output string.
+
+        'context' is an object returned by the 'context' method.
+
+        In this class the method calls 'export' method of the 'context' node
+        and returns the result.
+
+        """
+        node = context.node()
+        initial_export = self._initialize(context)
+        export = node.export(context)
+        final_export = self._finalize(context)
+        print export
+        result = initial_export + export + final_export
+        return result
+
+    def dump(*args, **kwargs):
+        """????"""
         pass

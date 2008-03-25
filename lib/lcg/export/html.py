@@ -415,23 +415,18 @@ class HtmlExporter(Exporter):
             name += '.'+lang
         return name + '.html'
 
-    def _node_uri(self, context, node, lang=None):
+    def _node_uri(self, context, node, lang=None, **kwargs):
         return self._output_file(context, node, lang=lang)
-
-    def uri(self, context, target, relative_to=None):
-        """Return the URI of the target as string."""
-        if isinstance(target, ContentNode):
-            return self._node_uri(context, target)
-        elif isinstance(target, Section):
-            if relative_to is not None and relative_to is target.parent():
-                base = ''
-            else:
-                base = self.uri(context, target.parent())
-            return base + "#" + target.anchor()
-        elif isinstance(target, (Link.ExternalTarget, Resource)):
-            return target.uri()
+    
+    def _uri_document(self, context, target, **kwargs):
+        return self._node_uri(context, target, **kwargs)
+    
+    def _uri_section(self, context, target, relative_to=None, **kwargs):
+        if relative_to is not None and relative_to is target.parent():
+            base = ''
         else:
-            raise Exception("Invalid URI target:", target)
+            base = self.uri(context, target.parent())
+        return base + "#" + target.anchor()
     
     def _styles(self, context):
         if self._inlinestyles:
