@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,5 +35,7 @@ from read import *
 
 # Resolve cyclic dependencies.
 
-for module in (resources, nodes, content, export, html, parse, i18n, util):
+import resources, nodes, content, export, parse, i18n, util
+
+for module in (resources, nodes, content, export, parse, i18n, util):
     module.__dict__.update(globals())
