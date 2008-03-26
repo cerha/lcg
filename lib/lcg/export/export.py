@@ -460,7 +460,7 @@ class Exporter(object):
         elif isinstance(target, Section):
             method = self._uri_section
         elif isinstance(target, (Link.ExternalTarget, Resource)):
-            method = self._uri_exernal
+            method = self._uri_external
         else:
             raise Exception("Invalid URI target:", target)
         return method(context, target, **kwargs)
