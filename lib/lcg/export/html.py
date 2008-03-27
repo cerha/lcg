@@ -418,7 +418,7 @@ class HtmlExporter(Exporter):
     def _node_uri(self, context, node, lang=None, **kwargs):
         return self._output_file(context, node, lang=lang)
     
-    def _uri_document(self, context, target, **kwargs):
+    def _uri_document(self, context, target, relative_to=None, **kwargs):
         return self._node_uri(context, target, **kwargs)
     
     def _uri_section(self, context, target, relative_to=None, **kwargs):
