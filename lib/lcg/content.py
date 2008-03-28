@@ -353,6 +353,9 @@ class FieldSet(Table):
 
     def export(self, context):
         g = context.generator()
+        # TODO: We should have something like g.fieldset(), which si implemented using a table in
+        # HTML generator and probably something more appropriate in other formats.  The method
+        # `fieldset()', however, already exists in HtmlGenerator with a different meaning.
         return g.table(self._exported_content(context), lang=self._lang, cls='lcg-fieldset')
     
 Field._ALLOWED_CONTAINER = FieldSet
