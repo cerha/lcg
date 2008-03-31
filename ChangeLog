@@ -17,14 +17,14 @@
 	* lib/lcg/parse.py (Parser._finish_field, _finish_definition)
 	(Parser._make_table): Use the new interface of content classes.
 
-	* lib/lcg/export/export.py (Generator.dl, Generator.fset)
+	* lib/lcg/export/export.py (Generator.definition, Generator.fset)
 	(Generator.gtable): New methods.
 	(Generator.table, Generator.thead, Generator.tbody)
 	(Generator.tfoot, Generator.tr, Generator.td, Generator.th):
 	Methods removed.
 
 	* lib/lcg/export/html.py: Don't use `types'.
-	(HtmlGenerator.dl, HtmlGenerator.fset, HtmlGenerator.gtable): New methods.
+	(HtmlGenerator.definition, HtmlGenerator.fset, HtmlGenerator.gtable): New methods.
 
 2008-03-28  Tomas Cerha  <cerha@brailcom.org>
 

@@ -317,7 +317,7 @@ class DefinitionList(Container):
     _SUBSEQUENCE_LENGTH = 2
 
     def export(self, context):
-        return context.generator().dl(self._exported_content(context), lang=self._lang)
+        return context.generator().definitions(self._exported_content(context), lang=self._lang)
 
     
 class FieldSet(Container):

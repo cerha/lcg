@@ -108,7 +108,7 @@ class Generator(object):
         """
         return concat(items)
 
-    def dl(self, items, **kwargs):
+    def definitions(self, items, **kwargs):
         """Return a list of definitions.
 
         Arguments:

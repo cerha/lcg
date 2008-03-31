@@ -103,7 +103,7 @@ class HtmlGenerator(Generator):
         items = [concat(spaces+'  <li>', i, '</li>\n') for i in items]
         return concat(spaces +'<'+ tag, attr, '>\n', items, spaces +'</'+ tag +'>\n')
 
-    def dl(self, items, **kwargs):
+    def definitions(self, items, **kwargs):
         content = [self._tag('dt', dt) + self._tag('dd', dd) for dt, dd in items]
         return self._tag('dl', content, _newlines=True, **kwargs)
 
