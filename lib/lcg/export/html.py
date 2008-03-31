@@ -276,7 +276,7 @@ class HtmlGenerator(Generator):
             items = items.items()
         else:
             assert isinstance(items, (tuple, list))
-        assert is_sequence_of(dict(items).keys(), types.StringType)
+        assert is_sequence_of(dict(items).keys(), str)
         pairs = [concat("'%s': " % k, self.js_value(v)) for k,v in items]
         return concat('{', concat(pairs, separator=", "), '}')
      
