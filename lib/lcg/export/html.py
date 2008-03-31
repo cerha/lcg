@@ -102,6 +102,14 @@ class HtmlGenerator(Generator):
         spaces = ' ' * indent
         items = [concat(spaces+'  <li>', i, '</li>\n') for i in items]
         return concat(spaces +'<'+ tag, attr, '>\n', items, spaces +'</'+ tag +'>\n')
+
+    def dl(self, items, **kwargs):
+        content = [self._tag('dt', dt) + self._tag('dd', dd) for dt, dd in items]
+        return self._tag('dl', content, _newlines=True, **kwargs)
+
+    def fset(self, items, **kwargs):
+        return self.table([self.tr((self.th(name), self.td(value)))+"\n" for name, value in items],
+                          cls='lcg-fieldset', **kwargs)
      
     def img(self, src, alt='', border=0, descr=None, **kwargs):
         attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
@@ -119,6 +127,12 @@ class HtmlGenerator(Generator):
     
     def tr(self, content, **kwargs):
         return self._tag('tr', content, **kwargs)
+
+    def gtable(self, rows, title=None, cls='lcg-table', **kwargs):
+        content = [self.tr([self.td(cell) for cell in row]) for row in rows]
+        if title:
+            content = ["<caption>"+ title +"</caption>"] + content
+        return self.table(self.tbody(content), cls=cls, **kwargs)
 
     def table(self, content, **kwargs):
         attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')

@@ -200,11 +200,10 @@ class InlineImage(Content):
         super(InlineImage, self).__init__()
 
     def export(self, context):
+        g = context.generator()
         img = self._image
-        kwargs = dict(alt=self._title or img.title() or '', descr=img.descr(),
-                      align=self._align, cls=self._name,
-                      width=img.width(), height=img.height())
-        return context.generator().img(img.uri(), **kwargs)
+        return g.img(img.uri(), alt=self._title or img.title() or '', descr=img.descr(),
+                     align=self._align, cls=self._name, width=img.width(), height=img.height())
 
 
 class Container(Content):
@@ -220,7 +219,9 @@ class Container(Content):
 
     """
     _ALLOWED_CONTENT = Content
-
+    _SUBSEQUENCES = False
+    _SUBSEQUENCE_LENGTH = None
+    
     def __init__(self, content, **kwargs):
         """Initialize the instance.
 
@@ -233,23 +234,39 @@ class Container(Content):
 
         """
         super(Container, self).__init__(**kwargs)
-        cls = self._ALLOWED_CONTENT
-        if isinstance(content, (list, tuple)):
-            assert is_sequence_of(content, cls), \
-                   "Not a '%s' instances sequence: %s" % (cls.__name__, content)
-            self._content = tuple(content)
+        if self._SUBSEQUENCES:
+            tuples = []
+            for seq in content:
+                if self._SUBSEQUENCE_LENGTH is not None:
+                    assert len(seq) == self._SUBSEQUENCE_LENGTH
+                assert is_sequence_of(seq, self._ALLOWED_CONTENT), \
+                       "Not a '%s' instances sequence: %s" % \
+                       (self._ALLOWED_CONTENT.__name__, content)
+                for c in seq:
+                    c.set_container(self)
+                tuples.append(tuple(seq))
+            content = tuple(tuples)
+        elif isinstance(content, (list, tuple)):
+            assert is_sequence_of(content, self._ALLOWED_CONTENT), \
+                   "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT.__name__, content)
+            for c in content:
+                c.set_container(self)
+            content = tuple(content)
         else:
-            assert isinstance(content, cls), \
-                   "Not a '%s' instance: %s" % (cls.__name__, content)
-            self._content = (content,)
-        for c in self._content:
-            c.set_container(self)
-
+            assert isinstance(content, self._ALLOWED_CONTENT), \
+                   "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT.__name__, content)
+            content.set_container(self)
+            content = (content,)
+        self._content = content
+            
     def content(self):
         return self._content
             
     def _exported_content(self, context):
-        return [c.export(context) for c in self._content]
+        if self._SUBSEQUENCES:
+            return [[c.export(context) for c in seq] for seq in self._content]
+        else:
+            return [c.export(context) for c in self._content]
 
     def export(self, context):
         result = concat(self._exported_content(context))
@@ -280,44 +297,53 @@ class ItemizedList(Container):
         super(ItemizedList, self).__init__(content, **kwargs)
 
     def export(self, context):
-        o, s = {self.TYPE_UNORDERED: (False, None),
-                self.TYPE_NUMERIC: (True, None),
-                self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
+        ordered, style = {self.TYPE_UNORDERED: (False, None),
+                          self.TYPE_NUMERIC: (True, None),
+                          self.TYPE_ALPHA: (True, 'lower-alpha')}[self._type]
         items = self._exported_content(context)
-        return context.generator().list(items, ordered=o, style=s, lang=self._lang)
+        return context.generator().list(items, ordered=ordered, style=style, lang=self._lang)
 
-    
-class Definition(Container):
-    """A single definition pair for the 'DefinitionList'."""
-    
-    def __init__(self, term, description):
-        super(Definition, self).__init__((term, description))
 
-    def export(self, context):
-        dt, dd = self._exported_content(context)
-        return "<dt>"+ dt +"</dt><dd>"+ dd +"</dd>\n"
 
-    
+
 class DefinitionList(Container):
-    """A list of definitions."""
-    _ALLOWED_CONTENT = Definition
+    """A list of definitions.
+
+    The constructor accepts a sequence of definitions, where each definition is a pair (TERM,
+    DESCRIPTION), where both items are Content instances.
+    
+    """
+    _SUBSEQUENCES = True
+    _SUBSEQUENCE_LENGTH = 2
 
     def export(self, context):
-        return concat(['<dl>\n'] + self._exported_content(context) + ['</dl>\n'])
-    
-Definition._ALLOWED_CONTAINER = DefinitionList
+        return context.generator().dl(self._exported_content(context), lang=self._lang)
 
     
-class TableRow(Container):
-    """One row in a table."""
-    
+class FieldSet(Container):
+    """A list label, value pairs.
+
+    The constructor accepts a sequence of (LABEL, VALUE) pairs, where both items are Content
+    instances.  Logically similar to 'DefinitionList', but more suitable for an enumeration of
+    shorter fields presented side by side (while definition description usually follows on another
+    line below the term).  
+
+    """
+    _SUBSEQUENCES = True
+    _SUBSEQUENCE_LENGTH = 2
+
     def export(self, context):
-        g = context.generator()
-        return g.tr([g.td(c) for c in self._exported_content(context)], lang=self._lang)
+        return context.generator().fset(self._exported_content(context), lang=self._lang)
+    
         
 class Table(Container):
-    """Table containing rows and cells."""
-    _ALLOWED_CONTENT = TableRow
+    """Table of rows and cells.
+
+    The constructor accepts a sequence of sequences.  Each outer sequence represents one table row,
+    the inner sequences consist of a 'Content' instance for each cell.
+
+    """
+    _SUBSEQUENCES = True
 
     def __init__(self, content, title=None, **kwargs):
         assert title is None or isinstance(title, (str, unicode))
@@ -325,42 +351,10 @@ class Table(Container):
         super(Table, self).__init__(content, **kwargs)
         
     def export(self, context):
-        g = context.generator()
-        rows = self._exported_content(context)
-        if self._title:
-            rows = ["<caption>"+ self._title +"</caption>"] + rows
-        return g.table(rows, cls='lcg-table')
-    
-TableRow._ALLOWED_CONTAINER = Table
+        return context.generator().gtable(self._exported_content(context),
+                                          title=self._title, lang=self._lang)
 
-    
-class Field(Container):
-    """A pair of label and a value for a FieldSet."""
-    _EXPORT_INLINE = False
-    
-    def __init__(self, label, value):
-        super(Field, self).__init__((label, value))
 
-    def export(self, context):
-        g = context.generator()
-        label, value = self._exported_content(context)
-        return g.tr((g.td(label, align="left", valign="top"), g.td(value)))
-
-    
-class FieldSet(Table):
-    """A list of label, value pairs (fields)."""
-    _ALLOWED_CONTENT = Field
-
-    def export(self, context):
-        g = context.generator()
-        # TODO: We should have something like g.fieldset(), which si implemented using a table in
-        # HTML generator and probably something more appropriate in other formats.  The method
-        # `fieldset()', however, already exists in HtmlGenerator with a different meaning.
-        return g.table(self._exported_content(context), lang=self._lang, cls='lcg-fieldset')
-    
-Field._ALLOWED_CONTAINER = FieldSet
-
-    
 class SectionContainer(Container):
     """A 'Container' which recognizes contained sections.
 
@@ -371,8 +365,6 @@ class SectionContainer(Container):
     method to allow building a global `TableOfContents'.
 
     """
-    _EXPORT_INLINE = False
-
     def __init__(self, content, toc_depth=None, **kwargs):
         """Initialize the instance.
 
@@ -802,11 +794,11 @@ def link(target, label=None, type=None, descr=None):
 def dl(items, formatted=False):
     """Create a 'DefinitionList' from a sequence of (TERM, DESCRIPTION) pairs.
 
-    Each term and description in the sequence is coerced and the pair is automatically turned into
-    a 'Definition' instance.  The 'formatted' argument only applies to the description.
+    Each term and description in the sequence is automatically coerced into a content instance, but
+    only the description is treated as formatted.
 
     """
-    return DefinitionList([Definition(coerce(term), coerce(descr, formatted=formatted))
+    return DefinitionList([(coerce(term), coerce(descr, formatted=formatted))
                            for term, descr in items])
 
 def ul(items, formatted=False):
@@ -821,11 +813,10 @@ def ol(items, formatted=False, alpha=False):
 def fieldset(pairs, title=None, formatted=False):
     """Create a 'FieldSet' out of given sequence of (LABEL, VALUE) pairs.
 
-    Both label and value are coerced.  The 'formatted' argument only applies to the value.
+    Both label and value are coerced, but only value is treated as formatted.
     
     """
-    fields = [Field(coerce(label), coerce(value, formatted=formatted))
-              for label, value in pairs]
+    fields = [(coerce(label), coerce(value, formatted=formatted)) for label, value in pairs]
     return FieldSet(fields, title=title)
 
 def p(*items, **kwargs):

@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -201,14 +201,13 @@ class Parser(object):
         return (WikiText(groups['label']), WikiText(groups['value']))
         
     def _finish_field(self, stored):
-        return (FieldSet([Field(label, value) for label, value in stored]),)
+        return (FieldSet(stored),)
     
     def _store_definition(self, block, groups):
         return (WikiText(groups['term']), WikiText(groups['descr']))
         
     def _finish_definition(self, stored):
-        definitions = [Definition(term, descr) for term, descr in stored]
-        return (DefinitionList(definitions),)
+        return (DefinitionList(stored),)
     
     def _parse_blocks(self, text):
         def finish(type, data):
@@ -247,7 +246,7 @@ class Parser(object):
             return None
     
     def _make_table(self, block, groups):
-        return Table([TableRow([WikiText(x.strip()) for x in row.split('|')[1:-1]])
+        return Table([[WikiText(x.strip()) for x in row.split('|')[1:-1]]
                       for row in block.strip().splitlines()])
 
     def _make_toc(self, block, groups):

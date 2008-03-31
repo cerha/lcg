@@ -1,3 +1,31 @@
+2008-03-31  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/css/default.css: Fieldset style improved.
+
+	* lib/lcg/content.py (Container): Added support for subsequences.
+	(Definition): Class removed.
+	(DefinitionList): Accept a sequence of `Content' pairs instead of
+	'Definition' instances.
+	(Field): Class removed.
+	(FieldSet): Accept a sequence of `Content' pairs instead of
+	`Field' instances.
+	(TableRow): Class removed.
+	(Table): Accept a sequence of `Content' sequences instead of
+	`TableRow' instances.
+	(dl, fieldset): Use the new interface of content classes.
+
+	* lib/lcg/parse.py (Parser._finish_field, _finish_definition)
+	(Parser._make_table): Use the new interface of content classes.
+
+	* lib/lcg/export/export.py (Generator.dl, Generator.fset)
+	(Generator.gtable): New methods.
+	(Generator.table, Generator.thead, Generator.tbody)
+	(Generator.tfoot, Generator.tr, Generator.td, Generator.th):
+	Methods removed.
+
+	* lib/lcg/export/html.py: Don't use `types'.
+	(HtmlGenerator.dl, HtmlGenerator.fset, HtmlGenerator.gtable): New methods.
+
 2008-03-28  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (FieldSet.export): Comment added.

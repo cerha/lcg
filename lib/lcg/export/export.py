@@ -107,6 +107,34 @@ class Generator(object):
 
         """
         return concat(items)
+
+    def dl(self, items, **kwargs):
+        """Return a list of definitions.
+
+        Arguments:
+
+          items -- sequence of (TERM, DESCRIPTION) pairs as tuples of previously exported
+            objects
+
+        In this class the method returns a concatenation of 'items' elements.
+        
+        """
+        return concat([concat(dt, dd) for dt, dd in items])
+
+    def fset(self, items, **kwargs):
+        """Return a list of label/value pairs.
+
+        Arguments:
+
+          items -- sequence of (LABEL, VALUE) pairs as tuples of previously exported
+            objects
+
+        In this class the method returns a concatenation of 'items' elements.
+        
+        """
+        return concat([concat(dt, dd) for dt, dd in items])
+        
+    
     
     def p(self, *content, **kwargs):
         """Return a single paragraph of exported 'content'.
@@ -176,70 +204,18 @@ class Generator(object):
 
     # Tables
 
-    def table(self, content, **kwargs):
-        """Return table consisting of 'content' rows.
+    def gtable(self, rows, title=None, **kwargs):
+        """A generic table consisting of 'rows'.
 
         Arguments:
 
-          content -- sequence of rows previously formatted by the 'tr' method
+          rows -- sequence of rows cells where each row is a sequence of previously formatted cells
+          title -- table caption as a string or None
 
-        In this class the method returns concatenation of 'content' elements.
-
-        """
-        return concat(content)
-
-    def thead(self, content, **kwargs):
-        """Return table heading with formatted 'content'.
-
-        In this class the method returns value of 'content'.
+        In this class the method returns a concatenation of 'rows'.
 
         """
-        return content
-    
-    def tbody(self, content, **kwargs):
-        """Return formatted 'content' of a table.
-
-        In this class the method returns value of 'content'.
-
-        """
-        return content
-    
-    def tfoot(self, content, **kwargs):
-        """Return table footer with formatted 'content'.
-
-        In this class the method returns value of 'content'.
-
-        """
-        return content
-    
-    def tr(self, content, **kwargs):
-        """Return table row containing 'content' cells.
-
-        Arguments:
-
-          content -- sequence of content previously formatted by the 'td' method
-
-        In this class the method returns concatenation of 'content' elements.
-
-        """
-        return concat(content)
-    
-    def td(self, content, **kwargs):
-        """Return 'content' of a single table cell.
-        
-        In this class the method returns value of 'content'.
-        
-        """
-        return content
-    
-    def th(self, content, **kwargs):
-        """Return 'content' of a single table heading cell.
-        
-        In this class the method calls 'td' with the same arguments and returns
-        the result.
-        
-        """
-        return self.td(content, **kwargs)
+        return concat([concat(row) for row in rows])
 
 
 class MarkupFormatter(object):
