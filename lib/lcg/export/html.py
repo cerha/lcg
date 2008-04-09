@@ -69,8 +69,8 @@ class HtmlGenerator(Generator):
     def strong(self, text, **kwargs):
         return self._tag('strong', text, **kwargs)
      
-    def pre(self, text, **kwargs):
-        return self._tag('pre', text, _newlines=True, **kwargs)
+    def pre(self, text, cls="lcg-preformatted-text"):
+        return self._tag('pre', text, _newlines=True)
      
     def sup(self, text, **kwargs):
         return self._tag('sup', text, **kwargs)
@@ -95,6 +95,9 @@ class HtmlGenerator(Generator):
         attr = ('href', 'type', 'name', 'title', 'target', 'accesskey')
         return self._tag('a', label, attr, href=uri, title=title, target=target,
                          accesskey=hotkey, cls=cls, **kwargs)
+
+    def link_target(self, label, name):
+        return self.link(label, None, name=name)
 
     def list(self, items, indent=0, ordered=False, style=None, **kwargs):
         tag = ordered and 'ol' or 'ul'

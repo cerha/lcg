@@ -38,7 +38,7 @@ class Generator(object):
 
     # Basic utilitites
 
-    def escape(self, text, **kwargs):
+    def escape(self, text):
         """Escape 'text' for the output format and return the resulting string.
 
         In this class the method returns value of 'text'.
@@ -48,7 +48,7 @@ class Generator(object):
 
     # Text styles
 
-    def pre(self, text, **kwargs):
+    def pre(self, text):
         """Return 'text' in a verbatim form.
 
         In this class the method returns value of 'text'.
@@ -56,7 +56,7 @@ class Generator(object):
         """
         return text
 
-    def strong(self, text, **kwargs):
+    def strong(self, text):
         """Return exported 'text' emphasized.
 
         In this class the method returns value of 'text'.
@@ -64,7 +64,7 @@ class Generator(object):
         """
         return text
      
-    def sup(self, text, **kwargs):
+    def sup(self, text):
         """Return exported 'text' as a superscript.
 
         In this class the method returns value of 'text'.
@@ -72,7 +72,7 @@ class Generator(object):
         """
         return text
     
-    def sub(self, text, **kwargs):
+    def sub(self, text):
         """Return exported 'text' as a subscript.
 
         In this class the method returns value of 'text'.
@@ -82,7 +82,7 @@ class Generator(object):
 
     # Sectioning
 
-    def h(self, title, level, **kwargs):
+    def h(self, title, level):
         """Return heading.
 
         Arguments:
@@ -96,67 +96,93 @@ class Generator(object):
         """
         return title
     
-    def list(self, items, **kwargs):
+    def list(self, items, ordered=False, style=None, lang=None):
         """Return list of 'items'.
 
         Arguments:
 
           items -- sequence of previously exported objects
+          ordered, style -- list item markup style; if 'ordered' is true,
+            markup for ordered list should be chosen, then 'style' can further
+            specify the style, its valid values are 'None' and the string
+            'lower-alpha'
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
         
         In this class method returns concatenation of 'items' elements.
 
         """
-        return concat(items)
+        return self.concat(items)
 
-    def definitions(self, items, **kwargs):
+    def definitions(self, items, lang=None):
         """Return a list of definitions.
 
         Arguments:
 
-          items -- sequence of (TERM, DESCRIPTION) pairs as tuples of previously exported
-            objects
+          items -- sequence of '(TERM, DESCRIPTION)' pairs as tuples of
+            previously exported objects
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
 
-        In this class the method returns a concatenation of 'items' elements.
+        In this class the method calls 'fset' on 'items'.
         
         """
-        return concat([concat(dt, dd) for dt, dd in items])
+        return self.fset(items, lang=lang)
 
-    def fset(self, items, **kwargs):
+    def fset(self, items, lang=None):
         """Return a list of label/value pairs.
 
         Arguments:
 
           items -- sequence of (LABEL, VALUE) pairs as tuples of previously exported
             objects
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
 
         In this class the method returns a concatenation of 'items' elements.
         
         """
-        return concat([concat(dt, dd) for dt, dd in items])
-        
-    
-    
-    def p(self, *content, **kwargs):
+        return self.concat([self.concat(dt, dd) for dt, dd in items])
+            
+    def p(self, content, lang=None):
         """Return a single paragraph of exported 'content'.
-
-        In this class the method returns concatenation of 'content' elements.
-        
-        """
-        return concat(content)
-
-    def div(self, content, **kwargs):
-        """Return a separated exported 'content'.
 
         Arguments:
 
-          content -- sequence of previously exported objects
+          content -- already exported content
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
 
-        In this class the method returns concatenation of 'content' elements.
+        In this class the method returns 'content' with the new line character
+        appended to it.
+        
+        """
+        return self.concat(content, '\n')
+
+    def div(self, content, lang=None, **kwargs):
+        """Return exported 'content' as a general block.
+
+        Arguments:
+
+          content -- already exported content
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
+
+        In this class the method returns 'content'.
 
         """
-        return concat(content)
+        return content
+
+    def concat(self, *exported):
+        """Return elements of 'exported' objects sequence as a general block.
+
+        In this class the method performs simply text concatenation of
+        'exported' objects.
+
+        """
+        return concat(*exported)
     
-    def br(self, **kwargs):
+    def br(self):
         """Return a newline separator.
 
         In this class the method returns a new line character.
@@ -164,7 +190,7 @@ class Generator(object):
         """
         return '\n'
 
-    def hr(self, **kwargs):
+    def hr(self):
         """Return a horizontal separator.
 
         In this class the method returns a form feed character.
@@ -182,40 +208,64 @@ class Generator(object):
           label -- exported content of the link
           uri -- the target URI as a string
 
-        In this class the method returns value of 'label'.
+        In this class the method returns a text created from 'label' and 'uri'.
         
         """
         if label:
-            return label + '(' + uri + ')'
+            result = self.concat(label, self.escape('(%s)' % (uri,)))
         else:
-            return uri
+            result = uri
+        return result
 
-    def img(src, **kwargs):
+    def link_target(self, label, name, **kwargs):
+        """Return link target named 'name' and containing 'label' text.
+
+        Arguments:
+
+          label -- exported content to be put into the place of the link target
+          name -- name of the link target as a string
+
+        In this class the method returns a text created from 'label' and
+        'name'.
+          
+        """
+        return self.escape('%s#%s' % (label, name,))
+
+    def img(src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
         """Return image stored at 'src' URI.
 
         Arguments:
 
           src -- URI (as a string) where the image is stored
+          alt -- title of the image as a string or unicode or 'None'
+          descr -- ???
+          align -- requested alignment of the image, 'None' or one of the
+            strings 'left' or 'right'
+          width -- ???
+          height -- ???
 
         In this class the method returns text of 'src'.
 
         """
-        return src
+        return self.escape(src)
 
     # Tables
 
-    def gtable(self, rows, title=None, **kwargs):
+    def gtable(self, rows, title=None, lang=None):
         """A generic table consisting of 'rows'.
 
         Arguments:
 
-          rows -- sequence of rows cells where each row is a sequence of previously formatted cells
-          title -- table caption as a string or None
+          rows -- sequence of rows cells where each row is a sequence of
+            previously formatted cells
+          title -- 'None' or table caption as a string or unicode
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
 
         In this class the method returns a concatenation of 'rows'.
 
         """
-        return concat([concat(row) for row in rows])
+        return self.concat([self.concat(row) for row in rows])
 
 
 class MarkupFormatter(object):
@@ -447,8 +497,9 @@ class Exporter(object):
         Arguments:
 
           node -- 'Content' instance to be exported
-          lang -- ???
-          
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
+
         """
         if lang is None:
             translator = NullTranslator()
@@ -478,7 +529,6 @@ class Exporter(object):
         initial_export = self._initialize(context)
         export = node.export(context)
         final_export = self._finalize(context)
-        print export
         result = initial_export + export + final_export
         return result
 
