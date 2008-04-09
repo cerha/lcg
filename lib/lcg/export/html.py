@@ -530,6 +530,9 @@ class HtmlExporter(Exporter):
     
     def _content(self, context):
         return context.node().content().export(context)
+
+    def _initialize(self, context):
+        return ''
     
     def export(self, context):
         lines = (self.DOCTYPE, '',

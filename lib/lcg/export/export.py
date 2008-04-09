@@ -91,10 +91,11 @@ class Generator(object):
           level -- level of the heading as a positive integer; the highest
             level is 1
 
-        In this class the method returns value of 'title'.
+        In this class the method returns value of 'title' separated by empty
+        lines.
         
         """
-        return title
+        return '\n' + title + '\n\n'
     
     def list(self, items, ordered=False, style=None, lang=None):
         """Return list of 'items'.
@@ -109,10 +110,14 @@ class Generator(object):
           lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
             language code
         
-        In this class method returns concatenation of 'items' elements.
+        In this class method returns concatenation of 'items' elements
+        surrounded by new lines.
 
         """
-        return self.concat(items)
+        items_nl = []
+        for i in items:
+            items_nl += [i, '\n']
+        return self.concat(items_nl)
 
     def definitions(self, items, lang=None):
         """Return a list of definitions.
@@ -153,11 +158,11 @@ class Generator(object):
           lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
             language code
 
-        In this class the method returns 'content' with the new line character
-        appended to it.
+        In this class the method returns 'content' surrounded by new line
+        characters.
         
         """
-        return self.concat(content, '\n')
+        return self.concat(content, '\n\n')
 
     def div(self, content, lang=None, **kwargs):
         """Return exported 'content' as a general block.
@@ -168,10 +173,10 @@ class Generator(object):
           lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
             language code
 
-        In this class the method returns 'content'.
+        In this class the method returns 'content' surrounded by new lines.
 
         """
-        return content
+        return content + '\n'
 
     def concat(self, *exported):
         """Return elements of 'exported' objects sequence as a general block.
@@ -376,6 +381,17 @@ class MarkupFormatter(object):
         if not isinstance(result, Localizable):
             result = str(result)
         return result
+    
+    def _link_formatter(self, context, label=None, href=None, anchor=None, descr=None, **kwargs):
+        if label:
+            result = label
+            if href:
+                result += ' (%s)' % (href,)
+        elif href:
+            result = href
+        else:
+            result = ''
+        return result
 
     def _formatter(self, context, type, groups, close=False):
         try:
@@ -511,11 +527,13 @@ class Exporter(object):
         return self.Context(self, self._generator, self._formatter, translator, node, **kwargs)
 
     def _initialize(self, context):
-        return ''
+        generator = context.generator()
+        content = generator.h(context.node().title(), 1)
+        return content
 
     def _finalize(self, context):
         return ''
-    
+        
     def export(self, context):
         """Export the object represented by 'context' and return the corresponding output string.
 
@@ -527,7 +545,7 @@ class Exporter(object):
         """
         node = context.node()
         initial_export = self._initialize(context)
-        export = node.export(context)
+        export = node.content().export(context)
         final_export = self._finalize(context)
         result = initial_export + export + final_export
         return result

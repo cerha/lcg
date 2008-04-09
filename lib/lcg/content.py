@@ -594,7 +594,7 @@ class NodeIndex(Content):
         if self._title is not None:
             #TODO: add a "skip" link?
             g = context.generator()
-            return g.div((g.div(g.strong(self._title), cls='title'), toc), cls='table-of-contents')
+            return g.div(g.concat(g.div(g.strong(self._title), cls='title'), toc), cls='table-of-contents')
         else:
             return toc
         
