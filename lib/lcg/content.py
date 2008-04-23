@@ -175,9 +175,10 @@ class FormattedText(TextContent):
     """
     def export(self, context):
         if self._text:
-            return context.formatter().format(context, context.translate(self._text))
+            result = context.formatter().format(context, context.translate(self._text))
         else:
-            return context.generator().escape('')
+            result = context.generator().escape('')
+        return result
 
 # Backwards compatibility alias.        
 WikiText = FormattedText
@@ -188,7 +189,7 @@ class PreformattedText(TextContent):
     
     def export(self, context):
         g = context.generator()
-        return g.pre(g.escape(self._text))
+        return g.pre(self._text)
 
 
 class Anchor(TextContent):
@@ -331,7 +332,9 @@ class Paragraph(Container):
 
     def export(self, context):
         g = context.generator()
-        return g.p(g.concat(self._exported_content(context)), lang=self._lang)
+        exported = self._exported_content(context)
+        exported_result = g.concat(*exported)
+        return g.p(exported_result, lang=self._lang)
 
     
 class ItemizedList(Container):
@@ -552,8 +555,15 @@ class Section(SectionContainer):
         else:
             href = None
         g = context.generator()
-        return g.h(g.link(self.title(), href, cls='backref', name=self.anchor()),
-                   len(self._section_path()) + 1)
+        if href is None:
+            header_content = self.title()
+        else:
+            header_content = g.link(self.title(), href, cls='backref')
+        link_target_id = self.anchor()
+        header_link_target = g.link_target(header_content, link_target_id)
+        level = len(self._section_path()) + 1
+        header = g.h(header_link_target, level)
+        return header
 
     def export(self, context):
         g = context.generator()
@@ -602,7 +612,7 @@ class NodeIndex(Content):
         g = context.generator()
         if depth is not None:
             if depth <= 0:
-                return ''
+                return g.escape('')
             depth -= 1 # Decrease for further calls.
         items = ()
         if isinstance(item, ContentNode):
@@ -627,7 +637,11 @@ class NodeIndex(Content):
                 descr = i.descr()
                 if not i.active():
                     cls = (cls and cls + ' ' or '') + 'inactive'
-            current_link = g.link(i.title(), uri, title=descr, name=name, cls=cls)
+            if name is None:
+                current_link_target = i.title()
+            else:
+                current_link_target = g.link_target(i.title(), name)
+            current_link = g.link(current_link_target, uri, title=descr, cls=cls)
             subtoc = self._make_toc(context, i, indent=indent+4, depth=depth)
             links.append(g.concat(current_link, subtoc))
         if isinstance(g, HtmlGenerator):

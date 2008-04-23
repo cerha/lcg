@@ -56,8 +56,24 @@ class Generator(object):
         """
         return text
 
-    def strong(self, text):
+    def emphasize(self, text):
         """Return exported 'text' emphasized.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+
+    def strong(self, text):
+        """Return exported 'text' in a bold face.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+
+    def fixed(self, text):
+        """Return exported 'text' in a fixed width font.
 
         In this class the method returns value of 'text'.
         
@@ -74,6 +90,30 @@ class Generator(object):
     
     def sub(self, text):
         """Return exported 'text' as a subscript.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+    
+    def underline(self, text):
+        """Return exported 'text' underlined.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+    
+    def citation(self, text):
+        """Return exported 'text' as ???.
+
+        In this class the method returns value of 'text'.
+        
+        """
+        return text
+    
+    def quotation(self, text):
+        """Return exported 'text' as ???.
 
         In this class the method returns value of 'text'.
         
@@ -147,7 +187,8 @@ class Generator(object):
         In this class the method returns a concatenation of 'items' elements.
         
         """
-        return self.concat([self.concat(dt, dd) for dt, dd in items])
+        exported_items = [self.concat(dt, dd, '\n') for dt, dd in items]
+        return self.concat(*exported_items)
             
     def p(self, content, lang=None):
         """Return a single paragraph of exported 'content'.
@@ -311,7 +352,7 @@ class MarkupFormatter(object):
 
     _FORMAT = {'linebreak': '\n',
                'comment': '',
-               'dash': '--',
+               'dash': u'—',
                'nbsp': u' ',
                'lt':   '<',
                'gt':   '>',
@@ -328,16 +369,17 @@ class MarkupFormatter(object):
         self._rules = re.compile('(?:' +'|'.join(regexps)+ ')', re.MULTILINE|re.UNICODE)
         self._paired_on_output = [type for type, format in self._FORMAT.items()
                                   if isinstance(format, tuple)]
-
+    
     def _markup_handler(self, context, match):
+        g = context.generator()
         type = [key for key, m in match.groupdict().items()
                 if m and not key in self._HELPER_PATTERNS][0]
         markup = match.group(type)
         backslashes = markup.count('\\')
-        markup = markup[backslashes:]
-        prefix = backslashes / 2 * '\\'
+        markup = g.escape(markup[backslashes:])
+        prefix = g.escape(backslashes / 2 * '\\')
         if backslashes % 2:
-            return prefix + markup
+            return g.concat(prefix, markup)
         # We need two variables (start and end), because both can be False for
         # unpaired markup.
         start = False
@@ -362,25 +404,26 @@ class MarkupFormatter(object):
             # This can be end markup, which was not opened or start markup,
             # which was already opened.
             result = markup
-        return prefix + result
+        return g.concat(prefix, result)
 
     def _substitution_formatter(self, context, subst, **kwargs):
+        g = context.generator()
         # get the substitution value for _SUBSTITUTION_REGEX match
         if subst.startswith('{') and subst.endswith('}'):
             text = subst[1:-1]
         else:
             text = subst
         if not text:
-            return '$' + subst
+            return g.escape('$' + subst)
         result = context.node().globals()
         for name in text.split('.'):
             try:
                 result = result[str(name)]
             except KeyError:
-                return '$' + subst
+                return g.escape('$' + subst)
         if not isinstance(result, Localizable):
             result = str(result)
-        return result
+        return g.escape(result)
     
     def _link_formatter(self, context, label=None, href=None, anchor=None, descr=None, **kwargs):
         if label:
@@ -392,28 +435,47 @@ class MarkupFormatter(object):
         else:
             result = ''
         return result
+    
+    def _uri_formatter(self, context, uri, close=False, **kwargs):
+        return self._link_formatter(context, href=uri, label=None)
 
     def _formatter(self, context, type, groups, close=False):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
         except AttributeError:
+            formatter = None
+        if formatter is not None:
+            result = formatter(context, close=close, **groups)
+        else:
             f = self._FORMAT.get(type, '')
-            return type in self._paired_on_output and f and f[close and 1 or 0] or f
-        return formatter(context, close=close, **groups)
+            if type in self._paired_on_output and f:
+                if close:
+                    text = f[1]
+                else:
+                    text = f[0]
+            else:
+                text = f
+            g = context.generator()
+            result = g.escape(text)
+        return result
         
     def format(self, context, text):
+        g = context.generator()
         self._open = []
         result = []
         pos = 0
         for match in self._rules.finditer(text):
-            result.extend((text[pos:match.start()], self._markup_handler(context, match)))
+            starting_text = g.escape(text[pos:match.start()])
+            markup = self._markup_handler(context, match)
+            result.extend((starting_text, markup))
             pos = match.end()
-        result.append(text[pos:])
+        final_text = g.escape(text[pos:])
+        result.append(final_text)
         self._open.reverse()
         x = self._open[:]
         for type in x:
             result.append(self._formatter(context, type, {}, close=True))
-        return concat(result)
+        return g.concat(*result)
 
 
 class Exporter(object):
@@ -528,11 +590,15 @@ class Exporter(object):
 
     def _initialize(self, context):
         generator = context.generator()
-        content = generator.h(context.node().title(), 1)
+        title = generator.escape(context.node().title())
+        content = generator.h(title, 1)
         return content
 
     def _finalize(self, context):
         return ''
+
+    def _export(self, node, context):
+        return node.content().export(context)
         
     def export(self, context):
         """Export the object represented by 'context' and return the corresponding output string.
@@ -545,9 +611,14 @@ class Exporter(object):
         """
         node = context.node()
         initial_export = self._initialize(context)
-        export = node.content().export(context)
+        export = self._export(node, context)
         final_export = self._finalize(context)
-        result = initial_export + export + final_export
+        generator = context.generator()
+        result = export
+        if initial_export is not None:
+            result = generator.concat(initial_export, result)
+        if final_export is not None:
+            result = generator.concat(result, final_export)
         return result
 
     def dump(*args, **kwargs):

@@ -395,9 +395,6 @@ class HtmlFormatter(MarkupFormatter):
             result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
         return result.export(context)
-    
-    def _uri_formatter(self, context, uri, close=False, **kwargs):
-        return self._link_formatter(context, href=uri, label=None)
 
     def _email_formatter(self, context, email, close=False, **kwargs):
         return self._link_formatter(context, href='mailto:'+email, label=email)
