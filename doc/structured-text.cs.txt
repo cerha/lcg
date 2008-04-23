@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (c) 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -60,10 +60,10 @@ Odstavec je každý celistvý blok textu.  Kdykoliv vynecháte prázdný řádek
 znamená to že začínáte nový odstavec (nebo jinou konstrukci).  Konce řádků a
 vícenásobné mezery uvnitř odstavce jsou ignorovány -- veškerý text odstavce
 vystupuje jako jeden celek a bude zformátován tak, aby odpovídal šířce
-výstopního média (např. okna prohlížeče).
+výstupního média (např. okna prohlížeče).
 
 
-=== Kapitoly ===
+=== Kapitoly === sections
 
 Kapitoly umožňují vytvářet hierarchickou strukturu obsahu.  Strukturu kapitol
 je potom možné vypsat ve formě hierarchického [#toc rejstříku] a umožnit tak
@@ -124,28 +124,28 @@ Seznamy mohou být také vnořené, položky mohou být číslované atd.  Více
 === Seznamy definic ===
 
 Seznam definic je vhodné použít kdykoliv potřebujeme vyjádřit posloupnost
-určitých termínů či názvů a k nim se vztahujících podrobnějších vysvětlení.
+určitých termínů či názvů a k~nim se vztahujících podrobnějších vysvětlení.
 
 *Příklad:*
 ------
 Krkonošský národní park 
-  Krkonošský národní park se rozprostírá v severovýchodní části Čech
-  při hranici s Polskem.  Jeho rozloha je 54 969 ha a byl založen roku 1963.
+  Krkonošský národní park se rozprostírá v~severovýchodní části Čech
+  při hranici s~Polskem.  Jeho rozloha je 54~969~ha a byl založen roku 1963.
 
 Národní park Šumava
   Národní park a chráněná krajinná oblast Šumava leží při jihozápadní hranici
   České republiky se Spolkovou republikou Německo a Rakouskem.  NP byl založen
-  roku 1991 a jeho rozloha činí 69 030 ha.
+  roku 1991 a jeho rozloha činí 69~030~ha.
 ------
 
 Krkonošský národní park 
-  Krkonošský národní park se rozprostírá v severovýchodní části Čech
-  při hranici s Polskem.  Jeho rozloha je 54 969 ha a byl založen roku 1963.
+  Krkonošský národní park se rozprostírá v~severovýchodní části Čech
+  při hranici s~Polskem.  Jeho rozloha je 54~969~ha a byl založen roku 1963.
 
 Národní park Šumava
   Národní park a chráněná krajinná oblast Šumava leží při jihozápadní hranici
   České republiky se Spolkovou republikou Německo a Rakouskem.  NP byl založen
-  roku 1991 a jeho rozloha činí 69 030 ha.
+  roku 1991 a jeho rozloha činí 69~030~ha.
 
 
 === Sledy položek ===
@@ -378,9 +378,9 @@ jsou označeny pořadovým číslem, nebo písmenem.
    1. Každá položka je odsazena nejméně jednou mezerou.
    2. Delší text položky může byt rozdělen na více řádků, pokud je zachováno
       patříčné odsazení.
-   3. Pro odsazení je možné použít tebelátory a mezery.  Jeden tabelátor
+   3. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
       odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
-      tebelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
+      tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
       převod tabelátorů na mezery.
    4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný vliv na
       výsledný dokument.  Jde čistě o vaši volbu.
@@ -411,9 +411,9 @@ Toto bude zobrazeno jako:
    1. Každá položka je odsazena nejméně jednou mezerou.
    2. Delší text položky může byt rozdělen na více řádků, pokud je zachováno
       patříčné odsazení.
-   3. Pro odsazení je možné použít tebelátory a mezery.  Jeden tabelátor
+   3. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
       odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
-      tebelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
+      tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
       převod tabelátorů na mezery.
    4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný vliv na
       výsledný dokument.  Jde čistě o vaši volbu.
@@ -558,13 +558,13 @@ textových bloků.
 ==== Zvýrazňování textu ====
 
 Můžete používat /zvýrazněný text/, *silně zvýrazněný text*, _podtržený text_,
-=písmo s pevnou šířkou znaku=, /*nebo jejich kombinace _kombinace_*/.
+=písmo s pevnou šířkou znaku=, /*nebo jejich _kombinace_*/.
 
 Zdrojový text pro výše uvedený odstavec by vypadal následovně:
 
 -----
 Můžete používat /zvýrazněný text/, *silně zvýrazněný text*, _podtržený text_,
-=písmo s pevnou šířkou znaku=, /*nebo jejich kombinace _kombinace_*/.
+=písmo s pevnou šířkou znaku=, /*nebo jejich _kombinace_*/.
 -----
 
 
@@ -579,13 +579,13 @@ potřeba.
 
 Podle druhu cíle odkazu rozeznáváme několik typů odkazů:
 
-Typy odakzů: @TOC@
+Typy odkazů: @TOC@
 
 
 ===== Místní odkazy =====
 
 Místní odkazy odkazují na jiné dokumenty v rámci jedné publikace nebo na
-konkrétní kapitoly.  Dokumenty jsou odkaznvány prostřednictvím svých
+konkrétní kapitoly.  Dokumenty jsou odkazovány prostřednictvím svých
 identifikátorů, kapitoly prostřednictvím kotev (více viz [#anchors]).  Kotvu v
 odkazu uvodíme mřížkou.  Pokud jde o kotvu v rámci jiného dokumentu, před
 mřížku ještě připojíme jeho identifikátor.
@@ -666,7 +666,7 @@ tak, aby šířka textu odpovídala šířce výstupního média.  To ovšem mů
 vést k tomu, že je řádka zalomena v místě, kde to není vhodné.  V češtině je to
 napříklas po jednpísmenné předložce či spojce, která by tak zůstala na konci
 řádku.  Proto je možně na určených místech zlom zakázat.  Namísto mezery
-zapište vlnku „\~“.  Ta bude na výstupu nahrazena nedělitoenou mezerou.
+zapište vlnku „\~“.  Ta bude na výstupu nahrazena nedělitelnou mezerou.
 
 *Příklad:*
 
