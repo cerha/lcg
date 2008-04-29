@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
+import cStringIO
 import os
 import urlparse
 
@@ -789,5 +790,8 @@ class PDFExporter(Exporter):
     def export(self, context):
         context.pdf_context = Context()
         generator_structure = super(PDFExporter, self).export(context)
-        result = generator_structure.export(context)
-        return result
+        document = generator_structure.export(context)
+        output = cStringIO.StringIO()
+        doc = reportlab.platypus.SimpleDocTemplate(output)
+        doc.build(document)
+        return output.getvalue()
