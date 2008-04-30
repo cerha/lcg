@@ -303,8 +303,8 @@ class DocDirReader(DocFileReader):
         return children
 
     
-def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, **kwargs):
-    """Create an instance of sensible reader class for given input directory and document name.
+def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, recourse=True, **kwargs):
+    """Create an instance of sensible reader class for given source directory and document name.
 
     All the keyword arguments are passed to the reader, if they make sense to it.
 
@@ -313,7 +313,7 @@ def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, **kwargs
     try:
         file, path, descr = imp.find_module(name, [dir])
     except ImportError:
-        if parent is None:
+        if parent is None and recourse:
             cls = DocDirReader
         else:
             subdir = os.path.join(dir, name)
