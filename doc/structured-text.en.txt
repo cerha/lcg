@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (c) 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -184,7 +184,7 @@ automatically and thus don't require the square brackets.
 -----
  * Link to another document: [intro]
  * Link to another section of the same document: [#bullet-lists]
- * This link with an explicit name: [#bullet-lists Section about Bullet Lists]
+ * This link with an explicit name: [#bullet-lists Bullets]
  * External link: [http://www.freebsoft.org Free(b)soft laboratory]
  * Unnamed external links: http://www.gnu.org
  * Email address: yourname@yourdomain.com
@@ -194,7 +194,7 @@ Resulting links:
 
  * Link to another document: [intro]
  * Link to another section of the same document: [#bullet-lists]
- * The same link with an explicit name: [#bullet-lists Section about Bullets]
+ * The same link with an explicit name: [#bullet-lists Bullets]
  * External link: [http://www.freebsoft.org Free(b)soft laboratory]
  * Unnamed external links: http://www.gnu.org
  * Email address: yourname@yourdomain.com

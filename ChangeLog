@@ -1,3 +1,7 @@
+2008-04-30  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/structured-text.en.txt (Module): Minor inconsistency fix.
+
 2008-03-31  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: Fieldset style improved.
