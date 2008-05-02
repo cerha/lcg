@@ -1,6 +1,57 @@
+2008-05-02  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (export): Use `Generator.heading()'.
+	(NodeIndex._make_toc): Temporary fix of HTML markup validity.
+
+	* bin/lcgmake.py: Added support for specifying the target
+	language. Added support for non-recursive processing of a single
+	file.  Added suport for PDF output.
+
+	* lib/lcg/export/pdf.py (Text.export): Perform translation here.
+	(PDFGenerator.heading): New method.
+	(PDFMarkupFormatter._FORMAT): Define replacements as `Text' elements.
+	(PDFExporter): Derive also from `FileExporter'.
+
+	* lib/lcg/export/ims.py (IMSExporter): Derive from
+	`StyledHtmlExporter' and `HtmlFileExporter'.
+
+	* lib/lcg/export/hhp.py (HhpExporter): Derive from
+	`HtmlFileExporter'.
+
+	* lib/lcg/export/html.py (HtmlExporter): Don't handle stylesheets
+	in this class.
+	(HtmlFileExporter): New class
+	(FileExporter): Generalized and moved to `export.py'.
+	(StyledHtmlExporter): New class.
+	(HtmlStaticExporter): Derive from `StyledHtmlExporter' and
+	`HtmlFileExporter'.
+
+	* lib/lcg/export/export.py (link_target): Renamed to `anchor'.
+	(Generator.heading): New generic constrict.
+	(Generator.toc): New generic constrict.
+	(MarkupFormatter._MARKUP): Don't handle special XML characters
+	here, they should be handled by proper escaping.
+	(MarkupFormatter._formatter): Don't escape the markup gathered
+	from `self._FORMAT'.
+	(Exporter, Exporter.Context, Exporter.context, Exporter.export):
+	Documentation added.
+	(Exporter.translator): New method.
+	(Exporter.export): Method removed.
+	(FileExporter): New class.
+
+2008-05-01  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/Makefile: Set PYTHONPATH to make it work before
+	installation.
+
 2008-04-30  Tomas Cerha  <cerha@brailcom.org>
 
-	* doc/structured-text.en.txt (Module): Minor inconsistency fix.
+	* lib/lcg/read.py (reader): New argument `recourse' to forbid
+	recursion.
+
+	* bin/lcgmake.py: Added support for generating PDF output.
+
+	* doc/structured-text.en.txt: Minor inconsistency fix.
 
 2008-03-31  Tomas Cerha  <cerha@brailcom.org>
 

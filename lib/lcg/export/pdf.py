@@ -218,7 +218,7 @@ class Text(Element):
     def export(self, context):
         content = self.content
         if isinstance(content, basestring):
-            result = self.content
+            result = context.translate(self.content)
         else:
             result = content.export(context)
         return result
@@ -603,8 +603,14 @@ class PDFGenerator(Generator):
 
     # Sectioning
 
-    def h(self, title, level):
-        return make_element(Heading, content=[title], level=level)
+    def heading(self, title, level, anchor=None, backref=None):
+        content = self.escape(title)
+        # TODO: Make backreferences optional?
+        if backref:
+            content = self.link(content, "#"+backref)
+        if anchor:
+            content = self.anchor(content, anchor)
+        return make_element(Heading, content=[content], level=level)
 
     def p(self, content, lang=None):
         if isinstance(content, Paragraph):
@@ -632,12 +638,12 @@ class PDFGenerator(Generator):
     def link(self, label, uri, **kwargs):
         return make_element(Link, content=label, uri=uri)
     
-    def link_target(self, label, name, **kwargs):
+    def anchor(self, label, name, **kwargs):
         return make_element(LinkTarget, content=label, name=name)
 
     def img(src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
         return make_element(Image, content=src)
-    
+
     # Tables and definition lists
 
     def gtable(self, rows, title=None, lang=None):
@@ -680,6 +686,10 @@ class PDFGenerator(Generator):
 
 class PDFMarkupFormatter(MarkupFormatter):
 
+    _FORMAT = {'comment': make_element(Empty),
+               'dash': make_element(Text, content=u'—'),
+               'nbsp': make_element(Text, content=u' ')}
+               
     class _StackEntry(object):
         def __init__(self, markup):
             self.markup = markup
@@ -773,11 +783,13 @@ class PDFMarkupFormatter(MarkupFormatter):
         return g.concat(*result)
 
 
-class PDFExporter(Exporter):
+class PDFExporter(FileExporter, Exporter):
     
     Generator = PDFGenerator
     Formatter = PDFMarkupFormatter
 
+    _OUTPUT_FILE_EXT = 'pdf'
+    
     def _export(self, node, context):
         result = node.content().export(context)
         if isinstance(result, basestring):

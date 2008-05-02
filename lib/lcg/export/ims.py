@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ class _Manifest:
         fh.close()
 
         
-class IMSExporter(HtmlExporter, FileExporter):
+class IMSExporter(StyledHtmlExporter, HtmlFileExporter):
     """Export the content as an IMS package."""
    
     def dump(self, node, directory, **kwargs):
