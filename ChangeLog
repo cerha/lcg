@@ -9,8 +9,11 @@
 
 	* lib/lcg/export/pdf.py (Text.export): Perform translation here.
 	(PDFGenerator.heading): New method.
-	(PDFMarkupFormatter._FORMAT): Define replacements as `Text' elements.
+	(PDFMarkupFormatter._FORMAT): Define replacements as `Text'
+	elements.
 	(PDFExporter): Derive also from `FileExporter'.
+	(PDFMarkupFormatter._link_formatter): Method removed in favor of
+	the parent class implementation.
 
 	* lib/lcg/export/ims.py (IMSExporter): Derive from
 	`StyledHtmlExporter' and `HtmlFileExporter'.
@@ -25,6 +28,10 @@
 	(StyledHtmlExporter): New class.
 	(HtmlStaticExporter): Derive from `StyledHtmlExporter' and
 	`HtmlFileExporter'.
+	(HtmlFormatter._BLANK_MATCHER, HtmlFormatter._IMAGE_URI_MATCHER)
+	(HtmlFormatter._IMAGE_ALIGN_MAPPING, HtmlFormatter._match_image)
+	(HtmlFormatter._find_resource, HtmlFormatter._link_formatter):
+	Moved to `export.py'.
 
 	* lib/lcg/export/export.py (link_target): Renamed to `anchor'.
 	(Generator.heading): New generic constrict.
@@ -33,6 +40,8 @@
 	here, they should be handled by proper escaping.
 	(MarkupFormatter._formatter): Don't escape the markup gathered
 	from `self._FORMAT'.
+	(MarkupFormatter): Generic link formatting implementation from
+	`html.py' moved here.
 	(Exporter, Exporter.Context, Exporter.context, Exporter.export):
 	Documentation added.
 	(Exporter.translator): New method.

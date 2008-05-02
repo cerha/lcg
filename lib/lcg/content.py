@@ -741,7 +741,7 @@ class Link(Container):
             descr = g.concat(g.escape(target.title()), g.escape(' (%s)' % (target.parent().title(),)))
         else:
             descr = None
-        label = concat(self._exported_content(context))
+        label = g.concat(*self._exported_content(context))
         uri = context.exporter().uri(context, target)
         return g.link(label, uri, title=descr, type=self._type)
 

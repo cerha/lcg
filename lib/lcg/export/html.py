@@ -335,12 +335,6 @@ class HtmlFormatter(MarkupFormatter):
                'dash': '&ndash;',
                'nbsp': '&nbsp;'}
     
-    _BLANK_MATCHER = re.compile('\s+')
-    _IMAGE_URI_MATCHER = re.compile(r'^(?P<align>[<>])?(?P<name>'
-                                    '(?P<basename>[\w\d_.,/-]+)\.'
-                                    '(jpe?g|png|gif))$', re.IGNORECASE)
-    _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
-
     def _citation_formatter(self, context, close=False, **kwargs):
         if not close:
             lang = context.sec_lang()
@@ -348,70 +342,6 @@ class HtmlFormatter(MarkupFormatter):
             return '<span%s class="citation">' % langattr
         else:
             return '</span>'
-
-    def _match_image(self, uri):
-        match = self._IMAGE_URI_MATCHER.match(uri)
-        if match:
-            uri = match.group('name')
-            name = match.group('basename').split('/')[-1].replace('.','-')
-            align = self._IMAGE_ALIGN_MAPPING.get(match.group('align'))
-            return True, uri, dict(name=name, align=align)
-        return False, uri, {}
-        
-    def _find_resource(self, node, cls, filename, label, descr, fallback=False, **imgargs):
-        result = node.resource(cls, filename, fallback=False)
-        if not result and fallback:
-            if issubclass(cls, XResource):
-                result = resource(node, cls, filename, fallback=True, title=label)
-            else:
-                log("%s: Unknown resource: %s: %s" % (node.id(), cls.__name__, filename))
-                result = cls(filename, title=label)
-        if result:
-            title = label or result.title()
-            if isinstance(result, Image):
-                return InlineImage(result, title=title, **imgargs)
-            else:
-                return Link(result, label=title)
-        return None
-
-    def _link_formatter(self, context, label=None, href=None, anchor=None, descr=None, **kwargs):
-        node = None
-        result = None
-        parent = context.node()
-        if href and not anchor:
-            is_image, href, imgargs = self._match_image(href)
-            cls = is_image and Image or Resource
-            result = self._find_resource(parent, cls, href, label, descr, fallback=is_image,
-                                         **imgargs)
-        if not result:
-            if not href:
-                node = parent
-            elif href.find('@') == href.find('/') == -1:
-                node = parent.root().find_node(href)
-                if not node:
-                    log("%s: Unknown node: %s" % (parent.id(), href))
-            target = node
-            if node and anchor:
-                target = node.find_section(anchor, context)
-                if target is None:
-                    log("%s: Unknown section: %s:%s" %
-                        (parent.id(), node.id(), anchor))
-            if not target:
-                if anchor is not None:
-                    href += '#'+anchor
-                target = Link.ExternalTarget(href, label or href)
-            if label:
-                parts = self._BLANK_MATCHER.split(label, maxsplit=1)
-                is_image, uri, imgargs = self._match_image(parts[0])
-                if is_image:
-                    title = len(parts) == 2 and parts[1] or None
-                    label = self._find_resource(parent, Image, uri, title, descr, fallback=True,
-                                                **imgargs)
-                    if isinstance(target, Link.ExternalTarget):
-                        target = Link.ExternalTarget(href, title, descr=title)
-            result = Link(target, label=label, descr=descr)
-        result.set_parent(parent)
-        return result.export(context)
 
     def _email_formatter(self, context, email, close=False, **kwargs):
         return self._link_formatter(context, href='mailto:'+email, label=email)

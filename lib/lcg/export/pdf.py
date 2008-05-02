@@ -734,26 +734,6 @@ class PDFMarkupFormatter(MarkupFormatter):
         g = context.generator()
         return g.fixed(email)
     
-    def _link_formatter(self, context, label=None, href=None, anchor=None, descr=None, **kwargs):
-        if anchor is not None:
-            assert isinstance(anchor, basestring), ('type error', anchor,)
-            if href is None:
-                href = ''
-            href += '#%s' % (anchor,)
-        if label is None and href is not None:
-            label = href
-        if label is not None:
-            assert isinstance(label, basestring), ('type error', label,)
-            text = make_element(Text, content=label)
-            if href:
-                assert isinstance(href, basestring), ('type error', href,)
-                result = make_element(Link, content=text, uri=str(href))
-            else:
-                result = text
-        else:
-            result = Empty()
-        return result
-        
     def format(self, context, text):
         if not hasattr(context, 'pdf_markup_stack'):
             context.pdf_markup_stack = []
