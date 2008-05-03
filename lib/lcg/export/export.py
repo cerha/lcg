@@ -131,7 +131,7 @@ class Generator(object):
 
     # Sectioning
 
-    def heading(self, title, level, anchor=None, backref=None):
+    def h(self, title, level):
         """Return heading.
 
         Arguments:
@@ -139,14 +139,6 @@ class Generator(object):
           title -- exported title of the heading
           level -- level of the heading as a positive integer; the highest
             level is 1
-          anchor -- link target identifier of the heading (allows links to
-            point to this heading as to an anchor).
-            
-          backref -- anchor name of the nearest item in a table of contents
-            pointing to this heading.  This heading should become a link
-            pointing to this anchor to support section title back-references
-            within the document.  May be ignored in output formats where
-            back-referencing is not desirable.
 
         In this class the method returns value of 'title' separated by empty
         lines.
@@ -271,8 +263,8 @@ class Generator(object):
             result = uri
         return result
 
-    def anchor(self, label, name, **kwargs):
-        """Return an anchor (link target) named 'name' and containing 'label' text.
+    def link_target(self, label, name, **kwargs):
+        """Return link target named 'name' and containing 'label' text.
 
         Arguments:
 
@@ -302,15 +294,6 @@ class Generator(object):
 
         """
         return self.escape(src)
-
-    def toc(self, item, depth=1):
-        """Generate a Table of Contents for given content 'item' limited to given 'depth'.
-
-        Arguments:
-           item -- An instance of 'ContentNode'
-
-        """
-        #TODO: Generalize the implementation from content.py.
 
     # Tables
 
@@ -360,14 +343,21 @@ class MarkupFormatter(object):
                                  "|\{[^\}]+\})")),
                ('comment', r'^#.*'),
                ('dash', r'(^|(?<=\s))--($|(?=\s))'),
-               ('nbsp', '~'))
-    
+               ('nbsp', '~'),
+               ('lt', '<'),
+               ('gt', '>'),
+               ('amp', '&'),
+               )
     _HELPER_PATTERNS = ('href', 'anchor', 'label', 'descr', 'subst')
 
     _FORMAT = {'linebreak': '\n',
                'comment': '',
                'dash': u'—',
-               'nbsp': u' '}
+               'nbsp': u' ',
+               'lt':   '<',
+               'gt':   '>',
+               'amp':  '&',
+               }
 
     _BLANK_MATCHER = re.compile('\s+')
     _IMAGE_URI_MATCHER = re.compile(r'^(?P<align>[<>])?(?P<name>'
@@ -519,11 +509,13 @@ class MarkupFormatter(object):
             f = self._FORMAT.get(type, '')
             if type in self._paired_on_output and f:
                 if close:
-                    result = f[1]
+                    text = f[1]
                 else:
-                    result = f[0]
+                    text = f[0]
             else:
-                result = context.generator().escape(f)
+                text = f
+            g = context.generator()
+            result = g.escape(text)
         return result
         
     def format(self, context, text):
@@ -548,62 +540,28 @@ class MarkupFormatter(object):
 class Exporter(object):
     """Transforming structured content objects to various output formats.
 
-    This class is a base class of all transformers.  It provides basic exporting framework to be
-    extended and customized for particular kinds of outputs.  When defining a real exporter you
-    should assign the 'Generator' and 'Formatter' attributes to corresponding utility classes.  The
-    exporter instantiates and uses them as needed.  You may also wish to extend the 'Context' which
-    is passed throughout the export process (see below).
+    This class is a base class of all transformers.  It provides basic
+    exporting framework to be extended and customized for particular kinds of
+    outputs.  When defining a real exporter you should assign the 'Generator'
+    and 'Formatter' attributes to corresponding utility classes.  The exporter
+    instantiates and uses them as needed.
 
-    The exporting process itself is run by subsequent calls of the 'export()' method, passing it a
-    context created by the 'context()' method.
+    The exporting process itself is run by subsequent calls of methods
+    'context' and 'export'.
     
     """
 
     Generator = Generator
     Formatter = MarkupFormatter
-    
+
     class Context(object):
-        """Storage class containing complete data necessary for export.
-
-        An instance of this class is passed to export methods of content classes.  It is possible
-        to access all information about the current context (exported node, target language, etc)
-        and also all the components involved in the export process (the exporter, formatter,
-        generator and translator instances).
-
-        The class is designed to be extensible.  The derived classes may accept additional
-        constructor arguments to expose additional context information to the export process (for
-        example the current request may be passed through the context in the on-line web
-        environment).  The method '_init_kwargs()' may be overriden to process these specific
-        arguments without the need to override the default constructor.
-        
-        To use an extended context class, just define it as the 'Context' attribute of the derived
-        'Exporter' class.
-
-        """
-        def __init__(self, exporter, generator, formatter, node, lang, **kwargs):
-            """Initialize the export context.
-
-            Arguments:
-            
-              exporter -- 'Exporter' instance to which this context belongs.
-              generator --  The exporter's 'Generator' instance.
-              formatter -- The exporter's 'Formatter' instance.
-              node -- 'ContentNode' instance to be exported.
-              lang -- Target language as an ISO 639-1 Alpha-2 lowercase language code or None.  If
-                None, the export will be language neutral (no information about the content
-                language will be present in the output and no translation will be performed).
-
-            
-
-            The constructor should not be called directly.  Use the metohd 'context()' instead.
-            
-            """
+        """Storage class containing complete data necessary for export."""
+        def __init__(self, exporter, generator, formatter, translator, node, **kwargs):
             self._exporter = exporter
             self._generator = generator
             self._formatter = formatter
+            self._translator = translator
             self._node = node
-            self._lang = lang
-            self._translator = exporter.translator(lang)
             self._init_kwargs(**kwargs)
 
         def _init_kwargs(self, sec_lang=None):
@@ -619,7 +577,7 @@ class Exporter(object):
             return self._formatter
         
         def lang(self):
-            return self._lang
+            return self._translator.lang()
 
         def sec_lang(self):
             return self._sec_lang
@@ -635,6 +593,9 @@ class Exporter(object):
         self._formatter = self.Formatter()
         self._translations = translations
         self._translators = {}
+
+    def _translator(self, lang):
+        return GettextTranslator(lang, path=self._translations, fallback=True)
 
     def _uri_document(self, context, target, **kwargs):
         return target.id()
@@ -667,15 +628,15 @@ class Exporter(object):
             raise Exception("Invalid URI target:", target)
         return method(context, target, **kwargs)
 
-    def _translator(self, lang):
-        return GettextTranslator(lang, path=self._translations, fallback=True)
+    def context(self, node, lang, **kwargs):
+        """Return context to be used as an argument to the 'export' method.
 
-    def translator(self, lang):
-        """Return a translator instance for given language.
+        Arguments:
 
-        Translator instances are reused, so you may get the same instance for two subsequent calls
-        with the same language.
-        
+          node -- 'Content' instance to be exported
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
+
         """
         if lang is None:
             translator = NullTranslator()
@@ -684,26 +645,12 @@ class Exporter(object):
                 translator = self._translators[lang]
             except KeyError:
                 translator = self._translators[lang] = self._translator(lang)
-        return translator
-
-    def context(self, node, lang, **kwargs):
-        """Return the export context instance to be used as an argument to the 'export' method.
-
-        All arguments are passed to the 'Context' constructor.  See its documentation for more
-        details.
-
-        Returns an instance of 'self.Context' class, thus if the derived exporter class overrides
-        the definition of its 'Context' class, the instance of this overriden class is returned.
-        This is also the recommended approach for extending the exporter context with specific
-        context information (see 'Exporter.Context' documentation for more information).
-
-        """
-        return self.Context(self, self._generator, self._formatter, node, lang, **kwargs)
+        return self.Context(self, self._generator, self._formatter, translator, node, **kwargs)
 
     def _initialize(self, context):
         generator = context.generator()
         title = generator.escape(context.node().title())
-        content = generator.heading(title, 1)
+        content = generator.h(title, 1)
         return content
 
     def _finalize(self, context):
@@ -713,10 +660,12 @@ class Exporter(object):
         return node.content().export(context)
         
     def export(self, context):
-        """Export the node represented by 'context' and return the corresponding output string.
+        """Export the object represented by 'context' and return the corresponding output string.
 
-        'context' is the exporter 'Context' instance as returned by the 'context()' method.  The
-        context holds the actual 'ContentNode' instance to be exported.
+        'context' is an object returned by the 'context' method.
+
+        In this class the method calls 'export' method of the 'context' node
+        and returns the result.
 
         """
         node = context.node()
@@ -731,57 +680,6 @@ class Exporter(object):
             result = generator.concat(result, final_export)
         return result
 
-
-
-class FileExporter(object):
-    """Mix-in class exporting content into files.
-
-    This class defines the 'dump()' method for writing the result of the export into filesystem.
-    See its documentation for more information.
-
-    """
-
-    _OUTPUT_FILE_EXT = None
-
-    def _write_file(self, filename, content):
-        directory = os.path.split(filename)[0]
-        if directory and not os.path.isdir(directory):
-            os.makedirs(directory)
-        file = open(filename, 'w')
-        if isinstance(content, unicode):
-            content = content.encode('utf-8')
-        file.write(content)
-        file.close()
-
-    def _filename(self, node, context):
-        """Return the pathname of node's output file relative to the output directory."""
-        name = node.id().replace(':', '-')
-        if context.lang() is not None and len(node.variants()) > 1:
-            name += '.'+ context.lang()
-        return name +'.'+ self._OUTPUT_FILE_EXT
-    
-    def dump(self, node, directory, filename=None, variant=None, **kwargs):
-        """Write node's content into the output file.
-
-        Arguments:
-
-           node -- the 'ContentNode' instance to dump.
-           directory -- name of the destination directory as a string.
-           filename -- the name of the output file as a string.  If None, the name will be
-             determined automatically based on the node id and corresponding language and file type
-             suffix.
-           variant -- the language variant to write.  The value must be the ISO language code
-             corresponding to one of the node's available language variants.  If None, all
-             available variants will be written.
-
-        All other keyword arguments will be passed to the exporter context constructor (See the .
-
-        """
-        variants = variant and (variant,) or node.variants() or (None,)
-        for lang in variants:
-            context = self.context(node, lang, **kwargs)
-            data = context.translate(self.export(context))
-            if filename is None:
-                filename = self._filename(node, context)
-            self._write_file(os.path.join(directory, filename), data)
-
+    def dump(*args, **kwargs):
+        """????"""
+        pass

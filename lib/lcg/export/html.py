@@ -63,23 +63,14 @@ class HtmlGenerator(Generator):
 
     # Generic constructs
      
-    def escape(self, text):
-        return saxutils.escape(text)
-
-    def heading(self, title, level, anchor=None, backref=None):
-        if anchor or backref:
-            if backref:
-                backref = "#" + backref
-            content = self.link(title, backref, name=anchor, cls='backref')
-        else:
-            content = title
-        return self.h(content, level)
+    def h(self, title, level, **kwargs):
+        return self._tag('h%d' % level, title, **kwargs) + '\n'
         
     def strong(self, text, **kwargs):
         return self._tag('strong', text, **kwargs)
      
-    def pre(self, text, cls="lcg-preformatted-text", **kwargs):
-        return self._tag('pre', text, _newlines=True, cls=cls, **kwargs)
+    def pre(self, text, cls="lcg-preformatted-text"):
+        return self._tag('pre', text, _newlines=True)
      
     def sup(self, text, **kwargs):
         return self._tag('sup', text, **kwargs)
@@ -105,7 +96,7 @@ class HtmlGenerator(Generator):
         return self._tag('a', label, attr, href=uri, title=title, target=target,
                          accesskey=hotkey, cls=cls, **kwargs)
 
-    def anchor(self, label, name):
+    def link_target(self, label, name):
         return self.link(label, None, name=name)
 
     def list(self, items, indent=0, ordered=False, style=None, **kwargs):
@@ -128,37 +119,9 @@ class HtmlGenerator(Generator):
         return '<img'+ self._attr(attr, src=src, alt=alt, longdesc=descr, border=border,
                                   **kwargs) +' />'
 
-
-        toc = self._make_toc(context, self._start_item(), depth=self._depth)
-        if self._title is not None:
-            #TODO: add a "skip" link?
-            g = context.generator()
-            return g.div(g.concat(g.div(g.strong(self._title), cls='title'), toc), cls='table-of-contents')
-        else:
-            return toc
-        
-    def toc(self, context, item, indent=0, depth=1):
-        pass
-
     def abbr(self, term, **kwargs):
         return self._tag('abbr', term, ('title',), **kwargs)
 
-    def gtable(self, rows, title=None, cls='lcg-table', **kwargs):
-        content = [self.tr([self.td(cell) for cell in row]) for row in rows]
-        if title:
-            content = ["<caption>"+ title +"</caption>"] + content
-        return self.table(self.tbody(content), cls=cls, **kwargs)
-
-    # HTML specific...
-    
-    def uri(self, base, *args, **kwargs):
-        uri = urllib.quote(base.encode('utf-8'))
-        query = ';'.join([k +'='+ urllib.quote(unicode(v).encode('utf-8'))
-                          for k,v in args + tuple(kwargs.items()) if v is not None])
-        if query:
-            uri += '?' + query
-        return uri
-     
     def th(self, content, **kwargs):
         return self._tag('th', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
     
@@ -167,6 +130,12 @@ class HtmlGenerator(Generator):
     
     def tr(self, content, **kwargs):
         return self._tag('tr', content, **kwargs)
+
+    def gtable(self, rows, title=None, cls='lcg-table', **kwargs):
+        content = [self.tr([self.td(cell) for cell in row]) for row in rows]
+        if title:
+            content = ["<caption>"+ title +"</caption>"] + content
+        return self.table(self.tbody(content), cls=cls, **kwargs)
 
     def table(self, content, **kwargs):
         attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
@@ -181,9 +150,19 @@ class HtmlGenerator(Generator):
     def tbody(self, content):
         return self._tag('tbody', content, _newlines=True)
     
-    def h(self, title, level, **kwargs):
-        return self._tag('h%d' % level, title, **kwargs) + '\n'
+    # HTML specific...
     
+    def escape(self, text):
+        return saxutils.escape(text)
+
+    def uri(self, base, *args, **kwargs):
+        uri = urllib.quote(base.encode('utf-8'))
+        query = ';'.join([k +'='+ urllib.quote(unicode(v).encode('utf-8'))
+                          for k,v in args + tuple(kwargs.items()) if v is not None])
+        if query:
+            uri += '?' + query
+        return uri
+     
     def span(self, text, **kwargs):
         return self._tag('span', text, **kwargs)
      
@@ -333,7 +312,11 @@ class HtmlFormatter(MarkupFormatter):
                'comment': '',
                'linebreak': '<br/>',
                'dash': '&ndash;',
-               'nbsp': '&nbsp;'}
+               'nbsp': '&nbsp;',
+               'lt':   '&lt;',
+               'gt':   '&gt;',
+               'amp':  '&amp;',
+               }
     
     def _citation_formatter(self, context, close=False, **kwargs):
         if not close:
@@ -361,6 +344,12 @@ class HtmlExporter(Exporter):
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
     
+    def __init__(self, stylesheet=None, inlinestyles=False, **kwargs):
+        """Initialize the exporter."""
+        super(HtmlExporter, self).__init__(**kwargs)
+        self._stylesheet = stylesheet
+        self._inlinestyles = inlinestyles
+    
     def _output_file(self, context, node, lang=None):
         """Return the pathname of node's output file relative to export dir."""
         name = node.id().replace(':', '-')
@@ -383,6 +372,14 @@ class HtmlExporter(Exporter):
             base = self.uri(context, target.parent())
         return base + "#" + target.anchor()
     
+    def _styles(self, context):
+        if self._inlinestyles:
+            return ['<style type="text/css">\n%s</style>' % s.get()
+                    for s in context.node().resources(Stylesheet)]
+        else:
+            return ['<link rel="stylesheet" type="text/css" href="%s">' % \
+                    s.uri() for s in context.node().resources(Stylesheet)]
+            
     def _title(self, context):
         return context.node().title()
 
@@ -392,7 +389,9 @@ class HtmlExporter(Exporter):
     
     def _head(self, context):
         node = context.node()
-        return [concat('<title>', self._title(context), '</title>')] + \
+        if self._stylesheet is not None:
+            node.resource(XStylesheet, self._stylesheet)
+        tags = [concat('<title>', self._title(context), '</title>')] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', context.lang()),
@@ -403,7 +402,9 @@ class HtmlExporter(Exporter):
                 (lang, self._node_uri(context, node, lang=lang))
                 for lang in node.variants() if lang != context.lang()] + \
                ['<script language="Javascript" type="text/javascript"' + \
-                ' src="%s"></script>' % s.uri() for s in node.resources(Script)]
+                ' src="%s"></script>' % s.uri()
+                for s in node.resources(Script)]
+        return concat('  ', concat(tags + self._styles(context), separator='\n  '))
 
     def _parts(self, context, parts):
         result = []
@@ -464,7 +465,7 @@ class HtmlExporter(Exporter):
         lines = (self.DOCTYPE, '',
                  '<html lang="%s">' % context.lang(),
                  '<head>',
-                 concat('  ', concat(self._head(context), separator='\n  ')),
+                 self._head(context),
                  '</head>',
                  '<body>',
                  self._parts(context, self._BODY_PARTS),
@@ -473,45 +474,39 @@ class HtmlExporter(Exporter):
         return concat(lines, separator="\n")
 
 
-class HtmlFileExporter(FileExporter, HtmlExporter):
-    """Export the content as a set of html files."""
+class FileExporter(object):
+    """Mix-in class exporting content into files."""
+
+    class Context(Exporter.Context):
+        def _init_kwargs(self, directory=None, **kwargs):
+            assert isinstance(directory, str)
+            self._directory = directory
+            super(FileExporter.Context, self)._init_kwargs(**kwargs)
+            
+        def directory(self):
+            return self._directory
+
+    def _write_file(self, filename, content):
+        file = open(filename, 'w')
+        file.write(content.encode('utf-8'))
+        file.close()
     
-    def _filename(self, node, context):
-        return self._output_file(context, node)
-    
-    def dump(self, node, directory, filename=None, **kwargs):
-        super(HtmlFileExporter, self).dump(node, directory, filename=filename, **kwargs)
-        for n in node.children():
-            self.dump(n, directory, **kwargs)
+    def dump(self, node, directory, sec_lang=None):
+        """Save the node's content and resources into files recursively."""
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+        for lang in node.variants() or (None,):
+            context = self.context(node, lang, directory=directory, sec_lang=sec_lang)
+            filename = os.path.join(directory, self._output_file(context, node))
+            self._write_file(filename, context.translate(self.export(context)))
         for r in node.resources():
             r.export(directory)
+        for n in node.children():
+            self.dump(n, directory, sec_lang=sec_lang)
 
 
-class StyledHtmlExporter(object):
-    """Mix-in class for HTML exporter with a CSS support."""
-    
-    def __init__(self, stylesheet=None, inlinestyles=False, **kwargs):
-        """Initialize the exporter."""
-        super(HtmlExporter, self).__init__(**kwargs)
-        self._stylesheet = stylesheet
-        self._inlinestyles = inlinestyles
-
-    def _head(self, context):
-        node = context.node()
-        if self._stylesheet is not None:
-            node.resource(XStylesheet, self._stylesheet)
-        if self._inlinestyles:
-            tags = ['<style type="text/css">\n%s</style>' % s.get()
-                    for s in context.node().resources(XStylesheet)]
-        else:
-            tags = ['<link rel="stylesheet" type="text/css" href="%s">' % \
-                    s.uri() for s in context.node().resources(Stylesheet)]
-        return super(StyledHtmlExporter, self)._head(context) + tags
-            
-
-            
-class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
-    """Export the content as a set of static web pages with navigation."""
+class HtmlStaticExporter(FileExporter, HtmlExporter):
+    """Export the content as a set of static web pages."""
 
     _hotkey = {
         'prev': '1',
@@ -588,4 +583,5 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
         nav = [g.span(_('Next') + ': ' + link(node.next(), key='next'), cls='next'),
                g.span(_('Previous') + ': ' + link(node.prev(), key='prev'), cls='prev')]
         return breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator'))
-        
+
+            

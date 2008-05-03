@@ -55,12 +55,7 @@
 
 2008-04-30  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/read.py (reader): New argument `recourse' to forbid
-	recursion.
-
-	* bin/lcgmake.py: Added support for generating PDF output.
-
-	* doc/structured-text.en.txt: Minor inconsistency fix.
+	* doc/structured-text.en.txt (Module): Minor inconsistency fix.
 
 2008-03-31  Tomas Cerha  <cerha@brailcom.org>
 
