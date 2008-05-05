@@ -212,7 +212,7 @@ class Anchor(TextContent):
         
     def export(self, context):
         g = context.generator()
-        return g.link_target(g.escape(self._text), self.anchor())
+        return g.anchor(g.escape(self._text), self.anchor())
 
 
 class InlineImage(Content):
@@ -549,25 +549,12 @@ class Section(SectionContainer):
     def _backref(self):
         return "backref-" + self.anchor()
         
-    def _header(self, context):
-        if self._backref_used:
-            href = "#"+self._backref()
-        else:
-            href = None
-        g = context.generator()
-        if href is None:
-            header_content = self.title()
-        else:
-            header_content = g.link(self.title(), href, cls='backref')
-        link_target_id = self.anchor()
-        header_link_target = g.link_target(header_content, link_target_id)
-        level = len(self._section_path()) + 1
-        header = g.h(header_link_target, level)
-        return header
-
     def export(self, context):
         g = context.generator()
-        exported = g.concat(self._header(context), super(Section, self).export(context))
+        level = len(self._section_path()) + 1
+        backref = self._backref_used and self._backref() or None
+        heading = g.heading(self.title(), level, anchor=self.anchor(), backref=backref)
+        exported = g.concat(heading, super(Section, self).export(context))
         return g.div(exported, id='section-' + self.anchor())
 
 
@@ -637,11 +624,15 @@ class NodeIndex(Content):
                 descr = i.descr()
                 if not i.active():
                     cls = (cls and cls + ' ' or '') + 'inactive'
-            if name is None:
-                current_link_target = i.title()
+            if isinstance(g, HtmlGenerator):
+                # Wrapping <a href=...><a name=...>...</a></a> is invalid in HTML!
+                current_link = g.link(i.title(), uri, name=name, title=descr, cls=cls)
             else:
-                current_link_target = g.link_target(i.title(), name)
-            current_link = g.link(current_link_target, uri, title=descr, cls=cls)
+                if name is None:
+                    current_anchor = i.title()
+                else:
+                    current_anchor = g.anchor(i.title(), name)
+                current_link = g.link(current_anchor, uri, title=descr, cls=cls)
             subtoc = self._make_toc(context, i, indent=indent+4, depth=depth)
             links.append(g.concat(current_link, subtoc))
         if isinstance(g, HtmlGenerator):

@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -98,37 +98,32 @@ class _Header(_MetaFile):
                 "Default topic=%s" % self._context.exporter().uri(self._context,
                                                                   self._context.node()),
                 "Charset=%s" % self._charset)
-
-
     
     
-class HhpExporter(HtmlExporter, FileExporter):
+class HhpExporter(HtmlFileExporter):
     
     class Formatter(HtmlFormatter):
         _FORMAT = dict(HtmlFormatter._FORMAT, underline=('<u>', '</u>'))
         
     class Generator(HtmlGenerator):
         def hr(self, **kwargs):
-            # We don't want XHTML tag syntax (<hr/>).
-            return '<hr>'
+            return '<hr>' # We don't want XHTML tag syntax (<hr/>).
 
         def table(self, content, cls=None, **kwargs):
             if cls == 'lcg-table':
                 kwargs = dict(kwargs, cellspacing=3, cellpadding=0)
             return super(HhpExporter.Generator, self).table(content, cls=cls, **kwargs)
         
-        def link(self, label, uri, cls=None, **kwargs):
-            if cls == 'backref':
-                uri = None
-            return super(HhpExporter.Generator, self).link(label, uri, cls=cls, **kwargs)
+        def heading(self, title, level, backref=None, **kwargs):
+            return super(HhpExporter.Generator, self).heading(title, level, **kwargs)
 
         def div(self, content, cls=None, **kwargs):
             if cls == 'table-of-contents':
-                content = ('<br>',) + content
+                content = '<br>' + content
             return super(HhpExporter.Generator, self).div(content, cls=cls, **kwargs)
         
-    def dump(self, node, directory, sec_lang=None):
-        super(HhpExporter, self).dump(node, directory, sec_lang=sec_lang)
+    def dump(self, node, directory, **kwargs):
+        super(HhpExporter, self).dump(node, directory, **kwargs)
         if node == node.root():
             context = self.context(node, None)
             contents = _Contents(context)
