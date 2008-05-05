@@ -1,3 +1,7 @@
+2008-05-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py: Regression fixes.
+
 2008-05-02  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (export): Use `Generator.heading()'.
