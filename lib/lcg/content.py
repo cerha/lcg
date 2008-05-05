@@ -284,29 +284,27 @@ class Container(Content):
         """
         super(Container, self).__init__(**kwargs)
         if self._SUBSEQUENCES:
-            tuples = []
-            for seq in content:
+            assert isinstance(content, (list, tuple)), "Not a sequence: %s" % content
+            self._content = tuple([tuple(subseq) for subseq in content])
+            for subseq in content:
+                assert isinstance(subseq, (list, tuple)), "Not a sequence: %s" % subseq
                 if self._SUBSEQUENCE_LENGTH is not None:
-                    assert len(seq) == self._SUBSEQUENCE_LENGTH
-                assert is_sequence_of(seq, self._ALLOWED_CONTENT), \
-                       "Not a '%s' instances sequence: %s" % \
-                       (self._ALLOWED_CONTENT.__name__, content)
-                for c in seq:
+                    assert len(subseq) == self._SUBSEQUENCE_LENGTH
+                for c in subseq:
+                    assert isinstance(c, self._ALLOWED_CONTENT), \
+                           "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, c)
                     c.set_container(self)
-                tuples.append(tuple(seq))
-            content = tuple(tuples)
         elif isinstance(content, (list, tuple)):
             assert is_sequence_of(content, self._ALLOWED_CONTENT), \
-                   "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT.__name__, content)
+                   "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT, content)
+            self._content = tuple(content)
             for c in content:
                 c.set_container(self)
-            content = tuple(content)
         else:
             assert isinstance(content, self._ALLOWED_CONTENT), \
-                   "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT.__name__, content)
+                   "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, content)
+            self._content = (content,)
             content.set_container(self)
-            content = (content,)
-        self._content = content
             
     def content(self):
         """Return content nodes given in the constructor."""
@@ -549,12 +547,17 @@ class Section(SectionContainer):
     def _backref(self):
         return "backref-" + self.anchor()
         
-    def export(self, context):
+    def _export_heading(self, context):
+        # This method may be used in derived classes (currently in Eurochance exercises).
         g = context.generator()
         level = len(self._section_path()) + 1
         backref = self._backref_used and self._backref() or None
-        heading = g.heading(self.title(), level, anchor=self.anchor(), backref=backref)
-        exported = g.concat(heading, super(Section, self).export(context))
+        return g.heading(self.title(), level, anchor=self.anchor(), backref=backref)
+    
+    def export(self, context):
+        g = context.generator()
+        exported = g.concat(self._export_heading(context),
+                            super(Section, self).export(context))
         return g.div(exported, id='section-' + self.anchor())
 
 
