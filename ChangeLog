@@ -1,3 +1,9 @@
+2008-05-07  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py: Docstring updates.
+
+	* lib/lcg/resources.py: Docstring updates.
+
 2008-05-05  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py: Regression fixes.

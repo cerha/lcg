@@ -78,14 +78,31 @@ class Content(object):
         return ()
         
     def set_container(self, container):
-        """???"""
+        """Set the parent 'Container' to 'container'.
+
+        This method is normally called automatically by the container constructor to inform the
+        contained 'Content' elements about their position in content hierarchy.  You only need to
+        care about calling this method if you implement your own 'Container' class and don't call
+        the default constructor for all the contained elements for some reason.
+
+        """
         if __debug__:
             cls = self._ALLOWED_CONTAINER or Container
             assert isinstance(container, cls), "Not a '%s' instance: %s" % (cls.__name__,container)
         self._container = container
 
     def set_parent(self, node):
-        """Set the parent 'ContentNode' to 'node'."""
+        """Set the parent 'ContentNode' to 'node'.
+
+        This method is called automatically by the 'ContentNode' constructor when the content is
+        assigned to a node.  The parent node is normally not known (and not needed) in the time of
+        content construction.  It is, however, needed in the export time, so you will need to call
+        it manually before attempting to export any content which was not assigned to a
+        'ContentNode' before.  Content which is contained within a container will automatically
+        determine its parent node recursively so it is only needed to set the parent of top level
+        elements.
+
+        """
         assert isinstance(node, ContentNode), \
                "Not a 'ContentNode' instance: %s" % node
         assert self._parent is None or self._parent is node, \

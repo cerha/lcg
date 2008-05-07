@@ -18,8 +18,10 @@
 
 """Representation of external resources.
 
-Any 'ContentNode' (or more often a piece of 'Content' within it) can depend on several external
-resources.  The resources are maintained by a 'ResourceProvider' instance for each node.
+The LCG content elements may depend on several external resources.  These resources usually refer
+to external files, but in general, thay don't depend on these files, they just provide their
+abstract representation.  The resources are maintained by a 'ResourceProvider' instance for each
+'ContentNode' instance.
     
 """
 
