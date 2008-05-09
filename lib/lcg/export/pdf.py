@@ -332,7 +332,6 @@ class Paragraph(Element):
 
     """
     _style = None
-    _indentation_size = 10
     def init(self):
         super(Paragraph, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -344,8 +343,10 @@ class Paragraph(Element):
         pdf_context = context.pdf_context
         style = copy.copy(style or self._style)
         if style is None:
-            style = pdf_context.normal_style()
-        style.leftIndent = pdf_context.nesting_level() * self._indentation_size
+            style = copy.copy(pdf_context.normal_style())
+        style.leftIndent = pdf_context.nesting_level() * 1.5 * style.fontSize
+        # Hack, should be handled better, preferrably in List only:
+        style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
         for c in self.content:
             exported += c.export(context)        
@@ -432,6 +433,9 @@ class List(Element):
         pdf_context = context.pdf_context
         style = pdf_context.list_style(self.ordered)
         list_nesting_level = pdf_context.list_nesting_level()
+        font_size = style.fontSize
+        style.bulletIndent = list_nesting_level * 1.5 * font_size
+        style.leftIndent = style.bulletIndent + 1.5 * font_size
         if self.ordered:
             seqid = pdf_context.get_seqid()
             seq_string = make_element(SimpleMarkup, content='seq', attributes=dict(id='list%d'%(seqid,)))
