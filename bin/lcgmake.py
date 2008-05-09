@@ -161,7 +161,10 @@ control which document is the root document and what extension is used to
 recognize source files.
 
 If <source> is a file, a single document is read just from this file (options
---root and --ext have no effect)."""
+--root and --ext have no effect).
+
+If your LCG installation is placed in a non-standard installation directory,
+set LCGDIR environment variable to its location."""
     die(help % (os.path.split(sys.argv[0])[-1], dumpoptions(optspec, width=80, indent=2)))
 
     
