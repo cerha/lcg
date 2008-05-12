@@ -18,7 +18,6 @@
 
 from export import *
 from html import *
-from pdf import PDFExporter
 import ims
 import hhp
 
