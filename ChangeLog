@@ -1,3 +1,9 @@
+2008-05-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/pdf.py: Prevent `reportlab' dependency on import.
+
+	* lib/lcg/export/__init__.py: Import `pdf' again.
+
 2008-05-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/__init__.py: Don't import from `pdf' to prevent

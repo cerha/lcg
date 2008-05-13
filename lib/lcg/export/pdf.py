@@ -22,11 +22,19 @@ import cStringIO
 import os
 import urlparse
 
-import reportlab.lib.fonts
-import reportlab.lib.styles
-import reportlab.pdfbase.pdfmetrics
-import reportlab.pdfbase.ttfonts
-import reportlab.platypus
+try:
+    import reportlab.lib.fonts
+    import reportlab.lib.styles
+    import reportlab.pdfbase.pdfmetrics
+    import reportlab.pdfbase.ttfonts
+    import reportlab.platypus
+except ImportError, err:
+    # Don't throw the exception in import time to prevent LCG's dependency on reportlab when the
+    # PDF export is not actually used.  If used, the exception will be re-raised in run-time.
+    class FakeReportlab(object):
+        def __getattr__(self, name):
+            raise err
+    reportlab = FakeReportlab()
 
 from lcg import *
 from lcg.export import *

@@ -18,6 +18,7 @@
 
 from export import *
 from html import *
+import pdf
 import ims
 import hhp
 
