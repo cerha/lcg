@@ -1,5 +1,7 @@
 2008-05-14  Tomas Cerha  <cerha@brailcom.org>
 
+	* bin/lcg-formatter.py: File removed.
+
 	* bin/lcgmake.py: Allow multiple stylesheets to be passed.
 
 	* lib/lcg/resources.py: Resource export moved to the exporter.
