@@ -32,6 +32,7 @@ See documentation of the particular classes for more details.
 """
 
 from lcg import *
+import shutil
 
         
 class Generator(object):
