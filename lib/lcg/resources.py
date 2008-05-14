@@ -26,10 +26,7 @@ abstract representation.  The resources are maintained by a 'ResourceProvider' i
 """
 
 import os
-import shutil
-import codecs
 import glob
-import textwrap
 import config
 
 from lcg import *
@@ -100,6 +97,7 @@ class Media(Resource):
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
     SUBDIR = 'flash'
+    
 
 class XResource(Resource):
     """Exportable resource.
@@ -121,21 +119,24 @@ class XResource(Resource):
         Arguments:
 
           filename -- name of the resource file.
-          src_file -- source file path.  This is an absolut filename of the source file.  The
-            filename of the source file must not necessarily be the same as 'file'.  For examlpe a
-            conversion may be involved (depending on particular 'Resource' subclass).
+          
+          src_file -- absolut pathname of the source file.  The filename (last part of the path)
+            must not necessarily be the same as 'filename'.  This may indicate that a conversion is
+            necessary on export (see the particular 'Exporter' class for the supported
+            conversions).  This argument may also be None to indicate, that the source file does
+            not exist.  This may happen when the Resource instance is required by the application,
+            but the source file was not found (so it will not be exported).
             
         """
         super(XResource, self).__init__(filename, **kwargs)
         self._src_file = src_file
 
     def src_file(self):
+        """Return the absolute pathname of the source file as passed to the constructor."""
         return self._src_file
     
-    def ok(self):
-        return self._src_file is not None
-
     def get(self):
+        """Return the resource file contents as a byte string or None if it does not exist."""
         if self._src_file is None:
             return None
         else:
@@ -159,38 +160,6 @@ class XScript(XResource, Script):
 
 class XFlash(XResource, Flash):
     pass
-    
-class XTranscript(XResource):
-    """A textual transcript of a recording ."""
-    SUBDIR = 'transcripts'
-
-    def __init__(self, filename, src_file=None, text=None, input_encoding='utf-8', **kwargs):
-        """Arguments:
-        
-          text -- if defined and the source file does not exist, the
-            destination file will be created using the specified text as its
-            content.
-
-        """
-        super(XTranscript, self).__init__(filename, src_file=None, **kwargs)
-        if text is None and src_file is not None:
-            fh = codecs.open(src_file, encoding=input_encoding)
-            try:
-                text = ''.join(fh.readlines())
-            except UnicodeDecodeError, e:
-                raise Exception("Error while reading file %s: %s" % (self._src_file, e))
-            fh.close()
-        if text is not None:
-            parts = [textwrap.fill(x) for x in text.replace("\r\n", "\n").split("\n\n")]
-            text = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE') + \
-                   "\n\n".join(parts).replace('\n', '\r\n')
-        self._text = text
-
-    def ok(self):
-        return self._text is not None
-            
-    def get(self):
-        return self._text
 
 
 ###################################################################################################
@@ -326,9 +295,8 @@ class FileResourceProvider(ResourceProvider):
                                     **kwargs)
                                 for path in pathlist]
         if fallback:
+            log("Resource file not found:", filename, dirs)
             result = cls(filename, src_file=None, **kwargs)
-            if not result.ok():
-                log("Resource file not found:", filename, dirs)
         else:
             result = None
         return result
