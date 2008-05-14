@@ -462,16 +462,16 @@ class HtmlFileExporter(FileExporter, HtmlExporter):
 class StyledHtmlExporter(object):
     """Mix-in class for HTML exporter with a CSS support."""
     
-    def __init__(self, stylesheet=None, inlinestyles=False, **kwargs):
+    def __init__(self, styles=(), inlinestyles=False, **kwargs):
         """Initialize the exporter."""
         super(StyledHtmlExporter, self).__init__(**kwargs)
-        self._stylesheet = stylesheet
+        self._styles = styles
         self._inlinestyles = inlinestyles
 
     def _head(self, context):
         node = context.node()
-        if self._stylesheet is not None:
-            node.resource(XStylesheet, self._stylesheet)
+        for style in self._styles:
+            node.resource(XStylesheet, style)
         if self._inlinestyles:
             tags = ['<style type="text/css">\n%s</style>' % s.get()
                     for s in context.node().resources(XStylesheet)]

@@ -23,7 +23,7 @@ import sys, getopt, os, lcg
 
 OPTIONS = (
     ('encoding=', 'utf-8', "Input encoding (output encoding is always utf-8)"),
-    ('stylesheet=', 'default.css', "Filename of the stylesheet to use."),
+    ('styles=', 'default.css', "Filename of the stylesheet to use (or a colon separated list)."),
     ('inline-styles', False, "Embed styles into the HTML pages."),
     ('ext=', 'txt', "Extension of the source files."),
     ('root=', 'index', "Filename of the root document."),
@@ -99,7 +99,7 @@ def main():
             cls = ims.IMSExporter
         else:
             cls = lcg.HtmlStaticExporter
-        kwargs = dict(stylesheet=opt['stylesheet'], inlinestyles=opt['inline-styles'])
+        kwargs = dict(styles=opt['styles'].split(':'), inlinestyles=opt['inline-styles'])
     # Create the exporter instance.
     exporter = cls(translations=translations, **kwargs)
     # Write the exported content to output file(s).
