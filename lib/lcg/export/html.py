@@ -258,14 +258,6 @@ class HtmlGenerator(Generator):
         attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
         return self._tag('textarea', value, attr, name=name, **kwargs)
      
-    # Special controls
-     
-    def speaking_text(self, text, media):
-        id_ = 'text_%s' % id(media)
-        a1 = self.button(text, "play_audio('%s');" % media.uri(), cls='speaking-text')
-        a2 = self.link(text, media.uri(), cls='speaking-text')
-        return self.script_write(a1, a2)
-
     # JavaScript code generation.
      
     def script(self, code, noscript=None):
@@ -361,28 +353,6 @@ class HtmlExporter(Exporter):
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
     
-    def _output_file(self, context, node, lang=None):
-        """Return the pathname of node's output file relative to export dir."""
-        name = node.id().replace(':', '-')
-        if lang is None:
-            lang = context.lang()
-        if lang is not None and len(node.variants()) > 1:
-            name += '.'+lang
-        return name + '.html'
-
-    def _node_uri(self, context, node, lang=None, **kwargs):
-        return self._output_file(context, node, lang=lang)
-    
-    def _uri_document(self, context, target, relative_to=None, **kwargs):
-        return self._node_uri(context, target, **kwargs)
-    
-    def _uri_section(self, context, target, relative_to=None, **kwargs):
-        if relative_to is not None and relative_to is target.parent():
-            base = ''
-        else:
-            base = self.uri(context, target.parent())
-        return base + "#" + target.anchor()
-    
     def _title(self, context):
         return context.node().title()
 
@@ -400,10 +370,10 @@ class HtmlExporter(Exporter):
                              ('Content-Style-Type', 'text/css'))] + \
                ['<meta name="%s" content="%s">' % pair for pair in self._meta(context)] + \
                ['<link rel="alternate" lang="%s" href="%s">' % \
-                (lang, self._node_uri(context, node, lang=lang))
+                (lang, self._uri_node(context, node, lang=lang))
                 for lang in node.variants() if lang != context.lang()] + \
                ['<script language="Javascript" type="text/javascript"' + \
-                ' src="%s"></script>' % s.uri() for s in node.resources(Script)]
+                ' src="%s"></script>' % context.uri(s) for s in node.resources(Script)]
 
     def _parts(self, context, parts):
         result = []
@@ -445,13 +415,13 @@ class HtmlExporter(Exporter):
                     label += g.img(image, border=None)
                 else:
                     label = g.img(image, alt=label, border=None)
-            links.append(g.link(label, self._node_uri(context, node, lang=lang), cls=cls)+sign)
+            links.append(g.link(label, self._uri_node(context, node, lang=lang), cls=cls)+sign)
         return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
                              name='language-selection-anchor'),
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 
     def _language_selection_image(self, context, lang):
-        #return context.node().resource(Image, 'flags/%s.gif' % lang).uri()
+        #return context.uri(context.node().resource(Image, 'flags/%s.gif' % lang))
         return None
     
     def _content(self, context):
@@ -476,15 +446,17 @@ class HtmlExporter(Exporter):
 class HtmlFileExporter(FileExporter, HtmlExporter):
     """Export the content as a set of html files."""
     
-    def _filename(self, node, context):
-        return self._output_file(context, node)
+    _OUTPUT_FILE_EXT = 'html'
+    
+    def _uri_node(self, context, node, lang=None):
+        return self._filename(node, context, lang=lang)
     
     def dump(self, node, directory, filename=None, **kwargs):
         super(HtmlFileExporter, self).dump(node, directory, filename=filename, **kwargs)
         for n in node.children():
             self.dump(n, directory, **kwargs)
         for r in node.resources():
-            r.export(directory)
+            self._export_resource(r, directory)
 
 
 class StyledHtmlExporter(object):
@@ -505,9 +477,8 @@ class StyledHtmlExporter(object):
                     for s in context.node().resources(XStylesheet)]
         else:
             tags = ['<link rel="stylesheet" type="text/css" href="%s">' % \
-                    s.uri() for s in context.node().resources(Stylesheet)]
+                    context.uri(s) for s in context.node().resources(Stylesheet)]
         return super(StyledHtmlExporter, self)._head(context) + tags
-            
 
             
 class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):

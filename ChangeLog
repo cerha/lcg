@@ -1,3 +1,25 @@
+2008-05-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/resources.py: Resource export moved to the exporter.
+	Added support for node/resource dependencies.  Many old hacks
+	removed.  Documentation improved.
+
+	* lib/lcg/read.py: Added support for node/resource dependencies.
+
+	* lib/lcg/nodes.py: Added support for node/resource dependencies.
+
+	* lib/lcg/content.py: URI handling unified.
+
+	* lib/lcg/export/pdf.py: URI handling unified. 
+
+	* lib/lcg/export/ims.py: URI handling unified.
+
+	* lib/lcg/export/html.py: URI/filename handling unified.
+	(StyledHtmlExporter): Allow multiple stylesheets to be passed.
+
+	* lib/lcg/export/export.py: URI handling unified.
+	(FileExporter): Added support for exporting resources.
+
 2008-05-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/pdf.py: Prevent `reportlab' dependency on import.

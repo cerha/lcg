@@ -62,7 +62,7 @@ class Reader(object):
             root = parent
             while root.parent() is not None:
                 root = root.parent()
-            resource_provider = root.resource_provider()
+            resource_provider = root._resource_provider_
         else:
             root = self
             resource_provider = self._resource_provider()
@@ -111,8 +111,8 @@ class Reader(object):
             self._variants_ = self._variants()
         return self._variants_
     
-    def resource_provider(self):
-        return self._resource_provider_
+    def resource(self, cls, filename, **kwargs):
+        return self._resource_provider_.resource(cls, filename, node=self._id, **kwargs)
 
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""

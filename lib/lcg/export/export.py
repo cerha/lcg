@@ -453,11 +453,8 @@ class MarkupFormatter(object):
     def _find_resource(self, node, cls, filename, label, descr, fallback=False, **imgargs):
         result = node.resource(cls, filename, fallback=False)
         if not result and fallback:
-            if issubclass(cls, XResource):
-                result = resource(node, cls, filename, fallback=True, title=label)
-            else:
-                log("%s: Unknown resource: %s: %s" % (node.id(), cls.__name__, filename))
-                result = cls(filename, title=label)
+            log("%s: Unknown resource: %s: %s" % (node.id(), cls.__name__, filename))
+            result = cls(filename, title=label)
         if result:
             title = label or result.title()
             if isinstance(result, Image):
@@ -630,19 +627,36 @@ class Exporter(object):
         def translate(self, text):
             return self._translator.translate(text)
 
+        def uri(self, target, **kwargs):
+            return self._exporter.uri(self, target, **kwargs)
+            
     def __init__(self, translations=()):
         self._generator = self.Generator()
         self._formatter = self.Formatter()
         self._translations = translations
         self._translators = {}
 
-    def _uri_document(self, context, target, **kwargs):
-        return target.id()
+    def _uri_node(self, context, node, lang=None):
+        return node.id()
 
-    def _uri_section(self, context, target, **kwargs):
-        return '#' + target.anchor()
+    def _uri_section(self, context, section, local=False):
+        result = "#" + section.anchor()
+        if not local:
+            result = self._uri_node(context, section.parent()) + result
+        return result
 
-    def _uri_external(self, context, target, **kwargs):
+    def _uri_resource(self, context, resource):
+        if resource.uri() is not None:
+            result = resource.uri()
+        else:
+            path = []
+            if resource.SUBDIR:
+                path.append(resource.SUBDIR)
+            path.extend(resource.filename().split(os.path.sep))
+            result = '/'.join(path)
+        return result
+    
+    def _uri_external(self, context, target):
         return target.uri()
     
     def uri(self, context, target, **kwargs):
@@ -652,16 +666,17 @@ class Exporter(object):
 
           context -- exporting object created in the 'context' method and
             propagated from the 'export' method
-          target -- URI target that can be one of: document ('ContentNode'
-            instance), section ('Section' instance), external target
-            ('Link.ExternalTarget' or 'Resource' instance)
+          target -- URI target that can be one of: 'ContentNode', 'Section', 'Link.ExternalTarget'
+            or 'Resource' instance
 
         """
         if isinstance(target, ContentNode):
-            method = self._uri_document
+            method = self._uri_node
         elif isinstance(target, Section):
             method = self._uri_section
-        elif isinstance(target, (Link.ExternalTarget, Resource)):
+        elif isinstance(target, Resource):
+            method = self._uri_resource
+        elif isinstance(target, Link.ExternalTarget):
             method = self._uri_external
         else:
             raise Exception("Invalid URI target:", target)
@@ -747,18 +762,60 @@ class FileExporter(object):
         directory = os.path.split(filename)[0]
         if directory and not os.path.isdir(directory):
             os.makedirs(directory)
-        file = open(filename, 'w')
         if isinstance(content, unicode):
             content = content.encode('utf-8')
-        file.write(content)
-        file.close()
+        file = open(filename, 'w')
+        try:
+            file.write(content)
+        finally:
+            file.close()
 
-    def _filename(self, node, context):
+    def _filename(self, node, context, lang=None):
         """Return the pathname of node's output file relative to the output directory."""
         name = node.id().replace(':', '-')
-        if context.lang() is not None and len(node.variants()) > 1:
-            name += '.'+ context.lang()
+        if lang is None:
+            lang = context.lang()
+        if lang is not None and len(node.variants()) > 1:
+            name += '.'+ lang
         return name +'.'+ self._OUTPUT_FILE_EXT
+    
+    def _export_resource(self, resource, dir):
+        infile = resource.src_file()
+        outfile = os.path.join(dir, resource.SUBDIR, resource.filename())
+        if infile is None:
+            data = resource.get()
+            if data is not None:
+                created = not os.path.exists(outfile)
+                self._write_file(outfile, data)
+                if created:
+                    log("%s: file created.", outfile)
+        elif not os.path.exists(outfile) or \
+                 os.path.exists(infile) and os.path.getmtime(outfile) < os.path.getmtime(infile):
+            if not os.path.isdir(os.path.dirname(outfile)):
+                os.makedirs(os.path.dirname(outfile))
+            input_format = os.path.splitext(infile)[1].lower()[1:]
+            output_format = os.path.splitext(outfile)[1].lower()[1:]
+            if input_format == output_format:
+                shutil.copyfile(infile, outfile)
+                log("%s: file copied.", outfile)
+            else:
+                if input_format != 'wav':
+                    raise Exception("Unsupported conversion: %s -> %s" % (input_format, output_format))
+                var = 'LCG_%s_COMMAND' % output_format.upper()
+                def cmd_err(msg):
+                    info = "Specify a command encoding %s file '%%infile' to %s file '%%outfile'."
+                    raise Exception(msg % var +"\n"+ info % (input_format, output_format))
+                try:
+                    cmd = os.environ[var]
+                except KeyError:
+                    cmd_err("Environment variable %s not set.")
+                if cmd.find("%infile") == -1 or cmd.find("%outfile") == -1:
+                    cmd_err("Environment variable %s must refer to '%%infile' and '%%outfile'.")
+                log("%s: converting to %s: %s", outfile, output_format, cmd)
+                command = cmd.replace('%infile', infile).replace('%outfile', outfile)
+                if os.system(command):
+                    raise IOError("Subprocess returned a non-zero exit status.")
+        
     
     def dump(self, node, directory, filename=None, variant=None, **kwargs):
         """Write node's content into the output file.
@@ -781,7 +838,9 @@ class FileExporter(object):
         for lang in variants:
             context = self.context(node, lang, **kwargs)
             data = context.translate(self.export(context))
-            if filename is None:
-                filename = self._filename(node, context)
-            self._write_file(os.path.join(directory, filename), data)
+            if filename:
+                fn = filename
+            else:
+                fn = self._filename(node, context)
+            self._write_file(os.path.join(directory, fn), data)
 

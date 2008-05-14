@@ -269,7 +269,7 @@ class InlineImage(Content):
     def export(self, context):
         g = context.generator()
         img = self._image
-        return g.img(img.uri(), alt=self._title or img.title() or '', descr=img.descr(),
+        return g.img(context.uri(img), alt=self._title or img.title() or '', descr=img.descr(),
                      align=self._align, cls=self._name, width=img.width(), height=img.height())
 
 
@@ -636,14 +636,18 @@ class NodeIndex(Content):
         while current is not None and current.hidden():
             current = current.parent()
         for i in items:
-            uri = context.exporter().uri(context, i, relative_to=parent)
-            name = isinstance(i, Section) and i.backref(parent) or None
-            cls = i is current and 'current' or None
+            name = None
+            uri_kwargs = {}
             descr = None
+            cls = i is current and 'current' or None
             if isinstance(i, ContentNode):
                 descr = i.descr()
                 if not i.active():
                     cls = (cls and cls + ' ' or '') + 'inactive'
+            elif isinstance(i, Section):
+                name = i.backref(parent)
+                uri_kwargs['local'] = parent is i.parent()
+            uri = context.uri(i, **uri_kwargs)
             if isinstance(g, HtmlGenerator):
                 # Wrapping <a href=...><a name=...>...</a></a> is invalid in HTML!
                 current_link = g.link(i.title(), uri, name=name, title=descr, cls=cls)
@@ -762,7 +766,7 @@ class Link(Container):
         else:
             descr = None
         label = g.concat(*self._exported_content(context))
-        uri = context.exporter().uri(context, target)
+        uri = context.uri(target)
         return g.link(label, uri, title=descr, type=self._type)
 
 

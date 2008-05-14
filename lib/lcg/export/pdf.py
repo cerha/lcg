@@ -782,6 +782,10 @@ class PDFExporter(FileExporter, Exporter):
 
     _OUTPUT_FILE_EXT = 'pdf'
     
+    def _uri_section(self, context, section, local=False):
+        # Force all section links to be local, since there is just one output document.
+        return super(PDFExporter, self)._uri_section(context, section, local=True)
+    
     def _export(self, node, context):
         result = node.content().export(context)
         if isinstance(result, basestring):

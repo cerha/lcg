@@ -61,7 +61,7 @@ class _Manifest:
 
     def _create_item(self, o, resources, node):
         item = self._append_xml_element(o, 'item')
-        exporter = self._context.exporter()
+        context = self._context
         self._set_xml_attr(item, 'identifier', 'toc-' + node.id())
         self._set_xml_attr(item, 'identifierref', node.id())
         self._append_xml_text(item, 'title', node.title())
@@ -69,10 +69,10 @@ class _Manifest:
         resource = self._append_xml_element(resources, 'resource')
         self._set_xml_attr(resource, 'identifier', node.id())
         self._set_xml_attr(resource, 'type', 'webcontent')
-        self._set_xml_attr(resource, 'href', exporter.uri(self._context, node))
+        self._set_xml_attr(resource, 'href', context.uri(node))
 
-        files = sorted([r.uri() for r in node.resources()])
-        for filename in (exporter.uri(self._context, node),) + tuple(files):
+        files = sorted([context.uri(r) for r in node.resources()])
+        for filename in (context.uri(node),) + tuple(files):
             file = self._append_xml_element(resource, 'file')
             self._set_xml_attr(file, 'href', filename)
 
