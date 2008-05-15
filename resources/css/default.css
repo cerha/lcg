@@ -41,6 +41,17 @@ a.backref, a:link.backref {
 #version { 
     font-size: 0.8em;
 }
+#media-player { 
+    margin: 0.5em 0;
+}
+#media-player-container { 
+    margin-top: 1.2em;
+}
+#mediaplayer { 
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
 
 div.navigation { 
     border: solid #b8bcc0;

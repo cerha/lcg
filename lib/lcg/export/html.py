@@ -349,6 +349,7 @@ class HtmlExporter(Exporter):
     _BODY_PARTS = ('heading',
                    'language_selection',
                    'content',
+                   'media_player',
                    )
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
@@ -427,17 +428,38 @@ class HtmlExporter(Exporter):
     def _content(self, context):
         return context.node().content().export(context)
 
+    def _media_player(self, context):
+        node = context.node()
+        if node.resources(Media):
+            node.resource(XScript, 'media.js')
+            node.resource(XScript, 'swfobject.js')
+            node.resource(XImage,  'media-play.gif') # Used in the default media control style.
+            player = node.resource(XFlash,  'mediaplayer.swf')
+            g = context.generator()
+            msg = g.strong(_("Warning:")) +' '+ \
+                  _("Flash %(version)s not detected.  Please install or upgrade your "
+                    "Flash plugin to %(version)s to be able to make use of advanced "
+                    "media playback capabilities.  See %(link)s for more information.",
+                    link=g.link(_("Adobe website"), 'http://www.adobe.com/products/flash/about/'),
+                    version='$version')
+            return g.div('', id='media-player-container') + \
+                   g.script("export_media_player('%s', 'media-player-container', %s)" %
+                            (context.uri(player), g.js_value(context.translate(msg))))
+        else:
+            return None
     def _initialize(self, context):
         return ''
     
     def export(self, context):
+        # Export body first to allocate all resources before generating the head.
+        body = self._parts(context, self._BODY_PARTS)
         lines = (self.DOCTYPE, '',
                  '<html lang="%s">' % context.lang(),
                  '<head>',
                  concat('  ', concat(self._head(context), separator='\n  ')),
                  '</head>',
                  '<body>',
-                 self._parts(context, self._BODY_PARTS),
+                 body,
                  '</body>',
                  '</html>')
         return concat(lines, separator="\n")
@@ -496,6 +518,7 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                    'language_selection',
                    'content',
                    'bottom_navigation',
+                   'media_player',
                    )
     
     def _head(self, context):

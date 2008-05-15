@@ -1,5 +1,18 @@
 2008-05-15  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/css/default.css: Media player styles added.
+
+	* lib/lcg/export/html.py: Added support for media playback.
+
+	* resources/images/media-play.gif: New file.
+
+	* resources/scripts/media.js: New file.
+
+	* lib/lcg/export/export.py (MarkupFormatter): Don't escape the
+	markup defined by `_FORMAT'.
+	(Exporter._uri_resource): Allow overriding the resource uri
+	prefix.
+
 	* lib/lcg/content.py (InlineImage): Use `Image.size()' instead of
 	`width()' and `height()'.
 
