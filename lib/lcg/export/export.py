@@ -521,7 +521,7 @@ class MarkupFormatter(object):
                 else:
                     result = f[0]
             else:
-                result = context.generator().escape(f)
+                result = f
         return result
         
     def format(self, context, text):
@@ -646,14 +646,24 @@ class Exporter(object):
             result = self._uri_node(context, section.parent()) + result
         return result
 
+    def _resource_uri_prefix(self, context, resource):
+        return None
+
     def _uri_resource(self, context, resource):
         if resource.uri() is not None:
             result = resource.uri()
         else:
-            path = []
-            if resource.SUBDIR:
-                path.append(resource.SUBDIR)
-            path.extend(resource.filename().split(os.path.sep))
+            if resource.relative_uri():
+                path = [context.req().uri()]
+            else:
+                prefix = self._resource_uri_prefix(context, resource)
+                if prefix is not None:
+                    path = [prefix]
+                else:
+                    path = []
+                if resource.SUBDIR:
+                    path.append(resource.SUBDIR)
+            path.append(resource.filename())
             result = '/'.join(path)
         return result
     
