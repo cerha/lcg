@@ -63,15 +63,15 @@ class Reader(object):
         if parent is None:
             root = self
             if resource_provider is None:
-                resource_provider = ResourceProvider()
+                resource_provider = self._resource_provider()
         else:
             root = parent
             while root.parent() is not None:
                 root = root.parent()
             assert resource_provider is None, (self._id, resource_provider)
-            resource_provider = root._resource_provider
+            resource_provider = root._resource_provider_
         self._root = root
-        self._resource_provider = resource_provider
+        self._resource_provider_ = resource_provider
         self._variants_ = None
         
     def _title(self):
@@ -96,6 +96,12 @@ class Reader(object):
         else:
             return ()
 
+    def _resource_dirs(self):
+        return ()
+    
+    def _resource_provider(self):
+        return ResourceProvider(dirs=self._resource_dirs())
+
     def _globals(self):
         return {}
 
@@ -112,7 +118,7 @@ class Reader(object):
         return self._variants_
     
     def resource(self, cls, filename, **kwargs):
-        return self._resource_provider.resource(cls, filename, node=self._id, **kwargs)
+        return self._resource_provider_.resource(cls, filename, node=self._id, **kwargs)
 
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""
@@ -120,23 +126,23 @@ class Reader(object):
         return ContentNode(id=self._id, title=self._title(), brief_title=self._brief_title(),
                            descr=self._descr(), variants=variants, content=self._content(), 
                            children=[child.build() for child in self._children()],
-                           resource_provider=self._resource_provider,
+                           resource_provider=self._resource_provider_,
                            globals=self._globals(), hidden=self._hidden)
     
         
 class FileReader(Reader):
     
-    def __init__(self, id='index', dir='.', encoding=None, resource_provider=None, **kwargs):
-        assert isinstance(dir, str)
-        assert encoding is None or isinstance(encoding, str) and codecs.lookup(encoding)
-        dir = os.path.normpath(dir)
-        if resource_provider is None and kwargs.get('parent') is None:
-            resource_provider = ResourceProvider(dirs=(dir,))
-        super(FileReader, self).__init__(id, resource_provider=resource_provider, **kwargs)
+    def __init__(self, id='index', dir='.', encoding=None, **kwargs):
+        assert isinstance(dir, str), dir
+        assert encoding is None or isinstance(encoding, str) and codecs.lookup(encoding), encoding
+        self._dir = os.path.normpath(dir)
+        super(FileReader, self).__init__(id, **kwargs)
         if not encoding and self._parent and isinstance(self._parent, FileReader):
             encoding = self._parent.encoding()
-        self._dir = dir
         self._encoding = encoding or 'ascii'
+
+    def _resource_dirs(self):
+        return (self._dir,)
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""
