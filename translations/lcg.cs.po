@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-03-13 16:24+0100\n"
-"PO-Revision-Date: 2008-03-14 17:03+0100\n"
+"POT-Creation-Date: 2008-05-15 21:49+0200\n"
+"PO-Revision-Date: 2008-05-15 21:52+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -187,26 +187,42 @@ msgstr "jidi¹"
 msgid "Chinese"
 msgstr "èín¹tina"
 
-#: ../lib/lcg/content.py:400
+#: ../lib/lcg/content.py:485
 msgid "Index:"
 msgstr "Obsah:"
 
-#: ../lib/lcg/export/html.py:400
+#: ../lib/lcg/export/html.py:354
 msgid "Choose your language:"
 msgstr "Zvolte jazyk:"
 
-#: ../lib/lcg/export/html.py:638
+#: ../lib/lcg/export/html.py:439
+msgid "Warning:"
+msgstr "Varování:"
+
+#: ../lib/lcg/export/html.py:443
+msgid "Adobe website"
+msgstr "stránky spoleènosti Adobe"
+
+#: ../lib/lcg/export/html.py:440
+#, python-format
+msgid ""
+"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
+"to %(version)s to be able to make use of advanced media playback "
+"capabilities.  See %(link)s for more information."
+msgstr "Flash %(version)s nebyl detekován.  Instalujte nebo aktualizujte Flash plugin na verzi %(version)s pro vyu¾ití pokroèilých mo¾ností pøehrávání médií. Více informací viz %(link)s."
+
+#: ../lib/lcg/export/html.py:579
 msgid "None"
 msgstr "není"
 
-#: ../lib/lcg/export/html.py:639
+#: ../lib/lcg/export/html.py:580
 msgid "You are here:"
 msgstr "Nacházíte se zde:"
 
-#: ../lib/lcg/export/html.py:641
+#: ../lib/lcg/export/html.py:582
 msgid "Next"
 msgstr "Dal¹í"
 
-#: ../lib/lcg/export/html.py:642
+#: ../lib/lcg/export/html.py:583
 msgid "Previous"
 msgstr "Pøedchozí"
