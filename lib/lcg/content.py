@@ -269,8 +269,14 @@ class InlineImage(Content):
     def export(self, context):
         g = context.generator()
         img = self._image
+        size = img.size()
+        if size is not None:
+            width, height = size
+            kwargs = dict(width=width, height=height)
+        else:
+            kwargs = {}
         return g.img(context.uri(img), alt=self._title or img.title() or '', descr=img.descr(),
-                     align=self._align, cls=self._name, width=img.width(), height=img.height())
+                     align=self._align, cls=self._name, **kwargs)
 
 
 class Container(Content):

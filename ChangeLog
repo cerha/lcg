@@ -1,3 +1,13 @@
+2008-05-15  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (InlineImage): Use `Image.size()' instead of
+	`width()' and `height()'.
+
+	* lib/lcg/resources.py: Further resource provider improvements.
+
+	* lib/lcg/read.py (Reader): Allow passing the `ResourceProvider'
+	instance throught the constructor.
+
 2008-05-14  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/lcg-formatter.py: File removed.

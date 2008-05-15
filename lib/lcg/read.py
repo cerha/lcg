@@ -44,7 +44,7 @@ class Reader(object):
     Just override the corresponding method, such as '_title()' for the 'title' argument, etc.
 
     """
-    def __init__(self, id, parent=None, hidden=False):
+    def __init__(self, id, parent=None, hidden=False, resource_provider=None):
         """Initialize the instance.
 
         Arguments:
@@ -52,22 +52,26 @@ class Reader(object):
           id -- node identifier
           parent -- parent 'Reader' instance in the hierarchy
           hidden -- boolean flag passed to the created 'ContentNode' constructor
+          resource_provider -- 'ResourceProvider' instance or None.  An instance may only be passed
+            to the root reader, child readers will automatically use the root's resource provider.
 
         """
         super(Reader, self).__init__()
         self._id = id
         self._parent = parent
         self._hidden = hidden
-        if parent is not None:
+        if parent is None:
+            root = self
+            if resource_provider is None:
+                resource_provider = ResourceProvider()
+        else:
             root = parent
             while root.parent() is not None:
                 root = root.parent()
-            resource_provider = root._resource_provider_
-        else:
-            root = self
-            resource_provider = self._resource_provider()
+            assert resource_provider is None, (self._id, resource_provider)
+            resource_provider = root._resource_provider
         self._root = root
-        self._resource_provider_ = resource_provider
+        self._resource_provider = resource_provider
         self._variants_ = None
         
     def _title(self):
@@ -95,10 +99,6 @@ class Reader(object):
     def _globals(self):
         return {}
 
-    def _resource_provider(self):
-        # To be overriden
-        return ResourceProvider()
-
     def id(self):
         return self._id
     
@@ -112,7 +112,7 @@ class Reader(object):
         return self._variants_
     
     def resource(self, cls, filename, **kwargs):
-        return self._resource_provider_.resource(cls, filename, node=self._id, **kwargs)
+        return self._resource_provider.resource(cls, filename, node=self._id, **kwargs)
 
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""
@@ -120,24 +120,23 @@ class Reader(object):
         return ContentNode(id=self._id, title=self._title(), brief_title=self._brief_title(),
                            descr=self._descr(), variants=variants, content=self._content(), 
                            children=[child.build() for child in self._children()],
-                           resource_provider=self._resource_provider_,
+                           resource_provider=self._resource_provider,
                            globals=self._globals(), hidden=self._hidden)
     
         
 class FileReader(Reader):
     
-    def __init__(self, id='index', dir='.', encoding=None, **kwargs):
+    def __init__(self, id='index', dir='.', encoding=None, resource_provider=None, **kwargs):
         assert isinstance(dir, str)
-        assert encoding is None or isinstance(encoding, str) \
-               and codecs.lookup(encoding)
-        self._dir = os.path.normpath(dir)
-        super(FileReader, self).__init__(id, **kwargs)
+        assert encoding is None or isinstance(encoding, str) and codecs.lookup(encoding)
+        dir = os.path.normpath(dir)
+        if resource_provider is None and kwargs.get('parent') is None:
+            resource_provider = ResourceProvider(dirs=(dir,))
+        super(FileReader, self).__init__(id, resource_provider=resource_provider, **kwargs)
         if not encoding and self._parent and isinstance(self._parent, FileReader):
             encoding = self._parent.encoding()
+        self._dir = dir
         self._encoding = encoding or 'ascii'
-
-    def _resource_provider(self):
-        return FileResourceProvider((self._dir,))
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""

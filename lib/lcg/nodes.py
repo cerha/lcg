@@ -70,8 +70,7 @@ class ContentNode(object):
             application specific and there is currently no difference in behavior of LCG in respect
             to this flag, except for marking the links by css class 'inactive' on export.
 
-          resource_provider -- a 'ResourceProvider' instance or None.  This provider handles
-            all resources used within this node.
+          resource_provider -- a 'ResourceProvider' instance or None.
 
           globals -- node global variables as a dictionary keyed by variable names.  The variables
             are allowed to contain nested dictionaries.  The variables are used for substitution

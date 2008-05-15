@@ -20,8 +20,7 @@
 
 The LCG content elements may depend on several external resources.  These resources usually refer
 to external files, but in general, thay don't depend on these files, they just provide their
-abstract representation.  The resources are maintained by a 'ResourceProvider' instance for each
-'ContentNode' instance.
+abstract representation.  The resources are managed by the 'ResourceProvider' (see below).
     
 """
 
@@ -38,7 +37,7 @@ class Resource(object):
     SUBDIR = None
     """Name of the subdirectory where files are searched on input and stored on output."""
     
-    def __init__(self, filename, title=None, descr=None, uri=None):
+    def __init__(self, filename, title=None, descr=None, uri=None, relative_uri=False):
         super(Resource, self).__init__()
         assert isinstance(filename, (str, unicode)), filename
         assert title is None or isinstance(title, (str, unicode)), title
@@ -48,6 +47,7 @@ class Resource(object):
         self._title = title
         self._descr = descr
         self._uri = uri
+        self._relative_uri = relative_uri
                  
     def filename(self):
         return self._filename
@@ -61,26 +61,21 @@ class Resource(object):
     def uri(self):
         return self._uri
 
+    def relative_uri(self):
+        return self._relative_uri
+
 
 class Image(Resource):
     """An image resource."""
     SUBDIR = 'images'
 
-    def __init__(self, filename, width=None, height=None, **kwargs):
+    def __init__(self, filename, size=None, **kwargs):
         super(Image, self).__init__(filename, **kwargs)
-        #if width is None or height is None:
-        #    import Image as Img
-        #    img = Img.open(self._src_path)
-        #    width, height = img.size
-        self._width = width
-        self._height = height
-        
-    def width(self):
-        return self._width
-        
-    def height(self):
-        return self._height
-    
+        self._size = size
+
+    def size(self):
+        return self._size
+
 
 class Stylesheet(Resource):
     """A cascading style-sheet."""
@@ -104,9 +99,8 @@ class XResource(Resource):
     
     This class extends the resource with an information about the location of the source file for
     the resource.  This source file is normally located by the resource provider, so it is not
-    recommended to create the instances directly.  Use the appropriate resource provider class
-    (such as 'FileResourceProvider') which is responsible for locating the source file and passing
-    the 'src_file' constructor argument to the resource constructor automatically.
+    recommended to create the instances directly.  The resource provider will supply the 'src_file'
+    constructor argument to the resource constructor automatically.
 
     When an 'XResource' instance is found in node's dependencies, the exporter is than able to
     export the resource to the output since the input file is known.
@@ -155,6 +149,13 @@ class XStylesheet(XResource, Stylesheet):
 class XImage(XResource, Image):
     pass
 
+    #def size(self):
+    #    if self._size is None:
+    #        import Image as Img
+    #        img = Img.open(self._src_file)
+    #        self._size = img.size
+    #    return self._size
+
 class XScript(XResource, Script):
     pass
 
@@ -163,17 +164,78 @@ class XFlash(XResource, Flash):
 
 
 ###################################################################################################
-###                                   Resource Providers                                       ####
+###                                   Resource Provider                                        ####
 ###################################################################################################
 
-    
 class ResourceProvider(object):
-    """An abstract base class for different resource provider implementations.
+    """Resource provider.
 
-    The public methods defined here form the mandatory resource provider interface.
+    The resource provider may be used to allocate resources during content construction, as well as
+    in export time.  The resource provider is designed to be shared among multilpe content nodes
+    while still keeping track of the dependencies of each node on its resources.
+
+    The source files for XResource subclasses are located automatically.  The possible source
+    directories are searched for the source file in this order:
     
+      * the directory passed as the 'searchdir' argument to the 'resource()' method call,
+      * all directories passed as the 'dirs' argument to the provider constructor,
+      * default resource directory ('config.default_resource_dir').
+
     """
-    def resource(self, cls, filename, fallback=True, node=None, **kwargs):
+    _CONVERSIONS = {'mp3': ('wav',),
+                    'ogg': ('wav',)}
+    """A dictionary of alternative source filename extensions.  When the input file is not found,
+    given alternative filename extensions are also tried.  The exporter is then responsible for the
+    conversion."""
+    
+    def __init__(self, dirs=(), resources=(), **kwargs):
+        """Arguments:
+
+          dirs -- sequence of directory names to search for resource input files (see the
+            documentation of this class for more information).
+          resources -- list of statically allocated resources already known in the construction
+            time.
+
+        """
+        assert isinstance(dirs, (list, tuple)), dirs
+        assert isinstance(resources, (list, tuple)), resources
+        self._dirs = tuple(dirs)
+        self._cache = {}
+        super(ResourceProvider, self).__init__(**kwargs)
+        
+    def _resource(self, cls, filename, searchdir, fallback, warn, **kwargs):
+        if issubclass(cls, XResource):
+            dirs = [os.path.join(dir, cls.SUBDIR) for dir in
+                    self._dirs + (config.default_resource_dir,)]
+            if searchdir is not None:
+                dirs.insert(0, searchdir)
+            basename, ext = os.path.splitext(filename)
+            altnames = [basename +'.'+ e
+                        for e in self._CONVERSIONS.get(ext.lower()[1:], ()) if e != ext]
+            for d in dirs:
+                for src_file in [filename] + altnames:
+                    src_path = os.path.join(d, src_file)
+                    if os.path.exists(src_path):
+                        return cls(filename, src_file=src_path, **kwargs)
+                    elif src_path.find('*') != -1:
+                        pathlist = glob.glob(src_path)
+                        if pathlist:
+                            pathlist.sort()
+                            i = len(d)+1
+                            return [cls(os.path.splitext(path[i:])[0]+ext, src_file=path, **kwargs)
+                                    for path in pathlist]
+            if warn:
+                log("Resource file not found:", filename, dirs)
+        else:
+            assert issubclass(cls, Resource), cls
+        if fallback:
+            result = cls(filename, **kwargs)
+        else:
+            result = None
+        return result
+
+    def resource(self, cls, filename, node=None, searchdir=None, fallback=True, warn=True,
+                 **kwargs):
         """Get the resource instance by its type and relative filename.
 
         Arguments:
@@ -201,8 +263,21 @@ class ResourceProvider(object):
         queries correctly).
 
         """
-        return None
-    
+        key = (cls, filename, tuple(kwargs.items()))
+        try:
+            resource, nodes = self._cache[key]
+        except KeyError:
+            resource = self._resource(cls, filename, searchdir, fallback, warn, **kwargs)
+            nodes = []
+            self._cache[key] = (resource, nodes)
+        if isinstance(node, ContentNode):
+            node_id = node.id()
+        else:
+            node_id = node
+        if node_id not in nodes:
+            nodes.append(node_id) 
+        return resource
+
     def resources(self, cls=None, node=None):
         """Return the list of all resources matching the query.
 
@@ -216,109 +291,6 @@ class ResourceProvider(object):
             nodes to which they belong.
         
         """
-        return ()
-        
-
-class StaticResourceProvider(object):
-    """Provides resources from a static list passed to the constructor.
-
-    This resource provider is practical when the list of resources is already known in the
-    construction time.  It may be for example read from a database etc.
-    
-    """
-
-    def __init__(self, resources, **kwargs):
-        self._resources = resources
-        self._dict = None
-        super(StaticResourceProvider, self).__init__(**kwargs)
-
-    def resource(self, cls, filename, fallback=False, node=None, **kwargs):
-        if self._dict is None:
-            self._dict = dict([(r.filename(), r) for r in self._resources])
-        resource = self._dict.get(filename)
-        if not isinstance(resource, cls):
-            resource = None
-        if resource is None and fallback:
-            resource = cls(filename, **kwargs)
-        return resource
-
-    def resources(self, cls=None, node=None):
-        if cls is not None:
-            return [r for r in self._resources if isinstance(r, cls)]
-        else:
-            return self._resources
-        
-
-class FileResourceProvider(ResourceProvider):
-    """Automatically locates source files of the allocated resources.
-    
-    The possible source directories are first searched for the source file:
-
-      * the directory passed as the 'searchdir' argument to the 'resource()' method call,
-      * all directories passed as the 'dirs' argument to the provider constructor,
-      * default resource directory ('config.default_resource_dir').
-
-    """
-    _CONVERSIONS = {'mp3': ('wav',),
-                    'ogg': ('wav',)}
-    """A dictionary of alternative source filename extensions.  When the input file is not found,
-    given alternative filename extensions are also tried.  The exporter is then responsible for the
-    conversion."""
-    
-    def __init__(self, dirs, **kwargs):
-        assert isinstance(dirs, (list, tuple))
-        self._dirs = tuple(dirs)
-        self._cache = {}
-        super(FileResourceProvider, self).__init__(**kwargs)
-        
-    def _resource(self, cls, filename, fallback=True, searchdir=None, **kwargs):
-        if not issubclass(cls, XResource):
-            assert issubclass(cls, Resource), cls
-            return fallback and cls(*args, **kwargs) or None
-        dirs = [os.path.join(dir, cls.SUBDIR) for dir in
-                self._dirs + (config.default_resource_dir,)]
-        if searchdir is not None:
-            dirs.insert(0, searchdir)
-        basename, ext = os.path.splitext(filename)
-        altnames = [basename +'.'+ e
-                    for e in self._CONVERSIONS.get(ext.lower()[1:], ()) if e != ext]
-        for d in dirs:
-            for src_file in [filename] + altnames:
-                src_path = os.path.join(d, src_file)
-                if os.path.exists(src_path):
-                    return cls(filename, src_file=src_path, **kwargs)
-                elif src_path.find('*') != -1:
-                    pathlist = glob.glob(src_path)
-                    if pathlist:
-                        pathlist.sort()
-                        return [cls(os.path.splitext(path[len(d)+1:])[0]+ext, src_file=path,
-                                    **kwargs)
-                                for path in pathlist]
-        if fallback:
-            log("Resource file not found:", filename, dirs)
-            result = cls(filename, src_file=None, **kwargs)
-        else:
-            result = None
-        return result
-
-    def resource(self, cls, filename, fallback=True, node=None, searchdir=None, **kwargs):
-        key = (cls, filename, tuple(kwargs.items()))
-        try:
-            resource, nodes = self._cache[key]
-        except KeyError:
-            resource = self._resource(cls, filename, fallback=fallback, searchdir=searchdir,
-                                      **kwargs)
-            nodes = []
-            self._cache[key] = (resource, nodes)
-        if isinstance(node, ContentNode):
-            node_id = node.id()
-        else:
-            node_id = node
-        if node_id not in nodes:
-            nodes.append(node_id) 
-        return resource
-
-    def resources(self, cls=None, node=None):
         if cls is None:
             cls = Resource
         result = []
@@ -332,3 +304,15 @@ class FileResourceProvider(ResourceProvider):
                     result.append(resource)
         return result
     
+class DummyResourceProvider(ResourceProvider):
+    """Pretends all resources can be found without checking for the source files.
+    
+    The resource instance is always returned as if the file was actually found.
+
+    This provider may be useful in the on-line web server environment, when the document is
+    processed in one request and the resources are served in independent requests, so checking for
+    files in the document serving request is only wasting system resources.
+    
+    """
+    def _resource(self, cls, filename, *args, **kwargs):
+        return cls(filename, **kwargs)
