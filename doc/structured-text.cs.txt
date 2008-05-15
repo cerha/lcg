@@ -314,7 +314,7 @@ Obsah: @TOC@
 -----
 
 Tato řádka zdrojového dokumentu bude na výstupu nahrazena rejstříkem.  Text
-před dvojtečkou bude tvořit jeho nadpis a ve výpisy budou obsaženy všechny
+před dvojtečkou bude tvořit jeho nadpis a ve výpisu budou obsaženy všechny
 kapitoly nacházající se v hierarchii pod aktuální kapitolou, ve které je makro
 použito.  To znamená že je možné vytvářet také lokální rejstříky pro jednotlivé
 části hierarchie.

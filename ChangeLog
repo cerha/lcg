@@ -1,5 +1,9 @@
 2008-05-15  Tomas Cerha  <cerha@brailcom.org>
 
+	* doc/structured-text.cs.txt: Typo fix.
+
+	* doc/intro.en.txt: Updated.
+
 	* resources/css/default.css: Media player styles added.
 
 	* lib/lcg/export/html.py: Added support for media playback.
