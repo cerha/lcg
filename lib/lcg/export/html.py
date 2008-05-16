@@ -430,8 +430,7 @@ class HtmlExporter(Exporter):
 
     def _media_player(self, context):
         node = context.node()
-        if node.resources(Media):
-            node.resource(XScript, 'media.js')
+        if 'media.js' in [r.filename() for r in node.resources(Script)]:
             node.resource(XScript, 'swfobject.js')
             node.resource(XImage,  'media-play.gif') # Used in the default media control style.
             player = node.resource(XFlash,  'mediaplayer.swf')
