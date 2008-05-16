@@ -80,7 +80,7 @@ function _media_player_command(cmd, uri) {
    if (player) {
       data = player.itemData(0);
       if (cmd == 'playpause') {
-	 if (data.file != uri) player.loadFile({file: uri});
+	 if (data == null || data.file != uri) player.loadFile({file: uri});
 	 player.sendEvent('playpause');
       } else if ((cmd == 'forward' || cmd == 'rewind') && data.file == uri) {
 	 position = _player_state.position;
