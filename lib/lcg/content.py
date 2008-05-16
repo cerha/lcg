@@ -737,7 +737,7 @@ class Link(Container):
           target -- target of the link, it may be either a 'Section' instance
             or a 'ContentNode' instance, a 'Link.ExternalTarget' instance or a
             'Resource' instance
-          label -- label of the link
+          label -- link label text as a string or an 'InlineImage' instance for image links
           descr -- ???
           type -- ???
         
@@ -752,7 +752,7 @@ class Link(Container):
         if isinstance(label, (str, unicode)):
             content = (TextContent(label),)
         else:
-            content = (label)
+            content = label
         self._target = target
         self._descr = descr
         self._type = type
