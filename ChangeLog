@@ -1,5 +1,7 @@
 2008-05-21  Tomas Cerha  <cerha@brailcom.org>
 
+	* resources/css/default.css: Navigation style identifiers updated.
+
 	* lib/lcg/_test.py: New tests covering the new resource handling
 	and (resource) link formatting.
 
