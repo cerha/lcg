@@ -31,6 +31,8 @@ import config
 from lcg import *
 
 
+
+
 class Resource(object):
     """Generic resource representation.
 
@@ -109,9 +111,9 @@ class Resource(object):
 
 
 class Image(Resource):
-    """An image."""
+    """An image of undefined type."""
     SUBDIR = 'images'
-
+    
     def __init__(self, filename, size=None, **kwargs):
         self._size = size
         super(Image, self).__init__(filename, **kwargs)
@@ -122,7 +124,6 @@ class Image(Resource):
         #    img = Img.open(self._src_file)
         #    self._size = img.size
         return self._size
-
 
 class Stylesheet(Resource):
     """A cascading style-sheet."""
@@ -135,6 +136,10 @@ class Script(Resource):
 class Media(Resource):
     """Media file, such as audio or video."""
     SUBDIR = 'media'
+
+class Audio(Media):
+    """Audio media file of undefined type."""
+    pass
 
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
@@ -166,11 +171,15 @@ class ResourceProvider(object):
     given alternative filename extensions are also tried.  The exporter is then responsible for the
     conversion."""
     
-    _TYPES = {r'jpe?g|gif|png': Image,
-              r'mp3|ogg': Media,
-              r'css': Stylesheet,
-              r'js':  Script,
-              r'swf': Flash}
+    _TYPEMAP = {'jpeg': Image,
+                'jpg':  Image,
+                'gif':  Image,
+                'png':  Image,
+                'mp3':  Audio,
+                'ogg':  Audio,
+                'css':  Stylesheet,
+                'js':   Script,
+                'swf':  Flash}
     
     def __init__(self, resources=(), dirs=(), **kwargs):
         """Arguments:
@@ -185,23 +194,16 @@ class ResourceProvider(object):
         assert isinstance(resources, (list, tuple)), resources
         self._dirs = tuple(dirs) + (config.default_resource_dir,)
         self._cache = dict([(r.filename(), (r, [None])) for r in resources])
-        regexps = []
-        self._types = {}
-        for regexp, cls in self._TYPES.items():
-            key = cls.__name__
-            regexps.append(r"(?P<%s>\\*%s)" % (key, regexp))
-            self._types[key] = cls
-        self._regexp = re.compile('\.(?:' +'|'.join(regexps)+ ')$', re.IGNORECASE)
         super(ResourceProvider, self).__init__(**kwargs)
         
     def _resource(self, filename, searchdir, warn):
-        match =  self._regexp.search(filename)
-        if not match:
+        try:
+            ext = filename.rsplit('.', 1)[1]
+            cls = self._TYPEMAP[ext.lower()]
+        except (KeyError, IndexError):
             if warn:
                 warn("Unable to determine resource type: %s" % filename)
             return None
-        key = [key for key, m in match.groupdict().items() if m][0]
-        cls = self._types[key]
         dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs]
         if searchdir is not None:
             dirs.insert(0, searchdir)
@@ -279,4 +281,4 @@ class ResourceProvider(object):
                 elif isinstance(resource, cls):
                     result.append(resource)
         return result
-    
+
