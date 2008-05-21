@@ -1,3 +1,5 @@
+/* Generic content styles */
+
 html, body { 
     background: #fff;
     font-family: sans-serif;
@@ -30,6 +32,7 @@ a.backref, a:link.backref {
 }
 #language-selection img { 
     margin: 0 0.2em;
+    border: 0;
 }
 #content { 
     margin-bottom: 1.6em;
@@ -53,19 +56,18 @@ a.backref, a:link.backref {
     right: 0;
 }
 
-div.navigation { 
+#navigation, #top-navigation, #bottom-navigation { 
     border: solid #b8bcc0;
     border-width: 1px 0;
     background: #e8ecf0;
 }
-div.navigation span.separator { 
+#navigation span.separator, #top-navigation span.separator, #bottom-navigation span.separator { 
     display: none;
 }
-div.navigation span.next { 
+#navigation span.next, #top-navigation span.next, #bottom-navigation span.next { 
     float: right;
 }
-hr.navigation { display: none; }
-
+#navigation hr, #top-navigation hr, #bottom-navigation hr { display: none; }
 
 /* Generic content elements */
 
