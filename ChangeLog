@@ -9,6 +9,8 @@
 	in links reimplemented.
 
 	* lib/lcg/export/html.py: Resource handling updated.
+	(HtmlExporter._media_player): Log problems when locating external
+	dependencies, but degrade gracefully.
 
 	* lib/lcg/resources.py: Yet another major rewrite.
 	(XResource): Class removed.

@@ -431,9 +431,20 @@ class HtmlExporter(Exporter):
     def _media_player(self, context):
         node = context.node()
         if 'media.js' in [r.filename() for r in node.resources(Script)]:
-            node.resource('swfobject.js')
             node.resource('media-play.gif') # Used in the default media control style.
-            player = node.resource('mediaplayer.swf')
+            def warn_mediaplayer(msg):
+                log(msg)
+                log("Get JW FLV MEDIA PLAYER 3.15 (or later) from "
+                    "http://www.jeroenwijering.com/?about=JW_FLV_Media_Player "
+                    "and put mediaplayer.swf to your resource path!")
+            def warn_swfobject(msg):
+                log(msg)
+                log("Get SWFObject v1.5 from http://blog.deconcept.com/swfobject/ "
+                    "and put swfobject.js to your resource path!")
+            player = node.resource('mediaplayer.swf', warn=warn_mediaplayer)
+            swfobject = node.resource('swfobject.js', warn=warn_swfobject)
+            if not player or not swfobject:
+                return None
             g = context.generator()
             msg = g.strong(_("Warning:")) +' '+ \
                   _("Flash %(version)s not detected.  Please install or upgrade your "
