@@ -256,9 +256,9 @@ class ContentNode(object):
         else:
             return ()
         
-    def resource(self, cls, file, **kwargs):
+    def resource(self, filename, **kwargs):
         """Get the resource instance by its type and relative filename."""
         if self._resource_provider:
-            return self._resource_provider.resource(cls, file, node=self, **kwargs)
+            return self._resource_provider.resource(filename, node=self, **kwargs)
         else:
             return None

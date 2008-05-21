@@ -342,6 +342,7 @@ class MarkupFormatter(object):
     is done on LCG output (export).
 
     """
+    _IMG_EXT = r'\.(?:jpe?g|png|gif)'
     _MARKUP = (('linebreak', '//'),
                ('emphasize', ('/',  '/')),
                ('strong',    ('\*', '\*')),
@@ -350,9 +351,13 @@ class MarkupFormatter(object):
                ('citation',  ('>>', '<<')),
                ('quotation', ('``', "''")),
                ('link', (r'\['
-                         r'(?P<href>[^\[\]\|\#\s]*)'
+                         r'(?P<align>[<>])?'
+                         r'(?P<href>[^\[\]\|\#\s]*?'
+                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'
                          r'(?:#(?P<anchor>[^\[\]\|\s]*))?'
-                         r'(?:(?:\s*\|\s*|\s+)(?P<label>[^\[\]\|]*))?'
+                         r'(?:(?:\s*\|\s*|\s+)'
+                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'
+                         r'(?P<label>[^\[\]\|]*))?'
                          r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'
                          r'\]')),
                ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
@@ -363,7 +368,8 @@ class MarkupFormatter(object):
                ('dash', r'(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'))
     
-    _HELPER_PATTERNS = ('href', 'anchor', 'label', 'descr', 'subst')
+    _HELPER_PATTERNS = ('align', 'href', 'imgname', 'anchor', 'label', 'label_img',
+                        'descr', 'subst')
 
     _FORMAT = {'linebreak': '\n',
                'comment': '',
@@ -371,9 +377,6 @@ class MarkupFormatter(object):
                'nbsp': u' '}
 
     _BLANK_MATCHER = re.compile('\s+')
-    _IMAGE_URI_MATCHER = re.compile(r'^(?P<align>[<>])?(?P<name>'
-                                    '(?P<basename>[\w\d_.,/-]+)\.'
-                                    '(jpe?g|png|gif))$', re.IGNORECASE)
     _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
 
     def __init__(self):
@@ -383,7 +386,8 @@ class MarkupFormatter(object):
         regexps = [isinstance(markup, str) and regexp % (type, markup)
                    or pair_regexp % (type, markup[1], type, markup[0])
                    for type, markup in self._MARKUP]
-        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')', re.MULTILINE|re.UNICODE)
+        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')',
+                                 re.MULTILINE|re.UNICODE|re.IGNORECASE)
         self._paired_on_output = [type for type, format in self._FORMAT.items()
                                   if isinstance(format, tuple)]
     
@@ -442,38 +446,18 @@ class MarkupFormatter(object):
             result = str(result)
         return g.escape(result)
     
-    def _match_image(self, uri):
-        match = self._IMAGE_URI_MATCHER.match(uri)
-        if match:
-            uri = match.group('name')
-            name = match.group('basename').split('/')[-1].replace('.','-')
-            align = self._IMAGE_ALIGN_MAPPING.get(match.group('align'))
-            return True, uri, dict(name=name, align=align)
-        return False, uri, {}
-        
-    def _find_resource(self, node, cls, filename, label, descr, fallback=False, **imgargs):
-        result = node.resource(cls, filename, fallback=False)
-        if not result and fallback:
-            log("%s: Unknown resource: %s: %s" % (node.id(), cls.__name__, filename))
-            result = cls(filename, title=label)
-        if result:
-            title = label or result.title()
-            if isinstance(result, Image):
-                return InlineImage(result, title=title, **imgargs)
-            else:
-                return Link(result, label=title)
-        return None
-
-    def _link_formatter(self, context, label=None, href=None, anchor=None, descr=None, **kwargs):
-        node = None
-        result = None
+    def _link_formatter(self, context, href=None, imgname=None, anchor=None, 
+                        label_img=None, label=None, descr=None, align=None, **kwargs):
         parent = context.node()
+        target = None
+        if label:
+            label=label.strip()
         if href and not anchor:
-            is_image, href, imgargs = self._match_image(href)
-            cls = is_image and Image or Resource
-            result = self._find_resource(parent, cls, href, label, descr, fallback=is_image,
-                                         **imgargs)
-        if not result:
+            target = parent.resource(href, warn=False)
+            if not target and imgname:
+                target = Image(href, uri=href)
+        if target is None:
+            node = None
             if not href:
                 node = parent
             elif href.find('@') == href.find('/') == -1:
@@ -486,22 +470,28 @@ class MarkupFormatter(object):
                 if target is None:
                     log("%s: Unknown section: %s:%s" %
                         (parent.id(), node.id(), anchor))
-            if not target:
-                if anchor is not None:
-                    href += '#'+anchor
-                target = Link.ExternalTarget(href, label or href)
-            if label:
-                parts = self._BLANK_MATCHER.split(label, maxsplit=1)
-                is_image, uri, imgargs = self._match_image(parts[0])
-                if is_image:
-                    title = len(parts) == 2 and parts[1] or None
-                    label = self._find_resource(parent, Image, uri, title, descr, fallback=True,
-                                                **imgargs)
-                    if isinstance(target, Link.ExternalTarget):
-                        target = Link.ExternalTarget(href, title, descr=title)
+        if target is None:
+            if anchor is not None:
+                href += '#'+anchor
+            target = Link.ExternalTarget(href, label or href)
+        if label_img:
+            image = parent.resource(label_img, warn=False)
+            if image is None or not isinstance(image, Image):
+                image = Image(label_img, uri=label_img)
+            name = os.path.splitext(os.path.basename(label_img))[0]
+            #if isinstance(target, Link.ExternalTarget):
+            #    target = Link.ExternalTarget(href, label or href)
+            label = InlineImage(image, title=label, name=name,
+                                align=self._IMAGE_ALIGN_MAPPING.get(align))
+        # Create the resulting content element and return its exported string.
+        if isinstance(target, Image) and not label_img:
+            result = InlineImage(target, title=label, descr=descr, name=imgname,
+                                 align=self._IMAGE_ALIGN_MAPPING.get(align))
+        else:
             result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
         return result.export(context)
+
     
     def _uri_formatter(self, context, uri, close=False, **kwargs):
         return self._link_formatter(context, href=uri, label=None)
@@ -653,16 +643,13 @@ class Exporter(object):
         if resource.uri() is not None:
             result = resource.uri()
         else:
-            if resource.relative_uri():
-                path = [context.req().uri()]
+            prefix = self._resource_uri_prefix(context, resource)
+            if prefix is not None:
+                path = [prefix]
             else:
-                prefix = self._resource_uri_prefix(context, resource)
-                if prefix is not None:
-                    path = [prefix]
-                else:
-                    path = []
-                if resource.SUBDIR:
-                    path.append(resource.SUBDIR)
+                path = []
+            if resource.SUBDIR:
+                path.append(resource.SUBDIR)
             path.append(resource.filename())
             result = '/'.join(path)
         return result

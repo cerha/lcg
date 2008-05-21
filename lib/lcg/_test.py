@@ -33,25 +33,6 @@ class TestSuite(unittest.TestSuite):
 
 tests = TestSuite()
 
-class ContentNode(unittest.TestCase):
-    
-    def check_misc(self):
-        b = lcg.ContentNode('b', content=lcg.TextContent("B"))
-    	a = lcg.ContentNode('a', content=lcg.TextContent("A"), children=(b,))
-        assert a.id() == 'a'
-        assert a.root() == b.root() == a
-
-    def check_media(self):
-    	a = lcg.ContentNode('a', content=lcg.TextContent("A"))
-        # TODO: This doesn.t work now.  Resources now only work with
-        # file-based nodes.
-        #m1 = a.resource(lcg.XMedia, 'sound1.ogg')
-        #m2 = a.resource(lcg.XMedia, 'sound2.ogg')
-        #r = a.resources(lcg.XMedia)
-        #assert len(r) == 2 and m1 in r and m2 in r, r
-
-tests.add(ContentNode)
-
 class TranslatableText(unittest.TestCase):
           
     def check_interpolation(self):
@@ -235,10 +216,56 @@ class GettextTranslator(unittest.TestCase):
 tests.add(GettextTranslator)
 
 
-class HtmlExporter(unittest.TestCase):
-    pass
+class ContentNode(unittest.TestCase):
+    
+    def check_misc(self):
+        b = lcg.ContentNode('b', content=lcg.TextContent("B"))
+    	a = lcg.ContentNode('a', content=lcg.TextContent("A"), children=(b,))
+        assert a.id() == 'a'
+        assert a.root() == b.root() == a
 
-tests.add(HtmlExporter)
+tests.add(ContentNode)
+
+
+class Resources(unittest.TestCase):
+    
+    def check_provider(self):
+        warnings = []
+        def warn(msg):
+            warnings.append(msg)
+        p = lcg.ResourceProvider()
+        r = p.resource('xxx.xx', warn=warn)
+        assert r is None, r
+        assert len(warnings) == 1, warnings
+        r = p.resource('xxx.mp3', warn=warn)
+        assert r is None, r
+        assert len(warnings) == 2, warnings
+        r = p.resource('yyy.mp3')
+        assert isinstance(r, lcg.Media), r
+        assert len(warnings) == 3, warnings
+        r = p.resource('default.css')
+        assert isinstance(r, lcg.Stylesheet), r
+        assert len(warnings) == 3, warnings
+        
+    def check_sharing(self):
+        p = lcg.ResourceProvider(resources=(lcg.Media('sound1.ogg'),
+                                            lcg.Media('sound2.ogg'),
+                                            lcg.Media('sound3.ogg'),
+                                            lcg.Media('sound4.ogg')))
+    	a = lcg.ContentNode('a', content=lcg.Content(), resource_provider=p)
+    	b = lcg.ContentNode('b', content=lcg.Content(), resource_provider=p)
+        a.resource('sound1.ogg')
+        a.resource('sound2.ogg')
+        b.resource('sound3.ogg')
+        p.resource('sound4.ogg')
+        ar = [r.filename() for r in a.resources(lcg.Media)]
+        assert len(ar) == 3, ar
+        assert 'sound1.ogg' in ar and 'sound2.ogg' in ar and 'sound4.ogg' in ar , ar
+        br = [r.filename() for r in b.resources(lcg.Media)]
+        assert len(br) == 2, br
+        assert 'sound3.ogg' in br and 'sound4.ogg' in br , br
+
+tests.add(Resources)
 
 
 class Parser(unittest.TestCase):
@@ -262,9 +289,74 @@ class Parser(unittest.TestCase):
         
 tests.add(Parser)
 
+
+class Export(unittest.TestCase):
+    
+    def check_formatter(self):
+        p = lcg.ResourceProvider(resources=(lcg.Media('xx.mp3'),
+                                            lcg.Image('aa.jpg'),
+                                            lcg.Image('bb.jpg'),
+                                            lcg.Image('cc.png', title="Image C",
+                                                      descr="Nice picture")))
+        content = lcg.SectionContainer((lcg.Section("Section One", anchor='sec1',
+                                                    content=lcg.Content()),))
+    	n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+                            content=content, resource_provider=p)
+        context = lcg.HtmlExporter().context(n, None)
+        for text, html in (
+            # Links
+            ('[test]',
+             '<a href="test" title="Some description">Test Node</a>'),
+            ('[test#sec1]',
+             '<a href="test#sec1">Section One</a>'),
+            ('[#sec1]',
+             '<a href="test#sec1">Section One</a>'),
+            ('[http://www.freebsoft.org]',
+             '<a href="http://www.freebsoft.org">http://www.freebsoft.org</a>'),
+            ('[http://www.freebsoft.org Free(b)soft website]',
+             '<a href="http://www.freebsoft.org">Free(b)soft website</a>'),
+            ('[http://www.freebsoft.org label | descr]',
+             '<a href="http://www.freebsoft.org" title="descr">label</a>'),
+            ('[xx.mp3]',
+             '<a href="media/xx.mp3">xx.mp3</a>'),
+            # Inline images
+            ('[aa.jpg]',
+             '<img src="images/aa.jpg" alt="" border="0" class="aa" />'),
+            ('[aa.jpg label]',
+             '<img src="images/aa.jpg" alt="label" border="0" class="aa" />'),
+            ('[>aa.jpg]',
+             '<img src="images/aa.jpg" alt="" align="right" border="0" class="aa" />'),
+            ('[<aa.jpg]',
+             '<img src="images/aa.jpg" alt="" align="left" border="0" class="aa" />'),
+            ('[aa.jpg label | descr]',
+             '<img src="images/aa.jpg" alt="label" longdesc="descr" border="0" class="aa" />'),
+            ('[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
+             '<img src="http://www.freebsoft.org/img/logo.gif" alt="Free(b)soft logo" border="0" class="logo" />'),
+            ('[cc.png]',
+             '<img src="images/cc.png" alt="Image C" longdesc="Nice picture" border="0" class="cc" />'),
+            # Image links (links with an image instead of a label)
+            ('[aa.jpg bb.jpg label | descr]',
+             '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" alt="label" border="0" class="bb" /></a>'),
+            ('[aa.jpg bb.jpg | descr]',
+             '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" alt="" border="0" class="bb" /></a>'),
+            ('[>aa.jpg bb.jpg label | descr]',
+             '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" alt="label" align="right" border="0" class="bb" /></a>'),
+            ('[test bb.jpg bb]',
+             '<a href="test" title="Some description"><img src="images/bb.jpg" alt="bb" border="0" class="bb" /></a>'),
+            ('[http://www.freebsoft.org /img/logo.gif]',
+             '<a href="http://www.freebsoft.org"><img src="/img/logo.gif" alt="" border="0" class="logo" /></a>'),
+            ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website]',
+             '<a href="http://www.freebsoft.org"><img src="/img/logo.gif" alt="Free(b)soft website" border="0" class="logo" /></a>'),
+            ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website | Go to Free(b)soft website]',
+             '<a href="http://www.freebsoft.org" title="Go to Free(b)soft website"><img src="/img/logo.gif" alt="Free(b)soft website" border="0" class="logo" /></a>'),
+            ):
+            result = lcg.FormattedText(text).export(context)
+            assert result == html, "\n  * %s\n  - expected: %s\n  - got:      %s" % \
+                   (text, html, result)
         
+tests.add(Export)
 
-
+        
 def get_tests():
     return tests
 

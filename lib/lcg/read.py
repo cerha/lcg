@@ -117,8 +117,8 @@ class Reader(object):
             self._variants_ = self._variants()
         return self._variants_
     
-    def resource(self, cls, filename, **kwargs):
-        return self._resource_provider_.resource(cls, filename, node=self._id, **kwargs)
+    def resource(self, filename, **kwargs):
+        return self._resource_provider_.resource(filename, node=self._id, **kwargs)
 
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""

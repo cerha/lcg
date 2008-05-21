@@ -422,7 +422,7 @@ class HtmlExporter(Exporter):
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 
     def _language_selection_image(self, context, lang):
-        #return context.uri(context.node().resource(Image, 'flags/%s.gif' % lang))
+        #return context.uri(context.node().resource('flags/%s.gif' % lang))
         return None
     
     def _content(self, context):
@@ -431,9 +431,9 @@ class HtmlExporter(Exporter):
     def _media_player(self, context):
         node = context.node()
         if 'media.js' in [r.filename() for r in node.resources(Script)]:
-            node.resource(XScript, 'swfobject.js')
-            node.resource(XImage,  'media-play.gif') # Used in the default media control style.
-            player = node.resource(XFlash,  'mediaplayer.swf')
+            node.resource('swfobject.js')
+            node.resource('media-play.gif') # Used in the default media control style.
+            player = node.resource('mediaplayer.swf')
             g = context.generator()
             msg = g.strong(_("Warning:")) +' '+ \
                   _("Flash %(version)s not detected.  Please install or upgrade your "
@@ -492,13 +492,14 @@ class StyledHtmlExporter(object):
     def _head(self, context):
         node = context.node()
         for style in self._styles:
-            node.resource(XStylesheet, style)
+            node.resource(style)
+        styles = node.resources(Stylesheet)
         if self._inlinestyles:
-            tags = ['<style type="text/css">\n%s</style>' % s.get()
-                    for s in context.node().resources(XStylesheet)]
+            tags = ['<style type="text/css">\n%s</style>' % content 
+                    for content in [s.get() for s in styles] if content is not None]
         else:
             tags = ['<link rel="stylesheet" type="text/css" href="%s">' % \
-                    context.uri(s) for s in context.node().resources(Stylesheet)]
+                    context.uri(s) for s in styles]
         return super(StyledHtmlExporter, self)._head(context) + tags
 
             
@@ -539,16 +540,16 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
             return super(HtmlStaticExporter, self)._language_selection(context)
         
     def _top_navigation(self, context):
-        nav = self._navigation(context)
-        if nav:
-            self._generator.div(nav, cls='navigation') + '<hr class="hidden">\n'
+        navigation = self._navigation(context)
+        if navigation:
+            return navigation + '<hr>\n'
         else:
             return None
 
     def _bottom_navigation(self, context):
-        nav = self._navigation(context)
-        if nav:
-            return '<hr class="hidden">\n' + self._generator.div(nav, cls='navigation')
+        navigation = self._navigation(context)
+        if navigation:
+            return '<hr>\n' + navigation
         else:
             return None
         

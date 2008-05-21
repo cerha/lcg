@@ -243,7 +243,7 @@ class InlineImage(Content):
     LEFT = 'left'
     RIGHT = 'right'
     
-    def __init__(self, image, align=None, title=None, name=None):
+    def __init__(self, image, title=None, descr=None, name=None, align=None):
         """Arguments:
 
           image -- 'Image' instance
@@ -260,9 +260,11 @@ class InlineImage(Content):
         assert align in (None, self.LEFT, self.RIGHT), align
         assert title is None or isinstance(title, (str, unicode)), title
         assert name is None or isinstance(name, (str, unicode)), name
+        assert descr is None or isinstance(descr, (str, unicode)), descr
         self._image = image
         self._align = align
         self._title = title
+        self._descr = descr
         self._name = name
         super(InlineImage, self).__init__()
 
@@ -275,8 +277,9 @@ class InlineImage(Content):
             kwargs = dict(width=width, height=height)
         else:
             kwargs = {}
-        return g.img(context.uri(img), alt=self._title or img.title() or '', descr=img.descr(),
-                     align=self._align, cls=self._name, **kwargs)
+        return g.img(context.uri(img), alt=self._title or img.title() or '',
+                     descr=self._descr or img.descr(), align=self._align,
+                     cls=self._name, **kwargs)
 
 
 class Container(Content):
@@ -737,22 +740,23 @@ class Link(Container):
           target -- target of the link, it may be either a 'Section' instance
             or a 'ContentNode' instance, a 'Link.ExternalTarget' instance or a
             'Resource' instance
-          label -- link label text as a string or an 'InlineImage' instance for image links
-          descr -- ???
+          label -- link label text as a string or a 'Content' instance (such as 'InlineImage' for
+            image links)
+          descr -- breif target description text.  If none the description is taken from the
+            'target' instance depending on its type
           type -- ???
         
         """
         assert isinstance(target, (Section, ContentNode, self.ExternalTarget, Resource)), target
-                                   #unicode, str)), target
-        assert label is None or isinstance(label, (str, unicode, InlineImage)), label
+        assert label is None or isinstance(label, (str, unicode, Content)), label
         assert descr is None or isinstance(descr, (str, unicode)), descr
         assert type is None or isinstance(type, (str, unicode)), type
-        if label is None:
-            label = target.title()
-        if isinstance(label, (str, unicode)):
-            content = (TextContent(label),)
-        else:
+        if label and isinstance(label, (str, unicode)):
+            content = TextContent(label)
+        elif label is not None:
             content = label
+        else:
+            content = ()
         self._target = target
         self._descr = descr
         self._type = type
@@ -771,9 +775,15 @@ class Link(Container):
             descr = g.concat(g.escape(target.title()), g.escape(' (%s)' % (target.parent().title(),)))
         else:
             descr = None
-        label = g.concat(*self._exported_content(context))
-        uri = context.uri(target)
-        return g.link(label, uri, title=descr, type=self._type)
+        if self._content:
+            label = g.concat(*self._exported_content(context))
+        elif isinstance(target, (ContentNode, Section)):
+            label = target.title()
+        elif isinstance(target, Resource):
+            label = target.title() or target.filename()
+        elif isinstance(target, self.ExternalTarget):
+            label = target.title() or target.uri()
+        return g.link(label, context.uri(target), title=descr, type=self._type)
 
 
 class Title(Content):
@@ -910,7 +920,7 @@ def link(target, label=None, type=None, descr=None):
       target -- link target.  It can be a direct URI as a string or unicode
         instance or any referable content element, such as 'Section',
         'ContentNode', 'Resource' or 'Link.ExternalTarget'.
-      label -- link labe is mandatory when the target is a direct URI (string
+      label -- link label is mandatory when the target is a direct URI (string
         or unicode) and optional for LCG content element targets.  In this case
         it just overrides the default title of the refered object.
       type -- mime type specification of the refered object.
@@ -918,13 +928,11 @@ def link(target, label=None, type=None, descr=None):
         the link target is a direct URI.
 
     """
-    assert isinstance(target, (str, unicode, ContentNode, Section,
-                               Link.ExternalTarget, Resource)), target
     if isinstance(target, (str, unicode)):
         assert label is not None
-        target = Link.ExternalTarget(target, label, descr=descr)
-        label = None
+        target = Link.ExternalTarget(target, None, descr=descr)
     else:
+        assert isinstance(target, (ContentNode, Section, Link.ExternalTarget, Resource)), target
         assert descr is None
     return Link(target, label=label, type=type)
     

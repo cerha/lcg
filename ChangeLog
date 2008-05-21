@@ -1,3 +1,36 @@
+2008-05-21  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py: New tests covering the new resource handling
+	and (resource) link formatting.
+
+	* lib/lcg/export/export.py (MarkupFormatter): Resource handling
+	in links reimplemented.
+
+	* lib/lcg/export/html.py: Resource handling updated.
+
+	* lib/lcg/resources.py: Yet another major rewrite.
+	(XResource): Class removed.
+	(ResourceProvider): Allow static resource list in constructor.
+	Automatically deduce resource types.  Unnecessary features removed.
+
+	* lib/lcg/read.py (Reader.resource): Don't pass the `cls' argument
+	along.
+
+	* lib/lcg/nodes.py (ContentNode.resource): Don't pass the `cls'
+	argument along.
+
+	* lib/lcg/content.py (InlineImage): Allow overriding the image
+	description through constructor args.
+	(Link): Label/title logic clarified.
+
+2008-05-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/media.js: Handle situation when
+	`player.itemData(0)' returns null.
+
+	* lib/lcg/export/html.py: Export the media player if 'media.js'
+	script was used, not if any 'Media' instance was used.
+
 2008-05-15  Tomas Cerha  <cerha@brailcom.org>
 
 	* translations/lcg.cs.po: Updated.
