@@ -233,37 +233,33 @@ class Resources(unittest.TestCase):
         warnings = []
         def warn(msg):
             warnings.append(msg)
-        p = lcg.ResourceProvider()
+        p = lcg.ResourceProvider(resources=(lcg.Audio('xxx.ogg'),))
         r = p.resource('xxx.xx', warn=warn)
         assert r is None, r
         assert len(warnings) == 1, warnings
         r = p.resource('xxx.mp3', warn=warn)
         assert r is None, r
         assert len(warnings) == 2, warnings
-        r = p.resource('yyy.mp3')
-        assert isinstance(r, lcg.Media), r
-        assert len(warnings) == 3, warnings
+        r = p.resource('xxx.ogg')
+        assert isinstance(r, lcg.Audio), r
+        assert len(warnings) == 2, warnings
         r = p.resource('default.css')
         assert isinstance(r, lcg.Stylesheet), r
-        assert len(warnings) == 3, warnings
+        assert len(warnings) == 2, warnings
         
-    def check_sharing(self):
-        p = lcg.ResourceProvider(resources=(lcg.Media('sound1.ogg'),
-                                            lcg.Media('sound2.ogg'),
-                                            lcg.Media('sound3.ogg'),
-                                            lcg.Media('sound4.ogg')))
+    def check_dependencies(self):
+        p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),
+                                            lcg.Audio('sound2.ogg')))
     	a = lcg.ContentNode('a', content=lcg.Content(), resource_provider=p)
     	b = lcg.ContentNode('b', content=lcg.Content(), resource_provider=p)
-        a.resource('sound1.ogg')
-        a.resource('sound2.ogg')
-        b.resource('sound3.ogg')
-        p.resource('sound4.ogg')
-        ar = [r.filename() for r in a.resources(lcg.Media)]
+        a.resource('default.css')
+        b.resource('media.js')
+        ar = [r.filename() for r in a.resources()]
         assert len(ar) == 3, ar
-        assert 'sound1.ogg' in ar and 'sound2.ogg' in ar and 'sound4.ogg' in ar , ar
-        br = [r.filename() for r in b.resources(lcg.Media)]
-        assert len(br) == 2, br
-        assert 'sound3.ogg' in br and 'sound4.ogg' in br , br
+        assert 'default.css' in ar and 'sound1.ogg' in ar and 'sound2.ogg' in ar, ar
+        br = [r.filename() for r in b.resources()]
+        assert len(br) == 3, br
+        assert 'media.js' in br and 'sound1.ogg' in br and 'sound2.ogg' in br , br
 
 tests.add(Resources)
 
@@ -293,11 +289,11 @@ tests.add(Parser)
 class Export(unittest.TestCase):
     
     def check_formatter(self):
-        p = lcg.ResourceProvider(resources=(lcg.Media('xx.mp3'),
-                                            lcg.Image('aa.jpg'),
-                                            lcg.Image('bb.jpg'),
-                                            lcg.Image('cc.png', title="Image C",
-                                                      descr="Nice picture")))
+        resources=(lcg.Media('xx.mp3'),
+                   lcg.Image('aa.jpg'),
+                   lcg.Image('bb.jpg'),
+                   lcg.Image('cc.png', title="Image C", descr="Nice picture"))
+        p = lcg.ResourceProvider(resources=resources)
         content = lcg.SectionContainer((lcg.Section("Section One", anchor='sec1',
                                                     content=lcg.Content()),))
     	n = lcg.ContentNode('test', title='Test Node', descr="Some description",
