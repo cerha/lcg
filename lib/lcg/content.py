@@ -206,7 +206,7 @@ class PreformattedText(TextContent):
     
     def export(self, context):
         g = context.generator()
-        return g.pre(self._text)
+        return g.pre(g.escape(self._text))
 
 
 class Anchor(TextContent):
