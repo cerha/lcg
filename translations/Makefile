@@ -26,3 +26,5 @@ include $(domains:%=%.d)
 
 clean:
 	rm -f *.d *.pot
+
+.PHONY: all clean
