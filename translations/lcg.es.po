@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-10-30 08:51+0100\n"
+"POT-Creation-Date: 2008-05-31 10:15+0200\n"
 "PO-Revision-Date: 2007-10-30 08:54+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -17,121 +17,224 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # Index of sections (table of contents)
-#: ../lib/lcg/content/content.py:409
+#: ../lib/lcg/content.py:488
 msgid "Index:"
 msgstr "Contenido:"
 
-#: ../lib/lcg/util.py:243
-msgid "Bulgarian"
-msgstr "búlgaro"
-
-#: ../lib/lcg/util.py:245
-msgid "Catalan"
-msgstr "catalán"
-
-#: ../lib/lcg/util.py:245
-msgid "Czech"
-msgstr "checo"
-
-#: ../lib/lcg/util.py:246
-msgid "Danish"
-msgstr "danés"
-
-#: ../lib/lcg/util.py:246
-msgid "German"
-msgstr "alemán"
-
-#: ../lib/lcg/util.py:247
-msgid "Greek"
-msgstr "griego"
-
-#: ../lib/lcg/util.py:247
-msgid "English"
-msgstr "inglés"
-
-#: ../lib/lcg/util.py:247
-msgid "Spanish"
-msgstr "espanol"
-
-#: ../lib/lcg/util.py:248
-msgid "Estonian"
-msgstr "estonio"
-
-#: ../lib/lcg/util.py:249
-msgid "Finnish"
-msgstr "finlandés"
-
-#: ../lib/lcg/util.py:250
-msgid "French"
-msgstr "francés"
-
-#: ../lib/lcg/util.py:252
-msgid "Irish"
-msgstr "irlandés"
-
-#: ../lib/lcg/util.py:255
-msgid "Hungarian"
-msgstr "húngaro"
-
-#: ../lib/lcg/util.py:257
-msgid "Icelandic"
-msgstr "islandés"
-
-#: ../lib/lcg/util.py:257
-msgid "Italian"
-msgstr "italiano"
-
-#: ../lib/lcg/util.py:267
-msgid "Dutch"
-msgstr "holandés"
-
-#: ../lib/lcg/util.py:267
-msgid "Norwegian"
-msgstr "noruego"
-
-#: ../lib/lcg/util.py:269
-msgid "Polish"
-msgstr "polaco"
-
-#: ../lib/lcg/util.py:270
-msgid "Portuguese"
-msgstr "portugués"
-
-#: ../lib/lcg/util.py:275
-msgid "Slovak"
-msgstr "eslovaco"
-
-#: ../lib/lcg/util.py:275
-msgid "Slovenian"
-msgstr "esloveno"
-
-#: ../lib/lcg/util.py:277
-msgid "Swedish"
-msgstr "sueco"
-
-#: ../lib/lcg/util.py:281
-msgid "Turkish"
-msgstr "turco"
-
-#: ../lib/lcg/export/html.py:436
+#: ../lib/lcg/export/html.py:354
 msgid "Choose your language:"
 msgstr "Escoja el idioma:"
 
+#: ../lib/lcg/export/html.py:449
+msgid "Warning:"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:453
+msgid "Adobe website"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:450
+#, python-format
+msgid ""
+"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
+"to %(version)s to be able to make use of advanced media playback "
+"capabilities.  See %(link)s for more information."
+msgstr ""
+
 # For exapmle "Next: None".
-#: ../lib/lcg/export/html.py:672
+#: ../lib/lcg/export/html.py:590
 msgid "None"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:673
+#: ../lib/lcg/export/html.py:591
 msgid "You are here:"
 msgstr ""
 
 # Link to the next page.
-#: ../lib/lcg/export/html.py:675
+#: ../lib/lcg/export/html.py:593
 msgid "Next"
 msgstr ""
 
 # Link to the previous page.
-#: ../lib/lcg/export/html.py:676
+#: ../lib/lcg/export/html.py:594
 msgid "Previous"
+msgstr ""
+
+#: ../lib/lcg/util.py:138
+msgid "Afrikaans"
+msgstr ""
+
+#: ../lib/lcg/util.py:139
+msgid "Arabic"
+msgstr ""
+
+#: ../lib/lcg/util.py:141
+msgid "Bulgarian"
+msgstr "búlgaro"
+
+#: ../lib/lcg/util.py:143
+msgid "Catalan"
+msgstr "catalán"
+
+#: ../lib/lcg/util.py:143
+msgid "Corsican"
+msgstr ""
+
+#: ../lib/lcg/util.py:143
+msgid "Czech"
+msgstr "checo"
+
+#: ../lib/lcg/util.py:144
+msgid "Danish"
+msgstr "danés"
+
+#: ../lib/lcg/util.py:144
+msgid "German"
+msgstr "alemán"
+
+#: ../lib/lcg/util.py:145
+msgid "Greek"
+msgstr "griego"
+
+#: ../lib/lcg/util.py:145
+msgid "English"
+msgstr "inglés"
+
+#: ../lib/lcg/util.py:145
+msgid "Spanish"
+msgstr "espanol"
+
+#: ../lib/lcg/util.py:146
+msgid "Estonian"
+msgstr "estonio"
+
+#: ../lib/lcg/util.py:146
+msgid "Basque"
+msgstr ""
+
+#: ../lib/lcg/util.py:147
+msgid "Finnish"
+msgstr "finlandés"
+
+#: ../lib/lcg/util.py:148
+msgid "French"
+msgstr "francés"
+
+#: ../lib/lcg/util.py:150
+msgid "Irish"
+msgstr "irlandés"
+
+#: ../lib/lcg/util.py:150
+#, fuzzy
+msgid "Galician"
+msgstr "italiano"
+
+#: ../lib/lcg/util.py:152
+msgid "Hindi"
+msgstr ""
+
+#: ../lib/lcg/util.py:152
+#, fuzzy
+msgid "Croatian"
+msgstr "catalán"
+
+#: ../lib/lcg/util.py:153
+msgid "Hungarian"
+msgstr "húngaro"
+
+#: ../lib/lcg/util.py:155
+msgid "Icelandic"
+msgstr "islandés"
+
+#: ../lib/lcg/util.py:155
+msgid "Italian"
+msgstr "italiano"
+
+#: ../lib/lcg/util.py:156
+msgid "Japanese"
+msgstr ""
+
+#: ../lib/lcg/util.py:157
+#, fuzzy
+msgid "Georgian"
+msgstr "alemán"
+
+#: ../lib/lcg/util.py:158
+#, fuzzy
+msgid "Korean"
+msgstr "noruego"
+
+#: ../lib/lcg/util.py:158
+#, fuzzy
+msgid "Kurdish"
+msgstr "turco"
+
+#: ../lib/lcg/util.py:162
+msgid "Macedonian"
+msgstr ""
+
+#: ../lib/lcg/util.py:163
+msgid "Moldavian"
+msgstr ""
+
+#: ../lib/lcg/util.py:165
+msgid "Dutch"
+msgstr "holandés"
+
+#: ../lib/lcg/util.py:165
+msgid "Norwegian"
+msgstr "noruego"
+
+#: ../lib/lcg/util.py:167
+msgid "Polish"
+msgstr "polaco"
+
+#: ../lib/lcg/util.py:168
+msgid "Portuguese"
+msgstr "portugués"
+
+#: ../lib/lcg/util.py:170
+#, fuzzy
+msgid "Romanian"
+msgstr "estonio"
+
+#: ../lib/lcg/util.py:173
+msgid "Slovak"
+msgstr "eslovaco"
+
+#: ../lib/lcg/util.py:173
+msgid "Slovenian"
+msgstr "esloveno"
+
+#: ../lib/lcg/util.py:174
+msgid "Albanian"
+msgstr ""
+
+#: ../lib/lcg/util.py:174
+#, fuzzy
+msgid "Serbian"
+msgstr "esloveno"
+
+#: ../lib/lcg/util.py:175
+msgid "Swedish"
+msgstr "sueco"
+
+#: ../lib/lcg/util.py:177
+msgid "Thai"
+msgstr ""
+
+#: ../lib/lcg/util.py:179
+msgid "Turkish"
+msgstr "turco"
+
+#: ../lib/lcg/util.py:180
+msgid "Ukrainian"
+msgstr ""
+
+#: ../lib/lcg/util.py:182
+msgid "Yiddish"
+msgstr ""
+
+#: ../lib/lcg/util.py:182
+msgid "Chinese"
 msgstr ""

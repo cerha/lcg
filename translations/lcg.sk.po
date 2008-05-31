@@ -7,13 +7,61 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-20 09:56+0100\n"
+"POT-Creation-Date: 2008-05-31 10:15+0200\n"
 "PO-Revision-Date: 2007-12-20 09:58+0100\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/lcg/content.py:488
+msgid "Index:"
+msgstr "Obsah:"
+
+#: ../lib/lcg/export/html.py:354
+msgid "Choose your language:"
+msgstr "Zvoµte si jazyk:"
+
+#: ../lib/lcg/export/html.py:449
+msgid "Warning:"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:453
+msgid "Adobe website"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:450
+#, python-format
+msgid ""
+"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
+"to %(version)s to be able to make use of advanced media playback "
+"capabilities.  See %(link)s for more information."
+msgstr ""
+
+#: ../lib/lcg/export/html.py:590
+msgid "None"
+msgstr "nieje"
+
+#: ../lib/lcg/export/html.py:591
+msgid "You are here:"
+msgstr "Nachádzate sa:"
+
+#: ../lib/lcg/export/html.py:593
+msgid "Next"
+msgstr "Dal¹ie"
+
+#: ../lib/lcg/export/html.py:594
+msgid "Previous"
+msgstr "Predchádzajúce"
+
+#: ../lib/lcg/util.py:138
+msgid "Afrikaans"
+msgstr ""
+
+#: ../lib/lcg/util.py:139
+msgid "Arabic"
+msgstr ""
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
@@ -22,6 +70,10 @@ msgstr "bulhar¹tina"
 #: ../lib/lcg/util.py:143
 msgid "Catalan"
 msgstr "katalán¹tina"
+
+#: ../lib/lcg/util.py:143
+msgid "Corsican"
+msgstr ""
 
 #: ../lib/lcg/util.py:143
 msgid "Czech"
@@ -51,6 +103,10 @@ msgstr "¹panielèina"
 msgid "Estonian"
 msgstr "estónètina"
 
+#: ../lib/lcg/util.py:146
+msgid "Basque"
+msgstr ""
+
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
 msgstr "fin¹tina"
@@ -63,6 +119,20 @@ msgstr "francúz¹tina"
 msgid "Irish"
 msgstr "ír¹tina"
 
+#: ../lib/lcg/util.py:150
+#, fuzzy
+msgid "Galician"
+msgstr "taliansky"
+
+#: ../lib/lcg/util.py:152
+msgid "Hindi"
+msgstr ""
+
+#: ../lib/lcg/util.py:152
+#, fuzzy
+msgid "Croatian"
+msgstr "katalán¹tina"
+
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
 msgstr "maïarèina"
@@ -74,6 +144,33 @@ msgstr "islandètina"
 #: ../lib/lcg/util.py:155
 msgid "Italian"
 msgstr "taliansky"
+
+#: ../lib/lcg/util.py:156
+msgid "Japanese"
+msgstr ""
+
+#: ../lib/lcg/util.py:157
+#, fuzzy
+msgid "Georgian"
+msgstr "nemèina"
+
+#: ../lib/lcg/util.py:158
+#, fuzzy
+msgid "Korean"
+msgstr "nórèina"
+
+#: ../lib/lcg/util.py:158
+#, fuzzy
+msgid "Kurdish"
+msgstr "tureètina"
+
+#: ../lib/lcg/util.py:162
+msgid "Macedonian"
+msgstr ""
+
+#: ../lib/lcg/util.py:163
+msgid "Moldavian"
+msgstr ""
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
@@ -91,6 +188,11 @@ msgstr "poµèina"
 msgid "Portuguese"
 msgstr "portugalètina"
 
+#: ../lib/lcg/util.py:170
+#, fuzzy
+msgid "Romanian"
+msgstr "estónètina"
+
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
 msgstr "slovenèina"
@@ -99,34 +201,35 @@ msgstr "slovenèina"
 msgid "Slovenian"
 msgstr "slovinèina"
 
+#: ../lib/lcg/util.py:174
+msgid "Albanian"
+msgstr ""
+
+#: ../lib/lcg/util.py:174
+#, fuzzy
+msgid "Serbian"
+msgstr "slovinèina"
+
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
 msgstr "¹védèina"
+
+#: ../lib/lcg/util.py:177
+msgid "Thai"
+msgstr ""
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
 msgstr "tureètina"
 
-#: ../lib/lcg/export/html.py:386
-msgid "Choose your language:"
-msgstr "Zvoµte si jazyk:"
+#: ../lib/lcg/util.py:180
+msgid "Ukrainian"
+msgstr ""
 
-#: ../lib/lcg/export/html.py:611
-msgid "None"
-msgstr "nieje"
+#: ../lib/lcg/util.py:182
+msgid "Yiddish"
+msgstr ""
 
-#: ../lib/lcg/export/html.py:612
-msgid "You are here:"
-msgstr "Nachádzate sa:"
-
-#: ../lib/lcg/export/html.py:614
-msgid "Next"
-msgstr "Dal¹ie"
-
-#: ../lib/lcg/export/html.py:615
-msgid "Previous"
-msgstr "Predchádzajúce"
-
-#: ../lib/lcg/content.py:400
-msgid "Index:"
-msgstr "Obsah:"
+#: ../lib/lcg/util.py:182
+msgid "Chinese"
+msgstr ""
