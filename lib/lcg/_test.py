@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
@@ -41,9 +42,9 @@ class TranslatableText(unittest.TestCase):
                                  person1="Joe", person2="Bob")
         c0 = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.")
         c = c0.interpolate(lambda key: '-'+key+'-')
-        a1 = a.translate(lcg.NullTranslator())
-        b1 = b.translate(lcg.NullTranslator())
-        c1 = c.translate(lcg.NullTranslator())
+        a1 = a.localize(lcg.NullTranslator())
+        b1 = b.localize(lcg.NullTranslator())
+        c1 = c.localize(lcg.NullTranslator())
         assert a1 == "Hi Joe, say hello to Bob.", a1
         assert b1 == "Hi Joe, say hello to Bob.", b1
         assert c1 == "Hi -person1-, say hello to -person2-.", c1
@@ -85,17 +86,48 @@ class TranslatableText(unittest.TestCase):
     def check_replace(self):
         t = lcg.TranslatableText("Version %s", "xox")
         a = t + '-yoy'
-        b = a.replace('o', '-')
-        c = b.replace('V', 'v')
+        b = t.replace('o', '-')
+        c = a.replace('o', '-')
+        d = c.replace('V', 'v')
         assert isinstance(a, lcg.Concatenation), a
-        assert isinstance(b, lcg.Concatenation), b
+        assert isinstance(b, lcg.TranslatableText), b
         assert isinstance(c, lcg.Concatenation), c
-        ax = a.translate(lcg.NullTranslator())
-        bx = b.translate(lcg.NullTranslator())
-        cx = c.translate(lcg.NullTranslator())
-        assert ax == 'Version xox-yoy', ax
-        assert bx == 'Versi-n x-x-y-y', bx
-        assert cx == 'versi-n x-x-y-y', cx
+        assert isinstance(d, lcg.Concatenation), d
+        ax = a.localize(lcg.NullTranslator())
+        bx = b.localize(lcg.NullTranslator())
+        cx = c.localize(lcg.NullTranslator())
+        dx = d.localize(lcg.NullTranslator())
+        assert str(a) == ax == 'Version xox-yoy', (a, ax)
+        assert str(b) == bx == 'Versi-n x-x',     (b, bx)
+        assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
+        assert str(d) == dx == 'versi-n x-x-y-y', (d, dx)
+
+    def check_quoteattr(self):
+        a = _('His name is "%s"', _("Bob"))
+        b = _("Bob") +' + '+ _("Joe")
+        c = a.quoteattr()
+        d = b.quoteattr()
+        e = "xxx=" + d # Test transformed Concatenation nesting!
+        assert isinstance(c, lcg.TranslatableText), c
+        assert isinstance(d, lcg.Concatenation), d
+        t = lcg.GettextTranslator('cs')
+        ax = a.localize(t)
+        bx = b.localize(t)
+        cx = c.localize(t)
+        dx = d.localize(t)
+        ex = e.localize(t)
+        assert str(a) == 'His name is "Bob"', str(a)
+        assert str(b) == 'Bob + Joe', str(b)
+        assert ax == 'Jmenuje se "Bobik"', ax
+        assert bx == 'Bobik + Pepa', bx
+        assert str(c) == '\'His name is "Bob"\'', str(c)
+        assert str(d) == '"Bob + Joe"', str(d)
+        assert str(e) == 'xxx="Bob + Joe"', str(e)
+        assert cx == '\'Jmenuje se "Bobik"\'', cx
+        assert dx == '"Bobik + Pepa"', dx
+        assert ex == 'xxx="Bobik + Pepa"', ex
+        c = lcg.quoteattr('x')
+        assert c == '"x"', c
 
     def check_string_context(self):
         a = lcg.TranslatableText("Version %s", "1.0")
@@ -111,19 +143,19 @@ tests.add(TranslatableText)
 class SelfTranslatableText(unittest.TestCase):
           
     def check_interpolation(self):
-        text = "Hi %(person1)s, say hello to %(person2)s."
-        translations = {'cs': "Ahoj %(person1)s, pozdravuj %(person2)s."}
+        text = "%(person1)s is smarter than %(person2)s."
+        translations = {'cs': u"%(person1)s je chytřejší než %(person2)s."}
         a = lcg.SelfTranslatableText(text, person1="Joe", person2="Ann", translations=translations)
         a2 = lcg.SelfTranslatableText(text, translations=translations)
         a3 = a2.interpolate(lambda key: '-'+key+'-')
-        b = a.translate(lcg.NullTranslator())
-        c = a.translate(lcg.GettextTranslator('cs'))
-        assert b == "Hi Joe, say hello to Ann.", b
-        assert c == "Ahoj Joe, pozdravuj Ann.", c
-        b2 = a3.translate(lcg.NullTranslator())
-        c2 = a3.translate(lcg.GettextTranslator('cs'))
-        assert b2 == "Hi -person1-, say hello to -person2-.", b2
-        assert c2 == "Ahoj -person1-, pozdravuj -person2-.", c2
+        b = a.localize(lcg.NullTranslator())
+        c = a.localize(lcg.GettextTranslator('cs'))
+        assert b == "Joe is smarter than Ann.", b
+        assert c == u"Joe je chytřejší než Ann.", c
+        b2 = a3.localize(lcg.NullTranslator())
+        c2 = a3.localize(lcg.GettextTranslator('cs'))
+        assert b2 == "-person1- is smarter than -person2-.", b2
+        assert c2 == u"-person1- je chytřejší než -person2-.", c2
         
 tests.add(SelfTranslatableText)
 
@@ -134,13 +166,13 @@ class LocalizableDateTime(unittest.TestCase):
         d2 = lcg.LocalizableDateTime("2006-12-21 02:43", show_time=False)
         d3 = lcg.LocalizableDateTime("2006-12-21 02:43")
         d4 = lcg.LocalizableDateTime("2006-12-21 18:43:32", show_weekday=True)
-        f = d1.format(lcg.GettextTranslator('cs').locale_data())
+        f = d1.localize(lcg.GettextTranslator('cs'))
         assert f == "21.12.2006", f
-        data = lcg.GettextTranslator('en').locale_data()
-        f1 = d1.format(data)
-        f2 = d2.format(data)
-        f3 = d3.format(data)
-        f4 = d4.format(data)
+        t = lcg.GettextTranslator('en')
+        f1 = d1.localize(t)
+        f2 = d2.localize(t)
+        f3 = d3.localize(t)
+        f4 = d4.localize(t)
         assert f1 == "12/21/2006", f1
         assert f2 == "12/21/2006", f2
         assert f3 == "12/21/2006 02:43 AM", f3
@@ -149,9 +181,9 @@ class LocalizableDateTime(unittest.TestCase):
     def check_concat(self):
         d = lcg.LocalizableDateTime("2006-01-30")
         c = "Date is: " + d
-        t = c.translate(lcg.GettextTranslator('en'))
+        t = c.localize(lcg.GettextTranslator('en'))
         assert t == "Date is: 01/30/2006", t
-        t = c.translate(lcg.GettextTranslator('cs'))
+        t = c.localize(lcg.GettextTranslator('cs'))
         assert t == "Date is: 30.01.2006", t
 
 tests.add(LocalizableDateTime)
@@ -161,10 +193,10 @@ class LocalizableTime(unittest.TestCase):
     def check_format(self):
         t1 = lcg.LocalizableTime("02:43")
         t2 = lcg.LocalizableTime("18:43:32")
-        t1cs = t1.format(lcg.GettextTranslator('cs').locale_data())
-        t2cs = t2.format(lcg.GettextTranslator('cs').locale_data())
-        t1no = t1.format(lcg.GettextTranslator('no').locale_data())
-        t2no = t2.format(lcg.GettextTranslator('no').locale_data())
+        t1cs = t1.localize(lcg.GettextTranslator('cs'))
+        t2cs = t2.localize(lcg.GettextTranslator('cs'))
+        t1no = t1.localize(lcg.GettextTranslator('no'))
+        t2no = t2.localize(lcg.GettextTranslator('no'))
         assert t1cs == "02:43", t1cs
         assert t2cs == "18:43:32", t2cs
         assert t1no == "02.43", t1no
@@ -176,7 +208,7 @@ tests.add(LocalizableTime)
 class TranslatableTextFactory(unittest.TestCase):
 
     def check_domain(self):
-        a = _("Hi %(name1)s, say hello to %(name2)s.", name1=_("Joe"), name2=_("Bob"))
+        a = _("%(name1)s is smarter than %(name2)s.", name1=_("Joe"), name2=_("Bob"))
         assert a.domain() == 'test'
 
 tests.add(TranslatableTextFactory)
@@ -207,10 +239,10 @@ class GettextTranslator(unittest.TestCase):
 
     def check_translate(self):
         t = lcg.GettextTranslator('cs')
-        a = _("Hi %(name1)s, say hello to %(name2)s.", name1=_("Joe"), name2=_("Bob"))
+        a = _("%(name1)s is smarter than %(name2)s.", name1=_("Joe"), name2=_("Bob"))
         b = t.translate(a)
-        assert b == "Ahoj Pepo, pozdravuj Bobika.", b
-        c = a.translate(t)
+        assert b == u"Pepa je chytřejší než Bobik.", b
+        c = a.localize(t)
         assert c == b, c
 
 tests.add(GettextTranslator)

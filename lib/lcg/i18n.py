@@ -73,6 +73,15 @@ class Localizable(unicode):
         'TranslatableText' or 'Concatenation' instances.
 
     """
+    def __new__(cls, text, _transforms=(), **kwargs):
+        for f in _transforms:
+            text = f(text)
+        return unicode.__new__(cls, text)
+
+    def __init__(self, _transforms=()):
+        assert isinstance(_transforms, tuple), _transforms
+        self._transforms = _transforms
+    
     def __add__(self, other):
         if not isinstance(other, (str, unicode)):
             return NotImplemented
@@ -83,6 +92,56 @@ class Localizable(unicode):
             return NotImplemented
         return concat((other, self))
 
+    def _clone_args(self):
+        return ()
+    
+    def _clone_kwargs(self):
+        return dict(_transforms=self._transforms)
+    
+    def _clone(self, **kwargs):
+        args = self._clone_args()
+        kwargs = dict(self._clone_kwargs(), **kwargs)
+        return self.__class__(*args, **kwargs)
+    
+    def _localize(self, translator):
+        raise Exception("This method must be overriden!")
+        
+    def replace(self, old, new):
+        """Return a new 'Localizable' replacing the string 'old' by 'new'.
+
+        This is the analogy of the string method of the same name and arguments.
+        Here the replacement is done after localization.
+
+        """
+        transforms = self._transforms + (lambda x: x.replace(old, new),)
+        return self._clone(_transforms=transforms)
+
+    def quoteattr(self):
+        """Return the localizable string as quoted value for an XML attributte.
+
+        The result is the same as with 'saxutils.quoteattr()', but the quotetion is done after
+        localization.
+        
+        """
+        transforms = self._transforms + (saxutils.quoteattr,)
+        return self._clone(_transforms=transforms)
+    
+    def localize(self, translator):
+        """Return the localized text as a plain string or unicode.
+
+        Arguments:
+
+          translator -- a 'Translator' instance.
+
+        If there was at least one unicode type argument, or if the 'translator'
+        returns unicode values, the result will be a unicode type.  If all the
+        input are plain strings, a plain string is returned.
+        
+        """
+        result = self._localize(translator)
+        for transform in self._transforms:
+            result = transform(result)
+        return result
     
 class TranslatableText(Localizable):
     """Translatable string with a delayed translation.
@@ -96,31 +155,35 @@ class TranslatableText(Localizable):
     us to build the content first and translate it afterwards.
 
     Instances must be treated cerefully to prevent losing the translation
-    information as described in 'Localizable' class documentation.  In addition
-    to the safe operations described there, the following two operations are
-    also safe on this class.
+    information as described in 'Localizable' class documentation.
 
-      * replacement using the 'replace' method.
-
-      * simple ``formatting'' using the 'format' function defined below.
-
+    This class also supports variable interpolation.  The string passed to the
+    constructor will be considered a format string if any substitution variables
+    are passed.  The interpolation is done after translation, because we need
+    the base string, not the interpolated one for translation.  And because the
+    translation is defered, variable substitution must be also defered.  This
+    makes the difference between using standatad gettex as the '_()' construct
+    and using the 'TranslatableText' for the same.  With standard gettext, we
+    get the translated version right away and we can substitute the variables in
+    place.  However with 'TranslatableText', we must pass the variables to its
+    constructor and let the instance interpolate them later.
     
     """
     _RESERVED_ARGS = ()
     
     class _Interpolator(object):
-        def __init__(self, interpole, translate):
-            self._interpole = interpole
-            self._translate = translate
+        def __init__(self, func, translator):
+            self._func = func
+            self._translator = translator
         def __getitem__(self, key):
-            return self._translate(self._interpole(str(key)))
+            return self._translator.translate(self._func(str(key)))
     
     def __new__(cls, text, *args, **kwargs):
         values = args or dict([(k,v) for k,v in kwargs.items()
                                if not k.startswith('_') and not k in cls._RESERVED_ARGS])
         if values:
             text %= values
-        return unicode.__new__(cls, text)
+        return Localizable.__new__(cls, text, **kwargs)
 
     def __init__(self, text, *args, **kwargs):
         """Initialize the instance.
@@ -135,21 +198,18 @@ class TranslatableText(Localizable):
 
         If 'args' or 'kwargs' are passed, the 'text' is considered a format
         string and it will be automatically interpolated after translation.
-        The interpolation must be done after the translation, because we need
-        the base string, not the interpolated one for translation.  And because
-        the translation is defered, the substitution of the formatting
-        variables must be also defered.  This makes the difference between
-        using standatad gettex as the '_()' construct and using the
-        'TranslatableText' for the same.  With standard gettext, we get the
-        translated version right away and we can substitute the variables in
-        place.  However with 'TranslatableText', we must pass the variables to
-        its constructor and let the instance interplate them later.
+        
+        Only 'args' or only 'kwargs' may be passed (not both at once).  This 
+        depends whether you are using named variables in the format string or
+        just positional substitution.  It is recommended to use named format
+        variables (with keyword arguments), especially when there is more than
+        one variable within the string.
 
-        Note, that only 'args' or only 'kwargs' may be passed (not both at
-        once).  This depends whether you are using named variables in the
-        format string or just positional substitution.  It is recommended to
-        use named format variables (with keyword arguments), especially when
-        there is more than one variable within the string.
+        Variable interpolation is performed on localization (when 'localize()'
+        is called).  Also all values of format variables are localized
+        recursively before interpolation, if they are 'Localizable' instances.
+        TypeError may be raised during localization, when the constructor
+        arguments didn't correspond to the format string.
         
         """
         assert isinstance(text, (str, unicode)), (text, type(text))
@@ -158,26 +218,23 @@ class TranslatableText(Localizable):
         self._init_kwargs(**kwargs)
         assert not args or not self._kwargs, (text, args, self._kwargs)
 
-    def _init_kwargs(self, _transforms=(), _domain=None, _origin='en', _interpolate=None,
-                     **kwargs):
-        assert isinstance(_transforms, tuple), _transforms
+    def _init_kwargs(self, _domain=None, _origin='en', _interpolate=None, _transforms=(), **kwargs):
         assert isinstance(_domain, (str)) or _domain is None, _domain
         assert isinstance(_origin, (str)), _origin
         assert _interpolate is None or callable(_interpolate), _interpolate
-        self._transforms = _transforms
         self._domain = _domain
         self._origin = _origin
         self._interpolate = _interpolate
         self._kwargs = kwargs
+        super(TranslatableText, self).__init__(_transforms=_transforms)
 
-    def _clone_kwargs(self):
-        return dict(self._kwargs, _domain=self._domain, _origin=self._origin,
-                    _transforms=self._transforms, _interpolate=self._interpolate)
+    def _clone_args(self):
+        return (self._text,) + self._args
     
-    def _clone(self, **kwargs):
-        kwargs = dict(self._clone_kwargs(), **kwargs)
-        return self.__class__(self._text, *self._args, **kwargs)
-        
+    def _clone_kwargs(self):
+        return dict(super(TranslatableText, self)._clone_kwargs(), _domain=self._domain, 
+                    _origin=self._origin, _interpolate=self._interpolate, **self._kwargs)
+    
     def domain(self):
         """Return the domain name bound to this instance."""
         return self._domain
@@ -194,51 +251,17 @@ class TranslatableText(Localizable):
         """
         return self._clone(_interpolate=func)
         
-    def replace(self, old, new):
-        """Return a new TranslatableText instance which replaces 'old' by 'new'.
-
-        This is the analogy of the string method of the same name and
-        arguments.  Here the replacement is left after the translation and
-        variable interpolation.  Thus the actual replace is automatically
-
-        """
-        transforms = self._transforms + (lambda x: x.replace(old, new),)
-        return self._clone(_transforms=transforms)
-
     def _translate(self, translator):
         return translator.gettext(self._text, domain=self._domain, origin=self._origin)
 
-    def translate(self, translator):
-        """Return the translated and interpolated string.
-        
-        Arguments:
-
-          translator -- a 'Translator' instance.
-
-        The returned string has all the format variables interpolated.  Also
-        all values of the format variables are translated (using the same
-        function) before interpolation, if they are TranslatableText or
-        Concatenation instances.
-
-        Note, that a TypeError may be raised, when the constructor arguments
-        didn't correspond to the format string.
-
-        """
-        assert isinstance(translator, Translator)
-        def translate(x):
-            if isinstance(x, Localizable):
-                return translator.translate(x)
-            else:
-                return x
+    def _localize(self, translator):
         result = self._translate(translator)
         if self._args:
-            result %= tuple([translate(arg) for arg in self._args])
+            result %= tuple([translator.translate(arg) for arg in self._args])
         elif self._interpolate:
-            result %= self._Interpolator(self._interpolate, translate)
+            result %= self._Interpolator(self._interpolate, translator)
         elif self._kwargs:
-            result %= dict([(k, translate(v)) for k, v in self._kwargs.items()])
-        for transform in self._transforms:
-            result = transform(result)
+            result %= dict([(k, translator.translate(v)) for k, v in self._kwargs.items()])
         return result
 
 
@@ -283,11 +306,8 @@ class LocalizableDateTime(Localizable):
     _RE = re.compile(r'^(\d\d\d\d)-(\d\d)-(\d\d)(?: (\d\d):(\d\d)(?::(\d\d))?)?$')
     _LEADING_ZEROS = re.compile(r'(?<!\d)0+')
 
-    def __new__(cls, text, **kwargs):
-        return unicode.__new__(cls, text)
-    
-    def __init__(self, string, show_weekday=False, show_time=None, leading_zeros=True):
-        super(LocalizableDateTime, self).__init__(string)
+    def __init__(self, string, show_weekday=False, show_time=None, leading_zeros=True, **kwargs):
+        super(LocalizableDateTime, self).__init__(**kwargs)
         m = self._RE.match(string)
         if not m:
             raise Exception("Invalid date/time format", self)
@@ -298,7 +318,8 @@ class LocalizableDateTime(Localizable):
         self._show_time = show_time is None and len(numbers) > 3 or show_time
         self._show_seconds = len(numbers) > 5
     
-    def format(self, data):
+    def _localize(self, translator):
+        data = translator.locale_data()
         result = self._datetime.strftime(data.date_format)
         if not self._leading_zeros:
             result = self._LEADING_ZEROS.sub('', result)
@@ -319,8 +340,8 @@ class LocalizableTime(Localizable):
     """
     _RE = re.compile(r'^(\d\d):(\d\d)(?::(\d\d))?$')
 
-    def __init__(self, string):
-        super(LocalizableTime, self).__init__(string)
+    def __init__(self, string, **kwargs):
+        super(LocalizableTime, self).__init__(**kwargs)
         m = self._RE.match(string)
         if not m:
             raise Exception("Invalid time format", self)
@@ -328,7 +349,8 @@ class LocalizableTime(Localizable):
         self._time = datetime.time(*numbers)
         self._show_seconds = len(numbers) > 2
     
-    def format(self, data):
+    def _localize(self, translator):
+        data = translator.locale_data()
         time_format = (self._show_seconds and data.exact_time_format or data.time_format)
         return self._time.strftime(time_format)
 
@@ -336,19 +358,20 @@ class LocalizableTime(Localizable):
 class Decimal(Localizable):
     """Localizable decimal number."""
     
-    def __new__(cls, value, precision=None):
+    def __new__(cls, value, precision=None, **kwargs):
         if precision is None:
             format = '%f'
         else:
             format = '%%.%df' % precision
-        return unicode.__new__(cls, format % value)
+        return Localizable.__new__(cls, format % value, **kwargs)
 
-    def __init__(self, value, precision=None):
+    def __init__(self, value, precision=None, **kwargs):
         self._value = value
         if precision is None:
             self._format = '%f'
         else:
             self._format = '%%.%df' % precision
+        super(Decimal, self).__init__(**kwargs)
 
     def _locales(self, data):
         return data.decimal_point, data.grouping, data.thousands_sep
@@ -378,7 +401,8 @@ class Decimal(Localizable):
             result = string + thousands_sep + result
         return result
       
-    def format(self, data):
+    def _localize(self, translator):
+        data = translator.locale_data()
         formatted = self._format % self._value
         if formatted.find('.') == -1:
             pre, post = formatted, None
@@ -395,8 +419,8 @@ class Decimal(Localizable):
 class Monetary(Decimal):
     """Localizable monetary amount."""
     
-    def __init__(self, value, precision=2):
-        super(Monetary, self).__init__(value, precision=precision)
+    def __init__(self, value, precision=2, **kwargs):
+        super(Monetary, self).__init__(value, precision=precision, **kwargs)
 
     def _locales(self, data):
         return data.mon_decimal_point, data.mon_grouping, data.mon_thousands_sep
@@ -408,21 +432,18 @@ class Concatenation(Localizable):
     Represents a block of text, where ordinary python strings, unicode strings
     and 'Localizable' instances are concatenated to make the final text.
 
-    As well as with 'TranslatableText', using an instance of this class in a
-    string (or unicode) context leads to the loss of translation information.
-    See the documentation of 'TranslatableText' for more information.
+    See 'Localizable' documentation for more information.
     
     """
-    def __new__(cls, *items, **kwargs):
-        sep = (lambda separator='': separator)(**kwargs)
+    def __new__(cls, items, separator='', **kwargs):
         def x(item):
             if isinstance(item, (list, tuple)):
-                return sep.join(item)
+                return separator.join(item)
             else:
                 return item
-        return unicode.__new__(cls, sep.join([x(item) for item in items]))
+        return Localizable.__new__(cls, separator.join([x(item) for item in items]), **kwargs)
     
-    def __init__(self, *items, **kwargs):
+    def __init__(self, items, separator='', **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -445,14 +466,13 @@ class Concatenation(Localizable):
             a 'Concatenation'.
             
         """
-        
-        separator = (lambda separator='': separator)(**kwargs)
+        super(Concatenation, self).__init__(**kwargs)
         def append(array, item):
-            if isinstance(item, Concatenation):
+            if isinstance(item, Concatenation) and not item._transforms:
                 for p in item.items():
                     append(array, p)
             else:
-                assert isinstance(item, (str, unicode)), item
+                assert isinstance(item, basestring), repr(item)
                 if not isinstance(item, Localizable) and array \
                        and not isinstance(array[-1], Localizable):
                     array[-1] +=  item
@@ -462,24 +482,19 @@ class Concatenation(Localizable):
         last = len(items) - 1
         for i, item in enumerate(items):
             if isinstance(item, (tuple, list)):
-                item = Concatenation(*item, **dict(separator=separator))
+                item = Concatenation(item, separator=separator)
             #if item is None or item == "":
             #    continue
             append(myitems, item)
             if i != last:
                 append(myitems, separator)
         
-    def replace(self, old, new):
-        """Apply the method to all items and return a new Concatenation.
-
-        The 'replace()' method with given arguments will be applied to all
-        arguments and a new Concatenation instance will be returned with the
-        modified arguments.  See 'string.replace()' and
-        'TranslatableText.replace()' for more information.
-
-        """
-        return concat([item.replace(old, new) for item in self._items])
-
+    def _clone_args(self):
+        return (self._items,)
+    
+    def _localize(self, translator):
+        return ''.join([translator.translate(item) for item in self._items])
+    
     def startswith(self, *args, **kwargs):
         """Return the result of 'startswidth()' call the method on the first item."""
         return self._items and self._items[0].startswith(*args, **kwargs)
@@ -497,38 +512,22 @@ class Concatenation(Localizable):
         be, however, internally merged or otherwise reorganized.
 
         The items returned byt this method are always either strings, unicode
-        strings, 'TranslatableText' or 'LocalizableDateTime' instances.
+        strings or other 'Localizable' instances (exept for 'Concatenation',
+        since their nesting is prevented in the constructor).
         
         """
         return self._items
-        
-    def translate(self, translator):
-        """Return the translated text as a string ot a unicode string.
-
-        Arguments:
-
-          translator -- a 'Translator' instance.
-
-        If there was at least one unicode type argument, or if the 'translator'
-        returnes unicode values, the result will be a unicode type.  If all the
-        input are plain strings, a plain string is returned.
-        
-        """
-        return ''.join([translator.translate(item) for item in self._items])
 
 
 class Translator(object):
     """A generic translator of translatable objects.
 
-    A translator should be able to translate different translatable objects,
-    such as 'TranslatableText' and 'Concatenation' instances.  Also
-    'LocalizableDateTime' instances will be formatted to a proper output
-    format.  'Concatenation' instances may contain 'TranslatableText' instances
-    coming from different domains and a translator should be able to deal with
-    them.
+    A translator should be able to localize different 'Localizable' objects,
+    such as 'TranslatableText', 'LocalizableDateTime' or 'Concatenation'
+    instances.  'TranslatableText' instances coming from different can be mixed.
 
-    This is class only defines the basic tr.  See 'GettextTranslator'
-    or 'NullTranslator' for concrete implementations.
+    This class only defines the basic API.  See 'GettextTranslator' or
+    'NullTranslator' for concrete implementations.
 
     """
     def __init__(self, lang=None):
@@ -566,10 +565,8 @@ class Translator(object):
         within the input (as well as 'Concatenation.translate()'.
         
         """
-        if isinstance(text, (Concatenation, TranslatableText)):
-            return text.translate(self)
-        elif isinstance(text, Localizable):
-            return text.format(self._locale_data)
+        if isinstance(text, Localizable):
+            return text.localize(self)
         else:
             return text
 
@@ -655,11 +652,23 @@ def concat(*args, **kwargs):
     See 'Concatenation' constructor for more information about the arguments.
 
     """
-    result = Concatenation(*args, **kwargs)
+    result = Concatenation(args, **kwargs)
     items = result.items()
     if len(items) == 1 and not isinstance(items[0], TranslatableText):
         return items[0]
     return result
+
+def quoteattr(text):
+    """Return the string as quoted value for an XML attributte.
+
+    The result is the same as with 'saxutils.quoteattr()', but 'Localizable'
+    instances are treated properly.
+
+    """
+    if isinstance(text, Localizable):
+        return text.quoteattr()
+    else:
+        return saxutils.quoteattr(text)
 
 
 def source_files_by_domain(basedir, domain=None):

@@ -1,3 +1,16 @@
+2008-06-25  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/test.cs.po: Updated.
+
+	* lib/lcg/export/html.py (HtmlGenerator._attr): Quote HTML
+	attributes properly.
+
+	* lib/lcg/_test.py: Tests updated.
+
+	* lib/lcg/i18n.py: Support for transformations generalized allow
+	them for all localizable types.  The localization API unified.
+	Added support `quoteattr' transformation.
+
 2008-05-23  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (PreformattedText.export): Escape the

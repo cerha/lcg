@@ -42,7 +42,7 @@ class HtmlGenerator(Generator):
             else:
                 if isinstance(value, int):
                     value = str(value)
-                result += ' ' + name + '="' + value + '"'
+                result += ' ' + name + '=' + quoteattr(value)
         assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
 

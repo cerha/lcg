@@ -1,5 +1,5 @@
 # Learning Content Generator
-# Copyright (C) 2006-2007 Brailcom, o.p.s.
+# Copyright (C) 2006-2008 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2006.
 #
@@ -7,26 +7,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-31 10:15+0200\n"
-"PO-Revision-Date: 2007-08-07 21:11+0200\n"
+"POT-Creation-Date: 2008-06-25 17:02+0200\n"
+"PO-Revision-Date: 2008-06-25 17:02+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/_test.py:179 ../lib/lcg/_test.py:210
-msgid "Joe"
-msgstr "Pepo"
-
-#: ../lib/lcg/_test.py:179 ../lib/lcg/_test.py:210
+#: ../lib/lcg/_test.py:106 ../lib/lcg/_test.py:195 ../lib/lcg/_test.py:226
 msgid "Bob"
-msgstr "Bobika"
+msgstr "Bobik"
 
-#: ../lib/lcg/_test.py:179 ../lib/lcg/_test.py:210
+#: ../lib/lcg/_test.py:106
 #, python-format
-msgid "Hi %(name1)s, say hello to %(name2)s."
-msgstr "Ahoj %(name1)s, pozdravuj %(name2)s."
+msgid "His name is \"%s\""
+msgstr "Jmenuje se \"%s\""
 
-#~ msgid "Hi %s, say hello to %s."
-#~ msgstr "Ahoj %s, pozdravuj %s."
+#: ../lib/lcg/_test.py:195 ../lib/lcg/_test.py:226
+msgid "Joe"
+msgstr "Pepa"
+
+#: ../lib/lcg/_test.py:195 ../lib/lcg/_test.py:226
+#, python-format
+msgid "%(name1)s is smarter than %(name2)s."
+msgstr "%(name1)s je chytřejší než %(name2)s."
