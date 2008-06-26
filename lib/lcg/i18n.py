@@ -647,18 +647,21 @@ class GettextTranslator(Translator):
 def concat(*args, **kwargs):
     """Concatenate the 'args' into a 'Concatenation' or a string.
 
-    This function has exactly the same effect as creating a 'Concatenation' by
-    calling its constructor.  All the arguments are the same.  The only
-    difference is, that when the whole concatenation is a plain Python string
-    (there were no translatable texts within the input), this string is
-    returned directly (without the surrounding 'Concatenation' instance).
+    This function has the same effect as creating a 'Concatenation' by calling
+    its constructor, but the items can be passed as positional arguments for
+    convenience.  Keyword arguments are passew without change.
+
+    One special case is handled differently.  When the whole concatenation is an
+    ordinary Python string or unicode type (there were no 'Localizable'
+    instances within the input), this string is returned directly (without the
+    surrounding 'Concatenation' instance).
 
     See 'Concatenation' constructor for more information about the arguments.
 
     """
     result = Concatenation(args, **kwargs)
     items = result.items()
-    if len(items) == 1 and not isinstance(items[0], TranslatableText):
+    if len(items) == 1 and not isinstance(items[0], Localizable):
         return items[0]
     return result
 
