@@ -21,6 +21,8 @@
 from lcg import *
 from lcg.export import *
 
+from xml.sax import saxutils
+
 _ = TranslatableTextFactory('lcg')
 
 class HtmlGenerator(Generator):
@@ -41,8 +43,12 @@ class HtmlGenerator(Generator):
                 result += ' ' + name
             else:
                 if isinstance(value, int):
-                    value = str(value)
-                result += ' ' + name + '=' + quoteattr(value)
+                    value = '"%d"' % value
+                elif isinstance(value, Localizable):
+                    value = value.transform(saxutils.quoteattr)
+                else:
+                    value = saxutils.quoteattr(value)
+                result += ' ' + name + '=' + value
         assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
 

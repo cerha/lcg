@@ -60,9 +60,8 @@ class Localizable(unicode):
     string formatting, substitution, etc leads to the loss of translation
     information.  In such a case the instance is unavoidably converted to an
     ordinary unicode string by Python and translation can not be performed
-    anymore.  This is why there is the 'Concatenation' class, which protects
-    the 'TranslatableText' instance while allowing to mix it with ordinary
-    strings.
+    anymore.  This is why there is the 'Concatenation' class, which protects the
+    'Localizable' instances but still allows mixing them with ordinary strings.
 
     To preserve the 'Localizable' instances, only the following operations are
     permitted:
@@ -71,6 +70,8 @@ class Localizable(unicode):
       
       * concatenation using the '+' operator with other string, unicode,
         'TranslatableText' or 'Concatenation' instances.
+
+      * generic transformations using the 'transform()' function.
 
     """
     def __new__(cls, text, _transforms=(), **kwargs):
@@ -93,7 +94,7 @@ class Localizable(unicode):
         return concat((other, self))
 
     def _clone_args(self):
-        return ()
+        return (unicode(self),)
     
     def _clone_kwargs(self):
         return dict(_transforms=self._transforms)
@@ -106,37 +107,37 @@ class Localizable(unicode):
     def _localize(self, translator):
         raise Exception("This method must be overriden!")
         
+    def transform(self, function):
+        """Return a copy performing given transformation after localization.
+
+        Creates a copy of the instance which applies given 'function' on the
+        final string after the dalayed localization.  The function will receive
+        one argument -- the localized (unicode) string representing given
+        instance.
+        
+        """
+        return self._clone(_transforms=self._transforms + (function,))
+    
     def replace(self, old, new):
         """Return a new 'Localizable' replacing the string 'old' by 'new'.
 
-        This is the analogy of the string method of the same name and arguments.
-        Here the replacement is done after localization.
+        This is just a convenience wrapper for:
+
+          x.transform(lambda string: string.replace(old, new))
 
         """
-        transforms = self._transforms + (lambda x: x.replace(old, new),)
-        return self._clone(_transforms=transforms)
+        return self.transform(lambda x: x.replace(old, new))
 
-    def quoteattr(self):
-        """Return the localizable string as quoted value for an XML attributte.
-
-        The result is the same as with 'saxutils.quoteattr()', but the quotetion is done after
-        localization.
-        
-        """
-        transforms = self._transforms + (saxutils.quoteattr,)
-        return self._clone(_transforms=transforms)
-    
     def localize(self, translator):
-        """Return the localized text as a plain string or unicode.
+        """Return the localized version of the instance as a string.
 
         Arguments:
 
           translator -- a 'Translator' instance.
 
-        If there was at least one unicode type argument, or if the 'translator'
-        returns unicode values, the result will be a unicode type.  If all the
-        input are plain strings, a plain string is returned.
-        
+        The returned string cen be unicode or plain string depending on the
+        original instance (and its type) and also on the translator.
+
         """
         result = self._localize(translator)
         for transform in self._transforms:
@@ -448,10 +449,9 @@ class Concatenation(Localizable):
 
         Arguments:
 
-          items -- any number of items may be specified as positional
-            arguments.  All these arguments are used to make the final text in
-            concatenation.  Each item may be a string, a unicode string, a
-            'Localizable' instance, a 'Concatenation' instance, tuple or list.
+          items -- a sequence of items composing the concatenation.  Each item
+            may be a string, a unicode string, a 'Localizable' instance, tuple
+            or list.
  
           separator -- this optional argument may be a string or a unicode
             string.  If specified, the items will be concatenated using this
@@ -464,6 +464,11 @@ class Concatenation(Localizable):
             of the items.  Thus, sequences behave like being unpacked.  If you
             want to prevent sequences from being unpacked, just pack them into
             a 'Concatenation'.
+
+        If there is at least one unicode type argument, the concatenation will
+        produce a unicode string on output (as the result of 'localize()'.  If
+        all the input items (including the separator) are plain strings, a plain
+        string is produced.
             
         """
         super(Concatenation, self).__init__(**kwargs)
@@ -506,14 +511,13 @@ class Concatenation(Localizable):
     def items(self):
         """Return the list of items included in this concatenation.
 
-        You can not rely on any relevance of the items passed to the
-        constructor and the final items returned by this method.  It is only
-        guaranted, that the items will form the same output string.  They may
-        be, however, internally merged or otherwise reorganized.
+        The items may not be returned in the same form as passed to the
+        constructor, since the nested 'Concatenation' instances may be merged or
+        otherwise reorganized.  It is only guaranted, that the items will form
+        the same output string.
 
         The items returned byt this method are always either strings, unicode
-        strings or other 'Localizable' instances (exept for 'Concatenation',
-        since their nesting is prevented in the constructor).
+        strings or other 'Localizable' instances.
         
         """
         return self._items
@@ -657,19 +661,6 @@ def concat(*args, **kwargs):
     if len(items) == 1 and not isinstance(items[0], TranslatableText):
         return items[0]
     return result
-
-def quoteattr(text):
-    """Return the string as quoted value for an XML attributte.
-
-    The result is the same as with 'saxutils.quoteattr()', but 'Localizable'
-    instances are treated properly.
-
-    """
-    if isinstance(text, Localizable):
-        return text.quoteattr()
-    else:
-        return saxutils.quoteattr(text)
-
 
 def source_files_by_domain(basedir, domain=None):
     """Return the list of all Python source files, which belong to given domain.

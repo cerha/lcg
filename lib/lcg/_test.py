@@ -102,11 +102,12 @@ class TranslatableText(unittest.TestCase):
         assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
         assert str(d) == dx == 'versi-n x-x-y-y', (d, dx)
 
-    def check_quoteattr(self):
+    def check_transform(self):
+        from xml.sax import saxutils
         a = _('His name is "%s"', _("Bob"))
         b = _("Bob") +' + '+ _("Joe")
-        c = a.quoteattr()
-        d = b.quoteattr()
+        c = a.transform(saxutils.quoteattr)
+        d = b.transform(saxutils.quoteattr)
         e = "xxx=" + d # Test transformed Concatenation nesting!
         assert isinstance(c, lcg.TranslatableText), c
         assert isinstance(d, lcg.Concatenation), d
@@ -126,8 +127,6 @@ class TranslatableText(unittest.TestCase):
         assert cx == '\'Jmenuje se "Bobik"\'', cx
         assert dx == '"Bobik + Pepa"', dx
         assert ex == 'xxx="Bobik + Pepa"', ex
-        c = lcg.quoteattr('x')
-        assert c == '"x"', c
 
     def check_string_context(self):
         a = lcg.TranslatableText("Version %s", "1.0")
@@ -161,22 +160,34 @@ tests.add(SelfTranslatableText)
 
 class LocalizableDateTime(unittest.TestCase):
 
-    def check_format(self):
+    def check_localize(self):
         d1 = lcg.LocalizableDateTime("2006-12-21")
         d2 = lcg.LocalizableDateTime("2006-12-21 02:43", show_time=False)
         d3 = lcg.LocalizableDateTime("2006-12-21 02:43")
         d4 = lcg.LocalizableDateTime("2006-12-21 18:43:32", show_weekday=True)
-        f = d1.localize(lcg.GettextTranslator('cs'))
-        assert f == "21.12.2006", f
-        t = lcg.GettextTranslator('en')
-        f1 = d1.localize(t)
-        f2 = d2.localize(t)
-        f3 = d3.localize(t)
-        f4 = d4.localize(t)
-        assert f1 == "12/21/2006", f1
-        assert f2 == "12/21/2006", f2
-        assert f3 == "12/21/2006 02:43 AM", f3
-        assert f4 == "Thu 12/21/2006 06:43:32 PM", f4
+        d5 = lcg.LocalizableDateTime("2006-01-30", leading_zeros=False)
+        t1 = lcg.GettextTranslator('en')
+        x1 = d1.localize(t1)
+        x2 = d2.localize(t1)
+        x3 = d3.localize(t1)
+        x4 = d4.localize(t1)
+        x5 = d5.localize(t1)
+        assert x1 == "12/21/2006", x1
+        assert x2 == "12/21/2006", x2
+        assert x3 == "12/21/2006 02:43 AM", x3
+        assert x4 == "Thu 12/21/2006 06:43:32 PM", x4
+        assert x5 == "1/30/2006", x5
+        t2 = lcg.GettextTranslator('cs')
+        y1 = d1.localize(t2)
+        y2 = d2.localize(t2)
+        y3 = d3.localize(t2)
+        y4 = d4.localize(t2)
+        y5 = d5.localize(t2)
+        assert y1 == "21.12.2006", y1
+        assert y2 == "21.12.2006", y2
+        assert y3 == "21.12.2006 02:43", y3
+        assert y4 == u"Čt 21.12.2006 18:43:32", y4
+        assert y5 == "30.1.2006", y5
         
     def check_concat(self):
         d = lcg.LocalizableDateTime("2006-01-30")
@@ -185,6 +196,29 @@ class LocalizableDateTime(unittest.TestCase):
         assert t == "Date is: 01/30/2006", t
         t = c.localize(lcg.GettextTranslator('cs'))
         assert t == "Date is: 30.01.2006", t
+
+    def check_replace(self):
+        a = lcg.LocalizableDateTime("2006-01-30")
+        b = a.replace('-', '+')
+        c = a.replace('/', '|')
+        d = a.replace('.', ':')
+        t1 = lcg.GettextTranslator('en')
+        t2 = lcg.GettextTranslator('cs')
+        b1 = b.localize(t1)
+        b2 = b.localize(t2)
+        assert str(b) == "2006+01+30", str(b)
+        assert b1 == "01/30/2006", b1
+        assert b2 == "30.01.2006", b2
+        c1 = c.localize(t1)
+        c2 = c.localize(t2)
+        assert str(c) == "2006-01-30", str(c)
+        assert c1 == "01|30|2006", c1
+        assert c2 == "30.01.2006", c2
+        d1 = d.localize(t1)
+        d2 = d.localize(t2)
+        assert str(d) == "2006-01-30", str(d)
+        assert d1 == "01/30/2006", d1
+        assert d2 == "30:01:2006", d2
 
 tests.add(LocalizableDateTime)
 
