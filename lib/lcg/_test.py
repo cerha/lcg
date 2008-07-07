@@ -108,7 +108,8 @@ class TranslatableText(unittest.TestCase):
         b = _("Bob") +' + '+ _("Joe")
         c = a.transform(saxutils.quoteattr)
         d = b.transform(saxutils.quoteattr)
-        e = "xxx=" + d # Test transformed Concatenation nesting!
+        e = "attr=" + d # Test transformed Concatenation nesting!
+        f = lcg.concat('<tag '+ e +'>')
         assert isinstance(c, lcg.TranslatableText), c
         assert isinstance(d, lcg.Concatenation), d
         t = lcg.GettextTranslator('cs')
@@ -117,16 +118,19 @@ class TranslatableText(unittest.TestCase):
         cx = c.localize(t)
         dx = d.localize(t)
         ex = e.localize(t)
+        fx = f.localize(t)
         assert str(a) == 'His name is "Bob"', str(a)
         assert str(b) == 'Bob + Joe', str(b)
         assert ax == 'Jmenuje se "Bobik"', ax
         assert bx == 'Bobik + Pepa', bx
         assert str(c) == '\'His name is "Bob"\'', str(c)
         assert str(d) == '"Bob + Joe"', str(d)
-        assert str(e) == 'xxx="Bob + Joe"', str(e)
+        assert str(e) == 'attr="Bob + Joe"', str(e)
+        assert str(f) == '<tag attr="Bob + Joe">', str(f)
         assert cx == '\'Jmenuje se "Bobik"\'', cx
         assert dx == '"Bobik + Pepa"', dx
-        assert ex == 'xxx="Bobik + Pepa"', ex
+        assert ex == 'attr="Bobik + Pepa"', ex
+        assert fx == '<tag attr="Bobik + Pepa">', fx
 
     def check_string_context(self):
         a = lcg.TranslatableText("Version %s", "1.0")
