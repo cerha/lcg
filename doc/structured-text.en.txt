@@ -620,7 +620,7 @@ Any link pointing to an image will display the image in-line.
 *Example:*
 
 ------
-http://www.google.com/images/logo.gif 
+http://www.google.com/images/logo.gif
 ------
 
 This will be presented as:
