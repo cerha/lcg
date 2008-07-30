@@ -385,6 +385,13 @@ class Export(unittest.TestCase):
              '<a href="http://www.freebsoft.org" title="descr">label</a>'),
             ('[xx.mp3]',
              '<a href="media/xx.mp3">xx.mp3</a>'),
+            # Absolute links
+            ('https://www.freebsoft.org',
+             '<a href="https://www.freebsoft.org">https://www.freebsoft.org</a>'),
+            ('See http://www.freebsoft.org.',
+             'See <a href="http://www.freebsoft.org">http://www.freebsoft.org</a>.'),
+            ('(see http://www.freebsoft.org)',
+             '(see <a href="http://www.freebsoft.org">http://www.freebsoft.org</a>)'),
             # Inline images
             ('[aa.jpg]',
              '<img src="images/aa.jpg" alt="" border="0" class="aa" />'),
@@ -415,6 +422,9 @@ class Export(unittest.TestCase):
              '<a href="http://www.freebsoft.org"><img src="/img/logo.gif" alt="Free(b)soft website" border="0" class="logo" /></a>'),
             ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website | Go to Free(b)soft website]',
              '<a href="http://www.freebsoft.org" title="Go to Free(b)soft website"><img src="/img/logo.gif" alt="Free(b)soft website" border="0" class="logo" /></a>'),
+            # Absolute image links
+            ('http://www.freebsoft.org/img/logo.gif',
+             '<img src="http://www.freebsoft.org/img/logo.gif" alt="" border="0" class="logo" />'),
             ):
             result = lcg.FormattedText(text).export(context)
             assert result == html, "\n  * %s\n  - expected: %s\n  - got:      %s" % \

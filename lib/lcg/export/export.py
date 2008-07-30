@@ -360,7 +360,8 @@ class MarkupFormatter(object):
                          r'(?P<label>[^\[\]\|]*))?'
                          r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'
                          r'\]')),
-               ('uri', r'(https?|ftp)://\S+?(?=[\),.:;]?(\s|$))'),
+               ('uri', (r'(?:https?|ftp)://\S+?(?:(?P<imgname_>[^\#\s/]+)'+ _IMG_EXT +\
+                        r')?(?=[\),.:;]?(\s|$))')),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
                ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
                                  "|\{[^\}]+\})")),
@@ -368,7 +369,7 @@ class MarkupFormatter(object):
                ('dash', r'(^|(?<=\s))--($|(?=\s))'),
                ('nbsp', '~'))
     
-    _HELPER_PATTERNS = ('align', 'href', 'imgname', 'anchor', 'label', 'label_img',
+    _HELPER_PATTERNS = ('align', 'href', 'imgname', 'imgname_', 'anchor', 'label', 'label_img',
                         'descr', 'subst')
 
     _FORMAT = {'linebreak': '\n',
@@ -493,8 +494,8 @@ class MarkupFormatter(object):
         return result.export(context)
 
     
-    def _uri_formatter(self, context, uri, close=False, **kwargs):
-        return self._link_formatter(context, href=uri, label=None)
+    def _uri_formatter(self, context, uri, imgname_, close=False, **kwargs):
+        return self._link_formatter(context, href=uri, label=None, imgname=imgname_)
 
     def _formatter(self, context, type, groups, close=False):
         try:

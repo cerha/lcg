@@ -1,3 +1,10 @@
+2008-07-30  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/export.py (MarkupFormatter._uri_formatter): Fixed
+	formatting of absolute image links.
+
+	* lib/lcg/_test.py: Added tests for absolute uri formatting.
+
 2008-07-10  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py (HtmlGenerator._input): Allow attributes
