@@ -73,7 +73,7 @@ class HtmlGenerator(Generator):
         attr = ('type', 'name', 'value', 'title', 'tabindex', 'size', 'maxlength', 'onclick',
                 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
                 'readonly', 'disabled')
-        return self._tag('input', _attr=attr+_attr, _pair=False, type=type, **kwargs)
+        return self._tag('input', _attr=attr+_attr, _paired=False, type=type, **kwargs)
 
     # Generic constructs
      
