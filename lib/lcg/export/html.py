@@ -33,7 +33,7 @@ class HtmlGenerator(Generator):
         result = ''
         #if kwargs.get('lang'):
         #    kwargs['style'] = 'color: red;' + (kwargs.get('style') or '')
-        for name in valid + ('id', 'lang', 'cls', 'style'):
+        for name in valid + ('id', 'lang', 'role', 'cls', 'style'):
             if not kwargs:
                 break
             value = kwargs.pop(name, None)
