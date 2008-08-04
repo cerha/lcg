@@ -1,3 +1,7 @@
+2008-08-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Always use generator methods for HTML generation.
+
 2008-07-30  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/export.py (MarkupFormatter._uri_formatter): Fixed
