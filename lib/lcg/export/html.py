@@ -26,6 +26,8 @@ from xml.sax import saxutils
 _ = TranslatableTextFactory('lcg')
 
 class HtmlGenerator(Generator):
+    #DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    _DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
 
     def _attr(self, valid, **kwargs):
         result = ''
@@ -52,21 +54,26 @@ class HtmlGenerator(Generator):
         assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
 
-    def _tag(self, tag, content, _attributes=(), _newlines=False, **kwargs):
+    def _tag(self, tag, content=None, _attr=(), _newlines=False, _paired=True, **kwargs):
         separator = _newlines and "\n" or ""
-        start = '<' + tag + self._attr(_attributes, **kwargs) + '>' + separator
-        end = '</' + tag + '>' + separator
-        if isinstance(content, (tuple, list)):
-            content = concat(content, separator=separator)
-        if _newlines and not content.endswith('\n'):
-            end = separator + end
-        return concat(start, content, end)
+        start = '<' + tag + self._attr(_attr, **kwargs) + '>' + separator
+        if not _paired:
+            assert content is None
+            return start
+        else:
+            assert content is not None
+            end = '</' + tag + '>' + separator
+            if isinstance(content, (tuple, list)):
+                content = concat(content, separator=separator)
+            if _newlines and not content.endswith('\n'):
+                end = separator + end
+            return concat(start, content, end)
      
     def _input(self, type, _attr=(), **kwargs):
         attr = ('type', 'name', 'value', 'title', 'tabindex', 'size', 'maxlength', 'onclick',
                 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
                 'readonly', 'disabled')
-        return concat('<input', self._attr(attr + _attr, type=type, **kwargs), ' />')
+        return self._tag('input', _attr=attr+_attr, type=type, **kwargs)
 
     # Generic constructs
      
@@ -98,29 +105,40 @@ class HtmlGenerator(Generator):
         return self._tag('p', content, _newlines=True, **kwargs)
      
     def br(self, **kwargs):
-        return concat('<br', self._attr((), **kwargs), '/>')
+        return self._tag('br', _paired=False, **kwargs)
      
     def hr(self, **kwargs):
-        return concat('<hr', self._attr((), **kwargs), '/>')
+        return self._tag('hr', _paired=False, **kwargs)
      
     def link(self, label, uri, title=None, target=None, hotkey=None, cls=None, **kwargs):
         if hotkey and title:
             title += ' (%s)' % hotkey
         if target:
             cls = (cls and cls+' ' or '') + 'external-link'
-        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey')
+        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'tabindex')
         return self._tag('a', label, attr, href=uri, title=title, target=target,
                          accesskey=hotkey, cls=cls, **kwargs)
 
     def anchor(self, label, name):
         return self.link(label, None, name=name)
 
-    def list(self, items, indent=0, ordered=False, style=None, **kwargs):
-        tag = ordered and 'ol' or 'ul'
-        attr = self._attr((), style=(style and 'list-style-type: %s' % style), **kwargs)
+    def li(self, content, **kwargs):
+        return self._tag('li', content, **kwargs)
+    
+    def ol(self, *content, **kwargs):
+        return self._tag('ol', content, **kwargs)
+    
+    def ul(self, *content, **kwargs):
+        return self._tag('ul', content, **kwargs)
+    
+    def list(self, items, indent=0, ordered=False, style=None, aria_menu=False, **kwargs):
         spaces = ' ' * indent
-        items = [concat(spaces+'  <li>', i, '</li>\n') for i in items]
-        return concat(spaces +'<'+ tag, attr, '>\n', items, spaces +'</'+ tag +'>\n')
+        irole = aria_menu and 'menuitem' or None
+        items = [concat(spaces, '  ', self.li(i, role=irole), '\n') for i in items]
+        tag = ordered and self.ol or self.ul
+        style = style and 'list-style-type: %s' % style
+        role = aria_menu and 'menu' or None
+        return spaces + tag(concat('\n', items, spaces), style=style, role=role, **kwargs)+'\n'
 
     def definitions(self, items, **kwargs):
         content = [self._tag('dt', dt) + self._tag('dd', dd) for dt, dd in items]
@@ -132,9 +150,9 @@ class HtmlGenerator(Generator):
      
     def img(self, src, alt='', border=0, descr=None, **kwargs):
         attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
-        return '<img'+ self._attr(attr, src=src, alt=alt, longdesc=descr, border=border,
-                                  **kwargs) +' />'
-
+        return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, longdesc=descr,
+                         border=border, **kwargs)
+    
 
         toc = self._make_toc(context, self._start_item(), depth=self._depth)
         if self._title is not None:
@@ -157,6 +175,17 @@ class HtmlGenerator(Generator):
         return self.table(self.tbody(content), cls=cls, **kwargs)
 
     # HTML specific...
+
+    def html(self, content, lang=None):
+        return concat(self._DOCTYPE, '\n\n',
+                      self._tag('html', concat(content), _newlines=True, lang=lang))
+    
+    def head(self, tags):
+        content = concat('  ', concat(tags, separator='\n  ')),
+        return self._tag('head', content, _newlines=True)
+    
+    def body(self, content, **kwargs):
+        return self._tag('body', content, ('onkeydown', 'role', 'onload'), _newlines=True, **kwargs)
     
     def uri(self, base, *args, **kwargs):
         uri = urllib.quote(base.encode('utf-8'))
@@ -225,7 +254,7 @@ class HtmlGenerator(Generator):
         return self._input('file', name=name, size=size, cls=cls, **kwargs)
      
     def radio(self, name, **kwargs):
-        return self._input('radio', ('checked',), name=name, **kwargs)
+        return self._input('radio', _attr=('checked',), name=name, **kwargs)
      
     def hidden(self, name, value):
         return self._input('hidden', name=name, value=value)
@@ -259,7 +288,7 @@ class HtmlGenerator(Generator):
         return self._tag('select', opts, attr, _newlines=True, name=name, **kwargs)
      
     def checkbox(self, name, **kwargs):
-        return self._input('checkbox', ('checked',), name=name, **kwargs)
+        return self._input('checkbox', _attr=('checked',), name=name, **kwargs)
      
     def textarea(self, name, value='', **kwargs):
         attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
@@ -330,7 +359,7 @@ class HtmlFormatter(MarkupFormatter):
                'citation': ('<span class="citation">', '</span>'),
                'quotation': (u'“<span class="quotation">', u'</span>”'),
                'comment': '',
-               'linebreak': '<br/>',
+               'linebreak': '<br>',
                'dash': '&ndash;',
                'nbsp': '&nbsp;'}
     
@@ -347,9 +376,6 @@ class HtmlFormatter(MarkupFormatter):
 
     
 class HtmlExporter(Exporter):
-    #DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
-    DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
-
     Generator = HtmlGenerator
     Formatter = HtmlFormatter
     
@@ -466,20 +492,16 @@ class HtmlExporter(Exporter):
             return None
     def _initialize(self, context):
         return ''
+
+    def _body_attr(self, context):
+        return {}
     
     def export(self, context):
         # Export body first to allocate all resources before generating the head.
-        body = self._parts(context, self._BODY_PARTS)
-        lines = (self.DOCTYPE, '',
-                 '<html lang="%s">' % context.lang(),
-                 '<head>',
-                 concat('  ', concat(self._head(context), separator='\n  ')),
-                 '</head>',
-                 '<body>',
-                 body,
-                 '</body>',
-                 '</html>')
-        return concat(lines, separator="\n")
+        g = context.generator()
+        parts = (g.head(self._head(context)),
+                 g.body(self._parts(context, self._BODY_PARTS), **self._body_attr(context)))
+        return g.html(parts, lang=context.lang())
 
 
 class HtmlFileExporter(FileExporter, HtmlExporter):
