@@ -493,8 +493,8 @@ class HtmlExporter(Exporter):
     def _initialize(self, context):
         return ''
 
-    def _body_attr(self, context):
-        return {}
+    def _body_attr(self, context, **kwargs):
+        return kwargs
     
     def export(self, context):
         # Export body first to allocate all resources before generating the head.
