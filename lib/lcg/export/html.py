@@ -33,7 +33,7 @@ class HtmlGenerator(Generator):
         result = ''
         #if kwargs.get('lang'):
         #    kwargs['style'] = 'color: red;' + (kwargs.get('style') or '')
-        for name in valid + ('id', 'lang', 'role', 'cls', 'style'):
+        for name in valid + ('id', 'lang', 'cls', 'style'):
             if not kwargs:
                 break
             value = kwargs.pop(name, None)
@@ -131,14 +131,12 @@ class HtmlGenerator(Generator):
     def ul(self, *content, **kwargs):
         return self._tag('ul', content, **kwargs)
     
-    def list(self, items, indent=0, ordered=False, style=None, aria_menu=False, **kwargs):
+    def list(self, items, indent=0, ordered=False, style=None, **kwargs):
         spaces = ' ' * indent
-        irole = aria_menu and 'menuitem' or None
-        items = [concat(spaces, '  ', self.li(i, role=irole), '\n') for i in items]
+        items = [concat(spaces, '  ', self.li(i), '\n') for i in items]
         tag = ordered and self.ol or self.ul
         style = style and 'list-style-type: %s' % style
-        role = aria_menu and 'menu' or None
-        return spaces + tag(concat('\n', items, spaces), style=style, role=role, **kwargs)+'\n'
+        return spaces + tag(concat('\n', items, spaces), style=style, **kwargs)+'\n'
 
     def definitions(self, items, **kwargs):
         content = [self._tag('dt', dt) + self._tag('dd', dd) for dt, dd in items]
@@ -185,7 +183,7 @@ class HtmlGenerator(Generator):
         return self._tag('head', content, _newlines=True)
     
     def body(self, content, **kwargs):
-        return self._tag('body', content, ('onkeydown', 'role', 'onload'), _newlines=True, **kwargs)
+        return self._tag('body', content, ('onkeydown', 'onload'), _newlines=True, **kwargs)
     
     def uri(self, base, *args, **kwargs):
         uri = urllib.quote(base.encode('utf-8'))
