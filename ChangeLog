@@ -1,3 +1,8 @@
+2008-08-06  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Allow the `tabindex' attribute for any
+	tag.
+
 2008-08-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Always use generator methods for HTML generation.

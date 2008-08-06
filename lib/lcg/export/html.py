@@ -33,7 +33,7 @@ class HtmlGenerator(Generator):
         result = ''
         #if kwargs.get('lang'):
         #    kwargs['style'] = 'color: red;' + (kwargs.get('style') or '')
-        for name in valid + ('id', 'lang', 'cls', 'style'):
+        for name in valid + ('id', 'lang', 'tabindex', 'cls', 'style'):
             if not kwargs:
                 break
             value = kwargs.pop(name, None)
@@ -70,7 +70,7 @@ class HtmlGenerator(Generator):
             return concat(start, content, end)
      
     def _input(self, type, _attr=(), **kwargs):
-        attr = ('type', 'name', 'value', 'title', 'tabindex', 'size', 'maxlength', 'onclick',
+        attr = ('type', 'name', 'value', 'title', 'size', 'maxlength', 'onclick',
                 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
                 'readonly', 'disabled')
         return self._tag('input', _attr=attr+_attr, _paired=False, type=type, **kwargs)
@@ -115,7 +115,7 @@ class HtmlGenerator(Generator):
             title += ' (%s)' % hotkey
         if target:
             cls = (cls and cls+' ' or '') + 'external-link'
-        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'tabindex')
+        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey')
         return self._tag('a', label, attr, href=uri, title=title, target=target,
                          accesskey=hotkey, cls=cls, **kwargs)
 
