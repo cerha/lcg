@@ -1,5 +1,5 @@
 # Learning Content Generator
-# Copyright (C) 2004-2007, Brailcom, o.p.s.
+# Copyright (C) 2004-2008, Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2004.
 #
@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-12 09:28+0200\n"
-"PO-Revision-Date: 2007-12-19 15:19+0100\n"
+"POT-Creation-Date: 2008-08-12 09:36+0200\n"
+"PO-Revision-Date: 2008-08-12 09:40+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,11 +17,11 @@ msgstr ""
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
-msgstr ""
+msgstr "afrikanisch"
 
 #: ../lib/lcg/util.py:139
 msgid "Arabic"
-msgstr ""
+msgstr "arabisch"
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
@@ -33,7 +33,7 @@ msgstr "katalanisch"
 
 #: ../lib/lcg/util.py:143
 msgid "Corsican"
-msgstr ""
+msgstr "korsikanisch"
 
 #: ../lib/lcg/util.py:143
 msgid "Czech"
@@ -65,7 +65,7 @@ msgstr "estnisch"
 
 #: ../lib/lcg/util.py:146
 msgid "Basque"
-msgstr ""
+msgstr "baskisch"
 
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
@@ -86,12 +86,11 @@ msgstr "italienisch"
 
 #: ../lib/lcg/util.py:152
 msgid "Hindi"
-msgstr ""
+msgstr "hindisch"
 
 #: ../lib/lcg/util.py:152
-#, fuzzy
 msgid "Croatian"
-msgstr "katalanisch"
+msgstr "kroatisch"
 
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
@@ -107,30 +106,27 @@ msgstr "italienisch"
 
 #: ../lib/lcg/util.py:156
 msgid "Japanese"
-msgstr ""
+msgstr "japanisch"
 
 #: ../lib/lcg/util.py:157
-#, fuzzy
 msgid "Georgian"
-msgstr "deutsch"
+msgstr "georgisch"
 
 #: ../lib/lcg/util.py:158
-#, fuzzy
 msgid "Korean"
-msgstr "norwegisch"
+msgstr "koreanisch"
 
 #: ../lib/lcg/util.py:158
-#, fuzzy
 msgid "Kurdish"
-msgstr "türkisch"
+msgstr "kurdische"
 
 #: ../lib/lcg/util.py:162
 msgid "Macedonian"
-msgstr ""
+msgstr "mazedonisch"
 
 #: ../lib/lcg/util.py:163
 msgid "Moldavian"
-msgstr ""
+msgstr "moldawish"
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
@@ -149,9 +145,8 @@ msgid "Portuguese"
 msgstr "portugiesisch"
 
 #: ../lib/lcg/util.py:170
-#, fuzzy
 msgid "Romanian"
-msgstr "estnisch"
+msgstr "rumänisch"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
@@ -163,12 +158,11 @@ msgstr "slowenisch"
 
 #: ../lib/lcg/util.py:174
 msgid "Albanian"
-msgstr ""
+msgstr "albanisch"
 
 #: ../lib/lcg/util.py:174
-#, fuzzy
 msgid "Serbian"
-msgstr "slowenisch"
+msgstr "serbisch"
 
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
@@ -176,7 +170,7 @@ msgstr "schwedisch"
 
 #: ../lib/lcg/util.py:177
 msgid "Thai"
-msgstr ""
+msgstr "thailändisch"
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
@@ -184,15 +178,15 @@ msgstr "türkisch"
 
 #: ../lib/lcg/util.py:180
 msgid "Ukrainian"
-msgstr ""
+msgstr "ukrainisch"
 
 #: ../lib/lcg/util.py:182
 msgid "Yiddish"
-msgstr ""
+msgstr "jiddisch"
 
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
-msgstr ""
+msgstr "chinesisch"
 
 # The table of contents...
 #: ../lib/lcg/content.py:488
@@ -205,11 +199,11 @@ msgstr "Sprache wählen:"
 
 #: ../lib/lcg/export/html.py:480
 msgid "Warning:"
-msgstr ""
+msgstr "Achtung:"
 
 #: ../lib/lcg/export/html.py:484
 msgid "Adobe website"
-msgstr ""
+msgstr "Adobe website"
 
 #: ../lib/lcg/export/html.py:481
 #, python-format
@@ -217,7 +211,7 @@ msgid ""
 "Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
 "to %(version)s to be able to make use of advanced media playback "
 "capabilities.  See %(link)s for more information."
-msgstr ""
+msgstr "Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder upgrade Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten der Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
 
 # This label is actually not used.
 #: ../lib/lcg/export/html.py:617
