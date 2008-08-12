@@ -1,5 +1,5 @@
 # Learning Content Generator
-# Copyright (C) 2006-2007 Brailcom, o.p.s.
+# Copyright (C) 2006-2008 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2006.
 #
@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-08-12 09:28+0200\n"
-"PO-Revision-Date: 2007-12-20 09:58+0100\n"
+"PO-Revision-Date: 2008-08-12 09:46+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,12 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../lib/lcg/util.py:138
+#, fuzzy
 msgid "Afrikaans"
-msgstr ""
+msgstr "afrikan¹tina"
 
 #: ../lib/lcg/util.py:139
+#, fuzzy
 msgid "Arabic"
-msgstr ""
+msgstr "aráb¹tina"
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
@@ -33,7 +35,7 @@ msgstr "katalán¹tina"
 
 #: ../lib/lcg/util.py:143
 msgid "Corsican"
-msgstr ""
+msgstr "korsinètina"
 
 #: ../lib/lcg/util.py:143
 msgid "Czech"
@@ -65,7 +67,7 @@ msgstr "estónètina"
 
 #: ../lib/lcg/util.py:146
 msgid "Basque"
-msgstr ""
+msgstr "baskiètina"
 
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
@@ -82,16 +84,15 @@ msgstr "ír¹tina"
 #: ../lib/lcg/util.py:150
 #, fuzzy
 msgid "Galician"
-msgstr "taliansky"
+msgstr "galiètina"
 
 #: ../lib/lcg/util.py:152
 msgid "Hindi"
-msgstr ""
+msgstr "hindètina"
 
 #: ../lib/lcg/util.py:152
-#, fuzzy
 msgid "Croatian"
-msgstr "katalán¹tina"
+msgstr "chorvát¹tina"
 
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
@@ -107,30 +108,27 @@ msgstr "taliansky"
 
 #: ../lib/lcg/util.py:156
 msgid "Japanese"
-msgstr ""
+msgstr "japonètina"
 
 #: ../lib/lcg/util.py:157
-#, fuzzy
 msgid "Georgian"
-msgstr "nemèina"
+msgstr "gruzín¹tina"
 
 #: ../lib/lcg/util.py:158
-#, fuzzy
 msgid "Korean"
-msgstr "nórèina"
+msgstr "korej¹tina"
 
 #: ../lib/lcg/util.py:158
-#, fuzzy
 msgid "Kurdish"
-msgstr "tureètina"
+msgstr "kurd¹tina"
 
 #: ../lib/lcg/util.py:162
 msgid "Macedonian"
-msgstr ""
+msgstr "macedónètina"
 
 #: ../lib/lcg/util.py:163
 msgid "Moldavian"
-msgstr ""
+msgstr "moldavètina"
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
@@ -149,9 +147,8 @@ msgid "Portuguese"
 msgstr "portugalètina"
 
 #: ../lib/lcg/util.py:170
-#, fuzzy
 msgid "Romanian"
-msgstr "estónètina"
+msgstr "rumun¹tina"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
@@ -163,12 +160,11 @@ msgstr "slovinèina"
 
 #: ../lib/lcg/util.py:174
 msgid "Albanian"
-msgstr ""
+msgstr "albánètina"
 
 #: ../lib/lcg/util.py:174
-#, fuzzy
 msgid "Serbian"
-msgstr "slovinèina"
+msgstr "srb¹tina"
 
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
@@ -176,7 +172,7 @@ msgstr "¹védèina"
 
 #: ../lib/lcg/util.py:177
 msgid "Thai"
-msgstr ""
+msgstr "thai¹ètina"
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
@@ -184,15 +180,15 @@ msgstr "tureètina"
 
 #: ../lib/lcg/util.py:180
 msgid "Ukrainian"
-msgstr ""
+msgstr "ukrajin¹tina"
 
 #: ../lib/lcg/util.py:182
 msgid "Yiddish"
-msgstr ""
+msgstr "jidi¹"
 
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
-msgstr ""
+msgstr "èin¹tina"
 
 #: ../lib/lcg/content.py:488
 msgid "Index:"
@@ -204,11 +200,11 @@ msgstr "Zvoµte si jazyk:"
 
 #: ../lib/lcg/export/html.py:480
 msgid "Warning:"
-msgstr ""
+msgstr "Upozornenie:"
 
 #: ../lib/lcg/export/html.py:484
 msgid "Adobe website"
-msgstr ""
+msgstr "Adobe stranka"
 
 #: ../lib/lcg/export/html.py:481
 #, python-format
@@ -217,6 +213,9 @@ msgid ""
 "to %(version)s to be able to make use of advanced media playback "
 "capabilities.  See %(link)s for more information."
 msgstr ""
+"Flash %(version)s nenájdený. Prosím nain¹talujte alebo upgradujte Flash "
+"plugin na %(version)s aby ste mohli vyu¾í» roz¹írené mo¾nosti prehrávania. "
+"Kliknite %(link)s pre viac informácií. "
 
 #: ../lib/lcg/export/html.py:617
 msgid "None"
