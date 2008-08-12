@@ -7,53 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-31 10:15+0200\n"
+"POT-Creation-Date: 2008-08-12 09:28+0200\n"
 "PO-Revision-Date: 2007-12-20 09:58+0100\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: Slovak <sk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: ../lib/lcg/content.py:488
-msgid "Index:"
-msgstr "Obsah:"
-
-#: ../lib/lcg/export/html.py:354
-msgid "Choose your language:"
-msgstr "Zvoµte si jazyk:"
-
-#: ../lib/lcg/export/html.py:449
-msgid "Warning:"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:453
-msgid "Adobe website"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:450
-#, python-format
-msgid ""
-"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
-"to %(version)s to be able to make use of advanced media playback "
-"capabilities.  See %(link)s for more information."
-msgstr ""
-
-#: ../lib/lcg/export/html.py:590
-msgid "None"
-msgstr "nieje"
-
-#: ../lib/lcg/export/html.py:591
-msgid "You are here:"
-msgstr "Nachádzate sa:"
-
-#: ../lib/lcg/export/html.py:593
-msgid "Next"
-msgstr "Dal¹ie"
-
-#: ../lib/lcg/export/html.py:594
-msgid "Previous"
-msgstr "Predchádzajúce"
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
@@ -233,3 +193,43 @@ msgstr ""
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
 msgstr ""
+
+#: ../lib/lcg/content.py:488
+msgid "Index:"
+msgstr "Obsah:"
+
+#: ../lib/lcg/export/html.py:385
+msgid "Choose your language:"
+msgstr "Zvoµte si jazyk:"
+
+#: ../lib/lcg/export/html.py:480
+msgid "Warning:"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:484
+msgid "Adobe website"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:481
+#, python-format
+msgid ""
+"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
+"to %(version)s to be able to make use of advanced media playback "
+"capabilities.  See %(link)s for more information."
+msgstr ""
+
+#: ../lib/lcg/export/html.py:617
+msgid "None"
+msgstr "nieje"
+
+#: ../lib/lcg/export/html.py:618
+msgid "You are here:"
+msgstr "Nachádzate sa:"
+
+#: ../lib/lcg/export/html.py:620
+msgid "Next"
+msgstr "Dal¹ie"
+
+#: ../lib/lcg/export/html.py:621
+msgid "Previous"
+msgstr "Predchádzajúce"
