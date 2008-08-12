@@ -219,10 +219,10 @@ class HtmlGenerator(Generator):
         return self._tag('h%d' % level, title, **kwargs) + '\n'
     
     def span(self, text, **kwargs):
-        return self._tag('span', text, **kwargs)
+        return self._tag('span', text, ('title',), **kwargs)
      
     def div(self, content, **kwargs):
-        return self._tag('div', content, _newlines=True, **kwargs)
+        return self._tag('div', content, ('title',), _newlines=True, **kwargs)
      
     def map(self, content, **kwargs):
         return self._tag('map', content, ('name', 'title'), _newlines=True, **kwargs)
@@ -448,8 +448,8 @@ class HtmlExporter(Exporter):
                 else:
                     label = g.img(image, alt=label, border=None)
             links.append(g.link(label, self._uri_node(context, node, lang=lang), cls=cls)+sign)
-        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
-                             name='language-selection-anchor'),
+        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None, tabindex=-1,
+                             id='language-selection-anchor', name='language-selection-anchor'),
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 
     def _language_selection_image(self, context, lang):
