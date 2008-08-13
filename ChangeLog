@@ -1,3 +1,8 @@
+2008-08-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Export body before header to make sure
+	all resources are allocated.
+
 2008-08-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Allow attribute title for span and div.

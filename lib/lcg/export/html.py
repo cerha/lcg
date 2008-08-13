@@ -495,10 +495,12 @@ class HtmlExporter(Exporter):
         return kwargs
     
     def export(self, context):
-        # Export body first to allocate all resources before generating the head.
         g = context.generator()
+        # Export body first to allocate all resources before generating the head.
+        body = self._parts(context, self._BODY_PARTS)
+        attr = self._body_attr(context)
         parts = (g.head(self._head(context)),
-                 g.body(self._parts(context, self._BODY_PARTS), **self._body_attr(context)))
+                 g.body(body, **attr))
         return g.html(parts, lang=context.lang())
 
 
