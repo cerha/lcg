@@ -472,8 +472,14 @@ class SectionContainer(Container):
 
     def sections(self, context):
         """Return content elements which are 'Section' instances."""
-        return [c for c in self._content if isinstance(c, Section)]
-    
+        result = []
+        for c in self._content:
+            if isinstance(c, Section):
+                result.append(c)
+            elif isinstance(c, SectionContainer): 
+                result.extend(c.sections())
+        return result
+            
     def _exported_content(self, context):
         result = super(SectionContainer, self)._exported_content(context)
         toc_sections = []

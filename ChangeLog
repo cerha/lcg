@@ -1,3 +1,8 @@
+2008-09-03  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py (SectionContainer.sections): Include also
+	sections of nested `SectionContainer' instances.
+
 2008-08-13  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Export body before header to make sure
