@@ -477,7 +477,7 @@ class SectionContainer(Container):
             if isinstance(c, Section):
                 result.append(c)
             elif isinstance(c, SectionContainer): 
-                result.extend(c.sections())
+                result.extend(c.sections(context))
         return result
             
     def _exported_content(self, context):
