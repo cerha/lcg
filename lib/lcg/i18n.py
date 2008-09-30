@@ -46,10 +46,15 @@ class TranslatableTextFactory(object):
         """Return the domain name as set in the constructor."""
         return self._domain
         
-    def __call__(self, text, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         kwargs['_domain'] = self._domain
         kwargs['_origin'] = self._origin
-        return TranslatableText(text, *args, **kwargs)
+        return TranslatableText(*args, **kwargs)
+    
+    def ngettext(self, *args, **kwargs):
+        kwargs['_domain'] = self._domain
+        kwargs['_origin'] = self._origin
+        return TranslatablePluralForms(*args, **kwargs)
     
 
 class Localizable(unicode):
@@ -180,8 +185,15 @@ class TranslatableText(Localizable):
             return self._translator.translate(self._func(str(key)))
     
     def __new__(cls, text, *args, **kwargs):
-        values = args or dict([(k,v) for k,v in kwargs.items()
-                               if not k.startswith('_') and not k in cls._RESERVED_ARGS])
+        if not args or __debug__:
+            substitution_dict = dict([(k,v) for k,v in kwargs.items()
+                                      if not k.startswith('_') and not k in cls._RESERVED_ARGS])
+            assert not args or not substitution_dict, \
+                   "Can not pass both positional and keyword substitution variables: " + \
+                   "(%s, %s, %s)" % (text, args, substitution_dict)
+        else:
+            substitution_dict = {}
+        values = args or substitution_dict
         if values:
             text %= values
         return Localizable.__new__(cls, text, **kwargs)
@@ -217,7 +229,6 @@ class TranslatableText(Localizable):
         self._text = text
         self._args = args
         self._init_kwargs(**kwargs)
-        assert not args or not self._kwargs, (text, args, self._kwargs)
 
     def _init_kwargs(self, _domain=None, _origin='en', _interpolate=None, _transforms=(), **kwargs):
         assert isinstance(_domain, (str)) or _domain is None, _domain
@@ -296,6 +307,54 @@ class SelfTranslatableText(TranslatableText):
     def _translate(self, translator):
         return self._translations.get(translator.lang(), translator.translate(self._text))
         
+
+class TranslatablePluralForms(TranslatableText):
+    """Translatable string with plural forms.
+
+    This class has the same purpose as the 'ngettext' family of GNU gettext calls.  The constructor
+    accepts two forms of the translation text (singular and plural) and a number determining which
+    form should be used.  If this number is 1, the singular form is used, if 2 or greater, the
+    plural form is used.  For languages other than English, more plural forms may be defined in the
+    translation file and the correct form will be selected according to the number.
+
+    The number determining the plural form may be passed as positional or keyword argument.  If
+    positional arguments are used for text substitution (as implemented by the parent class), the
+    number must be passed as the first positional argument.  If keyword arguments are used, the
+    number is passed as the keyword argument named 'n'.
+
+    Note: The current implementation restricted to 'origin' languages with just two plural forms,
+    such as English, but it would be possible to remove this limitation if needed.
+
+    """
+    def __new__(cls, singular, plural, *args, **kwargs):
+        if args:
+            n = args[0]
+        else:
+            assert kwargs.has_key('n'), \
+                   "A number determining the plural form must be passed as keyword argument 'n'."
+            n = kwargs['n']
+        assert isinstance(n, int)
+        text = n == 1 and singular or plural
+        return TranslatableText.__new__(cls, text, *args, **kwargs)
+    
+    def __init__(self, singular, plural, *args, **kwargs):
+        if args:
+            n = args[0]
+        else:
+            n = kwargs['n']
+        text = n == 1 and singular or plural
+        super(TranslatablePluralForms, self).__init__(text, *args, **kwargs)
+        self._singular = unicode(singular)
+        self._plural = unicode(plural)
+        self._n = n
+
+    def _clone_args(self):
+        return (self._singular, self._plural) + self._args
+    
+    def _translate(self, translator):
+        return translator.ngettext(self._singular, self._plural, self._n,
+                                   domain=self._domain, origin=self._origin)
+    
     
 class LocalizableDateTime(Localizable):
     """Date/time string which can be converted to a localized format.
@@ -556,6 +615,19 @@ class Translator(object):
         """
         pass
 
+    def ngettext(self, singular, plural, n, domain=None, origin=None):
+        """Return the translation of the plural form.
+
+        Arguments:
+
+
+          domain -- the name of the domain, form which this text origins.
+
+        Returns a unicode string.
+        
+        """
+        pass
+
     def locale_data(self):
         return self._locale_data
 
@@ -580,6 +652,9 @@ class NullTranslator(Translator):
     
     def gettext(self, text, domain=None, origin=None):
         return text
+
+    def ngettext(self, singular, plural, n, domain=None, origin=None):
+        return n == 1 and singular or plural
 
     
 class GettextTranslator(Translator):
@@ -634,15 +709,25 @@ class GettextTranslator(Translator):
             return gettext.NullTranslations()
         else:
             raise IOError(msg)
+
+    def _cached_gettext_instance(self, domain, origin):
+        try:
+            gettext = self._cache[(domain, origin)]
+        except KeyError:
+            gettext = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
+        return gettext
         
     def gettext(self, text, domain=None, origin=None):
         domain = domain or self._default_domain
-        try:
-            t = self._cache[(domain, origin)]
-        except KeyError:
-            t = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
-        return t.ugettext(text)
+        gettext = self._cached_gettext_instance(domain, origin)
+        return gettext.ugettext(text)
 
+    def ngettext(self, singular, plural, n, domain=None, origin=None):
+        domain = domain or self._default_domain
+        gettext = self._cached_gettext_instance(domain, origin)
+        result = gettext.ungettext(singular, plural, n)
+        return result
+    
         
 def concat(*args, **kwargs):
     """Concatenate the 'args' into a 'Concatenation' or a string.
