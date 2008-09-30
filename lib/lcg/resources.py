@@ -23,14 +23,11 @@ to external files, but in general, thay don't depend on these files, they just p
 abstract representation.  The resources are managed by the 'ResourceProvider' (see below).
     
 """
-
 import os
 import glob
 import config
 
 from lcg import *
-
-
 
 
 class Resource(object):
@@ -181,6 +178,20 @@ class ResourceProvider(object):
                 'js':   Script,
                 'swf':  Flash}
     
+    class OrderedDict(object):
+        # Totally simplistic - just what we need to get the resources in the order of allocation.
+        # This is needed for the correct precedence of stylesheets.
+        def __init__(self, pairs):
+            self._dict = dict(pairs)
+            self._values = [v for k,v in pairs]
+        def __setitem__(self, key, value):
+            self._values.append(value)
+            self._dict[key] = value
+        def __getitem__(self, key):
+            return self._dict[key]
+        def values(self):
+            return self._values
+    
     def __init__(self, resources=(), dirs=(), **kwargs):
         """Arguments:
 
@@ -193,7 +204,7 @@ class ResourceProvider(object):
         assert isinstance(dirs, (list, tuple)), dirs
         assert isinstance(resources, (list, tuple)), resources
         self._dirs = tuple(dirs) + (config.default_resource_dir,)
-        self._cache = dict([(r.filename(), (r, [None])) for r in resources])
+        self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
         
     def _resource(self, filename, searchdir, warn):

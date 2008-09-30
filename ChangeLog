@@ -1,3 +1,8 @@
+2008-09-30  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/resources.py: Return the resources in the order of their
+	allocation.
+
 2008-09-03  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py (SectionContainer.sections): Include also
