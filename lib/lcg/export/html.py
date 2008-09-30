@@ -143,7 +143,9 @@ class HtmlGenerator(Generator):
         return self._tag('dl', content, _newlines=True, **kwargs)
 
     def fset(self, items, **kwargs):
-        return self.table([self.tr((self.th(name), self.td(value)))+"\n" for name, value in items],
+        return self.table([self.tr((self.th(name, valign="top", align="left"),
+                                    self.td(value)))
+                           for name, value in items],
                           cls='lcg-fieldset', **kwargs)
      
     def img(self, src, alt='', border=0, descr=None, **kwargs):

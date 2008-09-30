@@ -1,5 +1,7 @@
 2008-09-30  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/export/html.py: Improved fieldset alignment.
+
 	* lib/lcg/resources.py: Return the resources in the order of their
 	allocation.
 
