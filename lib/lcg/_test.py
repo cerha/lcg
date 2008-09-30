@@ -147,39 +147,36 @@ tests.add(TranslatableText)
 class TranslatablePluralForms(unittest.TestCase):
           
     def check_translation(self):
-        ngettext = _.ngettext # For xgettext.
         t = lcg.GettextTranslator('cs')
         for n, translated in ((1, u"Mám 1 problém."),
                               (2, u"Mám 2 problémy."),
                               (5, u"Mám 5 problémů.")):
-            a = ngettext("I have %d problem.", "I have %d problems.", n)
+            a = _.ngettext("I have %d problem.", "I have %d problems.", n)
             b = a.localize(t)
             assert b == translated, (b, translated)
         
     def check_interpolation(self):
-        ngettext = _.ngettext # For xgettext.
         t = lcg.GettextTranslator('cs')
         for n, translated in ((1, u"1 záznam nalezen v tabulce xy."),
                               (2, u"2 záznamy nalezeny v tabulce xy."),
                               (5, u"5 záznamů nalezeno v tabulce xy.")):
-            a = ngettext("%(n)d record found in table %(name)s.",
-                         "%(n)d records found in table %(name)s.", n=n, name='xy')
+            a = _.ngettext("%(n)d record found in table %(name)s.",
+                           "%(n)d records found in table %(name)s.", n=n, name='xy')
             b = a.localize(t)
             assert b == translated, (b, translated)
         
     def check_replace(self):
-        ngettext = _.ngettext # For xgettext.
         t = lcg.GettextTranslator('cs')
         for n, ta, tb in ((1, u"Mám 1 problém.", u"1 záznam nalezen v tabulce xy."),
                           (2, u"Mám 2 problémy.", u"2 záznamy nalezeny v tabulce xy."),
                           (5, u"Mám 5 problémů.", u"5 záznamů nalezeno v tabulce xy.")):
-            a = ngettext("I have %d problem.", "I have %d problems.", n)
+            a = _.ngettext("I have %d problem.", "I have %d problems.", n)
             a1 = a.replace('5', '123')
             a2 = a1.localize(t)
             ta1 = ta.replace('5', '123')
             assert a2 == ta1, (a2, ta1)
-            b = ngettext("%(n)d record found in table %(name)s.",
-                         "%(n)d records found in table %(name)s.", n=n, name='xy')
+            b = _.ngettext("%(n)d record found in table %(name)s.",
+                           "%(n)d records found in table %(name)s.", n=n, name='xy')
             b1 = b.replace('5', '123')
             b2 = b1.localize(t)
             tb1 = tb.replace('5', '123')
