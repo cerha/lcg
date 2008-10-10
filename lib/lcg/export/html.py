@@ -70,8 +70,8 @@ class HtmlGenerator(Generator):
             return concat(start, content, end)
      
     def _input(self, type, _attr=(), **kwargs):
-        attr = ('type', 'name', 'value', 'title', 'size', 'maxlength', 'onclick',
-                'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
+        attr = ('type', 'name', 'value', 'title', 'size', 'maxlength', 'accesskey',
+                'onclick', 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
                 'readonly', 'disabled')
         return self._tag('input', _attr=attr+_attr, _paired=False, type=type, **kwargs)
 
