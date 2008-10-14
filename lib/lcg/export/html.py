@@ -479,15 +479,16 @@ class HtmlExporter(Exporter):
             if not player or not swfobject:
                 return None
             g = context.generator()
-            msg = g.strong(_("Warning:")) +' '+ \
-                  # Translators: %(version)s will be automatically replaced by the required version
-                  # number.  %(link)s will be substituted by a hypertext link to Adobe Website.
-                  _("Flash %(version)s not detected.  Please install or upgrade your "
-                    "Flash plugin to %(version)s to be able to make use of advanced "
-                    "media playback capabilities.  See %(link)s for more information.",
-                    # Translators: Title of the Adobe website link used in the Flash warning.
-                    link=g.link(_("Adobe website"), 'http://www.adobe.com/products/flash/about/'),
-                    version='$version')
+            msg = (g.strong(_("Warning:")) +' '+
+                   # Translators: %(version)s will be automatically replaced by the required
+                   # version number.  %(link)s will be substituted by a hypertext link to Adobe
+                   # Website.
+                   _("Flash %(version)s not detected.  Please install or upgrade your "
+                     "Flash plugin to %(version)s to be able to make use of advanced "
+                     "media playback capabilities.  See %(link)s for more information.",
+                     # Translators: Title of the Adobe website link used in the Flash warning.
+                     link=g.link(_("Adobe website"), 'http://www.adobe.com/products/flash/about/'),
+                     version='$version'))
             return g.div('', id='media-player-container') + \
                    g.script("export_media_player('%s', 'media-player-container', %s)" %
                             (context.uri(player), g.js_value(context.translate(msg))))
