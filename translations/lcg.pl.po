@@ -1,5 +1,5 @@
-# Learning Content Generator
-# Copyright (C) 2006-2007 Brailcom, o.p.s.
+# Learning Content Generator translations
+# Copyright (C) 2006-2008 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Pawel Loba <ploba@rogers.com>, 2006.
 #
@@ -7,53 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-31 10:15+0200\n"
-"PO-Revision-Date: 2007-10-30 09:02+0100\n"
+"POT-Creation-Date: 2008-10-14 11:45+0200\n"
+"PO-Revision-Date: 2008-10-14 12:32+0200\n"
 "Last-Translator: Pawel Loba <ploba@rogers.com>\n"
-"Language-Team: Polish <pl@li.org>\n"
+"Language-Team: Polish <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: ../lib/lcg/content.py:488
-msgid "Index:"
-msgstr "Indeks:"
-
-#: ../lib/lcg/export/html.py:354
-msgid "Choose your language:"
-msgstr "Wybierz jêzyk:"
-
-#: ../lib/lcg/export/html.py:449
-msgid "Warning:"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:453
-msgid "Adobe website"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:450
-#, python-format
-msgid ""
-"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
-"to %(version)s to be able to make use of advanced media playback "
-"capabilities.  See %(link)s for more information."
-msgstr ""
-
-#: ../lib/lcg/export/html.py:590
-msgid "None"
-msgstr "¯aden"
-
-#: ../lib/lcg/export/html.py:591
-msgid "You are here:"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:593
-msgid "Next"
-msgstr "Dalej"
-
-#: ../lib/lcg/export/html.py:594
-msgid "Previous"
-msgstr "Wstecz"
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
@@ -65,11 +25,11 @@ msgstr ""
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
-msgstr "Bu³garski"
+msgstr "BuÅ‚garski"
 
 #: ../lib/lcg/util.py:143
 msgid "Catalan"
-msgstr "Kataloñski"
+msgstr "KataloÅ„ski"
 
 #: ../lib/lcg/util.py:143
 msgid "Corsican"
@@ -81,7 +41,7 @@ msgstr "Czeski"
 
 #: ../lib/lcg/util.py:144
 msgid "Danish"
-msgstr "Duñski"
+msgstr "DuÅ„ski"
 
 #: ../lib/lcg/util.py:144
 msgid "German"
@@ -97,11 +57,11 @@ msgstr "Angielski"
 
 #: ../lib/lcg/util.py:145
 msgid "Spanish"
-msgstr "Hiszpañski"
+msgstr "HiszpaÅ„ski"
 
 #: ../lib/lcg/util.py:146
 msgid "Estonian"
-msgstr "Estoñski"
+msgstr "EstoÅ„ski"
 
 #: ../lib/lcg/util.py:146
 msgid "Basque"
@@ -109,7 +69,7 @@ msgstr ""
 
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
-msgstr "Fiñski"
+msgstr "FiÅ„ski"
 
 #: ../lib/lcg/util.py:148
 msgid "French"
@@ -122,7 +82,7 @@ msgstr "Irlandzki"
 #: ../lib/lcg/util.py:150
 #, fuzzy
 msgid "Galician"
-msgstr "W³oski"
+msgstr "WÅ‚oski"
 
 #: ../lib/lcg/util.py:152
 msgid "Hindi"
@@ -131,11 +91,11 @@ msgstr ""
 #: ../lib/lcg/util.py:152
 #, fuzzy
 msgid "Croatian"
-msgstr "Kataloñski"
+msgstr "KataloÅ„ski"
 
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
-msgstr "Wêgierski"
+msgstr "WÄ™gierski"
 
 #: ../lib/lcg/util.py:155
 msgid "Icelandic"
@@ -143,7 +103,7 @@ msgstr "Islandzki"
 
 #: ../lib/lcg/util.py:155
 msgid "Italian"
-msgstr "W³oski"
+msgstr "WÅ‚oski"
 
 #: ../lib/lcg/util.py:156
 msgid "Japanese"
@@ -191,15 +151,15 @@ msgstr "Portugalski"
 #: ../lib/lcg/util.py:170
 #, fuzzy
 msgid "Romanian"
-msgstr "Estoñski"
+msgstr "EstoÅ„ski"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
-msgstr "S³owacki"
+msgstr "SÅ‚owacki"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovenian"
-msgstr "S³oweñski"
+msgstr "SÅ‚oweÅ„ski"
 
 #: ../lib/lcg/util.py:174
 msgid "Albanian"
@@ -208,7 +168,7 @@ msgstr ""
 #: ../lib/lcg/util.py:174
 #, fuzzy
 msgid "Serbian"
-msgstr "S³oweñski"
+msgstr "SÅ‚oweÅ„ski"
 
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
@@ -233,3 +193,43 @@ msgstr ""
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
 msgstr ""
+
+#: ../lib/lcg/content.py:494
+msgid "Index:"
+msgstr "Indeks:"
+
+#: ../lib/lcg/export/html.py:387
+msgid "Choose your language:"
+msgstr "Wybierz jÄ™zyk:"
+
+#: ../lib/lcg/export/html.py:482
+msgid "Warning:"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:486
+msgid "Adobe website"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:483
+#, python-format
+msgid ""
+"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
+"to %(version)s to be able to make use of advanced media playback "
+"capabilities.  See %(link)s for more information."
+msgstr ""
+
+#: ../lib/lcg/export/html.py:621
+msgid "None"
+msgstr "Å»aden"
+
+#: ../lib/lcg/export/html.py:622
+msgid "You are here:"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:624
+msgid "Next"
+msgstr "Dalej"
+
+#: ../lib/lcg/export/html.py:625
+msgid "Previous"
+msgstr "Wstecz"

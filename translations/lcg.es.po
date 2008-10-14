@@ -1,64 +1,19 @@
-# Learning Content Generator
+# Learning Content Generator translations
 # Copyright (C) 2006-2007 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2006.
-# The give some hints about the context of each message.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-31 10:15+0200\n"
+"POT-Creation-Date: 2008-10-14 11:45+0200\n"
 "PO-Revision-Date: 2007-10-30 08:54+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
-"Language-Team: Spanish <es@li.org>\n"
+"Language-Team: Spanish <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-# Index of sections (table of contents)
-#: ../lib/lcg/content.py:488
-msgid "Index:"
-msgstr "Contenido:"
-
-#: ../lib/lcg/export/html.py:354
-msgid "Choose your language:"
-msgstr "Escoja el idioma:"
-
-#: ../lib/lcg/export/html.py:449
-msgid "Warning:"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:453
-msgid "Adobe website"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:450
-#, python-format
-msgid ""
-"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
-"to %(version)s to be able to make use of advanced media playback "
-"capabilities.  See %(link)s for more information."
-msgstr ""
-
-# For exapmle "Next: None".
-#: ../lib/lcg/export/html.py:590
-msgid "None"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:591
-msgid "You are here:"
-msgstr ""
-
-# Link to the next page.
-#: ../lib/lcg/export/html.py:593
-msgid "Next"
-msgstr ""
-
-# Link to the previous page.
-#: ../lib/lcg/export/html.py:594
-msgid "Previous"
-msgstr ""
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
@@ -237,4 +192,48 @@ msgstr ""
 
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
+msgstr ""
+
+# Index of sections (table of contents)
+#: ../lib/lcg/content.py:494
+msgid "Index:"
+msgstr "Contenido:"
+
+#: ../lib/lcg/export/html.py:387
+msgid "Choose your language:"
+msgstr "Escoja el idioma:"
+
+#: ../lib/lcg/export/html.py:482
+msgid "Warning:"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:486
+msgid "Adobe website"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:483
+#, python-format
+msgid ""
+"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
+"to %(version)s to be able to make use of advanced media playback "
+"capabilities.  See %(link)s for more information."
+msgstr ""
+
+# For exapmle "Next: None".
+#: ../lib/lcg/export/html.py:621
+msgid "None"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:622
+msgid "You are here:"
+msgstr ""
+
+# Link to the next page.
+#: ../lib/lcg/export/html.py:624
+msgid "Next"
+msgstr ""
+
+# Link to the previous page.
+#: ../lib/lcg/export/html.py:625
+msgid "Previous"
 msgstr ""

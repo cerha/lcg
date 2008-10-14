@@ -1,18 +1,19 @@
-# Learning Content Generator
+# Learning Content Generator translations
 # Copyright (C) 2004-2008, Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
-# Tomas Cerha <cerha@brailcom.org>, 2004.
+# Tomas Cerha <cerha@brailcom.org>, 2004
+# Pavel Vohnout <vohnout@officehouse.cz>
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-12 09:36+0200\n"
-"PO-Revision-Date: 2008-08-12 09:40+0200\n"
+"POT-Creation-Date: 2008-10-14 11:45+0200\n"
+"PO-Revision-Date: 2008-10-14 12:33+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
-"Language-Team: German <de@li.org>\n"
+"Language-Team: German <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../lib/lcg/util.py:138
@@ -41,7 +42,7 @@ msgstr "tschechisch"
 
 #: ../lib/lcg/util.py:144
 msgid "Danish"
-msgstr "d‰nisch"
+msgstr "d√§nisch"
 
 #: ../lib/lcg/util.py:144
 msgid "German"
@@ -73,7 +74,7 @@ msgstr "finnisch"
 
 #: ../lib/lcg/util.py:148
 msgid "French"
-msgstr "franz‰sisch"
+msgstr "franz√§sisch"
 
 #: ../lib/lcg/util.py:150
 msgid "Irish"
@@ -98,7 +99,7 @@ msgstr "ungarisch"
 
 #: ../lib/lcg/util.py:155
 msgid "Icelandic"
-msgstr "isl√§ndisch"
+msgstr "isl√É¬§ndisch"
 
 #: ../lib/lcg/util.py:155
 msgid "Italian"
@@ -130,7 +131,7 @@ msgstr "moldawish"
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
-msgstr "niederl‰ndisch"
+msgstr "niederl√§ndisch"
 
 #: ../lib/lcg/util.py:165
 msgid "Norwegian"
@@ -146,7 +147,7 @@ msgstr "portugiesisch"
 
 #: ../lib/lcg/util.py:170
 msgid "Romanian"
-msgstr "rum‰nisch"
+msgstr "rum√§nisch"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
@@ -170,11 +171,11 @@ msgstr "schwedisch"
 
 #: ../lib/lcg/util.py:177
 msgid "Thai"
-msgstr "thail‰ndisch"
+msgstr "thail√§ndisch"
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
-msgstr "t¸rkisch"
+msgstr "t√ºrkisch"
 
 #: ../lib/lcg/util.py:180
 msgid "Ukrainian"
@@ -189,45 +190,48 @@ msgid "Chinese"
 msgstr "chinesisch"
 
 # The table of contents...
-#: ../lib/lcg/content.py:488
+#: ../lib/lcg/content.py:494
 msgid "Index:"
 msgstr "Verzeichnis:"
 
-#: ../lib/lcg/export/html.py:385
+#: ../lib/lcg/export/html.py:387
 msgid "Choose your language:"
-msgstr "Sprache w‰hlen:"
+msgstr "Sprache w√§hlen:"
 
-#: ../lib/lcg/export/html.py:480
+#: ../lib/lcg/export/html.py:482
 msgid "Warning:"
 msgstr "Achtung:"
 
-#: ../lib/lcg/export/html.py:484
+#: ../lib/lcg/export/html.py:486
 msgid "Adobe website"
 msgstr "Adobe website"
 
-#: ../lib/lcg/export/html.py:481
+#: ../lib/lcg/export/html.py:483
 #, python-format
 msgid ""
 "Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
 "to %(version)s to be able to make use of advanced media playback "
 "capabilities.  See %(link)s for more information."
-msgstr "Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder upgrade Flash plugin auf %(version)s damit Sie die erweiterte Mˆglikeiten der Abtastung.  Klicken Sie bitte auf %(link)s f¸r mehr Informationen."
+msgstr ""
+"Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder upgrade "
+"Flash plugin auf %(version)s damit Sie die erweiterte M√∂glikeiten der "
+"Abtastung.  Klicken Sie bitte auf %(link)s f√ºr mehr Informationen."
 
 # This label is actually not used.
-#: ../lib/lcg/export/html.py:617
+#: ../lib/lcg/export/html.py:621
 msgid "None"
 msgstr "Nichts"
 
-#: ../lib/lcg/export/html.py:618
+#: ../lib/lcg/export/html.py:622
 msgid "You are here:"
 msgstr "Sie sind hier:"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:620
+#: ../lib/lcg/export/html.py:624
 msgid "Next"
 msgstr "weiter"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:621
+#: ../lib/lcg/export/html.py:625
 msgid "Previous"
 msgstr "vorhergehend"

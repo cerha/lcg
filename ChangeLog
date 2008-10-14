@@ -1,3 +1,18 @@
+2008-10-14  Tomas Cerha  <cerha@brailcom.org>
+
+	* translations/lcg.cs.po:
+	* translations/lcg.de.po:
+	* translations/lcg.es.po:
+	* translations/lcg.no.po:
+	* translations/lcg.pl.po:
+	* translations/lcg.sk.po:
+	* translations/test.cs.po:
+	Updated meta information and encoding unified.
+
+	* translations/lcg.fr.po:
+	* translations/lcg.hu.po:
+	New (empty) translation files.
+
 2008-10-10  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: 
@@ -258,7 +273,7 @@
 
 2008-04-30  Tomas Cerha  <cerha@brailcom.org>
 
-	* doc/structured-text.en.txt (Module): Minor inconsistency fix.
+	* doc/structured-text.en.txt: Minor inconsistency fix.
 
 2008-03-31  Tomas Cerha  <cerha@brailcom.org>
 
@@ -1314,15 +1329,15 @@
 
 2006-10-16  Tomas Cerha  <cerha@brailcom.org>
 
-	* translations/lcg.cs.po (Module): Updated.
+	* translations/lcg.cs.po: Updated.
 
-	* translations/lcg.de.po (Module): Updated.
+	* translations/lcg.de.po: Updated.
 
-	* translations/lcg.es.po (Module): Updated.
+	* translations/lcg.es.po: Updated.
 
-	* translations/lcg.no.po (Module): Updated.
+	* translations/lcg.no.po: Updated.
 
-	* translations/lcg.sk.po (Module): Updated.
+	* translations/lcg.sk.po: Updated.
 
 	* translations/Makefile: Pass the base directory to the i118
 	dpepndency script.
@@ -2132,39 +2147,39 @@
 
 2006-06-19  Tomas Cerha  <cerha@brailcom.org>
 
-	* lib/lcg/export/ims.py (Module): File moved.
+	* lib/lcg/export/ims.py: File moved.
 
-	* lib/lcg/export/hhp.py (Module): File moved.
+	* lib/lcg/export/hhp.py: File moved.
 
-	* lib/lcg/export/export.py (Module): File moved.
+	* lib/lcg/export/export.py: File moved.
 
-	* lib/lcg/export/_html.py (Module): File moved.
+	* lib/lcg/export/_html.py: File moved.
 
-	* lib/lcg/export/__init__.py (Module): New file.
+	* lib/lcg/export/__init__.py: New file.
 
-	* lib/lcg/content/exercises.py (Module): File moved.
+	* lib/lcg/content/exercises.py: File moved.
 
-	* lib/lcg/content/content.py (Module): File moved.
+	* lib/lcg/content/content.py: File moved.
 
-	* lib/lcg/content/__init__.py (Module): New file.
+	* lib/lcg/content/__init__.py: New file.
 
-	* lib/lcg/__init__.py (Module): Respect the new package
+	* lib/lcg/__init__.py: Respect the new package
 	organization.
 
-	* lib/lcg/eurochance.py (Module): Respect the new package
+	* lib/lcg/eurochance.py: Respect the new package
 	organization.
 
 	* lib/lcg/content.py (Message): Moved to the `content' submodule.
 
-	* lib/lcg/exercises.py (Module): Moved to the `content' submodule.
+	* lib/lcg/exercises.py: Moved to the `content' submodule.
 
-	* lib/lcg/_html.py (Module): Moved to the `export' submodule.
+	* lib/lcg/_html.py: Moved to the `export' submodule.
 
-	* lib/lcg/export.py (Module): Moved to the `export' submodule.
+	* lib/lcg/export.py: Moved to the `export' submodule.
 
-	* lib/lcg/hhp.py (Module): Moved to the `export' submodule.
+	* lib/lcg/hhp.py: Moved to the `export' submodule.
 	
-	* lib/lcg/ims.py (Module): Moved to the `export' submodule.
+	* lib/lcg/ims.py: Moved to the `export' submodule.
 
 2006-05-23  Tomas Cerha  <cerha@brailcom.org>
 
@@ -2903,7 +2918,7 @@
 
 2005-10-27  Tomas Cerha  <cerha@brailcom.org>
 
-	* translations/help.txt (Module): Minor fix.
+	* translations/help.txt: Minor fix.
 
 	* resources/media/responses/o0-49a.mp3: 
 
@@ -2973,14 +2988,14 @@
 
 	* lib/lcg/__init__.py: Import `*' from `util'.  Version set to `0.1'.
 
-	* lib/lcg/export.py (Module): Don't import `shutil'.  Import
+	* lib/lcg/export.py: Don't import `shutil'.  Import
 	`_html'.
 	(StaticExporter.body, StaticExporter._navigation)
 	(StaticExporter._link): Use all identifiers from `_html' module
 	with their full name `_html.*'.
 	(StaticExporter._link): Localize the string `None' with gettext.
 
-	* lib/lcg/_html.py (Module): Don't import `operator'.
+	* lib/lcg/_html.py: Don't import `operator'.
 	(b): Function replaced by `strong'.
 	(strong): New function.
 	(itemize): Renamed to `list'.
@@ -2993,7 +3008,7 @@
 	* lib/lcg/course.py (ContentNode._read_file): Use `log' instead of
 	`print'.
 
-	* lib/lcg/content.py (Module): Import `operator'.  Import `_html',
+	* lib/lcg/content.py: Import `operator'.  Import `_html',
 	not `* from _html'.  Use all identifiers from `_html' module with
 	their full name `_html.*'.
 	(Exercise.__init__): Don't catch `ResourceNotFound' exeptions..
@@ -3189,7 +3204,7 @@
 	(DictationHandler.init_recordings): New method.
 	(DictationHandler._handle_key): New method.
 
-	* resources/css/default.css (Module): New styles added.
+	* resources/css/default.css: New styles added.
 
 	* lib/lcg/wiki.py (Formatter.__init__): Fixed order of the parts
 	within the paired regexp.
@@ -3461,7 +3476,7 @@
 	(SectionContainer._export_content): New method.
 	(SectionContainer.export): Method removed.
 
-	* lib/lcg/_test.py (Module): Don't care about `gettext'.
+	* lib/lcg/_test.py: Don't care about `gettext'.
 	(ContentNode.check_misc): Use keyword arguemnts with their names.
 	Don't assume b in a's children.
 	(ContentNode.check_media): Don't use the removed arguemnt `tts_input'.
@@ -4168,9 +4183,9 @@
 
 	* doc/manual.wiki: Updated.
 
-	* bin/generate.py (Module): Completely rewritten.
+	* bin/generate.py: Completely rewritten.
 
-	* bin/wiki-formatter.py (Module): New file.
+	* bin/wiki-formatter.py: New file.
 
 	* lcg/wiki.py (Formatter._MARKUP): Uncomment the rules for
 	`italic' and `fixed'.  The pair markup defined now as one item.
@@ -4252,7 +4267,7 @@
 	(TableOfContents._make_toc): Make the URLs of the local sections
 	relative.
 
-	* lcg/config.py (Module): New file.
+	* lcg/config.py: New file.
 
 	* lcg/course.py (ContentNone.__init__): Argument
 	`default_resource_dir' removed.
@@ -4972,7 +4987,7 @@
 	`ContentNode.script()'.
 	(VocabList.__init__): Allocate the `audio.js' script.
 
-	* lcg/resources.py (Module): New module.  
+	* lcg/resources.py: New module.  
 	(Resource, Media, Script, Stylesheet): Moved here from the
 	`content' module.
 	(Transcript): New class.
@@ -5789,7 +5804,7 @@
 	* lcg/ims.py (Manifest): Renamed to `_Manifest'. 
 	(IMSExporter): New class.
 
-	* lcg/export.py (Module): New module.
+	* lcg/export.py: New module.
 	(Exporter._full_title): Method removed.
 	(Exporter._export_node): Put all files into the same directory.
 	(Exporter._wrap_content): Use `node.full_title()' instead of
@@ -5894,12 +5909,12 @@
 
 2004-05-03  Tomas Cerha  <cerha@brailcom.org>
 
-	* lcg/_test.py (Module): Import `lcg' and `os', not `lesson'.
+	* lcg/_test.py: Import `lcg' and `os', not `lesson'.
 	(ContentNode): New class
 	(Client): Class removed.
 	
 
-	* lcg/course.py (Module): Code reorganized to separate the general
+	* lcg/course.py: Code reorganized to separate the general
 	classes from the classes implementing concrete Eurochance Course
 	structure.
 	(EurochanceCourse): New class.

@@ -1,4 +1,4 @@
-# Learning Content Generator
+# Learning Content Generator translations
 # Copyright (C) 2005-2008 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2005.
@@ -7,225 +7,225 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-08-12 09:28+0200\n"
-"PO-Revision-Date: 2008-05-15 21:52+0200\n"
+"POT-Creation-Date: 2008-10-14 11:45+0200\n"
+"PO-Revision-Date: 2008-10-14 12:21+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
-"Language-Team: Czech <cs@li.org>\n"
+"Language-Team: Czech <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
-msgstr "afrik·nπtina"
+msgstr "afrik√°n≈°tina"
 
 #: ../lib/lcg/util.py:139
 msgid "Arabic"
-msgstr "arabπtina"
+msgstr "arab≈°tina"
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
-msgstr "bulharπtina"
+msgstr "bulhar≈°tina"
 
 #: ../lib/lcg/util.py:143
 msgid "Catalan"
-msgstr "katal·nπtina"
+msgstr "katal√°n≈°tina"
 
 #: ../lib/lcg/util.py:143
 msgid "Corsican"
-msgstr "korsiËtina"
+msgstr "korsiƒçtina"
 
 #: ../lib/lcg/util.py:143
 msgid "Czech"
-msgstr "Ëeπtina"
+msgstr "ƒçe≈°tina"
 
 #: ../lib/lcg/util.py:144
 msgid "Danish"
-msgstr "d·nπtina"
+msgstr "d√°n≈°tina"
 
 #: ../lib/lcg/util.py:144
 msgid "German"
-msgstr "nÏmËina"
+msgstr "nƒõmƒçina"
 
 #: ../lib/lcg/util.py:145
 msgid "Greek"
-msgstr "¯eËtina"
+msgstr "≈ôeƒçtina"
 
 #: ../lib/lcg/util.py:145
 msgid "English"
-msgstr "angliËtina"
+msgstr "angliƒçtina"
 
 #: ../lib/lcg/util.py:145
 msgid "Spanish"
-msgstr "πpanÏlπtina"
+msgstr "≈°panƒõl≈°tina"
 
 #: ../lib/lcg/util.py:146
 msgid "Estonian"
-msgstr "estonπtina"
+msgstr "eston≈°tina"
 
 #: ../lib/lcg/util.py:146
 msgid "Basque"
-msgstr "baskitπtina"
+msgstr "baskit≈°tina"
 
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
-msgstr "finπtina"
+msgstr "fin≈°tina"
 
 #: ../lib/lcg/util.py:148
 msgid "French"
-msgstr "fracouzπtina"
+msgstr "fracouz≈°tina"
 
 #: ../lib/lcg/util.py:150
 msgid "Irish"
-msgstr "irπtina"
+msgstr "ir≈°tina"
 
 #: ../lib/lcg/util.py:150
 msgid "Galician"
-msgstr "galicijπtina"
+msgstr "galicij≈°tina"
 
 #: ../lib/lcg/util.py:152
 msgid "Hindi"
-msgstr "hindπtina"
+msgstr "hind≈°tina"
 
 #: ../lib/lcg/util.py:152
 msgid "Croatian"
-msgstr "chorvatπtina"
+msgstr "chorvat≈°tina"
 
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
-msgstr "maÔarπtina"
+msgstr "maƒèar≈°tina"
 
 #: ../lib/lcg/util.py:155
 msgid "Icelandic"
-msgstr "islandπtina"
+msgstr "island≈°tina"
 
 #: ../lib/lcg/util.py:155
 msgid "Italian"
-msgstr "italπtina"
+msgstr "ital≈°tina"
 
 #: ../lib/lcg/util.py:156
 msgid "Japanese"
-msgstr "joponπtina"
+msgstr "jopon≈°tina"
 
 #: ../lib/lcg/util.py:157
 msgid "Georgian"
-msgstr "gruzÌnπtina"
+msgstr "gruz√≠n≈°tina"
 
 #: ../lib/lcg/util.py:158
 msgid "Korean"
-msgstr "korejπtina"
+msgstr "korej≈°tina"
 
 #: ../lib/lcg/util.py:158
 msgid "Kurdish"
-msgstr "kurdπtina"
+msgstr "kurd≈°tina"
 
 #: ../lib/lcg/util.py:162
 msgid "Macedonian"
-msgstr "makedonπtina"
+msgstr "makedon≈°tina"
 
 #: ../lib/lcg/util.py:163
 msgid "Moldavian"
-msgstr "moldavπtina"
+msgstr "moldav≈°tina"
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
-msgstr "d·nπtina"
+msgstr "d√°n≈°tina"
 
 #: ../lib/lcg/util.py:165
 msgid "Norwegian"
-msgstr "norπtina"
+msgstr "nor≈°tina"
 
 #: ../lib/lcg/util.py:167
 msgid "Polish"
-msgstr "polπtina"
+msgstr "pol≈°tina"
 
 #: ../lib/lcg/util.py:168
 msgid "Portuguese"
-msgstr "portugalπtina"
+msgstr "portugal≈°tina"
 
 #: ../lib/lcg/util.py:170
 msgid "Romanian"
-msgstr "rumunπtina"
+msgstr "rumun≈°tina"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
-msgstr "slovenπtina"
+msgstr "sloven≈°tina"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovenian"
-msgstr "slovinπtina"
+msgstr "slovin≈°tina"
 
 #: ../lib/lcg/util.py:174
 msgid "Albanian"
-msgstr "alb·nπtina"
+msgstr "alb√°n≈°tina"
 
 #: ../lib/lcg/util.py:174
 msgid "Serbian"
-msgstr "srbπtina"
+msgstr "srb≈°tina"
 
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
-msgstr "πvÈdπtina"
+msgstr "≈°v√©d≈°tina"
 
 #: ../lib/lcg/util.py:177
 msgid "Thai"
-msgstr "thaiπtina"
+msgstr "thai≈°tina"
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
-msgstr "tureËtina"
+msgstr "tureƒçtina"
 
 #: ../lib/lcg/util.py:180
 msgid "Ukrainian"
-msgstr "ukrainπtina"
+msgstr "ukrain≈°tina"
 
 #: ../lib/lcg/util.py:182
 msgid "Yiddish"
-msgstr "jidiπ"
+msgstr "jidi≈°"
 
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
-msgstr "ËÌnπtina"
+msgstr "ƒç√≠n≈°tina"
 
-#: ../lib/lcg/content.py:488
+#: ../lib/lcg/content.py:494
 msgid "Index:"
 msgstr "Obsah:"
 
-#: ../lib/lcg/export/html.py:385
+#: ../lib/lcg/export/html.py:387
 msgid "Choose your language:"
 msgstr "Zvolte jazyk:"
 
-#: ../lib/lcg/export/html.py:480
+#: ../lib/lcg/export/html.py:482
 msgid "Warning:"
-msgstr "Varov·nÌ:"
+msgstr "Varov√°n√≠:"
 
-#: ../lib/lcg/export/html.py:484
+#: ../lib/lcg/export/html.py:486
 msgid "Adobe website"
-msgstr "str·nky spoleËnosti Adobe"
+msgstr "str√°nky spoleƒçnosti Adobe"
 
-#: ../lib/lcg/export/html.py:481
+#: ../lib/lcg/export/html.py:483
 #, python-format
 msgid ""
 "Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
 "to %(version)s to be able to make use of advanced media playback "
 "capabilities.  See %(link)s for more information."
 msgstr ""
-"Flash %(version)s nebyl detekov·n.  Instalujte nebo aktualizujte Flash "
-"plugin na verzi %(version)s pro vyuæitÌ pokroËil˝ch moænostÌ p¯ehr·v·nÌ "
-"mÈdiÌ. VÌce informacÌ viz %(link)s."
-
-#: ../lib/lcg/export/html.py:617
-msgid "None"
-msgstr "nenÌ"
-
-#: ../lib/lcg/export/html.py:618
-msgid "You are here:"
-msgstr "Nach·zÌte se zde:"
-
-#: ../lib/lcg/export/html.py:620
-msgid "Next"
-msgstr "DalπÌ"
+"Flash %(version)s nebyl detekov√°n.  Instalujte nebo aktualizujte Flash "
+"plugin na verzi %(version)s pro vyu≈æit√≠ pokroƒçil√Ωch mo≈ænost√≠ p≈ôehr√°v√°n√≠ "
+"m√©di√≠. V√≠ce informac√≠ viz %(link)s."
 
 #: ../lib/lcg/export/html.py:621
+msgid "None"
+msgstr "nen√≠"
+
+#: ../lib/lcg/export/html.py:622
+msgid "You are here:"
+msgstr "Nach√°z√≠te se zde:"
+
+#: ../lib/lcg/export/html.py:624
+msgid "Next"
+msgstr "Dal≈°√≠"
+
+#: ../lib/lcg/export/html.py:625
 msgid "Previous"
-msgstr "P¯edchozÌ"
+msgstr "P≈ôedchoz√≠"
