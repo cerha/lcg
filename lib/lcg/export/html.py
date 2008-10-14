@@ -480,9 +480,8 @@ class HtmlExporter(Exporter):
                 return None
             g = context.generator()
             msg = (g.strong(_("Warning:")) +' '+
-                   # Translators: %(version)s will be automatically replaced by the required
-                   # version number.  %(link)s will be substituted by a hypertext link to Adobe
-                   # Website.
+                   # Translators: '%(version)s' is automatically replaced by the required version
+                   # number.  '%(link)s' is replaced by a hypertext link to Adobe Website.
                    _("Flash %(version)s not detected.  Please install or upgrade your "
                      "Flash plugin to %(version)s to be able to make use of advanced "
                      "media playback capabilities.  See %(link)s for more information.",
