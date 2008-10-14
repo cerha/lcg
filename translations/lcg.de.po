@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-14 15:04+0200\n"
+"POT-Creation-Date: 2008-10-14 15:27+0200\n"
 "PO-Revision-Date: 2008-10-14 12:33+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: German <lcg@lists.freebsoft.org>\n"
@@ -208,8 +208,8 @@ msgstr "Achtung:"
 msgid "Adobe website"
 msgstr "Adobe website"
 
-#. Translators: %(version)s will be automatically replaced by the required version
-#. number.  %(link)s will be substituted by a hypertext link to Adobe Website.
+#. Translators: '%(version)s' is automatically replaced by the required version
+#. number.  '%(link)s' is replaced by a hypertext link to Adobe Website.
 #: ../lib/lcg/export/html.py:485
 #, python-format
 msgid ""
