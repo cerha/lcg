@@ -480,9 +480,12 @@ class HtmlExporter(Exporter):
                 return None
             g = context.generator()
             msg = g.strong(_("Warning:")) +' '+ \
+                  # Translators: %(version)s will be automatically replaced by the required version
+                  # number.  %(link)s will be substituted by a hypertext link to Adobe Website.
                   _("Flash %(version)s not detected.  Please install or upgrade your "
                     "Flash plugin to %(version)s to be able to make use of advanced "
                     "media playback capabilities.  See %(link)s for more information.",
+                    # Translators: Title of the Adobe website link used in the Flash warning.
                     link=g.link(_("Adobe website"), 'http://www.adobe.com/products/flash/about/'),
                     version='$version')
             return g.div('', id='media-player-container') + \
@@ -618,10 +621,15 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                 return g.link(label, self.uri(context, target), title=target.title(),
                               hotkey=key and self._hotkey[key]) + hidden
             else:
+                # Translators: Label used instead of a link when the target does not exist.  For
+                # example sequential navigation may contain: "Previous: Introduction, Next: None".
                 return _("None")
         breadcrumbs = g.div(_("You are here:") +' '+ \
                             concat([link(n) for n in node.path()], separator=' / '))
-        nav = [g.span(_('Next') + ': ' + link(node.next(), key='next'), cls='next'),
-               g.span(_('Previous') + ': ' + link(node.prev(), key='prev'), cls='prev')]
+        nav = [
+            # Translators: Label of a link to the next page in sequential navigation.
+            g.span(_('Next') + ': ' + link(node.next(), key='next'), cls='next'),
+            # Translators: Label of a link to the next page in sequential navigation.
+            g.span(_('Previous') + ': ' + link(node.prev(), key='prev'), cls='prev')]
         return breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator'))
         

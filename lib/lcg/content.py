@@ -491,6 +491,7 @@ class SectionContainer(Container):
         if (self._toc_depth is None or self._toc_depth > 0) and \
                (len(toc_sections) > 1 or len(toc_sections) == 1 and 
                 len([s for s in toc_sections[0].sections(context) if s.in_toc()])):
+            # Translators: Title of the local table of contents (links to subsections).
             toc = TableOfContents(self, _("Index:"), depth=self._toc_depth)
             toc.set_container(self)
             toc.set_parent(self.parent())

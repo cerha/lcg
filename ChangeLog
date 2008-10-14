@@ -1,17 +1,21 @@
 2008-10-14  Tomas Cerha  <cerha@brailcom.org>
 
-	* translations/lcg.cs.po:
-	* translations/lcg.de.po:
-	* translations/lcg.es.po:
-	* translations/lcg.no.po:
-	* translations/lcg.pl.po:
-	* translations/lcg.sk.po:
+	* lib/lcg/content.py: 
+	* lib/lcg/export/html.py: 
+	Translation comments added.
+
+	* translations/Makefile: 
+	Extract source file comments labeled by "Translators:".
+
 	* translations/test.cs.po:
 	Updated meta information and encoding unified.
 
 	* translations/lcg.fr.po:
+	(Module): 
+
 	* translations/lcg.hu.po:
 	New (empty) translation files.
+	(Module): 
 
 2008-10-10  Tomas Cerha  <cerha@brailcom.org>
 
