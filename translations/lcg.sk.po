@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-14 11:45+0200\n"
+"POT-Creation-Date: 2008-10-14 15:04+0200\n"
 "PO-Revision-Date: 2008-10-14 12:31+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: Slovak <lcg@lists.freebsoft.org>\n"
@@ -191,7 +191,8 @@ msgstr "jidiš"
 msgid "Chinese"
 msgstr "činština"
 
-#: ../lib/lcg/content.py:494
+#. Translators: Title of the local table of contents (links to subsections).
+#: ../lib/lcg/content.py:495
 msgid "Index:"
 msgstr "Obsah:"
 
@@ -203,11 +204,14 @@ msgstr "Zvoľte si jazyk:"
 msgid "Warning:"
 msgstr "Upozornenie:"
 
-#: ../lib/lcg/export/html.py:486
+#. Translators: Title of the Adobe website link used in the Flash warning.
+#: ../lib/lcg/export/html.py:489
 msgid "Adobe website"
 msgstr "Adobe stranka"
 
-#: ../lib/lcg/export/html.py:483
+#. Translators: %(version)s will be automatically replaced by the required version
+#. number.  %(link)s will be substituted by a hypertext link to Adobe Website.
+#: ../lib/lcg/export/html.py:485
 #, python-format
 msgid ""
 "Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
@@ -218,18 +222,22 @@ msgstr ""
 "plugin na %(version)s aby ste mohli využíť rozšírené možnosti prehrávania. "
 "Kliknite %(link)s pre viac informácií. "
 
-#: ../lib/lcg/export/html.py:621
+#. Translators: Label used instead of a link when the target does not exist.  For
+#. example sequential navigation may contain: "Previous: Introduction, Next: None".
+#: ../lib/lcg/export/html.py:626
 msgid "None"
 msgstr "nieje"
 
-#: ../lib/lcg/export/html.py:622
+#: ../lib/lcg/export/html.py:627
 msgid "You are here:"
 msgstr "Nachádzate sa:"
 
-#: ../lib/lcg/export/html.py:624
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:631
 msgid "Next"
 msgstr "Dalšie"
 
-#: ../lib/lcg/export/html.py:625
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:633
 msgid "Previous"
 msgstr "Predchádzajúce"

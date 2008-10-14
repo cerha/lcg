@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-14 11:45+0200\n"
+"POT-Creation-Date: 2008-10-14 15:04+0200\n"
 "PO-Revision-Date: 2008-10-14 12:33+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: German <lcg@lists.freebsoft.org>\n"
@@ -190,7 +190,8 @@ msgid "Chinese"
 msgstr "chinesisch"
 
 # The table of contents...
-#: ../lib/lcg/content.py:494
+#. Translators: Title of the local table of contents (links to subsections).
+#: ../lib/lcg/content.py:495
 msgid "Index:"
 msgstr "Verzeichnis:"
 
@@ -202,11 +203,14 @@ msgstr "Sprache wählen:"
 msgid "Warning:"
 msgstr "Achtung:"
 
-#: ../lib/lcg/export/html.py:486
+#. Translators: Title of the Adobe website link used in the Flash warning.
+#: ../lib/lcg/export/html.py:489
 msgid "Adobe website"
 msgstr "Adobe website"
 
-#: ../lib/lcg/export/html.py:483
+#. Translators: %(version)s will be automatically replaced by the required version
+#. number.  %(link)s will be substituted by a hypertext link to Adobe Website.
+#: ../lib/lcg/export/html.py:485
 #, python-format
 msgid ""
 "Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
@@ -218,20 +222,24 @@ msgstr ""
 "Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
 
 # This label is actually not used.
-#: ../lib/lcg/export/html.py:621
+#. Translators: Label used instead of a link when the target does not exist.  For
+#. example sequential navigation may contain: "Previous: Introduction, Next: None".
+#: ../lib/lcg/export/html.py:626
 msgid "None"
 msgstr "Nichts"
 
-#: ../lib/lcg/export/html.py:622
+#: ../lib/lcg/export/html.py:627
 msgid "You are here:"
 msgstr "Sie sind hier:"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:624
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:631
 msgid "Next"
 msgstr "weiter"
 
 # Navigation bar label (at the bottom of each page)
-#: ../lib/lcg/export/html.py:625
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:633
 msgid "Previous"
 msgstr "vorhergehend"
