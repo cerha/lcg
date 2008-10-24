@@ -1,3 +1,8 @@
+2008-10-24  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py:
+	Add language specific styles to language selection menu links.
+
 2008-10-14  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py: 

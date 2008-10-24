@@ -437,12 +437,12 @@ class HtmlExporter(Exporter):
         links = []
         for lang in variants:
             label = language_name(lang)
+            cls = 'lang-'+lang
             if lang == context.lang():
+                cls += ' current'
                 sign = g.span(' *', cls='hidden')
-                cls = 'current'
             else:
                 sign = ''
-                cls = None
             image = self._language_selection_image(context, lang)
             if image:
                 if self._LANGUAGE_SELECTION_COMBINED:
