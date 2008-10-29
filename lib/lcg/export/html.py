@@ -450,7 +450,7 @@ class HtmlExporter(Exporter):
                 else:
                     label = g.img(image, alt=label, border=None)
             links.append(g.link(label, self._uri_node(context, node, lang=lang), cls=cls)+sign)
-        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None, tabindex=-1,
+        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
                              id='language-selection-anchor', name='language-selection-anchor'),
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 

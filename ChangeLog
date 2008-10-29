@@ -1,3 +1,7 @@
+2008-10-29  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py: Don't use tabindex value -1.
+
 2008-10-24  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py:
