@@ -47,11 +47,17 @@ function export_media_player(uri, target, msg) {
    */
 }
 
-function export_media_controls(uri, label, image) {
-   var attr = (' onclick="play_media(\''+ uri +'\'); return false;"'+
-	       ' onkeydown="return on_media_ctrl_keydown(event, \''+ uri +'\');"'+
-	       ' onkeypress="return on_media_ctrl_keypress(event, \''+ uri +'\');"'+
-	       ' class="sound-control"');
+function _media_control_attr(uri, label, image) {
+   return (' onclick="play_media('+ uri +'); return false;"'+
+	   ' onkeydown="return on_media_ctrl_keydown(event, '+ uri +');"'+
+	   ' onkeypress="return on_media_ctrl_keypress(event, '+ uri +');"'+
+	   ' class="media-control"');
+}
+
+function export_media_control(uri, label, image) {
+   // URI is evaluated as a Javascript expression, so a string value must be enclosed in
+   // apostrophes.  Example: "'/audio/track01.mp3'" or "'/audio/' + this.form.track.value"
+   var attr = _media_control_attr(uri);
    var html;
    if (image)
       html = '<button title="'+ label +'"'+ attr +'><img src="'+ image +'" alt="" /></button>';
@@ -71,7 +77,6 @@ function _media_player() {
    else
       return null;
 }
-      
 
 function _media_player_command(cmd, uri) {
    // Available commands: 'playpause', 'forward', 'rewind', 'volume+', 'volume-'
@@ -125,7 +130,7 @@ function play_media(uri) {
 }
 
 function on_media_ctrl_keydown(event, uri) {
-   // Not all browsers fire fire the keypress events for arrow keys, so we handle then on keydown.
+   // Not all browsers fire keypress events for arrow keys, so we handle them in onkeydown as well.
    var code = document.all ? event.keyCode : event.which;
    var map = {37: '<', // left arrow
 	      39: '>', // right arrow

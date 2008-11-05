@@ -1,3 +1,8 @@
+2008-11-05  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/media.js:
+	Allow JS expressions in media control URI.
+
 2008-10-29  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: Don't use tabindex value -1.
