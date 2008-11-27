@@ -563,8 +563,12 @@ class Section(SectionContainer):
     def anchor(self):
         """Return the link target name of this section."""
         if self._anchor is None:
-            numbers = [str(x.section_number()) for x in self._section_path()]
-            self._anchor = self._ANCHOR_PREFIX + '.'.join(numbers)
+            path = self._section_path()
+            if len(path) >= 2:
+                self._anchor = path[-2].anchor() +'.'+ str(self.section_number())
+            else:
+                numbers = [str(x.section_number()) for x in path]
+                self._anchor = self._ANCHOR_PREFIX + '.'.join(numbers)
         return self._anchor
         
     def backref(self, node):
