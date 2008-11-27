@@ -15,121 +15,130 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA */
 
-var MIN_FLASH_VERSION = '9'; //.0.115';
+var MIN_FLASH_VERSION = '9.0.115';
+var PLAYER_ID = 'shared-audio-player';
+var PLAYER_WIDTH = '300';
+var PLAYER_HEIGHT = '20';
 
 function export_media_player(uri, target, msg) {
    // TODO: Degrade gracefully when running locally (the player doesn't work in this case
    // because of Flash security restrictions).
-   var so = new SWFObject(uri, 'mediaplayer', '300', '20', MIN_FLASH_VERSION);
+   var so = new SWFObject(uri, PLAYER_ID, PLAYER_WIDTH, PLAYER_HEIGHT, MIN_FLASH_VERSION,
+			  false, {}, {}, {});
+   so.addVariable('id', PLAYER_ID);
+   so.addParam('allowfullscreen', 'false');
    so.addParam('allowscriptaccess', 'always');
-   so.addVariable('width', '300');
-   so.addVariable('height', '20');
-   so.addVariable('javascriptid', 'mediaplayer');
-   so.addVariable('enablejs', 'true');
    if (!so.write(target)) {
       // Supply the error message here to prevent it when Javascript is disabled.
       document.getElementById(target).innerHTML = msg.replace(/\$version/g, MIN_FLASH_VERSION);
    }
-   // Detect the existence of Windows Media Player v7 or higher as the fallback player.
-   /* Currently unused because the player (even if hidden) insists on rendering animations 
-      on the page (across our content).
-   if (window.ActiveXObject && navigator.userAgent.indexOf('Win') != -1)
-      try { 
-	 var wmp = new ActiveXObject('WMPlayer.OCX.7'); 
-	 if (wmp)
-	    document.write('<object id="windows_media_player" height="0" width="0"' +
-			   ' classid="CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6"' +
-			   ' type="application/x-oleobject">' +
-			   '<param name="uiMode" value="none">' +
-			   '</object>');
-      }
-      catch(e) {}
-   */
 }
 
-function _media_control_attr(uri, label, image) {
-   return (' onclick="play_media('+ uri +'); return false;"'+
-	   ' onkeydown="return on_media_ctrl_keydown(event, '+ uri +');"'+
-	   ' onkeypress="return on_media_ctrl_keypress(event, '+ uri +');"'+
+function _media_control_attr(uri, field_id) {
+   uri = "'"+uri+"'";
+   if (typeof field_id != 'undefined') field_id = "'"+field_id+"'";
+   return (' onclick="play_media('+ uri +', '+ field_id +'); return false;"'+
+	   ' onkeydown="return on_media_ctrl_keydown(event, '+ uri +', '+ field_id +');"'+
+	   ' onkeypress="return on_media_ctrl_keypress(event, '+ uri +', '+ field_id +');"'+
 	   ' class="media-control"');
 }
 
-function export_media_control(uri, label, image) {
-   // URI is evaluated as a Javascript expression, so a string value must be enclosed in
-   // apostrophes.  Example: "'/audio/track01.mp3'" or "'/audio/' + this.form.track.value"
-   var attr = _media_control_attr(uri);
+function export_media_control(uri, label, image, field_id) {
+   var attr = _media_control_attr(uri, field_id);
    var html;
-   if (image)
+   if (typeof image != 'undefined' && image != null)
       html = '<button title="'+ label +'"'+ attr +'><img src="'+ image +'" alt="" /></button>';
    else 
       html = '<input type="button" value="'+ label +'"'+ attr +' />';
-   document.write(html)
+   document.write(html);
 }
 
-function _media_player() {
-   var player;
-   if (navigator.appName.indexOf("Microsoft") != -1)
-      player = window.mediaplayer;
-   else 
-      player = document.mediaplayer;
-   if (player && player.itemData)
-      return player;
-   else
-      return null;
+var _player;
+var _player_state = {
+   position: null,
+   volume: null,
+   state: null,
+};
+var _current_playlist = null;
+
+function playerReady(obj) {
+   if (obj.id == PLAYER_ID) {
+      _player = document.getElementById(PLAYER_ID);
+      _player.addControllerListener("VOLUME", "_on_player_volume_changed");
+      _player.addModelListener("STATE", "_on_player_state_changed");
+      _player.addModelListener("TIME", "_on_player_time_changed");
+      _player_state.volume = _player.getConfig()['volume'];
+   }
+}
+function _on_player_time_changed(event) { 
+   _player_state.position = event.position;
+}
+function _on_player_volume_changed(event) {
+   _player_state.volume = event.percentage; 
+}
+function _on_player_state_changed(event) { //IDLE, BUFFERING, PLAYING, PAUSED, COMPLETED
+   _player_state.state = event.newstate; 
+   if (event.newstate == "COMPLETED" && event.oldstate == "PLAYING" && _current_playlist != null) {
+      var field = _current_playlist.field;
+      if (field.selectedIndex < field.options.length) {
+	 field.selectedIndex++;
+	 play_media(_current_playlist.uri, field.id);
+      }
+   }
 }
 
-function _media_player_command(cmd, uri) {
-   // Available commands: 'playpause', 'forward', 'rewind', 'volume+', 'volume-'
-   var player = _media_player();
-   // Use Flash player if possible.
-   if (player) {
-      data = player.itemData(0);
-      if (cmd == 'playpause') {
-	 if (data == null || data.file != uri) player.loadFile({file: uri});
-	 player.sendEvent('playpause');
-      } else if ((cmd == 'forward' || cmd == 'rewind') && data.file == uri) {
+function _media_player_command(cmd, uri, field_id) {
+   // Available commands: 'play', 'forward', 'rewind', 'volume+', 'volume-'
+   _current_playlist = null;
+   if (typeof field_id != 'undefined') {
+      var field = document.getElementById(field_id);
+      if (field != null) {
+	 if (field.type == 'select-one')
+	    _current_playlist = {uri: uri, field: field};
+	 uri += '/'+ field.value;
+      }
+   }
+   if (_player) {
+      // Use the player if possible.
+      playlist = _player.getPlaylist();
+      if (playlist != null && playlist.length != null)
+	 item = playlist[0]
+      else
+	 item = null
+      if (cmd == 'play') {
+	 if (item == null || item.file != uri)
+	    _player.sendEvent('LOAD', {file: uri});
+	 _player.sendEvent('PLAY');
+      } else if ((cmd == 'forward' || cmd == 'rewind') && item.file == uri) {
 	 position = _player_state.position;
-	 skip = 3; // Seconds
-	 if (cmd == 'forward' && data.duration > position+skip)
+	 skip = item.duration / 20; // Seconds
+	 if (skip < 3) skip = 3;
+	 if (skip > 30) skip = 30;
+	 if (cmd == 'forward' && item.duration > position+skip)
 	    position += skip;
 	 if (cmd == 'rewind')
 	    position = (position-skip >= 0) ? position-skip : 0;
-	 player.sendEvent('scrub', position);
-      } else if ((cmd == 'volume+' || cmd == 'volume-') && data.file == uri) {
+	 _player.sendEvent('SEEK', position);
+      } else if ((cmd == 'volume+' || cmd == 'volume-') && item.file == uri) {
 	 volume = _player_state.volume;
 	 skip = 5; // Percents
 	 if (cmd == 'volume+' && volume+skip <= 100)
 	    volume += skip;
 	 if (cmd == 'volume-' && volume-skip >= 20)
 	    volume -= skip;
-	 player.sendEvent('volume', volume);
+	 _player.sendEvent('VOLUME', volume);
       }
-   }
-   // Use Windows Media Player as the second option.
-   else if (document.windows_media_player) {
-      player = document.windows_media_player
-      if (cmd == 'playpause') {
-	 if (player.URL != uri)
-	    player.URL = uri;
-	 if (player.PlayState == 3)
-	    player.controls.pause();
-	 else
-	    player.controls.play();
-      } else if (cmd == 'forward' && player.controls.isAvailable('FastForward'))
-	 player.controls.fastForward();
-      else if (cmd == 'rewind' && player.controls.isAvailable('FastReverse'))
-	 player.controls.fastReverse();
-   } 
-   // Play the sound by system as the last resort.
-   else if (cmd == 'playpause')
+   } else if (cmd == 'play') {
+      // Play the sound through the system if the player is not available.
       self.location = uri;
+   }
 }
 
-function play_media(uri) {
-   _media_player_command('playpause', uri)
+function play_media(uri, field_id) {
+   _media_player_command('play', uri, field_id);
 }
 
-function on_media_ctrl_keydown(event, uri) {
+function on_media_ctrl_keydown(event, uri, field_id) {
    // Not all browsers fire keypress events for arrow keys, so we handle them in onkeydown as well.
    var code = document.all ? event.keyCode : event.which;
    var map = {37: '<', // left arrow
@@ -138,39 +147,32 @@ function on_media_ctrl_keydown(event, uri) {
 	      40: '-'} // down arrow
    var key = map[code];
    if (key != null) 
-      return _handle_media_ctrl_keys(uri, map[code], 'keydown');
+      return _handle_media_ctrl_keys(uri, map[code], 'keydown', field_id);
    else
       return true;
 }
 
-function on_media_ctrl_keypress(event, uri) {
+function on_media_ctrl_keypress(event, uri, field_id) {
    var code = event.charCode || event.keyCode;
-   return _handle_media_ctrl_keys(uri, String.fromCharCode(code), 'keypress');
+   return _handle_media_ctrl_keys(uri, String.fromCharCode(code), 'keypress', field_id);
 }
 
-function _handle_media_ctrl_keys(uri, key, type) {
+function _handle_media_ctrl_keys(uri, key, type, field_id) {
    if (key == '<') { 
-      _media_player_command('rewind', uri);
+      _media_player_command('rewind', uri, field_id);
       return false;
    }
    if (key == '>') { // right arrow
-      _media_player_command('forward', uri);
+      _media_player_command('forward', uri, field_id);
       return false;
    }
    if (key == '+') { // up arrow
-      _media_player_command('volume+', uri);
+      _media_player_command('volume+', uri, field_id);
       return false;
    }
    if (key == '-') { // down arrow
-      _media_player_command('volume-', uri);
+      _media_player_command('volume-', uri, field_id);
       return false;
    }
    return true;
 }
-
-var _player_state = {};
-function getUpdate(type, arg, arg2, swf) { 
-   if (type == 'state') _player_state.state = arg;
-   else if (type == 'time') _player_state.position = arg;
-   else if (type == 'volume') _player_state.volume = arg;
-};
