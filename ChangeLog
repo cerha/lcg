@@ -1,3 +1,7 @@
+2008-12-08  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/locales.py: Use the European date format for English.
+
 2008-11-27  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/css/default.css: 

@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class LocaleData_de(LocaleData):
     thousands_sep = ','
 
 class LocaleData_en(LocaleData):
-    date_format = "%m/%d/%Y"
+    date_format = "%d/%m/%Y"
     time_format = "%I:%M %p"
     exact_time_format = "%I:%M:%S %p"
     thousands_sep = ','
