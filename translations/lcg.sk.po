@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-14 15:27+0200\n"
+"POT-Creation-Date: 2008-12-08 17:53+0100\n"
 "PO-Revision-Date: 2008-10-14 12:31+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: Slovak <lcg@lists.freebsoft.org>\n"
@@ -200,44 +200,52 @@ msgstr "Obsah:"
 msgid "Choose your language:"
 msgstr "Zvoľte si jazyk:"
 
-#: ../lib/lcg/export/html.py:482
+#: ../lib/lcg/export/html.py:482 ../lib/lcg/export/html.py:493
 msgid "Warning:"
 msgstr "Upozornenie:"
 
-#. Translators: Title of the Adobe website link used in the Flash warning.
-#: ../lib/lcg/export/html.py:489
-msgid "Adobe website"
-msgstr "Adobe stranka"
+#: ../lib/lcg/export/html.py:491
+msgid "Adobe Flash plugin"
+msgstr ""
 
 #. Translators: '%(version)s' is automatically replaced by the required version
-#. number.  '%(link)s' is replaced by a hypertext link to Adobe Website.
-#: ../lib/lcg/export/html.py:485
-#, python-format
+#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
+#. download page.
+#: ../lib/lcg/export/html.py:486
+#, fuzzy, python-format
 msgid ""
-"Flash %(version)s not detected.  Please install or upgrade your Flash plugin "
-"to %(version)s to be able to make use of advanced media playback "
-"capabilities.  See %(link)s for more information."
+"Flash %(version)s not detected. Please, install or upgrade your Flash plugin "
+"to %(version)s for advanced media playback capabilities. Get %(plugin)s."
 msgstr ""
 "Flash %(version)s nenájdený. Prosím nainštalujte alebo upgradujte Flash "
 "plugin na %(version)s aby ste mohli využíť rozšírené možnosti prehrávania. "
 "Kliknite %(link)s pre viac informácií. "
 
+#: ../lib/lcg/export/html.py:494
+msgid ""
+"Please, enable JavaScript support in your browser for advanced media "
+"playback capabilities."
+msgstr ""
+
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:626
+#: ../lib/lcg/export/html.py:631
 msgid "None"
 msgstr "nieje"
 
-#: ../lib/lcg/export/html.py:627
+#: ../lib/lcg/export/html.py:632
 msgid "You are here:"
 msgstr "Nachádzate sa:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:631
+#: ../lib/lcg/export/html.py:636
 msgid "Next"
 msgstr "Dalšie"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:633
+#: ../lib/lcg/export/html.py:638
 msgid "Previous"
 msgstr "Predchádzajúce"
+
+#~ msgid "Adobe website"
+#~ msgstr "Adobe stranka"

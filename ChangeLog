@@ -1,5 +1,20 @@
-2008-12-08  Tomas Cerha  <cerha@brailcom.org>
+2008-12-09  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/export/html.py: 
+	* resources/css/default.css: 
+	* resources/scripts/media.js: 
+	* translations/lcg.cs.po: 
+	* translations/lcg.de.po: 
+	* translations/lcg.es.po: 
+	* translations/lcg.fr.po: 
+	* translations/lcg.hu.po: 
+	* translations/lcg.no.po: 
+	* translations/lcg.pl.po: 
+	* translations/lcg.sk.po: 
+	Modified for SWFObject 2.1.
+
+2008-12-08  Tomas Cerha  <cerha@brailcom.org>
+	
 	* lib/lcg/locales.py: Use the European date format for English.
 
 2008-11-27  Tomas Cerha  <cerha@brailcom.org>

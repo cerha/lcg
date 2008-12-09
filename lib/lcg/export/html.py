@@ -481,15 +481,20 @@ class HtmlExporter(Exporter):
             g = context.generator()
             msg = (g.strong(_("Warning:")) +' '+
                    # Translators: '%(version)s' is automatically replaced by the required version
-                   # number.  '%(link)s' is replaced by a hypertext link to Adobe Website.
-                   _("Flash %(version)s not detected.  Please install or upgrade your "
-                     "Flash plugin to %(version)s to be able to make use of advanced "
-                     "media playback capabilities.  See %(link)s for more information.",
-                     # Translators: Title of the Adobe website link used in the Flash warning.
-                     link=g.link(_("Adobe website"), 'http://www.adobe.com/products/flash/about/'),
-                     version='$version'))
-            return g.div('', id='media-player-container') + \
-                   g.script("export_media_player('%s', 'media-player-container', %s)" %
+                   # number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
+                   # download page.
+                   _("Flash %(version)s not detected. Please, install or upgrade your "
+                     "Flash plugin to %(version)s for advanced media playback capabilities. "
+                     "Get %(plugin)s.",
+                     # Translators: Title of the link to Adobe website used in the Flash warning.
+                     version='$version',
+                     plugin=g.link(_("Adobe Flash plugin"),
+                                   'http://www.adobe.com/products/flash/about/')))
+            return g.div(g.strong(_("Warning:")) + ' '+ \
+                         _("Please, enable JavaScript support in your browser for advanced media "
+                           "playback capabilities."),
+                         id='shared-audio-player') + \
+                   g.script("export_shared_audio_player('%s', 'shared-audio-player', %s)" %
                             (context.uri(player), g.js_value(context.translate(msg))))
         else:
             return None

@@ -16,21 +16,24 @@
  * USA */
 
 var MIN_FLASH_VERSION = '9.0.115';
-var PLAYER_ID = 'shared-audio-player';
-var PLAYER_WIDTH = '300';
-var PLAYER_HEIGHT = '20';
 
-function export_media_player(uri, target, msg) {
+var _shared_player_id = null;
+
+function export_shared_audio_player(uri, id, msg) {
    // TODO: Degrade gracefully when running locally (the player doesn't work in this case
    // because of Flash security restrictions).
-   var so = new SWFObject(uri, PLAYER_ID, PLAYER_WIDTH, PLAYER_HEIGHT, MIN_FLASH_VERSION,
-			  false, {}, {}, {});
-   so.addVariable('id', PLAYER_ID);
-   so.addParam('allowfullscreen', 'false');
-   so.addParam('allowscriptaccess', 'always');
-   if (!so.write(target)) {
-      // Supply the error message here to prevent it when Javascript is disabled.
-      document.getElementById(target).innerHTML = msg.replace(/\$version/g, MIN_FLASH_VERSION);
+   //var vars = {id: id};
+   if (swfobject.hasFlashPlayerVersion(MIN_FLASH_VERSION)) {
+      var vars = {id: id};
+      var params = {allowfullscreen: 'false',
+		    allowscriptaccess: 'always'};
+      swfobject.embedSWF(uri, id, 300, 20, MIN_FLASH_VERSION, false, vars, params);
+      _shared_player_id = id;
+   } else {
+      // Replace the "JavaScript disabled" error message by a "Flash not available" error message.
+      var node = document.getElementById(id);
+      if (node != null)
+	 node.innerHTML = msg.replace(/\$version/g, MIN_FLASH_VERSION);
    }
 }
 
@@ -62,8 +65,8 @@ var _player_state = {
 var _current_playlist = null;
 
 function playerReady(obj) {
-   if (obj.id == PLAYER_ID) {
-      _player = document.getElementById(PLAYER_ID);
+   if (obj.id == _shared_player_id) {
+      _player = document.getElementById(_shared_player_id);
       _player.addControllerListener("VOLUME", "_on_player_volume_changed");
       _player.addModelListener("STATE", "_on_player_state_changed");
       _player.addModelListener("TIME", "_on_player_time_changed");
