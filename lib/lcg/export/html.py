@@ -467,12 +467,12 @@ class HtmlExporter(Exporter):
             node.resource('media-play.gif') # Used in the default media control style.
             def warn_mediaplayer(msg):
                 log(msg)
-                log("Get JW FLV MEDIA PLAYER 3.15 (or later) from "
-                    "http://www.jeroenwijering.com/?about=JW_FLV_Media_Player "
+                log("Get JW FLV MEDIA PLAYER 4.2 (or later) from "
+                    "http://www.jeroenwijering.com/?item=JW_FLV_Media_Player "
                     "and put mediaplayer.swf to your resource path!")
             def warn_swfobject(msg):
                 log(msg)
-                log("Get SWFObject v1.5 from http://blog.deconcept.com/swfobject/ "
+                log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
                     "and put swfobject.js to your resource path!")
             player = node.resource('mediaplayer.swf', warn=warn_mediaplayer)
             swfobject = node.resource('swfobject.js', warn=warn_swfobject)
