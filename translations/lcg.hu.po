@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-08 17:53+0100\n"
+"POT-Creation-Date: 2008-12-09 15:05+0100\n"
 "PO-Revision-Date: 2008-10-14 12:35+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Hungarian <lcg@lists.freebsoft.org>\n"
@@ -196,11 +196,13 @@ msgstr ""
 msgid "Choose your language:"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:482 ../lib/lcg/export/html.py:493
+#: ../lib/lcg/export/html.py:482 ../lib/lcg/export/html.py:492
 msgid "Warning:"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:491
+#. Translators: Title of the link to Adobe website used in the Flash warning.
+#. The version is substituted within the JavaScript code.
+#: ../lib/lcg/export/html.py:490
 msgid "Adobe Flash plugin"
 msgstr ""
 
@@ -210,32 +212,32 @@ msgstr ""
 #: ../lib/lcg/export/html.py:486
 #, python-format
 msgid ""
-"Flash %(version)s not detected. Please, install or upgrade your Flash plugin "
-"to %(version)s for advanced media playback capabilities. Get %(plugin)s."
+"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+"advanced media playback capabilities."
 msgstr ""
 
-#: ../lib/lcg/export/html.py:494
+#: ../lib/lcg/export/html.py:493
 msgid ""
-"Please, enable JavaScript support in your browser for advanced media "
-"playback capabilities."
+"JavaScript not detected.  Use a JavaScript enabled browser for advanced "
+"media playback capabilities."
 msgstr ""
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:631
+#: ../lib/lcg/export/html.py:630
 msgid "None"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:632
+#: ../lib/lcg/export/html.py:631
 msgid "You are here:"
 msgstr ""
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:636
+#: ../lib/lcg/export/html.py:635
 msgid "Next"
 msgstr ""
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:638
+#: ../lib/lcg/export/html.py:637
 msgid "Previous"
 msgstr ""

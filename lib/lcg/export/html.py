@@ -483,16 +483,15 @@ class HtmlExporter(Exporter):
                    # Translators: '%(version)s' is automatically replaced by the required version
                    # number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
                    # download page.
-                   _("Flash %(version)s not detected. Please, install or upgrade your "
-                     "Flash plugin to %(version)s for advanced media playback capabilities. "
-                     "Get %(plugin)s.",
+                   _("Flash %(version)s not detected. Get %(plugin)s %(version)s or later "
+                     "for advanced media playback capabilities.",
                      # Translators: Title of the link to Adobe website used in the Flash warning.
-                     version='$version',
+                     version='$version', # The version is substituted within the JavaScript code.
                      plugin=g.link(_("Adobe Flash plugin"),
                                    'http://www.adobe.com/products/flash/about/')))
             return g.div(g.strong(_("Warning:")) + ' '+ \
-                         _("Please, enable JavaScript support in your browser for advanced media "
-                           "playback capabilities."),
+                         _("JavaScript not detected.  Use a JavaScript enabled browser "
+                           "for advanced media playback capabilities."),
                          id='shared-audio-player') + \
                    g.script("export_shared_audio_player('%s', 'shared-audio-player', %s)" %
                             (context.uri(player), g.js_value(context.translate(msg))))
