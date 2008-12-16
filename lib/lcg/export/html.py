@@ -256,8 +256,8 @@ class HtmlGenerator(Generator):
     def radio(self, name, **kwargs):
         return self._input('radio', _attr=('checked',), name=name, **kwargs)
      
-    def hidden(self, name, value):
-        return self._input('hidden', name=name, value=value)
+    def hidden(self, name, value, id=None):
+        return self._input('hidden', name=name, value=value, id=id)
      
     def button(self, content=None, label=None, cls=None, **kwargs):
         cls = cls and 'button ' + cls or 'button'

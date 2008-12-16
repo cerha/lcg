@@ -1,5 +1,8 @@
 2008-12-16  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/export/html.py:
+	Allow `id' for `hidden' field.
+	
 	* resources/scripts/media.js: 
 	* lib/lcg/export/html.py:
 	* translations/Makefile: 
