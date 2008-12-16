@@ -1,3 +1,18 @@
+2008-12-16  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/media.js: 
+	* lib/lcg/export/html.py:
+	* translations/Makefile: 
+	* translations/lcg.cs.po: 
+	* translations/lcg.de.po: 
+	* translations/lcg.es.po: 
+	* translations/lcg.fr.po: 
+	* translations/lcg.hu.po: 
+	* translations/lcg.no.po: 
+	* translations/lcg.pl.po: 
+	* translations/lcg.sk.po: 
+	Media player embedding and JavaScript handling completely rewritten.
+
 2008-12-09  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py: 

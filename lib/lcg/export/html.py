@@ -259,9 +259,13 @@ class HtmlGenerator(Generator):
     def hidden(self, name, value):
         return self._input('hidden', name=name, value=value)
      
-    def button(self, label, handler, cls=None, **kwargs):
+    def button(self, content=None, label=None, cls=None, **kwargs):
         cls = cls and 'button ' + cls or 'button'
-        return self._input('button', value=label, onclick=handler, cls=cls, **kwargs)
+        if content is None:
+            return self._input('button', value=label, cls=cls, **kwargs)
+        else:
+            attr = ('value', 'onclick' 'name', 'cls', 'disabled', 'title')
+            return self._tag('button', content, attr, title=label, **kwargs)
      
     def reset(self, label, onclick=None, cls=None, title=None):
         return self._input('reset', title=title, onclick=onclick, value=label, cls=cls)
@@ -349,7 +353,10 @@ class HtmlGenerator(Generator):
     def js_args(self, *args):
         return concat([self.js_value(arg) for arg in args], separator=", ")
      
-
+    def js_call(self, fname, *args):
+        fargs = concat([self.js_value(arg) for arg in args], separator=", ")
+        return self.script('%s(%s)' % (fname, fargs))
+    
 class HtmlFormatter(MarkupFormatter):
     
     _FORMAT = {'emphasize': ('<em>', '</em>'),
@@ -378,6 +385,15 @@ class HtmlFormatter(MarkupFormatter):
 class HtmlExporter(Exporter):
     Generator = HtmlGenerator
     Formatter = HtmlFormatter
+
+    class Context(Exporter.Context):
+        def __init__(self, *args, **kwargs):
+            super(HtmlExporter.Context, self).__init__(*args, **kwargs)
+            self._shared_player_used = False
+        def use_shared_player(self):
+            self._shared_player_used = True
+        def shared_player_used(self):
+            return self._shared_player_used
     
     _BODY_PARTS = ('heading',
                    'language_selection',
@@ -461,42 +477,46 @@ class HtmlExporter(Exporter):
     def _content(self, context):
         return context.node().content().export(context)
 
-    def _media_player(self, context):
+    def export_media_player(self, context, player_id, width, height, shared=False, media=None):
         node = context.node()
-        if 'media.js' in [r.filename() for r in node.resources(Script)]:
-            node.resource('media-play.gif') # Used in the default media control style.
-            def warn_mediaplayer(msg):
-                log(msg)
-                log("Get JW FLV MEDIA PLAYER 4.2 (or later) from "
-                    "http://www.jeroenwijering.com/?item=JW_FLV_Media_Player "
-                    "and put mediaplayer.swf to your resource path!")
-            def warn_swfobject(msg):
-                log(msg)
-                log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
-                    "and put swfobject.js to your resource path!")
-            player = node.resource('mediaplayer.swf', warn=warn_mediaplayer)
-            swfobject = node.resource('swfobject.js', warn=warn_swfobject)
-            if not player or not swfobject:
-                return None
-            g = context.generator()
-            msg = (g.strong(_("Warning:")) +' '+
-                   # Translators: '%(version)s' is automatically replaced by the required version
-                   # number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
-                   # download page.
-                   _("Flash %(version)s not detected. Get %(plugin)s %(version)s or later "
-                     "for advanced media playback capabilities.",
-                     # Translators: Title of the link to Adobe website used in the Flash warning.
-                     version='$version', # The version is substituted within the JavaScript code.
-                     plugin=g.link(_("Adobe Flash plugin"),
-                                   'http://www.adobe.com/products/flash/about/')))
-            return g.div(g.strong(_("Warning:")) + ' '+ \
-                         _("JavaScript not detected.  Use a JavaScript enabled browser "
-                           "for advanced media playback capabilities."),
-                         id='shared-audio-player') + \
-                   g.script("export_shared_audio_player('%s', 'shared-audio-player', %s)" %
-                            (context.uri(player), g.js_value(context.translate(msg))))
+        def warn_mediaplayer(msg):
+            log(msg)
+            log("Get JW FLV MEDIA PLAYER 4.2 (or later) from "
+                "http://www.jeroenwijering.com/?item=JW_FLV_Media_Player "
+                "and put mediaplayer.swf to your resource path!")
+        def warn_swfobject(msg):
+            log(msg)
+            log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
+                "and put swfobject.js to your resource path!")
+        node.resource('media.js')
+        player = node.resource('mediaplayer.swf', warn=warn_mediaplayer)
+        swfobject = node.resource('swfobject.js', warn=warn_swfobject)
+        if not player or not swfobject:
+            return None
+        g = context.generator()
+        flash_err = (g.strong(_("Warning:")) +' '+
+                     # Translators: '%(version)s' is automatically replaced by the required version
+                     # number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
+                     # download page.
+                     _("Flash %(version)s not detected. Get %(plugin)s %(version)s or later "
+                       "for advanced media playback capabilities.",
+                       # Translators: Title of the link to Adobe website used in the Flash warning.
+                       version='$version', # The version is substituted within the JavaScript code.
+                       plugin=g.link(_("Adobe Flash plugin"),
+                                     'http://www.adobe.com/products/flash/about/')))
+        js_err = g.strong(_("Warning:")) +' '+ \
+                 _("JavaScript not detected. "
+                   "Use a JavaScript enabled browser for advanced media playback capabilities.")
+        return g.div(js_err, id=player_id) + \
+               g.js_call('export_media_player', context.uri(player), player_id, width, height, 
+                         shared, media, context.translate(flash_err))
+
+    def _media_player(self, context):
+        if context.shared_player_used():
+            return self.export_media_player(context, 'shared-audio-player', 300, 20, shared=True)
         else:
             return None
+        
     def _initialize(self, context):
         return ''
 
