@@ -43,6 +43,7 @@ function export_media_player(uri, id, width, height, shared, media, flash_errmsg
 	 volume: null,
 	 playing: false,
 	 controls: null,
+	 loaded_uri: null,
 	 on_load: null
       };
       if (shared)
@@ -123,25 +124,29 @@ function _media_player(player_id) {
    return null;
 }
 
+function _media_player_current_uri(player) {
+   var playlist = player.getPlaylist();
+   if (playlist != null && playlist.length != null)
+      return playlist[0].file;
+   else
+      return null
+}
+
 function _media_player_play(player_id, uri, position) {
    var player = _media_player(player_id);
    if (player != null) {
-      var current_uri = null;
-      var playlist = player.getPlaylist();
-      if (playlist != null && playlist.length != null)
-	 current_uri = playlist[0].file;
-      if (uri != current_uri)
+      if (uri != _media_player_current_uri(player))
 	 player.sendEvent('LOAD', {file: uri});
       player.sendEvent('PLAY');
       if (position != null) {
-	 if (uri == current_uri) {
+	 var state = _player_state[player_id];
+	 if (uri == state.loaded_uri) {
 	    // When the file was already loaded, we can seek immediately.
 	    player.sendEvent('SEEK', position);
 	 } else {
 	    // If new file is being loaded, we need to postpone the SEEK until loading is finished
 	    // (SEEK doesn't work while loading).
 	    player.sendEvent('PLAY'); // Pause the playback for now.
-	    var state = _player_state[player_id];
 	    state.on_load = function () {
 	       player.sendEvent('PLAY');
 	       player.sendEvent('SEEK', position);
@@ -219,7 +224,6 @@ function _on_player_time_changed(event) {
 }
 
 function _on_player_volume_changed(event) {
-   alert(_str(event));
    var state = _player_state[event.id];
    state.volume = event.percentage; 
 }
@@ -242,9 +246,9 @@ function _on_player_state_changed(event) {
 function _on_player_loading_progress_changed(event) { 
    if (event.loaded == event.total) {
       var state = _player_state[event.id];
+      state.loaded_uri = _media_player_current_uri(_media_player(event.id));
       var on_load = state.on_load;
       if (on_load != null) {
-	 alert("** "+ on_load);
 	 state.on_load = null;
 	 setTimeout(on_load, 100);
       }
