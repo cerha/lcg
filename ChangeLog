@@ -1,3 +1,8 @@
+2008-12-17  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/media.js:
+	Ensure that seeking is performed after the file is fully loaded.
+
 2008-12-16  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py:
