@@ -71,7 +71,12 @@ function playerReady(obj) {
 	 var uri = ctrl.uri;
 	 if (ctrl.track_selection != null)
 	    uri +='/'+ ctrl.track_selection.value;
-	 player.sendEvent('LOAD', {file: uri});
+	 player.sendEvent('LOAD', uri);
+	 // The player actually starts download after playback is invoked, so this trick tries to
+	 // preload the initial track on page load.  The delay was chosen experimantally.  It may
+	 // not work 100%, but this feature is not essential.
+	 player.sendEvent('PLAY', true);
+	 setTimeout(function () { player.sendEvent('PLAY', false); }, 500);
       }
    }
 }
@@ -136,7 +141,7 @@ function _media_player_play(player_id, uri, position) {
    var player = _media_player(player_id);
    if (player != null) {
       if (uri != _media_player_current_uri(player))
-	 player.sendEvent('LOAD', {file: uri});
+	 player.sendEvent('LOAD', uri);
       player.sendEvent('PLAY');
       if (position != null) {
 	 var state = _player_state[player_id];
