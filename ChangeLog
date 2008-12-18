@@ -1,3 +1,9 @@
+2008-12-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/media.js:
+	Try to start downloading the initial track right after the page is
+	loaded.
+
 2008-12-17  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/scripts/media.js:
