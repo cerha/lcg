@@ -355,7 +355,7 @@ class HtmlGenerator(Generator):
      
     def js_call(self, fname, *args):
         fargs = concat([self.js_value(arg) for arg in args], separator=", ")
-        return self.script('%s(%s)' % (fname, fargs))
+        return '%s(%s)' % (fname, fargs)
     
 class HtmlFormatter(MarkupFormatter):
     
@@ -508,8 +508,8 @@ class HtmlExporter(Exporter):
                  _("JavaScript not detected. "
                    "Use a JavaScript enabled browser for advanced media playback capabilities.")
         return g.div(js_err, id=player_id) + \
-               g.js_call('export_media_player', context.uri(player), player_id, width, height, 
-                         shared, media, context.translate(flash_err))
+               g.script(g.js_call('export_media_player', context.uri(player), player_id,
+                                  width, height, shared, media, context.translate(flash_err)))
 
     def _media_player(self, context):
         if context.shared_player_used():
