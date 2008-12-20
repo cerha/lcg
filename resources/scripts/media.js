@@ -17,11 +17,26 @@
 
 var MIN_FLASH_VERSION = '9.0.115';
 
-/* There can be exactly one player instance on one page, that is shared by multiple player
- * controls.  Each control usually operates on one media file or one playlist (set of media files).
- * The shared player can play just one media file at a time, so invoking playback from one control
- * stops any playback previously invoked from other controls (reloads the player with different
- * media file).
+/* Media playback infrastructure for Flash Player embedded within a web page.
+ *
+ * The primary purpose of this module is to allow media player control using ordinary HTML
+ * elements, such as buttons, links, selection boxes etc.  The main advantage of this approach is
+ * the accessibility of such controls (Flash applications themselves are not accessible at the time
+ * being).
+ * 
+ * The implementation is currently specific for JW FLV Media Player
+ * (http://www.longtailvideo.com/players/jw-flv-player).  If the player is not available
+ * (i.e. Flash not installed), the media files should be sent to browser to play them using the
+ * system player (according to the client machines configuration).
+ *
+ * There can be exactly one "shared" player instance on one page, plus any number of "dedicated"
+ * players.  The shared player may have multiple controls, the dedicated player is always connected
+ * to just one set of controls.  Controls are UI elements which control the playback: The play/stop
+ * button and optionally a track selection.  Each set of controls operates on one media file (in
+ * this case the "set of controls" typically consists of just one play/stop button) or one playlist
+ * (if track selection control is used together with the button).  The shared player can play just
+ * one media file at a time, so invoking playback from one control stops any playback previously
+ * invoked from other controls (reloads the player with different media file).
  */
 var _shared_player_id = null;
 
@@ -67,21 +82,18 @@ function playerReady(obj) {
       player.addModelListener('LOADED', '_on_player_loading_progress_changed');
       state.volume = player.getConfig()['volume'];
       var ctrl = state.controls;
-      if (ctrl != null) {
-	 var uri = ctrl.uri;
-	 if (ctrl.track_selection != null)
-	    uri +='/'+ ctrl.track_selection.value;
-	 player.sendEvent('LOAD', uri);
-	 // The player actually starts download after playback is invoked, so this trick tries to
-	 // preload the initial track on page load.  The delay was chosen experimantally.  It may
-	 // not work 100%, but this feature is not essential.
-	 player.sendEvent('PLAY', true);
+      if (ctrl != null && ctrl.initial_position != null) {
+	 // If position was saved before, we want to start download on page load, because for
+	 // seeking we need to download the whole file first.  The player actually starts download
+	 // after playback is invoked, so the trick below starts and stops playback.  The delay was
+	 // chosen experimantally.  It may not work 100%, but this feature is not essential.
+	 _media_player_ctrl_play(ctrl, null);
 	 setTimeout(function () { player.sendEvent('PLAY', false); }, 500);
       }
    }
 }
 
-function init_player_controls(player_id, uri, position, button_id, selection_id, position_id) {
+function init_player_controls(player_id, uri, button_id, selection_id, durations, position_id) {
    // null in player_id means to use the shared player (its real id is not known to the caller and
    // at this time also not to this module).
    var button = document.getElementById(button_id);
@@ -90,10 +102,11 @@ function init_player_controls(player_id, uri, position, button_id, selection_id,
    var ctrl = {
       player_id: player_id,
       uri: uri,
-      initial_position: position,
       button: button,
       track_selection: select,
-      position_field: field
+      position_field: field,
+      initial_position: null,
+      track_durations: durations
    };
    if (button != null) {
       button._media_player_ctrl = ctrl;
@@ -106,13 +119,21 @@ function init_player_controls(player_id, uri, position, button_id, selection_id,
       select._media_player_ctrl = ctrl;
       select.onchange = _on_media_ctrl_select;
    }
+   if (field != null) {
+      // If the position field contains an initial value (position in seconds), the first playback
+      // will start from given position.
+      var position = field.value
+      if (typeof position != 'undefined' && position != 0)
+	 ctrl.initial_position = position;
+      field.value = 0;
+   }
    if (player_id != null)
       _player_state[player_id].controls = ctrl
 }
 
 function play_media(uri) {
    // Play given URI using the shared media player (if available).
-   _media_player_play(null, uri, null);
+   _media_player_play(null, uri, null, null);
 }
 
 // Media player control functions.
@@ -137,11 +158,11 @@ function _media_player_current_uri(player) {
       return null
 }
 
-function _media_player_play(player_id, uri, position) {
+function _media_player_play(player_id, uri, duration, position) {
    var player = _media_player(player_id);
    if (player != null) {
       if (uri != _media_player_current_uri(player))
-	 player.sendEvent('LOAD', uri);
+	 player.sendEvent('LOAD', {file: uri, duration: duration});
       player.sendEvent('PLAY');
       if (position != null) {
 	 var state = _player_state[player_id];
@@ -162,6 +183,18 @@ function _media_player_play(player_id, uri, position) {
       // Play the sound through the system if the player is not available.
       self.location = uri;
    }
+}
+
+function _media_player_ctrl_play(ctrl, position) {
+   var uri = ctrl.uri;
+   var duration = null;
+   var select = ctrl.track_selection;
+   if (select != null) {
+      uri += '/'+ select.value;
+      if (ctrl.track_durations != null)
+	 duration = ctrl.track_durations[select.selectedIndex];
+   }
+   _media_player_play(ctrl.player_id, uri, duration, position);
 }
 
 function _media_player_seek(player_id, forward) {
@@ -240,10 +273,9 @@ function _on_player_state_changed(event) {
    var ctrl = state.controls;
    if (ctrl != null && event.newstate == "COMPLETED" && event.oldstate == "PLAYING") {
       var select = ctrl.track_selection;
-      //alert(select.selectedIndex +':'+ select.options.length);
       if (select != null && select.selectedIndex < select.options.length-1) {
 	 select.selectedIndex++;
-	 _media_player_play(event.id, ctrl.uri +'/'+ select.value, null);
+	 _media_player_ctrl_play(ctrl, null);
       }
    }
 }
@@ -264,12 +296,9 @@ function _on_player_loading_progress_changed(event) {
 
 function _on_media_ctrl_click(event) {
    var ctrl = this._media_player_ctrl;
-   var uri = ctrl.uri;
-   if (ctrl.track_selection != null)
-      uri += '/'+ ctrl.track_selection.value;
    var position = ctrl.initial_position;
    ctrl.initial_position = null;
-   _media_player_play(ctrl.player_id, uri, position);
+   _media_player_ctrl_play(ctrl, position);
    return false;
 }
 
