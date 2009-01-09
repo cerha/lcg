@@ -14,6 +14,9 @@ doc:
 translations:
 	make -C translations
 
+translations-clean:
+	make -C translations clean
+
 test:
 	lib/lcg/_test.py
 
@@ -57,7 +60,7 @@ link-share-%: $(SHARE)/lcg
 	else echo "Linking $* to $(SHARE)/lcg"; \
 	ln -s $(CURDIR)/$* $(SHARE)/lcg; fi
 
-cvs-update: do-cvs-update compile translations
+cvs-update: do-cvs-update compile translations-clean translations
 
 do-cvs-update:
 	@echo "All local modifications will be lost and owerwritten with clean repository copies!"
