@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -218,11 +218,11 @@ class LocalizableDateTime(unittest.TestCase):
         x3 = d3.localize(t1)
         x4 = d4.localize(t1)
         x5 = d5.localize(t1)
-        assert x1 == "12/21/2006", x1
-        assert x2 == "12/21/2006", x2
-        assert x3 == "12/21/2006 02:43 AM", x3
-        assert x4 == "Thu 12/21/2006 06:43:32 PM", x4
-        assert x5 == "1/30/2006", x5
+        assert x1 == "21/12/2006", x1
+        assert x2 == "21/12/2006", x2
+        assert x3 == "21/12/2006 02:43 AM", x3
+        assert x4 == "Thu 21/12/2006 06:43:32 PM", x4
+        assert x5 == "30/1/2006", x5
         t2 = lcg.GettextTranslator('cs')
         y1 = d1.localize(t2)
         y2 = d2.localize(t2)
@@ -239,7 +239,7 @@ class LocalizableDateTime(unittest.TestCase):
         d = lcg.LocalizableDateTime("2006-01-30")
         c = "Date is: " + d
         t = c.localize(lcg.GettextTranslator('en'))
-        assert t == "Date is: 01/30/2006", t
+        assert t == "Date is: 30/01/2006", t
         t = c.localize(lcg.GettextTranslator('cs'))
         assert t == "Date is: 30.01.2006", t
 
@@ -253,17 +253,17 @@ class LocalizableDateTime(unittest.TestCase):
         b1 = b.localize(t1)
         b2 = b.localize(t2)
         assert str(b) == "2006+01+30", str(b)
-        assert b1 == "01/30/2006", b1
+        assert b1 == "30/01/2006", b1
         assert b2 == "30.01.2006", b2
         c1 = c.localize(t1)
         c2 = c.localize(t2)
         assert str(c) == "2006-01-30", str(c)
-        assert c1 == "01|30|2006", c1
+        assert c1 == "30|01|2006", c1
         assert c2 == "30.01.2006", c2
         d1 = d.localize(t1)
         d2 = d.localize(t2)
         assert str(d) == "2006-01-30", str(d)
-        assert d1 == "01/30/2006", d1
+        assert d1 == "30/01/2006", d1
         assert d2 == "30:01:2006", d2
 
 tests.add(LocalizableDateTime)
