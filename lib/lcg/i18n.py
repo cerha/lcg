@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004-2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -694,7 +694,7 @@ class GettextTranslator(Translator):
         super(GettextTranslator, self).__init__(lang)
 
     def _gettext_instance(self, domain, origin):
-        import gettext, config
+        import gettext
         for dir in self._path:
             try:
                 return gettext.translation(domain, dir, (self._lang,))

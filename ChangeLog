@@ -1,3 +1,17 @@
+2009-01-09  Tomáš Cerha  <cerha@brailcom.org>
+
+
+2009-01-09  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/__init__.py: 
+	* lib/lcg/resources.py: 
+	* lib/lcg/i18n.py: 
+	* lib/lcg/util.py:
+	Import `config' in `__init__.py'.
+
+	* lib/lcg/_test.py: Expect the default date style as European in
+	all tests.
+
 2008-12-20  Tomas Cerha  <cerha@brailcom.org>
 
 	* resources/scripts/media.js: 
