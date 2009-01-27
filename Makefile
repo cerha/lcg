@@ -8,6 +8,12 @@ lib := $(shell python -c 'import sys; print "$(LIB)".find("%d") != -1 and \
 
 .PHONY: translations doc test
 
+all: check-lib compile translations
+
+compile:
+	@echo "Compiling Python libraries from source..."
+	@python -c "import compileall; compileall.compile_dir('lib')" >/dev/null
+
 doc:
 	LCGDIR=. bin/lcgmake.py doc html
 
@@ -71,10 +77,6 @@ do-cvs-update:
 version = $(shell echo 'import lcg; print lcg.__version__' | python)
 dir = lcg-$(version)
 file = lcg-$(version).tar.gz
-
-compile:
-	@echo "Compiling Python libraries from source..."
-	@python -c "import compileall; compileall.compile_dir('lib')" >/dev/null
 
 release: compile translations
 	@ln -s .. releases/$(dir)
