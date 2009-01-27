@@ -1,3 +1,8 @@
+2009-01-27  Tomas Cerha  <cerha@brailcom.org>
+
+	* resources/scripts/media.js: Work around strange player state
+	changes to fix continuous playback.
+
 2009-01-09  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile: 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2008 Brailcom, o.p.s.
+/* Copyright (C) 2004-2009 Brailcom, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ function export_media_player(uri, id, width, height, shared, media, flash_errmsg
 	 position: 0,
 	 duration: null,
 	 volume: null,
-	 playing: false,
+	 //playing: false,
 	 controls: null,
 	 loaded_uri: null,
 	 on_load: null
@@ -269,9 +269,11 @@ function _on_player_volume_changed(event) {
 function _on_player_state_changed(event) {
    // Player states: IDLE, BUFFERING, PLAYING, PAUSED, COMPLETED
    var state = _player_state[event.id];
-   state.playing = (event.newstate == 'BUFFERING' || event.newstate == 'PLAYING'); 
+   //state.playing = (event.newstate == 'BUFFERING' || event.newstate == 'PLAYING'); 
    var ctrl = state.controls;
-   if (ctrl != null && event.newstate == "COMPLETED" && event.oldstate == "PLAYING") {
+   // Warning: The player behaves strangely with short recordings.  The state normally changes form
+   // 'PLAYING' to 'COMPLETED', but sometimes also 'PLAYING' -> 'PAUSED', 'PAUSED' -> 'COMPLETED'.
+   if (ctrl != null && event.newstate == "COMPLETED" && event.oldstate != "COMPLETED") {
       var select = ctrl.track_selection;
       if (select != null && select.selectedIndex < select.options.length-1) {
 	 select.selectedIndex++;
