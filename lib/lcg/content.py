@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -242,13 +242,17 @@ class InlineImage(Content):
     
     LEFT = 'left'
     RIGHT = 'right'
+    TOP = 'top'
+    BOTTOM = 'bottom'
+    MIDDLE = 'middle'
     
     def __init__(self, image, title=None, descr=None, name=None, align=None):
         """Arguments:
 
           image -- 'Image' instance
           align -- requested alignment of the image to the surrounding text;
-            one of the constants 'InlineImage.LEFT', 'InlineImage.RIGHT' or
+            one of the constants 'InlineImage.LEFT', 'InlineImage.RIGHT',
+            'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
             'None'
           title -- title of the image (or alternative text in some output
             formats) as a string or unicode; if not given 'image' title (if
@@ -257,7 +261,7 @@ class InlineImage(Content):
 
         """
         assert isinstance(image, Image), image
-        assert align in (None, self.LEFT, self.RIGHT), align
+        assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
         assert title is None or isinstance(title, (str, unicode)), title
         assert name is None or isinstance(name, (str, unicode)), name
         assert descr is None or isinstance(descr, (str, unicode)), descr
