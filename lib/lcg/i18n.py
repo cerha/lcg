@@ -786,7 +786,12 @@ def source_files_by_domain(basedir, domain=None):
             name = os.path.splitext(os.path.basename(filename))[0]
             path = os.path.dirname(filename)
             file, pathname, descr = imp.find_module(name, [path])
-            module = imp.load_module(name, file, pathname, descr)
+            try:
+                sys.path.append(path)
+                module = imp.load_module(name, file, pathname, descr)
+            finally:
+                file.close()                
+                sys.path.pop()
             if module.__dict__.has_key('_'):
                 x = module.__dict__['_']
                 if isinstance(x, lcg.TranslatableTextFactory) and x.domain() == domain:
@@ -812,5 +817,4 @@ if __name__ == '__main__':
            "Usage: python -m lcg/i18n directory [domain]"
     directory = sys.argv[1]
     domain = len(sys.argv) == 3 and sys.argv[2] or None
-    sys.path.append(directory)
     print " ".join(source_files_by_domain(directory, domain=domain))

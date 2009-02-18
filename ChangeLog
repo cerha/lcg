@@ -1,3 +1,8 @@
+2009-02-18  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/i18n.py: 
+	(source_files_by_domain): Handle recursive directories correctly.
+
 2009-01-28  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py:
