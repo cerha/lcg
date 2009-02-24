@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-16 10:30+0100\n"
-"PO-Revision-Date: 2007-10-30 08:54+0100\n"
-"Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
+"POT-Creation-Date: 2009-02-18 14:49+0100\n"
+"PO-Revision-Date: 2009-01-14 15:47+0100\n"
+"Last-Translator: Hynek Hanke <hanke@volny.cz>\n"
 "Language-Team: Spanish <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,11 +17,11 @@ msgstr ""
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
-msgstr ""
+msgstr "africano"
 
 #: ../lib/lcg/util.py:139
 msgid "Arabic"
-msgstr ""
+msgstr "árabe"
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
@@ -33,7 +33,7 @@ msgstr "catalán"
 
 #: ../lib/lcg/util.py:143
 msgid "Corsican"
-msgstr ""
+msgstr "corso"
 
 #: ../lib/lcg/util.py:143
 msgid "Czech"
@@ -57,7 +57,7 @@ msgstr "inglés"
 
 #: ../lib/lcg/util.py:145
 msgid "Spanish"
-msgstr "espanol"
+msgstr "espańol"
 
 #: ../lib/lcg/util.py:146
 msgid "Estonian"
@@ -65,7 +65,7 @@ msgstr "estonio"
 
 #: ../lib/lcg/util.py:146
 msgid "Basque"
-msgstr ""
+msgstr "vasco"
 
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
@@ -80,18 +80,16 @@ msgid "Irish"
 msgstr "irlandés"
 
 #: ../lib/lcg/util.py:150
-#, fuzzy
 msgid "Galician"
-msgstr "italiano"
+msgstr "gallego"
 
 #: ../lib/lcg/util.py:152
 msgid "Hindi"
-msgstr ""
+msgstr "hindú"
 
 #: ../lib/lcg/util.py:152
-#, fuzzy
 msgid "Croatian"
-msgstr "catalán"
+msgstr "croata"
 
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
@@ -107,30 +105,27 @@ msgstr "italiano"
 
 #: ../lib/lcg/util.py:156
 msgid "Japanese"
-msgstr ""
+msgstr "japonés"
 
 #: ../lib/lcg/util.py:157
-#, fuzzy
 msgid "Georgian"
-msgstr "alemán"
+msgstr "georgiano"
 
 #: ../lib/lcg/util.py:158
-#, fuzzy
 msgid "Korean"
-msgstr "noruego"
+msgstr "coreano"
 
 #: ../lib/lcg/util.py:158
-#, fuzzy
 msgid "Kurdish"
-msgstr "turco"
+msgstr "kurdo"
 
 #: ../lib/lcg/util.py:162
 msgid "Macedonian"
-msgstr ""
+msgstr "macedonio"
 
 #: ../lib/lcg/util.py:163
 msgid "Moldavian"
-msgstr ""
+msgstr "moldavo"
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
@@ -149,9 +144,8 @@ msgid "Portuguese"
 msgstr "portugués"
 
 #: ../lib/lcg/util.py:170
-#, fuzzy
 msgid "Romanian"
-msgstr "estonio"
+msgstr "rumano"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
@@ -163,12 +157,11 @@ msgstr "esloveno"
 
 #: ../lib/lcg/util.py:174
 msgid "Albanian"
-msgstr ""
+msgstr "albanés"
 
 #: ../lib/lcg/util.py:174
-#, fuzzy
 msgid "Serbian"
-msgstr "esloveno"
+msgstr "serbio"
 
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
@@ -176,7 +169,7 @@ msgstr "sueco"
 
 #: ../lib/lcg/util.py:177
 msgid "Thai"
-msgstr ""
+msgstr "tailandés"
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
@@ -184,35 +177,35 @@ msgstr "turco"
 
 #: ../lib/lcg/util.py:180
 msgid "Ukrainian"
-msgstr ""
+msgstr "ucraniano"
 
 #: ../lib/lcg/util.py:182
 msgid "Yiddish"
-msgstr ""
+msgstr "judío"
 
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
-msgstr ""
+msgstr "chino"
 
 # Index of sections (table of contents)
 #. Translators: Title of the local table of contents (links to subsections).
-#: ../lib/lcg/content.py:495
+#: ../lib/lcg/content.py:499
 msgid "Index:"
-msgstr "Contenido:"
+msgstr "Índice:"
 
 #: ../lib/lcg/export/html.py:403
 msgid "Choose your language:"
-msgstr "Escoja el idioma:"
+msgstr "Escoger el idioma:"
 
 #: ../lib/lcg/export/html.py:497 ../lib/lcg/export/html.py:507
 msgid "Warning:"
-msgstr ""
+msgstr "Aviso:"
 
 #. Translators: Title of the link to Adobe website used in the Flash warning.
 #. The version is substituted within the JavaScript code.
 #: ../lib/lcg/export/html.py:505
 msgid "Adobe Flash plugin"
-msgstr ""
+msgstr "Adobe Flash plug-in"
 
 #. Translators: '%(version)s' is automatically replaced by the required version
 #. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
@@ -223,32 +216,36 @@ msgid ""
 "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
 "advanced media playback capabilities."
 msgstr ""
+"Flash %(version)s no detectado. Obtener %(plugin)s %(version)s o más nuevo "
+"para las funciones más avanzadas."
 
 #: ../lib/lcg/export/html.py:508
 msgid ""
 "JavaScript not detected. Use a JavaScript enabled browser for advanced media "
 "playback capabilities."
 msgstr ""
+"Java script no detectado. Usar un navegador con JavaScript para las "
+"funciones más avanzadas."
 
 # For exapmle "Next: None".
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
 #: ../lib/lcg/export/html.py:650
 msgid "None"
-msgstr ""
+msgstr "Nada"
 
 #: ../lib/lcg/export/html.py:651
 msgid "You are here:"
-msgstr ""
+msgstr "Usted está aquí:"
 
 # Link to the next page.
 #. Translators: Label of a link to the next page in sequential navigation.
 #: ../lib/lcg/export/html.py:655
 msgid "Next"
-msgstr ""
+msgstr "Siguiente"
 
 # Link to the previous page.
 #. Translators: Label of a link to the next page in sequential navigation.
 #: ../lib/lcg/export/html.py:657
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
