@@ -1,3 +1,7 @@
+2009-02-24  Hynek Hanke  <hanke@brailcom.org>
+
+	* translations/lcg.es.po: Translated.
+
 2009-02-18  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/i18n.py: 
