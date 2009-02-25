@@ -1,5 +1,5 @@
 # Learning Content Generator translations
-# Copyright (C) 2006-2007 Brailcom, o.p.s.
+# Copyright (C) 2006-2009 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2006.
 #
@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-18 14:49+0100\n"
-"PO-Revision-Date: 2009-01-14 15:47+0100\n"
+"PO-Revision-Date: 2009-02-25 17:02+0100\n"
 "Last-Translator: Hynek Hanke <hanke@volny.cz>\n"
 "Language-Team: Spanish <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"

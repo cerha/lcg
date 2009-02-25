@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-16 10:30+0100\n"
+"POT-Creation-Date: 2009-02-17 09:44+0100\n"
 "PO-Revision-Date: 2007-10-30 08:54+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Norwegian <lcg@lists.freebsoft.org>\n"
@@ -191,7 +191,7 @@ msgid "Chinese"
 msgstr ""
 
 #. Translators: Title of the local table of contents (links to subsections).
-#: ../lib/lcg/content.py:495
+#: ../lib/lcg/content.py:499
 msgid "Index:"
 msgstr ""
 

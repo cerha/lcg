@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-16 10:30+0100\n"
+"POT-Creation-Date: 2009-02-17 09:44+0100\n"
 "PO-Revision-Date: 2008-12-08 17:51+0100\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: German <lcg@lists.freebsoft.org>\n"
@@ -191,7 +191,7 @@ msgstr "chinesisch"
 
 # The table of contents...
 #. Translators: Title of the local table of contents (links to subsections).
-#: ../lib/lcg/content.py:495
+#: ../lib/lcg/content.py:499
 msgid "Index:"
 msgstr "Verzeichnis:"
 
