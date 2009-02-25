@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004-2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -131,6 +131,8 @@ class Reader(object):
     
         
 class FileReader(Reader):
+
+    _ENCODING_HEADER_MATCHER = re.compile(r'^#\s*-\*-.*coding:\s*([^\s;]+).*-\*-\s*$')
     
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
         assert isinstance(dir, str), dir
@@ -160,21 +162,29 @@ class FileReader(Reader):
             if os.path.exists(filename2):
                 log("File '%s' not found. Using '%s' instead.", filename, filename2)
                 filename = filename2
-        fh = codecs.open(filename, encoding=self._encoding)
+        fh = open(filename)
         try:
             lines = fh.readlines()
+        finally:
+            fh.close()
+        encoding = self._encoding
+        if lines:
             marker = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE')
-            if lines and lines[0][0] == marker:
+            if lines[0][0] == marker:
                 # Strip the Unicode marker 
                 lines[0] = lines[0][1:]
+            match = self._ENCODING_HEADER_MATCHER.match(lines[0])
+            if match:
+                encoding = match.group(1)
+                del lines[0]
             if comment is not None:
                 # This is a hack (it breaks line numbering).
                 lines = [l for l in lines if not re.compile(comment).match(l)]
-            content = ''.join(lines)
+        content = ''.join(lines)
+        try:
+            return unicode(content, encoding=encoding)
         except UnicodeDecodeError, e:
-            raise Exception("Error while reading file %s: %s" % (filename, e))
-        fh.close()
-        return content
+            raise Exception("File %s: %s" % (filename, e))
         
     def encoding(self):
         """Return the name of encoding expected in source files.

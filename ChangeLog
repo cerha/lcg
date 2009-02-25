@@ -1,3 +1,9 @@
+2009-02-25  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/read.py:
+	* bin/lcgmake.py:
+	Added support for emacs-like encoding header in input files.
+
 2009-02-24  Hynek Hanke  <hanke@brailcom.org>
 
 	* translations/lcg.es.po: Translated.

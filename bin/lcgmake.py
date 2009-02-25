@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,8 @@ import os
 import sys, getopt, os, lcg
 
 OPTIONS = (
-    ('encoding=', 'utf-8', "Input encoding (output encoding is always utf-8)"),
+    ('encoding=', 'utf-8', ("Default input file encoding (may be overriden by emacs-like "
+                            "encoding header for particular source files)")),
     ('styles=', 'default.css', "Filename of the stylesheet to use (or a colon separated list)."),
     ('inline-styles', False, "Embed styles into the HTML pages."),
     ('ext=', 'txt', "Extension of the source files."),
