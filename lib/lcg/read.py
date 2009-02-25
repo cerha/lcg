@@ -133,6 +133,9 @@ class Reader(object):
 class FileReader(Reader):
 
     _ENCODING_HEADER_MATCHER = re.compile(r'^#\s*-\*-.*coding:\s*([^\s;]+).*-\*-\s*$')
+    _EMACS_CODING_MATCHER = re.compile(r'(^mule-|-(dos|unix|mac)$)')
+    # See http://en.wikipedia.org/wiki/Byte-order_mark
+    _BOM = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE').encode('utf-8')
     
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
         assert isinstance(dir, str), dir
@@ -169,13 +172,18 @@ class FileReader(Reader):
             fh.close()
         encoding = self._encoding
         if lines:
-            marker = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE')
-            if lines[0][0] == marker:
+            if lines[0].startswith(self._BOM):
                 # Strip the Unicode marker 
-                lines[0] = lines[0][1:]
+                lines[0] = lines[0][len(self._BOM):]
             match = self._ENCODING_HEADER_MATCHER.match(lines[0])
             if match:
-                encoding = match.group(1)
+                enc = self._EMACS_CODING_MATCHER.sub('', match.group(1))
+                try:
+                    codecs.lookup(enc)
+                except LookupError:
+                    log("File %s: Unknown encoding '%s' in file header.", filename, enc)
+                else:
+                    encoding = enc
                 del lines[0]
             if comment is not None:
                 # This is a hack (it breaks line numbering).
