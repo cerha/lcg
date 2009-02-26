@@ -264,7 +264,7 @@ class HtmlGenerator(Generator):
         if content is None:
             return self._input('button', value=label, cls=cls, **kwargs)
         else:
-            attr = ('value', 'onclick' 'name', 'cls', 'disabled', 'title')
+            attr = ('value', 'onclick', 'name', 'cls', 'disabled', 'title')
             return self._tag('button', content, attr, title=label, **kwargs)
      
     def reset(self, label, onclick=None, cls=None, title=None):
