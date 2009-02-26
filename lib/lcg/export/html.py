@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2008 Brailcom, o.p.s.
+# Copyright (C) 2004-2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -274,7 +274,7 @@ class HtmlGenerator(Generator):
         if value is None:
             return self._input('submit', value=label, **kwargs)
         else:
-            attr = ('value', 'onclick' 'name', 'cls', 'disabled', 'title')
+            attr = ('value', 'onclick', 'name', 'cls', 'disabled', 'title')
             return self._tag('button', label, attr, value=value, **kwargs)
             
     def select(self, name, options, selected=None, **kwargs):

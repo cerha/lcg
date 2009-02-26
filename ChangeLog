@@ -1,3 +1,8 @@
+2009-02-26  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py:
+	(HtmlGenerator.submit): Fixed typo in valid attributes list.
+
 2009-02-25  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/read.py:
