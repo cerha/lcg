@@ -1,3 +1,8 @@
+2009-03-04  Tomas Cerha  <cerha@brailcom.org>
+
+	* Makefile: 
+	Avoid using echo -e in `check-lib'.
+
 2009-02-26  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/export/html.py:

@@ -31,8 +31,8 @@ tags:
 	find -name '*.py' -not -name '_test.py' | xargs etags --append --regex='/^[ \t]+def[ \t]+\([a-zA-Z_0-9]+\)/\1/'
 
 check-lib:
-	@echo -e "import sys\nif '$(lib)' not in sys.path: sys.exit(1)" \
-	| python || echo 'WARNING: $(lib) not in Python path!'
+	@python -c "import sys; '$(lib)' not in sys.path and sys.exit(1)" || \
+           echo 'WARNING: $(lib) not in Python path!'
 
 install: check-lib $(SHARE)/lcg
 	cp -ruv doc resources translations $(SHARE)/lcg
