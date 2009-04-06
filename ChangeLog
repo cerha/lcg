@@ -1,3 +1,8 @@
+2009-04-06  Tomas Cerha  <cerha@debian.brailcom.xx>
+
+	* lib/lcg/export/html.py:
+	Fixed `selected' item assertion for hierarchical `select' options.
+
 2009-03-04  Tomas Cerha  <cerha@brailcom.org>
 
 	* Makefile: 
