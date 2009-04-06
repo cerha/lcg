@@ -278,16 +278,21 @@ class HtmlGenerator(Generator):
             return self._tag('button', label, attr, value=value, **kwargs)
             
     def select(self, name, options, selected=None, **kwargs):
-        assert selected is None or selected in [x[1] for x in options], (selected, options)
+        found = []
         def opt(label, value, enabled=True, cls=None):
             if isinstance(value, (list, tuple)):
                 return self._tag('optgroup', [opt(*x) for x in value], ('label',), label=label,
                                  _newlines=True)
             else:
+                if __debug__:
+                    if selected == value:
+                        found.append(value)
                 return self._tag('option', label, ('value', 'selected', 'disabled'),
                                  value=value, selected=(value == selected), disabled=not enabled,
                                  cls=not enabled and (cls and cls+' ' or '')+'disabled' or cls)
         opts = [opt(*x) for x in options]
+        assert selected is None or found, "Value %r not found in options: %r" % (selected, options)
+        # TODO: check also for duplicate `selected' values?
         attr = ('name', 'title', 'onchange', 'disabled', 'readonly')
         return self._tag('select', opts, attr, _newlines=True, name=name, **kwargs)
      
