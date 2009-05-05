@@ -303,6 +303,10 @@ class HtmlGenerator(Generator):
         attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
         return self._tag('textarea', value, attr, name=name, **kwargs)
      
+    def iframe(self, src, **kwargs):
+        attr = ('src', 'width', 'height', 'frameborder')
+        return self._tag('iframe', self.link(src, src), attr, src=src, **kwargs)
+     
     # JavaScript code generation.
      
     def script(self, code, noscript=None):
@@ -528,10 +532,13 @@ class HtmlExporter(Exporter):
     def _body_attr(self, context, **kwargs):
         return kwargs
     
+    def _body_content(self, context):
+        return self._parts(context, self._BODY_PARTS)
+    
     def export(self, context):
         g = context.generator()
         # Export body first to allocate all resources before generating the head.
-        body = self._parts(context, self._BODY_PARTS)
+        body = self._body_content(context)
         attr = self._body_attr(context)
         parts = (g.head(self._head(context)),
                  g.body(body, **attr))

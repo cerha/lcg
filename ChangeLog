@@ -1,3 +1,8 @@
+2009-05-05  Tomas Cerha  <cerha@debian.brailcom.xx>
+
+	* lib/lcg/export/html.py: 
+	Added support for HTML `iframe'.  Allow document dynamic body content redefinition.
+
 2009-04-06  Tomas Cerha  <cerha@debian.brailcom.xx>
 
 	* lib/lcg/export/html.py:
