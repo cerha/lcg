@@ -79,7 +79,7 @@ def main():
         elif output_format == HTML and not recourse:
             opt['inline-styles'] = True
             dst = '.'
-        elif recourse:
+        else:
             die("You must specify the destination directory!")
     # Process the passed-in translation directories.
     translations = (lcg.config.translation_dir,)
