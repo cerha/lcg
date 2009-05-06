@@ -76,6 +76,9 @@ def main():
             # to write it to the current directory by default.  Other formats generate a file
             # structure, so we require an explicit directory name.
             dst = '.'
+        elif output_format == HTML and not recourse:
+            opt['inline-styles'] = True
+            dst = '.'
         elif recourse:
             die("You must specify the destination directory!")
     # Process the passed-in translation directories.
@@ -162,7 +165,14 @@ control which document is the root document and what extension is used to
 recognize source files.
 
 If <source> is a file, a single document is read just from this file (options
---root and --ext have no effect).
+--root and --ext have no effect).  Inline styles are forced to true in this
+case if outout format is HTML.
+
+<destination> is the target directory.  It may be omited if output is PDF
+(always has single output file) or HTML with single source document (resulting
+in one output file too).  The output is placed in the current directory in
+this case.  In other cases the destination directory is required to prevent
+unwanted polution of the current directory by the output files.
 
 If your LCG installation is placed in a non-standard installation directory,
 set LCGDIR environment variable to its location."""

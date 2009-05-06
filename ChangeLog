@@ -1,3 +1,14 @@
+2009-05-06  Tomas Cerha  <cerha@debian.brailcom.xx>
+
+	* bin/lcgmake.py:
+	Don't require destination directory if single HTML file is
+	processed (place the output to the current directory).  Use inline
+	styles in this case.
+
+	* lib/lcg/export/html.py: 
+	Don't copy stylesheet files to the destination directory if inline
+	styles are used.
+
 2009-05-05  Tomas Cerha  <cerha@debian.brailcom.xx>
 
 	* lib/lcg/export/html.py: 
