@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005-2007 Brailcom, o.p.s.
+# Copyright (c) 2005-2007, 2009 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -137,3 +137,7 @@ Launch =lcgmake= with the =--help= argument to see the supported options:
 -----
 lcgmake --help
 -----
+
+A good example of a simple source document structure and =lcgmake= invocation is
+the LCG documentation itself.  It is generated into HTML by invoking =make doc=
+in the root directory of the LCG source archive.
