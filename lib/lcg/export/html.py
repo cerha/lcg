@@ -584,8 +584,8 @@ class StyledHtmlExporter(object):
         return super(StyledHtmlExporter, self)._head(context) + tags
     
     def _export_resource(self, resource, dir):
-        if not (self._inlinestyles and isinstance(resource, Stylesheet)):
-            return
+        if self._inlinestyles and isinstance(resource, Stylesheet):
+            pass
         else:
             super(StyledHtmlExporter, self)._export_resource(resource, dir)
 
