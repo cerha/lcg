@@ -1,5 +1,9 @@
 2009-05-06  Tomas Cerha  <cerha@debian.brailcom.xx>
 
+	* doc/usage/usage.en.txt: 
+	Added note about LCG documentation being an example of source
+	document structure.
+
 	* bin/lcgmake.py:
 	Don't require destination directory if single HTML file is
 	processed (place the output to the current directory).  Use inline
