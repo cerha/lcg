@@ -1,0 +1,7 @@
+= Tests index =
+
+This is the most primitive LCG source.
+
+test01: První test
+test02: Druhý test
+test03: Třetí test
