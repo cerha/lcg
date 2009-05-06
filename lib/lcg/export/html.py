@@ -552,7 +552,7 @@ class HtmlFileExporter(FileExporter, HtmlExporter):
     
     def _uri_node(self, context, node, lang=None):
         return self._filename(node, context, lang=lang)
-    
+
     def dump(self, node, directory, filename=None, **kwargs):
         super(HtmlFileExporter, self).dump(node, directory, filename=filename, **kwargs)
         for n in node.children():
@@ -582,6 +582,12 @@ class StyledHtmlExporter(object):
             tags = ['<link rel="stylesheet" type="text/css" href="%s">' % \
                     context.uri(s) for s in styles]
         return super(StyledHtmlExporter, self)._head(context) + tags
+    
+    def _export_resource(self, resource, dir):
+        if not (self._inlinestyles and isinstance(resource, Stylesheet)):
+            return
+        else:
+            super(StyledHtmlExporter, self)._export_resource(resource, dir)
 
             
 class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
