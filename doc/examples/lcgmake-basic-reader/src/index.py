@@ -16,7 +16,7 @@ class Reader(lcg.DocFileReader):
     def __init__(self, *args, **kwargs):
         """Initialize the instance.        
         """
-        super(Reader, self).__init__(id='src1', **kwargs)
+        super(Reader, self).__init__(id='src', **kwargs)
 
 
     # Here you would override the DocFileReader methods
