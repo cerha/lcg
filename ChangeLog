@@ -1,3 +1,9 @@
+2009-05-13  Tomas Cerha  <cerha@debian.brailcom.xx>
+
+	* doc/examples/lcgmake-basic-reader/example.sh: 
+	Don't create the destination directory (it is created
+	automatically by LCG).
+
 2009-05-13  Hynek Hanke  <hanke@brailcom.org>
 
 	* lib/lcg/config.py: Updated lcg.config.doc_dir for new documentation location
