@@ -1,0 +1,30 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Examples =
+
+This document contains descriptions of some examples of how to use key
+LCG features. 
+
+Table of Contents: @TOC(1)@
+
+== lcgmake == lcgmake-examples
+
+=== Compilation of simple document structure ===
+
+The target /doc/ in Makefile of this package presents a basic example
+of how to use lcgmake to generate HTML output from a directory
+containing LCG files (including the index.txt file).
+
+Execute it using 'make doc' in the LCG source tree.
+
+=== Basic reader and usage ===
+
+In \/doc/examples/lcgmake-basic-reader you can find an example of how
+to define and use a basic LCG Reader using the /index.py/ file, which
+you can use as a template to override some of LCG behavior.
+
+Execute lcgmake-basic-reader/example.sh and examine also
+lcgmake-basic-reader/src/index.py .
