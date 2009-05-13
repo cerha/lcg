@@ -1,4 +1,4 @@
-= Tests index =
+= Testing page =
 
 This is an example of an LCG source.
 
