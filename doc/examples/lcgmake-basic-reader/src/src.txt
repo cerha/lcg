@@ -1,0 +1,14 @@
+= Tests index =
+
+This is an example of an LCG source.
+
+It contains:
+
+ * main heading
+ * some paragraphs of text
+ * a list
+
+
+
+
+
