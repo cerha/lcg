@@ -1,3 +1,4 @@
 intro
 usage
 structured-text
+examples
