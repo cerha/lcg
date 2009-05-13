@@ -1,0 +1,143 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005-2007, 2009 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Using LCG =
+
+This document describes usage of LCG end-user tools, namely the =lcgmake=
+program, which is distributred together with LCG and which may be used directly
+to generate publications, such as manuals, help systems, e-learning courses etc.
+
+The basic concept is based on files arranged into a directory tree according to
+the logical structure of the publication.  The files are read by the LCG and
+the corresponding content hierarchy is built in the computer memory in an
+independent internal representation.  Then this model is exported into one of
+the supported output formats.
+
+The input files are either source documents in the Structured Text format (see
+[structured-text]) or Python files, which define the 'Reader' class to read the
+document in a custom way.  This makes the LCG input very versatile, however
+requires some programming and knowledge of LCG APIs.  You can write a plug-in
+to parse your own document syntax or read the content from a database, python
+docstrings or whateher else source one can imagine.
+
+Please note, that you can also use images, sound and video files, scripts,
+stylesheets and other media within your content, but these are not considered
+/source files/ from this point of view.  They are called /resources/ in this
+manual.  To include a resource, you usually refer to it from your source file,
+so you will also find the relavant information in the later sections.
+
+Index: @TOC@
+
+
+== Terminology ==
+
+We use the following terminology in the text below:
+
+Publication
+  A general term for the whole hierarchy of documents, which together make the
+  manual, e-learning course, help system or whatever you are using the LCG for.
+
+Node 
+  A node represents one document within the hierarchy.  This may be a
+  chapter of a book, unit of a course or any other logically complete unit of
+  the material.  A publication is a hierarchy of nodes.  Each node has a unique
+  identifier.
+
+Content
+  Each node contains some actual text.  LCG recognizes the logical structure of
+  the content.  Thus we have a hierarchy of content elements, such as sections,
+  paragraphs, itemized lists, code samples, tables, images etc.
+
+
+== Organization of the Source Data ==
+
+There is just one /source directory/, which contains files and subdirectories,
+which are read recursively.
+
+The following rules apply:
+
+  * The root node is located first.  By default, the root node's identifier is
+    'index', but any other id can be passed (see [#run]).
+ 
+  * The list of child nodes is built.  In short, a child node is created for
+    each file or directory found in the source directory, which has a
+    suitable name (see [#names]).
+
+  * A file represents a leave node (it has no children).  The node's id is the
+    base name of this file.  Node's content is read from the file in the
+    Structured Text format.  Each file can have multiple [#language-variants].
+    See [structured-text] for details about the input format.
+
+  * A directory represents a node with children.  The node's id is the name of
+    this directory.  The node's content is read from the file of the same name
+    within this directory, plus the suffix (e.g. =intro/intro.txt=).  All other
+    files and directories within the directory are child nodes of this node.
+    The process starts recursively as for the root node.
+
+  * A Python source file represents an extensible reader.  The file must define
+    a class named 'Reader', which implements 'lcg.Reader' API.  This reader
+    will be instantiated and used to construct the content of the node and may
+    also build a sub-hierarchy of nodes.
+
+  * It is possible to enforce the order and visibility of nodes using the
+    [#index-file].
+
+Files within the whole directory structure must have unique names, since they
+are used as node identifiers.  This also means that it is possible to refer to
+any node using it's id, without caring where in the hierarchy it is located.
+
+
+=== File and Directory Name Restrictions === names
+
+A valid /source directory/ name is any name, which doesn't begin with a dot or
+an underscore.  Also 'CVS' directories are ignored.
+
+A valid /source file/ must have the source file suffix.  This is '.txt' by
+default, but any other suffix can be passed (see [#run]).  The suffix '.py' is,
+however, reserved for Python source files.  Filenames beginning with a dot, an
+underscore and ending with a tilde are ignored.
+
+
+=== Index File === index-file
+
+The nodes are ordered alphabetically by default, but the order can be also
+defined explicitly using a file named '\_index.txt', which contains the list of
+child node identifiers one per line.  
+
+Nodes, which don't appear in the index file, but for which an input file is
+found, are still created, however they are considered "hidden" and thus they
+don't appear in the table of contents.
+
+Empty lines and lines beginning with a hash ('#') are ignored.
+
+
+=== Language Variants === language-variants
+
+Each source file can have multiple language variants.  The language of the
+source file is identified by the file name suffix.  This suffix must correspond
+to the ISO 639-1 Alpha-2 language code and must appear before the file type
+suffix.  Thus for example 'index.en.txt' defines the English variant of the
+'index' node content.
+
+The existing variants of the root document determine the available variants of
+the whole publication.  Thus the publication will be exported into all the
+languages, which exist for the root node.
+
+If you omit the language suffix for the root file, the language of the
+publication is undefined and you don't need to use language suffixes for any
+other source files.
+
+
+== Running lcgmake == run
+
+Launch =lcgmake= with the =--help= argument to see the supported options:
+
+-----
+lcgmake --help
+-----
+
+A good example of a simple source document structure and =lcgmake= invocation is
+the LCG documentation itself.  It is generated into HTML by invoking =make doc=
+in the root directory of the LCG source archive.

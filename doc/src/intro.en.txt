@@ -1,0 +1,48 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Introduction =
+
+The LCG is a computer program designed to process structured textual and
+multimedia data and produce their output presentation in one of the supported
+output formats.  LCG is highly modular and many of its components may be used
+independently as Python libraries.
+
+LCG stands for Learning Content Generator, since it was initially developed to
+generate e-learning courses, but the current use is much wider, so we don't
+refer to it by the full name to prevent missunderstanding.
+
+LCG supports /multimedia/ and /interactive/ content.  /Accessibility/ is one
+of the major concerns, with a special attention to users of screen-readers and
+other assistive technologies.
+
+The input data formats were designed to allow content creation without the need
+for any particular software or tool and to be easy to understand and edit even
+for non-technicians.
+
+One of the key points is total /separation/ of /input data/ and their /output
+presentation/.  Thus it is easy to change the appearance and user interface of
+the generated output without any changes in the source data.  This proved to be
+very useful when customizing interactive user interfaces to different output
+formats and for different target groups (e.g. people with various handicaps or
+using special technologies).
+
+LCG defines a set of generic content elements, such as /paragraphs, sections,
+bullet lists or tables/.  This set can be, however, further extended for
+particular application.  Implementations of more specialized constructs, such
+as /input forms/, /media viewers/players/ or /interactive exercises/ exist.
+
+LCG also handles documents in /multiple languages/ correctly.  It is able to
+manage several language versions of one document, as well as intermix more
+languages in one document.
+
+The following output formats are currently supported:
+  * HTML (a set of hyperlinked web pages)
+  * IMS content package (for use within a Learning Management System)
+  * HHP help (HTML Help Workshop format used by many on-line help viewers)
+  * PDF (a printable document)
+
+LCG is /Free Software/ distributed under the terms of GNU General Public
+License.

@@ -15,7 +15,7 @@ compile:
 	@python -c "import compileall; compileall.compile_dir('lib')" >/dev/null
 
 doc:
-	LCGDIR=. bin/lcgmake.py doc html
+	LCGDIR=. bin/lcgmake.py doc/src doc/html
 
 translations:
 	make -C translations

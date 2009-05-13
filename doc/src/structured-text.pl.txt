@@ -1,0 +1,775 @@
+# -*- coding: utf-8; mode: structured-text -*-
+# Copyright (c) 2005, 2006, 2007 Brailcom, o.p.s.
+# This is part of the LCG Documentation.
+# See the file index.en.txt for copying conditions.
+
+= Tekst strukturalny =
+
+Poniższy dokument opisuje strukturalne formatowanie tekstu używanego przez
+[http://www.freebsoft.org/lcg LCG].
+
+Spis treści: @TOC(1)@
+
+
+== Wprowadzenie == intro
+
+Tekst strukturalny jest prostym i klarownym zestawem instrukcji wymaganym dla
+Formatowania plików tekstowych. Format taki pozwala na oznaczenie logicznych
+Struktur takich jak sekcje, akapity, listy wypunktowane itd.
+
+Konstrukcje takie skupiają się głównie na treści pliku, a nie na Wyglądzie
+końcowego dokumentu, stąd najistotniejszym jest jego semantyczne znaczenie. Na
+przykład, nie używamy nagłówka dla uzyskania w naszym dokumencie powiększonej
+czcionki i tłustego druku, ale dla zaznaczenia tytułu następującego po nim
+logicznego fragmentu treści pliku.
+
+Wizualne własności danego logicznego elementu mogą być systemowo zmieniane przy
+użyciu arkuszy styli. Dlatego też są one kompletnie niezależne od treści jako
+takiej. Jest to jedna z podstawowych zasad tworzenia wizualnie
+usystematyzowanych dokumentów końcowych.
+
+Inną korzyścią takiego podejścia jest to, że plik źródłowy pozostaje łatwym do
+odczytu i edycji bez użycia żadnych wyszukanych narzędzi.  Prosty edytor tekstu
+jest wystarczający dla wykonania zadania. Zatem plik źródłowy jest bardzo
+dostępny i przenośny. różnorakie formaty mogą być wygenerowane końcowo z
+jednego pliku źródłowego.
+
+Niezrozumienie bądź niestosowanie się do podstawowej zasady oddzielenia
+logicznej i wizualnej prezentacji dokumentu może prowadzić do niezadowolenia
+użytkowników, którzy przywykli do specyficznego formatu dokumentów, aczkolwiek
+jak tylko przywykniesz do faktu, iż Twoim głównym celem jest koncentrowanie się
+na właściwym oznaczaniu treści pliku, a cały wizualny aspekt dokumentu możesz
+pozostawić komputerowi, przekonasz się że ta metoda nie ogranicza Cię w żadnej
+mierze, wręcz daje Ci więcej swobody i możesz bardziej skoncentrować się na
+treści pliku. Nie będzie to jednak możliwe bez odpowiedniej wiedzy na temat
+zasad odnoszących się do różnych logicznych elementów dokumentu. Zatem teraz
+wyjaśnimy najistotniejsze konstrukcje.
+
+
+== Krótki przegląd najważniejszych konstrukcji == overview
+
+Sekcja ta zawiera krótki i uproszczony opis najważniejszych konstrukcji.
+szczegółowy opis wszystkich konstrukcji znajdziesz w drugiej części tego
+dokumentu zatytułowanej [#complete-manual].
+
+Spis treści: @TOC@
+
+
+=== Akapity ===
+
+Ciągły fragment tekstu stanowi akapit. Gdziekolwiek pozostawisz pustą linie tam
+rozpoczynasz nowy akapit. Przełamanie linii wewnątrz akapitu nie ma znaczenia,
+gdyż będzie on przetworzony do potrzeb nośnika, np. okno przeglądarki.
+
+=== Sekcje ===
+
+Sekcje pozwalają Ci na utworzenie dodatkowych logicznych struktur w treści. 
+Hierarchia sekcji może być uwzględniona w spisie treści co pozwala na łatwe 
+poruszanie się w tej hierarchii czego przykładem jest ten podręcznik.
+
+Sekcja rozpoczyna się od nagłówka. Nagłówek stanowiący tytuł sekcji zamknięty
+jest znakami równości. Ilość znaków równości określa poziom nagłówka.
+
+*Przykład:*
+
+------
+ = Nagłówek główny =
+
+ Poziom zasadniczy treści.
+
+ == Sekcja pierwsza ==
+
+ Oto akapit należący do pierwszej sekcji.
+
+ === Podsekcja sekcji pierwszej ===
+
+ Ten tekst przynależy do podsekcji.
+
+ == Sekcja druga ==
+
+ Jest to sekcja druga usytuowana na tym samym poziomie co sekcja pierwsza.
+----- 
+
+
+=== Listy wypunktowane ===
+
+Listy wypunktowane winny być używane kiedykolwiek treść może być podzielona na 
+grupy obiektów. Każdy obiekt powinien być oznaczony gwiazdką i wcięciem.
+
+*Przykład:*
+
+------
+ * kot
+ * pies
+ * chomik
+------
+
+Będzie to miało taki wygląd:
+
+ * kot
+ * pies
+ * chomik
+
+Listy wypunktowane mogą być zagnieżdżane. Możesz tworzyć listy uporządkowane 
+itd. Więcej informacji znajdziesz w [#bullet-lists] i [#ordered-lists].
+
+=== Listy definicji ===
+
+Listy definicji są użyteczne przy wypisywaniu terminów czy określeń wraz z ich 
+definicją. Tworzysz takie listy pisząc termin czy określenie po czym 
+następuje definicja charakteryzująca się wcięciem. 
+
+*Przykład:*
+
+------
+Learning Content Generator (LCG)
+  LCG jest narzędziem programowym przetwarzającym strukturalne, tekstowe i
+  multimedialne dane produkując końcowo prezentacje użyteczne w środowisku 
+  edukacyjnym zarówno na linii jak i poza nią.
+
+Wiking
+  Wiking jest dostępnym systemem zarządzania zawartością (content management
+  system- CMS)  napisanym na bazie Pytis toolkit i LCG.
+------
+
+Będzie to miało taki wygląd:
+
+Learning Content Generator (LCG)
+  LCG jest narzędziem programowym przetwarzającym strukturalne, tekstowe i
+  multimedialne dane produkując końcowo prezentacje użyteczne w środowisku
+  edukacyjnym zarówno na linii jak i poza nią.
+
+Wiking
+  Wiking jest dostępnym systemem zarządzania zawartością (content management
+  system- CMS)  napisanym na bazie Pytis toolkit i LCG.
+
+Przeczytaj [#definition-lists] dla szczegółowego opisu.
+
+=== Zestaw-pól ===
+
+Generalnie, zestaw-pól może być użyty dla przedstawienia logicznej pary danych.
+Idea jest podobna jak przy tworzeniu list definicji, ale zestaw-pól jest
+bardziej odpowiedni dla pary danych typu etykieta/wartość niż termin/definicja.
+
+*Przykład:*
+
+------
+:Telefon:   254 354 645
+:Faks:     254 354 648
+:e-mail:  info@mojadomena.com
+------
+
+Będzie to miało taki wygląd:
+
+:Telefon:   254 354 645
+:Faks:     254 354 648
+:e-mail:  info@mojadomena.com
+
+Przeczytaj  [#field-sets] dla szczegółowego opisu.
+
+
+=== Łączniki ===
+
+Łączniki są hypertekstowymi odnośnikami do innych dokumentów bądź do zawartych
+w nich sekcji. Są one tworzone przy użyciu nawiasów kwadratowych.  Każdy
+łącznik ma swoje miejsce docelowe (cel) i może mieć wyraźnie określoną nazwę
+(jeśli nie zdefiniowana, system będzie próbował automatycznie przyporządkować
+nazwę).  Cel stanowi pierwszą część tekstu w nawiasach kwadratowych, a nadana
+nazwa może być umieszczona po spacji. Pewne rodzaje celów są rozpoznawane
+automatycznie i dlatego nie wymagają nawiasów kwadratowych.
+
+*Przykład:*
+
+-----
+ * Łącznik do innego dokumentu: [intro]
+ * Łącznik do innej sekcji tego samego dokumentu: [#bullet-lists]
+ * Łącznik z określoną nazwą: [#bullet-lists Sekcja o listach wypunktowanych]
+ * Łącznik zewnętrzny: [http://www.freebsoft.org Free(b)soft laboratory]
+ * Nienazwany łącznik zewnętrzny: http://www.gnu.org
+ * Adres emailowy: toja@mojadomena.com
+-----
+
+Otrzymane łączniki:
+
+ * Łącznikk do innego dokumentu: [intro]
+ * Łącznik do innej sekcji tego samego dokumentu: [#bullet-lists]
+ * Łącznik z określoną nazwą: [#bullet-lists Sekcja o listach wypunktowanych]
+ * Łącznik zewnętrzny: [http://www.freebsoft.org Free(b)soft laboratory]
+ * Nienazwany łącznik zewnętrzny: http://www.gnu.org
+ * Adres emailowy: toja@mojadomena.com
+
+Przeczytaj [#links] dla szczegółowego opisu.
+
+
+== Generalne zalecenia ==
+
+  * Zaznajom się z konstrukcjami i zawsze używaj tych, które najlepiej
+    spełniają oczekiwania. Prawie wszystko może być napisane jednym długim
+    akapitem, ale używając konstrukcji takich jak lista wypunktowana, lista
+    definicji itd. tekst może być znacznie wygodniejszy do odczytu. Ułatwisz w
+    ten sposób znacznie orientacje i poruszanie się niepełnosprawnym
+    użytkownikom specjalistycznych technologii.
+
+  * Nigdy nie używaj logicznych konstrukcji dla manipulowania wizualnymi
+    właściwościami prezentacji (wielkość czy rodzaj czcionki, wcięcia itd.),
+    chyba że wpasowuje się to logicznie. Przeanalizuj ponownie strukturę
+    informacji, aby znaleźć właściwe konstrukcje logiczne.
+
+  * Używaj tabeli jedynie wówczas, gdy nie można przedstawić informacji w żaden
+    inny sposób. Często jest możliwe przedstawienie tych samych informacji
+    używając zagnieżdżonych list zamiast tabeli. Taka forma może być bardziej
+    dostępna dla niepełnosprawnych użytkowników.
+
+  * Używaj hypertekstowych łączników tak często jak możliwe dla uproszczenia
+    poruszania się pomiędzy dokumentami czy ich sekcjami. Zajrzyj do {#links}
+    po więcej informacji.
+
+  * Kiedykolwiek istnieje powtarzająca się informacja umieść ją w wyodrębnionym
+    dokumencie/sekcji i połącz łącznikiem z odpowiednim miejscem.
+
+  * Unikaj długich zdań. Krótkie, klarowne zdania są bardziej przyswajalne.
+
+  * Nie nadużywaj elementów wyrazu w tekście. Dokumenty z nadmiernym użyciem
+    różnych rozmiarów czy styli są trudne do odczytu.
+
+###############################################################################
+###############################################################################
+
+
+== Podręcznik strukturalnego formatowania tekstu == complete-manual
+ 
+Ta sekcja dokładnie opisuje wszystkie stosowane struktury i ich składnie.
+Przeczytaj [#overview] dla uproszczonego opisu.
+
+Spis treści: @TOC@
+
+
+=== Bloki konstrukcyjne ===
+
+Bloki konstrukcyjne (czy konstrukcje strukturalne) wpływają na kształt 
+dokumentu. Zwykle odnoszą się one do bloków tekstu.  [#inline-constructs], z 
+drugiej strony, są używane wewnątrz tych bloków.
+
+==== Sekcje ====
+
+Jak to opisano w  [#overview], sekcje formułują strukturę hierarchiczną 
+dokumentu.
+
+Nagłówki sekcji są oznaczone znakami równości na początku i końcu linii. Tekst 
+zawarty między znakami równości stanowi tytuł sekcji. Ilość znaków równości 
+określa poziom nagłówka.
+
+*Przykład:*
+
+------
+ = Nagłówek główny =
+
+Wszystko co pojawia się po nagłówku sekcji należy do tej sekcji dopóki dopóty 
+nie pojawi się następny nagłówek. Dowolna ilość akapitów czy innych konstrukcji
+może być użyta w tekście danej sekcji.
+
+ == Sekcja pierwsza ==
+
+Ponieważ ten nagłówek zamknięty jest w większej ilości znaków równości niż 
+poprzedni, ta sekcja logicznie przynależy w hierarchii do poprzedniej.
+
+ === Podsekcja sekcji pierwszej ===
+
+ Ten tekst przynależy do podsekcji.
+
+ == Sekcja druga ==
+
+To jest sekcja druga umiejscowiona na poziomie sekcji pierwszej.
+----- 
+
+Spacje pomiędzy tytułem sekcji a znakami równości są obowiązkowe. W przeciwnym 
+razie sekcja nie będzie uwzględniona.
+
+
+==== Kotwice ==== anchors
+
+Dodatkowo nazwa kotwicy może być zdefiniowana dla każdego nagłówka sekcji.  
+Kotwica może zawierać znaki alfanumeryczne, podkeślniki i myślniki, i jest 
+zapisana na końcu linii nagłówka, oddzielona przynajmniej jedną spacją.
+
+-----
+ == Wprowadzenie == intro
+-----
+
+Kotwica może być użyta jako odnośnik do danej sekcji. Na przykład 
+łącznikk \[#intro], będzie odnosił się do nagłówka sekcji powyżej, przy czym 
+tytuł tej sekcji będzie stanowił nazwę łącznika (odwiedź [#links] po więcej 
+szczegółów).
+
+
+==== Spis treści ==== toc
+
+ Spis treści stanowi hierarchiczną listę wszystkich sekcji dokumentu lub jego 
+części.  Może on być umieszczony w dokumencie przy użyciu makro =@TOC@=.
+
+*Przykład:*
+
+-----
+Spis treści: @TOC@
+-----
+
+Ta właśnie linia będzie zastąpiona przez właściwy spis treści. Tekst 
+poprzedzający dwukropek określa tytuł, a makro TOC zawiera nagłówki wszystkich 
+podsekcji  z sekcji, w której był użyty.  Oznacza to również, że można utworzyć
+lokalny spis treści dla danej podsekcji.
+
+
+Makro TOC na początku [#complete-manual] było utworzone właśnie w ten sposób.
+
+=@TOC@= jest używane do listowania sekcji w ramach danego dokumentu.  Jeśli
+chcesz, możesz wylistować dokumenty zawarte w hierarchii dokumentów.  Można to
+zrobić przy użyciu makro =@NodeIndex@=.  Składnia jest
+taka sama.
+
+Spis treści ma charakter hierarchiczny.  Możesz /zawęzić poziom/ tej hierarchii.
+Można to zrobić dokładając cyfrę zamkniętą w nawiasach, co wygląda tak:
+
+-----
+Index: @TOC(1)@
+-----
+
+Wylistowane zostaną jedynie sekcje bez uwzględnienia ich podsekcji.  TOC na 
+początku tego dokumentu został utworzony w taki właśnie sposób.
+
+==== Listy wypunktowane ==== bullet-lists
+
+Listy wypunktowane są oznaczone gwiazdką  (lub zastępczo myślnikiem) 
+umieszczonym przed każdym obiektem. Wcięcie określa poziom listy (listy mogą 
+być zagnieżdżone).  
+
+*Przykład:*
+
+------
+ * koty
+   - czarne
+   - białe
+   - inne
+ * psy
+   * duże
+   * małe
+ * żaby
+------
+
+Będzie to miało taki wygląd:
+
+ * koty
+   - czarne
+   - białe
+   - inne
+ * psy
+   * duże
+   * małe
+ * żaby
+
+
+==== Listy uporządkowane ==== ordered-lists
+
+Listy uporządkowane pracują jak [#bullet-lists] gdzie zamiast gwiazdki  
+stosujemy cyfrę lub literę z następującą po niej kropką czy znakiem nawiasu 
+okrągłego.
+
+*Przykład:*
+
+------
+ * Zasady generalne:
+   1. Każdy obiekt musi być wcięty przy pomocy przynajmniej jednej spacji.
+   2. Dłuższy obiekt tekstowy powinien być rozłożony na kilka linii,
+      zapewniając ich właściwe wcięcie.
+   3. Klawisz tab i spacje mogą być użyte dla wcięć, ale klawisz tab
+      zajmuje szerokość 8 liter, mogą być kłopoty jeśli Twój edytor tekstu ma
+      inną szerokość tabulacji (zatem przetworzenie tabulacji na spacje
+      jest zalecane).
+
+   4. Puste linie między obiektami listy nie mają wpływu na wygląd listy
+      i jest to kwestia osobistych preferencji.
+
+ * Zasady list uporządkowanych:
+   0. Ignoruje się cyfry w dokumencie źródłowym, gdyż numery w dokumencie
+      końcowym są automatycznie generowane.  Dlatego można wpisywać zero,
+      ale można wprowadzać i poprawną kolejność numerów dla listy       uporządkowanej.
+   0. Można wpisywać litery dla alfabetycznie uporządkowanych list.
+ * Wewnętrznie zróżnicowane listy:
+   a) Mamy trzy podstawowe rodzaje list:
+      (1) nieuporządkowane
+      (2) numerycznie uporządkowane
+      (3) alfabetycznie uporządkowane
+   b) Przechodząc z jednego rodzaju na drugi (na jednakowym poziomie
+      wcięcia), poprzednia lista jest zakończona i porządek rozpoczyna się
+      na nowo.
+   c. Nie ma znaczenia użycie kropki czy nawiasu w dokumencie źródłowym.
+      Arkusz styli określa wygląd końcowy każdej z list.
+------
+
+Będzie to miało taki wygląd:
+
+ * Zasady generalne:
+   1. Każdy obiekt musi być wcięty przy pomocy przynajmniej jednej spacji.
+   2. Dłuższy obiekt tekstowy powinien być rozłożony na kilka linii,
+      zapewniając ich właściwe wcięcie.
+   3. Klawisz tab i spacje mogą być użyte dla wcięć, ale klawisz tab
+      zajmuje szerokość 8 liter, mogą być kłopoty jeśli Twój edytor tekstu ma
+      inną szerokość tabulacji (zatem przetworzenie tabulacji na spacje
+      jest zalecane).
+
+   4. Puste linie między obiektami listy nie mają wpływu na wygląd listy
+      i jest to kwestia osobistych preferencji.
+
+ * Zasady list uporządkowanych:
+   0. Ignoruje się cyfry w dokumencie źródłowym, gdyż numery w dokumencie
+      końcowym są automatycznie generowane.  Dlatego można wpisywać zero,
+      ale można wprowadzać i poprawną kolejność numerów dla listy       uporządkowanej.
+   0. Można wpisywać litery dla alfabetycznie uporządkowanych list.
+ * Wewnętrznie zróżnicowane listy:
+   a) Mamy trzy podstawowe rodzaje list:
+      (1) nieuporządkowane
+      (2) numerycznie uporządkowane
+      (3) alfabetycznie uporządkowane
+   b) Przechodząc z jednego rodzaju na drugi (na jednakowym poziomie
+      wcięcia), poprzednia lista jest zakończona i porządek rozpoczyna się
+      na nowo.
+   c. Nie ma znaczenia użycie kropki czy nawiasu w dokumencie źródłowym.
+      Arkusz styli określa wygląd końcowy każdej z list.
+
+
+==== Listy definicji ==== definition-lists
+
+Listy definicji są użyteczne dla wypisywania terminów i określeń wraz z ich 
+definicjami. Pary termin/definicja oddzielane są od siebie nawzajem 
+pustą linią.
+
+*Przykład:*
+
+------
+Składnia terminu
+   Linia tekstu, za którą następuje opis.
+
+Składnia opisu
+   Opis/definicja podążająca zaraz po terminie, do którego się odnosi,
+   zaznaczona jedną bądź więcej spacją.  więcej niż jedna linia jest
+   dopuszczalna jeśli każda z nich charakteryzuje się wcięciem.
+------
+
+Będzie to miało taki wygląd:
+
+Składnia terminu
+   Linia tekstu, za którą następuje opis.
+
+Składnia opisu
+   Opis/definicja podążająca zaraz po terminie, do którego się odnosi,
+   zaznaczona jedną bądź więcej spacją.  więcej niż jedna linia jest
+   dopuszczalna jeśli każda z nich charakteryzuje się wcięciem.
+
+
+==== Zestaw-pól ==== field-sets
+
+Zestaw-pól może być wykorzystany dla tworzenia prostych dwu-kolumnowych tabeli,
+gdzie pierwsza kolumna zawiera etykietę, a druga wartość przyporządkowaną 
+etykiecie z pierwszej kolumny. Etykieta oznaczona jest po obu stronach 
+dwukropkami. Wartość może być wielowierszowa, ale musi być odpowiednio wcięta.
+
+*Przykład:*
+
+------
+:Data urodzenia: 1975-08-30
+:Adres:
+   ul. Spacerowa 50//
+   Chałupy
+:Zawód: Wieczny student
+------
+
+Będzie to miało taki wygląd:
+
+:Data urodzenia: 1975-08-30
+:Adres:
+   ul. Spacerowa 50//
+   Chałupy
+:Zawód: Wieczny student
+
+
+==== Tekst preformatowany ==== preformatted-text
+
+Możesz oznaczyć blok tekstowy jako tekst preformatowany zamykając tenże blok
+liniami pięciu bądź więcej myślników.
+
+Żadne dalsze formatowanie nie może być zastosowane do tekstu preformatowanego. 
+Jest on przedstawiony tak jak w dokumencie źródłowym.
+
+*Przykład:*
+
+------
+ ------
+  foo   bar
+   x     y
+   1     2
+ ------
+------
+
+Będzie to miało taki wygląd:
+
+------
+ foo   bar
+  x     y
+  1     2
+------
+
+Wszystkie przykłady w tym podręczniku są tekstami preformatowanymi.
+
+
+==== Tabele ====
+
+
+Proste tabele można tworzyć umieszczając żądaną ilość komórek w wierszu. Każdy 
+wiersz jest w jednej linii i podzielony na komórki przy użyciu znaku kreski 
+pionowej. Każda z linii musi rozpoczynać się znakiem kreski pionowej.
+
+*Przykład:*
+
+------
+
+|        | Paweł | Hania |
+| wzrost | 189cm | 164cm |
+| waga   |  73kg |  78kg |
+------
+
+|        | Paweł | Hania |
+| wzrost | 189cm | 164cm |
+| waga   |  73kg |  78kg |
+
+
+=== Konstrukcje liniowe === inline-constructs
+
+Konstrukcje liniowe są używane wewnątrz bloku tekstowego.  Nie wpływają one na 
+strukturę dokumentu, ale pozwalają użyć różnego rodzaju elementów 
+wewnątrz bloków.
+
+
+==== Wyrażenie tekstu ====
+
+Można użyć /kursywy/, *tłustego druku*, _podkreślonego tekstu_, =ustalonej 
+czcionki=, /*albo ich _kombinacji_*/.
+
+Oto kod źródłowy powyższego akapitu:
+
+-----
+Można użyć /kursywy/, *tłustego druku*, _podkreślonego tekstu_, =ustalonej 
+czcionki=, /*albo ich _kombinacji_*/.
+-----
+
+
+==== Łączniki ==== links
+
+Łączniki mogą łączyć różne dokumenty, adresy internetowe, sekcje itd.  Są one
+oznaczone nawiasami kwadratowymi.  Pierwsza część tekstu w nawiasach jest
+łącznikiem docelowym. Może po nim następować spacja i nazwa łącznika. W
+zależności od typu łącznika docelowego, rozpoznajemy kilka rodzajów łączników.
+
+Kategorie łączników: @TOC@
+
+
+===== Łączniki lokalne =====
+
+Łączniki lokalne prowadzą do innego dokumentu w hierarchii, bądź do sekcji w
+ramach tego samego dokumentu.  Dokumenty są łączone za pomocą ich
+identyfikatorów, sekcje przy pomocy ich nazw kotwic (spójrz do [#anchors] po
+więcej szczegółów) poprzedzonych znakiem krzyżyka.  Sekcja zawarta w innym
+dokumencie również poprzedzona jest identyfikatorem dokumentu do jakiego
+przynależy.
+
+*Przykład:*
+
+------
+Przeczytaj  [intro].  Spójrz również do [#anchors].
+------
+
+Będzie to miało taki wygląd:
+
+Przeczytaj  [intro].  Spójrz również do [#anchors].
+
+Tytuł dokumentu bądź sekcji, do których odnosi się dany łącznik, automatycznie
+stanie się nazwą tegoż łącznika, chyba że określona nazwa zostanie specjalnie
+nadana temu łącznikowi.
+
+*Przykład:*
+
+-----
+Rozdział [exercises#exercise-types] opisuje  
+[exercises#exercise-types rodzaje ćwiczeń].
+-----
+
+Będzie to miało taki wygląd:
+
+Rozdział [exercises#exercise-types] opisuje  
+[exercises#exercise-types rodzaje ćwiczeń].
+
+
+===== Łączniki zewnętrzne =====
+
+Łączniki zewnętrzne rozpoczynające się od '\http://', są rozpoznawane 
+automatycznie, zatem nawiasy kwadratowe nie są konieczne, chyba że chcemy nadać
+łącznikowi bardziej opisową nazwę. Również adres e-mail staje się 
+automatycznie łącznikiem.
+
+------
+Adres http://www.gnu.org jest [http://www.gnu.org stroną domową GNU].
+Kontaktu się z bill@microsoft.com po więcej informacji.
+------
+
+Będzie to miało taki wygląd:
+
+Adres http://www.gnu.org jest [http://www.gnu.org stroną domową GNU].
+Kontaktu się z bill@microsoft.com po więcej informacji.
+
+
+===== Grafiki =====
+
+Jakikolwiek łącznik odnoszący się do jakiejkolwiek grafiki będzie wyświetlał 
+tę grafikę w linii.
+
+*Przykład:*
+
+------
+http://www.google.com/images/logo.gif 
+------
+
+Będzie to miało taki wygląd:
+
+http://www.google.com/images/logo.gif
+
+Jeśli nazwa łącznika zostanie nadana to nazwa ta będzie użyta dla 
+oznacznika ALT dla tej grafiki.
+
+
+==== Znaki specjalne i typograficzne ====
+
+===== Wymuszone przełamanie wiersza =====
+
+Dwa znaki ukośnika wymuszają przełamanie wiersza:
+
+------
+To zdanie będzie przełamane//w środku.
+------
+
+To zdanie będzie przełamane//w środku.
+
+===== Nieprzełamywalne spacje =====
+
+Przełamania wierszy są umieszczane automatycznie, kiedy akapit jest 
+formatowany, aby wpasować się w nośnik. Jednakże w niektórych sytuacjach 
+przełamanie wiersza nie jest pożądane .  Można wtedy użyć znaku tyldy 
+=\~= w miejsce spacji.
+
+*Przykład:*
+
+------
+Możemy wyeliminować przełamanie wiersza pomiędzy imieniem i nazwiskiem 
+Richard~Stallman, ale musimy poprzedzić znak tyldy znakiem lewego ukośnika, 
+pisząc komendę shell 'cd \~'.
+------
+
+Będzie to miało taki wygląd:
+
+Możemy wyeliminować przełamanie wiersza pomiędzy imieniem i nazwiskiem 
+Richard~Stallman, ale musimy poprzedzić znak tyldy znakiem lewego ukośnika, 
+pisząc komendę shell 'cd \~'.
+
+
+===== Długi myślnik =====
+
+Podwójny myślnik (dwa znaki minusa) wyjściowo wykreują długi myślnik.
+
+*Przykład:*
+
+------
+LCG -- autostradą do doskonałości.
+------
+
+Będzie to miało taki wygląd:
+
+LCG -- autostradą do doskonałości.
+
+#==== Citations ====
+
+
+==== Cudzysłowia ====
+
+Cudzysłów rozpoczynają dwa znaki akcentu a kończą dwa znaki apostrofu.
+
+*Przykład:*
+
+------
+Powiedział: ``Kto wie?''
+------
+
+Będzie to miało taki wygląd:
+
+Powiedział: ``Kto wie?''
+
+
+=== Inne funkcje ===
+
+
+==== Unikanie ====
+
+Można uniknąć specjalnego znaczenia wszystkich użytych tutaj konstrukcji 
+poprzedzając je znakiem lewego ukośnika.
+
+*Przykład:*
+
+------
+Znaki ukośnika są używane dla /kursywy/, jednakże czasami chcemy aby 
+\/przedstawić je tak\/.  Podwójny znak lewego ukośnika musi być użyty dla 
+wymuszenia \\/znaku lewego ukośnika/ jako takiego, poprzedzający jakikolwiek 
+oznacznik (gdziekolwiek indziej w tym tekście, znaki lewego ukośnika mogą być 
+używane dowolnie). Przykłady innych kombinacji znaku lewego ukośnika: 
+\*jeden* \\*dwa* \\\*trzy* \\\\*cztery* \\\\\*pięć*.
+------
+
+Będzie to miało taki wygląd:
+
+Znaki ukośnika są używane dla /kursywy/, jednakże czasami chcemy aby 
+\/przedstawić je tak\/.  Podwójny znak lewego ukośnika musi być użyty dla 
+wymuszenia \\/znaku lewego ukośnika/ jako takiego, poprzedzający jakikolwiek 
+oznacznik (gdziekolwiek indziej w tym tekście, znaki lewego ukośnika mogą być 
+używane dowolnie). Przykłady innych kombinacji znaku lewego ukośnika: 
+\*jeden* \\*dwa* \\\*trzy* \\\\*cztery* \\\\\*pięć*.
+
+==== Linie horyzontalne ====
+
+Linie horyzontalne można utworzyć przy użyciu 4 myślników umieszczonych w 
+osobnym wierszu.
+
+*Przykład:*
+
+------
+----
+------
+
+Będzie to miało taki wygląd:
+
+----
+
+
+==== Komentarze ====
+
+Można ukryć jakikolwiek treść wiersza umieszczając znak krzyżyka '#' na 
+jego początku.  Spowoduje to, iż ten teks będzie niewidoczny w dokumencie 
+wyjściowym np. dokumencie html.
+
+------
+ Pierwsza linia.
+ # Te linie 
+ # są ukryte.
+ Ostatnia linia.
+------
+
+Będzie to miało taki wygląd:
+
+Pierwsza linia.
+# Te linie 
+# są ukryte.
+Ostatnia linia.
