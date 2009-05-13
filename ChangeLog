@@ -1,3 +1,11 @@
+2009-05-13  Hynek Hanke  <hanke@brailcom.org>
+
+	* Makefile (doc): Take documentation source from
+	doc/src/ and generate it into doc/html/.
+
+	* doc/: Documentation moved from doc/ to doc/src to make space for
+	doc/examples and doc/html.
+
 2009-05-06  Tomas Cerha  <cerha@debian.brailcom.xx>
 
 	* doc/usage/usage.en.txt: 
