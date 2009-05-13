@@ -1,5 +1,8 @@
 2009-05-13  Tomas Cerha  <cerha@debian.brailcom.xx>
 
+	* lib/lcg/config.py:
+	Don't hardcode slashes as directory name separatods.
+
 	* doc/examples/lcgmake-basic-reader/src/index.py:
 	Docstring improved.  Don't ignore *args in constructor.
 

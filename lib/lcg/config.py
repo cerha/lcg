@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (C) 2004-2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -31,7 +31,7 @@ GNU gettext catalog.  This variable specifies the location where the compiled me
 installed.  More precisely, it is the base directory, where the subdirectories for different
 languages reside."""
 
-doc_dir = os.path.join(lcg_dir, 'doc/src')
+doc_dir = os.path.join(lcg_dir, 'doc', 'src')
 """The directory where lcg documentation source files can be found."""
 
 allow_backref = True
