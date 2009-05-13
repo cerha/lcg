@@ -1,5 +1,8 @@
 2009-05-13  Tomas Cerha  <cerha@debian.brailcom.xx>
 
+	* doc/examples/lcgmake-basic-reader/src/index.py:
+	Docstring improved.  Don't ignore *args in constructor.
+
 	* doc/examples/lcgmake-basic-reader/example.sh: 
 	Don't create the destination directory (it is created
 	automatically by LCG).
