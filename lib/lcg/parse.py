@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,65 @@ import types
 import re
 
 from lcg import *
+
+class ProcessingError(Exception):
+    """Exception for errors generated during processing of defective source data.
+
+    The reason (error message) must be specified when the error is raised.  A
+    special property of this class, however, is that other helper attributes
+    such as rough text location and associated source can be filled in later
+    during the exception propagation.  These other attributes should primarily
+    help the content creator to locate the error in the source document.
+
+    """
+    def __init__(self, reason, info=[]):
+        """Initialize the exception
+
+        Arguments:
+          reason -- text string describing the reason for the error
+          
+        """
+        self._reason = reason
+        self._info = info
+
+    def add_info(self, caption, information):
+        """Add more information to the exception.
+
+        There are no strict rules on 'caption' and 'information' except that
+        both must be strings.  See the 'info()' method.
+        
+        """
+        assert isinstance(caption, basestring)
+        self._info.append((caption, information))
+
+    def info(self):
+        """Return information about the error.
+
+        Returns a list of tuples (caption, information) where 'caption' is an
+        identification of the type of the information ('File', 'Line',
+        'Exercise' etc.)  and 'information' is a string containing the
+        information.
+
+        The list is sorted in the order the information has been added (this is
+        usually bottom-up).
+
+        Example:
+          [('File', '01-telephoning/exercises.py'),
+           ('Unit', '01-telephoning'),
+           ('Section', 'Consolidation'),
+           ('Offending text', '* Bla bla')]
+           
+        """
+        return self._info
+
+    def reason(self):
+        """Return reason for the error
+        
+        Example: A choice must start with a + or minus sign and a space!
+        
+        """
+        return self._reason
+    
 
 class Parser(object):
     """Structured text (wiki) document parser.
@@ -348,6 +407,30 @@ class MacroParser(object):
         parsed = unicode(structured)
         return self._substitute(parsed)
 
+def add_processing_info(exception, caption, information):
+    """Add processing info to a given exception.
+
+    This function is used to add more informatioin to an exception during its
+    propagation.
+    
+    If the exception is a 'ProcessingError' instance, the proper mechanism is
+    followed.  Raising 'ProcessingError' in the place, where the error is
+    detected should be always prefered.  A special attribute
+    '_lcg_processing_details' is added to other exception types.  This hack
+    allows us to to add processing information to any exception, which is
+    mostly useful for exeptions raised in old code, which did not use
+    'ProcessingError'.
+
+    See 'ProcesingError' for more information and for the meaning of the
+    arguments.
+
+    """
+    if isinstance(exception, ProcessingError):
+        exception.add_info(caption, information)
+    else:
+        if not hasattr(exception, '_lcg_processing_details'):
+            exception._lcg_processing_details = []
+        exception._lcg_processing_details.append((caption, information))
     
 def _log(*args):
     """Just for internal debugging purposes..."""

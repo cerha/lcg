@@ -1,3 +1,11 @@
+2009-05-21  Tomas Cerha  <cerha@debian.brailcom.xx>
+
+	* bin/lcgmake.py: 
+	* lib/lcg/parse.py: 
+	* lib/lcg/read.py: 
+	Added support for tracing processing information during exception
+	propagation (patch by Hynek Hanke <hanke@brailcom.org>).
+
 2009-05-13  Tomas Cerha  <cerha@debian.brailcom.xx>
 
 	* lib/lcg/config.py:

@@ -123,13 +123,21 @@ class Reader(object):
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""
         variants = self.variants()
-        return ContentNode(id=self._id, title=self._title(), brief_title=self._brief_title(),
-                           descr=self._descr(), variants=variants, content=self._content(), 
-                           children=[child.build() for child in self._children()],
-                           resource_provider=self._resource_provider_,
-                           globals=self._globals(), hidden=self._hidden)
-    
-        
+        try:
+            return ContentNode(id=self._id, title=self._title(), brief_title=self._brief_title(),
+                               descr=self._descr(), variants=variants, content=self._content(), 
+                               children=[child.build() for child in self._children()],
+                               resource_provider=self._resource_provider_,
+                               globals=self._globals(), hidden=self._hidden)
+        except Exception, e:
+            if hasattr(self, '_source_filename'):
+                # TODO: This is a quick hack.  The attribute `_source_filename' is prefilled in
+                # 'FileReader._read_file', so it would be at least more appropriate to move this
+                # hack into the 'FileReader' class.  Even then, there is no guarantee, that the
+                # exception was actually raised during processing this file.
+                e = add_processing_info(e, 'File', self._source_filename)
+            raise
+
 class FileReader(Reader):
 
     # Byte Order Mark (see http://en.wikipedia.org/wiki/Byte-order_mark).
@@ -166,6 +174,7 @@ class FileReader(Reader):
             if os.path.exists(filename2):
                 log("File '%s' not found. Using '%s' instead.", filename, filename2)
                 filename = filename2
+        self._source_filename = filename
         fh = open(filename)
         try:
             lines = fh.readlines()

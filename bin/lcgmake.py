@@ -175,10 +175,32 @@ this case.  In other cases the destination directory is required to prevent
 unwanted polution of the current directory by the output files.
 
 If your LCG installation is placed in a non-standard installation directory,
-set LCGDIR environment variable to its location."""
+set LCGDIR environment variable to its location.
+
+"""
     die(help % (os.path.split(sys.argv[0])[-1], dumpoptions(optspec, width=80, indent=2)))
 
-    
+def lcg_exception_details(title, details=[], reason=None):
+    """Print LCG specific details about the printed exception.
+
+    Attributes:
+      title -- a short string describing the type of information displayed
+      details -- a list of detailed information (see 'ProcessingError.info()')
+      reason -- reason for the error (error message)
+
+    Multi-line texts in 'details' are delimited by markings for easier reading.
+      
+    """
+    def format(line):
+        # Format one record in information output.
+        assert len(line) == 2
+        if "\n" in line[1]:
+            return "%s:\n---begin---\n%s\n---end---" % line
+        else:
+            return "%s: %s" % line
+    return """\n\n%s:\n%s\n\nError: %s\n""" % \
+           (title, "\n".join([format(line) for line in reversed(details)]), reason)
+
 if __name__ == "__main__":
     try:
         main()
@@ -186,7 +208,14 @@ if __name__ == "__main__":
         raise
     except SystemExit:
         raise
-    except:
+    except lcg.ProcessingError, p:
+        # Handles errors due to wrong format of input file. Gives the reason for the error and
+        # clues to find it in form of name of the defective file and some section of text in which
+        # the error is located.
+        sys.stderr.write(lcg_exception_details("PARSING ERROR (error in source text)",
+                                               p.info(), p.reason()))
+        sys.exit(1)
+    except Exception, ex:
         einfo = sys.exc_info()
         try:
             import cgitb
@@ -195,3 +224,13 @@ if __name__ == "__main__":
             sys.stderr.write("Unable to generate detailed traceback: "+ str(e) +"\n")
             import traceback
             traceback.print_exception(*einfo)
+        # The _lcg_processing_details exception attribute should not be generally used to pass data
+        # about errors in input. It is much prefered that you raise a proper ProcessingError
+        # exception whenever the error can be clearly identified as an error in input. The bellow
+        # exception attribute can serve 1) to better debug programming errors by giving pointers to
+        # which piece of input it triggered and 2) to find errors in input which are not caught
+        # right away and cause errors in program code at a different place.
+        if hasattr(ex, '_lcg_processing_details'):
+            sys.stderr.write(lcg_exception_details("LCG exception details",
+                                                   ex._lcg_processing_details, str(ex)))
+        sys.exit(1)
