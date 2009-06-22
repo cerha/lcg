@@ -160,11 +160,10 @@ class FileReader(Reader):
 
     def _input_file(self, name, ext='txt', lang=None, dir=None):
         """Return the full path to the source file."""
-        if lang:
-            ext = lang +'.'+ ext
+        filename = '.'.join([part for part in (name, lang, ext) if part])
         if dir is None:
             dir = self._dir
-        return os.path.join(dir, name + '.' + ext)
+        return os.path.join(dir, filename)
         
     def _read_file(self, name, ext='txt', comment=None, dir=None, lang=None, fallback_lang=None):
         """Return the text read from the source file."""

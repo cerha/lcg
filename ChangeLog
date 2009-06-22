@@ -1,3 +1,9 @@
+2009-06-22  Tomas Cerha  <cerha@brailcom.org>
+
+	* bin/lcgmake.py:
+	* lib/lcg/read.py:
+	Allow source files without extension.
+
 2009-05-21  Tomas Cerha  <cerha@debian.brailcom.xx>
 
 	* bin/lcgmake.py: 

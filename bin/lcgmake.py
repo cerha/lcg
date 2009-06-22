@@ -54,7 +54,7 @@ def main():
         src, filename = os.path.split(src)
         name = os.path.splitext(os.path.splitext(filename)[0])[0]
         lang = os.path.splitext(os.path.splitext(filename)[0])[1][1:] or None
-        ext = os.path.splitext(filename)[1][1:]
+        ext = os.path.splitext(filename)[1][1:] or None
         recourse = False
     else:
         name = opt['root']
