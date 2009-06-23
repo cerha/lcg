@@ -1,3 +1,12 @@
+2009-06-23  Tomas Cerha  <cerha@brailcom.org>
+
+	* doc/src/structured-text.en.txt:
+	* doc/src/structured-text.cs.txt:
+	Added description of image links, image alignment and styling,
+	image alt texts and descriptions, link tooltips.  Typographic
+	constructs marked as deprecated in favour of using unicode
+	characters.
+
 2009-06-22  Tomas Cerha  <cerha@brailcom.org>
 
 	* bin/lcgmake.py:

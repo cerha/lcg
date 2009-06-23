@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (c) 2005-2009 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -173,33 +173,64 @@ See [#field-sets] for a detailed syntax description.
 === Links ===
 
 Links are hypertext references to other documents or sections within them.
-They are written using square brackets.  Each link has its target and may have
-an explicit name (if not defined, the system will try to find out the name
-automatically).  The target is the first part of the text within brackets, the
-name may follow after a space.  Certain kinds of targets are recognized
-automatically and thus don't require the square brackets.
+They are written using square brackets.  Each link has its target, may have an
+explicit label (text displayed in place of the link) and an optional
+description for tooltip text.  Target is the first text in the brackets up to
+the first space, label follows and description may follow after the pipe
+character (`|').  If the link label is not defined explicitly, the
+system will use the title of the target document or section where possible.
+Certain kinds of targets are recognized automatically and thus don't require
+square brackets.
 
 *Examples*:
 
 -----
- * Link to another document: [intro]
- * Link to another section of the same document: [#bullet-lists]
- * This link with an explicit name: [#bullet-lists Bullets]
- * External link: [http://www.freebsoft.org Free(b)soft laboratory]
- * Unnamed external links: http://www.gnu.org
- * Email address: yourname@yourdomain.com
+ * link to another document: [intro]
+ * link to another section of the same document: [#bullet-lists]
+ * with an explicit name: [#bullet-lists Bullets]
+ * with a description (tooltip): [#bullet-lists Bullets | Using Bullet Lists]
+ * external link: [http://www.freebsoft.org Free(b)soft laboratory]
+ * automatic link: http://www.gnu.org
+ * email address: yourname@yourdomain.com
 -----
 
 Resulting links:
 
- * Link to another document: [intro]
- * Link to another section of the same document: [#bullet-lists]
- * The same link with an explicit name: [#bullet-lists Bullets]
- * External link: [http://www.freebsoft.org Free(b)soft laboratory]
- * Unnamed external links: http://www.gnu.org
- * Email address: yourname@yourdomain.com
+ * link to another document: [intro]
+ * link to another section of the same document: [#bullet-lists]
+ * with an explicit name: [#bullet-lists Bullets]
+ * with a description (tooltip): [#bullet-lists Bullets | Using Bullet Lists]
+ * external link: [http://www.freebsoft.org Free(b)soft laboratory]
+ * automatic link: http://www.gnu.org
+ * email address: yourname@yourdomain.com
 
-See [#links] for more details.
+See [#links] and [#automatic-links] for more details.
+
+
+=== Images ===
+
+Links with an image in place of a link target display the image inline.  Links
+with an image instead of link label display an image which acts as a link.
+
+-----
+ * simple image: [http://www.google.com/accounts/google_white.gif]
+ * with ALT text: [http://www.google.com/accounts/google_white.gif Google logo]
+ * image link: [http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png]
+ * image link with label: [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png 
+   OSI | Open Source Initiative]
+-----
+
+Resulting images:
+
+ * simple image: [http://www.google.com/accounts/google_white.gif]
+ * with ALT text: [http://www.google.com/accounts/google_white.gif Google logo]
+ * simple image link: [http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png]
+ * image link with label and description: [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png 
+   OSI | Open Source Initiative]
+
+See [#images] and [#image-links] for more details.
 
 
 == General recommendations ==
@@ -557,148 +588,156 @@ You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
 ==== Links ==== links
 
 Links can be used to refer to other documents, web addresses, sections etc.
-They are marked by square brackets.  The first part of the text in the brackets
-is the link target.  The target can be optionally followed by a space and a
-link name.  Depending on the type of the link target, we recognize several
-kinds of links.
+They are marked by square brackets and they have the following structure:
 
-Link categories: @TOC@
+=\[<link-target> <link-label> | <link-description]=
+
+Link target
+  This is the first text within square brackets up to the first space.  It can
+  be a document or section identifier or an external URL.  See examples below
+  for possible link targets.
+
+Link label
+  Defines the user visible link text.  If not present, the system will try to
+  supply the label automatically (depending on link target type as described
+  below).  An image may be used in place of label to produce an [#image-links
+  image link]. 
+
+Link description
+  Also optional, separated by the `|' pipe character.  It's output presentation
+  depends on the output media.  In HTML, for example, the description is
+  represented as a tooltip by most browsers.
+
+Possible link targets are:
+
+Local document
+  Local documents (other documents within the same hierarchy) are referenced by
+  their identifier directly.  Document title becomes the link label
+  automatically.
+
+Local section
+  A section within the same document is referenced by its anchor
+  name (see [#anchors]) prefixed by a hash (`#' character).  A section of
+  another document is a concatenation of document title and anchor.  Section
+  title is used for link label automatically.
+
+External target
+  Target which is not recognized as local document or section is treated as an
+  external URL.  Labels are not determined automatically for external links so
+  if you don't specify an explicit label, the URL itself is used for the label.
+
+Image 
+  If the target is detected to be an image the link is presented as [#image
+  inline image].
 
 
-===== Local Links =====
+*Examples:*
+------
+ * Local document: 
+   - automatic label: [intro]
+   - explicit label: [intro LCG Introduction]
+ * Local section:
+   - same document: [#anchors]
+   - other document: [usage#run]
+   - explicit label: [#links Using links in documents]
+   - description: [#links Links | Complete description of using links in LCG structured text]
+ * External links:
+   - [http://www.gnu.org GNU | Homepage of the GNU project]
+------
 
-Local links lead to another document withing the hierarchy, or another section
-within the same document.  Documents are referenced by their identifier,
-sections by their anchor names (see [#anchors] for more details) prefixed with
-a hash.  A section of another document must be also preceded by that
-document's identifier.
+ * Local document: 
+   - automatic label: [intro]
+   - explicit label: [intro LCG Introduction]
+ * Local section:
+   - same document: [#anchors]
+   - other document: [usage#run]
+   - explicit label: [#links Using links in documents]
+   - description: [#links Links | Complete description of using links in LCG structured text]
+ * External links:
+   - [http://www.gnu.org GNU | Homepage of the GNU project]
+
+
+==== Automatic links ==== automatic-links
+
+External links beginning with URL scheme, such as '\http://', are recognized
+automatically, so the square brackets are not necessary, unless you want to
+give the link a more descriptive name.  Also e-mail addresses become links
+automatically.
+
+------
+See GNU project homepage at http://www.gnu.org (contact bill@microsoft.com for
+more information).
+------
+
+See GNU project homepage at http://www.gnu.org (contact bill@microsoft.com for
+more information).
+
+
+==== Images ==== images
+
+Images are a special kind of [#links].  Any link pointing to an image will
+automatically display the target image in-line.  Images are recognized by
+filename extension.  JPEG, PNG and GIF images are currently supported.
 
 *Example:*
-
 ------
-Read the [intro].  See also [#anchors].
+http://www.google.com/images/logo_sm.gif
 ------
 
-This will be presented as:
+http://www.google.com/images/logo_sm.gif
 
-Read the [intro].  See also [#anchors].
-
-The title of the referenced document or section becomes the name of the link
-automatically.  You can also supply a different name within the brackets
-explicitly.
+If a link label is given, this label is be used as the accessible ALT text.
+Link description is used as image accessible description.
 
 *Example:*
-
------
-Learn more about [#links using links].
------
-
-This will be presented as:
-
-Learn more about [#links using links].
-
-
-===== External Links =====
-
-External links beginning with '\http://', are recognized automatically, so the
-square brackets are not necessary, unless you want to give the link a more
-descriptive name.  Also e-mail addresses automatically become links.
-
 ------
-The address http://www.gnu.org is the [http://www.gnu.org GNU homepage].
-Contact bill@microsoft.com for more information.
+[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | A handsome 
+GNU Head with typical beard and smart-looking curled horns]
 ------
 
-The address http://www.gnu.org is the [http://www.gnu.org GNU homepage].
-Contact bill@microsoft.com for more information.
+[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | A handsome 
+GNU Head with typical beard and smart-looking curled horns]
 
-
-===== Images =====
-
-Any link pointing to an image will display the image in-line.
-
-*Example:*
-
-------
-http://www.google.com/images/logo.gif
-------
-
-This will be presented as:
-
-http://www.google.com/images/logo.gif
-
-If a link name is given, this name will be used as the ALT text for this image.
-
-
-==== Special and Typographical Characters ====
-
-===== Explicit line-break =====
-
-Two slashes force a line-break:
+[<http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg]
+Images can be also aligned to the left or right side of the text which follows
+them.  Simply use a left or right angle bracket (less than or greater than
+sign) preceding the image name inside square brackets.  The OSI logo floating on
+the left side of this paragraph was written like this:
 
 ------
-This sentence will break//in the middle.
+[<http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg]
+Images can be also aligned ...
 ------
 
-This sentence will break//in the middle.
-
-===== Non-breakable Space =====
-
-The line-breaks are inserted automatically, when the paragraph is formatted to
-fit the output media.  However, you sometimes don't want a line-break in a
-certain place.  You can use a tilde =\~= instead of a space in such
-cases.
-
-*Example:*
-
-------
-We can forbid a line-break between the first and second name of
-Richard~Stallman, but we must prefix the tilde with a backslash, when
-we need to write the shell command 'cd \~'.
-------
-
-This will be presented as:
-
-We can forbid a line-break between the first and second name of
-Richard~Stallman, but we must prefix the tilde with a backslash, when
-we need to write the shell command 'cd \~'.
+Images can be styled through external /style sheets/.  In HTML output, each
+image automatically has the `class' attribute set according to the name of the
+image without file type extension.  For example the image
+`\http://www.google.com/images/logo_sm.gif' will have class `logo_sm'.
 
 
-===== Long Dash =====
+==== Image links ==== image-links
 
-Double dash (two minus signs) produce a long dash on the output
-
-*Example:*
+Image links are a combination of image and link, presented as an inline image
+which acts as a link (can be clicked to get to the link target).  They are
+created simply by using an image target (document-local resource filename or
+URL) in place of the link label.  Textual link label (used for image accessible
+ALT text) and description (used for link tooltip) may follow in the usual form.
 
 ------
-LCG -- highway to excellence.
+[http://www.google.com http://www.google.com/accounts/google_white.gif]
+[http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png
+OSI logo | Open Source Initiative]
 ------
 
-This will be presented as:
+[http://www.google.com http://www.google.com/accounts/google_white.gif]
+[http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png
+OSI logo | Open Source Initiative]
 
-LCG -- highway to excellence.
-
-#==== Citations ====
-
-
-==== Quotations ====
-
-Quotation begins with two reverse apostrophes and ends with two single
-apostrophes.
-
-*Example:*
-
-------
-He said: ``Who knows?''
-------
-
-This will be presented as:
-
-He said: ``Who knows?''
+Image links can be aligned using < and > similarly as ordinary images and
+styled (see above).
 
 
 === Other features ===
-
 
 ==== Escaping ====
 
@@ -722,6 +761,17 @@ here\/.  Double backslash must be used to force the \\/backslash/ itself in
 front of a markup (anywhere else in the text, backslashes can be used freely).
 Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
 \\\\\*five*.
+
+
+==== Explicit line-break ====
+
+Two slashes force a line-break:
+
+------
+This sentence will break//in the middle.
+------
+
+This sentence will break//in the middle.
 
 
 ==== Horizontal Lines ====
@@ -767,3 +817,28 @@ The first line.
 # These lines have been 
 # commented out
 The last line.
+
+=== Deprecated features ===
+
+The following features remain for backwards compatibility, but should not be
+used in new documents, since they may be removed in future LCG versions.
+
+==== Non-breakable Space ====
+
+A tilde character (=\~=) is interpreted as a non-breakable space, but is now
+deprecated in favor of the Unicode character for non-breakable space (U+00A0).
+Please avoid using tildes since they may not be recognized in future.
+
+==== Long Dash ====
+
+Double dash (two minus signs) produce a long dash on the output, but is now
+deprecated in favor of the Unicode character "EM DASH" (U+00A0).  Please avoid
+using double dashes since they may not be recognized in future.
+
+==== Quotations ====
+
+Quotations begin with two reverse apostrophes and end with two single
+apostrophes.  They are supposed to be replaced by relevant national quotation
+characters on the output, but are now deprecated in favor of language dependent
+Unicode characters for quotes.  Please avoid using quotations since they may
+not be recognized in future.

@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (c) 2005-2009 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -175,30 +175,63 @@ Více podrobností viz [#field-sets].
 
 Odkazy umožňují hypertextové provázání dokumentů a jejich částí.  Zapisují se
 pomocí hranatých závorek.  Každý odkaz má svůj cíl a může mít i explicitní
-název (pokud není určen, pokusí se systém název doplnit automaticky).  Cíl je
-první část textu uvnitř závorek a název může následovat za první mezerou.
-Některé typy odkazů jsou rozpoznány automaticky, takže hranaté závorky nejsou
+název (text zobrazený v místě odkazu) a popis (zobrazený jako bublinová
+nápověda).  Cíl je první část textu uvnitř závorek, název může následovat za
+první mezerou a popis za rourou (znak „|“).  Pokud není název určen explicitně,
+systém doplní název cílového dokumentu nebo kapitoly, pokud to lze).  Některé
+typy odkazů jsou rozpoznány automaticky, takže hranaté závorky u nich nejsou
 potřeba.
 
 *Příklady*:
 
 -----
- * Odkaz na jiný dokument: [intro]
- * Odkaz na jinou kapitolu stejného dokumentu: [#bullet-lists]
- * Stejný odkaz s explicitním názvem: [#bullet-lists kapitola o odrážkách]
- * Externí odkaz: [http://www.freebsoft.org Free(b)soft laboratoř]
- * Externí odkaz bez názvu: http://www.gnu.org
- * E-mailová adresa: vasejmeno@vasedomena.cz
+ * odkaz na jiný dokument: [intro]
+ * odkaz na jinou kapitolu stejného dokumentu: [#bullet-lists]
+ * s explicitním názvem: [#bullet-lists kapitola o odrážkách]
+ * s popisem (bublina): [#bullet-lists odrážky | používání odrážkových seznamů]
+ * externí odkaz: [http://www.freebsoft.org Free(b)soft laboratoř]
+ * automatický odkaz: http://www.gnu.org
+ * e-mailová adresa: vasejmeno@vasedomena.cz
 -----
 
 Výsledné odkazy:
 
- * Odkaz na jiný dokument: [intro]
- * Odkaz na jinou kapitolu stejného dokumentu: [#bullet-lists]
- * Stejný odkaz s explicitním názvem: [#bullet-lists kapitola o odrážkách]
- * Externí odkaz: [http://www.freebsoft.org Free(b)soft laboratoř]
- * Externí odkaz bez názvu: http://www.gnu.org
- * E-mailová adresa: vasejmeno@vasedomena.cz
+ * odkaz na jiný dokument: [intro]
+ * odkaz na jinou kapitolu stejného dokumentu: [#bullet-lists]
+ * s explicitním názvem: [#bullet-lists kapitola o odrážkách]
+ * s popisem (bublina): [#bullet-lists odrážky | používání odrážkových seznamů]
+ * externí odkaz: [http://www.freebsoft.org Free(b)soft laboratoř]
+ * automatický odkaz: http://www.gnu.org
+ * e-mailová adresa: vasejmeno@vasedomena.cz
+
+Více podrobností viz [#links].
+
+
+=== Obrázky ===
+
+Odkazy, jejichž cílem je obrázek, automaticky zobrazí tento obrázek v těle
+dokumentu.  Odkazy, které mají obrázek na místě názvu odkazu se zobrazí jako
+tento obrázek, ale nadále fungují jako odkaz.
+
+-----
+ * jednoduchý obrázek: [http://www.google.com/accounts/google_white.gif]
+ * s alternativním textem: [http://www.google.com/accounts/google_white.gif Google logo]
+ * jednoduchý odkaz s obrázkem: [http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png]
+ * odkaz s obrázkem, textem a popisem: [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png 
+   OSI | Open Source Iniciativa]
+-----
+
+Výsledné obrázky:
+
+ * jednoduchý obrázek: [http://www.google.com/accounts/google_white.gif]
+ * s alternativním textem: [http://www.google.com/accounts/google_white.gif Google logo]
+ * jednoduchý odkaz s obrázkem: [http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png]
+ * odkaz s obrázkem, textem a popisem: [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png 
+   OSI | Open Source Iniciativa]
+
+Více podrobností viz [#images].
 
 
 == Obecná doporučení ==
@@ -571,149 +604,154 @@ Můžete používat /zvýrazněný text/, *silně zvýrazněný text*, _podtrže
 ==== Odkazy ==== links
 
 Odkazy umožňují hypertextové provázání dokumentů a jejich částí.  Zapisují se
-pomocí hranatých závorek.  Každý odkaz má svůj cíl a může mít i explicitní
-název (pokud není určen, pokusí se systém název doplnit automaticky).  Cíl je
-první část textu uvnitř závorek a název může následovat za první mezerou.
-Některé typy odkazů jsou rozpoznány automaticky, takže hranaté závorky nejsou
-potřeba.
+pomocí hranatých závorek a mají následující strukturu:
 
-Podle druhu cíle odkazu rozeznáváme několik typů odkazů:
+=\[<cíl-odkazu> <název-odkazu> | <popis-odkazu>]=
 
-Typy odkazů: @TOC@
+Cíl odkazu
+  Tvoří první část uvnitř hranatých závorek až do první mezery.  Může to být
+  identifikátor dokumentu, kapitoly, nebo externí URL.  Více viz příklady níže.
 
+Název odkazu
+  Název určuje text zobrazený v místě odkazu.  Pokud není uveden, systém se
+  pokusí doplnit název automaticky (v závislosti na typu cíle odkazu, jak je
+  popsáno níže).  Pokud je v místě názvu uveden obrázek, bude odkaz zobrazen
+  jako [#image-links obrázkový odkaz].
 
-===== Místní odkazy =====
+Popis odkazu
+  Je také nepovinný, oddělený znakem roury „|“ or názvu odkazu.  Prezentace
+  závisí na druhu výstupního média.  Např. v HTML je popis ve většině
+  prohlížečů zobrazen jako bublinová nápověda (tooltip).
 
-Místní odkazy odkazují na jiné dokumenty v rámci jedné publikace nebo na
-konkrétní kapitoly.  Dokumenty jsou odkazovány prostřednictvím svých
-identifikátorů, kapitoly prostřednictvím kotev (více viz [#anchors]).  Kotvu v
-odkazu uvodíme mřížkou.  Pokud jde o kotvu v rámci jiného dokumentu, před
-mřížku ještě připojíme jeho identifikátor.
+Cílem odkazů mohou být:
 
-*Příklad:*
+Místní dokument
+  Místní dokumenty (jiné dokumenty ve stejné hierarchii) jsou odkazovány přímo
+  pomocí svých identifikátorů.  Název dokumentu je potom automaticky použit
+  jako název odkazu (pokud nebyl určen explicitní název v hranatých závorkách).
 
+Místní kapitola
+  Kapitoly jsou odkazovány prostřednictvím kotev (více viz [#anchors]).  Kotvu
+  v odkazu uvodíme mřížkou.  Pokud jde o kotvu v rámci jiného dokumentu, před
+  mřížku ještě připojíme jeho identifikátor.  Název kapitoly je potom použit
+  pro automatické doplnění názvu odkazu.
+
+Externí cíl
+  Cíl, který není rozpoznán jako místní dokument nebo kapitola je považován za
+  externí URL.  Název v takovém případě není doplňován automaticky.  Pokud není
+  uveden explicitně, bude URL zobrazeno také jako název odkazu.
+
+Obrázek
+  Pokud je cíl odkazu rozpoznán jako obrázek, odkaz je zobrazen jako [#image
+  obrázek v těle dokumentu].
+
+*Příklady:*
 ------
-Přečtěte si [intro].  Více viz [#anchors].
-------
-
-Toto bude zobrazeno jako:
-
-Přečtěte si [intro].  Více viz [#anchors].
-
-Název odkazovaného dokumentu nebo kapitoly je automaticky doplněn jako název
-odkazu.  Můžete však také určit jiný název, tím že jej uvedete v závorkách.
-
-*Příklad:*
-
------
-Kapitola [#bullet-lists] popisuje tvorbu [#bullet-lists odrážkových seznamů].
------
-
-Toto bude zobrazeno jako:
-
-Kapitola [#bullet-lists] popisuje tvorbu [#bullet-lists odrážkových seznamů].
-
-
-===== Externí odkazy =====
-
-Externí odkazy začínající '\http://', jsou rozpoznány automaticky, takže není
-třeba používat hranatých závorek, pokud nechcete odkaz pojmenovat.  Také
-e-mailové adresy jsou automaticky převáděny na odkazy.
-
------- 
-Addresa http://www.gnu.org je [http://www.gnu.org domovská stránka
-projektu GNU].  Napište na bill@microsoft.com pro více informací.
-------
-
-Addresa http://www.gnu.org je [http://www.gnu.org domovská stránka
-projektu GNU].  Napište na bill@microsoft.com pro více informací.
-
-
-===== Obrázky =====
-
-Namísto libovolného odkazu, jehož cílem je obrázek, bude zobrazen tento
-obrázek.
-
-*Příklad:*
-
-------
-http://www.google.com/images/logo.gif 
+ * Místní dokument: 
+   - automatický název: [intro]
+   - explicitní název: [intro Úvod do LCG]
+ * Místní kapitola:
+   - stejný dokument: [#anchors]
+   - jiný dokument: [usage#run]
+   - explicitní název: [#links Použití odkazů v dokumentech]
+   - popis: [#links Odkazy | Kompletní popis použití odkazů ve strukturovaném textu LCG]
+ * Externí odkaz:
+   - [http://www.gnu.org GNU | Domovská stránka GNU projektu]
 ------
 
-Toto bude zobrazeno jako:
+ * Místní dokument: 
+   - automatický název: [intro]
+   - explicitní název: [intro Úvod do LCG]
+ * Místní kapitola:
+   - stejný dokument: [#anchors]
+   - jiný dokument: [usage#run]
+   - explicitní název: [#links Použití odkazů v dokumentech]
+   - popis: [#links Odkazy | Kompletní popis použití odkazů ve strukturovaném textu LCG]
+ * Externí odkaz:
+   - [http://www.gnu.org GNU | Domovská stránka GNU projektu]
 
-http://www.google.com/images/logo.gif
 
-Pokud je určen název, bude použit jako ALT text tohoto obrázku.
+==== Automatické odkazy ==== automatic-links
 
-
-==== Speciální a typografické znaky ====
-
-===== Vynucený řádkový zlom =====
-
-Dvě lomítka vynutí řádkový zlom:
-
-------
-Tato věta bude // uprostřed zalomena.
-------
-
-Tato věta bude // uprostřed zalomena.
-
-===== Nedělitelná mezera =====
-
-Při zobrazení výsledného dokumentu jsou řádkové zlomy vytvářeny automaticky
-tak, aby šířka textu odpovídala šířce výstupního média.  To ovšem může někdy
-vést k tomu, že je řádka zalomena v místě, kde to není vhodné.  V češtině je to
-napříklas po jednpísmenné předložce či spojce, která by tak zůstala na konci
-řádku.  Proto je možně na určených místech zlom zakázat.  Namísto mezery
-zapište vlnku „\~“.  Ta bude na výstupu nahrazena nedělitelnou mezerou.
-
-*Příklad:*
+Externí odkazy začínající na URL schema, jako např. '\http://', jsou rozpoznány
+automaticky, takže není třeba použít hranatých závorek, pokud nechcete
+definovat explicitní název nebo popis odkazu.   Také e-mailové adresy jsou
+automaticky zobrazeny formou odkazu.
 
 ------
-Třešně a~višně.
-Dlouhý~nedělitelný~text~může~způsobit~problémy~s~formátováním~odstavce~pokud~je~např.~zobrazen~v~malém~okně~prohlížeče.
+Navštivte domovskou stránku projektu GNU na adrese http://www.gnu.org, případně 
+kontaktujte bill@microsoft.com pro více informací.
 ------
 
-Toto bude zobrazeno jako:
 
-Třešně a~višně.
-Dlouhý~nedělitelný~text~může~způsobit~problémy~s~formátováním~odstavce~pokud~je~např.~zobrazen~v~malém~okně~prohlížeče.
+==== Obrázky ==== images
 
-O tom, jak zamezit interpretaci vlnky jako nedělitelné mezery a zobrazit
-přímo vlnku, se dozvíte v kapitole [#escape].
+Obrázky jsou speciálním případem odkazů [#links].  Libovolný odkaz, jehož cílem
+je obrázek bude automaticky zobrazen jako obrázek v těle dokumentu.  Obrázky
+jsou rozeznávány podle přípony.  Momentálně jsou podporovány obrázky typu JPEG,
+PNG a GIF.
 
-===== Dlouhá pomlčka =====
-
-Dvojitá pomlčka (znak mínus) bude na výstupu nahrazena dlouhou pomlčkou.
-
-*Příklad:*
-
+*Příklad*:
 ------
-LCG -- dálnice k dokonalosti
+http://www.google.com/images/logo_sm.gif
 ------
 
-Toto bude zobrazeno jako:
+http://www.google.com/images/logo_sm.gif
 
-LCG -- dálnice k dokonalosti
+Pokud je určen název odkazu, bude použit jako alternativní text obrázku.  Popis
+odkazu je potom použit jako popis obrázku pro potřeby zpřístupnění.
 
-
-==== Citace ====
-
-Citace začíná dvěma zpětnými apostrofy a končí dvěma obyčejnými apostrofy.
-
-*Příklad:*
-
+*Příklad*:
 ------
-Řekl: ``Kdo ví.''
+[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | Pohledná hlava
+pakoně s typickou bradkou a zatočenými rohy umocňujícími chytré vzezření]
 ------
 
-Toto bude zobrazeno jako:
+[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | Pohledná hlava
+pakoně s typickou bradkou a zatočenými rohy umocňujícími chytré vzezření]
 
-Řekl: ``Kdo ví.''
+[<http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg]
+Obrázky mohou být také zarovnány vpravo nebo vlevo od textu, který za nimi v
+dokumentu následuje.  Jednoduše použijte znaménko „je menší“, resp. „je větší“
+(levá a pravá špičatá závorka) před názvem obrázku uvnitř hranatých závorek.
+Logo OSI po levé straně tohoto odstavce bylo zapsáno následovně:
+
+------
+[<http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg]
+Obrázky mohou být také zarovnány ...
+------
+
+Způsob zobrazení obrázků může být dále ovlivněn pomocí stylů.  V HTML výstupu
+má každý obrázek přiřazenu třídu (atribut `class') podle jména souboru obrázku
+bez přípony.  Například obrázek `\http://www.google.com/images/logo_sm.gif' tak
+bude mít automaticky nastavenu třídu `logo_sm'.
+
+
+==== Obrázkové odkazy ==== image-links
+
+Obrázkové odkazy jsou kombinací odkazu a obrázku, prezentované v podobě
+obrázku, který funguje jako odkaz.  Vytvoříme je uvedením obrázku (souboru nebo
+externího URL) na místě názvu odkazu.
+
+Textový název (použitý jako alternativní text) a popis (pro bublinovou
+nápovědu) mohou následovat v obvyklé formě.
+
+------
+[http://www.google.com http://www.google.com/accounts/google_white.gif]
+[http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png
+OSI logo | Open Source Iniciativa]
+------
+
+[http://www.google.com http://www.google.com/accounts/google_white.gif]
+[http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png
+OSI logo | Open Source Iniciativa]
+
+Obrázkové odkazy mohou být zarovnány vpravo či vlevo a používat styly podobně
+jako běžné obrázky (viz výše).
 
 
 === Další vlastnosti ===
+
 
 ==== Potlačování speciálního významu zápisu ==== escape
 
@@ -741,6 +779,17 @@ lomítka, jako \/např. zde\/.  Dvojité zpětné lomítko může být použito 
 (kdekoliv jinde v textu mohou být zpětná lomítka používána bez omezení).  Další
 příklady použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čtyři*
 \\\\\*pět*.
+
+
+==== Vynucený řádkový zlom ====
+
+Dvě lomítka vynutí řádkový zlom:
+
+------
+Tato věta bude // uprostřed zalomena.
+------
+
+Tato věta bude // uprostřed zalomena.
 
 
 ==== Horizontální čára ====
@@ -785,3 +834,31 @@ První řádek.
 # Tyto dva řádky
 # jsou „zakomentovány“.
 Poslední řádek.
+
+
+=== Zavržené vlastnosti ===
+
+Následující vlastnosti jsou nyní zachovány pro zpětnou kompatibilitu, ale
+neměly by být v nových textech používány, protože byly zavrženy a v budoucích
+verzích LCG budou zcela zrušeny.
+
+==== Nedělitelná mezera ====
+
+Znak vlnky „\~“ je interpretován jako nedělitelná mezera (zakazující řádkový
+zlom).  Namísto vlnky nyní používejte příslušný znak Unicode (+U00A0).  Rozumné
+editory by jej dokonce měly doplňovat automaticky.  Vyvarujte se prosím použití
+vlnek, které již v budoucnu nebudou interpretovány jako nedělitelné mezery.
+
+==== Dlouhá pomlčka ====
+
+Dvojitá pomlčka (znak mínus) je interpretován jako dlouhá pomlčka.  Použijte
+příslušný znak Unicode „EM DASH“ (+U00A0) pro vytvoření pomlčky šířky písmene
+M.  Vyvarujte se použití dvojitých obyčejných pomlček ve významu dlouhé pomlčky.
+
+=== Citace ===
+
+Citace začíná dvěma zpětnými apostrofy a končí dvěma obyčejnými apostrofy a na
+výstupu jsou zobrazeny pomocí příslušných (jazykově závislých) uvozovek.
+Používejte v textu přímo Unicode znaky uvozovek obvyklých v příslušném národním
+prostředí a vyvarujte se použití dvojitých apostrofů.
+

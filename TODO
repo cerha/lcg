@@ -1,2 +1,5 @@
 
-  * Clean up everithing concerning resources.
+  * Use link target as alt text for image links with no label.
+
+  * Allow using resources in generic document structures (such as LCG
+    documentation).
