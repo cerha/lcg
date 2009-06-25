@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-17 09:17+0200\n"
-"PO-Revision-Date: 2007-10-30 08:54+0100\n"
-"Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
+"POT-Creation-Date: 2009-06-24 16:05+0200\n"
+"PO-Revision-Date: 2009-06-23 23:02+0100\n"
+"Last-Translator: katarina kletecka <na cisarce 3224/28 Praha 15000>\n"
 "Language-Team: Norwegian <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,178 +17,175 @@ msgstr ""
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikansk"
 
 #: ../lib/lcg/util.py:139
 msgid "Arabic"
-msgstr ""
+msgstr "Arabisk"
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
-msgstr ""
+msgstr "Bulgarsk"
 
 #: ../lib/lcg/util.py:143
 msgid "Catalan"
-msgstr ""
+msgstr "Katalansk"
 
 #: ../lib/lcg/util.py:143
 msgid "Corsican"
-msgstr ""
+msgstr "Korsikansk"
 
 #: ../lib/lcg/util.py:143
 msgid "Czech"
-msgstr "tsjekkisk"
+msgstr "Tsjekkisk"
 
 #: ../lib/lcg/util.py:144
 msgid "Danish"
-msgstr "dansk"
+msgstr "Dansk"
 
 #: ../lib/lcg/util.py:144
 msgid "German"
-msgstr "tysk"
+msgstr "Tysk"
 
 #: ../lib/lcg/util.py:145
 msgid "Greek"
-msgstr ""
+msgstr "Gresk"
 
 #: ../lib/lcg/util.py:145
 msgid "English"
-msgstr "engelsk"
+msgstr "Engelsk"
 
 #: ../lib/lcg/util.py:145
 msgid "Spanish"
-msgstr "spansk"
+msgstr "Spansk"
 
 #: ../lib/lcg/util.py:146
 msgid "Estonian"
-msgstr ""
+msgstr "Estisk"
 
 #: ../lib/lcg/util.py:146
 msgid "Basque"
-msgstr ""
+msgstr "Baskisk"
 
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
-msgstr "finsk"
+msgstr "Finsk"
 
 #: ../lib/lcg/util.py:148
 msgid "French"
-msgstr ""
+msgstr "Fransk"
 
 #: ../lib/lcg/util.py:150
 msgid "Irish"
-msgstr ""
+msgstr "Irsk"
 
 #: ../lib/lcg/util.py:150
 msgid "Galician"
-msgstr ""
+msgstr "Gallisk"
 
 #: ../lib/lcg/util.py:152
 msgid "Hindi"
-msgstr ""
+msgstr "Hindu"
 
 #: ../lib/lcg/util.py:152
 msgid "Croatian"
-msgstr ""
+msgstr "Kroatisk"
 
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
-msgstr ""
+msgstr "Ungarsk"
 
 #: ../lib/lcg/util.py:155
 msgid "Icelandic"
-msgstr ""
+msgstr "Islandsk"
 
 #: ../lib/lcg/util.py:155
 msgid "Italian"
-msgstr ""
+msgstr "Italiensk"
 
 #: ../lib/lcg/util.py:156
 msgid "Japanese"
-msgstr ""
+msgstr "Japansk"
 
 #: ../lib/lcg/util.py:157
-#, fuzzy
 msgid "Georgian"
-msgstr "tysk"
+msgstr "Georgiansk"
 
 #: ../lib/lcg/util.py:158
-#, fuzzy
 msgid "Korean"
-msgstr "norsk"
+msgstr "Koreansk"
 
 #: ../lib/lcg/util.py:158
 msgid "Kurdish"
-msgstr ""
+msgstr "Kurdisk"
 
 #: ../lib/lcg/util.py:162
 msgid "Macedonian"
-msgstr ""
+msgstr "Makedonsk"
 
 #: ../lib/lcg/util.py:163
 msgid "Moldavian"
-msgstr ""
+msgstr "Moldavisk"
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
-msgstr ""
+msgstr "Nederlandsk"
 
 #: ../lib/lcg/util.py:165
 msgid "Norwegian"
-msgstr "norsk"
+msgstr "Norsk"
 
 #: ../lib/lcg/util.py:167
 msgid "Polish"
-msgstr "polsk"
+msgstr "Polsk"
 
 #: ../lib/lcg/util.py:168
 msgid "Portuguese"
-msgstr ""
+msgstr "Portugisisk"
 
 #: ../lib/lcg/util.py:170
 msgid "Romanian"
-msgstr ""
+msgstr "Romani"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
-msgstr "slovakisk"
+msgstr "Slovakisk"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovenian"
-msgstr "slovensk"
+msgstr "Slovensk"
 
 #: ../lib/lcg/util.py:174
 msgid "Albanian"
-msgstr ""
+msgstr "Albansk"
 
 #: ../lib/lcg/util.py:174
-#, fuzzy
 msgid "Serbian"
-msgstr "slovensk"
+msgstr "Serbisk"
 
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
-msgstr ""
+msgstr "Svensk"
 
 #: ../lib/lcg/util.py:177
 msgid "Thai"
-msgstr ""
+msgstr "Thai"
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
-msgstr ""
+msgstr "Turkisk"
 
 #: ../lib/lcg/util.py:180
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainsk"
 
 #: ../lib/lcg/util.py:182
 msgid "Yiddish"
-msgstr ""
+msgstr "Jiddisk"
 
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
-msgstr ""
+msgstr "Kinesisk"
 
 #: ../lib/lcg/export/html.py:412
 msgid "Choose your language:"
@@ -197,13 +194,13 @@ msgstr "Velg språk:"
 #: ../lib/lcg/export/html.py:506 ../lib/lcg/export/html.py:516
 #: ../lib/lcg/export/html.py:546 ../lib/lcg/export/html.py:556
 msgid "Warning:"
-msgstr ""
+msgstr "Advarsel:"
 
 #. Translators: Title of the link to Adobe website used in the Flash warning.
 #. The version is substituted within the JavaScript code.
 #: ../lib/lcg/export/html.py:514 ../lib/lcg/export/html.py:554
 msgid "Adobe Flash plugin"
-msgstr ""
+msgstr "Adobe Flash plugin"
 
 #. Translators: '%(version)s' is automatically replaced by the required version
 #. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
@@ -214,49 +211,58 @@ msgid ""
 "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
 "advanced media playback capabilities."
 msgstr ""
+"Flash %(version)s ikke oppdaget. Få %(plugin)s %(version)s eller senere for "
+"avansert media avspilling evner."
 
 #: ../lib/lcg/export/html.py:517
 msgid ""
 "JavaScript not detected. Use a JavaScript enabled browser for advanced media "
 "playback capabilities."
 msgstr ""
+"JavaScript ikke oppdaget. Bruk en aktivert  JavaScript nettleser for "
+"avanserte media avspilling evner."
 
 #. Translators: '%(version)s' is automatically replaced by the required version
 #. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
 #. download page.
 #: ../lib/lcg/export/html.py:550
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
 "audiochat."
 msgstr ""
+"Flash %(version)s ikke oppdaget. Få %(plugin)s %(version)s eller senere for "
+"avansert media avspilling evner."
 
 #: ../lib/lcg/export/html.py:557
+#, fuzzy
 msgid ""
 "JavaScript not detected. Use a JavaScript enabled browser for audiochat."
 msgstr ""
+"JavaScript ikke oppdaget. Bruk en aktivert  JavaScript nettleser for "
+"avanserte media avspilling evner."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
 #: ../lib/lcg/export/html.py:711
 msgid "None"
-msgstr ""
+msgstr "Ingen"
 
 #: ../lib/lcg/export/html.py:712
 msgid "You are here:"
-msgstr ""
+msgstr "Du er her:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
 #: ../lib/lcg/export/html.py:716
 msgid "Next"
-msgstr ""
+msgstr "Neste"
 
 #. Translators: Label of a link to the next page in sequential navigation.
 #: ../lib/lcg/export/html.py:718
 msgid "Previous"
-msgstr ""
+msgstr "Forrige"
 
 #. Translators: Title of the local table of contents (links to subsections).
 #: ../lib/lcg/content.py:499
 msgid "Index:"
-msgstr ""
+msgstr "Register:"
