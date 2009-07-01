@@ -434,6 +434,8 @@ class Export(unittest.TestCase):
              'See <a href="http://www.freebsoft.org">http://www.freebsoft.org</a>.'),
             ('(see http://www.freebsoft.org)',
              '(see <a href="http://www.freebsoft.org">http://www.freebsoft.org</a>)'),
+            ('(see http://www.freebsoft.org).',
+             '(see <a href="http://www.freebsoft.org">http://www.freebsoft.org</a>).'),
             # Inline images
             ('[aa.jpg]',
              '<img src="images/aa.jpg" alt="" border="0" class="aa">'),
@@ -467,6 +469,9 @@ class Export(unittest.TestCase):
             # Absolute image links
             ('http://www.freebsoft.org/img/logo.gif',
              '<img src="http://www.freebsoft.org/img/logo.gif" alt="" border="0" class="logo">'),
+            # Escapes
+            (r'\*one* \\*two* \\\*three* \\\\*four* \\\\\*five*',
+             r'*one* \<strong>two</strong> \*three* \\<strong>four</strong> \\*five*')
             ):
             result = lcg.FormattedText(text).export(context)
             assert result == html, "\n  * %s\n  - expected: %s\n  - got:      %s" % \

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2008 Brailcom, o.p.s.
+# Copyright (C) 2004-2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -361,7 +361,7 @@ class MarkupFormatter(object):
                          r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'
                          r'\]')),
                ('uri', (r'(?:https?|ftp)://\S+?(?:(?P<imgname_>[^\#\s/]+)'+ _IMG_EXT +\
-                        r')?(?=[\),.:;]?(\s|$))')),
+                        r')?(?=[\),.:;]*(\s|$))')),
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
                ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
                                  "|\{[^\}]+\})")),
