@@ -5,19 +5,15 @@ Dependencies:
   * You need Python 2.3 or later to run LCG.  
 
 The simplest installation can be done using the provided Makefile.  Just run
-`make install' within the package's root directory.  Feel free to edit the
-Makefile and setup your own installation paths.  Apparently, you need to have
-GNU make on your system to do that.
+"make && make install" within the package root directory.  Feel free to
+edit the Makefile and setup your own installation paths.
 
-There is also an alternative installation, which allows you to run LCG directly
-from a CVS checkout directory (it doesn't make much sense from a release
-pakage).  The advantage is that you will be able to check out a newer version
-at any time and this new version will be used automatically.  If you prefer
-this, run `make cvs-install'.  To update your installation from CVS anytime
-later, run `make cvs-update' (which also rebuilds your locale data
-automatically).  You need a GNU gettext package to be able to do that.  Beware,
-that running CVS code is in general risky and is not recommended in production
-environment.
+You can also run the development version directly out of your checked out tree,
+being able to check out a newer version at any time and using this new version
+right away.  The Makefile supports this setup by linking the necessary
+directories into your checked out tree.  You need to run "make && make
+install-links" for the first time, and then just "make all" after each
+checkout.
 
 The third option is not to install anything at all.  You just setup your
 environment to find LCG, wherever it is.  This might become handy when you, for

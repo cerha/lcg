@@ -8,20 +8,21 @@ lib := $(shell python -c 'import sys; print "$(LIB)".find("%d") != -1 and \
 
 .PHONY: translations doc test
 
-all: check-lib compile translations
+all: check compile translations
+
+check:
+	@python -c "import sys; '$(lib)' not in sys.path and sys.exit(1)" || \
+           echo 'WARNING: $(lib) not in Python path!'
 
 compile:
 	@echo "Compiling Python libraries from source..."
 	@python -c "import compileall; compileall.compile_dir('lib')" >/dev/null
 
-doc:
-	LCGDIR=. bin/lcgmake.py doc/src doc/html
-
 translations:
 	make -C translations
 
-translations-clean:
-	make -C translations clean
+doc:
+	LCGDIR=. bin/lcgmake.py doc/src doc/html
 
 test:
 	lib/lcg/_test.py
@@ -30,11 +31,7 @@ tags:
 	rm -f TAGS
 	find -name '*.py' -not -name '_test.py' | xargs etags --append --regex='/^[ \t]+def[ \t]+\([a-zA-Z_0-9]+\)/\1/'
 
-check-lib:
-	@python -c "import sys; '$(lib)' not in sys.path and sys.exit(1)" || \
-           echo 'WARNING: $(lib) not in Python path!'
-
-install: check-lib $(SHARE)/lcg
+install: $(SHARE)/lcg
 	cp -ruv doc resources translations $(SHARE)/lcg
 	cp -ruv lib/lcg $(lib)
 	cp -u bin/lcgmake.py $(BIN)/lcgmake
@@ -44,10 +41,7 @@ uninstall:
 	rm -rf $(lib)/lcg
 	cp -f $(BIN)/lcgmake
 
-$(SHARE)/lcg:
-	mkdir $(SHARE)/lcg
-
-cvs-install: check-lib compile translations link-lib link-bin link-share
+install-links: link-lib link-bin link-share
 
 link-lib:
 	@if [ -d $(lib)/lcg ]; then echo "$(lib)/lcg already exists!"; \
@@ -66,13 +60,8 @@ link-share-%: $(SHARE)/lcg
 	else echo "Linking $* to $(SHARE)/lcg"; \
 	ln -s $(CURDIR)/$* $(SHARE)/lcg; fi
 
-cvs-update: do-cvs-update compile translations-clean translations
-
-do-cvs-update:
-	@echo "All local modifications will be lost and owerwritten with clean repository copies!"
-	@echo -n "Press Enter to continue or Ctrl-C to abort: "
-	@read || exit 1
-	cvs update -dPC
+$(SHARE)/lcg:
+	mkdir $(SHARE)/lcg
 
 version = $(shell echo 'import lcg; print lcg.__version__' | python)
 dir = lcg-$(version)
