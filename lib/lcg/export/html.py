@@ -260,12 +260,12 @@ class HtmlGenerator(Generator):
         return self._input('hidden', name=name, value=value, id=id)
      
     def button(self, content=None, label=None, cls=None, **kwargs):
-        cls = cls and 'button ' + cls or 'button'
         if content is None:
+            cls = cls and 'button ' + cls or 'button'
             return self._input('button', value=label, cls=cls, **kwargs)
         else:
             attr = ('value', 'onclick', 'name', 'cls', 'disabled', 'title')
-            return self._tag('button', content, attr, title=label, **kwargs)
+            return self._tag('button', content, attr, title=label, cls=cls, **kwargs)
      
     def reset(self, label, onclick=None, cls=None, title=None):
         return self._input('reset', title=title, onclick=onclick, value=label, cls=cls)
