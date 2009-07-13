@@ -616,6 +616,9 @@ class Exporter(object):
         def node(self):
             return self._node
             
+        def locale_data(self):
+            return self._translator.locale_data()
+
         def translate(self, text):
             return self._translator.translate(text)
 
