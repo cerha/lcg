@@ -387,7 +387,8 @@ class LocalizableDateTime(Localizable):
             time_format = (self._show_seconds and data.exact_time_format or data.time_format)
             result += ' '+ self._datetime.strftime(time_format)
         if self._show_weekday:
-            result = data.weekdays[self._datetime.weekday()] + ' ' + result
+            weekday = translator.translate(week_day_name(self._datetime.weekday(), abbrev=True))
+            result = weekday + ' ' + result
         return result
 
 
@@ -790,7 +791,7 @@ def source_files_by_domain(basedir, domain=None):
                 sys.path.append(path)
                 module = imp.load_module(name, file, pathname, descr)
             finally:
-                file.close()                
+                file.close()
                 sys.path.pop()
             if module.__dict__.has_key('_'):
                 x = module.__dict__['_']

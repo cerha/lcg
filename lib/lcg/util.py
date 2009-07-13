@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -185,7 +185,7 @@ _LANGUAGE_NAMES = {
 def language_name(code):
     """Return the language name corresponding to given ISO 639-1 code.
 
-    The returned string is the name in English.
+    The returned string is 'lcg.TranslatableText' instance.
     
     """
     try:
@@ -193,3 +193,60 @@ def language_name(code):
     except KeyError:
         return code
 
+
+# Translators: The following 7 strings represent full week day names.  Please, take care to use
+# upper/lower case letters according to the rules of the target language.
+_FULL_DAY_NAMES = (_("Monday"), _("Tuesday"), _("Wednesday"), _("Thursday"), _("Friday"),
+                   _("Saturday"), _("Sunday"))
+
+# Translators: The following 7 strings represent the abbreviated week day names.  The
+# abbreviations should normally take up to three characters.  Feel free to use whatever form
+# usual in the target language.
+_SHORT_DAY_NAMES = (_("Mon"), _("Tue"), _("Wed"), _("Thu"), _("Fri"), _("Sat"), _("Sun"))
+
+def week_day_name(number, abbrev=False):
+    """Return the week day name corresponding to given numeric index.
+
+    Arguments:
+      number -- numeric index from 0 to 6, where 0 corresponds to Monday and 6 to Sunday (according
+        to ISO-8601).
+      abbrev -- iff true, the abbreviated variant is returned (up to 3 characters in most
+        languages).  Full name is returned otherwise (by default).
+      
+    The returned string is 'lcg.TranslatableText' instance.
+    
+    """
+    if abbrev:
+        names = _SHORT_DAY_NAMES
+    else:
+        names = _FULL_DAY_NAMES
+    return names[number]
+
+# Translators: The following 12 strings represent full month names.  Please, take care to use
+# upper/lower case letters according to the rules of the target language.
+_FULL_MONTH_NAMES = (_("January"), _("February"), _("March"), _("April"), _("May"), _("June"),
+                     _("July"), _("August"), _("September"), _("October"), _("November"),
+                     _("December"))
+
+# Translators: The following 12 strings represent the abbreviated month names.  The
+# abbreviations should normally take up to three characters.  Feel free to use whatever form
+# usual in the target language.
+_SHORT_MONTH_NAMES = (_("Jan"), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"),
+                      _("Aug"), _("Sep"), _("Oct"), _("Nov"), _("Dec"))
+
+def month_name(number, abbrev=False):
+    """Return the calendar month name corresponding to given numeric index.
+
+    Arguments:
+      number -- numeric index from 0 to 11, where 0 corresponds to June and 11 to December.
+      abbrev -- iff true, the abbreviated variant is returned (up to 3 characters in most
+        languages).  Full name is returned otherwise (by default).
+      
+    The returned string is 'lcg.TranslatableText' instance.
+    
+    """
+    if abbrev:
+        names = _SHORT_MONTH_NAMES
+    else:
+        names = _FULL_MONTH_NAMES
+    return names[number]

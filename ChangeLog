@@ -1,5 +1,10 @@
 2009-07-13  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/i18n.py: 
+	* lib/lcg/locales.py: 
+	* lib/lcg/util.py: 
+	Added calendar related localization functions.
+	
 	* lib/lcg/export/export.py: 
 	Allow access to locale data in exporter context.
 
