@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-17 09:17+0200\n"
-"PO-Revision-Date: 2009-02-25 17:02+0100\n"
+"POT-Creation-Date: 2009-07-13 17:35+0200\n"
+"PO-Revision-Date: 2009-07-13 15:59+0200\n"
 "Last-Translator: Hynek Hanke <hanke@volny.cz>\n"
 "Language-Team: Spanish <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
@@ -187,18 +187,181 @@ msgstr "judío"
 msgid "Chinese"
 msgstr "chino"
 
+#. Translators: The following 7 strings represent full week day names.  Please, take care to use
+#. upper/lower case letters according to the rules of the target language.
+#: ../lib/lcg/util.py:199
+msgid "Monday"
+msgstr ""
+
+#: ../lib/lcg/util.py:199
+msgid "Tuesday"
+msgstr ""
+
+#: ../lib/lcg/util.py:199
+msgid "Wednesday"
+msgstr ""
+
+#: ../lib/lcg/util.py:199
+msgid "Thursday"
+msgstr ""
+
+#: ../lib/lcg/util.py:199
+msgid "Friday"
+msgstr ""
+
+#: ../lib/lcg/util.py:200
+msgid "Saturday"
+msgstr ""
+
+#: ../lib/lcg/util.py:200
+msgid "Sunday"
+msgstr ""
+
+#. Translators: The following 7 strings represent the abbreviated week day names.  The
+#. abbreviations should normally take up to three characters.  Feel free to use whatever form
+#. usual in the target language.
+#: ../lib/lcg/util.py:205
+msgid "Mon"
+msgstr "lun"
+
+#: ../lib/lcg/util.py:205
+msgid "Tue"
+msgstr "mar"
+
+#: ../lib/lcg/util.py:205
+msgid "Wed"
+msgstr "mié"
+
+#: ../lib/lcg/util.py:205
+msgid "Thu"
+msgstr "jue"
+
+#: ../lib/lcg/util.py:205
+msgid "Fri"
+msgstr "vie"
+
+#: ../lib/lcg/util.py:205
+msgid "Sat"
+msgstr "sáb"
+
+#: ../lib/lcg/util.py:205
+msgid "Sun"
+msgstr "dom"
+
+#. Translators: The following 12 strings represent full month names.  Please, take care to use
+#. upper/lower case letters according to the rules of the target language.
+#: ../lib/lcg/util.py:227
+msgid "January"
+msgstr ""
+
+#: ../lib/lcg/util.py:227
+msgid "February"
+msgstr ""
+
+#: ../lib/lcg/util.py:227
+msgid "March"
+msgstr ""
+
+#: ../lib/lcg/util.py:227
+msgid "April"
+msgstr ""
+
+#: ../lib/lcg/util.py:227 ../lib/lcg/util.py:234
+msgid "May"
+msgstr ""
+
+#: ../lib/lcg/util.py:227
+msgid "June"
+msgstr ""
+
+#: ../lib/lcg/util.py:228
+msgid "July"
+msgstr ""
+
+#: ../lib/lcg/util.py:228
+msgid "August"
+msgstr ""
+
+#: ../lib/lcg/util.py:228
+msgid "September"
+msgstr ""
+
+#: ../lib/lcg/util.py:228
+msgid "October"
+msgstr ""
+
+#: ../lib/lcg/util.py:228
+msgid "November"
+msgstr ""
+
+#: ../lib/lcg/util.py:229
+msgid "December"
+msgstr ""
+
+#. Translators: The following 12 strings represent the abbreviated month names.  The
+#. abbreviations should normally take up to three characters.  Feel free to use whatever form
+#. usual in the target language.
+#: ../lib/lcg/util.py:234
+msgid "Jan"
+msgstr ""
+
+#: ../lib/lcg/util.py:234
+msgid "Feb"
+msgstr ""
+
+#: ../lib/lcg/util.py:234
+msgid "Mar"
+msgstr ""
+
+#: ../lib/lcg/util.py:234
+msgid "Apr"
+msgstr ""
+
+#: ../lib/lcg/util.py:234
+msgid "Jun"
+msgstr ""
+
+#: ../lib/lcg/util.py:234
+msgid "Jul"
+msgstr ""
+
+#: ../lib/lcg/util.py:235
+msgid "Aug"
+msgstr ""
+
+#: ../lib/lcg/util.py:235
+msgid "Sep"
+msgstr ""
+
+#: ../lib/lcg/util.py:235
+msgid "Oct"
+msgstr ""
+
+#: ../lib/lcg/util.py:235
+msgid "Nov"
+msgstr ""
+
+#: ../lib/lcg/util.py:235
+msgid "Dec"
+msgstr ""
+
+# Index of sections (table of contents)
+#. Translators: Title of the local table of contents (links to subsections).
+#: ../lib/lcg/content.py:499
+msgid "Index:"
+msgstr "Índice:"
+
 #: ../lib/lcg/export/html.py:412
 msgid "Choose your language:"
 msgstr "Escoger el idioma:"
 
 #: ../lib/lcg/export/html.py:506 ../lib/lcg/export/html.py:516
-#: ../lib/lcg/export/html.py:546 ../lib/lcg/export/html.py:556
 msgid "Warning:"
 msgstr "Aviso:"
 
 #. Translators: Title of the link to Adobe website used in the Flash warning.
 #. The version is substituted within the JavaScript code.
-#: ../lib/lcg/export/html.py:514 ../lib/lcg/export/html.py:554
+#: ../lib/lcg/export/html.py:514
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plug-in"
 
@@ -222,51 +385,40 @@ msgstr ""
 "Java script no detectado. Usar un navegador con JavaScript para las "
 "funciones más avanzadas."
 
-#. Translators: '%(version)s' is automatically replaced by the required version
-#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
-#. download page.
-#: ../lib/lcg/export/html.py:550
-#, fuzzy, python-format
-msgid ""
-"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
-"audiochat."
-msgstr ""
-"Flash %(version)s no detectado. Obtener %(plugin)s %(version)s o más nuevo "
-"para las funciones más avanzadas."
-
-#: ../lib/lcg/export/html.py:557
-#, fuzzy
-msgid ""
-"JavaScript not detected. Use a JavaScript enabled browser for audiochat."
-msgstr ""
-"Java script no detectado. Usar un navegador con JavaScript para las "
-"funciones más avanzadas."
-
 # For exapmle "Next: None".
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:711
+#: ../lib/lcg/export/html.py:668
 msgid "None"
 msgstr "Nada"
 
-#: ../lib/lcg/export/html.py:712
+#: ../lib/lcg/export/html.py:669
 msgid "You are here:"
 msgstr "Usted está aquí:"
 
 # Link to the next page.
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:716
+#: ../lib/lcg/export/html.py:673
 msgid "Next"
 msgstr "Siguiente"
 
 # Link to the previous page.
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:718
+#: ../lib/lcg/export/html.py:675
 msgid "Previous"
 msgstr "Anterior"
 
-# Index of sections (table of contents)
-#. Translators: Title of the local table of contents (links to subsections).
-#: ../lib/lcg/content.py:499
-msgid "Index:"
-msgstr "Índice:"
+#, fuzzy
+#~ msgid ""
+#~ "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+#~ "audiochat."
+#~ msgstr ""
+#~ "Flash %(version)s no detectado. Obtener %(plugin)s %(version)s o más "
+#~ "nuevo para las funciones más avanzadas."
+
+#, fuzzy
+#~ msgid ""
+#~ "JavaScript not detected. Use a JavaScript enabled browser for audiochat."
+#~ msgstr ""
+#~ "Java script no detectado. Usar un navegador con JavaScript para las "
+#~ "funciones más avanzadas."

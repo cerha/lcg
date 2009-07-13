@@ -1,5 +1,15 @@
 2009-07-13  Tomas Cerha  <cerha@brailcom.org>
 
+	* translations/lcg.cs.po: 
+	* translations/lcg.de.po: 
+	* translations/lcg.es.po: 
+	* translations/lcg.fr.po: 
+	* translations/lcg.hu.po: 
+	* translations/lcg.no.po: 
+	* translations/lcg.pl.po: 
+	* translations/lcg.sk.po: 
+	Translations updated.
+
 	* lib/lcg/i18n.py: 
 	* lib/lcg/locales.py: 
 	* lib/lcg/util.py: 
