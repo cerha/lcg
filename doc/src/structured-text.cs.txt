@@ -534,8 +534,8 @@ Toto bude zobrazeno jako:
 
 ==== Předformátovaný text ==== preformatted-text
 
-Pokud text obklopíte shora i sdola řádkem o pěti a více pomlčkách, je vše
-uvnitř tohoto bloku považováno za předformátovaná text.  Tento text nebude dále
+Pokud text obklopíte shora i zdola řádkem o pěti a více pomlčkách, je vše
+uvnitř tohoto bloku považováno za předformátovaný text.  Tento text nebude dále
 formátován, ale bude ponecháno jeho původní formátování, včetně všech mezer,
 řádkových zlomů a odsazení.  Text je zkrátka zobrazen přesně tak, jak je
 zapsán.
