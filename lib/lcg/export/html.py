@@ -572,7 +572,7 @@ class StyledHtmlExporter(object):
     def _head(self, context):
         for style in self._styles:
             context.resource(style)
-        styles = context.resources(Stylesheet)
+        styles = context.node().resources(Stylesheet)
         if self._inlinestyles:
             tags = ['<style type="text/css">\n%s</style>' % content 
                     for content in [s.get() for s in styles] if content is not None]
