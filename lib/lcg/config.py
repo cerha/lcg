@@ -31,8 +31,5 @@ GNU gettext catalog.  This variable specifies the location where the compiled me
 installed.  More precisely, it is the base directory, where the subdirectories for different
 languages reside."""
 
-doc_dir = os.path.join(lcg_dir, 'doc', 'src')
-"""The directory where lcg documentation source files can be found."""
-
 allow_backref = True
 """Boolean flag indicating, whether using backreferences in section titles is allowed."""
