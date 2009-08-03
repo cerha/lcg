@@ -1,5 +1,9 @@
 2009-08-03  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/export/export.py: 
+	* lib/lcg/export/html.py: 
+	New convenience method to allocate resources directly through export context.
+
 	* lib/lcg/config.py: 
 	Config option `doc_dir' removed.
 

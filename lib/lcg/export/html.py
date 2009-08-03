@@ -480,14 +480,13 @@ class HtmlExporter(Exporter):
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 
     def _language_selection_image(self, context, lang):
-        #return context.uri(context.node().resource('flags/%s.gif' % lang))
+        #return context.uri(context.resource('flags/%s.gif' % lang))
         return None
     
     def _content(self, context):
         return context.node().content().export(context)
 
     def export_media_player(self, context, player_id, width, height, shared=False, media=None):
-        node = context.node()
         def warn_mediaplayer(msg):
             log(msg)
             log("Get JW FLV MEDIA PLAYER 4.2 (or later) from "
@@ -497,9 +496,9 @@ class HtmlExporter(Exporter):
             log(msg)
             log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
                 "and put swfobject.js to your resource path!")
-        node.resource('media.js')
-        player = node.resource('mediaplayer.swf', warn=warn_mediaplayer)
-        swfobject = node.resource('swfobject.js', warn=warn_swfobject)
+        context.resource('media.js')
+        player = context.resource('mediaplayer.swf', warn=warn_mediaplayer)
+        swfobject = context.resource('swfobject.js', warn=warn_swfobject)
         if not player or not swfobject:
             return None
         g = context.generator()
@@ -571,10 +570,9 @@ class StyledHtmlExporter(object):
         self._inlinestyles = inlinestyles
 
     def _head(self, context):
-        node = context.node()
         for style in self._styles:
-            node.resource(style)
-        styles = node.resources(Stylesheet)
+            context.resource(style)
+        styles = context.resources(Stylesheet)
         if self._inlinestyles:
             tags = ['<style type="text/css">\n%s</style>' % content 
                     for content in [s.get() for s in styles] if content is not None]

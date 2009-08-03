@@ -622,6 +622,9 @@ class Exporter(object):
         def translate(self, text):
             return self._translator.translate(text)
 
+        def resource(self, filename, **kwargs):
+            return self._node.resource(filename, **kwargs)
+        
         def uri(self, target, **kwargs):
             return self._exporter.uri(self, target, **kwargs)
             
