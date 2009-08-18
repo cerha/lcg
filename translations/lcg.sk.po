@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-08-05 12:54+0200\n"
-"PO-Revision-Date: 2009-08-18 09:54+0100\n"
+"PO-Revision-Date: 2009-08-18 10:04+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Slovak <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
@@ -415,12 +415,12 @@ msgstr "Nachádzate sa:"
 #. Translators: Label of a link to the next page in sequential navigation in a webpage.
 #: ../lib/lcg/export/html.py:721
 msgid "Next"
-msgstr "Dalšie"
+msgstr "Ďalej"
 
 #. Translators: Label of a link to the next page in sequential navigation in a webpage.
 #: ../lib/lcg/export/html.py:723
 msgid "Previous"
-msgstr "Predchádzajúce"
+msgstr "Naspäť"
 
 #. Translators: Title of the local table of contents (links to subsections).
 #: ../lib/lcg/content.py:499
