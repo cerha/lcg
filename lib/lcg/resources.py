@@ -122,9 +122,22 @@ class Image(Resource):
         return self._size
 
 class Stylesheet(Resource):
-    """A cascading style-sheet."""
+    """A cascading style sheet."""
     SUBDIR = 'css'
 
+    def __init__(self, filename, media='all', **kwargs):
+        """Arguments:
+
+        media -- a string determining the stylesheet media type as defined by
+          CSS, such as 'all', 'screen', 'print', etc.
+
+        """
+        self._media = media
+        super(Stylesheet, self).__init__(filename, **kwargs)
+
+    def media(self):
+        return self._media
+    
 class Script(Resource):
     """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'

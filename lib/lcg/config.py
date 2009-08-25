@@ -21,15 +21,17 @@ import os
 lcg_dir = os.environ.get('LCGDIR', '/usr/local/share/lcg')
 
 default_resource_dir = os.path.join(lcg_dir, 'resources')
-"""The LCG comes with a set of default resources (stylesheets, scripts and media files).  They are
-used if no custom files of the same name are present in the source directory.  This variable
-specifies the name of the directory, where LCG default resources are installed."""
+"""The LCG comes with a set of default resources (style sheets, scripts and
+media files).  They are used if no custom files of the same name are present in
+the source directory.  This variable specifies the name of the directory, where
+LCG default resources are installed."""
 
 translation_dir = os.path.join(lcg_dir, 'translations')
-"""The LCG inserts some texts into the generated documents.  These texts can be translated using a
-GNU gettext catalog.  This variable specifies the location where the compiled message catalogs are
-installed.  More precisely, it is the base directory, where the subdirectories for different
-languages reside."""
+"""The LCG inserts some texts into the generated documents.  These texts can be
+translated using a GNU gettext catalog.  This variable specifies the location
+where the compiled message catalogs are installed.  More precisely, it is the
+base directory, where the subdirectories for different languages reside."""
 
 allow_backref = True
-"""Boolean flag indicating, whether using backreferences in section titles is allowed."""
+"""Boolean flag indicating, whether using backreferences in section titles is
+allowed."""

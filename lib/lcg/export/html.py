@@ -574,11 +574,12 @@ class StyledHtmlExporter(object):
             context.resource(style)
         styles = context.node().resources(Stylesheet)
         if self._inlinestyles:
-            tags = ['<style type="text/css">\n%s</style>' % content 
-                    for content in [s.get() for s in styles] if content is not None]
+            tags = ['<style type="text/css" media="%s">\n%s</style>' % (media, content)
+                    for media, content in [(s.media(), s.get()) for s in styles]
+                    if content is not None]
         else:
-            tags = ['<link rel="stylesheet" type="text/css" href="%s">' % \
-                    context.uri(s) for s in styles]
+            tags = ['<link rel="stylesheet" type="text/css" href="%s" media="%s">' % \
+                    (context.uri(s), s.media()) for s in styles]
         return super(StyledHtmlExporter, self)._head(context) + tags
     
     def _export_resource(self, resource, dir):
