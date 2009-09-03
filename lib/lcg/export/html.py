@@ -150,8 +150,7 @@ class HtmlGenerator(Generator):
      
     def img(self, src, alt='', border=0, descr=None, **kwargs):
         attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
-        return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, longdesc=descr,
-                         border=border, **kwargs)
+        return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, border=border, **kwargs)
     
 
         toc = self._make_toc(context, self._start_item(), depth=self._depth)
