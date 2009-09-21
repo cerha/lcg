@@ -1,5 +1,11 @@
 2009-09-21  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/__init__.py:
+	Version changed to 0.3.7.
+
+	* NEWS: 
+	Updated.
+
 	* lib/lcg/content.py (Container): 
 	Allow passing a textual container identifier used as CSS class
 	selector in HTML
