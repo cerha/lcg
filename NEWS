@@ -1,5 +1,17 @@
 -*- mode: change-log -*-
 
+2009-09-21  Tomas Cerha  <cerha@brailcom.org>
+
+	Version 0.3.7
+
+	Minor API extensions.
+
+	Bug fixes.
+	
+	Documentation additions and improvements.
+
+	New translations: de, es, it, no, sk
+
 2007-11-05  Tomas Cerha  <cerha@brailcom.org>
 
 	Version 0.3.6
