@@ -485,20 +485,45 @@ class HtmlExporter(Exporter):
     def _content(self, context):
         return context.node().content().export(context)
 
-    def export_media_player(self, context, player_id, width, height, shared=False, media=None):
-        def warn_mediaplayer(msg):
+    def export_swf_player(self, context, player_id, width, height,
+                          jscontrol, flashapp,
+                          js_post_hook=None, js_post_hook_args=()):
+        """Export an arbitrary SWF Player object.
+        
+        This method tries to export a Flash object into HTML. The object
+        is not included directly, but using a mechanism with a Javascript
+        library that ensures that if Javascript or Flash is not available
+        on client side, an error message is displayed.
+
+        Initialization of the new SWF object can be done using a
+        javascript post hook function, which gets called after
+        the (TODO: successful) initialization of the SWF object.
+
+        An example can be found in the lcg.HTMLExporter._media_player() method.
+
+        Arguments:
+        player_id -- id to use as HTML element ID for the player
+        (this is necessary for communication via Javascript)
+        width, height -- size of the HTML element in pixels
+        jscontrol -- name of a Javascript file with scripts to controll the Flash application
+        flashapp -- name of the .swf file to use for the Flash object
+        js_post_hook -- Javascript to call on (TODO: successful) initialization of the Flash object
+        js_post_hook_args -- list of arguments passed to js_post_hook
+        """
+        node = context.node()
+        def warn_flashapp(msg):
             log(msg)
-            log("Get JW FLV MEDIA PLAYER 4.2 (or later) from "
-                "http://www.jeroenwijering.com/?item=JW_FLV_Media_Player "
-                "and put mediaplayer.swf to your resource path!")
+            log("Install the apropriate flashw .swf applicaion to your resource path!")
         def warn_swfobject(msg):
             log(msg)
             log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
                 "and put swfobject.js to your resource path!")
-        context.resource('media.js')
-        player = context.resource('mediaplayer.swf', warn=warn_mediaplayer)
-        swfobject = context.resource('swfobject.js', warn=warn_swfobject)
+        node.resource('media.js')
+        node.resource(jscontrol)
+        player = node.resource(flashapp, warn=warn_flashapp)
+        swfobject = node.resource('swfobject.js', warn=warn_swfobject)
         if not player or not swfobject:
+            log("Can't find swf player or swfobject");
             return None
         g = context.generator()
         flash_err = (g.strong(_("Warning:")) +' '+
@@ -506,19 +531,61 @@ class HtmlExporter(Exporter):
                      # number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
                      # download page.
                      _("Flash %(version)s not detected. Get %(plugin)s %(version)s or later "
-                       "for advanced media playback capabilities.",
+                       "for advanced media capabilities.",
                        # Translators: Title of the link to Adobe website used in the Flash warning.
                        version='$version', # The version is substituted within the JavaScript code.
                        plugin=g.link(_("Adobe Flash plugin"),
                                      'http://www.adobe.com/products/flash/about/')))
         js_err = g.strong(_("Warning:")) +' '+ \
-                 _("JavaScript not detected. "
-                   "Use a JavaScript enabled browser for advanced media playback capabilities.")
-        return g.div(js_err, id=player_id) + \
-               g.script(g.js_call('export_media_player', context.uri(player), player_id,
-                                  width, height, shared, media, context.translate(flash_err)))
+            _("JavaScript not detected. "
+              "Use a JavaScript enabled browser for audiochat.")
+
+        # Here we first create a DIV containing error text about js
+        # not working, then javascript code that replaces this error
+        # message with the flash object when page is loaded into
+        # browser and js is working.
+        res = g.div(js_err, id=player_id) + \
+            g.script(g.js_call('export_swf_object', context.uri(player), player_id,
+                               width, height, context.translate(flash_err)))
+        
+        # Place a call of the Javascript post hook.
+        # TODO: This should be called from inside export_swf_object only
+        # on success.
+        if js_post_hook:
+            res += g.script(g.js_call(js_post_hook, *js_post_hook_args))
+            
+        return res
+
+    def export_media_player(self, context, player_id, width, height,
+                            shared=False, media=None):
+        
+        """Export the Flash media player
+        
+        The player can be controlled from other parts of the webpage
+        through Javascript functions from the resource media.js .
+        
+        Caution: The media player works only if the webpage is served
+        through a webserver. If it is displayed locally, Flash and
+        Javascript communication is not possible due to security
+        restrictions. The player displays but there is no way to
+        controll it.
+        
+        Arguments:
+        context, player_id, width, heitght -- see export_swf_player() arguments
+        shared -- whether to use a shared media player (e.g. in bottom right corner
+        of a webpage to serve many different media playback requests)
+        media -- media to link with this media player (TODO: Not implemented)
+        """
+        return self.export_swf_player(context, player_id, width, height,
+                                      jscontrol='media.js', flashapp='mediaplayer.swf',
+                                      js_post_hook='init_media_player',
+                                      js_post_hook_args=(player_id, shared))
 
     def _media_player(self, context):
+        """Export shared media player if in use, otherwise do nothing.
+
+        See export_media_player() for more details.
+        """
         if context.shared_player_used():
             return self.export_media_player(context, 'shared-audio-player', 300, 20, shared=True)
         else:
