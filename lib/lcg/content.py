@@ -62,7 +62,7 @@ class Content(object):
         self._parent = None
         self._container = None
         self._lang = lang
-        super(Content, self).__init__()
+        super(Content, self).__init__(**kwargs)
         
     def sections(self, context):
         """Return the contained sections as a sequence of 'Section' instances.
