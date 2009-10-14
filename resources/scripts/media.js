@@ -43,7 +43,7 @@ var _shared_player_id = null;
 /* Dictionary with a state object for each player instance (initialized on player export) */
 var _player_state = {};
 
-function export_media_player(uri, id, width, height, shared, media, flash_errmsg) {
+function export_swf_object(uri, id, width, height, flash_errmsg) {
    // TODO: Degrade gracefully when running locally (the player doesn't work in this case
    // because of Flash security restrictions).
    if (swfobject.hasFlashPlayerVersion(MIN_FLASH_VERSION)) {
@@ -52,23 +52,26 @@ function export_media_player(uri, id, width, height, shared, media, flash_errmsg
 		    allowscriptaccess: 'always'};
       var attrs = {id: id, name: id};
       swfobject.embedSWF(uri, id, width, height, MIN_FLASH_VERSION, false, vars, params, attrs);
-      _player_state[id] = {
-	 position: 0,
-	 duration: null,
-	 volume: null,
-	 //playing: false,
-	 controls: null,
-	 loaded_uri: null,
-	 on_load: null
-      };
-      if (shared)
-	 _shared_player_id = id;
    } else {
       // Replace the "JavaScript disabled" error message by a "Flash not available" error message.
       var node = document.getElementById(id);
       if (node != null)
 	 node.innerHTML = flash_errmsg.replace(/\$version/g, MIN_FLASH_VERSION);
    }
+}
+
+function init_media_player(id, shared){
+   _player_state[id] = {
+       position: 0,
+       duration: null,
+       volume: null,
+       //playing: false,
+       controls: null,
+       loaded_uri: null,
+       on_load: null
+   };
+   if (shared)
+       _shared_player_id = id;
 }
 
 function playerReady(obj) {
