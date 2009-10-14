@@ -1,8 +1,19 @@
-2009-10-14  Hynek Hanke  <hanke@kropacek>
+2009-10-14  Hynek Hanke  <hanke@brailcom.org>
+	
+	* html.py (HtmlExporter.export_media_player): Use
+	export_swf_player. Looks like the argument media has no
+	effect. Seems like a bug from before.
 
-	* resources/scripts/media.js (export_swf_object): Renamed from export_media_player
-	and made more generic to handle any swf object. The 'media' argument which was
-	not used in the code was dropped. The 'shared' argument moved to init_media_player.
+	* lib/lcg/content.py (Content.__init__): Pass keyword arguments to
+	parent again. When the parent is 'object', the list should be
+	empty (if not, this is an error).
+	
+2009-10-14  Hynek Hanke  <hanke@brailcom.org>
+
+	* resources/scripts/media.js (export_swf_object): Renamed from
+	export_media_player and made more generic to handle any swf
+	object. The 'media' argument which was not used in the code was
+	dropped. The 'shared' argument moved to init_media_player.
 	
 	(init_media_player): New function. Splitted from export_media_player.
 
@@ -10,7 +21,8 @@
 	arguments to parent. In Python 2.6, the class Object doesn't
 	accept any arguments in the constructor.
 
-	* lib/lcg/_test.py (Export.check_formatter): Do not check for longdesc as it is not used this way.
+	* lib/lcg/_test.py (Export.check_formatter): Do not check for
+	longdesc as it is not used this way.
 
 2009-09-21  Tomas Cerha  <cerha@brailcom.org>
 
