@@ -400,12 +400,17 @@ tests.add(Parser)
 class MacroParser(unittest.TestCase):
 
     def check_simple_condition(self):
+        text = "@if x\nX\n@else\nY@endif\n"
+        r = lcg.MacroParser(globals=dict(x=True)).parse(text)
+        assert r == "X\n", repr(r)
+
+    def check_condition(self):
         text = "Hi, how are you?\n@if fine\nFine, thanks.\n@else\nNot really well.\n@endif\n"
         r1 = lcg.MacroParser(globals=dict(fine=True)).parse(text)
         r2 = lcg.MacroParser(globals=dict(fine=False)).parse(text)
         assert r1 == "Hi, how are you?\nFine, thanks.\n", repr(r1)
         assert r2 == "Hi, how are you?\nNot really well.\n", repr(r2)
-
+        
     def check_condition_newlines(self):
         text = "A\n@if x\nX\n@endif\n\nB\n\n"
         r = lcg.MacroParser(globals=dict(x=True)).parse(text)

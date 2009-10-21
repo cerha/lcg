@@ -371,7 +371,7 @@ class MacroParser(object):
     The @ sign marking the macro must always start the line.
 
     """
-    _CONDITION_REGEX = re.compile(r'(?m)\r?\n?^(@(?:if .+|else|endif))\s*?$')
+    _CONDITION_REGEX = re.compile(r'(?m)^(@(?:if .+|else|endif))\s*?$\r?\n?')
     _INCLUDE_REGEX = re.compile(r'(?m)^@include (.*)$')
 
     class _ConditionalText(object):
