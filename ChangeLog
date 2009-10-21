@@ -1,3 +1,9 @@
+2009-10-21  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py:
+	* lib/lcg/parse.py:
+	Macro parser resurrected.
+
 2009-10-14  Hynek Hanke  <hanke@brailcom.org>
 	
 	* html.py (HtmlExporter.export_media_player): Use

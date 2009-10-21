@@ -334,78 +334,108 @@ class Parser(object):
 
 
 class MacroParser(object):
-    _SUBSTITUTION_REGEX = re.compile(r"(?!\\)\$([a-zA-Z_]+|\{[^\}]+\})")
-    _INCLUDE_REGEX = re.compile(r'(?m)^\s*#include (.*)$')
-    _IF_ELSE_REGEX = re.compile(r'(?m)^\s*(#(?:if .+|else|endif))\s*$')
+    """Simple text macro parser.
+
+    Macro parser is designed to be applied on structured text source before
+    structured text parsing (using 'Parser'), but it can be used on any
+    reasonable text format which doesn't interfer with the macro syntax.
+
+    The method 'parse()' takes text on input, expands any macros within this
+    text and returns the resulting text on output.
+
+    Two macros are currently supported:
+
+      * Contitional text
+      * Inclusion
+
+    Conditional text syntax:
+
+    @if condition
+    Text for condition evaluated as true.
+    @else
+    Optional text for false condition.
+    @endif
+
+    The condition is by default a python expression using 'globals' passed to
+    parser constructor, but you may also use the 'evaluate' parser constructor
+    to supply any condition evaluation method you wish.
+
+    Inclusion syntax:
+
+    @include foo
+
+    The default inclusion method is to replace the macro with the value of
+    given variable from 'globals' passed to parser constructor.  identifier
+    ('foo' in this case)
+
+    The @ sign marking the macro must always start the line.
+
+    """
+    _CONDITION_REGEX = re.compile(r'(?m)\r?\n?^(@(?:if .+|else|endif))\s*?$')
+    _INCLUDE_REGEX = re.compile(r'(?m)^@include (.*)$')
 
     class _ConditionalText(object):
-        def __init__(self, provider, condition, parent=None):
-            self._provider = provider
+        def __init__(self, evaluate, condition, parent=None):
+            self._evaluate = evaluate
             self._condition = condition
             self.parent = parent
             self._state = True
             self._content = {True: [], False: []}
-            
+
         def switch(self):
             self._state = False
-        
+
         def append(self, content):
             self._content[self._state].append(content)
 
         def __str__(self):
-            value = bool(self._provider(self._condition))
-            return '\n'.join([unicode(x) for x in self._content[value]])
+            value = bool(self._evaluate(self._condition))
+            return ''.join([unicode(x) for x in self._content[value]])
 
-    
-    def __init__(self, eval_provider=None, include_provider=None,
-                 substitution_provider=None, include_dir='.'):
-        self._eval_provider = eval_provider or self._python_eval_provider
-        self._include_provider = include_provider
-        self._substitution_provider = substitution_provider
-        self._include_dir = include_dir
-        self._globals = {}
+    def __init__(self, globals=None, evaluate=None, include=None):
+        """Arguments:
+        
+          globals -- dictionary of variables used by default inclusion and
+            evaliation methods.
+          evaluate -- None for the default evaluation method or a function of
+            one argument (the conditionalal expression as a string) returning a
+            boolean result of custom expression evaluation.
+          include -- None for the default inclusion method or a function of one
+            argument (the @include macro argument as a string) returning a
+            string value to replace given inclusion macro.
 
-    def _python_eval_provider(self, expr):
+        """
+        self._globals = globals or {}
+        self._evaluate = evaluate or self._default_evaluate
+        self._include = include or self._default_include
+
+    def _default_evaluate(self, expr):
         return eval("bool(%s)" % expr, self._globals)
 
-    def _substitution(self, match):
-        # get the substitution value for _SUBSTITUTION_REGEX match
-        name = match.group(1)
-        if name[0] == '{' and name[-1] == '}':
-            name = name[1:-1]
+    def _default_include(self, name):
         try:
-            return self._globals[name]
-        except KeyError, e:
-            if self._substitution_provider is not None:
-                return self._substitution_provider(name)
-            else:
-                log("Invalid substitution:", name)
-    
-    def _substitute(self, text):
-        return self._SUBSTITUTION_REGEX.sub(self._substitution, text)
-
-    def add_globals(self, **kwargs):
-        self._globals.update(kwargs)
+            return unicode(self._globals[name])
+        except KeyError:
+            return ''
 
     def parse(self, text):
-        func = lambda m: self._include_provider(m.group(1).strip())
-        text = self._INCLUDE_REGEX.sub(func, text)
-        tokens = self._IF_ELSE_REGEX.split(text)
-        structured = current = self._ConditionalText(self._eval_provider, 1)
+        """Return the text with all macros processed."""
+        text = self._INCLUDE_REGEX.sub(lambda m: self._include(m.group(1).strip()), text)
+        tokens = self._CONDITION_REGEX.split(text)
+        result = current = self._ConditionalText(self._evaluate, True)
         for t in tokens:
-            if t.startswith('#if'):
-                new = self._ConditionalText(self._eval_provider, t[4:].strip(),
-                                            parent=current)
+            if t.startswith('@if'):
+                new = self._ConditionalText(self._evaluate, t[4:].strip(), parent=current)
                 current.append(new)
                 current = new
-            elif t == '#else':
+            elif t == '@else':
                 current.switch()
-            elif t == '#endif' and current.parent is not None:
+            elif t == '@endif' and current.parent is not None:
                 current = current.parent
             else:
                 current.append(t)
-        parsed = unicode(structured)
-        return self._substitute(parsed)
+        return unicode(result)
+
 
 def add_processing_info(exception, caption, information):
     """Add processing info to a given exception.

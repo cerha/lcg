@@ -397,6 +397,47 @@ class Parser(unittest.TestCase):
         
 tests.add(Parser)
 
+class MacroParser(unittest.TestCase):
+
+    def check_simple_condition(self):
+        text = "Hi, how are you?\n@if fine\nFine, thanks.\n@else\nNot really well.\n@endif\n"
+        r1 = lcg.MacroParser(globals=dict(fine=True)).parse(text)
+        r2 = lcg.MacroParser(globals=dict(fine=False)).parse(text)
+        assert r1 == "Hi, how are you?\nFine, thanks.\n", repr(r1)
+        assert r2 == "Hi, how are you?\nNot really well.\n", repr(r2)
+
+    def check_condition_newlines(self):
+        text = "A\n@if x\nX\n@endif\n\nB\n\n"
+        r = lcg.MacroParser(globals=dict(x=True)).parse(text)
+        assert r == "A\nX\n\nB\n\n", repr(r)
+
+    def check_nested_condition(self):
+        def join(*lines):
+            return "".join([line+"\n" for line in lines])
+        text = join("A",
+                    "@if b",
+                    "B",
+                    "@else",
+                    "@if c",
+                    "C",
+                    "@endif",
+                    "D",
+                    "@endif",
+                    "E")
+        r1 = lcg.MacroParser(globals=dict(b=True, c=True)).parse(text)
+        r2 = lcg.MacroParser(globals=dict(b=False, c=True)).parse(text)
+        r3 = lcg.MacroParser(globals=dict(b=False, c=False)).parse(text)
+        assert r1 == join("A", "B", "E"), r1
+        assert r2 == join("A", "C", "D", "E"), r2
+        assert r3 == join("A", "D", "E"), r3
+
+    def check_inclusion(self):
+        text = "Foo\n@include bar\nBaz\n"
+        r = lcg.MacroParser(globals=dict(bar='Bar')).parse(text)
+        assert r == "Foo\nBar\nBaz\n", repr(r)
+
+tests.add(MacroParser)
+
 
 class Export(unittest.TestCase):
     
