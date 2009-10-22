@@ -285,6 +285,30 @@ class InlineImage(Content):
                      descr=self._descr or img.descr(), align=self._align,
                      cls=self._name, **kwargs)
 
+class InlineAudio(Content):
+    """Audio file put inside the document
+
+    For example in HTML, this might be exported as a play button using a
+    Flash audio player.
+    """
+       
+    def __init__(self, context, audiofile, label=None, shared=True):
+        """Arguments:
+
+        audiofile -- file for audio playback available through resources
+        shared -- whether to use shared media player
+        """
+        assert isinstance(audiofile, Audio), audiofile
+        assert isinstance(shared, bool)
+        self._audiofile = audiofile
+        self._shared = shared
+        self._label = label
+
+        super(InlineAudio, self).__init__()
+
+    def export(self, context):
+        g = context.generator()
+        return g.audio(context, self._audiofile, label=self._label, shared=self._shared)
 
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
