@@ -232,6 +232,18 @@ Resulting images:
 
 See [#images] and [#image-links] for more details.
 
+=== Audio ===
+
+Audio .mp3 files can be included in the document in a similar way to
+images.
+
+In HTML output, the link to mp3 file will be rendered as a play button
+controlling a tiny shared Flash media player, which appears in the
+bottom right corner of the webpage.
+
+-----
+ * play button with optional button label: [test1.mp3 Play test sound]
+-----
 
 == General recommendations ==
 
@@ -735,6 +747,7 @@ OSI logo | Open Source Initiative]
 
 Image links can be aligned using < and > similarly as ordinary images and
 styled (see above).
+
 
 
 === Other features ===
