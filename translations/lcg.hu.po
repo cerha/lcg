@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-13 17:35+0200\n"
+"POT-Creation-Date: 2009-10-22 10:04+0200\n"
 "PO-Revision-Date: 2008-10-14 12:35+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Hungarian <lcg@lists.freebsoft.org>\n"
@@ -345,57 +345,97 @@ msgstr ""
 msgid "Dec"
 msgstr ""
 
-#. Translators: Title of the local table of contents (links to subsections).
-#: ../lib/lcg/content.py:499
-msgid "Index:"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:412
+#: ../lib/lcg/export/html.test.py:411 ../lib/lcg/export/html.py:436
+#: ../lib/lcg/export/html.old.py:411
 msgid "Choose your language:"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:506 ../lib/lcg/export/html.py:516
+#: ../lib/lcg/export/html.test.py:507 ../lib/lcg/export/html.test.py:517
+#: ../lib/lcg/export/html.py:554 ../lib/lcg/export/html.py:564
+#: ../lib/lcg/export/html.old.py:504 ../lib/lcg/export/html.old.py:514
+#: ../lib/lcg/export/html.old.py:544 ../lib/lcg/export/html.old.py:554
 msgid "Warning:"
 msgstr ""
 
 #. Translators: Title of the link to Adobe website used in the Flash warning.
 #. The version is substituted within the JavaScript code.
-#: ../lib/lcg/export/html.py:514
+#: ../lib/lcg/export/html.test.py:515 ../lib/lcg/export/html.py:562
+#: ../lib/lcg/export/html.old.py:512 ../lib/lcg/export/html.old.py:552
 msgid "Adobe Flash plugin"
 msgstr ""
 
 #. Translators: '%(version)s' is automatically replaced by the required version
 #. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
 #. download page.
-#: ../lib/lcg/export/html.py:510
+#: ../lib/lcg/export/html.test.py:511 ../lib/lcg/export/html.old.py:548
+#, python-format
+msgid ""
+"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+"audiochat."
+msgstr ""
+
+#: ../lib/lcg/export/html.test.py:518 ../lib/lcg/export/html.py:565
+#: ../lib/lcg/export/html.old.py:555
+msgid ""
+"JavaScript not detected. Use a JavaScript enabled browser for audiochat."
+msgstr ""
+
+#. Translators: Label used instead of a link when the target does not exist.  For
+#. example sequential navigation may contain: "Previous: Introduction, Next: None".
+#: ../lib/lcg/export/html.test.py:691 ../lib/lcg/export/html.py:758
+#: ../lib/lcg/export/html.old.py:709
+msgid "None"
+msgstr ""
+
+#: ../lib/lcg/export/html.test.py:692 ../lib/lcg/export/html.py:759
+#: ../lib/lcg/export/html.old.py:710
+msgid "You are here:"
+msgstr ""
+
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.test.py:696 ../lib/lcg/export/html.py:763
+#: ../lib/lcg/export/html.old.py:714
+msgid "Next"
+msgstr ""
+
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.test.py:698 ../lib/lcg/export/html.py:765
+#: ../lib/lcg/export/html.old.py:716
+msgid "Previous"
+msgstr ""
+
+#. Translators: Play (audio)
+#: ../lib/lcg/export/html.py:181
+msgid "Play"
+msgstr ""
+
+#. Translators: '%(version)s' is automatically replaced by the required version
+#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
+#. download page.
+#: ../lib/lcg/export/html.py:558
+#, python-format
+msgid ""
+"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+"advanced media capabilities."
+msgstr ""
+
+#. Translators: '%(version)s' is automatically replaced by the required version
+#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
+#. download page.
+#: ../lib/lcg/export/html.old.py:508
 #, python-format
 msgid ""
 "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
 "advanced media playback capabilities."
 msgstr ""
 
-#: ../lib/lcg/export/html.py:517
+#: ../lib/lcg/export/html.old.py:515
 msgid ""
 "JavaScript not detected. Use a JavaScript enabled browser for advanced media "
 "playback capabilities."
 msgstr ""
 
-#. Translators: Label used instead of a link when the target does not exist.  For
-#. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:668
-msgid "None"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:669
-msgid "You are here:"
-msgstr ""
-
-#. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:673
-msgid "Next"
-msgstr ""
-
-#. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:675
-msgid "Previous"
+#. Translators: Title of the local table of contents (links to subsections).
+#: ../lib/lcg/content.py:526
+msgid "Index:"
 msgstr ""

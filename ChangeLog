@@ -1,3 +1,17 @@
+2009-10-22  Hynek Hanke  <hanke@kropacek>
+
+	* translations/*.po: Translations updated.
+	
+	* lib/lcg/export/html.py (HtmlGenerator.img): Remove dead code.
+	(HtmlGenerator.audio): New method.
+
+	* lib/lcg/export/export.py (Generator.audio): New method.
+	(MarkupFormatter): Comments so that regexps are more understandable.
+	(MarkupFormatter._link_formatter): Comments.
+	(MarkupFormatter._link_formatter): Handle also Audio objects.
+
+	* lib/lcg/content.py (InlineAudio): New class.
+
 2009-10-21  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/_test.py:
