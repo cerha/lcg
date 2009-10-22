@@ -151,16 +151,41 @@ class HtmlGenerator(Generator):
     def img(self, src, alt='', border=0, descr=None, **kwargs):
         attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
         return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, border=border, **kwargs)
-    
 
-        toc = self._make_toc(context, self._start_item(), depth=self._depth)
-        if self._title is not None:
-            #TODO: add a "skip" link?
-            g = context.generator()
-            return g.div(g.concat(g.div(g.strong(self._title), cls='title'), toc), cls='table-of-contents')
-        else:
-            return toc
+    def audio(self, context, file, label=None, shared=True):
+        """Audio object in HTML
+
+        An audio object available from resources or with a full http
+        path can be rendered as a PLAY button controlling a shared
+        Flash audio player (usually located in the bottom right corner
+        of a webpage) or using a standalone Flash audio player
+        (generated at the place in the HTML document where the file
+        object was located). In both cases, if Flash or Javascript is
+        not available, only a link to the audio file is rendered.
+
+        Arguments:
+        context -- the context object is needed because the method must
+        tell it whether shared player will be needed
+        file -- name of a file available from resources or a full http URI
+        label -- label (e.g. in HTML label of the playback controll button)
+        shared -- True if using a shared audio player is desired, False otherwise
+        (False not implemented yet)
+        """
         
+        if shared:
+            g = context.generator()
+            context.use_shared_player()
+            button_id = '%x%x' % (positive_id(self), positive_id(file))
+            img = g.img(context.uri(context.node().resource('media-play.gif')))
+            # Translators: Play (audio)
+            ctrl = g.button(content=img, label=(label or _("Play")), id=button_id, cls='media-control')
+            uri = context.uri(file)
+
+            return g.script_write(ctrl, concat('[', g.link(label, uri), ']')) + \
+                g.script(g.js_call('init_player_controls', None, uri, button_id))
+        else:
+            raise NotImplementedError
+
     def toc(self, context, item, indent=0, depth=1):
         pass
 
