@@ -304,6 +304,19 @@ class Generator(object):
         """
         return self.escape(src)
 
+    def audio(src, shared = True):
+        """Return audio stored at URI.
+
+        Arguments:
+
+          src -- URI (as a string) where the audiofile is stored
+          shared -- Whether to use a shared player
+
+        In this class the method returns text of 'src'.
+
+        """
+        return self.escape(src)
+
     def toc(self, item, depth=1):
         """Generate a Table of Contents for given content 'item' limited to given 'depth'.
 
@@ -350,18 +363,20 @@ class MarkupFormatter(object):
                ('underline', ('_',  '_')),
                ('citation',  ('>>', '<<')),
                ('quotation', ('``', "''")),
+               # Link to an inside or outside (http) source via [ ], see _link_formatter()
                ('link', (r'\['
-                         r'(?P<align>[<>])?'
-                         r'(?P<href>[^\[\]\|\#\s]*?'
-                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'
-                         r'(?:#(?P<anchor>[^\[\]\|\s]*))?'
-                         r'(?:(?:\s*\|\s*|\s+)'
-                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'
-                         r'(?P<label>[^\[\]\|]*))?'
-                         r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'
+                         r'(?P<align>[<>])?'                    # Left/right Image aligment e.g. [<imagefile], [>imagefile]
+                         r'(?P<href>[^\[\]\|\#\s]*?'                        # The source itself e.g. [src]
+                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'  # Matches images. What is imgname?
+                         r'(?:#(?P<anchor>[^\[\]\|\s]*))?'                  # Anchor ex. [#topic11]
+                         r'(?:(?:\s*\|\s*|\s+)'                             # ???
+                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'    # Label (only for images)
+                         r'(?P<label>[^\[\]\|]*))?'                         # Label (for others like links, audio etc.)
+                         r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'            # Description after | [src Label | Description] 
                          r'\]')),
+               # Link directly in the text starting with http(s)/ftp://, see _uri_formatter()
                ('uri', (r'(?:https?|ftp)://\S+?(?:(?P<imgname_>[^\#\s/]+)'+ _IMG_EXT +\
-                        r')?(?=[\),.:;]*(\s|$))')),
+                        r')?(?=[\),.:;]*(\s|$))')),   # ?!? SOS!
                ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
                ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
                                  "|\{[^\}]+\})")),
@@ -451,6 +466,10 @@ class MarkupFormatter(object):
                         label_img=None, label=None, descr=None, align=None, **kwargs):
         parent = context.node()
         target = None
+
+        # Prepare the link data like name, description, target
+        # TODO: This fails to prepare an Audio() object if the file
+        # is link to audio file via http://
         if label:
             label=label.strip()
         if href and not anchor:
@@ -488,6 +507,8 @@ class MarkupFormatter(object):
         if isinstance(target, Image) and not label_img:
             result = InlineImage(target, title=label, descr=descr, name=imgname,
                                  align=self._IMAGE_ALIGN_MAPPING.get(align))
+        elif isinstance(target, Audio):
+            result = InlineAudio(context, target, label=label, shared=True)
         else:
             result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
