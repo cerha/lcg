@@ -1,3 +1,14 @@
+2009-10-27  Hynek Hanke  <hanke@kropacek>
+
+	* lib/lcg/export/html.py (HtmlExporter.export_audio): Method moved
+	from HTMLGenerator.audio()
+
+	* lib/lcg/export/export.py (Exporter.export_audio): Method moved
+	from Generator.audio()
+	
+	* lib/lcg/content.py (InlineAudio.export): Use exporter not
+	generator to export audio.
+	
 2009-10-22  Milan Zamazal  <pdm@brailcom.org>
 
 	* Moved to git.

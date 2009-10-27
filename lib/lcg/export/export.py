@@ -304,19 +304,6 @@ class Generator(object):
         """
         return self.escape(src)
 
-    def audio(src, shared = True):
-        """Return audio stored at URI.
-
-        Arguments:
-
-          src -- URI (as a string) where the audiofile is stored
-          shared -- Whether to use a shared player
-
-        In this class the method returns text of 'src'.
-
-        """
-        return self.escape(src)
-
     def toc(self, item, depth=1):
         """Generate a Table of Contents for given content 'item' limited to given 'depth'.
 
@@ -741,6 +728,20 @@ class Exporter(object):
         """
         return self.Context(self, self._generator, self._formatter, node, lang, **kwargs)
 
+    def export_audio(src, shared = True):
+        """Return audio stored at URI.
+
+        Arguments:
+
+          src -- URI (as a string) where the audiofile is stored
+          shared -- Whether to use a shared player
+
+        In this class the method returns text of 'src'.
+
+        """
+        return self.escape(src)
+
+
     def _initialize(self, context):
         generator = context.generator()
         title = generator.escape(context.node().title())
@@ -771,7 +772,6 @@ class Exporter(object):
         if final_export is not None:
             result = generator.concat(result, final_export)
         return result
-
 
 
 class FileExporter(object):

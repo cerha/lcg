@@ -307,8 +307,8 @@ class InlineAudio(Content):
         super(InlineAudio, self).__init__()
 
     def export(self, context):
-        g = context.generator()
-        return g.audio(context, self._audiofile, label=self._label, shared=self._shared)
+        g = context.exporter()
+        return g.export_audio(context, self._audiofile, label=self._label, shared=self._shared)
 
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
