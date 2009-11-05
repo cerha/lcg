@@ -1,3 +1,7 @@
+2009-11-05  Hynek Hanke  <hanke@kropacek>
+
+	* lib/lcg/export/html.py (HtmlExporter.export_audio): Do not pass label None to g.link()
+
 2009-10-27  Hynek Hanke  <hanke@kropacek>
 
 	* lib/lcg/export/html.py (HtmlExporter.export_audio): Method moved

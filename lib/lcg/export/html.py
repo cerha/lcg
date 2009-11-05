@@ -608,10 +608,10 @@ class HtmlExporter(Exporter):
             button_id = '%x%x' % (positive_id(self), positive_id(file))
             img = g.img(context.uri(context.node().resource('media-play.gif')))
             # Translators: Play (audio)
-            ctrl = g.button(content=img, label=(label or _("Play")), id=button_id, cls='media-control')
+            play_label = label or _("Play")
+            ctrl = g.button(content=img, label=play_label, id=button_id, cls='media-control')
             uri = context.uri(file)
-
-            return g.script_write(ctrl, concat('[', g.link(label, uri), ']')) + \
+            return g.script_write(ctrl, concat('[', g.link(play_label, uri), ']')) + \
                 g.script(g.js_call('init_player_controls', None, uri, button_id))
         else:
             raise NotImplementedError
