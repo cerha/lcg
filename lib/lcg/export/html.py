@@ -477,8 +477,7 @@ class HtmlExporter(Exporter):
         return context.node().content().export(context)
 
     def export_swf_player(self, context, player_id, width, height,
-                          jscontrol, flashapp,
-                          js_post_hook=None, js_post_hook_args=()):
+                          flashapp, js_post_hook=None, js_post_hook_args=()):
         """Export an arbitrary SWF Player object.
         
         This method tries to export a Flash object into HTML. The object
@@ -496,8 +495,6 @@ class HtmlExporter(Exporter):
         player_id -- id to use as HTML element ID for the player
         (this is necessary for communication via Javascript)
         width, height -- size of the HTML element in pixels
-        jscontrol -- name of a Javascript file with scripts to controll the Flash application
-        flashapp -- name of the .swf file to use for the Flash object
         js_post_hook -- Javascript to call on (TODO: successful) initialization of the Flash object
         js_post_hook_args -- list of arguments passed to js_post_hook
         """
@@ -510,7 +507,6 @@ class HtmlExporter(Exporter):
             log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
                 "and put swfobject.js to your resource path!")
         node.resource('media.js')
-        node.resource(jscontrol)
         player = node.resource(flashapp, warn=warn_flashapp)
         swfobject = node.resource('swfobject.js', warn=warn_swfobject)
         if not player or not swfobject:
@@ -568,7 +564,7 @@ class HtmlExporter(Exporter):
         media -- media to link with this media player (TODO: Not implemented)
         """
         return self.export_swf_player(context, player_id, width, height,
-                                      jscontrol='media.js', flashapp='mediaplayer.swf',
+                                      flashapp='mediaplayer.swf',
                                       js_post_hook='init_media_player',
                                       js_post_hook_args=(player_id, shared))
 
