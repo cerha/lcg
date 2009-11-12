@@ -1,5 +1,12 @@
 2009-11-12  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/_test.py:
+	* lib/lcg/content.py:
+	* lib/lcg/export/export.py:
+	Allow explicit image sizing..
+
+2009-11-12  Tomas Cerha  <cerha@brailcom.org>
+
 	* lib/lcg/export/export.py:
 	Link formatter regex comments fixed/improved..
 

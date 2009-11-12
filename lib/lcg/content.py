@@ -246,36 +246,47 @@ class InlineImage(Content):
     BOTTOM = 'bottom'
     MIDDLE = 'middle'
     
-    def __init__(self, image, title=None, descr=None, name=None, align=None):
+    def __init__(self, image, title=None, descr=None, name=None, align=None, size=None):
         """Arguments:
 
-          image -- 'Image' instance
+          image -- 'Image' resource instance.
+          title -- image title as a string or unicode.  The
+            title used for example as alternative text in HTML.
+          descr -- image description a string or unicode.  Currently
+            unused in HTML.
+          name -- arbitrary name (string) identifying the image.  Used as CSS
+            class name in HTML to allow individual image styling.
           align -- requested alignment of the image to the surrounding text;
             one of the constants 'InlineImage.LEFT', 'InlineImage.RIGHT',
             'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
             'None'
-          title -- title of the image (or alternative text in some output
-            formats) as a string or unicode; if not given 'image' title (if
-            present) is used
-          name -- ???
+          size -- image size in pixels as a tuple of two integers (WIDTH, HEIGHT)
 
+        If 'title' or 'descr' is None, the title/description defined by the
+        'Image' resource instance is used.
+
+          
         """
         assert isinstance(image, Image), image
-        assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
         assert title is None or isinstance(title, (str, unicode)), title
-        assert name is None or isinstance(name, (str, unicode)), name
         assert descr is None or isinstance(descr, (str, unicode)), descr
+        assert name is None or isinstance(name, (str, unicode)), name
+        assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
+        assert size is None or isinstance(size, tuple), size
         self._image = image
         self._align = align
         self._title = title
         self._descr = descr
         self._name = name
+        self._size = size
         super(InlineImage, self).__init__()
 
     def export(self, context):
         g = context.generator()
         img = self._image
-        size = img.size()
+        size = self._size
+        if size is None:
+            size = img.size()
         if size is not None:
             width, height = size
             kwargs = dict(width=width, height=height)

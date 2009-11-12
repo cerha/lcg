@@ -356,6 +356,7 @@ class MarkupFormatter(object):
                          r'(?P<href>[^\[\]\|\#\s]*?'                        # The link target e.g. [src]
                          r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'  # If the target is an image, imgname is its file name without extension.  It is used for CSS class to allow individual image styling.
                          r'(?:#(?P<anchor>[^\[\]\|\s]*))?'                  # Anchor ex. [#topic11]
+                         r'(?::(?P<size>\d+x\d+))?'                         # Optional explicit image (or video) size e.g. [image.jpg:30x40])
                          r'(?:(?:\s*\|\s*|\s+)'                             # Separator (pipe is enabled for backwards compatibility, but space is the official separator)
                          r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'    # Link label image (a link displayed as a clickable image)
                          r'(?P<label>[^\[\]\|]*))?'                         # Label text
@@ -372,7 +373,7 @@ class MarkupFormatter(object):
                ('nbsp', '~'))
     
     _HELPER_PATTERNS = ('align', 'href', 'imgname', 'imgname_', 'anchor', 'label', 'label_img',
-                        'descr', 'subst')
+                        'descr', 'subst', 'size')
 
     _FORMAT = {'linebreak': '\n',
                'comment': '',
@@ -449,11 +450,10 @@ class MarkupFormatter(object):
             result = str(result)
         return g.escape(result)
     
-    def _link_formatter(self, context, href=None, imgname=None, anchor=None, 
+    def _link_formatter(self, context, href=None, imgname=None, anchor=None, size=None,
                         label_img=None, label=None, descr=None, align=None, **kwargs):
         parent = context.node()
         target = None
-
         # Prepare the link data like name, description, target
         # TODO: This fails to prepare an Audio() object if the file
         # is link to audio file via http://
@@ -490,10 +490,12 @@ class MarkupFormatter(object):
             #    target = Link.ExternalTarget(href, label or href)
             label = InlineImage(image, title=label, name=name,
                                 align=self._IMAGE_ALIGN_MAPPING.get(align))
+        if size:
+            size = tuple(map(int, size.split('x')))
         # Create the resulting content element and return its exported string.
         if isinstance(target, Image) and not label_img:
             result = InlineImage(target, title=label, descr=descr, name=imgname,
-                                 align=self._IMAGE_ALIGN_MAPPING.get(align))
+                                 align=self._IMAGE_ALIGN_MAPPING.get(align), size=size)
         elif isinstance(target, Audio):
             result = InlineAudio(context, target, label=label, shared=True)
         else:
