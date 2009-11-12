@@ -352,13 +352,13 @@ class MarkupFormatter(object):
                ('quotation', ('``', "''")),
                # Link to an inside or outside (http) source via [ ], see _link_formatter()
                ('link', (r'\['
-                         r'(?P<align>[<>])?'                    # Left/right Image aligment e.g. [<imagefile], [>imagefile]
-                         r'(?P<href>[^\[\]\|\#\s]*?'                        # The source itself e.g. [src]
-                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'  # Matches images. What is imgname?
+                         r'(?P<align>[<>])?'                                # Left/right Image aligment e.g. [<imagefile], [>imagefile]
+                         r'(?P<href>[^\[\]\|\#\s]*?'                        # The link target e.g. [src]
+                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'  # If the target is an image, imgname is its file name without extension.  It is used for CSS class to allow individual image styling.
                          r'(?:#(?P<anchor>[^\[\]\|\s]*))?'                  # Anchor ex. [#topic11]
-                         r'(?:(?:\s*\|\s*|\s+)'                             # ???
-                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'    # Label (only for images)
-                         r'(?P<label>[^\[\]\|]*))?'                         # Label (for others like links, audio etc.)
+                         r'(?:(?:\s*\|\s*|\s+)'                             # Separator (pipe is enabled for backwards compatibility, but space is the official separator)
+                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'    # Link label image (a link displayed as a clickable image)
+                         r'(?P<label>[^\[\]\|]*))?'                         # Label text
                          r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'            # Description after | [src Label | Description] 
                          r'\]')),
                # Link directly in the text starting with http(s)/ftp://, see _uri_formatter()
