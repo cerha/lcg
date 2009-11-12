@@ -297,30 +297,75 @@ class InlineImage(Content):
                      cls=self._name, **kwargs)
 
 class InlineAudio(Content):
-    """Audio file put inside the document
+    """Audio file embedded inside the document.
 
     For example in HTML, this might be exported as a play button using a
     Flash audio player.
+    
     """
        
-    def __init__(self, context, audiofile, label=None, shared=True):
+    def __init__(self, audio, title=None, descr=None, image=None, shared=True):
         """Arguments:
 
-        audiofile -- file for audio playback available through resources
-        shared -- whether to use shared media player
-        """
-        assert isinstance(audiofile, Audio), audiofile
-        assert isinstance(shared, bool)
-        self._audiofile = audiofile
-        self._shared = shared
-        self._label = label
+          audio -- 'Audio' resource instance.
+          title -- audio file title as a string.
+          descr -- audio file description as a string.
+          image -- visual presentation image as an 'Image' resource instance or None.
+          shared -- boolean flag indicating whether using a shared audio player is desired.
 
+        If 'title' or 'descr' is None, the title/description defined by the
+        resource instance is used.
+        
+        
+        """
+        assert isinstance(audio, Audio), audio
+        assert isinstance(shared, bool)
+        self._audio = audio
+        self._title = title
+        self._descr = descr
+        self._image = image
+        self._shared = shared
         super(InlineAudio, self).__init__()
 
     def export(self, context):
-        g = context.exporter()
-        return g.export_audio(context, self._audiofile, label=self._label, shared=self._shared)
+        return context.exporter().export_inline_audio(context, self._audio, title=self._title,
+                                                      descr=self._descr, image=self._image,
+                                                      shared=self._shared)
 
+class InlineVideo(Content):
+    """Video file embedded inside the document.
+
+    For example in HTML, this might be exported as an embedded video player.
+    
+    """
+       
+    def __init__(self, video, title=None, descr=None, image=None, size=None):
+        """Arguments:
+
+          video -- 'Video' resource instance.
+          title -- video file title as a string.  
+          descr -- video file description as a string.
+          image -- video thumbnail image as an 'Image' resource instance or None.
+          size -- video size in pixels as a tuple of two integers (WIDTH, HEIGHT)
+
+        If 'title' or 'descr' is None, the title/description defined by the
+        resource instance is used.
+        
+        """
+        assert isinstance(video, Video), video
+        self._video = video
+        self._title = title
+        self._descr = descr
+        self._image = image
+        self._size = size
+        super(InlineVideo, self).__init__()
+
+    def export(self, context):
+        return context.exporter().export_inline_video(context, self._video, title=self._title,
+                                                      descr=self._descr, image=self._image,
+                                                      size=self._size)
+    
+    
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
 
@@ -793,10 +838,10 @@ class Link(Container):
           target -- target of the link, it may be either a 'Section' instance
             or a 'ContentNode' instance, a 'Link.ExternalTarget' instance or a
             'Resource' instance
-          label -- link label text as a string or a 'Content' instance (such as 'InlineImage' for
-            image links)
-          descr -- breif target description text.  If none the description is taken from the
-            'target' instance depending on its type
+          label -- link label text as a string or a 'Content' instance (such as
+            'InlineImage' for image links)
+          descr -- breif target description text.  If none the description is
+             taken from the 'target' instance depending on its type
           type -- ???
         
         """

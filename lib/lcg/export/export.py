@@ -481,24 +481,29 @@ class MarkupFormatter(object):
             if anchor is not None:
                 href += '#'+anchor
             target = Link.ExternalTarget(href, label or href)
-        if label_img:
-            image = parent.resource(label_img, warn=False)
-            if image is None or not isinstance(image, Image):
-                image = Image(label_img, uri=label_img)
-            name = os.path.splitext(os.path.basename(label_img))[0]
-            #if isinstance(target, Link.ExternalTarget):
-            #    target = Link.ExternalTarget(href, label or href)
-            label = InlineImage(image, title=label, name=name,
-                                align=self._IMAGE_ALIGN_MAPPING.get(align))
         if size:
             size = tuple(map(int, size.split('x')))
+        if label_img:
+            label_image = parent.resource(label_img, warn=False)
+            if label_image is None or not isinstance(label_image, Image):
+                label_image = Image(label_img, uri=label_img)
+        else:
+            label_image = None
         # Create the resulting content element and return its exported string.
-        if isinstance(target, Image) and not label_img:
+        if not label_image and isinstance(target, Image):
             result = InlineImage(target, title=label, descr=descr, name=imgname,
                                  align=self._IMAGE_ALIGN_MAPPING.get(align), size=size)
         elif isinstance(target, Audio):
-            result = InlineAudio(context, target, label=label, shared=True)
+            result = InlineAudio(target, title=label, descr=descr, image=label_image, shared=True)
+        elif isinstance(target, Video):
+            result = InlineVideo(target, title=label, descr=descr, image=label_image, size=size)
         else:
+            if label_image:
+                name = os.path.splitext(os.path.basename(label_img))[0]
+                label = InlineImage(label_image, title=label, name=name,
+                                    align=self._IMAGE_ALIGN_MAPPING.get(align))
+                #if isinstance(target, Link.ExternalTarget):
+                #    target = Link.ExternalTarget(href, label or href)
             result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
         return result.export(context)
@@ -730,20 +735,6 @@ class Exporter(object):
         """
         return self.Context(self, self._generator, self._formatter, node, lang, **kwargs)
 
-    def export_audio(src, shared = True):
-        """Return audio stored at URI.
-
-        Arguments:
-
-          src -- URI (as a string) where the audiofile is stored
-          shared -- Whether to use a shared player
-
-        In this class the method returns text of 'src'.
-
-        """
-        return self.escape(src)
-
-
     def _initialize(self, context):
         generator = context.generator()
         title = generator.escape(context.node().title())
@@ -774,6 +765,44 @@ class Exporter(object):
         if final_export is not None:
             result = generator.concat(result, final_export)
         return result
+
+    def export_inline_audio(self, context, audio, title=None, descr=None, image=None, shared=True):
+        """Export embedded audio player for given 'Audio' resource instance.
+
+        Arguments:
+
+          context -- current exporter context as 'Exporter.Context' instance
+          audio -- 'Audio' resource instance or an absolute URI (as a string)
+          title -- audio file title as a string.
+          descr -- audio file description as a string.
+          image -- visual presentation image as an 'Image' resource instance or None.
+          shared -- True if using a shared audio player is desired, False otherwise
+
+        In this class the method returns the audio title as a string.
+        Derived classes implement a more appropriate behavior relevant for
+        given output media.
+
+        """
+        return self.escape(title or audio.title() or audio.filename())
+
+    def export_inline_video(self, context, video, title=None, descr=None, image=None, size=None):
+        """Export embedded video player for given 'Video' resource instance.
+
+        Arguments:
+
+          context -- current exporter context as 'Exporter.Context' instance
+          video -- 'Video' resource instance or an absolute URI (as a string)
+          title -- video file title as a string.
+          descr -- video file description as a string.
+          image -- video thumbnail image as an 'Image' resource instance or None.
+          size -- video size in pixels as a sequence of two integers (WIDTH, HEIGHT)
+
+        In this class the method returns the video file title as a string.
+        Derived classes implement a more appropriate behavior relevant for
+        given output media.
+
+        """
+        return self.escape(title or video.title() or video.filename())
 
 
 class FileExporter(object):

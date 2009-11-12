@@ -1,5 +1,20 @@
 2009-11-12  Tomas Cerha  <cerha@brailcom.org>
 
+	* lib/lcg/content.py:
+	* lib/lcg/export/export.py:
+	* lib/lcg/export/html.py:
+	* lib/lcg/resources.py:
+	* resources/scripts/flash.js:
+	* resources/scripts/media.js:
+	Added support for video embedding and audio embedding generalized..
+	
+	This change introduces major rafactoring of Flash embedding and shared media
+	player export strategy, so all applications using the related APIs need to be
+	modified.  Related changes in `eurochance' and `wiking-communicator' will
+	follow.
+
+2009-11-12  Tomas Cerha  <cerha@brailcom.org>
+
 	* lib/lcg/_test.py:
 	* lib/lcg/content.py:
 	* lib/lcg/export/export.py:
