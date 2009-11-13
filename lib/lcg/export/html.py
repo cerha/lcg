@@ -488,8 +488,8 @@ class HtmlExporter(Exporter):
     def _content(self, context):
         return context.node().content().export(context)
 
-    def export_swf_object(self, context, filename, element_id, width, height,
-                          vars={}, min_flash_version=None, alternative_content=None):
+    def export_swf_object(self, context, filename, element_id, width, height, vars={},
+                          min_flash_version=None, alternative_content=None, warning=None):
         """Export an arbitrary SWF object.
         
         This method tries to export a Flash object into HTML.  The object is
@@ -504,18 +504,26 @@ class HtmlExporter(Exporter):
           element_id -- HTML id to use for the flash object HTML element  
             (necessary for communication via Javascript)
           width, height -- size of the HTML element in pixels
-          vars -- dictionary of variables to pass to the flash object (through SWFObject's
-            'flashvars' parameter).
+          vars -- dictionary of variables to pass to the flash object (through
+            SWFObject's 'flashvars' parameter).
           min_flash_version -- minimal required Flash version as a string, such
             as '9' or '9.0.25'
-          alternative_content -- HTML content (as a string or unicode) displayed inside the
-            HTML element when Flash or JavaScript don't work on the client side
-            (Flash not installed or its version doesn't match
+          alternative_content -- HTML content (as a string or unicode) displayed
+            inside the HTML element when Flash or JavaScript don't work on the
+            client side (Flash not installed or its version doesn't match
             'min_flash_version', JS is disabled or not supoported, ...).  You
             may also pass a tuple of two strings in which case the first is
-            used when flash doesn't work and the second when the problem is in
-            JavaScript.  You may think of using 'self._flash_warnings()' to get
-            decent warning messages for this argument.
+            used when Flash doesn't work and the second when the problem is in
+            JavaScript.  If you wish to display simple warning messages, you
+            may think of using the argument 'warning' instead of this one.
+          warning -- Warning message displayed as alternative content.  This
+            message will become a part of automatically created alternative
+            content, so it cannot be used in combination with the
+            'alternative_content' argument.  Individual warnings are generated
+            to cover both situations (no JS and no Flash).  They will look like:
+            ``Warning: <warning> Get Adobe Flash plugin 9.0.10 or later.'' and 
+            ``Warning: <warning> Use a JavaScript enabled browser.'', where
+            ``<warning>'' is replaced by the value of this argument.
         
         """
         def warn_swfobject(msg):
@@ -539,6 +547,20 @@ class HtmlExporter(Exporter):
         if isinstance(alternative_content, tuple):
             no_flash_content, no_js_content = alternative_content
             no_flash_content = context.translate(no_flash_content)
+        elif warning and alternative_content is None:
+            # Translators: Warning message displayed if Flash plugin is not installed or doesn't
+            # have the required version.  '%(plugin)s' is automatically replaced by a hypertext
+            # link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
+            # version number.
+            msg1 = _("Get %(plugin)s %(version)s or later.",
+                     version=min_flash_version or '9',
+                     # Translators: Title of the link to Adobe website used in
+                     # the Flash warning.
+                     plugin=g.link(_("Adobe Flash plugin"),
+                                   'http://www.adobe.com/products/flash/about/'))
+            msg2 = _("Use a JavaScript enabled browser.")
+            no_flash_content = context.translate(g.strong(_("Warning:")) +' '+ warning +' '+ msg1)
+            no_js_content = g.strong(_("Warning:")) +' '+ warning +' '+ msg2
         else:
             no_flash_content = None
             no_js_content = alternative_content
@@ -549,20 +571,6 @@ class HtmlExporter(Exporter):
                 g.script(g.js_call('embed_swf_object', context.uri(flash_object), element_id,
                                    width, height, flashvars, min_flash_version, no_flash_content)))
 
-    def _flash_warnings(self, context, warning, min_flash_version=None):
-        # Translators: '%(plugin)s' is automatically replaced by a hypertext
-        # link to Adobe Flash plugin download page.  '%(version)s' is replaced
-        # by the required version number or an empty string if no version was
-        # required.
-        g = context.generator()
-        flash_msg = _("Get %(plugin)s %(version)s or later.",
-                      version=min_flash_version or '',
-                      # Translators: Title of the link to Adobe website used in the Flash warning.
-                      plugin=g.link(_("Adobe Flash plugin"),
-                                    'http://www.adobe.com/products/flash/about/'))
-        return (g.strong(_("Warning:")) +' '+ warning +' '+ flash_msg,
-                g.strong(_("Warning:")) +' '+ warning +' '+ _("Use a JavaScript enabled browser."))
-    
     def export_media_player(self, context, player_id, width, height, shared=False):
         """Export Flash media player
         
@@ -581,11 +589,9 @@ class HtmlExporter(Exporter):
         
         """
         g = context.generator()
-        min_flash_version = '9.0.115'
-        warnings = self._flash_warnings(context, _("Media Player unavailable."), min_flash_version)
         result = self.export_swf_object(context, 'mediaplayer.swf', player_id, width, height,
-                                        min_flash_version=min_flash_version,
-                                        alternative_content=warnings)
+                                        min_flash_version='9.0.115',
+                                        warning=_("Media Player unavailable."))
         if result:
             context.resource('media.js')
             result += g.script(g.js_call('init_media_player', player_id, shared))

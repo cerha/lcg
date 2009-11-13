@@ -1,3 +1,8 @@
+2009-11-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py:
+	Pass SWF embed warnings to `export_swf_object' directly..
+
 2009-11-12  Tomas Cerha  <cerha@brailcom.org>
 
 	* lib/lcg/content.py:
