@@ -1,3 +1,35 @@
+2009-11-13  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/html.py:
+	Pass SWF embed warnings to `export_swf_object' directly..
+
+2009-11-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/content.py:
+	* lib/lcg/export/export.py:
+	* lib/lcg/export/html.py:
+	* lib/lcg/resources.py:
+	* resources/scripts/flash.js:
+	* resources/scripts/media.js:
+	Added support for video embedding and audio embedding generalized..
+	
+	This change introduces major rafactoring of Flash embedding and shared media
+	player export strategy, so all applications using the related APIs need to be
+	modified.  Related changes in `eurochance' and `wiking-communicator' will
+	follow.
+
+2009-11-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/_test.py:
+	* lib/lcg/content.py:
+	* lib/lcg/export/export.py:
+	Allow explicit image sizing..
+
+2009-11-12  Tomas Cerha  <cerha@brailcom.org>
+
+	* lib/lcg/export/export.py:
+	Link formatter regex comments fixed/improved..
+
 2009-11-05  Hynek Hanke  <hanke@kropacek>
 
 	* lib/lcg/export/html.py (HtmlExporter.export_audio): Do not pass label None to g.link()

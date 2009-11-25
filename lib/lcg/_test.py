@@ -487,6 +487,8 @@ class Export(unittest.TestCase):
              '<img src="images/aa.jpg" alt="" border="0" class="aa">'),
             ('[aa.jpg label]',
              '<img src="images/aa.jpg" alt="label" border="0" class="aa">'),
+            ('[aa.jpg:20x30 label]',
+             '<img src="images/aa.jpg" alt="label" width="20" height="30" border="0" class="aa">'),
             ('[>aa.jpg]',
              '<img src="images/aa.jpg" alt="" align="right" border="0" class="aa">'),
             ('[<aa.jpg]',

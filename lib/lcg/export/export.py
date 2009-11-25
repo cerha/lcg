@@ -352,13 +352,14 @@ class MarkupFormatter(object):
                ('quotation', ('``', "''")),
                # Link to an inside or outside (http) source via [ ], see _link_formatter()
                ('link', (r'\['
-                         r'(?P<align>[<>])?'                    # Left/right Image aligment e.g. [<imagefile], [>imagefile]
-                         r'(?P<href>[^\[\]\|\#\s]*?'                        # The source itself e.g. [src]
-                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'  # Matches images. What is imgname?
+                         r'(?P<align>[<>])?'                                # Left/right Image aligment e.g. [<imagefile], [>imagefile]
+                         r'(?P<href>[^\[\]\|\#\s]*?'                        # The link target e.g. [src]
+                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'  # If the target is an image, imgname is its file name without extension.  It is used for CSS class to allow individual image styling.
                          r'(?:#(?P<anchor>[^\[\]\|\s]*))?'                  # Anchor ex. [#topic11]
-                         r'(?:(?:\s*\|\s*|\s+)'                             # ???
-                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'    # Label (only for images)
-                         r'(?P<label>[^\[\]\|]*))?'                         # Label (for others like links, audio etc.)
+                         r'(?::(?P<size>\d+x\d+))?'                         # Optional explicit image (or video) size e.g. [image.jpg:30x40])
+                         r'(?:(?:\s*\|\s*|\s+)'                             # Separator (pipe is enabled for backwards compatibility, but space is the official separator)
+                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'    # Link label image (a link displayed as a clickable image)
+                         r'(?P<label>[^\[\]\|]*))?'                         # Label text
                          r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'            # Description after | [src Label | Description] 
                          r'\]')),
                # Link directly in the text starting with http(s)/ftp://, see _uri_formatter()
@@ -372,7 +373,7 @@ class MarkupFormatter(object):
                ('nbsp', '~'))
     
     _HELPER_PATTERNS = ('align', 'href', 'imgname', 'imgname_', 'anchor', 'label', 'label_img',
-                        'descr', 'subst')
+                        'descr', 'subst', 'size')
 
     _FORMAT = {'linebreak': '\n',
                'comment': '',
@@ -449,11 +450,10 @@ class MarkupFormatter(object):
             result = str(result)
         return g.escape(result)
     
-    def _link_formatter(self, context, href=None, imgname=None, anchor=None, 
+    def _link_formatter(self, context, href=None, imgname=None, anchor=None, size=None,
                         label_img=None, label=None, descr=None, align=None, **kwargs):
         parent = context.node()
         target = None
-
         # Prepare the link data like name, description, target
         # TODO: This fails to prepare an Audio() object if the file
         # is link to audio file via http://
@@ -481,22 +481,29 @@ class MarkupFormatter(object):
             if anchor is not None:
                 href += '#'+anchor
             target = Link.ExternalTarget(href, label or href)
+        if size:
+            size = tuple(map(int, size.split('x')))
         if label_img:
-            image = parent.resource(label_img, warn=False)
-            if image is None or not isinstance(image, Image):
-                image = Image(label_img, uri=label_img)
-            name = os.path.splitext(os.path.basename(label_img))[0]
-            #if isinstance(target, Link.ExternalTarget):
-            #    target = Link.ExternalTarget(href, label or href)
-            label = InlineImage(image, title=label, name=name,
-                                align=self._IMAGE_ALIGN_MAPPING.get(align))
-        # Create the resulting content element and return its exported string.
-        if isinstance(target, Image) and not label_img:
-            result = InlineImage(target, title=label, descr=descr, name=imgname,
-                                 align=self._IMAGE_ALIGN_MAPPING.get(align))
-        elif isinstance(target, Audio):
-            result = InlineAudio(context, target, label=label, shared=True)
+            label_image = parent.resource(label_img, warn=False)
+            if label_image is None or not isinstance(label_image, Image):
+                label_image = Image(label_img, uri=label_img)
         else:
+            label_image = None
+        # Create the resulting content element and return its exported string.
+        if not label_image and isinstance(target, Image):
+            result = InlineImage(target, title=label, descr=descr, name=imgname,
+                                 align=self._IMAGE_ALIGN_MAPPING.get(align), size=size)
+        elif isinstance(target, Audio):
+            result = InlineAudio(target, title=label, descr=descr, image=label_image, shared=True)
+        elif isinstance(target, Video):
+            result = InlineVideo(target, title=label, descr=descr, image=label_image, size=size)
+        else:
+            if label_image:
+                name = os.path.splitext(os.path.basename(label_img))[0]
+                label = InlineImage(label_image, title=label, name=name,
+                                    align=self._IMAGE_ALIGN_MAPPING.get(align))
+                #if isinstance(target, Link.ExternalTarget):
+                #    target = Link.ExternalTarget(href, label or href)
             result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
         return result.export(context)
@@ -728,20 +735,6 @@ class Exporter(object):
         """
         return self.Context(self, self._generator, self._formatter, node, lang, **kwargs)
 
-    def export_audio(src, shared = True):
-        """Return audio stored at URI.
-
-        Arguments:
-
-          src -- URI (as a string) where the audiofile is stored
-          shared -- Whether to use a shared player
-
-        In this class the method returns text of 'src'.
-
-        """
-        return self.escape(src)
-
-
     def _initialize(self, context):
         generator = context.generator()
         title = generator.escape(context.node().title())
@@ -772,6 +765,44 @@ class Exporter(object):
         if final_export is not None:
             result = generator.concat(result, final_export)
         return result
+
+    def export_inline_audio(self, context, audio, title=None, descr=None, image=None, shared=True):
+        """Export embedded audio player for given 'Audio' resource instance.
+
+        Arguments:
+
+          context -- current exporter context as 'Exporter.Context' instance
+          audio -- 'Audio' resource instance or an absolute URI (as a string)
+          title -- audio file title as a string.
+          descr -- audio file description as a string.
+          image -- visual presentation image as an 'Image' resource instance or None.
+          shared -- True if using a shared audio player is desired, False otherwise
+
+        In this class the method returns the audio title as a string.
+        Derived classes implement a more appropriate behavior relevant for
+        given output media.
+
+        """
+        return self.escape(title or audio.title() or audio.filename())
+
+    def export_inline_video(self, context, video, title=None, descr=None, image=None, size=None):
+        """Export embedded video player for given 'Video' resource instance.
+
+        Arguments:
+
+          context -- current exporter context as 'Exporter.Context' instance
+          video -- 'Video' resource instance or an absolute URI (as a string)
+          title -- video file title as a string.
+          descr -- video file description as a string.
+          image -- video thumbnail image as an 'Image' resource instance or None.
+          size -- video size in pixels as a sequence of two integers (WIDTH, HEIGHT)
+
+        In this class the method returns the video file title as a string.
+        Derived classes implement a more appropriate behavior relevant for
+        given output media.
+
+        """
+        return self.escape(title or video.title() or video.filename())
 
 
 class FileExporter(object):

@@ -388,11 +388,23 @@ class HtmlExporter(Exporter):
     class Context(Exporter.Context):
         def __init__(self, *args, **kwargs):
             super(HtmlExporter.Context, self).__init__(*args, **kwargs)
-            self._shared_player_used = False
-        def use_shared_player(self):
-            self._shared_player_used = True
-        def shared_player_used(self):
-            return self._shared_player_used
+            self._shared_player_controls = []
+        def connect_shared_player(self, *args):
+            """Connect given player controls to the shared player.
+
+            Arguments correspond to the arguments of the JavaScript function
+            'init_player_controls()' defined in 'media.js' starting with 'uri'.  At least two
+            arguments ('uri' and 'button_id') should be passed.  The remaining arguments are
+            optional.
+
+            If this method is called at least once during document export, a shared media player is
+            exported at the bottom of the page and passed player controls are connected to the
+            player.
+
+            """
+            self._shared_player_controls.append(args)
+        def shared_player_controls(self):
+            return self._shared_player_controls
     
     _BODY_PARTS = ('heading',
                    'language_selection',
@@ -476,141 +488,187 @@ class HtmlExporter(Exporter):
     def _content(self, context):
         return context.node().content().export(context)
 
-    def export_swf_player(self, context, player_id, width, height,
-                          flashapp, js_post_hook=None, js_post_hook_args=()):
-        """Export an arbitrary SWF Player object.
+    def export_swf_object(self, context, filename, element_id, width, height, vars={},
+                          min_flash_version=None, alternative_content=None, warning=None):
+        """Export an arbitrary SWF object.
         
-        This method tries to export a Flash object into HTML. The object
-        is not included directly, but using a mechanism with a Javascript
-        library that ensures that if Javascript or Flash is not available
-        on client side, an error message is displayed.
-
-        Initialization of the new SWF object can be done using a
-        javascript post hook function, which gets called after
-        the (TODO: successful) initialization of the SWF object.
-
-        An example can be found in the lcg.HTMLExporter._media_player() method.
+        This method tries to export a Flash object into HTML.  The object is
+        not included directly, but using a mechanism with a Javascript library
+        that ensures that if Javascript or Flash is not available on client
+        side, alternative content (error message or a gracefull degradation)
+        may be displayed.
 
         Arguments:
-        player_id -- id to use as HTML element ID for the player
-        (this is necessary for communication via Javascript)
-        width, height -- size of the HTML element in pixels
-        js_post_hook -- Javascript to call on (TODO: successful) initialization of the Flash object
-        js_post_hook_args -- list of arguments passed to js_post_hook
+          filename -- name of the .swf file of the Flash object to embed (must
+            be available through resources)
+          element_id -- HTML id to use for the flash object HTML element  
+            (necessary for communication via Javascript)
+          width, height -- size of the HTML element in pixels
+          vars -- dictionary of variables to pass to the flash object (through
+            SWFObject's 'flashvars' parameter).
+          min_flash_version -- minimal required Flash version as a string, such
+            as '9' or '9.0.25'
+          alternative_content -- HTML content (as a string or unicode) displayed
+            inside the HTML element when Flash or JavaScript don't work on the
+            client side (Flash not installed or its version doesn't match
+            'min_flash_version', JS is disabled or not supoported, ...).  You
+            may also pass a tuple of two strings in which case the first is
+            used when Flash doesn't work and the second when the problem is in
+            JavaScript.  If you wish to display simple warning messages, you
+            may think of using the argument 'warning' instead of this one.
+          warning -- Warning message displayed as alternative content.  This
+            message will become a part of automatically created alternative
+            content, so it cannot be used in combination with the
+            'alternative_content' argument.  Individual warnings are generated
+            to cover both situations (no JS and no Flash).  They will look like:
+            ``Warning: <warning> Get Adobe Flash plugin 9.0.10 or later.'' and 
+            ``Warning: <warning> Use a JavaScript enabled browser.'', where
+            ``<warning>'' is replaced by the value of this argument.
+        
         """
-        node = context.node()
-        def warn_flashapp(msg):
-            log(msg)
-            log("Install the apropriate flashw .swf applicaion to your resource path!")
         def warn_swfobject(msg):
             log(msg)
             log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
-                "and put swfobject.js to your resource path!")
-        node.resource('media.js')
-        player = node.resource(flashapp, warn=warn_flashapp)
-        swfobject = node.resource('swfobject.js', warn=warn_swfobject)
-        if not player or not swfobject:
-            log("Can't find swf player or swfobject");
+                "and put swfobject.js to your resource path.")
+        def escape(value):
+            return str(value).replace('?', '%3F').replace('=', '%3D').replace('&', '%26')
+        flash_object = context.resource(filename)
+        if flash_object is None:
+            return None
+        swfobject_js = context.resource('swfobject.js', warn=warn_swfobject)
+        if swfobject_js is None:
+            return None
+        flash_js = context.resource('flash.js')
+        if flash_js is None:
             return None
         g = context.generator()
-        flash_err = (g.strong(_("Warning:")) +' '+
-                     # Translators: '%(version)s' is automatically replaced by the required version
-                     # number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
-                     # download page.
-                     _("Flash %(version)s not detected. Get %(plugin)s %(version)s or later "
-                       "for advanced media capabilities.",
-                       # Translators: Title of the link to Adobe website used in the Flash warning.
-                       version='$version', # The version is substituted within the JavaScript code.
-                       plugin=g.link(_("Adobe Flash plugin"),
-                                     'http://www.adobe.com/products/flash/about/')))
-        js_err = g.strong(_("Warning:")) +' '+ \
-            _("JavaScript not detected. "
-              "Use a JavaScript enabled browser for audiochat.")
+        flashvars = '&'.join(['='.join((name, escape(value)))
+                              for name, value in vars.items()])
+        if isinstance(alternative_content, tuple):
+            no_flash_content, no_js_content = alternative_content
+            no_flash_content = context.translate(no_flash_content)
+        elif warning and alternative_content is None:
+            # Translators: Warning message displayed if Flash plugin is not installed or doesn't
+            # have the required version.  '%(plugin)s' is automatically replaced by a hypertext
+            # link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
+            # version number.
+            msg1 = _("Get %(plugin)s %(version)s or later.",
+                     version=min_flash_version or '9',
+                     # Translators: Title of the link to Adobe website used in
+                     # the Flash warning.
+                     plugin=g.link(_("Adobe Flash plugin"),
+                                   'http://www.adobe.com/products/flash/about/'))
+            msg2 = _("Use a JavaScript enabled browser.")
+            no_flash_content = context.translate(g.strong(_("Warning:")) +' '+ warning +' '+ msg1)
+            no_js_content = g.strong(_("Warning:")) +' '+ warning +' '+ msg2
+        else:
+            no_flash_content = None
+            no_js_content = alternative_content
+        # Here we first create a DIV containing error text about js not
+        # working, then a javascript code that replaces this error message with
+        # the flash object when page is loaded into browser and js is working.
+        return (g.div(no_js_content or '', id=element_id) + 
+                g.script(g.js_call('embed_swf_object', context.uri(flash_object), element_id,
+                                   width, height, flashvars, min_flash_version, no_flash_content)))
 
-        # Here we first create a DIV containing error text about js
-        # not working, then javascript code that replaces this error
-        # message with the flash object when page is loaded into
-        # browser and js is working.
-        res = g.div(js_err, id=player_id) + \
-            g.script(g.js_call('export_swf_object', context.uri(player), player_id,
-                               width, height, context.translate(flash_err)))
+    def export_media_player(self, context, player_id, width, height, shared=False):
+        """Export Flash media player
         
-        # Place a call of the Javascript post hook.
-        # TODO: This should be called from inside export_swf_object only
-        # on success.
-        if js_post_hook:
-            res += g.script(g.js_call(js_post_hook, *js_post_hook_args))
-            
-        return res
-
-    def export_media_player(self, context, player_id, width, height,
-                            shared=False, media=None):
+        The player can be controlled from other parts of the webpage through
+        Javascript functions defined in 'media.js'.
         
-        """Export the Flash media player
-        
-        The player can be controlled from other parts of the webpage
-        through Javascript functions from the resource media.js .
-        
-        Caution: The media player works only if the webpage is served
-        through a webserver. If it is displayed locally, Flash and
-        Javascript communication is not possible due to security
-        restrictions. The player displays but there is no way to
-        controll it.
+        Caution: The media player works only if the webpage is served through a
+        webserver. If it is displayed locally, Flash and Javascript
+        communication is not possible due to security restrictions. The player
+        displays but there is no way to controll it.
         
         Arguments:
-        context, player_id, width, heitght -- see export_swf_player() arguments
-        shared -- whether to use a shared media player (e.g. in bottom right corner
-        of a webpage to serve many different media playback requests)
-        media -- media to link with this media player (TODO: Not implemented)
+          context, player_id, width, height -- see 'export_swf_object()' arguments
+          shared -- whether to use a shared media player (e.g. in bottom right corner
+            of a webpage to serve many different media playback requests)
+        
         """
-        return self.export_swf_player(context, player_id, width, height,
-                                      flashapp='mediaplayer.swf',
-                                      js_post_hook='init_media_player',
-                                      js_post_hook_args=(player_id, shared))
+        g = context.generator()
+        result = self.export_swf_object(context, 'mediaplayer.swf', player_id, width, height,
+                                        min_flash_version='9.0.115',
+                                        warning=_("Media Player unavailable."))
+        if result:
+            context.resource('media.js')
+            result += g.script(g.js_call('init_media_player', player_id, shared))
+        return result
 
     def _media_player(self, context):
         """Export shared media player if in use, otherwise do nothing.
 
         See export_media_player() for more details.
+        
         """
-        if context.shared_player_used():
-            return self.export_media_player(context, 'shared-audio-player', 300, 20, shared=True)
+        controls = context.shared_player_controls()
+        if controls:
+            # Shared player controls exist, so create the player and connect the controls to it.
+            g = context.generator()
+            player_id = 'shared-audio-player'
+            # export_media_player() returns None if one of the dependencies is not found...
+            content = self.export_media_player(context, player_id, 300, 20, shared=True)
+            if content:
+                for args in controls:
+                    content += "\n"+ g.script(g.js_call('init_player_controls', player_id, *args))
+            return content
         else:
             return None
 
-    def export_audio(self, context, file, label=None, shared=True):
-        """Audio object in HTML
+    def export_inline_audio(self, context, audio, title=None, descr=None, image=None, shared=True):
+        """Export emedded audio player for given audio file.
 
-        An audio object available from resources or with a full http
-        path can be rendered as a PLAY button controlling a shared
-        Flash audio player (usually located in the bottom right corner
-        of a webpage) or using a standalone Flash audio player
-        (generated at the place in the HTML document where the file
-        object was located). In both cases, if Flash or Javascript is
-        not available, only a link to the audio file is rendered.
+        Inline audio can be rendered as a simple link which controls a shared
+        Flash audio player (usually located in the bottom right corner of a
+        webpage) or using a standalone Flash audio player located directly
+        inside page content in place of the link.  In both cases, if Flash or
+        Javascript is not available, a simple link without a player is rendered
+        allowing just downloading the audio file.
 
-        Arguments:
-        context -- the context object is needed because the method must
-        tell it whether shared player will be needed
-        file -- name of a file available from resources or a full http URI
-        label -- label (e.g. in HTML label of the playback controll button)
-        shared -- True if using a shared audio player is desired, False otherwise
-        (False not implemented yet)
-        """
+        Arguments are described in parent class method.
         
+        """
         if shared:
             g = context.generator()
-            context.use_shared_player()
-            button_id = '%x%x' % (positive_id(self), positive_id(file))
-            img = g.img(context.uri(context.node().resource('media-play.gif')))
-            # Translators: Play (audio)
-            play_label = label or _("Play")
-            ctrl = g.button(content=img, label=play_label, id=button_id, cls='media-control')
-            uri = context.uri(file)
-            return g.script_write(ctrl, concat('[', g.link(play_label, uri), ']')) + \
-                g.script(g.js_call('init_player_controls', None, uri, button_id))
+            uri = context.uri(audio)
+            link_id = '%x' % positive_id(audio)
+            context.connect_shared_player(uri, link_id)
+            if image:
+                label = g.img(context.uri(image), alt=title)
+                descr = descr or title
+            else:
+                label = title or audio.title()
+            return g.link(label, uri, id=link_id, title=descr, cls='media-control-link')
         else:
             raise NotImplementedError
+        
+    def export_inline_video(self, context, video, title=None, descr=None, image=None, size=None):
+        """Export emedded video player for given video file.
+
+        The 'Video' resource instance is rendered as a standalone Flash video
+        player preloaded with given video.  If Flash or Javascript is not
+        available, only a link to the video file is rendered.
+
+        Arguments are described in parent class method.
+        
+        """
+        g = context.generator()
+        if size is None:
+            width, height = (200, 200)
+        else:
+            width, height = size
+        uri = context.uri(video)
+        title = title or video.title()
+        descr = descr or video.descr()
+        link = g.link(title, uri, title=descr)
+        player = self.export_swf_object(context, 'mediaplayer.swf', '%x' % positive_id(video),
+                                        width, height, min_flash_version='9.0.115',
+                                        vars=dict(file=uri, title=title, description=descr,
+                                                  image=(image and context.uri(image))),
+                                        alternative_content=link)
+        return g.div(player or link, cls='video-player')
         
     def _initialize(self, context):
         return ''

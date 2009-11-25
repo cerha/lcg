@@ -15,8 +15,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA */
 
-var MIN_FLASH_VERSION = '9.0.115';
-
 /* Media playback infrastructure for Flash Player embedded within a web page.
  *
  * The primary purpose of this module is to allow media player control using ordinary HTML
@@ -38,30 +36,14 @@ var MIN_FLASH_VERSION = '9.0.115';
  * one media file at a time, so invoking playback from one control stops any playback previously
  * invoked from other controls (reloads the player with different media file).
  */
+
 var _shared_player_id = null;
 
 /* Dictionary with a state object for each player instance (initialized on player export) */
 var _player_state = {};
 
-function export_swf_object(uri, id, width, height, flash_errmsg) {
-   // TODO: Degrade gracefully when running locally (the player doesn't work in this case
-   // because of Flash security restrictions).
-   if (swfobject.hasFlashPlayerVersion(MIN_FLASH_VERSION)) {
-      var vars = {id: id};
-      var params = {allowfullscreen: 'false',
-		    allowscriptaccess: 'always'};
-      var attrs = {id: id, name: id};
-      swfobject.embedSWF(uri, id, width, height, MIN_FLASH_VERSION, false, vars, params, attrs);
-   } else {
-      // Replace the "JavaScript disabled" error message by a "Flash not available" error message.
-      var node = document.getElementById(id);
-      if (node != null)
-	 node.innerHTML = flash_errmsg.replace(/\$version/g, MIN_FLASH_VERSION);
-   }
-}
-
-function init_media_player(id, shared){
-   _player_state[id] = {
+function init_media_player(player_id, shared){
+   _player_state[player_id] = {
        position: 0,
        duration: null,
        volume: null,
@@ -71,34 +53,48 @@ function init_media_player(id, shared){
        on_load: null
    };
    if (shared)
-       _shared_player_id = id;
-}
-
-function playerReady(obj) {
-   //Called automatically by JW Media Player when a player instance is initialized.
-   var player = document.getElementById(obj.id);
-   var state = _player_state[obj.id];
-   if (player && typeof state != 'undefined') {
-      player.addControllerListener('VOLUME', '_on_player_volume_changed');
-      player.addModelListener('STATE', '_on_player_state_changed');
-      player.addModelListener('TIME', '_on_player_time_changed');
-      player.addModelListener('LOADED', '_on_player_loading_progress_changed');
-      state.volume = player.getConfig()['volume'];
-      var ctrl = state.controls;
-      if (ctrl != null && ctrl.initial_position != null) {
-	 // If position was saved before, we want to start download on page load, because for
-	 // seeking we need to download the whole file first.  The player actually starts download
-	 // after playback is invoked, so the trick below starts and stops playback.  The delay was
-	 // chosen experimantally.  It may not work 100%, but this feature is not essential.
-	 _media_player_ctrl_play(ctrl, null);
-	 setTimeout(function () { player.sendEvent('PLAY', false); }, 500);
-      }
-   }
+      _shared_player_id = player_id;
 }
 
 function init_player_controls(player_id, uri, button_id, selection_id, durations, position_id) {
-   // null in player_id means to use the shared player (its real id is not known to the caller and
-   // at this time also not to this module).
+   /* Initialize external media player controls.
+
+      This method makes it possible to connect ordinary HTML controls to an
+      embedded Flash media player.  The primary motivation for this trick is to
+      make player controls accessible, since flash accessibility is currently
+      very limited.
+
+      Arguments:
+
+        player_id -- id of the HTML element containing the player to connect
+          with this set of controls.
+        uri -- media file URI (string).  If track selection is used
+          ('selection_id' is passed), the uri is just a base URI and the actual
+          track URI is determined by concatenation of 'uri' and current
+          selected value of track selection.
+	button_id -- id of the HTML element controlling the player.  This is
+	  usually a button, but a plain link may be used as well.  Key presses
+	  and mouse clicks on this element will be handled and will control the
+	  connected player (space or Enter starts/stops the playback, <, > and
+	  left/right arrows seek backwards/forward, +, - and up/down arrows
+	  control the volumne.
+	selection_id -- id of the HTML <select> element containing track
+	  selection.  The options must have track URI's relative to 'uri' in
+	  their values (track titles may be used as labels).  The currently
+	  selected option determines the track to play.
+	durations -- array of track durations in seconds.  Each item of the
+	  array corresponds to one option in track selection.  Passing track
+	  durations makes it possible to display download progress in the
+	  player.  TODO: make it possible to pass duration also for single file
+	  controls without track selection.
+	position_id -- id of the HTML element containing the playback position.
+	  It may be an HTML <input> or <hidden> element.  The initial playback
+	  position may be passed to the player through this element and also
+	  the current position may be passed back from the player to the web
+	  application.  The field's value is automatically updated during
+	  playback, so the form can be submitted to save the last position etc.
+ 
+   */
    var button = document.getElementById(button_id);
    var select = document.getElementById(selection_id);
    var field = document.getElementById(position_id);
@@ -130,20 +126,40 @@ function init_player_controls(player_id, uri, button_id, selection_id, durations
 	 ctrl.initial_position = position;
       field.value = 0;
    }
-   if (player_id != null)
+   if (player_id != _shared_player_id)
       _player_state[player_id].controls = ctrl
 }
 
 function play_media(uri) {
    // Play given URI using the shared media player (if available).
-   _media_player_play(null, uri, null, null);
+   _media_player_play(_shared_player_id, uri, null, null);
+}
+
+function playerReady(obj) {
+   //Called automatically by JW Media Player when a player instance is initialized.
+   var player = document.getElementById(obj.id);
+   var state = _player_state[obj.id];
+   if (player && typeof state != 'undefined') {
+      player.addControllerListener('VOLUME', '_on_player_volume_changed');
+      player.addModelListener('STATE', '_on_player_state_changed');
+      player.addModelListener('TIME', '_on_player_time_changed');
+      player.addModelListener('LOADED', '_on_player_loading_progress_changed');
+      state.volume = player.getConfig()['volume'];
+      var ctrl = state.controls;
+      if (ctrl != null && ctrl.initial_position != null) {
+	 // If position was saved before, we want to start download on page load, because for
+	 // seeking we need to download the whole file first.  The player actually starts download
+	 // after playback is invoked, so the trick below starts and stops playback.  The delay was
+	 // chosen experimantally.  It may not work 100%, but this feature is not essential.
+	 _media_player_ctrl_play(ctrl, true);
+	 setTimeout(function () { player.sendEvent('PLAY', false); }, 500);
+      }
+   }
 }
 
 // Media player control functions.
 
 function _media_player(player_id) {
-   if (player_id == null)
-      player_id = _shared_player_id;
    if (player_id != null) {
       var player = document.getElementById(player_id);
       // Check that this really is the player instance, not its empty container.
@@ -188,14 +204,20 @@ function _media_player_play(player_id, uri, duration, position) {
    }
 }
 
-function _media_player_ctrl_play(ctrl, position) {
+function _media_player_ctrl_play(ctrl, preserve_initial_position) {
    var uri = ctrl.uri;
    var duration = null;
+   var position = null;
    var select = ctrl.track_selection;
    if (select != null) {
       uri += '/'+ select.value;
       if (ctrl.track_durations != null)
 	 duration = ctrl.track_durations[select.selectedIndex];
+   }
+   if (typeof preserve_initial_position == 'undefined') {
+      // HACK: Don't reset initial position when called from playerReady() just to start download.
+      position = ctrl.initial_position;
+      ctrl.initial_position = null;
    }
    _media_player_play(ctrl.player_id, uri, duration, position);
 }
@@ -279,8 +301,9 @@ function _on_player_state_changed(event) {
    if (ctrl != null && event.newstate == "COMPLETED" && event.oldstate != "COMPLETED") {
       var select = ctrl.track_selection;
       if (select != null && select.selectedIndex < select.options.length-1) {
+	 // Automatically advance to the next track if track selection control is present.
 	 select.selectedIndex++;
-	 _media_player_ctrl_play(ctrl, null);
+	 _media_player_ctrl_play(ctrl);
       }
    }
 }
@@ -300,10 +323,7 @@ function _on_player_loading_progress_changed(event) {
 // UI callbacks.
 
 function _on_media_ctrl_click(event) {
-   var ctrl = this._media_player_ctrl;
-   var position = ctrl.initial_position;
-   ctrl.initial_position = null;
-   _media_player_ctrl_play(ctrl, position);
+   _media_player_ctrl_play(this._media_player_ctrl);
    return false;
 }
 
@@ -324,7 +344,7 @@ function _on_media_ctrl_keydown(event) {
 	      40: '-'} // down arrow
    var key = map[code];
    if (key != null) 
-      return _handle_media_ctrl_keys(key, this._media_player_ctrl.player_id);
+      return _handle_media_ctrl_keys(key, this._media_player_ctrl);
    else
       return true;
 }
@@ -333,23 +353,30 @@ function _on_media_ctrl_keypress(event) {
    if (document.all) event = window.event;
    var code = event.charCode || event.keyCode;
    var key = String.fromCharCode(code);
-   return _handle_media_ctrl_keys(key, this._media_player_ctrl.player_id);
+   return _handle_media_ctrl_keys(key, this._media_player_ctrl);
 }
 
-function _handle_media_ctrl_keys(key, player_id) {
+function _handle_media_ctrl_keys(key, ctrl) {
+   if (key == ' ' && ctrl.button.nodeName == 'A') {
+      // Pressing space invokes the click event on buttons, but not on links,
+      // so we must handle space on links explicitly here.
+      _media_player_ctrl_play(ctrl);
+      return false;
+   }
+   var player_id = ctrl.player_id;
    if (key == '>') { 
       _media_player_seek(player_id, true);
       return false;
    }
-   if (key == '<') { // right arrow
+   if (key == '<') {
       _media_player_seek(player_id, false);
       return false;
    }
-   if (key == '+') { // up arrow
+   if (key == '+') {
       _media_player_volume(player_id, +5);
       return false;
    }
-   if (key == '-') { // down arrow
+   if (key == '-') {
       _media_player_volume(player_id, -5);
       return false;
    }
