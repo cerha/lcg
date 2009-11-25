@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-22 10:04+0200\n"
-"PO-Revision-Date: 2009-06-26 22:52+0100\n"
-"Last-Translator: Zuzana Lamperova <lamperova.zuzana@centrum.cz>\n"
+"POT-Creation-Date: 2009-11-25 12:15+0100\n"
+"PO-Revision-Date: 2009-11-25 12:16+0100\n"
+"Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Slovak <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -267,7 +267,8 @@ msgstr ""
 msgid "April"
 msgstr ""
 
-#: ../lib/lcg/util.py:227 ../lib/lcg/util.py:234
+#: ../lib/lcg/util.py:227
+#: ../lib/lcg/util.py:234
 msgid "May"
 msgstr ""
 
@@ -346,111 +347,85 @@ msgstr ""
 msgid "Dec"
 msgstr ""
 
-#: ../lib/lcg/export/html.test.py:411 ../lib/lcg/export/html.py:436
-#: ../lib/lcg/export/html.old.py:411
+#: ../lib/lcg/export/html.py:402
 msgid "Choose your language:"
 msgstr "Zvoľte si jazyk:"
 
-#: ../lib/lcg/export/html.test.py:507 ../lib/lcg/export/html.test.py:517
-#: ../lib/lcg/export/html.py:554 ../lib/lcg/export/html.py:564
-#: ../lib/lcg/export/html.old.py:504 ../lib/lcg/export/html.old.py:514
-#: ../lib/lcg/export/html.old.py:544 ../lib/lcg/export/html.old.py:554
+#: ../lib/lcg/export/html.py:516
+#: ../lib/lcg/export/html.py:526
 msgid "Warning:"
 msgstr "Upozornenie:"
 
 #. Translators: Title of the link to Adobe website used in the Flash warning.
 #. The version is substituted within the JavaScript code.
-#: ../lib/lcg/export/html.test.py:515 ../lib/lcg/export/html.py:562
-#: ../lib/lcg/export/html.old.py:512 ../lib/lcg/export/html.old.py:552
+#: ../lib/lcg/export/html.py:524
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plugin"
 
 #. Translators: '%(version)s' is automatically replaced by the required version
 #. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
 #. download page.
-#: ../lib/lcg/export/html.test.py:511 ../lib/lcg/export/html.old.py:548
-#, fuzzy, python-format
-msgid ""
-"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
-"audiochat."
-msgstr ""
-"Flash %(version)s nenájdený. Prosím nainštalujte alebo upgradujte %(plugin) %"
-"(version)s aby ste mohli využíť rozšírené možnosti prehrávania."
+#: ../lib/lcg/export/html.py:520
+#, python-format
+msgid "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for advanced media capabilities."
+msgstr "Flash %(version)s nenájdený. Prosím nainštalujte alebo upgradujte %(plugin)s %(version)s aby ste mohli využíť rozšírené možnosti prehrávania."
 
-#: ../lib/lcg/export/html.test.py:518 ../lib/lcg/export/html.py:565
-#: ../lib/lcg/export/html.old.py:555
+#: ../lib/lcg/export/html.py:527
 #, fuzzy
-msgid ""
-"JavaScript not detected. Use a JavaScript enabled browser for audiochat."
+msgid "JavaScript not detected. Use a JavaScript enabled browser for audiochat."
+msgstr "JavaScript nenájdený. Použijte prehliadač s podporou JavaScriptu aby ste mohli využiť rozšírené možnosti prehrávania."
+
+#. Translators: Play (audio)
+#: ../lib/lcg/export/html.py:607
+msgid "Play"
 msgstr ""
-"JavaScript nenájdený. Použijte prehliadač s podporou JavaScriptu aby ste "
-"mohli využiť rozšírené možnosti prehrávania."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.test.py:691 ../lib/lcg/export/html.py:758
-#: ../lib/lcg/export/html.old.py:709
+#: ../lib/lcg/export/html.py:754
 msgid "None"
 msgstr "Nie je"
 
-#: ../lib/lcg/export/html.test.py:692 ../lib/lcg/export/html.py:759
-#: ../lib/lcg/export/html.old.py:710
+#: ../lib/lcg/export/html.py:755
 msgid "You are here:"
 msgstr "Nachádzate sa tu:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.test.py:696 ../lib/lcg/export/html.py:763
-#: ../lib/lcg/export/html.old.py:714
+#: ../lib/lcg/export/html.py:759
 msgid "Next"
 msgstr "Nasledujúce"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.test.py:698 ../lib/lcg/export/html.py:765
-#: ../lib/lcg/export/html.old.py:716
+#: ../lib/lcg/export/html.py:761
 msgid "Previous"
 msgstr "Predchádzajúce"
-
-#. Translators: Play (audio)
-#: ../lib/lcg/export/html.py:181
-msgid "Play"
-msgstr ""
-
-#. Translators: '%(version)s' is automatically replaced by the required version
-#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
-#. download page.
-#: ../lib/lcg/export/html.py:558
-#, fuzzy, python-format
-msgid ""
-"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
-"advanced media capabilities."
-msgstr ""
-"Flash %(version)s nenájdený. Prosím nainštalujte alebo upgradujte %(plugin) %"
-"(version)s aby ste mohli využíť rozšírené možnosti prehrávania."
-
-#. Translators: '%(version)s' is automatically replaced by the required version
-#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
-#. download page.
-#: ../lib/lcg/export/html.old.py:508
-#, fuzzy, python-format
-msgid ""
-"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
-"advanced media playback capabilities."
-msgstr ""
-"Flash %(version)s nenájdený. Prosím nainštalujte alebo upgradujte %(plugin) %"
-"(version)s aby ste mohli využíť rozšírené možnosti prehrávania."
-
-#: ../lib/lcg/export/html.old.py:515
-msgid ""
-"JavaScript not detected. Use a JavaScript enabled browser for advanced media "
-"playback capabilities."
-msgstr ""
-"JavaScript nenájdený. Použijte prehliadač s podporou JavaScriptu aby ste "
-"mohli využiť rozšírené možnosti prehrávania."
 
 #. Translators: Title of the local table of contents (links to subsections).
 #: ../lib/lcg/content.py:526
 msgid "Index:"
 msgstr "Obsah:"
 
+#, fuzzy
+#~ msgid ""
+#~ "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+#~ "audiochat."
+#~ msgstr ""
+#~ "Flash %(version)s nenájdený. Prosím nainštalujte alebo upgradujte %"
+#~ "(plugin) %(version)s aby ste mohli využíť rozšírené možnosti prehrávania."
+
+#, fuzzy
+#~ msgid ""
+#~ "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+#~ "advanced media playback capabilities."
+#~ msgstr ""
+#~ "Flash %(version)s nenájdený. Prosím nainštalujte alebo upgradujte %"
+#~ "(plugin) %(version)s aby ste mohli využíť rozšírené možnosti prehrávania."
+#~ msgid ""
+#~ "JavaScript not detected. Use a JavaScript enabled browser for advanced "
+#~ "media playback capabilities."
+#~ msgstr ""
+#~ "JavaScript nenájdený. Použijte prehliadač s podporou JavaScriptu aby ste "
+#~ "mohli využiť rozšírené možnosti prehrávania."
 #~ msgid "Adobe website"
 #~ msgstr "Adobe stranka"
+

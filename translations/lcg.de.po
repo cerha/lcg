@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-22 10:04+0200\n"
+"POT-Creation-Date: 2009-11-25 12:15+0100\n"
 "PO-Revision-Date: 2009-07-13 15:57+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: German <lcg@lists.freebsoft.org>\n"
@@ -347,84 +347,24 @@ msgstr ""
 msgid "Dec"
 msgstr ""
 
-#: ../lib/lcg/export/html.test.py:411 ../lib/lcg/export/html.py:436
-#: ../lib/lcg/export/html.old.py:411
+#: ../lib/lcg/export/html.py:402
 msgid "Choose your language:"
 msgstr "Sprache wählen:"
 
-#: ../lib/lcg/export/html.test.py:507 ../lib/lcg/export/html.test.py:517
-#: ../lib/lcg/export/html.py:554 ../lib/lcg/export/html.py:564
-#: ../lib/lcg/export/html.old.py:504 ../lib/lcg/export/html.old.py:514
-#: ../lib/lcg/export/html.old.py:544 ../lib/lcg/export/html.old.py:554
+#: ../lib/lcg/export/html.py:516 ../lib/lcg/export/html.py:526
 msgid "Warning:"
 msgstr "Achtung:"
 
 #. Translators: Title of the link to Adobe website used in the Flash warning.
 #. The version is substituted within the JavaScript code.
-#: ../lib/lcg/export/html.test.py:515 ../lib/lcg/export/html.py:562
-#: ../lib/lcg/export/html.old.py:512 ../lib/lcg/export/html.old.py:552
+#: ../lib/lcg/export/html.py:524
 msgid "Adobe Flash plugin"
 msgstr ""
 
 #. Translators: '%(version)s' is automatically replaced by the required version
 #. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
 #. download page.
-#: ../lib/lcg/export/html.test.py:511 ../lib/lcg/export/html.old.py:548
-#, fuzzy, python-format
-msgid ""
-"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
-"audiochat."
-msgstr ""
-"Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder upgrade "
-"Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten der "
-"Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
-
-#: ../lib/lcg/export/html.test.py:518 ../lib/lcg/export/html.py:565
-#: ../lib/lcg/export/html.old.py:555
-#, fuzzy
-msgid ""
-"JavaScript not detected. Use a JavaScript enabled browser for audiochat."
-msgstr ""
-"Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder upgrade "
-"Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten der "
-"Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
-
-# This label is actually not used.
-#. Translators: Label used instead of a link when the target does not exist.  For
-#. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.test.py:691 ../lib/lcg/export/html.py:758
-#: ../lib/lcg/export/html.old.py:709
-msgid "None"
-msgstr "Nichts"
-
-#: ../lib/lcg/export/html.test.py:692 ../lib/lcg/export/html.py:759
-#: ../lib/lcg/export/html.old.py:710
-msgid "You are here:"
-msgstr "Sie sind hier:"
-
-# Navigation bar label (at the bottom of each page)
-#. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.test.py:696 ../lib/lcg/export/html.py:763
-#: ../lib/lcg/export/html.old.py:714
-msgid "Next"
-msgstr "weiter"
-
-# Navigation bar label (at the bottom of each page)
-#. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.test.py:698 ../lib/lcg/export/html.py:765
-#: ../lib/lcg/export/html.old.py:716
-msgid "Previous"
-msgstr "vorhergehend"
-
-#. Translators: Play (audio)
-#: ../lib/lcg/export/html.py:181
-msgid "Play"
-msgstr ""
-
-#. Translators: '%(version)s' is automatically replaced by the required version
-#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
-#. download page.
-#: ../lib/lcg/export/html.py:558
+#: ../lib/lcg/export/html.py:520
 #, fuzzy, python-format
 msgid ""
 "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
@@ -434,34 +374,75 @@ msgstr ""
 "Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten der "
 "Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
 
-#. Translators: '%(version)s' is automatically replaced by the required version
-#. number.  '%(plugin)s' is replaced by a hypertext link to Adobe Flash plugin
-#. download page.
-#: ../lib/lcg/export/html.old.py:508
-#, fuzzy, python-format
+#: ../lib/lcg/export/html.py:527
+#, fuzzy
 msgid ""
-"Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
-"advanced media playback capabilities."
+"JavaScript not detected. Use a JavaScript enabled browser for audiochat."
 msgstr ""
 "Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder upgrade "
 "Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten der "
 "Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
 
-#: ../lib/lcg/export/html.old.py:515
-#, fuzzy
-msgid ""
-"JavaScript not detected. Use a JavaScript enabled browser for advanced media "
-"playback capabilities."
+#. Translators: Play (audio)
+#: ../lib/lcg/export/html.py:607
+msgid "Play"
 msgstr ""
-"Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder upgrade "
-"Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten der "
-"Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
+
+# This label is actually not used.
+#. Translators: Label used instead of a link when the target does not exist.  For
+#. example sequential navigation may contain: "Previous: Introduction, Next: None".
+#: ../lib/lcg/export/html.py:754
+msgid "None"
+msgstr "Nichts"
+
+#: ../lib/lcg/export/html.py:755
+msgid "You are here:"
+msgstr "Sie sind hier:"
+
+# Navigation bar label (at the bottom of each page)
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:759
+msgid "Next"
+msgstr "weiter"
+
+# Navigation bar label (at the bottom of each page)
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:761
+msgid "Previous"
+msgstr "vorhergehend"
 
 # The table of contents...
 #. Translators: Title of the local table of contents (links to subsections).
 #: ../lib/lcg/content.py:526
 msgid "Index:"
 msgstr "Verzeichnis:"
+
+#, fuzzy
+#~ msgid ""
+#~ "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+#~ "audiochat."
+#~ msgstr ""
+#~ "Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder "
+#~ "upgrade Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten "
+#~ "der Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
+
+#, fuzzy
+#~ msgid ""
+#~ "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+#~ "advanced media playback capabilities."
+#~ msgstr ""
+#~ "Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder "
+#~ "upgrade Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten "
+#~ "der Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
+
+#, fuzzy
+#~ msgid ""
+#~ "JavaScript not detected. Use a JavaScript enabled browser for advanced "
+#~ "media playback capabilities."
+#~ msgstr ""
+#~ "Flash %(version)s ist nicht gefunden.  Bitte installisieren Sie oder "
+#~ "upgrade Flash plugin auf %(version)s damit Sie die erweiterte Möglikeiten "
+#~ "der Abtastung.  Klicken Sie bitte auf %(link)s für mehr Informationen."
 
 #~ msgid "Adobe website"
 #~ msgstr "Adobe website"
