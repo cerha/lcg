@@ -815,6 +815,10 @@ class FileExporter(object):
 
     _OUTPUT_FILE_EXT = None
 
+    def __init__(self, force_lang_ext=False, **kwargs):
+        super(FileExporter, self).__init__(**kwargs)
+        self._force_lang_ext = force_lang_ext
+
     def _write_file(self, filename, content):
         directory = os.path.split(filename)[0]
         if directory and not os.path.isdir(directory):
@@ -832,7 +836,7 @@ class FileExporter(object):
         name = node.id().replace(':', '-')
         if lang is None:
             lang = context.lang()
-        if lang is not None and len(node.variants()) > 1:
+        if lang is not None and ((len(node.variants()) > 1) or (self._force_lang_ext)):
             name += '.'+ lang
         return name +'.'+ self._OUTPUT_FILE_EXT
     

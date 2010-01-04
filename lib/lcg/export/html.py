@@ -733,7 +733,7 @@ class StyledHtmlExporter(object):
         else:
             super(StyledHtmlExporter, self)._export_resource(resource, dir)
 
-            
+
 class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
     """Export the content as a set of static web pages with navigation."""
 
@@ -751,7 +751,7 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                    'bottom_navigation',
                    'media_player',
                    )
-    
+
     def _head(self, context):
         base = super(HtmlStaticExporter, self)._head(context)
         node = context.node()
