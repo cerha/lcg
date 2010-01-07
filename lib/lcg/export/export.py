@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2009 Brailcom, o.p.s.
+# Copyright (C) 2004-2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -286,7 +286,7 @@ class Generator(object):
         """
         return self.escape('%s#%s' % (label, name,))
 
-    def img(src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
+    def img(self, src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
         """Return image stored at 'src' URI.
 
         Arguments:

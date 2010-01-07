@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008 Brailcom, o.p.s.
+# Copyright (C) 2008, 2010 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -653,7 +653,7 @@ class PDFGenerator(Generator):
     def anchor(self, label, name, **kwargs):
         return make_element(LinkTarget, content=label, name=name)
 
-    def img(src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
+    def img(self, src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
         return make_element(Image, content=src)
 
     # Tables and definition lists
