@@ -1,138 +1,132 @@
--*- mode: change-log -*-
+Version 0.4.0 (2010-01-21):
 
-2009-09-21  Tomas Cerha  <cerha@brailcom.org>
+  * Added support for video embedding
+   
+  * Audio embedding generalized.
 
-	Version 0.3.7
+  * Macro parser resurrected and improved (backwards incompatible).
 
-	Minor API extensions.
+  * Allow explicit image sizing in structured text.
 
-	Bug fixes.
+  * Documentation additions.
+
+  * Translation updates.
 	
-	Documentation additions and improvements.
+Version 0.3.7 (2009-09-21):
 
-	New translations: de, es, it, no, sk
+  * Minor API extensions.
 
-2007-11-05  Tomas Cerha  <cerha@brailcom.org>
+  * Bug fixes.
 
-	Version 0.3.6
+  * Documentation additions and improvements.
 
-	Removed all files specific to e-learning (exercises etc.).
+  * New translations: de, es, it, no, sk
 
-	New i18n classes for locale-formatted decimal and monetary
-	amounts.
+Version 0.3.6 (2007-11-05)
 
-	New interface for locale data definition.
+  * Removed all files specific to e-learning (exercises etc.).
 
-	`Reader' API cleaning and stabilization.
+  * New i18n classes for locale-formatted decimal and monetary
+    amounts.
 
-	Generate all language variants in one pass.
+  * New interface for locale data definition.
 
-2007-08-10  Tomas Cerha  <cerha@brailcom.org>
+  * `Reader' API cleaning and stabilization.
 
-	Version 0.3.5
+  * Generate all language variants in one pass.
 
-	Removed all files specific to the Eurochance project.
+Version 0.3.5 (2007-08-10):
 
-	Major API changes: Final separation of ContentNode representation
-	and document structure processing from source files (new Reader
-	classes).  Output format generators can now be overriden within
-	the Exporter class.  Generalized resource constructions process.
+  * Removed all files specific to the Eurochance project.
 
-	Many new convenience functions for content construction.
+  * Major API changes: Final separation of ContentNode representation and
+    document structure processing from source files (new Reader classes).
+    Output format generators can now be overriden within the Exporter class.
+    Generalized resource constructions process.
 
-	Minor improvements in the markup formatter.
+  * New convenience functions for content construction.
+
+  * Minor improvements in the markup formatter.
 	
-	Improved navigation within statically generated html pages.
+  * Improved navigation within statically generated html pages.
 
 	
-2006-12-04  Tomas Cerha  <cerha@brailcom.org>
+Version 0.3.4 (2006-12-04):
 
-	Version 0.3.4
+  * Improved HTML generation features.
 
-	Added Polish translations for generated content and formatting
-	manual (thanks to Pawel Loba).
+  * Many new features in the internationalization API.  There is a new
+    `LocalizableDateTime' class for locale specific date/time conversions.
+    `TranslatableText' and `Concatenation' classes are now unicode subclasses.
+    See the API documentation for more details.
+
+  * Most of the export related functionality was now moved to the exporter
+    classes from the content classes.  This increases abstraction of the
+    content and allows more control for custom exporter classes.  The related
+    APIs have changed, but these changes are hidden when using the end user
+    tools.
+
+  * Added Polish translations including the formatting manual (thanks to Pawel
+    Loba).
 	
-	Improved HTML generation features.
+Version 0.3.3 (2006-07-28): 
 
-	Many new features in the internationalization API.  There is a new
-	`LocalizableDateTime' class for locale specific date/time
-	conversions.  `TranslatableText' and `Concatenation' classes are
-	now unicode subclasses.  See the API documentation for more
-	details.
+  * Added defered translation support to allow dynamic translation at the
+    export time.  This change lead to a major rewrite of the export part and
+    internal text processing, but should not lead to any incompatibilities
+    except those described below.
+  
+  * The output language is now not set using the `LCG_LANGUAGE' environment
+    variable (which only allowed to set the language once for one process), but
+    using the `lang' argument of the exporter.  This change is reflected by the
+    user tools (lcgmake and generate), so should not be notifiable if you don't
+    use the API directly.
+  
+  * Back-references from section titles to the table of contents were
+    fixed. They accidently stoped to work under certain conditions sometimes
+    before the 0.3 version.
 
-	Most of the export related functionality was now moved to the
-	exporter classes from the content classes.  This increases
-	abstraction of the content and allows more control for custom
-	exporter classes.  The related APIs have changed, but these
-	changes are hidden when using the end user tools.
 
-2006-07-28  Tomas Cerha  <cerha@brailcom.org>
+Version 0.3.2 (2006-07-25): 
 
-	Version 0.3.3
-
-	Added defered translation support to allow dynamic translation at
-	the export time.  This change lead to a major rewrite of the
-	export part and internal text processing, but should not lead to
-	any incompatibilities except those described below.
-
-	The output language is now not set using the `LCG_LANGUAGE' environment
-	variable (which only allowed to set the language once for one process),
-	but using the `lang' argument of the exporter.  This change is
-	reflected by the user tools (lcgmake and generate), so should not be
-	notifiable if you don't use the API directly.
-
-	* BUGFIX: Back-references from section titles to the table of
-	contents were fixed.  They accidently stoped to work under certain
-	conditions sometimes before the 0.3 version.
-	
-
-2006-07-25  Tomas Cerha  <cerha@brailcom.org>
-
-	Version 0.3.2
-
-	This is an API cleanup version.  There are no new features or data
-	format incompatibilities, but there are major API changes.
-
-	The content was finally made independent of the node.  Thus it is
-	possible to construct the content separately and assign it to a
-	`ContentNode' instance later.  In consequence, `Content' and all the
-	derived classes take no `parent' argument now.
-
-	Much of the export related functionality was moved from the
-	`ContentNode' class and some `Content' subclasses to the Exporter.
-
-	The import ralated functionality was also moved away from
-	`ContentNode' and concentrated into derived classes.  This is an
-	intemediate solution before creating a separate import layer.
-	
-
-2006-05-22  Tomas Cerha  <cerha@brailcom.org>
-
-	Version 0.3.1
-
-	Internal dealing with secondary language was made a generic
-	feature, rather than a hack just for the Eurochance course.
-
-	Language selection was also made a generic feature.  It appears
-	automatically when multiple versions of the document exist.
-
-	Added Czech, Spanish, Norwegian and Slovak translations of some
-	LCG generated texts.
-
-	Some internal cleanup.
-	
-	* BUGFIX: Added a hack to prevent some MSIE versions from
-	displaying the Media Player window over the page text.
-	
-	* BUGFIX: Include the navigation bar in the output only when there
-	is more than one page.
+  * This is an API cleanup version.  There are no new features or data format
+    incompatibilities, but there are major API changes.
+    
+  * The content was finally made independent of the node.  Thus it is possible
+    to construct the content separately and assign it to a `ContentNode'
+    instance later.  In consequence, `Content' and all the derived classes take
+    no `parent' argument now.
+    
+  * Much of the export related functionality was moved from the `ContentNode'
+    class and some `Content' subclasses to the Exporter.
+    
+  * The import ralated functionality was also moved away from `ContentNode' and
+    concentrated into derived classes.  This is an intemediate solution before
+    creating a separate import layer.
 	
 
-2006-04-12  Tomas Cerha  <cerha@brailcom.org>
+Version 0.3.1 (2006-05-22):
 
-	Version 0.3
+  * Internal dealing with secondary language was made a generic feature, rather
+    than a hack just for the Eurochance course.
 
-	This is the first public version, which was released at the occassion
-	of releasing the Eurochance language courses (see
-	http://eurochance.brailcom.org), which are generated by the
-	LCG.
+  * Language selection was also made a generic feature.  It appears
+    automatically when multiple versions of the document exist.
+
+  * Added Czech, Spanish, Norwegian and Slovak translations of some
+    LCG generated texts.
+
+  * Internal cleanup.
+	
+  * Added a hack to prevent some MSIE versions from displaying the Media Player
+    window over the page text.
+	
+  * Include the navigation bar in the output only when there is more than one
+    page.
+	
+
+Version 0.3 (2006-04-12):
+
+  * This is the first public version, which was released at the occassion of
+    releasing the Eurochance language courses (see
+    http://eurochance.brailcom.org), which are generated by the LCG.

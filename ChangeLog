@@ -1,5 +1,11 @@
 2010-01-21  Tomas Cerha  <cerha@brailcom.org>
 
+	* NEWS:
+	* lib/lcg/__init__.py:
+	Released version 0.4.0.
+
+2010-01-21  Tomas Cerha  <cerha@brailcom.org>
+
 	* INSTALL:
 	Installation instructions updated.
 
