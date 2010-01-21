@@ -1,3 +1,8 @@
+2010-01-21  Tomas Cerha  <cerha@brailcom.org>
+
+	* INSTALL:
+	Installation instructions updated.
+
 2010-01-07  Milan Zamazal  <pdm@brailcom.org>
 
 	* lib/lcg/export/export.py:

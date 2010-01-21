@@ -28,8 +28,10 @@ suppose that you have unpacked LCG to `/home/bob/lcg'.
 
      $ export LCGDIR=/home/bob/lcg
 
-  3. If you checked LCG out from CVS, you should also run `make translations'.
-     This step can be omitted if you downloaded an LCG release package.
+  3. Compile the Python libraries and create other generated files (this step
+     can be omitted if you downloaded an LCG release package).
+
+     $ make all
 
   4. If you need to use LCG executables, such as `lcgmake', just use their full
      path.  You will find them in the `bin' subdirectory.
