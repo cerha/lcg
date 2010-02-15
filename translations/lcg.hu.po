@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-11-25 12:19+0100\n"
-"PO-Revision-Date: 2008-10-14 12:35+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-02-15 15:36+0100\n"
+"PO-Revision-Date: 2010-02-03 01:56+0100\n"
+"Last-Translator: Hostomský Károly <khostomsky@gmail.com>\n"
 "Language-Team: Hungarian <lcg@lists.freebsoft.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,343 +17,343 @@ msgstr ""
 
 #: ../lib/lcg/util.py:138
 msgid "Afrikaans"
-msgstr ""
+msgstr "afrikaans"
 
 #: ../lib/lcg/util.py:139
 msgid "Arabic"
-msgstr ""
+msgstr "arab"
 
 #: ../lib/lcg/util.py:141
 msgid "Bulgarian"
-msgstr ""
+msgstr "bolgár"
 
 #: ../lib/lcg/util.py:143
 msgid "Catalan"
-msgstr ""
+msgstr "katalán"
 
 #: ../lib/lcg/util.py:143
 msgid "Corsican"
-msgstr ""
+msgstr "korzikai"
 
 #: ../lib/lcg/util.py:143
 msgid "Czech"
-msgstr ""
+msgstr "cseh"
 
 #: ../lib/lcg/util.py:144
 msgid "Danish"
-msgstr ""
+msgstr "dán"
 
 #: ../lib/lcg/util.py:144
 msgid "German"
-msgstr ""
+msgstr "német"
 
 #: ../lib/lcg/util.py:145
 msgid "Greek"
-msgstr ""
+msgstr "görög"
 
 #: ../lib/lcg/util.py:145
 msgid "English"
-msgstr ""
+msgstr "angol"
 
 #: ../lib/lcg/util.py:145
 msgid "Spanish"
-msgstr ""
+msgstr "spanyol"
 
 #: ../lib/lcg/util.py:146
 msgid "Estonian"
-msgstr ""
+msgstr "észt"
 
 #: ../lib/lcg/util.py:146
 msgid "Basque"
-msgstr ""
+msgstr "baszk"
 
 #: ../lib/lcg/util.py:147
 msgid "Finnish"
-msgstr ""
+msgstr "finn"
 
 #: ../lib/lcg/util.py:148
 msgid "French"
-msgstr ""
+msgstr "francia"
 
 #: ../lib/lcg/util.py:150
 msgid "Irish"
-msgstr ""
+msgstr "ír"
 
 #: ../lib/lcg/util.py:150
 msgid "Galician"
-msgstr ""
+msgstr "galíciai"
 
 #: ../lib/lcg/util.py:152
 msgid "Hindi"
-msgstr ""
+msgstr "hindi"
 
 #: ../lib/lcg/util.py:152
 msgid "Croatian"
-msgstr ""
+msgstr "horvát"
 
 #: ../lib/lcg/util.py:153
 msgid "Hungarian"
-msgstr ""
+msgstr "magyar"
 
 #: ../lib/lcg/util.py:155
 msgid "Icelandic"
-msgstr ""
+msgstr "izlandi"
 
 #: ../lib/lcg/util.py:155
 msgid "Italian"
-msgstr ""
+msgstr "olasz"
 
 #: ../lib/lcg/util.py:156
 msgid "Japanese"
-msgstr ""
+msgstr "japán"
 
 #: ../lib/lcg/util.py:157
 msgid "Georgian"
-msgstr ""
+msgstr "grúz"
 
 #: ../lib/lcg/util.py:158
 msgid "Korean"
-msgstr ""
+msgstr "koreai"
 
 #: ../lib/lcg/util.py:158
 msgid "Kurdish"
-msgstr ""
+msgstr "kurd"
 
 #: ../lib/lcg/util.py:162
 msgid "Macedonian"
-msgstr ""
+msgstr "macedón"
 
 #: ../lib/lcg/util.py:163
 msgid "Moldavian"
-msgstr ""
+msgstr "moldáv"
 
 #: ../lib/lcg/util.py:165
 msgid "Dutch"
-msgstr ""
+msgstr "holland"
 
 #: ../lib/lcg/util.py:165
 msgid "Norwegian"
-msgstr ""
+msgstr "ńorvég"
 
 #: ../lib/lcg/util.py:167
 msgid "Polish"
-msgstr ""
+msgstr "lengyel"
 
 #: ../lib/lcg/util.py:168
 msgid "Portuguese"
-msgstr ""
+msgstr "portugál"
 
 #: ../lib/lcg/util.py:170
 msgid "Romanian"
-msgstr ""
+msgstr "román"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovak"
-msgstr ""
+msgstr "szlovák"
 
 #: ../lib/lcg/util.py:173
 msgid "Slovenian"
-msgstr ""
+msgstr "szlovén"
 
 #: ../lib/lcg/util.py:174
 msgid "Albanian"
-msgstr ""
+msgstr "albán"
 
 #: ../lib/lcg/util.py:174
 msgid "Serbian"
-msgstr ""
+msgstr "szerb"
 
 #: ../lib/lcg/util.py:175
 msgid "Swedish"
-msgstr ""
+msgstr "svéd"
 
 #: ../lib/lcg/util.py:177
 msgid "Thai"
-msgstr ""
+msgstr "tai"
 
 #: ../lib/lcg/util.py:179
 msgid "Turkish"
-msgstr ""
+msgstr "török"
 
 #: ../lib/lcg/util.py:180
 msgid "Ukrainian"
-msgstr ""
+msgstr "ukrán"
 
 #: ../lib/lcg/util.py:182
 msgid "Yiddish"
-msgstr ""
+msgstr "jiddis"
 
 #: ../lib/lcg/util.py:182
 msgid "Chinese"
-msgstr ""
+msgstr "kínai"
 
 #. Translators: The following 7 strings represent full week day names.  Please, take care to use
 #. upper/lower case letters according to the rules of the target language.
 #: ../lib/lcg/util.py:199
 msgid "Monday"
-msgstr ""
+msgstr "hétfő"
 
 #: ../lib/lcg/util.py:199
 msgid "Tuesday"
-msgstr ""
+msgstr "kedd"
 
 #: ../lib/lcg/util.py:199
 msgid "Wednesday"
-msgstr ""
+msgstr "szerda"
 
 #: ../lib/lcg/util.py:199
 msgid "Thursday"
-msgstr ""
+msgstr "csütörtök"
 
 #: ../lib/lcg/util.py:199
 msgid "Friday"
-msgstr ""
+msgstr "péntek"
 
 #: ../lib/lcg/util.py:200
 msgid "Saturday"
-msgstr ""
+msgstr "szombat"
 
 #: ../lib/lcg/util.py:200
 msgid "Sunday"
-msgstr ""
+msgstr "vasárnap"
 
 #. Translators: The following 7 strings represent the abbreviated week day names.  The
 #. abbreviations should normally take up to three characters.  Feel free to use whatever form
 #. usual in the target language.
 #: ../lib/lcg/util.py:205
 msgid "Mon"
-msgstr ""
+msgstr "Hét"
 
 #: ../lib/lcg/util.py:205
 msgid "Tue"
-msgstr ""
+msgstr "Kedd"
 
 #: ../lib/lcg/util.py:205
 msgid "Wed"
-msgstr ""
+msgstr "Szer"
 
 #: ../lib/lcg/util.py:205
 msgid "Thu"
-msgstr ""
+msgstr "Csüt"
 
 #: ../lib/lcg/util.py:205
 msgid "Fri"
-msgstr ""
+msgstr "Pén"
 
 #: ../lib/lcg/util.py:205
 msgid "Sat"
-msgstr ""
+msgstr "Szom"
 
 #: ../lib/lcg/util.py:205
 msgid "Sun"
-msgstr ""
+msgstr "Vas"
 
 #. Translators: The following 12 strings represent full month names.  Please, take care to use
 #. upper/lower case letters according to the rules of the target language.
 #: ../lib/lcg/util.py:227
 msgid "January"
-msgstr ""
+msgstr "Január"
 
 #: ../lib/lcg/util.py:227
 msgid "February"
-msgstr ""
+msgstr "Február"
 
 #: ../lib/lcg/util.py:227
 msgid "March"
-msgstr ""
+msgstr "Március"
 
 #: ../lib/lcg/util.py:227
 msgid "April"
-msgstr ""
+msgstr "Április"
 
 #: ../lib/lcg/util.py:227 ../lib/lcg/util.py:234
 msgid "May"
-msgstr ""
+msgstr "Május"
 
 #: ../lib/lcg/util.py:227
 msgid "June"
-msgstr ""
+msgstr "Június"
 
 #: ../lib/lcg/util.py:228
 msgid "July"
-msgstr ""
+msgstr "Július"
 
 #: ../lib/lcg/util.py:228
 msgid "August"
-msgstr ""
+msgstr "Augusztus"
 
 #: ../lib/lcg/util.py:228
 msgid "September"
-msgstr ""
+msgstr "Szeptember"
 
 #: ../lib/lcg/util.py:228
 msgid "October"
-msgstr ""
+msgstr "Október"
 
 #: ../lib/lcg/util.py:228
 msgid "November"
-msgstr ""
+msgstr "November"
 
 #: ../lib/lcg/util.py:229
 msgid "December"
-msgstr ""
+msgstr "December"
 
 #. Translators: The following 12 strings represent the abbreviated month names.  The
 #. abbreviations should normally take up to three characters.  Feel free to use whatever form
 #. usual in the target language.
 #: ../lib/lcg/util.py:234
 msgid "Jan"
-msgstr ""
+msgstr "Jan"
 
 #: ../lib/lcg/util.py:234
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: ../lib/lcg/util.py:234
 msgid "Mar"
-msgstr ""
+msgstr "Már"
 
 #: ../lib/lcg/util.py:234
 msgid "Apr"
-msgstr ""
+msgstr "Ápr"
 
 #: ../lib/lcg/util.py:234
 msgid "Jun"
-msgstr ""
+msgstr "Jún"
 
 #: ../lib/lcg/util.py:234
 msgid "Jul"
-msgstr ""
+msgstr "Júl"
 
 #: ../lib/lcg/util.py:235
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 #: ../lib/lcg/util.py:235
 msgid "Sep"
-msgstr ""
+msgstr "Szep"
 
 #: ../lib/lcg/util.py:235
 msgid "Oct"
-msgstr ""
+msgstr "Okt"
 
 #: ../lib/lcg/util.py:235
 msgid "Nov"
-msgstr ""
+msgstr "Nov"
 
 #: ../lib/lcg/util.py:235
 msgid "Dec"
-msgstr ""
+msgstr "Dec"
 
 #: ../lib/lcg/export/html.py:414
 msgid "Choose your language:"
-msgstr ""
+msgstr "Válassz nyelvet:"
 
 #. Translators: Title of the link to Adobe website used in
 #. the Flash warning.
 #: ../lib/lcg/export/html.py:559
 msgid "Adobe Flash plugin"
-msgstr ""
+msgstr "Adobe Flash plugin"
 
 #. Translators: Warning message displayed if Flash plugin is not installed or doesn't
 #. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
@@ -362,41 +362,41 @@ msgstr ""
 #: ../lib/lcg/export/html.py:555
 #, python-format
 msgid "Get %(plugin)s %(version)s or later."
-msgstr ""
+msgstr "Töltse le a %(version)s vagy későbbi verziójú %(plugin)s-t."
 
 #: ../lib/lcg/export/html.py:561
 msgid "Use a JavaScript enabled browser."
-msgstr ""
+msgstr "JavaScripttel ellátott böngészőt használjon."
 
 #: ../lib/lcg/export/html.py:562 ../lib/lcg/export/html.py:563
 msgid "Warning:"
-msgstr ""
+msgstr "Figyelem:"
 
 #: ../lib/lcg/export/html.py:594
 msgid "Media Player unavailable."
-msgstr ""
+msgstr "Media Player nem elérhető."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
 #: ../lib/lcg/export/html.py:812
 msgid "None"
-msgstr ""
+msgstr "Üres"
 
 #: ../lib/lcg/export/html.py:813
 msgid "You are here:"
-msgstr ""
+msgstr "Ön itt található:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
 #: ../lib/lcg/export/html.py:817
 msgid "Next"
-msgstr ""
+msgstr "Következő"
 
 #. Translators: Label of a link to the next page in sequential navigation.
 #: ../lib/lcg/export/html.py:819
 msgid "Previous"
-msgstr ""
+msgstr "Előző"
 
 #. Translators: Title of the local table of contents (links to subsections).
 #: ../lib/lcg/content.py:582
 msgid "Index:"
-msgstr ""
+msgstr "Tartalom:"
