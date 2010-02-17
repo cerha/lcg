@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -305,8 +305,24 @@ class Parser(object):
             return None
     
     def _make_table(self, block, groups):
-        return Table([[WikiText(x.strip()) for x in row.split('|')[1:-1]]
-                      for row in block.strip().splitlines()])
+        def align(cell):
+            length = len(cell)
+            if length - len(cell.lstrip()) > length - len(cell.rstrip()):
+                return TableCell.RIGHT
+            else:
+                return None
+        lines = block.strip().splitlines()
+        # When all cells of the first row are bold or empty, they are considered headings.
+        headings = [cell.strip() for cell in lines[0].split('|')[1:-1]]
+        if False not in [not h or h.startswith("*") and h.endswith("*") for h in headings]:
+            del lines[0]
+            rows = [TableRow([TableHeading(FormattedText(h and h[1:-1])) for h in headings])]
+        else:
+            rows = []
+        rows += [TableRow([TableCell(FormattedText(cell.strip()), align=align(cell.expandtabs())) 
+                           for cell in line.split('|')[1:-1]])
+                 for line in lines]
+        return Table(rows)
 
     def _make_toc(self, block, groups):
         title = groups['title']

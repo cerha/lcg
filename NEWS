@@ -1,3 +1,7 @@
+
+  * Tables now allow more flexible structures of cells and headings and
+    structured text parser now autodetects column headers and cell alignment.
+
 Version 0.4.0 (2010-01-21):
 
   * Added support for video embedding

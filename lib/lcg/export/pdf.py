@@ -539,6 +539,9 @@ class Table(Element):
     Content of the cells is unspecified.
 
     """
+    #TODO: content is no more a sequence of sequences.  It is a sequence of
+    # exported table rows.  The table rows should be exported by th(), td() and
+    # tr() methods, which should be now implemented by the PDF generator.
     def init(self):
         super(Table, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -658,8 +661,8 @@ class PDFGenerator(Generator):
 
     # Tables and definition lists
 
-    def gtable(self, rows, title=None, lang=None):
-        return make_element(Table, content=rows)
+    def table(self, content, title=None, cls=None, lang=None):
+        return make_element(Table, content=content)
 
     def fset(self, items, lang=None):
         def make_item(title, description):

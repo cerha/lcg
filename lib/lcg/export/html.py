@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009 Brailcom, o.p.s.
+# Copyright (C) 2004-2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,12 +158,19 @@ class HtmlGenerator(Generator):
     def abbr(self, term, **kwargs):
         return self._tag('abbr', term, ('title',), **kwargs)
 
-    def gtable(self, rows, title=None, cls='lcg-table', **kwargs):
-        content = [self.tr([self.td(cell) for cell in row]) for row in rows]
-        if title:
-            content = ["<caption>"+ title +"</caption>"] + content
-        return self.table(self.tbody(content), cls=cls, **kwargs)
+    def th(self, content, **kwargs):
+        return self._tag('th', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
+    
+    def td(self, content, **kwargs):
+        return self._tag('td', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
+    
+    def tr(self, content, **kwargs):
+        return self._tag('tr', content, **kwargs)
 
+    def table(self, content, **kwargs):
+        attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
+        return self._tag('table', content, attr, _newlines=True, **kwargs)
+    
     # HTML specific...
 
     def html(self, content, lang=None):
@@ -184,19 +191,6 @@ class HtmlGenerator(Generator):
         if query:
             uri += '?' + query
         return uri
-     
-    def th(self, content, **kwargs):
-        return self._tag('th', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
-    
-    def td(self, content, **kwargs):
-        return self._tag('td', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
-    
-    def tr(self, content, **kwargs):
-        return self._tag('tr', content, **kwargs)
-
-    def table(self, content, **kwargs):
-        attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
-        return self._tag('table', content, attr, _newlines=True, **kwargs)
 
     def thead(self, content):
         return self._tag('thead', content)

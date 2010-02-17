@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -510,20 +510,54 @@ class FieldSet(Container):
     def export(self, context):
         return context.generator().fset(self._exported_content(context), lang=self._lang)
     
-        
+
+class TableCell(Container):
+    """Table cell is a container of cell content and may appear within 'TableRow'."""
+    LEFT = 'left'
+    RIGHT = 'right'
+    CENTER = 'center'
+
+    def __init__(self, content, align=None, **kwargs):
+        """Arguments:
+
+          align -- requested cell content alignment, 'None' or one of the
+            constants 'TableCell.LEFT', 'TableCell.RIGHT', 'TableCell.CENTER'
+            or 'None' for the default alignment.
+
+        """
+        assert align in (None, self.LEFT, self.RIGHT, self.CENTER)
+        self._align = align
+        super(TableCell, self).__init__(content, **kwargs)
+
+
+    def export(self, context):
+        return context.generator().td(self._exported_content(context), align=self._align,
+                                      lang=self._lang)
+
+
+class TableHeading(Container):
+    """Table heading is a container of heading content and may appear within 'TableRow'."""
+
+    def export(self, context):
+        return context.generator().th(self._exported_content(context), lang=self._lang)
+
+
+class TableRow(Container):
+    """Table row is a container of cells or headings and may appear within 'Table'."""
+    _ALLOWED_CONTENT = (TableCell, TableHeading)
+
+    def export(self, context):
+        return context.generator().tr(self._exported_content(context), lang=self._lang)
+
+    
 class Table(Container):
-    """Table of rows and cells.
-
-    The constructor accepts a sequence of sequences.  Each outer sequence represents one table row,
-    the inner sequences consist of a 'Content' instance for each cell.
-
-    """
-    _SUBSEQUENCES = True
+    """Table is a container of 'TableRow' instances."""
+    _ALLOWED_CONTENT = TableRow
 
     def __init__(self, content, title=None, **kwargs):
         """Arguments:
 
-          content -- sequence (rows items) of sequences (cell items)
+          content -- sequence 'TableRow' instances
           title -- 'None' or table caption as a string or unicode
 
         """
@@ -532,8 +566,8 @@ class Table(Container):
         super(Table, self).__init__(content, **kwargs)
         
     def export(self, context):
-        return context.generator().gtable(self._exported_content(context),
-                                          title=self._title, lang=self._lang)
+        return context.generator().table(self._exported_content(context), cls='lcg-table',
+                                         title=self._title, lang=self._lang)
 
 
 class SectionContainer(Container):

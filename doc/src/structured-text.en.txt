@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005-2009 Brailcom, o.p.s.
+# Copyright (c) 2005-2010 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -567,14 +567,21 @@ also begin and end with a pipe character.
 *Example:*
 
 ------
-|        | Dick   | Jane |
-| height | 72"    | 65"  |
-| weight | 130lbs | 150lbs |
+|        | *Height* | *Weight* | *Sex*  |
+| Dick   |      72" |   130lbs | male   |
+| Jane   |      65" |   150lbs | female |
 ------
 
-|        | Dick   | Jane |
-| height | 72"    | 65"  |
-| weight | 130lbs | 150lbs |
+|        | *Height* | *Weight* | *Sex*  |
+| Dick   |      72" |   130lbs | male   |
+| Jane   |      65" |   150lbs | female |
+
+/Column headers/ are automatically recognized if the whole first row contains
+only bold or empty cells, as in the example above.
+
+/Cell alignment/ is also detected — if left padding (spaces or tabs) is greater
+than right padding within a cell, the cell is aligned left.
+
 
 
 === Inline Constructs === inline-constructs

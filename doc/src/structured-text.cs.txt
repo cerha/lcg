@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005-2009 Brailcom, o.p.s.
+# Copyright (c) 2005-2010 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -572,14 +572,20 @@ konec řádku tabulky.
 *Příklad:*
 
 ------
-|       | Pavel  | Jana  |
-| výška | 189cm  | 164cm |
-| váha  |  73kg  |  78kg |
+|        | *Výška*  | *Váha*   | *Pohlaví* |
+| Pavel  |   189 cm |    73 kg | muž       |
+| Jana   |   164 cm |    78 kg | žena      |
 ------
 
-|       | Pavel  | Jana  |
-| výška | 189cm  | 164cm |
-| váha  |  73kg  |  78kg |
+|        | *Výška*  | *Váha*   | *Pohlaví* |
+| Pavel  |   189 cm |    73 kg | muž       |
+| Jana   |   164 cm |    78 kg | žena      |
+
+/Záhlaví sloupců/ je rozpoznáno automaticky, pokud celý první řádek obsahuje
+pouze buňky tučným písmem, nebo prázdné buňky, jako ve výše uvedeném příkladu.
+
+/Zarovnání buňek/ je také detekováno — pokud je odsazení (počet mezer a
+tabelátorů) na levé straně větší než na pravé, je buňka zarovnána vpravo.
 
 
 === Řádkové konstrukce === inline-constructs

@@ -315,21 +315,65 @@ class Generator(object):
 
     # Tables
 
-    def gtable(self, rows, title=None, lang=None):
-        """A generic table consisting of 'rows'.
-
+    def th(self, content, lang=None):
+        """A table heading container wrapping previously exported heading content.
+        
         Arguments:
 
-          rows -- sequence of rows cells where each row is a sequence of
-            previously formatted cells
-          title -- 'None' or table caption as a string or unicode
+          content -- previously exported heading content
           lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
             language code
 
-        In this class the method returns a concatenation of 'rows'.
+        In this class the method returns the 'content' unchanged.
 
         """
-        return self.concat([self.concat(row) for row in rows])
+        return content
+
+    def td(self, content, align=None, lang=None):
+        """A table cell container wrapping previously exported cell content.
+        
+        Arguments:
+
+          content -- previously exported cell content
+          align -- requested cell content alignment, 'None' or one of the
+            strings 'left', 'right', 'center'.
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
+
+        In this class the method returns the 'content' unchanged.
+
+        """
+        return content
+
+    def tr(self, content, lang=None):
+        """A table row container wrapping previously exported table cells.
+        
+        Arguments:
+
+          content -- previously exported row content
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
+
+        In this class the method returns the 'content' unchanged.
+
+        """
+        return content
+        
+    def table(self, content, title=None, cls=None, lang=None):
+        """A table container wrapping previously exported table rows.
+
+        Arguments:
+
+          content -- previously exported table content
+          title -- 'None' or table caption as a string or unicode
+          cls -- table presentation class identifier as a string
+          lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
+            language code
+
+        In this class the method returns the 'content' unchanged.
+
+        """
+        return content
 
 
 class MarkupFormatter(object):
