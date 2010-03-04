@@ -412,8 +412,13 @@ class HtmlExporter(Exporter):
         return context.node().title()
 
     def _meta(self, context):
+        """Return the list of pairs (NAME, CONTENT) for meta tags of given context/node."""
         import lcg
         return (('generator', 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
+
+    def _scripts(self, context):
+        """Return the list of 'Script' instances for given context/node."""
+        return context.node().resources(Script)
     
     def _head(self, context):
         node = context.node()
@@ -428,7 +433,7 @@ class HtmlExporter(Exporter):
                 (lang, self._uri_node(context, node, lang=lang))
                 for lang in node.variants() if lang != context.lang()] + \
                ['<script language="Javascript" type="text/javascript"' + \
-                ' src="%s"></script>' % context.uri(s) for s in node.resources(Script)]
+                ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
 
     def _parts(self, context, parts):
         result = []
@@ -708,10 +713,14 @@ class StyledHtmlExporter(object):
         self._styles = styles
         self._inlinestyles = inlinestyles
 
+    def _stylesheets(self, context):
+        """Return the list of 'Stylesheet' instances for given context/node."""
+        return context.node().resources(Stylesheet)
+        
     def _head(self, context):
         for style in self._styles:
             context.resource(style)
-        styles = context.node().resources(Stylesheet)
+        styles = self._stylesheets(context)
         if self._inlinestyles:
             tags = ['<style type="text/css" media="%s">\n%s</style>' % (media, content)
                     for media, content in [(s.media(), s.get()) for s in styles]
