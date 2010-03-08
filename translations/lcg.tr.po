@@ -1,0 +1,425 @@
+# Learning Content Generator translations
+# Copyright (C) 2005-2009 Brailcom, o.p.s.
+# This file is distributed under the same license as the LCG package.
+# Tomas Cerha <cerha@brailcom.org>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-08 10:13+0100\n"
+"PO-Revision-Date: 2010-03-07 20:40+0100\n"
+"Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
+"Language-Team: Czech <lcg@lists.freebsoft.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/lcg/util.py:138
+msgid "Afrikaans"
+msgstr "Afrikanca"
+
+#: ../lib/lcg/util.py:139
+msgid "Arabic"
+msgstr "Arapça"
+
+#: ../lib/lcg/util.py:141
+msgid "Bulgarian"
+msgstr "Bulgarca"
+
+#: ../lib/lcg/util.py:143
+msgid "Catalan"
+msgstr "Katalanca"
+
+#: ../lib/lcg/util.py:143
+msgid "Corsican"
+msgstr "Korsikalı"
+
+#: ../lib/lcg/util.py:143
+msgid "Czech"
+msgstr "Çekçe"
+
+#: ../lib/lcg/util.py:144
+msgid "Danish"
+msgstr "Danca"
+
+#: ../lib/lcg/util.py:144
+msgid "German"
+msgstr "Almanca"
+
+#: ../lib/lcg/util.py:145
+msgid "Greek"
+msgstr "Yunanca"
+
+#: ../lib/lcg/util.py:145
+msgid "English"
+msgstr "İngilizce"
+
+#: ../lib/lcg/util.py:145
+msgid "Spanish"
+msgstr "İspanyolca"
+
+#: ../lib/lcg/util.py:146
+msgid "Estonian"
+msgstr "Estonca"
+
+#: ../lib/lcg/util.py:146
+msgid "Basque"
+msgstr "Baskça"
+
+#: ../lib/lcg/util.py:147
+msgid "Finnish"
+msgstr "Fince"
+
+#: ../lib/lcg/util.py:148
+msgid "French"
+msgstr "Fransızca"
+
+#: ../lib/lcg/util.py:150
+msgid "Irish"
+msgstr "İrlandaca"
+
+#: ../lib/lcg/util.py:150
+msgid "Galician"
+msgstr "Galiçyaca"
+
+#: ../lib/lcg/util.py:152
+msgid "Hindi"
+msgstr "Hintçe"
+
+#: ../lib/lcg/util.py:152
+msgid "Croatian"
+msgstr "Hırvatça"
+
+#: ../lib/lcg/util.py:153
+msgid "Hungarian"
+msgstr "Macarca"
+
+#: ../lib/lcg/util.py:155
+msgid "Icelandic"
+msgstr "İzlandaca"
+
+#: ../lib/lcg/util.py:155
+msgid "Italian"
+msgstr "İtalyanca"
+
+#: ../lib/lcg/util.py:156
+msgid "Japanese"
+msgstr "Japonca"
+
+#: ../lib/lcg/util.py:157
+msgid "Georgian"
+msgstr "Gürcüce"
+
+#: ../lib/lcg/util.py:158
+msgid "Korean"
+msgstr "Korece"
+
+#: ../lib/lcg/util.py:158
+msgid "Kurdish"
+msgstr "Kürtçe"
+
+#: ../lib/lcg/util.py:162
+msgid "Macedonian"
+msgstr "Makedonca"
+
+#: ../lib/lcg/util.py:163
+msgid "Moldavian"
+msgstr "Moldovyalı"
+
+#: ../lib/lcg/util.py:165
+msgid "Dutch"
+msgstr "Holandaca"
+
+#: ../lib/lcg/util.py:165
+msgid "Norwegian"
+msgstr "Norveççe"
+
+#: ../lib/lcg/util.py:167
+msgid "Polish"
+msgstr "Lehçe"
+
+#: ../lib/lcg/util.py:168
+msgid "Portuguese"
+msgstr "Portekizce"
+
+#: ../lib/lcg/util.py:170
+msgid "Romanian"
+msgstr "Romence"
+
+#: ../lib/lcg/util.py:173
+msgid "Slovak"
+msgstr "Slovakça"
+
+#: ../lib/lcg/util.py:173
+msgid "Slovenian"
+msgstr "Slovence"
+
+#: ../lib/lcg/util.py:174
+msgid "Albanian"
+msgstr "Arnavutça"
+
+#: ../lib/lcg/util.py:174
+msgid "Serbian"
+msgstr "Sırpça"
+
+#: ../lib/lcg/util.py:175
+msgid "Swedish"
+msgstr "İsveççe"
+
+#: ../lib/lcg/util.py:177
+msgid "Thai"
+msgstr "Tayca"
+
+#: ../lib/lcg/util.py:179
+msgid "Turkish"
+msgstr "Türkçe"
+
+#: ../lib/lcg/util.py:180
+msgid "Ukrainian"
+msgstr "Ukraynaca"
+
+#: ../lib/lcg/util.py:182
+msgid "Yiddish"
+msgstr "İbranice"
+
+#: ../lib/lcg/util.py:182
+msgid "Chinese"
+msgstr "Çince"
+
+#. Translators: The following 7 strings represent full week day names.  Please, take care to use
+#. upper/lower case letters according to the rules of the target language.
+#: ../lib/lcg/util.py:199
+msgid "Monday"
+msgstr "Pazartesi"
+
+#: ../lib/lcg/util.py:199
+msgid "Tuesday"
+msgstr "Salı"
+
+#: ../lib/lcg/util.py:199
+msgid "Wednesday"
+msgstr "Çarşamba"
+
+#: ../lib/lcg/util.py:199
+msgid "Thursday"
+msgstr "Perşembe"
+
+#: ../lib/lcg/util.py:199
+msgid "Friday"
+msgstr "Cuma"
+
+#: ../lib/lcg/util.py:200
+msgid "Saturday"
+msgstr "Cumartesi"
+
+#: ../lib/lcg/util.py:200
+msgid "Sunday"
+msgstr "Pazar"
+
+#. Translators: The following 7 strings represent the abbreviated week day names.  The
+#. abbreviations should normally take up to three characters.  Feel free to use whatever form
+#. usual in the target language.
+#: ../lib/lcg/util.py:205
+msgid "Mon"
+msgstr "Pts"
+
+#: ../lib/lcg/util.py:205
+msgid "Tue"
+msgstr "Sa"
+
+#: ../lib/lcg/util.py:205
+msgid "Wed"
+msgstr "Çar"
+
+#: ../lib/lcg/util.py:205
+msgid "Thu"
+msgstr "Per"
+
+#: ../lib/lcg/util.py:205
+msgid "Fri"
+msgstr "Cu"
+
+#: ../lib/lcg/util.py:205
+msgid "Sat"
+msgstr "Cts"
+
+#: ../lib/lcg/util.py:205
+msgid "Sun"
+msgstr "Paz"
+
+#. Translators: The following 12 strings represent full month names.  Please, take care to use
+#. upper/lower case letters according to the rules of the target language.
+#: ../lib/lcg/util.py:227
+msgid "January"
+msgstr "Ocak"
+
+#: ../lib/lcg/util.py:227
+msgid "February"
+msgstr "Şubat"
+
+#: ../lib/lcg/util.py:227
+msgid "March"
+msgstr "Mart"
+
+#: ../lib/lcg/util.py:227
+msgid "April"
+msgstr "Nisan"
+
+#: ../lib/lcg/util.py:227 ../lib/lcg/util.py:234
+msgid "May"
+msgstr "Mayıs"
+
+#: ../lib/lcg/util.py:227
+msgid "June"
+msgstr "Haziran"
+
+#: ../lib/lcg/util.py:228
+msgid "July"
+msgstr "Temmuz"
+
+#: ../lib/lcg/util.py:228
+msgid "August"
+msgstr "Ağustos"
+
+#: ../lib/lcg/util.py:228
+msgid "September"
+msgstr "Eylül"
+
+#: ../lib/lcg/util.py:228
+msgid "October"
+msgstr "Ekim"
+
+#: ../lib/lcg/util.py:228
+msgid "November"
+msgstr "Kasım"
+
+#: ../lib/lcg/util.py:229
+msgid "December"
+msgstr "Aralık"
+
+#. Translators: The following 12 strings represent the abbreviated month names.  The
+#. abbreviations should normally take up to three characters.  Feel free to use whatever form
+#. usual in the target language.
+#: ../lib/lcg/util.py:234
+msgid "Jan"
+msgstr "Oca"
+
+#: ../lib/lcg/util.py:234
+msgid "Feb"
+msgstr "Şub"
+
+#: ../lib/lcg/util.py:234
+msgid "Mar"
+msgstr "Mar"
+
+#: ../lib/lcg/util.py:234
+msgid "Apr"
+msgstr "Nis"
+
+#: ../lib/lcg/util.py:234
+msgid "Jun"
+msgstr "Haz"
+
+#: ../lib/lcg/util.py:234
+msgid "Jul"
+msgstr "Tem"
+
+#: ../lib/lcg/util.py:235
+msgid "Aug"
+msgstr "Ağu"
+
+#: ../lib/lcg/util.py:235
+msgid "Sep"
+msgstr "Eyl"
+
+#: ../lib/lcg/util.py:235
+msgid "Oct"
+msgstr "Eki"
+
+#: ../lib/lcg/util.py:235
+msgid "Nov"
+msgstr "Kas"
+
+#: ../lib/lcg/util.py:235
+msgid "Dec"
+msgstr "Ara"
+
+#: ../lib/lcg/export/html.py:408
+msgid "Choose your language:"
+msgstr "Dil seçiniz:"
+
+#. Translators: Title of the link to Adobe website used in
+#. the Flash warning.
+#: ../lib/lcg/export/html.py:558
+msgid "Adobe Flash plugin"
+msgstr "Adobe Flash plugin"
+
+#. Translators: Warning message displayed if Flash plugin is not installed or doesn't
+#. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
+#. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
+#. version number.
+#: ../lib/lcg/export/html.py:554
+#, python-format
+msgid "Get %(plugin)s %(version)s or later."
+msgstr "Eklenti alın %(plugin)s %(version)s veya sonra."
+
+#: ../lib/lcg/export/html.py:560
+msgid "Use a JavaScript enabled browser."
+msgstr "JavaScript etkin tarayıcısı kullanınız."
+
+#: ../lib/lcg/export/html.py:561 ../lib/lcg/export/html.py:562
+msgid "Warning:"
+msgstr "Uyarı:"
+
+#: ../lib/lcg/export/html.py:593
+msgid "Media Player unavailable."
+msgstr "Media Player ulaşılamıyor."
+
+#. Translators: Label used instead of a link when the target does not exist.  For
+#. example sequential navigation may contain: "Previous: Introduction, Next: None".
+#: ../lib/lcg/export/html.py:815
+msgid "None"
+msgstr "Hiçbiri"
+
+#: ../lib/lcg/export/html.py:816
+msgid "You are here:"
+msgstr "Buradasınız:"
+
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:820
+msgid "Next"
+msgstr "Sonraki"
+
+#. Translators: Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:822
+msgid "Previous"
+msgstr "Önceki"
+
+#. Translators: Title of the local table of contents (links to subsections).
+#: ../lib/lcg/content.py:616
+msgid "Index:"
+msgstr "İçindekiler:"
+
+#, fuzzy
+#~ msgid ""
+#~ "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+#~ "advanced media capabilities."
+#~ msgstr ""
+#~ "Flash %(version)s nebyl detekován. Získejte %(plugin)s %(version)s nebo "
+#~ "pozdější pro využití pokročilých možností přehrávání médií."
+
+#, fuzzy
+#~ msgid ""
+#~ "Flash %(version)s not detected. Get %(plugin)s %(version)s or later for "
+#~ "advanced media playback capabilities."
+#~ msgstr ""
+#~ "Flash %(version)s nebyl detekován. Získejte %(plugin)s %(version)s nebo "
+#~ "pozdější pro využití pokročilých možností přehrávání médií."
+
+#~ msgid ""
+#~ "JavaScript not detected. Use a JavaScript enabled browser for advanced "
+#~ "media playback capabilities."
+#~ msgstr ""
+#~ "JavaScript nebyl detekován. Použijte prohlížeč s podporou JavaScriptu, "
+#~ "pokud chcete využít pokročilých možností přehrávání médií."
