@@ -49,9 +49,9 @@ link-lib:
 	ln -s $(CURDIR)/lib/lcg $(lib)/lcg; fi
 
 link-bin:
-	@if [ -f $(BIN)/lcg-make ]; then echo "$(BIN)/lcg-make already exists!"; \
-	else echo "Linking LCG make to $(BIN)/lcg-make"; \
-	ln -s $(CURDIR)/bin/lcgmake.py $(BIN)/lcg-make; fi
+	@if [ -f $(BIN)/lcgmake ]; then echo "$(BIN)/lcgmake already exists!"; \
+	else echo "Linking LCG make to $(BIN)/lcgmake"; \
+	ln -s $(CURDIR)/bin/lcgmake.py $(BIN)/lcgmake; fi
 
 link-share: link-share-doc link-share-translations link-share-resources
 
