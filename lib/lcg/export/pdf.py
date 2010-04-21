@@ -323,10 +323,10 @@ class PreformattedText(Element):
     """
     def init(self):
         super(PreformattedText, self).init()
-        assert isinstance(self.content, unicode), ('type error', self.content,)
+        assert isinstance(self.content, Text), ('type error', self.content,)
     def export(self, context):
         style = context.pdf_context.code_style()
-        result = reportlab.platypus.Preformatted(self.content, style)
+        result = reportlab.platypus.Preformatted(self.content.export(context), style)
         return result
 
 class Paragraph(Element):
@@ -357,7 +357,7 @@ class Paragraph(Element):
         style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
         for c in self.content:
-            exported += c.export(context)        
+            exported += c.export(context)
         result = reportlab.platypus.Paragraph(exported, style)
         return result
     def prepend_text(self, text):
@@ -422,6 +422,36 @@ class Container(Element):
             text_element = make_element(Text, content=text)
             paragraph = make_element(Paragraph, content=[text_element])
             self.content = [paragraph]
+    def expand(self, filter_):
+        """Convert the container into a plain sequence of 'Element's and return it.
+
+        The primary purpose of this method is to cope with the mess caused by
+        LCG mixing everything together under the assumptions that all the
+        exported objects are HTML strings and that there are no strict
+        restrictions on the content (e.g. paragraph may contain other
+        paragraphs or even itself).
+
+        The container is inspected recursively and its objects are put to a
+        single non-nested sequence.  'filter_' is applied on non-'Container'
+        instances.
+
+        Arguments:
+
+          filter_ -- function of a single argument, the content instance,
+            returning a list of 'Element' instances.  Through the filtering
+            function the container content may be changed or filtered out (by
+            returning empty lists).
+          
+        """
+        expanded = []
+        for c in self.content:
+            if isinstance(c, Container):
+                # We should prevent infinite recursion here, but hopefully LCG
+                # actually doesn't use Containers containing themselves.
+                expanded += c.expand(filter_)
+            else:
+                expanded += filter_(c)
+        return expanded
 
 class List(Element):
     """List of items.
@@ -519,9 +549,14 @@ class LinkTarget(Text):
 class Image(Element):
     """Image taken from a file.
 
-    'content' is a URL (string) pointing to image source data.
+    'content' is a URL (string) pointing to image source data.  An additional
+    argument 'text' may provide text description of the image in the form of
+    base string.
     
     """
+    def init(self):
+        super(Image, self).init()
+        assert self.text is None or isinstance(self.text, basestring)
     def export(self, context):
         url_info = urlparse.urlparse(self.content)
         if url_info[0] in ('', 'file',):
@@ -529,7 +564,9 @@ class Image(Element):
             assert isinstance(image_url, str), ('type error', image_url,)
             result = reportlab.platypus.Flowable(image_url)
         else:
-            result = make_element(Link, uri=self.content).export(context)
+            content = make_element(Text, content=self.content)
+            link = make_element(Link, uri=self.content, content=content)
+            result = make_element(Paragraph, content=[link]).export(context)
         return result
 
 class Table(Element):
@@ -549,7 +586,11 @@ class Table(Element):
             for c in self.content:
                 assert isinstance(c, (list, tuple,)), ('type error', c,)
     def export(self, context):
-        exported_content = [[column.export(context) for column in row] for row in self.content]
+        exported_content = []
+        for row in self.content:
+            for column in row:
+                for c in column:
+                    exported_content += c.export(context)
         return reportlab.platypus.Table(exported_content)
 
 def make_element(cls, **kwargs):
@@ -621,14 +662,17 @@ class PDFGenerator(Generator):
     def heading(self, title, level, anchor=None, backref=None):
         content = self.escape(title)
         # TODO: Make backreferences optional?
-        if backref:
-            content = self.link(content, "#"+backref)
         if anchor:
             content = self.anchor(content, anchor)
+        if backref:
+            content = self.link(content, "#"+backref)
         return make_element(Heading, content=[content], level=level)
 
     def p(self, content, lang=None):
-        if isinstance(content, Paragraph):
+        # LCG interpretation of "paragraph" is very wide, we have to expect
+        # anything containing anything.  The only "paragraph" meaning we use
+        # here is that the content should be separated from other text.
+        if not isinstance(content, Text):
             return content
         return make_element(Paragraph, content=[content])
 
@@ -651,13 +695,29 @@ class PDFGenerator(Generator):
     # Links and images
     
     def link(self, label, uri, **kwargs):
+        if isinstance(label, basestring):
+            label = make_element(Text, content=label)
+        elif isinstance(label, Container):
+            def filter_(c):
+                if isinstance(c, Text):
+                    result = [c]
+                elif isinstance(c, basestring):
+                    result = [make_element(Text, content=c)]
+                elif isinstance(c, Image):
+                    link_content = make_element(Text, content=(c.text or c.content))
+                    result = [make_element(Link, content=link_content, uri=c.content)]
+                else:
+                    result = []
+                return result
+            filtered_content = label.expand(filter_)
+            label = make_element(TextContainer, content=filtered_content)
         return make_element(Link, content=label, uri=uri)
     
     def anchor(self, label, name, **kwargs):
         return make_element(LinkTarget, content=label, name=name)
 
     def img(self, src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
-        return make_element(Image, content=src)
+        return make_element(Image, content=src, text=alt)
 
     # Tables and definition lists
 
