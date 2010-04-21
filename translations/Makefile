@@ -1,6 +1,6 @@
 domains := lcg test
 mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
-src_files := PYTHONPATH=../lib python -m lcg/i18n ../lib
+src_files := PYTHONPATH=../lib python -m lcg.i18n ../lib
 
 all: $(mo_files)
 
