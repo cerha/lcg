@@ -141,8 +141,7 @@ class Generator(object):
           level -- level of the heading as a positive integer; the highest
             level is 1
           anchor -- link target identifier of the heading (allows links to
-            point to this heading as to an anchor).
-            
+            point to this heading as to an anchor).            
           backref -- anchor name of the nearest item in a table of contents
             pointing to this heading.  This heading should become a link
             pointing to this anchor to support section title back-references
