@@ -624,9 +624,13 @@ class Table(Element):
     def export(self, context):
         exported_content = []
         for row in self.content:
+            row_content = []
             for column in row:
-                for c in column:
-                    exported_content += c.export(context)
+                if isinstance(column, (list, tuple,)):
+                    row_content += [c.export(context) for c in column]
+                else:
+                    row_content += column.export(context)
+            exported_content.append(row_content)
         return reportlab.platypus.Table(exported_content)
 
 def make_element(cls, **kwargs):
