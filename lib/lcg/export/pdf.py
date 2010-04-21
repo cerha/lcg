@@ -20,6 +20,7 @@
 import copy
 import cStringIO
 import os
+import sys
 import urlparse
 
 try:
@@ -62,6 +63,7 @@ class Context(object):
         self._normal_style.fontName='FreeSerif'
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
+        self._anchors = {}
 
     def _init_fonts(self):
         self._fonts = {}
@@ -158,6 +160,37 @@ class Context(object):
         """
         self._counter += 1
         return self._counter
+
+    def register_anchor_reference(self, name):
+        """Register anchor reference into the context.
+
+        This serves for later detection of anchor references to nonexistent
+        anchors.
+
+        Parameters:
+
+          name -- name of the anchor, basestring
+          
+        """
+        if not self._anchors.has_key(name):
+            self._anchors[name] = False
+
+    def clear_anchor_reference(self, name):
+        """Mark anchor reference as valid.
+
+        This means the given anchor actually exists in the document.
+
+        Parameters:
+
+          name -- name of the anchor, basestring
+          
+        """
+        self._anchors[name] = True
+
+    def invalid_anchor_references(self):
+        """Return sequence of names of invalid anchor references.
+        """
+        return [k for k, v in self._anchors.items() if not v]
 
 
 class Element(object):
@@ -525,6 +558,8 @@ class Link(Text):
         exported_content = super(Link, self).export(context)
         if self.uri[:5] == 'http:' or self.uri[0] == '#':
             result = u'<link href="%s">%s</link>' % (self.uri, exported_content,)
+            if self.uri[0] == '#':
+                context.pdf_context.register_anchor_reference(self.uri[1:])
         else:
             result = u'<i>%s</i>' % (exported_content,)
         return result
@@ -544,6 +579,7 @@ class LinkTarget(Text):
         assert self.name, ('empty target name', self.name,)
     def export(self, context):
         exported_text = super(LinkTarget, self).export(context)
+        context.pdf_context.clear_anchor_reference(self.name)
         return u'<a name="%s"/>%s' % (self.name, exported_text,)
 
 class Image(Element):
@@ -862,6 +898,14 @@ class PDFExporter(FileExporter, Exporter):
         context.pdf_context = Context()
         generator_structure = super(PDFExporter, self).export(context)
         document = generator_structure.export(context)
+        # It is necessary to check for invalid anchors before doc.build gets
+        # called, otherwise Reportlab throws an ugly error.
+        invalid_anchors = context.pdf_context.invalid_anchor_references()
+        if invalid_anchors:
+            sys.stderr.write("Error: Invalid internal links:\n")
+            for a in invalid_anchors:
+                sys.stderr.write("  #%s\n" % (a,))
+            return ''
         output = cStringIO.StringIO()
         doc = reportlab.platypus.SimpleDocTemplate(output)
         doc.build(document)
