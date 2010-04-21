@@ -646,7 +646,7 @@ External target
   if you don't specify an explicit label, the URL itself is used for the label.
 
 Image 
-  If the target is detected to be an image the link is presented as [#image
+  If the target is detected to be an image the link is presented as [#images
   inline image].
 
 

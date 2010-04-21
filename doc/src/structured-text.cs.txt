@@ -648,7 +648,7 @@ Externí cíl
   uveden explicitně, bude URL zobrazeno také jako název odkazu.
 
 Obrázek
-  Pokud je cíl odkazu rozpoznán jako obrázek, odkaz je zobrazen jako [#image
+  Pokud je cíl odkazu rozpoznán jako obrázek, odkaz je zobrazen jako [#images
   obrázek v těle dokumentu].
 
 *Příklady:*
