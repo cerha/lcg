@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,45 +38,43 @@ class ContentNode(object):
     """
 
     def __init__(self, id, title=None, brief_title=None, descr=None, variants=(), content=None,
-                 children=(), hidden=False, active=True, resource_provider=None, globals=None):
+                 children=(), hidden=False, active=True, resource_provider=None, globals=None,
+                 page_header=None, page_footer=None, first_page_header=None):
         """Initialize the instance.
 
         Arguments:
 
           id -- a unique textual identifier of this node (as a string).
-
           title -- the title of this node (as a unicode string).
-
           brief_title -- the brief (shorter) form of title of this node (as a unicode string).  If
             given, this title will be used to refer to this node from places, where brevity
             matters.  If None, the 'title' will be used instead.
-
           descr -- a short textual description of this node (as a uni code string).  Additional
             information, which may determine the content of the node in addition to the title.
-          
           variants -- a sequence of all available language variants of this node.  The
             sequence contains lowercase ISO 639-1 Alpha-2 language codes as strings.  
-
           content -- a content element hierarchy.  This is the actual content of this node.  The
-            value can be a `Content' instance or a sequence of `Content' instances.
-            
+            value can be a `Content' instance or a sequence of `Content' instances.            
           children -- a sequence of child nodes in the hierarchy.
-            
           hidden -- a boolean flag indicating, that this node should not appear in the
             automatically generated Indexes (Tables of Contents).  Such a node will usually be
             refered explicitely.
-
           active -- a boolean flag indicating, that this node is active.  Usage of this flag may be
             application specific and there is currently no difference in behavior of LCG in respect
             to this flag, except for marking the links by css class 'inactive' on export.
-
           resource_provider -- a 'ResourceProvider' instance or None.
-
           globals -- node global variables as a dictionary keyed by variable names.  The variables
             are allowed to contain nested dictionaries.  The variables are used for substitution
             within `MarkupFormatter', but they may be also used for other purposes depending on the
             application.
-            
+          page_header -- 'Content' instance to be inserted at the top of each
+            generated page.  If 'None', no page header is inserted.
+          page_header -- 'Content' instance to be inserted at the bottom of each
+            generated page.  If 'None', no page footer is inserted.
+          first_page_header -- 'Content' instance to be inserted at the top of the
+            first generated page.  If 'None', page_header (if any) is used on
+            all pages.
+          
         """
         assert isinstance(id, str), repr(id)
         assert isinstance(hidden, bool), hidden
@@ -262,3 +260,14 @@ class ContentNode(object):
             return self._resource_provider.resource(filename, node=self, **kwargs)
         else:
             return None
+
+    def page_header(self):
+        """Return the page header."""
+
+    def page_footer(self):
+        """Return the page footer."""
+
+    def first_page_header(self):
+        """Return the first page header."""
+
+        

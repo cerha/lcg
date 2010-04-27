@@ -38,6 +38,42 @@ from lcg import *
 
 _ = TranslatableTextFactory('lcg')
 
+
+class Presentation(object):
+    """Set of presentation properties.
+
+    Using instance of this class, you can provide explicit presentation
+    information to some LCG content elements.  Note that it is often not
+    desirable to define presentation explicitly.  You need to define
+    presentation this way when you prepare a printed document with fixed
+    structure, on the other hand when preparing a general HTML page you should
+    use variable external stylesheets instead.
+
+    This class serves just as a storage of presentation properties, it does not
+    provide any special methods.  All of the attribute values can be set to
+    'None' meaning there is no presentation requirement for that attribute.  If 
+
+    """
+    font_size = None
+    "Font size in points, integer."
+    font_family = None
+    "Font family to be used for typesetting text, one of 'FontFamily' constants."
+    bold = None
+    "True when bold font face should be used, False otherwise."
+    italic = None
+    "True when italic font face should be used, False otherwise."
+    boxed = None
+    "'True' when the content should be surrounded by a box."
+    table_separator_height = None
+    "Height of lines separating rows in tables, 'Unit'."
+    table_separator_margin = None
+    "Amount of space between table rows, 'Unit'."
+    table_header_separator_height = None
+    "Height of lines separating table headers from table rows, 'Unit'."
+    table_header_separator_margin = None
+    "Amount of space between table headers and table rows, 'Unit'."
+
+    
 class Content(object):
     """Generic base class for all types of content.
 
@@ -150,6 +186,58 @@ class HorizontalSeparator(Content):
     
     def export(self, context):
         return context.generator().hr()
+
+
+class NewPage(Content):
+    """New page starts here."""
+
+
+class PageNumber(Content):
+    """Current page number.
+
+    The page number is generated as an ordinal arabic number starting from one.
+
+    This content may be used only inside page headers and footers.
+
+    """
+    def __init__(self, total=False):
+        """
+        Arguments:
+
+          total -- iff true, output not only the page number, but also the
+            total number of pages
+
+        """
+
+
+class HSpace(Content):
+    """Horizontal space of given size.
+
+    This should be used only in places where explicit space is needed.  In many
+    cases better means such as higher level elements, alignment or style sheets
+    can be used.
+
+    """
+    def __init__(self, size):
+        """
+        @type: L{Unit}
+        @param: Size of the space.
+        """
+        
+
+class VSpace(Content):
+    """Vertical space of given size.
+
+    This should be used only in places where explicit space is needed.  In many
+    cases better means such as higher level elements, alignment or style sheets
+    can be used.
+
+    """
+    def __init__(self, size):
+        """
+        @type: L{Unit}
+        @param: Size of the space.
+        """
         
 
 class TextContent(Content):
@@ -404,7 +492,8 @@ class Container(Content):
     _SUBSEQUENCES = False
     _SUBSEQUENCE_LENGTH = None
     
-    def __init__(self, content, id=None, name=None, **kwargs):
+    def __init__(self, content, id=None, name=None, halign=None, valign=None, orientation=None,
+                 presentation=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -415,6 +504,15 @@ class Container(Content):
           name -- optional string identifier which may be used as output
             presentation selector (for example as a 'class' attribute in HTML).
           id -- depracated, use 'name' instead.
+          halign -- horizontal alignment of the container content; one of the
+            'HorizontalAlignment' constants or 'None' (default alignment).
+          valign -- vertical alignment of the container content; one of the
+            'VerticalAlignment' constants or 'None' (default alignment).
+          orientation -- orientation of the container content; one of the
+            'Orientation' constants or 'None' (default orientation).
+          presentation -- 'Presentation' instance defining various presentation
+            properties; if 'None' no explicit presentation for this container
+            is defined.
 
         """
         super(Container, self).__init__(**kwargs)
@@ -577,11 +675,18 @@ class Table(Container):
     """Table is a container of 'TableRow' instances."""
     _ALLOWED_CONTENT = TableRow
 
-    def __init__(self, content, title=None, **kwargs):
+    def __init__(self, content, title=None, long=False, **kwargs):
         """Arguments:
 
           content -- sequence 'TableRow' instances
           title -- 'None' or table caption as a string or unicode
+          long -- boolean indicating whether the table is long.  Long table is
+            usually a table that may not fit on a single page.  Long tables may
+            be handled in a different way, e.g. by splitting into several parts
+            even when the table could fit on a new separate page or by using
+            different column widths on each page when the column widths are
+            variable.
+          kwargs -- ???
 
         """
         assert title is None or isinstance(title, (str, unicode))

@@ -28,6 +28,8 @@ from locales import *
 from util import *
 from nodes import *
 from resources import *
+from units import UFont, UMm, UPoint, USpace, FontFamily, \
+     HorizontalAlignment, VerticalAlignment, Orientation
 from content import *
 from export import *
 from parse import *
