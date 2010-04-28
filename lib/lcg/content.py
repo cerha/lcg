@@ -55,7 +55,7 @@ class Presentation(object):
 
     """
     font_size = None
-    "Font size in points, integer."
+    "Font size relative to the current font size (1.0 is the same size), float."
     font_family = None
     "Font family to be used for typesetting text, one of 'FontFamily' constants."
     bold = None
@@ -650,7 +650,6 @@ class TableCell(Container):
         self._align = align
         super(TableCell, self).__init__(content, **kwargs)
 
-
     def export(self, context):
         return context.generator().td(self._exported_content(context), align=self._align,
                                       lang=self._lang)
@@ -675,10 +674,11 @@ class Table(Container):
     """Table is a container of 'TableRow' instances."""
     _ALLOWED_CONTENT = TableRow
 
-    def __init__(self, content, title=None, long=False, **kwargs):
+    def __init__(self, content, title=None, long=False, column_widths=None,
+                 **kwargs):
         """Arguments:
 
-          content -- sequence 'TableRow' instances
+          content -- sequence of 'TableRow' and 'HorizontalSeparator' instances
           title -- 'None' or table caption as a string or unicode
           long -- boolean indicating whether the table is long.  Long table is
             usually a table that may not fit on a single page.  Long tables may
@@ -686,6 +686,13 @@ class Table(Container):
             even when the table could fit on a new separate page or by using
             different column widths on each page when the column widths are
             variable.
+          column_widths -- sequence of 'Unit's defining widths of columns, it
+            must have the same number of elements and in the same order as
+            table columns.  If any of the elements is 'None', the width of the
+            corresponding column is to be determined automatically.
+            Alternatively the whole 'column_widths' value may be 'None' to
+            determine widths of all the columns automatically.
+          
           kwargs -- ???
 
         """
