@@ -64,15 +64,22 @@ class Presentation(object):
     "True when italic font face should be used, False otherwise."
     boxed = None
     "'True' when the content should be surrounded by a box."
-    table_separator_height = None
-    "Height of lines separating rows in tables, 'Unit'."
-    table_separator_margin = None
-    "Amount of space between table rows, 'Unit'."
-    table_header_separator_height = None
-    "Height of lines separating table headers from table rows, 'Unit'."
-    table_header_separator_margin = None
-    "Amount of space between table headers and table rows, 'Unit'."
-
+    separator_height = None
+    """Height of lines separating objects, 'Unit'.
+    It currently works only for row separators in tables.
+    """
+    separator_margin = None
+    """Amount of space between objects, 'Unit'.
+    It currently works only for spaces between table rows.
+    """
+    header_separator_height = None
+    """Height of line separating headers from content, 'Unit'.
+    It currently works only for tables.
+    """
+    header_separator_margin = None
+    """Amount of space separating headers from content, 'Unit'.
+    It currently works only for tables.
+    """
     
 class Content(object):
     """Generic base class for all types of content.
