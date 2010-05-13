@@ -51,7 +51,8 @@ class Presentation(object):
 
     This class serves just as a storage of presentation properties, it does not
     provide any special methods.  All of the attribute values can be set to
-    'None' meaning there is no presentation requirement for that attribute.  If 
+    'None' meaning there is no presentation requirement for that attribute and
+    it can be taken from another active presentation.
 
     """
     font_size = None
@@ -197,6 +198,9 @@ class HorizontalSeparator(Content):
 
 class NewPage(Content):
     """New page starts here."""
+    
+    def export(self, context):
+        return context.generator().new_page()
 
 
 class PageNumber(Content):
@@ -230,6 +234,11 @@ class HSpace(Content):
         @type: L{Unit}
         @param: Size of the space.
         """
+        assert isinstance(size, Unit), size
+        self._size = size
+
+    def export(self, context):
+        return context.generator().space(self._size, UPoint(0))
         
 
 class VSpace(Content):
@@ -246,6 +255,9 @@ class VSpace(Content):
         @param: Size of the space.
         """
         
+    def export(self, context):
+        return context.generator().space(UPoint(0), self._size)
+
 
 class TextContent(Content):
     """A simple piece of text."""
@@ -518,12 +530,23 @@ class Container(Content):
           orientation -- orientation of the container content; one of the
             'Orientation' constants or 'None' (default orientation).
           presentation -- 'Presentation' instance defining various presentation
-            properties; if 'None' no explicit presentation for this container
+            properties; if 'None' then no explicit presentation for this container
             is defined.
+
+        Note that 'halign', 'valign', 'orientation' and 'presentation'
+        parameters may be ignored by some exporters.
 
         """
         super(Container, self).__init__(**kwargs)
         self._name = name or id
+        assert halign is None or isinstance(halign, str), halign
+        self._halign = halign
+        assert valign is None or isinstance(valign, str), valign
+        self._valign = valign
+        assert orientation is None or isinstance(orientation, str), orientation
+        self._orientation = orientation
+        assert presentation is None or isinstance(presentation, Presentation), presentation
+        self._presentation = presentation
         if self._SUBSEQUENCES:
             assert isinstance(content, (list, tuple)), "Not a sequence: %s" % content
             self._content = tuple([tuple(subseq) for subseq in content])
@@ -562,7 +585,9 @@ class Container(Content):
         exported = self._exported_content(context)
         result = g.concat(*exported)
         if self._lang is not None or self._name is not None:
-            result = g.div(result, lang=self._lang, cls=self._name)
+            result = g.div(result, lang=self._lang, cls=self._name,
+                           halign=self._halign, valign=self._valign, orientation=self._orientation,
+                           presentation=self._presentation)
         return result
 
 
@@ -573,7 +598,7 @@ class Paragraph(Container):
         g = context.generator()
         exported = self._exported_content(context)
         exported_result = g.concat(*exported)
-        return g.p(exported_result, lang=self._lang)
+        return g.p(exported_result, lang=self._lang, presentation=self._presentation)
 
     
 class ItemizedList(Container):
@@ -698,18 +723,22 @@ class Table(Container):
             table columns.  If any of the elements is 'None', the width of the
             corresponding column is to be determined automatically.
             Alternatively the whole 'column_widths' value may be 'None' to
-            determine widths of all the columns automatically.
-          
-          kwargs -- ???
+            determine widths of all the columns automatically.          
 
         """
         assert title is None or isinstance(title, (str, unicode))
         self._title = title
+        assert isinstance(long, bool), long
+        self._long = long
+        assert column_widths is None or isinstance(column_widths, (tuple, list,)), column_widths
+        self._column_widths = column_widths
         super(Table, self).__init__(content, **kwargs)
         
     def export(self, context):
         return context.generator().table(self._exported_content(context), cls='lcg-table',
-                                         title=self._title, lang=self._lang)
+                                         title=self._title, lang=self._lang,
+                                         long=self._long, column_widths=self._column_widths,
+                                         presentation=self._presentation)
 
 
 class SectionContainer(Container):

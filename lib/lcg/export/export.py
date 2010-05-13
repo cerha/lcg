@@ -222,7 +222,8 @@ class Generator(object):
         """
         return self.concat(content, '\n\n')
 
-    def div(self, content, lang=None, **kwargs):
+    def div(self, content, lang=None, halign=None, valign=None, orientation=None,
+            presentation=None, **kwargs):
         """Return exported 'content' as a general block.
 
         Arguments:
@@ -230,6 +231,15 @@ class Generator(object):
           content -- already exported content
           lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
             language code
+          halign -- horizontal alignment of the block; one of the
+            'HorizontalAlignment' constants or 'None' (default alignment).
+          valign -- vertical alignment of the block; one of the
+            'VerticalAlignment' constants or 'None' (default alignment).
+          orientation -- orientation of the block; one of the
+            'Orientation' constants or 'None' (default orientation).
+          presentation -- 'Presentation' instance defining various presentation
+            properties; if 'None' no explicit presentation for this block
+            is defined.
 
         In this class the method returns 'content' surrounded by new lines.
 
@@ -251,6 +261,27 @@ class Generator(object):
 
         """
         return '\f'
+
+    def new_page(self):
+        """Make new page.
+
+        In this class the method returns the page break character.
+        
+        """
+        return '\n'
+
+    def space(self, width, height):
+        """Make a space.
+
+        Arguments:
+
+          width -- width of the space, 'Unit'
+          height -- height of the space, 'Unit'
+
+        In this class the method returns an empty text.
+          
+        """
+        return ''
 
     # Links and images
     
@@ -314,7 +345,7 @@ class Generator(object):
 
     # Tables
 
-    def th(self, content, lang=None):
+    def th(self, content, align=None, lang=None):
         """A table heading container wrapping previously exported heading content.
         
         Arguments:
@@ -322,6 +353,8 @@ class Generator(object):
           content -- previously exported heading content
           lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
             language code
+          align -- requested cell content alignment, 'None' or one of the
+            strings 'left', 'right', 'center'.
 
         In this class the method returns the 'content' unchanged.
 
@@ -358,7 +391,7 @@ class Generator(object):
         """
         return content
         
-    def table(self, content, title=None, cls=None, lang=None):
+    def table(self, content, title=None, cls=None, lang=None, long=False, column_widths=None):
         """A table container wrapping previously exported table rows.
 
         Arguments:
@@ -368,6 +401,18 @@ class Generator(object):
           cls -- table presentation class identifier as a string
           lang -- 'None' or content language as an ISO 639-1 Alpha-2 lowercase
             language code
+          long -- boolean indicating whether the table is long.  Long table is
+            usually a table that may not fit on a single page.  Long tables may
+            be handled in a different way, e.g. by splitting into several parts
+            even when the table could fit on a new separate page or by using
+            different column widths on each page when the column widths are
+            variable.
+          column_widths -- sequence of 'Unit's defining widths of columns, it
+            must have the same number of elements and in the same order as
+            table columns.  If any of the elements is 'None', the width of the
+            corresponding column is to be determined automatically.
+            Alternatively the whole 'column_widths' value may be 'None' to
+            determine widths of all the columns automatically.          
 
         In this class the method returns the 'content' unchanged.
 

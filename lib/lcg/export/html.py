@@ -51,7 +51,14 @@ class HtmlGenerator(Generator):
                 else:
                     value = saxutils.quoteattr(value)
                 result += ' ' + name + '=' + value
-        assert not kwargs, "Invalid attributes: %s" % kwargs
+        if __debug__:
+            # Some attributes are ignored in HTML backend now
+            for name in ('presentation', 'long', 'column_widths',):
+                try:
+                    del kwargs[name]
+                except KeyError:
+                    pass
+            assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
 
     def _tag(self, tag, content=None, _attr=(), _newlines=False, _paired=True, **kwargs):
@@ -116,6 +123,9 @@ class HtmlGenerator(Generator):
      
     def hr(self, **kwargs):
         return self._tag('hr', _paired=False, **kwargs)
+
+    def new_page(self):
+        return self.hr()
      
     def link(self, label, uri, title=None, target=None, hotkey=None, cls=None, **kwargs):
         if hotkey and title:

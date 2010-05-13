@@ -69,7 +69,7 @@ class ContentNode(object):
             application.
           page_header -- 'Content' instance to be inserted at the top of each
             generated page.  If 'None', no page header is inserted.
-          page_header -- 'Content' instance to be inserted at the bottom of each
+          page_footer -- 'Content' instance to be inserted at the bottom of each
             generated page.  If 'None', no page footer is inserted.
           first_page_header -- 'Content' instance to be inserted at the top of the
             first generated page.  If 'None', page_header (if any) is used on
@@ -88,6 +88,12 @@ class ContentNode(object):
         self._hidden = hidden
         self._active = active
         self._variants = tuple(variants)
+        assert page_header is None or isinstance(page_header, Content), page_header
+        self._page_header = page_header
+        assert first_page_header is None or isinstance(first_page_header, Content), first_page_header
+        self._first_page_header = first_page_header
+        assert page_footer is None or isinstance(page_footer, Content), page_footer
+        self._page_footer = page_footer
         if isinstance(content, (tuple, list)):
             content = SectionContainer(content)
         assert isinstance(content, Content), content
@@ -263,11 +269,12 @@ class ContentNode(object):
 
     def page_header(self):
         """Return the page header."""
+        return self._page_header
 
     def page_footer(self):
         """Return the page footer."""
+        return self._page_footer
 
     def first_page_header(self):
         """Return the first page header."""
-
-        
+        return self._first_page_header

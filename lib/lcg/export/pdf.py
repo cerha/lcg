@@ -20,12 +20,15 @@
 import copy
 import cStringIO
 import os
+import string
 import sys
 import urlparse
 
 try:
+    import reportlab.lib.colors
     import reportlab.lib.fonts
     import reportlab.lib.styles
+    import reportlab.lib.units
     import reportlab.pdfbase.pdfmetrics
     import reportlab.pdfbase.ttfonts
     import reportlab.platypus
@@ -64,22 +67,47 @@ class Context(object):
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
         self._anchors = {}
+        self._presentations = []
 
     def _init_fonts(self):
         self._fonts = {}
-        for font in 'Serif', 'Sans', 'Mono':
-            font_name = 'Free' + font
+        for family in 'Serif', 'Sans', 'Mono':
+            font_name = 'Free' + family
             i = 0
-            if font == 'Serif':
-                faces = ('', 'Italic', 'Bold', 'BoldItalic',)
+            if family == 'Serif':
+                faces = (('', False, False,), ('Italic', False, True,),
+                         ('Bold', True, False,), ('BoldItalic', True, True,),)
             else:
-                faces = ('', 'Oblique', 'Bold', 'BoldOblique',)
-            for face in faces:
+                faces = (('', False, False,), ('Oblique', False, True,),
+                         ('Bold', True, False,), ('BoldOblique', True, True,),)
+            for face, bold, italic in faces:
                 font_face_name = font_name + face
                 f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, os.path.join(self._font_path, font_face_name) + '.ttf')
                 reportlab.pdfbase.pdfmetrics.registerFont(f)
                 reportlab.lib.fonts.addMapping(font_name, i/2, i%2, font_face_name)
                 i = i + 1
+                self._fonts[(family, bold, italic)] = font_face_name
+
+    def font(self, family, bold, italic):
+        """Return full font name for given arguments.
+
+        Arguments:
+
+          family -- one of 'Serif', 'Sans', 'Mono' constants
+          bold -- boolean
+          italic -- boolean
+          
+        """
+        return self._fonts[(family, bold, italic,)]
+
+    def font_parameters(self, font_name):
+        """Return tuple (FAMILY, BOLD, ITALIC,) corresponding to given 'font_name'.
+        """
+        for k, v in self._fonts.items():
+            if v == font_name:
+                return k
+        else:
+            raise KeyError(font_name)
 
     def nesting_level(self):
         """Return current paragraph and list nesting level.
@@ -151,6 +179,36 @@ class Context(object):
         style.fontName='FreeSerif'
         return style
 
+    def style(self, style=None):
+        """Return style corresponding to the given context.
+
+        Arguments:
+
+          style -- style to use as a template; if 'None' then use normal style
+        
+        """
+        style = copy.copy(style or self.normal_style())
+        presentation = self.current_presentation()
+        if presentation is not None:
+            if presentation.font_size is not None:
+                style.font_size = style.font_size * presentation.font_size
+            family, bold, italic = self.font_parameters(style.fontName)
+            if presentation.font_family is not None:
+                if presentation.font_family == 'PROPORTIONAL':
+                    family = 'FreeSerif'
+                elif presentation.font_family == 'SANS_SERIF':
+                    family = 'FreeSans'
+                elif presentation.font_family == 'FIXED_WIDTH':
+                    family = 'FreeMono'
+                else:
+                    raise Exception('Unknown font family', presentation.font_family)
+            if presentation.bold is not None:
+                bold = presentation.bold
+            if presentation.italic is not None:
+                italic = presentation.italic
+            style.font_family = self.font(family, bold, italic)
+        return style
+
     def get_seqid(self):
         """Increase counter value by 1 and return the new value.
 
@@ -191,6 +249,48 @@ class Context(object):
         """Return sequence of names of invalid anchor references.
         """
         return [k for k, v in self._anchors.items() if not v]
+
+    def current_presentation(self):
+        """Return current 'Presentation' instance."""
+        if self._presentations:
+            presentation = self._presentations[-1]
+        else:
+            presentation = None
+        return presentation
+
+    def add_presentation(self, presentation):
+        """Add 'presentation' to presentations.
+
+        It is merged with other presentations in the current presentation list
+        and the resulting presentation is added to the list and becomes the
+        current presentation.  The presentation must be removed from the
+        presentation list using 'remove_presentation' method when the object it
+        introduces is left.
+
+        Arguments:
+
+          presentation -- 'Presentation' to be applied; if 'None', current
+            presentation is used instead
+        
+        """
+        current_presentation = self.current_presentation()
+        if current_presentation is None:
+            new_presentation = presentation
+        elif presentation is None:
+            new_presentation = current_presentation
+        else:
+            new_presentation = Presentation()
+            for attr in dir(presentation):
+                if attr[0] in string.ascii_lowercase:
+                    value = getattr(presentation, attr)
+                    if value is None:
+                        value = getattr(current_presentation, attr)
+                    setattr(new_presentation, attr, value)
+        self._presentations.append(new_presentation)
+
+    def remove_presentation(self):
+        """Remove the current presentation from the presentation list."""
+        self._presentations.pop()
 
 
 class Element(object):
@@ -238,6 +338,16 @@ class Element(object):
 
         """
         raise Exception('Not implemented')
+    def _unit2points(self, size, style):
+        if isinstance(size, UMm):
+            points = size.size() * reportlab.lib.units.mm
+        elif isinstance(size, UPoint):
+            points = size.size()
+        elif isinstance(size, (UFont, USpace,)):
+            points = size.size() * style.fontSize
+        else:
+            raise Exception('Not implemented', size)
+        return points
 
 class Text(Element):
     """Basic text.
@@ -373,6 +483,7 @@ class Paragraph(Element):
 
     """
     _style = None
+    presentation = None
     def init(self):
         super(Paragraph, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -382,9 +493,9 @@ class Paragraph(Element):
         self.content = list(self.content)
     def export(self, context, style=None):
         pdf_context = context.pdf_context
-        style = copy.copy(style or self._style)
-        if style is None:
-            style = copy.copy(pdf_context.normal_style())
+        pdf_context.add_presentation(self.presentation)
+        template_style = style or self._style or pdf_context.normal_style()
+        style = pdf_context.style(style=template_style)
         style.leftIndent = pdf_context.nesting_level() * 1.5 * style.fontSize
         # Hack, should be handled better, preferrably in List only:
         style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
@@ -392,6 +503,7 @@ class Paragraph(Element):
         for c in self.content:
             exported += c.export(context)
         result = reportlab.platypus.Paragraph(exported, style)
+        pdf_context.remove_presentation()
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
@@ -422,6 +534,22 @@ class PageBreak(Element):
     def export(self, context):
         return reportlab.platypus.PageBreak()
 
+class Space(Element):
+    """Hard space.
+
+    There is no content, instead there are two size parameters:
+
+      width -- width of the space, 'Unit'
+      height -- height of the space, 'Unit'
+
+    """
+    def export(self, context):
+        # Note: According to Reportlab documentation, only vertical spaces work.
+        style = context.pdf_context.style()
+        width = self._unit2points(self.width, style)
+        height = self._unit2points(self.height, style)
+        return reportlab.platypus.Spacer(width, height)
+
 class Container(Element):
     """Sequence of (almost) any objects.
 
@@ -432,11 +560,14 @@ class Container(Element):
     restricted in future (not counting current implementation restrictions).
 
     """
+    presentation = None
     def init(self):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, Element), ('type error', c,)
     def export(self, context):
+        pdf_context = context.pdf_context
+        pdf_context.add_presentation(self.presentation)
         result = []
         for c in self.content:
             if isinstance(c, Text):
@@ -446,6 +577,7 @@ class Container(Element):
                 result += exported
             else:
                 result.append(exported)
+        pdf_context.remove_presentation()
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
@@ -605,16 +737,25 @@ class Image(Element):
             result = make_element(Paragraph, content=[link]).export(context)
         return result
 
+class TableCell(Container):
+    """Table cell.
+
+    'content' is unspecified.
+    There are additional styling attributes 'align', 'valign', and 'heading'.
+    They are not used directly here, they are used by 'Table'.
+
+    """
+    align = None
+    valign = None
+    heading = False
+    
 class Table(Element):
     """Table of rows and columns.
 
     'content' is a sequence of rows, each of them being a sequence of cells.
-    Content of the cells is unspecified.
+    Cells are 'TableCell' instances.
 
     """
-    #TODO: content is no more a sequence of sequences.  It is a sequence of
-    # exported table rows.  The table rows should be exported by th(), td() and
-    # tr() methods, which should be now implemented by the PDF generator.
     def init(self):
         super(Table, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -622,16 +763,89 @@ class Table(Element):
             for c in self.content:
                 assert isinstance(c, (list, tuple,)), ('type error', c,)
     def export(self, context):
+        pdf_context = context.pdf_context
+        pdf_context.add_presentation(self.presentation)
+        content = self.content
         exported_content = []
-        for row in self.content:
+        # Find out information about the table
+        table_style_data = []
+        number_of_rows = len(content)
+        header_row_p = False
+        alignments = []
+        if number_of_rows > 1:
+            if all([c.heading for c in content[0]]):
+                header_row_p = True
+            row = content[1]
+            for j in range(len(row)):
+                column = row[j]
+                if isinstance(column, TableCell) and column.align is not None:
+                    alignments.append(column.align)
+                    table_style_data.append(('ALIGN', (j, 0), (j, -1), column.align.upper(),))
+                else:
+                    alignments.append(None)
+                if isinstance(column, TableCell) and column.valign is not None:
+                    table_style_data.append(('VALIGN', (j, 0), (j, -1), column.valign.upper(),))
+        # Export content
+        black = reportlab.lib.colors.black
+        style = pdf_context.style()
+        family, bold, italic = pdf_context.font_parameters(style.fontName)
+        bold_font = pdf_context.font(family, True, italic)
+        i = 0
+        for row in content:
+            row = content[i]
+            if isinstance(row, PageBreak):
+                table_style_data.append(('LINEABOVE', (0, i), (-1, i), 1, black,))
+                continue
             row_content = []
-            for column in row:
+            for j in range(len(row)):
+                column = row[j]
                 if isinstance(column, (list, tuple,)):
                     row_content += [c.export(context) for c in column]
                 else:
+                    if isinstance(column, TableCell):
+                        if column.heading:
+                            table_style_data.append(('FACE', (j, i), (j, i), bold_font,))
+                        if column.align is not None and column.align != alignments[j]:
+                            table_style_data.append(('ALIGN', (j, i), (j, i), column.align.upper(),))
                     row_content += column.export(context)
             exported_content.append(row_content)
-        return reportlab.platypus.Table(exported_content)
+            i += 1
+        # Add remaining presentation
+        presentation = pdf_context.current_presentation()
+        if presentation is not None:
+            if presentation.separator_height:
+                size = self._unit2points(presentation.separator_height, style)
+                table_style_data.append(('GRID', (0, 0), (-1, -1), size, black,))
+            if header_row_p and presentation.header_separator_height is not None:
+                size = self._unit2points(presentation.header_separator_height, style)
+                table_style_data.append(('LINEBELOW', (0, 0), (-1, 0), size, black,))
+            if presentation.separator_margin:
+                size = self._unit2points(presentation.separator_margin, style) / 2
+                table_style_data.append(('TOPPADDING', (0, 0), (-1, -1), size,))
+                table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, -1), size,))
+            if header_row_p and presentation.header_separator_margin is not None:
+                size = self._unit2points(presentation.header_separator_margin, style) / 2
+                table_style_data.append(('TOPPADDING', (0, 0), (-1, 0), size,))
+                table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, 0), size,))
+        # Create the table instance
+        repeat_cols = 0
+        if self.long:
+            # It may or needn't be a good idea to always use LongTable
+            # unconditionally here.
+            class_ = reportlab.platypus.LongTable
+            if header_row_p:
+                repeat_cols = 1
+        else:
+            class_ = reportlab.platypus.Table
+        if self.column_widths is None:
+            column_widths = None
+        else:
+            column_widths = [self._unit2points(w, style) for w in self.column_widths]
+        table_style = reportlab.platypus.TableStyle(table_style_data)
+        table = class_(exported_content, colWidths=column_widths, style=table_style,
+                       repeatCols=repeat_cols)
+        pdf_context.remove_presentation()
+        return table
 
 def make_element(cls, **kwargs):
     """Create instance of 'cls' class and initialize its attributes.
@@ -708,20 +922,33 @@ class PDFGenerator(Generator):
             content = self.link(content, "#"+backref)
         return make_element(Heading, content=[content], level=level)
 
-    def p(self, content, lang=None):
+    def p(self, content, lang=None, presentation=None):
         # LCG interpretation of "paragraph" is very wide, we have to expect
         # anything containing anything.  The only "paragraph" meaning we use
         # here is that the content should be separated from other text.
         if not isinstance(content, Text):
             return content
-        return make_element(Paragraph, content=[content])
+        return make_element(Paragraph, content=[content], presentation=presentation)
 
-    def div(self, content, lang=None, **kwargs):
+    def div(self, content, lang=None, halign=None, valign=None, orientation=None,
+            presentation=None, **kwargs):
         if isinstance(content, Text):
-            result = make_element(Paragraph, content=[content])
+            result_content = make_element(Paragraph, content=[content], presentation=presentation)
+            if presentation is not None and presentation.boxed:
+                cell = make_element(Table_Cell, content=result_content)
+                result_content = make_element(Table, content=[[cell]], presentation=presentation)
+        elif (isinstance(content, (tuple, list,)) and
+              (orientation == 'HORIZONTAL' or halign is not None or valign is not None)):
+            def cell(content):
+                return make_element(TableCell, content=c, align=halign, valign=valign)
+            if orientation == 'HORIZONTAL':
+                table_content = [[cell(c) for c in content]]
+            else:
+                table_content = [[cell(c)] for c in content]
+            result_content = make_element(Table, content=table_content, presentation=presentation)
         else:
-            result = content
-        return content
+            result_content = content
+        return result_content
     
     def list(self, items, ordered=False, style=None, lang=None):
         return make_element(List, content=items, ordered=ordered)
@@ -730,8 +957,14 @@ class PDFGenerator(Generator):
         return make_element(SimpleMarkup, content='br')
 
     def hr(self):
+        return self.new_page()
+
+    def new_page(self):
         return make_element(PageBreak)
 
+    def space(self, width, height):
+        return make_element(Space, width=width, height=height)
+    
     # Links and images
     
     def link(self, label, uri, **kwargs):
@@ -761,8 +994,16 @@ class PDFGenerator(Generator):
 
     # Tables and definition lists
 
-    def table(self, content, title=None, cls=None, lang=None):
-        return make_element(Table, content=content)
+    def th(self, content, align=None, lang=None):
+        return make_element(TableCell, content=content, align=align, heading=True)
+        
+    def td(self, content, align=None, lang=None):
+        return make_element(TableCell, content=content, align=align, heading=False)
+        
+    def table(self, content, title=None, cls=None, lang=None, long=False, column_widths=None,
+              presentation=None):
+        return make_element(Table, content=content, long=long, column_widths=column_widths,
+                            presentation=presentation)
 
     def fset(self, items, lang=None):
         def make_item(title, description):
