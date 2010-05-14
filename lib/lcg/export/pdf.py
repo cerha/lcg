@@ -57,6 +57,9 @@ class Context(object):
     _nesting_level = 0
     _list_nesting_level = 0
     _counter = 0
+    page = 0
+    total_pages = None
+    total_pages_requested = False
 
     def __init__(self, *args, **kwargs):
         super(Context, self).__init__(*args, **kwargs)
@@ -534,6 +537,23 @@ class PageBreak(Element):
     def export(self, context):
         return reportlab.platypus.PageBreak()
 
+class PageNumber(Element):
+    """Page number.
+
+    'total' parameter determines whether total number of pages should be added.
+
+    """
+    def export(self, context):
+        pd_context = context.pdf_context
+        text = str(pdf_context.page)
+        if self.total:
+            total = pdf_context.total_pages
+            if total is None:
+                pdf_context.total_pages_requested = True
+            else:
+                text = '%s/%s' % (text, total,)
+        return text
+
 class Space(Element):
     """Hard space.
 
@@ -962,6 +982,9 @@ class PDFGenerator(Generator):
     def new_page(self):
         return make_element(PageBreak)
 
+    def page_number(self, total):
+        return make_element(PageNumber, total=total)
+
     def space(self, width, height):
         return make_element(Space, width=width, height=height)
     
@@ -1139,8 +1162,9 @@ class PDFExporter(FileExporter, Exporter):
     def _finalize(self, context):
         return None
     
-    def export(self, context):
-        context.pdf_context = Context()
+    def export(self, context, total_pages=None):
+        context.pdf_context = pdf_context = Context()
+        pdf_context.total_pages = total_pages
         generator_structure = super(PDFExporter, self).export(context)
         document = generator_structure.export(context)
         # It is necessary to check for invalid anchors before doc.build gets
@@ -1153,5 +1177,34 @@ class PDFExporter(FileExporter, Exporter):
             return ''
         output = cStringIO.StringIO()
         doc = reportlab.platypus.SimpleDocTemplate(output)
-        doc.build(document)
+        def on_page(canvas, doc):
+            # I don't know whether this allocates proper vertical space.
+            # Perhaps not, but then the proper solution is more complicated.
+            # Look at FancyPage in rst2pdf for an example of such a solution.
+            page = doc.page
+            pdf_context.page = page
+            canvas.saveState()
+            style = pdf_context.normal_style()
+            cm = reportlab.lib.units.cm
+            node = context.node()
+            def add_flowable(content, top):
+                flowable = content.export(context)
+                width, height = flowable.wrap(18*cm, 14*cm)
+                if top:
+                    y = 29.5*cm
+                else:
+                    y = height + 0.5*cm
+                p.drawOn(canvas, cm, y)
+            header = node.first_page_header()
+            if page > 1 or header is None:
+                header = node.page_header()
+            if header is not None:
+                add_flowable(header, True)
+            footer = node.page_footer()
+            if footer is not None:
+                add_flowable(footer, False)
+            canvas.restoreState()
+        doc.build(document, onFirstPage=on_page, onLaterPages=on_page)
+        if total_pages is None and pdf_context.total_pages_requested:
+            return self.export(context, total_pages=pdf_context.page)
         return output.getvalue()

@@ -219,6 +219,10 @@ class PageNumber(Content):
             total number of pages
 
         """
+        self._total = total
+        
+    def export(self, context):
+        return context.generator().page_number(total=self._total)
 
 
 class HSpace(Content):

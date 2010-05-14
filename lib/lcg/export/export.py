@@ -270,6 +270,18 @@ class Generator(object):
         """
         return '\n'
 
+    def page_number(self, total):
+        """Make current page number.
+
+        Arguments:
+
+          total -- if true, add total number of pages
+
+        In this class this method returns an empty text.
+
+        """
+        return ''
+
     def space(self, width, height):
         """Make a space.
 
