@@ -544,7 +544,7 @@ class PageNumber(Element):
 
     """
     def export(self, context):
-        pd_context = context.pdf_context
+        pdf_context = context.pdf_context
         text = str(pdf_context.page)
         if self.total:
             total = pdf_context.total_pages
@@ -1181,6 +1181,9 @@ class PDFExporter(FileExporter, Exporter):
             # I don't know whether this allocates proper vertical space.
             # Perhaps not, but then the proper solution is more complicated.
             # Look at FancyPage in rst2pdf for an example of such a solution.
+            # (Due to other necessary parameters such as background, pytis
+            # layout parameters, etc. it will be necessary to use the other
+            # solution anyway.)
             page = doc.page
             pdf_context.page = page
             canvas.saveState()
@@ -1189,12 +1192,21 @@ class PDFExporter(FileExporter, Exporter):
             node = context.node()
             def add_flowable(content, top):
                 flowable = content.export(context)
+                if isinstance(flowable, Element):
+                    flowable = flowable.export(context)
+                if isinstance(flowable, basestring):
+                    flowable = reportlab.platypus.Paragraph(flowable, style)
+                while isinstance(flowable, (tuple, list,)):
+                    if len(flowable) == 1:
+                        flowable = flowable[0]
+                    else:
+                        flowable = reportlab.platypus.Table([flowable])
                 width, height = flowable.wrap(18*cm, 14*cm)
                 if top:
                     y = 29.5*cm
                 else:
                     y = height + 0.5*cm
-                p.drawOn(canvas, cm, y)
+                flowable.drawOn(canvas, cm, y)
             header = node.first_page_header()
             if page > 1 or header is None:
                 header = node.page_header()
