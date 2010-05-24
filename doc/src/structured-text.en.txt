@@ -612,7 +612,7 @@ You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
 Links can be used to refer to other documents, web addresses, sections etc.
 They are marked by square brackets and they have the following structure:
 
-=\[<link-target> <link-label> | <link-description]=
+=\[<link-target> <link-label> | <link-description>]=
 
 Link target
   This is the first text within square brackets up to the first space.  It can
@@ -708,8 +708,9 @@ http://www.google.com/images/logo_sm.gif
 
 http://www.google.com/images/logo_sm.gif
 
-If a link label is given, this label is be used as the accessible ALT text as
-well as the link description (see the example below).
+If a link label is given, this label is used as the accessible ALT text for the
+image.  Similarly, if link description is defined, it is also included in the
+ALT text (see the example below).
 
 *Example:*
 ------
