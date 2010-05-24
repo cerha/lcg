@@ -25,7 +25,7 @@ from xml.sax import saxutils
 
 _ = TranslatableTextFactory('lcg')
 
-class HtmlGenerator(Generator):
+class HtmlGenerator(object):
     #DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
     _DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
 
@@ -51,14 +51,7 @@ class HtmlGenerator(Generator):
                 else:
                     value = saxutils.quoteattr(value)
                 result += ' ' + name + '=' + value
-        if __debug__:
-            # Some attributes are ignored in HTML backend now
-            for name in ('presentation', 'long', 'column_widths',):
-                try:
-                    del kwargs[name]
-                except KeyError:
-                    pass
-            assert not kwargs, "Invalid attributes: %s" % kwargs
+        assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
 
     def _tag(self, tag, content=None, _attr=(), _newlines=False, _paired=True, **kwargs):
@@ -81,21 +74,46 @@ class HtmlGenerator(Generator):
                 'onclick', 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
                 'readonly', 'disabled')
         return self._tag('input', _attr=attr+_attr, _paired=False, type=type, **kwargs)
+    
+    def uri(self, base, *args, **kwargs):
+        uri = urllib.quote(base.encode('utf-8'))
+        query = ';'.join([k +'='+ urllib.quote(unicode(v).encode('utf-8'))
+                          for k,v in args + tuple(kwargs.items()) if v is not None])
+        if query:
+            uri += '?' + query
+        return uri
 
-    # Generic constructs
-     
     def escape(self, text):
         return saxutils.escape(text)
 
-    def heading(self, title, level, anchor=None, backref=None):
-        if anchor or backref:
-            if backref:
-                backref = "#" + backref
-            content = self.link(title, backref, name=anchor, cls='backref')
-        else:
-            content = title
-        return self.h(content, level)
-        
+    def concat(self, *items):
+        return concat(*items)
+
+    # HTML tags
+
+    def html(self, content, lang=None):
+        return concat(self._DOCTYPE, '\n\n',
+                      self._tag('html', concat(content), _newlines=True, lang=lang))
+    
+    def head(self, tags):
+        content = concat('  ', concat(tags, separator='\n  ')),
+        return self._tag('head', content, _newlines=True)
+    
+    def body(self, content, **kwargs):
+        return self._tag('body', content, ('onkeydown', 'onload'), _newlines=True, **kwargs)
+    
+    def div(self, content, **kwargs):
+        return self._tag('div', content, ('title',), _newlines=True, **kwargs)
+     
+    def span(self, text, **kwargs):
+        return self._tag('span', text, ('title',), **kwargs)
+     
+    def h(self, title, level, **kwargs):
+        return self._tag('h%d' % level, title, **kwargs)
+    
+    def map(self, content, **kwargs):
+        return self._tag('map', content, ('name', 'title'), _newlines=True, **kwargs)
+
     def strong(self, text, **kwargs):
         return self._tag('strong', text, **kwargs)
      
@@ -124,56 +142,58 @@ class HtmlGenerator(Generator):
     def hr(self, **kwargs):
         return self._tag('hr', _paired=False, **kwargs)
 
-    def new_page(self):
-        return self.hr()
-     
+    def a(self, label, **kwargs):
+        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey')
+        return self._tag('a', label, attr, **kwargs)
+
     def link(self, label, uri, title=None, target=None, hotkey=None, cls=None, **kwargs):
+        """Deprecated!  Just for backwards compatibility."""
         if hotkey and title:
             title += ' (%s)' % hotkey
         if target:
             cls = (cls and cls+' ' or '') + 'external-link'
-        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey')
-        return self._tag('a', label, attr, href=uri, title=title, target=target,
-                         accesskey=hotkey, cls=cls, **kwargs)
+        return self.a(label, href=uri, title=title, target=target, accesskey=hotkey, cls=cls,
+                      **kwargs)
 
-    def anchor(self, label, name):
-        return self.link(label, None, name=name)
-
-    def li(self, content, **kwargs):
-        return self._tag('li', content, **kwargs)
-    
     def ol(self, *content, **kwargs):
         return self._tag('ol', content, **kwargs)
     
     def ul(self, *content, **kwargs):
         return self._tag('ul', content, **kwargs)
     
+    def li(self, content, **kwargs):
+        return self._tag('li', content, **kwargs)
+    
     def list(self, items, indent=0, ordered=False, style=None, **kwargs):
+        """Deprecated!  Just for backwards compatibility."""
         spaces = ' ' * indent
         items = [concat(spaces, '  ', self.li(i), '\n') for i in items]
         tag = ordered and self.ol or self.ul
         style = style and 'list-style-type: %s' % style
         return spaces + tag(concat('\n', items, spaces), style=style, **kwargs)+'\n'
-
-    def definitions(self, items, **kwargs):
-        content = [self._tag('dt', dt) + self._tag('dd', dd) for dt, dd in items]
+    
+    def dl(self, *content, **kwargs):
         return self._tag('dl', content, _newlines=True, **kwargs)
 
-    def fset(self, items, **kwargs):
-        return self.table([self.tr((self.th(name, valign="top", align="left"),
-                                    self.td(value)))
-                           for name, value in items],
-                          cls='lcg-fieldset', **kwargs)
-     
-    def img(self, src, alt='', border=0, descr=None, **kwargs):
+    def dt(self, content, **kwargs):
+        return self._tag('dt', content)
+
+    def dd(self, content, **kwargs):
+        return self._tag('dd', content)
+    
+    def img(self, src, alt='', border=0, **kwargs):
         attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
         return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, border=border, **kwargs)
 
-    def toc(self, context, item, indent=0, depth=1):
-        pass
-
     def abbr(self, term, **kwargs):
         return self._tag('abbr', term, ('title',), **kwargs)
+
+    def table(self, content, **kwargs):
+        attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
+        return self._tag('table', content, attr, _newlines=True, **kwargs)
+    
+    def tr(self, content, **kwargs):
+        return self._tag('tr', content, **kwargs)
 
     def th(self, content, **kwargs):
         return self._tag('th', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
@@ -181,34 +201,6 @@ class HtmlGenerator(Generator):
     def td(self, content, **kwargs):
         return self._tag('td', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
     
-    def tr(self, content, **kwargs):
-        return self._tag('tr', content, **kwargs)
-
-    def table(self, content, **kwargs):
-        attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
-        return self._tag('table', content, attr, _newlines=True, **kwargs)
-    
-    # HTML specific...
-
-    def html(self, content, lang=None):
-        return concat(self._DOCTYPE, '\n\n',
-                      self._tag('html', concat(content), _newlines=True, lang=lang))
-    
-    def head(self, tags):
-        content = concat('  ', concat(tags, separator='\n  ')),
-        return self._tag('head', content, _newlines=True)
-    
-    def body(self, content, **kwargs):
-        return self._tag('body', content, ('onkeydown', 'onload'), _newlines=True, **kwargs)
-    
-    def uri(self, base, *args, **kwargs):
-        uri = urllib.quote(base.encode('utf-8'))
-        query = ';'.join([k +'='+ urllib.quote(unicode(v).encode('utf-8'))
-                          for k,v in args + tuple(kwargs.items()) if v is not None])
-        if query:
-            uri += '?' + query
-        return uri
-
     def thead(self, content):
         return self._tag('thead', content)
     
@@ -218,18 +210,10 @@ class HtmlGenerator(Generator):
     def tbody(self, content):
         return self._tag('tbody', content, _newlines=True)
     
-    def h(self, title, level, **kwargs):
-        return self._tag('h%d' % level, title, **kwargs) + '\n'
-    
-    def span(self, text, **kwargs):
-        return self._tag('span', text, ('title',), **kwargs)
+    def iframe(self, src, **kwargs):
+        attr = ('src', 'width', 'height', 'frameborder')
+        return self._tag('iframe', self.a(src, href=src), attr, src=src, **kwargs)
      
-    def div(self, content, **kwargs):
-        return self._tag('div', content, ('title',), _newlines=True, **kwargs)
-     
-    def map(self, content, **kwargs):
-        return self._tag('map', content, ('name', 'title'), _newlines=True, **kwargs)
-
     def object(self, content, **kwargs):
         return self._tag('object', content, (
                 'align', 'archive', 'border', 'classid', 'codebase', 'codetype',
@@ -241,8 +225,8 @@ class HtmlGenerator(Generator):
         return self._tag('param', _attr=('name', 'value', 'valuetype', 'type'),
                          _paired=False, **kwargs)
  
-
-    # Form controls
+    # Form controls (special methods for various HTML INPUT fields are defined, so the `input'
+    # method itself is not needed).
      
     def form(self, content, action="#", **kwargs):
         attr = ('name', 'action', 'method', 'enctype')
@@ -254,9 +238,11 @@ class HtmlGenerator(Generator):
         return self._tag('fieldset', content, _newlines=True, **kwargs)
      
     def label(self, text, id, **kwargs):
+        # We don't respect the HTML attribute name since 'for' is a Python keyword.
+        # Additionally we also intentionally force this atributte to be mandatory.
         kwargs['for'] = id
         return self._tag('label', text, ('for',), **kwargs)
-     
+
     def field(self, value='', name='', size=20, password=False, cls=None, **kwargs):
         type = password and 'password' or 'text'
         cls = type + (cls and ' '+cls or '')
@@ -315,10 +301,6 @@ class HtmlGenerator(Generator):
     def textarea(self, name, value='', **kwargs):
         attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
         return self._tag('textarea', value, attr, name=name, **kwargs)
-     
-    def iframe(self, src, **kwargs):
-        attr = ('src', 'width', 'height', 'frameborder')
-        return self._tag('iframe', self.link(src, src), attr, src=src, **kwargs)
      
     # JavaScript code generation.
      
@@ -405,13 +387,20 @@ class HtmlFormatter(MarkupFormatter):
 
     
 class HtmlExporter(Exporter):
-    Generator = HtmlGenerator
     Formatter = HtmlFormatter
+    Generator = HtmlGenerator
 
     class Context(Exporter.Context):
+        
         def __init__(self, *args, **kwargs):
-            super(HtmlExporter.Context, self).__init__(*args, **kwargs)
+            self._generator = kwargs['generator']
             self._shared_player_controls = []
+            del kwargs['generator']
+            super(HtmlExporter.Context, self).__init__(*args, **kwargs)
+            
+        def generator(self):
+            return self._generator
+    
         def connect_shared_player(self, *args):
             """Connect given player controls to the shared player.
 
@@ -426,9 +415,10 @@ class HtmlExporter(Exporter):
 
             """
             self._shared_player_controls.append(args)
+            
         def shared_player_controls(self):
             return self._shared_player_controls
-    
+        
     _BODY_PARTS = ('heading',
                    'language_selection',
                    'content',
@@ -436,6 +426,10 @@ class HtmlExporter(Exporter):
                    )
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
+
+    def __init__(self, *args, **kwargs):
+        self._generator = self.Generator()
+        super(HtmlExporter, self).__init__(*args, **kwargs)
     
     def _title(self, context):
         return context.node().title()
@@ -483,7 +477,7 @@ class HtmlExporter(Exporter):
         return self._generator.h(context.node().title(), level=1)
 
     def _language_selection(self, context):
-        g = context.generator()
+        g = context._generator
         node = context.node()
         variants = list(node.variants())
         if len(variants) <= 1:
@@ -515,6 +509,281 @@ class HtmlExporter(Exporter):
     
     def _content(self, context):
         return context.node().content().export(context)
+
+    def _body_attr(self, context, **kwargs):
+        return kwargs
+    
+    def _body_content(self, context):
+        return self._parts(context, self._BODY_PARTS)
+    
+    def context(self, *args, **kwargs):
+        kwargs['generator'] = self._generator
+        return super(HtmlExporter, self).context(*args, **kwargs)
+
+    # Specific methods for exporting content elements.
+    
+    def _export_horizontal_separator(self, context, element):
+        return self._generator.hr()
+
+    def _export_new_line(self, context, element):
+        return self._generator.br()
+
+    def _export_new_page(self, context, element):
+        return self._generator.hr()
+    
+    def _export_anchor(self, context, element):
+        return self._generator.a(self._export_text_content(context, element),
+                                 name=element.anchor())
+    
+    def _export_link(self, context, element):
+        return self._generator.a(self.concat(self._exported_container_content(context, element)),
+                                 href=context.uri(element.target()),
+                                 title=element.descr(), type=element.type())
+
+    def _container_attr(self, element):
+        attr = (('cls', element.name()),
+                ('lang', element.lang(inherited=False)),
+                )
+        return dict([(key, value) for key, value in attr if value is not None])
+    
+    def _exported_container_content(self, context, element):
+        return [subcontent.export(context) for subcontent in element.content()]
+    
+    def _export_container(self, context, element):
+        result = self.concat(self._exported_container_content(context, element))
+        attr = self._container_attr(element)
+        if attr:
+            result = g.div(result, **attr)
+        return result
+    
+    def _export_paragraph(self, context, element):
+        return self._generator.p(self.concat(self._exported_container_content(context, element)),
+                                 **self._container_attr(element))
+
+    def _export_section(self, context, element):
+        g = self._generator
+        level = len(element.path()) + 1
+        anchor = element.anchor()
+        title = self.escape(element.title())
+        backref = element.backref()
+        if backref:
+            href = "#" + backref
+        else:
+            href = None
+        heading = g.h(g.a(title, href=href, name=anchor, cls='backref'), level)
+        return g.div((heading,
+                      self.concat(self._exported_container_content(context, element))),
+                     id='section-' + anchor,
+                     **self._container_attr(element))
+    
+    def _export_preformatted_text(self, context, element):
+        return self._generator.pre(self.escape(element.text()))
+
+    def _itemized_list(self, items, order=None, _indent=0):
+        g = self._generator
+        spaces = ' ' * _indent
+        items = [concat(spaces, '  ', g.li(item), '\n') for item in items]
+        style = None
+        if order is None:
+            method = g.ul
+        else:
+            method = g.ol
+            if order == 'lower-alpha':
+                style = 'list-style-type: lower-alpha'
+            elif order == 'upper-alpha':
+                style = 'list-style-type: upper-alpha'
+        return spaces + method(concat('\n', items, spaces), style=style)+'\n'
+        
+    def _export_itemized_list(self, context, element):
+        return self._itemized_list([item.export(context) for item in element.content()],
+                                   order=element.order())
+
+    def _export_definition_list(self, context, element):
+        g = self._generator
+        content = [g.dt(dt.export(context)) + g.dd(dd.export(context))
+                   for dt, dd in element.content()]
+        return g.dl(*content)
+
+    def _export_field_set(self, context, element):
+        g = self._generator
+        return g.table([g.tr((g.th(name.export(context), valign="top", align="left"),
+                              g.td(value.export(context))))
+                        for name, value in element.content()],
+                       cls='lcg-fieldset')
+
+    def _table_of_contents(self, context, item, parent, depth=None, detailed=True, _indent=0):
+        g = self._generator
+        if depth is not None:
+            if depth <= 0:
+                return g.escape('')
+            depth -= 1 # Decrease for further calls.
+        items = ()
+        if isinstance(item, ContentNode):
+            items = [node for node in item.children() if not node.hidden()]
+        if len(items) == 0 and detailed:
+            if isinstance(item, (tuple, list)):
+                items = item
+            else:
+                items = [s for s in item.sections(context) if s.in_toc()]
+        if len(items) == 0:
+            return g.escape('')
+        links = []
+        current = parent
+        while current is not None and current.hidden():
+            current = current.parent()
+        for i in items:
+            name = None
+            uri_kwargs = {}
+            descr = None
+            cls = i is current and 'current' or None
+            if isinstance(i, ContentNode):
+                descr = i.descr()
+                if not i.active():
+                    cls = (cls and cls + ' ' or '') + 'inactive'
+            elif isinstance(i, Section):
+                name = i.create_backref(parent)
+                uri_kwargs['local'] = parent is i.parent()
+            uri = context.uri(i, **uri_kwargs)
+            link = g.a(i.title(), href=uri, name=name, title=descr, cls=cls)
+            subtoc = self._table_of_contents(context, i, parent, depth=depth, detailed=detailed,
+                                             _indent=_indent+4)
+            links.append(g.concat(link, subtoc))
+        return concat("\n", self._itemized_list(links, _indent=_indent), ' '*(_indent-2))
+
+    def _export_table_of_contents(self, context, element, _indent=0):
+        toc = self._table_of_contents(context, element.item(), element.parent(),
+                                      depth=element.depth(), detailed=element.detailed(),
+                                      _indent=_indent)
+        title = element.title()
+        if title is not None:
+            g = self._generator
+            #TODO: add a "skip" link?
+            toc = g.div(g.concat(g.div(g.strong(title), cls='title'), toc),
+                        cls='table-of-contents')
+        return toc
+    
+    def _export_table(self, context, element):
+        return self._generator.table(self._exported_container_content(context, element),
+                                     cls='lcg-table', title=element.title(),
+                                     **self._container_attr(element))
+
+    def _export_table_row(self, context, element):
+        return self._generator.tr(self.concat(self._exported_container_content(context, element)),
+                                  **self._container_attr(element))
+
+    def _export_table_cell(self, context, element):
+        return self._generator.td(self.concat(self._exported_container_content(context, element)),
+                                  align=element.align(),
+                                  **self._container_attr(element))
+    
+    def _export_table_heading(self, context, element):
+        return self._generator.th(self.concat(self._exported_container_content(context, element)),
+                                  align=element.align(),
+                                  **self._container_attr(element))
+
+    def _export_inline_image(self, context, element):
+        g = self._generator
+        image = element.image()
+        title = element.title()
+        descr = element.descr()
+        size = element.size()
+        uri = context.uri(image)
+        if size is None:
+            size = image.size()
+        if title is None:
+            title = image.title()
+        if descr is None:
+            descr = image.descr()
+        if size is not None:
+            width, height = size
+        else:
+            width, height = None, None
+        if descr:
+            if title:
+                title = self.concat(title, ' (', descr, ')')
+            else:
+                title = descr
+        return g.img(uri, alt=(title or ''), align=element.align(), cls=element.name(),
+                     width=width, height=height)
+
+
+    def _export_inline_audio(self, context, element):
+        """Export emedded audio player for given audio file.
+
+        Inline audio can be rendered as a simple link which controls a shared
+        Flash audio player (usually located at the bottom right corner of a
+        webpage) or using a standalone Flash audio player located directly
+        inside page content in place of the link.  In both cases, if Flash or
+        Javascript is not available, a simple link without a player is rendered
+        allowing just downloading the audio file.
+
+        """
+        if element.shared():
+            g = self._generator
+            audio = element.audio()
+            image = element.image()
+            title = element.title()
+            descr = element.descr()
+            uri = context.uri(audio)
+            link_id = '%x' % positive_id(audio)
+            context.connect_shared_player(uri, link_id)
+            if image:
+                label = g.img(context.uri(image), alt=title)
+                descr = descr or title
+            else:
+                label = title or audio.title()
+            return g.link(label, uri, id=link_id, title=descr, cls='media-control-link')
+        else:
+            raise NotImplementedError
+        
+    def _export_inline_video(self, context, element):
+        """Export emedded video player for given video file.
+
+        The 'Video' resource instance is rendered as a standalone Flash video
+        player preloaded with given video.  If Flash or Javascript is not
+        available, only a link to the video file is rendered.
+
+        """
+        g = self._generator
+        if element.size() is None:
+            width, height = (200, 200)
+        else:
+            width, height = element.size()
+        video = element.video()
+        image = element.image()
+        uri = context.uri(video)
+        title = element.title() or video.title()
+        descr = element.descr() or video.descr()
+        link = g.link(title, uri, title=descr)
+        player = self.export_swf_object(context, 'mediaplayer.swf', '%x' % positive_id(video),
+                                        width, height, min_flash_version='9.0.115',
+                                        vars=dict(file=uri, title=title, description=descr,
+                                                  image=(image and context.uri(image))),
+                                        alternative_content=link)
+        return g.div(player or link, cls='video-player')
+
+    def _export_inline_external_video(self, context, element):
+        """Export emedded video player for external services such as YouTube or Vimeo.
+        
+        A remote player from the video service is embedded into the page.
+       
+        """
+        g = context.generator()
+        service = element.service()
+        if service == 'youtube':
+            # rel=0 means do not load related videos
+            video_uri = "http://www.youtube.com/v/%s?rel=0" % element.video_id()
+        elif service == 'vimeo':
+            video_uri = "http://vimeo.com/moogaloop.swf?clip_id=%s&server=vimeo.com" % element.video_id()
+        else:
+            Exception("Unsupported video service %s" % service)
+        width, height = element.size() or (500,300)
+        return g.object(
+            (g.param(name="movie", value=video_uri),
+             g.param(name="wmode", value="opaque")),
+            type="application/x-shockwave-flash",
+            title=_("Flash movie object"),
+            data=video_uri, width=width, height=height)
 
     def export_swf_object(self, context, filename, element_id, width, height, vars={},
                           min_flash_version=None, alternative_content=None, warning=None):
@@ -569,7 +838,7 @@ class HtmlExporter(Exporter):
         flash_js = context.resource('flash.js')
         if flash_js is None:
             return None
-        g = context.generator()
+        g = self._generator
         flashvars = '&'.join(['='.join((name, escape(value)))
                               for name, value in vars.items()])
         if isinstance(alternative_content, tuple):
@@ -616,7 +885,7 @@ class HtmlExporter(Exporter):
             of a webpage to serve many different media playback requests)
         
         """
-        g = context.generator()
+        g = self._generator
         result = self.export_swf_object(context, 'mediaplayer.swf', player_id, width, height,
                                         min_flash_version='9.0.115',
                                         warning=_("Media Player unavailable."))
@@ -634,7 +903,7 @@ class HtmlExporter(Exporter):
         controls = context.shared_player_controls()
         if controls:
             # Shared player controls exist, so create the player and connect the controls to it.
-            g = context.generator()
+            g = self._generator
             player_id = 'shared-audio-player'
             # export_media_player() returns None if one of the dependencies is not found...
             content = self.export_media_player(context, player_id, 300, 20, shared=True)
@@ -645,90 +914,14 @@ class HtmlExporter(Exporter):
         else:
             return None
 
-    def export_inline_audio(self, context, audio, title=None, descr=None, image=None, shared=True):
-        """Export emedded audio player for given audio file.
-
-        Inline audio can be rendered as a simple link which controls a shared
-        Flash audio player (usually located in the bottom right corner of a
-        webpage) or using a standalone Flash audio player located directly
-        inside page content in place of the link.  In both cases, if Flash or
-        Javascript is not available, a simple link without a player is rendered
-        allowing just downloading the audio file.
-
-        Arguments are described in parent class method.
-        
-        """
-        if shared:
-            g = context.generator()
-            uri = context.uri(audio)
-            link_id = 'audio-%x' % positive_id(audio)
-            context.connect_shared_player(uri, link_id)
-            if image:
-                label = g.img(context.uri(image), alt=title)
-                descr = descr or title
-            else:
-                label = title or audio.title()
-            return g.link(label, uri, id=link_id, title=descr, cls='media-control-link')
-        else:
-            raise NotImplementedError
-        
-    def export_inline_video(self, context, video, title=None, descr=None, image=None, size=None):
-        """Export emedded video player for given video file.
-
-        The 'Video' resource instance is rendered as a standalone Flash video
-        player preloaded with given video.  If Flash or Javascript is not
-        available, only a link to the video file is rendered.
-
-        Arguments are described in parent class method.
-        
-        """
-        g = context.generator()
-        width, height = size or (200, 200)
-        uri = context.uri(video)
-        title = title or video.title()
-        descr = descr or video.descr()
-        link = g.link(title, uri, title=descr)
-        player = self.export_swf_object(context, 'mediaplayer.swf', 'video-%x' % positive_id(video),
-                                        width, height, min_flash_version='9.0.115',
-                                        vars=dict(file=uri, title=title, description=descr,
-                                                  image=(image and context.uri(image))),
-                                        alternative_content=link)
-        return g.div(player or link, cls='video-player')
-
-    def export_embedded_video(self, context, video_id, service, size=None):
-        """Export emedded video player for services such as YouTube or Vimeo.
-        
-        Arguments are described in parent class method.
-        
-        """
-        g = context.generator()
-        width, height = size or (500,300)
-
-        if service == 'youtube':
-            # rel=0 means do not load related videos
-            video_uri="http://www.youtube.com/v/%s?rel=0" % str(video_id)
-        elif service == 'vimeo':
-            video_uri="http://vimeo.com/moogaloop.swf?clip_id=%s&server=vimeo.com" % str(video_id)
-        else:
-            Exception("Unsupported video service %s" % service)
-        return g.object(
-            (g.param(name="movie", value=video_uri),
-             g.param(name="wmode", value="opaque")),
-            type="application/x-shockwave-flash",
-            title=_("Flash movie object"),
-            data=video_uri, width=width, height=height)
-
-    def _initialize(self, context):
-        return ''
-
-    def _body_attr(self, context, **kwargs):
-        return kwargs
+    def escape(self, text):
+        return self._generator.escape(text)
     
-    def _body_content(self, context):
-        return self._parts(context, self._BODY_PARTS)
+    def concat(self, *items):
+        return self._generator.concat(*items)
     
     def export(self, context):
-        g = context.generator()
+        g = self._generator
         # Export body first to allocate all resources before generating the head.
         body = self._body_content(context)
         attr = self._body_attr(context)

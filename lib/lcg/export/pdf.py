@@ -22,7 +22,6 @@ import cStringIO
 import os
 import string
 import sys
-import urlparse
 
 try:
     import reportlab.lib.colors
@@ -166,15 +165,16 @@ class Context(object):
         style.fontName='FreeSerif'
         return style
 
-    def list_style(self, ordered=False):
+    def list_style(self, order=None):
         """Return paragraph style for lists.
 
         Arguments:
 
-          ordered -- iff true, consider the list ordered
-          
+          order -- None for an unordered list (bullet list) or one of allowed strings
+            describing ordering style ('numeric', 'lower-alpha', 'upper-alpha').
+
         """
-        if ordered:
+        if order:
             style_name = 'Normal'
         else:
             style_name = 'Bullet'
@@ -643,23 +643,24 @@ class List(Element):
 
     'content' is a list of the list items; in theory they can be of any type,
     but 'Text' or 'Paragraph' instances are recommended.  An optional attribute
-    may be used to distinguish between ordered (numbered) lists and unordered
-    (bulleted) lists.
+    'order' may be used to distinguish between several ordering styles (None
+    for unordered (bulleted) lists or one of ('numeric', 'lower-alpha',
+    'upper-alpha') for ordered lists.
 
     """
-    ordered = False
+    order = False
     def init(self):
         super(List, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
         self.content = list(self.content)
     def export(self, context):
         pdf_context = context.pdf_context
-        style = pdf_context.list_style(self.ordered)
+        style = pdf_context.list_style(self.order)
         list_nesting_level = pdf_context.list_nesting_level()
         font_size = style.fontSize
         style.bulletIndent = list_nesting_level * 1.5 * font_size
         style.leftIndent = style.bulletIndent + 1.5 * font_size
-        if self.ordered:
+        if self.order:
             seqid = pdf_context.get_seqid()
             seq_string = make_element(SimpleMarkup, content='seq', attributes=dict(id='list%d'%(seqid,)))
             dot_string = make_element(Text, content=u'.')
@@ -735,27 +736,20 @@ class LinkTarget(Text):
         return u'<a name="%s"/>%s' % (self.name, exported_text,)
 
 class Image(Element):
-    """Image taken from a file.
+    """Image taken from an Image resource instance.
 
-    'content' is a URL (string) pointing to image source data.  An additional
-    argument 'text' may provide text description of the image in the form of
-    base string.
+    'image' is an Image instance.  An additional argument 'text' may provide text description of
+    the image in the form of base string.
     
     """
     def init(self):
         super(Image, self).init()
+        assert isinstance(self.image, Image)
         assert self.text is None or isinstance(self.text, basestring)
     def export(self, context):
-        url_info = urlparse.urlparse(self.content)
-        if url_info[0] in ('', 'file',):
-            image_url = url_info[2]
-            assert isinstance(image_url, str), ('type error', image_url,)
-            result = reportlab.platypus.Flowable(image_url)
-        else:
-            content = make_element(Text, content=self.content)
-            link = make_element(Link, uri=self.content, content=content)
-            result = make_element(Paragraph, content=[link]).export(context)
-        return result
+        assert isinstance(image_url, str), ('type error', image_url,)
+        
+        return reportlab.platypus.Flowable(image_url)
 
 class TableCell(Container):
     """Table cell.
@@ -886,183 +880,6 @@ def make_element(cls, **kwargs):
     return element
 
 
-class PDFGenerator(Generator):
-
-    def _translate(self, object):
-        # to be implemented
-        return object
-            
-    def _concat(self, items):
-        result = ''
-        for i in items:
-            result += self._translate(i)
-        return result
-    
-    def escape(self, text):
-        return make_element(Text, content=text)
-
-    def pre(self, text):
-        return make_element(PreformattedText, content=text)
-
-    def _markup(self, text, tag, **attributes):
-        return make_element(MarkedText, content=text, tag=tag, attributes=attributes)
-
-    def emphasize(self, text):
-        return self._markup(text, 'i')
-
-    def strong(self, text):
-        return self._markup(text, 'strong')
-    
-    def fixed(self, text):
-        return self._markup(text, 'font', face='FreeMono')
-     
-    def sup(self, text):
-        return self._markup(text, 'super')
-    
-    def sub(self, text):
-        return self._markup(text, 'sub')
-    
-    def underline(self, text):
-        return self._markup(text, 'u')
-    
-    def citation(self, text):
-        return self.emphasize(text)
-    
-    def quotation(self, text):
-        return self.emphasize(text)
-
-    # Sectioning
-
-    def heading(self, title, level, anchor=None, backref=None):
-        content = self.escape(title)
-        # TODO: Make backreferences optional?
-        if anchor:
-            content = self.anchor(content, anchor)
-        if backref:
-            content = self.link(content, "#"+backref)
-        return make_element(Heading, content=[content], level=level)
-
-    def p(self, content, lang=None, presentation=None):
-        # LCG interpretation of "paragraph" is very wide, we have to expect
-        # anything containing anything.  The only "paragraph" meaning we use
-        # here is that the content should be separated from other text.
-        if not isinstance(content, Text):
-            return content
-        return make_element(Paragraph, content=[content], presentation=presentation)
-
-    def div(self, content, lang=None, halign=None, valign=None, orientation=None,
-            presentation=None, **kwargs):
-        if isinstance(content, Text):
-            result_content = make_element(Paragraph, content=[content], presentation=presentation)
-            if presentation is not None and presentation.boxed:
-                cell = make_element(Table_Cell, content=result_content)
-                result_content = make_element(Table, content=[[cell]], presentation=presentation)
-        elif (isinstance(content, (tuple, list,)) and
-              (orientation == 'HORIZONTAL' or halign is not None or valign is not None)):
-            def cell(content):
-                return make_element(TableCell, content=c, align=halign, valign=valign)
-            if orientation == 'HORIZONTAL':
-                table_content = [[cell(c) for c in content]]
-            else:
-                table_content = [[cell(c)] for c in content]
-            result_content = make_element(Table, content=table_content, presentation=presentation)
-        else:
-            result_content = content
-        return result_content
-    
-    def list(self, items, ordered=False, style=None, lang=None):
-        return make_element(List, content=items, ordered=ordered)
-    
-    def br(self):
-        return make_element(SimpleMarkup, content='br')
-
-    def hr(self):
-        return self.new_page()
-
-    def new_page(self):
-        return make_element(PageBreak)
-
-    def page_number(self, total):
-        return make_element(PageNumber, total=total)
-
-    def space(self, width, height):
-        return make_element(Space, width=width, height=height)
-    
-    # Links and images
-    
-    def link(self, label, uri, **kwargs):
-        if isinstance(label, basestring):
-            label = make_element(Text, content=label)
-        elif isinstance(label, Container):
-            def filter_(c):
-                if isinstance(c, Text):
-                    result = [c]
-                elif isinstance(c, basestring):
-                    result = [make_element(Text, content=c)]
-                elif isinstance(c, Image):
-                    link_content = make_element(Text, content=(c.text or c.content))
-                    result = [make_element(Link, content=link_content, uri=c.content)]
-                else:
-                    result = []
-                return result
-            filtered_content = label.expand(filter_)
-            label = make_element(TextContainer, content=filtered_content)
-        return make_element(Link, content=label, uri=uri)
-    
-    def anchor(self, label, name, **kwargs):
-        return make_element(LinkTarget, content=label, name=name)
-
-    def img(self, src, alt=None, descr=None, align=None, width=None, height=None, **kwargs):
-        return make_element(Image, content=src, text=alt)
-
-    # Tables and definition lists
-
-    def th(self, content, align=None, lang=None):
-        return make_element(TableCell, content=content, align=align, heading=True)
-        
-    def td(self, content, align=None, lang=None):
-        return make_element(TableCell, content=content, align=align, heading=False)
-        
-    def table(self, content, title=None, cls=None, lang=None, long=False, column_widths=None,
-              presentation=None):
-        return make_element(Table, content=content, long=long, column_widths=column_widths,
-                            presentation=presentation)
-
-    def fset(self, items, lang=None):
-        def make_item(title, description):
-            content = [self._markup(title, 'i'),
-                       make_element(Text, content=u': '),
-                       make_element(Text, content=description)]
-            return make_element(Paragraph, content=content)
-        result_items = [make_item(title, description) for title, description in items]
-        return make_element(Container, content=result_items)
-
-    # Special methods
-
-    def concat(self, *exported):
-        # This method should be considered a temporary hack.
-        # Its semantics is undefined.
-        # Proper data types and method calls with strict rules should be used
-        # instead of the inelegant and unreliable guesswork.
-        if exported:
-            for e in exported:
-                if not isinstance(e, Text):
-                    def transform(item):
-                        if isinstance(item, Text):
-                            result = make_element(Paragraph, content=[item])
-                        else:
-                            result = item
-                        return result
-                    result = make_element(Container, content=[transform(item) for item in exported])
-                    break
-            else:
-                # everything is Text
-                result = make_element(TextContainer, content=list(exported))
-        else:
-            result = make_element(Container, content=())
-        return result
-
-
 class PDFMarkupFormatter(MarkupFormatter):
 
     _FORMAT = {'comment': make_element(Empty),
@@ -1079,8 +896,8 @@ class PDFMarkupFormatter(MarkupFormatter):
             entry = context.pdf_markup_stack.pop()
             assert entry.markup == markup, ('markup mismatch', entry.markup, markup,)
             exported = make_element(TextContainer, content=entry.content)
-            g = context.generator()
-            method = getattr(g, markup)
+            e = context.exporter()
+            method = getattr(e, markup)
             result = method(exported)
         else:
             context.pdf_markup_stack.append(self._StackEntry(markup))
@@ -1106,17 +923,16 @@ class PDFMarkupFormatter(MarkupFormatter):
         return self._handle_open_close_markup('quotation', *args, **kwargs)
 
     def _linebreak_formatter(self, context, **kwargs):
-        g = context.generator()
-        return g.br()
+        return context.exporter().new_line(context)
 
     def _email_formatter(self, context, email, **kwargs):
-        g = context.generator()
-        return g.fixed(email)
+        e = context.exporter()
+        return e.fixed(email)
     
     def format(self, context, text):
         if not hasattr(context, 'pdf_markup_stack'):
             context.pdf_markup_stack = []
-        g = context.generator()
+        e = context.exporter()
         self._open = []
         result = []
         pos = 0
@@ -1128,23 +944,22 @@ class PDFMarkupFormatter(MarkupFormatter):
             else:
                 result.append(exported)
         for match in self._rules.finditer(text):
-            starting_text = g.escape(text[pos:match.start()])
+            starting_text = e.escape(text[pos:match.start()])
             insert_text(starting_text)
             markup = self._markup_handler(context, match)
             insert_text(markup)
             pos = match.end()
-        final_text = g.escape(text[pos:])
+        final_text = e.escape(text[pos:])
         insert_text(final_text)
         self._open.reverse()
         x = self._open[:]
         for type in x:
             result.append(self._formatter(context, type, {}, close=True))
-        return g.concat(*result)
+        return e.concat(*result)
 
 
 class PDFExporter(FileExporter, Exporter):
     
-    Generator = PDFGenerator
     Formatter = PDFMarkupFormatter
 
     _OUTPUT_FILE_EXT = 'pdf'
@@ -1154,19 +969,175 @@ class PDFExporter(FileExporter, Exporter):
         return super(PDFExporter, self)._uri_section(context, section, local=True)
     
     def _export(self, node, context):
+        title = self.escape(node.title())
+        heading = self.heading(title, 1)
         result = node.content().export(context)
         if isinstance(result, basestring):
-            result = context.generator().p(result)
-        return result
+            result = context.exporter().paragraph(result)
+        return self.concat(heading, result)
 
-    def _finalize(self, context):
-        return None
+    def _markup(self, text, tag, **attributes):
+        return make_element(MarkedText, content=text, tag=tag, attributes=attributes)
+
+    def concat(self, *exported):
+        # This method should be considered a temporary hack.
+        # Its semantics is undefined.
+        # Proper data types and method calls with strict rules should be used
+        # instead of the inelegant and unreliable guesswork.
+        if exported:
+            for e in exported:
+                if not isinstance(e, Text):
+                    def transform(item):
+                        if isinstance(item, Text):
+                            result = make_element(Paragraph, content=[item])
+                        else:
+                            result = item
+                        return result
+                    result = make_element(Container, content=[transform(item) for item in exported])
+                    break
+            else:
+                # everything is Text
+                result = make_element(TextContainer, content=list(exported))
+        else:
+            result = make_element(Container, content=())
+        return result
     
+    def escape(self, text):
+        return make_element(Text, content=text)
+
+    def emphasize(self, context, text):
+        return self._markup(text, 'i')
+
+    def strong(self, context, text):
+        return self._markup(text, 'strong')
+    
+    def fixed(self, context, text):
+        return self._markup(text, 'font', face='FreeMono')
+     
+    def underline(self, context, text):
+        return self._markup(text, 'u')
+    
+    def superscript(self, context, text):
+        return self._markup(text, 'super')
+    
+    def subscript(self, context, text):
+        return self._markup(text, 'sub')
+    
+    def citation(self, context, text):
+        return self.emphasize(text)
+    
+    def quotation(self, context, text):
+        return self.emphasize(text)
+
+    # The methods below are moved here from the (now removed) Generator, but
+    # they need to be rewritten for the new exporter interface.
+
+    def heading(self, context, title, level, anchor=None, backref=None):
+        content = self.escape(title)
+        # TODO: Make backreferences optional?
+        if anchor:
+            content = self.anchor(content, anchor)
+        if backref:
+            content = self.link(content, "#"+backref)
+        return make_element(Heading, content=[content], level=level)
+
+    def paragraph(self, context, content, presentation=None):
+        # LCG interpretation of "paragraph" is very wide, we have to expect
+        # anything containing anything.  The only "paragraph" meaning we use
+        # here is that the content should be separated from other text.
+        if not isinstance(content, Text):
+            return content
+        return make_element(Paragraph, content=[content], presentation=presentation)
+
+    def preformatted_text(self, context, text):
+        return make_element(PreformattedText, content=text)
+
+    def itemized_list(self, context, items, order=False):
+        return make_element(List, content=items, order=order)
+    
+    def field_set(self, context, items):
+        def make_item(title, description):
+            content = [self._markup(title, 'i'),
+                       make_element(Text, content=u': '),
+                       make_element(Text, content=description)]
+            return make_element(Paragraph, content=content)
+        result_items = [make_item(title, description) for title, description in items]
+        return make_element(Container, content=result_items)
+
+    def container(self, context, content, name=None, lang=None, halign=None, valign=None,
+                  orientation=None, presentation=None):
+        if orientation == 'HORIZONTAL' or halign is not None or valign is not None:
+            def cell(content):
+                return make_element(TableCell, content=c, align=halign, valign=valign)
+            if orientation == 'HORIZONTAL':
+                table_content = [[cell(c) for c in content]]
+            else:
+                table_content = [[cell(c)] for c in content]
+            result_content = make_element(Table, content=table_content, presentation=presentation)
+        else:
+            result_content = content
+        return result_content
+    
+    def new_line(self, context):
+        return make_element(SimpleMarkup, content='br')
+
+    def new_page(self, context):
+        return make_element(PageBreak)
+
+    def page_number(self, context, total=False):
+        return make_element(PageNumber, total=total)
+
+    def horizontal_separator(self, context):
+        return self.new_page(context)
+
+    def space(self, context, width, height):
+        return make_element(Space, width=width, height=height)
+    
+    # Links and images
+    
+    def link(self, context, target, content, descr=None, type=None):
+        uri = context.uri(target)
+        if isinstance(content, Container):
+            def filter_(c):
+                if isinstance(c, Text):
+                    result = [c]
+                elif isinstance(c, basestring):
+                    result = [make_element(Text, content=c)]
+                elif isinstance(c, Image):
+                    link_content = make_element(Text, content=(c.text or c.content))
+                    result = [make_element(Link, content=link_content, uri=c.content)]
+                else:
+                    result = []
+                return result
+            filtered_content = content.expand(filter_)
+            content = make_element(TextContainer, content=filtered_content)
+        return make_element(Link, content=content, uri=uri)
+    
+    def anchor(self, context, label, name):
+        return make_element(LinkTarget, content=label, name=name)
+
+    def inline_image(self, context, image, title=None, descr=None, align=None, name=None,
+                     size=None):
+        return make_element(Image, image=image, text=title)
+
+    # Tables
+
+    def table(self, context, content, title=None, cls=None, long=False, column_widths=None,
+              presentation=None):
+        return make_element(Table, content=content, long=long, column_widths=column_widths,
+                            presentation=presentation)
+
+    def table_heading(self, context, content, align=None, lang=None):
+        return make_element(TableCell, content=content, align=align, heading=True)
+        
+    def table_cell(self, context, content, align=None, lang=None):
+        return make_element(TableCell, content=content, align=align, heading=False)
+        
     def export(self, context, total_pages=None):
         context.pdf_context = pdf_context = Context()
         pdf_context.total_pages = total_pages
-        generator_structure = super(PDFExporter, self).export(context)
-        document = generator_structure.export(context)
+        exported_structure = super(PDFExporter, self).export(context)
+        document = exported_structure.export(context)
         # It is necessary to check for invalid anchors before doc.build gets
         # called, otherwise Reportlab throws an ugly error.
         invalid_anchors = context.pdf_context.invalid_anchor_references()

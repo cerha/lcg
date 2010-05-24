@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2006, 2007, 2008 Brailcom, o.p.s.
+# Copyright (C) 2006, 2007, 2008, 2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -114,15 +114,13 @@ class HhpExporter(HtmlFileExporter):
                 kwargs = dict(kwargs, cellspacing=3, cellpadding=0)
             return super(HhpExporter.Generator, self).table(content, cls=cls, **kwargs)
         
-        def heading(self, title, level, backref=None, **kwargs):
-            return super(HhpExporter.Generator, self).heading(title, level, **kwargs)
-
         def div(self, content, cls=None, **kwargs):
             if cls == 'table-of-contents':
                 content = '<br>' + content
             return super(HhpExporter.Generator, self).div(content, cls=cls, **kwargs)
-        
+
     def dump(self, node, directory, **kwargs):
+        config.allow_backref
         super(HhpExporter, self).dump(node, directory, **kwargs)
         if node == node.root():
             context = self.context(node, None)

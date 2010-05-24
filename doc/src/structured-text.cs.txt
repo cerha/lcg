@@ -718,8 +718,8 @@ http://www.google.com/images/logo_sm.gif
 
 http://www.google.com/images/logo_sm.gif
 
-Pokud je určen název odkazu, bude použit jako alternativní text obrázku.  Popis
-odkazu je potom použit jako popis obrázku pro potřeby zpřístupnění.
+Pokud je určen název odkazu, bude použit jako alternativní text obrázku pro
+potřeby zpřístupnění, stejně jako případný popis odkazu (viz. příklad níže).
 
 *Příklad*:
 ------

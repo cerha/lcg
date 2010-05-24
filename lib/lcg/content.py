@@ -108,6 +108,23 @@ class Content(object):
         self._lang = lang
         super(Content, self).__init__(**kwargs)
         
+    def _container_path(self):
+        path = [self]
+        while path[0]._container is not None:
+            path.insert(0, path[0]._container)
+        return tuple(path)
+
+    def _export_element_type(self):
+        """Return the element class recognized by the exporter.
+
+        The class returned by this method determines how the exporter treats the element during
+        export.  The base class implementation of this method returns 'self.__class__', but you may
+        need to override this in derived classes to either mimic another class or just retain the
+        parent class export.
+
+        """
+        return self.__class__
+
     def sections(self, context):
         """Return the contained sections as a sequence of 'Section' instances.
 
@@ -127,7 +144,8 @@ class Content(object):
         This method is normally called automatically by the container constructor to inform the
         contained 'Content' elements about their position in content hierarchy.  You only need to
         care about calling this method if you implement your own 'Container' class and don't call
-        the default constructor for all the contained elements for some reason.
+        the default constructor for all the contained elements for some reason.  Otherwise it is
+        always called automatically by LCG behind the scenes.
 
         """
         if __debug__:
@@ -143,8 +161,8 @@ class Content(object):
         content construction.  It is, however, needed in the export time, so you will need to call
         it manually before attempting to export any content which was not assigned to a
         'ContentNode' before.  Content which is contained within a container will automatically
-        determine its parent node recursively so it is only needed to set the parent of top level
-        elements.
+        determine its parent node recursively so it is only needed to set the parent explicitly of
+        top level elements or for unbound elements.
 
         """
         assert isinstance(node, ContentNode), \
@@ -159,15 +177,21 @@ class Content(object):
         assert parent is not None, "Parent unknown: %s" % self
         return parent
 
-    def _container_path(self):
-        path = [self]
-        while path[0]._container is not None:
-            path.insert(0, path[0]._container)
-        return tuple(path)
+    def lang(self, inherited=True):
+        """Return the content language as lowercase ISO 639-1 Alpha-2 language code.
 
-    def lang(self):
-        """???"""
-        return self._lang or self._container and self._container.lang()
+        Arguemnts:
+        
+          inherited -- iff True, the language will be determined from the
+            parent element in the hierarchy if this element doesn't define
+            'lang' explicitly.  When False, the value of 'lang' passed to the
+            constructor is returned.
+
+        """
+        lang = self._lang
+        if lang is None and inherited and self._container:
+            lang = self._container.lang()
+        return lang
 
     def export(self, context):
         """Return the formatted content in an output specific form.
@@ -180,8 +204,8 @@ class Content(object):
             created and returned by 'Exporter.context' method
 
         """
-        g = context.generator()
-        return g.escape('')
+        return context.exporter().export_element(context, self._export_element_type(), self)
+    #return context.exporter().escape('')
 
     
 class HorizontalSeparator(Content):
@@ -191,16 +215,12 @@ class HorizontalSeparator(Content):
     separator in documents without pages.
 
     """
-    
-    def export(self, context):
-        return context.generator().hr()
+    pass
 
 
 class NewPage(Content):
     """New page starts here."""
-    
-    def export(self, context):
-        return context.generator().new_page()
+    pass
 
 
 class PageNumber(Content):
@@ -221,8 +241,9 @@ class PageNumber(Content):
         """
         self._total = total
         
-    def export(self, context):
-        return context.generator().page_number(total=self._total)
+    def total(self):
+        """Return the value of 'total' as passed to the constructor."""
+        return self._total
 
 
 class HSpace(Content):
@@ -241,11 +262,12 @@ class HSpace(Content):
         assert isinstance(size, Unit), size
         self._size = size
 
-    def export(self, context):
-        return context.generator().space(self._size, UPoint(0))
+    def size(self, context):
+        """Return the value of 'size' as passed to the constructor."""
+        return self._size
         
 
-class VSpace(Content):
+class VSpace(HSpace):
     """Vertical space of given size.
 
     This should be used only in places where explicit space is needed.  In many
@@ -258,9 +280,6 @@ class VSpace(Content):
         @type: L{Unit}
         @param: Size of the space.
         """
-        
-    def export(self, context):
-        return context.generator().space(UPoint(0), self._size)
 
 
 class TextContent(Content):
@@ -290,23 +309,18 @@ class TextContent(Content):
         cls = self.__class__.__name__
         return '<%s at 0x%x text="%s">' % (cls, id(self), sample)
 
-    def export(self, context):
-        g = context.generator()
-        return g.escape(self._text)
+    def text(self):
+        """Return the value of 'text' as passed to the constructor."""
+        return self._text
 
     
 class FormattedText(TextContent):
-    """Formatted text using a simple wiki-based markup.
+    """Formatted text using a simple wiki-based inline markup.
 
     See 'MarkupFormatter' for more information about the formatting rules.
     
     """
-    def export(self, context):
-        if self._text:
-            result = context.formatter().format(context, context.translate(self._text))
-        else:
-            result = context.generator().escape('')
-        return result
+    pass
 
 # Backwards compatibility alias.        
 WikiText = FormattedText
@@ -314,37 +328,29 @@ WikiText = FormattedText
     
 class PreformattedText(TextContent):
     """Preformatted text."""
-    
-    def export(self, context):
-        g = context.generator()
-        return g.pre(g.escape(self._text))
-
+    pass
 
 class Anchor(TextContent):
     """Target of a link (an anchor)."""
     
-    def __init__(self, anchor, text=''):
+    def __init__(self, anchor, text='', **kwargs):
         """Arguments:
 
-          anchor -- name of the target place as a string
-          text -- text of the target place as a string or unicode
+          anchor -- name of the link target anchor as a string.
+          text -- text of the target place as a string or unicode.
 
         """
         assert isinstance(anchor, str)
         self._anchor = anchor
-        super(Anchor, self).__init__(text)
+        super(Anchor, self).__init__(text, **kwargs)
 
     def anchor(self):
-        """Return link target place name given in the constructor."""
+        """Return link target name given in the constructor."""
         return self._anchor
-        
-    def export(self, context):
-        g = context.generator()
-        return g.anchor(g.escape(self._text), self.anchor())
 
 
 class InlineImage(Content):
-    """Image put inside the document.
+    """Image embedded inside the document.
 
     It is unspecified whether the image is floating or to be put directly into
     the place of invocation.
@@ -392,20 +398,30 @@ class InlineImage(Content):
         self._size = size
         super(InlineImage, self).__init__()
 
-    def export(self, context):
-        g = context.generator()
-        img = self._image
-        size = self._size
-        if size is None:
-            size = img.size()
-        if size is not None:
-            width, height = size
-            kwargs = dict(width=width, height=height)
-        else:
-            kwargs = {}
-        return g.img(context.uri(img), alt=self._title or img.title() or '',
-                     descr=self._descr or img.descr(), align=self._align,
-                     cls=self._name, **kwargs)
+    def image(self):
+        """Return the value of 'image' as passed to the constructor."""
+        return self._image
+
+    def title(self):
+        """Return the value of 'title' as passed to the constructor."""
+        return self._title
+    
+    def descr(self):
+        """Return the value of 'descr' as passed to the constructor."""
+        return self._descr
+    
+    def name(self):
+        """Return the value of 'name' as passed to the constructor."""
+        return self._name
+    
+    def align(self):
+        """Return the value of 'align' as passed to the constructor."""
+        return self._align
+    
+    def size(self):
+        """Return the value of 'size' as passed to the constructor."""
+        return self._size
+    
 
 class InlineAudio(Content):
     """Audio file embedded inside the document.
@@ -438,10 +454,26 @@ class InlineAudio(Content):
         self._shared = shared
         super(InlineAudio, self).__init__()
 
-    def export(self, context):
-        return context.exporter().export_inline_audio(context, self._audio, title=self._title,
-                                                      descr=self._descr, image=self._image,
-                                                      shared=self._shared)
+    def audio(self):
+        """Return the value of 'audio' as passed to the constructor."""
+        return self._audio
+
+    def title(self):
+        """Return the value of 'title' as passed to the constructor."""
+        return self._title
+    
+    def descr(self):
+        """Return the value of 'descr' as passed to the constructor."""
+        return self._descr
+    
+    def image(self):
+        """Return the value of 'image' as passed to the constructor."""
+        return self._image
+    
+    def shared(self):
+        """Return the value of 'shared' as passed to the constructor."""
+        return self._shared
+
 
 class InlineVideo(Content):
     """Video file embedded inside the document.
@@ -471,32 +503,63 @@ class InlineVideo(Content):
         self._size = size
         super(InlineVideo, self).__init__()
 
-    def export(self, context):
-        return context.exporter().export_inline_video(context, self._video, title=self._title,
-                                                      descr=self._descr, image=self._image,
-                                                      size=self._size)
+    def video(self):
+        """Return the value of 'video' as passed to the constructor."""
+        return self._video
+
+    def title(self):
+        """Return the value of 'title' as passed to the constructor."""
+        return self._title
+    
+    def descr(self):
+        """Return the value of 'descr' as passed to the constructor."""
+        return self._descr
+    
+    def image(self):
+        """Return the value of 'image' as passed to the constructor."""
+        return self._image
+    
+    def size(self):
+        """Return the value of 'size' as passed to the constructor."""
+        return self._size
 
 
-class EmbeddedVideo(Content):
-    """Embedded video from services such as YouTube or Vimeo
+class InlineExternalVideo(Content):
+    """Embedded video from external services such as YouTube or Vimeo
 
-    For example in HTML, this might be exported as an embedded YouTube video player.
+    For example in HTML, this might be exported as an embedded YouTube video
+    player.
     
     """
-    def __init__(self, video_id, service, size=None):
+    def __init__(self, service, video_id, size=None):
         """Arguments:
 
-          video_id -- id of the video as a string
-          size -- video size in pixels as a tuple of two integers (WIDTH, HEIGHT)
+          service -- string identifier of the video service.  The two currently
+            supported services are 'youtube' and 'vimeo'.
+          video_id -- string identifier of the video within the given service.
+          size -- explicit video size in pixels as a tuple of two integers
+            (WIDTH, HEIGHT) or None for the default size.
+          
         """
-        self._video_id = video_id
+        assert service in ('youtube', 'vimeo'), service
+        assert isinstance(video_id, (str, unicode)), video_id
+        assert isinstance(size, tuple), size
         self._service = service
+        self._video_id = video_id
         self._size = size
-        super(EmbeddedVideo, self).__init__()
+        super(InlineExternalVideo, self).__init__()
 
-    def export(self, context):
-        return context.exporter().export_embedded_video(context, self._video_id,
-                                                        service=self._service, size=self._size)
+    def service(self):
+        """Return the string identifier of the video service."""
+        return self._service
+
+    def video_id(self):
+        """Return the string identifier of the video within the service."""
+        return self._video_id
+    
+    def size(self):
+        """Return the video size in pixels as a pair of integers or None."""
+        return self._size
 
 
 class Container(Content):
@@ -543,13 +606,21 @@ class Container(Content):
         """
         super(Container, self).__init__(**kwargs)
         self._name = name or id
+        assert name is None or isinstance(name, (str, unicode)), name
         assert halign is None or isinstance(halign, str), halign
-        self._halign = halign
         assert valign is None or isinstance(valign, str), valign
-        self._valign = valign
         assert orientation is None or isinstance(orientation, str), orientation
-        self._orientation = orientation
         assert presentation is None or isinstance(presentation, Presentation), presentation
+        super(Container, self).__init__(**kwargs)
+        if name:
+            assert id == None, id
+        else:
+            # For backwards compatibility ('name' was formely named 'id').
+            name = id
+        self._name = name
+        self._halign = halign
+        self._valign = valign
+        self._orientation = orientation
         self._presentation = presentation
         if self._SUBSEQUENCES:
             assert isinstance(content, (list, tuple)), "Not a sequence: %s" % content
@@ -575,14 +646,9 @@ class Container(Content):
             content.set_container(self)
             
     def content(self):
-        """Return content nodes given in the constructor."""
+        """Return the sequence of contained content elements.
+        """
         return self._content
-            
-    def _exported_content(self, context):
-        if self._SUBSEQUENCES:
-            return [[c.export(context) for c in seq] for seq in self._content]
-        else:
-            return [c.export(context) for c in self._content]
 
     def export(self, context):
         g = context.generator()
@@ -593,48 +659,55 @@ class Container(Content):
                            halign=self._halign, valign=self._valign, orientation=self._orientation,
                            presentation=self._presentation)
         return result
-
-
-class Paragraph(Container):
-    """A paragraph of text, where the text can be any 'Content'."""
-
-    def export(self, context):
-        g = context.generator()
-        exported = self._exported_content(context)
-        exported_result = g.concat(*exported)
-        return g.p(exported_result, lang=self._lang, presentation=self._presentation)
+            
+    def name(self):
+        """Return the value of 'name' as passed to the constructor."""
+        return self._name
+    
+    def halign(self):
+        """Return the value of 'halign' as passed to the constructor."""
+        return self._halign
+    
+    def valign(self):
+        """Return the value of 'valign' as passed to the constructor."""
+        return self._valign
+    
+    def orientation(self):
+        """Return the value of 'orientation' as passed to the constructor."""
+        return self._orientation
+    
+    def presentation(self):
+        """Return the value of 'presentation' as passed to the constructor."""
+        return self._presentation
 
     
+class Paragraph(Container):
+    """A paragraph of text, where the text can be any 'Content'."""
+    pass
+
+
 class ItemizedList(Container):
     """An itemized list."""
 
-    TYPE_UNORDERED = 'UNORDERED'
-    TYPE_ALPHA = 'ALPHA'
-    TYPE_NUMERIC = 'NUMERIC'
+    NUMERIC = 'numeric'
+    LOWER_ALPHA = 'lower-alpha'
+    UPPER_ALPHA = 'upper-alpha'
     
-    def __init__(self, content, type=TYPE_UNORDERED, **kwargs):
+    def __init__(self, content, order=None, **kwargs):
         """Arguments:
         
-          content -- sequence of list items containing exported contents
-          type -- one of the class 'TYPE_' constants determining the list style
+          content -- sequence of list items as 'Content' instances.
+          order -- one of class constants determining the list item ordering style or
+            None for an unordered list (bullet list).
           
         """
-        assert type in (self.TYPE_UNORDERED,
-                        self.TYPE_ALPHA,
-                        self.TYPE_NUMERIC)
-        self._type = type
+        assert order in (None, self.LOWER_ALPHA, self.UPPER_ALPHA, self.NUMERIC)
+        self._order = order
         super(ItemizedList, self).__init__(content, **kwargs)
 
-    def _styles(self):
-        return {self.TYPE_UNORDERED: (False, None),
-                self.TYPE_NUMERIC: (True, None),
-                self.TYPE_ALPHA: (True, 'lower-alpha'),
-                }
-
-    def export(self, context):
-        ordered, style = self._styles()[self._type]
-        items = self._exported_content(context)
-        return context.generator().list(items, ordered=ordered, style=style, lang=self._lang)
+    def order(self):
+        """Return the value of 'order' as passed to the constructor."""
+        return self._order
 
 
 class DefinitionList(Container):
@@ -646,9 +719,6 @@ class DefinitionList(Container):
     """
     _SUBSEQUENCES = True
     _SUBSEQUENCE_LENGTH = 2
-
-    def export(self, context):
-        return context.generator().definitions(self._exported_content(context), lang=self._lang)
 
     
 class FieldSet(Container):
@@ -663,9 +733,6 @@ class FieldSet(Container):
     """
     _SUBSEQUENCES = True
     _SUBSEQUENCE_LENGTH = 2
-
-    def export(self, context):
-        return context.generator().fset(self._exported_content(context), lang=self._lang)
     
 
 class TableCell(Container):
@@ -686,32 +753,26 @@ class TableCell(Container):
         self._align = align
         super(TableCell, self).__init__(content, **kwargs)
 
-    def export(self, context):
-        return context.generator().td(self._exported_content(context), align=self._align,
-                                      lang=self._lang)
+    def align(self):
+        """Return the value of 'align' as passed to the constructor."""
+        return self._align
 
 
-class TableHeading(Container):
+class TableHeading(TableCell):
     """Table heading is a container of heading content and may appear within 'TableRow'."""
-
-    def export(self, context):
-        return context.generator().th(self._exported_content(context), lang=self._lang)
+    pass
 
 
 class TableRow(Container):
     """Table row is a container of cells or headings and may appear within 'Table'."""
     _ALLOWED_CONTENT = (TableCell, TableHeading)
 
-    def export(self, context):
-        return context.generator().tr(self._exported_content(context), lang=self._lang)
-
     
 class Table(Container):
     """Table is a container of 'TableRow' instances."""
     _ALLOWED_CONTENT = TableRow
 
-    def __init__(self, content, title=None, long=False, column_widths=None,
-                 **kwargs):
+    def __init__(self, content, title=None, long=False, column_widths=None, **kwargs):
         """Arguments:
 
           content -- sequence of 'TableRow' and 'HorizontalSeparator' instances
@@ -731,19 +792,25 @@ class Table(Container):
 
         """
         assert title is None or isinstance(title, (str, unicode))
-        self._title = title
         assert isinstance(long, bool), long
-        self._long = long
         assert column_widths is None or isinstance(column_widths, (tuple, list,)), column_widths
+        self._title = title
+        self._long = long
         self._column_widths = column_widths
         super(Table, self).__init__(content, **kwargs)
         
-    def export(self, context):
-        return context.generator().table(self._exported_content(context), cls='lcg-table',
-                                         title=self._title, lang=self._lang,
-                                         long=self._long, column_widths=self._column_widths,
-                                         presentation=self._presentation)
-
+    def title(self):
+        """Return the value of 'title' as passed to the constructor."""
+        return self._title
+    
+    def long(self):
+        """Return the value of 'long' as passed to the constructor."""
+        return self._long
+    
+    def column_widths(self):
+        """Return the value of 'column_widths' as passed to the constructor."""
+        return self._column_widths
+        
 
 class SectionContainer(Container):
     """A 'Container' which recognizes contained sections.
@@ -766,8 +833,11 @@ class SectionContainer(Container):
         self._toc_depth = toc_depth
         super(SectionContainer, self).__init__(content, **kwargs)
 
+    def _export_element_type(self):
+        return Container
+
     def sections(self, context):
-        """Return content elements which are 'Section' instances."""
+        """Return the list of contained elements which are 'Section' instances."""
         result = []
         for c in self._content:
             if isinstance(c, Section):
@@ -776,12 +846,12 @@ class SectionContainer(Container):
                 result.extend(c.sections(context))
         return result
             
-    def _exported_content(self, context):
-        result = super(SectionContainer, self)._exported_content(context)
+    def content(self):
+        content = super(SectionContainer, self).content()
         toc_sections = []
-        for c in self._content:
+        for c in content:
             if isinstance(c, TableOfContents) and not toc_sections:
-                return result
+                return content
             if isinstance(c, Section) and c.in_toc():
                 toc_sections.append(c)
         if (self._toc_depth is None or self._toc_depth > 0) and \
@@ -791,8 +861,8 @@ class SectionContainer(Container):
             toc = TableOfContents(self, _("Index:"), depth=self._toc_depth)
             toc.set_container(self)
             toc.set_parent(self.parent())
-            result = [toc.export(context)] + result
-        return result
+            content = [toc] + list(content)
+        return content
     
     
 class Section(SectionContainer):
@@ -838,10 +908,14 @@ class Section(SectionContainer):
         self._title = title
         self._in_toc = in_toc
         self._anchor = anchor
-        self._backref_used = False
+        self._backref = None
         super(Section, self).__init__(content, toc_depth=toc_depth, **kwargs)
 
-    def _section_path(self):
+    def _export_element_type(self):
+        return self.__class__
+    
+    def path(self):
+        """Return the sequence of all containers above this one in the hierarchy."""
         return [c for c in self._container_path() if isinstance(c, Section)]
     
     def section_number(self):
@@ -857,165 +931,127 @@ class Section(SectionContainer):
         return self._in_toc
     
     def anchor(self):
-        """Return the link target name of this section."""
+        """Return the link target name of this section as a string.
+
+        If 'anchor' was passed to the constructor, it is used.  Otherwise the
+        anchor name is automatically generated.  The generated name is unique
+        within the parent node and does not change when the section structure
+        remains the same (links will work throughout multiple exports).
+
+        """
         if self._anchor is None:
-            path = self._section_path()
+            path = self.path()
             if len(path) >= 2:
                 self._anchor = path[-2].anchor() +'.'+ str(self.section_number())
             else:
                 numbers = [str(x.section_number()) for x in path]
                 self._anchor = self._ANCHOR_PREFIX + '.'.join(numbers)
         return self._anchor
+
+    def create_backref(self, node):
+        """Create a back reference anchor for the section and return it as a string.
+
+        Arguments:
+          node -- the parent node of the table of contents for which the back
+            reference should be created.
+
+        Back reference is a reference leading from the section heading to the
+        corresponding link in the table of contents.
         
-    def backref(self, node):
-        """???"""
-        # We can allow just one backref target on the page.  Links on other
-        # pages are not backreferenced.
-        if node is self.parent() and not self._backref_used and config.allow_backref:
-            self._backref_used = True
-            return self._backref()
+        Just one back reference target on one page is allowed.  Links on other
+        pages are not back referenced.  Thus if 'node' is not section's parent
+        or if a back references was already created, the method retorns 'None'.
+
+        Back references may also be disabled in configuration.  In this case
+        'None' is always returned.
+
+        """
+        if node is self.parent() and self._backref is None and config.allow_backref:
+            self._backref = "backref-" + self.anchor()
+            return self._backref
         else:
             return None
     
-    def _backref(self):
-        return "backref-" + self.anchor()
-        
-    def _export_heading(self, context):
-        # This method may be used in derived classes (currently in Eurochance exercises).
-        g = context.generator()
-        level = len(self._section_path()) + 1
-        backref = self._backref_used and self._backref() or None
-        return g.heading(self.title(), level, anchor=self.anchor(), backref=backref)
-    
-    def export(self, context):
-        g = context.generator()
-        exported = g.concat(self._export_heading(context),
-                            super(Section, self).export(context))
-        return g.div(exported, id='section-' + self.anchor())
+    def backref(self):
+        """Return the anchor name if a back reference was previously created successfully."""
+        return self._backref
 
 
-class NodeIndex(Content):
-    """A Table of Contents which lists the node subtree of the current node."""
-
-    def __init__(self, title=None, node=None, depth=None, detailed=False):
-        """Arguments:
-
-          title -- the title of the index as a string or unicode
-          node -- the top level node to place the index in; if 'None', the
-            parent node of the node is used
-          depth -- hierarchy depth limit as an integer or 'None' for unlimited depth
-          detailed -- boolean indicating whether the whole 'Content' hierarchy
-            ('True') or only 'ContentNode' hierarchy ('False') of the leaf
-            nodes of the node tree will be included in the index
-
-        """
-        super(NodeIndex, self).__init__()
-        assert title is None or isinstance(title, (str, unicode))
-        assert node is None or isinstance(node, ContentNode)
-        assert depth is None or isinstance(depth, int)
-        assert isinstance(detailed, bool)
-        self._title = title
-        self._node = node
-        self._depth = depth
-        self._detailed = detailed
-                      
-    def _start_item(self):
-        return self._node or self.parent()
-        
-    def export(self, context):
-        toc = self._make_toc(context, self._start_item(), depth=self._depth)
-        if self._title is not None:
-            #TODO: add a "skip" link?
-            g = context.generator()
-            return g.div(g.concat(g.div(g.strong(self._title), cls='title'), toc), cls='table-of-contents')
-        else:
-            return toc
-        
-    def _make_toc(self, context, item, indent=0, depth=1):
-        g = context.generator()
-        if depth is not None:
-            if depth <= 0:
-                return g.escape('')
-            depth -= 1 # Decrease for further calls.
-        items = ()
-        if isinstance(item, ContentNode):
-            items = [node for node in item.children() if not node.hidden()]
-        if len(items) == 0 and self._detailed:
-            if isinstance(item, (tuple, list)):
-                items = item
-            else:
-                items = [s for s in item.sections(context) if s.in_toc()]
-        if len(items) == 0:
-            return g.escape('')
-        links = []
-        parent = current = self.parent()
-        while current is not None and current.hidden():
-            current = current.parent()
-        for i in items:
-            name = None
-            uri_kwargs = {}
-            descr = None
-            cls = i is current and 'current' or None
-            if isinstance(i, ContentNode):
-                descr = i.descr()
-                if not i.active():
-                    cls = (cls and cls + ' ' or '') + 'inactive'
-            elif isinstance(i, Section):
-                name = i.backref(parent)
-                uri_kwargs['local'] = parent is i.parent()
-            uri = context.uri(i, **uri_kwargs)
-            if isinstance(g, HtmlGenerator):
-                # Wrapping <a href=...><a name=...>...</a></a> is invalid in HTML!
-                current_link = g.link(i.title(), uri, name=name, title=descr, cls=cls)
-            else:
-                if name is None:
-                    current_anchor = i.title()
-                else:
-                    current_anchor = g.anchor(i.title(), name)
-                current_link = g.link(current_anchor, uri, title=descr, cls=cls)
-            subtoc = self._make_toc(context, i, indent=indent+4, depth=depth)
-            links.append(g.concat(current_link, subtoc))
-        if isinstance(g, HtmlGenerator):
-            result = concat("\n", g.list(links, indent=indent), ' '*(indent-2))
-        else:
-            result = g.list(links)
-        return result
-
-
-class RootIndex(NodeIndex):
-    """ ??? """
-    
-    def _start_item(self):
-        return self.parent().root()
-
-    
-class TableOfContents(NodeIndex):
+class TableOfContents(Content):
     """A Table of Contents which lists the content subtree.
 
-    ??? I don't understand this class. ???
+    This element works as a sort of macro, which expands to the hierarchical
+    listing of content nodes and their subcontent (sections) on the output.
 
     """
-    
-    def __init__(self, start=None, title=None, depth=None):
+    _TOC_ITEM_TYPE = Content
+    def __init__(self, item=None, title=None, depth=None, detailed=True):
         """Arguments:
         
           item -- the place where to start in the content hierarchy tree as a 'Content' instance.
             None means to start at the container (a local Table of Contents).  See 'Section'
             documentation for more information how the content tree is built.
+          title -- the title of the index as a string or unicode
+          depth -- hierarchy depth limit as an integer or 'None' for unlimited depth
+          detailed -- boolean indicating whether the whole 'Content' hierarchy
+            ('True') or only 'ContentNode' hierarchy ('False') of the leaf
+            nodes of the node tree will be included in the index
             
           All other arguments have the same meaning as in the parent class constructor.
         
         """
-        assert isinstance(start, Content) or start is None
-        self._start_item_ = start
-        super(TableOfContents, self).__init__(title=title, detailed=True, depth=depth)
+        assert item is None or isinstance(item, self._TOC_ITEM_TYPE)
+        assert title is None or isinstance(title, (str, unicode))
+        assert depth is None or isinstance(depth, int)
+        assert isinstance(detailed, bool)
+        self._item = item
+        self._title = title
+        self._depth = depth
+        self._detailed = detailed
+        super(TableOfContents, self).__init__()
         
-    def _start_item(self):
-        start_item = self._start_item_
-        if not start_item:
+    def item(self):
+        """Return the position in the hierarchy where to start the table of contents."""
+        item = self._item
+        if not item:
             assert isinstance(self._container, SectionContainer)
-            start_item = self._container
-        return start_item
+            item = self._container
+        return item
+
+    def title(self):
+        """Return the value of 'title' as passed to the constructor."""
+        return self._title
+
+    def depth(self):
+        """Return the value of 'depth' as passed to the constructor."""
+        return self._depth
+
+    def detailed(self):
+        """Return the value of 'detailed' as passed to the constructor."""
+        return self._detailed
+    
+    
+class NodeIndex(TableOfContents):
+    """A Table of Contents which lists the node subtree of the current node."""
+    _TOC_ITEM_TYPE = ContentNode
+
+    def __init__(self, title=None, node=None, depth=None, detailed=False):
+        super(NodeIndex, self).__init__(node, title=title, depth=depth, detailed=detailed)
+
+    def _export_element_type(self):
+        return TableOfContents
+                      
+    def item(self):
+        return self._item or self.parent()
+        
+
+class RootIndex(NodeIndex):
+    """'NodeIndex' starting from the root node."""
+    
+    def item(self):
+        return self.parent().root()
+
+    
     
 
 class Link(Container):
@@ -1058,7 +1094,14 @@ class Link(Container):
         assert label is None or isinstance(label, (str, unicode, Content)), label
         assert descr is None or isinstance(descr, (str, unicode)), descr
         assert type is None or isinstance(type, (str, unicode)), type
-        if label and isinstance(label, (str, unicode)):
+        if label is None:
+            if isinstance(target, (ContentNode, Section)):
+                label = target.title()
+            elif isinstance(target, Resource):
+                label = target.title() or target.filename()
+            elif isinstance(target, self.ExternalTarget):
+                label = target.title() or target.uri()
+        if isinstance(label, (str, unicode)):
             content = TextContent(label)
         elif label is not None:
             content = label
@@ -1069,28 +1112,30 @@ class Link(Container):
         self._type = type
         super(Link, self).__init__(content)
 
-    def export(self, context):
-        g = context.generator()
-        target = self._target
-        #if isinstance(target, (str, unicode)):
-        #    target = self.parent().find_section(target, context)
-        if self._descr is not None:
-            descr = self._descr
-        elif isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
-            descr = target.descr()
-        elif target.parent() is not self.parent():
-            descr = g.concat(g.escape(target.title()), g.escape(' (%s)' % (target.parent().title(),)))
-        else:
-            descr = None
-        if self._content:
-            label = g.concat(*self._exported_content(context))
-        elif isinstance(target, (ContentNode, Section)):
-            label = target.title()
-        elif isinstance(target, Resource):
-            label = target.title() or target.filename()
-        elif isinstance(target, self.ExternalTarget):
-            label = target.title() or target.uri()
-        return g.link(label, context.uri(target), title=descr, type=self._type)
+    def target(self):
+        """Return the value of 'target' as passed to the constructor."""
+        return self._target
+
+    def descr(self):
+        """Return the link description as a string.
+
+        If 'descr' was passed to the constructor and is not 'None', it is used.
+        Otherwise the description is taken from target description if it was
+        defined.
+
+        """
+        descr = self._descr
+        if descr is None:
+            target = self._target
+            if isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
+                descr = target.descr()
+            elif target.parent() is not self.parent():
+                descr = target.title() + ' ('+ target.parent().title() +')'
+        return descr
+
+    def type(self):
+        """Return the value of 'type' as passed to the constructor."""
+        return self._type
 
 
 class Title(Content):
@@ -1118,32 +1163,22 @@ class Title(Content):
         """
         super(Title, self).__init__()
         self._id = id
-        
-    def export(self, context):
-        g = context.generator()
-        parent = self.parent()
-        if self._id is None:
-            item = parent
-        else:
-            item = parent.find_section(self._id, context)
-            if not item:
-                item = parent.root().find_node(self._id)
-            if not item:
-                return self._id
-        return g.escape(item.title())
+
+    def id(self):
+        """Return the value of 'id' as passed to the constructor."""
+        return self._id
 
 
 class NoneContent(Content):
-    """Empty content.
+    """Deprecated.
 
-    Useful in places where 'Content' is required but there is nothing to put
-    in.
+    Intended for places where 'Content' is required but there is nothing to put
+    in.  It is, however, actually useless, since 'Content' may be used for the
+    same purpose.
     
     """
-    
-    def export(self, context):
-        g = context.generator()
-        return g.escape('')
+    def _export_element_type(self):
+        return Content
 
 
 class ContentVariants(Container):
@@ -1176,8 +1211,17 @@ class ContentVariants(Container):
     def sections(self, context):
         return self._variants[context.lang()].sections(context)
         
-    def export(self, context):
-        return self._variants[context.lang()].export(context)
+    def variant(self, lang):
+        """Return the content variant for given language.
+
+        Arguments:
+          lang -- lowercase ISO 639-1 Alpha-2 language code
+
+        'KeyError' is raised when the content for given language is not
+        defined.
+
+        """
+        return self._variants[lang]
     
     
 # Convenience functions for simple content construction.
@@ -1260,7 +1304,7 @@ def ul(items, formatted=False):
 def ol(items, formatted=False, alpha=False):
     """Create an 'ItemizedList' by coercing given sequence of items."""
     return ItemizedList([coerce(item, formatted=formatted) for item in items],
-                        type=(alpha and ItemizedList.TYPE_ALPHA or ItemizedList.TYPE_NUMERIC))
+                        order=(alpha and ItemizedList.LOWER_ALPHA or ItemizedList.NUMERIC))
 
 def fieldset(pairs, title=None, formatted=False):
     """Create a 'FieldSet' out of given sequence of (LABEL, VALUE) pairs.

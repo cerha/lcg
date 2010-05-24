@@ -210,34 +210,34 @@ class Parser(object):
     def _store_list_item(self, block, groups):
         content = WikiText(groups['content'])
         indent = re.sub(' {0,7}\t', 8*' ', groups['indent'])
-        return (self._list_item_type(groups), len(indent), content)
+        return (self._list_item_order(groups), len(indent), content)
         
     def _finish_list_item(self, stored):
         class _Context:
-            def __init__(self, type, indent, content):
-                self.type = type
+            def __init__(self, order, indent, content):
+                self.order = order
                 self.indent = indent
                 self.content = content
                 self.items = []
             def state(self):
-                return (self.type, self.indent, self.content, self.items)
+                return (self.order, self.indent, self.content, self.items)
             def make_list(self):
                 #_log("**")
                 items = [len(i) > 1 and Container(i) or i[0]
                          for i in self.items]
-                self.content.append(ItemizedList(items, type=self.type))
+                self.content.append(ItemizedList(items, order=self.order))
                 self.items = []
         result = []
         stack = [] # For storing the context between level changes.
         context = _Context(stored[0][0], stored[0][1], result)
         stored.append(('xxx', 0, None))
-        for type, indent, content in stored:
-            #_log("====", content, indent, type, len(stack), context.state())
+        for order, indent, content in stored:
+            #_log("====", content, indent, order, len(stack), context.state())
             if indent != context.indent:
                 if indent > context.indent:
                     # Save the context and start a new level.
                     stack.append(context)
-                    context = _Context(type, indent, context.items[-1])
+                    context = _Context(order, indent, context.items[-1])
                 else:
                     # Restore the context of the higher level.
                     while indent < context.indent:
@@ -246,11 +246,11 @@ class Parser(object):
                             context = stack.pop()
                         else:
                             # That's a bad indentation, but let's not panic.
-                            context = _Context(type, indent, context.content)
+                            context = _Context(order, indent, context.content)
                 #_log("<=>", context.state())
-            if context.items and context.type != type:
+            if context.items and context.order != order:
                 context.make_list()
-                context.type = type
+                context.order = order
             if content is not None:
                 context.items.append([content])
         assert not stack
@@ -333,16 +333,19 @@ class Parser(object):
     def _make_rule(self, block, groups):
         return HorizontalSeparator()
     
-    def _list_item_type(self, groups):
+    def _list_item_order(self, groups):
         t = groups.get('type')
         if not t:
             return None
         elif t in ('*', '-'):
-            return ItemizedList.TYPE_UNORDERED
+            return None
         elif t[0].isalpha():
-            return ItemizedList.TYPE_ALPHA
+            if t.lower() == t:
+                return ItemizedList.LOWER_ALPHA
+            else:
+                return ItemizedList.UPPER_ALPHA
         else:
-            return ItemizedList.TYPE_NUMERIC
+            return ItemizedList.NUMERIC
 
     def parse(self, text):
         assert isinstance(text, (str, unicode)), text

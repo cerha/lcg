@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009 Brailcom, o.p.s.
+# Copyright (C) 2004-2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -735,7 +735,7 @@ def concat(*args, **kwargs):
 
     This function has the same effect as creating a 'Concatenation' by calling
     its constructor, but the items can be passed as positional arguments for
-    convenience.  Keyword arguments are passew without change.
+    convenience.  Keyword arguments are passed on without change.
 
     One special case is handled differently.  When the whole concatenation is an
     ordinary Python string or unicode type (there were no 'Localizable'

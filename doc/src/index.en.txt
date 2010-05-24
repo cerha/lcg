@@ -12,7 +12,7 @@ in the section [fdl].
 
 == Table of Contents ==
 
-@NTOC(2)@
+@NodeIndex(2)@
 
 == Appendices ==
 

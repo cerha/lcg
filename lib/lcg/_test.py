@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -494,11 +494,11 @@ class Export(unittest.TestCase):
             ('[<aa.jpg]',
              '<img src="images/aa.jpg" alt="" align="left" border="0" class="aa">'),
             ('[aa.jpg label | descr]',
-             '<img src="images/aa.jpg" alt="label" border="0" class="aa">'),
+             '<img src="images/aa.jpg" alt="label (descr)" border="0" class="aa">'),
             ('[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
              '<img src="http://www.freebsoft.org/img/logo.gif" alt="Free(b)soft logo" border="0" class="logo">'),
             ('[cc.png]',
-             '<img src="images/cc.png" alt="Image C" border="0" class="cc">'),
+             '<img src="images/cc.png" alt="Image C (Nice picture)" border="0" class="cc">'),
             # Image links (links with an image instead of a label)
             ('[aa.jpg bb.jpg label | descr]',
              '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" alt="label" border="0" class="bb"></a>'),
@@ -519,7 +519,10 @@ class Export(unittest.TestCase):
              '<img src="http://www.freebsoft.org/img/logo.gif" alt="" border="0" class="logo">'),
             # Escapes
             (r'\*one* \\*two* \\\*three* \\\\*four* \\\\\*five*',
-             r'*one* \<strong>two</strong> \*three* \\<strong>four</strong> \\*five*')
+             r'*one* \<strong>two</strong> \*three* \\<strong>four</strong> \\*five*'),
+            # HTML special
+            (r'<bla>',
+             r'&lt;bla&gt;'),
             ):
             result = lcg.FormattedText(text).export(context)
             assert result == html, "\n  * %s\n  - expected: %s\n  - got:      %s" % \

@@ -708,8 +708,8 @@ http://www.google.com/images/logo_sm.gif
 
 http://www.google.com/images/logo_sm.gif
 
-If a link label is given, this label is be used as the accessible ALT text.
-Link description is used as image accessible description.
+If a link label is given, this label is be used as the accessible ALT text as
+well as the link description (see the example below).
 
 *Example:*
 ------
