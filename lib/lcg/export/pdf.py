@@ -521,6 +521,8 @@ class Paragraph(Element):
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
         style.leftIndent = pdf_context.nesting_level() * 1.5 * style.fontSize
+        if self.presentation and self.presentation.left_indent:
+            style.leftIndent += self._unit2points(self.presentation.left_indent, style)
         # Hack, should be handled better, preferrably in List only:
         style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
@@ -818,6 +820,10 @@ class Table(Element):
     Cells are 'TableCell' instances.
 
     """
+    presentation = None
+    long = False
+    column_widths = None
+    
     def init(self):
         super(Table, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -1239,11 +1245,22 @@ class PDFExporter(FileExporter, Exporter):
             if isinstance(title, Text):
                 title = make_element(Paragraph, content=[title])
             if isinstance(description, Text):
-                title = make_element(Paragraph, content=[description])
+                presentation = Presentation()
+                presentation.left_indent = UMm(10)
+                description = make_element(Paragraph, content=[description],
+                                           presentation=presentation)
             return make_element(Container, content=[title, description])
         result_items = [make_item(dt.export(context), dd.export(context))
                         for dt, dd in element.content()]
         return make_element(Container, content=result_items)
+    
+    def _export_field_set(self, context, element):
+        def make_item(label, value):
+            content = [make_element(TableCell, content=[label.export(context)]),
+                       make_element(TableCell, content=[value.export(context)])]
+            return make_element(TableRow, content=content)
+        rows = [make_item(*c) for c in element.content()]
+        return make_element(Table, content=rows)
             
     def _export_paragraph(self, context, element):
         # LCG interpretation of "paragraph" is very wide, we have to expect

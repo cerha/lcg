@@ -81,6 +81,8 @@ class Presentation(object):
     """Amount of space separating headers from content, 'Unit'.
     It currently works only for tables.
     """
+    left_indent = None
+    """Amount of space to put on left of the object, 'Unit'."""
     
 class Content(object):
     """Generic base class for all types of content.
