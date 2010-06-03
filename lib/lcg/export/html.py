@@ -550,6 +550,7 @@ class HtmlExporter(Exporter):
         return [subcontent.export(context) for subcontent in element.content()]
     
     def _export_container(self, context, element):
+        g = self._generator
         result = self.concat(self._exported_container_content(context, element))
         attr = self._container_attr(element)
         if attr:
