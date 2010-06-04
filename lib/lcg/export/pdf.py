@@ -1082,10 +1082,22 @@ class PDFExporter(FileExporter, Exporter):
     def export(self, context, total_pages=None):
         context.pdf_context = pdf_context = Context()
         pdf_context.total_pages = total_pages
-        exported_structure = super(PDFExporter, self).export(context)
-        if isinstance(exported_structure, (tuple, list,)):
-            exported_structure = self.concat(*exported_structure)
-        document = exported_structure.export(context)
+	exported_structure = []
+        lang = context.lang()
+        for node in context.node().linear():
+            subcontext = self.context(node, lang)
+            subcontext.pdf_context = pdf_context
+            title = node.title()
+            if title:
+                exported_title = make_element(Heading, content=[make_element(Text, content=title)],
+                                              level=0)
+                exported_structure.append(exported_title)
+            exported = node.content().export(subcontext)
+            if isinstance(exported, (tuple, list,)):
+                exported = self.concat(*exported)
+            exported_structure.append(exported)
+        exported_content = self.concat(*exported_structure)
+        document = exported_content.export(context)
         # It is necessary to check for invalid anchors before doc.build gets
         # called, otherwise Reportlab throws an ugly error.
         invalid_anchors = context.pdf_context.invalid_anchor_references()
