@@ -612,56 +612,36 @@ class HtmlExporter(Exporter):
                         for name, value in element.content()],
                        cls='lcg-fieldset')
 
-    def _table_of_contents(self, context, item, parent, depth=None, detailed=True, _indent=0):
+    def _export_table_of_contents(self, context, element):
         g = self._generator
-        if depth is not None:
-            if depth <= 0:
+        parent = element.parent()
+        def make_toc(items, _indent=0):
+            if len(items) == 0:
                 return g.escape('')
-            depth -= 1 # Decrease for further calls.
-        items = ()
-        if isinstance(item, ContentNode):
-            items = [node for node in item.children() if not node.hidden()]
-        if len(items) == 0 and detailed:
-            if isinstance(item, (tuple, list)):
-                items = item
-            else:
-                items = [s for s in item.sections(context) if s.in_toc()]
-        if len(items) == 0:
-            return g.escape('')
-        links = []
-        current = parent
-        while current is not None and current.hidden():
-            current = current.parent()
-        for i in items:
-            name = None
-            uri_kwargs = {}
-            descr = None
-            cls = i is current and 'current' or None
-            if isinstance(i, ContentNode):
-                descr = i.descr()
-                if not i.active():
-                    cls = (cls and cls + ' ' or '') + 'inactive'
-            elif isinstance(i, Section):
-                name = i.create_backref(parent)
-                uri_kwargs['local'] = parent is i.parent()
-            uri = context.uri(i, **uri_kwargs)
-            link = g.a(i.title(), href=uri, name=name, title=descr, cls=cls)
-            subtoc = self._table_of_contents(context, i, parent, depth=depth, detailed=detailed,
-                                             _indent=_indent+4)
-            links.append(g.concat(link, subtoc))
-        return concat("\n", self._itemized_list(links, _indent=_indent), ' '*(_indent-2))
-
-    def _export_table_of_contents(self, context, element, _indent=0):
-        toc = self._table_of_contents(context, element.item(), element.parent(),
-                                      depth=element.depth(), detailed=element.detailed(),
-                                      _indent=_indent)
+            links = []
+            for item, subitems in items:
+                if isinstance(item, ContentNode):
+                    descr = item.descr()
+                    name = None
+                    uri_kwargs = {}
+                else:
+                    assert isinstance(item, Section)
+                    descr = None
+                    name = item.create_backref(parent)
+                    uri_kwargs = dict(local=(parent is item.parent()))
+                uri = context.uri(item, **uri_kwargs)
+                link = g.a(item.title(), href=uri, name=name, title=descr)
+                subtoc = make_toc(subitems, _indent=_indent+4)
+                links.append(g.concat(link, subtoc))
+            return concat("\n", self._itemized_list(links, _indent=_indent), ' '*(_indent-2))
+        result = make_toc(element.items(context), _indent=0)
         title = element.title()
         if title is not None:
             g = self._generator
             #TODO: add a "skip" link?
-            toc = g.div(g.concat(g.div(g.strong(title), cls='title'), toc),
-                        cls='table-of-contents')
-        return toc
+            result = g.div(g.concat(g.div(g.strong(title), cls='title'), result),
+                           cls='table-of-contents')
+        return result
     
     def _export_table(self, context, element):
         return self._generator.table(self._exported_container_content(context, element),

@@ -1276,14 +1276,21 @@ class PDFExporter(FileExporter, Exporter):
             result = make_element(Container, content=[content])
         return result
 
-    # TODO:
     def _export_table_of_contents(self, context, element):
-        """Generate a Table of Contents for given 'TableOfContents' element.
-
-        In this class the method just returns an empty content.
-
-        """
-        return self.escape('')
+        def make_toc(items):
+            if len(items) == 0:
+                return self.escape('')
+            toc_items = []
+            for item, subitems in items:
+                label = make_element(Text, content=item.title())
+                subtoc = make_toc(subitems)
+                toc_items.append(self.concat(label, subtoc))
+            return make_element(List, content=toc_items)
+        result = make_toc(element.items(context))
+        title = element.title()
+        if title is not None:
+            result = self.concat(self._markup(title, 'strong'), result)
+        return result
 
     # Tables
 

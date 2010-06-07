@@ -980,24 +980,35 @@ class Section(SectionContainer):
 
 
 class TableOfContents(Content):
-    """A Table of Contents which lists the content subtree.
+    """A table of contents which lists the content subtree.
 
     This element works as a sort of macro, which expands to the hierarchical
     listing of content nodes and their subcontent (sections) on the output.
 
+    The items actually present in the table of contents depend on the content
+    itself (i.e. hidden sections are omitted automatically) and on the arguments
+    passed to the 'TableOfContents' constructor (limiting the hierachy depth,
+    selection of the root item of the hierarchy, etc).
+
     """
     _TOC_ITEM_TYPE = Content
-    def __init__(self, item=None, title=None, depth=None, detailed=True):
+    def __init__(self, item=None, title=None, depth=None, detailed=True, **kwargs):
         """Arguments:
         
-          item -- the place where to start in the content hierarchy tree as a 'Content' instance.
-            None means to start at the container (a local Table of Contents).  See 'Section'
-            documentation for more information how the content tree is built.
+          item -- the place where to start in the content hierarchy tree as a
+            'Container' instance, 'ContentNode' instance or None.  When a
+            'Container' is used, the table of contents will contain its sections
+            (see 'Container.sections()').  'ContentNode' may be used to display
+            a node hierarchy and 'None' means to start at the container of given
+            'TableOfContents' instance (a local Table of Contents).  See also
+            'Section' documentation for more information how section hierarchy
+            representation is built.
           title -- the title of the index as a string or unicode
           depth -- hierarchy depth limit as an integer or 'None' for unlimited depth
           detailed -- boolean indicating whether the whole 'Content' hierarchy
             ('True') or only 'ContentNode' hierarchy ('False') of the leaf
-            nodes of the node tree will be included in the index
+            nodes of the node tree will be included in the index.  This argument
+            has no effect when 'item' is a 'Container' instance.
             
           All other arguments have the same meaning as in the parent class constructor.
         
@@ -1010,31 +1021,64 @@ class TableOfContents(Content):
         self._title = title
         self._depth = depth
         self._detailed = detailed
-        super(TableOfContents, self).__init__()
+        super(TableOfContents, self).__init__(**kwargs)
         
-    def item(self):
+    def _root_item(self):
         """Return the position in the hierarchy where to start the table of contents."""
         item = self._item
         if not item:
+            # Create a local table of contens automatically (taking this elements container as a
+            # start point).
             assert isinstance(self._container, SectionContainer)
             item = self._container
         return item
+
+    def _items(self, context, item, depth=None):
+        if depth is not None:
+            if depth <= 0:
+                return ()
+            depth -= 1
+        items = ()
+        if isinstance(item, ContentNode):
+            items = [node for node in item.children() if not node.hidden()]
+        if len(items) == 0 and self._detailed:
+            if isinstance(item, (tuple, list)):
+                items = item
+            else:
+                items = [s for s in item.sections(context) if s.in_toc()]
+        if len(items) == 0:
+            return ()
+        return [(i, self._items(context, i, depth)) for i in items]
 
     def title(self):
         """Return the value of 'title' as passed to the constructor."""
         return self._title
 
-    def depth(self):
-        """Return the value of 'depth' as passed to the constructor."""
-        return self._depth
+    def items(self, context):
+        """Return the hierarchy of items present in the table of contents.
 
-    def detailed(self):
-        """Return the value of 'detailed' as passed to the constructor."""
-        return self._detailed
+        The returned value is a recursive structure.  It is a sequence of pairs
+        (tuples) ITEM, SUBITEMS, where ITEM is always either 'Section' or
+        'ContentNode' instance and SUBITEMS is a nested sequence of the same
+        type if given item has subitems displayed in the table of contents.
+        Otherwise SUBITEMS is an empty sequence.
+
+        The method handles hidden items, depth limit and other conditions
+        internally, so that the caller doesn't need to care which items belong
+        to the table of contents.  All returned items should be displayed.
+
+        """
+        return self._items(context, self._root_item(), depth=self._depth)
     
     
 class NodeIndex(TableOfContents):
-    """A Table of Contents which lists the node subtree of the current node."""
+    """A table of contents which lists the node subtree of the current node.
+
+    This class is just a specific type of 'TableOfContents', which by default
+    starts at the parent node of the content where it is used and which by
+    default displays only nodes, not their inner conent (detailed=False).
+    
+    """
     _TOC_ITEM_TYPE = ContentNode
 
     def __init__(self, title=None, node=None, depth=None, detailed=False):
@@ -1043,14 +1087,14 @@ class NodeIndex(TableOfContents):
     def _export_element_type(self):
         return TableOfContents
                       
-    def item(self):
+    def _root_item(self):
         return self._item or self.parent()
         
 
 class RootIndex(NodeIndex):
-    """'NodeIndex' starting from the root node."""
+    """'NodeIndex' starting from the top level node of the whole tree."""
     
-    def item(self):
+    def _root_item(self):
         return self.parent().root()
 
     
