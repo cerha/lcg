@@ -476,7 +476,7 @@ class Text(Element):
 class Empty(Text):
     """An empty content.
 
-    Useful when 'Element' is required or expected, but there is no actual
+    Useful when 'Text' is required or expected, but there is no actual
     content to provide.  'content' value is ignored.
     
     """
