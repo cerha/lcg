@@ -583,14 +583,23 @@ class Paragraph(Element):
         self.content = list(self.content)
     def export(self, context, style=None):
         pdf_context = context.pdf_context
-        pdf_context.add_presentation(self.presentation)
+        presentation = self.presentation
+        pdf_context.add_presentation(presentation)
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
         style.leftIndent = pdf_context.nesting_level() * 1.5 * style.fontSize
         if self.noindent:
             style.firstLineIndent = 0
-        if self.presentation and self.presentation.left_indent:
-            style.leftIndent += self._unit2points(self.presentation.left_indent, style)
+        if presentation and presentation.left_indent:
+            style.leftIndent += self._unit2points(presentation.left_indent, style)
+        if presentation and presentation.bold:
+            style.fontName = style.fontName + 'Bold'
+        if presentation and presentation.italic:
+            if style.fontName.find('Serif') >= 0:
+                suffix = 'Italic'
+            else:
+                suffix = 'Oblique'
+            style.fontName = style.fontName + suffix
         # Hack, should be handled better, preferrably in List only:
         style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
