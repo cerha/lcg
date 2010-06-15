@@ -26,6 +26,7 @@ import sys
 import reportlab.lib.colors
 import reportlab.lib.fonts
 import reportlab.lib.pagesizes
+import reportlab.lib.sequencer
 import reportlab.lib.styles
 import reportlab.lib.units
 import reportlab.pdfbase.pdfmetrics
@@ -33,6 +34,7 @@ import reportlab.pdfbase.ttfonts
 import reportlab.pdfgen
 import reportlab.platypus
 import reportlab.platypus.flowables
+import reportlab.platypus.tableofcontents
 
 from lcg import *
 from lcg.export import *
@@ -41,13 +43,34 @@ class PageTemplate(reportlab.platypus.PageTemplate):
     pass
 
 class DocTemplate(reportlab.platypus.BaseDocTemplate):
-    
+
+    def __init__(self, *args, **kwargs):
+        reportlab.platypus.BaseDocTemplate.__init__(self, *args, **kwargs)
+        self._toc_sequencer = reportlab.lib.sequencer.Sequencer()
+
     def handle_pageBegin(self):
         self._handle_pageBegin()
         self._handle_nextPageTemplate('Later')
+        
+    def afterFlowable(self, flowable):
+        reportlab.platypus.BaseDocTemplate.afterFlowable(self, flowable)
+        if isinstance(flowable, reportlab.platypus.Paragraph):
+            style = flowable.style.name
+            if style in ('Heading1', 'Heading2', 'Heading3',):
+                text = flowable.getPlainText()
+                level = int(style[7]) - 1
+                key = 'heading-%s' % (self._toc_sequencer.next('tocheading'),)
+                if level <= 1:
+                    self.notify('TOCEntry', (level, text, self.page,))
+                self.canv.bookmarkPage(key)
+                self.canv.addOutlineEntry(text, key, level=level, closed=(level>=1))
 
-    def build(self, flowables, context, first_page_header, page_header, page_footer):
+    def build(self, flowables, *args, **kwargs):
+        context = self._lcg_context
         pdf_context = context.pdf_context
+        first_page_header = pdf_context.first_page_header
+        page_header = pdf_context.page_header
+        page_footer = pdf_context.page_footer
         def make_flowable(content):
             style = pdf_context.normal_style()
             flowable = content.export(context)
@@ -1253,10 +1276,10 @@ class PDFExporter(FileExporter, Exporter):
         doc = DocTemplate(output, pagesize=page_size,
                           leftMargin=margin, rightMargin=margin,
                           topMargin=margin, bottomMargin=margin)
-        doc.build(document, context=context,
-                  first_page_header=node.first_page_header(),
-                  page_header=node.page_header(),
-                  page_footer=node.page_footer())
+        pdf_context.first_page_header=node.first_page_header()
+        pdf_context.page_header=node.page_header()
+        pdf_context.page_footer=node.page_footer()
+        doc.multi_build(document, context=context)
         if total_pages is None and pdf_context.total_pages_requested:
             return self.export(context, total_pages=pdf_context.page)
         return output.getvalue()
