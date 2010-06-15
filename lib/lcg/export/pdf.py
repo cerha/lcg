@@ -133,6 +133,11 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         reportlab.platypus.BaseDocTemplate.build(self, flowables,
                                                  canvasmaker=reportlab.pdfgen.canvas.Canvas)
 
+    def multi_build(self, story, context=None, **kwargs):
+        if context:
+            self._lcg_context = context
+        reportlab.platypus.BaseDocTemplate.multiBuild(self, story, **kwargs)
+
 class Context(object):
     """Place holder for PDF backend export state.
 
@@ -150,6 +155,7 @@ class Context(object):
     total_pages = None
     total_pages_requested = False
     heading_level = 1
+    toc_present = False
 
     def __init__(self, *args, **kwargs):
         super(Context, self).__init__(*args, **kwargs)
@@ -181,6 +187,12 @@ class Context(object):
                 reportlab.lib.fonts.addMapping(font_name, i/2, i%2, font_face_name)
                 i = i + 1
                 self._fonts[(family, bold, italic)] = font_face_name
+        default_font = 'FreeSerif'
+        reportlab.platypus.tableofcontents.levelZeroParaStyle.fontName = default_font
+        reportlab.platypus.tableofcontents.levelOneParaStyle.fontName = default_font
+        reportlab.platypus.tableofcontents.levelTwoParaStyle.fontName = default_font
+        reportlab.platypus.tableofcontents.levelThreeParaStyle.fontName = default_font
+        reportlab.platypus.tableofcontents.levelFourParaStyle.fontName = default_font
 
     def font(self, family, bold, italic):
         """Return full font name for given arguments.
@@ -686,6 +698,16 @@ class HorizontalRule(Element):
     """
     def export(self, context):
         return reportlab.platypus.flowables.HRFlowable(width='100%')
+
+class TableOfContents(Element):
+    """Table of contents.
+
+    This table of contents is complete and usually shouldn't be present in the
+    document more than once.
+    
+    """
+    def export(self, context):
+        return reportlab.platypus.tableofcontents.TableOfContents()
 
 class PageNumber(Text):
     """Page number.
@@ -1419,19 +1441,18 @@ class PDFExporter(FileExporter, Exporter):
         return result
 
     def _export_table_of_contents(self, context, element):
-        def make_toc(items):
-            if len(items) == 0:
-                return self.escape('')
-            toc_items = []
-            for item, subitems in items:
-                label = make_element(Text, content=item.title())
-                subtoc = make_toc(subitems)
-                toc_items.append(self.concat(label, subtoc))
-            return make_element(List, content=toc_items)
-        result = make_toc(element.items(context))
-        title = element.title()
-        if title is not None:
-            result = self.concat(self._markup(title, 'strong'), result)
+        pdf_context = context.pdf_context
+        if pdf_context.toc_present:
+            result = make_element(Space)
+        else:
+            result = make_element(TableOfContents)
+            title = element.title()
+            if title:
+                heading = make_element(Paragraph, content=[self.strong(context, title)],
+                                       noindent=True)
+                result = self.concat(heading, result)
+            result = self.concat(make_element(Space, height=UFont(1)), result)
+            pdf_context.toc_present = True
         return result
 
     # Tables
