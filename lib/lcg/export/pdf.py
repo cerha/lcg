@@ -552,12 +552,17 @@ class PageBreak(Element):
     def export(self, context):
         return reportlab.platypus.PageBreak()
 
-class PageNumber(Element):
+class PageNumber(Text):
     """Page number.
 
     'total' parameter determines whether total number of pages should be added.
 
     """
+    # This implementation is an ugly hack to make the class a subclass of Text
+    # easily, for the reasons of type checking and appropriate handling at
+    # several places.
+    def init(self):
+        pass
     def export(self, context):
         pdf_context = context.pdf_context
         text = str(pdf_context.page)
@@ -567,7 +572,9 @@ class PageNumber(Element):
                 pdf_context.total_pages_requested = True
             else:
                 text = '%s/%s' % (text, total,)
-        return text
+        self.content = text
+        Text.init(self)
+        return Text.export(self, context)
 
 class Space(Element):
     """Hard space.
@@ -1191,12 +1198,13 @@ class PDFExporter(FileExporter, Exporter):
         if (element.orientation() == 'HORIZONTAL' or
             element.halign() is not None or element.valign() is not None):
             def cell(content):
-                return make_element(TableCell, content=content,
+                exported_content = [content.export(context)]
+                return make_element(TableCell, content=exported_content,
                                     align=element.halign(), valign=element.valign())
             if element.orientation() == 'HORIZONTAL':
-                table_content = [[cell(c) for c in content]]
+                table_content = [make_element(TableRow, content=[cell(c) for c in content])]
             else:
-                table_content = [[cell(c)] for c in content]
+                table_content = [make_element(TableRow, content=[cell(c)]) for c in content]
             result_content = make_element(Table, content=table_content,
                                           presentation=element.presentation())
         else:
