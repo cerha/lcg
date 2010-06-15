@@ -627,8 +627,9 @@ class Heading(Paragraph):
         assert isinstance(self.level, int), ('type error', self.level,)
     def export(self, context):
         style = context.pdf_context.heading_style(self.level)
-        result = super(Heading, self).export(context, style=style)
-        return result
+        maybe_break = reportlab.platypus.CondPageBreak(self._unit2points(UFont(5), style))
+        heading = super(Heading, self).export(context, style=style)
+        return [maybe_break, heading]
 
 class PageBreak(Element):
     """Unconditional page break.
