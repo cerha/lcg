@@ -683,19 +683,16 @@ class Container(Element):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         result = []
+        all_text = all([isinstance(c, (basestring, Text,)) for c in self.content])
         for c in self.content:
             if isinstance(c, basestring):
                 c = make_element(Text, content=c)
-            if isinstance(c, Text):
+            if isinstance(c, Text) and not all_text:
                 c = make_element(Paragraph, content=[c])
             exported = c.export(context)
             if isinstance(exported, (list, tuple,)):
-                # for i in range(len(exported)):
-                #     if isinstance(exported[i], basestring):
-                #         exported[i] = make_element(Text, content=exported[i])
                 result += exported
             else:
-                assert not isinstance(exported, basestring), ('invalid export', exported, c,)
                 result.append(exported)
         pdf_context.remove_presentation()
         assert _ok_export_result(result), ('wrong export', result,)
