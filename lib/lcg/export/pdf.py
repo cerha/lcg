@@ -125,6 +125,7 @@ class Context(object):
     page = 0
     total_pages = None
     total_pages_requested = False
+    heading_level = 1
 
     def __init__(self, *args, **kwargs):
         super(Context, self).__init__(*args, **kwargs)
@@ -1288,6 +1289,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Link, content=content, uri=uri)
 
     def _export_section(self, context, element):
+        pdf_context = context.pdf_context
         content = self.escape(element.title())
         anchor = element.anchor()
         if anchor:
@@ -1295,9 +1297,14 @@ class PDFExporter(FileExporter, Exporter):
         backref = element.backref()
         if backref:
             content = self.link(content, "#"+backref)
-        heading = make_element(Heading, content=[content], level=1)
+        level = pdf_context.heading_level
+        heading = make_element(Heading, content=[content], level=level)
+        pdf_context.heading_level += 1
         inner_content = self._export_container(context, element)
-        return make_element(Container, content=[heading, inner_content])
+        pdf_context.heading_level = level
+        intro_space = make_element(Space, height=UFont(1))
+        content = [intro_space, heading, inner_content]
+        return make_element(Container, content=content)
 
     def _export_itemized_list(self, context, element):
         content = self._content_export(context, element, collapse=False)
