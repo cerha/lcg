@@ -288,21 +288,18 @@ class Context(object):
 
 
 def _ok_export_result(result):
-    if not isinstance(result, (tuple, list,)):
+    if not isinstance(result, (tuple, list,)) or not result:
         return True
-    variation = None
-    for r in result:
+    if isinstance(result[0], basestring):
+        expected = 'string'
+    else:
+        expected = 'nonstring'
+    for r in result[1:]:
         if isinstance(r, basestring):
-            if variation is None:
-                variation = 'string'
-            elif variation != 'string':
-                print '???semistring'
+            if expected != 'string':
                 return False
         else:
-            if variation is None:
-                variation = 'other'
-            elif variation != 'other':
-                print '???semiother'
+            if expected != 'nonstring':
                 return False
     return True
 
