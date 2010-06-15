@@ -1326,7 +1326,9 @@ class PDFExporter(FileExporter, Exporter):
     def _export_definition_list(self, context, element):
         def make_item(title, description):
             if isinstance(title, Text):
-                title = make_element(Paragraph, content=[title])
+                presentation = Presentation()
+                presentation.bold = True
+                title = make_element(Paragraph, content=[title], presentation=presentation)
             if isinstance(description, Text):
                 presentation = Presentation()
                 presentation.left_indent = UMm(10)
