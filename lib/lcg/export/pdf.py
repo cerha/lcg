@@ -132,7 +132,8 @@ class Context(object):
         self._init_fonts()
         self._styles = reportlab.lib.styles.getSampleStyleSheet()        
         self._normal_style = copy.copy(self._styles['Normal'])
-        self._normal_style.fontName='FreeSerif'
+        self._normal_style.fontName = 'FreeSerif'
+        self._normal_style.firstLineIndent = 10
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
         self._anchors = {}
@@ -571,6 +572,7 @@ class Paragraph(Element):
 
     """
     _style = None
+    noindent = False
     presentation = None
     def init(self):
         super(Paragraph, self).init()
@@ -585,6 +587,8 @@ class Paragraph(Element):
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
         style.leftIndent = pdf_context.nesting_level() * 1.5 * style.fontSize
+        if self.noindent:
+            style.firstLineIndent = 0
         if self.presentation and self.presentation.left_indent:
             style.leftIndent += self._unit2points(self.presentation.left_indent, style)
         # Hack, should be handled better, preferrably in List only:
@@ -1318,7 +1322,7 @@ class PDFExporter(FileExporter, Exporter):
                 presentation = Presentation()
                 presentation.left_indent = UMm(10)
                 description = make_element(Paragraph, content=[description],
-                                           presentation=presentation)
+                                           presentation=presentation, noindent=True)
             return make_element(Container, content=[title, description])
         result_items = [make_item(dt.export(context), dd.export(context))
                         for dt, dd in element.content()]
