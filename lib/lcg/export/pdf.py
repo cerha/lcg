@@ -657,6 +657,8 @@ class Space(Element):
       height -- height of the space, 'Unit'
 
     """
+    width = UMm(0)
+    height = UMm(0)
     def export(self, context):
         # Note: According to Reportlab documentation, only vertical spaces work.
         style = context.pdf_context.style()
