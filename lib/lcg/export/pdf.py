@@ -25,14 +25,89 @@ import sys
 
 import reportlab.lib.colors
 import reportlab.lib.fonts
+import reportlab.lib.pagesizes
 import reportlab.lib.styles
 import reportlab.lib.units
 import reportlab.pdfbase.pdfmetrics
 import reportlab.pdfbase.ttfonts
+import reportlab.pdfgen
 import reportlab.platypus
 
 from lcg import *
 from lcg.export import *
+
+class PageTemplate(reportlab.platypus.PageTemplate):
+    pass
+
+class DocTemplate(reportlab.platypus.BaseDocTemplate):
+    
+    def handle_pageBegin(self):
+        self._handle_pageBegin()
+        self._handle_nextPageTemplate('Later')
+
+    def build(self, flowables, context, first_page_header, page_header, page_footer):
+        pdf_context = context.pdf_context
+        def make_flowable(content):
+            style = pdf_context.normal_style()
+            flowable = content.export(context)
+            if isinstance(flowable, Element):
+                flowable = flowable.export(context)
+            if isinstance(flowable, basestring):
+                flowable = reportlab.platypus.Paragraph(flowable, style)
+            while isinstance(flowable, (tuple, list,)):
+                if len(flowable) == 1:
+                    flowable = flowable[0]
+                else:
+                    flowable = reportlab.platypus.Table([flowable])
+            max_height = self.height / 3  # so that header, footer and content have all chance to fit
+            width, height = flowable.wrap(self.width, max_height)
+            return flowable, width, height
+        def frame_height(header, footer):
+            bottom_margin = self.bottomMargin
+            height = self.height
+            separator_space = 0.5 * reportlab.lib.units.cm
+            if header:
+                _, _, header_height = make_flowable(header)
+                header_height = header_height + separator_space
+                height = height - header_height
+            if footer:
+                _, _, footer_height = make_flowable(footer)
+                footer_height = footer_height + separator_space
+                height = height - footer_height
+                bottom_margin = bottom_margin + footer_height
+            return bottom_margin, height
+        def on_page(canvas, doc):
+            page = doc.page
+            pdf_context.page = page
+            canvas.saveState()
+            def add_flowable(content, top):
+                flowable, width, height = make_flowable(content)
+                x = (self.pagesize[0] - width) / 2
+                if top:
+                    y = self.height + self.bottomMargin
+                else:
+                    y = height + self.bottomMargin
+                flowable.drawOn(canvas, self.leftMargin, y)
+            header = first_page_header
+            if page > 1 or header is None:
+                header = page_header
+            if header is not None:
+                add_flowable(header, True)
+            if page_footer is not None:
+                add_flowable(page_footer, False)
+            canvas.restoreState()
+        self._calc()
+        Frame = reportlab.platypus.frames.Frame
+        bottom_margin, height = frame_height((first_page_header or page_header), page_footer)
+        first_frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id='first')
+        bottom_margin, height = frame_height(page_header, page_footer)
+        later_frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id='later')
+        self.addPageTemplates([
+            PageTemplate(id='First', frames=first_frame, onPage=on_page, pagesize=self.pagesize),
+            PageTemplate(id='Later', frames=later_frame, onPage=on_page, pagesize=self.pagesize)
+            ])
+        reportlab.platypus.BaseDocTemplate.build(self, flowables,
+                                                 canvasmaker=reportlab.pdfgen.canvas.Canvas)
 
 class Context(object):
     """Place holder for PDF backend export state.
@@ -1111,47 +1186,19 @@ class PDFExporter(FileExporter, Exporter):
                 sys.stderr.write("  #%s\n" % (a,))
             return ''
         output = cStringIO.StringIO()
-        doc = reportlab.platypus.SimpleDocTemplate(output)
-        def on_page(canvas, doc):
-            # I don't know whether this allocates proper vertical space.
-            # Perhaps not, but then the proper solution is more complicated.
-            # Look at FancyPage in rst2pdf for an example of such a solution.
-            # (Due to other necessary parameters such as background, pytis
-            # layout parameters, etc. it will be necessary to use the other
-            # solution anyway.)
-            page = doc.page
-            pdf_context.page = page
-            canvas.saveState()
-            style = pdf_context.normal_style()
-            cm = reportlab.lib.units.cm
-            node = context.node()
-            def add_flowable(content, top):
-                flowable = content.export(context)
-                if isinstance(flowable, Element):
-                    flowable = flowable.export(context)
-                if isinstance(flowable, basestring):
-                    flowable = reportlab.platypus.Paragraph(flowable, style)
-                while isinstance(flowable, (tuple, list,)):
-                    if len(flowable) == 1:
-                        flowable = flowable[0]
-                    else:
-                        flowable = reportlab.platypus.Table([flowable])
-                width, height = flowable.wrap(18*cm, 14*cm)
-                if top:
-                    y = 29.5*cm
-                else:
-                    y = height + 0.5*cm
-                flowable.drawOn(canvas, cm, y)
-            header = node.first_page_header()
-            if page > 1 or header is None:
-                header = node.page_header()
-            if header is not None:
-                add_flowable(header, True)
-            footer = node.page_footer()
-            if footer is not None:
-                add_flowable(footer, False)
-            canvas.restoreState()
-        doc.build(document, onFirstPage=on_page, onLaterPages=on_page)
+        margin = 10 * reportlab.lib.units.mm
+        page_size = reportlab.lib.pagesizes.A4
+        if True:
+            page_size = reportlab.lib.pagesizes.portrait(page_size)
+        else:
+            page_size = reportlab.lib.pagesizes.landscape(page_size)
+        doc = DocTemplate(output, pagesize=page_size,
+                          leftMargin=margin, rightMargin=margin,
+                          topMargin=margin, bottomMargin=margin)
+        doc.build(document, context=context,
+                  first_page_header=node.first_page_header(),
+                  page_header=node.page_header(),
+                  page_footer=node.page_footer())
         if total_pages is None and pdf_context.total_pages_requested:
             return self.export(context, total_pages=pdf_context.page)
         return output.getvalue()
