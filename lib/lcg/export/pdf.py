@@ -32,6 +32,7 @@ import reportlab.pdfbase.pdfmetrics
 import reportlab.pdfbase.ttfonts
 import reportlab.pdfgen
 import reportlab.platypus
+import reportlab.platypus.flowables
 
 from lcg import *
 from lcg.export import *
@@ -654,6 +655,15 @@ class PageBreak(Element):
     def export(self, context):
         return reportlab.platypus.PageBreak()
 
+class HorizontalRule(Element):
+    """Horizontal rule, similar to HTML <hr>.
+
+    Its 'content' is ignored.
+
+    """
+    def export(self, context):
+        return reportlab.platypus.flowables.HRFlowable(width='100%')
+
 class PageNumber(Text):
     """Page number.
 
@@ -1272,7 +1282,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(PageBreak)
 
     def _export_horizontal_separator(self, context, element):
-        return make_element(PageBreak)
+        return make_element(HorizontalRule)
 
     def _export_page_number(self, context, element):
         return make_element(PageNumber, total=element.total())
