@@ -956,12 +956,19 @@ class Table(Element):
                 table_style_data.append(('LINEBELOW', (0, 0), (-1, 0), size, black,))
             if presentation.separator_margin:
                 size = self._unit2points(presentation.separator_margin, style) / 2
-                table_style_data.append(('TOPPADDING', (0, 0), (-1, -1), size,))
-                table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, -1), size,))
+            else:
+                size = 0
+            table_style_data.append(('TOPPADDING', (0, 0), (-1, -1), size,))
+            table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, -1), size,))
             if header_row_p and presentation.header_separator_margin is not None:
                 size = self._unit2points(presentation.header_separator_margin, style) / 2
                 table_style_data.append(('TOPPADDING', (0, 0), (-1, 0), size,))
                 table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, 0), size,))
+        else:
+            table_style_data.append(('TOPPADDING', (0, 0), (-1, -1), 0,))
+            table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, -1), 0,))
+        table_style_data.append(('LEFTPADDING', (0, 0), (-1, -1), 0,))
+        table_style_data.append(('RIGHTPADDING', (0, 0), (-1, -1), 0,))        
         # Create the table instance
         repeat_cols = 0
         if self.long:
