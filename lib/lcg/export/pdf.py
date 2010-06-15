@@ -558,7 +558,8 @@ class PreformattedText(Element):
         assert isinstance(self.content, basestring), ('type error', self.content,)
     def export(self, context):
         style = context.pdf_context.code_style()
-        result = reportlab.platypus.Preformatted(self.content, style)
+        space = reportlab.platypus.Spacer(0, self._unit2points(UFont(0.5), style))
+        result = [space, reportlab.platypus.Preformatted(self.content, style), space]
         return result
 
 class Paragraph(Element):
