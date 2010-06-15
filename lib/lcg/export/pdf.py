@@ -942,7 +942,8 @@ class Table(Element):
                     if isinstance(column, TableCell):
                         if column.heading:
                             table_style_data.append(('FACE', (j, i), (j, i), bold_font,))
-                        if column.align is not None and column.align != alignments[j]:
+                        if (column.align is not None and
+                            (not alignments or column.align != alignments[j])):
                             table_style_data.append(('ALIGN', (j, i), (j, i), column.align.upper(),))
                     row_content += column.export(context)
             exported_content.append(row_content)
@@ -1239,13 +1240,14 @@ class PDFExporter(FileExporter, Exporter):
     
     def _export_container(self, context, element):
         content = element.content()
-        if (element.orientation() == 'HORIZONTAL' or
+        orientation = element.orientation()
+        if (orientation == 'HORIZONTAL' or
             element.halign() is not None or element.valign() is not None):
             def cell(content):
                 exported_content = [content.export(context)]
                 return make_element(TableCell, content=exported_content,
                                     align=element.halign(), valign=element.valign())
-            if element.orientation() == 'HORIZONTAL':
+            if orientation == 'HORIZONTAL':
                 table_content = [make_element(TableRow, content=[cell(c) for c in content])]
             else:
                 table_content = [make_element(TableRow, content=[cell(c)]) for c in content]
