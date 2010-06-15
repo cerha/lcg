@@ -468,6 +468,9 @@ class Text(Element):
             self.content = make_element(TextContainer, content=new_content)
         else:
             self.content.prepend_text(text)
+    def plain_text(self):
+        """Return true iff the text is plain text without markup."""
+        return True
 
 class Empty(Text):
     """An empty content.
@@ -503,6 +506,8 @@ class MarkedText(Text):
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
         self.content.prepend_text(text)
+    def plain_text(self):
+        return False
 
 class SimpleMarkup(Text):
     """In-paragraph markup without content.
@@ -522,6 +527,8 @@ class SimpleMarkup(Text):
             mark += ' %s="%s"' % (k, v,)
         result = '<%s/>' % (mark,)
         return result
+    def plain_text(self):
+        return False
 
 class TextContainer(Text):
     """Container of any number of 'Text' elements.
@@ -546,6 +553,13 @@ class TextContainer(Text):
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
         self.content.insert(0, make_element(Text, content=text))
+    def plain_text(self):
+        result = True
+        for c in self.content:
+            if not c.plain_text():
+                result = False
+                break
+        return result
     
 class PreformattedText(Element):
     """Text to be output verbatim.
@@ -701,12 +715,18 @@ class Container(Element):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         result = []
-        all_text = all([isinstance(c, (basestring, Text,)) for c in self.content])
+        all_text = True
+        for c in self.content:
+            if (not isinstance(c, (basestring, Text,)) or
+                (isinstance(c, basestring) and c.find('<') >= 0) or
+                (isinstance(c, Text) and not c.plain_text())):
+                all_text = False
+                break
         for c in self.content:
             if isinstance(c, basestring):
                 c = make_element(Text, content=c)
             if isinstance(c, Text) and not all_text:
-                c = make_element(Paragraph, content=[c])
+                c = make_element(Paragraph, content=[c], noindent=True)
             exported = c.export(context)
             if isinstance(exported, (list, tuple,)):
                 result += exported
@@ -908,6 +928,7 @@ class Table(Element):
     presentation = None
     long = False
     column_widths = None
+    compact = True
     
     def init(self):
         super(Table, self).init()
@@ -982,11 +1003,13 @@ class Table(Element):
                 size = self._unit2points(presentation.header_separator_margin, style) / 2
                 table_style_data.append(('TOPPADDING', (0, 0), (-1, 0), size,))
                 table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, 0), size,))
-        else:
+        elif self.compact:
             table_style_data.append(('TOPPADDING', (0, 0), (-1, -1), 0,))
             table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, -1), 0,))
-        table_style_data.append(('LEFTPADDING', (0, 0), (-1, -1), 0,))
-        table_style_data.append(('RIGHTPADDING', (0, 0), (-1, -1), 0,))        
+        if self.compact:
+            table_style_data.append(('LEFTPADDING', (0, 0), (-1, -1), 0,))
+            table_style_data.append(('RIGHTPADDING', (0, 0), (-1, -1), 0,))
+        table_style_data.append(('FONTNAME', (0, 0), (-1, -1), style.fontName,))
         # Create the table instance
         repeat_cols = 0
         if self.long:
@@ -1347,7 +1370,7 @@ class PDFExporter(FileExporter, Exporter):
                        make_element(TableCell, content=[value.export(context)])]
             return make_element(TableRow, content=content)
         rows = [make_item(*c) for c in element.content()]
-        return make_element(Table, content=rows)
+        return make_element(Table, content=rows, compact=False)
             
     def _export_paragraph(self, context, element):
         # LCG interpretation of "paragraph" is very wide, we have to expect
@@ -1380,7 +1403,7 @@ class PDFExporter(FileExporter, Exporter):
 
     def _export_table(self, context, element):
         return make_element(Table, content=[c.export(context) for c in element.content()],
-                            long=element.long(),
+                            long=element.long(), compact=False,
                             column_widths=element.column_widths(),
                             presentation=element.presentation())
 
