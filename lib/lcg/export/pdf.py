@@ -824,9 +824,11 @@ class List(Element):
             else:
                 raise Exception ('type error', item,)
             return result
-        result = []
+        space = reportlab.platypus.Spacer(0, self._unit2points(UFont(0.5), style))
+        result = [space]
         for item in self.content:
             result += make_item(item)
+        result.append(space)
         assert _ok_export_result(result), ('wrong export', result,)
         return result
 
