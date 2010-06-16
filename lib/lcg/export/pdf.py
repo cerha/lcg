@@ -468,6 +468,10 @@ class Element(object):
             points = size.size()
         elif isinstance(size, (UFont, USpace,)):
             points = size.size() * style.fontSize
+        elif size is None:
+            # TODO: This should produce flexible space, but for now we just
+            # prevent it from breaking the document processing.
+            points = 10
         else:
             raise Exception('Not implemented', size)
         return points
