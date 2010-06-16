@@ -277,11 +277,6 @@ class VSpace(HSpace):
     can be used.
 
     """
-    def __init__(self, size):
-        """
-        @type: L{Unit}
-        @param: Size of the space.
-        """
 
 
 class TextContent(Content):
