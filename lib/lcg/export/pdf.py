@@ -978,7 +978,7 @@ class TableRow(Element):
 class Table(Element):
     """Table of rows and columns.
 
-    'content' is a sequence of 'TableRow's.
+    'content' is a sequence of 'TableRow's and 'HorizontalRule's.
     Cells are 'TableCell' instances.
 
     """
@@ -992,7 +992,7 @@ class Table(Element):
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
         if __debug__:
             for c in self.content:
-                assert isinstance(c, TableRow), ('type error', c,)
+                assert isinstance(c, (TableRow, HorizontalRule,)), ('type error', c,)
     def export(self, context):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
@@ -1023,7 +1023,7 @@ class Table(Element):
         bold_font = pdf_context.font(family, True, italic)
         i = 0
         for row in content:
-            if isinstance(row, PageBreak):
+            if isinstance(row, HorizontalRule):
                 table_style_data.append(('LINEABOVE', (0, i), (-1, i), 1, black,))
                 continue
             row_content = []

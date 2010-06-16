@@ -767,7 +767,7 @@ class TableRow(Container):
     
 class Table(Container):
     """Table is a container of 'TableRow' instances."""
-    _ALLOWED_CONTENT = TableRow
+    _ALLOWED_CONTENT = (TableRow, HorizontalSeparator,)
 
     def __init__(self, content, title=None, long=False, column_widths=None, **kwargs):
         """Arguments:
