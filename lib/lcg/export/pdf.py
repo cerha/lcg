@@ -1344,10 +1344,10 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(PageNumber, total=element.total())
 
     def _export_hspace(self, context, element):
-        return make_element(Space, width=element.size(), height=UMm(0))
+        return make_element(Space, width=element.size(context), height=UMm(0))
 
     def _export_vspace(self, context, element):
-        return make_element(Space, height=element.size(), width=UMm(0))
+        return make_element(Space, height=element.size(context), width=UMm(0))
 
     # Container elements
     
