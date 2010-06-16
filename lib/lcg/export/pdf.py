@@ -287,7 +287,7 @@ class Context(object):
         return style
 
     def style(self, style=None):
-        """Return style corresponding to the given context.
+        """Return ReportLab style corresponding to the given context.
 
         Arguments:
 
@@ -298,22 +298,22 @@ class Context(object):
         presentation = self.current_presentation()
         if presentation is not None:
             if presentation.font_size is not None:
-                style.font_size = style.font_size * presentation.font_size
+                style.fontSize = style.fontSize * presentation.font_size
             family, bold, italic = self.font_parameters(style.fontName)
             if presentation.font_family is not None:
                 if presentation.font_family == 'PROPORTIONAL':
-                    family = 'FreeSerif'
+                    family = 'Serif'
                 elif presentation.font_family == 'SANS_SERIF':
-                    family = 'FreeSans'
+                    family = 'Sans'
                 elif presentation.font_family == 'FIXED_WIDTH':
-                    family = 'FreeMono'
+                    family = 'Mono'
                 else:
                     raise Exception('Unknown font family', presentation.font_family)
             if presentation.bold is not None:
                 bold = presentation.bold
             if presentation.italic is not None:
                 italic = presentation.italic
-            style.font_family = self.font(family, bold, italic)
+            style.fontFamily = self.font(family, bold, italic)
         return style
 
     def get_seqid(self):
@@ -651,6 +651,8 @@ class Paragraph(Element):
             else:
                 suffix = 'Oblique'
             style.fontName = style.fontName + suffix
+        if presentation and presentation.font_size is not None:
+            style.fontSize = presentation.font_size
         # Hack, should be handled better, preferrably in List only:
         style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
@@ -1067,6 +1069,7 @@ class Table(Element):
             table_style_data.append(('LEFTPADDING', (0, 0), (-1, -1), 0,))
             table_style_data.append(('RIGHTPADDING', (0, 0), (-1, -1), 0,))
         table_style_data.append(('FONTNAME', (0, 0), (-1, -1), style.fontName,))
+        table_style_data.append(('FONTSIZE', (0, 0), (-1, -1), style.fontSize))
         # Create the table instance
         repeat_cols = 0
         if self.long:
@@ -1194,7 +1197,7 @@ class PDFExporter(FileExporter, Exporter):
         # Force all section links to be local, since there is just one output document.
         return super(PDFExporter, self)._uri_section(context, section, local=True)
 
-    def _content_export(self, context, element, collapse=True):
+    def _content_export(self, context, element, collapse=True, presentation=None):
         content = element.content()
         if isinstance(content, (tuple, list,)):
             exported_content = [c.export(context) for c in content]
@@ -1204,6 +1207,14 @@ class PDFExporter(FileExporter, Exporter):
             result_content = self.concat(*exported_content)
         else:
             result_content = exported_content
+        if presentation is not None and collapse:
+            if isinstance(result_content, basestring):
+                result_content = make_element(Container,
+                                              content=[make_element(Text, result_content)],
+                                              presentation=presentation)
+            else:
+                result_content = make_element(Container, content=[result_content],
+                                              presentation=presentation)
         return result_content
 
     def _markup(self, text, tag, **attributes):
@@ -1356,7 +1367,8 @@ class PDFExporter(FileExporter, Exporter):
             result_content = make_element(Table, content=table_content,
                                           presentation=element.presentation())
         else:
-            result_content = self._content_export(context, element)
+            result_content = self._content_export(context, element,
+                                                  presentation=element.presentation())
         return result_content
 
     def _export_link(self, context, element):
