@@ -793,6 +793,10 @@ class Container(Element):
                 result += exported
             else:
                 result.append(exported)
+        if not all_text:                # crude hack
+            for i in range(len(result)):
+                if isinstance(result[i], basestring):
+                    result[i] = reportlab.platypus.Paragraph(result[i], style=pdf_context.style())
         pdf_context.remove_presentation()
         assert _ok_export_result(result), ('wrong export', result,)
         return result
@@ -1233,6 +1237,8 @@ class PDFExporter(FileExporter, Exporter):
             for e in exported:
                 if not isinstance(e, Text):
                     def transform(item):
+                        if isinstance(item, basestring):
+                            item = make_element(Text, content=[item])
                         if isinstance(item, Text):
                             result = make_element(Paragraph, content=[item])
                         else:
