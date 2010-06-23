@@ -382,7 +382,7 @@ class Container(Content):
     _SUBSEQUENCES = False
     _SUBSEQUENCE_LENGTH = None
     
-    def __init__(self, content, id=None, **kwargs):
+    def __init__(self, content, id=None, name=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -390,12 +390,13 @@ class Container(Content):
           content -- the actual content wrapped into this container as a
             sequence of 'Content' instances in the order in which they should
             appear in the output.
-          id -- optional string identifier which may be used as output
+          name -- optional string identifier which may be used as output
             presentation selector (for example as a 'class' attribute in HTML).
+          id -- depracated, use 'name' instead.
 
         """
         super(Container, self).__init__(**kwargs)
-        self._id = id
+        self._name = name or id
         if self._SUBSEQUENCES:
             assert isinstance(content, (list, tuple)), "Not a sequence: %s" % content
             self._content = tuple([tuple(subseq) for subseq in content])
@@ -433,8 +434,8 @@ class Container(Content):
         g = context.generator()
         exported = self._exported_content(context)
         result = g.concat(*exported)
-        if self._lang is not None or self._id is not None:
-            result = g.div(result, lang=self._lang, cls=self._id)
+        if self._lang is not None or self._name is not None:
+            result = g.div(result, lang=self._lang, cls=self._name)
         return result
 
 
