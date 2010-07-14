@@ -188,12 +188,15 @@ class Context(object):
                 i = i + 1
                 self._fonts[(family, bold, italic)] = font_face_name
         default_font = 'FreeSerif'
-        reportlab.platypus.tableofcontents.levelZeroParaStyle.fontName = default_font
-        reportlab.platypus.tableofcontents.levelOneParaStyle.fontName = default_font
-        reportlab.platypus.tableofcontents.levelTwoParaStyle.fontName = default_font
-        reportlab.platypus.tableofcontents.levelThreeParaStyle.fontName = default_font
-        reportlab.platypus.tableofcontents.levelFourParaStyle.fontName = default_font
-
+        try: # these objects are no longer present in newer ReportLab versions
+            reportlab.platypus.tableofcontents.levelZeroParaStyle.fontName = default_font
+            reportlab.platypus.tableofcontents.levelOneParaStyle.fontName = default_font
+            reportlab.platypus.tableofcontents.levelTwoParaStyle.fontName = default_font
+            reportlab.platypus.tableofcontents.levelThreeParaStyle.fontName = default_font
+            reportlab.platypus.tableofcontents.levelFourParaStyle.fontName = default_font
+        except AttributeError:
+            pass
+            
     def font(self, family, bold, italic):
         """Return full font name for given arguments.
 
