@@ -156,6 +156,7 @@ class Context(object):
     total_pages_requested = False
     heading_level = 1
     toc_present = False
+    relative_font_size = 1
 
     def __init__(self, *args, **kwargs):
         super(Context, self).__init__(*args, **kwargs)
@@ -249,12 +250,16 @@ class Context(object):
     def normal_style(self):
         """Return standard paragraph style.
         """
-        return self._normal_style
+        style = copy.copy(self._normal_style)
+        style.fontSize *= self.relative_font_size
+        return style
 
     def code_style(self):
         """Return paragraph style for verbatim texts.
         """
-        return self._code_style
+        style = copy.copy(self._code_style)
+        style.fontSize *= self.relative_font_size
+        return style
 
     def heading_style(self, level):
         """Return paragraph style for headings.
@@ -270,6 +275,7 @@ class Context(object):
             level = 3
         style = copy.copy(self._styles['Heading%d' % (level,)])
         style.fontName='FreeSerif'
+        style.fontSize *= self.relative_font_size
         return style
 
     def list_style(self, order=None):
@@ -287,6 +293,7 @@ class Context(object):
             style_name = 'Bullet'
         style = copy.copy(self._styles[style_name])
         style.fontName='FreeSerif'
+        style.fontSize *= self.relative_font_size
         return style
 
     def style(self, style=None):
@@ -317,6 +324,7 @@ class Context(object):
             if presentation.italic is not None:
                 italic = presentation.italic
             style.fontFamily = self.font(family, bold, italic)
+        style.fontSize *= self.relative_font_size
         return style
 
     def get_seqid(self):
@@ -1328,7 +1336,21 @@ class PDFExporter(FileExporter, Exporter):
         pdf_context.first_page_header=node.first_page_header()
         pdf_context.page_header=node.page_header()
         pdf_context.page_footer=node.page_footer()
-        doc.multi_build(document, context=context)
+        while True:
+            try:
+                doc.multi_build(document, context=context)
+            except reportlab.platypus.doctemplate.LayoutError, e:
+                if str(e).find('too large') >= 0:
+                    pdf_context.relative_font_size /= 1.2
+                    if pdf_context.relative_font_size < 0.1:
+                        log("Page content extremely large, giving up")
+                        raise Exception("Content too large", e)
+                    log("Page content too large, reducing it by %s" %
+                        (pdf_context.relative_font_size,))
+                else:
+                    raise
+            else:
+                break
         if total_pages is None and pdf_context.total_pages_requested:
             return self.export(context, total_pages=pdf_context.page)
         return output.getvalue()
