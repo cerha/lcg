@@ -782,6 +782,7 @@ class Container(Element):
 
     """
     presentation = None
+    vertical = False
     def init(self):
         if __debug__:
             for c in self.content:
@@ -790,13 +791,14 @@ class Container(Element):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         result = []
-        all_text = True
-        for c in self.content:
-            if (not isinstance(c, (basestring, Text,)) or
-                (isinstance(c, basestring) and c.find('<') >= 0) or
-                (isinstance(c, Text) and not c.plain_text())):
-                all_text = False
-                break
+        all_text = not self.vertical
+        if all_text:
+            for c in self.content:
+                if (not isinstance(c, (basestring, Text,)) or
+                    (isinstance(c, basestring) and c.find('<') >= 0) or
+                    (isinstance(c, Text) and not c.plain_text())):
+                    all_text = False
+                    break
         for c in self.content:
             if isinstance(c, basestring):
                 c = make_element(Text, content=c)
@@ -1392,7 +1394,7 @@ class PDFExporter(FileExporter, Exporter):
     def _export_container(self, context, element):
         content = element.content()
         orientation = element.orientation()
-        if (orientation == 'HORIZONTAL' or
+        if ((orientation == 'HORIZONTAL' and len(content) > 1) or
             element.halign() is not None or element.valign() is not None):
             def cell(content):
                 exported_content = [content.export(context)]
@@ -1405,8 +1407,9 @@ class PDFExporter(FileExporter, Exporter):
             result_content = make_element(Table, content=table_content,
                                           presentation=element.presentation())
         else:
-            result_content = self._content_export(context, element,
-                                                  presentation=element.presentation())
+            exported_content = self._content_export(context, element, collapse=False,
+                                                    presentation=element.presentation())
+            result_content = make_element(Container, content=exported_content, vertical=True)
         return result_content
 
     def _export_link(self, context, element):
