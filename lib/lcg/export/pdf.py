@@ -509,6 +509,7 @@ class Text(Element):
         if isinstance(self.content, basestring):
             for old, new in self._replacements:
                 self.content = self.content.replace(old, new)
+        self.content = unicode(self.content)
     def export(self, context):
         content = self.content
         if isinstance(content, basestring):
@@ -801,7 +802,7 @@ class Container(Element):
                     break
         for c in self.content:
             if isinstance(c, basestring):
-                c = make_element(Text, content=c)
+                c = make_element(Text, content=unicode(c))
             if isinstance(c, Text) and not all_text:
                 c = make_element(Paragraph, content=[c], noindent=True)
             exported = c.export(context)
