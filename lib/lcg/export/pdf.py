@@ -395,6 +395,11 @@ class Context(object):
                     value = getattr(presentation, attr)
                     if value is None:
                         value = getattr(current_presentation, attr)
+                    elif attr == 'font_size':
+                        last_value = getattr(current_presentation, attr)
+                        if last_value is None:
+                            last_value = 1
+                        value = value * last_value
                     setattr(new_presentation, attr, value)
         self._presentations.append(new_presentation)
 
@@ -658,8 +663,6 @@ class Paragraph(Element):
             else:
                 suffix = 'Oblique'
             style.fontName = style.fontName + suffix
-        if presentation and presentation.font_size is not None:
-            style.fontSize = presentation.font_size
         # Hack, should be handled better, preferrably in List only:
         style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
