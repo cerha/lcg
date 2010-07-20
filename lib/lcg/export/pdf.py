@@ -509,7 +509,14 @@ class Text(Element):
         if isinstance(self.content, basestring):
             for old, new in self._replacements:
                 self.content = self.content.replace(old, new)
-            self.content = unicode(self.content)
+            # The following two lines of code are tricky.  In order to prevent
+            # some coding issues with pytis data retrieved from the database we
+            # must make sure that the result is unicode.  On the other hand we
+            # shouldn't touch the original object unless needed, otherwise the
+            # mysterious Context.translate method may stop produce texts from
+            # symbolic labels.
+            if not isinstance(self.content, unicode):
+                self.content = unicode(self.content)
     def export(self, context):
         content = self.content
         if isinstance(content, basestring):
