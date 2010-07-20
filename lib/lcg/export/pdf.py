@@ -556,6 +556,7 @@ class MarkedText(Text):
     def export(self, context):
         exported = super(MarkedText, self).export(context)
         start_mark = self.tag
+        presentation = context.pdf_context.current_presentation()
         for k, v in self.attributes.items():
             start_mark += ' %s="%s"' % (k, v,)
         result = u'<%s>%s</%s>' % (start_mark, exported, self.tag,)
@@ -657,21 +658,14 @@ class Paragraph(Element):
         pdf_context = context.pdf_context
         presentation = self.presentation
         pdf_context.add_presentation(presentation)
+        current_presentation = pdf_context.current_presentation()
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
         style.leftIndent = pdf_context.nesting_level() * 1.5 * style.fontSize
         if self.noindent:
             style.firstLineIndent = 0
-        if presentation and presentation.left_indent:
-            style.leftIndent += self._unit2points(presentation.left_indent, style)
-        if presentation and presentation.bold:
-            style.fontName = style.fontName + 'Bold'
-        if presentation and presentation.italic:
-            if style.fontName.find('Serif') >= 0:
-                suffix = 'Italic'
-            else:
-                suffix = 'Oblique'
-            style.fontName = style.fontName + suffix
+        if current_presentation and current_presentation.left_indent:
+            style.leftIndent += self._unit2points(current_presentation.left_indent, style)
         # Hack, should be handled better, preferrably in List only:
         style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
