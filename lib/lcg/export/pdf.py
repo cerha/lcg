@@ -509,7 +509,7 @@ class Text(Element):
         if isinstance(self.content, basestring):
             for old, new in self._replacements:
                 self.content = self.content.replace(old, new)
-        self.content = unicode(self.content)
+            self.content = unicode(self.content)
     def export(self, context):
         content = self.content
         if isinstance(content, basestring):
