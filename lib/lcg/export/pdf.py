@@ -163,6 +163,7 @@ class Context(object):
     heading_level = 1
     toc_present = False
     relative_font_size = 1
+    default_font_size = 12
 
     def __init__(self, *args, **kwargs):
         super(Context, self).__init__(*args, **kwargs)
@@ -170,9 +171,11 @@ class Context(object):
         self._styles = reportlab.lib.styles.getSampleStyleSheet()        
         self._normal_style = copy.copy(self._styles['Normal'])
         self._normal_style.fontName = 'FreeSerif'
+        self._normal_style.fontSize = self.default_font_size
         self._normal_style.firstLineIndent = 10
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
+        self._code_style.fontSize = self.default_font_size
         self._anchors = {}
         self._presentations = []
 
@@ -281,7 +284,7 @@ class Context(object):
             level = 3
         style = copy.copy(self._styles['Heading%d' % (level,)])
         style.fontName='FreeSerif'
-        style.fontSize *= self.relative_font_size
+        style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size
         return style
 
     def list_style(self, order=None):
@@ -299,7 +302,7 @@ class Context(object):
             style_name = 'Bullet'
         style = copy.copy(self._styles[style_name])
         style.fontName='FreeSerif'
-        style.fontSize *= self.relative_font_size
+        style.fontSize = self.default_font_size * self.relative_font_size
         return style
 
     def style(self, style=None):
