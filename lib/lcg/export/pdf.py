@@ -1073,10 +1073,17 @@ class Table(Element):
         if presentation is not None:
             if presentation.separator_height:
                 size = self._unit2points(presentation.separator_height, style)
-                table_style_data.append(('GRID', (0, 0), (-1, -1), size, black,))
+                table_style_data.append(('LINEBELOW', (0, 0), (-1, -1), size, black,))
             if header_row_p and presentation.header_separator_height is not None:
                 size = self._unit2points(presentation.header_separator_height, style)
                 table_style_data.append(('LINEBELOW', (0, 0), (-1, 0), size, black,))
+            elif presentation.separator_height:
+                size = self._unit2points(presentation.separator_height, style)
+                table_style_data.append(('LINEABOVE', (0, 0), (-1, 0), size, black,))
+            if presentation.separator_width:
+                size = self._unit2points(presentation.separator_width, style)
+                table_style_data.append(('LINEAFTER', (0, 0), (-1, -1), size, black,))
+                table_style_data.append(('LINEBEFORE', (0, 0), (-1, 0), size, black,))
             if presentation.separator_margin:
                 size = self._unit2points(presentation.separator_margin, style) / 2
             else:

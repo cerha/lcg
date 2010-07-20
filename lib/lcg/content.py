@@ -69,6 +69,10 @@ class Presentation(object):
     """Height of lines separating objects, 'Unit'.
     It currently works only for row separators in tables.
     """
+    separator_width = None
+    """Width of lines separating objects, 'Unit'.
+    It currently works only for column separators in tables.
+    """
     separator_margin = None
     """Amount of space between objects, 'Unit'.
     It currently works only for spaces between table rows.
