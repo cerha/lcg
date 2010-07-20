@@ -1401,6 +1401,7 @@ class PDFExporter(FileExporter, Exporter):
     
     def _export_container(self, context, element):
         content = element.content()
+        presentation = element.presentation()
         orientation = element.orientation()
         if ((orientation == 'HORIZONTAL' and len(content) > 1) or
             element.halign() is not None or element.valign() is not None):
@@ -1412,12 +1413,11 @@ class PDFExporter(FileExporter, Exporter):
                 table_content = [make_element(TableRow, content=[cell(c) for c in content])]
             else:
                 table_content = [make_element(TableRow, content=[cell(c)]) for c in content]
-            result_content = make_element(Table, content=table_content,
-                                          presentation=element.presentation())
+            result_content = make_element(Table, content=table_content, presentation=presentation)
         else:
-            exported_content = self._content_export(context, element, collapse=False,
-                                                    presentation=element.presentation())
-            result_content = make_element(Container, content=exported_content, vertical=True)
+            exported_content = self._content_export(context, element, collapse=False)
+            result_content = make_element(Container, content=exported_content, vertical=True,
+                                          presentation=presentation)
         return result_content
 
     def _export_link(self, context, element):
