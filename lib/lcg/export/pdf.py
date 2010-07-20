@@ -1103,13 +1103,13 @@ class Table(Element):
         table_style_data.append(('FONTNAME', (0, 0), (-1, -1), style.fontName,))
         table_style_data.append(('FONTSIZE', (0, 0), (-1, -1), style.fontSize))
         # Create the table instance
-        repeat_cols = 0
+        repeat_rows = 0
         if self.long:
             # It may or needn't be a good idea to always use LongTable
             # unconditionally here.
             class_ = reportlab.platypus.LongTable
             if header_row_p:
-                repeat_cols = 1
+                repeat_rows = 1
         else:
             class_ = reportlab.platypus.Table
         if self.column_widths is None:
@@ -1118,7 +1118,7 @@ class Table(Element):
             column_widths = [self._unit2points(w, style) for w in self.column_widths]
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
-                       repeatCols=repeat_cols)
+                       repeatRows=repeat_rows)
         pdf_context.remove_presentation()
         return table
 
