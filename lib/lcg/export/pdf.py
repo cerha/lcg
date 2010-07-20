@@ -1054,10 +1054,12 @@ class Table(Element):
                 if isinstance(column, TableCell) and column.valign is not None:
                     table_style_data.append(('VALIGN', (j, 0), (j, -1), column.valign.upper(),))
         # Export content
+        # (In case of table style overlappings, last definition takes precedence.)
         black = reportlab.lib.colors.black
         style = pdf_context.style()
         family, bold, italic = pdf_context.font_parameters(style.fontName)
         bold_font = pdf_context.font(family, True, italic)
+        table_style_data.append(('FONT', (0, 0), (-1, -1), style.fontName, style.fontSize))
         i = 0
         for row in content:
             if isinstance(row, HorizontalRule):
@@ -1071,7 +1073,7 @@ class Table(Element):
                 else:
                     if isinstance(column, TableCell):
                         if column.heading:
-                            table_style_data.append(('FACE', (j, i), (j, i), bold_font,))
+                            table_style_data.append(('FONT', (j, i), (j, i), bold_font, style.fontSize))
                         if (column.align is not None and
                             (not alignments or column.align != alignments[j])):
                             table_style_data.append(('ALIGN', (j, i), (j, i), column.align.upper(),))
@@ -1110,8 +1112,6 @@ class Table(Element):
         if self.compact:
             table_style_data.append(('LEFTPADDING', (0, 0), (-1, -1), 0,))
             table_style_data.append(('RIGHTPADDING', (0, 0), (-1, -1), 0,))
-        table_style_data.append(('FONTNAME', (0, 0), (-1, -1), style.fontName,))
-        table_style_data.append(('FONTSIZE', (0, 0), (-1, -1), style.fontSize))
         # Create the table instance
         repeat_rows = 0
         if self.long:
