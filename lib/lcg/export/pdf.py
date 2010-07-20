@@ -323,7 +323,7 @@ class Context(object):
                 bold = presentation.bold
             if presentation.italic is not None:
                 italic = presentation.italic
-            style.fontFamily = self.font(family, bold, italic)
+            style.fontName = self.font(family, bold, italic)
         style.fontSize *= self.relative_font_size
         return style
 
