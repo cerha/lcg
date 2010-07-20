@@ -138,6 +138,12 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             self._lcg_context = context
         reportlab.platypus.BaseDocTemplate.multiBuild(self, story, **kwargs)
 
+class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
+    def getLevelStyle(self, n):
+        style = reportlab.platypus.tableofcontents.TableOfContents.getLevelStyle(self, n)
+        style.fontName = 'FreeSerif'
+        return style
+
 class Context(object):
     """Place holder for PDF backend export state.
 
@@ -729,7 +735,7 @@ class TableOfContents(Element):
     
     """
     def export(self, context):
-        return reportlab.platypus.tableofcontents.TableOfContents()
+        return RLTableOfContents()
 
 class PageNumber(Text):
     """Page number.
