@@ -1426,7 +1426,8 @@ class PDFExporter(FileExporter, Exporter):
             result_content = make_element(Table, content=table_content, presentation=presentation)
         else:
             exported_content = self._content_export(context, element, collapse=False)
-            result_content = make_element(Container, content=exported_content, vertical=True,
+            result_content = make_element(Container, content=exported_content,
+                                          vertical=(orientation == 'VERTICAL'),
                                           presentation=presentation)
         return result_content
 
