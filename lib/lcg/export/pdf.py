@@ -1382,6 +1382,8 @@ class PDFExporter(FileExporter, Exporter):
             exported_structure.append(exported)
         exported_content = self.concat(*exported_structure)
         document = exported_content.export(context)
+        if len(document) == 1 and isinstance(document[0], basestring):
+            document = [reportlab.platypus.Paragraph(document[0], pdf_context.style())]
         # It is necessary to check for invalid anchors before doc.build gets
         # called, otherwise Reportlab throws an ugly error.
         invalid_anchors = context.pdf_context.invalid_anchor_references()
