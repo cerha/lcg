@@ -139,10 +139,13 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         reportlab.platypus.BaseDocTemplate.multiBuild(self, story, **kwargs)
 
 class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
-    def getLevelStyle(self, n):
-        style = reportlab.platypus.tableofcontents.TableOfContents.getLevelStyle(self, n)
-        style.fontName = 'FreeSerif'
-        return style
+    def __init__(self, *args, **kwargs):
+        reportlab.platypus.tableofcontents.TableOfContents.__init__(self, *args, **kwargs)
+        for i in range(len(self.levelStyles)):
+            style = copy.copy(self.levelStyles[i])
+            style.fontName = 'FreeSerif'
+            style.fontSize *= Context.default_font_size / 10.0
+            self.levelStyles[i] = style
 
 class Context(object):
     """Place holder for PDF backend export state.
