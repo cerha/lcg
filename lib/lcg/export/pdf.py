@@ -801,31 +801,34 @@ class Container(Element):
     def export(self, context):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
-        result = []
-        all_text = not self.vertical
-        if all_text:
+        if len(self.content) == 1 and isinstance(self.content[0], Container):
+            result = self.content[0].export(context)
+        else:
+            result = []
+            all_text = not self.vertical
+            if all_text:
+                for c in self.content:
+                    if (not isinstance(c, (basestring, Text,)) or
+                        (isinstance(c, basestring) and c.find('<') >= 0) or
+                        (isinstance(c, Text) and not c.plain_text())):
+                        all_text = False
+                        break
             for c in self.content:
-                if (not isinstance(c, (basestring, Text,)) or
-                    (isinstance(c, basestring) and c.find('<') >= 0) or
-                    (isinstance(c, Text) and not c.plain_text())):
-                    all_text = False
-                    break
-        for c in self.content:
-            if isinstance(c, basestring):
-                c = make_element(Text, content=unicode(c))
-            if isinstance(c, Text) and not all_text:
-                c = make_element(Paragraph, content=[c], noindent=True)
-            exported = c.export(context)
-            if isinstance(exported, (list, tuple,)):
-                result += exported
-            else:
-                result.append(exported)
-        if not all_text:                # crude hack
-            for i in range(len(result)):
-                if isinstance(result[i], basestring):
-                    result[i] = reportlab.platypus.Paragraph(result[i], style=pdf_context.style())
-        pdf_context.remove_presentation()
-        assert _ok_export_result(result), ('wrong export', result,)
+                if isinstance(c, basestring):
+                    c = make_element(Text, content=unicode(c))
+                if isinstance(c, Text) and not all_text:
+                    c = make_element(Paragraph, content=[c], noindent=True)
+                exported = c.export(context)
+                if isinstance(exported, (list, tuple,)):
+                    result += exported
+                else:
+                    result.append(exported)
+            if not all_text:                # crude hack
+                for i in range(len(result)):
+                    if isinstance(result[i], basestring):
+                        result[i] = reportlab.platypus.Paragraph(result[i], style=pdf_context.style())
+            pdf_context.remove_presentation()
+            assert _ok_export_result(result), ('wrong export', result,)
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
