@@ -801,11 +801,25 @@ class Container(Element):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, Element), ('type error', c,)
-    def export(self, context):
+    def export(self, context, parent_presentation=None):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
-        if len(self.content) == 1 and isinstance(self.content[0], Container):
-            result = self.content[0].export(context)
+        presentation = pdf_context.current_presentation()
+        if (len(self.content) == 1 and
+            (isinstance(self.content[0], (Container, Table, Paragraph,)) or
+             (isinstance(self.content[0], Text) and self.content[0].plain_text() and parent_presentation is not None)) and
+            (presentation is None or
+             parent_presentation is not None or
+             (presentation.bold is None and presentation.italic is None))):
+            if presentation is not None and parent_presentation is not None:
+                for attr in ('bold', 'italic', 'font_size', 'font_family',):
+                    value = getattr(presentation, attr)
+                    if value is not None:
+                        setattr(parent_presentation, attr, value)
+            if isinstance(self.content[0], Container):
+                result = self.content[0].export(context, parent_presentation=parent_presentation)
+            else:
+                result = [self.content[0].export(context)]
         else:
             result = []
             all_text = not self.vertical
@@ -1077,13 +1091,24 @@ class Table(Element):
                 if isinstance(column, (list, tuple,)):
                     row_content += [c.export(context) for c in column]
                 else:
+                    kwargs = {}
+                    p = None
                     if isinstance(column, TableCell):
+                        p = copy.copy(self.presentation) or Presentation()
                         if column.heading:
-                            table_style_data.append(('FONT', (j, i), (j, i), bold_font, style.fontSize))
+                            p.bold = True
                         if (column.align is not None and
                             (not alignments or column.align != alignments[j])):
                             table_style_data.append(('ALIGN', (j, i), (j, i), column.align.upper(),))
-                    row_content += column.export(context)
+                        kwargs['parent_presentation'] = p
+                    row_content += column.export(context, **kwargs)
+                    if (p is not None and
+                        (p.bold is not None or p.italic is not None or
+                         p.font_family is not None or p.font_size is not None)):
+                        pdf_context.add_presentation(p)
+                        style = pdf_context.style()
+                        table_style_data.append(('FONT', (j, i), (j, i), style.fontName, style.fontSize))
+                        pdf_context.remove_presentation()
             exported_content.append(row_content)
             i += 1
         # Add remaining presentation
