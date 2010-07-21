@@ -844,8 +844,8 @@ class Container(Element):
                 for i in range(len(result)):
                     if isinstance(result[i], basestring):
                         result[i] = reportlab.platypus.Paragraph(result[i], style=pdf_context.style())
-            pdf_context.remove_presentation()
             assert _ok_export_result(result), ('wrong export', result,)
+        pdf_context.remove_presentation()
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
