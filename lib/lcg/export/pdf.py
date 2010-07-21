@@ -423,6 +423,22 @@ class Context(object):
                     setattr(new_presentation, attr, value)
         self._presentations.append(new_presentation)
 
+    def set_presentation(self, presentation):
+        """Set 'presentation' as the current presentation.
+
+        Unlike 'add_presentation' the presentation is set as it is and is not
+        merged with current presentations.  The presentation must be removed
+        from the presentation list using 'remove_presentation' method when the
+        object it introduces is left.
+
+        Arguments:
+
+          presentation -- 'Presentation' to be applied; if 'None', current
+            presentation is used instead
+        
+        """
+        self._presentations.append(presentation)        
+
     def remove_presentation(self):
         """Remove the current presentation from the presentation list."""
         self._presentations.pop()
@@ -1094,7 +1110,7 @@ class Table(Element):
                     kwargs = {}
                     p = None
                     if isinstance(column, TableCell):
-                        p = copy.copy(self.presentation) or Presentation()
+                        p = Presentation()
                         if column.heading:
                             p.bold = True
                         if (column.align is not None and
@@ -1105,9 +1121,9 @@ class Table(Element):
                     if (p is not None and
                         (p.bold is not None or p.italic is not None or
                          p.font_family is not None or p.font_size is not None)):
-                        pdf_context.add_presentation(p)
-                        style = pdf_context.style()
-                        table_style_data.append(('FONT', (j, i), (j, i), style.fontName, style.fontSize))
+                        pdf_context.set_presentation(p)
+                        s = pdf_context.style()
+                        table_style_data.append(('FONT', (j, i), (j, i), s.fontName, s.fontSize))
                         pdf_context.remove_presentation()
             exported_content.append(row_content)
             i += 1
