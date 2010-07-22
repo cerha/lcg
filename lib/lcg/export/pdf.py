@@ -832,8 +832,7 @@ class Container(Element):
             (isinstance(self.content[0], (Container, Table, Paragraph,)) or
              (isinstance(self.content[0], Text) and self.content[0].plain_text() and parent_presentation is not None)) and
             (presentation is None or
-             parent_presentation is not None or
-             (presentation.bold is None and presentation.italic is None))):
+             parent_presentation is not None)):
             if presentation is not None and parent_presentation is not None:
                 for attr in ('bold', 'italic', 'font_size', 'font_family',):
                     value = getattr(presentation, attr)
@@ -845,7 +844,7 @@ class Container(Element):
                 result = [self.content[0].export(context)]
         else:
             result = []
-            all_text = not self.vertical
+            all_text = not self.vertical and presentation is None
             if all_text:
                 for c in self.content:
                     if (not isinstance(c, (basestring, Text,)) or
