@@ -1066,6 +1066,8 @@ class Table(Element):
     long = False
     column_widths = None
     compact = True
+    halign = None
+    valign = None
     
     def init(self):
         super(Table, self).init()
@@ -1187,7 +1189,7 @@ class Table(Element):
                     column_widths.append(self._unit2points(w, style))
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
-                       repeatRows=repeat_rows)
+                       repeatRows=repeat_rows, hAlign=self.halign, vAlign=self.valign)
         pdf_context.remove_presentation()
         return table
 
@@ -1478,13 +1480,14 @@ class PDFExporter(FileExporter, Exporter):
             element.halign() is not None or element.valign() is not None):
             def cell(content):
                 exported_content = [content.export(context)]
-                return make_element(TableCell, content=exported_content,
-                                    align=element.halign(), valign=element.valign())
+                return make_element(TableCell, content=exported_content)
             if orientation == 'HORIZONTAL':
-                table_content = [make_element(TableRow, content=[cell(c) for c in content])]
+                content = [cell(c) for c in content]
+                table_content = [make_element(TableRow, content=content)]
             else:
                 table_content = [make_element(TableRow, content=[cell(c)]) for c in content]
-            result_content = make_element(Table, content=table_content, presentation=presentation)
+            result_content = make_element(Table, content=table_content, presentation=presentation,
+                                          halign=element.halign(), valign=element.valign())
         else:
             exported_content = self._content_export(context, element, collapse=False)
             result_content = make_element(Container, content=exported_content,
