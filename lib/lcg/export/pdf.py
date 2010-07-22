@@ -147,6 +147,14 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
             style.fontSize *= Context.default_font_size / 10.0
             self.levelStyles[i] = style
 
+class RLSpacer(reportlab.platypus.flowables.Spacer):
+    def wrap(self, availWidth, availHeight):
+        if self.width is None:
+            self.width = availWidth
+        if self.height is None:
+            self.height = availHeight-1e-8
+        return self.width, self.height
+    
 class Context(object):
     """Place holder for PDF backend export state.
 
@@ -512,10 +520,10 @@ class Element(object):
             points = size.size()
         elif isinstance(size, (UFont, USpace,)):
             points = size.size() * style.fontSize
-        elif size is None:
+        elif isinstance(size, UAny):
             # TODO: This should produce flexible space, but for now we just
             # prevent it from breaking the document processing.
-            points = 10
+            points = None
         else:
             raise Exception('Not implemented', size)
         return points
@@ -795,11 +803,10 @@ class Space(Element):
     width = UMm(0)
     height = UMm(0)
     def export(self, context):
-        # Note: According to Reportlab documentation, only vertical spaces work.
         style = context.pdf_context.style()
         width = self._unit2points(self.width, style)
         height = self._unit2points(self.height, style)
-        return reportlab.platypus.Spacer(width, height)
+        return RLSpacer(width, height)
 
 class Container(Element):
     """Sequence of (almost) any objects.
@@ -1172,7 +1179,12 @@ class Table(Element):
         if self.column_widths is None:
             column_widths = None
         else:
-            column_widths = [self._unit2points(w, style) for w in self.column_widths]
+            column_widths = []
+            for w in self.column_widths:
+                if w is None:
+                    column_widths.append(None)
+                else:
+                    column_widths.append(self._unit2points(w, style))
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
                        repeatRows=repeat_rows)
