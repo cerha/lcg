@@ -108,7 +108,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 flowable, width, height = make_flowable(content)
                 x = (self.pagesize[0] - width) / 2
                 if top:
-                    y = self.height + self.bottomMargin
+                    y = self.height - self.bottomMargin
                 else:
                     y = height + self.bottomMargin
                 flowable.drawOn(canvas, x, y)
@@ -123,9 +123,9 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         self._calc()
         Frame = reportlab.platypus.frames.Frame
         bottom_margin, height = frame_height((first_page_header or page_header), page_footer)
-        first_frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id='first')
+        first_frame = Frame(self.leftMargin, bottom_margin, self.width, height, id='first')
         bottom_margin, height = frame_height(page_header, page_footer)
-        later_frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id='later')
+        later_frame = Frame(self.leftMargin, bottom_margin, self.width, height, id='later')
         self.addPageTemplates([
             PageTemplate(id='First', frames=first_frame, onPage=on_page, pagesize=self.pagesize),
             PageTemplate(id='Later', frames=later_frame, onPage=on_page, pagesize=self.pagesize)
