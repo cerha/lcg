@@ -1021,9 +1021,9 @@ class Image(Element):
         assert isinstance(self.image, resources.Image), ('type error', self.image,)
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
     def export(self, context):
-        filename = self.image.src_file()
+        filename = self.image.filename()
         if filename:
-            result = reportlab.platypus.Flowable(filename)
+            result = reportlab.platypus.flowables.Image(filename)
         else:
             content = make_element(Text, content=(self.image.title() or '[image]'))
             result = make_element(Paragraph, content=[content]).export(context)
