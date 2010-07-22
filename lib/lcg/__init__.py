@@ -28,7 +28,7 @@ from locales import *
 from util import *
 from nodes import *
 from resources import *
-from units import Unit, UFont, UMm, UPoint, USpace, FontFamily, \
+from units import Unit, UAny, UFont, UMm, UPoint, USpace, FontFamily, \
      HorizontalAlignment, VerticalAlignment, Orientation
 from content import *
 from export import *
