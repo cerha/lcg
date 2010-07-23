@@ -108,7 +108,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 flowable, width, height = make_flowable(content)
                 x = (self.pagesize[0] - width) / 2
                 if top:
-                    y = self.height - self.bottomMargin
+                    y = self.height + self.bottomMargin - height
                 else:
                     y = height - self.bottomMargin
                 flowable.drawOn(canvas, x, y)
