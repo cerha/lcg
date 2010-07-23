@@ -1126,7 +1126,28 @@ class Table(Element):
                             (not alignments or column.align != alignments[j])):
                             table_style_data.append(('ALIGN', (j, i), (j, i), column.align.upper(),))
                         kwargs['parent_presentation'] = p
-                    row_content += column.export(context, **kwargs)
+                    # ReportLab can't take anything as a cell content, let's prepare for it
+                    def simplify(exported_column):
+                        if isinstance(exported_column, str):
+                            result = unicode(exported_column)
+                        elif isinstance(exported_column, (tuple, list,)):
+                            exported_column = [simplify(x) for x in exported_column]
+                            if len(exported_column) == 1:
+                                result = exported_column[0]
+                            elif all([isinstance(x, unicode) for x in exported_column]):
+                                result = string.join(exported_column, ' ')
+                            else:
+                                result = []
+                                for x in exported_column:
+                                    if isinstance(x, unicode):
+                                        para = make_element(Paragraph, content=[Text(content=x)])
+                                        x = para.export(context)
+                                    result.append(x)
+                        else:
+                            result = exported_column
+                        return result
+                    exported_column = simplify(column.export(context, **kwargs))
+                    row_content.append(exported_column)
                     if (p is not None and
                         (p.bold is not None or p.italic is not None or
                          p.font_family is not None or p.font_size is not None)):
