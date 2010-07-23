@@ -93,6 +93,11 @@ class UFont(Unit):
 class USpace(Unit):
     """Units corresponding to a current preferred gap between two words."""
 
+class UAny(Unit):
+    """Special unit representing a flexible space.
+    The value is currently ignored.
+    """
+
 
 class HorizontalAlignment(object):
     """Enumeration of horizontal alignment kinds."""
