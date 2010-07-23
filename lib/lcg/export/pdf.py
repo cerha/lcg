@@ -1125,6 +1125,11 @@ class Table(Element):
                         if (column.align is not None and
                             (not alignments or column.align != alignments[j])):
                             table_style_data.append(('ALIGN', (j, i), (j, i), column.align.upper(),))
+                        # If it is a layout table we need to work around
+                        # misalignment caused by expansion of the table over
+                        # the whole page width.
+                        elif self.halign is not None and len(row.content) == 1:
+                            table_style_data.append(('ALIGN', (j, i), (j, i), self.halign,))
                         kwargs['parent_presentation'] = p
                     # ReportLab can't take anything as a cell content, let's prepare for it
                     def simplify(exported_column):
