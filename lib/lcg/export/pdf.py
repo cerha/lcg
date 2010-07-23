@@ -82,7 +82,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 if len(flowable) == 1:
                     flowable = flowable[0]
                 else:
-                    flowable = reportlab.platypus.Table([flowable])
+                    flowable = reportlab.platypus.Table([[f] for f in flowable])
             max_height = self.height / 3  # so that header, footer and content have all chance to fit
             width, height = flowable.wrap(self.width, max_height)
             return flowable, width, height
