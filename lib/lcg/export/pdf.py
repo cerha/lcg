@@ -77,7 +77,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             if isinstance(flowable, Element):
                 flowable = flowable.export(context)
             if isinstance(flowable, basestring):
-                flowable = reportlab.platypus.Paragraph(flowable, style)
+                flowable = reportlab.platypus.Paragraph(unicode(flowable), style)
             while isinstance(flowable, (tuple, list,)):
                 if len(flowable) == 1:
                     flowable = flowable[0]
@@ -560,6 +560,7 @@ class Text(Element):
         else:
             result = content.export(context)
         assert _ok_export_result(result), ('wrong export', result,)
+        result = unicode(result)
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
