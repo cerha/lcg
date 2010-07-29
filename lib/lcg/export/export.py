@@ -150,9 +150,11 @@ class MarkupFormatter(object):
                 result = result[str(name)]
             except KeyError:
                 return exporter.escape('$' + subst)
-        if not isinstance(result, Localizable):
-            result = str(result)
-        return exporter.escape(result)
+        if not isinstance(result, Content):
+            if not isinstance(result, Localizable):
+                result = str(result)
+            result = exporter.escape(result)
+        return result
     
     def _link_formatter(self, context, href=None, imgname=None, anchor=None, size=None,
                         label_img=None, label=None, descr=None, align=None, **kwargs):
