@@ -364,7 +364,7 @@ class MacroParser(object):
 
     Two macros are currently supported:
 
-      * Contitional text
+      * Conditional text
       * Inclusion
 
     Conditional text syntax:
@@ -415,7 +415,7 @@ class MacroParser(object):
         """Arguments:
         
           globals -- dictionary of variables used by default inclusion and
-            evaliation methods.
+            evaluation methods.
           evaluate -- None for the default evaluation method or a function of
             one argument (the conditionalal expression as a string) returning a
             boolean result of custom expression evaluation.
