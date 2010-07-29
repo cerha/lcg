@@ -1422,7 +1422,8 @@ class PDFExporter(FileExporter, Exporter):
             if isinstance(exported, (tuple, list,)):
                 exported = self.concat(*exported)
             exported_structure.append(exported)
-        exported_content = self.concat(*exported_structure)
+            exported_structure.append(make_element(PageBreak))
+        exported_content = self.concat(*exported_structure[:-1])
         document = exported_content.export(context)
         if len(document) == 1 and isinstance(document[0], basestring):
             document = [reportlab.platypus.Paragraph(document[0], pdf_context.style())]
