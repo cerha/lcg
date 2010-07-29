@@ -1194,7 +1194,7 @@ class Table(Element):
         if self.compact:
             table_style_data.append(('LEFTPADDING', (0, 0), (-1, -1), 0,))
             table_style_data.append(('RIGHTPADDING', (0, 0), (-1, -1), 0,))
-        if presentation.boxed:
+        if presentation is not None and presentation.boxed:
             table_style_data.append(('BOX', (0, 0), (-1, -1), 1, black))
         # Create the table instance
         repeat_rows = 0
