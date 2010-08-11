@@ -146,9 +146,10 @@ class MarkupFormatter(object):
             return exporter.escape('$' + subst)
         result = context.node().globals()
         for name in text.split('.'):
-            try:
-                result = result[str(name)]
-            except KeyError:
+            key = str(name)
+            if result.has_key(key):
+                result = result[key]
+            else:
                 return exporter.escape('$' + subst)
         if isinstance(result, Content):
             result = result.export(context)
