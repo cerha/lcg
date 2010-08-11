@@ -150,7 +150,9 @@ class MarkupFormatter(object):
                 result = result[str(name)]
             except KeyError:
                 return exporter.escape('$' + subst)
-        if not isinstance(result, Content):
+        if isinstance(result, Content):
+            result = result.export(context)
+        else:
             if not isinstance(result, Localizable):
                 result = str(result)
             result = exporter.escape(result)
