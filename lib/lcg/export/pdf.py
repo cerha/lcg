@@ -1416,7 +1416,7 @@ class PDFExporter(FileExporter, Exporter):
             subcontext = self.context(node, lang)
             subcontext.pdf_context = pdf_context
             title = node.title()
-            if title:
+            if title.strip():
                 exported_title = make_element(Heading, content=[make_element(Text, content=title)],
                                               level=0)
                 exported_structure.append(exported_title)
