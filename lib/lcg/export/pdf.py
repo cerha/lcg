@@ -110,7 +110,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 if top:
                     y = self.height + self.bottomMargin - height
                 else:
-                    y = height - self.bottomMargin
+                    y = height
                 flowable.drawOn(canvas, x, y)
             header = first_page_header
             if page > 1 or header is None:
