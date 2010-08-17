@@ -1411,6 +1411,8 @@ class PDFExporter(FileExporter, Exporter):
 	exported_structure = []
         lang = context.lang()
         for node in context.node().linear():
+            if node.id()[:7] == '__dummy':
+                continue
             subcontext = self.context(node, lang)
             subcontext.pdf_context = pdf_context
             title = node.title()
@@ -1423,6 +1425,8 @@ class PDFExporter(FileExporter, Exporter):
                 exported = self.concat(*exported)
             exported_structure.append(exported)
             exported_structure.append(make_element(PageBreak))
+        if not exported_structure:
+            return ''
         exported_content = self.concat(*exported_structure[:-1])
         document = exported_content.export(context)
         if len(document) == 1 and isinstance(document[0], basestring):
