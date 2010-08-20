@@ -48,9 +48,15 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         reportlab.platypus.BaseDocTemplate.__init__(self, *args, **kwargs)
         self._toc_sequencer = reportlab.lib.sequencer.Sequencer()
 
-    def handle_pageBegin(self):
-        self._handle_pageBegin()
-        self._handle_nextPageTemplate('Later')
+    def handle_pageEnd(self):
+        if self._new_lcg_context is None:
+            next_template = 'Later'
+        else:
+            next_template = 'First'
+            self._lcg_context = self._new_lcg_context
+            self._new_lcg_context = None
+        self._handle_nextPageTemplate(next_template)
+        reportlab.platypus.BaseDocTemplate.handle_pageEnd(self)
         
     def afterFlowable(self, flowable):
         reportlab.platypus.BaseDocTemplate.afterFlowable(self, flowable)
@@ -68,10 +74,12 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
     def build(self, flowables, *args, **kwargs):
         context = self._lcg_context
         pdf_context = context.pdf_context
-        first_page_header = pdf_context.first_page_header
-        page_header = pdf_context.page_header
-        page_footer = pdf_context.page_footer
+        first_page_header = pdf_context.first_page_header()
+        page_header = pdf_context.page_header()
+        page_footer = pdf_context.page_footer()
         def make_flowable(content):
+            context = self._lcg_context
+            pdf_context = context.pdf_context
             style = pdf_context.normal_style()
             flowable = content.export(context)
             if isinstance(flowable, Element):
@@ -101,8 +109,8 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 bottom_margin = bottom_margin + footer_height
             return bottom_margin, height
         def on_page(canvas, doc):
-            page = doc.page
-            pdf_context.page = page
+            pdf_context = self._lcg_context.pdf_context
+            page = pdf_context.page
             canvas.saveState()
             def add_flowable(content, top):
                 flowable, width, height = make_flowable(content)
@@ -119,6 +127,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 add_flowable(header, True)
             if page_footer is not None:
                 add_flowable(page_footer, False)
+            pdf_context.page = page + 1
             canvas.restoreState()
         self._calc()
         Frame = reportlab.platypus.frames.Frame
@@ -168,16 +177,13 @@ class Context(object):
     _nesting_level = 0
     _list_nesting_level = 0
     _counter = 0
-    page = 0
-    total_pages = None
-    total_pages_requested = False
+    page = 1
     heading_level = 1
     toc_present = False
-    relative_font_size = 1
     default_font_size = 12
 
-    def __init__(self, *args, **kwargs):
-        super(Context, self).__init__(*args, **kwargs)
+    def __init__(self, parent_context=None, total_pages=None, first_page_header=None,
+                 page_header=None, page_footer=None):
         self._init_fonts()
         self._styles = reportlab.lib.styles.getSampleStyleSheet()        
         self._normal_style = copy.copy(self._styles['Normal'])
@@ -189,6 +195,18 @@ class Context(object):
         self._code_style.fontSize = self.default_font_size
         self._anchors = {}
         self._presentations = []
+        self._total_pages = total_pages
+        self._total_pages_requested = False
+        self._parent_context = parent_context
+        if parent_context is None:
+            self._first_page_header = first_page_header
+            self._page_header = page_header
+            self._page_footer = page_footer
+        else:
+            self._first_page_header = parent_context.first_page_header()
+            self._page_header = parent_context.page_header()
+            self._page_footer = parent_context.page_footer()
+        self._relative_font_size = 1
 
     def _init_fonts(self):
         self._fonts = {}
@@ -271,14 +289,14 @@ class Context(object):
         """Return standard paragraph style.
         """
         style = copy.copy(self._normal_style)
-        style.fontSize *= self.relative_font_size
+        style.fontSize *= self.relative_font_size()
         return style
 
     def code_style(self):
         """Return paragraph style for verbatim texts.
         """
         style = copy.copy(self._code_style)
-        style.fontSize *= self.relative_font_size
+        style.fontSize *= self.relative_font_size()
         return style
 
     def heading_style(self, level):
@@ -295,7 +313,7 @@ class Context(object):
             level = 3
         style = copy.copy(self._styles['Heading%d' % (level,)])
         style.fontName='FreeSerif'
-        style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size
+        style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
         return style
 
     def list_style(self, order=None):
@@ -313,7 +331,7 @@ class Context(object):
             style_name = 'Bullet'
         style = copy.copy(self._styles[style_name])
         style.fontName='FreeSerif'
-        style.fontSize = self.default_font_size * self.relative_font_size
+        style.fontSize = self.default_font_size * self.relative_font_size()
         return style
 
     def style(self, style=None):
@@ -344,7 +362,7 @@ class Context(object):
             if presentation.italic is not None:
                 italic = presentation.italic
             style.fontName = self.font(family, bold, italic)
-        style.fontSize *= self.relative_font_size
+        style.fontSize *= self.relative_font_size()
         return style
 
     def get_seqid(self):
@@ -370,6 +388,8 @@ class Context(object):
         """
         if not self._anchors.has_key(name):
             self._anchors[name] = False
+        if self._parent_context:
+            self._parent_context.register_anchor_reference(name)
 
     def clear_anchor_reference(self, name):
         """Mark anchor reference as valid.
@@ -382,6 +402,8 @@ class Context(object):
           
         """
         self._anchors[name] = True
+        if self._parent_context:
+            self._parent_context.clear_anchor_reference(name)            
 
     def invalid_anchor_references(self):
         """Return sequence of names of invalid anchor references.
@@ -451,6 +473,43 @@ class Context(object):
         """Remove the current presentation from the presentation list."""
         self._presentations.pop()
 
+    def total_pages_requested(self):
+        """Return whether it is necessary to know the total page number in this context."""
+        return self._total_pages_requested
+
+    def total_pages(self):
+        """Return total number of pages of the given context.
+
+        If the number is unknown, return 'None'.
+
+        """
+        self._total_pages_requested = True
+        if self._parent_context is not None:
+            self._parent_context.total_pages()
+        return self._total_pages
+
+    def first_page_header(self):
+        """Return first page header markup."""
+        return self._first_page_header
+
+    def page_header(self):
+        """Return page header markup."""
+        return self._page_header
+
+    def page_footer(self):
+        """Return page footer markup."""
+        return self._page_footer
+
+    def relative_font_size(self):
+        """Return global font size coefficient."""
+        coefficient = self._relative_font_size
+        if self._parent_context is not None:
+            coefficient = coefficient * self._parent_context.relative_font_size()
+        return coefficient
+
+    def set_relative_font_size(self, coefficient):
+        """Make default font size of this context to 'coefficient'."""
+        self._relative_font_size = coefficient
 
 def _ok_export_result(result):
     if not isinstance(result, (tuple, list,)) or not result:
@@ -749,6 +808,26 @@ class PageBreak(Element):
     def export(self, context):
         return reportlab.platypus.PageBreak()
 
+class NewDocument(PageBreak):
+    """Element with no real content marking end of a new document in series.
+
+    This mark serves for transfering contexts to ReportLab formatting.  The
+    content is LCG 'Content' instance to be transferred to the given place.
+    
+    """
+    def init(self):
+        super(NewDocument, self).init()
+        assert isinstance(self.content, Exporter.Context), ('type error', self.content,)
+        assert isinstance(self.first, bool), ('type error', self.first)
+    def export(self, context):
+        context = self.content
+        def set_context(flowable, aW, aH, context=context):
+            flowable.canv._doctemplate._new_lcg_context = context
+        exported = [reportlab.platypus.flowables.CallerMacro(wrapCallable=set_context)]
+        if not self.first:
+            exported.append(reportlab.platypus.PageBreak())
+        return exported
+
 class HorizontalRule(Element):
     """Horizontal rule, similar to HTML <hr>.
 
@@ -783,11 +862,10 @@ class PageNumber(Text):
         pdf_context = context.pdf_context
         text = str(pdf_context.page)
         if self.total:
-            total = pdf_context.total_pages
+            total = pdf_context.total_pages()
             if total is None:
-                pdf_context.total_pages_requested = True
-            else:
-                text = '%s/%s' % (text, total,)
+                total = '?'
+            text = '%s/%s' % (text, total,)
         self.content = text
         Text.init(self)
         return Text.export(self, context)
@@ -808,7 +886,7 @@ class Space(Element):
         width = self._unit2points(self.width, style)
         height = self._unit2points(self.height, style)
         return RLSpacer(width, height)
-
+        
 class Container(Element):
     """Sequence of (almost) any objects.
 
@@ -1405,16 +1483,40 @@ class PDFExporter(FileExporter, Exporter):
 
     # Classic exports
         
-    def export(self, context, total_pages=None):
-        context.pdf_context = pdf_context = Context()
-        pdf_context.total_pages = total_pages
+    def export(self, context, old_contexts=None):
+        first_pass = (old_contexts is None)
+        if old_contexts is None:
+            old_contexts = {}
+        old = old_contexts.get(None)
+        total_pages = None
+        if old is not None:
+            total_pages = old.page
+        node = context.node()
+        context.pdf_context = old_contexts[None] = pdf_context = \
+                              Context(total_pages=total_pages,
+                                      first_page_header=node.first_page_header(),
+                                      page_header=node.page_header(),
+                                      page_footer=node.page_footer())
 	exported_structure = []
         lang = context.lang()
         for node in context.node().linear():
-            if node.id()[:7] == '__dummy':
+            node_id = node.id()
+            if node_id[:7] == '__dummy':
                 continue
             subcontext = self.context(node, lang)
-            subcontext.pdf_context = pdf_context
+            old = old_contexts.get(node_id)
+            total_pages = None
+            if old is not None:
+                total_pages = old.page
+            subcontext.pdf_context = old_contexts[node_id] = pdf_subcontext = \
+                                     Context(parent_context=pdf_context, total_pages=total_pages)
+            # The subcontext serves twice: 1. when exporting node content;
+            # 2. when exporting to ReportLab.  The question is how to transfer
+            # the subcontext to the proper place in ReportLab formatting.  This
+            # is not very easy and there may be some limitations.  We use a
+            # special element that starts a new subdocument.
+            new_document = make_element(NewDocument, content=subcontext, first=(not exported_structure))
+            exported_structure.append(new_document)
             title = node.title()
             if title.strip():
                 exported_title = make_element(Heading, content=[make_element(Text, content=title)],
@@ -1424,10 +1526,9 @@ class PDFExporter(FileExporter, Exporter):
             if isinstance(exported, (tuple, list,)):
                 exported = self.concat(*exported)
             exported_structure.append(exported)
-            exported_structure.append(make_element(PageBreak))
         if not exported_structure:
             return ''
-        exported_content = self.concat(*exported_structure[:-1])
+        exported_content = self.concat(*exported_structure)
         document = exported_content.export(context)
         if len(document) == 1 and isinstance(document[0], basestring):
             document = [reportlab.platypus.Paragraph(document[0], pdf_context.style())]
@@ -1449,26 +1550,23 @@ class PDFExporter(FileExporter, Exporter):
         doc = DocTemplate(output, pagesize=page_size,
                           leftMargin=margin, rightMargin=margin,
                           topMargin=margin, bottomMargin=margin)
-        pdf_context.first_page_header=node.first_page_header()
-        pdf_context.page_header=node.page_header()
-        pdf_context.page_footer=node.page_footer()
         while True:
             try:
                 doc.multi_build(document, context=context)
             except reportlab.platypus.doctemplate.LayoutError, e:
                 if str(e).find('too large') >= 0:
-                    pdf_context.relative_font_size /= 1.2
-                    if pdf_context.relative_font_size < 0.1:
+                    pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
+                    if pdf_context.relative_font_size() < 0.1:
                         log("Page content extremely large, giving up")
                         raise Exception("Content too large", e)
                     log("Page content too large, reducing it by %s" %
-                        (pdf_context.relative_font_size,))
+                        (pdf_context.relative_font_size(),))
                 else:
                     raise
             else:
                 break
-        if total_pages is None and pdf_context.total_pages_requested:
-            return self.export(context, total_pages=pdf_context.page)
+        if first_pass and pdf_context.total_pages_requested():
+            return self.export(context, old_contexts=old_contexts)
         return output.getvalue()
     
     def export_element(self, context, element_type, element):
