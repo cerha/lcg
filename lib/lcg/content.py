@@ -364,8 +364,30 @@ class InlineVideo(Content):
         return context.exporter().export_inline_video(context, self._video, title=self._title,
                                                       descr=self._descr, image=self._image,
                                                       size=self._size)
+
+
+class EmbeddedVideo(Content):
+    """Embedded video from services such as YouTube or Vimeo
+
+    For example in HTML, this might be exported as an embedded YouTube video player.
     
-    
+    """
+    def __init__(self, video_id, service, size=None):
+        """Arguments:
+
+          video_id -- id of the video as a string
+          size -- video size in pixels as a tuple of two integers (WIDTH, HEIGHT)
+        """
+        self._video_id = video_id
+        self._service = service
+        self._size = size
+        super(EmbeddedVideo, self).__init__()
+
+    def export(self, context):
+        return context.exporter().export_embedded_video(context, self._video_id,
+                                                        service=self._service, size=self._size)
+
+
 class Container(Content):
     """Container of multiple parts, each of which is a 'Content' instance.
 

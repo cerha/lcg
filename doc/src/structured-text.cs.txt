@@ -233,6 +233,42 @@ Výsledné obrázky:
 
 Více podrobností viz [#images].
 
+=== Zvuk a hudba ===
+
+Podobně jako obrázky lze do dokumentu vkládat i soubory formátu .mp3
+
+V HTML výstupu se pak jakýkoliv link na mp3 soubor zobrazí jako
+tlačítko Přehrát ovládající malý flashový přehrávač médií v pravém
+dolním rohu stránky.
+
+Například:
+-----
+ * Přehrávací tlačítko s volitelným popiskem: [test1.mp3 Přehraj zkoušku]
+-----
+
+=== Video ===
+
+=== Vkládané video z YouTube a Vimeo ===
+
+Odkaz na video na stránkách YouTube nebo Vimeo se v HTML výstupu
+zobrazí jako vložený flashový přehrávač s příslušným videem.
+
+Pokud je link uveden v hranatých závorkách, může být následován
+dvojtečkou a zadáním velikosti videa, podobně jako u obrázků.
+
+Příklad níže do stránky vloží 4 různé vložené přehrávače:
+-----
+Video YouTube o velikosti 800x500:
+[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:800x500]
+
+Video YouTube jako link nebo jako URI:
+[http://www.youtube.com/watch?v=qLNZH5as2Xs]
+http://www.youtube.com/watch?v=zmzOGNSQKtU
+
+Odkazy na Vimeo fungují obdobně:
+[http://www.vimeo.com/8719387]
+-----
+
 
 == Obecná doporučení ==
 

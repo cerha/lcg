@@ -245,6 +245,31 @@ bottom right corner of the webpage.
  * play button with optional button label: [test1.mp3 Play test sound]
 -----
 
+=== Video ===
+
+=== Embedded Video from YouTube or Vimeo ===
+
+A link to video on a YouTube or Vimeo website will in HTML output be
+rendered as an embedded Flash video player with the corresponding
+video.
+
+If the link is specified in square brackets, it's possible
+to follow it with colon and size specifications for the video,
+in the same way as for images.
+
+The bellow example will render 4 different embedded video players:
+-----
+Youtube video with specified size 800x500:
+[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:800x500]
+
+Youtube video as a link and as URI:
+[http://www.youtube.com/watch?v=qLNZH5as2Xs]
+http://www.youtube.com/watch?v=zmzOGNSQKtU
+
+Vimeo links work in the same way:
+[http://www.vimeo.com/8719387]
+-----
+
 == General recommendations ==
 
   * Get familiar with the available constructs and always use those, which

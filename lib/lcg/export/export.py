@@ -541,13 +541,22 @@ class MarkupFormatter(object):
         elif isinstance(target, Video):
             result = InlineVideo(target, title=label, descr=descr, image=label_image, size=size)
         else:
-            if label_image:
-                name = os.path.splitext(os.path.basename(label_img))[0]
-                label = InlineImage(label_image, title=label, name=name,
+            youtube_match = re.match(r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)", href)
+            vimeo_match = re.match(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)", href)
+            if youtube_match:
+                video_id = youtube_match.group("video_id")
+                result = EmbeddedVideo(video_id, service="youtube", size=size)
+            elif vimeo_match:
+                video_id = vimeo_match.group("video_id")
+                result = EmbeddedVideo(video_id, service="vimeo", size=size)
+            else:                
+                if label_image:
+                    name = os.path.splitext(os.path.basename(label_img))[0]
+                    label = InlineImage(label_image, title=label, name=name,
                                     align=self._IMAGE_ALIGN_MAPPING.get(align))
                 #if isinstance(target, Link.ExternalTarget):
                 #    target = Link.ExternalTarget(href, label or href)
-            result = Link(target, label=label, descr=descr)
+                result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
         return result.export(context)
 
@@ -846,7 +855,23 @@ class Exporter(object):
 
         """
         return self.escape(title or video.title() or video.filename())
+ 
+    def export_embedded_video(self, context, video_id, service,size=None):
+        """Export embedded video player for given 'Video' resource instance.
 
+        Arguments:
+
+          context -- current exporter context as 'Exporter.Context' instance
+          service -- which service to use (e.g. 'youtube', 'vimeo')
+          video_id -- id of the video in the corresponding service as a string
+          size -- video size in pixels as a sequence of two integers (WIDTH, HEIGHT)
+
+        In this class the method returns the video identification. Derived classes
+        implement a more appropriate behavior relevant for given output media.
+
+        """
+        return self.escape(title or "Embedded Video %s id=%s" % (service, str(id)))
+ 
 
 class FileExporter(object):
     """Mix-in class exporting content into files.

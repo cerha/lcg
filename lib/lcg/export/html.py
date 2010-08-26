@@ -213,6 +213,16 @@ class HtmlGenerator(Generator):
     def map(self, content, **kwargs):
         return self._tag('map', content, ('name', 'title'), _newlines=True, **kwargs)
 
+    def object(self, content, **kwargs):
+        return self._tag('object', content, (
+                'align', 'archive', 'border', 'classid', 'codebase', 'codetype',
+                'data', 'declare', 'height', 'hspace', 'name', 'standby', 'type',
+                'usemap', 'vspace', 'width', 'dir', 'title'), 
+                         _newlines=True, **kwargs)
+
+    def param(self, **kwargs):
+        return self._tag('param', '', ('name', 'value', 'valuetype', 'type'), **kwargs)
+
     # Form controls
      
     def form(self, content, action="#", **kwargs):
@@ -654,10 +664,7 @@ class HtmlExporter(Exporter):
         
         """
         g = context.generator()
-        if size is None:
-            width, height = (200, 200)
-        else:
-            width, height = size
+        width, height = size or (200, 200)
         uri = context.uri(video)
         title = title or video.title()
         descr = descr or video.descr()
@@ -668,7 +675,30 @@ class HtmlExporter(Exporter):
                                                   image=(image and context.uri(image))),
                                         alternative_content=link)
         return g.div(player or link, cls='video-player')
+
+    def export_embedded_video(self, context, video_id, service, size=None):
+        """Export emedded video player for services such as YouTube or Vimeo.
         
+        Arguments are described in parent class method.
+        
+        """
+        g = context.generator()
+        width, height = size or (500,300)
+
+        if service == 'youtube':
+            # rel=0 means do not load related videos
+            video_uri="http://www.youtube.com/v/%s?rel=0" % str(video_id)
+        elif service == 'vimeo':
+            video_uri="http://vimeo.com/moogaloop.swf?clip_id=%s&server=vimeo.com" % str(video_id)
+        else:
+            Exception("Unsupported video service %s" % service)
+        return g.object(
+            (g.param(name="movie", value=video_uri),
+             g.param(name="wmode", value="opaque")),
+            type="application/x-shockwave-flash",
+            title=_("Flash movie object"),
+            data=video_uri, width=width, height=height)
+
     def _initialize(self, context):
         return ''
 
