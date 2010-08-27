@@ -797,7 +797,7 @@ class Paragraph(Element):
         current_presentation = pdf_context.current_presentation()
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
-        if self.noindent:
+        if self.noindent or (current_presentation and current_presentation.noindent):
             style.firstLineIndent = 0
         if current_presentation and current_presentation.left_indent:
             style.leftIndent += self._unit2points(current_presentation.left_indent, style)
