@@ -202,19 +202,24 @@ class Context(object):
         self._relative_font_size = 1
 
     def _init_styles(self):
-        self._styles = reportlab.lib.styles.getSampleStyleSheet()        
+        self._styles = reportlab.lib.styles.getSampleStyleSheet()
+        # Normal
         self._normal_style = copy.copy(self._styles['Normal'])
         self._normal_style.fontName = 'FreeSerif'
         self._normal_style.fontSize = self.default_font_size
         self._normal_style.firstLineIndent = 10
+        # Code
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
         self._code_style.fontSize = self.default_font_size
+        # Ordered
         ordered_style = copy.copy(self._normal_style)
         ordered_style.name = 'Ordered'
-        ordered_style.spaceBefore = 5
+        ordered_style.spaceBefore = self.default_font_size / 2
         ordered_style.firstLineIndent = 0
         self._styles.add(ordered_style)
+        # Bullet
+        self._styles['Bullet'].space_before = self.default_font_size / 3
 
     def _init_fonts(self):
         self._fonts = {}
