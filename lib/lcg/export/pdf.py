@@ -258,7 +258,18 @@ class Context(object):
             reportlab.platypus.tableofcontents.levelFourParaStyle.fontName = default_font
         except AttributeError:
             pass
-            
+
+    def _font_family(self, presentation_family):
+        if presentation_family == 'PROPORTIONAL':
+            family = 'Serif'
+        elif presentation_family == 'SANS_SERIF':
+            family = 'Sans'
+        elif presentation_family == 'FIXED_WIDTH':
+            family = 'Mono'
+        else:
+            raise Exception('Unknown font family', presentation_family)
+        return family
+
     def font(self, family, bold, italic):
         """Return full font name for given arguments.
 
@@ -337,7 +348,11 @@ class Context(object):
         elif level > 3:
             level = 3
         style = copy.copy(self._styles['Heading%d' % (level,)])
-        style.fontName='FreeSerif'
+        presentation = self.current_presentation()
+        if presentation and presentation.heading_font_family:
+            style.fontName = 'Free' + self._font_family(presentation.heading_font_family)
+        else:
+            style.fontName = 'FreeSerif'
         style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
         style.leading = style.fontSize * 1.2
         return style
@@ -374,15 +389,9 @@ class Context(object):
                 style.fontSize = style.fontSize * presentation.font_size
                 style.leading = style.fontSize * 1.2
             family, bold, italic = self.font_parameters(style.fontName)
-            if presentation.font_family is not None and style.name != 'Code':
-                if presentation.font_family == 'PROPORTIONAL':
-                    family = 'Serif'
-                elif presentation.font_family == 'SANS_SERIF':
-                    family = 'Sans'
-                elif presentation.font_family == 'FIXED_WIDTH':
-                    family = 'Mono'
-                else:
-                    raise Exception('Unknown font family', presentation.font_family)
+            if (presentation.font_family is not None and
+                style.name != 'Code' and style.name[:7] != 'Heading'):
+                family = self._font_family(presentation.font_family)
             if presentation.bold is not None:
                 bold = presentation.bold
             if presentation.italic is not None:

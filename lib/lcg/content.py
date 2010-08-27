@@ -59,6 +59,8 @@ class Presentation(object):
     "Font size relative to the current font size (1.0 is the same size), float."
     font_family = None
     "Font family to be used for typesetting text, one of 'FontFamily' constants."
+    heading_font_family = None
+    "Font family to be used for typesetting headings, one of 'FontFamily' constants."
     noindent = None
     "If true, don't indent first lines of paragraphs."
     bold = None
