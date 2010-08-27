@@ -185,14 +185,7 @@ class Context(object):
     def __init__(self, parent_context=None, total_pages=None, first_page_header=None,
                  page_header=None, page_footer=None):
         self._init_fonts()
-        self._styles = reportlab.lib.styles.getSampleStyleSheet()        
-        self._normal_style = copy.copy(self._styles['Normal'])
-        self._normal_style.fontName = 'FreeSerif'
-        self._normal_style.fontSize = self.default_font_size
-        self._normal_style.firstLineIndent = 10
-        self._code_style = copy.copy(self._styles['Code'])
-        self._code_style.fontName='FreeMono'
-        self._code_style.fontSize = self.default_font_size
+        self._init_styles()
         self._anchors = {}
         self._presentations = []
         self._total_pages = total_pages
@@ -207,6 +200,21 @@ class Context(object):
             self._page_header = parent_context.page_header()
             self._page_footer = parent_context.page_footer()
         self._relative_font_size = 1
+
+    def _init_styles(self):
+        self._styles = reportlab.lib.styles.getSampleStyleSheet()        
+        self._normal_style = copy.copy(self._styles['Normal'])
+        self._normal_style.fontName = 'FreeSerif'
+        self._normal_style.fontSize = self.default_font_size
+        self._normal_style.firstLineIndent = 10
+        self._code_style = copy.copy(self._styles['Code'])
+        self._code_style.fontName='FreeMono'
+        self._code_style.fontSize = self.default_font_size
+        ordered_style = copy.copy(self._normal_style)
+        ordered_style.name = 'Ordered'
+        ordered_style.spaceBefore = 5
+        ordered_style.firstLineIndent = 0
+        self._styles.add(ordered_style)
 
     def _init_fonts(self):
         self._fonts = {}
@@ -326,7 +334,7 @@ class Context(object):
 
         """
         if order:
-            style_name = 'Normal'
+            style_name = 'Ordered'
         else:
             style_name = 'Bullet'
         style = copy.copy(self._styles[style_name])
