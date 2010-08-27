@@ -1717,7 +1717,7 @@ class PDFExporter(FileExporter, Exporter):
                 title = make_element(Paragraph, content=[title], presentation=presentation)
             if isinstance(description, Text):
                 presentation = Presentation()
-                presentation.left_indent = UMm(10)
+                presentation.left_indent = UFont(2*1.2)
                 description = make_element(Paragraph, content=[description],
                                            presentation=presentation, noindent=True)
             return make_element(Container, content=[title, description])
