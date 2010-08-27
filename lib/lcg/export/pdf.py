@@ -185,11 +185,13 @@ class Context(object):
     bullet_indent = 0
 
     def __init__(self, parent_context=None, total_pages=None, first_page_header=None,
-                 page_header=None, page_footer=None):
+                 page_header=None, page_footer=None, presentation=None):
         self._init_fonts()
         self._init_styles()
         self._anchors = {}
         self._presentations = []
+        if presentation is not None:
+            self._presentations.append(presentation)
         self._total_pages = total_pages
         self._total_pages_requested = False
         self._parent_context = parent_context
@@ -1497,7 +1499,7 @@ class PDFExporter(FileExporter, Exporter):
 
     # Classic exports
         
-    def export(self, context, old_contexts=None):
+    def export(self, context, old_contexts=None, presentation=None):
         first_pass = (old_contexts is None)
         if old_contexts is None:
             old_contexts = {}
@@ -1510,7 +1512,8 @@ class PDFExporter(FileExporter, Exporter):
                               Context(total_pages=total_pages,
                                       first_page_header=node.first_page_header(),
                                       page_header=node.page_header(),
-                                      page_footer=node.page_footer())
+                                      page_footer=node.page_footer(),
+                                      presentation=context.presentation())
 	exported_structure = []
         lang = context.lang()
         for node in context.node().linear():

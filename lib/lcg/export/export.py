@@ -328,8 +328,9 @@ class Exporter(object):
             self._translator = exporter.translator(lang)
             self._init_kwargs(**kwargs)
 
-        def _init_kwargs(self, sec_lang=None):
+        def _init_kwargs(self, sec_lang=None, presentation=None):
             self._sec_lang = sec_lang
+            self._presentation = presentation
             
         def exporter(self):
             return self._exporter
@@ -348,6 +349,9 @@ class Exporter(object):
             
         def locale_data(self):
             return self._translator.locale_data()
+
+        def presentation(self):
+            return self._presentation
 
         def translate(self, text):
             return self._translator.translate(text)
