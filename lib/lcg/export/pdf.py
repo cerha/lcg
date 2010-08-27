@@ -208,6 +208,8 @@ class Context(object):
         self._normal_style.fontName = 'FreeSerif'
         self._normal_style.fontSize = self.default_font_size
         self._normal_style.firstLineIndent = 10
+        self._normal_style.bulletFontName = self._normal_style.fontName
+        self._normal_style.bulletFontSize = self._normal_style.fontSize
         # Code
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
