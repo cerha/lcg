@@ -154,6 +154,7 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
             style = copy.copy(self.levelStyles[i])
             style.fontName = 'FreeSerif'
             style.fontSize *= Context.default_font_size / 10.0
+            style.leading = style.fontSize * 1.2
             self.levelStyles[i] = style
 
 class RLSpacer(reportlab.platypus.flowables.Spacer):
@@ -214,10 +215,12 @@ class Context(object):
         self._normal_style.firstLineIndent = 10
         self._normal_style.bulletFontName = self._normal_style.fontName
         self._normal_style.bulletFontSize = self._normal_style.fontSize
+        self._normal_style.leading = self._normal_style.fontSize * 1.2
         # Code
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
         self._code_style.fontSize = self.default_font_size
+        self._code_style.leading = self._code_style.fontSize * 1.2
         # Bullet
         self._styles['Bullet'].space_before = self.default_font_size / 2
 
@@ -303,6 +306,7 @@ class Context(object):
         """
         style = copy.copy(self._normal_style)
         style.fontSize *= self.relative_font_size()
+        style.leading = style.fontSize * 1.2
         return style
 
     def code_style(self):
@@ -310,6 +314,7 @@ class Context(object):
         """
         style = copy.copy(self._code_style)
         style.fontSize *= self.relative_font_size()
+        style.leading = style.fontSize * 1.2
         return style
 
     def heading_style(self, level):
@@ -327,6 +332,7 @@ class Context(object):
         style = copy.copy(self._styles['Heading%d' % (level,)])
         style.fontName='FreeSerif'
         style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
+        style.leading = style.fontSize * 1.2
         return style
 
     def list_style(self, order=None):
@@ -342,6 +348,7 @@ class Context(object):
         style.fontName='FreeSerif'
         style.fontSize = self.default_font_size * self.relative_font_size()
         style.bulletFontSize = style.fontSize
+        style.leading = style.fontSize * 1.2
         style.space_before = self.default_font_size / 2
         return style
 
@@ -358,6 +365,7 @@ class Context(object):
         if presentation is not None:
             if presentation.font_size is not None:
                 style.fontSize = style.fontSize * presentation.font_size
+                style.leading = style.fontSize * 1.2
             family, bold, italic = self.font_parameters(style.fontName)
             if presentation.font_family is not None:
                 if presentation.font_family == 'PROPORTIONAL':
@@ -374,6 +382,7 @@ class Context(object):
                 italic = presentation.italic
             style.fontName = self.font(family, bold, italic)
         style.fontSize *= self.relative_font_size()
+        style.leading = style.fontSize * 1.2
         style.leftIndent = self.left_indent
         style.bulletIndent = self.bullet_indent
         return style
