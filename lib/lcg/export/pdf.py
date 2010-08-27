@@ -808,6 +808,8 @@ class Paragraph(Element):
         style = pdf_context.style(style=template_style)
         if self.noindent or (current_presentation and current_presentation.noindent):
             style.firstLineIndent = 0
+        if (current_presentation and current_presentation.noindent and style.name[:7] != 'Heading'):
+            style.spaceBefore = style.fontSize * 1.2
         if current_presentation and current_presentation.left_indent:
             style.leftIndent += self._unit2points(current_presentation.left_indent, style)
         exported = ''
