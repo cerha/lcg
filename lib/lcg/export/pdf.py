@@ -181,6 +181,8 @@ class Context(object):
     heading_level = 1
     toc_present = False
     default_font_size = 12
+    left_indent = 0
+    bullet_indent = 0
 
     def __init__(self, parent_context=None, total_pages=None, first_page_header=None,
                  page_header=None, page_footer=None):
@@ -370,6 +372,8 @@ class Context(object):
                 italic = presentation.italic
             style.fontName = self.font(family, bold, italic)
         style.fontSize *= self.relative_font_size()
+        style.leftIndent = self.left_indent
+        style.bulletIndent = self.bullet_indent
         return style
 
     def get_seqid(self):
@@ -771,13 +775,10 @@ class Paragraph(Element):
         current_presentation = pdf_context.current_presentation()
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
-        style.leftIndent = pdf_context.nesting_level() * 1.5 * style.fontSize
         if self.noindent:
             style.firstLineIndent = 0
         if current_presentation and current_presentation.left_indent:
             style.leftIndent += self._unit2points(current_presentation.left_indent, style)
-        # Hack, should be handled better, preferrably in List only:
-        style.bulletIndent = max(pdf_context.list_nesting_level() - 1, 0) * 1.5 * style.fontSize
         exported = ''
         for c in self.content:
             exported += c.export(context)
@@ -1011,11 +1012,15 @@ class List(Element):
         self.content = list(self.content)
     def export(self, context):
         pdf_context = context.pdf_context
-        style = pdf_context.list_style(self.order)
+        style = pdf_context.style(pdf_context.list_style(self.order))
         list_nesting_level = pdf_context.list_nesting_level()
         font_size = style.fontSize
-        style.bulletIndent = list_nesting_level * 1.5 * font_size
-        style.leftIndent = style.bulletIndent + 1.5 * font_size
+        style.bulletIndent = (list_nesting_level + 1) * 1.5 * font_size
+        if self.order:
+            after_bullet = 1.5
+        else:
+            after_bullet = 1
+        style.leftIndent = style.bulletIndent + after_bullet * font_size
         if self.order:
             seqid = pdf_context.get_seqid()
             seq_string = make_element(SimpleMarkup, content='seq', attributes=dict(id='list%d'%(seqid,)))
@@ -1030,6 +1035,8 @@ class List(Element):
         next_pdf_context = copy.copy(pdf_context)
         next_pdf_context.inc_nesting_level()
         next_pdf_context.inc_list_nesting_level()
+        next_pdf_context.left_indent = style.leftIndent
+        next_pdf_context.bullet_indent = style.bulletIndent
         next_context = copy.copy(context)
         next_context.pdf_context = next_pdf_context
         def make_item(item):
