@@ -149,11 +149,18 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
 
 class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
     def __init__(self, *args, **kwargs):
+        if kwargs.has_key('presentation'):
+            presentation = kwargs['presentation']
+            del kwargs['presentation']
+        else:
+            presentation = None
         reportlab.platypus.tableofcontents.TableOfContents.__init__(self, *args, **kwargs)
         for i in range(len(self.levelStyles)):
             style = copy.copy(self.levelStyles[i])
             style.fontName = 'FreeSerif'
             style.fontSize *= Context.default_font_size / 10.0
+            if presentation is not None:
+                style.fontSize *= (presentation.font_size or 1)
             style.leading = style.fontSize * 1.2
             self.levelStyles[i] = style
 
@@ -346,7 +353,7 @@ class Context(object):
         """
         style = copy.copy(self._styles['Bullet'])
         style.fontName='FreeSerif'
-        style.fontSize = self.default_font_size * self.relative_font_size()
+        style.fontSize = self.default_font_size
         style.bulletFontSize = style.fontSize
         style.leading = style.fontSize * 1.2
         style.space_before = self.default_font_size / 2
@@ -384,6 +391,7 @@ class Context(object):
         style.fontSize *= self.relative_font_size()
         style.leading = style.fontSize * 1.2
         style.leftIndent = self.left_indent
+        style.bulletFontSize = style.fontSize
         style.bulletIndent = self.bullet_indent
         return style
 
@@ -754,7 +762,8 @@ class PreformattedText(Element):
         super(PreformattedText, self).init()
         assert isinstance(self.content, basestring), ('type error', self.content,)
     def export(self, context):
-        style = context.pdf_context.code_style()
+        pdf_context = context.pdf_context
+        style = pdf_context.style(pdf_context.code_style())
         space = reportlab.platypus.Spacer(0, self._unit2points(UFont(0.5), style))
         result = [space, reportlab.platypus.Preformatted(self.content, style), space]
         return result
@@ -864,7 +873,7 @@ class TableOfContents(Element):
     
     """
     def export(self, context):
-        return RLTableOfContents()
+        return RLTableOfContents(presentation=context.presentation())
 
 class PageNumber(Text):
     """Page number.
