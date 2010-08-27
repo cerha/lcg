@@ -219,10 +219,10 @@ class Context(object):
         self._normal_style = copy.copy(self._styles['Normal'])
         self._normal_style.fontName = 'FreeSerif'
         self._normal_style.fontSize = self.default_font_size
-        self._normal_style.firstLineIndent = 10
         self._normal_style.bulletFontName = self._normal_style.fontName
         self._normal_style.bulletFontSize = self._normal_style.fontSize
         self._normal_style.leading = self._normal_style.fontSize * 1.2
+        self._normal_style.firstLineIndent = self._normal_style.leading
         # Code
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
@@ -393,6 +393,8 @@ class Context(object):
         style.leftIndent = self.left_indent
         style.bulletFontSize = style.fontSize
         style.bulletIndent = self.bullet_indent
+        if style.firstLineIndent != 0:
+            style.firstLineIndent = style.leading
         return style
 
     def get_seqid(self):
