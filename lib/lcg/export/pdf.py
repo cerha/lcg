@@ -214,14 +214,8 @@ class Context(object):
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName='FreeMono'
         self._code_style.fontSize = self.default_font_size
-        # Ordered
-        ordered_style = copy.copy(self._normal_style)
-        ordered_style.name = 'Ordered'
-        ordered_style.spaceBefore = self.default_font_size / 2
-        ordered_style.firstLineIndent = 0
-        self._styles.add(ordered_style)
         # Bullet
-        self._styles['Bullet'].space_before = self.default_font_size / 3
+        self._styles['Bullet'].space_before = self.default_font_size / 2
 
     def _init_fonts(self):
         self._fonts = {}
@@ -340,13 +334,11 @@ class Context(object):
             describing ordering style ('numeric', 'lower-alpha', 'upper-alpha').
 
         """
-        if order:
-            style_name = 'Ordered'
-        else:
-            style_name = 'Bullet'
-        style = copy.copy(self._styles[style_name])
+        style = copy.copy(self._styles['Bullet'])
         style.fontName='FreeSerif'
         style.fontSize = self.default_font_size * self.relative_font_size()
+        style.bulletFontSize = style.fontSize
+        style.space_before = self.default_font_size / 2
         return style
 
     def style(self, style=None):
