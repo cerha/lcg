@@ -225,7 +225,7 @@ class Context(object):
         self._normal_style.firstLineIndent = self._normal_style.leading
         # Code
         self._code_style = copy.copy(self._styles['Code'])
-        self._code_style.fontName='FreeMono'
+        self._code_style.fontName = 'FreeMono'
         self._code_style.fontSize = self.default_font_size
         self._code_style.leading = self._code_style.fontSize * 1.2
         # Bullet
@@ -374,7 +374,7 @@ class Context(object):
                 style.fontSize = style.fontSize * presentation.font_size
                 style.leading = style.fontSize * 1.2
             family, bold, italic = self.font_parameters(style.fontName)
-            if presentation.font_family is not None:
+            if presentation.font_family is not None and style.name != 'Code':
                 if presentation.font_family == 'PROPORTIONAL':
                     family = 'Serif'
                 elif presentation.font_family == 'SANS_SERIF':
