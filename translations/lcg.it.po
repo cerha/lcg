@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-03 13:14+0100\n"
+"POT-Creation-Date: 2010-08-27 11:34+0200\n"
 "PO-Revision-Date: 2009-11-30 23:40+0100\n"
 "Last-Translator: kkkk <kkkkkkkkkkk>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -345,13 +345,13 @@ msgstr ""
 msgid "Dec"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:414
+#: ../lib/lcg/export/html.py:418
 msgid "Choose your language:"
 msgstr "Scegli la lingua:"
 
 #. Translators: Title of the link to Adobe website used in
 #. the Flash warning.
-#: ../lib/lcg/export/html.py:559
+#: ../lib/lcg/export/html.py:568
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plugin"
 
@@ -359,7 +359,7 @@ msgstr "Adobe Flash plugin"
 #. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
 #. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
 #. version number.
-#: ../lib/lcg/export/html.py:555
+#: ../lib/lcg/export/html.py:564
 #, fuzzy, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr ""
@@ -367,43 +367,47 @@ msgstr ""
 "versione piú recente per usufruire delle più avanzate capacità di "
 "riproduzione dei media."
 
-#: ../lib/lcg/export/html.py:561
+#: ../lib/lcg/export/html.py:570
 #, fuzzy
 msgid "Use a JavaScript enabled browser."
 msgstr ""
 "JavaScript non rivelato. Utilizza il browser con il sostegno di JavaScript "
 "se vuoi usufruire delle più avanzate capacità di riproduzione dei media."
 
-#: ../lib/lcg/export/html.py:562 ../lib/lcg/export/html.py:563
+#: ../lib/lcg/export/html.py:571 ../lib/lcg/export/html.py:572
 msgid "Warning:"
 msgstr "Avvertenza:"
 
-#: ../lib/lcg/export/html.py:594
+#: ../lib/lcg/export/html.py:603
 msgid "Media Player unavailable."
+msgstr ""
+
+#: ../lib/lcg/export/html.py:699
+msgid "Flash movie object"
 msgstr ""
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:812
+#: ../lib/lcg/export/html.py:845
 msgid "None"
 msgstr "Nessuna"
 
-#: ../lib/lcg/export/html.py:813
+#: ../lib/lcg/export/html.py:846
 msgid "You are here:"
 msgstr "Ti trovi qui:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:817
+#: ../lib/lcg/export/html.py:850
 msgid "Next"
 msgstr "Avanti"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:819
+#: ../lib/lcg/export/html.py:852
 msgid "Previous"
 msgstr "Indietro"
 
 #. Translators: Title of the local table of contents (links to subsections).
-#: ../lib/lcg/content.py:582
+#: ../lib/lcg/content.py:639
 msgid "Index:"
 msgstr "Indice:"
 
