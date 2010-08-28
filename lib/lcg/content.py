@@ -145,6 +145,10 @@ class Content(object):
         however, can override this method to return the sequence of contained
         subsections.
 
+        The argument 'context' ('lcg.Exporter.Context' instance) must be passed
+        because the returned value may depend in on the current export context
+        (for example 'ContentVariants' depends on current export language).
+
         """
         return ()
         
@@ -879,11 +883,15 @@ class Section(SectionContainer):
       * Every section has a title, which appears in the output document as a
         heading.
 
-      * Link targets are attached to sections.
+      * Link targets (anchors) are attached to sections.  You may define the
+        anchor name explicitly or it is assigned automatically.  The
+        automatically assigned link targets are based on section order and
+        hierarchy, so they will not change across several LCG invocations as
+        long as the hierarchy remains unchanged.
 
       * Sections are numbered.  Each section knows its number within its
         container.
-    
+
     """
     _ANCHOR_PREFIX = 'sec'
     
@@ -920,7 +928,14 @@ class Section(SectionContainer):
         return self.__class__
     
     def path(self):
-        """Return the sequence of all containers above this one in the hierarchy."""
+        """Return the sequence of parent sections in the container hierarchy.
+
+        The returned value is a list of 'Section' instances, which are above
+        this section in the hieararchy.  The document's top level section
+        appears as the first and 'self' is always the last element of
+        the list.
+
+        """
         return [c for c in self._container_path() if isinstance(c, Section)]
     
     def section_number(self):
