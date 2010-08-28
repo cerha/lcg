@@ -95,7 +95,7 @@ class ContentNode(object):
         assert page_footer is None or isinstance(page_footer, Content), page_footer
         self._page_footer = page_footer
         if isinstance(content, (tuple, list)):
-            content = SectionContainer(content)
+            content = Container(content)
         assert isinstance(content, Content), content
         content.set_parent(self)
         self._content = content

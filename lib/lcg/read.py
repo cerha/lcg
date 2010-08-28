@@ -242,7 +242,7 @@ class StructuredTextReader(FileReader):
         s = sections[0]
         title = s.title()
         sections = s.content()
-        return title, SectionContainer(sections, toc_depth=0)
+        return title, Container(sections)
 
     def _title(self):
         # This method is called first, so we read the document here and store the content for later

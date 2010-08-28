@@ -452,10 +452,9 @@ class Export(unittest.TestCase):
                    lcg.Image('bb.jpg'),
                    lcg.Image('cc.png', title="Image C", descr="Nice picture"))
         p = lcg.ResourceProvider(resources=resources)
-        content = lcg.SectionContainer((lcg.Section("Section One", anchor='sec1',
-                                                    content=lcg.Content()),))
+        sec = lcg.Section("Section One", anchor='sec1', content=lcg.Content())
     	n = lcg.ContentNode('test', title='Test Node', descr="Some description",
-                            content=content, resource_provider=p)
+                            content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
         for text, html in (
             # Links

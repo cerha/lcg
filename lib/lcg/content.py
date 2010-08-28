@@ -669,6 +669,15 @@ class Container(Content):
                            presentation=self._presentation)
         return result
             
+    def sections(self, context):
+        result = []
+        for c in self._content:
+            if isinstance(c, Section):
+                result.append(c)
+            elif isinstance(c, Container):
+                result.extend(c.sections(context))
+        return result
+    
     def name(self):
         """Return the value of 'name' as passed to the constructor."""
         return self._name
@@ -689,6 +698,8 @@ class Container(Content):
         """Return the value of 'presentation' as passed to the constructor."""
         return self._presentation
 
+SectionContainer = Container
+"""Deprecated: Use 'Container' instead."""
     
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
@@ -820,64 +831,11 @@ class Table(Container):
         """Return the value of 'column_widths' as passed to the constructor."""
         return self._column_widths
         
-
-class SectionContainer(Container):
-    """A 'Container' which recognizes contained sections.
-
-    'SectionContainer' acts as a 'Container', but for any contained 'Section'
-    instances, a local 'TableOfContents' can be created automatically,
-    preceding the actual content (depending on the 'toc_depth' constructor
-    argument).  The contained sections are also returned by the 'sections()'
-    method to allow building a global `TableOfContents'.
-
-    """
-    def __init__(self, content, toc_depth=None, **kwargs):
-        """Arguments:
-
-          content -- same as in the parent class
-          toc_depth -- the depth of local table of contents; see 'depth' argument
-            of 'TableOfContents' constructor
-
-        """
-        self._toc_depth = toc_depth
-        super(SectionContainer, self).__init__(content, **kwargs)
-
-    def _export_element_type(self):
-        return Container
-
-    def sections(self, context):
-        """Return the list of contained elements which are 'Section' instances."""
-        result = []
-        for c in self._content:
-            if isinstance(c, Section):
-                result.append(c)
-            elif isinstance(c, SectionContainer): 
-                result.extend(c.sections(context))
-        return result
-            
-    def content(self):
-        content = super(SectionContainer, self).content()
-        toc_sections = []
-        for c in content:
-            if isinstance(c, TableOfContents) and not toc_sections:
-                return content
-            if isinstance(c, Section) and c.in_toc():
-                toc_sections.append(c)
-        if (self._toc_depth is None or self._toc_depth > 0) and \
-               (len(toc_sections) > 1 or len(toc_sections) == 1 and 
-                len([s for s in toc_sections[0].sections(context) if s.in_toc()])):
-            # Translators: Title of the local table of contents (links to subsections).
-            toc = TableOfContents(self, _("Index:"), depth=self._toc_depth)
-            toc.set_container(self)
-            toc.set_parent(self.parent())
-            content = [toc] + list(content)
-        return content
     
-    
-class Section(SectionContainer):
+class Section(Container):
     """Section wraps the subordinary contents into an inline section.
 
-    Section is very similar to a 'SectionContainer', but there are a few
+    Section is very similar to a 'Container', but there are a few
     differences:
 
       * Every section has a title, which appears in the output document as a
@@ -895,8 +853,7 @@ class Section(SectionContainer):
     """
     _ANCHOR_PREFIX = 'sec'
     
-    def __init__(self, title, content, anchor=None, toc_depth=0,
-                 in_toc=True, **kwargs):
+    def __init__(self, title, content, anchor=None, in_toc=True, **kwargs):
         """Arguments:
 
           title -- section title as a string
@@ -909,8 +866,6 @@ class Section(SectionContainer):
             not rely on the default anchor name, so that's how you can define
             your own.  This also allows you to find a section by its anchor
             name in the hierarchy (see 'ContentNode.find_section()').
-          toc_depth -- the depth of the local Table of Contents (see
-            'SectionContainer')
           in_toc -- a boolean flag indicating whether this section is supposed
             to be included in the Table of Contents
             
@@ -922,7 +877,7 @@ class Section(SectionContainer):
         self._in_toc = in_toc
         self._anchor = anchor
         self._backref = None
-        super(Section, self).__init__(content, toc_depth=toc_depth, **kwargs)
+        super(Section, self).__init__(content, **kwargs)
 
     def _export_element_type(self):
         return self.__class__
@@ -932,8 +887,7 @@ class Section(SectionContainer):
 
         The returned value is a list of 'Section' instances, which are above
         this section in the hieararchy.  The document's top level section
-        appears as the first and 'self' is always the last element of
-        the list.
+        appears as the first and 'self' is always the last element of the list.
 
         """
         return [c for c in self._container_path() if isinstance(c, Section)]
@@ -1047,7 +1001,7 @@ class TableOfContents(Content):
         if not item:
             # Create a local table of contens automatically (taking this elements container as a
             # start point).
-            assert isinstance(self._container, SectionContainer)
+            assert isinstance(self._container, Container)
             item = self._container
         return item
 
@@ -1268,7 +1222,7 @@ class ContentVariants(Container):
         self._variants = {}
         for lang, content in variants:
             if isinstance(content, (list, tuple)): 
-                content = SectionContainer(content)
+                content = Container(content)
             self._variants[lang] = content
         super(ContentVariants, self).__init__(self._variants.values())
 
@@ -1312,9 +1266,7 @@ def coerce(content, formatted=False):
         items = []
         for item in content:
             if item is not None:
-                if isinstance(item, Section):
-                    container = SectionContainer
-                elif not isinstance(item, Content):
+                if not isinstance(item, Content):
                     item = coerce(item, formatted=formatted)
                 items.append(item)
         return container(items)
