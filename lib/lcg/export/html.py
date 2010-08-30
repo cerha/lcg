@@ -228,7 +228,9 @@ class HtmlGenerator(Generator):
                          _newlines=True, **kwargs)
 
     def param(self, **kwargs):
-        return self._tag('param', '', ('name', 'value', 'valuetype', 'type'), **kwargs)
+        return self._tag('param', _attr=('name', 'value', 'valuetype', 'type'),
+                         _paired=False, **kwargs)
+ 
 
     # Form controls
      
