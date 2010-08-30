@@ -232,43 +232,21 @@ Resulting images:
 
 See [#images] and [#image-links] for more details.
 
-=== Audio ===
 
-Audio .mp3 files can be included in the document in a similar way to
-images.
+=== Audio and Video ===
 
-In HTML output, the link to mp3 file will be rendered as a play button
-controlling a tiny shared Flash media player, which appears in the
-bottom right corner of the webpage.
+Similarly as images, also audio files in MP3 format, videos in FLV format and
+links to YouTube and Vimeo services are automatically recognized.
 
------
- * play button with optional button label: [test1.mp3 Play test sound]
------
+Links to audio recordings will appear as ordinary links in HTML, but these
+links will act as a remote control of the audio player displayed at the bottom
+right corner of the browser window.  Full keyboard accessibility is also
+implemented.  See [#audio] for more information.
 
-=== Video ===
+Links to videos in FLV format are represented by an embedded multimedia player.
+Also links to Youtube and Vimeo videos are detected and an embedded player is
+displayed automatically.  See [#video] for more information.
 
-=== Embedded Video from YouTube or Vimeo ===
-
-A link to video on a YouTube or Vimeo website will in HTML output be
-rendered as an embedded Flash video player with the corresponding
-video.
-
-If the link is specified in square brackets, it's possible
-to follow it with colon and size specifications for the video,
-in the same way as for images.
-
-The bellow example will render 4 different embedded video players:
------
-Youtube video with specified size 800x500:
-[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:800x500]
-
-Youtube video as a link and as URI:
-[http://www.youtube.com/watch?v=qLNZH5as2Xs]
-http://www.youtube.com/watch?v=zmzOGNSQKtU
-
-Vimeo links work in the same way:
-[http://www.vimeo.com/8719387]
------
 
 == General recommendations ==
 
@@ -758,6 +736,14 @@ image automatically has the `class' attribute set according to the name of the
 image without file type extension.  For example the image
 `\http://www.google.com/images/logo_sm.gif' will have class `logo_sm'.
 
+The image size may be specified explicitly using a colon and width x height in
+pixels at the end of the image filename:
+
+------
+[http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg:27x24]
+------
+
+[http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg:27x24]
 
 ==== Image links ==== image-links
 
@@ -780,6 +766,118 @@ OSI logo | Open Source Initiative]
 Image links can be aligned using < and > similarly as ordinary images and
 styled (see above).
 
+
+==== Audio ==== audio
+
+Links to audio recordings in MP3 format will appear as ordinary links in HTML,
+but these links will act as a remote control of the audio player displayed at
+the bottom right corner of the browser window.  Single player is used for all
+recordings present on the page, so only one recording will be played at a time.
+
+Full keyboard accessibility is also implemented.  The following keyboard
+commands are available when the audio file link has keyboard focus:
+ * Space — Start/stop playback
+ * Arrow left — Fast forward
+ * Arrow right — Rewind
+ * Arrow up — Increase volume
+ * Arrow down — Decrease volume
+
+Since the technical requirements (see below) can not be easily enforced for
+distribution of this documentation, the examples don't include a player demo,
+but a simple link like this should work:
+
+-----
+If you are interested, [recording.mp3 listen to the recording].
+-----
+
+If it doesn't, check the requirements below.
+
+/Note:/ The player is currently not used for external links.  Only local files
+will work.
+
+
+===== Technical requirements ===== player-requirements
+
+/User side requirements:/ A JavaScript enabled browser with Adobe Flash support is
+required on the user side to use the embedded media player.  If not, the link
+will simply download the file.
+
+/Server side requirements:/ LCG must be configured properly to be able to embed
+the media player.  This means JW Media Player and SWF Object must be available
+in the resource path.  LCG will complain to the error output with more details.
+
+
+==== Video ==== video
+
+Video can be embedded into the webpage either locally as a file
+in the FLV format or as a link to the YouTube or Vimeo services.
+In either case, the user is presented with an embedded player,
+in which it is possible to directly play the video.
+
+/Note:/ The same [#player-requirements technical requirements] as for audio
+embedding apply here.
+
+===== Local FLV video files =====
+
+Links to video files in FLV format will be automatically represented by an
+embedded multimedia player.  Most video formats can be converted to
+FLV — find out more about
+[http://en.kioskea.net/faq/447-how-to-convert-a-video-clip-in-flv-format-and-vice-versa
+FLV conversion tools].
+
+It is possible to control the size of the player in the same way as the size of
+images (colon and width x height after the filename).
+
+If an image is used in place of link label, this image will be used as the
+video preview (the player will display the image until the user starts
+playback).
+
+/Note:/ Embedding currently doesn't work for external links.  Only local videos
+may be embedded this way, but see below how to embed videos from public video
+services, such as YouTube.
+
+Since the technical requirements can not be easily enforced for distribution of
+this documentation, the examples don't include a player demo.  The following
+example should work, however, when the requirements are fulfilled:
+
+-----
+[video.flv:400x300 preview.jpg]
+-----
+
+
+===== Embedded Video from YouTube or Vimeo =====
+
+A link to a video on YouTube or Vimeo will be in HTML rendered as an embedded
+video player.  Thus you don't need to use any special code to embed these
+videos.  Just the URI is enough.
+
+-----
+http://www.youtube.com/watch?v=aKULi72yUko
+-----
+
+http://www.youtube.com/watch?v=aKULi72yUko
+
+If the link is specified in square brackets, it is also possible to specify the
+explicit video size in the same way as for images (colon and width x height
+after the filename).
+
+-----
+Youtube video with specified size 400x250:
+
+[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
+
+Vimeo links work in the same way:
+
+[http://www.vimeo.com/8719387]
+-----
+
+Youtube video with specified size 400x250:
+
+[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
+
+Vimeo links work in the same way:
+
+[http://www.vimeo.com/8719387]
 
 
 === Other features ===

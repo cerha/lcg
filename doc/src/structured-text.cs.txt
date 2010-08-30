@@ -233,41 +233,25 @@ Výsledné obrázky:
 
 Více podrobností viz [#images].
 
-=== Zvuk a hudba ===
+=== Audio a Video ===
 
-Podobně jako obrázky lze do dokumentu vkládat i soubory formátu .mp3
+Podobně jako obrázky, budou rozpoznány také vložené audio soubory ve formátu
+MP3, video soubory ve formátu FLV a odkazy na videa ze služeb YouTube a Vimeo.
 
-V HTML výstupu se pak jakýkoliv link na mp3 soubor zobrazí jako
-tlačítko Přehrát ovládající malý flashový přehrávač médií v pravém
-dolním rohu stránky.
+Odkazy na zvukové nahrávky budou v mít HTML výstupu podobu běžného odkazu, ale
+tento odkaz bude fungovat jako ovládací prvek přehrávače, který se zobrazí v
+pravém dolním rohu okna prohlížeče.  Podporováno je i plně zpřístupněné
+ovládání z klávesnice.  Více viz [#audio].
 
-Například:
 -----
- * Přehrávací tlačítko s volitelným popiskem: [test1.mp3 Přehraj zkoušku]
+http://www.youtube.com/watch?v=aKULi72yUko
 -----
 
-=== Video ===
+http://www.youtube.com/watch?v=aKULi72yUko
 
-=== Vkládané video z YouTube a Vimeo ===
-
-Odkaz na video na stránkách YouTube nebo Vimeo se v HTML výstupu
-zobrazí jako vložený flashový přehrávač s příslušným videem.
-
-Pokud je link uveden v hranatých závorkách, může být následován
-dvojtečkou a zadáním velikosti videa, podobně jako u obrázků.
-
-Příklad níže do stránky vloží 4 různé vložené přehrávače:
------
-Video YouTube o velikosti 800x500:
-[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:800x500]
-
-Video YouTube jako link nebo jako URI:
-[http://www.youtube.com/watch?v=qLNZH5as2Xs]
-http://www.youtube.com/watch?v=zmzOGNSQKtU
-
-Odkazy na Vimeo fungují obdobně:
-[http://www.vimeo.com/8719387]
------
+Odkazy na video ve formátu FLV budou zobrazeny vloženým multimediálním
+přehrávačem. Stejně tak je vložený přehrávač automaticky zobrazen
+i u odkazů na služby YouTube a Vimeo. Více viz [#video].
 
 
 == Obecná doporučení ==
@@ -348,7 +332,7 @@ Počet rovnítek určuje úroveň kapitoly v rámci hierarchie.
  Toto je druhá kapitola stejné úrovně jako první kapitola.
 ----- 
 
-Je /důležité/, aby mezi nadpisem a rovnítky byla z každé strany jena mezera,
+Je /důležité/, aby mezi nadpisem a rovnítky byla z každé strany jedna mezera,
 jinak nebude nadpis správně rozpoznán.
 
 
@@ -395,8 +379,8 @@ možné použít také makro =@NodeIndex@=, které vytvoří rejstřík
 dokumnetů v rámci jejich struktury (tam, kde je LCG použito ke zpracování
 celých struktur dokumentů)
 
-Výchzí podoba rejstříku je hierarchická.  Můžete však také obezit hloubku této
-hierarchie.  Toho dosáhnete udáním celého čísla v kulatách závorkách, jako v
+Výchozí podoba rejstříku je hierarchická.  Můžete však také obezit hloubku této
+hierarchie.  Toho dosáhnete udáním celého čísla v kulatých závorkách, jako v
 následujícím příkladu:
 
 -----
@@ -446,7 +430,7 @@ jsou označeny pořadovým číslem, nebo písmenem.
  * Obecná pravidla:
    1. Každá položka je odsazena nejméně jednou mezerou.
    2. Delší text položky může byt rozdělen na více řádků, pokud je zachováno
-      patříčné odsazení.
+      patřičné odsazení.
    3. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
       odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
       tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
@@ -461,7 +445,7 @@ jsou označeny pořadovým číslem, nebo písmenem.
       vzestupně.  Tím vám odpadá starost o udržování správných hodnot čísel při
       úpravách dokumentu.  Pokud však chcete, nic vám nebrání používat skutečná
       pořadová čísla.
-   0. Namísto čísel mužete použít také písmena pro abecedně řazené seznamy.
+   0. Namísto čísel můžete použít také písmena pro abecedně řazené seznamy.
  * Míchání různých typů seznamů:
    a) Existují v zásadě tři druhy seznamů:
       (1) neuspořádané (odrážkové)
@@ -479,7 +463,7 @@ Toto bude zobrazeno jako:
  * Obecná pravidla:
    1. Každá položka je odsazena nejméně jednou mezerou.
    2. Delší text položky může byt rozdělen na více řádků, pokud je zachováno
-      patříčné odsazení.
+      patřičné odsazení.
    3. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
       odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
       tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
@@ -494,7 +478,7 @@ Toto bude zobrazeno jako:
       vzestupně.  Tím vám odpadá starost o udržování správných hodnot čísel při
       úpravách dokumentu.  Pokud však chcete, nic vám nebrání používat skutečná
       pořadová čísla.
-   0. Namísto čísel mužete použít také písmena pro abecedně řazené seznamy.
+   0. Namísto čísel můžete použít také písmena pro abecedně řazené seznamy.
  * Míchání různých typů seznamů:
    a) Existují v zásadě tři druhy seznamů:
       (1) neuspořádané (odrážkové)
@@ -538,7 +522,7 @@ LCG (Learning Content Generator)
   použití v on-line nebo off-line výukovém prostředí.
 
 Wiking
-  Wiking je systém správy obsahu s vysokým stupňem zpřístupnění, který je
+  Wiking je systém správy obsahu s vysokým stupněm zpřístupnění, který je
   postaven nad databázovým toolkitem Pytis a LCG.
 
 
@@ -546,7 +530,7 @@ Wiking
 
 Sledy položek mohou být obecně použity pro zápis datových dvojic, kde první
 položka každé dvojice je název a druhá položka je odpovídající hodnota.
-Název je z obou stran obklopen dojtečkami.  Hodnoty mohou být víceřádkové,
+Název je z obou stran obklopen dvojtečkami.  Hodnoty mohou být víceřádkové,
 pokud jsou správně odsazeny.
 
 *Příklad:*
@@ -601,7 +585,7 @@ Všechny příklady v tomto návodu jsou zapsány jako předformátovaný text.
 
 Můžete vytvářet také jednoduché pravidelné tabulky se shodným počtem buněk v
 každém řádku.  Každý řádek tabulky je jeden řádek vstupního textu.  K oddělení
-buňek je používán znak svislé čáry „|“.  Tento znak také označuje začátek a
+buněk je používán znak svislé čáry „|“.  Tento znak také označuje začátek a
 konec řádku tabulky.
 
 
@@ -620,7 +604,7 @@ konec řádku tabulky.
 /Záhlaví sloupců/ je rozpoznáno automaticky, pokud celý první řádek obsahuje
 pouze buňky tučným písmem, nebo prázdné buňky, jako ve výše uvedeném příkladu.
 
-/Zarovnání buňek/ je také detekováno — pokud je odsazení (počet mezer a
+/Zarovnání buněk/ je také detekováno — pokud je odsazení (počet mezer a
 tabelátorů) na levé straně větší než na pravé, je buňka zarovnána vpravo.
 
 
@@ -661,7 +645,7 @@ Název odkazu
   jako [#image-links obrázkový odkaz].
 
 Popis odkazu
-  Je také nepovinný, oddělený znakem roury „|“ or názvu odkazu.  Prezentace
+  Je také nepovinný, oddělený znakem roury „|“ od názvu odkazu.  Prezentace
   závisí na druhu výstupního média.  Např. v HTML je popis ve většině
   prohlížečů zobrazen jako bublinová nápověda (tooltip).
 
@@ -792,8 +776,122 @@ Obrázkové odkazy mohou být zarovnány vpravo či vlevo a používat styly pod
 jako běžné obrázky (viz výše).
 
 
-=== Další vlastnosti ===
+==== Audio ==== audio
 
+Odkaz na zvukový soubor ve formátu MP3 bude v HTML výstupu zobrazen jako běžný
+odkaz, ale tento odkaz bude fungovat jako ovládací prvek přehrávače, který se
+zobrazí v pravém dolním rohu okna prohlížeče.  Tento jediný přehrávač je
+používán pro přehrávání všech nahrávek přítomných ve stránce, takže v jednu
+chvíli bude přehrávána vždy jen jedna nahrávka.
+
+Podporováno je i plně zpřístupněné ovládání z klávesnice.  Následující
+klávesové příkazy jsou dostupné pokud je kurzor umístěn na odkazu:
+ * Mezerník — Spustit/pozastavit přehrávání
+ * Šipka vlevo — Převinout vpřed
+ * Šipka vpravo — Převinou zpět
+ * Šipka nahoru — Zvýšit hlasitost
+ * Šipka dolů — Ztišit
+
+Protože není možné zaručit dodržení technických požadavků (viz níže) při
+distribuci této dokumentace, ukázku neobsahují živou ukázku přehrávače, ale
+jednoduchý odkaz, jako je ten následující by měl fungovat,
+
+-----
+Pokud máte zájem, [recording.mp3 poslechněte si nahrávku].
+-----
+
+Pokud nefunguje, podívejte se do technických požadavků.
+
+/Poznámka:/ Přehrávač momentálně není používán pro externí odkazy.  Pouze
+lokální soubory budou fungovat jak je popsáno.
+
+
+===== Technické požadavky ===== player-requirements
+
+/Požadavky na straně klienta:/ Pro zobrazení vloženého přehrávače médií musí mít
+uživatel nainstalován webový prohlížeč s podporou JavaScriptu a AdobeFlash. Pokud
+tyto nejsou k dispozici, zobrazí se pouze link pro stažení souboru.
+
+/Požadavky na straně serveru:/ LCG musí být pro správnou funkci vloženého
+přehrávače správně zkonfigurováno. To znamená, že mezi zdroji (resource path)
+musí být dostupný flashový JW Media Player a javascriptová knihovna SWF Object.
+Pokud tyto nejsou k dispozici, poskytne LCG varování a více informací na
+svém chybovém výstupu.
+
+==== Video ==== video
+
+Video lze do LCG stránek vkládat buď lokálně jako soubor ve formátu
+FLV nebo jako odkaz na služby YouTube nebo Vimeo. V obou případech se
+při použití HTML výstupu uživateli ve výsledné stránce zobrazí vložený
+přehrávač, ve kterém je možné video přímo spustit.
+
+/Poznámka:/ I v tomto případě platí stejné [#player-requirements
+technické požadavky] jako pro vkládání audia.
+
+===== Lokální video soubory FLV =====
+
+Odkazy na videa ve formátu FLV budou automaticky reprezentovány vloženým
+multimediálním přehrávačem. Většinu formátů videa lze do FLV zkonvertovat,
+potřebné informace, jak to provést, můžete nalézt na stránce
+[http://en.kioskea.net/faq/447-how-to-convert-a-video-clip-in-flv-format-and-vice-versa
+nástroje na konverzi FLV].
+
+Velikost videopřehrávače můžete ovlivnit podobným způsobem jako velikost
+obrázků (za jménem dvojtečka a šířka x výška)
+
+Pokud je místo názvu linku uveden obrázek, bude tento obrázek použit
+jako náhled (dokud uživatel nespustí přehrávání, bude přehrávač zobrazovat
+tento obrázek).
+
+/Poznámka:/ Přehrávač momentálně není používán pro externí odkazy.
+Tak, jak je popsáno, budou fungovat pouze lokální soubory. Jak vkládat
+videa z veřejných služeb typu YouTube a Vimeo je popsáno níže.
+
+Protože při distribuci této dokumentace není možné zaručit dodržení
+technických požadavků (viz níže), následující příklad neobsahuje živou
+ukázku přehrávače. Při jejich dodržení by však měl fungovat:
+
+-----
+[video.flv:400x300 preview.jpg]
+-----
+
+
+===== Vkládání videa z YouTube a Vimeo =====
+
+Odkaz na video na stránkách YouTube nebo Vimeo se v HTML výstupu
+zobrazí jako vložený přehrávač. Není zapotřebí žádný speciální kód,
+postačuje uvést příslušné URI:
+
+-----
+http://www.youtube.com/watch?v=aKULi72yUko
+-----
+
+http://www.youtube.com/watch?v=aKULi72yUko
+
+Pokud je link uveden v hranatých závorkách, může být určena explicitní velikost
+videa, podobně jako u obrázků (dvojtečka a šířka x výška v pixelech za názvem
+souboru).
+
+-----
+Video YouTube o velikosti 400x250:
+
+[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
+
+Odkazy na Vimeo fungují obdobně:
+
+[http://www.vimeo.com/8719387]
+-----
+
+Video YouTube o velikosti 400x250:
+
+[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
+
+Odkazy na Vimeo fungují obdobně:
+
+[http://www.vimeo.com/8719387]
+
+
+=== Další vlastnosti ===
 
 ==== Potlačování speciálního významu zápisu ==== escape
 
