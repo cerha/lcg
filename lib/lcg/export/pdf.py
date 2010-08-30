@@ -820,7 +820,9 @@ class Paragraph(Element):
         current_presentation = pdf_context.current_presentation()
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
-        if self.noindent or (current_presentation and current_presentation.noindent):
+        if (self.noindent or
+            (current_presentation and current_presentation.noindent) or
+            pdf_context.last_element_category != 'paragraph'):
             style.firstLineIndent = 0
         if (current_presentation and current_presentation.noindent and style.name[:7] != 'Heading'):
             style.spaceBefore = style.fontSize * 1.2
