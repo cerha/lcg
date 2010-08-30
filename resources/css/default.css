@@ -7,9 +7,9 @@ html, body {
 h1 { font-size: 2.0em; }
 h2 { font-size: 1.8em; }
 h3 { font-size: 1.6em; }
-h4 { font-size: 1.4em; }
-h5 { font-size: 1.3em; }
-h6 { font-size: 1.2em; }
+h4 { font-size: 1.4em; margin-top: 0.2em; margin-bottom: 0.1em; }
+h5 { font-size: 1.3em; margin-top: 0.2em; margin-bottom: 0.1em; }
+h6 { font-size: 1.2em; margin-top: 0.2em; margin-bottom: 0.1em; }
 h7,h8,h9 { font-size: 1.1em; }
 
 a:link, a:visited { color: #04b; }
