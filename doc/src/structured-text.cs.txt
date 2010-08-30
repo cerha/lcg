@@ -243,12 +243,6 @@ tento odkaz bude fungovat jako ovládací prvek přehrávače, který se zobraz�
 pravém dolním rohu okna prohlížeče.  Podporováno je i plně zpřístupněné
 ovládání z klávesnice.  Více viz [#audio].
 
------
-http://www.youtube.com/watch?v=aKULi72yUko
------
-
-http://www.youtube.com/watch?v=aKULi72yUko
-
 Odkazy na video ve formátu FLV budou zobrazeny vloženým multimediálním
 přehrávačem. Stejně tak je vložený přehrávač automaticky zobrazen
 i u odkazů na služby YouTube a Vimeo. Více viz [#video].
@@ -808,9 +802,10 @@ lokální soubory budou fungovat jak je popsáno.
 
 ===== Technické požadavky ===== player-requirements
 
-/Požadavky na straně klienta:/ Pro zobrazení vloženého přehrávače médií musí mít
-uživatel nainstalován webový prohlížeč s podporou JavaScriptu a AdobeFlash. Pokud
-tyto nejsou k dispozici, zobrazí se pouze link pro stažení souboru.
+/Požadavky na straně klienta:/ Pro zobrazení vloženého přehrávače médií musí
+mít uživatel nainstalován webový prohlížeč s podporou JavaScriptu a Adobe
+Flash. Pokud tyto nejsou k dispozici, zobrazí se pouze link pro stažení
+souboru.
 
 /Požadavky na straně serveru:/ LCG musí být pro správnou funkci vloženého
 přehrávače správně zkonfigurováno. To znamená, že mezi zdroji (resource path)
@@ -824,9 +819,6 @@ Video lze do LCG stránek vkládat buď lokálně jako soubor ve formátu
 FLV nebo jako odkaz na služby YouTube nebo Vimeo. V obou případech se
 při použití HTML výstupu uživateli ve výsledné stránce zobrazí vložený
 přehrávač, ve kterém je možné video přímo spustit.
-
-/Poznámka:/ I v tomto případě platí stejné [#player-requirements
-technické požadavky] jako pro vkládání audia.
 
 ===== Lokální video soubory FLV =====
 
@@ -846,6 +838,9 @@ tento obrázek).
 /Poznámka:/ Přehrávač momentálně není používán pro externí odkazy.
 Tak, jak je popsáno, budou fungovat pouze lokální soubory. Jak vkládat
 videa z veřejných služeb typu YouTube a Vimeo je popsáno níže.
+
+/Poznámka:/ I v tomto případě platí stejné [#player-requirements technické
+požadavky] jako pro vkládání audia.
 
 Protože při distribuci této dokumentace není možné zaručit dodržení
 technických požadavků (viz níže), následující příklad neobsahuje živou
@@ -890,6 +885,10 @@ Odkazy na Vimeo fungují obdobně:
 
 [http://www.vimeo.com/8719387]
 
+/Poznámka:/ Tento způsob vkládání videa má výhodu v nulových technických
+požadavcích na straně serveru.  Požadavky pro přehrávání na straně klienta jsou
+však stejné jako pro jiné způsoby vkládání multimédií. (prohlížeč s podporou
+JavaScriptu a Adobe Flash).
 
 === Další vlastnosti ===
 

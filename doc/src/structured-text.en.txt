@@ -814,9 +814,6 @@ in the FLV format or as a link to the YouTube or Vimeo services.
 In either case, the user is presented with an embedded player,
 in which it is possible to directly play the video.
 
-/Note:/ The same [#player-requirements technical requirements] as for audio
-embedding apply here.
-
 ===== Local FLV video files =====
 
 Links to video files in FLV format will be automatically represented by an
@@ -835,6 +832,9 @@ playback).
 /Note:/ Embedding currently doesn't work for external links.  Only local videos
 may be embedded this way, but see below how to embed videos from public video
 services, such as YouTube.
+
+/Note:/ The same [#player-requirements technical requirements] as for audio
+embedding apply here.
 
 Since the technical requirements can not be easily enforced for distribution of
 this documentation, the examples don't include a player demo.  The following
@@ -878,6 +878,10 @@ Youtube video with specified size 400x250:
 Vimeo links work in the same way:
 
 [http://www.vimeo.com/8719387]
+
+/Note:/ This way of embedding has the advantage of no server side technical
+requirements.  Client side requirements are the same as for other types of
+multimedia embedding (JavaScript enabled browser with Adobe Flash support).
 
 
 === Other features ===
