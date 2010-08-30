@@ -102,6 +102,13 @@ class HtmlGenerator(Generator):
         return self._tag('sub', text, **kwargs)
     
     def p(self, *content, **kwargs):
+        if content[0].find('object') != -1:
+            # This is a nasty hack to suppress <p>...</p> around a video player.  In any case,
+            # wrapping a block-level element in another block level element is invalid HTML, so
+            # this should never be wrong to omit the paragraph.
+            if content and content[0].strip().startswith('<div') \
+                   and content[-1].strip().endswith('</div>'):
+                return concat(content, separator='\n')
         return self._tag('p', content, _newlines=True, **kwargs)
      
     def br(self, **kwargs):
