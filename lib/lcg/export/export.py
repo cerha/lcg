@@ -425,6 +425,9 @@ class MarkupFormatter(object):
 
     _BLANK_MATCHER = re.compile('\s+')
     _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
+    _VIMEO_VIDEO_MATCHER = re.compile(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
+    _YOUTUBE_VIDEO_MATCHER = re.compile(
+        r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)")
 
     def __init__(self):
         regexp = r"(?P<%s>\\*%s)"
@@ -541,8 +544,8 @@ class MarkupFormatter(object):
         elif isinstance(target, Video):
             result = InlineVideo(target, title=label, descr=descr, image=label_image, size=size)
         else:
-            youtube_match = re.match(r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)", href)
-            vimeo_match = re.match(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)", href)
+            youtube_match = self._YOUTUBE_VIDEO_MATCHER.match(href)
+            vimeo_match = self._VIMEO_VIDEO_MATCHER.match(href)
             if youtube_match:
                 video_id = youtube_match.group("video_id")
                 result = EmbeddedVideo(video_id, service="youtube", size=size)
