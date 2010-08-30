@@ -191,6 +191,7 @@ class Context(object):
     default_font_size = 12
     left_indent = 0
     bullet_indent = 0
+    last_element_category = None 
 
     def __init__(self, parent_context=None, total_pages=None, first_page_header=None,
                  page_header=None, page_footer=None, presentation=None):
@@ -583,7 +584,10 @@ class Element(object):
     instances of these classes.
     
     """
+    _CATEGORY = None
+    
     content = None
+    
     def init(self):
         """Initialize class.
 
@@ -592,14 +596,20 @@ class Element(object):
         
         """
         pass
-    def export(self, context):
+    def export(self, context, **kwargs):
         """Export this element and its contents into a reportlab document.
 
         Arguments:
 
           context -- LCG 'Context' instance
+          kwargs -- class specific arguments
           
         """
+        result = self._export(context, **kwargs)
+        if self._CATEGORY is not None:
+            context.pdf_context.last_element_category = self._CATEGORY
+        return result
+    def _export(self, context, **kwargs):
         raise Exception ('Not implemented')
     def prepend_text(self, text):
         """Prepend given 'text' to the front of the element contents.
@@ -636,6 +646,7 @@ class Text(Element):
     'Text' or one of its subclasses to store text into the document.
 
     """
+    _CATEGORY = 'text'
     _replacements = (('&', '&amp;',),
                      ('<', '&lt;',),
                      ('>', '&gt;',),
@@ -653,7 +664,7 @@ class Text(Element):
             # symbolic labels.
             if not isinstance(self.content, unicode):
                 self.content = unicode(self.content)
-    def export(self, context):
+    def _export(self, context):
         content = self.content
         if isinstance(content, basestring):
             result = context.translate(self.content)
@@ -680,6 +691,7 @@ class Empty(Text):
     content to provide.  'content' value is ignored.
     
     """
+    _CATEGORY = None
     def init(self):
         self.content = ''
 
@@ -697,8 +709,8 @@ class MarkedText(Text):
         super(MarkedText, self).init()
         assert isinstance(self.tag, str), ('type error', self.tag,)
         assert isinstance(self.attributes, dict)
-    def export(self, context):
-        exported = super(MarkedText, self).export(context)
+    def _export(self, context):
+        exported = super(MarkedText, self)._export(context)
         start_mark = self.tag
         presentation = context.pdf_context.current_presentation()
         for k, v in self.attributes.items():
@@ -723,7 +735,7 @@ class SimpleMarkup(Text):
     attributes = {}
     def init(self):
         assert isinstance(self.content, str), ('type error', self.content,)
-    def export(self, context):
+    def _export(self, context):
         mark = self.content
         for k, v in self.attributes.items():
             mark += ' %s="%s"' % (k, v,)
@@ -746,7 +758,7 @@ class TextContainer(Text):
         if __debug__:
             for c in content:
                 assert isinstance(c, Text), ('type error', c,)
-    def export(self, context):
+    def _export(self, context):
         result = u''
         for c in self.content:
             result += c.export(context)
@@ -769,10 +781,11 @@ class PreformattedText(Element):
     'content' is a unicode object to be printed.
     
     """
+    _CATEGORY = 'paragraph'
     def init(self):
         super(PreformattedText, self).init()
         assert isinstance(self.content, basestring), ('type error', self.content,)
-    def export(self, context):
+    def _export(self, context):
         pdf_context = context.pdf_context
         style = pdf_context.style(pdf_context.code_style())
         space = reportlab.platypus.Spacer(0, self._unit2points(UFont(0.5), style))
@@ -789,6 +802,7 @@ class Paragraph(Element):
     paragraphs is not allowed, paragraphs may only contain text elements.
 
     """
+    _CATEGORY = 'paragraph'
     _style = None
     noindent = False
     presentation = None
@@ -799,7 +813,7 @@ class Paragraph(Element):
             for c in self.content:
                 assert isinstance(c, Text), ('type error', c,)
         self.content = list(self.content)
-    def export(self, context, style=None):
+    def _export(self, context, style=None):
         pdf_context = context.pdf_context
         presentation = self.presentation
         pdf_context.add_presentation(presentation)
@@ -830,14 +844,15 @@ class Heading(Paragraph):
     property must be specified, as an int starting from 1 (the topmost level).
     
     """
+    _CATEGORY = 'heading'
     level = None
     def init(self):
         super(Heading, self).init()
         assert isinstance(self.level, int), ('type error', self.level,)
-    def export(self, context):
+    def _export(self, context):
         style = context.pdf_context.heading_style(self.level)
         maybe_break = reportlab.platypus.CondPageBreak(self._unit2points(UFont(5), style))
-        heading = super(Heading, self).export(context, style=style)
+        heading = super(Heading, self)._export(context, style=style)
         return [maybe_break, heading]
 
 class PageBreak(Element):
@@ -846,7 +861,8 @@ class PageBreak(Element):
     Its 'content' is ignored.
 
     """
-    def export(self, context):
+    _CATEGORY = 'break'
+    def _export(self, context):
         return reportlab.platypus.PageBreak()
 
 class NewDocument(PageBreak):
@@ -860,7 +876,7 @@ class NewDocument(PageBreak):
         super(NewDocument, self).init()
         assert isinstance(self.content, Exporter.Context), ('type error', self.content,)
         assert isinstance(self.first, bool), ('type error', self.first)
-    def export(self, context):
+    def _export(self, context):
         context = self.content
         def set_context(flowable, aW, aH, context=context):
             flowable.canv._doctemplate._new_lcg_context = context
@@ -875,7 +891,8 @@ class HorizontalRule(Element):
     Its 'content' is ignored.
 
     """
-    def export(self, context):
+    _CATEGORY = 'break'
+    def _export(self, context):
         return reportlab.platypus.flowables.HRFlowable(width='100%')
 
 class TableOfContents(Element):
@@ -885,7 +902,8 @@ class TableOfContents(Element):
     document more than once.
     
     """
-    def export(self, context):
+    _CATEGORY = 'paragraph'
+    def _export(self, context):
         return RLTableOfContents(presentation=context.presentation())
 
 class PageNumber(Text):
@@ -899,7 +917,7 @@ class PageNumber(Text):
     # several places.
     def init(self):
         pass
-    def export(self, context):
+    def _export(self, context):
         pdf_context = context.pdf_context
         text = str(pdf_context.page)
         if self.total:
@@ -909,7 +927,7 @@ class PageNumber(Text):
             text = '%s/%s' % (text, total,)
         self.content = text
         Text.init(self)
-        return Text.export(self, context)
+        return Text._export(self, context)
 
 class Space(Element):
     """Hard space.
@@ -920,9 +938,10 @@ class Space(Element):
       height -- height of the space, 'Unit'
 
     """
+    _CATEGORY = 'break'
     width = UMm(0)
     height = UMm(0)
-    def export(self, context):
+    def _export(self, context):
         style = context.pdf_context.style()
         width = self._unit2points(self.width, style)
         height = self._unit2points(self.height, style)
@@ -938,13 +957,14 @@ class Container(Element):
     restricted in future (not counting current implementation restrictions).
 
     """
+    _CATEGORY = None
     presentation = None
     vertical = False
     def init(self):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, Element), ('type error', c,)
-    def export(self, context, parent_presentation=None):
+    def _export(self, context, parent_presentation=None):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         presentation = pdf_context.current_presentation()
@@ -1038,12 +1058,13 @@ class List(Element):
     'upper-alpha') for ordered lists.
 
     """
+    _CATEGORY = 'block'
     order = False
     def init(self):
         super(List, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
         self.content = list(self.content)
-    def export(self, context):
+    def _export(self, context):
         pdf_context = context.pdf_context
         style = pdf_context.style(pdf_context.list_style(self.order))
         list_nesting_level = pdf_context.list_nesting_level()
@@ -1106,8 +1127,8 @@ class Link(Text):
         super(Link, self).init()
         assert isinstance(self.uri, basestring), ('type error', self.uri,)
         assert self.uri, ('empty URI', self.uri,)
-    def export(self, context):
-        exported_content = super(Link, self).export(context)
+    def _export(self, context):
+        exported_content = super(Link, self)._export(context)
         if self.uri[:5] == 'http:' or self.uri[0] == '#':
             result = u'<link href="%s">%s</link>' % (self.uri, exported_content,)
             if self.uri[0] == '#':
@@ -1129,8 +1150,8 @@ class LinkTarget(Text):
         super(LinkTarget, self).init()
         assert isinstance(self.name, basestring), ('type error', self.name,)
         assert self.name, ('empty target name', self.name,)
-    def export(self, context):
-        exported_text = super(LinkTarget, self).export(context)
+    def _export(self, context):
+        exported_text = super(LinkTarget, self)._export(context)
         context.pdf_context.clear_anchor_reference(self.name)
         result = u'<a name="%s"/>%s' % (self.name, exported_text,)
         return result
@@ -1142,11 +1163,12 @@ class Image(Element):
     the image in the form of base string.
     
     """
+    _CATEGORY = 'block'
     def init(self):
         super(Image, self).init()
         assert isinstance(self.image, resources.Image), ('type error', self.image,)
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
-    def export(self, context):
+    def _export(self, context):
         filename = self.image.filename()
         if filename:
             result = reportlab.platypus.flowables.Image(filename)
@@ -1187,6 +1209,7 @@ class Table(Element):
     Cells are 'TableCell' instances.
 
     """
+    _CATEGORY = 'block'
     presentation = None
     long = False
     column_widths = None
@@ -1200,7 +1223,7 @@ class Table(Element):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, (TableRow, HorizontalRule,)), ('type error', c,)
-    def export(self, context):
+    def _export(self, context):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         content = self.content
