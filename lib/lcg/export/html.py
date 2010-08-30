@@ -649,7 +649,7 @@ class HtmlExporter(Exporter):
         if shared:
             g = context.generator()
             uri = context.uri(audio)
-            link_id = '%x' % positive_id(audio)
+            link_id = 'audio-%x' % positive_id(audio)
             context.connect_shared_player(uri, link_id)
             if image:
                 label = g.img(context.uri(image), alt=title)
@@ -676,7 +676,7 @@ class HtmlExporter(Exporter):
         title = title or video.title()
         descr = descr or video.descr()
         link = g.link(title, uri, title=descr)
-        player = self.export_swf_object(context, 'mediaplayer.swf', '%x' % positive_id(video),
+        player = self.export_swf_object(context, 'mediaplayer.swf', 'video-%x' % positive_id(video),
                                         width, height, min_flash_version='9.0.115',
                                         vars=dict(file=uri, title=title, description=descr,
                                                   image=(image and context.uri(image))),
