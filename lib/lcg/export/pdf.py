@@ -1227,6 +1227,7 @@ class Table(Element):
                 assert isinstance(c, (TableRow, HorizontalRule,)), ('type error', c,)
     def _export(self, context):
         pdf_context = context.pdf_context
+        last_element_category = pdf_context.last_element_category
         pdf_context.add_presentation(self.presentation)
         content = self.content
         exported_content = []
@@ -1368,6 +1369,11 @@ class Table(Element):
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
                        repeatRows=repeat_rows, hAlign=self.halign, vAlign=self.valign)
+        if last_element_category == 'paragraph':
+            space = make_element(Space, height=UFont(1))
+            exported_space = space.export(context)
+            table = [exported_space, table, exported_space]
+            pdf_context.last_element_category = self._CATEGORY
         pdf_context.remove_presentation()
         return table
 
