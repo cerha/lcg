@@ -882,7 +882,8 @@ class Exporter(object):
         In this class the method returns just the escaped video title.
         
         """
-        return self.escape(element.title() or "Embedded Video %s id=%s" % (element.service(), element.id()))
+        return self.escape(element.title() or \
+                           "Embedded Video %s id=%s" % (element.service(), element.video_id()))
     
         
 class FileExporter(object):

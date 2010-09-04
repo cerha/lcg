@@ -763,7 +763,7 @@ class HtmlExporter(Exporter):
             (g.param(name="movie", value=video_uri),
              g.param(name="wmode", value="opaque")),
             type="application/x-shockwave-flash",
-            title=_("Flash movie object"),
+            title=element.title() or _("Flash movie object"),
             data=video_uri, width=width, height=height)
 
     def export_swf_object(self, context, filename, element_id, width, height, vars={},

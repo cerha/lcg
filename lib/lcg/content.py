@@ -540,7 +540,7 @@ class InlineExternalVideo(Content):
     player.
     
     """
-    def __init__(self, service, video_id, size=None):
+    def __init__(self, service, video_id, title=None, descr=None, size=None):
         """Arguments:
 
           service -- string identifier of the video service.  The two currently
@@ -552,9 +552,11 @@ class InlineExternalVideo(Content):
         """
         assert service in ('youtube', 'vimeo'), service
         assert isinstance(video_id, (str, unicode)), video_id
-        assert isinstance(size, tuple), size
+        assert size is None or isinstance(size, tuple), size
         self._service = service
         self._video_id = video_id
+        self._title = title
+        self._descr = descr
         self._size = size
         super(InlineExternalVideo, self).__init__()
 
@@ -565,6 +567,14 @@ class InlineExternalVideo(Content):
     def video_id(self):
         """Return the string identifier of the video within the service."""
         return self._video_id
+    
+    def title(self):
+        """Return the value of 'title' as passed to the constructor."""
+        return self._title
+    
+    def descr(self):
+        """Return the value of 'descr' as passed to the constructor."""
+        return self._descr
     
     def size(self):
         """Return the video size in pixels as a pair of integers or None."""
@@ -587,7 +597,7 @@ class Container(Content):
     _SUBSEQUENCES = False
     _SUBSEQUENCE_LENGTH = None
     
-    def __init__(self, content, id=None, name=None, halign=None, valign=None, orientation=None,
+    def __init__(self, content, name=None, id=None, halign=None, valign=None, orientation=None,
                  presentation=None, **kwargs):
         """Initialize the instance.
 
@@ -658,16 +668,6 @@ class Container(Content):
         """Return the sequence of contained content elements.
         """
         return self._content
-
-    def export(self, context):
-        g = context.generator()
-        exported = self._exported_content(context)
-        result = g.concat(*exported)
-        if self._lang is not None or self._name is not None:
-            result = g.div(result, lang=self._lang, cls=self._name,
-                           halign=self._halign, valign=self._valign, orientation=self._orientation,
-                           presentation=self._presentation)
-        return result
             
     def sections(self, context):
         result = []
