@@ -71,7 +71,10 @@ class MarkupFormatter(object):
                                  "|\{[^\}]+\})")),
                ('comment', r'^#.*'),
                ('dash', r'(^|(?<=\s))--($|(?=\s))'),
-               ('nbsp', '~'))
+               ('nbsp', '~'),
+               ('page', '@PAGE@'),
+               ('total_pages', '@PAGES@'),
+               )
     
     _HELPER_PATTERNS = ('align', 'href', 'imgname', 'imgname_', 'anchor', 'label', 'label_img',
                         'descr', 'subst', 'size')
@@ -225,10 +228,15 @@ class MarkupFormatter(object):
                 result = Link(target, label=label, descr=descr)
         result.set_parent(parent)
         return result.export(context)
-
     
     def _uri_formatter(self, context, uri, imgname_, close=False, **kwargs):
         return self._link_formatter(context, href=uri, label=None, imgname=imgname_)
+
+    def _page_formatter(self, context, **kwargs):
+        return ''
+    
+    def _total_pages_formatter(self, context, **kwargs):
+        return ''
 
     def _formatter(self, context, type, groups, close=False):
         try:

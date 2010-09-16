@@ -911,22 +911,26 @@ class TableOfContents(Element):
 class PageNumber(Text):
     """Page number.
 
-    'total' parameter determines whether total number of pages should be added.
+    'total' parameter determines whether total number of pages should be output
+    instead of the current page number.
 
     """
     # This implementation is an ugly hack to make the class a subclass of Text
     # easily, for the reasons of type checking and appropriate handling at
     # several places.
+    total = False
     def init(self):
         pass
     def _export(self, context):
         pdf_context = context.pdf_context
-        text = str(pdf_context.page)
         if self.total:
             total = pdf_context.total_pages()
             if total is None:
-                total = '?'
-            text = '%s/%s' % (text, total,)
+                text = '?'
+            else:
+                text = str(total)
+        else:
+            text = str(pdf_context.page)
         self.content = text
         Text.init(self)
         return Text._export(self, context)
@@ -1444,6 +1448,12 @@ class PDFMarkupFormatter(MarkupFormatter):
     def _email_formatter(self, context, email, **kwargs):
         e = context.exporter()
         return e.fixed(context, email)
+
+    def _page_formatter(self, context, **kwargs):
+        return make_element(PageNumber)
+    
+    def _total_pages_formatter(self, context, **kwargs):
+        return make_element(PageNumber, total=True)
     
     def format(self, context, text):
         if not hasattr(context, 'pdf_markup_stack'):
@@ -1672,7 +1682,11 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(HorizontalRule)
 
     def _export_page_number(self, context, element):
-        return make_element(PageNumber, total=element.total())
+        if element.total():
+            result = make_element(PageNumber)
+        else:
+            result = make_element(PageNumber, total=True)
+        return result
 
     def _export_hspace(self, context, element):
         return make_element(Space, width=element.size(context), height=UMm(0))
