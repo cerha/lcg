@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009 Brailcom, o.p.s.
+# Copyright (C) 2004-2010 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,6 +73,7 @@ class Reader(object):
         self._root = root
         self._resource_provider_ = resource_provider
         self._variants_ = None
+        self._parameters = {}
         
     def _title(self):
         return None
@@ -128,7 +129,8 @@ class Reader(object):
                                descr=self._descr(), variants=variants, content=self._content(), 
                                children=[child.build() for child in self._children()],
                                resource_provider=self._resource_provider_,
-                               globals=self._globals(), hidden=self._hidden)
+                               globals=self._globals(), hidden=self._hidden,
+                               **self._parameters)
         except Exception, e:
             if hasattr(self, '_source_filename'):
                 # TODO: This is a quick hack.  The attribute `_source_filename' is prefilled in
@@ -233,7 +235,10 @@ class StructuredTextReader(FileReader):
         return None
         
     def _parse_text(self, text):
-        return self._parser.parse(text)
+        parser = self._parser
+        result = parser.parse(text)
+        self._parameters = parser.parameters()
+        return result
 
     def _document(self, text):
         sections = self._parse_text(text)
@@ -242,7 +247,7 @@ class StructuredTextReader(FileReader):
         s = sections[0]
         title = s.title()
         sections = s.content()
-        return title, Container(sections)
+        return title, Container(sections, presentation=s.presentation())
 
     def _title(self):
         # This method is called first, so we read the document here and store the content for later

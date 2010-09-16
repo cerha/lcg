@@ -132,6 +132,14 @@ class Parser(object):
     _HELPER_PATTERNS = ('indent', 'content', 'title', 'label', 'value', 'term',
                         'descr', 'toctype', 'tocdepth')
 
+    _PARAMETERS = (('parameter', 'page_header', 'HEADER', None,),
+                   ('parameter', 'first_page_header', 'FIRST_PAGE_HEADER', None,),
+                   ('parameter', 'page_footer', 'FOOTER', None,),
+                   ('presentation', 'font_size', 'FONT_SIZE', int),
+                   ('presentation', 'font_family', 'FONT_FAMILY', None),
+                   ('presentation', 'noindent', 'NOINDENT', bool),
+                   )
+
     class _Section(object):
         def __init__(self, title, anchor, level):
             assert isinstance(title, types.StringTypes)
@@ -153,9 +161,9 @@ class Parser(object):
             
         
     def __init__(self):
-        pass
+        self._parameters = {}
 
-    def _parse_sections(self, text):
+    def _parse_sections(self, text, presentation=None):
         root = last = self._Section('__ROOT_SECTION__', None, 0)
         while (1):
             m = self._SECTION_RE.search(text)
@@ -175,10 +183,11 @@ class Parser(object):
                     parent = parent.parent
             parent.add_child(this)
             last = this
-        return self._make_sections(root)
+        return self._make_sections(root, presentation)
 
-    def _make_sections(self, section):
-        subsections = [Section(s.title, self._make_sections(s), anchor=s.anchor)
+    def _make_sections(self, section, presentation=None):
+        subsections = [Section(s.title, self._make_sections(s), anchor=s.anchor,
+                               presentation=presentation)
                        for s in section.children]
         if section.content is None:
             return subsections
@@ -347,9 +356,51 @@ class Parser(object):
         else:
             return ItemizedList.NUMERIC
 
+    def _parse_parameters(self, text):
+        parameters = {}
+        presentation = Presentation()
+        def add_parameter(kind, name, value, function):
+            if function is not None:
+                value = function(value)
+            if kind == 'parameter':
+                parameters[name] = Container(self._parse_sections(value))
+            elif kind == 'presentation':
+                setattr(presentation, name, value)
+            else:
+                raise Exception("Program error", kind)
+        def cut_off(text, start, end):
+            return text[:start] + text[end:]
+        for kind, name, identifier, function in self._PARAMETERS:
+            # Only single occurrence supported for now
+            match = re.search('^#\+%s: ([^\n]*)(\n|$)' % (identifier,), text, re.MULTILINE)
+            if match:
+                add_parameter(kind, name, match.group(1), function)
+                text = cut_off(text, match.start(), match.end())
+            else:
+                start_match = re.search('^#\+BEGIN_%s *(\n|$)' % (identifier,), text, re.MULTILINE)
+                if start_match:
+                    end_match = re.search('^#\+END_%s *(\n|$)' % (identifier,), text, re.MULTILINE)
+                    if end_match and end_match.start() >= start_match.end():
+                        add_parameter(kind, name, text[start_match.end():end_match.start()], function)
+                        text = cut_off(text, start_match.start(), end_match.end())
+        return parameters, presentation, text
+
+    def parameters(self):
+        """Return dictionary of document parameters.
+
+        The dictionary consists from some keyword arguments of
+        'ContentNode' constructor.
+
+        The parameters are instantiated only after 'parse()' method gets called.
+
+        """
+        return self._parameters
+        
     def parse(self, text):
         assert isinstance(text, (str, unicode)), text
-        return self._parse_sections(text)
+        self._parameters, presentation, content_text = self._parse_parameters(text)
+        sections = self._parse_sections(content_text, presentation=presentation)
+        return sections
 
 
 class MacroParser(object):
