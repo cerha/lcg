@@ -67,16 +67,24 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             if style in ('Heading1', 'Heading2', 'Heading3',):
                 text = flowable.getPlainText()
                 level = int(style[7]) - 1
-                key = 'heading-%s' % (self._toc_sequencer.next('tocheading'),)
+                match = self._toc_key_regexp.match(flowable.text)
+                if match:
+                    toc_key = match.group(1)
+                else:
+                    toc_key = None
                 if level <= 1:
-                    match = self._toc_key_regexp.match(flowable.text)
-                    if match:
-                        toc_key = match.group(1)
-                    else:
-                        toc_key = None
                     self.notify('TOCEntry', (level, text, self.page, toc_key,))
-                self.canv.bookmarkPage(key)
-                self.canv.addOutlineEntry(text, key, level=level, closed=(level>=1))
+                if toc_key is None:
+                    outline_key = 'heading-%s' % (self._toc_sequencer.next('tocheading'),)
+                    # The position of the following bookmark is incorrect.  It
+                    # (sometimes?) points to the next page after the element
+                    # start.  As the bookmark can point only to a whole page
+                    # and not to the exact element location, it's desirable to
+                    # use toc_key whenever possible anyway.
+                    self.canv.bookmarkPage(outline_key)
+                else:
+                    outline_key = toc_key
+                self.canv.addOutlineEntry(text, outline_key, level=level, closed=(level>=1))
 
     def build(self, flowables, *args, **kwargs):
         context = self._lcg_context
