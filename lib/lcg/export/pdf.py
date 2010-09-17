@@ -89,6 +89,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
     def build(self, flowables, *args, **kwargs):
         context = self._lcg_context
         pdf_context = context.pdf_context
+        pdf_context.page = 1
         first_page_header = pdf_context.first_page_header()
         page_header = pdf_context.page_header()
         page_footer = pdf_context.page_footer()
