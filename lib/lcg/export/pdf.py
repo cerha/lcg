@@ -20,6 +20,7 @@
 import copy
 import cStringIO
 import os
+import re
 import string
 import sys
 
@@ -47,6 +48,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
     def __init__(self, *args, **kwargs):
         reportlab.platypus.BaseDocTemplate.__init__(self, *args, **kwargs)
         self._toc_sequencer = reportlab.lib.sequencer.Sequencer()
+        self._toc_key_regexp = re.compile('<a name="([^"]+)"')
 
     def handle_pageEnd(self):
         if self._new_lcg_context is None:
@@ -67,7 +69,12 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 level = int(style[7]) - 1
                 key = 'heading-%s' % (self._toc_sequencer.next('tocheading'),)
                 if level <= 1:
-                    self.notify('TOCEntry', (level, text, self.page,))
+                    match = self._toc_key_regexp.match(flowable.text)
+                    if match:
+                        toc_key = match.group(1)
+                    else:
+                        toc_key = None
+                    self.notify('TOCEntry', (level, text, self.page, toc_key,))
                 self.canv.bookmarkPage(key)
                 self.canv.addOutlineEntry(text, key, level=level, closed=(level>=1))
 
