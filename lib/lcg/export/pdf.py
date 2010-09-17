@@ -49,6 +49,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         reportlab.platypus.BaseDocTemplate.__init__(self, *args, **kwargs)
         self._toc_sequencer = reportlab.lib.sequencer.Sequencer()
         self._toc_key_regexp = re.compile('<a name="([^"]+)"')
+        self._new_lcg_context = None
 
     def handle_pageEnd(self):
         if self._new_lcg_context is None:
@@ -89,7 +90,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
     def build(self, flowables, *args, **kwargs):
         context = self._lcg_context
         pdf_context = context.pdf_context
-        pdf_context.page = 1
+        pdf_context.page = 0
         first_page_header = pdf_context.first_page_header()
         page_header = pdf_context.page_header()
         page_footer = pdf_context.page_footer()
@@ -126,6 +127,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             return bottom_margin, height
         def on_page(canvas, doc):
             pdf_context = self._lcg_context.pdf_context
+            pdf_context.page += 1
             page = pdf_context.page
             canvas.saveState()
             def add_flowable(content, top):
@@ -143,7 +145,6 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 add_flowable(header, True)
             if page_footer is not None:
                 add_flowable(page_footer, False)
-            pdf_context.page = page + 1
             canvas.restoreState()
         self._calc()
         Frame = reportlab.platypus.frames.Frame
@@ -195,13 +196,13 @@ class Context(object):
     'Context' instance.
 
     """
-    
+
     _font_path = '/usr/share/fonts/truetype/freefont'
 
     _nesting_level = 0
     _list_nesting_level = 0
     _counter = 0
-    page = 1
+    page = 0
     heading_level = 1
     toc_present = False
     default_font_size = 12
@@ -209,7 +210,7 @@ class Context(object):
     bullet_indent = 0
     last_element_category = None 
 
-    def __init__(self, parent_context=None, total_pages=None, first_page_header=None,
+    def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
                  page_header=None, page_footer=None, presentation=None):
         self._init_fonts()
         self._init_styles()
@@ -941,10 +942,10 @@ class PageNumber(Text):
         pdf_context = context.pdf_context
         if self.total:
             total = pdf_context.total_pages()
-            if total is None:
-                text = '?'
-            else:
+            if total:
                 text = str(total)
+            else:
+                text = '?'
         else:
             text = str(pdf_context.page)
         self.content = text
@@ -1592,7 +1593,7 @@ class PDFExporter(FileExporter, Exporter):
         if old_contexts is None:
             old_contexts = {}
         old = old_contexts.get(None)
-        total_pages = None
+        total_pages = 0
         if old is not None:
             total_pages = old.page
         node = context.node()
@@ -1604,13 +1605,14 @@ class PDFExporter(FileExporter, Exporter):
                                       presentation=context.presentation())
 	exported_structure = []
         lang = context.lang()
+        first_subcontext = None
         for node in context.node().linear():
             node_id = node.id()
             if node_id[:7] == '__dummy':
                 continue
             subcontext = self.context(node, lang)
             old = old_contexts.get(node_id)
-            total_pages = None
+            total_pages = 0
             if old is not None:
                 total_pages = old.page
             subcontext.pdf_context = old_contexts[node_id] = pdf_subcontext = \
@@ -1620,8 +1622,11 @@ class PDFExporter(FileExporter, Exporter):
             # the subcontext to the proper place in ReportLab formatting.  This
             # is not very easy and there may be some limitations.  We use a
             # special element that starts a new subdocument.
-            new_document = make_element(NewDocument, content=subcontext, first=(not exported_structure))
-            exported_structure.append(new_document)
+            if first_subcontext is None:
+                first_subcontext = subcontext
+            else:
+                new_document = make_element(NewDocument, content=subcontext, first=(not exported_structure))
+                exported_structure.append(new_document)
             title = node.title()
             if title.strip():
                 exported_title = make_element(Heading, content=[make_element(Text, content=title)],
@@ -1634,7 +1639,7 @@ class PDFExporter(FileExporter, Exporter):
         if not exported_structure:
             return ''
         exported_content = self.concat(*exported_structure)
-        document = exported_content.export(context)
+        document = exported_content.export(first_subcontext)
         if len(document) == 1 and isinstance(document[0], basestring):
             document = [reportlab.platypus.Paragraph(document[0], pdf_context.style())]
         # It is necessary to check for invalid anchors before doc.build gets
@@ -1657,7 +1662,7 @@ class PDFExporter(FileExporter, Exporter):
                           topMargin=margin, bottomMargin=margin)
         while True:
             try:
-                doc.multi_build(document, context=context)
+                doc.multi_build(document, context=first_subcontext)
             except reportlab.platypus.doctemplate.LayoutError, e:
                 if str(e).find('too large') >= 0:
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
@@ -1699,9 +1704,9 @@ class PDFExporter(FileExporter, Exporter):
 
     def _export_page_number(self, context, element):
         if element.total():
-            result = make_element(PageNumber)
-        else:
             result = make_element(PageNumber, total=True)
+        else:
+            result = make_element(PageNumber)
         return result
 
     def _export_hspace(self, context, element):
