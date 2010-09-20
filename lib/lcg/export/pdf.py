@@ -894,14 +894,12 @@ class NewDocument(PageBreak):
     def init(self):
         super(NewDocument, self).init()
         assert isinstance(self.content, Exporter.Context), ('type error', self.content,)
-        assert isinstance(self.first, bool), ('type error', self.first)
     def _export(self, context):
         context = self.content
         def set_context(flowable, aW, aH, context=context):
             flowable.canv._doctemplate._new_lcg_context = context
-        exported = [reportlab.platypus.flowables.CallerMacro(wrapCallable=set_context)]
-        if not self.first:
-            exported.append(reportlab.platypus.PageBreak())
+        exported = [reportlab.platypus.flowables.CallerMacro(wrapCallable=set_context),
+                    reportlab.platypus.PageBreak()]
         return exported
 
 class HorizontalRule(Element):
@@ -1626,7 +1624,7 @@ class PDFExporter(FileExporter, Exporter):
             if first_subcontext is None:
                 first_subcontext = subcontext
             else:
-                new_document = make_element(NewDocument, content=subcontext, first=(not exported_structure))
+                new_document = make_element(NewDocument, content=subcontext)
                 exported_structure.append(new_document)
             title = node.title()
             if title.strip():
