@@ -39,7 +39,7 @@ class ContentNode(object):
 
     def __init__(self, id, title=None, brief_title=None, descr=None, variants=(), content=None,
                  children=(), hidden=False, active=True, resource_provider=None, globals=None,
-                 page_header=None, page_footer=None, first_page_header=None):
+                 page_header=None, page_footer=None, first_page_header=None, presentation=None):
         """Initialize the instance.
 
         Arguments:
@@ -74,6 +74,7 @@ class ContentNode(object):
           first_page_header -- 'Content' instance to be inserted at the top of the
             first generated page.  If 'None', page_header (if any) is used on
             all pages.
+          presentation -- 'Presentation' instance associated with this node, or 'None'.
           
         """
         assert isinstance(id, str), repr(id)
@@ -94,6 +95,8 @@ class ContentNode(object):
         self._first_page_header = first_page_header
         assert page_footer is None or isinstance(page_footer, Content), page_footer
         self._page_footer = page_footer
+        assert presentation is None or isinstance(presentation, Presentation), presentation
+        self._presentation = presentation
         if isinstance(content, (tuple, list)):
             content = Container(content)
         assert isinstance(content, Content), content
@@ -278,3 +281,7 @@ class ContentNode(object):
     def first_page_header(self):
         """Return the first page header."""
         return self._first_page_header
+
+    def presentation(self):
+        """Return presentation of this node."""
+        return self._presentation

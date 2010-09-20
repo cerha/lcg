@@ -1597,12 +1597,13 @@ class PDFExporter(FileExporter, Exporter):
         if old is not None:
             total_pages = old.page
         node = context.node()
+        presentation = node.presentation() or context.presentation()
         context.pdf_context = old_contexts[None] = pdf_context = \
                               Context(total_pages=total_pages,
                                       first_page_header=node.first_page_header(),
                                       page_header=node.page_header(),
                                       page_footer=node.page_footer(),
-                                      presentation=context.presentation())
+                                      presentation=presentation)
 	exported_structure = []
         lang = context.lang()
         first_subcontext = None
@@ -1616,7 +1617,7 @@ class PDFExporter(FileExporter, Exporter):
             if old is not None:
                 total_pages = old.page
             subcontext.pdf_context = old_contexts[node_id] = pdf_subcontext = \
-                                     Context(parent_context=pdf_context, total_pages=total_pages)
+                                     Context(parent_context=pdf_context, total_pages=total_pages, presentation=presentation)
             # The subcontext serves twice: 1. when exporting node content;
             # 2. when exporting to ReportLab.  The question is how to transfer
             # the subcontext to the proper place in ReportLab formatting.  This

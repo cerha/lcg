@@ -163,7 +163,7 @@ class Parser(object):
     def __init__(self):
         self._parameters = {}
 
-    def _parse_sections(self, text, presentation=None):
+    def _parse_sections(self, text):
         root = last = self._Section('__ROOT_SECTION__', None, 0)
         while (1):
             m = self._SECTION_RE.search(text)
@@ -183,11 +183,10 @@ class Parser(object):
                     parent = parent.parent
             parent.add_child(this)
             last = this
-        return self._make_sections(root, presentation)
+        return self._make_sections(root)
 
-    def _make_sections(self, section, presentation=None):
-        subsections = [Section(s.title, self._make_sections(s), anchor=s.anchor,
-                               presentation=presentation)
+    def _make_sections(self, section):
+        subsections = [Section(s.title, self._make_sections(s), anchor=s.anchor)
                        for s in section.children]
         if section.content is None:
             return subsections
@@ -383,7 +382,9 @@ class Parser(object):
                     if end_match and end_match.start() >= start_match.end():
                         add_parameter(kind, name, text[start_match.end():end_match.start()], function)
                         text = cut_off(text, start_match.start(), end_match.end())
-        return parameters, presentation, text
+        parameters['presentation'] = presentation
+        self._parameters = parameters
+        return text
 
     def parameters(self):
         """Return dictionary of document parameters.
@@ -398,8 +399,8 @@ class Parser(object):
         
     def parse(self, text):
         assert isinstance(text, (str, unicode)), text
-        self._parameters, presentation, content_text = self._parse_parameters(text)
-        sections = self._parse_sections(content_text, presentation=presentation)
+        content_text = self._parse_parameters(text)
+        sections = self._parse_sections(content_text)
         return sections
 
 
