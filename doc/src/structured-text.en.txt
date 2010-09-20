@@ -3,6 +3,8 @@
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
+#+FOOTER: - @PAGE@ -
+
 = Structured Text Formatting Manual =
 
 This document describes the Structured Text format used by the
