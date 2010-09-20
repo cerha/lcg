@@ -171,13 +171,15 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
             del kwargs['presentation']
         else:
             presentation = None
+        font_size_coefficient = Context.default_font_size / 10.0
+        if presentation is not None:
+            font_size_coefficient *= (presentation.font_size or 1)
         reportlab.platypus.tableofcontents.TableOfContents.__init__(self, *args, **kwargs)
+        self.levelStyles = copy.copy(self.levelStyles)
         for i in range(len(self.levelStyles)):
             style = copy.copy(self.levelStyles[i])
             style.fontName = 'FreeSerif'
-            style.fontSize *= Context.default_font_size / 10.0
-            if presentation is not None:
-                style.fontSize *= (presentation.font_size or 1)
+            style.fontSize *= font_size_coefficient
             style.leading = style.fontSize * 1.2
             self.levelStyles[i] = style
 
