@@ -166,19 +166,24 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
 
 class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
     def __init__(self, *args, **kwargs):
-        if kwargs.has_key('presentation'):
-            presentation = kwargs['presentation']
-            del kwargs['presentation']
+        if kwargs.has_key('context'):
+            context = kwargs['context']
+            del kwargs['context']
+            presentation = context.pdf_context.current_presentation()
+            font_size_coefficient = Context.default_font_size / 10.0
+            presentation_family = None
+            if presentation is not None:
+                font_size_coefficient *= (presentation.font_size or 1)
+                presentation_family = presentation.heading_font_family or presentation.font_family
+            font_name = context.pdf_context.font_name(presentation_family)
         else:
-            presentation = None
-        font_size_coefficient = Context.default_font_size / 10.0
-        if presentation is not None:
-            font_size_coefficient *= (presentation.font_size or 1)
+            font_size_coefficient = 1
+            font_name = 'FreeSerif'
         reportlab.platypus.tableofcontents.TableOfContents.__init__(self, *args, **kwargs)
         self.levelStyles = copy.copy(self.levelStyles)
         for i in range(len(self.levelStyles)):
             style = copy.copy(self.levelStyles[i])
-            style.fontName = 'FreeSerif'
+            style.fontName = font_name
             style.fontSize *= font_size_coefficient
             style.leading = style.fontSize * 1.2
             self.levelStyles[i] = style
@@ -311,6 +316,21 @@ class Context(object):
         else:
             raise KeyError(font_name)
 
+    def font_name(self, presentation_family):
+        """Return font name corresponding to presentation family.
+
+        Arguments:
+
+          presentation_family -- one of 'FontFamily' constants or 'None' (in
+            which case default font name is returned)
+
+        """
+        if presentation_family:
+            font_name = 'Free' + self._font_family(presentation_family)
+        else:
+            font_name = 'FreeSerif'
+        return font_name
+
     def nesting_level(self):
         """Return current paragraph and list nesting level.
 
@@ -369,10 +389,10 @@ class Context(object):
             level = 3
         style = copy.copy(self._styles['Heading%d' % (level,)])
         presentation = self.current_presentation()
-        if presentation and presentation.heading_font_family:
-            style.fontName = 'Free' + self._font_family(presentation.heading_font_family)
-        else:
-            style.fontName = 'FreeSerif'
+        presentation_family = None
+        if presentation:
+            presentation_family = presentation.heading_font_family or presentation.font_family
+        style.fontName = self.font_name(presentation_family)
         style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
         style.leading = style.fontSize * 1.2
         return style
@@ -923,7 +943,7 @@ class TableOfContents(Element):
     """
     _CATEGORY = 'paragraph'
     def _export(self, context):
-        return RLTableOfContents(presentation=context.presentation())
+        return RLTableOfContents(context=context)
 
 class PageNumber(Text):
     """Page number.
