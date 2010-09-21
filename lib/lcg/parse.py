@@ -137,6 +137,7 @@ class Parser(object):
                    ('parameter', 'page_footer', 'FOOTER', None,),
                    ('presentation', 'font_size', 'FONT_SIZE', float,),
                    ('presentation', 'font_family', 'FONT_FAMILY', None,),
+                   ('presentation', 'heading_font_family', 'HEADING_FONT_FAMILY', None,),
                    ('presentation', 'noindent', 'NOINDENT', bool,),
                    ('presentation', 'line_spacing', 'LINE_SPACING', float,),
                    )
