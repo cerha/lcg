@@ -67,14 +67,18 @@ class ContentNode(object):
             are allowed to contain nested dictionaries.  The variables are used for substitution
             within `MarkupFormatter', but they may be also used for other purposes depending on the
             application.
-          page_header -- 'Content' instance to be inserted at the top of each
-            generated page.  If 'None', no page header is inserted.
-          page_footer -- 'Content' instance to be inserted at the bottom of each
-            generated page.  If 'None', no page footer is inserted.
-          first_page_header -- 'Content' instance to be inserted at the top of the
-            first generated page.  If 'None', page_header (if any) is used on
-            all pages.
-          presentation -- 'Presentation' instance associated with this node, or 'None'.
+          page_header -- dictionary of 'Content' instances, with language codes
+            as keys, to be inserted at the top of each generated page.  If content is
+            'None', no page header is inserted.
+          page_footer -- dictionary of 'Content' instances, with language codes
+            as keys, to be inserted at the bottom of each generated page.  If
+            content is 'None', no page footer is inserted.
+          first_page_header -- dictionary of 'Content' instances, with language
+            codes as keys, to be inserted at the top of the first generated
+            page.  If content is 'None', page_header (if any) is used on all
+            pages.
+          presentation -- dictionary of 'Presentation' instances (or 'None'
+            values) associated with this node, with language codes as keys.
           
         """
         assert isinstance(id, str), repr(id)
@@ -89,13 +93,13 @@ class ContentNode(object):
         self._hidden = hidden
         self._active = active
         self._variants = tuple(variants)
-        assert page_header is None or isinstance(page_header, Content), page_header
+        assert page_header is None or isinstance(page_header, dict) and all ([isinstance(x, Content) for x in page_header.values()]), page_header
         self._page_header = page_header
-        assert first_page_header is None or isinstance(first_page_header, Content), first_page_header
+        assert first_page_header is None or isinstance(first_page_header, dict) and all ([isinstance(x, Content) for x in first_page_header.values()]), first_page_header
         self._first_page_header = first_page_header
-        assert page_footer is None or isinstance(page_footer, Content), page_footer
+        assert page_footer is None or isinstance(page_footer, dict) and all ([isinstance(x, Content) for x in page_footer.values()]), page_footer
         self._page_footer = page_footer
-        assert presentation is None or isinstance(presentation, Presentation), presentation
+        assert presentation is None or isinstance(presentation, dict) and all ([isinstance(x, Presentation) for x in presentation.values()]), presentation
         self._presentation = presentation
         if isinstance(content, (tuple, list)):
             content = Container(content)
@@ -270,18 +274,27 @@ class ContentNode(object):
         else:
             return None
 
-    def page_header(self):
+    def _lang_parameter(self, dictionary, lang):
+        if dictionary is None:
+            result = None
+        elif dictionary.has_key(lang):
+            result = dictionary[lang]
+        else:
+            result = dictionary.get(None)
+        return result            
+        
+    def page_header(self, lang):
         """Return the page header."""
-        return self._page_header
+        return self._lang_parameter(self._page_header, lang)
 
-    def page_footer(self):
+    def page_footer(self, lang):
         """Return the page footer."""
-        return self._page_footer
+        return self._lang_parameter(self._page_footer, lang)
 
-    def first_page_header(self):
+    def first_page_header(self, lang):
         """Return the first page header."""
-        return self._first_page_header
+        return self._lang_parameter(self._first_page_header, lang)
 
-    def presentation(self):
+    def presentation(self, lang):
         """Return presentation of this node."""
-        return self._presentation
+        return self._lang_parameter(self._presentation, lang)

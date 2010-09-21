@@ -163,7 +163,7 @@ class Parser(object):
             
         
     def __init__(self):
-        self._parameters = {}
+        pass
 
     def _parse_sections(self, text):
         root = last = self._Section('__ROOT_SECTION__', None, 0)
@@ -357,14 +357,14 @@ class Parser(object):
         else:
             return ItemizedList.NUMERIC
 
-    def _parse_parameters(self, text):
-        parameters = {}
+    def _parse_parameters(self, text, parameters=None):
         presentation = Presentation()
         def add_parameter(kind, name, value, function):
             if function is not None:
                 value = function(value)
             if kind == 'parameter':
-                parameters[name] = Container(self._parse_sections(value))
+                if parameters is not None:
+                    parameters[name] = Container(self._parse_sections(value))
             elif kind == 'presentation':
                 setattr(presentation, name, value)
             else:
@@ -384,24 +384,13 @@ class Parser(object):
                     if end_match and end_match.start() >= start_match.end():
                         add_parameter(kind, name, text[start_match.end():end_match.start()], function)
                         text = cut_off(text, start_match.start(), end_match.end())
-        parameters['presentation'] = presentation
-        self._parameters = parameters
+        if parameters is not None:
+            parameters['presentation'] = presentation
         return text
-
-    def parameters(self):
-        """Return dictionary of document parameters.
-
-        The dictionary consists from some keyword arguments of
-        'ContentNode' constructor.
-
-        The parameters are instantiated only after 'parse()' method gets called.
-
-        """
-        return self._parameters
         
-    def parse(self, text):
+    def parse(self, text, parameters=None):
         assert isinstance(text, (str, unicode)), text
-        content_text = self._parse_parameters(text)
+        content_text = self._parse_parameters(text, parameters)
         sections = self._parse_sections(content_text)
         return sections
 

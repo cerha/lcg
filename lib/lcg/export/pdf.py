@@ -1636,16 +1636,16 @@ class PDFExporter(FileExporter, Exporter):
         if old is not None:
             total_pages = old.page
         node = context.node()
+        lang = context.lang()
         context.pdf_context = old_contexts[None] = pdf_context = \
                               Context(total_pages=total_pages,
-                                      first_page_header=node.first_page_header(),
-                                      page_header=node.page_header(),
-                                      page_footer=node.page_footer(),
-                                      presentation=node.presentation())
+                                      first_page_header=node.first_page_header(lang),
+                                      page_header=node.page_header(lang),
+                                      page_footer=node.page_footer(lang),
+                                      presentation=node.presentation(lang))
         pdf_context.add_presentation(context.presentation())
         presentation = pdf_context.current_presentation()
 	exported_structure = []
-        lang = context.lang()
         first_subcontext = None
         for node in context.node().linear():
             node_id = node.id()

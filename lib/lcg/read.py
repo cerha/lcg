@@ -236,35 +236,41 @@ class StructuredTextReader(FileReader):
         
     def _parse_text(self, text):
         parser = self._parser
-        result = parser.parse(text)
-        self._parameters = parser.parameters()
-        return result
+        parameters = {}
+        result = parser.parse(text, parameters)
+        return result, parameters
 
     def _document(self, text):
-        sections = self._parse_text(text)
+        sections, parameters = self._parse_text(text)
         if len(sections) != 1 or not isinstance(sections[0], Section):
             raise Exception("The document has no top-level section:", self._id)
         s = sections[0]
         title = s.title()
         sections = s.content()
-        return title, Container(sections)
+        return title, Container(sections), parameters
 
     def _title(self):
         # This method is called first, so we read the document here and store the content for later
         # use.
         variants = self.variants()
+        parameters = {}
         if len(variants) <= 1:
             lang = variants and variants[0] or None
-            title, content = self._document(self._source_text(lang))
+            title, content, parameters[lang] = self._document(self._source_text(lang))
         else:
             titles = {}
             content_variants = []
             for lang in variants:
-                titles[lang], c = self._document(self._source_text(lang))
+                titles[lang], c, parameters[lang] = self._document(self._source_text(lang))
                 content_variants.append((lang, c))
             title = SelfTranslatableText(self._id, translations=titles)
             content = ContentVariants(content_variants)
         self._content_ = content
+        self._parameters = {}
+        for lang, parameter_set in parameters.items():
+            for k, v in parameter_set.items():
+                self._parameters[k] = parameters_k = self._parameters.get(k, {})
+                parameters_k[lang] = v
         return title
     
     def _content(self):
