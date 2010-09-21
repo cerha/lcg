@@ -91,6 +91,9 @@ class Presentation(object):
     """
     left_indent = None
     """Amount of space to put on left of the object, 'Unit'."""
+    line_spacing = None
+    """Distance between line bases, 'Unit'."""
+    
     
 class Content(object):
     """Generic base class for all types of content.

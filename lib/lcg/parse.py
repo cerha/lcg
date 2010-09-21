@@ -135,9 +135,10 @@ class Parser(object):
     _PARAMETERS = (('parameter', 'page_header', 'HEADER', None,),
                    ('parameter', 'first_page_header', 'FIRST_PAGE_HEADER', None,),
                    ('parameter', 'page_footer', 'FOOTER', None,),
-                   ('presentation', 'font_size', 'FONT_SIZE', float),
-                   ('presentation', 'font_family', 'FONT_FAMILY', None),
-                   ('presentation', 'noindent', 'NOINDENT', bool),
+                   ('presentation', 'font_size', 'FONT_SIZE', float,),
+                   ('presentation', 'font_family', 'FONT_FAMILY', None,),
+                   ('presentation', 'noindent', 'NOINDENT', bool,),
+                   ('presentation', 'line_spacing', 'LINE_SPACING', float,),
                    )
 
     class _Section(object):

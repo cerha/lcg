@@ -177,6 +177,7 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
                 presentation_family = presentation.heading_font_family or presentation.font_family
             font_name = context.pdf_context.font_name(presentation_family)
         else:
+            context = None
             font_size_coefficient = 1
             font_name = 'FreeSerif'
         reportlab.platypus.tableofcontents.TableOfContents.__init__(self, *args, **kwargs)
@@ -185,7 +186,10 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
             style = copy.copy(self.levelStyles[i])
             style.fontName = font_name
             style.fontSize *= font_size_coefficient
-            style.leading = style.fontSize * 1.2
+            if context is None:
+                style.leading = style.fontSize * 1.2
+            else:
+                context.pdf_context.adjust_style_leading(style)
             self.levelStyles[i] = style
 
 class RLSpacer(reportlab.platypus.flowables.Spacer):
@@ -219,10 +223,10 @@ class Context(object):
 
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
                  page_header=None, page_footer=None, presentation=None):
+        self._presentations = []
         self._init_fonts()
         self._init_styles()
         self._anchors = {}
-        self._presentations = []
         if presentation is not None:
             self._presentations.append(presentation)
         self._total_pages = total_pages
@@ -246,13 +250,13 @@ class Context(object):
         self._normal_style.fontSize = self.default_font_size
         self._normal_style.bulletFontName = self._normal_style.fontName
         self._normal_style.bulletFontSize = self._normal_style.fontSize
-        self._normal_style.leading = self._normal_style.fontSize * 1.2
+        self.adjust_style_leading(self._normal_style)
         self._normal_style.firstLineIndent = self._normal_style.leading
         # Code
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName = 'FreeMono'
         self._code_style.fontSize = self.default_font_size
-        self._code_style.leading = self._code_style.fontSize * 1.2
+        self.adjust_style_leading(self._code_style)
         # Bullet
         self._styles['Bullet'].space_before = self.default_font_size / 2
 
@@ -364,7 +368,7 @@ class Context(object):
         """
         style = copy.copy(self._normal_style)
         style.fontSize *= self.relative_font_size()
-        style.leading = style.fontSize * 1.2
+        self.adjust_style_leading(style)
         return style
 
     def code_style(self):
@@ -372,7 +376,7 @@ class Context(object):
         """
         style = copy.copy(self._code_style)
         style.fontSize *= self.relative_font_size()
-        style.leading = style.fontSize * 1.2
+        self.adjust_style_leading(style)
         return style
 
     def heading_style(self, level):
@@ -394,7 +398,7 @@ class Context(object):
             presentation_family = presentation.heading_font_family or presentation.font_family
         style.fontName = self.font_name(presentation_family)
         style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
-        style.leading = style.fontSize * 1.2
+        self.adjust_style_leading(style)
         return style
 
     def list_style(self, order=None):
@@ -410,7 +414,7 @@ class Context(object):
         style.fontName='FreeSerif'
         style.fontSize = self.default_font_size
         style.bulletFontSize = style.fontSize
-        style.leading = style.fontSize * 1.2
+        self.adjust_style_leading(style)
         style.space_before = self.default_font_size / 2
         return style
 
@@ -427,7 +431,7 @@ class Context(object):
         if presentation is not None:
             if presentation.font_size is not None:
                 style.fontSize = style.fontSize * presentation.font_size
-                style.leading = style.fontSize * 1.2
+                self.adjust_style_leading(style)
             family, bold, italic = self.font_parameters(style.fontName)
             if (presentation.font_family is not None and
                 style.name != 'Code' and style.name[:7] != 'Heading'):
@@ -438,13 +442,28 @@ class Context(object):
                 italic = presentation.italic
             style.fontName = self.font(family, bold, italic)
         style.fontSize *= self.relative_font_size()
-        style.leading = style.fontSize * 1.2
+        self.adjust_style_leading(style)
         style.leftIndent = self.left_indent
         style.bulletFontSize = style.fontSize
         style.bulletIndent = self.bullet_indent
         if style.firstLineIndent != 0:
             style.firstLineIndent = style.leading
         return style
+
+    def adjust_style_leading(self, style):
+        """Adjust leading in 'style' according to current presentation.
+
+        Arguments:
+
+          style -- ReportLab style object
+
+        """
+        presentation = self.current_presentation()
+        if presentation is None or presentation.line_spacing is None:
+            coefficient = 1.2
+        else:
+            coefficient = presentation.line_spacing
+        style.leading = style.fontSize * coefficient
 
     def get_seqid(self):
         """Increase counter value by 1 and return the new value.
