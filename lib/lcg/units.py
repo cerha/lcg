@@ -115,9 +115,11 @@ class Orientation(object):
     VERTICAL = 'VERTICAL'
 
 class FontFamily(object):
-    PROPORTIONAL = 'PROPORTIONAL'
-    """Standard proportional font (e.g. Times)."""
+    PROPORTIONAL = 'SERIF'
+    """Standard proportional font, alias for 'SERIF'."""
+    SERIF = 'SERIF'
+    """Standard proportional font with serifs (e.g. Times)."""
     SANS_SERIF = 'SANS_SERIF'
-    """Standard sans serif font(e.g. Helvetica)."""
+    """Standard sans serif proportional font(e.g. Helvetica)."""
     FIXED_WIDTH = 'FIXED_WIDTH'
     """Standard nonproportional font (e.g. Courier)."""

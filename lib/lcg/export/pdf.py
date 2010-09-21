@@ -285,11 +285,11 @@ class Context(object):
             pass
 
     def _font_family(self, presentation_family):
-        if presentation_family == 'PROPORTIONAL':
+        if presentation_family == FontFamily.SERIF:
             family = 'Serif'
-        elif presentation_family == 'SANS_SERIF':
+        elif presentation_family == FontFamily.SANS_SERIF:
             family = 'Sans'
-        elif presentation_family == 'FIXED_WIDTH':
+        elif presentation_family == FontFamily.FIXED_WIDTH:
             family = 'Mono'
         else:
             raise Exception('Unknown font family', presentation_family)
