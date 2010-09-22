@@ -232,14 +232,16 @@ class Context(object):
         self._total_pages = total_pages
         self._total_pages_requested = False
         self._parent_context = parent_context
-        if parent_context is None:
-            self._first_page_header = first_page_header
-            self._page_header = page_header
-            self._page_footer = page_footer
-        else:
-            self._first_page_header = parent_context.first_page_header()
-            self._page_header = parent_context.page_header()
-            self._page_footer = parent_context.page_footer()
+        self._first_page_header = first_page_header
+        self._page_header = page_header
+        self._page_footer = page_footer
+        if parent_context is not None:
+            if self._first_page_header is None:
+                self._first_page_header = parent_context.first_page_header()
+            if self._page_header is None:
+                self._page_header = parent_context.page_header()
+            if self._page_footer is None:
+                self._page_footer = parent_context.page_footer()
         self._relative_font_size = 1
 
     def _init_styles(self):
@@ -1658,6 +1660,9 @@ class PDFExporter(FileExporter, Exporter):
                 total_pages = old.page
             subcontext.pdf_context = old_contexts[node_id] = pdf_subcontext = \
                                      Context(parent_context=pdf_context, total_pages=total_pages,
+                                             first_page_header=node.first_page_header(lang),
+                                             page_header=node.page_header(lang),
+                                             page_footer=node.page_footer(lang),
                                              presentation=presentation)
             # The subcontext serves twice: 1. when exporting node content;
             # 2. when exporting to ReportLab.  The question is how to transfer
