@@ -127,7 +127,10 @@ class Parser(object):
     _REGEXPS = [r"^(\s*\r?\n)*(?P<%s>%s)$" % (key, matcher)
                 for key, matcher in _MATCHERS]
 
-    _MATCHER = re.compile('(?:' + '|'.join(_REGEXPS) + ')', re.DOTALL)
+    _MATCHER = re.compile(('(?:@(?P<halign>center|centre|left|right)\r?\n)?(?:' +
+                           '|'.join(_REGEXPS) + ')'),
+                          re.DOTALL)
+    _HALIGN_MATCHER = re.compile('@(center|centre|left|right)\r?\n', re.MULTILINE)
 
     _HELPER_PATTERNS = ('indent', 'content', 'title', 'label', 'value', 'term',
                         'descr', 'toctype', 'tocdepth')
@@ -208,14 +211,28 @@ class Parser(object):
         return content
 
     def _identify_block(self, text):
+        match = self._HALIGN_MATCHER.match(text)
+        if match:
+            identifier = match.group(1)
+            if identifier in ('center', 'centre',):
+                halign = HorizontalAlignment.CENTER
+            elif identifier == 'left':
+                halign = HorizontalAlignment.LEFT
+            elif identifier == 'right':
+                halign = HorizontalAlignment.RIGHT                
+            text = text[match.end():]
+        else:
+            halign = None
         match = self._MATCHER.match(text)
         if match:
             found = [(key, match.groupdict())
                      for key, m in match.groupdict().items()
                      if m and not key in self._HELPER_PATTERNS]
-            return (text, found[0][0], found[0][1])
+            result = (text, found[0][0], dict(found[0][1]))
         else:
-            return (text, 'paragraph', {})
+            result = (text, 'paragraph', {})
+        result[2]['halign'] = halign
+        return result
 
     def _store_list_item(self, block, groups):
         content = WikiText(groups['content'])
@@ -285,7 +302,8 @@ class Parser(object):
         content = []
         unfinished = None
         for piece in self._SPLITTER_RE.split(text):
-            if len(piece.strip()) == 0: continue
+            if len(piece.strip()) == 0:
+                continue
             block, type, groups = self._identify_block(piece)
             #_log("============", type)
             #_log(block)
@@ -310,9 +328,10 @@ class Parser(object):
     def _make_paragraph(self, block, groups):
         text = self._COMMENT_MATCHER.sub("", block).strip()
         if text:
-            return Paragraph(WikiText(text))
+            paragraph = Paragraph(WikiText(text), halign=groups.get('halign'))
         else:
-            return None
+            paragraph = None
+        return paragraph
     
     def _make_table(self, block, groups):
         def align(cell):

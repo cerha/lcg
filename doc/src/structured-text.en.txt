@@ -3,7 +3,10 @@
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
-#+FOOTER: - @PAGE@ -
+#+BEGIN_FOOTER
+@center
+- @PAGE@ -
+#+END_FOOTER
 
 = Structured Text Formatting Manual =
 

@@ -25,6 +25,7 @@ import string
 import sys
 
 import reportlab.lib.colors
+import reportlab.lib.enums
 import reportlab.lib.fonts
 import reportlab.lib.pagesizes
 import reportlab.lib.sequencer
@@ -866,6 +867,7 @@ class Paragraph(Element):
     _style = None
     noindent = False
     presentation = None
+    halign = None
     def init(self):
         super(Paragraph, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -875,6 +877,7 @@ class Paragraph(Element):
         self.content = list(self.content)
     def _export(self, context, style=None):
         pdf_context = context.pdf_context
+        halign = self.halign
         presentation = self.presentation
         pdf_context.add_presentation(presentation)
         current_presentation = pdf_context.current_presentation()
@@ -882,12 +885,19 @@ class Paragraph(Element):
         style = pdf_context.style(style=template_style)
         if (self.noindent or
             (current_presentation and current_presentation.noindent) or
+            halign or
             pdf_context.last_element_category != 'paragraph'):
             style.firstLineIndent = 0
         if (current_presentation and current_presentation.noindent and style.name[:7] != 'Heading'):
             style.spaceBefore = style.fontSize * 1.2
         if current_presentation and current_presentation.left_indent:
             style.leftIndent += self._unit2points(current_presentation.left_indent, style)
+        if halign == HorizontalAlignment.LEFT:
+            style.alignment = reportlab.lib.enums.TA_LEFT
+        elif halign == HorizontalAlignment.RIGHT:
+            style.alignment = reportlab.lib.enums.TA_RIGHT
+        elif halign == HorizontalAlignment.CENTER:
+            style.alignment = reportlab.lib.enums.TA_CENTER
         exported = ''
         for c in self.content:
             exported += c.export(context)
@@ -1862,11 +1872,14 @@ class PDFExporter(FileExporter, Exporter):
         # anything containing anything.  The only "paragraph" meaning we use
         # here is that the content should be separated from other text.
         content = self._content_export(context, element)
+        halign = element.halign()
         if isinstance(content, Text):
-            result = make_element(Paragraph, content=[content], presentation=element.presentation())
+            paragraph = make_element(Paragraph, content=[content],
+                                     presentation=element.presentation(),
+                                     halign=halign)
         else:
-            result = make_element(Container, content=[content])
-        return result
+            paragraph = make_element(Container, content=[content], halign=halign)
+        return paragraph
 
     def _export_table_of_contents(self, context, element):
         pdf_context = context.pdf_context
