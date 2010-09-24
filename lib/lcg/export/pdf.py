@@ -1340,7 +1340,7 @@ class Table(Element):
             if row.line_above:
                 table_style_data.append(('LINEABOVE', (0, i), (-1, i), 1, black,))
             if row.line_below:
-                table_style_data.append(('LINEBELOW', (0, i), (-1, i), 1, black,))                
+                table_style_data.append(('LINEBELOW', (0, i), (-1, i), 1, black,))
             row_content = []
             for j in range(len(row.content)):
                 column = row.content[j]
@@ -1426,7 +1426,12 @@ class Table(Element):
             table_style_data.append(('LEFTPADDING', (0, 0), (-1, -1), 0,))
             table_style_data.append(('RIGHTPADDING', (0, 0), (-1, -1), 0,))
         if presentation is not None and presentation.boxed:
-            table_style_data.append(('BOX', (0, 0), (-1, -1), 1, black))
+            table_style_data.append(('BOX', (0, 0), (-1, -1), 1, black,))
+        for bar in self.bars:
+            if bar == 0:
+                table_style_data.append(('LINEBEFORE', (0, 0), (0, -1), 1, black,))
+            else:
+                table_style_data.append(('LINEAFTER', (bar-1, 0), (bar-1, -1), 1, black,))
         # Create the table instance
         repeat_rows = 0
         if self.long:
@@ -1910,6 +1915,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Table, content=[c.export(context) for c in element.content()],
                             long=element.long(), compact=False,
                             column_widths=element.column_widths(),
+                            bars=element.bars(),
                             presentation=element.presentation())
 
     def _export_table_row(self, context, element):

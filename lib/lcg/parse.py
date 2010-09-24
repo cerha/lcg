@@ -340,30 +340,60 @@ class Parser(object):
                 return TableCell.RIGHT
             else:
                 return None
-        def horizontal_line(line):
-            return line[:2] == '|-'
+        def horizontal_rule(line):
+            return line and line[0][:1] == '-'
         table_rows = []
-        lines = block.strip().splitlines()
+        lines = [line.split('|')[1:-1] for line in block.strip().splitlines()]
+        # Check for specification column in the table
+        data_column_start = 0
+        nonempty_seen = False
+        spec_lines = []
+        for line in lines:
+            if not line or horizontal_rule(line):
+                continue
+            cell = line[0].strip()
+            if cell not in ('', '/', '#',):
+                break
+            if cell:
+                nonempty_seen = True
+                if cell == '/':
+                    spec_lines.append([cell.strip() for cell in line[1:]])
+        else:
+            if nonempty_seen:
+                data_column_start = 1
+        # Vertical bars
+        bars = []
+        if data_column_start:
+            for line in spec_lines:
+                for i in range(len(line)):
+                    cell = line[i]
+                    if cell in ('<', '<>',):
+                        bars.append(i)
+                    if cell in ('>', '<>',):
+                        bars.append(i+1)
+        # Prepare parameters
         previous_line = None
         last_line = None
         line_above = 0
         last_line_below = 0
         n = len(lines) - 1
-        while n >= 0 and horizontal_line(lines[n]):
+        while n >= 0 and horizontal_rule(lines[n]):
             last_line_below += 1
             n -= 1
         if n >= 0:
             last_line = lines[n]
+        # Process table lines
         for line in lines:
-            if horizontal_line(line):
+            if horizontal_rule(line):
                 line_above += 1
+            elif data_column_start and line and line[0].strip() == '/':
+                continue
             else:
-                cells = line.split('|')[1:-1]
                 row_cells = [TableCell(FormattedText(cell.strip()), align=align(cell.expandtabs()))
-                             for cell in cells]
+                             for cell in line[data_column_start:]]
                 if previous_line is None:
                     # When all cells of the first row are bold or empty, they are considered headings.
-                    headings = [cell.strip() for cell in cells]
+                    headings = [cell.strip() for cell in line[data_column_start:]]
                     if all([not h or h.startswith("*") and h.endswith("*") for h in headings]):
                         row_cells = [TableHeading(FormattedText(h and h[1:-1])) for h in headings]
                 if line is last_line:
@@ -373,7 +403,7 @@ class Parser(object):
                 table_rows.append(TableRow(row_cells, line_above=line_above, line_below=line_below))
                 line_above = 0
                 previous_line = line
-        return Table(table_rows)
+        return Table(table_rows, bars=bars)
 
     def _make_toc(self, block, groups):
         title = groups['title']

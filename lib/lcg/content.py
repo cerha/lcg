@@ -820,7 +820,7 @@ class Table(Container):
     """Table is a container of 'TableRow' instances."""
     _ALLOWED_CONTENT = (TableRow, HorizontalSeparator,)
 
-    def __init__(self, content, title=None, long=False, column_widths=None, **kwargs):
+    def __init__(self, content, title=None, long=False, column_widths=None, bars=(), **kwargs):
         """Arguments:
 
           content -- sequence of 'TableRow' and 'HorizontalSeparator' instances
@@ -836,15 +836,21 @@ class Table(Container):
             table columns.  If any of the elements is 'None', the width of the
             corresponding column is to be determined automatically.
             Alternatively the whole 'column_widths' value may be 'None' to
-            determine widths of all the columns automatically.          
+            determine widths of all the columns automatically.
+          bars -- sequence of vertical bars positions, integers.  The position
+            before the first column is numbered 0, the next position is 1 and
+            the position after the last column is numbered N where N is the
+            number of columns in the table.
 
         """
         assert title is None or isinstance(title, (str, unicode))
         assert isinstance(long, bool), long
         assert column_widths is None or isinstance(column_widths, (tuple, list,)), column_widths
+        assert isinstance(bars, (tuple, list,)), bars
         self._title = title
         self._long = long
         self._column_widths = column_widths
+        self._bars = bars
         super(Table, self).__init__(content, **kwargs)
         
     def title(self):
@@ -858,6 +864,14 @@ class Table(Container):
     def column_widths(self):
         """Return the value of 'column_widths' as passed to the constructor."""
         return self._column_widths
+
+    def bars(self):
+        """Return positions of vertical bars.
+
+        See '__init__()' documentation for information about the positions.
+
+        """
+        return self._bars
         
     
 class Section(Container):
