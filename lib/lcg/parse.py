@@ -340,18 +340,40 @@ class Parser(object):
                 return TableCell.RIGHT
             else:
                 return None
+        def horizontal_line(line):
+            return line[:2] == '|-'
+        table_rows = []
         lines = block.strip().splitlines()
-        # When all cells of the first row are bold or empty, they are considered headings.
-        headings = [cell.strip() for cell in lines[0].split('|')[1:-1]]
-        if False not in [not h or h.startswith("*") and h.endswith("*") for h in headings]:
-            del lines[0]
-            rows = [TableRow([TableHeading(FormattedText(h and h[1:-1])) for h in headings])]
-        else:
-            rows = []
-        rows += [TableRow([TableCell(FormattedText(cell.strip()), align=align(cell.expandtabs())) 
-                           for cell in line.split('|')[1:-1]])
-                 for line in lines]
-        return Table(rows)
+        previous_line = None
+        last_line = None
+        line_above = 0
+        last_line_below = 0
+        n = len(lines) - 1
+        while n >= 0 and horizontal_line(lines[n]):
+            last_line_below += 1
+            n -= 1
+        if n >= 0:
+            last_line = lines[n]
+        for line in lines:
+            if horizontal_line(line):
+                line_above += 1
+            else:
+                cells = line.split('|')[1:-1]
+                row_cells = [TableCell(FormattedText(cell.strip()), align=align(cell.expandtabs()))
+                             for cell in cells]
+                if previous_line is None:
+                    # When all cells of the first row are bold or empty, they are considered headings.
+                    headings = [cell.strip() for cell in cells]
+                    if all([not h or h.startswith("*") and h.endswith("*") for h in headings]):
+                        row_cells = [TableHeading(FormattedText(h and h[1:-1])) for h in headings]
+                if line is last_line:
+                    line_below = last_line_below
+                else:
+                    line_below = 0
+                table_rows.append(TableRow(row_cells, line_above=line_above, line_below=line_below))
+                line_above = 0
+                previous_line = line
+        return Table(table_rows)
 
     def _make_toc(self, block, groups):
         title = groups['title']

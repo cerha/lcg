@@ -1267,8 +1267,12 @@ class TableRow(Element):
     """Table row.
 
     'content' is a sequence of 'TableCell's.
+    'line_above' and 'line_below' indicate whether to put a horizontal line
+    above or below the row, respectively.
     
     """
+    line_above = None
+    line_below = None
     def init(self):
         super(TableRow, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -1333,6 +1337,10 @@ class Table(Element):
             if isinstance(row, HorizontalRule):
                 table_style_data.append(('LINEABOVE', (0, i), (-1, i), 1, black,))
                 continue
+            if row.line_above:
+                table_style_data.append(('LINEABOVE', (0, i), (-1, i), 1, black,))
+            if row.line_below:
+                table_style_data.append(('LINEBELOW', (0, i), (-1, i), 1, black,))                
             row_content = []
             for j in range(len(row.content)):
                 column = row.content[j]
@@ -1905,7 +1913,8 @@ class PDFExporter(FileExporter, Exporter):
                             presentation=element.presentation())
 
     def _export_table_row(self, context, element):
-        return make_element(TableRow, content=[c.export(context) for c in element.content()])
+        return make_element(TableRow, content=[c.export(context) for c in element.content()],
+                            line_above=element.line_above(), line_below=element.line_below())
 
     def _simple_export_table_cell(self, context, element, heading):
         return make_element(TableCell,
