@@ -334,7 +334,11 @@ class Parser(object):
         return paragraph
     
     def _make_table(self, block, groups):
-        def align(cell):
+        global_alignments = {}
+        def align(column_number, cell):
+            alignment = global_alignments.get(column_number)
+            if alignment is not None:
+                return alignment
             length = len(cell)
             if length - len(cell.lstrip()) > length - len(cell.rstrip()):
                 return TableCell.RIGHT
@@ -361,16 +365,41 @@ class Parser(object):
         else:
             if nonempty_seen:
                 data_column_start = 1
-        # Vertical bars
+        # Vertical bars, global alignments, widths
         bars = []
+        global_widths = {}
+        alignment_mapping = {'c': TableCell.CENTER, 'l': TableCell.LEFT, 'r': TableCell.RIGHT}
+        matcher = re.compile('<([clr]?)([0-9]*)>')
         if data_column_start:
             for line in spec_lines:
+                line_alignments = []
+                line_widths = []
                 for i in range(len(line)):
+                    width = None
                     cell = line[i]
+                    if not cell:
+                        continue
                     if cell in ('<', '<>',):
                         bars.append(i)
                     if cell in ('>', '<>',):
                         bars.append(i+1)
+                    match = matcher.match(cell)
+                    if match:
+                        alignment_char = match.group(1)
+                        alignment = alignment_mapping.get(alignment_char)
+                        if alignment is not None:
+                            global_alignments[i] = alignment
+                        width = match.group(2) or None
+                        if width is not None:
+                            try:
+                                width = UFont(float(width))
+                            except ValueError:
+                                width = None
+                        global_widths[i] = width
+        if all([w is None for w in global_widths.values()]):
+            column_widths = None
+        else:
+            column_widths = [global_widths[i] for i in range(len(global_widths))]
         # Prepare parameters
         previous_line = None
         last_line = None
@@ -389,8 +418,12 @@ class Parser(object):
             elif data_column_start and line and line[0].strip() == '/':
                 continue
             else:
-                row_cells = [TableCell(FormattedText(cell.strip()), align=align(cell.expandtabs()))
-                             for cell in line[data_column_start:]]
+                row_cells = []
+                i = 0
+                for cell in line[data_column_start:]:
+                    row_cells.append(TableCell(FormattedText(cell.strip()),
+                                               align=align(i, cell.expandtabs())))
+                    i += 1
                 if previous_line is None:
                     # When all cells of the first row are bold or empty, they are considered headings.
                     headings = [cell.strip() for cell in line[data_column_start:]]
@@ -403,7 +436,7 @@ class Parser(object):
                 table_rows.append(TableRow(row_cells, line_above=line_above, line_below=line_below))
                 line_above = 0
                 previous_line = line
-        return Table(table_rows, bars=bars)
+        return Table(table_rows, bars=bars, column_widths=column_widths)
 
     def _make_toc(self, block, groups):
         title = groups['title']
