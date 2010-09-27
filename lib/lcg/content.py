@@ -798,15 +798,19 @@ class TableRow(Container):
     """Table row is a container of cells or headings and may appear within 'Table'."""
     _ALLOWED_CONTENT = (TableCell, TableHeading)
 
-    def __init__(self, content, line_above=None, line_below=None, **kwargs):
+    def __init__(self, content, line_above=None, line_below=None, iterated=False, **kwargs):
         """Arguments:
 
           line_above -- iff true, request line above the row
           line_below -- iff true, request line below the row
+          iterated -- iff true, this row expands into any number of rows
+            according to the iterator variable used within one or more of its
+            cells
     
         """
         self._line_above = line_above
         self._line_below = line_below
+        self._iterated = iterated
         super(TableRow, self).__init__(content, **kwargs)
 
     def line_above(self):
@@ -814,6 +818,9 @@ class TableRow(Container):
 
     def line_below(self):
         return self._line_below
+
+    def iterated(self):
+        return self._iterated
 
     
 class Table(Container):

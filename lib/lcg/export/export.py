@@ -33,6 +33,82 @@ from lcg import *
 import shutil
 
 
+class SubstitutionIterator(object):
+    """Supporting object for multiple-value substitution variables.
+
+    There are situations where a substitution variable used inside structured
+    text markup can provide multiple values repeatedly, e.g. to generate
+    several different values for repeated rows of a table.  This is where
+    instance of this class is to be used as the variable value in provided
+    globals.
+
+    It works as follows: New instance of this class is created.  Before each
+    new value is retrieved via 'value()' method, 'next()' method must be called
+    and checked for its return value.  The iterator can be reinitialized using
+    'reset()' method.  'value()' is called by 'MarkupFormatter', other methods
+    must be called by the code providing the globals.
+
+    In order to implement iterating behavior for particular substitution
+    situation you should subclass this class and redefine the methods
+    '_value()', '_next()' and '_reset()'.
+    
+    """
+    class NotStartedError(Exception):
+        """Exception raised when 'value()' without previous 'next()' is called.
+        """
+        def __init__(self, iterator):
+            self._iterator = iterator
+        def iterator(self):
+            return self._iterator
+
+    def __init__(self):
+        self.reset()
+        
+    def value(self):
+        """Return the current value of the iterator.
+
+        It is an error, signalled by 'NotStartedError', if 'next()' method
+        hasn't been called after the instance was created or 'reset()' method
+        was called.  Once 'next()' method has been called, it's legal to call
+        'value()' method several times to retrieve the same value, or to call
+        'next()' method any time (even without calling 'value()' method) to
+        advance to the next iterator value.
+
+        """
+        if not self._started:
+            raise self.NotStartedError(self)
+        return self._value()
+
+    def _value(self):
+        return None
+    
+    def next(self):
+        """Advance the iterator to the next value.
+
+        Return true if the next value is available (via 'value()' method) and
+        false if there is no next value.
+
+        """
+        self._started = True
+        return self._next()
+
+    def _next(self):
+        return False
+    
+    def reset(self):
+        """Reset the iterator to its initial state.
+
+        After this operation the iterator can be used to generate all the
+        substitution values again.
+        
+        """
+        self._started = False
+        self._reset()
+
+    def _reset(self):
+        pass
+
+
 class MarkupFormatter(object):
     """Simple inline ASCII markup formatter.
 
@@ -152,6 +228,8 @@ class MarkupFormatter(object):
             key = str(name)
             if result.has_key(key):
                 result = result[key]
+                if isinstance(result, SubstitutionIterator):
+                    result = result.value()
             else:
                 return exporter.escape('$' + subst)
         if isinstance(result, Content):

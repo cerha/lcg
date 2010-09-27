@@ -433,7 +433,9 @@ class Parser(object):
                     line_below = last_line_below
                 else:
                     line_below = 0
-                table_rows.append(TableRow(row_cells, line_above=line_above, line_below=line_below))
+                iterated = data_column_start and line[0].strip() == '#'
+                table_rows.append(TableRow(row_cells, line_above=line_above, line_below=line_below,
+                                           iterated=iterated))
                 line_above = 0
                 previous_line = line
         return Table(table_rows, bars=bars, column_widths=column_widths)

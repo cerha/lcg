@@ -1913,15 +1913,34 @@ class PDFExporter(FileExporter, Exporter):
     # Tables
 
     def _export_table(self, context, element):
-        return make_element(Table, content=[c.export(context) for c in element.content()],
+        content = []
+        for c in element.content():
+            content += c.export(context).content
+        return make_element(Table, content=content,
                             long=element.long(), compact=False,
                             column_widths=element.column_widths(),
                             bars=element.bars(),
                             presentation=element.presentation())
 
     def _export_table_row(self, context, element):
-        return make_element(TableRow, content=[c.export(context) for c in element.content()],
-                            line_above=element.line_above(), line_below=element.line_below())
+        def make_row():
+            return make_element(TableRow, content=[c.export(context) for c in element.content()],
+                                line_above=element.line_above(), line_below=element.line_below())
+        if element.iterated():
+            iterator = None
+            try:
+                make_row()
+            except SubstitutionIterator.NotStartedError, e:
+                iterator = e.iterator()
+            if iterator is None:
+                raise Exception("No table row iterator found")
+            rows = []
+            while iterator.next():
+                rows.append(make_row())
+            iterator.reset()
+        else:
+            rows = [make_row()]
+        return make_element(Container, content=rows)
 
     def _simple_export_table_cell(self, context, element, heading):
         return make_element(TableCell,
