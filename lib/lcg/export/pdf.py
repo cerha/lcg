@@ -1294,6 +1294,7 @@ class Table(Element):
     compact = True
     halign = None
     valign = None
+    bars = ()
     
     def init(self):
         super(Table, self).init()
