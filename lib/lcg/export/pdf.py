@@ -1920,6 +1920,7 @@ class PDFExporter(FileExporter, Exporter):
                             long=element.long(), compact=False,
                             column_widths=element.column_widths(),
                             bars=element.bars(),
+                            halign=element.halign(),
                             presentation=element.presentation())
 
     def _export_table_row(self, context, element):

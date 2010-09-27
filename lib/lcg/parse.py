@@ -438,7 +438,8 @@ class Parser(object):
                                            iterated=iterated))
                 line_above = 0
                 previous_line = line
-        return Table(table_rows, bars=bars, column_widths=column_widths)
+        return Table(table_rows, bars=bars, column_widths=column_widths,
+                     halign=groups.get('halign'))
 
     def _make_toc(self, block, groups):
         title = groups['title']
