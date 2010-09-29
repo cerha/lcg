@@ -490,31 +490,26 @@ class Exporter(object):
         """
         return self.Context(self, self._formatter, node, lang, **kwargs)
 
-    def export_element(self, context, element_type, element):
+    def export_element(self, context, element):
         """Export the given content element and return its output representation.
 
         Arguments:
 
           context -- export context object created by the 'context()' method and
             propagated from the 'export()' method.  Instance of 'self.Context'.
-          element_type -- content element class (derived from 'Content')
-            determining how the content element will be treated.  Most often
-            this is the class of the 'element' instance, but a different class
-            may be passed (usually one of 'element's superclasses) to force
-            specific behavior.  In any case, the class must be compatible with
-            the 'element' instance's class (have the same public methods) and
-            must be supported by the exporter.  If the exporter doesn't
-            recognize the class, 'UnsupportedElementType' exception is raised.
           element -- 'Content' instance to be exported.
-
-        The supported element types are defined by the method
-        '_define_export_methods()'.
+          
+        The supported element types are defined by the method '_define_export_methods()'.  If the
+        'element' class is not found there directly, all its base classes are searched.
 
         """
+        cls = element.__class__
+        while cls not in self._export_method and cls.__bases__:
+            cls = cls.__bases__[0]
         try:
-            method = self._export_method[element_type]
+            method = self._export_method[cls]
         except KeyError:
-            raise UnsupportedElementType(element_type)
+            raise UnsupportedElementType(element.__class__)
         return method(context, element)
 
     def export(self, context):

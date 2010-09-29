@@ -124,17 +124,6 @@ class Content(object):
             path.insert(0, path[0]._container)
         return tuple(path)
 
-    def _export_element_type(self):
-        """Return the element class recognized by the exporter.
-
-        The class returned by this method determines how the exporter treats the element during
-        export.  The base class implementation of this method returns 'self.__class__', but you may
-        need to override this in derived classes to either mimic another class or just retain the
-        parent class export.
-
-        """
-        return self.__class__
-
     def sections(self, context):
         """Return the contained sections as a sequence of 'Section' instances.
 
@@ -218,7 +207,7 @@ class Content(object):
             created and returned by 'Exporter.context' method
 
         """
-        return context.exporter().export_element(context, self._export_element_type(), self)
+        return context.exporter().export_element(context, self)
     #return context.exporter().escape('')
 
     
@@ -879,9 +868,6 @@ class Section(Container):
         self._backref = None
         super(Section, self).__init__(content, **kwargs)
 
-    def _export_element_type(self):
-        return self.__class__
-    
     def path(self):
         """Return the sequence of parent sections in the container hierarchy.
 
@@ -1056,9 +1042,6 @@ class NodeIndex(TableOfContents):
     def __init__(self, title=None, node=None, depth=None, detailed=False):
         super(NodeIndex, self).__init__(node, title=title, depth=depth, detailed=detailed)
 
-    def _export_element_type(self):
-        return TableOfContents
-                      
     def _root_item(self):
         return self._item or self.parent()
         
@@ -1195,9 +1178,7 @@ class NoneContent(Content):
     same purpose.
     
     """
-    def _export_element_type(self):
-        return Content
-
+    pass
 
 class ContentVariants(Container):
     """Container of multiple language variants of the same content.

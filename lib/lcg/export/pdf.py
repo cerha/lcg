@@ -1648,8 +1648,8 @@ class PDFExporter(FileExporter, Exporter):
             return self.export(context, old_contexts=old_contexts)
         return output.getvalue()
     
-    def export_element(self, context, element_type, element):
-        result = super(PDFExporter, self).export_element(context, element_type, element)
+    def export_element(self, context, element):
+        result = super(PDFExporter, self).export_element(context, element)
         assert isinstance(result, Element), ('Invalid export result', element, result,)
         return result
     
