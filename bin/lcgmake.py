@@ -18,7 +18,7 @@
 
 """Simple and `quite' generic LCG generator."""
 
-import sys, getopt, os, lcg, string, imp, operator
+import sys, getopt, os, lcg, string, imp, re, operator
 
 OPTIONS = (
     ("Input options", (
@@ -123,7 +123,16 @@ def main():
     #######################################################################################
     # Read the source files (first real action after processing options).
     reader = lcg.reader(src, name, ext=ext, recourse=recourse, encoding=opt['encoding'])
-    node = reader.build()
+    try:
+        node = reader.build()
+    except IOError, e:
+        message = unicode(e)
+        match = re.match('[[]Errno[^]]*[]] *', message)
+        if match:
+            message = message[match.end():]
+        sys.stderr.write(message)
+        sys.stderr.write('\n')
+        return
     # Decide which exporter to use.
     kwargs = {}
     if output_format == PDF:
