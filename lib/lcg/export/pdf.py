@@ -22,6 +22,7 @@ import cStringIO
 import os
 import re
 import string
+import subprocess
 import sys
 
 import reportlab.lib.colors
@@ -172,15 +173,20 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
             del kwargs['context']
             presentation = context.pdf_context.current_presentation()
             font_size_coefficient = Context.default_font_size / 10.0
+            presentation_name = None
             presentation_family = None
             if presentation is not None:
                 font_size_coefficient *= (presentation.font_size or 1)
-                presentation_family = presentation.heading_font_family or presentation.font_family
-            font_name = context.pdf_context.font_name(presentation_family)
+                presentation_name = presentation.font_name
+                presentation_family = (presentation.heading_font_family or
+                                       presentation.font_family or
+                                       FontFamily.SERIF)
+            font_name = context.pdf_context.font(presentation_name, presentation_family,
+                                                 False, False)
         else:
             context = None
             font_size_coefficient = 1
-            font_name = 'FreeSerif'
+            font_name = Context().font(None, FontFamily.SERIF, False, False)
         reportlab.platypus.tableofcontents.TableOfContents.__init__(self, *args, **kwargs)
         self.levelStyles = copy.copy(self.levelStyles)
         for i in range(len(self.levelStyles)):
@@ -209,8 +215,6 @@ class Context(object):
 
     """
 
-    _font_path = '/usr/share/fonts/truetype/freefont'
-
     _nesting_level = 0
     _list_nesting_level = 0
     _counter = 0
@@ -220,10 +224,11 @@ class Context(object):
     default_font_size = 12
     left_indent = 0
     bullet_indent = 0
-    last_element_category = None 
+    last_element_category = None
 
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
-                 page_header=None, page_footer=None, presentation=None):
+                 page_header=None, page_footer=None, presentation=None, lang=None):
+        self._lang = lang
         self._presentations = []
         self._init_fonts()
         self._init_styles()
@@ -249,7 +254,7 @@ class Context(object):
         self._styles = reportlab.lib.styles.getSampleStyleSheet()
         # Normal
         self._normal_style = copy.copy(self._styles['Normal'])
-        self._normal_style.fontName = 'FreeSerif'
+        self._normal_style.fontName = self.font(None, FontFamily.SERIF, False, False)
         self._normal_style.fontSize = self.default_font_size
         self._normal_style.bulletFontName = self._normal_style.fontName
         self._normal_style.bulletFontSize = self._normal_style.fontSize
@@ -257,7 +262,7 @@ class Context(object):
         self._normal_style.firstLineIndent = self._normal_style.leading
         # Code
         self._code_style = copy.copy(self._styles['Code'])
-        self._code_style.fontName = 'FreeMono'
+        self._code_style.fontName = self.font(None, FontFamily.FIXED_WIDTH, False, False)
         self._code_style.fontSize = self.default_font_size
         self.adjust_style_leading(self._code_style)
         # Bullet
@@ -265,23 +270,7 @@ class Context(object):
 
     def _init_fonts(self):
         self._fonts = {}
-        for family in 'Serif', 'Sans', 'Mono':
-            font_name = 'Free' + family
-            i = 0
-            if family == 'Serif':
-                faces = (('', False, False,), ('Italic', False, True,),
-                         ('Bold', True, False,), ('BoldItalic', True, True,),)
-            else:
-                faces = (('', False, False,), ('Oblique', False, True,),
-                         ('Bold', True, False,), ('BoldOblique', True, True,),)
-            for face, bold, italic in faces:
-                font_face_name = font_name + face
-                f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, os.path.join(self._font_path, font_face_name) + '.ttf')
-                reportlab.pdfbase.pdfmetrics.registerFont(f)
-                reportlab.lib.fonts.addMapping(font_name, i/2, i%2, font_face_name)
-                i = i + 1
-                self._fonts[(family, bold, italic)] = font_face_name
-        default_font = 'FreeSerif'
+        default_font = self.font(None, FontFamily.SERIF, False, False)
         try: # these objects are no longer present in newer ReportLab versions
             reportlab.platypus.tableofcontents.levelZeroParaStyle.fontName = default_font
             reportlab.platypus.tableofcontents.levelOneParaStyle.fontName = default_font
@@ -291,31 +280,129 @@ class Context(object):
         except AttributeError:
             pass
 
-    def _font_family(self, presentation_family):
-        if presentation_family == FontFamily.SERIF:
-            family = 'Serif'
-        elif presentation_family == FontFamily.SANS_SERIF:
-            family = 'Sans'
-        elif presentation_family == FontFamily.FIXED_WIDTH:
-            family = 'Mono'
+    def _find_font_file(self, name, family, bold, italic, lang):
+        # It seems there fontconfig utilities are a bit buggy so we have to use
+        # nonstraight ways of retrieving the font file.  It's prone to
+        # fontconfig changes but we hardly can do much better unless we are
+        # going to use fontconfig library directly.
+        #
+        # Find pattern
+        if family == FontFamily.SERIF:
+            family_pattern = 'serif'
+        elif family == FontFamily.SANS_SERIF:
+            family_pattern = 'sans-serif'
+        elif family == FontFamily.FIXED_WIDTH:
+            family_pattern = 'monospace'
         else:
             raise Exception('Unknown font family', presentation_family)
-        return family
+        if bold:
+            bold_pattern = 'bold'
+        else:
+            bold_pattern = 'medium'
+        if italic:
+            italic_pattern = 'italic'
+        else:
+            italic_pattern = 'roman'
+        if lang is None:
+            language_pattern = ''
+        else:
+            language_pattern = ':lang=' + lang
+        pattern = (':family=%s:weight=%s:slant=%s%s' %
+                   (family_pattern, bold_pattern, italic_pattern, language_pattern,))
+        # Retrieve candidates
+        p = subprocess.Popen(['fc-match', '-v', '--sort', pattern],
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, close_fds=True)
+        output = ''
+        while True:
+            data = p.stdout.read()
+            if not data:
+                break
+            output += data
+        p.stdout.close()
+        # Find matching font
+        font_file = None
+        default_font_file = None
+        family_match = False
+        family_string = 'family: "%s' % (name or '',)
+        re_file = re.compile('.*file: *"([^"]+\.ttf)"')
+        for line in output.splitlines():
+            if line.find('family: ') >= 0:
+                family_match = (line.find(family_string) >= 0)
+            else:
+                match = re_file.match(line)
+                if match:
+                    file_ = match.group(1)
+                    if family_match:
+                        font_file = file_
+                        break
+                    elif default_font_file is None:
+                        default_font_file = file_
+        # If there is no match, use a fallback font
+        if font_file is None:
+            font_file = default_font_file
+        if font_file is None:
+            if family == FontFamily.SERIF:
+                family_name = 'Serif'
+            elif family == FontFamily.SANS_SERIF:
+                family_name = 'Sans'
+            elif family == FontFamily.FIXED_WIDTH:
+                family_name = 'Mono'
+            if bold:
+                bold_name = 'Bold'
+            else:
+                bold_name = ''
+            if italic:
+                if family == FontFamily.SERIF:
+                    italic_name = 'Italic'
+                else:
+                    italic_name = 'Oblique'
+            else:
+                italic_name = ''
+            font_file = ('/usr/share/fonts/truetype/freefont/Free%s%s%s.ttf' %
+                         (family_name, bold_name, italic_name,))
+        # That's all
+        return font_file
 
-    def font(self, family, bold, italic):
+    def _register_font(self, name, family, bold, italic, font_file):
+        assert font_file
+        font_name = self.font_name(name, family)
+        font_face_name = '%s%s%s' % (font_name,
+                                     bold and '_Bold' or '',
+                                     italic and '_Italic' or '',)
+        f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, font_file)
+        reportlab.pdfbase.pdfmetrics.registerFont(f)
+        reportlab.lib.fonts.addMapping(font_name, bold, italic, font_face_name)
+        return font_face_name
+        
+    def font(self, name, family, bold, italic):
         """Return full font name for given arguments.
 
         Arguments:
 
-          family -- one of 'Serif', 'Sans', 'Mono' constants
+          name -- name of the font (string), such as 'Free' or 'DejaVu'; it may
+            also be 'None' in which case any suitable font is used
+          family -- one of 'FontFamily' constants
           bold -- boolean
           italic -- boolean
           
         """
-        return self._fonts[(family, bold, italic,)]
+        assert family is not None
+        key = (name, family, bold, italic,)
+        font = self._fonts.get(key)
+        if font is None:
+            font_file = self._find_font_file(name, family, bold, italic, self._lang)
+            font = self._fonts[key] = self._register_font(name, family, bold, italic, font_file)
+        return font
 
     def font_parameters(self, font_name):
-        """Return tuple (FAMILY, BOLD, ITALIC,) corresponding to given 'font_name'.
+        """Return tuple (NAME, FAMILY, BOLD, ITALIC,) corresponding to given 'font_name'.
+
+        Arguments:
+        
+          font-name -- font name as a string
+
+        Raise 'KeyError' if the given name is not found.
+
         """
         for k, v in self._fonts.items():
             if v == font_name:
@@ -323,20 +410,21 @@ class Context(object):
         else:
             raise KeyError(font_name)
 
-    def font_name(self, presentation_family):
-        """Return font name corresponding to presentation family.
+    def font_name(self, name, family):
+        """Return font name corresponding to given font name and family.
 
         Arguments:
 
-          presentation_family -- one of 'FontFamily' constants or 'None' (in
+          name -- font name as a string (such as 'Free' or 'DejaVu') or 'None'
+            in which case default font is used
+          family -- one of 'FontFamily' constants or 'None' (in
             which case default font name is returned)
 
         """
-        if presentation_family:
-            font_name = 'Free' + self._font_family(presentation_family)
-        else:
-            font_name = 'FreeSerif'
-        return font_name
+        assert family is not None
+        font_name = (name or 'DEFAULT')
+        name = '%s_%s' % (font_name, family,)
+        return name
 
     def nesting_level(self):
         """Return current paragraph and list nesting level.
@@ -396,10 +484,14 @@ class Context(object):
             level = 3
         style = copy.copy(self._styles['Heading%d' % (level,)])
         presentation = self.current_presentation()
-        presentation_family = None
+        presentation_font_name = None
+        presentation_font_family = None
         if presentation:
-            presentation_family = presentation.heading_font_family or presentation.font_family
-        style.fontName = self.font_name(presentation_family)
+            presentation_font_name = presentation.font_name
+            presentation_font_family = (presentation.heading_font_family or
+                                        presentation.font_family or
+                                        FontFamily.SERIF)
+        style.fontName = self.font(presentation_font_name, presentation_font_family, False, False)
         style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
         self.adjust_style_leading(style)
         return style
@@ -414,7 +506,7 @@ class Context(object):
 
         """
         style = copy.copy(self._styles['Bullet'])
-        style.fontName='FreeSerif'
+        style.fontName = self.font(None, FontFamily.SERIF, False, False)
         style.fontSize = self.default_font_size
         style.bulletFontSize = style.fontSize
         self.adjust_style_leading(style)
@@ -435,15 +527,17 @@ class Context(object):
             if presentation.font_size is not None:
                 style.fontSize = style.fontSize * presentation.font_size
                 self.adjust_style_leading(style)
-            family, bold, italic = self.font_parameters(style.fontName)
+            font_name, family, bold, italic = self.font_parameters(style.fontName)
+            if presentation.font_name is not None:
+                font_name = presentation.font_name
             if (presentation.font_family is not None and
                 style.name != 'Code' and style.name[:7] != 'Heading'):
-                family = self._font_family(presentation.font_family)
+                family = presentation.font_family
             if presentation.bold is not None:
                 bold = presentation.bold
             if presentation.italic is not None:
                 italic = presentation.italic
-            style.fontName = self.font(family, bold, italic)
+            style.fontName = self.font(font_name, family, bold, italic)
         style.fontSize *= self.relative_font_size()
         self.adjust_style_leading(style)
         style.leftIndent = self.left_indent
@@ -1048,7 +1142,7 @@ class Container(Element):
             (presentation is None or
              parent_presentation is not None)):
             if presentation is not None and parent_presentation is not None:
-                for attr in ('bold', 'italic', 'font_size', 'font_family',):
+                for attr in ('bold', 'italic', 'font_size', 'font_name', 'font_family',):
                     value = getattr(presentation, attr)
                     if value is not None:
                         setattr(parent_presentation, attr, value)
@@ -1330,8 +1424,8 @@ class Table(Element):
         # (In case of table style overlappings, last definition takes precedence.)
         black = reportlab.lib.colors.black
         style = pdf_context.style()
-        family, bold, italic = pdf_context.font_parameters(style.fontName)
-        bold_font = pdf_context.font(family, True, italic)
+        font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
+        bold_font = pdf_context.font(font_name, family, True, italic)
         table_style_data.append(('FONT', (0, 0), (-1, -1), style.fontName, style.fontSize))
         i = 0
         for row in content:
@@ -1387,7 +1481,8 @@ class Table(Element):
                     row_content.append(exported_column)
                     if (p is not None and
                         (p.bold is not None or p.italic is not None or
-                         p.font_family is not None or p.font_size is not None)):
+                         p.font_name is not None or p.font_family is not None or
+                         p.font_size is not None)):
                         pdf_context.set_presentation(p)
                         s = pdf_context.style()
                         table_style_data.append(('FONT', (j, i), (j, i), s.fontName, s.fontSize))
@@ -1634,7 +1729,8 @@ class PDFExporter(FileExporter, Exporter):
         return self._markup(text, 'strong')
     
     def fixed(self, context, text):
-        return self._markup(text, 'font', face='FreeMono')
+        face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, None, None)
+        return self._markup(text, 'font', face=face)
      
     def underline(self, context, text):
         return self._markup(text, 'u')
@@ -1668,7 +1764,8 @@ class PDFExporter(FileExporter, Exporter):
                                       first_page_header=node.first_page_header(lang),
                                       page_header=node.page_header(lang),
                                       page_footer=node.page_footer(lang),
-                                      presentation=node.presentation(lang))
+                                      presentation=node.presentation(lang),
+                                      lang=lang)
         pdf_context.add_presentation(context.presentation())
         presentation = pdf_context.current_presentation()
 	exported_structure = []
@@ -1687,7 +1784,8 @@ class PDFExporter(FileExporter, Exporter):
                                              first_page_header=node.first_page_header(lang),
                                              page_header=node.page_header(lang),
                                              page_footer=node.page_footer(lang),
-                                             presentation=presentation)
+                                             presentation=presentation,
+                                             lang=lang)
             # The subcontext serves twice: 1. when exporting node content;
             # 2. when exporting to ReportLab.  The question is how to transfer
             # the subcontext to the proper place in ReportLab formatting.  This

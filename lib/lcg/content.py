@@ -57,6 +57,8 @@ class Presentation(object):
     """
     font_size = None
     "Font size relative to the current font size (1.0 is the same size), float."
+    font_name = None
+    "Name of the font to use, e.g. 'Free' or 'DejaVu', string."
     font_family = None
     "Font family to be used for typesetting text, one of 'FontFamily' constants."
     heading_font_family = None

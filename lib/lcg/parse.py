@@ -139,6 +139,7 @@ class Parser(object):
                    ('parameter', 'first_page_header', 'FIRST_PAGE_HEADER', None,),
                    ('parameter', 'page_footer', 'FOOTER', None,),
                    ('presentation', 'font_size', 'FONT_SIZE', float,),
+                   ('presentation', 'font_name', 'FONT_NAME', None,),
                    ('presentation', 'font_family', 'FONT_FAMILY', None,),
                    ('presentation', 'heading_font_family', 'HEADING_FONT_FAMILY', None,),
                    ('presentation', 'noindent', 'NOINDENT', bool,),
