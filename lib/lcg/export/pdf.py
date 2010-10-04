@@ -214,6 +214,7 @@ class Context(object):
     'Context' instance.
 
     """
+    _registered_fonts = {}
 
     _nesting_level = 0
     _list_nesting_level = 0
@@ -369,9 +370,15 @@ class Context(object):
         font_face_name = '%s%s%s' % (font_name,
                                      bold and '_Bold' or '',
                                      italic and '_Italic' or '',)
-        f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, font_file)
-        reportlab.pdfbase.pdfmetrics.registerFont(f)
-        reportlab.lib.fonts.addMapping(font_name, bold, italic, font_face_name)
+        key = (font_name, bold, italic,)
+        if Context._registered_fonts.has_key(key):
+            assert Context._registered_fonts[key] == font_file, \
+                   ("Inconsistent font definition", key, font_file,)
+        else:
+            f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, font_file)
+            reportlab.pdfbase.pdfmetrics.registerFont(f)
+            reportlab.lib.fonts.addMapping(font_name, bold, italic, font_face_name)
+            Context._registered_fonts[key] = font_file
         return font_face_name
         
     def font(self, name, family, bold, italic):
