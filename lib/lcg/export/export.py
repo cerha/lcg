@@ -236,7 +236,7 @@ class MarkupFormatter(object):
             result = result.export(context)
         else:
             if not isinstance(result, Localizable):
-                result = str(result)
+                result = unicode(result)
             result = exporter.escape(result)
         return result
     
