@@ -93,13 +93,13 @@ class ContentNode(object):
         self._hidden = hidden
         self._active = active
         self._variants = tuple(variants)
-        assert page_header is None or isinstance(page_header, dict) and all ([isinstance(x, Content) for x in page_header.values()]), page_header
+        assert page_header is None or isinstance(page_header, dict) and all ([x is None or isinstance(x, Content) for x in page_header.values()]), page_header
         self._page_header = page_header
-        assert first_page_header is None or isinstance(first_page_header, dict) and all ([isinstance(x, Content) for x in first_page_header.values()]), first_page_header
+        assert first_page_header is None or isinstance(first_page_header, dict) and all ([x is None or isinstance(x, Content) for x in first_page_header.values()]), first_page_header
         self._first_page_header = first_page_header
-        assert page_footer is None or isinstance(page_footer, dict) and all ([isinstance(x, Content) for x in page_footer.values()]), page_footer
+        assert page_footer is None or isinstance(page_footer, dict) and all ([x is None or isinstance(x, Content) for x in page_footer.values()]), page_footer
         self._page_footer = page_footer
-        assert presentation is None or isinstance(presentation, dict) and all ([isinstance(x, Presentation) for x in presentation.values()]), presentation
+        assert presentation is None or isinstance(presentation, dict) and all ([x is None or isinstance(x, Presentation) for x in presentation.values()]), presentation
         self._presentation = presentation
         if isinstance(content, (tuple, list)):
             content = Container(content)
