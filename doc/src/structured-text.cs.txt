@@ -71,7 +71,7 @@ výstupního média (např. okna prohlížeče).
 === Kapitoly === sections
 
 Kapitoly umožňují vytvářet hierarchickou strukturu obsahu.  Strukturu kapitol
-je potom možné vypsat ve formě hierarchického [#toc rejstříku] a umožnit tak
+je potom možné vypsat ve formě hierarchického [#toc obsahu] a umožnit tak
 snadnou navigaci v rámci této struktury (podobně jako je tomu v tomto návodu).
 
 Kapitola začíná nadpisem.  Nadpis je na začátku a na konci řádku obklopen
@@ -352,9 +352,9 @@ Kotva potom může být použita v odkazech na tuto kapitolu.  Například odkaz
 automaticky doplněn jako název odkazu.  Více viz [#links].
 
 
-==== Rejstříky ==== toc
+==== Obsah ==== toc
 
-Rejstřík je hierarchický výpis kapitol dokumentu nebo jeho části.  Je to
+Obsah je hierarchický výpis kapitol dokumentu nebo jeho části.  Je to
 důležitý navigační prvek (jednotlivé položky tvoří odkazy do příslušných
 kapitol).  Do dokumentu jej vložíme pomocí makra =@TOC@= (z anglického „Table
 of Contents“).
@@ -365,20 +365,20 @@ of Contents“).
 Obsah: @TOC@
 -----
 
-Tato řádka zdrojového dokumentu bude na výstupu nahrazena rejstříkem.  Text
+Tato řádka zdrojového dokumentu bude na výstupu nahrazena obsahem.  Text
 před dvojtečkou bude tvořit jeho nadpis a ve výpisu budou obsaženy všechny
 kapitoly nacházející se v hierarchii pod aktuální kapitolou, ve které je makro
-použito.  To znamená že je možné vytvářet také lokální rejstříky pro jednotlivé
+použito.  To znamená že je možné vytvářet také lokální obsahy pro jednotlivé
 části hierarchie.
 
 Obsah na začátku kapitoly [#complete-manual] byl vytvořen stejným způsobem.
 
-=@TOC@= vytváří rejstřík kapitol v rámci jednoho dokumentu.  Kromě toho je
-možné použít také makro =@NodeIndex@=, které vytvoří rejstřík
+=@TOC@= vytváří obsah v rámci jednoho dokumentu.  Kromě toho je
+možné použít také makro =@NodeIndex@=, které vytvoří obsah
 dokumentů v rámci jejich struktury (tam, kde je LCG použito ke zpracování
 celých struktur dokumentů).
 
-Výchozí podoba rejstříku je hierarchická.  Můžete však také omezit hloubku této
+Výchozí podoba obsahu je hierarchická.  Můžete však také omezit hloubku této
 hierarchie.  Toho dosáhnete udáním celého čísla v kulatých závorkách, jako
 v následujícím příkladu:
 
@@ -387,7 +387,7 @@ Obsah: @TOC(1)@
 -----
 
 Tím vytvoříte výpis obsahující pouze položky na nejvyšší úrovni hierarchie.
-Rejstřík na začátku tohoto dokumentu byl vytvořen stejným způsobem.
+Obsah na začátku tohoto dokumentu byl vytvořen stejným způsobem.
 
 
 ==== Odrážkové seznamy ==== bullet-lists
@@ -535,7 +535,7 @@ pokud jsou správně odsazeny.
 *Příklad:*
 
 ------
-:Datum narození: 30.8. 1975
+:Datum narození: 30. 8. 1975
 :Adresa:
    Důlní 23//
    Ostrava
@@ -544,7 +544,7 @@ pokud jsou správně odsazeny.
 
 Toto bude zobrazeno jako:
 
-:Datum narození: 30.8. 1975
+:Datum narození: 30. 8. 1975
 :Adresa:
    Důlní 23//
    Ostrava
