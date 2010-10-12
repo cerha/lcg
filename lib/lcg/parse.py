@@ -83,7 +83,7 @@ class ProcessingError(Exception):
         return self._reason
     
 
-class Parser(object):
+class OldParser(object):
     """Structured text (wiki) document parser.
 
     This parser parses the structure of the document and builds the
@@ -501,6 +501,446 @@ class Parser(object):
         content_text = self._parse_parameters(text, parameters)
         sections = self._parse_sections(content_text)
         return sections
+
+
+class NewParser(object):
+    """Structured text (wiki) document parser.
+
+    This parser parses the structure of the document and builds the
+    corresponding 'Content' element hierarchy.  This parser doesn't care about
+    inline markup at all.  Only higher-level constructs are recognized here.
+    Formatting the inline markup is done by the 'MarkupFormatter' on LCG output
+    (as opposed to parsing, which is done on LCG input).
+
+    """
+    _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *$')
+    _HRULE_MATCHER = re.compile(r'^----+ *$')
+    _TOC_MATCHER = re.compile(r'(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>(N?TOC|NodeIndex))(\((?P<tocdepth>\d+)\))?\@ *')
+    _TABLE_MATCHER = re.compile(r'\|.*\| *$')
+    _CELL_ALIGNMENT_MATCHER = re.compile(r'<([clr]?)([0-9]*)>')
+    _CELL_ALIGNMENT_MAPPING = {'c': TableCell.CENTER, 'l': TableCell.LEFT, 'r': TableCell.RIGHT}
+    _COMMENT_MATCHER = re.compile('^#[^\n]*(\n|$)', re.MULTILINE)
+    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<title>.*) (?P=level)' +
+                                   r'(?:[\t ]+(?:\*|(?P<anchor>[\w\d_-]+)))? *$'),
+                                  re.MULTILINE)
+    _LINE_MATCHER = re.compile(r'^( *)([^\n\r]*)(\r?\n\r?|$)', re.MULTILINE)
+    _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *$', re.DOTALL|re.MULTILINE)
+    _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?$', re.MULTILINE)
+    _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
+                                r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)')
+    _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
+                                     r'(?P<descr>([\t ]+[^\r\n]+\r?\n)*([\t ]+[^\r\n]+\r?\n?))')
+    _LIST_MATCHER = re.compile(r'( *)\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.)) +')
+    _TAB_MATCHER = re.compile(r'^\t')
+    
+    _PARAMETERS = {'header': ('parameter', 'page_header', None,),
+                   'first_page_header': ('parameter', 'first_page_header', None,),
+                   'footer': ('parameter', 'page_footer', None,),
+                   'font_size': ('presentation', 'font_size', float,),
+                   'font_name': ('presentation', 'font_name', None,),
+                   'font_family': ('presentation', 'font_family', None,),
+                   'heading_font_family': ('presentation', 'heading_font_family', None,),
+                   'noindent': ('presentation', 'noindent', bool,),
+                   'line_spacing': ('presentation', 'line_spacing', float,),
+                   }
+    
+    def __init__(self):
+        self._processors = (self._alignment_processor,
+                            self._field_processor,
+                            self._hrule_processor,
+                            self._section_processor,
+                            self._literal_processor,
+                            self._toc_processor,
+                            self._table_processor,
+                            self._definition_processor,
+                            self._list_processor,
+                            self._parameters_processor,
+                            self._paragraph_processor,
+                            )
+
+    def _alignment_processor(self, text, position, **kwargs):
+        match = self._ALIGNMENT_MATCHER.match(text[position:])
+        if not match:
+            return None
+        identifier = match.group(1)
+        if identifier in ('center', 'centre',):
+            halign = HorizontalAlignment.CENTER
+        elif identifier == 'left':
+            halign = HorizontalAlignment.LEFT
+        elif identifier == 'right':
+            halign = HorizontalAlignment.RIGHT                
+        position = self._find_next_block(text, match.end())
+        return self._parse(text, position, halign=halign, **kwargs)
+
+    def _field_processor(self, text, position, **kwargs):
+        if text[position] != ':':
+            return None
+        fields = []
+        while True:
+            match = self._FIELD_MATCHER.match(text[position:])
+            if not match:
+                break
+            groups = match.groupdict()
+            fields.append((WikiText(groups['label']), WikiText(groups['value']),))
+            position += match.end()
+        return FieldSet(fields), position
+
+    def _definition_processor(self, text, position, **kwargs):
+        match = self._DEFINITION_MATCHER.match(text[position:])
+        if not match:
+            return None
+        definitions = []
+        while match:
+            groups = match.groupdict()
+            definitions.append((WikiText(groups['term']), WikiText(groups['descr']),))
+            position += match.end()
+            match = self._DEFINITION_MATCHER.match(text[position:])
+        return DefinitionList(definitions), position
+        
+    def _hrule_processor(self, text, position, **kwargs):
+        if not self._HRULE_MATCHER.match(text[position:]):
+            return None
+        return HorizontalSeparator(), position + match.end()
+
+    def _section_processor(self, text, position, section_level=0, **kwargs):
+        # section_level is ignored now, but it may become useful if we want to
+        # restrict section levels by some rules.
+        match = self._SECTION_MATCHER.match(text[position:])
+        if not match:
+            return None
+        title = match.group('title')
+        anchor = match.group('anchor')
+        level = len(match.group('level'))
+        section_content = []
+        size = len(text)
+        position += match.end()
+        while True:
+            position = self._find_next_block(text, position)
+            if position >= size:
+                break
+            match = self._SECTION_MATCHER.match(text[position:])
+            if match and len(match.group('level')) <= level:
+                break
+            content, position = self._parse(text, position, section_level=level, **kwargs)
+            section_content.append(content)
+        container = Container(section_content)
+        return Section(title=title, content=container, anchor=anchor), position
+
+    def _literal_processor(self, text, position, **kwargs):
+        match = self._LITERAL_MATCHER.match(text[position:])
+        if not match:
+            return None
+        content = PreformattedText(match.group(1))
+        return content, position + match.end()
+
+    def _toc_processor(self, text, position, **kwargs):
+        match = self._TOC_MATCHER.match(text[position:])
+        if not match:
+            return None
+        groups = match.groupdict()
+        title = groups['title']
+        if groups['toctype'] in ('NodeIndex', 'NTOC'):
+            class_ = NodeIndex
+        else:
+            class_ = TableOfContents
+        depth = None
+        if groups['tocdepth']:
+            depth = int(groups['tocdepth'])
+        return class_(title=title, depth=depth), position + match.end()
+
+    def _list_processor(self, text, position, indentation=0, **kwargs):
+        size = len(text)
+        match = self._LIST_MATCHER.match(text[position:])
+        if not match:
+            return None
+        def list_kind(text, position):
+            char = text[position]
+            if char in ('*', '-',):
+                return None
+            elif char in string.digits:
+                return ItemizedList.NUMERIC
+            elif char == char.lower():
+                return ItemizedList.LOWER_ALPHA
+            else:
+                return ItemizedList.UPPER_ALPHA
+        items = []
+        kind = list_kind(text, position)
+        list_indentation = indentation + match.end(1)
+        inner_indentation = list_indentation + 1
+        while True:                     # consume list items
+            position += match.end()
+            item_content = []
+            while True:                 # consume content of a single list item
+                content, position = self._parse(text, position, indentation=inner_indentation,
+                                                processors=(self._list_processor,
+                                                            self._paragraph_processor,),
+                                                **kwargs)
+                item_content.append(content)
+                if position >= size:
+                    break
+                position = self._find_next_block(text, position)
+                current_indentation = 0
+                while current_indentation < inner_indentation and position < size:
+                    if text[position+current_indentation] == ' ':
+                        current_indentation += 1
+                    else:
+                        break
+                if current_indentation < inner_indentation: # no inner content anymore
+                    break
+            items.append(Container(item_content))
+            if position >= size or current_indentation != list_indentation: # no next item
+                break
+            match = self._LIST_MATCHER.match(text[position:])
+            if not match:               # this is not a (next) list item
+                break
+            if list_kind(text, position) != kind: # list kind switch => start new list
+                break
+        return ItemizedList(items, order=kind), position
+
+    def _table_processor(self, text, position, halign=None, **kwargs):
+        if not self._TABLE_MATCHER.match(text[position:]):
+            return None
+        bars = None
+        global_widths = None
+        global_alignments = {}
+        def align(column_number, cell):
+            alignment = global_alignments.get(column_number)
+            if alignment is not None:
+                return alignment
+            length = len(cell)
+            if length - len(cell.lstrip()) > length - len(cell.rstrip()):
+                return TableCell.RIGHT
+            else:
+                return None
+        table_rows = []
+        line_above = 0
+        while text[position:position+1] == '|':
+            # Get the line
+            start_position = position = position + 1
+            eol = text[start_position:].find('\n')
+            if eol >= 0:
+                position += eol + 1
+                if text[position-2] != '\r' and text[position:position+1] == '\r': # Mac
+                    position += 1
+            else:
+                position = len(text)
+            # Rule?
+            if text[start_position:start_position+1] == '-':
+                line_above += 1
+                continue
+            # Examine the cells
+            text_cells = text[start_position:position].split('|')[:-1]
+            stripped_cells = [cell.strip() for cell in text_cells]
+            # Is it a bar specification?
+            if bars is None:
+                maybe_bars = []
+                for cell in stripped_cells:
+                    if not cell:
+                        continue
+                    if cell not in ('<', '<>', '>',):
+                        break
+                    if cell in ('<', '<>',):
+                        maybe_bars.append(i)
+                    if cell in ('>', '<>',):
+                        maybe_bars.append(i+1)
+                else:
+                    bars = maybe_bars
+                    continue
+            # Is it an alignment specification?
+            if global_widths is None:
+                maybe_global_alignments = {}
+                maybe_global_widths = {}
+                for i in range(len(stripped_cells)):
+                    cell = stripped_cells[i]
+                    if not cell:
+                        continue
+                    match = self._CELL_ALIGNMENT_MATCHER.match(cell)
+                    if match:
+                        alignment_char = match.group(1)
+                        alignment = self._CELL_ALIGNMENT_MAPPING.get(alignment_char)
+                        if alignment is not None:
+                            maybe_global_alignments[i] = alignment
+                        width = match.group(2) or None
+                        if width is not None:
+                            try:
+                                width = UFont(float(width))
+                            except ValueError:
+                                width = None
+                        maybe_global_widths[i] = width
+                    else:
+                        break
+                else:
+                    global_alignments = maybe_global_alignments
+                    global_widths = maybe_global_widths
+                    continue
+            # Is it a heading?
+            if (not table_rows and
+                all([not cell or cell.startswith("*") and cell.endswith("*")
+                     for cell in stripped_cells])):
+                row_cells = [TableHeading(FormattedText(cell and cell[1:-1]))
+                             for cell in stripped_cells]
+            else:
+                # Well, it's just a standard line
+                row_cells = []
+                i = 0
+                for cell in line[data_column_start:]:
+                    row_cells.append(TableCell(FormattedText(cell.strip()),
+                                               align=align(i, cell.expandtabs())))
+                    i += 1
+            table_rows.append(TableRow(row_cells, line_above=line_above, line_below=line_below))
+            line_above = 0
+        if line_above > 0 and table_rows:
+            table_rows[-1].set_line_below(line_above)
+        # Make and return the content object
+        if bars is None:
+            bars = ()
+        if global_widths is None or all([w is None for w in global_widths.values()]):
+            column_widths = None
+        else:
+            column_widths = [global_widths[i] for i in range(len(global_widths))]
+        content = Table(table_rows, bars=bars, column_widths=column_widths, halign=halign)
+        return content, position
+
+    def _parameters_processor(self, text, position, parameters=None, presentation=None,
+                              **kwargs):
+        match = self._PARAMETER_MATCHER.match(text[position:])
+        if not match:
+            return None
+        identifier = match.group(1)
+        value = match.group(2)
+        position += match.end()
+        while text[position:position+1] in ('\r', '\n',):
+            position += 1
+        if value:
+            value = value.strip()
+        if not value:
+            match = re.search('^@end %s *$' % (identifier,), text[position:], re.MULTILINE)
+            if match:
+                value = text[position:position+match.start()].strip()
+                position += match.end()
+            else:                       # unfinished parameter
+                return None, position
+        info = self._PARAMETERS.get(identifier)
+        if info is not None:
+            kind, name, function = info
+            if function is not None:
+                value = function(value)
+            if kind == 'parameter':
+                if parameters is not None:
+                    parameters[name] = Container(Parser().parse(value))
+            elif kind == 'presentation':
+                setattr(presentation, name, value)
+            else:
+                raise Exception("Program error", kind)
+        return None, position
+
+    def _paragraph_processor(self, text, position, halign=None, indentation=0, **kwargs):
+        next_position = self._skip_content(text, position, indentation=indentation)
+        if next_position == position:
+            return None
+        content = Paragraph(WikiText(text[position:next_position]), halign=halign)
+        return content, next_position
+
+    def _strip_comments(self, text):
+        stripped_text = ''
+        while True:
+            match = self._COMMENT_MATCHER.search(text)
+            if not match:
+                break
+            stripped_text += text[:match.start()]
+            text = text[match.end():]
+        stripped_text += text
+        return stripped_text
+
+    def _expand_tabs(self, text):
+        # Well, non-linear time complexity here
+        while True:
+            match = self._TAB_MATCHER.search(text)
+            if not match:
+                break
+            text = text[:match.start()] + ' '*8 + text[match.end():]
+        return text
+
+    def _skip_content(self, text, position, indentation=0, first_not_indented=True):
+        while True:
+            match = self._LINE_MATCHER.match(text[position:])
+            if not match:               # end of text?
+                break
+            if not match.group(2):      # blank line?
+                break
+            if (not first_not_indented
+                and match.end(1) - match.start(1) < indentation): # reduced indentation?
+                break
+            position += match.end()
+            first_not_indented = False
+        return position
+        
+    def _find_next_block(self, text, position):
+        start_position = position
+        size = len(text)
+        while True:
+            if position >= size:
+                break
+            char = text[position]
+            if char not in string.whitespace:
+                break
+            position += 1
+            if char == '\n' or char == '\r':
+                start_position = position
+        return start_position
+
+    def _parse(self, text, position, parameters, presentation, processors=None, **kwargs):
+        assert position > self._old_position, \
+               (self._old_position, position, text[position:position+100],)
+        if __debug__:
+            self._old_position = position
+        for processor in (processors or self._processors):
+            result = processor(text, position, parameters=parameters, presentation=presentation,
+                               **kwargs)
+            if result is not None:
+                if __debug__:
+                    position = result[1]
+                    assert position >= min(self._old_position + 1, len(text)), \
+                           (self._old_position, position, text[position:position+100], processor,)
+                return result
+        else:
+            raise Exception('Unhandled text', text[position:])
+
+    def parse(self, text, parameters=None):
+        """Parse given 'text' and return corresponding content.
+
+        The return value is a sequence of 'Content' instances.
+
+        Arguments:
+
+          text -- input structured text, string or unicode
+          parameters -- 'None' or dictionary where keyword parameters for
+            'ContentNode' constructor can be stored
+
+        """
+        assert isinstance(text, basestring), text
+        if __debug__:
+            self._old_position = -1
+        presentation = Presentation()
+        text = self._strip_comments(text)
+        text = self._expand_tabs(text)
+        contents = []
+        position = 0
+        size = len(text)
+        while True:
+            position = self._find_next_block(text, position)
+            if position >= size:
+                break
+            content, position = self._parse(text, position, parameters, presentation)
+            if content is not None:
+                contents.append(content)
+            position = self._find_next_block(text, position)
+        if parameters is not None:
+            parameters['presentation'] = presentation
+        return contents
+
+
+Parser = OldParser
 
 
 class MacroParser(object):

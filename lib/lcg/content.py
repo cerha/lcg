@@ -821,6 +821,9 @@ class TableRow(Container):
     def line_below(self):
         return self._line_below
 
+    def set_line_below(self, n):
+        self._line_below = n
+
     def iterated(self):
         return self._iterated
 

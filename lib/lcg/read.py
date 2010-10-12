@@ -243,7 +243,7 @@ class StructuredTextReader(FileReader):
     def _document(self, text):
         sections, parameters = self._parse_text(text)
         if len(sections) != 1 or not isinstance(sections[0], Section):
-            raise Exception("The document has no top-level section:", self._id)
+            raise Exception("The document has no top-level section:", (self._id, sections,))
         s = sections[0]
         title = s.title()
         sections = s.content()
