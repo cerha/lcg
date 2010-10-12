@@ -513,7 +513,7 @@ class NewParser(object):
     (as opposed to parsing, which is done on LCG input).
 
     """
-    _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *$')
+    _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *$', re.MULTILINE)
     _HRULE_MATCHER = re.compile(r'^----+ *$')
     _TOC_MATCHER = re.compile(r'(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>(N?TOC|NodeIndex))(\((?P<tocdepth>\d+)\))?\@ *')
     _TABLE_MATCHER = re.compile(r'\|.*\| *$')
