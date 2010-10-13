@@ -377,24 +377,152 @@ tests.add(Resources)
 
 
 class Parser(unittest.TestCase):
-    SIMPLE_TEXT = "Hallo, how are you?\n\n  * one\n  * two\n  * three\n"
-    SECTIONS = "= Main =\n== Sub1 ==\n== Sub2 ==\n=== SubSub1 ===\n== Sub3 =="
-    
+
+    def setUp(self):
+        self._parser = lcg.Parser()
+        
     def check_simple_text(self):
-        p = lcg.Parser()
-        c = p.parse(self.SIMPLE_TEXT)
+        text = "Hallo, how are you?\n\n  * one\n  * two\n  * three\n"
+        c = self._parser.parse(text)
         assert len(c) == 2 and isinstance(c[0], lcg.Paragraph) and \
                isinstance(c[1], lcg.ItemizedList), c
+        assert len(c[1].content()) == 3, c[1].content()
+        assert c[1].order() is None, c[1].order()
 
     def check_sections(self):
-        p = lcg.Parser()
-        c = p.parse(self.SECTIONS)
+        text = "= Main =\n== Sub1 ==\n== Sub2 ==\n=== SubSub1 ===\n== Sub3 =="
+        c = self._parser.parse(text)
         assert len(c) == 1 and isinstance(c[0], lcg.Section), c
         s = c[0].sections(None)
         assert len(s) == 3 and isinstance(s[0], lcg.Section) and \
                len(s[0].sections(None)) == 0 and len(s[1].sections(None)) == 1 and \
                len(s[2].sections(None)) == 0, s
-        
+
+    def check_parameters(self):
+        text = '''
+@parameter header hello
+@parameter footer
+@center
+@PAGE@
+@end footer
+'''
+        parameters = {}
+        c = self._parser.parse(text, parameters)
+        assert parameters.has_key('page_header'), parameters
+        assert parameters.has_key('page_footer'), parameters
+        assert not parameters.has_key('first_page_header'), parameters
+        header = parameters['page_header']
+        assert header.content()[0].content()[0].text() == 'hello', header.content()[0].content()[0].text()
+        footer = parameters['page_footer']
+        assert footer.content()[0].content()[0].text() == '@PAGE@', footer.content()[0].content()[0].text()
+        assert footer.content()[0].halign() == lcg.HorizontalAlignment.CENTER, footer.content()[0].content().halign()
+
+    def check_hrule(self):
+        text = '''
+blah blah
+
+----
+
+blah blah
+'''
+        c = self._parser.parse(text)
+        assert len(c) == 3, c
+        assert isinstance(c[1], lcg.HorizontalSeparator), c[1]
+
+    def check_alignment(self):
+        for alignment, constant in (('center', lcg.HorizontalAlignment.CENTER,),
+                                    ('left', lcg.HorizontalAlignment.LEFT,),
+                                    ('right', lcg.HorizontalAlignment.RIGHT,),):
+            text = '''
+blah blah
+
+@%s
+blah blah
+
+blah blah
+''' % (alignment,)
+            c = self._parser.parse(text)
+            assert len(c) == 3, c
+            assert c[0].halign() == None, c[0].content()[0].content()[0].halign()
+            assert c[1].halign() == constant, c[0].content()[0].content()[0].halign()
+            assert c[2].halign() == None, c[0].content()[0].content()[0].halign()
+
+    def check_table(self):
+        text = '''
+| *header* | *line* |
+|-------------------|
+| text1    | text2  |
+
+|-------------------|
+| *header* | *line* |
+| text1    | text2  |
+|-------------------|
+
+| >        | <>     |
+| <r20>    | <c>    |
+| *header* | *line* |
+| text1    | text2  |
+'''
+        c = self._parser.parse(text)
+        assert len(c) == 3, c
+        assert all([isinstance (x, lcg.Table) for x in c]), c
+        for i in range(3):
+            rows = c[i].content()
+            assert len(rows) == 2, rows
+            assert all([isinstance(r, lcg.TableRow) for r in rows]), rows
+            for cell in rows[0].content():
+                assert isinstance(cell, lcg.TableHeading), rows[0]
+            for cell in rows[1].content():
+                assert isinstance(cell, lcg.TableCell), rows[1]
+        row = c[2].content()[1]
+        cells = row.content()
+        assert cells[0].align() == lcg.TableCell.RIGHT, cells[0].align()
+        assert cells[1].align() == lcg.TableCell.CENTER, cells[1].align()
+        bars = c[2].bars()
+        assert 1 in bars, bars
+        assert 2 in bars, bars
+        assert 0 not in bars, bars
+
+    def check_lists(self):
+        text = '''
+* Unordered item 1.
+  1. Ordered item 1.
+  2. Ordered item 2.
+     - Unordered item 11.
+     - Unordered item 12.
+
+* Unordered item 2.
+  a. Ordered item 1.
+     Next line 1.
+
+     Next paragraph 1.
+     
+  b. Ordered item 2.
+
+     Next paragraph 2.
+* Unordered item 3.
+'''
+        c = self._parser.parse(text)
+        assert len(c) == 1, c
+        assert isinstance(c[0], lcg.ItemizedList), c[0]
+        assert c[0].order() is None, c[0].order()
+        items = c[0].content()
+        assert len(items) == 3, items
+        # First item contents
+        item_content = items[0].content()
+        assert len(item_content) == 2, item_content
+        assert isinstance(item_content[0], lcg.Paragraph), item_content[0]
+        assert isinstance(item_content[1], lcg.ItemizedList), item_content[1]
+        assert item_content[1].order() == lcg.ItemizedList.NUMERIC, item_content[1].order()
+        assert len(item_content[1].content()) == 2, item_content[1].content()
+        # Second item contents
+        item_content = items[1].content()
+        assert len(item_content) == 2, item_content
+        assert isinstance(item_content[0], lcg.Paragraph), item_content[0]
+        assert isinstance(item_content[1], lcg.ItemizedList), item_content[1]
+        assert item_content[1].order() == lcg.ItemizedList.LOWER_ALPHA, item_content[1].order()
+        assert len(item_content[1].content()) == 2, item_content[1].content()        
+                
 tests.add(Parser)
 
 class MacroParser(unittest.TestCase):
