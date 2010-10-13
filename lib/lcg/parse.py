@@ -514,9 +514,9 @@ class NewParser(object):
 
     """
     _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *$', re.MULTILINE)
-    _HRULE_MATCHER = re.compile(r'^----+ *$')
+    _HRULE_MATCHER = re.compile(r'^----+ *$', re.MULTILINE)
     _TOC_MATCHER = re.compile(r'(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>(N?TOC|NodeIndex))(\((?P<tocdepth>\d+)\))?\@ *')
-    _TABLE_MATCHER = re.compile(r'\|.*\| *$')
+    _TABLE_MATCHER = re.compile(r'\|.*\| *$', re.MULTILINE)
     _CELL_ALIGNMENT_MATCHER = re.compile(r'<([clr]?)([0-9]*)>')
     _CELL_ALIGNMENT_MAPPING = {'c': TableCell.CENTER, 'l': TableCell.LEFT, 'r': TableCell.RIGHT}
     _COMMENT_MATCHER = re.compile('^#[^\n]*(\n|$)', re.MULTILINE)
@@ -547,13 +547,13 @@ class NewParser(object):
     def __init__(self):
         self._processors = (self._alignment_processor,
                             self._field_processor,
-                            self._hrule_processor,
                             self._section_processor,
                             self._literal_processor,
+                            self._hrule_processor,
                             self._toc_processor,
                             self._table_processor,
-                            self._definition_processor,
                             self._list_processor,
+                            self._definition_processor,
                             self._parameters_processor,
                             self._paragraph_processor,
                             )
@@ -569,7 +569,7 @@ class NewParser(object):
             halign = HorizontalAlignment.LEFT
         elif identifier == 'right':
             halign = HorizontalAlignment.RIGHT                
-        position = self._find_next_block(text, match.end())
+        position = self._find_next_block(text, position + match.end())
         return self._parse(text, position, halign=halign, **kwargs)
 
     def _field_processor(self, text, position, **kwargs):
@@ -598,7 +598,8 @@ class NewParser(object):
         return DefinitionList(definitions), position
         
     def _hrule_processor(self, text, position, **kwargs):
-        if not self._HRULE_MATCHER.match(text[position:]):
+        match = self._HRULE_MATCHER.match(text[position:])
+        if not match:
             return None
         return HorizontalSeparator(), position + match.end()
 
@@ -734,7 +735,8 @@ class NewParser(object):
             # Is it a bar specification?
             if bars is None:
                 maybe_bars = []
-                for cell in stripped_cells:
+                for i in range(len(stripped_cells)):
+                    cell = stripped_cells[i]
                     if not cell:
                         continue
                     if cell not in ('<', '<>', '>',):
@@ -783,11 +785,11 @@ class NewParser(object):
                 # Well, it's just a standard line
                 row_cells = []
                 i = 0
-                for cell in line[data_column_start:]:
+                for cell in text_cells:
                     row_cells.append(TableCell(FormattedText(cell.strip()),
                                                align=align(i, cell.expandtabs())))
                     i += 1
-            table_rows.append(TableRow(row_cells, line_above=line_above, line_below=line_below))
+            table_rows.append(TableRow(row_cells, line_above=line_above))
             line_above = 0
         if line_above > 0 and table_rows:
             table_rows[-1].set_line_below(line_above)
