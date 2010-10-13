@@ -18,9 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import copy
 import os
-import types
 import re
+import types
 
 from lcg import *
 
@@ -558,6 +559,15 @@ class NewParser(object):
                             self._paragraph_processor,
                             )
 
+    def _prune_kwargs(self, kwargs, prune):
+        kwargs = copy.copy(kwargs)
+        for k in prune:
+            try:
+                del kwargs[k]
+            except:
+                pass
+        return kwargs
+
     def _alignment_processor(self, text, position, **kwargs):
         match = self._ALIGNMENT_MATCHER.match(text[position:])
         if not match:
@@ -570,6 +580,7 @@ class NewParser(object):
         elif identifier == 'right':
             halign = HorizontalAlignment.RIGHT                
         position = self._find_next_block(text, position + match.end())
+        kwargs = self._prune_kwargs(kwargs, ('halign',))
         return self._parse(text, position, halign=halign, **kwargs)
 
     def _field_processor(self, text, position, **kwargs):
@@ -615,6 +626,7 @@ class NewParser(object):
         section_content = []
         size = len(text)
         position += match.end()
+        kwargs = self._prune_kwargs(kwargs, ('section_level',))
         while True:
             position = self._find_next_block(text, position)
             if position >= size:
@@ -649,7 +661,7 @@ class NewParser(object):
             depth = int(groups['tocdepth'])
         return class_(title=title, depth=depth), position + match.end()
 
-    def _list_processor(self, text, position, indentation=0, **kwargs):
+    def _list_processor(self, text, position, indentation=0, extra_indentation=0, **kwargs):
         size = len(text)
         match = self._LIST_MATCHER.match(text[position:])
         if not match:
@@ -665,17 +677,22 @@ class NewParser(object):
             else:
                 return ItemizedList.UPPER_ALPHA
         items = []
-        kind = list_kind(text, position)
-        list_indentation = indentation + match.end(1)
-        inner_indentation = list_indentation + 1
+        kind = list_kind(text, position + match.end(1))
+        list_indentation = extra_indentation + match.end(1)
+        inner_indentation = extra_indentation + match.end()
+        kwargs = self._prune_kwargs(kwargs, ('processors', 'compressed',))
         while True:                     # consume list items
             position += match.end()
+            inner_extra_indentation = inner_indentation
             item_content = []
             while True:                 # consume content of a single list item
                 content, position = self._parse(text, position, indentation=inner_indentation,
+                                                extra_indentation=inner_extra_indentation,
                                                 processors=(self._list_processor,
                                                             self._paragraph_processor,),
+                                                compressed=True,
                                                 **kwargs)
+                inner_extra_indentation = 0
                 item_content.append(content)
                 if position >= size:
                     break
@@ -694,7 +711,7 @@ class NewParser(object):
             match = self._LIST_MATCHER.match(text[position:])
             if not match:               # this is not a (next) list item
                 break
-            if list_kind(text, position) != kind: # list kind switch => start new list
+            if list_kind(text, position + match.end(1)) != kind: # list kind switch => start new list
                 break
         return ItemizedList(items, order=kind), position
 
@@ -836,8 +853,11 @@ class NewParser(object):
                 raise Exception("Program error", kind)
         return None, position
 
-    def _paragraph_processor(self, text, position, halign=None, indentation=0, **kwargs):
-        next_position = self._skip_content(text, position, indentation=indentation)
+    def _paragraph_processor(self, text, position, halign=None, indentation=0, extra_indentation=0,
+                             compressed=False, **kwargs):
+        next_position = self._skip_content(text, position, indentation=indentation,
+                                           extra_indentation=extra_indentation,
+                                           compressed=compressed)
         if next_position == position:
             return None
         content = Paragraph(WikiText(text[position:next_position]), halign=halign)
@@ -863,18 +883,20 @@ class NewParser(object):
             text = text[:match.start()] + ' '*8 + text[match.end():]
         return text
 
-    def _skip_content(self, text, position, indentation=0, first_not_indented=True):
+    def _skip_content(self, text, position, indentation=0, extra_indentation=0, compressed=False):
+        first_line = True
         while True:
             match = self._LINE_MATCHER.match(text[position:])
             if not match:               # end of text?
                 break
             if not match.group(2):      # blank line?
                 break
-            if (not first_not_indented
-                and match.end(1) - match.start(1) < indentation): # reduced indentation?
+            if match.end(1) - match.start(1) + extra_indentation < indentation: # reduced indentation?
+                break
+            if compressed and self._LIST_MATCHER.match(text[position:]): # inner list
                 break
             position += match.end()
-            first_not_indented = False
+            extra_indentation = 0
         return position
         
     def _find_next_block(self, text, position):
@@ -896,6 +918,7 @@ class NewParser(object):
                (self._old_position, position, text[position:position+100],)
         if __debug__:
             self._old_position = position
+        kwargs = self._prune_kwargs(kwargs, ('parameters', 'presentation',))
         for processor in (processors or self._processors):
             result = processor(text, position, parameters=parameters, presentation=presentation,
                                **kwargs)
