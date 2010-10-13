@@ -528,7 +528,7 @@ class NewParser(object):
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *$', re.DOTALL|re.MULTILINE)
     _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?$', re.MULTILINE)
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
-                                r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)')
+                                r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?\n')
     _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
                                      r'(?P<descr>([\t ]+[^\r\n]+\r?\n)*([\t ]+[^\r\n]+\r?\n?))')
     _LIST_MATCHER = re.compile(r'( *)\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.)) +')
