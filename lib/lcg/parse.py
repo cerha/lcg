@@ -237,7 +237,7 @@ class OldParser(object):
         return result
 
     def _store_list_item(self, block, groups):
-        content = WikiText(groups['content'])
+        content = FormattedText(groups['content'])
         indent = re.sub(' {0,7}\t', 8*' ', groups['indent'])
         return (self._list_item_order(groups), len(indent), content)
         
@@ -286,13 +286,13 @@ class OldParser(object):
         return result
 
     def _store_field(self, block, groups):
-        return (WikiText(groups['label']), WikiText(groups['value']))
+        return (FormattedText(groups['label']), FormattedText(groups['value']))
         
     def _finish_field(self, stored):
         return (FieldSet(stored),)
     
     def _store_definition(self, block, groups):
-        return (WikiText(groups['term']), WikiText(groups['descr']))
+        return (FormattedText(groups['term']), FormattedText(groups['descr']))
         
     def _finish_definition(self, stored):
         return (DefinitionList(stored),)
@@ -330,7 +330,7 @@ class OldParser(object):
     def _make_paragraph(self, block, groups):
         text = self._COMMENT_MATCHER.sub("", block).strip()
         if text:
-            paragraph = Paragraph(WikiText(text), halign=groups.get('halign'))
+            paragraph = Paragraph(FormattedText(text), halign=groups.get('halign'))
         else:
             paragraph = None
         return paragraph
@@ -592,7 +592,7 @@ class NewParser(object):
             if not match:
                 break
             groups = match.groupdict()
-            fields.append((WikiText(groups['label']), WikiText(groups['value']),))
+            fields.append((FormattedText(groups['label']), FormattedText(groups['value']),))
             position += match.end()
         return FieldSet(fields), position
 
@@ -603,7 +603,7 @@ class NewParser(object):
         definitions = []
         while match:
             groups = match.groupdict()
-            definitions.append((WikiText(groups['term']), WikiText(groups['descr']),))
+            definitions.append((FormattedText(groups['term']), FormattedText(groups['descr']),))
             position += match.end()
             match = self._DEFINITION_MATCHER.match(text[position:])
         return DefinitionList(definitions), position
@@ -863,7 +863,7 @@ class NewParser(object):
                                            compressed=compressed)
         if next_position == position:
             return None
-        content = Paragraph(WikiText(text[position:next_position]), halign=halign)
+        content = Paragraph(FormattedText(text[position:next_position]), halign=halign)
         return content, next_position
 
     def _strip_comments(self, text):
@@ -1117,7 +1117,7 @@ def add_processing_info(exception, caption, information):
 def _log(*args):
     """Just for internal debugging purposes..."""
     def _str(x):
-        if isinstance(x, WikiText):
+        if isinstance(x, FormattedText):
             return '"'+str(x._text.encode('ascii', 'replace'))+'"'
         elif isinstance(x, Container):
             return "<%s %s>" % (x.__class__.__name__, _str(x._content))
