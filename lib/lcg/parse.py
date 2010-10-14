@@ -705,7 +705,10 @@ class NewParser(object):
                         break
                 if current_indentation < inner_indentation: # no inner content anymore
                     break
-            items.append(Container(item_content))
+            if len(item_content) == 1:
+                items.append(item_content[0])
+            else:
+                items.append(Container(item_content))
             if position >= size or current_indentation != list_indentation: # no next item
                 break
             match = self._LIST_MATCHER.match(text[position:])
