@@ -895,7 +895,9 @@ class NewParser(object):
     def _skip_content(self, text, position, indentation=0, extra_indentation=0, compressed=False):
         first_line = True
         while True:
-            if self._LITERAL_MATCHER.match(text[position:]): # they don't have to be separated by blank lines
+            if (self._LITERAL_MATCHER.match(text[position:]) or
+                self._LIST_MATCHER.match(text[position:])):
+                # some blocks don't have to be separated by blank lines
                 break
             match = self._LINE_MATCHER.match(text[position:])
             if not match:               # end of text?
