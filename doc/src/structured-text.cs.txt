@@ -5,7 +5,7 @@
 
 @parameter footer
 @center
-- @PAGE@ -
+\- @PAGE@ -
 @end footer
 
 = Příručka formátování strukturovaného textu =
