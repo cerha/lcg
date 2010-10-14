@@ -706,7 +706,13 @@ class NewParser(object):
                 if current_indentation < inner_indentation: # no inner content anymore
                     break
             if len(item_content) == 1:
-                items.append(item_content[0])
+                element = item_content[0]
+                # Hack to prevent ugly list formatting
+                if (isinstance(element, Paragraph) and
+                    element.halign() is None and
+                    len(element.content()) == 1):
+                    element = element.content()[0]
+                items.append(element)
             else:
                 items.append(Container(item_content))
             if position >= size or current_indentation != list_indentation: # no next item
