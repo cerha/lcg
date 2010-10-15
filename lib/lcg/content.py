@@ -311,6 +311,18 @@ class TextContent(Content):
         """Return the value of 'text' as passed to the constructor."""
         return self._text
 
+
+class HtmlContent(TextContent):
+    """LCG content class for wrapping already exported HTML text.
+
+    This class allows embedding HTML content into the LCG content hierarchy.
+    Its export is a noop.  It denies all the advantages of the LCG's export
+    separation, so use only when there is no other choice and with caution.
+    
+    """
+    def export(self, context):
+        return self._text
+
     
 class FormattedText(TextContent):
     """Formatted text using a simple wiki-based inline markup.
