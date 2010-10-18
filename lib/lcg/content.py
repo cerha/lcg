@@ -315,12 +315,19 @@ class TextContent(Content):
 class HtmlContent(TextContent):
     """LCG content class for wrapping already exported HTML text.
 
-    This class allows embedding HTML content into the LCG content hierarchy.
-    Its export is a noop.  It denies all the advantages of the LCG's export
-    separation, so use only when there is no other choice and with caution.
+    This class allows embedding HTML content directly into the LCG content
+    hierarchy.  Its export in HTML is a noop, but it is only implemented for the
+    HTML output.  Attempt to export this type of content to any other target
+    format will lead to an error.
+
+    At the same time, this class demonstrates a content element, which exports
+    itself actively and doesn't rely on the exporter as the other generic
+    elements defined in this module.
     
     """
     def export(self, context):
+        assert isinstance(context.exporter(), HtmlExporter), \
+               "Only HTML export is supported for this element."
         return self._text
 
     
