@@ -254,7 +254,7 @@ class TranslatableText(Localizable):
     def interpolate(self, func):
         """Return a new TranslatableText instance using given interpolation function.
 
-        The intrpolation is not performed immediately.  It is left to translation time and also
+        The interpolation is not performed immediately.  It is left to translation time and also
         translation of the interpolated arguments is performed.  The function passed to this method
         must take one argument -- the interpolation variable name -- and return a string.  The
         original instance must be created without any interpolation arguments passed to the
