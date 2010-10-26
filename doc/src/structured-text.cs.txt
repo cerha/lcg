@@ -427,13 +427,14 @@ jsou označeny pořadovým číslem, nebo písmenem.
 
 ------
  * Obecná pravidla:
-   1. Každá položka je odsazena nejméně jednou mezerou.
-   2. Delší text položky může byt rozdělen na více řádků, pokud je zachováno
+   1. Delší text položky může být rozdělen na více řádků, pokud je zachováno
       patřičné odsazení.
-   3. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
+   2. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
       odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
       tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
       převod tabelátorů na mezery.
+   3. Položka seznamu může obsahovat jeden nebo více odstavců textu.
+      
    4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný vliv na
       výsledný dokument.  Jde čistě o vaši volbu.
 
@@ -460,13 +461,14 @@ jsou označeny pořadovým číslem, nebo písmenem.
 Toto bude zobrazeno jako:
 
  * Obecná pravidla:
-   1. Každá položka je odsazena nejméně jednou mezerou.
-   2. Delší text položky může byt rozdělen na více řádků, pokud je zachováno
+   1. Delší text položky může být rozdělen na více řádků, pokud je zachováno
       patřičné odsazení.
-   3. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
+   2. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
       odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
       tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
       převod tabelátorů na mezery.
+   3. Položka seznamu může obsahovat jeden nebo více odstavců textu.
+      
    4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný vliv na
       výsledný dokument.  Jde čistě o vaši volbu.
 
@@ -582,21 +584,24 @@ Všechny příklady v tomto návodu jsou zapsány jako předformátovaný text.
 
 ==== Tabulky ====
 
-Můžete vytvářet také jednoduché pravidelné tabulky se shodným počtem buněk v
-každém řádku.  Každý řádek tabulky je jeden řádek vstupního textu.  K oddělení
-buněk je používán znak svislé čáry „|“.  Tento znak také označuje začátek a
-konec řádku tabulky.
-
+Můžete vytvářet také jednoduché pravidelné tabulky se shodným počtem buněk
+v každém řádku.  Každý řádek tabulky je jeden řádek vstupního textu.
+K oddělení buněk je používán znak svislé čáry „|“.  Tento znak také označuje
+začátek a konec řádku tabulky.  Jestliže je bezprostředně za znakem svislé čáry
+pomlčka, je na tomto místě vytvořena vodorovná čára (ne nutně ve všech
+výstupních formátech).
 
 *Příklad:*
 
 ------
 |        | *Výška*  | *Váha*   | *Pohlaví* |
+|------------------------------------------|
 | Pavel  |   189 cm |    73 kg | muž       |
 | Jana   |   164 cm |    78 kg | žena      |
 ------
 
 |        | *Výška*  | *Váha*   | *Pohlaví* |
+|------------------------------------------|
 | Pavel  |   189 cm |    73 kg | muž       |
 | Jana   |   164 cm |    78 kg | žena      |
 
@@ -605,6 +610,61 @@ pouze buňky tučným písmem, nebo prázdné buňky, jako ve výše uvedeném p
 
 /Zarovnání buněk/ je také detekováno — pokud je odsazení (počet mezer a
 tabelátorů) na levé straně větší než na pravé, je buňka zarovnána vpravo.
+Zarovnání a šířku sloupců lze také definovat explicitně vložením speciálního
+řádku obsahujícího buňky tvaru jako =<r20>= nebo =<c>=, kde písmeno může být
+jedno z =l= (left — vlevo), =r= (right — vpravo), =c= (center — uprostřed) a
+nepovinné číslo určuje šířku sloupce ve znacích.  Odsazení mezerami a
+tabelátory uvnitř buněk je v případě přítomnosti takového řádku ignorováno a
+tento řádek se také neobjeví na výstupu.  Některé výstupní formáty mohou tuto
+definici zarovnání a šířek ignorovat.
+
+Pokud chcete některé sloupce tabulky oddělit svislými čárami, můžete použít
+jinou formu definičního řádku obsahujícího buňky tvaru =<= (čára nalevo od
+sloupce), =>= (čára napravo od sloupce), =<>= (čára na obou stranách).  Některé
+výstupní formáty nemusí svislé čáry podporovat.
+
+*Příklad tabulky s definičními řádky:*
+
+------
+| <>     | <        |          | >         |
+| <l10>  | <r>      | <r10>    | <l>       |
+|        | *Výška*  | *Váha*   | *Pohlaví* |
+|------------------------------------------|
+| Pavel  |   189 cm |    73 kg | muž       |
+| Jana   |   164 cm |    78 kg | žena      |
+------
+
+| <>     | <        |          | >         |
+| <l10>  | <r>      | <r10>    | <l>       |
+|        | *Výška*  | *Váha*   | *Pohlaví* |
+|------------------------------------------|
+| Pavel  |   189 cm |    73 kg | muž       |
+| Jana   |   164 cm |    78 kg | žena      |
+
+
+==== Horizontální pozice ====
+
+Můžete říci, že následující prvek má být umístěn nalevo, resp. napravo,
+resp. vycentrován, když před ním na samostatném řádku uvedete značku =@left=,
+resp. =@right=, resp. =@center=.  Horizontální umístění prvků je v současné
+době podporováno pouze u tabulek a odstavců a nemusí být podporováno všemi
+výstupními formáty.
+
+*Příklad:*
+
+-----
+@left
+Tento text bude umístěn nalevo.
+
+@right
+Tento text bude umístěn napravo.
+-----
+
+@left
+Tento text bude umístěn nalevo.
+
+@right
+Tento text bude umístěn napravo.
 
 
 === Řádkové konstrukce === inline-constructs
@@ -896,6 +956,14 @@ požadavcích na straně serveru.  Požadavky pro přehrávání na straně klie
 však stejné jako pro jiné způsoby vkládání multimédií. (prohlížeč s podporou
 JavaScriptu a Adobe Flash).
 
+==== Čísla stran ====
+
+Do hlavičky nebo patičky stránky můžete vložit číslo aktuální stránky,
+resp. celkový počet stran, pomocí značek =\@PAGE@=, resp. =\@PAGES@=.  Pozor,
+to funguje jen v hlavičkách a patičkách a jen v těch výstupních formátech, kde
+dochází ke stránkování (tj. např. v PDF, ale nikoliv v HTML).
+
+
 === Další vlastnosti ===
 
 ==== Potlačování speciálního významu zápisu ==== escape
@@ -959,6 +1027,67 @@ Nad
 ----
 
 Pod
+
+
+==== Hlavičky a patičky stránek ====
+
+Pomocí následujících parametrů můžete nastavit obsah hlaviček a patiček
+stránek:
+
+\@parameter header TEXT
+  Text, který se má objevit v hlavičce každé stránky.
+
+\@parameter first_page_header TEXT
+  Hlavička první strany dokumentu.  Pokud tento parametr není uveden, použije
+  se na první straně stejná hlavička jako na ostatních stranách.
+  
+\@parameter footer TEXT
+  Text, který se má objevit v patičce každé stránky.
+
+Pokud je text delší nebo komplikovanější, můžete použít víceřádkovou definici
+parametru, např.:
+
+-----
+@parameter footer
+@center
+@PAGE@/@PAGES@
+@end footer
+-----
+
+Hlavičky a patičky stránek mají smysl pouze u některých výstupních formátů a ne
+ve všech výstupních formátech jsou podporovány.
+
+
+==== Prezentační vlastnosti ====
+
+Pomocí značky =@parameter= můžete nastavit i některé další vlastnosti
+dokumentu:
+
+\@parameter font_size ČÍSLO
+  Změna výchozí velikosti fontu jejím vynásobením uvedeným číslem.
+
+\@parameter font_name NÁZEV
+  Název výchozího fontu dokumentu, např. =DejaVu= nebo =Bitstream Vera=.
+  V závislosti na instalaci systému uvedený font může a nemusí být dostupný.
+  Není-li dostupný, je použit jiný font.
+
+\@parameter font_family NÁZEV
+  Název výchozí rodiny fontů dokument, může být =SERIF=, =SANS_SERIF= nebo
+  =FIXED_WIDTH=.
+
+\@parameter heading_font_family NÁZEV
+  To samé jako font_family, akorát platí pouze pro nadpisy.
+
+\@parameter noindent JEDNIČKA_NEBO_NULA
+  Je-li uvedena jednička (=1=), první řádky odstavců nejsou odsazeny.  Je-li
+  uvedena nula (=0=), první řádky odstavců jsou odsazeny.
+
+\@parameter line_spacing ČÍSLO
+  Řádkování bude nastaveno na uvedený násobek velikosti aktuálního fontu.
+
+Ne všechny tyto vlastnosti mají význam ve všech výstupních formátech.  Také
+nemusí být všemi výstupními formáty podporovány a mohou jimi být ignorovány.
+
 
 ==== Komentáře ====
 

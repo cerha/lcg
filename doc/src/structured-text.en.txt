@@ -101,7 +101,7 @@ equation signs determines the level.
 === Bullet Lists ===
 
 Bullet lists should be used whenever the content can be split into a sequence
-of separate items.  Each item is marked by an asterisk and must be indented.
+of separate items.  Each item is marked by an asterisk and may be indented.
 
 *Example:*
 
@@ -152,7 +152,7 @@ Wiking
 
 See [#definition-lists] for a detailed syntax description.
 
-=== Field-sets ===
+=== Field-Sets ===
 
 In general, a field-set can be used to represent any logically paired data set.
 They are similar to definition lists, but they are more suitable for
@@ -253,7 +253,7 @@ Also links to Youtube and Vimeo videos are detected and an embedded player is
 displayed automatically.  See [#video] for more information.
 
 
-== General recommendations ==
+== General Recommendations ==
 
   * Get familiar with the available constructs and always use those, which
     best fit given purpose.  Nearly everything can be written down as one long
@@ -427,12 +427,12 @@ period (or round brackets) instead of an asterisk.
 
 ------
  * General rules:
-   1. Each item must be indented by at least one space character.
-   2. Longer item texts can be split over multiple lines, provided
+   1. Longer item texts can be split over multiple lines, provided
       that they are indented properly.
-   3. Tabs and spaces can be used for indentation, but tab is always considered
+   2. Tabs and spaces can be used for indentation, but tab is always considered
       8 characters wide, so you may have problems when your editor sets the tab
       width differently (then converting tabs to spaces is recommended).
+   3. A list item may contain one or more paragraphs of text.
 
    4. Empty lines between the list items are optional and have no effect on the
       output.  That's just a matter of your preference.
@@ -457,12 +457,12 @@ period (or round brackets) instead of an asterisk.
 This will be presented as:
 
  * General rules:
-   1. Each item must be indented by at least one space character.
-   2. Longer item texts can be split over multiple lines, provided
+   1. Longer item texts can be split over multiple lines, provided
       that they are indented properly.
-   3. Tabs and spaces can be used for indentation, but tab is always considered
+   2. Tabs and spaces can be used for indentation, but tab is always considered
       8 characters wide, so you may have problems when your editor sets the tab
       width differently (then converting tabs to spaces is recommended).
+   3. A list item may contain one or more paragraphs of text.
 
    4. Empty lines between the list items are optional and have no effect on the
       output.  That's just a matter of your preference.
@@ -514,7 +514,7 @@ Description syntax
 
 
 
-==== Field-sets ==== field-sets
+==== Field-Sets ==== field-sets
 
 Field-sets can be used for generic two-column tabular data, where the first
 column is the label and the second column is the corresponding value.  The
@@ -568,19 +568,23 @@ All the examples in this manual are written as preformatted text.
 ==== Tables ====
 
 You can make simple tables with constant number of cells per row.  Each row is
-on one line and pipe characters are used to separate the cells.  The line must
-also begin and end with a pipe character.
+on one line and vertical bars characters are used to separate the cells.  The
+line must also begin and end with a vertical bar character.  If the vertical
+bar character is immediately followed by a dash, horizontal line is generated
+at that place (some backends may omit the horizontal line).
 
 
 *Example:*
 
 ------
 |        | *Height* | *Weight* | *Sex*  |
+|---------------------------------------|
 | Dick   |      72" |   130lbs | male   |
 | Jane   |      65" |   150lbs | female |
 ------
 
 |        | *Height* | *Weight* | *Sex*  |
+|---------------------------------------|
 | Dick   |      72" |   130lbs | male   |
 | Jane   |      65" |   150lbs | female |
 
@@ -588,8 +592,60 @@ also begin and end with a pipe character.
 only bold or empty cells, as in the example above.
 
 /Cell alignment/ is also detected — if left padding (spaces or tabs) is greater
-than right padding within a cell, the cell is aligned left.
+than right padding within a cell, the cell is aligned left.  You can also
+define cell alignments and widths explicitly by including a special row with
+cells of the form like =<r20>= or =<c>= where the letter is one of =l= (left),
+=r= (right), =c= (center) and the optional number defines cell width in
+characters.  Paddings within cells are ignored if such a specification row is
+present and the specification row doesn't appear in the output.  Note that some
+backends may ignore alignment and width specifications.
 
+If you want to separate table columns by vertical bars, you can use another
+specification row containing cells of the form =<= (bar on the left), =>= (bar
+on the right) or =<>= (bars on both left and right).  Note that some backends
+may not produce the vertical bars.
+
+*Example of a table with format specification rows:*
+
+------
+| <>     | <        |          | >      |
+| <l10>  | <r>      | <r10>    | <l>    |
+|        | *Height* | *Weight* | *Sex*  |
+|---------------------------------------|
+| Dick   |      72" |   130lbs | male   |
+| Jane   |      65" |   150lbs | female |
+------
+
+| <>     |          |          | >      |
+| <l10>  | <r>      | <r10>    | <l>    |
+|        | *Height* | *Weight* | *Sex*  |
+|---------------------------------------|
+| Dick   |      72" |   130lbs | male   |
+| Jane   |      65" |   150lbs | female |
+
+
+==== Horizontal Alignment ====
+
+You can request the following object to be put on the left, on the right or in
+the center by preceding it with =@left=, =@right= or =@center= (or =@centre=)
+respectively on a separate line.  Note alignment currently works only on tables
+and paragraphs and only in some backends.
+
+*Example:*
+
+-----
+@left
+This text will be placed on the left.
+
+@right
+This text will be placed on the right.
+-----
+
+@left
+This text will be placed on the left.
+
+@right
+This text will be placed on the right.
 
 
 === Inline Constructs === inline-constructs
@@ -684,7 +740,7 @@ Image
    - [http://www.gnu.org GNU | Homepage of the GNU project]
 
 
-==== Automatic links ==== automatic-links
+==== Automatic Links ==== automatic-links
 
 External links beginning with URL scheme, such as '\http://', are recognized
 automatically, so the square brackets are not necessary, unless you want to
@@ -751,7 +807,7 @@ pixels at the end of the image filename:
 
 [http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg:27x24]
 
-==== Image links ==== image-links
+==== Image Links ==== image-links
 
 Image links are a combination of image and link, presented as an inline image
 which acts as a link (can be clicked to get to the link target).  They are
@@ -802,7 +858,7 @@ If it doesn't, check the requirements below.
 will work.
 
 
-===== Technical requirements ===== player-requirements
+===== Technical Requirements ===== player-requirements
 
 /User side requirements:/ A JavaScript enabled browser with Adobe Flash support is
 required on the user side to use the embedded media player.  If not, the link
@@ -820,7 +876,7 @@ in the FLV format or as a link to the YouTube or Vimeo services.
 In either case, the user is presented with an embedded player,
 in which it is possible to directly play the video.
 
-===== Local FLV video files =====
+===== Local FLV Video Files =====
 
 Links to video files in FLV format will be automatically represented by an
 embedded multimedia player.  Most video formats can be converted to
@@ -889,8 +945,15 @@ Vimeo links work in the same way:
 requirements.  Client side requirements are the same as for other types of
 multimedia embedding (JavaScript enabled browser with Adobe Flash support).
 
+==== Page Numbers ====
 
-=== Other features ===
+You can include page numbers and total number of pages in document headers and
+footers by using the marks =\@PAGE@= and =\@PAGES@=.  Note this works only in
+document headers and footers and only those backends where actual document
+pages are created (e.g. in PDF, but not in HTML).
+
+
+=== Other Features ===
 
 ==== Escaping ====
 
@@ -916,9 +979,9 @@ Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
 \\\\\*five*.
 
 
-==== Explicit line-break ====
+==== Explicit Line Break ====
 
-Two slashes force a line-break:
+Two slashes force a line break:
 
 ------
 This sentence will break//in the middle.
@@ -951,6 +1014,66 @@ Above
 Below
 
 
+==== Page Headers and Footers ====
+
+You can set document headers and footers by declaring corresponding parameters:
+
+\@parameter header TEXT
+  Text to be put into the header of every page.
+
+\@parameter first_page_header TEXT
+  Header to be used on the first page of the document.  If this parameter is
+  not present, the header is the same as on other pages.
+  
+\@parameter footer TEXT
+  Text to be put into the footer of every page.
+
+If the text is longer or more complicated, you can use the multiline form of
+parameter definition, e.g.:
+
+-----
+@parameter footer
+@center
+@PAGE@/@PAGES@
+@end footer
+-----
+
+Note that page headers and footers may make sense only in some document formats
+and may be supported only by some backends while being ignored by other
+backends.
+
+
+==== Presentation Parameters ====
+
+It is possible to set some presentation parameters using =@parameter= mark:
+
+\@parameter font_size NUMBER
+  Changing default font size by multiplying it by NUMBER.
+
+\@parameter font_name NAME
+  Name of the default font of the document, e.g. =DejaVu= or =Bitstream Vera=.
+  Whether the given font can be actually used in the document depends on the
+  system installation.  If the given font cannot be found, another font is
+  used.
+
+\@parameter font_family NAME
+  Default font family of the document, NAME can be one of =SERIF=,
+  =SANS_SERIF=, =FIXED_WIDTH=.
+
+\@parameter heading_font_family NAME
+  The same as font_family except that it applies only to section headings.
+
+\@parameter noindent ONE_OR_ZERO
+  If set to =1=, don't indent first lines of paragraphs.  If set to =0=, indent
+  them.
+
+\@parameter line_spacing NUMBER
+  Line spacing is set to NUMBER times the size of the current font.
+
+Note that not all presentation parameters make sense in all backends or are
+supported by all of them, the may be ignored.
+
+
 ==== Comments ====
 
 You can comment out any text with '# ' at the beginning of a line.  This will
@@ -971,7 +1094,7 @@ The first line.
 # commented out
 The last line.
 
-=== Deprecated features ===
+=== Deprecated Features ===
 
 The following features remain for backwards compatibility, but should not be
 used in new documents, since they may be removed in future LCG versions.
