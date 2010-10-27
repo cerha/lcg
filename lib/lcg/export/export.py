@@ -150,6 +150,7 @@ class MarkupFormatter(object):
                ('nbsp', '~'),
                ('page', '@PAGE@'),
                ('total_pages', '@PAGES@'),
+               ('escape', '\\\\(?P<char>[-*@])'),
                )
     
     _HELPER_PATTERNS = ('align', 'href', 'imgname', 'imgname_', 'anchor', 'label', 'label_img',
@@ -315,6 +316,9 @@ class MarkupFormatter(object):
     
     def _total_pages_formatter(self, context, **kwargs):
         return ''
+
+    def _escape_formatter(self, context, type, groups, **kwargs):
+        return groups['char']
 
     def _formatter(self, context, type, groups, close=False):
         try:
