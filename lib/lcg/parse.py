@@ -981,7 +981,7 @@ class NewParser(object):
         return contents
 
 
-Parser = OldParser
+Parser = NewParser
 
 
 class MacroParser(object):
