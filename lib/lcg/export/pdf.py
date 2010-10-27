@@ -1266,6 +1266,8 @@ class List(Element):
         next_pdf_context.inc_list_nesting_level()
         next_pdf_context.left_indent = style.leftIndent
         next_pdf_context.bullet_indent = style.bulletIndent
+        # Prevent paragpraph indenting of text after bullet:
+        next_pdf_context.last_element_category = 'list-item-start'
         next_context = copy.copy(context)
         next_context.pdf_context = next_pdf_context
         def make_item(item):
