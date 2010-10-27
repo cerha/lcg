@@ -504,6 +504,9 @@ class OldParser(object):
         return sections
 
 
+def _bool(string):
+    return string.strip().lower() not in ('0', 'false', 'no',)
+
 class NewParser(object):
     """Structured text (wiki) document parser.
 
@@ -541,7 +544,7 @@ class NewParser(object):
                    'font_name': ('presentation', 'font_name', None,),
                    'font_family': ('presentation', 'font_family', None,),
                    'heading_font_family': ('presentation', 'heading_font_family', None,),
-                   'noindent': ('presentation', 'noindent', bool,),
+                   'noindent': ('presentation', 'noindent', _bool,),
                    'line_spacing': ('presentation', 'line_spacing', float,),
                    }
     
