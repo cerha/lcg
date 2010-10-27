@@ -96,6 +96,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         first_page_header = pdf_context.first_page_header()
         page_header = pdf_context.page_header()
         page_footer = pdf_context.page_footer()
+        page_background = pdf_context.page_background()
         def make_flowable(content):
             context = self._lcg_context
             pdf_context = context.pdf_context
@@ -132,21 +133,27 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             pdf_context.page += 1
             page = pdf_context.page
             canvas.saveState()
-            def add_flowable(content, top):
+            def add_flowable(content, position):
                 flowable, width, height = make_flowable(content)
                 x = (self.pagesize[0] - width) / 2
-                if top:
+                if position == 'top':
                     y = self.height + self.bottomMargin - height
-                else:
+                elif position == 'bottom':
                     y = height
+                elif position == 'center':
+                    y = self.bottomMargin + (self.height - height) / 2
+                else:
+                    raise Exception("Program error", position)
                 flowable.drawOn(canvas, x, y)
             header = first_page_header
             if page > 1 or header is None:
                 header = page_header
             if header is not None:
-                add_flowable(header, True)
+                add_flowable(header, 'top')
             if page_footer is not None:
-                add_flowable(page_footer, False)
+                add_flowable(page_footer, 'bottom')
+            if page_background is not None:
+                add_flowable(page_background, 'center')
             canvas.restoreState()
         self._calc()
         Frame = reportlab.platypus.frames.Frame
@@ -228,7 +235,8 @@ class Context(object):
     last_element_category = None
 
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
-                 page_header=None, page_footer=None, presentation=None, lang=None):
+                 page_header=None, page_footer=None, page_background=None, presentation=None,
+                 lang=None):
         self._lang = lang
         self._presentations = []
         self._init_fonts()
@@ -242,6 +250,7 @@ class Context(object):
         self._first_page_header = first_page_header
         self._page_header = page_header
         self._page_footer = page_footer
+        self._page_background = page_background
         if parent_context is not None:
             if self._first_page_header is None:
                 self._first_page_header = parent_context.first_page_header()
@@ -703,6 +712,10 @@ class Context(object):
     def page_footer(self):
         """Return page footer markup."""
         return self._page_footer
+
+    def page_background(self):
+        """Return page background markup."""
+        return self._page_background
 
     def relative_font_size(self):
         """Return global font size coefficient."""
@@ -1773,6 +1786,7 @@ class PDFExporter(FileExporter, Exporter):
                                       first_page_header=node.first_page_header(lang),
                                       page_header=node.page_header(lang),
                                       page_footer=node.page_footer(lang),
+                                      page_background=node.page_background(lang),
                                       presentation=node.presentation(lang),
                                       lang=lang)
         pdf_context.add_presentation(context.presentation())
@@ -1793,6 +1807,7 @@ class PDFExporter(FileExporter, Exporter):
                                              first_page_header=node.first_page_header(lang),
                                              page_header=node.page_header(lang),
                                              page_footer=node.page_footer(lang),
+                                             page_background=node.page_background(lang),
                                              presentation=presentation,
                                              lang=lang)
             # The subcontext serves twice: 1. when exporting node content;

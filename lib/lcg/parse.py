@@ -540,6 +540,7 @@ class NewParser(object):
     _PARAMETERS = {'header': ('parameter', 'page_header', None,),
                    'first_page_header': ('parameter', 'first_page_header', None,),
                    'footer': ('parameter', 'page_footer', None,),
+                   'background': ('parameter', 'page_background', None,),
                    'font_size': ('presentation', 'font_size', float,),
                    'font_name': ('presentation', 'font_name', None,),
                    'font_family': ('presentation', 'font_family', None,),

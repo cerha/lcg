@@ -1028,6 +1028,9 @@ You can set document headers and footers by declaring corresponding parameters:
 \@parameter footer TEXT
   Text to be put into the footer of every page.
 
+\@parameter background TEXT
+  Text to be put on the background of every page.
+
 If the text is longer or more complicated, you can use the multiline form of
 parameter definition, e.g.:
 

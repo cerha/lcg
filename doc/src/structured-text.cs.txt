@@ -1044,6 +1044,9 @@ stránek:
 \@parameter footer TEXT
   Text, který se má objevit v patičce každé stránky.
 
+\@parameter background TEXT
+  Text, který se má objevit na pozadí každé stránky.
+
 Pokud je text delší nebo komplikovanější, můžete použít víceřádkovou definici
 parametru, např.:
 

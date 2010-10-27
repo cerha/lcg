@@ -39,7 +39,8 @@ class ContentNode(object):
 
     def __init__(self, id, title=None, brief_title=None, descr=None, variants=(), content=None,
                  children=(), hidden=False, active=True, resource_provider=None, globals=None,
-                 page_header=None, page_footer=None, first_page_header=None, presentation=None):
+                 page_header=None, page_footer=None, first_page_header=None, page_background=None,
+                 presentation=None):
         """Initialize the instance.
 
         Arguments:
@@ -77,6 +78,9 @@ class ContentNode(object):
             codes as keys, to be inserted at the top of the first generated
             page.  If content is 'None', page_header (if any) is used on all
             pages.
+          page_background -- dictionary of 'Content' instances, with language codes
+            as keys, to be put on the background of each generated page.  If content is
+            'None', nothing is put on the background.
           presentation -- dictionary of 'Presentation' instances (or 'None'
             values) associated with this node, with language codes as keys.
           
@@ -99,6 +103,8 @@ class ContentNode(object):
         self._first_page_header = first_page_header
         assert page_footer is None or isinstance(page_footer, dict) and all ([x is None or isinstance(x, Content) for x in page_footer.values()]), page_footer
         self._page_footer = page_footer
+        assert page_background is None or isinstance(page_background, dict) and all ([x is None or isinstance(x, Content) for x in page_background.values()]), page_background
+        self._page_background = page_background
         assert presentation is None or isinstance(presentation, dict) and all ([x is None or isinstance(x, Presentation) for x in presentation.values()]), presentation
         self._presentation = presentation
         if isinstance(content, (tuple, list)):
@@ -294,6 +300,10 @@ class ContentNode(object):
     def first_page_header(self, lang):
         """Return the first page header."""
         return self._lang_parameter(self._first_page_header, lang)
+        
+    def page_background(self, lang):
+        """Return the page background."""
+        return self._lang_parameter(self._page_background, lang)
 
     def presentation(self, lang):
         """Return presentation of this node."""
