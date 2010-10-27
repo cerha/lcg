@@ -139,7 +139,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 if position == 'top':
                     y = self.height + self.bottomMargin - height
                 elif position == 'bottom':
-                    y = height
+                    y = self.bottomMargin
                 elif position == 'center':
                     y = self.bottomMargin + (self.height - height) / 2
                 else:
