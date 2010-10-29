@@ -1433,15 +1433,16 @@ class Table(Element):
             if all([c.heading for c in content[0].content]):
                 header_row_p = True
             row = content[1].content
-            for j in range(len(row)):
-                column = row[j]
-                if isinstance(column, TableCell) and column.align is not None:
-                    alignments.append(column.align)
-                    table_style_data.append(('ALIGN', (j, 0), (j, -1), column.align.upper(),))
-                else:
-                    alignments.append(None)
-                if isinstance(column, TableCell) and column.valign is not None:
-                    table_style_data.append(('VALIGN', (j, 0), (j, -1), column.valign.upper(),))
+            if row is not None:         # i.e. not a HorizontalSeparator
+                for j in range(len(row)):
+                    column = row[j]
+                    if isinstance(column, TableCell) and column.align is not None:
+                        alignments.append(column.align)
+                        table_style_data.append(('ALIGN', (j, 0), (j, -1), column.align.upper(),))
+                    else:
+                        alignments.append(None)
+                    if isinstance(column, TableCell) and column.valign is not None:
+                        table_style_data.append(('VALIGN', (j, 0), (j, -1), column.valign.upper(),))
         # Export content
         # (In case of table style overlappings, last definition takes precedence.)
         black = reportlab.lib.colors.black
@@ -2037,7 +2038,11 @@ class PDFExporter(FileExporter, Exporter):
     def _export_table(self, context, element):
         content = []
         for c in element.content():
-            content += c.export(context).content
+            exported = c.export(context)
+            if isinstance(exported, HorizontalRule):
+                content.append(exported)
+            else:
+                content += exported.content
         return make_element(Table, content=content,
                             long=element.long(), compact=False,
                             column_widths=element.column_widths(),
