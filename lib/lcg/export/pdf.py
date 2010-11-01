@@ -42,6 +42,21 @@ import reportlab.platypus.tableofcontents
 from lcg import *
 from lcg.export import *
 
+class RLTable(reportlab.platypus.Table):
+    # The original Table class doesn't care much about determining unspecified
+    # column widths.  This makes serious troubles with our horizontal
+    # containers.  We avoid the most important problem by classifying at least
+    # our tables as being of fixed width.
+    # But beware, this can have problematic consequences in some cases.  There
+    # is at least one situation where some table columns may get lost, probably
+    # when using an unaligned vertical container within a table, possibly
+    # accompanied by other circumstances.
+    def _canGetWidth(self, thing):
+        if isinstance(thing, RLTable):
+            return 1
+        else:
+            return reportlab.platypus.Table._canGetWidth(self, thing)
+
 class PageTemplate(reportlab.platypus.PageTemplate):
     pass
 
@@ -110,7 +125,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 if len(flowable) == 1:
                     flowable = flowable[0]
                 else:
-                    flowable = reportlab.platypus.Table([[f] for f in flowable])
+                    flowable = RLTable([[f] for f in flowable])
             max_height = self.height / 3  # so that header, footer and content have all chance to fit
             width, height = flowable.wrap(self.width, max_height)
             return flowable, width, height
@@ -1560,7 +1575,7 @@ class Table(Element):
             if header_row_p:
                 repeat_rows = 1
         else:
-            class_ = reportlab.platypus.Table
+            class_ = RLTable
         if self.column_widths is None:
             column_widths = None
         else:
