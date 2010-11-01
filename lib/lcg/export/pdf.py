@@ -224,11 +224,15 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
 class RLSpacer(reportlab.platypus.flowables.Spacer):
     def wrap(self, availWidth, availHeight):
         if self.width is None:
-            self.width = availWidth
+            width = availWidth
+        else:
+            width = min(self.width, availWidth)
         if self.height is None:
-            self.height = availHeight-1e-8
-        return self.width, self.height
-    
+            height = availHeight-1e-8
+        else:
+            height = min(self.height, availHeight)
+        return width, height
+
 class Context(object):
     """Place holder for PDF backend export state.
 
