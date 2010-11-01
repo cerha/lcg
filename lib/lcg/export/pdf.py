@@ -1440,7 +1440,7 @@ class Table(Element):
         content = self.content
         exported_content = []
         # Find out information about the table
-        table_style_data = []
+        table_style_data = [('VALIGN', (0, 0), (-1, -1), 'TOP',)]
         number_of_rows = len(content)
         header_row_p = False
         alignments = []
