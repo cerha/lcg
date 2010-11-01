@@ -42,21 +42,6 @@ import reportlab.platypus.tableofcontents
 from lcg import *
 from lcg.export import *
 
-class RLTable(reportlab.platypus.Table):
-    # The original Table class doesn't care much about determining unspecified
-    # column widths.  This makes serious troubles with our horizontal
-    # containers.  We avoid the most important problem by classifying at least
-    # our tables as being of fixed width.
-    # But beware, this can have problematic consequences in some cases.  There
-    # is at least one situation where some table columns may get lost, probably
-    # when using an unaligned vertical container within a table, possibly
-    # accompanied by other circumstances.
-    def _canGetWidth(self, thing):
-        if isinstance(thing, RLTable):
-            return 1
-        else:
-            return reportlab.platypus.Table._canGetWidth(self, thing)
-
 class PageTemplate(reportlab.platypus.PageTemplate):
     pass
 
@@ -220,6 +205,21 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
             else:
                 context.pdf_context.adjust_style_leading(style)
             self.levelStyles[i] = style
+
+class RLTable(reportlab.platypus.Table):
+    # The original Table class doesn't care much about determining unspecified
+    # column widths.  This makes serious troubles with our horizontal
+    # containers.  We avoid the most important problem by classifying at least
+    # our tables as being of fixed width.
+    # But beware, this can have problematic consequences in some cases.  There
+    # is at least one situation where some table columns may get lost, probably
+    # when using an unaligned vertical container within a table, possibly
+    # accompanied by other circumstances.
+    def _canGetWidth(self, thing):
+        if isinstance(thing, RLTable):
+            return 1
+        else:
+            return reportlab.platypus.Table._canGetWidth(self, thing)
 
 class RLSpacer(reportlab.platypus.flowables.Spacer):
     def wrap(self, availWidth, availHeight):
