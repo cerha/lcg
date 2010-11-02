@@ -1195,6 +1195,7 @@ class Container(Element):
     _CATEGORY = None
     presentation = None
     vertical = False
+    halign = None
     def init(self):
         if __debug__:
             for c in self.content:
@@ -1205,7 +1206,10 @@ class Container(Element):
         presentation = pdf_context.current_presentation()
         if (len(self.content) == 1 and
             (isinstance(self.content[0], (Container, Table, Paragraph,)) or
-             (isinstance(self.content[0], Text) and self.content[0].plain_text() and parent_presentation is not None)) and
+             (isinstance(self.content[0], Text) and
+              self.content[0].plain_text() and
+              parent_presentation is not None and
+              self.halign is None)) and
             (presentation is None or
              parent_presentation is not None)):
             if presentation is not None and parent_presentation is not None:
@@ -1213,10 +1217,13 @@ class Container(Element):
                     value = getattr(presentation, attr)
                     if value is not None:
                         setattr(parent_presentation, attr, value)
-            if isinstance(self.content[0], Container):
-                result = self.content[0].export(context, parent_presentation=parent_presentation)
+            content_element = self.content[0]
+            if self.halign is not None and content_element.halign is None:
+                content_element.halign = self.halign
+            if isinstance(content_element, Container):
+                result = content_element.export(context, parent_presentation=parent_presentation)
             else:
-                result = [self.content[0].export(context)]
+                result = [content_element.export(context)]
         else:
             result = []
             all_text = not self.vertical and presentation is None
@@ -1227,11 +1234,20 @@ class Container(Element):
                         (isinstance(c, Text) and not c.plain_text())):
                         all_text = False
                         break
+            force_align = (self.halign is not None)
             for c in self.content:
                 if isinstance(c, basestring):
                     c = make_element(Text, content=unicode(c))
-                if isinstance(c, Text) and not all_text:
-                    c = make_element(Paragraph, content=[c], noindent=True)
+                if isinstance(c, Text) and (force_align or not all_text):
+                    c = make_element(Paragraph, content=[c], noindent=True, halign=self.halign)
+                if force_align:
+                    if hasattr(c, 'halign'):
+                        if c.halign is None:
+                            c.halign = self.halign
+                    else:
+                        cell = make_element(TableCell, content=[c])
+                        row = make_element(TableRow, content=[cell])
+                        c = make_element(Table, content=[row], halign=self.halign)
                 exported = c.export(context)
                 if isinstance(exported, (list, tuple,)):
                     result += exported
@@ -1963,7 +1979,7 @@ class PDFExporter(FileExporter, Exporter):
         presentation = element.presentation()
         orientation = element.orientation()
         if ((orientation == 'HORIZONTAL' and len(content) > 1) or
-            element.halign() is not None or element.valign() is not None):
+            element.valign() is not None):
             def cell(content):
                 exported_content = [content.export(context)]
                 return make_element(TableCell, content=exported_content)
@@ -1978,6 +1994,7 @@ class PDFExporter(FileExporter, Exporter):
             exported_content = self._content_export(context, element, collapse=False)
             result_content = make_element(Container, content=exported_content,
                                           vertical=(orientation == 'VERTICAL'),
+                                          halign=element.halign(),
                                           presentation=presentation)
         return result_content
 
