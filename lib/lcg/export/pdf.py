@@ -241,6 +241,7 @@ class Context(object):
 
     """
     _registered_fonts = {}
+    _registered_font_files = {}
 
     _nesting_level = 0
     _list_nesting_level = 0
@@ -403,8 +404,13 @@ class Context(object):
             assert Context._registered_fonts[key] == font_file, \
                    ("Inconsistent font definition", key, font_file,)
         else:
-            f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, font_file)
-            reportlab.pdfbase.pdfmetrics.registerFont(f)
+            if Context._registered_font_files.has_key(font_file):
+                # ReportLab really doesn't like using the same font file more than once.
+                font_face_name = Context._registered_font_files[font_file]
+            else:
+                f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, font_file)
+                reportlab.pdfbase.pdfmetrics.registerFont(f)
+                Context._registered_font_files[font_file] = font_face_name
             reportlab.lib.fonts.addMapping(font_name, bold, italic, font_face_name)
             Context._registered_fonts[key] = font_file
         return font_face_name
