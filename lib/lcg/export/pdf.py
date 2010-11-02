@@ -339,22 +339,42 @@ class Context(object):
             language_pattern = ':lang=' + lang
         pattern = (':family=%s:weight=%s:slant=%s%s' %
                    (family_pattern, bold_pattern, italic_pattern, language_pattern,))
-        # Retrieve candidates
-        p = subprocess.Popen(['fc-match', '-v', '--sort', pattern],
-                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, close_fds=True)
-        output = ''
-        while True:
-            data = p.stdout.read()
-            if not data:
+        # Retrieve preferred font.
+        # Fontconfig is very weird.  For instance, in Fontconfig 2.8.0
+        # `fc-match PATTERN' returns other result than the first item in
+        # `fc-match --sort PATTERN'.  The former seems to give better results
+        # so we first ask for the preferred font using `fc-match PATTERN' and
+        # then try to use it if possible.
+        # Oh, and expect fc-match output format changes among different
+        # Fontconfig versions, there is nothing like stable documented output
+        # format there.
+        def read_from_process(process_args):
+            p = subprocess.Popen(process_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                 close_fds=True)
+            output = ''
+            while True:
+                data = p.stdout.read()
+                if not data:
+                    break
+                output += data
+            p.stdout.close()
+            return output
+        output = read_from_process(['fc-match', '-v', pattern])
+        re_file = re.compile('.*file: *"([^"]+\.ttf)"')
+        for line in output.splitlines():
+            match = re_file.match(line)
+            if match:
+                preferred_font_file = match.group(1)
                 break
-            output += data
-        p.stdout.close()
+        else:
+            preferred_font_file = None
+        # Retrieve candidates
+        output = read_from_process(['fc-match', '-v', '--sort', pattern])
         # Find matching font
         font_file = None
         default_font_file = None
         family_match = False
         family_string = 'family: "%s' % (name or '',)
-        re_file = re.compile('.*file: *"([^"]+\.ttf)"')
         for line in output.splitlines():
             if line.find('family: ') >= 0:
                 family_match = (line.find(family_string) >= 0)
@@ -363,8 +383,10 @@ class Context(object):
                 if match:
                     file_ = match.group(1)
                     if family_match:
-                        font_file = file_
-                        break
+                        if font_file is None or file_ == preferred_font_file:
+                            font_file = file_
+                            if file_ == preferred_font_file:
+                                break
                     elif default_font_file is None:
                         default_font_file = file_
         # If there is no match, use a fallback font
