@@ -39,6 +39,7 @@ import reportlab.platypus
 import reportlab.platypus.flowables
 import reportlab.platypus.tableofcontents
 
+import lcg
 from lcg import *
 from lcg.export import *
 
@@ -1973,13 +1974,37 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Space, height=element.size(context), width=UMm(0))
 
     # Container elements
+
+    def _tabular_content(self, content):
+        # We sometimes prefer tabular content over simple container.  The
+        # reason is that paragraph, unlike simple text table cells, don't have
+        # fixed width and this makes problems with alignment of upper tables.
+        # On the other hand it's not possible to put anything into table, a
+        # typical example being long tables.  In some cases it makes no sense
+        # to make an extra table, e.g. when the content is already a paragraph
+        # or when the content is just a single table.
+        single = (len(content) <= 1)
+        for c in content:
+            if isinstance(c, lcg.Container):
+                if not self._tabular_content(c.content()):
+                    return False
+            elif not single:
+                if isinstance(c, lcg.Paragraph):
+                    return False
+                elif isinstance(c, lcg.Table) and c.long():
+                    return False
+            elif not isinstance(c, lcg.TextContent):
+                print '!!!', c
+                return False
+        return True
     
     def _export_container(self, context, element):
         content = element.content()
         presentation = element.presentation()
         orientation = element.orientation()
         if ((orientation == 'HORIZONTAL' and len(content) > 1) or
-            element.valign() is not None):
+            element.valign() is not None
+            or self._tabular_content(content)):
             def cell(content):
                 exported_content = [content.export(context)]
                 return make_element(TableCell, content=exported_content)
