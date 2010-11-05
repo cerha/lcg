@@ -280,6 +280,7 @@ class Context(object):
             if self._page_footer is None:
                 self._page_footer = parent_context.page_footer()
         self._relative_font_size = 1
+        self._export_notes = []
 
     def _init_styles(self):
         self._styles = reportlab.lib.styles.getSampleStyleSheet()
@@ -775,6 +776,32 @@ class Context(object):
     def set_relative_font_size(self, coefficient):
         """Make default font size of this context to 'coefficient'."""
         self._relative_font_size = coefficient
+
+    def export_notes(self):
+        """Return sequence of export notes.
+
+        Export notes are arbitrary strings put on a stack and they serve as
+        information modifying the process of building pdf.py hierarchy of
+        classes.  For instance, they can be used to prevent some
+        transformations inside certain elements.
+
+        """
+        return tuple(self._export_notes)
+
+    def append_export_note(self, note):
+        """Add export note on the notes stack.
+
+        Arguments:
+
+          note -- the note, string
+
+        """
+        assert isinstance(note, str)
+        self._export_notes.append(note)
+        
+    def pop_export_note(self):
+        """Remove the last export note from the notes stack."""
+        self._export_notes.pop()
 
 def _ok_export_result(result):
     if not isinstance(result, (tuple, list,)) or not result:
@@ -1975,7 +2002,7 @@ class PDFExporter(FileExporter, Exporter):
 
     # Container elements
 
-    def _tabular_content(self, content):
+    def _tabular_content(self, context, content):
         # We sometimes prefer tabular content over simple container.  The
         # reason is that paragraph, unlike simple text table cells, don't have
         # fixed width and this makes problems with alignment of upper tables.
@@ -1983,10 +2010,12 @@ class PDFExporter(FileExporter, Exporter):
         # typical example being long tables.  In some cases it makes no sense
         # to make an extra table, e.g. when the content is already a paragraph
         # or when the content is just a single table.
+        if 'list' in context.pdf_context.export_notes():
+            return False
         single = (len(content) <= 1)
         for c in content:
             if isinstance(c, lcg.Container):
-                if not self._tabular_content(c.content()):
+                if not self._tabular_content(context, c.content()):
                     return False
             elif not single:
                 if isinstance(c, lcg.Paragraph):
@@ -1994,7 +2023,6 @@ class PDFExporter(FileExporter, Exporter):
                 elif isinstance(c, lcg.Table) and c.long():
                     return False
             elif not isinstance(c, lcg.TextContent):
-                print '!!!', c
                 return False
         return True
     
@@ -2003,8 +2031,8 @@ class PDFExporter(FileExporter, Exporter):
         presentation = element.presentation()
         orientation = element.orientation()
         if ((orientation == 'HORIZONTAL' and len(content) > 1) or
-            element.valign() is not None
-            or self._tabular_content(content)):
+            element.valign() is not None or
+            self._tabular_content(context, content)):
             def cell(content):
                 exported_content = [content.export(context)]
                 return make_element(TableCell, content=exported_content)
@@ -2066,7 +2094,10 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Container, content=content)
 
     def _export_itemized_list(self, context, element):
+        pdf_context = context.pdf_context
+        pdf_context.append_export_note('list')
         content = self._content_export(context, element, collapse=False)
+        pdf_context.pop_export_note()
         return make_element(List, content=content, order=element.order())
 
     def _export_definition_list(self, context, element):
