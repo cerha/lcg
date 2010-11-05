@@ -1092,6 +1092,51 @@ Ne všechny tyto vlastnosti mají význam ve všech výstupních formátech.  Ta
 nemusí být všemi výstupními formáty podporovány a mohou jimi být ignorovány.
 
 
+==== Proměnné ====
+
+Můžete si definovat pojmenovaný text (proměnnou) pro pozdější použití, typicky
+opakované:
+
+------
+@define pi 3.14
+@define repeated_text
+Jedna z nejznámějších matematických konstant je π.
+Její hodnota je $pi.
+@end repeated_text
+
+$repeated_text
+
+Opakuji: $repeated_text
+
+@define pi 3.14159
+Zkusíme být o něco přesnější:
+$repeated_text
+------
+
+Toto bude zobrazeno jako:
+
+@define pi 3.14
+@define repeated_text
+Jedna z nejznámějších matematických konstant je π.
+Její hodnota je $pi.
+@end repeated_text
+
+$repeated_text
+
+Opakuji: $repeated_text
+
+@define pi 3.14159
+Zkusíme být o něco přesnější:
+$repeated_text
+
+Jména proměnných (jako =pi= nebo =repeated_text=) mohou obsahovat pouze malá
+písmena anglické abecedy a podtržítka.  Příslušný text je standardní
+strukturovaný text.  Všimněte si, že ve víceřádkové verzi definice je text
+interpretován jako blok, zatímco v jednořádkové verzi může být text vložen
+i dovnitř odstavce.  Definice proměnné platí od jejího prvního výskytu až do
+případné jiné definice proměnné téhož jména.
+
+
 ==== Komentáře ====
 
 Můžete „zakomentovat“ libovolný text pomocí křížku „#“ na začátku řádky.  Tím

@@ -117,7 +117,10 @@ class ContentNode(object):
             child._set_parent(self)
         self._children = children
         self._resource_provider = resource_provider
-        self._globals = globals or {}
+        if globals is None:
+            self._globals = {}
+        else:
+            self._globals = copy.copy(globals)
         #if __debug__:
         #    seen = {}
         #    for n in self.linear():
@@ -260,7 +263,20 @@ class ContentNode(object):
     def globals(self):
         """Return the node variables as a dictionary keyed by variable names."""
         return self._globals
-    
+
+    def set_global(self, name, value):
+        """Set node variable 'name' to 'value'.
+
+        Arguments:
+
+          name -- name of the variable, string
+          value -- value of the variable, 'Content' instance
+
+        """
+        assert isinstance(name, str), name
+        assert isinstance(value, Content), value
+        self._globals[name] = value
+
     def resources(self, cls=None):
         """Return the list of all resources this node depends on.
 

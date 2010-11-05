@@ -109,6 +109,7 @@ class Parser(object):
                                   re.MULTILINE)
     _LINE_MATCHER = re.compile(r'^( *)([^\n\r]*)(\r?\n\r?|$)', re.MULTILINE)
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *$', re.DOTALL|re.MULTILINE)
+    _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?$', re.MULTILINE)
     _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?$', re.MULTILINE)
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
                                 r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?\n')
@@ -140,6 +141,7 @@ class Parser(object):
                             self._list_processor,
                             self._definition_processor,
                             self._parameters_processor,
+                            self._variable_processor,
                             self._paragraph_processor,
                             )
 
@@ -219,7 +221,8 @@ class Parser(object):
             if match and len(match.group('level')) <= level:
                 break
             content, position = self._parse(text, position, section_level=level, **kwargs)
-            section_content.append(content)
+            if content is not None:
+                section_content.append(content)
         container = Container(section_content)
         return Section(title=title, content=container, anchor=anchor), position
 
@@ -446,6 +449,29 @@ class Parser(object):
                 raise Exception("Program error", kind)
         return None, position
 
+    def _variable_processor(self, text, position, **kwargs):
+        match = self._VARIABLE_MATCHER.match(text[position:])
+        if not match:
+            return None
+        identifier = match.group(1)
+        value = match.group(2)
+        position += match.end()
+        while text[position:position+1] in ('\r', '\n',):
+            position += 1
+        if value:
+            value = value.strip()
+            variable_content = FormattedText(value)
+        else:
+            match = re.search('^@end %s *$' % (identifier,), text[position:], re.MULTILINE)
+            if match:
+                value = text[position:position+match.start()].strip()
+                position += match.end()
+            else:                       # unfinished variable
+                return None, position
+            variable_content = Container(self.parse(value))
+        content = SetVariable(str(identifier), variable_content)
+        return content, position
+
     def _paragraph_processor(self, text, position, halign=None, indentation=0, extra_indentation=0,
                              compressed=False, **kwargs):
         next_position = self._skip_content(text, position, indentation=indentation,
@@ -510,15 +536,13 @@ class Parser(object):
                 start_position = position
         return start_position
 
-    def _parse(self, text, position, parameters, presentation, processors=None, **kwargs):
+    def _parse(self, text, position, processors=None, **kwargs):
         assert position > self._old_position, \
                (self._old_position, position, text[position:position+100],)
         if __debug__:
             self._old_position = position
-        kwargs = self._prune_kwargs(kwargs, ('parameters', 'presentation',))
         for processor in (processors or self._processors):
-            result = processor(text, position, parameters=parameters, presentation=presentation,
-                               **kwargs)
+            result = processor(text, position, **kwargs)
             if result is not None:
                 if __debug__:
                     position = result[1]
@@ -536,8 +560,8 @@ class Parser(object):
         Arguments:
 
           text -- input structured text, string or unicode
-          parameters -- 'None' or dictionary where keyword parameters for
-            'ContentNode' constructor can be stored
+          parameters -- 'None' or a dictionary where keyword parameters for
+            'ContentNode' constructor are stored to
 
         """
         assert isinstance(text, basestring), text
@@ -553,7 +577,8 @@ class Parser(object):
             position = self._find_next_block(text, position)
             if position >= size:
                 break
-            content, position = self._parse(text, position, parameters, presentation)
+            content, position = self._parse(text, position, parameters=parameters,
+                                            presentation=presentation)
             if content is not None:
                 contents.append(content)
             position = self._find_next_block(text, position)

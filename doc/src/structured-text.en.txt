@@ -1077,6 +1077,52 @@ Note that not all presentation parameters make sense in all backends or are
 supported by all of them, the may be ignored.
 
 
+==== Variables ====
+
+You can define a named piece of a structured text (variable) for later
+(typically repeated) use:
+
+------
+@define pi 3.14
+@define repeated_text
+One of the most famous mathematical constants is π.
+Its value is $pi.
+@end repeated_text
+
+$repeated_text
+
+I repeat: $repeated_text
+
+@define pi 3.14159
+Let's be more exact now:
+$repeated_text
+------
+
+This will be presented as:
+
+@define pi 3.14
+@define repeated_text
+One of the most famous mathematical constants is π.
+Its value is $pi.
+@end repeated_text
+
+$repeated_text
+
+I repeat: $repeated_text
+
+@define pi 3.14159
+Let's be more exact now:
+$repeated_text
+
+Variable names (e.g. =pi= or =repeated_text=) may consist only of lower-case
+English letters and underscores.  The replacement text is a standard structured
+text.  Note that in the multi-line version of a variable definition the text is
+interpreted as a block while in the single-line version the text can be
+embedded in a paragraph.  A variable definition applies from its first
+occurrence, until it possibly gets redefined by another definition of a
+variable of the same name.
+
+
 ==== Comments ====
 
 You can comment out any text with '# ' at the beginning of a line.  This will

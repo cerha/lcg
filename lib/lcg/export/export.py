@@ -520,6 +520,7 @@ class Exporter(object):
                 InlineAudio: self._export_inline_audio,
                 InlineVideo: self._export_inline_video,
                 InlineExternalVideo: self._export_inline_external_video,
+                SetVariable: self._export_set_variable,
                 }
     
     def _export(self, node, context):
@@ -819,6 +820,15 @@ class Exporter(object):
         
         """
         return self.escape(element.text())
+
+    def _export_set_variable(self, context, element):
+        """Set node variable defined by 'element'.
+
+        The method returns export of an empty content.
+
+        """
+        context.node().set_global(element.name(), element.value())
+        return self._export_content(context, Content())
 
     # Container elements
     

@@ -1117,8 +1117,6 @@ class RootIndex(NodeIndex):
     def _root_item(self):
         return self.parent().root()
 
-    
-    
 
 class Link(Container):
     """Link to internal or external location."""
@@ -1244,6 +1242,36 @@ class NoneContent(Content):
     
     """
     pass
+
+class SetVariable(Content):
+    """Pseudo-content serving for setting node global variables.
+
+    This content doesn't produce any output, it just sets a node global
+    variable value.  It is used by structured text parser to set global
+    variables at proper places.
+    
+    """
+    def __init__(self, name, value):
+        """
+        Arguments:
+
+          name -- name of the variable, string
+          value -- value of the variable, 'Content' instance
+
+        """
+        assert isinstance(name, str), str
+        assert isinstance(value, Content), value
+        self._name = name
+        self._value = value
+
+    def name(self):
+        """Return name of the variable."""
+        return self._name
+
+    def value(self):
+        """Return value of the variable as a 'Content' instance."""
+        return self._value
+
 
 class ContentVariants(Container):
     """Container of multiple language variants of the same content.
