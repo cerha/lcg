@@ -116,7 +116,7 @@ class Content(object):
         self._parent = None
         self._container = None
         self._lang = lang
-        super(Content, self).__init__(**kwargs)
+        super(Content, self).__init__()
         
     def _container_path(self):
         path = [self]
