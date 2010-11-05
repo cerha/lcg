@@ -2010,6 +2010,7 @@ class PDFExporter(FileExporter, Exporter):
         # typical example being long tables.  In some cases it makes no sense
         # to make an extra table, e.g. when the content is already a paragraph
         # or when the content is just a single table.
+        return False
         if 'list' in context.pdf_context.export_notes():
             return False
         single = (len(content) <= 1)
