@@ -264,18 +264,45 @@ class ContentNode(object):
         """Return the node variables as a dictionary keyed by variable names."""
         return self._globals
 
-    def set_global(self, name, value):
+    def global_(self, name):
+        """Return value of node variable named 'name'.
+
+        If the variable is not present in this instance globals, look for it in
+        parent nodes.
+
+        Arguments:
+
+          name -- name of the variable, string
+
+        """
+        if self._globals.has_key(name):
+            result = self._globals[name]
+        elif self._parent is not None:
+            result = self._parent.global_(name)
+        else:
+            result = None
+        return result
+
+    def set_global(self, name, value, top=False):
         """Set node variable 'name' to 'value'.
 
         Arguments:
 
           name -- name of the variable, string
           value -- value of the variable, 'Content' instance
+          top -- iff true, set the value in the top node
 
         """
         assert isinstance(name, str), name
         assert isinstance(value, Content), value
-        self._globals[name] = value
+        node = self
+        if top:
+            while True:
+                parent = node.parent()
+                if parent is None:
+                    break
+                node = parent
+        node.globals()[name] = value
 
     def resources(self, cls=None):
         """Return the list of all resources this node depends on.

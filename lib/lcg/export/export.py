@@ -224,21 +224,23 @@ class MarkupFormatter(object):
             text = subst
         if not text:
             return exporter.escape('$' + subst)
-        result = context.node().globals()
-        for name in text.split('.'):
-            key = str(name)
-            if result.has_key(key):
-                result = result[key]
-                if isinstance(result, SubstitutionIterator):
-                    result = result.value()
+        names = text.split('.')
+        value = context.node().global_(str(names[0]))
+        for name in names[1:]:
+            if value is None:
+                break
+            if isinstance(value, SubstitutionIterator):
+                value = value.value()
             else:
-                return exporter.escape('$' + subst)
-        if isinstance(result, Content):
-            result = result.export(context)
+                value = value.get(str(name))
+        if value is None:
+            result = exporter.escape('$' + subst)
+        elif isinstance(value, Content):
+            result = value.export(context)
         else:
-            if not isinstance(result, Localizable):
-                result = unicode(result)
-            result = exporter.escape(result)
+            if not isinstance(value, Localizable):
+                result = unicode(value)
+            result = exporter.escape(value)
         return result
     
     def _link_formatter(self, context, href=None, imgname=None, anchor=None, size=None,
@@ -827,7 +829,7 @@ class Exporter(object):
         The method returns export of an empty content.
 
         """
-        context.node().set_global(element.name(), element.value())
+        context.node().set_global(element.name(), element.value(), top=True)
         return self._export_content(context, Content())
 
     # Container elements
