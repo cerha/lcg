@@ -234,6 +234,27 @@ class RLSpacer(reportlab.platypus.flowables.Spacer):
             height = min(self.height, availHeight)
         return width, height
 
+class RLImage(reportlab.platypus.flowables.Image):
+    # This class is introduced to handle images exceeding page dimensions.
+    # Its instance can't be used more than once in the document.
+    def __init__(self, *args, **kwargs):
+        self._last_avail_height = None
+        reportlab.platypus.flowables.Image.__init__(self, *args, **kwargs)
+    def wrap(self, availWidth, availHeight):
+        if availWidth < self.drawWidth:
+            # We allow any width compression.
+            self._setup(min(availWidth, self.drawWidth), self.drawHeight,
+                        kind='proportional', lazy=0)
+        elif (availHeight < self.drawHeight and
+              self._last_avail_height is not None and
+              self._last_avail_height < availHeight):
+            # We must be more careful with height compressions so that images
+            # are not unnecessarily reduced at the end of page.
+            self._setup(availWidth, min(availHeight, self.drawHeight),
+                        kind='proportional', lazy=0)
+        self._last_avail_height = availHeight
+        return reportlab.platypus.flowables.Image.wrap(self, availWidth, availHeight)
+
 class Context(object):
     """Place holder for PDF backend export state.
 
@@ -1452,7 +1473,7 @@ class Image(Element):
     def _export(self, context):
         filename = self.image.filename()
         if filename:
-            result = reportlab.platypus.flowables.Image(filename)
+            result = RLImage(filename)
         else:
             content = make_element(Text, content=(self.image.title() or '[image]'))
             result = make_element(Paragraph, content=[content]).export(context)
