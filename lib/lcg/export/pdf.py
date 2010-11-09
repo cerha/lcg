@@ -218,9 +218,110 @@ class RLTable(reportlab.platypus.Table):
     # accompanied by other circumstances.
     def _canGetWidth(self, thing):
         if isinstance(thing, RLTable):
-            return 1
+            result = 1
         else:
-            return reportlab.platypus.Table._canGetWidth(self, thing)
+            result = reportlab.platypus.Table._canGetWidth(self, thing)
+        return result
+
+class RLBox(reportlab.platypus.flowables.Flowable):
+    # Using tables for container management is actually not reasonably
+    # manageable.  For this reason we introduce our own container object that
+    # is much simpler than ReportLab alternatives such as Table or
+    # KeepTogether.  The class is rather primitive but hopefully this is enough
+    # to serve its purpose.
+    BOX_CENTER = 'CENTER'
+    BOX_TOP = 'TOP'
+    BOX_BOTTOM = 'BOTTOM'
+    BOX_LEFT = 'LEFT'
+    BOX_RIGHT = 'RIGHT'
+    def __init__(self, content, vertical=False, align=None):
+        assert isinstance(content, (tuple, list,)), content
+        assert isinstance(vertical, bool), vertical
+        if __debug__:
+            if vertical:
+                assert align in (self.BOX_CENTER, self.BOX_TOP, self.BOX_BOTTOM, None,), align
+            else:
+                assert align in (self.BOX_CENTER, self.BOX_LEFT, self.BOX_RIGHT, None,), align
+        reportlab.platypus.flowables.Flowable.__init__(self)
+        self._box_content = [self._box_adjusted_content(c) for c in content]
+        self._box_vertical = vertical
+        self._box_align = align or self.BOX_CENTER
+    def _box_adjusted_content(self, content):
+        if isinstance(content, basestring):
+            content = RLTable([[content]])
+        assert isinstance(content, reportlab.platypus.flowables.Flowable), content
+        return content
+    def wrap(self, availWidth, availHeight):
+        vertical = self._box_vertical
+        if vertical:
+            length_index = 1
+            avail_length = availHeight
+            fixed_attr = '_fixedHeight'
+        else:
+            length_index = 0
+            avail_length = availWidth
+            fixed_attr = '_fixedWidth'
+        depth_index = 1 - length_index
+        self._box_total_length = 0
+        self._box_depth = 0
+        variable_content = []
+        self._box_lengths = []
+        def wrap(content, width, height):
+            sizes = content.wrap(width, height)
+            length = sizes[length_index]
+            self._box_total_length += length
+            self._box_depth = max(self._box_depth, sizes[depth_index])
+            return length
+        i = 0
+        for c in self._box_content:
+            if getattr(c, fixed_attr):
+                length = wrap(c, availWidth, availHeight)
+            else:
+                length = None
+                min_width = None
+                if not vertical:
+                    min_width = c.minWidth()
+                variable_content.append((i, c, min_width,))
+            self._box_lengths.append(length)
+            i += 1
+        if variable_content:
+            stop = False
+            while not stop:
+                stop = True
+                avail = (avail_length - self._box_total_length) / len(variable_content)
+                if vertical:
+                    args = (availWidth, avail,)
+                else:
+                    args = (avail, availHeight,)
+                stop = True
+                for i, c, w in variable_content:
+                    if w and w > avail and self._box_lengths[i] is None:
+                        length = wrap(c, *args)
+                        self._box_lengths[i] = length
+                        stop = False                
+            for i, c, w in variable_content:
+                length = wrap(c, *args)
+                self._box_lengths[i] = length                
+        if vertical:
+            result = (self._box_depth, self._box_total_length,)
+        else:
+            result = (self._box_total_length, self._box_depth,)
+        return result
+    def draw(self):
+        canv = self.canv
+        lengths = self._box_lengths
+        vertical = self._box_vertical
+        x = 0
+        y = 0
+        i = 0
+        for c in self._box_content:
+            l = lengths[i]
+            if vertical:
+                y -= l
+            c.drawOn(canv, x, y)
+            if not vertical:
+                x += l
+            i += 1
 
 class RLSpacer(reportlab.platypus.flowables.Spacer):
     def wrap(self, availWidth, availHeight):
@@ -1245,6 +1346,7 @@ class Container(Element):
     presentation = None
     vertical = False
     halign = None
+    group = False
     def init(self):
         if __debug__:
             for c in self.content:
@@ -1308,6 +1410,8 @@ class Container(Element):
                         result[i] = reportlab.platypus.Paragraph(result[i], style=pdf_context.style())
             assert _ok_export_result(result), ('wrong export', result,)
         pdf_context.remove_presentation()
+        if self.group:
+            result = [RLBox(content=result, vertical=self.vertical)]
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
@@ -1562,6 +1666,8 @@ class Table(Element):
         font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
         bold_font = pdf_context.font(font_name, family, True, italic)
         table_style_data.append(('FONT', (0, 0), (-1, -1), style.fontName, style.fontSize))
+        table_style_data.append(('INNERGRID', (0, 0), (-1, -1), 1, reportlab.lib.colors.red))
+        table_style_data.append(('BOX', (0, 0), (-1, -1), 1, reportlab.lib.colors.red))
         i = 0
         for row in content:
             if isinstance(row, HorizontalRule):
@@ -1971,6 +2077,7 @@ class PDFExporter(FileExporter, Exporter):
                 doc.multi_build(document, context=first_subcontext)
             except reportlab.platypus.doctemplate.LayoutError, e:
                 if str(e).find('too large') >= 0:
+                    import pdb; pdb.set_trace()
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
                         log("Page content extremely large, giving up")
@@ -2025,18 +2132,17 @@ class PDFExporter(FileExporter, Exporter):
 
     def _tabular_content(self, context, content):
         # We sometimes prefer tabular content over simple container.  The
-        # reason is that paragraph, unlike simple text table cells, don't have
-        # fixed width and this makes problems with alignment of upper tables.
-        # On the other hand it's not possible to put anything into table, a
+        # reason is that paragraphs, unlike simple text table cells, don't have
+        # fixed widths and this makes problems with alignment of upper tables.
+        # On the other hand it's not possible to put anything into a table, a
         # typical example being long tables.  In some cases it makes no sense
         # to make an extra table, e.g. when the content is already a paragraph
         # or when the content is just a single table.
-        return False
         if 'list' in context.pdf_context.export_notes():
             return False
         single = (len(content) <= 1)
         for c in content:
-            if isinstance(c, lcg.Container):
+            if c.__class__ == lcg.Container:
                 if not self._tabular_content(context, c.content()):
                     return False
             elif not single:
@@ -2056,15 +2162,14 @@ class PDFExporter(FileExporter, Exporter):
             element.valign() is not None or
             self._tabular_content(context, content)):
             def cell(content):
-                exported_content = [content.export(context)]
-                return make_element(TableCell, content=exported_content)
-            if orientation == 'HORIZONTAL':
-                content = [cell(c) for c in content]
-                table_content = [make_element(TableRow, content=content)]
-            else:
-                table_content = [make_element(TableRow, content=[cell(c)]) for c in content]
-            result_content = make_element(Table, content=table_content, presentation=presentation,
-                                          halign=element.halign(), valign=element.valign())
+                exported_content = content.export(context)
+                if isinstance(exported_content, (tuple, list,)):
+                    exported_content = make_element(Container, content=exported_content)
+                return exported_content
+            content = [cell(c) for c in content]
+            result_content = make_element(Container, content=content, presentation=presentation,
+                                          halign=element.halign(), valign=element.valign(),
+                                          vertical=(orientation == 'VERTICAL'), group=True)
         else:
             exported_content = self._content_export(context, element, collapse=False)
             result_content = make_element(Container, content=exported_content,
