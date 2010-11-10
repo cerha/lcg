@@ -239,9 +239,9 @@ class RLBox(reportlab.platypus.flowables.Flowable):
         assert isinstance(vertical, bool), vertical
         if __debug__:
             if vertical:
-                assert align in (self.BOX_CENTER, self.BOX_TOP, self.BOX_BOTTOM, None,), align
-            else:
                 assert align in (self.BOX_CENTER, self.BOX_LEFT, self.BOX_RIGHT, None,), align
+            else:
+                assert align in (self.BOX_CENTER, self.BOX_TOP, self.BOX_BOTTOM, None,), align
         reportlab.platypus.flowables.Flowable.__init__(self)
         self._box_content = [self._box_adjusted_content(c) for c in content]
         self._box_vertical = vertical
@@ -263,26 +263,33 @@ class RLBox(reportlab.platypus.flowables.Flowable):
             fixed_attr = '_fixedWidth'
         depth_index = 1 - length_index
         self._box_total_length = 0
-        self._box_depth = 0
+        self._box_max_depth = 0
         variable_content = []
         self._box_lengths = []
-        def wrap(content, width, height):
+        self._box_depths = []
+        def wrap(content, i, width, height):
             sizes = content.wrap(width, height)
             length = sizes[length_index]
+            depth = sizes[depth_index]
             self._box_total_length += length
-            self._box_depth = max(self._box_depth, sizes[depth_index])
-            return length
+            self._box_max_depth = max(self._box_max_depth, sizes[depth_index])
+            if i is None:
+                self._box_lengths.append(length)
+                self._box_depths.append(depth)
+            else:
+                self._box_lengths[i] = length
+                self._box_depths[i] = depth
         i = 0
         for c in self._box_content:
             if getattr(c, fixed_attr):
-                length = wrap(c, availWidth, availHeight)
+                wrap(c, None, availWidth, availHeight)
             else:
-                length = None
                 min_width = None
                 if not vertical:
                     min_width = c.minWidth()
                 variable_content.append((i, c, min_width,))
-            self._box_lengths.append(length)
+                self._box_lengths.append(None)
+                self._box_depths.append(None)
             i += 1
         if variable_content:
             stop = False
@@ -296,29 +303,42 @@ class RLBox(reportlab.platypus.flowables.Flowable):
                 stop = True
                 for i, c, w in variable_content:
                     if w and w > avail and self._box_lengths[i] is None:
-                        length = wrap(c, *args)
-                        self._box_lengths[i] = length
+                        wrap(c, i, *args)
                         stop = False                
             for i, c, w in variable_content:
-                length = wrap(c, *args)
-                self._box_lengths[i] = length                
+                wrap(c, i, *args)
         if vertical:
-            result = (self._box_depth, self._box_total_length,)
+            result = (self._box_max_depth, self._box_total_length,)
         else:
-            result = (self._box_total_length, self._box_depth,)
+            result = (self._box_total_length, self._box_max_depth,)
         return result
     def draw(self):
         canv = self.canv
         lengths = self._box_lengths
         vertical = self._box_vertical
         x = 0
-        y = 0
+        if vertical:
+            y = self._box_total_length
+        else:
+            y = 0
         i = 0
+        align = self._box_align
         for c in self._box_content:
             l = lengths[i]
             if vertical:
                 y -= l
-            c.drawOn(canv, x, y)
+            x_shift = y_shift = 0
+            if align == self.BOX_CENTER:
+                shift = (self._box_max_depth - self._box_depths[i]) / 2
+                if vertical:
+                    x_shift = shift
+                else:
+                    y_shift = shift
+            elif align == self.BOX_TOP:
+                y_shift = self._box_max_depth - self._box_depths[i]
+            elif align == self.BOX_RIGHT:
+                x_shift = self._box_max_depth - self._box_depths[i]
+            c.drawOn(canv, x + x_shift, y + y_shift)
             if not vertical:
                 x += l
             i += 1
@@ -1411,7 +1431,11 @@ class Container(Element):
             assert _ok_export_result(result), ('wrong export', result,)
         pdf_context.remove_presentation()
         if self.group:
-            result = [RLBox(content=result, vertical=self.vertical)]
+            if self.vertical:
+                align = self.halign
+            else:
+                align = self.valign
+            result = [RLBox(content=result, vertical=self.vertical, align=align)]
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
