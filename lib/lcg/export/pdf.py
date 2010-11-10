@@ -246,6 +246,12 @@ class RLBox(reportlab.platypus.flowables.Flowable):
         self._box_content = [self._box_adjusted_content(c) for c in content]
         self._box_vertical = vertical
         self._box_align = align or self.BOX_CENTER
+        # Another hack for pytis markup:
+        if len(content) == 1:
+            if getattr(content[0], 'hAlign', None):
+                self.hAlign = content[0].hAlign
+            else:
+                self.hAlign = self._box_align
     def _box_adjusted_content(self, content):
         if isinstance(content, basestring):
             content = RLTable([[content]])
@@ -322,8 +328,10 @@ class RLBox(reportlab.platypus.flowables.Flowable):
         else:
             y = 0
         i = 0
-        align = self._box_align
         for c in self._box_content:
+            align = self._box_align
+            if vertical and getattr(c, 'hAlign', None):
+                align = c.hAlign
             l = lengths[i]
             if vertical:
                 y -= l
@@ -1071,6 +1079,8 @@ class Text(Element):
                      ('<', '&lt;',),
                      ('>', '&gt;',),
                      )
+    style = None
+    halign = None
     def init(self):
         assert isinstance(self.content, (basestring, Text,)), ('type error', self.content,)
         if isinstance(self.content, basestring):
@@ -1402,6 +1412,8 @@ class Container(Element):
             for c in self.content:
                 assert isinstance(c, Element), ('type error', c,)
     def _export(self, context, parent_presentation=None):
+        # This method has become, together with PDFExporter, complete mess now.
+        # It should be rewritten.
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         presentation = pdf_context.current_presentation()
@@ -1435,12 +1447,16 @@ class Container(Element):
                         (isinstance(c, Text) and not c.plain_text())):
                         all_text = False
                         break
-            force_align = (self.halign is not None)
+            force_align = (self.halign is not None and not self.group)
             for c in self.content:
                 if isinstance(c, basestring):
                     c = make_element(Text, content=unicode(c))
-                if isinstance(c, Text) and (force_align or not all_text):
-                    c = make_element(Paragraph, content=[c], noindent=True, halign=self.halign)
+                if isinstance(c, Text):
+                    if force_align:
+                        c = make_element(Paragraph, content=[c], noindent=True, halign=self.halign)
+                    elif not all_text and c.style is None: # make it a fixed non-paragraph text
+                        c.style = pdf_context.style()
+                        c.halign = self.halign
                 if force_align:
                     if hasattr(c, 'halign'):
                         if c.halign is None:
