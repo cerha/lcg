@@ -343,6 +343,34 @@ class RLBox(reportlab.platypus.flowables.Flowable):
                 x += l
             i += 1
 
+class RLText(reportlab.platypus.flowables.Flowable):
+    # Paragraphs have variable dimensions and they don't work well when
+    # wrapping simple texts for horizontal concatenation.  Tables can handle
+    # simple texts without wrapping them by paragraphs, but they have other
+    # problems (see RLBox).  For this reason we implement a simple text
+    # flowable to be used inside RLBoxes.  No formatting, no wrapping, just a
+    # piece of plain text with a style.
+    _fixedWidth = 1
+    _fixedHeight = 1
+    def __init__(self, text, style, halign=None):
+        reportlab.platypus.flowables.Flowable.__init__(self)
+        self._text = text
+        self._style = style
+        self.width = reportlab.pdfbase.pdfmetrics.stringWidth(text, style.fontName, style.fontSize)
+        self.height = style.leading
+        self.hAlign = halign
+    def draw(self):
+        x = 0
+        y = self.height - self._style.fontSize
+        if self._style.textColor:
+            self.canv.setFillColor(self._style.textColor)
+        tx = self.canv.beginText(x, y)
+        tx.setFont(self._style.fontName,
+                  self._style.fontSize,
+                  self._style.leading)
+        tx.textLine(self._text)
+        self.canv.drawText(tx)
+    
 class RLSpacer(reportlab.platypus.flowables.Spacer):
     def wrap(self, availWidth, availHeight):
         if self.width is None:
@@ -1064,6 +1092,8 @@ class Text(Element):
             result = content.export(context)
         assert _ok_export_result(result), ('wrong export', result,)
         result = unicode(result)
+        if self.style is not None:
+            result = RLText(result, self.style, halign=self.halign)
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
