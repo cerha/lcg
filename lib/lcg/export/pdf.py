@@ -1690,8 +1690,6 @@ class Table(Element):
         font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
         bold_font = pdf_context.font(font_name, family, True, italic)
         table_style_data.append(('FONT', (0, 0), (-1, -1), style.fontName, style.fontSize))
-        table_style_data.append(('INNERGRID', (0, 0), (-1, -1), 1, reportlab.lib.colors.red))
-        table_style_data.append(('BOX', (0, 0), (-1, -1), 1, reportlab.lib.colors.red))
         i = 0
         for row in content:
             if isinstance(row, HorizontalRule):
@@ -2101,7 +2099,6 @@ class PDFExporter(FileExporter, Exporter):
                 doc.multi_build(document, context=first_subcontext)
             except reportlab.platypus.doctemplate.LayoutError, e:
                 if str(e).find('too large') >= 0:
-                    import pdb; pdb.set_trace()
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
                         log("Page content extremely large, giving up")
