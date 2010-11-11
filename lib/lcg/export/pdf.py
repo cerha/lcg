@@ -223,7 +223,7 @@ class RLTable(reportlab.platypus.Table):
             result = reportlab.platypus.Table._canGetWidth(self, thing)
         return result
 
-class RLBox(reportlab.platypus.flowables.Flowable):
+class RLContainer(reportlab.platypus.flowables.Flowable):
     # Using tables for container management is actually not reasonably
     # manageable.  For this reason we introduce our own container object that
     # is much simpler than ReportLab alternatives such as Table or
@@ -355,9 +355,9 @@ class RLText(reportlab.platypus.flowables.Flowable):
     # Paragraphs have variable dimensions and they don't work well when
     # wrapping simple texts for horizontal concatenation.  Tables can handle
     # simple texts without wrapping them by paragraphs, but they have other
-    # problems (see RLBox).  For this reason we implement a simple text
-    # flowable to be used inside RLBoxes.  No formatting, no wrapping, just a
-    # piece of plain text with a style.
+    # problems (see RLContainer).  For this reason we implement a simple text
+    # flowable to be used inside RLContainers.  No formatting, no wrapping,
+    # just a piece of plain text with a style.
     _fixedWidth = 1
     _fixedHeight = 1
     def __init__(self, text, style, halign=None):
@@ -1406,25 +1406,34 @@ class Container(Element):
     presentation = None
     vertical = False
     halign = None
-    group = False
+    valign = None
     def init(self):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, Element), ('type error', c,)
     def _export(self, context, parent_presentation=None):
-        # This method has become, together with PDFExporter, complete mess now.
-        # It should be rewritten.
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         presentation = pdf_context.current_presentation()
+        style = pdf_context.style()
+        halign = self.halign
+        # Let's first transform simple text elements into real exportable elements.
+        def transform_content(c):
+            if isinstance(c, basestring):
+                if c.find('<') >= 0:
+                    c_text = make_element(Text, content=unicode(c))
+                    c = make_element(Paragraph, content=[c_text], noindent=True, halign=halign)
+                else:
+                    c = make_element(Text, content=unicode(c), style=style, halign=halign)
+            elif isinstance(c, Text):
+                if c.style is None:
+                    c.style = style
+                    c.halign = halign
+            return c
+        content = [transform_content(c) for c in self.content]
+        # If there is only a single element, try to unwrap it from the container.
         if (len(self.content) == 1 and
-            (isinstance(self.content[0], (Container, Table, Paragraph,)) or
-             (isinstance(self.content[0], Text) and
-              self.content[0].plain_text() and
-              parent_presentation is not None and
-              self.halign is None)) and
-            (presentation is None or
-             parent_presentation is not None)):
+            (presentation is None or parent_presentation is not None)):
             if presentation is not None and parent_presentation is not None:
                 for attr in ('bold', 'italic', 'font_size', 'font_name', 'font_family',):
                     value = getattr(presentation, attr)
@@ -1437,51 +1446,25 @@ class Container(Element):
                 result = content_element.export(context, parent_presentation=parent_presentation)
             else:
                 result = [content_element.export(context)]
+        # Otherwise perform standard export.
         else:
+            # Export content elements and check the result.
             result = []
-            all_text = not self.vertical and presentation is None
-            if all_text:
-                for c in self.content:
-                    if (not isinstance(c, (basestring, Text,)) or
-                        (isinstance(c, basestring) and c.find('<') >= 0) or
-                        (isinstance(c, Text) and not c.plain_text())):
-                        all_text = False
-                        break
-            force_align = (self.halign is not None and not self.group)
             for c in self.content:
-                if isinstance(c, basestring):
-                    c = make_element(Text, content=unicode(c))
-                if isinstance(c, Text):
-                    if force_align:
-                        c = make_element(Paragraph, content=[c], noindent=True, halign=self.halign)
-                    elif not all_text and c.style is None: # make it a fixed non-paragraph text
-                        c.style = pdf_context.style()
-                        c.halign = self.halign
-                if force_align:
-                    if hasattr(c, 'halign'):
-                        if c.halign is None:
-                            c.halign = self.halign
-                    else:
-                        cell = make_element(TableCell, content=[c])
-                        row = make_element(TableRow, content=[cell])
-                        c = make_element(Table, content=[row], halign=self.halign)
                 exported = c.export(context)
                 if isinstance(exported, (list, tuple,)):
                     result += exported
                 else:
-                    result.append(exported)
-            if not all_text:                # crude hack
-                for i in range(len(result)):
-                    if isinstance(result[i], basestring):
-                        result[i] = reportlab.platypus.Paragraph(result[i], style=pdf_context.style())
+                    result.append(exported)                    
             assert _ok_export_result(result), ('wrong export', result,)
-        pdf_context.remove_presentation()
-        if self.group:
+            # And now create the resulting ReportLab Container.
             if self.vertical:
                 align = self.halign
             else:
                 align = self.valign
-            result = [RLBox(content=result, vertical=self.vertical, align=align)]
+            result = [RLContainer(content=result, vertical=self.vertical, align=align)]                
+        # Export completed.
+        pdf_context.remove_presentation()
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
@@ -2196,54 +2179,13 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Space, height=element.size(context), width=UMm(0))
 
     # Container elements
-
-    def _tabular_content(self, context, content):
-        # We sometimes prefer tabular content over simple container.  The
-        # reason is that paragraphs, unlike simple text table cells, don't have
-        # fixed widths and this makes problems with alignment of upper tables.
-        # On the other hand it's not possible to put anything into a table, a
-        # typical example being long tables.  In some cases it makes no sense
-        # to make an extra table, e.g. when the content is already a paragraph
-        # or when the content is just a single table.
-        if 'list' in context.pdf_context.export_notes():
-            return False
-        single = (len(content) <= 1)
-        for c in content:
-            if c.__class__ == lcg.Container:
-                if not self._tabular_content(context, c.content()):
-                    return False
-            elif not single:
-                if isinstance(c, lcg.Paragraph):
-                    return False
-                elif isinstance(c, lcg.Table) and c.long():
-                    return False
-            elif not isinstance(c, lcg.TextContent):
-                return False
-        return True
     
     def _export_container(self, context, element):
-        content = element.content()
-        presentation = element.presentation()
-        orientation = element.orientation()
-        if ((orientation == 'HORIZONTAL' and len(content) > 1) or
-            element.valign() is not None or
-            self._tabular_content(context, content)):
-            def cell(content):
-                exported_content = content.export(context)
-                if isinstance(exported_content, (tuple, list,)):
-                    exported_content = make_element(Container, content=exported_content)
-                return exported_content
-            content = [cell(c) for c in content]
-            result_content = make_element(Container, content=content, presentation=presentation,
-                                          halign=element.halign(), valign=element.valign(),
-                                          vertical=(orientation == 'VERTICAL'), group=True)
-        else:
-            exported_content = self._content_export(context, element, collapse=False)
-            result_content = make_element(Container, content=exported_content,
-                                          vertical=(orientation == 'VERTICAL'),
-                                          halign=element.halign(),
-                                          presentation=presentation)
-        return result_content
+        exported_content = self._content_export(context, element, collapse=False)
+        return make_element(Container, content=exported_content,
+                            vertical=(element.orientation() == 'VERTICAL'),
+                            halign=element.halign(), valign=element.valign(),
+                            presentation=element.presentation())
 
     def _export_link(self, context, element):
         target = element.target()
