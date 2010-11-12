@@ -1490,9 +1490,9 @@ class Container(Element):
             wrap = False
             for c in self.content:
                 if (isinstance(c, Container) and
-                    (c.vertical != self.vertical or
-                     c.halign != self.halign or
-                     c.valign != self.valign)):
+                    ((not self.vertical and c.vertical) or
+                     (c.halign is not None and c.halign != self.halign) or
+                     (c.valign is not None and c.valign != self.valign))):
                     wrap = True
                     break
             if wrap:
