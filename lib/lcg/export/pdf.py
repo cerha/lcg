@@ -371,7 +371,7 @@ class RLText(reportlab.platypus.flowables.Flowable):
         self._style = style
         self.width = reportlab.pdfbase.pdfmetrics.stringWidth(text, style.fontName, style.fontSize)
         self.height = style.leading
-        self.hAlign = halign
+        self.hAlign = halign or 'LEFT'
     def draw(self):
         x = 0
         y = self.height - self._style.fontSize
@@ -1846,7 +1846,7 @@ class Table(Element):
                     column_widths.append(self._unit2points(w, style))
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
-                       repeatRows=repeat_rows, hAlign=self.halign, vAlign=self.valign)
+                       repeatRows=repeat_rows, hAlign=(self.halign or 'CENTER'), vAlign=self.valign)
         if last_element_category == 'paragraph':
             space = make_element(Space, height=UFont(1))
             exported_space = space.export(context)
