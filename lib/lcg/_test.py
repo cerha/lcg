@@ -405,12 +405,20 @@ class MacroParser(unittest.TestCase):
         assert r == "X\n", repr(r)
 
     def check_condition(self):
-        text = "Hi, how are you?\n@if fine\nFine, thanks.\n@else\nNot really well.\n@endif\n"
-        r1 = lcg.MacroParser(globals=dict(fine=True)).parse(text)
-        r2 = lcg.MacroParser(globals=dict(fine=False)).parse(text)
-        assert r1 == "Hi, how are you?\nFine, thanks.\n", repr(r1)
-        assert r2 == "Hi, how are you?\nNot really well.\n", repr(r2)
-        
+        def check(contidion, expected_result, **globals):
+            text = ("@if "+ contidion +"\nTrue\n@else\nFalse\n@endif")
+            parser = lcg.MacroParser(globals=globals)
+            result = parser.parse(text).strip() == 'True'
+            assert result == expected_result, (contidion, globals, result)
+        # Some more complicated condition.
+        c1 = "a in ('A', 'B', 'C') and b > 3 and b+5 <= c and c is not None"
+        check(c1, True, a='A', b=5, c=55)
+        check(c1, False, a='X', b=5, c=None)
+        # Try using builtins.
+        c2 = "ord(a) == b and chr(b) == a and sum((b,c,3)) >= 70 and any([True, False, a == b])"
+        check(c2, True, a='A', b=65, c=2)
+        check(c2, False, a='X', b=5, c=2)
+
     def check_condition_newlines(self):
         text = "A\n@if x\nX\n@endif\n\nB\n\n"
         r = lcg.MacroParser(globals=dict(x=True)).parse(text)
