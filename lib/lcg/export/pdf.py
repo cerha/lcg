@@ -437,6 +437,7 @@ class Context(object):
     left_indent = 0
     bullet_indent = 0
     last_element_category = None
+    in_paragraph = False
 
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
                  page_header=None, page_footer=None, page_background=None, presentation=None,
@@ -1121,6 +1122,10 @@ class Text(Element):
             self.content.prepend_text(text)
     def plain_text(self):
         """Return true iff the text is plain text without markup."""
+        if self.style is not None:
+            return False
+        if isinstance(self.content, Text):
+            return self.content.plain_text()
         return True
 
 class Empty(Text):
@@ -1197,10 +1202,28 @@ class TextContainer(Text):
         if __debug__:
             for c in content:
                 assert isinstance(c, Text), ('type error', c,)
-    def _export(self, context):
-        result = u''
+    def _expand_content(self):
+        content = []
         for c in self.content:
-            result += c.export(context)
+            if isinstance(c, TextContainer):
+                content += c._expand_content()
+            else:
+                content.append(c)
+        return content
+    def _export(self, context):
+        pdf_context = context.pdf_context
+        content = self._expand_content()
+        result = u''
+        for c in content:
+            if isinstance(c, TextContainer):
+                result += c.export(context)
+            else:
+                result += c.export(context)                
+        if (not pdf_context.in_paragraph and
+            not all([c.plain_text() for c in content])):
+            style = pdf_context.style()
+            style.firstLineIndent = 0
+            result = reportlab.platypus.Paragraph(result, style)
         assert _ok_export_result(result), ('wrong export', result,)
         return result
     def prepend_text(self, text):
@@ -1255,6 +1278,8 @@ class Paragraph(Element):
         self.content = list(self.content)
     def _export(self, context, style=None):
         pdf_context = context.pdf_context
+        assert not pdf_context.in_paragraph
+        pdf_context.in_paragraph = True
         halign = self.halign
         presentation = self.presentation
         pdf_context.add_presentation(presentation)
@@ -1282,6 +1307,7 @@ class Paragraph(Element):
         assert _ok_export_result(exported), ('wrong export', exported,)
         result = reportlab.platypus.Paragraph(exported, style)
         pdf_context.remove_presentation()
+        pdf_context.in_paragraph = False
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
@@ -1426,11 +1452,7 @@ class Container(Element):
         # Let's first transform simple text elements into real exportable elements.
         def transform_content(c):
             if isinstance(c, basestring):
-                if c.find('<') >= 0:
-                    c_text = make_element(Text, content=unicode(c))
-                    c = make_element(Paragraph, content=[c_text], noindent=True, halign=halign)
-                else:
-                    c = make_element(Text, content=unicode(c), style=style, halign=halign)
+                c = make_element(Text, content=unicode(c), style=style, halign=halign)
             elif isinstance(c, Text):
                 if c.style is None:
                     c.style = style
@@ -1565,7 +1587,12 @@ class List(Element):
             # Prevent paragpraph indenting of text after bullet:
             next_pdf_context.last_element_category = 'list-item-start'
             item.prepend_text(bullet)
+            if isinstance(item, Text):
+                assert not next_pdf_context.in_paragraph
+                next_pdf_context.in_paragraph = True
             exported = item.export(next_context)
+            if isinstance(item, Text):
+                next_pdf_context.in_paragraph = False
             if isinstance(item, Text):
                 result = [reportlab.platypus.Paragraph(exported, style)]
             elif isinstance(item, Paragraph):
