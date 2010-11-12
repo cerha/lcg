@@ -270,8 +270,12 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         variable_content = []
         self._box_lengths = []
         self._box_depths = []
-        def wrap(content, i, width, height):
+        def wrap(content, i, width, height, store=True):
+            content.canv = self.canv
             sizes = content.wrap(width, height)
+            del content.canv
+            if not store:
+                return
             length = sizes[length_index]
             depth = sizes[depth_index]
             self._box_total_length += length
@@ -289,6 +293,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             else:
                 min_width = None
                 if not vertical:
+                    # It is necessary to call `wrap' in order to set the object
+                    # minimum width in some flowables, e.g. TableOfContents.
+                    c.canv = self.canv
+                    wrap(c, None, availWidth, availHeight, store=False)
                     min_width = c.minWidth()
                 variable_content.append((i, c, min_width,))
                 self._box_lengths.append(None)
