@@ -295,7 +295,6 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 if not vertical:
                     # It is necessary to call `wrap' in order to set the object
                     # minimum width in some flowables, e.g. TableOfContents.
-                    c.canv = self.canv
                     wrap(c, None, availWidth, availHeight, store=False)
                     min_width = c.minWidth()
                 variable_content.append((i, c, min_width,))
