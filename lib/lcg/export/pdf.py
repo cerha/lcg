@@ -1487,14 +1487,15 @@ class Container(Element):
                     result.append(exported)                    
             assert _ok_export_result(result), ('wrong export', result,)
             # If wrapping by a container is needed, create a ReportLab container.
-            wrap = False
-            for c in self.content:
-                if (isinstance(c, Container) and
-                    ((not self.vertical and c.vertical) or
-                     (c.halign is not None and c.halign != self.halign) or
-                     (c.valign is not None and c.valign != self.valign))):
-                    wrap = True
-                    break
+            if self.vertical:
+                wrap = False
+                for c in self.content:
+                    if (isinstance(c, Container) and
+                        (c.halign is not None and c.halign != self.halign)):
+                        wrap = True
+                        break
+            else:
+                wrap = True
             if wrap:
                 if self.vertical:
                     align = self.halign
