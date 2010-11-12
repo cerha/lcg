@@ -1409,7 +1409,7 @@ class Container(Element):
     """
     _CATEGORY = None
     presentation = None
-    vertical = False
+    vertical = True
     halign = None
     valign = None
     def init(self):
@@ -2186,7 +2186,7 @@ class PDFExporter(FileExporter, Exporter):
     def _export_container(self, context, element):
         exported_content = self._content_export(context, element, collapse=False)
         return make_element(Container, content=exported_content,
-                            vertical=(element.orientation() == 'VERTICAL'),
+                            vertical=(element.orientation() != 'HORIZONTAL'),
                             halign=element.halign(), valign=element.valign(),
                             presentation=element.presentation())
 
