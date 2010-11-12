@@ -369,10 +369,15 @@ class RLText(reportlab.platypus.flowables.Flowable):
         reportlab.platypus.flowables.Flowable.__init__(self)
         self._text = text
         self._style = style
-        self.width = reportlab.pdfbase.pdfmetrics.stringWidth(text, style.fontName, style.fontSize)
-        self.height = style.leading
+        if text:
+            self.width = reportlab.pdfbase.pdfmetrics.stringWidth(text, style.fontName, style.fontSize)
+            self.height = style.leading
+        else:
+            self.width = self.height = 0
         self.hAlign = halign or 'LEFT'
     def draw(self):
+        if not self._text:
+            return
         x = 0
         y = self.height - self._style.fontSize
         if self._style.textColor:
