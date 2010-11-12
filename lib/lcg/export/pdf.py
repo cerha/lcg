@@ -1467,7 +1467,7 @@ class Container(Element):
         # If there is only a single element, unwrap it from the container.
         if len(self.content) == 1:
             content_element = self.content[0]
-            if self.halign is not None and content_element.halign is None:
+            if self.halign is not None and getattr(content_element, 'halign', None) is None:
                 content_element.halign = self.halign
             result = content_element.export(context)
             if not isinstance(result, (list, tuple,)):
