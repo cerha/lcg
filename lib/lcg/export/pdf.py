@@ -366,27 +366,27 @@ class RLText(reportlab.platypus.flowables.Flowable):
     _fixedHeight = 1
     def __init__(self, text, style, halign=None):
         reportlab.platypus.flowables.Flowable.__init__(self)
-        self._text = text
+        self._text = text.split('\n')
         self._style = style
-        if text:
-            self.width = reportlab.pdfbase.pdfmetrics.stringWidth(text, style.fontName, style.fontSize)
-            self.height = style.leading
-        else:
-            self.width = self.height = 0
+        self.width = 0
+        for line in self._text:
+            width = reportlab.pdfbase.pdfmetrics.stringWidth(line, style.fontName, style.fontSize)
+            self.width = max(self.width, width)
+        self.height = style.leading * len(self._text)
         self.hAlign = halign or 'LEFT'
     def draw(self):
-        if not self._text:
-            return
         x = 0
         y = self.height - self._style.fontSize
         if self._style.textColor:
             self.canv.setFillColor(self._style.textColor)
-        tx = self.canv.beginText(x, y)
-        tx.setFont(self._style.fontName,
-                  self._style.fontSize,
-                  self._style.leading)
-        tx.textLine(self._text)
-        self.canv.drawText(tx)
+        for line in self._text:
+            tx = self.canv.beginText(x, y)
+            tx.setFont(self._style.fontName,
+                      self._style.fontSize,
+                      self._style.leading)
+            tx.textLine(line)
+            self.canv.drawText(tx)
+            y -= self._style.leading
     
 class RLSpacer(reportlab.platypus.flowables.Spacer):
     def wrap(self, availWidth, availHeight):
