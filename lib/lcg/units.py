@@ -108,6 +108,8 @@ class HorizontalAlignment(object):
 class VerticalAlignment(object):
     """Enumeration of vertical alignment kinds."""
     CENTER = 'CENTER'
+    TOP = 'TOP'
+    BOTTOM = 'BOTTOM'
 
 class Orientation(object):
     """Enumeration of container orientations."""
