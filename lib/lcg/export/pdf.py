@@ -1416,10 +1416,9 @@ class Container(Element):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, Element), ('type error', c,)
-    def _export(self, context, parent_presentation=None):
+    def _export(self, context):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
-        presentation = pdf_context.current_presentation()
         style = pdf_context.style()
         halign = self.halign
         # Let's first transform simple text elements into real exportable elements.
@@ -1753,7 +1752,6 @@ class Table(Element):
                         # the whole page width.
                         elif self.halign is not None and len(row.content) == 1:
                             table_style_data.append(('ALIGN', (j, i), (j, i), self.halign,))
-                        kwargs['parent_presentation'] = p
                     # ReportLab can't take anything as a cell content, let's prepare for it
                     def simplify(exported_column):
                         if isinstance(exported_column, str):
