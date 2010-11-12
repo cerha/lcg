@@ -271,7 +271,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._box_lengths = []
         self._box_depths = []
         def wrap(content, i, width, height, store=True):
-            content.canv = self.canv
+            content.canv = getattr(self, 'canv', None)
             sizes = content.wrap(width, height)
             del content.canv
             if not store:
