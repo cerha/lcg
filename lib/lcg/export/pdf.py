@@ -994,6 +994,8 @@ def _ok_export_result(result):
     else:
         expected = 'nonstring'
     for r in result[1:]:
+        if isinstance(r, (tuple, list)):
+            return False
         if isinstance(r, basestring):
             if expected != 'string':
                 return False
@@ -1435,21 +1437,14 @@ class Container(Element):
                     c.halign = halign
             return c
         content = [transform_content(c) for c in self.content]
-        # If there is only a single element, try to unwrap it from the container.
-        if (len(self.content) == 1 and
-            (presentation is None or parent_presentation is not None)):
-            if presentation is not None and parent_presentation is not None:
-                for attr in ('bold', 'italic', 'font_size', 'font_name', 'font_family',):
-                    value = getattr(presentation, attr)
-                    if value is not None:
-                        setattr(parent_presentation, attr, value)
+        # If there is only a single element, unwrap it from the container.
+        if len(self.content) == 1:
             content_element = self.content[0]
             if self.halign is not None and content_element.halign is None:
                 content_element.halign = self.halign
-            if isinstance(content_element, Container):
-                result = content_element.export(context, parent_presentation=parent_presentation)
-            else:
-                result = [content_element.export(context)]
+            result = content_element.export(context)
+            if not isinstance(result, (list, tuple,)):
+                result = [result]
         # Otherwise perform standard export.
         else:
             # Export content elements and check the result.
@@ -1457,16 +1452,28 @@ class Container(Element):
             for c in self.content:
                 exported = c.export(context)
                 if isinstance(exported, (list, tuple,)):
+                    if __debug__:
+                        for e in exported:
+                            assert not isinstance(e, (tuple, list)), e
                     result += exported
                 else:
                     result.append(exported)                    
             assert _ok_export_result(result), ('wrong export', result,)
-            # And now create the resulting ReportLab Container.
-            if self.vertical:
-                align = self.halign
-            else:
-                align = self.valign
-            result = [RLContainer(content=result, vertical=self.vertical, align=align)]                
+            # If wrapping by a container is needed, create a ReportLab container.
+            wrap = False
+            for c in self.content:
+                if (isinstance(c, Container) and
+                    (c.vertical != self.vertical or
+                     c.halign != self.halign or
+                     c.valign != self.valign)):
+                    wrap = True
+                    break
+            if wrap:
+                if self.vertical:
+                    align = self.halign
+                else:
+                    align = self.valign
+                result = [RLContainer(content=result, vertical=self.vertical, align=align)]                
         # Export completed.
         pdf_context.remove_presentation()
         return result
