@@ -242,8 +242,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 assert align in (self.BOX_CENTER, self.BOX_LEFT, self.BOX_RIGHT, None,), align
             else:
                 assert align in (self.BOX_CENTER, self.BOX_TOP, self.BOX_BOTTOM, None,), align
+            for c in content:
+                assert isinstance(c, reportlab.platypus.flowables.Flowable), (c, content,)
         reportlab.platypus.flowables.Flowable.__init__(self)
-        self._box_content = [self._box_adjusted_content(c) for c in content]
+        self._box_content = content
         self._box_vertical = vertical
         self._box_align = align or self.BOX_CENTER
         # Another hack for pytis markup:
@@ -252,11 +254,6 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 self.hAlign = content[0].hAlign
             else:
                 self.hAlign = self._box_align
-    def _box_adjusted_content(self, content):
-        if isinstance(content, basestring):
-            content = RLTable([[content]])
-        assert isinstance(content, reportlab.platypus.flowables.Flowable), content
-        return content
     def wrap(self, availWidth, availHeight):
         vertical = self._box_vertical
         if vertical:
