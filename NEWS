@@ -1,6 +1,26 @@
+Version 0.5.0 (2010-11-22):
+
+  * PDF export finished into a usable state for all generic content elements
+    (this also includes a major refactor of export the mechanism).
+ 
+  * Restrict the condition evaluation namespace in `MacroParser' (sucurity fix).
+
+  * Class `SectionContainer' deprecated in favor of `Container' which now
+    handles sections transparently.
+
+  * Support for embedding YouTube and Vimeo videos.
+
+  * Deprecate `Container' argument `id' in favour of `name'.
+
+  * Allow overriding the default lists of stylesheets and scripts within HTML
+    head export.
 
   * Tables now allow more flexible structures of cells and headings and
     structured text parser now autodetects column headers and cell alignment.
+
+  * Bug fixes.
+
+  * Translation updates.
 
 Version 0.4.0 (2010-01-21):
 
