@@ -408,8 +408,12 @@ class MacroParser(object):
             self._content[self._state].append(content)
 
         def __str__(self):
-            value = bool(self._evaluate(self._condition))
-            return ''.join([unicode(x) for x in self._content[value]])
+            try:
+                result = self._evaluate(self._condition)
+            except Exception, e:
+                return e.__class__.__name__+': '+unicode(e)
+            else:
+                return ''.join([unicode(x) for x in self._content[bool(result)]])
 
     def __init__(self, globals=None, evaluate=None, include=None):
         """Arguments:
