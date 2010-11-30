@@ -1764,7 +1764,6 @@ class Table(Element):
                         table_style_data.append(('VALIGN', (j, 0), (j, -1), column.valign.upper(),))
         # Export content
         # (In case of table style overlappings, last definition takes precedence.)
-        table_style_data.append(('GRID', (0, 0), (-1, -1), 1, reportlab.lib.colors.red,))
         black = reportlab.lib.colors.black
         style = pdf_context.style()
         font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
