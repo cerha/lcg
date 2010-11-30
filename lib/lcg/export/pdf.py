@@ -292,9 +292,11 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 wrap(c, None, availWidth, availHeight)
             else:
                 min_width = None
-                if not vertical:
+                if not vertical and not isinstance(c, RLTable):
                     # It is necessary to call `wrap' in order to set the object
                     # minimum width in some flowables, e.g. TableOfContents.
+                    # We don't do it on tables, because they may consume all
+                    # the space as minimum width.
                     wrap(c, None, availWidth, availHeight, store=False)
                     min_width = c.minWidth()
                 variable_content.append((i, c, min_width,))
@@ -1388,13 +1390,16 @@ class PageNumber(Text):
     """Page number.
 
     'total' parameter determines whether total number of pages should be output
-    instead of the current page number.
+    instead of the current page number.  If 'separator' parameter is given and
+    'total' is true, output both numbers, separated by 'separator'
+    (basestring).
 
     """
     # This implementation is an ugly hack to make the class a subclass of Text
     # easily, for the reasons of type checking and appropriate handling at
     # several places.
     total = False
+    separator = None
     def init(self):
         pass
     def _export(self, context):
@@ -1405,6 +1410,8 @@ class PageNumber(Text):
                 text = str(total)
             else:
                 text = '?'
+            if self.separator is not None :
+                text = str(pdf_context.page) + self.separator + text
         else:
             text = str(pdf_context.page)
         self.content = text
@@ -1757,6 +1764,7 @@ class Table(Element):
                         table_style_data.append(('VALIGN', (j, 0), (j, -1), column.valign.upper(),))
         # Export content
         # (In case of table style overlappings, last definition takes precedence.)
+        table_style_data.append(('GRID', (0, 0), (-1, -1), 1, reportlab.lib.colors.red,))
         black = reportlab.lib.colors.black
         style = pdf_context.style()
         font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
@@ -2208,11 +2216,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(HorizontalRule)
 
     def _export_page_number(self, context, element):
-        if element.total():
-            result = make_element(PageNumber, total=True)
-        else:
-            result = make_element(PageNumber)
-        return result
+        return make_element(PageNumber, total=element.total(), separator=element.separator())
 
     def _export_hspace(self, context, element):
         return make_element(Space, width=element.size(context), height=UMm(0))

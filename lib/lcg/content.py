@@ -239,19 +239,28 @@ class PageNumber(Content):
     This content may be used only inside page headers and footers.
 
     """
-    def __init__(self, total=False):
+    def __init__(self, total=False, separator=None):
         """
         Arguments:
 
           total -- iff true, output not only the page number, but also the
+            total number of pages; if 'separator' is 'None', output only the
             total number of pages
+          separator -- basestring or 'None'; if it is a basestring and 'total'
+            is true, insert it betwenn the page numebr and the total number of
+            pages
 
         """
         self._total = total
+        self._separator = separator
         
     def total(self):
         """Return the value of 'total' as passed to the constructor."""
         return self._total
+
+    def separator(self):
+        """Return the value of 'separator' as passed to the constructor."""
+        return self._separator
 
 
 class HSpace(Content):
