@@ -1767,7 +1767,6 @@ class Table(Element):
         black = reportlab.lib.colors.black
         style = pdf_context.style()
         font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
-        bold_font = pdf_context.font(font_name, family, True, italic)
         table_style_data.append(('FONT', (0, 0), (-1, -1), style.fontName, style.fontSize))
         i = 0
         for row in content:
@@ -1824,7 +1823,7 @@ class Table(Element):
                         (p.bold is not None or p.italic is not None or
                          p.font_name is not None or p.font_family is not None or
                          p.font_size is not None)):
-                        pdf_context.set_presentation(p)
+                        pdf_context.add_presentation(p)
                         s = pdf_context.style()
                         table_style_data.append(('FONT', (j, i), (j, i), s.fontName, s.fontSize))
                         pdf_context.remove_presentation()
