@@ -1455,7 +1455,7 @@ class Container(Element):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, Element), ('type error', c,)
-    def _export(self, context):
+    def _export(self, context, parent_container=None):
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
         style = pdf_context.style()
@@ -1475,7 +1475,11 @@ class Container(Element):
             content_element = self.content[0]
             if self.halign is not None and getattr(content_element, 'halign', None) is None:
                 content_element.halign = self.halign
-            result = content_element.export(context)
+            if isinstance(content_element, Container):
+                kwargs = dict(parent_container=self)
+            else:
+                kwargs = {}
+            result = content_element.export(context, **kwargs)
             if not isinstance(result, (list, tuple,)):
                 result = [result]
         # Otherwise perform standard export.
@@ -1483,7 +1487,11 @@ class Container(Element):
             # Export content elements and check the result.
             result = []
             for c in self.content:
-                exported = c.export(context)
+                if isinstance(c, Container):
+                    kwargs = dict(parent_container=self)
+                else:
+                    kwargs = {}
+                exported = c.export(context, **kwargs)
                 if isinstance(exported, (list, tuple,)):
                     if __debug__:
                         for e in exported:
@@ -1493,21 +1501,22 @@ class Container(Element):
                     result.append(exported)                    
             assert _ok_export_result(result), ('wrong export', result,)
             # If wrapping by a container is needed, create a ReportLab container.
-            if self.vertical:
-                wrap = False
-                for c in self.content:
-                    if (isinstance(c, Container) and
-                        (c.halign is not None and c.halign != self.halign)):
-                        wrap = True
-                        break
-            else:
-                wrap = True
-            if wrap:
-                if self.vertical:
-                    align = self.halign
+            if len(result) > 1:
+                if parent_container is None:
+                    wrap = (not self.vertical)
+                elif (parent_container.vertical != self.vertical or
+                      (parent_container.vertical and
+                       self.halign is not None and
+                       parent_container.halign != self.halign)):
+                    wrap = True
                 else:
-                    align = self.valign
-                result = [RLContainer(content=result, vertical=self.vertical, align=align)]                
+                    wrap = False
+                if wrap:
+                    if self.vertical:
+                        align = self.halign
+                    else:
+                        align = self.valign
+                    result = [RLContainer(content=result, vertical=self.vertical, align=align)]                
         # Export completed.
         pdf_context.remove_presentation()
         return result
