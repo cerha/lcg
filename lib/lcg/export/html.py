@@ -583,7 +583,8 @@ class HtmlExporter(Exporter):
     def _itemized_list(self, items, order=None, _indent=0):
         g = self._generator
         spaces = ' ' * _indent
-        items = [concat(spaces, '  ', g.li(item), '\n') for item in items]
+        items = [concat(spaces, '  ', g.li(item, cls="i%d" % (i+1)), '\n')
+                 for i, item in enumerate(items)]
         style = None
         if order is None:
             method = g.ul
