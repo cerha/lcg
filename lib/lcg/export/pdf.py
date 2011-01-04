@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008, 2010 Brailcom, o.p.s.
+# Copyright (C) 2008, 2010, 2011 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -234,7 +234,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     BOX_BOTTOM = 'BOTTOM'
     BOX_LEFT = 'LEFT'
     BOX_RIGHT = 'RIGHT'
-    def __init__(self, content, vertical=False, align=None):
+    def __init__(self, content, vertical=False, align=None, boxed=False):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         if __debug__:
@@ -248,6 +248,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._box_content = content
         self._box_vertical = vertical
         self._box_align = align or self.BOX_CENTER
+        self._boxed = boxed
         # Another hack for pytis markup:
         if len(content) == 1:
             if getattr(content[0], 'hAlign', None):
@@ -320,10 +321,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             for i, c, w in variable_content:
                 wrap(c, i, *args)
         if vertical:
-            result = (self._box_max_depth, self._box_total_length,)
+            self._width_height = (self._box_max_depth, self._box_total_length,)
         else:
-            result = (self._box_total_length, self._box_max_depth,)
-        return result
+            self._width_height = (self._box_total_length, self._box_max_depth,)
+        return self._width_height
     def draw(self):
         canv = self.canv
         lengths = self._box_lengths
@@ -356,6 +357,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             if not vertical:
                 x += l
             i += 1
+        if self._boxed:
+            width, height = self._width_height
+            self.canv.rect(0, 0, width, height)
 
 class RLText(reportlab.platypus.flowables.Flowable):
     # Paragraphs have variable dimensions and they don't work well when
@@ -1471,7 +1475,8 @@ class Container(Element):
             return c
         content = [transform_content(c) for c in self.content]
         # If there is only a single element, unwrap it from the container.
-        if len(self.content) == 1:
+        boxed = self.presentation and self.presentation.boxed
+        if len(self.content) == 1 and not boxed:
             content_element = self.content[0]
             if self.halign is not None and getattr(content_element, 'halign', None) is None:
                 content_element.halign = self.halign
@@ -1501,8 +1506,10 @@ class Container(Element):
                     result.append(exported)                    
             assert _ok_export_result(result), ('wrong export', result,)
             # If wrapping by a container is needed, create a ReportLab container.
-            if len(result) > 1:
-                if parent_container is None:
+            if len(result) > 1 or boxed:
+                if boxed:
+                    wrap = True
+                elif parent_container is None:
                     wrap = (not self.vertical)
                 elif (parent_container.vertical != self.vertical or
                       (parent_container.vertical and
@@ -1516,7 +1523,7 @@ class Container(Element):
                         align = self.halign
                     else:
                         align = self.valign
-                    result = [RLContainer(content=result, vertical=self.vertical, align=align)]                
+                    result = [RLContainer(content=result, vertical=self.vertical, align=align, boxed=boxed)]
         # Export completed.
         pdf_context.remove_presentation()
         return result
