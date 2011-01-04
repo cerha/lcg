@@ -146,16 +146,18 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 else:
                     raise Exception("Program error", position)
                 flowable.drawOn(canvas, x, y)
-            header = first_page_header
+            header = pdf_context.first_page_header()
             if page > 1 or header is None:
-                header = page_header
+                header = pdf_context.page_header()
             if header is not None:
                 add_flowable(header, 'top')
             if page_footer is not None:
-                add_flowable(page_footer, 'bottom')
+                add_flowable(pdf_context.page_footer(), 'bottom')
             if page_background is not None:
-                add_flowable(page_background, 'center')
+                add_flowable(pdf_context.page_background(), 'center')
             canvas.restoreState()
+        # There is a limitation here: Sizes of all headers and footers are
+        # assumed to be the same.
         self._calc()
         Frame = reportlab.platypus.frames.Frame
         bottom_margin, height = frame_height((first_page_header or page_header), page_footer)
