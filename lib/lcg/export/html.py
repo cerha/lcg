@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2010 Brailcom, o.p.s.
+# Copyright (C) 2004-2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -258,13 +258,9 @@ class HtmlGenerator(object):
     def hidden(self, name, value, id=None):
         return self._input('hidden', name=name, value=value, id=id)
      
-    def button(self, content=None, label=None, cls=None, **kwargs):
-        if content is None:
-            cls = cls and 'button ' + cls or 'button'
-            return self._input('button', value=label, cls=cls, **kwargs)
-        else:
-            attr = ('value', 'onclick', 'name', 'cls', 'disabled', 'title')
-            return self._tag('button', content, attr, title=label, cls=cls, **kwargs)
+    def button(self, content, type='submit', **kwargs):
+        attr = ('name', 'value', 'type', 'onclick', 'cls', 'disabled', 'title')
+        return self._tag('button', content, attr, type=type, **kwargs)
      
     def reset(self, label, onclick=None, cls=None, title=None):
         return self._input('reset', title=title, onclick=onclick, value=label, cls=cls)
