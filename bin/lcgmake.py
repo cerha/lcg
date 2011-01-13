@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2004-2010 Brailcom, o.p.s.
+# Copyright (C) 2004-2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -165,7 +165,7 @@ def read_presentation(filename):
 def getoptions(optspec):
     optlist = reduce(operator.add, [optlist for section, optlist in optspec], ())
     import getopt
-    opts, args = getopt.getopt(sys.argv[1:], '', [x[0] for x in optspec])
+    opts, args = getopt.getopt(sys.argv[1:], '', [x[0] for x in optlist])
     optdict = dict(opts)
     options = {}
     for option, default, doc in optlist:
