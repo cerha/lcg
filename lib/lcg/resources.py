@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009 Brailcom, o.p.s.
+# Copyright (C) 2004-2009, 2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -175,12 +175,11 @@ class ResourceProvider(object):
     in export time.  The resource provider is designed to be shared among multilpe content nodes
     while still keeping track of the dependencies of each node on its resources.
 
-    The source files for XResource subclasses are located automatically.  The possible source
-    directories are searched for the source file in this order:
+    The resource files are searched in the source directories in this order:
     
       * the directory passed as the 'searchdir' argument to the 'resource()' method call,
-      * all directories passed as the 'dirs' argument to the provider constructor,
-      * default resource directory ('config.default_resource_dir').
+      * all directories passed as the 'dirs' argument to the provider constructor
+      * default resource directory set by 'config.default_resource_dir' (if not None).
 
     """
     _CONVERSIONS = {'mp3': ('wav',),
@@ -224,7 +223,9 @@ class ResourceProvider(object):
         """
         assert isinstance(dirs, (list, tuple)), dirs
         assert isinstance(resources, (list, tuple)), resources
-        self._dirs = tuple(dirs) + (config.default_resource_dir,)
+        self._dirs = tuple(dirs)
+        if config.default_resource_dir is not None:
+            self._dirs += (config.default_resource_dir,)
         self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
         

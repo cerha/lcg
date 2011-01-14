@@ -30,7 +30,12 @@ OPTIONS = (
             ('root=', 'index',
              ("Filename of the root document.")),
             ('translations=', None,
-             ("Colon separated list of directories where translations are searched.")),
+             ("Colon separated list of directories where translations are "
+              "searched when LCG localizes the generated documents. "
+              "These directories are supposed to contain compiled GNU Gettext "
+              "message catalogs in their usual structure (with subdirectories for "
+              "each of the supported locales, such as 'de/LC_MESSAGES/lcg.mo' "
+              "for german translations of the texts supplied by LCG itself)).")),
             ('presentation=', None, ("Presentation file.")),
             )),
     ("Output format selection", (
@@ -105,10 +110,14 @@ def main():
             dst = '.'
         else:
             die("You must specify the destination directory!")
-    # Process the passed-in translation directories.
-    translations = (lcg.config.translation_dir,)
+    # Initialize translation and resource directories.
+    translations = []
+    lcg_dir = os.environ.get('LCGDIR')
+    if lcg_dir:
+        translations.append(os.path.abspath(os.path.join(lcg_dir, 'translations')))
+        lcg.config.default_resource_dir = os.path.normpath(os.path.join(lcg_dir, 'resources'))
     if opt['translations']:
-        translations += tuple([os.path.abspath(d) for d in opt['translations'].split(':')])
+        translations.extend([os.path.abspath(d) for d in opt['translations'].split(':')])
     #######################################################################################
     # Read the source files (first real action after processing options).
     reader = lcg.reader(src, name, ext=ext, recourse=recourse, encoding=opt['encoding'])

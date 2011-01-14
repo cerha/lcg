@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2010 Brailcom, o.p.s.
+# Copyright (C) 2004-2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -671,10 +671,10 @@ class GettextTranslator(Translator):
           default_domain -- the name of the default domain, used when the translatable has no
             explicit domain defined.
 
-          path -- a sequence of directory names to search for translations.  If None, the directory
-            'config.translation_dir' is used.  The listed directories should contain the locale
-            subdirectories as usual with GNU getext (eg. 'de/LC_MESSAGES/domain.mo', where 'de' is
-            the language code and 'domain' is the translation domain name).
+          path -- a sequence of directory names to search for translations.
+            The listed directories should contain the locale subdirectories as
+            usual with GNU getext (eg. 'de/LC_MESSAGES/domain.mo', where 'de'
+            is the language code and 'domain' is the translation domain name).
 
           fallback -- if true, the translator will silently use a null translation in case the
             desired translation files are not found.
@@ -686,11 +686,7 @@ class GettextTranslator(Translator):
         assert isinstance(fallback, bool), fallback
         self._default_domain = default_domain
         self._fallback = fallback
-        if path is None:
-            path = (config.translation_dir,)
-        else:
-            path = tuple(path)
-        self._path = path
+        self._path = tuple(path)
         self._cache = {}
         super(GettextTranslator, self).__init__(lang)
 
