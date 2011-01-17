@@ -1,3 +1,18 @@
+Version 0.5.1 (2011-01-17):
+
+  * LCGDIR environment variable now only by the lcgmake script, not when
+    lcg is used as a library.
+
+  * `lcgmake --help' output improved.
+
+  * HTML generator's 'button()' method now always produces HTML <button> tag,
+    never <input type="button">.
+
+  * Added support for styling list items in HTML.
+
+  * Minor bug fixes.
+
+
 Version 0.5.0 (2010-11-22):
 
   * PDF export finished into a usable state for all generic content elements
