@@ -661,7 +661,7 @@ class NullTranslator(Translator):
 class GettextTranslator(Translator):
     """Translator based on the GNU gettext interface."""
     
-    def __init__(self, lang, path=None, default_domain='lcg', fallback=False):
+    def __init__(self, lang, path=(), default_domain='lcg', fallback=False):
         """Initialize the instance.
 
         Arguments:
@@ -681,8 +681,8 @@ class GettextTranslator(Translator):
         
         """
         assert isinstance(lang, str), lang
+        assert isinstance(path, (list, tuple)), path
         assert isinstance(default_domain, str), default_domain
-        assert isinstance(path, (list, tuple)) or path is None, path
         assert isinstance(fallback, bool), fallback
         self._default_domain = default_domain
         self._fallback = fallback
