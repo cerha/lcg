@@ -247,10 +247,12 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             for c in content:
                 assert isinstance(c, reportlab.platypus.flowables.Flowable), (c, content,)
         reportlab.platypus.flowables.Flowable.__init__(self)
-        self._box_content = content
+        self._box_original_content = content
+        self._box_content = [copy.copy(c) for c in content]
         self._box_vertical = vertical
         self._box_align = align or self.BOX_CENTER
-        self._boxed = boxed
+        self._box_boxed = boxed
+        self._box_last_split_height = None
         # Another hack for pytis markup:
         if len(content) == 1:
             if getattr(content[0], 'hAlign', None):
@@ -258,6 +260,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             else:
                 self.hAlign = self._box_align
     def wrap(self, availWidth, availHeight):
+        self._box_content = [copy.copy(c) for c in self._box_original_content]
         vertical = self._box_vertical
         if vertical:
             length_index = 1
@@ -291,7 +294,15 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 self._box_depths[i] = depth
         i = 0
         for c in self._box_content:
-            if getattr(c, fixed_attr):
+            if (getattr(c, fixed_attr) or
+                (vertical and isinstance(c, reportlab.platypus.tables.LongTable))):
+                # We have to handle long tables as fixed height objects.  If
+                # they are shorter than available height, this is fine.  If
+                # they are longer, they return height just a little bit higher
+                # than available space which 1. may produce incorrect spacing
+                # when another variable height object is present in the page;
+                # 2. may prevent split and thus cut the rest of the table
+                # (ReportLab can do that happily).
                 wrap(c, None, availWidth, availHeight)
             else:
                 min_width = None
@@ -315,11 +326,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                     args = (availWidth, avail,)
                 else:
                     args = (avail, availHeight,)
-                stop = True
                 for i, c, w in variable_content:
                     if w and w > avail and self._box_lengths[i] is None:
                         wrap(c, i, *args)
-                        stop = False                
+                        stop = False
             for i, c, w in variable_content:
                 wrap(c, i, *args)
         if vertical:
@@ -327,6 +337,30 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         else:
             self._width_height = (self._box_total_length, self._box_max_depth,)
         return self._width_height
+    def split(self, availWidth, availHeight):
+        if not self._box_vertical or not self._box_content:
+            return []
+        i = 0
+        height = 0
+        content = [copy.copy(c) for c in self._box_original_content]
+        lengths = self._box_lengths
+        while i < len(self._box_lengths):
+            next_height = lengths[i]
+            if height + next_height > availHeight:
+                break
+            height += next_height
+            i += 1
+        def container(content):
+            return RLContainer(content, vertical=self._box_vertical, align=self._box_align, boxed=self._box_boxed)
+        if i == self._box_lengths:
+            result = [self]
+        elif isinstance(content[i], (RLContainer, reportlab.platypus.tables.LongTable,)):
+            result = [container(content[:i]), content[i], container(content[i+1:])]
+        elif i > 0:
+            result = [container(content[:i]), container(content[i:])]
+        else:
+            result = []
+        return result
     def draw(self):
         canv = self.canv
         lengths = self._box_lengths
@@ -359,7 +393,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             if not vertical:
                 x += l
             i += 1
-        if self._boxed:
+        if self._box_boxed:
             width, height = self._width_height
             self.canv.rect(0, 0, width, height)
 
