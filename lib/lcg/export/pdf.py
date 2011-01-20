@@ -292,17 +292,15 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             else:
                 self._box_lengths[i] = length
                 self._box_depths[i] = depth
+            return sizes
+        def unwrap(i):
+            self._box_total_length -= self._box_lengths[i]
+            self._box_lengths[i] = None
+            self._box_content[i] = self._box_original_content[i]
+            return self._box_content[i]
         i = 0
         for c in self._box_content:
-            if (getattr(c, fixed_attr) or
-                (vertical and isinstance(c, reportlab.platypus.tables.LongTable))):
-                # We have to handle long tables as fixed height objects.  If
-                # they are shorter than available height, this is fine.  If
-                # they are longer, they return height just a little bit higher
-                # than available space which 1. may produce incorrect spacing
-                # when another variable height object is present in the page;
-                # 2. may prevent split and thus cut the rest of the table
-                # (ReportLab can do that happily).
+            if getattr(c, fixed_attr):
                 wrap(c, None, availWidth, availHeight)
             else:
                 min_width = None
@@ -317,21 +315,45 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 self._box_lengths.append(None)
                 self._box_depths.append(None)
             i += 1
-        if variable_content:
-            stop = False
-            while not stop:
-                stop = True
-                avail = (avail_length - self._box_total_length) / len(variable_content)
+        while variable_content:
+            # Handling flexible size content is tricky with ReportLab.
+            # Long tables are flexible and when they are higher than available
+            # height they return the minimum height higher instead of the total
+            # height.  If we believe the value and it can, despite exceeding
+            # the height limit slightly, fit into a higher level container,
+            # ReportLab will cut the long table to fit into the given height!
+            # OTOH we can't be generous with space on the general level because
+            # then e.g. flexible spacers might consume more space than is
+            # desirable.  So we must be careful and hope the layout (or even
+            # the content!) won't get destroyed here.
+            wrapped = []
+            average_avail = (avail_length - self._box_total_length) / len(variable_content)
+            for n in range(len(variable_content)):
+                i, c, width = variable_content[n]
                 if vertical:
-                    args = (availWidth, avail,)
+                    args = [availWidth, average_avail]
                 else:
-                    args = (avail, availHeight,)
-                for i, c, w in variable_content:
-                    if w and w > avail and self._box_lengths[i] is None:
-                        wrap(c, i, *args)
-                        stop = False
-            for i, c, w in variable_content:
-                wrap(c, i, *args)
+                    args = [average_avail, availHeight]
+                w, h = wrap(c, i, *args)
+                if ((vertical and h > average_avail) or
+                    (not vertical and w > average_avail) or
+                    (width and width > average_avail)):
+                    for j in range(len(wrapped)):
+                        variable_content[j] = variable_content[j][0], unwrap(wrapped[j]), variable_content[j][2]
+                    max_avail = avail_length - self._box_total_length
+                    avail = average_avail
+                    while avail < max_avail:
+                        c = unwrap(i)
+                        avail = min(avail + average_avail, max_avail)
+                        args[length_index] = avail
+                        sizes = wrap(c, i, *args)
+                        if sizes[length_index] <= avail:
+                            break
+                    del variable_content[n]
+                    break
+                wrapped.append(i)
+            else:
+                break
         if vertical:
             self._width_height = (self._box_max_depth, self._box_total_length,)
         else:
@@ -342,7 +364,6 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             return []
         i = 0
         height = 0
-        content = [copy.copy(c) for c in self._box_original_content]
         lengths = self._box_lengths
         while i < len(self._box_lengths):
             next_height = lengths[i]
