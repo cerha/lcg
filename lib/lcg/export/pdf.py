@@ -340,7 +340,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                     (width and width > average_avail)):
                     for j in range(len(wrapped)):
                         variable_content[j] = variable_content[j][0], unwrap(wrapped[j]), variable_content[j][2]
-                    max_avail = avail_length - self._box_total_length
+                    max_avail = avail_length - self._box_total_length + self._box_lengths[i]
                     avail = average_avail
                     while avail < max_avail:
                         c = unwrap(i)
