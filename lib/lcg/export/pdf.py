@@ -284,6 +284,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 return
             length = sizes[length_index]
             depth = sizes[depth_index]
+            assert length >= 0 and depth >= 0, ("Negative size", length, depth, content,)
             self._box_total_length += length
             self._box_max_depth = max(self._box_max_depth, sizes[depth_index])
             if i is None:
@@ -328,6 +329,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             # the content!) won't get destroyed here.
             wrapped = []
             average_avail = (avail_length - self._box_total_length) / len(variable_content)
+            if average_avail < 0:
+                average_avail = 0
             for n in range(len(variable_content)):
                 i, c, width = variable_content[n]
                 if vertical:
@@ -338,17 +341,21 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 if ((vertical and h > average_avail) or
                     (not vertical and w > average_avail) or
                     (width and width > average_avail)):
+                    max_avail = avail_length
                     for j in range(len(wrapped)):
                         variable_content[j] = variable_content[j][0], unwrap(wrapped[j]), variable_content[j][2]
-                    max_avail = avail_length - self._box_total_length + self._box_lengths[i]
-                    avail = average_avail
-                    while avail < max_avail:
-                        c = unwrap(i)
-                        avail = min(avail + average_avail, max_avail)
-                        args[length_index] = avail
-                        sizes = wrap(c, i, *args)
-                        if sizes[length_index] <= avail:
-                            break
+                    for j in range(i):
+                        if self._box_lengths[j] is not None:
+                            max_avail -= self._box_lengths[j]
+                    if max_avail >= 0:
+                        avail = average_avail
+                        while avail < max_avail:
+                            c = unwrap(i)
+                            avail = min(avail + max_avail/10, max_avail)
+                            args[length_index] = avail
+                            sizes = wrap(c, i, *args)
+                            if sizes[length_index] <= avail:
+                                break
                     del variable_content[n]
                     break
                 wrapped.append(i)
