@@ -373,6 +373,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             i += 1
         def container(content):
             return RLContainer(content, vertical=self._box_vertical, align=self._box_align, boxed=self._box_boxed)
+        content = self._box_content
         if i == self._box_lengths:
             result = [self]
         elif isinstance(content[i], (RLContainer, reportlab.platypus.tables.LongTable,)):
