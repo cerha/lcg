@@ -230,8 +230,14 @@ in one output file too).  The output is placed in the current directory in
 this case.  In other cases the destination directory is required to prevent
 unwanted polution of the current directory by the output files.
 
-If your LCG installation is placed in a non-standard installation directory,
-set LCGDIR environment variable to its location.
+Environment variables:
+
+  LCGDIR ... If specified the directory '$LCGDIR/resources' will be added to
+             the first position of the default resource path (which normally
+             includes only source directories).  Also the directory
+             '$LCGDIR/translations' will be added to the beginning of the
+             translation path (specified by --translations).
+             
 
 """
     die(help % (os.path.split(sys.argv[0])[-1], dumpoptions(optspec, width=80, indent=2)))
