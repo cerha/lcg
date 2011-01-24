@@ -137,6 +137,11 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             def add_flowable(content, position):
                 flowable, width, height = make_flowable(content)
                 x = (self.pagesize[0] - width) / 2
+                if isinstance(content, lcg.Container):
+                    if content.halign() == lcg.HorizontalAlignment.LEFT:
+                        x = 0
+                    elif content.halign() == lcg.HorizontalAlignment.RIGHT:
+                        x = self.pagesize[0] - width
                 if position == 'top':
                     y = self.height + self.bottomMargin - height
                 elif position == 'bottom':
