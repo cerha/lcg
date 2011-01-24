@@ -74,11 +74,21 @@ def main():
         opt, args = getoptions(OPTIONS)
     except getopt.GetoptError:
         usage(OPTIONS)
-    if len(args) not in (1, 2):
-        usage(OPTIONS)
-    src = args[0]
-    dst = len(args) == 2 and args[1] or None
+    # Select the output format if options make sense.
+    formats = [k for k in (HTML, IMS, HHP, PDF) if opt[k]]
+    if not formats:
+        output_format = HTML
+    elif len(formats) == 1:
+        output_format = formats[0]
+    else:
+        die("Can't use %s together!" % ' and '.join(['--'+f for f in formats]))
     # Find out whether the input is a single file or a directory.
+    if len(args) == 1:
+        src, dst = args[0], None
+    elif len(args) == 2:
+        src, dst = args
+    else:
+        usage(OPTIONS)
     if os.path.isfile(src):
         src, filename = os.path.split(src)
         name = os.path.splitext(os.path.splitext(filename)[0])[0]
@@ -90,15 +100,6 @@ def main():
         ext = opt['ext']
         lang = opt['lang']
         recourse = True
-    # Select the output format if options make sense.
-    formats = [k for k in (HTML, IMS, HHP, PDF) if opt[k]]
-    if not formats:
-        output_format = HTML
-    elif len(formats) > 1:
-        lcg.log("Select just one output format!")
-        sys.exit()
-    else:
-        output_format = formats[0]
     if dst is None:
         if output_format == PDF:
             # PDF has always just one output file (per each language variant), so there is no harm
