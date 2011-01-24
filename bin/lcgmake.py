@@ -71,9 +71,9 @@ PDF = 'pdf'
 def main():
     # Process options.
     try:
-        opt, args = getoptions(OPTIONS)
+        opt, args = getoptions()
     except getopt.GetoptError:
-        usage(OPTIONS)
+        usage()
     # Select the output format if options make sense.
     formats = [k for k in (HTML, IMS, HHP, PDF) if opt[k]]
     if not formats:
@@ -88,7 +88,7 @@ def main():
     elif len(args) == 2:
         src, dst = args
     else:
-        usage(OPTIONS)
+        usage()
     if os.path.isfile(src):
         src, filename = os.path.split(src)
         name = os.path.splitext(os.path.splitext(filename)[0])[0]
@@ -172,13 +172,13 @@ def read_presentation(filename):
             setattr(presentation, o, confmodule.__dict__[o])
     return presentation
 
-def getoptions(optspec):
-    optlist = reduce(operator.add, [optlist for section, optlist in optspec], ())
+def getoptions():
+    optspec = reduce(operator.add, [optspec for section, optspec in OPTIONS], ())
     import getopt
-    opts, args = getopt.getopt(sys.argv[1:], '', [x[0] for x in optlist])
+    opts, args = getopt.getopt(sys.argv[1:], '', [x[0] for x in optspec])
     optdict = dict(opts)
     options = {}
-    for option, default, doc in optlist:
+    for option, default, doc in optspec:
             if option.endswith('='):
                 option = option[:-1]
                 options[option] = optdict.get('--'+option, default)
@@ -187,13 +187,13 @@ def getoptions(optspec):
     return options, args
 
 
-def dumpoptions(optspec, width=80, indent=3):
+def dumpoptions(width=80, indent=3):
     from textwrap import wrap
     result = []
-    for section, optlist in optspec:
+    for section, optspec in OPTIONS:
         maxlen = 0
         options = []
-        for option, default, descr in optlist:
+        for option, default, descr in optspec:
             if option.endswith('='):
                 option += '<value>'
                 descr += "  Default is %r." % default
@@ -210,7 +210,7 @@ def die(msg):
     sys.stderr.write(msg +"\n")
     sys.exit(2)
 
-def usage(optspec):
+def usage():
     help = """Usage: %s [options] source [destination]
 
 %s
@@ -241,7 +241,7 @@ Environment variables:
              
 
 """
-    die(help % (os.path.split(sys.argv[0])[-1], dumpoptions(optspec, width=80, indent=2)))
+    die(help % (os.path.split(sys.argv[0])[-1], dumpoptions(width=80, indent=2)))
 
 def lcg_exception_details(title, details=[], reason=None):
     """Print LCG specific details about the printed exception.
