@@ -91,9 +91,10 @@ def main():
         usage()
     if os.path.isfile(src):
         src, filename = os.path.split(src)
-        name = os.path.splitext(os.path.splitext(filename)[0])[0]
-        lang = os.path.splitext(os.path.splitext(filename)[0])[1][1:] or None
-        ext = os.path.splitext(filename)[1][1:] or None
+        basename, master_ext = os.path.splitext(filename)
+        name, lang_ext = os.path.splitext(basename)
+        lang = lang_ext and lang_ext[1:] or None
+        ext = master_ext and master_ext[1:] or None
         recourse = False
     else:
         name = opt['root']
