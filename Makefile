@@ -22,7 +22,7 @@ translations:
 	make -C translations
 
 doc:
-	LCGDIR=. PYTHONPATH="./lib:$PYTHONPATH" bin/lcgmake.py doc/src doc/html
+	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" bin/lcgmake.py doc/src doc/html
 
 test:
 	lib/lcg/_test.py
