@@ -693,6 +693,7 @@ class Context(object):
         if Context._registered_fonts.has_key(key):
             assert Context._registered_fonts[key] == font_file, \
                    ("Inconsistent font definition", key, font_file,)
+            font_face_name = Context._registered_font_files[font_file]
         else:
             if Context._registered_font_files.has_key(font_file):
                 # ReportLab really doesn't like using the same font file more than once.
