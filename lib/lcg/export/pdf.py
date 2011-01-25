@@ -2250,15 +2250,28 @@ class PDFExporter(FileExporter, Exporter):
                 sys.stderr.write("  #%s\n" % (a,))
             return ''
         output = cStringIO.StringIO()
-        margin = 10 * reportlab.lib.units.mm
         page_size = reportlab.lib.pagesizes.A4
         if True:
             page_size = reportlab.lib.pagesizes.portrait(page_size)
         else:
             page_size = reportlab.lib.pagesizes.landscape(page_size)
+        def margin(attr):
+            try:
+                size = getattr(presentation, attr)
+                if isinstance(size, UMm):
+                    points = size.size() * reportlab.lib.units.mm
+                elif isinstance(size, UPoint):
+                    points = size.size()
+                else:
+                    points = 10 * reportlab.lib.units.mm
+            except:
+                points = 10 * reportlab.lib.units.mm
+            return points
         doc = DocTemplate(output, pagesize=page_size,
-                          leftMargin=margin, rightMargin=margin,
-                          topMargin=margin, bottomMargin=margin)
+                          leftMargin=margin('left_margin'),
+                          rightMargin=margin('right_margin'),
+                          topMargin=margin('top_margin'),
+                          bottomMargin=margin('bottom_margin'))
         while True:
             try:
                 doc.multi_build(document, context=first_subcontext)

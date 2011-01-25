@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,26 @@ class Presentation(object):
     """Amount of space to put on left of the object, 'Unit'."""
     line_spacing = None
     """Distance between line bases, 'Unit'."""
+    top_margin = None
+    """Amount of space on the top of the object, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for PDF pages if set for the top level node.
+    """
+    bottom_margin = None
+    """Amount of space on the bottom of the object, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for PDF pages if set for the top level node.
+    """
+    left_margin = None
+    """Amount of space on the left of the object, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for PDF pages if set for the top level node.
+    """
+    right_margin = None
+    """Amount of space on the right of the object, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for PDF pages if set for the top level node.
+    """    
     
     
 class Content(object):
