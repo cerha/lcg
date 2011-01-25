@@ -121,13 +121,15 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             separator_space = 0.5 * reportlab.lib.units.cm
             if header:
                 _, _, header_height = make_flowable(header)
-                header_height = header_height + separator_space
-                height = height - header_height
+                if header_height > 0:
+                    header_height = header_height + separator_space
+                    height = height - header_height
             if footer:
                 _, _, footer_height = make_flowable(footer)
-                footer_height = footer_height + separator_space
-                height = height - footer_height
-                bottom_margin = bottom_margin + footer_height
+                if footer_height > 0:
+                    footer_height = footer_height + separator_space
+                    height = height - footer_height
+                    bottom_margin = bottom_margin + footer_height
             return bottom_margin, height
         def on_page(canvas, doc):
             pdf_context = self._lcg_context.pdf_context
