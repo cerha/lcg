@@ -141,9 +141,9 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 x = (self.pagesize[0] - width) / 2
                 if isinstance(content, lcg.Container):
                     if content.halign() == lcg.HorizontalAlignment.LEFT:
-                        x = 0
+                        x = self.leftMargin
                     elif content.halign() == lcg.HorizontalAlignment.RIGHT:
-                        x = self.pagesize[0] - width
+                        x = self.pagesize[0] - width - self.rightMargin
                 if position == 'top':
                     y = self.height + self.bottomMargin - height
                 elif position == 'bottom':
