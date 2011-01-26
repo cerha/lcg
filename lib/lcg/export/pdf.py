@@ -2217,6 +2217,7 @@ class PDFExporter(FileExporter, Exporter):
                                              page_background=node.page_background(lang),
                                              presentation=presentation,
                                              lang=lang)
+            subcontext.pdf_context.add_presentation(node.presentation(lang))
             # The subcontext serves twice: 1. when exporting node content;
             # 2. when exporting to ReportLab.  The question is how to transfer
             # the subcontext to the proper place in ReportLab formatting.  This
