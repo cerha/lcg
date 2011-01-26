@@ -71,6 +71,10 @@ class Presentation(object):
     "True when italic font face should be used, False otherwise."
     boxed = None
     "'True' when the content should be surrounded by a box."
+    box_margin = None
+    """Space between the box and the content, 'Unit'.
+    It may be ignored in some boxed elements.
+    """
     separator_height = None
     """Height of lines separating objects, 'Unit'.
     It currently works only for row separators in tables.

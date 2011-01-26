@@ -243,7 +243,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     BOX_BOTTOM = 'BOTTOM'
     BOX_LEFT = 'LEFT'
     BOX_RIGHT = 'RIGHT'
-    def __init__(self, content, vertical=False, align=None, boxed=False):
+    def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         if __debug__:
@@ -259,6 +259,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._box_vertical = vertical
         self._box_align = align or self.BOX_CENTER
         self._box_boxed = boxed
+        if not boxed:
+            box_margin = 0
+        self._box_box_margin = box_margin
         self._box_last_split_height = None
         # Another hack for pytis markup:
         if len(content) == 1:
@@ -267,6 +270,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             else:
                 self.hAlign = self._box_align
     def wrap(self, availWidth, availHeight):
+        box_margin_size_2 = self._box_box_margin * 2
+        if self._box_boxed:
+            availWidth -= box_margin_size_2
+            availHeight -= box_margin_size_2
         self._box_content = [copy.copy(c) for c in self._box_original_content]
         vertical = self._box_vertical
         if vertical:
@@ -372,12 +379,13 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             self._width_height = (self._box_max_depth, self._box_total_length,)
         else:
             self._width_height = (self._box_total_length, self._box_max_depth,)
+        self._width_height = (self._width_height[0] + box_margin_size_2, self._width_height[1] + box_margin_size_2,)
         return self._width_height
     def split(self, availWidth, availHeight):
         if not self._box_vertical or not self._box_content:
             return []
         i = 0
-        height = 0
+        height = self._box_box_margin * 2
         lengths = self._box_lengths
         while i < len(self._box_lengths):
             next_height = lengths[i]
@@ -401,11 +409,12 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         canv = self.canv
         lengths = self._box_lengths
         vertical = self._box_vertical
-        x = 0
+        box_margin = self._box_box_margin
+        x = box_margin
         if vertical:
-            y = self._box_total_length
+            y = self._box_total_length + box_margin
         else:
-            y = 0
+            y = box_margin
         i = 0
         for c in self._box_content:
             align = self._box_align
@@ -1548,7 +1557,8 @@ class Container(Element):
             return c
         content = [transform_content(c) for c in self.content]
         # If there is only a single element, unwrap it from the container.
-        boxed = self.presentation and self.presentation.boxed
+        presentation = self.presentation
+        boxed = presentation and presentation.boxed
         if len(self.content) == 1 and not boxed:
             content_element = self.content[0]
             if self.halign is not None and getattr(content_element, 'halign', None) is None:
@@ -1596,7 +1606,13 @@ class Container(Element):
                         align = self.halign
                     else:
                         align = self.valign
-                    result = [RLContainer(content=result, vertical=self.vertical, align=align, boxed=boxed)]
+                    box_margin = presentation and presentation.box_margin
+                    if box_margin is None:
+                        box_margin_points = 0
+                    else:
+                        box_margin_points = self._unit2points(box_margin, style)
+                    result = [RLContainer(content=result, vertical=self.vertical, align=align,
+                                          boxed=boxed, box_margin=box_margin_points)]
         # Export completed.
         pdf_context.remove_presentation()
         return result
