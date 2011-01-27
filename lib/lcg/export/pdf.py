@@ -263,6 +263,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             box_margin = 0
         self._box_box_margin = box_margin
         self._box_last_split_height = None
+        self._box_last_wrap = None
         # Another hack for pytis markup:
         if len(content) == 1:
             if getattr(content[0], 'hAlign', None):
@@ -270,6 +271,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             else:
                 self.hAlign = self._box_align
     def wrap(self, availWidth, availHeight):
+        self._box_last_wrap = availWidth, availHeight
         box_margin_size_2 = self._box_box_margin * 2
         if self._box_boxed:
             availWidth -= box_margin_size_2
@@ -384,6 +386,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     def split(self, availWidth, availHeight):
         if not self._box_vertical or not self._box_content:
             return []
+        if self._box_last_wrap is None or self._box_last_wrap != (availWidth, availHeight,):
+            self.wrap(availWidth, availHeight)
         i = 0
         height = self._box_box_margin * 2
         lengths = self._box_lengths
