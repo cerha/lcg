@@ -2208,10 +2208,11 @@ class PDFExporter(FileExporter, Exporter):
             total_pages = old.page
         node = context.node()
         lang = context.lang()
+        page_header = node.page_header(lang)
         context.pdf_context = old_contexts[None] = pdf_context = \
                               Context(total_pages=total_pages,
-                                      first_page_header=node.first_page_header(lang),
-                                      page_header=node.page_header(lang),
+                                      first_page_header=(node.first_page_header(lang) or page_header),
+                                      page_header=page_header,
                                       page_footer=node.page_footer(lang),
                                       page_background=node.page_background(lang),
                                       presentation=node.presentation(lang),
@@ -2229,10 +2230,11 @@ class PDFExporter(FileExporter, Exporter):
             total_pages = 0
             if old is not None:
                 total_pages = old.page
+            page_header = node.page_header(lang)
             subcontext.pdf_context = old_contexts[node_id] = pdf_subcontext = \
                                      Context(parent_context=pdf_context, total_pages=total_pages,
-                                             first_page_header=node.first_page_header(lang),
-                                             page_header=node.page_header(lang),
+                                             first_page_header=(node.first_page_header(lang) or page_header),
+                                             page_header=page_header,
                                              page_footer=node.page_footer(lang),
                                              page_background=node.page_background(lang),
                                              presentation=presentation,
