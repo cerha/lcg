@@ -492,8 +492,8 @@ class RLSpacer(reportlab.platypus.flowables.Spacer):
         return width, height
 
 class RLImage(reportlab.platypus.flowables.Image):
-    # This class is introduced to handle images exceeding page dimensions.
-    # Its instance can't be used more than once in the document.
+    # This class is introduced to handle images exceeding page dimensions and
+    # to respect image resolution at least for some image formats.
     def __init__(self, *args, **kwargs):
         self._last_avail_height = None
         reportlab.platypus.flowables.Image.__init__(self, *args, **kwargs)
@@ -511,6 +511,22 @@ class RLImage(reportlab.platypus.flowables.Image):
                         kind='proportional', lazy=0)
         self._last_avail_height = availHeight
         return reportlab.platypus.flowables.Image.wrap(self, availWidth, availHeight)
+    def _setup_inner(self):
+        if self._width is None or self._height is None:
+            # Let's try to set actual image size, based on the image parameters.
+            try:
+                import PIL
+                img = PIL.Image.open(self.filename)
+                img.load()
+                w, h = img.size
+                xdpi, ydpi = img.info.get('dpi', (None, None,))
+                if self._width is None and xdpi:
+                    self._width = w*reportlab.lib.units.inch / xdpi
+                if self._height is None and ydpi:
+                    self._height = h*reportlab.lib.units.inch / ydpi
+            except:
+                pass
+        reportlab.platypus.flowables.Image._setup_inner(self)
 
 class Context(object):
     """Place holder for PDF backend export state.
