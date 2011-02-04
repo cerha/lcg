@@ -1633,6 +1633,9 @@ class Container(Element):
                         box_margin_points = self._unit2points(box_margin, style)
                     result = [RLContainer(content=result, vertical=self.vertical, align=align,
                                           boxed=boxed, box_margin=box_margin_points)]
+        # Enforce upper alignment
+        if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):
+            result[0].hAlign = halign
         # Export completed.
         pdf_context.remove_presentation()
         return result
