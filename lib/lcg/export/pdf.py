@@ -1117,6 +1117,19 @@ def _ok_export_result(result):
                 return False
     return True
 
+_replacements = (('&', '&amp;',),
+                 ('<', '&lt;',),
+                 ('>', '&gt;',),
+                 )
+def _escape(text):
+    for old, new in _replacements:
+        text = text.replace(old, new)
+    return text
+def _unescape(text):
+    for old, new in _replacements:
+        text = text.replace(new, old)
+    return text
+    
 class Element(object):
     """Base class of all content classes.
 
@@ -1195,17 +1208,12 @@ class Text(Element):
 
     """
     _CATEGORY = 'text'
-    _replacements = (('&', '&amp;',),
-                     ('<', '&lt;',),
-                     ('>', '&gt;',),
-                     )
     style = None
     halign = None
     def init(self):
         assert isinstance(self.content, (basestring, Text,)), ('type error', self.content,)
         if isinstance(self.content, basestring):
-            for old, new in self._replacements:
-                self.content = self.content.replace(old, new)
+            self.content = _escape(self.content)
             # The following two lines of code are tricky.  In order to prevent
             # some coding issues with pytis data retrieved from the database we
             # must make sure that the result is unicode.  On the other hand we
@@ -1223,8 +1231,7 @@ class Text(Element):
         assert _ok_export_result(result), ('wrong export', result,)
         result = unicode(result)
         if self.style is not None:
-            for old, new in self._replacements:
-                result = result.replace(new, old)
+            result = _unescape(result)
             result = RLText(result, self.style, halign=self.halign)
         return result
     def prepend_text(self, text):
@@ -1948,6 +1955,8 @@ class Table(Element):
                             result = exported_column
                         return result
                     exported_column = simplify(column.export(context, **kwargs))
+                    if isinstance(exported_column, basestring):
+                        exported_column = _unescape(exported_column)
                     row_content.append(exported_column)
                     if (p is not None and
                         (p.bold is not None or p.italic is not None or
