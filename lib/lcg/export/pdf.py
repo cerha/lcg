@@ -1223,6 +1223,8 @@ class Text(Element):
         assert _ok_export_result(result), ('wrong export', result,)
         result = unicode(result)
         if self.style is not None:
+            for old, new in self._replacements:
+                result = result.replace(new, old)
             result = RLText(result, self.style, halign=self.halign)
         return result
     def prepend_text(self, text):
