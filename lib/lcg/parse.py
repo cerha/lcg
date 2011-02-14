@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Brailcom, o.p.s.
+# Copyright (C) 2004-2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -97,20 +97,20 @@ class Parser(object):
     (as opposed to parsing, which is done on LCG input).
 
     """
-    _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *$', re.MULTILINE)
-    _HRULE_MATCHER = re.compile(r'^----+ *$', re.MULTILINE)
+    _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *\r?$', re.MULTILINE)
+    _HRULE_MATCHER = re.compile(r'^----+ *\r?$', re.MULTILINE)
     _TOC_MATCHER = re.compile(r'(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>(N?TOC|NodeIndex))(\((?P<tocdepth>\d+)\))?\@ *')
-    _TABLE_MATCHER = re.compile(r'\|.*\| *$', re.MULTILINE)
+    _TABLE_MATCHER = re.compile(r'\|.*\| *\r?$', re.MULTILINE)
     _CELL_ALIGNMENT_MATCHER = re.compile(r'<([clr]?)([0-9]*)>')
     _CELL_ALIGNMENT_MAPPING = {'c': TableCell.CENTER, 'l': TableCell.LEFT, 'r': TableCell.RIGHT}
-    _COMMENT_MATCHER = re.compile('^#[^\n]*(\n|$)', re.MULTILINE)
+    _COMMENT_MATCHER = re.compile('^#[^\r\n]*\r?(\n|$)', re.MULTILINE)
     _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<title>.*) (?P=level)' +
-                                   r'(?:[\t ]+(?:\*|(?P<anchor>[\w\d_-]+)))? *$'),
+                                   r'(?:[\t ]+(?:\*|(?P<anchor>[\w\d_-]+)))? *\r?$'),
                                   re.MULTILINE)
-    _LINE_MATCHER = re.compile(r'^( *)([^\n\r]*)(\r?\n\r?|$)', re.MULTILINE)
-    _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *$', re.DOTALL|re.MULTILINE)
-    _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?$', re.MULTILINE)
-    _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?$', re.MULTILINE)
+    _LINE_MATCHER = re.compile(r'^( *)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
+    _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL|re.MULTILINE)
+    _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
+    _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
                                 r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?\n')
     _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
@@ -429,7 +429,7 @@ class Parser(object):
         if value:
             value = value.strip()
         if not value:
-            match = re.search('^@end %s *$' % (identifier,), text[position:], re.MULTILINE)
+            match = re.search('^@end %s *\r?$' % (identifier,), text[position:], re.MULTILINE)
             if match:
                 value = text[position:position+match.start()].strip()
                 position += match.end()
@@ -462,7 +462,7 @@ class Parser(object):
             value = value.strip()
             variable_content = FormattedText(value)
         else:
-            match = re.search('^@end %s *$' % (identifier,), text[position:], re.MULTILINE)
+            match = re.search('^@end %s *\r?$' % (identifier,), text[position:], re.MULTILINE)
             if match:
                 value = text[position:position+match.start()].strip()
                 position += match.end()
@@ -626,7 +626,7 @@ class MacroParser(object):
 
     """
     _CONDITION_REGEX = re.compile(r'(?m)^(@(?:if .+|else|endif))\s*?$\r?\n?')
-    _INCLUDE_REGEX = re.compile(r'(?m)^@include (.*)$')
+    _INCLUDE_REGEX = re.compile(r'(?m)^@include (.*)\r?$')
 
     class _ConditionalText(object):
         def __init__(self, evaluate, condition, parent=None):
