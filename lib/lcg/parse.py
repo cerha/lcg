@@ -527,6 +527,7 @@ class Parser(object):
         size = len(text)
         while True:
             if position >= size:
+                start_position = position
                 break
             char = text[position]
             if char not in string.whitespace:
