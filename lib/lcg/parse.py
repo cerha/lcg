@@ -114,7 +114,7 @@ class Parser(object):
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
                                 r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?\n')
     _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
-                                     r'(?P<descr>([\t ]+[^\r\n]+\r?\n)*([\t ]+[^\r\n]+\r?\n?))')
+                                     r'(?P<description>([\t ]+[^\r\n]+\r?\n)*([\t ]+[^\r\n]+\r?\n?))')
     _LIST_MATCHER = re.compile(r'( *)\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.)) +')
     _TAB_MATCHER = re.compile(r'^\t')
     
@@ -189,7 +189,14 @@ class Parser(object):
         definitions = []
         while match:
             groups = match.groupdict()
-            definitions.append((FormattedText(groups['term']), FormattedText(groups['descr']),))
+            term, description = groups['term'], groups['description']
+            # Handle backward compatibility with the old structured text constructs
+            if not definitions:
+                parsed_description = self.parse(description)
+                if (len(parsed_description) == 1 and
+                    isinstance(parsed_description[0], ItemizedList)):
+                    return None
+            definitions.append((FormattedText(term), FormattedText(description),))
             position += match.end()
             match = self._DEFINITION_MATCHER.match(text[position:])
         return DefinitionList(definitions), position
