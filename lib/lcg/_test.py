@@ -67,7 +67,7 @@ class TranslatableText(unittest.TestCase):
         assert f == "xxxVersion 1.0xxx", f
         try:
             e = a + 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         assert isinstance(e, TypeError), e
             
@@ -418,9 +418,9 @@ class Parser(unittest.TestCase):
 '''
         parameters = {}
         c = self._parser.parse(text, parameters)
-        assert parameters.has_key('page_header'), parameters
-        assert parameters.has_key('page_footer'), parameters
-        assert not parameters.has_key('first_page_header'), parameters
+        assert 'page_header' in parameters, parameters
+        assert 'page_footer' in parameters, parameters
+        assert 'first_page_header' not in parameters, parameters
         header = parameters['page_header']
         assert header.content()[0].content()[0].text() == 'hello', header.content()[0].content()[0].text()
         footer = parameters['page_footer']

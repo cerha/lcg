@@ -26,7 +26,9 @@ allows us to decide for the output language at the export time.
 
 from lcg import *
 
-import re, datetime
+import collections
+import datetime
+import re
 
 class TranslatableTextFactory(object):
     """A helper for defining the '_' identifier bound to a certain domain.
@@ -233,7 +235,7 @@ class TranslatableText(Localizable):
     def _init_kwargs(self, _domain=None, _origin='en', _interpolate=None, _transforms=(), **kwargs):
         assert isinstance(_domain, (str)) or _domain is None, _domain
         assert isinstance(_origin, (str)), _origin
-        assert _interpolate is None or callable(_interpolate), _interpolate
+        assert _interpolate is None or isinstance(_interpolate, collections.Callable), _interpolate
         self._domain = _domain
         self._origin = _origin
         self._interpolate = _interpolate
@@ -330,7 +332,7 @@ class TranslatablePluralForms(TranslatableText):
         if args:
             n = args[0]
         else:
-            assert kwargs.has_key('n'), \
+            assert 'n' in kwargs, \
                    "A number determining the plural form must be passed as keyword argument 'n'."
             n = kwargs['n']
         assert isinstance(n, int)
@@ -698,7 +700,7 @@ class GettextTranslator(Translator):
         for dir in self._path:
             try:
                 return gettext.translation(domain, dir, (self._lang,))
-            except IOError, e:
+            except IOError as e:
                 continue
         # The MO file was not found.
         msg = "No translation file found: domain=%r, path=%r, lang=%r, origin=%r" % \
@@ -792,7 +794,7 @@ def source_files_by_domain(basedir, domain=None):
             finally:
                 file.close()
                 sys.path.pop()
-            if module.__dict__.has_key('_'):
+            if '_' in module.__dict__:
                 x = module.__dict__['_']
                 if isinstance(x, lcg.TranslatableTextFactory) and x.domain() == domain:
                     result.append(filename)

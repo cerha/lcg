@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010 Brailcom, o.p.s.
+# Copyright (C) 2004-2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ document in the hierarchy is represented by a single 'ContentNode' instance (def
 """
 
 from lcg import *
+
+import functools
 
 class ContentNode(object):
     """Representation of one output document within an LCG publication.
@@ -125,7 +127,7 @@ class ContentNode(object):
         #    seen = {}
         #    for n in self.linear():
         #        nid = n.id()
-        #        assert not seen.has_key(nid), \
+        #        assert nid not in seen, \
         #               "Duplicate node id: %s, %s" % (n, seen[nid])
         #        seen[nid] = n
         
@@ -222,7 +224,7 @@ class ContentNode(object):
         
     def linear(self):
         """Return the linearized subtree of this node as a list."""
-        return [self] + reduce(lambda l, n: l + n.linear(), self.children(), [])
+        return [self] + functools.reduce(lambda l, n: l + n.linear(), self.children(), [])
 
     def next(self):
         """Return the node following this node in the linearized structure."""
@@ -275,7 +277,7 @@ class ContentNode(object):
           name -- name of the variable, string
 
         """
-        if self._globals.has_key(name):
+        if name in self._globals:
             result = self._globals[name]
         elif self._parent is not None:
             result = self._parent.global_(name)
@@ -326,7 +328,7 @@ class ContentNode(object):
     def _lang_parameter(self, dictionary, lang):
         if dictionary is None:
             result = None
-        elif dictionary.has_key(lang):
+        elif lang in dictionary:
             result = dictionary[lang]
         else:
             result = dictionary.get(None)

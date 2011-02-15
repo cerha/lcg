@@ -664,7 +664,7 @@ class MacroParser(object):
         def __str__(self):
             try:
                 result = self._evaluate(self._condition)
-            except Exception, e:
+            except Exception as e:
                 return e.__class__.__name__+': '+unicode(e)
             else:
                 return ''.join([unicode(x) for x in self._content[bool(result)]])

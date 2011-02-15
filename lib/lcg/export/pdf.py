@@ -186,7 +186,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
 
 class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
     def __init__(self, *args, **kwargs):
-        if kwargs.has_key('context'):
+        if 'context' in kwargs:
             context = kwargs['context']
             del kwargs['context']
             presentation = context.pdf_context.current_presentation()
@@ -729,12 +729,12 @@ class Context(object):
                                      bold and '_Bold' or '',
                                      italic and '_Italic' or '',)
         key = (font_name, bold, italic,)
-        if Context._registered_fonts.has_key(key):
+        if key in Context._registered_fonts:
             assert Context._registered_fonts[key] == font_file, \
                    ("Inconsistent font definition", key, font_file,)
             font_face_name = Context._registered_font_files[font_file]
         else:
-            if Context._registered_font_files.has_key(font_file):
+            if font_file in Context._registered_font_files:
                 # ReportLab really doesn't like using the same font file more than once.
                 font_face_name = Context._registered_font_files[font_file]
             else:
@@ -966,7 +966,7 @@ class Context(object):
           name -- name of the anchor, basestring
           
         """
-        if not self._anchors.has_key(name):
+        if name not in self._anchors:
             self._anchors[name] = False
         if self._parent_context:
             self._parent_context.register_anchor_reference(name)
@@ -2366,7 +2366,7 @@ class PDFExporter(FileExporter, Exporter):
         while True:
             try:
                 doc.multi_build(document, context=first_subcontext)
-            except reportlab.platypus.doctemplate.LayoutError, e:
+            except reportlab.platypus.doctemplate.LayoutError as e:
                 if str(e).find('too large') >= 0:
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
@@ -2551,7 +2551,7 @@ class PDFExporter(FileExporter, Exporter):
             iterator = None
             try:
                 make_row()
-            except SubstitutionIterator.NotStartedError, e:
+            except SubstitutionIterator.NotStartedError as e:
                 iterator = e.iterator()
             if iterator is None:
                 raise Exception("No table row iterator found")

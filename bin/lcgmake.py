@@ -18,7 +18,7 @@
 
 """Simple and `quite' generic LCG generator."""
 
-import sys, getopt, os, lcg, string, imp, re, operator
+import sys, getopt, os, lcg, string, imp, re, operator, functools
 
 OPTIONS = (
     ("Input options", (
@@ -125,7 +125,7 @@ def main():
     reader = lcg.reader(src, name, ext=ext, recourse=recourse, encoding=opt['encoding'])
     try:
         node = reader.build()
-    except IOError, e:
+    except IOError as e:
         message = unicode(e)
         match = re.match('[[]Errno[^]]*[]] *', message)
         if match:
@@ -173,7 +173,7 @@ def read_presentation(filename):
         die("Can't open file: %s" % (filename,))
     try:
         confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
-    except Exception, e:
+    except Exception as e:
         die("Can't process configuration: %s" % (e,))
     finally:
         f.close()
@@ -183,7 +183,7 @@ def read_presentation(filename):
     return presentation
 
 def getoptions():
-    optspec = reduce(operator.add, [optspec for section, optspec in OPTIONS], ())
+    optspec = functools.reduce(operator.add, [optspec for section, optspec in OPTIONS], ())
     import getopt
     opts, args = getopt.getopt(sys.argv[1:], '', [x[0] for x in optspec])
     optdict = dict(opts)
@@ -193,7 +193,7 @@ def getoptions():
                 option = option[:-1]
                 options[option] = optdict.get('--'+option, default)
             else:
-                options[option] = optdict.has_key('--'+option)
+                options[option] = ('--'+option) in optdict
     return options, args
 
 
@@ -281,19 +281,19 @@ if __name__ == "__main__":
         raise
     except SystemExit:
         raise
-    except lcg.ProcessingError, p:
+    except lcg.ProcessingError as p:
         # Handles errors due to wrong format of input file. Gives the reason for the error and
         # clues to find it in form of name of the defective file and some section of text in which
         # the error is located.
         sys.stderr.write(lcg_exception_details("PARSING ERROR (error in source text)",
                                                p.info(), p.reason()))
         sys.exit(1)
-    except Exception, ex:
+    except Exception as ex:
         einfo = sys.exc_info()
         try:
             import cgitb
             sys.stderr.write(cgitb.text(einfo))
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write("Unable to generate detailed traceback: "+ str(e) +"\n")
             import traceback
             traceback.print_exception(*einfo)

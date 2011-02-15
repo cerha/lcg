@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2010 Brailcom, o.p.s.
+# Copyright (C) 2004-2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ class Reader(object):
                                resource_provider=self._resource_provider_,
                                globals=self._globals(), hidden=self._hidden,
                                **self._parameters)
-        except Exception, e:
+        except Exception as e:
             if hasattr(self, '_source_filename'):
                 # TODO: This is a quick hack.  The attribute `_source_filename' is prefilled in
                 # 'FileReader._read_file', so it would be at least more appropriate to move this
@@ -203,7 +203,7 @@ class FileReader(Reader):
         content = ''.join(lines)
         try:
             return unicode(content, encoding=encoding)
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError as e:
             raise Exception("File %s: %s" % (filename, e))
         
     def encoding(self):
