@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2010 Brailcom, o.p.s.
+# Copyright (C) 2004-2011 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1089,4 +1089,4 @@ class FileExporter(object):
 class UnsupportedElementType(Exception):
     def __init__(self, element_type):
         msg = "Element type not supported by the exporter: %s" % element_type
-        return super(UnsupportedElementType, self).__init__(msg)
+        super(UnsupportedElementType, self).__init__(msg)
