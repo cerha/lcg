@@ -192,7 +192,9 @@ class Parser(object):
             term, description = groups['term'], groups['description']
             # Handle backward compatibility with the old structured text constructs
             if not definitions:
+                old_position = self._old_position
                 parsed_description = self.parse(description)
+                self._old_position = old_position
                 if (len(parsed_description) == 1 and
                     isinstance(parsed_description[0], ItemizedList)):
                     return None
