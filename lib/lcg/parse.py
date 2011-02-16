@@ -107,7 +107,7 @@ class Parser(object):
     _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<title>.*) (?P=level)' +
                                    r'(?:[\t ]+(?:\*|(?P<anchor>[\w\d_-]+)))? *\r?$'),
                                   re.MULTILINE)
-    _LINE_MATCHER = re.compile(r'^( *)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
+    _LINE_MATCHER = re.compile(r'^([\t ]*)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL|re.MULTILINE)
     _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
@@ -190,16 +190,25 @@ class Parser(object):
         while match:
             groups = match.groupdict()
             term, description = groups['term'], groups['description']
-            # Handle backward compatibility with the old structured text constructs
-            if not definitions:
-                old_position = self._old_position
-                parsed_description = self.parse(description)
-                self._old_position = old_position
-                if (len(parsed_description) == 1 and
-                    isinstance(parsed_description[0], ItemizedList)):
-                    return None
-            definitions.append((FormattedText(term), FormattedText(description),))
+            old_position = self._old_position
             position += match.end()
+            next_position = position
+            while True:
+                line_match = self._LINE_MATCHER.match(text[position:])
+                if (not line_match or
+                    (line_match.group(2) and not line_match.group(1)) or
+                    line_match.end() == 0):
+                    break
+                position += line_match.end()
+            description += text[next_position:position]
+            parsed_description = self.parse(description)
+            # Handle backward compatibility with the old structured text constructs
+            if (not definitions and
+                len(parsed_description) == 1 and
+                isinstance(parsed_description[0], ItemizedList)):
+                self._old_position = old_position
+                return None
+            definitions.append((FormattedText(term), Container(parsed_description),))
             match = self._DEFINITION_MATCHER.match(text[position:])
         return DefinitionList(definitions), position
         
