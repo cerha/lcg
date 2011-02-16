@@ -594,6 +594,12 @@ class Context(object):
         self.adjust_style_leading(self._code_style)
         # Bullet
         self._styles['Bullet'].space_before = self.default_font_size / 2
+        # Label
+        self._label_style = copy.copy(self._styles['Normal'])
+        self._label_style.name = 'Label'
+        self._label_style.fontName = self.font(None, FontFamily.SERIF, True, False)
+        self._label_style.fontSize = self.default_font_size
+        self.adjust_style_leading(self._label_style)
 
     def _init_fonts(self):
         self._fonts = {}
@@ -856,6 +862,14 @@ class Context(object):
         style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
         self.adjust_style_leading(style)
         return style
+
+    def label_style(self):
+        """Return paragraph style for labels, e.g. in definition lists.
+        """
+        style = copy.copy(self._label_style)
+        style.fontSize *= self.relative_font_size()
+        self.adjust_style_leading(style)
+        return style        
 
     def list_style(self, order=None):
         """Return paragraph style for lists.
@@ -1412,7 +1426,8 @@ class Paragraph(Element):
             halign or
             pdf_context.last_element_category != 'paragraph'):
             style.firstLineIndent = 0
-        if (current_presentation and current_presentation.noindent and style.name[:7] != 'Heading'):
+        if (current_presentation and current_presentation.noindent and
+            style.name[:7] != 'Heading' and style.name != 'Label'):
             style.spaceBefore = style.fontSize * 1.2
         if current_presentation and current_presentation.left_indent:
             style.leftIndent += self._unit2points(current_presentation.left_indent, style)
@@ -1434,7 +1449,22 @@ class Paragraph(Element):
         assert isinstance(text, Text), ('type error', text,)
         self.content.insert(0, make_element(Text, content=text))
         
-class Heading(Paragraph):
+class Label(Paragraph):
+    """Label, e.g. in a definition list.
+
+    'content' is the same as in 'Paragraph'.
+    
+    """
+    _CATEGORY = 'label'
+    def _style(self, context):
+        return context.pdf_context.label_style()
+    def _export(self, context):
+        style = self._style(context)
+        maybe_break = reportlab.platypus.CondPageBreak(self._unit2points(UFont(5), style))
+        label = super(Label, self)._export(context, style=style)
+        return [maybe_break, label]
+
+class Heading(Label):
     """Heading of a section, etc.
 
     'content' is the same as in 'Paragraph'.  Additionally heading 'level'
@@ -1446,11 +1476,8 @@ class Heading(Paragraph):
     def init(self):
         super(Heading, self).init()
         assert isinstance(self.level, int), ('type error', self.level,)
-    def _export(self, context):
-        style = context.pdf_context.heading_style(self.level)
-        maybe_break = reportlab.platypus.CondPageBreak(self._unit2points(UFont(5), style))
-        heading = super(Heading, self)._export(context, style=style)
-        return [maybe_break, heading]
+    def _style(self, context):
+        return context.pdf_context.heading_style(self.level)
 
 class PageBreak(Element):
     """Unconditional page break.
@@ -2438,14 +2465,15 @@ class PDFExporter(FileExporter, Exporter):
     def _export_definition_list(self, context, element):
         def make_item(title, description):
             if isinstance(title, Text):
-                presentation = Presentation()
-                presentation.bold = True
-                title = make_element(Paragraph, content=[title], presentation=presentation)
+                title = make_element(Label, content=[title])
+            presentation = Presentation()
+            presentation.left_indent = UFont(2*1.2)
             if isinstance(description, Text):
-                presentation = Presentation()
-                presentation.left_indent = UFont(2*1.2)
                 description = make_element(Paragraph, content=[description],
                                            presentation=presentation, noindent=True)
+            else:
+                description = make_element(Container, content=[description],
+                                           presentation=presentation)
             return make_element(Container, content=[title, description])
         result_items = [make_item(dt.export(context), dd.export(context))
                         for dt, dd in element.content()]
