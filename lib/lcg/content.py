@@ -819,9 +819,9 @@ class FieldSet(Container):
 
 class TableCell(Container):
     """Table cell is a container of cell content and may appear within 'TableRow'."""
-    LEFT = 'left'
-    RIGHT = 'right'
-    CENTER = 'center'
+    LEFT = HorizontalAlignment.LEFT
+    RIGHT = HorizontalAlignment.RIGHT
+    CENTER = HorizontalAlignment.CENTER
 
     def __init__(self, content, align=None, **kwargs):
         """Arguments:
@@ -831,7 +831,7 @@ class TableCell(Container):
             or 'None' for the default alignment.
 
         """
-        assert align in (None, self.LEFT, self.RIGHT, self.CENTER)
+        assert align in (None, self.LEFT, self.RIGHT, self.CENTER), align
         self._align = align
         super(TableCell, self).__init__(content, **kwargs)
 
