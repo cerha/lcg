@@ -2332,11 +2332,11 @@ class PDFExporter(FileExporter, Exporter):
             return ''
         output = cStringIO.StringIO()
         page_size = reportlab.lib.pagesizes.A4
-        if True:
-            page_size = reportlab.lib.pagesizes.portrait(page_size)
-        else:
+        if presentation and presentation.landscape:
             page_size = reportlab.lib.pagesizes.landscape(page_size)
-        def margin(attr):
+        else:
+            page_size = reportlab.lib.pagesizes.portrait(page_size)
+        def presentation_size(attr, default=10*reportlab.lib.units.mm):
             try:
                 size = getattr(presentation, attr)
                 if isinstance(size, UMm):
@@ -2344,15 +2344,17 @@ class PDFExporter(FileExporter, Exporter):
                 elif isinstance(size, UPoint):
                     points = size.size()
                 else:
-                    points = 10 * reportlab.lib.units.mm
+                    points = default
             except:
-                points = 10 * reportlab.lib.units.mm
+                points = default
             return points
+        page_size = (presentation_size('page_width', default=page_size[0]),
+                     presentation_size('page_height', default=page_size[1]),)
         doc = DocTemplate(output, pagesize=page_size,
-                          leftMargin=margin('left_margin'),
-                          rightMargin=margin('right_margin'),
-                          topMargin=margin('top_margin'),
-                          bottomMargin=margin('bottom_margin'))
+                          leftMargin=presentation_size('left_margin'),
+                          rightMargin=presentation_size('right_margin'),
+                          topMargin=presentation_size('top_margin'),
+                          bottomMargin=presentation_size('bottom_margin'))
         while True:
             try:
                 doc.multi_build(document, context=first_subcontext)

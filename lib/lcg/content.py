@@ -118,7 +118,23 @@ class Presentation(object):
     """Amount of space on the right of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
-    """    
+    """
+    page_width = None
+    """Page width, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for PDF pages if set for the top level node.
+    """
+    page_height = None
+    """Page height, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for PDF pages if set for the top level node.
+    """
+    landscape = None
+    """Page orientation.
+    If False then use portrait orientation, if True then use landscape orientation.
+    If 'None', use the default value.
+    It currently works only for PDF pages if set for the top level node.
+    """
     
     
 class Content(object):
