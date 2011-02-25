@@ -1,8 +1,14 @@
-Learning Content Generator Installation Instructions
+LCG Installation Instructions
 
 Dependencies:
 
   * You need Python 2.3 or later to run LCG.  
+
+  * When using PDF output, you also need:
+    - Python module `reportlab',
+    - Fontconfig (the package name in Debian is `fontconfig'),
+    - the default font `Freefont' if you don't specify another font explicitly.
+      (the package name in Debian is `ttf-freefont').
 
 The simplest installation can be done using the provided Makefile.  Just run
 "make && make install" within the package root directory.  Feel free to
@@ -33,5 +39,6 @@ suppose that you have unpacked LCG to `/home/bob/lcg'.
 
      $ make all
 
-  4. If you need to use LCG executables, such as `lcgmake', just use their full
-     path.  You will find them in the `bin' subdirectory.
+  4. If you need to use LCG executables, such as `lcgmake.py', just use their
+     full path or link them manually somewhere to your PATH.  You will find
+     them in the `bin' subdirectory.
