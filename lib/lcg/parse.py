@@ -112,7 +112,7 @@ class Parser(object):
     _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
-                                r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?\n')
+                                r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?$', re.MULTILINE)
     _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
                                      r'(?P<description>([\t ]+[^\r\n]+\r?\n)*([\t ]+[^\r\n]+\r?\n?))')
     _LIST_MATCHER = re.compile(r'( *)\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.)) +')
@@ -179,7 +179,7 @@ class Parser(object):
                 break
             groups = match.groupdict()
             fields.append((FormattedText(groups['label']), FormattedText(groups['value']),))
-            position += match.end()
+            position += match.end() + 1
         return FieldSet(fields), position
 
     def _definition_processor(self, text, position, **kwargs):
