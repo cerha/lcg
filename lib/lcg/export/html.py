@@ -447,7 +447,8 @@ class HtmlExporter(Exporter):
                 for pair in (('Content-Type', 'text/html; charset=UTF-8'),
                              ('Content-Language', context.lang()),
                              ('Content-Script-Type', 'text/javascript'),
-                             ('Content-Style-Type', 'text/css'))] + \
+                             ('Content-Style-Type', 'text/css'),
+                             ('X-UA-Compatible', 'edge'))] + \
                ['<meta name="%s" content="%s">' % pair for pair in self._meta(context)] + \
                ['<link rel="alternate" lang="%s" href="%s">' % \
                 (lang, self._uri_node(context, node, lang=lang))
