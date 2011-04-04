@@ -858,6 +858,8 @@ class Context(object):
             presentation_font_family = (presentation.heading_font_family or
                                         presentation.font_family or
                                         FontFamily.SERIF)
+        else:
+            presentation_font_family = FontFamily.SERIF
         style.fontName = self.font(presentation_font_name, presentation_font_family, False, False)
         style.fontSize *= (self.default_font_size / 10.0) * self.relative_font_size()
         self.adjust_style_leading(style)
