@@ -198,6 +198,8 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
                 presentation_family = (presentation.heading_font_family or
                                        presentation.font_family or
                                        FontFamily.SERIF)
+            else:
+                presentation_family = FontFamily.SERIF
             font_name = context.pdf_context.font(presentation_name, presentation_family,
                                                  False, False)
         else:
@@ -914,6 +916,8 @@ class Context(object):
                 bold = presentation.bold
             if presentation.italic is not None:
                 italic = presentation.italic
+            if family is None:
+                family = FontFamily.SERIF
             style.fontName = self.font(font_name, family, bold, italic)
         style.fontSize *= self.relative_font_size()
         self.adjust_style_leading(style)
