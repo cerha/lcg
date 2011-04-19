@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import codecs
 import copy
 import cStringIO
 import os
@@ -655,8 +656,9 @@ class Context(object):
             p = subprocess.Popen(process_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                  close_fds=True)
             output = ''
+            decode = codecs.getdecoder('utf-8')
             while True:
-                data = p.stdout.read()
+                data = decode(p.stdout.read())[0]
                 if not data:
                     break
                 output += data
