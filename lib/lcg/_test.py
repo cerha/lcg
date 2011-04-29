@@ -313,7 +313,15 @@ class Monetary(unittest.TestCase):
         b1 = lcg.Translator().translate(b)
         assert a1 == '8976', a1
         assert b1 == '8975.500', b1
-    
+
+    def test_transform(self):
+        a = lcg.Monetary(8975.5, precision=2)
+        b = a.transform(lambda x: x.replace('.', ','))
+        a1 = lcg.Translator().translate(a)
+        b1 = lcg.Translator().translate(b)
+        assert a1 == '8975.50', a1
+        assert b1 == '8975,50', b1
+        
 tests.add(Monetary)
 
 
