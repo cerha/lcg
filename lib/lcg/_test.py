@@ -32,6 +32,10 @@ class TestSuite(unittest.TestSuite):
 
 tests = TestSuite()
 
+lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
+lcg.config.default_resource_dir = os.path.join(lcg_dir, 'resources')
+translation_path = [os.path.join(lcg_dir, 'translations')]
+
 class TranslatableText(unittest.TestCase):
           
     def test_interpolation(self):
@@ -110,7 +114,7 @@ class TranslatableText(unittest.TestCase):
         f = lcg.concat('<tag '+ e +'>')
         assert isinstance(c, lcg.TranslatableText), c
         assert isinstance(d, lcg.Concatenation), d
-        t = lcg.GettextTranslator('cs')
+        t = lcg.GettextTranslator('cs', path=translation_path)
         ax = a.localize(t)
         bx = b.localize(t)
         cx = c.localize(t)
@@ -145,7 +149,7 @@ tests.add(TranslatableText)
 class TranslatablePluralForms(unittest.TestCase):
           
     def test_translation(self):
-        t = lcg.GettextTranslator('cs')
+        t = lcg.GettextTranslator('cs', path=translation_path)
         for n, translated in ((1, u"Mám 1 problém."),
                               (2, u"Mám 2 problémy."),
                               (5, u"Mám 5 problémů.")):
@@ -154,7 +158,7 @@ class TranslatablePluralForms(unittest.TestCase):
             assert b == translated, (b, translated)
         
     def test_interpolation(self):
-        t = lcg.GettextTranslator('cs')
+        t = lcg.GettextTranslator('cs', path=translation_path)
         for n, translated in ((1, u"1 záznam nalezen v tabulce xy."),
                               (2, u"2 záznamy nalezeny v tabulce xy."),
                               (5, u"5 záznamů nalezeno v tabulce xy.")):
@@ -164,7 +168,7 @@ class TranslatablePluralForms(unittest.TestCase):
             assert b == translated, (b, translated)
         
     def test_replace(self):
-        t = lcg.GettextTranslator('cs')
+        t = lcg.GettextTranslator('cs', path=translation_path)
         for n, ta, tb in ((1, u"Mám 1 problém.", u"1 záznam nalezen v tabulce xy."),
                           (2, u"Mám 2 problémy.", u"2 záznamy nalezeny v tabulce xy."),
                           (5, u"Mám 5 problémů.", u"5 záznamů nalezeno v tabulce xy.")):
@@ -192,11 +196,11 @@ class SelfTranslatableText(unittest.TestCase):
         a2 = lcg.SelfTranslatableText(text, translations=translations)
         a3 = a2.interpolate(lambda key: '-'+key+'-')
         b = a.localize(lcg.NullTranslator())
-        c = a.localize(lcg.GettextTranslator('cs'))
+        c = a.localize(lcg.GettextTranslator('cs', path=translation_path))
         assert b == "Joe is smarter than Ann.", b
         assert c == u"Joe je chytřejší než Ann.", c
         b2 = a3.localize(lcg.NullTranslator())
-        c2 = a3.localize(lcg.GettextTranslator('cs'))
+        c2 = a3.localize(lcg.GettextTranslator('cs', path=translation_path))
         assert b2 == "-person1- is smarter than -person2-.", b2
         assert c2 == u"-person1- je chytřejší než -person2-.", c2
         
@@ -210,7 +214,7 @@ class LocalizableDateTime(unittest.TestCase):
         d3 = lcg.LocalizableDateTime("2006-12-21 02:43")
         d4 = lcg.LocalizableDateTime("2006-12-21 18:43:32", show_weekday=True)
         d5 = lcg.LocalizableDateTime("2006-01-30", leading_zeros=False)
-        t1 = lcg.GettextTranslator('en')
+        t1 = lcg.GettextTranslator('en', path=translation_path)
         x1 = d1.localize(t1)
         x2 = d2.localize(t1)
         x3 = d3.localize(t1)
@@ -221,7 +225,7 @@ class LocalizableDateTime(unittest.TestCase):
         assert x3 == "21/12/2006 02:43 AM", x3
         assert x4 == "Thu 21/12/2006 06:43:32 PM", x4
         assert x5 == "30/1/2006", x5
-        t2 = lcg.GettextTranslator('cs')
+        t2 = lcg.GettextTranslator('cs', path=translation_path)
         y1 = d1.localize(t2)
         y2 = d2.localize(t2)
         y3 = d3.localize(t2)
@@ -236,9 +240,9 @@ class LocalizableDateTime(unittest.TestCase):
     def test_concat(self):
         d = lcg.LocalizableDateTime("2006-01-30")
         c = "Date is: " + d
-        t = c.localize(lcg.GettextTranslator('en'))
+        t = c.localize(lcg.GettextTranslator('en', path=translation_path))
         assert t == "Date is: 30/01/2006", t
-        t = c.localize(lcg.GettextTranslator('cs'))
+        t = c.localize(lcg.GettextTranslator('cs', path=translation_path))
         assert t == "Date is: 30.01.2006", t
 
     def test_replace(self):
@@ -246,8 +250,8 @@ class LocalizableDateTime(unittest.TestCase):
         b = a.replace('-', '+')
         c = a.replace('/', '|')
         d = a.replace('.', ':')
-        t1 = lcg.GettextTranslator('en')
-        t2 = lcg.GettextTranslator('cs')
+        t1 = lcg.GettextTranslator('en', path=translation_path)
+        t2 = lcg.GettextTranslator('cs', path=translation_path)
         b1 = b.localize(t1)
         b2 = b.localize(t2)
         assert str(b) == "2006+01+30", str(b)
@@ -271,10 +275,10 @@ class LocalizableTime(unittest.TestCase):
     def test_format(self):
         t1 = lcg.LocalizableTime("02:43")
         t2 = lcg.LocalizableTime("18:43:32")
-        t1cs = t1.localize(lcg.GettextTranslator('cs'))
-        t2cs = t2.localize(lcg.GettextTranslator('cs'))
-        t1no = t1.localize(lcg.GettextTranslator('no'))
-        t2no = t2.localize(lcg.GettextTranslator('no'))
+        t1cs = t1.localize(lcg.GettextTranslator('cs', path=translation_path))
+        t2cs = t2.localize(lcg.GettextTranslator('cs', path=translation_path))
+        t1no = t1.localize(lcg.GettextTranslator('no', path=translation_path))
+        t2no = t2.localize(lcg.GettextTranslator('no', path=translation_path))
         assert t1cs == "02:43", t1cs
         assert t2cs == "18:43:32", t2cs
         assert t1no == "02.43", t1no
@@ -316,7 +320,7 @@ tests.add(Monetary)
 class GettextTranslator(unittest.TestCase):
 
     def test_translate(self):
-        t = lcg.GettextTranslator('cs')
+        t = lcg.GettextTranslator('cs', path=translation_path)
         a = _("%(name1)s is smarter than %(name2)s.", name1=_("Joe"), name2=_("Bob"))
         b = t.translate(a)
         assert b == u"Pepa je chytřejší než Bobik.", b
