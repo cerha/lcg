@@ -434,6 +434,9 @@ class Decimal(Localizable):
             self._format = '%%.%df' % precision
         super(Decimal, self).__init__(**kwargs)
 
+    def _clone_args(self):
+        return (self._value,)
+    
     def _locales(self, data):
         return data.decimal_point, data.grouping, data.thousands_sep
     
