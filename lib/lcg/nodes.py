@@ -87,7 +87,7 @@ class ContentNode(object):
             values) associated with this node, with language codes as keys.
           
         """
-        assert isinstance(id, str), repr(id)
+        assert isinstance(id, basestring), repr(id)
         assert isinstance(hidden, bool), hidden
         assert isinstance(active, bool), active
         assert isinstance(variants, (list, tuple))
