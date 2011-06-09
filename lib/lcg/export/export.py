@@ -239,7 +239,7 @@ class MarkupFormatter(object):
             result = value.export(context)
         else:
             if not isinstance(value, Localizable):
-                result = unicode(value)
+                value = unicode(value)
             result = exporter.escape(value)
         return result
     
