@@ -20,7 +20,6 @@
 import codecs
 import copy
 import cStringIO
-import os
 import re
 import string
 import subprocess
@@ -1299,7 +1298,6 @@ class MarkedText(Text):
     def _export(self, context):
         exported = super(MarkedText, self)._export(context)
         start_mark = self.tag
-        presentation = context.pdf_context.current_presentation()
         for k, v in self.attributes.items():
             start_mark += ' %s="%s"' % (k, v,)
         result = u'<%s>%s</%s>' % (start_mark, exported, self.tag,)
@@ -1619,7 +1617,8 @@ class Container(Element):
                     c.style = style
                     c.halign = halign
             return c
-        content = [transform_content(c) for c in self.content]
+        for c in self.content:
+            transform_content(c)
         # If there is only a single element, unwrap it from the container.
         presentation = self.presentation
         boxed = presentation and presentation.boxed
@@ -2296,7 +2295,7 @@ class PDFExporter(FileExporter, Exporter):
             if old is not None:
                 total_pages = old.page
             page_header = node.page_header(lang)
-            subcontext.pdf_context = old_contexts[node_id] = pdf_subcontext = \
+            subcontext.pdf_context = old_contexts[node_id] = \
                                      Context(parent_context=pdf_context, total_pages=total_pages,
                                              first_page_header=(node.first_page_header(lang) or page_header),
                                              page_header=page_header,
@@ -2389,9 +2388,6 @@ class PDFExporter(FileExporter, Exporter):
     
     def _export_content(self, context, element):
         return make_element(Empty)
-
-    def _export_horizontal_separator(self, context, element):
-        return self.new_page(context)
 
     def _export_preformatted_text(self, context, element):
         return make_element(PreformattedText, content=element.text())
