@@ -760,8 +760,15 @@ class Context(object):
         key = (name, family, bold, italic,)
         font = self._fonts.get(key)
         if font is None:
-            font_file = self._find_font_file(name, family, bold, italic, self._lang)
-            font = self._fonts[key] = self._register_font(name, family, bold, italic, font_file)
+            # It is necessary to register all bold/italic versions, to not
+            # burden other code with further registrations, e.g. when making
+            # in-paragraph marks.
+            for b in False, True:
+                for i in False, True:
+                    k = (name, family, b, i,)
+                    font_file = self._find_font_file(name, family, b, i, self._lang)
+                    self._fonts[k] = self._register_font(name, family, b, i, font_file)
+            font = self._fonts[key]
         return font
 
     def font_parameters(self, font_name):
@@ -2242,7 +2249,7 @@ class PDFExporter(FileExporter, Exporter):
         return self._markup(text, 'strong')
     
     def fixed(self, context, text):
-        face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, None, None)
+        face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, False, False)
         return self._markup(text, 'font', face=face)
      
     def underline(self, context, text):
