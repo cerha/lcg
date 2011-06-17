@@ -366,13 +366,13 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                         if self._box_lengths[j] is not None:
                             max_avail -= self._box_lengths[j]
                     if max_avail >= 0:
-                        avail = average_avail
+                        avail = max(average_avail-20, 0) # gross hack to help handling RL LongTables
                         while avail < max_avail:
                             c = unwrap(i)
                             avail = min(avail + max_avail/10, max_avail)
                             args[length_index] = avail
                             sizes = wrap(c, i, *args)
-                            if sizes[length_index] <= avail:
+                            if sizes[length_index] <= max_avail:
                                 break
                     del variable_content[n]
                     break
