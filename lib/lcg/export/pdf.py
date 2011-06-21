@@ -395,7 +395,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         lengths = self._box_lengths
         while i < len(self._box_lengths):
             next_height = lengths[i]
-            if height + next_height > availHeight:
+            if height + next_height >= availHeight:
                 break
             height += next_height
             i += 1
