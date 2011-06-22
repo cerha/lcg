@@ -231,8 +231,10 @@ class MarkupFormatter(object):
                 break
             if isinstance(value, SubstitutionIterator):
                 value = value.value()
-            else:
+            try:
                 value = value.get(str(name))
+            except:
+                break
         if value is None:
             result = exporter.escape('$' + subst)
         elif isinstance(value, Content):
