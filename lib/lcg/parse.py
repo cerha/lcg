@@ -346,7 +346,9 @@ class Parser(object):
                 return None
         table_rows = []
         line_above = 0
+        re_iterate = re.compile(' *@iterate ')
         while text[position:position+1] == '|':
+            iterated = False
             # Get the line
             start_position = position = position + 1
             eol = text[start_position:].find('\n')
@@ -417,10 +419,14 @@ class Parser(object):
                 row_cells = []
                 i = 0
                 for cell in text_cells:
+                    match_iterate = re_iterate.match(cell)
+                    if match_iterate:
+                        iterated = True
+                        cell = cell[match_iterate.end():]
                     row_cells.append(TableCell(FormattedText(cell.strip()),
                                                align=align(i, cell.expandtabs())))
                     i += 1
-            table_rows.append(TableRow(row_cells, line_above=line_above))
+            table_rows.append(TableRow(row_cells, line_above=line_above, iterated=iterated))
             line_above = 0
         if line_above > 0 and table_rows:
             table_rows[-1].set_line_below(line_above)
