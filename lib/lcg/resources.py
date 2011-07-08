@@ -152,12 +152,7 @@ class Audio(Media):
 
 class Video(Media):
     """Video media file of undefined type."""
-    def size(self):
-        #if self._size is None and self._src_file is not None:
-        #    import Image as Img
-        #    img = Img.open(self._src_file)
-        #    self._size = img.size
-        return self._size
+    pass
 
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
