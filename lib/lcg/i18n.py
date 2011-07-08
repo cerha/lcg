@@ -700,7 +700,7 @@ class GettextTranslator(Translator):
         for dir in self._path:
             try:
                 return gettext.translation(domain, dir, (self._lang,))
-            except IOError, e:
+            except IOError as e:
                 continue
         # The MO file was not found.
         msg = "No translation file found: domain=%r, path=%r, lang=%r, origin=%r" % \
