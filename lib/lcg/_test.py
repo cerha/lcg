@@ -67,7 +67,7 @@ class TranslatableText(unittest.TestCase):
         assert f == "xxxVersion 1.0xxx", f
         try:
             e = a + 1
-        except TypeError, e:
+        except TypeError as e:
             pass
         assert isinstance(e, TypeError), e
             

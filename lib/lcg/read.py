@@ -131,7 +131,7 @@ class Reader(object):
                                resource_provider=self._resource_provider_,
                                globals=self._globals(), hidden=self._hidden,
                                **self._parameters)
-        except Exception, e:
+        except Exception as e:
             if hasattr(self, '_source_filename'):
                 # TODO: This is a quick hack.  The attribute `_source_filename' is prefilled in
                 # 'FileReader._read_file', so it would be at least more appropriate to move this
@@ -203,7 +203,7 @@ class FileReader(Reader):
         content = ''.join(lines)
         try:
             return unicode(content, encoding=encoding)
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError as e:
             raise Exception("File %s: %s" % (filename, e))
         
     def encoding(self):

@@ -2372,7 +2372,7 @@ class PDFExporter(FileExporter, Exporter):
         while True:
             try:
                 doc.multi_build(document, context=first_subcontext)
-            except reportlab.platypus.doctemplate.LayoutError, e:
+            except reportlab.platypus.doctemplate.LayoutError as e:
                 if str(e).find('too large') >= 0:
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
@@ -2554,7 +2554,7 @@ class PDFExporter(FileExporter, Exporter):
             iterator = None
             try:
                 make_row()
-            except SubstitutionIterator.NotStartedError, e:
+            except SubstitutionIterator.NotStartedError as e:
                 iterator = e.iterator()
             if iterator is None:
                 raise Exception("No table row iterator found")
