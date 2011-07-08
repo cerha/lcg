@@ -475,21 +475,16 @@ class Exporter(object):
         return result
 
     def _resource_uri_prefix(self, context, resource):
-        return None
+        return resource.SUBDIR
 
     def _uri_resource(self, context, resource):
         if resource.uri() is not None:
             result = resource.uri()
         else:
+            result = resource.filename()
             prefix = self._resource_uri_prefix(context, resource)
-            if prefix is not None:
-                path = [prefix]
-            else:
-                path = []
-            if resource.SUBDIR:
-                path.append(resource.SUBDIR)
-            path.append(resource.filename())
-            result = '/'.join(path)
+            if prefix:
+                result = prefix + '/' + result
         return result
     
     def _uri_external(self, context, target):
