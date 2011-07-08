@@ -251,14 +251,14 @@ class ResourceProvider(object):
         super(ResourceProvider, self).__init__(**kwargs)
         
     def _resource(self, filename, searchdir, warn):
+        dirs = list(self._dirs)
         try:
             ext = filename.rsplit('.', 1)[1]
             cls = self._TYPEMAP[ext.lower()]
         except (KeyError, IndexError):
-            if warn:
-                warn("Unable to determine resource type: %s" % filename)
-            return None
-        dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs] + list(self._dirs)
+            cls = Resource
+        if cls.SUBDIR:
+            dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs] + dirs
         if searchdir is not None:
             dirs.insert(0, searchdir)
         basename, ext = os.path.splitext(filename)
