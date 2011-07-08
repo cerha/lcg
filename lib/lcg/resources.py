@@ -33,6 +33,7 @@ class Resource(object):
     """Generic resource representation.
 
     Specific classes for certain resource types may be derived from this class.
+    
     """
     
     SUBDIR = None
@@ -166,15 +167,40 @@ class Flash(Resource):
 class ResourceProvider(object):
     """Resource provider.
 
-    The resource provider may be used to allocate resources during content construction, as well as
-    in export time.  The resource provider is designed to be shared among multilpe content nodes
-    while still keeping track of the dependencies of each node on its resources.
+    The resource provider may be used to allocate resources during content
+    construction, as well as in export time.  The resource provider is designed
+    to be shared among multilpe content nodes while still keeping track of the
+    dependencies of each node on its resources.
 
     The resource files are searched in the source directories in this order:
     
-      * the directory passed as the 'searchdir' argument to the 'resource()' method call,
-      * all directories passed as the 'dirs' argument to the provider constructor
-      * default resource directory set by 'config.default_resource_dir' (if not None).
+      1) the directory passed as the 'searchdir' argument to the 'resource()'
+         method call,
+
+      2) type specific subdirectory of all directories passed as the 'dirs'
+         argument to the provider constructor (see below for more info about
+         type specific subdirectories)
+
+      3) all directories passed as the 'dirs' argument to the provider
+         constructor
+      
+      4) default resource directory set by 'config.default_resource_dir' (if
+         not None).
+
+    The type specific subdirectories mentioned in step 2) are given by the
+    SUBDIR attribute defined by the corresponding resource type.  For example
+    filename 'x.jpg' corresponds to the resource class Images, which defines
+    SUBDIR = 'images', so the files are first searched in the subdirectory
+    'images' within the source directories and only when not found in this type
+    specific subdirectory, they are searched in the source directories directly
+    in step 3).  This allows more flexibility in organization of the resource
+    files.  Sometimes it is more practical to have different kinds of files
+    arranged separately, sometimes it is more practical to group them in some
+    other way but LCG shold still be able to locate them.
+
+    Unsuccessful resource allocations are usually logged together with the
+    exact list of directories where the file was searched so this might help
+    you to discover problems in your setup.
 
     """
     _CONVERSIONS = {'mp3': ('wav',),
@@ -232,7 +258,7 @@ class ResourceProvider(object):
             if warn:
                 warn("Unable to determine resource type: %s" % filename)
             return None
-        dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs]
+        dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs] + list(self._dirs)
         if searchdir is not None:
             dirs.insert(0, searchdir)
         basename, ext = os.path.splitext(filename)
@@ -270,6 +296,10 @@ class ResourceProvider(object):
         The resource instances may be cached by 'filename'.  These cached instances may be shared
         for multiple nodes, but the provider is responsible for keeping track of their dependency
         on particular nodes (to be able to serve the 'resources()' queries correctly).
+
+        Unsuccessful resource allocations are usually logged together with the
+        exact list of directories where the file was searched so this might help
+        you to discover problems in your setup.
 
         """
         try:
