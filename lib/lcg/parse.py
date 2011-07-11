@@ -19,7 +19,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import copy
-import os
 import re
 import types
 
@@ -527,7 +526,6 @@ class Parser(object):
         return text
 
     def _skip_content(self, text, position, indentation=0, extra_indentation=0, compressed=False):
-        first_line = True
         while True:
             if (self._LITERAL_MATCHER.match(text[position:]) or
                 self._LIST_MATCHER.match(text[position:])):
