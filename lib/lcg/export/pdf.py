@@ -457,13 +457,20 @@ class RLText(reportlab.platypus.flowables.Flowable):
     # just a piece of plain text with a style.
     _fixedWidth = 1
     _fixedHeight = 1
-    def __init__(self, text, style, halign=None):
+    def __init__(self, text, style, halign=None, max_width=None):
         reportlab.platypus.flowables.Flowable.__init__(self)
         self._text = text.split('\n')
         self._style = style
         self.width = 0
-        for line in self._text:
-            width = reportlab.pdfbase.pdfmetrics.stringWidth(line, style.fontName, style.fontSize)
+        for i in range(len(self._text)):
+            while True:
+                width = reportlab.pdfbase.pdfmetrics.stringWidth(self._text[i], style.fontName,
+                                                                style.fontSize)
+                if max_width is None or width <= max_width:
+                    break
+                text_length = len(self._text[i])
+                cut_length = min(int(text_length * width / max_width), text_length - 1)
+                self._text[i] = self._text[i][:cut_length]
             self.width = max(self.width, width)
         self.height = style.leading * len(self._text)
         self.hAlign = halign or 'LEFT'
@@ -2062,11 +2069,16 @@ class Table(Element):
             column_widths = None
         else:
             column_widths = []
-            for w in self.column_widths:
+            for i in range(len(self.column_widths)):
+                w = self.column_widths[i]
                 if w is None:
                     column_widths.append(None)
                 else:
-                    column_widths.append(self._unit2points(w, style))
+                    w_points = self._unit2points(w, style)
+                    column_widths.append(w_points)
+                    for row in exported_content:
+                        if isinstance(row[i], basestring):
+                            row[i] = RLText(row[i], style, max_width=w_points)
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
                        repeatRows=repeat_rows, hAlign=(self.halign or 'CENTER'), vAlign=self.valign)
