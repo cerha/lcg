@@ -235,6 +235,8 @@ class MarkupFormatter(object):
                 value = value.get(str(name))
             except:
                 break
+            if isinstance(value, collections.Callable):
+                value = value()
         if value is None:
             result = exporter.escape('$' + subst)
         elif isinstance(value, Content):
