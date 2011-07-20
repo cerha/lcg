@@ -266,7 +266,10 @@ class ResourceProvider(object):
                     for e in self._CONVERSIONS.get(ext.lower()[1:], ()) if e != ext]
         for d in dirs:
             for src_file in [filename] + altnames:
-                src_path = os.path.join(d, src_file)
+                # Here we assume that the filesystem uses UTF-8 filenames.  If
+                # it is not always the case, we may need to make it
+                # configurable.
+                src_path = unicode(os.path.join(d, src_file)).encode('utf-8')
                 if os.path.exists(src_path):
                     return cls(filename, src_file=src_path)
                 elif src_path.find('*') != -1:
