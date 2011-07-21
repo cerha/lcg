@@ -149,7 +149,7 @@ class Content(object):
     """
     _ALLOWED_CONTAINER = None
     
-    def __init__(self, lang=None, **kwargs):
+    def __init__(self, lang=None):
         """Initialize the instance.
 
         Arguments:
