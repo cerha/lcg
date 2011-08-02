@@ -2077,7 +2077,11 @@ class Table(Element):
                     w_points = self._unit2points(w, style)
                     column_widths.append(w_points)
                     for row in exported_content:
-                        if isinstance(row[i], basestring):
+                        try:
+                            cell = row[i]
+                        except IndexError:
+                            continue
+                        if isinstance(cell, basestring):
                             row[i] = RLText(row[i], style, max_width=w_points)
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
