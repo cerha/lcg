@@ -231,12 +231,19 @@ class MarkupFormatter(object):
                 break
             if isinstance(value, SubstitutionIterator):
                 value = value.value()
+            key = str(name)
+            dictionary = value
             try:
-                value = value.get(str(name))
+                value = value.get(key)
             except:
+                dictionary = None
                 break
             if isinstance(value, collections.Callable):
                 value = value()
+                # It is necessary to store the computed value in order to
+                # prevent repeated object initializations in it.  Otherwise it
+                # fails e.g. with substitution iterators.
+                dictionary[key] = value
         if value is None:
             result = exporter.escape('$' + subst)
         elif isinstance(value, Content):
