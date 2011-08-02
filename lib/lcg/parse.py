@@ -20,6 +20,7 @@
 
 import copy
 import re
+import string
 import types
 
 from lcg import *
@@ -293,7 +294,8 @@ class Parser(object):
                 content, position = self._parse(text, position, indentation=inner_indentation,
                                                 extra_indentation=inner_extra_indentation,
                                                 processors=(self._list_processor,
-                                                            self._paragraph_processor,),
+                                                            self._paragraph_processor,
+                                                            self._whitespace_processor,),
                                                 compressed=True,
                                                 **kwargs)
                 inner_extra_indentation = 0
@@ -503,6 +505,13 @@ class Parser(object):
         if next_position == position:
             return None
         content = Paragraph(FormattedText(text[position:next_position]), halign=halign)
+        return content, next_position
+
+    def _whitespace_processor(self, text, position, **kwargs):
+        next_position = position
+        while text[next_position:] and text[next_position] in string.whitespace:
+            next_position += 1
+        content = Paragraph(FormattedText(''))
         return content, next_position
 
     def _strip_comments(self, text):
