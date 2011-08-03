@@ -1967,6 +1967,12 @@ class Table(Element):
         # (In case of table style overlappings, last definition takes precedence.)
         black = reportlab.lib.colors.black
         style = pdf_context.style()
+        if header_row_p:
+            p = Presentation()
+            p.bold = True
+            pdf_context.add_presentation(p)
+            header_style = pdf_context.style()
+            pdf_context.remove_presentation()        
         font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
         table_style_data.append(('FONT', (0, 0), (-1, -1), style.fontName, style.fontSize))
         i = 0
@@ -2098,7 +2104,11 @@ class Table(Element):
                         except IndexError:
                             continue
                         if isinstance(cell, basestring):
-                            row[i] = RLText(row[i], style, max_width=w_points)
+                            if row is exported_content[0]:
+                                s = header_style
+                            else:
+                                s = style
+                            row[i] = RLText(row[i], s, max_width=w_points)
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
                        repeatRows=repeat_rows, hAlign=(self.halign or 'CENTER'), vAlign=self.valign)
