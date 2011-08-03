@@ -219,20 +219,36 @@ class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
             self.levelStyles[i] = style
 
 class RLTable(reportlab.platypus.Table):
-    # The original Table class doesn't care much about determining unspecified
-    # column widths.  This makes serious troubles with our horizontal
-    # containers.  We avoid the most important problem by classifying at least
-    # our tables as being of fixed width.
-    # But beware, this can have problematic consequences in some cases.  There
-    # is at least one situation where some table columns may get lost, probably
-    # when using an unaligned vertical container within a table, possibly
-    # accompanied by other circumstances.
+    # There are some problems with standard ReportLab tables, so we install
+    # workarounds here.
     def _canGetWidth(self, thing):
+        # The original Table class doesn't care much about determining unspecified
+        # column widths.  This makes serious troubles with our horizontal
+        # containers.  We avoid the most important problem by classifying at least
+        # our tables as being of fixed width.
+        # But beware, this can have problematic consequences in some cases.  There
+        # is at least one situation where some table columns may get lost, probably
+        # when using an unaligned vertical container within a table, possibly
+        # accompanied by other circumstances.
         if isinstance(thing, RLTable):
             result = 1
         else:
             result = reportlab.platypus.Table._canGetWidth(self, thing)
         return result
+    def _hasVariWidthElements(self, upToRow=None):
+        # The original implementation includes fixed width columns in the test,
+        # which is wrong.
+        if upToRow is None:
+            upToRow = self._nrows
+        col_widths = self._colWidths
+        for row in xrange(min(self._nrows, upToRow)):
+            for col in xrange(self._ncols):
+                if col_widths[col] is not None:
+                    continue
+                value = self._cellvalues[row][col]
+                if not self._canGetWidth(value):
+                    return 1
+        return 0
 
 class RLContainer(reportlab.platypus.flowables.Flowable):
     # Using tables for container management is actually not reasonably
