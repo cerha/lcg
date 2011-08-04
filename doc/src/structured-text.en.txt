@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005-2010 Brailcom, o.p.s.
+# Copyright (c) 2005-2011 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -944,6 +944,19 @@ Vimeo links work in the same way:
 /Note:/ This way of embedding has the advantage of no server side technical
 requirements.  Client side requirements are the same as for other types of
 multimedia embedding (JavaScript enabled browser with Adobe Flash support).
+
+==== Vertical Space ====
+
+Explicit vertical space may be added using =\@vspace= mark with the required
+space given in millimeters:
+
+-----
+@vspace 20mm
+-----
+
+This mark should be used only in places where explicit vertical space is
+needed.  In many cases better means such as higher level elements, alignment or
+style sheets can be used.
 
 ==== Page Numbers ====
 

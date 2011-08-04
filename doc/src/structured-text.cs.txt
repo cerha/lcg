@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005-2010 Brailcom, o.p.s.
+# Copyright (c) 2005-2011 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -955,6 +955,20 @@ Odkazy na Vimeo fungují obdobně:
 požadavcích na straně serveru.  Požadavky pro přehrávání na straně klienta jsou
 však stejné jako pro jiné způsoby vkládání multimédií. (prohlížeč s podporou
 JavaScriptu a Adobe Flash).
+
+==== Vertikální mezery ====
+
+Vertikální mezery mohou být vloženy pomocí značky =\@vspace= určující velikost
+vertikální mezery v milimetrech:
+
+-----
+@vspace 20mm
+-----
+
+Tato značka by měla být používána pouze v případech, kdy je opravdu nutné
+uvádět pevnou vertikální mezeru.  V mnoha případech je pro vložení vertikální
+mezery vhodnější použít jiné prostředky, jako např. logické značky, zarovnání
+nebo styly.
 
 ==== Čísla stran ====
 

@@ -111,6 +111,7 @@ class Parser(object):
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL|re.MULTILINE)
     _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
+    _VSPACE_MATCHER = re.compile(r'@vspace +([0-9]+(\.[0-9]+)?)mm\r?$', re.MULTILINE)
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
                                 r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?$', re.MULTILINE)
     _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
@@ -142,6 +143,7 @@ class Parser(object):
                             self._definition_processor,
                             self._parameters_processor,
                             self._variable_processor,
+                            self._space_processor,
                             self._paragraph_processor,
                             )
 
@@ -497,6 +499,15 @@ class Parser(object):
         content = SetVariable(str(identifier), variable_content)
         return content, position
 
+    def _space_processor(self, text, position, **kwargs):
+        match = self._VSPACE_MATCHER.match(text[position:])
+        if not match:
+            return None
+        value = float(match.group(1))
+        position += match.end()
+        content = VSpace(UMm(value))
+        return content, position
+        
     def _paragraph_processor(self, text, position, halign=None, indentation=0, extra_indentation=0,
                              compressed=False, **kwargs):
         next_position = self._skip_content(text, position, indentation=indentation,
