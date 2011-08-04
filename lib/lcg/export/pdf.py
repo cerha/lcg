@@ -2598,7 +2598,7 @@ class PDFExporter(FileExporter, Exporter):
             except SubstitutionIterator.NotStartedError as e:
                 iterator = e.iterator()
             if iterator is None:
-                raise Exception("No table row iterator found")
+                raise SubstitutionIterator.IteratorError("No table row iterator found")
             rows = []
             while iterator.next():
                 rows.append(make_row())

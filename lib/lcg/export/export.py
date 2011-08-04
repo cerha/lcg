@@ -61,6 +61,10 @@ class SubstitutionIterator(object):
         def iterator(self):
             return self._iterator
 
+    class IteratorError(Exception):
+        """Exception available to any code to signal iterator related errors.
+        """
+
     def __init__(self):
         self.reset()
         
