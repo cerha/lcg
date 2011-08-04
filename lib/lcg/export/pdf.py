@@ -753,7 +753,7 @@ class Context(object):
         key = (font_name, bold, italic,)
         if key in Context._registered_fonts:
             assert Context._registered_fonts[key] == font_file, \
-                   ("Inconsistent font definition", key, font_file,)
+                   ("Inconsistent font definition", key, font_file, Context._registered_fonts[key],)
             font_face_name = Context._registered_font_files[font_file]
         else:
             if font_file in Context._registered_font_files:
