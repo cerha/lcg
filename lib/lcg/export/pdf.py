@@ -2493,16 +2493,15 @@ class PDFExporter(FileExporter, Exporter):
 
     def _export_section(self, context, element):
         pdf_context = context.pdf_context
-        content = self.escape(element.title())
+        content = context.exporter().export_element(context, element.heading())
         anchor = element.anchor()
         if anchor:
             content = make_element(LinkTarget, content=content, name=anchor)
         backref = element.backref()
+        level = pdf_context.heading_level
         if backref:
             content = self.link(content, "#"+backref)
-        level = pdf_context.heading_level
-        heading_content = context.exporter().export_element(context, element.heading())
-        heading = make_element(Heading, content=[heading_content], level=level)
+        heading = make_element(Heading, content=[content], level=level)
         pdf_context.heading_level += 1
         inner_content = self._export_container(context, element)
         pdf_context.heading_level = level
