@@ -157,7 +157,16 @@ class ContentNode(object):
         
         """
         return brief and self._brief_title or self._title
+    
+    def heading(self):
+        """Return formatted node title as a 'Content' instance.
 
+        The title is interpreted as a markup text and corresponding 'Content'
+        instance was created.
+
+        """
+        return FormattedText(self.title())
+    
     def descr(self):
         """Return a short description of this node as a string or None."""
         return self._descr

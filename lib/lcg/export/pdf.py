@@ -2363,11 +2363,10 @@ class PDFExporter(FileExporter, Exporter):
             else:
                 new_document = make_element(NewDocument, content=subcontext)
                 exported_structure.append(new_document)
-            title = node.title()
-            if title.strip():
-                exported_title = make_element(Heading, content=[make_element(Text, content=title)],
-                                              level=0)
-                exported_structure.append(exported_title)
+            if node.title().strip():
+                title = subcontext.exporter().export_element(subcontext, node.heading())
+                exported_heading = make_element(Heading, content=[title], level=0)
+                exported_structure.append(exported_heading)
             exported = node.content().export(subcontext)
             if isinstance(exported, (tuple, list,)):
                 exported = self.concat(*exported)
@@ -2502,7 +2501,8 @@ class PDFExporter(FileExporter, Exporter):
         if backref:
             content = self.link(content, "#"+backref)
         level = pdf_context.heading_level
-        heading = make_element(Heading, content=[content], level=level)
+        heading_content = context.exporter().export_element(context, element.heading())
+        heading = make_element(Heading, content=[heading_content], level=level)
         pdf_context.heading_level += 1
         inner_content = self._export_container(context, element)
         pdf_context.heading_level = level

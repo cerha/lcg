@@ -959,7 +959,7 @@ class Section(Container):
     def __init__(self, title, content, anchor=None, in_toc=True, **kwargs):
         """Arguments:
 
-          title -- section title as a string
+          title -- plain text section title; basestring
           content -- the actual content wrapped into this section as a
             sequence of 'Content' instances in the order in which they should
             appear in the output
@@ -973,8 +973,8 @@ class Section(Container):
             to be included in the Table of Contents
             
         """
-        assert isinstance(title, (str, unicode)), title
-        assert isinstance(anchor, (str, unicode)) or anchor is None, anchor
+        assert isinstance(title, basestring), title
+        assert isinstance(anchor, basestring) or anchor is None, anchor
         assert isinstance(in_toc, bool), in_toc
         self._title = title
         self._in_toc = in_toc
@@ -997,8 +997,17 @@ class Section(Container):
         return list(self._container.sections(None)).index(self) + 1
     
     def title(self):
-        """Return the section title as a string."""
+        """Return the section title as a basestring."""
         return self._title
+
+    def heading(self):
+        """Return formatted section title as a 'Content' instance.
+
+        The title is interpreted as a markup text and corresponding 'Content'
+        instance was created.
+
+        """
+        return FormattedText(self.title())
 
     def in_toc(self):
         """Return true if the section is supposed to appear in TOC."""
