@@ -2104,7 +2104,7 @@ class Table(Element):
                         except IndexError:
                             continue
                         if isinstance(cell, basestring):
-                            if row is exported_content[0]:
+                            if row is exported_content[0] and header_row_p:
                                 s = header_style
                             else:
                                 s = style
