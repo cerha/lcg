@@ -30,6 +30,7 @@ from nodes import *
 from resources import *
 from units import Unit, UAny, UFont, UMm, UPoint, USpace, FontFamily, \
      HorizontalAlignment, VerticalAlignment, Orientation
+from presentation import Presentation
 from content import *
 from export import *
 from parse import *
