@@ -1048,18 +1048,8 @@ class Context(object):
         elif presentation is None:
             new_presentation = current_presentation
         else:
-            new_presentation = Presentation()
-            for attr in dir(presentation):
-                if attr[0] in string.ascii_lowercase:
-                    value = getattr(presentation, attr)
-                    if value is None:
-                        value = getattr(current_presentation, attr)
-                    elif attr == 'font_size':
-                        last_value = getattr(current_presentation, attr)
-                        if last_value is None:
-                            last_value = 1
-                        value = value * last_value
-                    setattr(new_presentation, attr, value)
+            new_presentation = lcg.PresentationSet.merge_presentations((current_presentation,
+                                                                        presentation,))
         self._presentations.append(new_presentation)
 
     def set_presentation(self, presentation):
