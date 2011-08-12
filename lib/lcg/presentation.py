@@ -33,6 +33,7 @@ currently processed 'Content' instance and current language.
 
 import copy
 import lcg
+import re
 import string
 
 class Presentation(object):
@@ -270,3 +271,174 @@ class PresentationSet(object):
             presentation = self._merge_cache[key] = \
                            self.merge_presentations(applicable_presentations)
         return presentation
+
+
+def _parse_ufont(s):
+    return lcg.UFont(float(s))
+def _parse_string(s):
+    return s
+def _parse_boolean(s):
+    s = s.lower()
+    if s == 'yes':
+        return True
+    elif s == 'no':
+        return False
+    else:
+        raise Exception("Invalid boolean value")
+class StyleFile(object):
+    """Style file support.
+
+    External style file can be used to define output style properties.  Its
+    syntax is, not very formally, as follows:
+
+      STYLES := STYLE STYLES | $
+      STYLE := identifier '(' INHERITS ')' ':' newline PROPERTIES
+      INHERITS := identifier ',' INHERITS | $
+      PROPERTIES := PROPERTY newline PROPERTIES | $
+      PROPERTY := identifier = VALUE newline
+      VALUE := 'yes' | 'no' | number | text
+
+    Supported style identifiers are defined in '_MATCHERS' attribute, supported
+    property identifiers in '_PROPERTY_MAPPING' attribute.  The user can define
+    his own styles with his own names (all lower case identifiers are
+    recommended) and inherit them in the supported styles or his other styles.
+    
+    """
+    _MATCHERS = (('Common', ContentMatcher(),),
+                 ('Heading_1',),
+                 ('Heading_2',),
+                 ('Heading_3',),
+                 ('Table_Of_Contents',),
+                 ('Preformatted_Text',),
+                 )
+
+    _PROPERTY_MAPPING = (('font_size', 'font_size', _parse_ufont,),
+                         ('font_name', 'font_name', _parse_string,),
+                         ('font_family', 'font_family', _parse_string,),
+                         ('bold', 'bold', _parse_boolean,),
+                         ('italic', 'italic', _parse_boolean,),
+                         )
+                         
+    class _Style(object):
+        name = None
+        inherits = ()
+        presentation = Presentation()
+
+    class ParseError(Exception):
+        pass
+        
+    def __init__(self):
+        self._styles = {}
+
+    def read(self, file):
+        """Read styles from file.
+
+        Arguments:
+
+          file -- file object open for reading
+
+        """
+        def syntax_error(number, line):
+            raise self.ParseError("Syntax error in style file on line %s: %s" % (number, line,))
+        styles = {}
+        style_line_matcher = re.compile('(.*)[(](.*)[)]')
+        property_line_matcher = re.compile('(.*)=(.*)')
+        current_presentation = None
+        line_number = 0
+        while True:
+            raw_line = file.readline()
+            if not raw_line:
+                break
+            line_number += 1
+            line = raw_line.strip()
+            if not line:
+                continue
+            if line[-1] == ':':
+                # Style declaration
+                line = line[:-1].strip()
+                match = style_line_matcher.match(line)
+                if not match:
+                    syntax_error(line_number, raw_line)
+                name = match.group(1).strip()
+                inherits = [s.strip() for s in match.group(2).split(',')]
+                for s in inherits:
+                    if not styles.has_key(s):
+                        raise self.ParseError("Unknown style `%s' in style file on line %s" %
+                                         (s, line_number,))
+                style = styles[name] = self._Style()
+                style.name = name
+                style.inherits = inherits
+                style.presentation = current_presentation = Presentation()
+            else:
+                # Style property
+                if current_presentation is None:
+                    syntax_error(line_number, raw_line)
+                match = property_line_matcher.match(line)
+                if not match:
+                    syntax_error(line_number, raw_line)
+                name = match.group(1).strip()
+                text_value = match.group(2).strip()
+                for identifier, property, parser in self._PROPERTY_MAPPING:
+                    if name == identifier:
+                        try:
+                            value = parser(text_value)
+                        except:
+                            raise self.ParseError("Invalid property value on line %s: %s" %
+                                                  (line_number, raw_line,))
+                        break
+                else:
+                    raise self.ParseError("Unknown property name `%s' in style file on line %s" %
+                                          (name, line_number,))
+                setattr(current_presentation, property, value)
+        self._styles = styles
+
+    def write(self, file):
+        """Write styles to file.
+
+        Arguments:
+
+          file -- file object open for writing
+
+        """
+        for style in self._styles.values():
+            file.write(style.name)
+            file.write(' (%s) :\n' % (string.join(style.inherits, ', '),))
+            presentation = style.presentation
+            for identifier, property, parser in self._PROPERTY_MAPPING:
+                value = getattr(presentation, property)
+                if value is None:
+                    continue
+                if isinstance(value, bool):
+                    if value:
+                        str_value = 'yes'
+                    else:
+                        str_value = 'no'
+                elif isinstance(value, lcg.UFont):
+                    str_value = str(value.size())
+                elif isinstance(value, basestring):
+                    str_value = unicode(value)
+                else:
+                    raise Exception("Unsupported value type")
+                file.write('%s = %s\n' % (identifier, str_value,))                
+
+    def presentations(self):
+        """Return presentations corresponding to the style.
+
+        The return value is in the form of 'presentation' argument of
+        'PresentationSet' constructor.
+
+        """
+        presentations = []
+        styles = self._styles
+        for s in styles.values():
+            for name, matcher in self._MATCHERS:
+                if name == s.name:
+                    break
+            else:
+                continue
+            presentation_list = [styles[name].presentation for name in s.inherits]
+            presentation_list.reverse()
+            presentation_list.append(s.presentation)
+            merged = PresentationSet.merge_presentations(presentations)
+            presentations.append((merged, matcher,))
+        return presentations
