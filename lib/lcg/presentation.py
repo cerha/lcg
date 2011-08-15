@@ -351,7 +351,7 @@ class StyleFile(object):
                 break
             line_number += 1
             line = raw_line.strip()
-            if not line:
+            if not line or line[0] == '#':
                 continue
             if line[-1] == ':':
                 # Style declaration
