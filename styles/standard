@@ -1,0 +1,23 @@
+Common ():
+  font_size = 1.0
+  font_name = DejaVu
+  font_family = SERIF
+  bold = no
+  italic = no
+
+Heading (Common):
+  bold = yes
+  
+Heading_1 (Heading):
+  font_size = 1.7
+
+Heading_2 (Heading):
+  font_size = 1.4
+
+Heading_3 (Heading):
+  font_size = 1.2
+
+Table_Of_Contents (Common):
+
+Preformatted_Text (Common):
+  font_family = FIXED_WIDTH

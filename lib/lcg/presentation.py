@@ -184,6 +184,42 @@ class LanguageMatcher(ContentMatcher):
         assert lang is None or isinstance(lang, basestring), lang
         return self._lang is None or lang is None or lang == self._lang
 
+
+class LCGClassMatcher(ContentMatcher):
+    """Content class matching."""
+
+    def __init__(self, content_class):
+        """
+        Arguments:
+
+          content_class -- content class to match, 'lcg.Content' subclass
+
+        """
+        assert issubclass(content_class, lcg.Content), content_class
+        self._content_class = content_class
+        
+    def matches(self, content, lang):
+        return isinstance(content, self._content_class)
+
+
+class LCGSectionMatcher(LCGClassMatcher):
+    """'lcg.Section' matching, based on the section level."""
+
+    def __init__(self, level):
+        """
+        Arguments:
+
+          level -- section level to match, positive integer
+
+        """
+        assert isinstance(level, int) and level > 0, level
+        super(LCGSectionMatcher, self).__init__(lcg.Section)
+        self._path_len = level - 1
+
+    def matches(self, content, lang):
+        return (super(LCGSectionMatcher, self).matches(content, lang) and
+                len(content.path()) == self._path_len)
+        
     
 class PresentationSet(object):
     """Group of 'Presentation' objects, together with their matchers.
@@ -197,9 +233,9 @@ class PresentationSet(object):
         Arguments:
 
           presentations -- sequence of pairs (PRESENTATION, MATCHER) where
-           PRESENTATION is 'Presentation' instance and MATCHER is
-           'ContentMatcher' instance determining applicability of the
-           presentation.
+            PRESENTATION is 'Presentation' instance and MATCHER is
+            'ContentMatcher' instance determining applicability of the
+            presentation.
 
         """
         assert isinstance(presentations, (list, tuple,)), presentations
@@ -285,6 +321,16 @@ def _parse_boolean(s):
         return False
     else:
         raise Exception("Invalid boolean value")
+def _parse_font_family(s):
+    if s == 'SERIF':
+        result = lcg.FontFamily.SERIF
+    elif s == 'SANS_SERIF':
+        result = lcg.FontFamily.SANS_SERIF
+    elif s == 'FIXED_WIDTH':
+        result = lcg.FontFamily.FIXED_WIDTH
+    else:
+        raise Exception("Invalid font family")
+    return result
 class StyleFile(object):
     """Style file support.
 
@@ -305,16 +351,16 @@ class StyleFile(object):
     
     """
     _MATCHERS = (('Common', ContentMatcher(),),
-                 ('Heading_1',),
-                 ('Heading_2',),
-                 ('Heading_3',),
-                 ('Table_Of_Contents',),
-                 ('Preformatted_Text',),
+                 ('Heading_1', LCGSectionMatcher(1),),
+                 ('Heading_2', LCGSectionMatcher(2),),
+                 ('Heading_3', LCGSectionMatcher(3),),
+                 ('Table_Of_Contents', LCGClassMatcher(lcg.TableOfContents),),
+                 ('Preformatted_Text', LCGClassMatcher(lcg.PreformattedText),),
                  )
 
     _PROPERTY_MAPPING = (('font_size', 'font_size', _parse_ufont,),
                          ('font_name', 'font_name', _parse_string,),
-                         ('font_family', 'font_family', _parse_string,),
+                         ('font_family', 'font_family', _parse_font_family,),
                          ('bold', 'bold', _parse_boolean,),
                          ('italic', 'italic', _parse_boolean,),
                          )
@@ -328,7 +374,8 @@ class StyleFile(object):
         pass
         
     def __init__(self):
-        self._styles = {}
+        self._styles = []
+        self._names_styles = {}
 
     def read(self, file):
         """Read styles from file.
@@ -340,7 +387,8 @@ class StyleFile(object):
         """
         def syntax_error(number, line):
             raise self.ParseError("Syntax error in style file on line %s: %s" % (number, line,))
-        styles = {}
+        styles = []
+        names_styles = {}
         style_line_matcher = re.compile('(.*)[(](.*)[)]')
         property_line_matcher = re.compile('(.*)=(.*)')
         current_presentation = None
@@ -361,11 +409,14 @@ class StyleFile(object):
                     syntax_error(line_number, raw_line)
                 name = match.group(1).strip()
                 inherits = [s.strip() for s in match.group(2).split(',')]
+                if inherits == ['']:
+                    inherits = []
                 for s in inherits:
-                    if not styles.has_key(s):
+                    if not names_styles.has_key(s):
                         raise self.ParseError("Unknown style `%s' in style file on line %s" %
                                          (s, line_number,))
-                style = styles[name] = self._Style()
+                style = names_styles[name] = self._Style()
+                styles.append(style)
                 style.name = name
                 style.inherits = inherits
                 style.presentation = current_presentation = Presentation()
@@ -391,6 +442,7 @@ class StyleFile(object):
                                           (name, line_number,))
                 setattr(current_presentation, property, value)
         self._styles = styles
+        self._names_styles = names_styles
 
     def write(self, file):
         """Write styles to file.
@@ -400,7 +452,7 @@ class StyleFile(object):
           file -- file object open for writing
 
         """
-        for style in self._styles.values():
+        for style in self._styles:
             file.write(style.name)
             file.write(' (%s) :\n' % (string.join(style.inherits, ', '),))
             presentation = style.presentation
@@ -429,16 +481,15 @@ class StyleFile(object):
 
         """
         presentations = []
-        styles = self._styles
-        for s in styles.values():
+        for s in self._styles:
             for name, matcher in self._MATCHERS:
                 if name == s.name:
                     break
             else:
                 continue
-            presentation_list = [styles[name].presentation for name in s.inherits]
+            presentation_list = [self._names_styles[name].presentation for name in s.inherits]
             presentation_list.reverse()
             presentation_list.append(s.presentation)
-            merged = PresentationSet.merge_presentations(presentations)
+            merged = PresentationSet.merge_presentations(presentation_list)
             presentations.append((merged, matcher,))
         return presentations

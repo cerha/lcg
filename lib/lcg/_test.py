@@ -21,6 +21,7 @@
 
 import unittest
 import os
+import string
 import lcg
 
 _ = lcg.TranslatableTextFactory('test')
@@ -417,7 +418,7 @@ class Parser(unittest.TestCase):
 @end footer
 '''
         parameters = {}
-        c = self._parser.parse(text, parameters)
+        self._parser.parse(text, parameters)
         assert 'page_header' in parameters, parameters
         assert 'page_footer' in parameters, parameters
         assert 'first_page_header' not in parameters, parameters
@@ -679,6 +680,29 @@ class Export(unittest.TestCase):
                    (text, html, result)
         
 tests.add(Export)
+
+
+class Presentations(unittest.TestCase):
+    
+    def test_style_file(self):
+        style_file = lcg.StyleFile()
+        f = open(os.path.join(lcg_dir, 'styles', 'standard'))
+        style_file.read(f)
+        f.close()
+        f = os.tmpfile()
+        style_file.write(f)
+        f.seek(0)
+        style_file_2 = lcg.StyleFile()
+        style_file_2.read(f)
+        f.close()
+        for pm_1, pm_2 in zip(style_file.presentations(), style_file_2.presentations()):
+            p_1, p_2 = pm_1[0], pm_2[0]
+            for attr in dir(p_1):
+                if attr[0] in string.ascii_lowercase:
+                    value_1, value_2 = getattr(p_1, attr), getattr(p_2, attr)
+                    assert value_1 == value_2, (attr, value_1, value_2,)
+
+tests.add(Presentations)
 
         
 def get_tests():

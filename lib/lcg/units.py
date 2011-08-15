@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2010 Brailcom, o.p.s.
+# Copyright (C) 2010, 2011 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -73,7 +73,14 @@ class Unit(object):
         @return: New instance of the same class, with size multiplied by C{size}.
         """
         assert isinstance(size, (float, int, long,)), size
-        return self.__class__(self._size * size)        
+        return self.__class__(self._size * size)
+
+    def __cmp__(self, other):
+        if self.__class__ == other.__class__:
+            result = cmp(self.__class__, other.__class__)
+        else:
+            result = cmp(self.size(), other.size())
+        return result
 
     def size(self):
         """
