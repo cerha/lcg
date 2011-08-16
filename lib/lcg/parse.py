@@ -117,6 +117,7 @@ class Parser(object):
     _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
                                      r'(?P<description>([\t ]+[^\r\n]+\r?\n)*([\t ]+[^\r\n]+\r?\n?))')
     _LIST_MATCHER = re.compile(r'( *)\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.)) +')
+    _STYLE_MATCHER = re.compile(r'@style +([a-z_]+)[\t ]*\r?$', re.MULTILINE)
     _TAB_MATCHER = re.compile(r'^\t')
     
     _PARAMETERS = {'header': ('parameter', 'page_header', None,),
@@ -143,6 +144,7 @@ class Parser(object):
                             self._definition_processor,
                             self._parameters_processor,
                             self._variable_processor,
+                            self._style_processor,
                             self._space_processor,
                             self._paragraph_processor,
                             )
@@ -499,6 +501,25 @@ class Parser(object):
                 return None, position
             variable_content = Container(self.parse(value))
         content = SetVariable(str(identifier), variable_content)
+        return content, position
+
+    def _style_processor(self, text, position, **kwargs):
+        match = self._STYLE_MATCHER.match(text[position:])
+        if not match:
+            return None
+        name = match.group(1)
+        position_1 += match.end()
+        while text[position_1:position_1+1] in ('\r', '\n',):
+            position_1 += 1
+        match = re.search('^@end style *\r?$', text[position_1:], re.MULTILINE)
+        if match:
+            position_2 += match.end()
+        else:
+            return None, position
+        content, position = self._parse(text[:position_2], position_1, **kwargs)
+        if content is None:
+            return content, position_2
+        content = Container(content, name=name)
         return content, position
 
     def _space_processor(self, text, position, **kwargs):
