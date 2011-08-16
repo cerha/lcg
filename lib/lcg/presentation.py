@@ -202,24 +202,43 @@ class LCGClassMatcher(ContentMatcher):
         return isinstance(content, self._content_class)
 
 
-class LCGSectionMatcher(LCGClassMatcher):
-    """'lcg.Section' matching, based on the section level."""
+class LCGHeadingMatcher(LCGClassMatcher):
+    """'lcg.Heading' matching, based on the heading level."""
 
     def __init__(self, level):
         """
         Arguments:
 
-          level -- section level to match, positive integer
+          level -- heading level to match, positive integer
 
         """
         assert isinstance(level, int) and level > 0, level
-        super(LCGSectionMatcher, self).__init__(lcg.Section)
-        self._path_len = level - 1
+        super(LCGHeadingMatcher, self).__init__(lcg.Heading)
+        self._level = level
 
     def matches(self, content, lang):
-        return (super(LCGSectionMatcher, self).matches(content, lang) and
-                len(content.path()) == self._path_len)
-        
+        return (super(LCGHeadingMatcher, self).matches(content, lang) and
+                content.level() == self._level)
+
+
+class LCGContainerMatcher(LCGClassMatcher):
+    """'lcg.Container' matching, based on the container names."""
+
+    def __init__(self, name):
+        """
+        Arguments:
+
+          name -- container name to match, string
+
+        """
+        assert isinstance(name, basestring), name
+        super(LCGContainerMatcher, self).__init__(lcg.Container)
+        self._name = name
+
+    def matches(self, content, lang):
+        return (super(LCGContainerMatcher, self).matches(content, lang) and
+                content.name() == self._name)
+
     
 class PresentationSet(object):
     """Group of 'Presentation' objects, together with their matchers.
@@ -351,9 +370,9 @@ class StyleFile(object):
     
     """
     _MATCHERS = (('Common', ContentMatcher(),),
-                 ('Heading_1', LCGSectionMatcher(1),),
-                 ('Heading_2', LCGSectionMatcher(2),),
-                 ('Heading_3', LCGSectionMatcher(3),),
+                 ('Heading_1', LCGHeadingMatcher(1),),
+                 ('Heading_2', LCGHeadingMatcher(2),),
+                 ('Heading_3', LCGHeadingMatcher(3),),
                  ('Table_Of_Contents', LCGClassMatcher(lcg.TableOfContents),),
                  ('Preformatted_Text', LCGClassMatcher(lcg.PreformattedText),),
                  )
@@ -486,7 +505,7 @@ class StyleFile(object):
                 if name == s.name:
                     break
             else:
-                continue
+                matcher = LCGContainerMatcher(name=s.name)
             presentation_list = [self._names_styles[name].presentation for name in s.inherits]
             presentation_list.reverse()
             presentation_list.append(s.presentation)

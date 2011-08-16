@@ -519,6 +519,7 @@ class Exporter(object):
                 Paragraph: self._export_paragraph,
                 Link: self._export_link,
                 Section: self._export_section, 
+                Heading: self._export_formatted_text, 
                 ContentVariants: self._export_content_variants,
                 TableOfContents: self._export_table_of_contents,
                 ItemizedList: self._export_itemized_list,

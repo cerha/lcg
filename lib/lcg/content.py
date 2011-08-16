@@ -298,6 +298,32 @@ class FormattedText(TextContent):
 # Backwards compatibility alias.        
 WikiText = FormattedText
 
+class Heading(FormattedText):
+    """Heading, e.g. heading of a section.
+
+    Purpose of this element is twofold: to provide information about level of
+    the heading and to distinguish the element from other parts of a document
+    for the purpose of applying specific styles to its content.
+
+    """
+    def __init__(self, text, level, **kwargs):
+        """
+        Arguments:
+        
+          text -- the actual text content of this element as a string or
+            unicode
+          level -- level of the heading, positive integer, starting from 1
+          kwargs -- keyword arguments for parent class constructor
+          
+        """
+        assert isinstance(level, int) and level > 0, level
+        super(Heading, self).__init__(text, **kwargs)
+        self._level = level
+
+    def level(self):
+        "Return level of the heading, positive integer, starting from 1."
+        return self._level
+
     
 class PreformattedText(TextContent):
     """Preformatted text."""
@@ -909,7 +935,7 @@ class Section(Container):
         instance was created.
 
         """
-        return FormattedText(self.title())
+        return Heading(self.title(), level=len(self.path())+1)
 
     def in_toc(self):
         """Return true if the section is supposed to appear in TOC."""
