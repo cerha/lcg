@@ -158,10 +158,13 @@ def main():
         dst, filename = os.path.split(dst)
     else:
         filename = None
-    if opt['presentation'] is None:
+    presentation_option = opt['presentation']
+    if presentation_option is None:
         presentation = None
+    elif presentation_option[-3:] == '.py':
+        presentation = read_presentation(presentation_option)
     else:
-        presentation = read_presentation(opt['presentation'])
+        presentation = read_style(presentation_option)
     exporter.dump(node, dst, filename=filename, variant=lang, sec_lang=opt['sec-lang'],
                   presentation=presentation)
 
@@ -174,13 +177,27 @@ def read_presentation(filename):
     try:
         confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
     except Exception as e:
-        die("Can't process configuration: %s" % (e,))
+        die("Can't process presentation file: %s" % (e,))
     finally:
         f.close()
     for o in dir(confmodule):
         if o[0] in string.lowercase and hasattr(presentation, o):
             setattr(presentation, o, confmodule.__dict__[o])
-    return presentation
+    return lcg.PresentationSet(((presentation, lcg.ContentMatcher(),),))
+
+def read_style(filename):
+    style_file = lcg.StyleFile()
+    try:
+        f = open(filename)
+    except:
+        die("Can't open file: %s" % (filename,))
+    try:
+        style_file.read(f)
+    except Exception, e:
+        die("Can't process style file: %s" % (e,))
+    finally:
+        f.close()
+    return lcg.PresentationSet(style_file.presentations())
 
 def getoptions():
     optspec = functools.reduce(operator.add, [optspec for section, optspec in OPTIONS], ())

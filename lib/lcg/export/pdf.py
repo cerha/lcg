@@ -577,7 +577,7 @@ class Context(object):
 
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
                  page_header=None, page_footer=None, page_background=None, presentation=None,
-                 lang=None):
+                 presentation_set=None, lang=None):
         self._lang = lang
         self._presentations = []
         self._init_fonts()
@@ -592,6 +592,8 @@ class Context(object):
         self._page_header = page_header
         self._page_footer = page_footer
         self._page_background = page_background
+        self._presentation_set = presentation_set
+        self._styled_presentations = []
         if parent_context is not None:
             if self._first_page_header is None:
                 self._first_page_header = parent_context.first_page_header()
@@ -940,8 +942,7 @@ class Context(object):
             font_name, family, bold, italic = self.font_parameters(style.fontName)
             if presentation.font_name is not None:
                 font_name = presentation.font_name
-            if (presentation.font_family is not None and
-                style.name != 'Code' and style.name[:7] != 'Heading'):
+            if presentation.font_family is not None:
                 family = presentation.font_family
             if presentation.bold is not None:
                 bold = presentation.bold
@@ -1072,6 +1073,32 @@ class Context(object):
         """Remove the current presentation from the presentation list."""
         self._presentations.pop()
 
+    def presentation_set(self):
+        """Return 'lcg.PresentationSet' set in this context or 'None'."""
+        return self._presentation_set
+
+    def set_styled_presentation(self, element):
+        """Set \"styled\" presentation based on the given 'element'.
+
+        The presentation is determined using the presentation set of this
+        context instance.
+
+        Arguments:
+
+          element -- element to use to find the appropriate presentation,
+            'lcg.Content' instance
+
+        """
+        presentation = result = self._presentation_set.presentation(element, None)
+        if self._styled_presentations and self._styled_presentations[-1] is presentation:
+            result = None
+        self._styled_presentations.append(presentation)
+        return result
+
+    def unset_styled_presentation(self):
+        """Remove previously set styled presentation."""
+        self._styled_presentations.pop()
+
     def total_pages_requested(self):
         """Return whether it is necessary to know the total page number in this context."""
         return self._total_pages_requested
@@ -1189,6 +1216,7 @@ class Element(object):
     _CATEGORY = None
     
     content = None
+    presentation = None
     
     def init(self):
         """Initialize class.
@@ -1207,7 +1235,10 @@ class Element(object):
           kwargs -- class specific arguments
           
         """
+        pdf_context = context.pdf_context
+        pdf_context.add_presentation(self.presentation)
         result = self._export(context, **kwargs)
+        pdf_context.remove_presentation()
         if self._CATEGORY is not None:
             context.pdf_context.last_element_category = self._CATEGORY
         return result
@@ -1428,7 +1459,6 @@ class Paragraph(Element):
     _CATEGORY = 'paragraph'
     _style = None
     noindent = False
-    presentation = None
     halign = None
     def init(self):
         super(Paragraph, self).init()
@@ -1442,8 +1472,6 @@ class Paragraph(Element):
         assert not pdf_context.in_paragraph
         pdf_context.in_paragraph = True
         halign = self.halign
-        presentation = self.presentation
-        pdf_context.add_presentation(presentation)
         current_presentation = pdf_context.current_presentation()
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
@@ -1468,7 +1496,6 @@ class Paragraph(Element):
             exported += c.export(context)
         assert _ok_export_result(exported), ('wrong export', exported,)
         result = reportlab.platypus.Paragraph(exported, style)
-        pdf_context.remove_presentation()
         pdf_context.in_paragraph = False
         return result
     def prepend_text(self, text):
@@ -1615,7 +1642,6 @@ class Container(Element):
 
     """
     _CATEGORY = None
-    presentation = None
     vertical = True
     halign = None
     valign = None
@@ -1625,7 +1651,6 @@ class Container(Element):
                 assert isinstance(c, Element), ('type error', c,)
     def _export(self, context, parent_container=None):
         pdf_context = context.pdf_context
-        pdf_context.add_presentation(self.presentation)
         style = pdf_context.style()
         halign = self.halign
         # Let's first transform simple text elements into real exportable elements.
@@ -1640,7 +1665,7 @@ class Container(Element):
         for c in self.content:
             transform_content(c)
         # If there is only a single element, unwrap it from the container.
-        presentation = self.presentation
+        presentation = pdf_context.current_presentation()
         boxed = presentation and presentation.boxed
         if len(self.content) == 1 and not boxed:
             content_element = self.content[0]
@@ -1700,7 +1725,6 @@ class Container(Element):
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):
             result[0].hAlign = halign
         # Export completed.
-        pdf_context.remove_presentation()
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
@@ -1914,7 +1938,6 @@ class Table(Element):
 
     """
     _CATEGORY = 'block'
-    presentation = None
     long = False
     column_widths = None
     compact = True
@@ -1931,7 +1954,6 @@ class Table(Element):
     def _export(self, context):
         pdf_context = context.pdf_context
         last_element_category = pdf_context.last_element_category
-        pdf_context.add_presentation(self.presentation)
         content = self.content
         exported_content = []
         # Find out information about the table
@@ -2107,7 +2129,6 @@ class Table(Element):
             exported_space = space.export(context)
             table = [exported_space, table, exported_space]
             pdf_context.last_element_category = self._CATEGORY
-        pdf_context.remove_presentation()
         return table
 
 def make_element(cls, **kwargs):
@@ -2319,8 +2340,8 @@ class PDFExporter(FileExporter, Exporter):
                                       page_footer=node.page_footer(lang),
                                       page_background=node.page_background(lang),
                                       presentation=node.presentation(lang),
+                                      presentation_set=context.presentation(),
                                       lang=lang)
-        pdf_context.add_presentation(context.presentation())
         presentation = pdf_context.current_presentation()
 	exported_structure = []
         first_subcontext = None
@@ -2341,6 +2362,7 @@ class PDFExporter(FileExporter, Exporter):
                                              page_footer=node.page_footer(lang),
                                              page_background=node.page_background(lang),
                                              presentation=presentation,
+                                             presentation_set=context.presentation(),
                                              lang=lang)
             subcontext.pdf_context.add_presentation(node.presentation(lang))
             # The subcontext serves twice: 1. when exporting node content;
@@ -2420,8 +2442,16 @@ class PDFExporter(FileExporter, Exporter):
         return output.getvalue()
     
     def export_element(self, context, element):
+        pdf_context = context.pdf_context
+        presentation = pdf_context.set_styled_presentation(element)
         result = super(PDFExporter, self).export_element(context, element)
         assert isinstance(result, Element), ('Invalid export result', element, result,)
+        if presentation is not None:
+            if result.presentation is not None:
+                presentation = lcg.PresentationSet.merge_presentations((result.presentation,
+                                                                        presentation,))
+            result.presentation = presentation
+        pdf_context.unset_styled_presentation()
         return result
     
     def _export_content(self, context, element):
