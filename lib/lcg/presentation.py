@@ -310,7 +310,7 @@ class PresentationSet(object):
 
 
 def _parse_ufont(s):
-    return lcg.UFont(float(s))
+    return float(s)
 def _parse_string(s):
     return s
 def _parse_boolean(s):
