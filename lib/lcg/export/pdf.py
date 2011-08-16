@@ -652,7 +652,7 @@ class Context(object):
         elif family == FontFamily.FIXED_WIDTH:
             family_pattern = 'monospace'
         else:
-            raise Exception('Unknown font family', presentation_family)
+            raise Exception('Unknown font family', family)
         if bold:
             bold_pattern = 'bold'
         else:
