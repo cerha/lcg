@@ -285,13 +285,11 @@ _LANGUAGE_NAMES = {
 def language_name(code):
     """Return the language name corresponding to given ISO 639-1 code.
 
-    The returned string is 'lcg.TranslatableText' instance.
+    The returned string is 'lcg.TranslatableText' instance or None if given
+    code is not known.
     
     """
-    try:
-        return _LANGUAGE_NAMES[code]
-    except KeyError:
-        return code
+    return _LANGUAGE_NAMES.get(code)
 
 _COUNTRY_NAMES = {
     # Translators: The following 249 strings represent names of countries.
