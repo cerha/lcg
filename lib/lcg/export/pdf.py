@@ -1089,9 +1089,14 @@ class Context(object):
             'lcg.Content' instance
 
         """
-        presentation = result = self._presentation_set.presentation(element, None)
+        if self._presentation_set is None:
+            presentation = None
+        else:
+            presentation = self._presentation_set.presentation(element, None)
         if self._styled_presentations and self._styled_presentations[-1] is presentation:
             result = None
+        else:
+            result = presentation
         self._styled_presentations.append(presentation)
         return result
 
