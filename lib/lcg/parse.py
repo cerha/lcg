@@ -508,19 +508,32 @@ class Parser(object):
         if not match:
             return None
         name = match.group(1)
-        position_1 += match.end()
-        while text[position_1:position_1+1] in ('\r', '\n',):
-            position_1 += 1
-        match = re.search('^@end style *\r?$', text[position_1:], re.MULTILINE)
-        if match:
-            position_2 += match.end()
-        else:
+        text_start = position + match.end()
+        while text[text_start:text_start+1] in ('\r', '\n',):
+            text_start += 1
+        match = re.search('^@end style *\r?$', text[text_start:], re.MULTILINE)
+        if not match:
             return None, position
-        content, position = self._parse(text[:position_2], position_1, **kwargs)
-        if content is None:
-            return content, position_2
-        content = Container(content, name=name)
-        return content, position
+        text_end = text_start + match.start()
+        end_position = text_start + match.end()
+        cut_text = text[:text_end]
+        position = text_start
+        content_list = []
+        position = self._find_next_block(text, position)
+        while True:
+            if position >= text_end:
+                break
+            content, position = self._parse(cut_text, position, **kwargs)
+            if content is None:
+                break
+            content_list.append(content)
+            if position >= text_end:
+                break
+            position = self._find_next_block(text, position)
+        if not content_list:
+            return None, end_position
+        container = Container(content_list, name=name)
+        return container, end_position
 
     def _space_processor(self, text, position, **kwargs):
         match = self._VSPACE_MATCHER.match(text[position:])
