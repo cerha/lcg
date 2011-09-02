@@ -639,8 +639,8 @@ class Parser(object):
         contents = []
         position = 0
         size = len(text)
+        position = self._find_next_block(text, position)
         while True:
-            position = self._find_next_block(text, position)
             if position >= size:
                 break
             content, position = self._parse(text, position, parameters=parameters,
