@@ -178,6 +178,8 @@ class Parser(object):
         while True:
             match = self._FIELD_MATCHER.match(text[position:])
             if not match:
+                if not fields:
+                    return None
                 break
             groups = match.groupdict()
             fields.append((FormattedText(groups['label']), FormattedText(groups['value']),))
