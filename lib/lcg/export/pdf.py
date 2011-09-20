@@ -2304,10 +2304,10 @@ class PDFExporter(FileExporter, Exporter):
         return self._markup(text, 'sub')
     
     def citation(self, context, text):
-        return self.emphasize(text)
+        return self.emphasize(context, text)
     
     def quotation(self, context, text):
-        return self.emphasize(text)
+        return self.emphasize(context, text)
 
     # Classic exports
         
