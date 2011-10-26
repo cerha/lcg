@@ -430,6 +430,7 @@ class Decimal(Localizable):
 
     def __init__(self, value, precision=None, **kwargs):
         self._value = value
+        self._precision = precision
         if precision is None:
             self._format = '%f'
         else:
@@ -438,6 +439,10 @@ class Decimal(Localizable):
 
     def _clone_args(self):
         return (self._value,)
+    
+    def _clone_kwargs(self):
+        return dict(super(Decimal, self)._clone_kwargs(),
+                    precision=self._precision)
     
     def _locales(self, data):
         return data.decimal_point, data.grouping, data.thousands_sep
