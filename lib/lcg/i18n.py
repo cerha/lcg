@@ -422,7 +422,9 @@ class Decimal(Localizable):
     """Localizable decimal number."""
     
     def __new__(cls, value, precision=None, **kwargs):
-        if precision is None:
+        if isinstance(value, int):
+            format = '%d'
+        elif precision is None:
             format = '%f'
         else:
             format = '%%.%df' % precision
@@ -431,7 +433,9 @@ class Decimal(Localizable):
     def __init__(self, value, precision=None, **kwargs):
         self._value = value
         self._precision = precision
-        if precision is None:
+        if isinstance(value, int):
+            self._format = '%d'
+        elif precision is None:
             self._format = '%f'
         else:
             self._format = '%%.%df' % precision
