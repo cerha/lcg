@@ -664,6 +664,12 @@ class HtmlExporter(Exporter):
     def _export_inline_image(self, context, element):
         g = self._generator
         image = element.image()
+        thumbnail = image.thumbnail()
+        if thumbnail:
+            link = context.uri(image)
+            image = thumbnail
+        else:
+            link = None
         title = element.title()
         descr = element.descr()
         size = element.size()
@@ -683,8 +689,15 @@ class HtmlExporter(Exporter):
                 title = self.concat(title, ' (', descr, ')')
             else:
                 title = descr
-        return g.img(uri, alt=(title or ''), align=element.align(), cls=element.name(),
-                     width=width, height=height)
+        if title and not link:
+            alt = title
+        else:
+            alt = ''
+        img = g.img(uri, alt=alt, align=element.align(), cls=element.name(),
+                    width=width, height=height)
+        if link:
+            img = g.a(img, href=link, title=title)
+        return img
 
 
     def _export_inline_audio(self, context, element):

@@ -111,16 +111,29 @@ class Image(Resource):
     """An image of undefined type."""
     SUBDIR = 'images'
     
-    def __init__(self, filename, size=None, **kwargs):
+    def __init__(self, filename, size=None, thumbnail=None, **kwargs):
+        """Arguments:
+
+        size -- explicit image size as a tuple of two integers (width, height)
+          in pixels.  If not None, the HTML output will use these values when
+          the 'Image' instance is used within an 'InlineImage' element.
+          
+        thumbnail -- image thumbnail an an Image instance.  If not None, the
+          image will not be rendered in full size when used within an
+          'InlineImage' element, but given thumbnail will be used instead.  The
+          thumbnail will be clickable and will display the full size image only
+          upon a user request.
+
+        """
         self._size = size
+        self._thumbnail = thumbnail
         super(Image, self).__init__(filename, **kwargs)
 
     def size(self):
-        #if self._size is None and self._src_file is not None:
-        #    import Image as Img
-        #    img = Img.open(self._src_file)
-        #    self._size = img.size
         return self._size
+
+    def thumbnail(self):
+        return self._thumbnail
 
 class Stylesheet(Resource):
     """A cascading style sheet."""
