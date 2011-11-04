@@ -269,7 +269,7 @@ class PresentationSet(object):
         return [p for p, m in self._presentations if m.matches(content, lang)]
 
     @classmethod
-    def merge_presentations(class_, presentations):
+    def merge_presentations(class_, presentations, override=()):
         """Return a common presentation created from 'presentations'.
 
         The presentations are merged in their order; non-default parameters of
@@ -277,7 +277,9 @@ class PresentationSet(object):
 
         Arguments:
 
-          presentation -- sequence of 'Presentation' instances          
+          presentation -- sequence of 'Presentation' instances
+          override -- sequence of parameter names (strings); default parameters
+            present here override parameters of former presentations
 
         """
         assert isinstance(presentations, (list, tuple,)), presentations
@@ -289,7 +291,7 @@ class PresentationSet(object):
                 for attr in dir(p):
                     if attr[0] in string.ascii_lowercase:
                         value = getattr(p, attr)
-                        if value is None:
+                        if value is None and attr not in override:
                             value = getattr(new_presentation, attr)
                         elif attr == 'font_size':
                             last_value = getattr(new_presentation, attr)

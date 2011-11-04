@@ -1050,7 +1050,8 @@ class Context(object):
             new_presentation = current_presentation
         else:
             new_presentation = lcg.PresentationSet.merge_presentations((current_presentation,
-                                                                        presentation,))
+                                                                        presentation,),
+                                                                       override=('boxed',))
         self._presentations.append(new_presentation)
 
     def set_presentation(self, presentation):
@@ -2454,7 +2455,8 @@ class PDFExporter(FileExporter, Exporter):
         if presentation is not None:
             if result.presentation is not None:
                 presentation = lcg.PresentationSet.merge_presentations((result.presentation,
-                                                                        presentation,))
+                                                                        presentation,),
+                                                                       override=('boxed',))
             result.presentation = presentation
         pdf_context.unset_styled_presentation()
         return result
