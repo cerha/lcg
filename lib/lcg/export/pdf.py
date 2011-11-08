@@ -2328,7 +2328,7 @@ class PDFExporter(FileExporter, Exporter):
 
     # Classic exports
         
-    def export(self, context, old_contexts=None, presentation=None):
+    def export(self, context, old_contexts=None, global_presentation=None):
         first_pass = (old_contexts is None)
         if old_contexts is None:
             old_contexts = {}
@@ -2411,7 +2411,7 @@ class PDFExporter(FileExporter, Exporter):
             page_size = reportlab.lib.pagesizes.portrait(page_size)
         def presentation_size(attr, default=10*reportlab.lib.units.mm):
             try:
-                size = getattr(presentation, attr)
+                size = getattr(global_presentation, attr)
                 if isinstance(size, UMm):
                     points = size.size() * reportlab.lib.units.mm
                 elif isinstance(size, UPoint):
