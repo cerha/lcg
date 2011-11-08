@@ -2339,13 +2339,19 @@ class PDFExporter(FileExporter, Exporter):
         node = context.node()
         lang = context.lang()
         page_header = node.page_header(lang)
+        node_presentation = node.presentation(lang) or lcg.Presentation()
+        if global_presentation is not None:
+            node_presentation = copy.copy(node_presentation)
+            for p in ('font_name', 'font_family',):
+                setattr(node_presentation, p,
+                        (getattr(node_presentation, p) or getattr(global_presentation, p)))
         context.pdf_context = old_contexts[None] = pdf_context = \
                               Context(total_pages=total_pages,
                                       first_page_header=(node.first_page_header(lang) or page_header),
                                       page_header=page_header,
                                       page_footer=node.page_footer(lang),
                                       page_background=node.page_background(lang),
-                                      presentation=node.presentation(lang),
+                                      presentation=node_presentation,
                                       presentation_set=context.presentation(),
                                       lang=lang)
         presentation = pdf_context.current_presentation()
