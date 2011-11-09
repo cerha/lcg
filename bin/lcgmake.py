@@ -183,7 +183,7 @@ def read_presentation(filename):
     for o in dir(confmodule):
         if o[0] in string.lowercase and hasattr(presentation, o):
             setattr(presentation, o, confmodule.__dict__[o])
-    return lcg.PresentationSet(((presentation, lcg.ContentMatcher(),),))
+    return lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
 
 def read_style(filename):
     style_file = lcg.StyleFile()

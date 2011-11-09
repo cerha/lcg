@@ -155,6 +155,17 @@ class ContentMatcher(object):
         return True
 
 
+class TopLevelMatcher(ContentMatcher):
+    """General matcher of the whole content.
+
+    As a convention the matcher returns true on null content.
+
+    """
+    def matches(self, content, lang):
+        """Return true iff 'content' is 'None'."""
+        return content is None
+        
+
 class LanguageMatcher(ContentMatcher):
     """Langugage based matching, ignoring content.
 
@@ -283,6 +294,7 @@ class PresentationSet(object):
 
         """
         assert isinstance(presentations, (list, tuple,)), presentations
+        presentations = [p for p in presentations if p is not None]
         if __debug__:
             assert all([isinstance(p, Presentation) for p in presentations]), presentations
         if presentations:
@@ -319,7 +331,7 @@ class PresentationSet(object):
           lang -- lowercase ISO 639-1 Alpha-2 language code; string or 'None'
 
         """
-        assert isinstance(content, lcg.Content), content
+        assert isinstance(content, lcg.Content) or content is None, content
         assert lang is None or isinstance(lang, basestring), lang
         applicable_presentations = self._matching_presentations(content, lang)
         key = tuple([id(p) for p in applicable_presentations])
@@ -371,7 +383,7 @@ class StyleFile(object):
     recommended) and inherit them in the supported styles or his other styles.
     
     """
-    _MATCHERS = (('Common', ContentMatcher(),),
+    _MATCHERS = (('Common', TopLevelMatcher(),),
                  ('Heading_1', LCGHeadingMatcher(1),),
                  ('Heading_2', LCGHeadingMatcher(2),),
                  ('Heading_3', LCGHeadingMatcher(3),),

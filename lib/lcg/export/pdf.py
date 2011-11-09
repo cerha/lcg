@@ -2339,7 +2339,14 @@ class PDFExporter(FileExporter, Exporter):
         node = context.node()
         lang = context.lang()
         page_header = node.page_header(lang)
-        node_presentation = node.presentation(lang) or lcg.Presentation()
+        presentation_set = context.presentation()
+        if presentation_set is None:
+            node_presentation = node.presentation(lang) or lcg.Presentation()
+        else:
+            presentations = (lcg.Presentation(),
+                             presentation_set.presentation(None, lang),
+                             node.presentation(lang),)
+            node_presentation = presentation_set.merge_presentations(presentations)
         if global_presentation is not None:
             node_presentation = copy.copy(node_presentation)
             for p in ('font_name', 'font_family',):
@@ -2352,7 +2359,7 @@ class PDFExporter(FileExporter, Exporter):
                                       page_footer=node.page_footer(lang),
                                       page_background=node.page_background(lang),
                                       presentation=node_presentation,
-                                      presentation_set=context.presentation(),
+                                      presentation_set=presentation_set,
                                       lang=lang)
         presentation = pdf_context.current_presentation()
 	exported_structure = []
