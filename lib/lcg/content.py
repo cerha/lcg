@@ -117,8 +117,8 @@ class Content(object):
         """
         assert isinstance(node, ContentNode), \
                "Not a 'ContentNode' instance: %s" % node
-        assert self._parent is None or self._parent is node, \
-               "Reparenting not allowed: %s -> %s" % (self._parent, node)
+        #assert self._parent is None or self._parent is node, \
+        #       "Reparenting not allowed: %s -> %s" % (self._parent, node)
         self._parent = node
 
     def parent(self):
