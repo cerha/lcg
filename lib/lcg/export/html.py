@@ -665,11 +665,11 @@ class HtmlExporter(Exporter):
         g = self._generator
         image = element.image()
         thumbnail = image.thumbnail()
+        link = None
         if thumbnail:
-            link = context.uri(image)
             image = thumbnail
-        else:
-            link = None
+            if True not in [isinstance(c, lcg.Link) for c in element.container_path()]:
+                link = context.uri(image)
         title = element.title()
         descr = element.descr()
         size = element.size()

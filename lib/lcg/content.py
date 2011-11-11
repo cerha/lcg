@@ -65,11 +65,16 @@ class Content(object):
         self._lang = lang
         super(Content, self).__init__()
         
-    def _container_path(self):
+    def container_path(self):
+        """Return a list of containers of the given element
+
+        The list is sorted from top to bottom, the last element being
+        this element itself."""
         path = [self]
         while path[0]._container is not None:
             path.insert(0, path[0]._container)
         return tuple(path)
+    _container_path = container_path # Backwards compatibility in use, but not overriding
 
     def sections(self, context):
         """Return the contained sections as a sequence of 'Section' instances.
@@ -918,7 +923,7 @@ class Section(Container):
         appears as the first and 'self' is always the last element of the list.
 
         """
-        return [c for c in self._container_path() if isinstance(c, Section)]
+        return [c for c in self.container_path() if isinstance(c, Section)]
     
     def section_number(self):
         """Return the number of this section within its container as int."""
