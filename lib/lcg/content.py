@@ -1147,7 +1147,7 @@ class Link(Container):
         assert type is None or isinstance(type, (str, unicode)), type
         if label is None:
             if isinstance(target, (ContentNode, Section)):
-                label = target.title()
+                label = target.heading()
             elif isinstance(target, Resource):
                 label = target.title() or target.filename()
             elif isinstance(target, self.ExternalTarget):
