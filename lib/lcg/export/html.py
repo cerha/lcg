@@ -230,7 +230,7 @@ class HtmlGenerator(object):
     # method itself is not needed).
      
     def form(self, content, action="#", **kwargs):
-        attr = ('name', 'action', 'method', 'enctype')
+        attr = ('name', 'action', 'method', 'enctype', 'onsubmit')
         return self._tag('form', content, attr, _newlines=True, action=action, **kwargs)
      
     def fieldset(self, legend, content, **kwargs):
