@@ -339,11 +339,13 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 wrap(c, None, availWidth, availHeight)
             else:
                 min_width = None
-                if not vertical and not isinstance(c, RLTable):
+                if (not vertical and
+                    not isinstance(c, RLTable) and
+                    (not isinstance(c, RLSpacer) or c.width is not None)):
                     # It is necessary to call `wrap' in order to set the object
                     # minimum width in some flowables, e.g. TableOfContents.
-                    # We don't do it on tables, because they may consume all
-                    # the space as minimum width.
+                    # We don't do it on tables and flexible spacers, because
+                    # they may consume all the space as minimum width.
                     wrap(c, None, availWidth, availHeight, store=False)
                     min_width = c.minWidth()
                 variable_content.append((i, c, min_width,))
@@ -505,6 +507,12 @@ class RLText(reportlab.platypus.flowables.Flowable):
             y -= self._style.leading
     
 class RLSpacer(reportlab.platypus.flowables.Spacer):
+    def __init__(self, *args, **kwargs):
+        reportlab.platypus.flowables.Spacer.__init__(self, *args, **kwargs)
+        if self.width is None:
+            self._fixedWidth = 0
+        if self.height is None:
+            self._fixedHeight = 0
     def wrap(self, availWidth, availHeight):
         if self.width is None:
             width = availWidth
