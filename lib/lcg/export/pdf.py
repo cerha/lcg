@@ -367,8 +367,22 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             average_avail = (avail_length - self._box_total_length) / len(variable_content)
             if average_avail < 0:
                 average_avail = 0
+            if vertical:
+                # We process flexible vertical spacers in the end because they
+                # must stretch over average height if other elements don't use
+                # their average heights.
+                variable_content = ([x for x in variable_content
+                                     if not isinstance(x[1], RLSpacer) or x[1].height is not None] +
+                                    [x for x in variable_content
+                                     if isinstance(x[1], RLSpacer) and x[1].height is None])
+                spacers_started = False
             for n in range(len(variable_content)):
                 i, c, width = variable_content[n]
+                if vertical and not spacers_started and isinstance(c, RLSpacer) and c.height is None:
+                    average_avail = (avail_length - self._box_total_length) / (len(variable_content) - n)
+                    if average_avail < 0:
+                        average_avail = 0
+                    spacers_started = True
                 if vertical:
                     args = [availWidth, average_avail]
                 else:
