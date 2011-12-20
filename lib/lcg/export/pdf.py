@@ -1921,7 +1921,7 @@ class Image(Element):
         assert isinstance(self.image, resources.Image), ('type error', self.image,)
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
     def _export(self, context):
-        filename = self.image.filename()
+        filename = (self.image.src_file() or self.image.filename())
         if filename:
             result = RLImage(filename)
         else:
