@@ -694,7 +694,7 @@ class GettextTranslator(Translator):
             desired translation files are not found.
         
         """
-        assert isinstance(lang, str), lang
+        assert isinstance(lang, basestring), lang
         assert isinstance(path, (list, tuple)), path
         assert isinstance(default_domain, str), default_domain
         assert isinstance(fallback, bool), fallback
