@@ -785,7 +785,7 @@ class Context(object):
             # But beware: Already registered fonts may probably disappear from ReportLab
             # in Wiking processes.
             if (font_file in Context._registered_font_files and
-                f.font_name in reportlab.pdfbase.pdfmetrics.getRegisteredFontNames()):
+                f.fontName in reportlab.pdfbase.pdfmetrics.getRegisteredFontNames()):
                 font_face_name = Context._registered_font_files[font_file]
             else:
                 reportlab.pdfbase.pdfmetrics.registerFont(f)
