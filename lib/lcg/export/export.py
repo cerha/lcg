@@ -1031,7 +1031,9 @@ class FileExporter(object):
     
     def _export_resource(self, resource, dir):
         infile = resource.src_file()
-        outfile = os.path.join(dir, resource.SUBDIR, resource.filename())
+        if resource.SUBDIR:
+            dir = os.path.join(dir, resource.SUBDIR)
+        outfile = os.path.join(dir, resource.filename())
         if infile is None:
             data = resource.get()
             if data is not None:
