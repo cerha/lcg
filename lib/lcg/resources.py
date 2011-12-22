@@ -283,10 +283,10 @@ class ResourceProvider(object):
                 # it is not always the case, we may need to make it
                 # configurable.
                 src_path = unicode(os.path.join(d, src_file)).encode('utf-8')
-                if os.path.exists(src_path):
+                if os.path.isfile(src_path):
                     return cls(filename, src_file=src_path)
                 elif src_path.find('*') != -1:
-                    pathlist = glob.glob(src_path)
+                    pathlist = [path for path in glob.glob(src_path) if os.path.isfile(path)]
                     if pathlist:
                         pathlist.sort()
                         i = len(d)+1
