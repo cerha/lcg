@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008, 2010, 2011 Brailcom, o.p.s.
+# Copyright (C) 2008, 2010, 2011, 2012 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -582,21 +582,6 @@ class Context(object):
     'Context' instance.
 
     """
-    _registered_fonts = {}
-    _registered_font_files = {}
-
-    _nesting_level = 0
-    _list_nesting_level = 0
-    _counter = 0
-    page = 0
-    heading_level = 1
-    toc_present = False
-    default_font_size = 12
-    left_indent = 0
-    bullet_indent = 0
-    last_element_category = None
-    in_paragraph = False
-
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
                  page_header=None, page_footer=None, page_background=None, presentation=None,
                  presentation_set=None, lang=None):
@@ -661,6 +646,33 @@ class Context(object):
             reportlab.platypus.tableofcontents.levelFourParaStyle.fontName = default_font
         except AttributeError:
             pass
+
+    @classmethod
+    def reset(class_):
+        """Initialize 'Context' class.
+
+        This method must be run before every new use of 'Context' class.
+        
+        """
+        # Global variables
+        # Note: We can't initialize them simply on the class level, because
+        # apparently they can under some unknown circumstances survive between
+        # Wiking requests while corresponding ReportLab structures don't.  So
+        # it may happen that the cached objects are no longer valid.
+        Context._registered_fonts = {}
+        Context._registered_font_files = {}
+        # Single export variables
+        Context._nesting_level = 0
+        Context._list_nesting_level = 0
+        Context._counter = 0
+        Context.page = 0
+        Context.heading_level = 1
+        Context.toc_present = False
+        Context.default_font_size = 12
+        Context.left_indent = 0
+        Context.bullet_indent = 0
+        Context.last_element_category = None
+        Context.in_paragraph = False
 
     def _find_font_file(self, name, family, bold, italic, lang):
         # It seems there fontconfig utilities are a bit buggy so we have to use
@@ -2354,6 +2366,7 @@ class PDFExporter(FileExporter, Exporter):
     # Classic exports
         
     def export(self, context, old_contexts=None, global_presentation=None):
+        Context.reset()
         first_pass = (old_contexts is None)
         if old_contexts is None:
             old_contexts = {}
