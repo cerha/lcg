@@ -533,7 +533,9 @@ class RLSpacer(reportlab.platypus.flowables.Spacer):
         else:
             width = min(self.width, availWidth)
         if self.height is None:
-            height = availHeight-1e-8
+            height = availHeight - 1e-8
+            if height < 0:
+                height = 0
         else:
             height = min(self.height, availHeight)
         return width, height
