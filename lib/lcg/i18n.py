@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -760,6 +760,26 @@ def concat(*args, **kwargs):
     if len(items) == 1 and not isinstance(items[0], Localizable):
         return items[0]
     return result
+
+def format(template, *args, **kwargs):
+    """Return a translatable string with interpolated format values.
+
+    Positional interpolation variables are passed as positional arguments,
+    named variables are passed as keyword arguments.
+    
+    This is a translatable replacement of Python's built in string formatting
+    operator %.  Python's built in formatting returns a plain Python string or
+    unicode object and thus destroys the translatability.  Use this function if
+    you need a translatable result.  All interpolation variables may be
+    translatable objects and the result remains a translatable object.  The
+    translated result is simply the result of python's built in formatting, but
+    all interpolation variables are translated *before* interpolation, so the
+    behavior and available formatting conversion characters are otherwise the
+    the same as for standard Python's formatting.
+
+    """
+    return TranslatableText(template, *args, **kwargs)
+
 
 def source_files_by_domain(basedir, domain=None):
     """Return the list of all Python source files, which belong to given domain.
