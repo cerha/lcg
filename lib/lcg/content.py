@@ -69,12 +69,13 @@ class Content(object):
         """Return a list of containers of the given element
 
         The list is sorted from top to bottom, the last element being
-        this element itself."""
+        this element itself.
+
+        """
         path = [self]
         while path[0]._container is not None:
             path.insert(0, path[0]._container)
         return tuple(path)
-    _container_path = container_path # Backwards compatibility in use, but not overriding
 
     def sections(self, context):
         """Return the contained sections as a sequence of 'Section' instances.
