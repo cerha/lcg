@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -999,19 +999,20 @@ class TableOfContents(Content):
     passed to the 'TableOfContents' constructor (limiting the hierachy depth,
     selection of the root item of the hierarchy, etc).
 
+    See also the 'NodeIndex' class if you need to display a hierarchy of nodes.
+
     """
     _TOC_ITEM_TYPE = Content
     def __init__(self, item=None, title=None, depth=None, detailed=True, **kwargs):
         """Arguments:
-        
           item -- the place where to start in the content hierarchy tree as a
-            'Container' instance, 'ContentNode' instance or None.  When a
-            'Container' is used, the table of contents will contain its sections
-            (see 'Container.sections()').  'ContentNode' may be used to display
-            a node hierarchy and 'None' means to start at the container of given
-            'TableOfContents' instance (a local Table of Contents).  See also
-            'Section' documentation for more information how section hierarchy
-            representation is built.
+            'Container' instance instance or None.  If not None, the table of
+            contents will start from that point -- the contained sections (see
+            'Container.sections()') will become top level items in the table.
+            If None, the container of given 'TableOfContents' element itself is
+            used so the result is a local Table of Contents at given place.
+            See also 'Section' documentation for more information how section
+            hierarchy representation is built.
           title -- the title of the index as a string or unicode
           depth -- hierarchy depth limit as an integer or 'None' for unlimited depth
           detailed -- boolean indicating whether the whole 'Content' hierarchy
