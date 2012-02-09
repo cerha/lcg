@@ -916,7 +916,7 @@ class Section(Container):
         self._backref = None
         super(Section, self).__init__(content, **kwargs)
 
-    def path(self):
+    def section_path(self):
         """Return the sequence of parent sections in the container hierarchy.
 
         The returned value is a list of 'Section' instances, which are above
@@ -941,7 +941,7 @@ class Section(Container):
         instance was created.
 
         """
-        return Heading(self.title(), level=len(self.path())+1)
+        return Heading(self.title(), level=len(self.section_path())+1)
 
     def in_toc(self):
         """Return true if the section is supposed to appear in TOC."""
@@ -957,7 +957,7 @@ class Section(Container):
 
         """
         if self._anchor is None:
-            path = self.path()
+            path = self.section_path()
             if len(path) >= 2:
                 self._anchor = path[-2].anchor() +'.'+ str(self.section_number())
             else:

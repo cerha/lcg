@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -561,7 +561,7 @@ class HtmlExporter(Exporter):
 
     def _export_section(self, context, element):
         g = self._generator
-        level = len(element.path()) + 1
+        level = len(element.section_path()) + 1
         anchor = element.anchor()
         title = self.escape(element.title())
         backref = element.backref()
