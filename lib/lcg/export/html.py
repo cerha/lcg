@@ -629,7 +629,7 @@ class HtmlExporter(Exporter):
                     name = item.create_backref(parent)
                     uri_kwargs = dict(local=(parent is item.parent()))
                 uri = context.uri(item, **uri_kwargs)
-                link = g.a(item.title(), href=uri, name=name, title=descr)
+                link = g.a(item.heading().export(context), href=uri, name=name, title=descr)
                 subtoc = make_toc(subitems, _indent=_indent+4)
                 links.append(g.concat(link, subtoc))
             return concat("\n", self._itemized_list(links, _indent=_indent), ' '*(_indent-2))
