@@ -730,7 +730,7 @@ class HtmlExporter(Exporter):
                 label = g.img(context.uri(image), alt=title)
                 descr = descr or title
             else:
-                label = title or audio.title()
+                label = title or audio.title() or audio.filename()
             return g.link(label, uri, id=link_id, title=descr, cls='media-control-link')
         else:
             raise NotImplementedError
