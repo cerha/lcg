@@ -645,11 +645,11 @@ class Export(unittest.TestCase):
             ('[<aa.jpg]',
              '<img src="images/aa.jpg" alt="" align="left" border="0" class="aa">'),
             ('[aa.jpg label | descr]',
-             '<img src="images/aa.jpg" alt="label (descr)" border="0" class="aa">'),
+             '<img src="images/aa.jpg" alt="label: descr" border="0" class="aa">'),
             ('[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
              '<img src="http://www.freebsoft.org/img/logo.gif" alt="Free(b)soft logo" border="0" class="logo">'),
             ('[cc.png]',
-             '<img src="images/cc.png" alt="Image C (Nice picture)" border="0" class="cc">'),
+             '<img src="images/cc.png" alt="Image C: Nice picture" border="0" class="cc">'),
             # Image links (links with an image instead of a label)
             ('[aa.jpg bb.jpg label | descr]',
              '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" alt="label" border="0" class="bb"></a>'),
