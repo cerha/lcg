@@ -842,7 +842,7 @@ class HtmlExporter(Exporter):
                               for name, value in vars.items()])
         if isinstance(alternative_content, tuple):
             no_flash_content, no_js_content = alternative_content
-            no_flash_content = context.translate(no_flash_content)
+            no_flash_content = context.localize(no_flash_content)
         elif warning and alternative_content is None:
             # Translators: Warning message displayed if Flash plugin is not installed or doesn't
             # have the required version.  '%(plugin)s' is automatically replaced by a hypertext
@@ -855,7 +855,7 @@ class HtmlExporter(Exporter):
                      plugin=g.link(_("Adobe Flash plugin"),
                                    'http://www.adobe.com/products/flash/about/'))
             msg2 = _("Use a JavaScript enabled browser.")
-            no_flash_content = context.translate(g.strong(_("Warning:")) +' '+ warning +' '+ msg1)
+            no_flash_content = context.localize(g.strong(_("Warning:")) +' '+ warning +' '+ msg1)
             no_js_content = g.strong(_("Warning:")) +' '+ warning +' '+ msg2
         else:
             no_flash_content = None

@@ -460,8 +460,10 @@ class Exporter(object):
         def presentation(self):
             return self._presentation
 
-        def translate(self, text):
+        def localize(self, text):
             return self._localizer.localize(text)
+
+        translate = localize # For backwards compatibility...
 
         def resource(self, filename, **kwargs):
             return self._node.resource(filename, **kwargs)
@@ -739,7 +741,7 @@ class Exporter(object):
         if text:
             # Since formatting will destroy the translatable instances,
             # translate them before formatting.
-            result = self._formatter.format(context, context.translate(text))
+            result = self._formatter.format(context, context.localize(text))
         else:
             result = self.escape('')
         return result
@@ -1078,7 +1080,7 @@ class FileExporter(object):
         variants = variant and (variant,) or node.variants() or (None,)
         for lang in variants:
             context = self.context(node, lang, **kwargs)
-            data = context.translate(self.export(context))
+            data = context.localize(self.export(context))
             if filename:
                 fn = filename
             else:
