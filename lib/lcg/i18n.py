@@ -111,7 +111,7 @@ class Localizable(unicode):
         kwargs = dict(self._clone_kwargs(), **kwargs)
         return self.__class__(*args, **kwargs)
     
-    def _localize(self, translator):
+    def _localize(self, localizer):
         raise Exception("This method must be overriden!")
         
     def transform(self, function):
@@ -135,18 +135,18 @@ class Localizable(unicode):
         """
         return self.transform(lambda x: x.replace(old, new))
 
-    def localize(self, translator):
+    def localize(self, localizer):
         """Return the localized version of the instance as a string.
 
         Arguments:
 
-          translator -- a 'Translator' instance.
+          localizer -- a 'Localizer' instance.
 
-        The returned string cen be unicode or plain string depending on the
-        original instance (and its type) and also on the translator.
+        The returned string can be unicode or plain string depending on the
+        original instance (and its type) and also on the localizer.
 
         """
-        result = self._localize(translator)
+        result = self._localize(localizer)
         for transform in self._transforms:
             result = transform(result)
         return result
@@ -180,11 +180,11 @@ class TranslatableText(Localizable):
     _RESERVED_ARGS = ()
     
     class _Interpolator(object):
-        def __init__(self, func, translator):
+        def __init__(self, func, localizer):
             self._func = func
-            self._translator = translator
+            self._localizer = localizer
         def __getitem__(self, key):
-            return self._translator.translate(self._func(str(key)))
+            return self._localizer.localize(self._func(str(key)))
     
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
@@ -206,9 +206,7 @@ class TranslatableText(Localizable):
         Arguments:
 
           text -- the actual text to translate as a string or unicode instance.
-
           args -- positional substitution values (see below).
-          
           kwargs -- named substitution arguments (see below).
 
         If 'args' or 'kwargs' are passed, the 'text' is considered a format
@@ -265,30 +263,33 @@ class TranslatableText(Localizable):
         """
         return self._clone(_interpolate=func)
         
-    def _translate(self, translator):
+    def _translate(self, localizer):
+        translator = localizer.translator()
         return translator.gettext(self._text, domain=self._domain, origin=self._origin)
 
-    def _localize(self, translator):
-        result = self._translate(translator)
+    def _localize(self, localizer):
+        result = self._translate(localizer)
         if self._args:
-            result %= tuple([translator.translate(arg) for arg in self._args])
+            result %= tuple([localizer.localize(arg) for arg in self._args])
         elif self._interpolate:
-            result %= self._Interpolator(self._interpolate, translator)
+            result %= self._Interpolator(self._interpolate, localizer)
         elif self._kwargs:
-            result %= dict([(k, translator.translate(v)) for k, v in self._kwargs.items()])
+            result %= dict([(k, localizer.localize(v)) for k, v in self._kwargs.items()])
         return result
 
 
 class SelfTranslatableText(TranslatableText):
     """Translatable string capable of self-translation.
 
-    The translations of this string are pre-defined by passing them as a constructor argument.  The
-    instance than translates itself -- the translator is only used to find out the target language.
+    The translations of this string are pre-defined by passing them as a
+    constructor argument.  The instance than translates itself -- the localizer
+    is only used to find out the target language.
 
-    As oposed to the translator-based translation, which uses translation catalogs, this class is
-    handy when the translation string is part of application data, rather than application
-    definition -- for example when the translated term and its translations are user defined
-    strings stored in a database.
+    As oposed to the translator-based translation, which uses translation
+    catalogs, this class is handy when the translation string is part of
+    application data, rather than application definition -- for example when
+    the translated term and its translations are user defined strings stored in
+    a database.
 
     Additional constructor arguments:
 
@@ -306,8 +307,8 @@ class SelfTranslatableText(TranslatableText):
         return dict(super(SelfTranslatableText, self)._clone_kwargs(),
                     translations=self._translations)
     
-    def _translate(self, translator):
-        return self._translations.get(translator.lang(), translator.translate(self._text))
+    def _translate(self, localizer):
+        return self._translations.get(localizer.lang(), localizer.localize(self._text))
         
 
 class TranslatablePluralForms(TranslatableText):
@@ -353,9 +354,9 @@ class TranslatablePluralForms(TranslatableText):
     def _clone_args(self):
         return (self._singular, self._plural) + self._args
     
-    def _translate(self, translator):
-        return translator.ngettext(self._singular, self._plural, self._n,
-                                   domain=self._domain, origin=self._origin)
+    def _translate(self, localizer):
+        return localizer.translator().ngettext(self._singular, self._plural, self._n,
+                                               domain=self._domain, origin=self._origin)
     
     
 class LocalizableDateTime(Localizable):
@@ -368,30 +369,76 @@ class LocalizableDateTime(Localizable):
     _RE = re.compile(r'^(\d\d\d\d)-(\d\d)-(\d\d)(?: (\d\d):(\d\d)(?::(\d\d))?)?$')
     _LEADING_ZEROS = re.compile(r'(?<!\d)0+')
 
-    def __init__(self, string, show_weekday=False, show_time=None, leading_zeros=True, **kwargs):
+    class _UTCTimezone(datetime.tzinfo):
+        _ZERO_DIFF = datetime.timedelta(0)
+        def utcoffset(self, dt):
+            return self._ZERO_DIFF
+        def tzname(self, dt):
+            return "UTC"
+        def dst(self, dt):
+            return self._ZERO_DIFF
+    _UTC_TZ = _UTCTimezone()
+
+    def __init__(self, string, show_weekday=False, show_time=True, leading_zeros=True, utc=False,
+                 **kwargs):
+        """Initialize the instance.
+
+        Arguments:
+          string -- the input date/datetime value as an ISO formatted string,
+            such as 'yyyy-mm-dd' for date values and 'yyyy-mm-dd HH:MM' or
+            'yyyy-mm-dd HH:MM:SS' for datetime values.  The time precision used
+            on input is respected on output.
+          show_weekday -- if true, abbreviated localized week day name is added
+            to the date/datetime value on output.
+          show_time -- if true and the 'string' contains the time part (it is a
+            datetime value) the time is also shown on output.  If false, the
+            time part is never shown.
+          leading_zeros -- if true the numeric values are always padded by
+            leading zeros on output to maintain the same character width for
+            any value.
+          utc -- if true, the time is supposed to be in UTC and will be
+            converted to the local time zone on translation.  If false, the
+            time is supposed to be in local time zone and no conversion
+            applies.
+          
+        """
         super(LocalizableDateTime, self).__init__(**kwargs)
         m = self._RE.match(string)
         if not m:
             raise Exception("Invalid date/time format", self)
         numbers = [int(n) for n in m.groups() if n is not None]
-        self._datetime = datetime.datetime(*numbers)
+        if utc:
+            tz = self._UTC_TZ
+        else:
+            tz = None
+        self._datetime = datetime.datetime(*numbers, tzinfo=tz)
         self._show_weekday = show_weekday
         self._leading_zeros = leading_zeros
-        self._show_time = show_time is None and len(numbers) > 3 or show_time
+        self._has_time = len(numbers) > 3
+        self._show_time = show_time
         self._show_seconds = len(numbers) > 5
+        self._utc = utc
     
-    def _localize(self, translator):
-        data = translator.locale_data()
-        result = self._datetime.strftime(data.date_format)
+    def _localize(self, localizer):
+        data = localizer.locale_data()
+        dt = self._datetime
+        displayed_timezone = ''
+        if self._has_time and self._utc:
+            timezone = localizer.timezone() or data.default_timezone
+            if timezone is not None:
+                dt = dt.astimezone(timezone)
+            else:
+                displayed_timezone = ' UTC'
+        result = dt.strftime(data.date_format)
         if not self._leading_zeros:
             result = self._LEADING_ZEROS.sub('', result)
-        if self._show_time:
+        if self._has_time and self._show_time:
             time_format = (self._show_seconds and data.exact_time_format or data.time_format)
-            result += ' '+ self._datetime.strftime(time_format)
+            result += ' '+ dt.strftime(time_format)
         if self._show_weekday:
-            weekday = translator.translate(week_day_name(self._datetime.weekday(), abbrev=True))
+            weekday = localizer.localize(week_day_name(dt.weekday(), abbrev=True))
             result = weekday + ' ' + result
-        return result
+        return result + displayed_timezone
 
 
 class LocalizableTime(Localizable):
@@ -412,8 +459,8 @@ class LocalizableTime(Localizable):
         self._time = datetime.time(*numbers)
         self._show_seconds = len(numbers) > 2
     
-    def _localize(self, translator):
-        data = translator.locale_data()
+    def _localize(self, localizer):
+        data = localizer.locale_data()
         time_format = (self._show_seconds and data.exact_time_format or data.time_format)
         return self._time.strftime(time_format)
 
@@ -476,8 +523,8 @@ class Decimal(Localizable):
             result = string + thousands_sep + result
         return result
       
-    def _localize(self, translator):
-        data = translator.locale_data()
+    def _localize(self, localizer):
+        data = localizer.locale_data()
         formatted = self._format % self._value
         if formatted.find('.') == -1:
             pre, post = formatted, None
@@ -571,8 +618,8 @@ class Concatenation(Localizable):
     def _clone_args(self):
         return (self._items,)
     
-    def _localize(self, translator):
-        return ''.join([translator.translate(item) for item in self._items])
+    def _localize(self, localizer):
+        return ''.join([localizer.localize(item) for item in self._items])
     
     def startswith(self, *args, **kwargs):
         """Return the result of 'startswidth()' call the method on the first item."""
@@ -600,9 +647,9 @@ class Concatenation(Localizable):
 class Translator(object):
     """A generic translator of translatable objects.
 
-    A translator should be able to localize different 'Localizable' objects,
-    such as 'TranslatableText', 'LocalizableDateTime' or 'Concatenation'
-    instances.  'TranslatableText' instances coming from different can be mixed.
+    A translator is used to translate instances of 'TranslatableText' and
+    derived classes.  Translatable instances coming from different translation
+    domains can be mixed.
 
     This class only defines the basic API.  See 'GettextTranslator' or
     'NullTranslator' for concrete implementations.
@@ -610,12 +657,7 @@ class Translator(object):
     """
     def __init__(self, lang=None):
         self._lang = lang
-        self._locale_data = globals().get('LocaleData_'+(lang or ''), LocaleData)()
         
-    def lang(self):
-        """Return the target language of this translator."""
-        return self._lang
-
     def gettext(self, text, domain=None, origin=None):
         """Return the translation of the string 'text' from given domain.
 
@@ -643,24 +685,6 @@ class Translator(object):
         """
         pass
 
-    def locale_data(self):
-        return self._locale_data
-
-    def translate(self, text):
-        """Return the translation of given translatable.
-
-        The argument may be a 'Localizable' instance or a plain or unicode
-        string instance.
-
-        Returns a string or unicode depending if there was a unicode type
-        within the input (as well as 'Concatenation.translate()'.
-        
-        """
-        if isinstance(text, Localizable):
-            return text.localize(self)
-        else:
-            return text
-
 
 class NullTranslator(Translator):
     """A translator which just returns identical strings as translations."""
@@ -675,7 +699,7 @@ class NullTranslator(Translator):
 class GettextTranslator(Translator):
     """Translator based on the GNU gettext interface."""
     
-    def __init__(self, lang, path=(), default_domain='lcg', fallback=False):
+    def __init__(self, lang, path=(), default_domain='lcg', fallback=False, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -702,7 +726,7 @@ class GettextTranslator(Translator):
         self._fallback = fallback
         self._path = tuple(path)
         self._cache = {}
-        super(GettextTranslator, self).__init__(lang)
+        super(GettextTranslator, self).__init__(lang, **kwargs)
 
     def _gettext_instance(self, domain, origin):
         import gettext
@@ -738,6 +762,84 @@ class GettextTranslator(Translator):
         gettext = self._cached_gettext_instance(domain, origin)
         result = gettext.ungettext(singular, plural, n)
         return result
+
+
+class Localizer(object):
+    """Localizer of localizable objects.
+
+    A localizer is able to localize different 'Localizable' objects, such as
+    'TranslatableText', 'LocalizableDateTime' or 'Concatenation' instances.
+    'TranslatableText' instances coming from different gettext domains can be
+    mixed.
+
+
+    """
+    _translator_cache = {}
+    _locale_data_cache = {}
+    
+    @classmethod
+    def _get_translator(cls, lang, translation_path):
+        key = (lang, tuple(translation_path))
+        try:
+            translator = cls._translator_cache[key]
+        except KeyError:
+            if lang is None:
+                translator = NullTranslator()
+            else:
+                translator = GettextTranslator(lang, path=translation_path, fallback=True)
+            cls._translator_cache[key] = translator
+        return translator
+
+    @classmethod
+    def _get_locale_data(cls, lang):
+        try:
+            locale_data = cls._locale_data_cache[lang]
+        except KeyError:
+            locale_data = globals().get('LocaleData_'+(lang or ''), LocaleData)()
+            cls._locale_data_cache[lang] = locale_data
+        return locale_data
+    
+    def __init__(self, lang=None, translation_path=(), timezone=None):
+        assert lang is None or isinstance(lang, basestring)
+        assert timezone is None or isinstance(timezone, datetime.tzinfo)
+        self._lang = lang
+        self._timezone = timezone
+        self._translator = self._get_translator(lang, translation_path)
+        self._locale_data = self._get_locale_data(lang)
+        
+    def lang(self):
+        """Return the target language of this localizer."""
+        return self._lang
+
+    def timezone(self):
+        """Return the target time zone for output datetime conversion."""
+        return self._timezone
+
+    def locale_data(self):
+        """Return the locale data for the current locale as a 'LocaleData' instance."""
+        return self._locale_data
+
+    def translator(self):
+        """Return the currently user 'Translator' instance."""
+        return self._translator
+
+    def localize(self, text):
+        """Return the localized string for given localizable or string instance.
+
+        The argument may be a 'Localizable' instance or a plain or unicode
+        string instance.
+
+        Returns a string or unicode depending if there was a unicode type
+        within the input (as well as 'Concatenation.localize()'.
+        
+        """
+        if isinstance(text, Localizable):
+            return text.localize(self)
+        else:
+            return text
+
+    translate = localize
+    """Deprecated backwards compatibility alias - please use 'localize' instead."""
     
         
 def concat(*args, **kwargs):

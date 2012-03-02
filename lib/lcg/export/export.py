@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -398,7 +398,7 @@ class Exporter(object):
         classes.  It is possible to access all information about the current
         context (exported node, target language, etc) and also all the
         components involved in the export process (the exporter, formatter,
-        generator and translator instances).
+        generator and localizer instances).
 
         The class is designed to be extensible.  The derived classes may accept
         additional constructor arguments to expose additional context
@@ -431,13 +431,13 @@ class Exporter(object):
             self._exporter = exporter
             self._formatter = formatter
             self._node = node
-            self._lang = lang
-            self._translator = exporter.translator(lang)
-            self._init_kwargs(**kwargs)
+            self._init_kwargs(lang=lang, **kwargs)
 
-        def _init_kwargs(self, sec_lang=None, presentation=None):
+        def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None):
+            self._lang = lang
             self._sec_lang = sec_lang
             self._presentation = presentation
+            self._localizer = self._exporter.localizer(lang, timezone=timezone)
             
         def exporter(self):
             return self._exporter
@@ -455,13 +455,13 @@ class Exporter(object):
             return self._node
             
         def locale_data(self):
-            return self._translator.locale_data()
+            return self._localizer.locale_data()
 
         def presentation(self):
             return self._presentation
 
         def translate(self, text):
-            return self._translator.translate(text)
+            return self._localizer.localize(text)
 
         def resource(self, filename, **kwargs):
             return self._node.resource(filename, **kwargs)
@@ -471,12 +471,8 @@ class Exporter(object):
             
     def __init__(self, translations=()):
         self._formatter = self.Formatter()
-        self._translations = translations
-        self._translators = {}
+        self._translation_path = translations
         self._export_method = self._define_export_methods()
-
-    def _translator(self, lang):
-        return GettextTranslator(lang, path=self._translations, fallback=True)
 
     def _uri_node(self, context, node, lang=None):
         return node.id()
@@ -562,21 +558,12 @@ class Exporter(object):
             raise Exception("Invalid URI target:", target)
         return method(context, target, **kwargs)
 
-    def translator(self, lang):
-        """Return a translator instance for given language.
-
-        Translator instances are reused, so you may get the same instance for
-        two subsequent calls with the same language.
-        
-        """
-        if lang is None:
-            translator = NullTranslator()
-        else:
-            try:
-                translator = self._translators[lang]
-            except KeyError:
-                translator = self._translators[lang] = self._translator(lang)
-        return translator
+    def localizer(self, lang, timezone=None):
+        """Return a 'lcg.Localizer' instance for given language and time zone."""
+        return Localizer(lang, timezone=timezone, translation_path=self._translation_path)
+    
+    translator = localizer
+    """Deprecated backwards compatibility alias - please use 'localizer' instead."""
 
     def context(self, node, lang, **kwargs):
         """Return the export context instance to be used as an argument to the 'export' method.

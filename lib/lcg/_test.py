@@ -22,6 +22,7 @@
 import unittest
 import os
 import string
+import datetime
 import lcg
 
 _ = lcg.TranslatableTextFactory('test')
@@ -45,9 +46,9 @@ class TranslatableText(unittest.TestCase):
                                  person1="Joe", person2="Bob")
         c0 = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.")
         c = c0.interpolate(lambda key: '-'+key+'-')
-        a1 = a.localize(lcg.NullTranslator())
-        b1 = b.localize(lcg.NullTranslator())
-        c1 = c.localize(lcg.NullTranslator())
+        a1 = a.localize(lcg.Localizer())
+        b1 = b.localize(lcg.Localizer())
+        c1 = c.localize(lcg.Localizer())
         assert a1 == "Hi Joe, say hello to Bob.", a1
         assert b1 == "Hi Joe, say hello to Bob.", b1
         assert c1 == "Hi -person1-, say hello to -person2-.", c1
@@ -96,10 +97,10 @@ class TranslatableText(unittest.TestCase):
         assert isinstance(b, lcg.TranslatableText), b
         assert isinstance(c, lcg.Concatenation), c
         assert isinstance(d, lcg.Concatenation), d
-        ax = a.localize(lcg.NullTranslator())
-        bx = b.localize(lcg.NullTranslator())
-        cx = c.localize(lcg.NullTranslator())
-        dx = d.localize(lcg.NullTranslator())
+        ax = a.localize(lcg.Localizer())
+        bx = b.localize(lcg.Localizer())
+        cx = c.localize(lcg.Localizer())
+        dx = d.localize(lcg.Localizer())
         assert str(a) == ax == 'Version xox-yoy', (a, ax)
         assert str(b) == bx == 'Versi-n x-x',     (b, bx)
         assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
@@ -115,13 +116,13 @@ class TranslatableText(unittest.TestCase):
         f = lcg.concat('<tag '+ e +'>')
         assert isinstance(c, lcg.TranslatableText), c
         assert isinstance(d, lcg.Concatenation), d
-        t = lcg.GettextTranslator('cs', path=translation_path)
-        ax = a.localize(t)
-        bx = b.localize(t)
-        cx = c.localize(t)
-        dx = d.localize(t)
-        ex = e.localize(t)
-        fx = f.localize(t)
+        loc = lcg.Localizer('cs', translation_path=translation_path)
+        ax = a.localize(loc)
+        bx = b.localize(loc)
+        cx = c.localize(loc)
+        dx = d.localize(loc)
+        ex = e.localize(loc)
+        fx = f.localize(loc)
         assert str(a) == 'His name is "Bob"', str(a)
         assert str(b) == 'Bob + Joe', str(b)
         assert ax == 'Jmenuje se "Bobik"', ax
@@ -150,16 +151,16 @@ tests.add(TranslatableText)
 class TranslatablePluralForms(unittest.TestCase):
           
     def test_translation(self):
-        t = lcg.GettextTranslator('cs', path=translation_path)
+        loc = lcg.Localizer('cs', translation_path=translation_path)
         for n, translated in ((1, u"Mám 1 problém."),
                               (2, u"Mám 2 problémy."),
                               (5, u"Mám 5 problémů.")):
             a = _.ngettext("I have %d problem.", "I have %d problems.", n)
-            b = a.localize(t)
+            b = a.localize(loc)
             assert b == translated, (b, translated)
         
     def test_interpolation(self):
-        t = lcg.GettextTranslator('cs', path=translation_path)
+        t = lcg.Localizer('cs', translation_path=translation_path)
         for n, translated in ((1, u"1 záznam nalezen v tabulce xy."),
                               (2, u"2 záznamy nalezeny v tabulce xy."),
                               (5, u"5 záznamů nalezeno v tabulce xy.")):
@@ -169,19 +170,19 @@ class TranslatablePluralForms(unittest.TestCase):
             assert b == translated, (b, translated)
         
     def test_replace(self):
-        t = lcg.GettextTranslator('cs', path=translation_path)
+        loc = lcg.Localizer('cs', translation_path=translation_path)
         for n, ta, tb in ((1, u"Mám 1 problém.", u"1 záznam nalezen v tabulce xy."),
                           (2, u"Mám 2 problémy.", u"2 záznamy nalezeny v tabulce xy."),
                           (5, u"Mám 5 problémů.", u"5 záznamů nalezeno v tabulce xy.")):
             a = _.ngettext("I have %d problem.", "I have %d problems.", n)
             a1 = a.replace('5', '123')
-            a2 = a1.localize(t)
+            a2 = a1.localize(loc)
             ta1 = ta.replace('5', '123')
             assert a2 == ta1, (a2, ta1)
             b = _.ngettext("%(n)d record found in table %(name)s.",
                            "%(n)d records found in table %(name)s.", n=n, name='xy')
             b1 = b.replace('5', '123')
-            b2 = b1.localize(t)
+            b2 = b1.localize(loc)
             tb1 = tb.replace('5', '123')
             assert b2 == tb1, (b2, tb1)
             
@@ -196,54 +197,75 @@ class SelfTranslatableText(unittest.TestCase):
         a = lcg.SelfTranslatableText(text, person1="Joe", person2="Ann", translations=translations)
         a2 = lcg.SelfTranslatableText(text, translations=translations)
         a3 = a2.interpolate(lambda key: '-'+key+'-')
-        b = a.localize(lcg.NullTranslator())
-        c = a.localize(lcg.GettextTranslator('cs', path=translation_path))
+        b = a.localize(lcg.Localizer())
+        c = a.localize(lcg.Localizer('cs', translation_path=translation_path))
         assert b == "Joe is smarter than Ann.", b
         assert c == u"Joe je chytřejší než Ann.", c
-        b2 = a3.localize(lcg.NullTranslator())
-        c2 = a3.localize(lcg.GettextTranslator('cs', path=translation_path))
+        b2 = a3.localize(lcg.Localizer())
+        c2 = a3.localize(lcg.Localizer('cs', translation_path=translation_path))
         assert b2 == "-person1- is smarter than -person2-.", b2
         assert c2 == u"-person1- je chytřejší než -person2-.", c2
         
 tests.add(SelfTranslatableText)
 
 class LocalizableDateTime(unittest.TestCase):
+    class tzinfo(datetime.tzinfo):
+        def __init__(self, offset):
+            self._offset = offset
+        def utcoffset(self, dt):
+            return datetime.timedelta(minutes=self._offset)
+        def tzname(self, dt):
+            offset = self._offset
+            sign = offset/abs(offset)
+            div, mod = divmod(abs(offset), 60)
+            if mod:
+                return "GMT %+d:%d" % (div*sign, mod)
+            else:
+                return "GMT %+d" % div*sign
+        def dst(self, dt):
+            return datetime.timedelta(0)
 
+    
     def test_localize(self):
         d1 = lcg.LocalizableDateTime("2006-12-21")
         d2 = lcg.LocalizableDateTime("2006-12-21 02:43", show_time=False)
         d3 = lcg.LocalizableDateTime("2006-12-21 02:43")
         d4 = lcg.LocalizableDateTime("2006-12-21 18:43:32", show_weekday=True)
         d5 = lcg.LocalizableDateTime("2006-01-30", leading_zeros=False)
-        t1 = lcg.GettextTranslator('en', path=translation_path)
-        x1 = d1.localize(t1)
-        x2 = d2.localize(t1)
-        x3 = d3.localize(t1)
-        x4 = d4.localize(t1)
-        x5 = d5.localize(t1)
+        d6 = lcg.LocalizableDateTime("2006-12-21 18:43:32", utc=True)
+        loc1 = lcg.Localizer('en', translation_path=translation_path)
+        x1 = d1.localize(loc1)
+        x2 = d2.localize(loc1)
+        x3 = d3.localize(loc1)
+        x4 = d4.localize(loc1)
+        x5 = d5.localize(loc1)
+        x6 = d6.localize(loc1)
         assert x1 == "21/12/2006", x1
         assert x2 == "21/12/2006", x2
         assert x3 == "21/12/2006 02:43 AM", x3
         assert x4 == "Thu 21/12/2006 06:43:32 PM", x4
         assert x5 == "30/1/2006", x5
-        t2 = lcg.GettextTranslator('cs', path=translation_path)
-        y1 = d1.localize(t2)
-        y2 = d2.localize(t2)
-        y3 = d3.localize(t2)
-        y4 = d4.localize(t2)
-        y5 = d5.localize(t2)
+        assert x6 == "21/12/2006 06:43:32 PM UTC", x6
+        loc2 = lcg.Localizer('cs', translation_path=translation_path, timezone=self.tzinfo(-60))
+        y1 = d1.localize(loc2)
+        y2 = d2.localize(loc2)
+        y3 = d3.localize(loc2)
+        y4 = d4.localize(loc2)
+        y5 = d5.localize(loc2)
+        y6 = d6.localize(loc2)
         assert y1 == "21.12.2006", y1
         assert y2 == "21.12.2006", y2
         assert y3 == "21.12.2006 02:43", y3
         assert y4 == u"Čt 21.12.2006 18:43:32", y4
         assert y5 == "30.1.2006", y5
+        assert y6 == u"21.12.2006 17:43:32", y6
         
     def test_concat(self):
         d = lcg.LocalizableDateTime("2006-01-30")
         c = "Date is: " + d
-        t = c.localize(lcg.GettextTranslator('en', path=translation_path))
+        t = c.localize(lcg.Localizer('en', translation_path=translation_path))
         assert t == "Date is: 30/01/2006", t
-        t = c.localize(lcg.GettextTranslator('cs', path=translation_path))
+        t = c.localize(lcg.Localizer('cs', translation_path=translation_path))
         assert t == "Date is: 30.01.2006", t
 
     def test_replace(self):
@@ -251,20 +273,20 @@ class LocalizableDateTime(unittest.TestCase):
         b = a.replace('-', '+')
         c = a.replace('/', '|')
         d = a.replace('.', ':')
-        t1 = lcg.GettextTranslator('en', path=translation_path)
-        t2 = lcg.GettextTranslator('cs', path=translation_path)
-        b1 = b.localize(t1)
-        b2 = b.localize(t2)
+        loc1 = lcg.Localizer('en', translation_path=translation_path)
+        loc2 = lcg.Localizer('cs', translation_path=translation_path)
+        b1 = b.localize(loc1)
+        b2 = b.localize(loc2)
         assert str(b) == "2006+01+30", str(b)
         assert b1 == "30/01/2006", b1
         assert b2 == "30.01.2006", b2
-        c1 = c.localize(t1)
-        c2 = c.localize(t2)
+        c1 = c.localize(loc1)
+        c2 = c.localize(loc2)
         assert str(c) == "2006-01-30", str(c)
         assert c1 == "30|01|2006", c1
         assert c2 == "30.01.2006", c2
-        d1 = d.localize(t1)
-        d2 = d.localize(t2)
+        d1 = d.localize(loc1)
+        d2 = d.localize(loc2)
         assert str(d) == "2006-01-30", str(d)
         assert d1 == "30/01/2006", d1
         assert d2 == "30:01:2006", d2
@@ -276,10 +298,10 @@ class LocalizableTime(unittest.TestCase):
     def test_format(self):
         t1 = lcg.LocalizableTime("02:43")
         t2 = lcg.LocalizableTime("18:43:32")
-        t1cs = t1.localize(lcg.GettextTranslator('cs', path=translation_path))
-        t2cs = t2.localize(lcg.GettextTranslator('cs', path=translation_path))
-        t1no = t1.localize(lcg.GettextTranslator('no', path=translation_path))
-        t2no = t2.localize(lcg.GettextTranslator('no', path=translation_path))
+        t1cs = t1.localize(lcg.Localizer('cs', translation_path=translation_path))
+        t2cs = t2.localize(lcg.Localizer('cs', translation_path=translation_path))
+        t1no = t1.localize(lcg.Localizer('no', translation_path=translation_path))
+        t2no = t2.localize(lcg.Localizer('no', translation_path=translation_path))
         assert t1cs == "02:43", t1cs
         assert t2cs == "18:43:32", t2cs
         assert t1no == "02.43", t1no
@@ -300,9 +322,9 @@ class Monetary(unittest.TestCase):
 
     def test_format(self):
         a = lcg.Monetary(8975.5)
-        a1 = lcg.Translator().translate(a)
-        a2 = lcg.Translator('cs').translate(a)
-        a3 = lcg.Translator('en').translate(a)
+        a1 = lcg.Localizer().localize(a)
+        a2 = lcg.Localizer('cs').localize(a)
+        a3 = lcg.Localizer('en').localize(a)
         assert a1 == '8975.50', a1
         assert a2 == u'8\xa0975,50', a2
         assert a3 == '8,975.50', a3
@@ -310,16 +332,16 @@ class Monetary(unittest.TestCase):
     def test_precision(self):
         a = lcg.Monetary(8975.5, precision=0)
         b = lcg.Monetary(8975.5, precision=3)
-        a1 = lcg.Translator().translate(a)
-        b1 = lcg.Translator().translate(b)
+        a1 = lcg.Localizer().localize(a)
+        b1 = lcg.Localizer().localize(b)
         assert a1 == '8976', a1
         assert b1 == '8975.500', b1
 
     def test_transform(self):
         a = lcg.Monetary(8975.5, precision=2)
         b = a.transform(lambda x: x.replace('.', ','))
-        a1 = lcg.Translator().translate(a)
-        b1 = lcg.Translator().translate(b)
+        a1 = lcg.Localizer().localize(a)
+        b1 = lcg.Localizer().localize(b)
         assert a1 == '8975.50', a1
         assert b1 == '8975,50', b1
         
@@ -329,12 +351,10 @@ tests.add(Monetary)
 class GettextTranslator(unittest.TestCase):
 
     def test_translate(self):
-        t = lcg.GettextTranslator('cs', path=translation_path)
-        a = _("%(name1)s is smarter than %(name2)s.", name1=_("Joe"), name2=_("Bob"))
-        b = t.translate(a)
-        assert b == u"Pepa je chytřejší než Bobik.", b
-        c = a.localize(t)
-        assert c == b, c
+        t = lcg.Localizer('cs', translation_path=translation_path).translator()
+        a = "%(name1)s is smarter than %(name2)s."
+        b = t.gettext(a, domain='test')
+        assert b == u"%(name1)s je chytřejší než %(name2)s.", b
 
 tests.add(GettextTranslator)
 
