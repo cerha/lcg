@@ -355,8 +355,9 @@ class TranslatablePluralForms(TranslatableText):
         return (self._singular, self._plural) + self._args
     
     def _translate(self, localizer):
-        return localizer.translator().ngettext(self._singular, self._plural, self._n,
-                                               domain=self._domain, origin=self._origin)
+        translator = localizer.translator()
+        return translator.ngettext(self._singular, self._plural, self._n,
+                                   domain=self._domain, origin=self._origin)
     
     
 class LocalizableDateTime(Localizable):

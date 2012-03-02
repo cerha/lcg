@@ -1342,7 +1342,7 @@ class Text(Element):
     def _export(self, context):
         content = self.content
         if isinstance(content, basestring):
-            result = context.translate(self.content)
+            result = context.localize(self.content)
         else:
             result = content.export(context)
         assert _ok_export_result(result), ('wrong export', result,)
