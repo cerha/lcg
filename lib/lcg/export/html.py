@@ -368,6 +368,25 @@ class HtmlGenerator(object):
         return '%s(%s)' % (fname, fargs)
 
 
+class Html5Generator(HtmlGenerator):
+    def _attr(self, valid, **kwargs):
+        kwargs_ = dict()
+        for name, value in kwargs.iteritems():
+            if value == True:
+                value = 'yes'
+            kwargs_[name] = value
+        return super(Html5Generator, self)._attr(valid, **kwargs_)
+
+    def _tag(self, tag, content=None, _attr=(), _newlines=False, _paired=True, **kwargs):
+        if not _paired:
+            print "Unpaired tag: " + tag
+            assert content is None
+            separator = _newlines and "\n" or ""
+            start = '<' + tag + self._attr(_attr, **kwargs) + '/>' + separator
+            return start
+        return super(Html5Generator, self)._tag(tag, content, _attr, _newlines, _paired, **kwargs)
+
+    
 class HtmlExporter(Exporter):
     Generator = HtmlGenerator
 
@@ -439,8 +458,7 @@ class HtmlExporter(Exporter):
         node = context.node()
         return [concat('<title>', self._title(context), '</title>')] + \
                ['<meta http-equiv="%s" content="%s">' % pair
-                for pair in (('Content-Type', 'text/html; charset=UTF-8'),
-                             ('Content-Language', context.lang()),
+                for pair in (('Content-Language', context.lang()),
                              ('Content-Script-Type', 'text/javascript'),
                              ('Content-Style-Type', 'text/css'),
                              ('X-UA-Compatible', 'edge'))] + \
@@ -968,6 +986,26 @@ class HtmlExporter(Exporter):
         parts = (g.head(self._head(context)),
                  g.body(body, **attr))
         return g.html(parts, lang=context.lang())
+
+
+class Html5Exporter(HtmlExporter):
+    Generator = Html5Generator
+    def _head(self, context):
+        node = context.node()
+        return [concat('<title>', self._title(context), '</title>')] + \
+               ['<meta charset="UTF-8"/>'] + \
+               ['<meta http-equiv="%s" content="%s"/>' % pair
+                for pair in (('Content-Type', 'text/html; charset=UTF-8'),
+                             ('Content-Language', context.lang()),
+                             ('Content-Script-Type', 'text/javascript'),
+                             ('Content-Style-Type', 'text/css'),
+                             ('X-UA-Compatible', 'edge'))] + \
+               ['<meta name="%s" content="%s"/>' % pair for pair in self._meta(context)] + \
+               ['<link rel="alternate" lang="%s" href="%s"/>' % \
+                (lang, self._uri_node(context, node, lang=lang))
+                for lang in node.variants() if lang != context.lang()] + \
+               ['<script language="Javascript" type="text/javascript"' + \
+                ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
 
 
 class HtmlFileExporter(FileExporter, HtmlExporter):

@@ -18,6 +18,7 @@
 
 from export import *
 from html import *
+from epub import EpubExporter
 try:
     import pdf
 except ImportError:

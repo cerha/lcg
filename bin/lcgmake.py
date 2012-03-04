@@ -45,6 +45,7 @@ OPTIONS = (
             ('pdf', False, "generate output in PDF format."),
             ('text', False, "generate a plain text file."),
             ('braille', False, "generate a Braille script file."),
+            ('epub', False, "generate output in EPUB format."),
             )),
     ("Output options", (
             ('lang=', None,
@@ -74,6 +75,7 @@ IMS = 'ims'
 PDF = 'pdf'
 TEXT = 'text'
 BRAILLE = 'braille'
+EPUB = 'epub'
 
 _debug = False
 
@@ -86,7 +88,7 @@ def main(argv):
     global _debug
     _debug = opt['debug']
     # Select the output format if options make sense.
-    formats = [k for k in (HTML, IMS, HHP, PDF, TEXT, BRAILLE,) if opt[k]]
+    formats = [k for k in (HTML, IMS, HHP, PDF, TEXT, BRAILLE, EPUB,) if opt[k]]
     if not formats:
         output_format = HTML
     elif len(formats) == 1:
@@ -113,7 +115,7 @@ def main(argv):
         lang = opt['lang']
         recourse = True
     if dst is None:
-        if output_format in (PDF, TEXT, BRAILLE,):
+        if output_format in (PDF, TEXT, BRAILLE, EPUB,):
             # PDF, plain text and Braille script have always just one output
             # file (per each language variant), so there is no harm to write it
             # to the current directory by default.  Other formats generate a
@@ -158,6 +160,9 @@ def main(argv):
     elif output_format == BRAILLE:
         from lcg import braille
         cls = lcg.BrailleExporter
+    elif output_format == EPUB:
+        from lcg import EpubExporter
+        cls = EpubExporter
     else:
         if output_format == IMS:
             from lcg import ims
@@ -174,6 +179,8 @@ def main(argv):
         output_format == BRAILLE and (dst.lower().endswith('.text') or dst.lower().endswith('.txt'))):
         # TODO: Something similar would make sense for other formats too, at least when generating
         # just one document (no recursion).
+        dst, filename = os.path.split(dst)
+    elif output_format == EPUB and dst.lower().endswith('.epub'):
         dst, filename = os.path.split(dst)
     else:
         filename = None
