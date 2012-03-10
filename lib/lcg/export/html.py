@@ -369,6 +369,7 @@ class HtmlGenerator(object):
 
 
 class Html5Generator(HtmlGenerator):
+    _DOCTYPE='<!DOCTYPE html>'
     def _attr(self, valid, **kwargs):
         kwargs_ = dict()
         for name, value in kwargs.iteritems():
@@ -385,6 +386,11 @@ class Html5Generator(HtmlGenerator):
             start = '<' + tag + self._attr(_attr, **kwargs) + '/>' + separator
             return start
         return super(Html5Generator, self)._tag(tag, content, _attr, _newlines, _paired, **kwargs)
+
+    def html(self, content, lang=None):
+        return concat('<?xml version="1.0" encoding="UTF-8"?>', '\n',
+                      self._DOCTYPE, '\n',
+                      self._tag('html', concat(content), _attr=('xmlns',), _newlines=True, lang=lang, xmlns='http://www.w3.org/1999/xhtml'))
 
     
 class HtmlExporter(Exporter):
@@ -993,13 +999,8 @@ class Html5Exporter(HtmlExporter):
     def _head(self, context):
         node = context.node()
         return [concat('<title>', self._title(context), '</title>')] + \
-               ['<meta charset="UTF-8"/>'] + \
                ['<meta http-equiv="%s" content="%s"/>' % pair
-                for pair in (('Content-Type', 'text/html; charset=UTF-8'),
-                             ('Content-Language', context.lang()),
-                             ('Content-Script-Type', 'text/javascript'),
-                             ('Content-Style-Type', 'text/css'),
-                             ('X-UA-Compatible', 'edge'))] + \
+                for pair in (('X-UA-Compatible', 'edge'),)] + \
                ['<meta name="%s" content="%s"/>' % pair for pair in self._meta(context)] + \
                ['<link rel="alternate" lang="%s" href="%s"/>' % \
                 (lang, self._uri_node(context, node, lang=lang))
