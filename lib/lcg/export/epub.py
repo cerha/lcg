@@ -102,7 +102,7 @@ class EpubExporter(Exporter):
         packagedoc_path = Constants.PATHSEP.join((self.Config.RESOURCEDIR, self.Config.PACKAGE_DOC_FILENAME,))
         rootfile.setAttribute('full-path', packagedoc_path)
         rootfile.setAttribute('media-type', Constants.PACKAGE_DOC_MIMETYPE)
-        return doc.toprettyxml(indent=4*' ', newl='\n', encoding='UTF-8')
+        return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
 
     def _package_document(self, node, lang):
         doc = xml.Document()
@@ -144,7 +144,7 @@ class EpubExporter(Exporter):
         for resource in node.resources():
             add_item('TODO', resource.filename(), mediatype=self._guess_media_type(resource))
         # export
-        return doc.toprettyxml(indent=4*' ', newl='\n', encoding='UTF-8')
+        return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
 
     def _guess_media_type(self, resource):
         #TODO
