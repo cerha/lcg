@@ -99,7 +99,7 @@ class EpubExporter(Exporter):
         container.setAttribute('version', '1.0')
         rootfiles = container.appendChild(doc.createElement('rootfiles'))
         rootfile = rootfiles.appendChild(doc.createElement('rootfile'))
-        packagedoc_path = Constants.PATHSEP.join((self.Config.RESOURCEDIR, self.Config.PACKAGE_DOC_FILENAME,))
+        packagedoc_path = self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME)
         rootfile.setAttribute('full-path', packagedoc_path)
         rootfile.setAttribute('media-type', Constants.PACKAGE_DOC_MIMETYPE)
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
