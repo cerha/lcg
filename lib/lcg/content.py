@@ -890,7 +890,7 @@ class Section(Container):
     """
     _ANCHOR_PREFIX = 'sec'
     
-    def __init__(self, title, content, anchor=None, in_toc=True, **kwargs):
+    def __init__(self, title, content, anchor=None, descr=None, in_toc=True, **kwargs):
         """Arguments:
 
           title -- plain text section title; basestring
@@ -913,6 +913,7 @@ class Section(Container):
         self._title = title
         self._in_toc = in_toc
         self._anchor = anchor
+        self._descr = descr
         self._backref = None
         super(Section, self).__init__(content, **kwargs)
 
@@ -933,6 +934,10 @@ class Section(Container):
     def title(self):
         """Return the section title as a basestring."""
         return self._title
+
+    def descr(self):
+        """Return a breif (but more verbose than title) description as a basestring or None."""
+        return self._descr
 
     def heading(self):
         """Return formatted section title as a 'Content' instance.
