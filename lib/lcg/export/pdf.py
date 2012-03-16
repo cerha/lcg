@@ -2580,7 +2580,7 @@ class PDFExporter(FileExporter, Exporter):
         backref = element.backref()
         level = pdf_context.heading_level
         if backref:
-            content = self.link(content, "#"+backref)
+            content = make_element(Link, content=content, uri="#"+backref)
         heading = make_element(Heading, content=[content], level=level)
         pdf_context.heading_level += 1
         inner_content = self._export_container(context, element)
