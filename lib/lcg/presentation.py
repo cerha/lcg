@@ -498,9 +498,7 @@ class StyleFile(object):
                         str_value = 'yes'
                     else:
                         str_value = 'no'
-                elif isinstance(value, lcg.UFont):
-                    str_value = str(value.size())
-                elif isinstance(value, basestring):
+                elif isinstance(value, (basestring, float,)):
                     str_value = unicode(value)
                 else:
                     raise Exception("Unsupported value type", value)
