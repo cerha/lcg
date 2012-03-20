@@ -1,3 +1,42 @@
+Version 0.6.0 (2012-03-20):
+
+  * `Section' can now have a description
+  * Generalized localization process and support for datetime conversions
+    during localization (induces some API changes, such as introduction of the
+    new `Localizer' class, new method 'Exporter.localizer()' instead of
+    `translator()' or renaming `Localizable.translate()' and
+    `Exporter.Context.translate()' to `localize()').  The changes should be
+    backwards compatible as there are aliases for the old methods
+    (`Exporter.translator()' will actually return a 'Localizer' instance, which
+    is, however API compatible with the former 'Translator', except for methods
+    used by LCG internally).
+  * Updated test cases to pass with the current implementation
+  * Resource filename is used for `InlineAudio' link label if no other label is
+    specified
+  * `Container.path()' renamed to `section_path()'
+  * Formatted text now allowed inside headings
+  * New function `format()' for translatable string formatting
+  * Added support for image thumbnails
+  * Added support for localization of country names
+  * Resource allocation now also works for types not in ResourceProvider._TYPEMAP
+  * Adjustments for Python 2.6
+  * HTML 4.0 Strict now used instead of HTML 4.0 Transitional
+  * Unicode is accepted where str was expected
+  * Structured text parser rewritten to allow more flexible contextual parsing
+    (e.g. nested constructs inside list items)
+  * Support for table row iterators in structured text documents
+  * Major PDF output improvements
+  * Support for defining parameters and presentation in structured text documents
+  * Improved lcgmake arguments processing
+  * Documentation updates and additions
+
+  Bug fixes:
+  * Fix bug in Monetary.transform()
+  * Fix locale specific formatting of integers
+  * Preserve translatable decimal numbar precision during transformations
+  * Don't recognize directories as resources in resource provider
+  * Fix image links for images with a thumbnail
+
 Version 0.5.1 (2011-01-17):
 
   * LCGDIR environment variable now only by the lcgmake script, not when
