@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2011 Brailcom, o.p.s.
+# Copyright (C) 2011, 2012 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -503,7 +503,7 @@ class StyleFile(object):
                 elif isinstance(value, basestring):
                     str_value = unicode(value)
                 else:
-                    raise Exception("Unsupported value type")
+                    raise Exception("Unsupported value type", value)
                 file.write('%s = %s\n' % (identifier, str_value,))                
 
     def presentations(self):
