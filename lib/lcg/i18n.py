@@ -420,6 +420,13 @@ class LocalizableDateTime(Localizable):
         self._show_seconds = len(numbers) > 5
         self._utc = utc
     
+    def _clone_kwargs(self):
+        return dict(super(LocalizableDateTime, self)._clone_kwargs(),
+                    show_weekday=self._show_weekday,
+                    show_time=self._show_time,
+                    leading_zeros=self._leading_zeros,
+                    utc=self._utc)
+    
     def _localize(self, localizer):
         data = localizer.locale_data()
         dt = self._datetime
