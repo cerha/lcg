@@ -752,7 +752,7 @@ class Exporter(object):
         In this class the method just returns the page break character.
         
         """
-        return '\n'
+        return '\f'
 
     def _export_horizontal_separator(self, context):
         """Export the given 'HorizontalSeparator' element.
