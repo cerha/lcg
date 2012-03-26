@@ -712,14 +712,6 @@ class Exporter(object):
         """
         return self.escape('')
 
-    def _export_horizontal_separator(self, context, element):
-        """Export the given 'HorizontalSeparator' element.
-
-        In this class the method just returns a form feed characted.
-        
-        """
-        return '\f'
-
     def _export_text_content(self, context, element):
         """Export the given 'TextContent' element.
 
