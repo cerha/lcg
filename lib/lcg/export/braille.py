@@ -266,8 +266,8 @@ class BrailleExporter(FileExporter, Exporter):
         return self.text(context, title, lang=element.lang())
 
     def _export_page_number(self, context, element):
-        return self.text(context, context.advance_page_number(), lang=element.lang())
+        return self.text(context, str(context.page_number()), lang=element.lang())
 
     def _page_formatter(self, context, **kwargs):
-        return self.text(context, context.advance_page_number())
+        return self.text(context, str(context.page_number()))
     

@@ -187,7 +187,7 @@ class PageNumber(Content):
     This content may be used only inside page headers and footers.
 
     """
-    def __init__(self, total=False, separator=None):
+    def __init__(self, total=False, separator=None, lang=None):
         """
         Arguments:
 
@@ -197,8 +197,10 @@ class PageNumber(Content):
           separator -- basestring or 'None'; if it is a basestring and 'total'
             is true, insert it betwenn the page numebr and the total number of
             pages
+          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
 
         """
+        super(PageNumber, self).__init__(lang=lang)
         self._total = total
         self._separator = separator
         
@@ -219,11 +221,14 @@ class HSpace(Content):
     can be used.
 
     """
-    def __init__(self, size):
+    def __init__(self, size, lang=None):
         """
         @type: L{Unit}
         @param: Size of the space.
+        @type: string
+        @param: Content language as an ISO 639-1 Alpha-2 language code (lowercase).
         """
+        super(HSpace, self).__init__(lang=lang)
         assert isinstance(size, Unit), size
         self._size = size
 

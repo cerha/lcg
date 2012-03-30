@@ -817,7 +817,7 @@ class Exporter(object):
 
     def _export_hspace(self, context, element):
         """Export the given 'HSpace' element."""
-        if element.size():
+        if element.size(context):
             text = self._space(context)
         else:
             text = ''
