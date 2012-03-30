@@ -1,3 +1,8 @@
+Version 0.6.1 (2012-03-30):
+
+  Bug fixes:
+  * Preserve LocalizableDateTime kwargs on cloning
+
 Version 0.6.0 (2012-03-20):
 
   * `Section' can now have a description
