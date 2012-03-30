@@ -29,8 +29,17 @@ See documentation of the individual classes for more details.
 
 """
 
-from lcg import *
+import collections
+import os
+import re
 import shutil
+
+from lcg import Anchor, Audio, concat, Container, Content, ContentNode, ContentVariants, \
+     DefinitionList, FieldSet, FormattedText, Heading, HorizontalSeparator, HSpace, Image, \
+     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, Link, Localizable, \
+     Localizer, log, NewPage, PageNumber, Paragraph, PreformattedText, Resource, Section, \
+     SetVariable, Table, TableCell, TableHeading, TableOfContents, TableRow, TextContent, \
+     Title, Video, VSpace
 
 
 class SubstitutionIterator(object):
@@ -183,14 +192,14 @@ class MarkupFormatter(object):
         self._paired_on_output = [type for type, format in self._FORMAT.items()
                                   if isinstance(format, tuple)]
     
-    def _markup_handler(self, context, match):
+    def _markup_handler(self, context, match, lang=None):
         exporter = context.exporter()
         type = [key for key, m in match.groupdict().items()
                 if m and not key in self._HELPER_PATTERNS][0]
-        markup = match.group(type)
-        backslashes = markup.count('\\')
-        markup = exporter.escape(markup[backslashes:])
-        prefix = exporter.escape(backslashes / 2 * '\\')
+        markup_group = match.group(type)
+        backslashes = markup_group.count('\\')
+        markup = exporter.text(context, markup_group[backslashes:], lang=lang)
+        prefix = exporter.text(context, backslashes / 2 * '\\', lang=lang)
         if backslashes % 2:
             return exporter.concat(prefix, markup)
         # We need two variables (start and end), because both can be False for
@@ -206,12 +215,12 @@ class MarkupFormatter(object):
         if not start and self._open and type == self._open[-1]:
             # Closing an open markup.
             self._open.pop()
-            result = self._formatter(context, type, match.groupdict(), close=True)
+            result = self._formatter(context, type, match.groupdict(), close=True, lang=lang)
         elif not end and not (start and type in self._open):
             # Start markup or an unpaired markup.
             if start:
                 self._open.append(type)
-            result = self._formatter(context, type, match.groupdict())
+            result = self._formatter(context, type, match.groupdict(), lang=lang)
         else:
             # Markup in an invalid context is just printed as is.
             # This can be end markup, which was not opened or start markup,
@@ -259,7 +268,7 @@ class MarkupFormatter(object):
         return result
     
     def _link_formatter(self, context, href=None, imgname=None, anchor=None, size=None,
-                        label_img=None, label=None, descr=None, align=None, **kwargs):
+                        label_img=None, label=None, descr=None, align=None, lang=None, **kwargs):
         parent = context.node()
         target = None
         # Prepare the link data like name, description, target
@@ -288,7 +297,7 @@ class MarkupFormatter(object):
         if target is None:
             if anchor is not None:
                 href += '#'+anchor
-            target = Link.ExternalTarget(href, label or href)
+            target = Link.ExternalTarget(href, label or href, lang=lang)
         if size:
             size = tuple(map(int, size.split('x')))
         if label_img:
@@ -300,72 +309,75 @@ class MarkupFormatter(object):
         # Create the resulting content element and return its exported string.
         if not label_image and isinstance(target, Image):
             result = InlineImage(target, title=label, descr=descr, name=imgname,
-                                 align=self._IMAGE_ALIGN_MAPPING.get(align), size=size)
+                                 align=self._IMAGE_ALIGN_MAPPING.get(align), size=size, lang=lang)
         elif isinstance(target, Audio):
-            result = InlineAudio(target, title=label, descr=descr, image=label_image, shared=True)
+            result = InlineAudio(target, title=label, descr=descr, image=label_image, shared=True,
+                                 lang=lang)
         elif isinstance(target, Video):
-            result = InlineVideo(target, title=label, descr=descr, image=label_image, size=size)
+            result = InlineVideo(target, title=label, descr=descr, image=label_image, size=size,
+                                 lang=lang)
         else:
             youtube_match = self._YOUTUBE_VIDEO_MATCHER.match(href)
             vimeo_match = self._VIMEO_VIDEO_MATCHER.match(href)
             if youtube_match:
                 video_id = youtube_match.group("video_id")
-                result = InlineExternalVideo('youtube', video_id, size=size)
+                result = InlineExternalVideo('youtube', video_id, size=size, lang=lang)
             elif vimeo_match:
                 video_id = vimeo_match.group("video_id")
-                result = InlineExternalVideo('vimeo', video_id, size=size)
+                result = InlineExternalVideo('vimeo', video_id, size=size, lang=lang)
             else:
                 if label_image:
                     name = os.path.splitext(os.path.basename(label_img))[0]
                     label = InlineImage(label_image, title=label, name=name,
-                                    align=self._IMAGE_ALIGN_MAPPING.get(align))
+                                        align=self._IMAGE_ALIGN_MAPPING.get(align))
                 #if isinstance(target, Link.ExternalTarget):
                 #    target = Link.ExternalTarget(href, label or href)
-                result = Link(target, label=label, descr=descr)
+                result = Link(target, label=label, descr=descr, lang=lang)
         result.set_parent(parent)
         return result.export(context)
     
-    def _uri_formatter(self, context, uri, imgname_, close=False, **kwargs):
-        return self._link_formatter(context, href=uri, label=None, imgname=imgname_)
+    def _uri_formatter(self, context, uri, imgname_, close=False, lang=None, **kwargs):
+        return self._link_formatter(context, href=uri, label=None, imgname=imgname_, lang=lang)
 
     def _page_formatter(self, context, **kwargs):
-        return ''
+        return context.exporter().text(context, '')
     
     def _total_pages_formatter(self, context, **kwargs):
-        return ''
+        return context.exporter().text(context, '')
 
-    def _escape_formatter(self, context, type, groups, **kwargs):
-        return groups['char']
+    def _escape_formatter(self, context, type, groups, lang=None, **kwargs):
+        return context.exporter().text(context, groups['char'], lang=lang)
 
-    def _formatter(self, context, type, groups, close=False):
+    def _formatter(self, context, type, groups, close=False, lang=None):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
         except AttributeError:
             formatter = None
         if formatter is not None:
-            result = formatter(context, close=close, **groups)
+            result = formatter(context, close=close, lang=lang, **groups)
         else:
             f = self._FORMAT.get(type, '')
             if type in self._paired_on_output and f:
                 if close:
-                    result = f[1]
+                    transformed = f[1]
                 else:
-                    result = f[0]
+                    transformed = f[0]
             else:
-                result = f
+                transformed = f
+            result = context.exporter().text(context, transformed, lang=lang)
         return result
         
-    def format(self, context, text):
+    def format(self, context, text, lang=None):
         exporter = context.exporter()
         self._open = []
         result = []
         pos = 0
         for match in self._rules.finditer(text):
-            starting_text = exporter.escape(text[pos:match.start()])
-            markup = self._markup_handler(context, match)
+            starting_text = exporter.text(context, text[pos:match.start()], lang=lang)
+            markup = self._markup_handler(context, match, lang=lang)
             result.extend((starting_text, markup))
             pos = match.end()
-        final_text = exporter.escape(text[pos:])
+        final_text = exporter.text(context, text[pos:], lang=lang)
         result.append(final_text)
         self._open.reverse()
         x = self._open[:]
@@ -389,8 +401,10 @@ class Exporter(object):
     
     """
 
-    Formatter = MarkupFormatter
-    
+    Formatter = MarkupFormatter    
+
+    _RE_SPACE_MATCHER = re.compile('  +')
+
     class Context(object):
         """Storage class containing complete data necessary for export.
 
@@ -604,7 +618,7 @@ class Exporter(object):
         except KeyError:
             raise UnsupportedElementType(element.__class__)
         return method(context, element)
-
+        
     def export(self, context):
         """Export the node represented by 'context' and return the corresponding output string.
 
@@ -633,6 +647,39 @@ class Exporter(object):
 
         """
         return concat(*items)
+
+    def text(self, context, text, lang=None):
+        """Return exported 'text'.
+
+        Arguments:
+
+          context -- current 'Context' instance
+          text -- text to convert; unicode
+          lang -- target language as an ISO 639-1 Alpha-2 lowercase
+            language code or 'None'
+
+        """
+        return self.escape(text)
+
+    def _reformat_text(self, text):
+        text = text.replace('\n', ' ')
+        text = text.replace('\r', ' ')
+        text = text.replace('\t', ' ')
+        text = self._RE_SPACE_MATCHER.sub(' ', text)
+        text = text.strip()
+        return text
+
+    def _newline(self, context, number=1):
+        return u'\n' * number
+
+    def _space(self, context, number=1):
+        return u' ' * number
+
+    def _list_item_prefix(self, context):
+        return u'• '
+
+    def _separator(self, context, lang=None):
+        return self.text(context, u' — ', lang=lang)
 
     # Inline constructs (text styles).
 
@@ -710,7 +757,7 @@ class Exporter(object):
         this method in derived classes.
 
         """
-        return self.escape('')
+        return self.text(context, '')
 
     def _export_text_content(self, context, element):
         """Export the given 'TextContent' element.
@@ -719,7 +766,8 @@ class Exporter(object):
         should not be necessary to override this method in derived classes.
         
         """
-        return self.escape(element.text())
+        t = self._reformat_text(element.text())
+        return self.text(context, t, lang=element.lang())
 
     def _export_formatted_text(self, context, element):
         """Export the given 'FormattedText' element.
@@ -733,9 +781,10 @@ class Exporter(object):
         if text:
             # Since formatting will destroy the translatable instances,
             # translate them before formatting.
-            result = self._formatter.format(context, context.localize(text))
+            t = self._reformat_text(context.localize(text))
+            result = self._formatter.format(context, t, lang=element.lang())
         else:
-            result = self.escape('')
+            result = self.text(context, '')
         return result
         
     def _export_anchor(self, context, element):
@@ -754,13 +803,9 @@ class Exporter(object):
         """
         return '\f'
 
-    def _export_horizontal_separator(self, context):
-        """Export the given 'HorizontalSeparator' element.
-
-        In this class the method just returns a form feed character.
-
-        """
-        return '\f'
+    def _export_horizontal_separator(self, context, element):
+        """Export the given 'HorizontalSeparator' element."""
+        return '\n'
 
     def _export_page_number(self, context, element):
         """Export the given 'PageNumber' element.
@@ -768,23 +813,19 @@ class Exporter(object):
         In this class this method returns an escaped empty text.
 
         """
-        return self.escape('')
+        return self.text(context, '')
 
     def _export_hspace(self, context, element):
-        """Export the given 'HSpace' element.
-
-        In this class this method returns an escaped empty text.
-          
-        """
-        return self.escape('')
+        """Export the given 'HSpace' element."""
+        if element.size():
+            text = self._space(context)
+        else:
+            text = ''
+        return self.text(context, text, lang=element.lang())
 
     def _export_vspace(self, context, element):
-        """Export the given 'VSpace' element.
-
-        In this class this method returns an escaped empty text.
-          
-        """
-        return self.escape('')
+        """Export the given 'VSpace' element."""
+        return self._newline(context, 2 if element.size() else 1)
 
     def _export_title(self, context, element):
         """Export the given 'Title' element.
@@ -805,7 +846,7 @@ class Exporter(object):
             title = item.title()
         else:
             title = id
-        return self.escape(title)
+        return self.text(context, title, lang=element.lang())
 
     def _export_preformatted_text(self, context, element):
         """Export verbatim text of given 'PreformattedText' element.
@@ -813,7 +854,7 @@ class Exporter(object):
         In this class the method returns just the escaped element text.
         
         """
-        return self.escape(element.text())
+        return self.text(context, element.text(), lang=element.lang())
 
     def _export_set_variable(self, context, element):
         """Set node variable defined by 'element'.
@@ -849,7 +890,11 @@ class Exporter(object):
         lines.
         
         """
-        return '\n' + element.title() + '\n\n' + self._export_container(context, element) + '\n'
+        return self.concat(self._newline(context),
+                           self.text(context, element.title(), element.lang()),
+                           self._newline(context, 2),
+                           self._export_container(context, element),
+                           self._newline(context))
 
     def _export_content_variants(self, context, element):
         """Export the proper language variant of 'ContentVariants' element.
@@ -861,85 +906,113 @@ class Exporter(object):
         """
         return element.variant(context.lang()).export(context)
  
-    def _export_itemized_list(self, context, element):
-        """Export given 'ItemizedList' element.
-
-        In this class the method returns just a concatenation of list items.
-
-        """
-        return self._export_container(context, element)
+    def _export_itemized_list(self, context, element, lang=None):
+        """Export given 'ItemizedList' element."""
+        numbering = element.order()
+        letters = u'abcdefghijklmnopqrstuvwxyz'
+        n_letters = len(letters)
+        item_number = [1]
+        def number():
+            n = item_number[0]
+            item_number[0] += 1
+            if numbering == ItemizedList.NUMERIC:
+                result = u'%d.' % (n,)
+            elif numbering in (ItemizedList.LOWER_ALPHA, ItemizedList.UPPER_ALPHA,):
+                result = letters[(n-1) % n_letters]
+                while n > n_letters:
+                    n = n / n_letters
+                    result = letters[(n-1) % n_letters] + result
+                if numbering == ItemizedList.UPPER_ALPHA:
+                   result = result.upper()
+            else:
+                result = self._list_item_prefix(context)
+            return result
+        content = [self._newline(context)]
+        for c in element.content():
+            content.append(self.text(context, number(), lang=lang))
+            content.append(c.export(context))
+        return self.concat(*content)
 
     def _export_definition_list(self, context, element):
-        """Export given 'DefinitionList' element.
-
-        In this class the method returns just a simple concatenation of
-        definition terms and their descriptions.
-
-        """
-        return self.concat(*[self.concat(dt.export(context), dd.export(context), '\n')
+        """Export given 'DefinitionList' element."""
+        lang = element.lang()
+        return self.concat(*[self.concat(dt.export(context),
+                                         self.text(context, self._separator(context), lang=lang),
+                                         dd.export(context),
+                                         self._newline(context))
                              for dt, dd in element.content()])
 
     def _export_field_set(self, context, element):
-        """Export given 'FieldSet' element.
-
-        In this class the method returns a simple concatenation of fieldset's
-        name/value pairs.
-        
-        """
+        """Export given 'FieldSet' element."""
         return self._export_definition_list(context, element)
             
     def _export_paragraph(self, context, element):
-        """Export given 'Paragraph' element.
-
-        In this class the method returns the exported paragraph content with an
-        empty line appended (two new line characters).
-        
-        """
-        return self.concat(self._export_container(context, element), '\n\n')
+        """Export given 'Paragraph' element."""
+        return self.concat(self._export_container(context, element), self._newline(context, 2))
 
     def _export_table_of_contents(self, context, element):
-        """Generate a Table of Contents for given 'TableOfContents' element.
-
-        In this class the method just returns an empty content.
-
-        """
-        return self.escape('')
+        """Generate a Table of Contents for given 'TableOfContents' element."""
+        # TODO: Implement page numbers
+        lang = element.lang()
+        item_list = []
+        def export(items):
+            for node, subitems in items:
+                if isinstance(node, Section):
+                    item_list.append(self.text(context, node.title(), lang=(node.lang() or lang)))
+                else:
+                    item_list.append(node.export(context))
+                item_list.append(self._newline(context))
+                if subitems:
+                    export(subitems)
+        return self.concat(self.text(context, element.title(), lang=lang),
+                           self._newline(context, 2),
+                           self.concat(*item_list))
 
     # Tables
 
     def _export_table(self, context, element):
-        """Export given 'Table' element.
-
-        In this class the method returns just the exported table content.
-
-        """
-        return content
+        """Export given 'Table' element."""
+        exported_rows = [row.export(context) for row in element.content()]
+        n_cells = 0
+        for row in exported_rows:
+            if isinstance(row, list):
+                n_cells = len(row)
+                widths = [0] * n_cells
+                break
+        else:
+            return self.concat(*exported_rows)
+        for row in exported_rows:
+            if isinstance(row, list):
+                for i in range(n_cells):
+                    widths[i] = max(widths[i], len(row[i]))
+        item_list = []
+        for row in exported_rows:
+            if isinstance(row, list):
+                for i in range(n_cells):
+                    cell = row[i]
+                    item_list.append(cell)
+                    item_list.append((self._space(context, widths[i] - len(cell) + 1), '2',))
+                item_list.append(self._newline(context))
+            else:
+                item_list.append(row)
+        return self.concat(*item_list)
 
     def _export_table_row(self, context, element):
-        """Export given 'TableRow' element.
-        
-        In this class the method returns just the exported row content.
-
-        """
-        return self._export_container(context, element)
+        """Export given 'TableRow' element."""
+        return [c.export(context) for c in element.content()]
         
     def _export_table_cell(self, context, element):
-        """Export given 'TableCell' element.
-        
-        In this class the method returns just the exported cell content.
-
-        """
+        """Export given 'TableCell' element."""
         return self._export_container(context, element)
 
     def _export_table_heading(self, context, element):
-        """Export given 'TableHeading' element.
-        
-        In this class the method returns the result of '_export_table_cell()'.
-
-        """
+        """Export given 'TableHeading' element."""
         return self._export_table_cell(context, element)
 
     # Media (represented by resources wrapped in inline content elements)
+
+    def _inline_export(self, context, label, lang=None):
+        return self.text(context, label, lang=lang)
 
     def _export_inline_image(self, context, element):
         """Export embedded image for given 'InlineImage' element.
@@ -947,7 +1020,8 @@ class Exporter(object):
         In this class the method returns just the escaped image title.
         
         """
-        return self.escape(element.title() or element.image().title() or element.image().filename())
+        label = element.title() or element.image().title() or element.image().filename()
+        return self._inline_export(context, label, lang=element.lang())
 
     def _export_inline_audio(self, context, element):
         """Export embedded audio player for given 'InlineAudio' element.
@@ -955,7 +1029,8 @@ class Exporter(object):
         In this class the method returns just the escaped audio title.
 
         """
-        return self.escape(element.title() or element.audio().title() or element.audio().filename())
+        label = element.title() or element.audio().title() or element.audio().filename()
+        return self._inline_export(context, label, lang=element.lang())
 
     def _export_inline_video(self, context, element):
         """Export embedded video player for given 'InlineVideo' element.
@@ -963,7 +1038,8 @@ class Exporter(object):
         In this class the method returns just the escaped video title.
 
         """
-        return self.escape(element.title() or element.video().title() or element.video().filename())
+        label = element.title() or element.video().title() or element.video().filename()
+        return self._inline_export(context, label, lang=element.lang())
 
     def _export_inline_external_video(self, context, element):
         """Export embedded video player for given 'InlineExternalVideo' element.
@@ -971,8 +1047,8 @@ class Exporter(object):
         In this class the method returns just the escaped video title.
         
         """
-        return self.escape(element.title() or \
-                           "Embedded Video %s id=%s" % (element.service(), element.video_id()))
+        label = element.title() or "Embedded Video %s id=%s" % (element.service(), element.video_id())
+        return self._inline_export(context, label, lang=element.lang())
     
         
 class FileExporter(object):
@@ -1084,3 +1160,7 @@ class UnsupportedElementType(Exception):
     def __init__(self, element_type):
         msg = "Element type not supported by the exporter: %s" % element_type
         super(UnsupportedElementType, self).__init__(msg)
+
+
+class TextExporter(FileExporter, Exporter):
+    _OUTPUT_FILE_EXT = 'text'

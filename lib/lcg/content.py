@@ -368,7 +368,7 @@ class InlineImage(Content):
     BOTTOM = 'bottom'
     MIDDLE = 'middle'
     
-    def __init__(self, image, title=None, descr=None, name=None, align=None, size=None):
+    def __init__(self, image, title=None, descr=None, name=None, align=None, size=None, lang=None):
         """Arguments:
 
           image -- 'Image' resource instance.
@@ -383,6 +383,7 @@ class InlineImage(Content):
             'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
             'None'
           size -- image size in pixels as a tuple of two integers (WIDTH, HEIGHT)
+          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
 
         If 'title' or 'descr' is None, the title/description defined by the
         'Image' resource instance is used.
@@ -401,7 +402,7 @@ class InlineImage(Content):
         self._descr = descr
         self._name = name
         self._size = size
-        super(InlineImage, self).__init__()
+        super(InlineImage, self).__init__(lang=lang)
 
     def image(self):
         """Return the value of 'image' as passed to the constructor."""
@@ -436,7 +437,7 @@ class InlineAudio(Content):
     
     """
        
-    def __init__(self, audio, title=None, descr=None, image=None, shared=True):
+    def __init__(self, audio, title=None, descr=None, image=None, shared=True, lang=None):
         """Arguments:
 
           audio -- 'Audio' resource instance.
@@ -444,6 +445,7 @@ class InlineAudio(Content):
           descr -- audio file description as a string.
           image -- visual presentation image as an 'Image' resource instance or None.
           shared -- boolean flag indicating whether using a shared audio player is desired.
+          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
 
         If 'title' or 'descr' is None, the title/description defined by the
         resource instance is used.
@@ -457,7 +459,7 @@ class InlineAudio(Content):
         self._descr = descr
         self._image = image
         self._shared = shared
-        super(InlineAudio, self).__init__()
+        super(InlineAudio, self).__init__(lang=lang)
 
     def audio(self):
         """Return the value of 'audio' as passed to the constructor."""
@@ -487,7 +489,7 @@ class InlineVideo(Content):
     
     """
        
-    def __init__(self, video, title=None, descr=None, image=None, size=None):
+    def __init__(self, video, title=None, descr=None, image=None, size=None, lang=None):
         """Arguments:
 
           video -- 'Video' resource instance.
@@ -495,6 +497,7 @@ class InlineVideo(Content):
           descr -- video file description as a string.
           image -- video thumbnail image as an 'Image' resource instance or None.
           size -- video size in pixels as a tuple of two integers (WIDTH, HEIGHT)
+          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
 
         If 'title' or 'descr' is None, the title/description defined by the
         resource instance is used.
@@ -506,7 +509,7 @@ class InlineVideo(Content):
         self._descr = descr
         self._image = image
         self._size = size
-        super(InlineVideo, self).__init__()
+        super(InlineVideo, self).__init__(lang=lang)
 
     def video(self):
         """Return the value of 'video' as passed to the constructor."""
@@ -536,7 +539,7 @@ class InlineExternalVideo(Content):
     player.
     
     """
-    def __init__(self, service, video_id, title=None, descr=None, size=None):
+    def __init__(self, service, video_id, title=None, descr=None, size=None, lang=None):
         """Arguments:
 
           service -- string identifier of the video service.  The two currently
@@ -544,6 +547,7 @@ class InlineExternalVideo(Content):
           video_id -- string identifier of the video within the given service.
           size -- explicit video size in pixels as a tuple of two integers
             (WIDTH, HEIGHT) or None for the default size.
+          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
           
         """
         assert service in ('youtube', 'vimeo'), service
@@ -554,7 +558,7 @@ class InlineExternalVideo(Content):
         self._title = title
         self._descr = descr
         self._size = size
-        super(InlineExternalVideo, self).__init__()
+        super(InlineExternalVideo, self).__init__(lang=lang)
 
     def service(self):
         """Return the string identifier of the video service."""
@@ -1121,25 +1125,29 @@ class Link(Container):
     
     class ExternalTarget(object):
         """Representation of an external target specified by its URI."""
-        def __init__(self, uri, title, descr=None):
+        def __init__(self, uri, title, descr=None, lang=None):
             """Arguments:
 
               uri -- URI of the link target as a string
               title -- title of the target as a string or unicode
               descr -- ???
+              lang -- lowercase ISO 639-1 Alpha-2 language code
               
             """
             self._uri = uri
             self._title = title
             self._descr = descr
+            self._lang = lang
         def uri(self):
             return self._uri
         def title(self):
             return self._title
         def descr(self):
             return self._descr
+        def lang(self):
+            return self._lang
     
-    def __init__(self, target, label=None, descr=None, type=None):
+    def __init__(self, target, label=None, descr=None, type=None, lang=None):
         """Arguments:
 
           target -- target of the link, it may be either a 'Section' instance
@@ -1150,12 +1158,14 @@ class Link(Container):
           descr -- breif target description text.  If none the description is
              taken from the 'target' instance depending on its type
           type -- ???
+          lang -- lowercase ISO 639-1 Alpha-2 language code
         
         """
         assert isinstance(target, (Section, ContentNode, self.ExternalTarget, Resource)), target
-        assert label is None or isinstance(label, (str, unicode, Content)), label
-        assert descr is None or isinstance(descr, (str, unicode)), descr
-        assert type is None or isinstance(type, (str, unicode)), type
+        assert label is None or isinstance(label, (basestring, Content)), label
+        assert descr is None or isinstance(descr, basestring), descr
+        assert type is None or isinstance(type, basestring), type
+        assert lang is None or isinstance(lang, basestring), lang
         if label is None:
             if isinstance(target, (ContentNode, Section)):
                 label = target.heading()
@@ -1172,7 +1182,7 @@ class Link(Container):
         self._target = target
         self._descr = descr
         self._type = type
-        super(Link, self).__init__(content)
+        super(Link, self).__init__(content, lang=lang)
 
     def target(self):
         """Return the value of 'target' as passed to the constructor."""
