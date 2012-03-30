@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ OPTIONS = (
             ('hhp', False, "generate a MS HTML Help Workshop package."),
             ('ims', False, "generate an IMS package."),
             ('pdf', False, "generate output in PDF format."),
+            ('text', False, "generate a plain text file."),
+            ('braille', False, "generate a Braille script file."),
             )),
     ("Output options", (
             ('lang=', None,
@@ -67,6 +69,8 @@ HTML = 'html'
 HHP = 'hhp'
 IMS = 'ims'
 PDF = 'pdf'
+TEXT = 'text'
+BRAILLE = 'braille'
 
 def main():
     # Process options.
@@ -75,7 +79,7 @@ def main():
     except getopt.GetoptError:
         usage()
     # Select the output format if options make sense.
-    formats = [k for k in (HTML, IMS, HHP, PDF) if opt[k]]
+    formats = [k for k in (HTML, IMS, HHP, PDF, TEXT, BRAILLE,) if opt[k]]
     if not formats:
         output_format = HTML
     elif len(formats) == 1:
@@ -102,10 +106,11 @@ def main():
         lang = opt['lang']
         recourse = True
     if dst is None:
-        if output_format == PDF:
-            # PDF has always just one output file (per each language variant), so there is no harm
-            # to write it to the current directory by default.  Other formats generate a file
-            # structure, so we require an explicit directory name.
+        if output_format in (PDF, TEXT, BRAILLE,):
+            # PDF, plain text and Braille script have always just one output
+            # file (per each language variant), so there is no harm to write it
+            # to the current directory by default.  Other formats generate a
+            # file structure, so we require an explicit directory name.
             dst = '.'
         elif output_format == HTML and not recourse:
             opt['inline-styles'] = True
@@ -141,6 +146,11 @@ def main():
     elif output_format == HHP:
         from lcg import hhp
         cls = hhp.HhpExporter
+    elif output_format == TEXT:
+        cls = lcg.TextExporter
+    elif output_format == BRAILLE:
+        from lcg import braille
+        cls = lcg.BrailleExporter
     else:
         if output_format == IMS:
             from lcg import ims
@@ -152,7 +162,9 @@ def main():
     # Create the exporter instance.
     exporter = cls(translations=translations, **kwargs)
     # Write the exported content to output file(s).
-    if output_format == PDF and dst.lower().endswith('.pdf'):
+    if (output_format == PDF and dst.lower().endswith('.pdf') or
+        output_format == TEXT and (dst.lower().endswith('.text') or dst.lower().endswith('.txt')) or
+        output_format == BRAILLE and (dst.lower().endswith('.text') or dst.lower().endswith('.txt'))):
         # TODO: Something similar would make sense for other formats too, at least when generating
         # just one document (no recursion).
         dst, filename = os.path.split(dst)
@@ -252,11 +264,12 @@ If <source> is a file, a single document is read just from this file (options
 --root and --ext have no effect).  Inline styles are forced to true in this
 case if outout format is HTML.
 
-<destination> is the target directory.  It may be omited if output is PDF
-(always has single output file) or HTML with single source document (resulting
-in one output file too).  The output is placed in the current directory in
-this case.  In other cases the destination directory is required to prevent
-unwanted polution of the current directory by the output files.
+<destination> is the target directory.  It may be omited if output is PDF,
+plain text or Braille script (they always have single output file) or HTML with
+single source document (resulting in one output file too).  The output is
+placed in the current directory in this case.  In other cases the destination
+directory is required to prevent unwanted polution of the current directory by
+the output files.
 
 Environment variables:
 
