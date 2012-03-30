@@ -42,7 +42,7 @@ class BrailleExporter(FileExporter, Exporter):
             assert isinstance(hyphenation_tables, dict), hyphenation_tables
             self._tables = tables
             self._hyphenation_tables = hyphenation_tables
-            self._page_number = 0
+            self._page_number = 1
 
         def tables(self, lang):
             if lang is None:
@@ -63,9 +63,13 @@ class BrailleExporter(FileExporter, Exporter):
             self._tables = tables
             self._hyphenation_tables = hyphenation_tables
 
-        def advance_page_number(self):
-            self._page_number += 1
+        def page_number(self):
             return self._page_number
+        
+        def advance_page_number(self):
+            page_number = self._page_number
+            self._page_number += 1
+            return page_number
 
     def export(self, context):
         # Presentation
@@ -87,7 +91,8 @@ class BrailleExporter(FileExporter, Exporter):
         if page_height:
             assert isinstance(page_height, (UFont, USpace,)), page_height
             page_height = page_height.size()
-        status_line = node.page_footer(lang)
+        left_status_line = presentation.left_page_footer or node.left_page_footer(lang)
+        right_status_line = presentation.right_page_footer or node.right_page_footer(lang)
         device_table = presentation.device_output
         if device_table is None:
             device_table = {' ': ' ', '\n': '\n', '\f': '\f'}
@@ -131,16 +136,17 @@ class BrailleExporter(FileExporter, Exporter):
                 hyphenation = hyphenation[1:]
         # Page breaking
         if page_height:
-            if status_line:
+            if left_status_line or right_status_line:
                 page_height -= 1
             new_pages = []
             def add_page(page):
+                status_line = left_status_line if context.page_number() % 2 else right_status_line
                 page = page + [''] * (page_height - len(page))
                 if status_line:
-                    # TODO: page number
                     exported_status_line, __ = status_line.export(context)
                     page.append(exported_status_line)
                 new_pages.append(page)
+                context.advance_page_number()
             for page in pages:
                 while len(page) > page_height:
                     add_page(page[:page_height])

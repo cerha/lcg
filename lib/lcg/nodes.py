@@ -41,8 +41,8 @@ class ContentNode(object):
 
     def __init__(self, id, title=None, brief_title=None, descr=None, variants=(), content=None,
                  children=(), hidden=False, active=True, resource_provider=None, globals=None,
-                 page_header=None, page_footer=None, first_page_header=None, page_background=None,
-                 presentation=None):
+                 page_header=None, page_footer=None, left_page_footer=None, right_page_footer=None,
+                 first_page_header=None, page_background=None, presentation=None):
         """Initialize the instance.
 
         Arguments:
@@ -105,6 +105,10 @@ class ContentNode(object):
         self._first_page_header = first_page_header
         assert page_footer is None or isinstance(page_footer, dict) and all ([x is None or isinstance(x, Content) for x in page_footer.values()]), page_footer
         self._page_footer = page_footer
+        assert left_page_footer is None or isinstance(left_page_footer, dict) and all ([x is None or isinstance(x, Content) for x in left_page_footer.values()]), left_page_footer
+        self._left_page_footer = left_page_footer
+        assert right_page_footer is None or isinstance(right_page_footer, dict) and all ([x is None or isinstance(x, Content) for x in right_page_footer.values()]), right_page_footer
+        self._right_page_footer = right_page_footer
         assert page_background is None or isinstance(page_background, dict) and all ([x is None or isinstance(x, Content) for x in page_background.values()]), page_background
         self._page_background = page_background
         assert presentation is None or isinstance(presentation, dict) and all ([x is None or isinstance(x, Presentation) for x in presentation.values()]), presentation
@@ -354,6 +358,16 @@ class ContentNode(object):
     def page_footer(self, lang):
         """Return the page footer."""
         return self._lang_parameter(self._page_footer, lang)
+
+    def left_page_footer(self, lang):
+        """Return the page footer for left pages."""
+        return (self._lang_parameter(self._left_page_footer, lang) or
+                self._lang_parameter(self._page_footer, lang))
+
+    def right_page_footer(self, lang):
+        """Return the page footer for right pages."""
+        return (self._lang_parameter(self._right_page_footer, lang) or
+                self._lang_parameter(self._page_footer, lang))
 
     def first_page_header(self, lang):
         """Return the first page header."""

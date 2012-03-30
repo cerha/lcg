@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -123,6 +123,8 @@ class Parser(object):
     _PARAMETERS = {'header': ('parameter', 'page_header', None,),
                    'first_page_header': ('parameter', 'first_page_header', None,),
                    'footer': ('parameter', 'page_footer', None,),
+                   'left_footer': ('parameter', 'left_page_footer', None,),
+                   'right_footer': ('parameter', 'right_page_footer', None,),
                    'background': ('parameter', 'page_background', None,),
                    'font_size': ('presentation', 'font_size', float,),
                    'font_name': ('presentation', 'font_name', None,),

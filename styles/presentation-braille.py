@@ -19,7 +19,7 @@
 
 """Default presentation file for Braille output."""
 
-from lcg import UFont
+import lcg
 
 braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': ['cs-g1.ctb']}
@@ -27,5 +27,11 @@ braille_hyphenation_tables = {'en': 'hyph_en_US.dic'}
 # Hyphenation is quite buggy in current liblouis,
 # so let's disable it for now.
 braille_hyphenation_tables = {}
-page_width = UFont(40)
-page_height = UFont(25)
+page_width = lcg.UFont(40)
+page_height = lcg.UFont(25)
+left_page_footer = lcg.Container((lcg.PageNumber(),
+                                  lcg.HSpace(lcg.UFont(3)),
+                                  lcg.TextContent(u"Structured Text Formatting Manual"),))
+right_page_footer = lcg.Container((lcg.TextContent(u"Structured Text Formatting Manual"),
+                                   lcg.HSpace(lcg.UFont(3)),
+                                   lcg.PageNumber(),))

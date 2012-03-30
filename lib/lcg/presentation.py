@@ -152,7 +152,11 @@ class Presentation(object):
     names (strings) for liblouis.
     Useful only for Braille output.
     """
-
+    left_page_footer = None
+    """Custom left page footer, 'lcg.Content' instance or 'None'."""
+    right_page_footer = None
+    """Custom right page footer, 'lcg.Content' instance or 'None'."""
+    
 
 class ContentMatcher(object):
     """Matcher for presentations.
