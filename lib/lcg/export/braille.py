@@ -184,7 +184,7 @@ class BrailleExporter(FileExporter, Exporter):
         if hyphenation_table is None:
             hyphenation = ''
             for c in braille:
-                hyphenation += ('2' if c in string.whitespace else '0')
+                hyphenation += ('2' if (c in string.whitespace or c == u'\u2800') else '0')
         else:
             hyphenation_tables = tables + [hyphenation_table]
             braille_text = louis.translateString(tables, text, typeform=copy.copy(typeform))
