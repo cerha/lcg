@@ -119,18 +119,38 @@ class Presentation(object):
     page_width = None
     """Page width, non-relative 'Unit'.
     If 'None', use the default value.
-    It currently works only for PDF pages if set for the top level node.
+    It currently works only for PDF pages or Braille output (restricted to
+    UFont and USpace instances) if set for the top level node.
     """
     page_height = None
     """Page height, non-relative 'Unit'.
     If 'None', use the default value.
-    It currently works only for PDF pages if set for the top level node.
+    It currently works only for PDF pages or Braille output (restricted to
+    UFont and USpace instances) if set for the top level node.
     """
     landscape = None
     """Page orientation.
     If False then use portrait orientation, if True then use landscape orientation.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
+    """
+    device_output = None
+    """Device output specification.
+    It is currently used only for Braille output where it is a dictionary
+    mapping Unicode Braille and whitespace characters to output device
+    characters.
+    """
+    braille_tables = None
+    """Dictionary of Braille tables to use.
+    Keys are language codes (strings), values are lists of Braille table names
+    (strings) for liblouis.
+    Useful only for Braille output.
+    """
+    braille_hyphenation_tables = None
+    """Dictionary of Braille hyphenation tables to use.
+    Keys are language codes (strings), values are Braille hyphenation table
+    names (strings) for liblouis.
+    Useful only for Braille output.
     """
 
 
