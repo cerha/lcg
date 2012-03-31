@@ -2250,7 +2250,7 @@ class PDFMarkupFormatter(MarkupFormatter):
     def _total_pages_formatter(self, context, **kwargs):
         return make_element(PageNumber, total=True)
     
-    def format(self, context, text):
+    def format(self, context, text, lang=None):
         if not hasattr(context, 'pdf_markup_stack'):
             context.pdf_markup_stack = []
         e = context.exporter()
