@@ -136,7 +136,7 @@ class Content(object):
     def lang(self, inherited=True):
         """Return the content language as lowercase ISO 639-1 Alpha-2 language code.
 
-        Arguemnts:
+        Arguments:
         
           inherited -- iff True, the language will be determined from the
             parent element in the hierarchy if this element doesn't define
@@ -161,7 +161,6 @@ class Content(object):
 
         """
         return context.exporter().export_element(context, self)
-    #return context.exporter().escape('')
 
     
 class HorizontalSeparator(Content):
