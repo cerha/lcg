@@ -404,7 +404,8 @@ class Exporter(object):
     Formatter = MarkupFormatter    
 
     _RE_SPACE_MATCHER = re.compile('  +')
-
+    _HFILL = u''
+    
     class Context(object):
         """Storage class containing complete data necessary for export.
 
@@ -445,6 +446,7 @@ class Exporter(object):
             self._exporter = exporter
             self._formatter = formatter
             self._node = node
+            self._toc_markers = {}
             self._init_kwargs(lang=lang, **kwargs)
 
         def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None):
@@ -484,6 +486,14 @@ class Exporter(object):
         
         def uri(self, target, **kwargs):
             return self._exporter.uri(self, target, **kwargs)
+
+        def toc_element(self, marker):
+            return self._toc_markers[marker]
+            
+        def add_toc_marker(self, element):
+            marker = unicode(len(self._toc_markers))
+            self._toc_markers[marker] = element
+            return marker
             
     def __init__(self, translations=()):
         self._formatter = self.Formatter()
@@ -659,6 +669,8 @@ class Exporter(object):
             language code or 'None'
 
         """
+        if text and self._private_char(text[0]):
+            text = ''
         return self.escape(text)
 
     def _reformat_text(self, text):
@@ -680,6 +692,10 @@ class Exporter(object):
 
     def _separator(self, context, lang=None):
         return self.text(context, u' — ', lang=lang)
+
+    def _private_char(self, char):
+        char_code = ord(char)
+        return 57344 <= char_code and char_code <= 63743
 
     # Inline constructs (text styles).
 
@@ -890,7 +906,9 @@ class Exporter(object):
         lines.
         
         """
-        return self.concat(self._newline(context),
+        toc_marker = context.add_toc_marker(element)
+        return self.concat(self.text(context, u'%s' % (toc_marker,)),
+                           self._newline(context, 2),
                            self.text(context, element.title(), element.lang()),
                            self._newline(context, 2),
                            self._export_container(context, element),
@@ -952,18 +970,24 @@ class Exporter(object):
 
     def _export_table_of_contents(self, context, element):
         """Generate a Table of Contents for given 'TableOfContents' element."""
-        # TODO: Implement page numbers
         lang = element.lang()
+        presentation_set = context.presentation()
+        presentation = presentation_set and presentation_set.presentation(None, lang)
+        page_width = presentation and presentation.page_width
         item_list = []
         def export(items):
             for node, subitems in items:
+                current_lang = (node.lang() or lang)
                 if isinstance(node, Section):
-                    item_list.append(self.text(context, node.title(), lang=(node.lang() or lang)))
+                    item_list.append(self.text(context, node.title(), lang=current_lang))
                 else:
                     item_list.append(node.export(context))
+                item_list.append(self.text(context, self._HFILL if page_width else ' '))
+                item_list.append(self.text(context, node.page_number(context), lang=current_lang))
                 item_list.append(self._newline(context))
                 if subitems:
                     export(subitems)
+        export(element.items(context))
         return self.concat(self.text(context, element.title(), lang=lang),
                            self._newline(context, 2),
                            self.concat(*item_list))

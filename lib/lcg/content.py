@@ -63,6 +63,7 @@ class Content(object):
         self._parent = None
         self._container = None
         self._lang = lang
+        self._page_number = ''
         super(Content, self).__init__()
         
     def container_path(self):
@@ -148,6 +149,34 @@ class Content(object):
         if lang is None and inherited and self._container:
             lang = self._container.lang()
         return lang
+
+    def page_number(self, context):
+        """Return page number of the content element.
+
+        This is to be used in table of contents.
+
+        Arguments:
+        
+          context -- formatting context as a 'Exporter.Context' instance
+            created and returned by 'Exporter.context' method
+            
+        """
+        return self._page_number
+
+    def set_page_number(self, context, number):
+        """Set page number of the content element.
+
+        This is to be used in table of contents.
+
+        Arguments:
+        
+          context -- formatting context as a 'Exporter.Context' instance
+            created and returned by 'Exporter.context' method
+          number -- the page number; basestring
+          
+        """
+        assert isinstance(number, basestring), number
+        self._page_number = number
 
     def export(self, context):
         """Return the formatted content in an output specific form.

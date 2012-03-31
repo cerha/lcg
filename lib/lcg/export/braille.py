@@ -71,6 +71,9 @@ class BrailleExporter(FileExporter, Exporter):
             self._page_number += 1
             return page_number
 
+        def reset_page_number(self):
+            self._page_number = 1
+
     def export(self, context):
         # Presentation
         presentation_set = context.presentation()
@@ -102,57 +105,86 @@ class BrailleExporter(FileExporter, Exporter):
         hyphenation_tables = presentation.braille_hyphenation_tables
         context.set_tables(braille_tables, hyphenation_tables)
         # Export
-        text, hyphenation = super(BrailleExporter, self).export(context)
-        # Line breaking
-        page_strings = text.split('\f')
-        pages = [p.split('\n') for p in page_strings]
-        if page_width:
-            for i in range(len(pages)):
-                lines = []
-                for line in pages[i]:
-                    while len(line) > page_width:
-                        pos = page_width
-                        if hyphenation[pos] != '2':
-                            pos -= 1
-                            while pos > 0 and hyphenation[pos] == '0':
+        def run_export(page_height=page_height):
+            text, hyphenation = super(BrailleExporter, self).export(context)
+            assert len(text) == len(hyphenation)
+            # Line breaking
+            hfill = self._HFILL
+            page_strings = text.split('\f')
+            pages = [p.split('\n') for p in page_strings]
+            if page_width:
+                for i in range(len(pages)):
+                    lines = []
+                    for line in pages[i]:
+                        while len(line) > page_width:
+                            pos = page_width
+                            if hyphenation[pos] != '2':
                                 pos -= 1
-                        if pos == 0:
-                            lines.append(line[:page_width])
-                            line = line[page_width:]
-                            hyphenation = hyphenation[page_width:]
-                        elif hyphenation[pos] == '1':
-                            lines.append(line[:pos] + self.text(context, u'-', lang=lang)[0])
-                            line = line[pos:]
-                            hyphenation = hyphenation[pos:]
-                        elif hyphenation[pos] == '2':
-                            lines.append(line[:pos])
-                            line = line[pos+1:]
-                            hyphenation = hyphenation[pos+1:]
+                                while pos > 0 and hyphenation[pos] == '0':
+                                    pos -= 1
+                            if pos == 0:
+                                lines.append(line[:page_width])
+                                line = line[page_width:]
+                                hyphenation = hyphenation[page_width:]
+                            elif hyphenation[pos] == '1':
+                                lines.append(line[:pos] + self.text(context, u'-', lang=lang)[0])
+                                line = line[pos:]
+                                hyphenation = hyphenation[pos:]
+                            elif hyphenation[pos] == '2':
+                                lines.append(line[:pos])
+                                line = line[pos+1:]
+                                hyphenation = hyphenation[pos+1:]
+                            else:
+                                raise Exception("Program error", hyphenation[pos])
+                        pos = line.find(hfill)
+                        if pos >= 0:
+                            fill_len = (page_width - len(line) + len(hfill))
+                            line = (line[:pos] + ' '*fill_len + line[pos+len(hfill):])
+                            hyphenation = (hyphenation[:pos] + '0'*fill_len + hyphenation[pos+len(hfill):])
+                        lines.append(line)
+                        hyphenation = hyphenation[len(line)+1:]
+                    pages[i] = lines
+                    hyphenation = hyphenation[1:]
+            else:
+                for i in range(len(pages)):
+                    pages[i] = [line.replace(hfill, ' ') for line in pages[i]]
+            # Page breaking
+            if page_height:
+                context.reset_page_number()
+                if left_status_line or right_status_line:
+                    page_height -= 1
+                new_pages = []
+                def add_page(page):
+                    page.reverse()
+                    lines = []
+                    while page and len(lines) < page_height:
+                        l = page.pop()
+                        if l and l[0] == u'':
+                            marker = l[1:]
+                            page_number = unicode(context.page_number())
+                            context.toc_element(marker).set_page_number(context, page_number)
                         else:
-                            raise Exception("Program error")
-                    lines.append(line)
-                    hyphenation = hyphenation[len(line)+1:]
-                pages[i] = lines
-                hyphenation = hyphenation[1:]
-        # Page breaking
-        if page_height:
-            if left_status_line or right_status_line:
-                page_height -= 1
-            new_pages = []
-            def add_page(page):
-                status_line = left_status_line if context.page_number() % 2 else right_status_line
-                page = page + [''] * (page_height - len(page))
-                if status_line:
-                    exported_status_line, __ = status_line.export(context)
-                    page.append(exported_status_line)
-                new_pages.append(page)
-                context.advance_page_number()
-            for page in pages:
-                while len(page) > page_height:
-                    add_page(page[:page_height])
-                    page = page[page_height:]
-                add_page(page)
-            pages = new_pages
+                            lines.append(l)
+                    status_line = left_status_line if context.page_number() % 2 else right_status_line
+                    lines = lines + [''] * (page_height - len(lines))
+                    if status_line:
+                        exported_status_line, __ = status_line.export(context)
+                        lines.append(exported_status_line)
+                    new_pages.append(lines)
+                    context.advance_page_number()
+                    page.reverse()
+                for page in pages:
+                    while len(page) > page_height:
+                        add_page(page)
+                    add_page(page)
+                pages = new_pages
+            else:
+                for i in range(len(pages)):
+                    pages[i] = [line for line in pages[i] if not line or line[0] != u'']
+            return pages
+        # Two-pass export in order to get page numbers in table of contents
+        run_export()
+        pages = run_export()
         # Device character set transformation
         final_text = string.join([string.join(p, '\n') for p in pages], '\f')
         output = ''
@@ -183,6 +215,8 @@ class BrailleExporter(FileExporter, Exporter):
         assert lang is None or isinstance(lang, basestring), lang
         if not text:
             return '', ''
+        if self._private_char(text[0]):
+            return text, '0' * len(text)
         tables = context.tables(lang)
         typeform = [form] * len(text)
         braille = louis.translateString(tables, text, typeform=copy.copy(typeform), mode=louis.dotsIO+128)
