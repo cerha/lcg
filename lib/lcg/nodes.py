@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -333,6 +333,10 @@ class ContentNode(object):
             return self._resource_provider.resource(filename, node=self, **kwargs)
         else:
             return None
+
+    def resource_provider(self, filename, **kwargs):
+        """Get the 'ResourceProvider' instance associated with this node."""
+        return self._resource_provider
 
     def _lang_parameter(self, dictionary, lang):
         if dictionary is None:
