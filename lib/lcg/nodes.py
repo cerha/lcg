@@ -334,7 +334,7 @@ class ContentNode(object):
         else:
             return None
 
-    def resource_provider(self, filename, **kwargs):
+    def resource_provider(self):
         """Get the 'ResourceProvider' instance associated with this node."""
         return self._resource_provider
 
