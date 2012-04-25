@@ -891,7 +891,14 @@ class Exporter(object):
         In this class the method returns just the escaped element text.
         
         """
-        return self.text(context, element.text(), lang=element.lang())
+        text = element.text()
+        lang = element.lang()
+        text_lines = text.split('\n')
+        output_lines = [self.text(context, text_lines[0], lang=lang)]
+        for l in text_lines[1:]:
+            output_lines.append(self._newline(context))
+            output_lines.append(self.text(context, l, lang=lang))
+        return self.concat(*output_lines)
 
     def _export_set_variable(self, context, element):
         """Set node variable defined by 'element'.
