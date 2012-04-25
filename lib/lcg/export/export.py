@@ -973,10 +973,12 @@ class Exporter(object):
             else:
                 result = self._list_item_prefix(context)
             return result
-        content = [self._newline(context)]
+        content = []
         for c in element.content():
             content.append(self.text(context, number(), lang=lang))
             content.append(c.export(context))
+            content.append(self._newline(context))
+        content.append(self._newline(context))
         return self.concat(*content)
 
     def _export_definition_list(self, context, element):
