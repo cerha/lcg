@@ -2197,9 +2197,9 @@ def make_element(cls, **kwargs):
 
 class PDFMarkupFormatter(MarkupFormatter):
 
-    _FORMAT = {'comment': make_element(Empty),
-               'dash': make_element(Text, content=u'—'),
-               'nbsp': make_element(Text, content=u' ')}
+    _FORMAT = {'comment': '',
+               'dash': u'—',
+               'nbsp': u' '}
                
     class _StackEntry(object):
         def __init__(self, markup):
@@ -2335,6 +2335,14 @@ class PDFExporter(FileExporter, Exporter):
                 result = make_element(TextContainer, content=list(exported))
         else:
             result = make_element(Container, content=())
+        return result
+    
+    def text(self, context, text, lang=None):
+        assert isinstance(text, basestring), text
+        if text:
+            result = make_element(Text, content=text)
+        else:
+            result = make_element(Empty)
         return result
     
     def escape(self, text):
