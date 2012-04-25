@@ -898,6 +898,7 @@ class Exporter(object):
         for l in text_lines[1:]:
             output_lines.append(self._newline(context))
             output_lines.append(self.text(context, l, lang=lang))
+        output_lines.append(self._newline(context))
         return self.concat(*output_lines)
 
     def _export_set_variable(self, context, element):
