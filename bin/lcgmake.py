@@ -72,12 +72,12 @@ PDF = 'pdf'
 TEXT = 'text'
 BRAILLE = 'braille'
 
-def main():
+def main(argv):
     # Process options.
     try:
-        opt, args = getoptions()
+        opt, args = getoptions(argv)
     except getopt.GetoptError:
-        usage()
+        usage(argv)
     # Select the output format if options make sense.
     formats = [k for k in (HTML, IMS, HHP, PDF, TEXT, BRAILLE,) if opt[k]]
     if not formats:
@@ -92,7 +92,7 @@ def main():
     elif len(args) == 2:
         src, dst = args
     else:
-        usage()
+        usage(argv)
     if os.path.isfile(src):
         src, filename = os.path.split(src)
         basename, master_ext = os.path.splitext(filename)
@@ -211,10 +211,10 @@ def read_style(filename):
         f.close()
     return lcg.PresentationSet(style_file.presentations())
 
-def getoptions():
+def getoptions(argv):
     optspec = functools.reduce(operator.add, [optspec for section, optspec in OPTIONS], ())
     import getopt
-    opts, args = getopt.getopt(sys.argv[1:], '', [x[0] for x in optspec])
+    opts, args = getopt.getopt(argv[1:], '', [x[0] for x in optspec])
     optdict = dict(opts)
     options = {}
     for option, default, doc in optspec:
@@ -249,7 +249,7 @@ def die(msg):
     sys.stderr.write(msg +"\n")
     sys.exit(2)
 
-def usage():
+def usage(argv):
     help = """Usage: %s [options] source [destination]
 
 %s
@@ -281,7 +281,7 @@ Environment variables:
              
 
 """
-    die(help % (os.path.split(sys.argv[0])[-1], dumpoptions(width=80, indent=2)))
+    die(help % (os.path.split(argv[0])[-1], dumpoptions(width=80, indent=2)))
 
 def lcg_exception_details(title, details=[], reason=None):
     """Print LCG specific details about the printed exception.
@@ -306,7 +306,7 @@ def lcg_exception_details(title, details=[], reason=None):
 
 if __name__ == "__main__":
     try:
-        main()
+        main(sys.argv)
     except KeyboardInterrupt:
         raise
     except SystemExit:
