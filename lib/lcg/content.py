@@ -241,6 +241,15 @@ class PageNumber(Content):
         return self._separator
 
 
+class PageHeading(Content):
+    """Current page heading.
+
+    This content may be used only inside page headers and footers.
+
+    """
+    pass
+
+
 class HSpace(Content):
     """Horizontal space of given size.
 

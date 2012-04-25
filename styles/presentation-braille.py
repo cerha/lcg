@@ -31,8 +31,8 @@ page_width = lcg.UFont(40)
 page_height = lcg.UFont(25)
 left_page_footer = lcg.Container((lcg.PageNumber(),
                                   lcg.HSpace(lcg.UFont(3)),
-                                  lcg.TextContent(u"Structured Text Formatting Manual"),))
-right_page_footer = lcg.Container((lcg.TextContent(u"Structured Text Formatting Manual"),
+                                  lcg.PageHeading(),))
+right_page_footer = lcg.Container((lcg.PageHeading(),
                                    lcg.HSpace(lcg.UFont(3)),
                                    lcg.PageNumber(),))
 

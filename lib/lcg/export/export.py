@@ -37,7 +37,7 @@ import shutil
 from lcg import Anchor, Audio, concat, Container, Content, ContentNode, ContentVariants, \
      DefinitionList, FieldSet, FormattedText, Heading, HorizontalSeparator, HSpace, Image, \
      InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, Link, Localizable, \
-     Localizer, log, NewPage, PageNumber, Paragraph, PreformattedText, Resource, Section, \
+     Localizer, log, NewPage, PageHeading, PageNumber, Paragraph, PreformattedText, Resource, Section, \
      SetVariable, Table, TableCell, TableHeading, TableOfContents, TableRow, TextContent, \
      Title, Video, VSpace
 
@@ -448,6 +448,7 @@ class Exporter(object):
             self._node = node
             self._toc_markers = {}
             self._init_kwargs(lang=lang, **kwargs)
+            self._page_heading = None
 
         def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None):
             self._lang = lang
@@ -494,6 +495,12 @@ class Exporter(object):
             marker = unicode(len(self._toc_markers))
             self._toc_markers[marker] = element
             return marker
+        
+        def page_heading(self):
+            return self._page_heading
+
+        def set_page_heading(self, heading):
+            self._page_heading = heading
             
     def __init__(self, translations=()):
         self._formatter = self.Formatter()
@@ -530,6 +537,7 @@ class Exporter(object):
                 HorizontalSeparator: self._export_horizontal_separator,
                 NewPage: self._export_new_page,
                 PageNumber: self._export_page_number,
+                PageHeading: self._export_page_heading,
                 Title: self._export_title,
                 HSpace: self._export_hspace,
                 VSpace: self._export_vspace,
@@ -559,7 +567,9 @@ class Exporter(object):
                 }
     
     def _export(self, node, context):
-        return self.concat(node.heading().export(context),
+        heading = node.heading().export(context)
+        context.set_page_heading(heading)
+        return self.concat(heading,
                            self._newline(context, 2),
                            node.content().export(context))
 
@@ -828,6 +838,14 @@ class Exporter(object):
 
     def _export_page_number(self, context, element):
         """Export the given 'PageNumber' element.
+
+        In this class this method returns an escaped empty text.
+
+        """
+        return self.text(context, '')
+
+    def _export_page_heading(self, context, element):
+        """Export the given 'PageHeading' element.
 
         In this class this method returns an escaped empty text.
 
