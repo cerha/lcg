@@ -669,6 +669,7 @@ class Exporter(object):
             language code or 'None'
 
         """
+        assert isinstance(text, basestring), text
         if text and self._private_char(text[0]):
             text = ''
         return self.escape(text)
