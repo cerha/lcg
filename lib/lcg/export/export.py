@@ -559,7 +559,9 @@ class Exporter(object):
                 }
     
     def _export(self, node, context):
-        return node.content().export(context)
+        return self.concat(node.heading().export(context),
+                           self._newline(context, 2),
+                           node.content().export(context))
 
     def uri(self, context, target, **kwargs):
         """Return the URI of the target as string.
