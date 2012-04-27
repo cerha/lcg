@@ -937,11 +937,9 @@ class Exporter(object):
         """
         toc_marker = context.add_toc_marker(element)
         return self.concat(self.text(context, u'%s' % (toc_marker,)),
-                           self._newline(context, 2),
                            self.text(context, element.title(), element.lang()),
                            self._newline(context, 2),
-                           self._export_container(context, element),
-                           self._newline(context))
+                           self._export_container(context, element))
 
     def _export_content_variants(self, context, element):
         """Export the proper language variant of 'ContentVariants' element.
@@ -982,18 +980,20 @@ class Exporter(object):
         content.append(self._newline(context))
         return self.concat(*content)
 
-    def _export_definition_list(self, context, element):
+    def _export_definition_list(self, context, element, add_newlines=False):
         """Export given 'DefinitionList' element."""
         lang = element.lang()
-        return self.concat(*[self.concat(dt.export(context),
-                                         self.text(context, self._separator(context), lang=lang),
-                                         dd.export(context),
-                                         self._newline(context))
-                             for dt, dd in element.content()])
+        n_newlines = 1 if add_newlines else 0
+        items = self.concat(*[self.concat(dt.export(context),
+                                          self.text(context, self._separator(context), lang=lang),
+                                          dd.export(context),
+                                          self._newline(context, n_newlines))
+                              for dt, dd in element.content()])
+        return self.concat(items, self._newline(context, n_newlines))
 
     def _export_field_set(self, context, element):
         """Export given 'FieldSet' element."""
-        return self._export_definition_list(context, element)
+        return self._export_definition_list(context, element, add_newlines=True)
             
     def _export_paragraph(self, context, element):
         """Export given 'Paragraph' element."""
@@ -1021,7 +1021,8 @@ class Exporter(object):
         export(element.items(context))
         return self.concat(self.text(context, element.title(), lang=lang),
                            self._newline(context, 2),
-                           self.concat(*item_list))
+                           self.concat(*item_list),
+                           self._newline(context))
 
     # Tables
 
