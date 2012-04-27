@@ -832,9 +832,10 @@ class Exporter(object):
         """
         return '\f'
 
-    def _export_horizontal_separator(self, context, element):
+    def _export_horizontal_separator(self, context, element, width=64, in_table=False):
         """Export the given 'HorizontalSeparator' element."""
-        return '\n'
+        separator = u'─' * width
+        return self.concat(self.text(context, separator), self._newline(context))
 
     def _export_page_number(self, context, element):
         """Export the given 'PageNumber' element.
@@ -1028,7 +1029,16 @@ class Exporter(object):
 
     def _export_table(self, context, element):
         """Export given 'Table' element."""
-        exported_rows = [row.export(context) for row in element.content()]
+        separator = HorizontalSeparator()
+        content = element.content()
+        exported_rows = []
+        if content and content[0].line_above:
+            exported_rows.append(separator)            
+        for row in element.content():
+            exported_rows.append(row.export(context))
+            if row.line_below:
+                exported_rows.append(separator)
+        widths = []
         n_cells = 0
         for row in exported_rows:
             if isinstance(row, list):
@@ -1041,16 +1051,33 @@ class Exporter(object):
             if isinstance(row, list):
                 for i in range(n_cells):
                     widths[i] = max(widths[i], len(row[i]))
+        total_width = 0
+        # Unclean (but easy): the separators are exported out of context
+        vertical_separator, vertical_separator_width = self._vertical_cell_separator(context)
+        for w in widths:
+            total_width += w + vertical_separator_width + 1
+        if widths:
+            total_width += 1
+        exported_separator = self._export_horizontal_separator(context, separator, width=total_width,
+                                                               in_table=True)
         item_list = []
         for row in exported_rows:
             if isinstance(row, list):
+                if n_cells > 0:
+                    item_list.append(vertical_separator)
                 for i in range(n_cells):
                     cell = row[i]
                     item_list.append(cell)
-                    item_list.append((self._space(context, widths[i] - len(cell) + 1), '2',))
+                    space = self._space(context, widths[i] - len(cell) + 1)
+                    item_list.append(self.text(context, space))
+                    item_list.append(vertical_separator)
                 item_list.append(self._newline(context))
+            elif row is separator:
+                if exported_separator is not None:
+                    item_list.append(exported_separator)
             else:
                 item_list.append(row)
+        item_list.append(self._newline(context))
         return self.concat(*item_list)
 
     def _export_table_row(self, context, element):
@@ -1064,6 +1091,9 @@ class Exporter(object):
     def _export_table_heading(self, context, element):
         """Export given 'TableHeading' element."""
         return self._export_table_cell(context, element)
+
+    def _vertical_cell_separator(self, context):
+        return u'│ ', 2
 
     # Media (represented by resources wrapped in inline content elements)
 

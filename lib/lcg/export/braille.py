@@ -298,9 +298,14 @@ class BrailleExporter(FileExporter, Exporter):
     def _export_new_page(self, context):
         return '\f', '0'
 
-    def _export_horizontal_separator(self, context, element):
+    def _export_horizontal_separator(self, context, element, width=64, in_table=False):
+        if in_table:
+            return None
         return '\n', '0'
 
+    def _vertical_cell_separator(self, context):
+        return (u' ', '1',), 1
+    
     def _export_title(self, context, element):
         title = super(BrailleExporter, self)._export_title(context, element)
         return self.text(context, title, lang=element.lang())
