@@ -216,7 +216,7 @@ class BrailleExporter(FileExporter, Exporter):
         if not text:
             return '', ''
         if self._private_char(text[0]):
-            return text, '0' * len(text)
+            return text + '\n', '0' * (len(text) + 1)
         tables = context.tables(lang)
         typeform = [form] * len(text)
         braille = louis.translateString(tables, text, typeform=copy.copy(typeform), mode=louis.dotsIO+128)
