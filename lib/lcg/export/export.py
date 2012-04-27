@@ -172,7 +172,14 @@ class MarkupFormatter(object):
     _FORMAT = {'linebreak': '\n',
                'comment': '',
                'dash': u'—',
-               'nbsp': u' '}
+               'nbsp': u' ',
+               'emphasize': ('', ''),
+               'strong': ('', ''),
+               'fixed': ('', ''),
+               'underline': ('', ''),
+               'citation': ('', ''),
+               'quotation': ('', ''),
+               }
 
     _BLANK_MATCHER = re.compile('\s+')
     _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
@@ -347,6 +354,9 @@ class MarkupFormatter(object):
 
     def _escape_formatter(self, context, type, groups, lang=None, **kwargs):
         return context.exporter().text(context, groups['char'], lang=lang)
+    
+    def _email_formatter(self, context, email, close=False, **kwargs):
+        return context.exporter().text(context, email)
 
     def _formatter(self, context, type, groups, close=False, lang=None):
         try:
