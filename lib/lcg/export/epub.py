@@ -55,11 +55,11 @@ class EpubExporter(Exporter):
                 mimeinfo.compress_type = zipfile.ZIP_STORED
                 epub.writestr(mimeinfo, Constants.EPUB_MIMETYPE)
                 epub.writestr(self._meta_path('container.xml'), self._ocf_container(node, lang))
-                epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME), self._package_document(node, lang))
                 epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), self._navigation_document(node, lang))
                 for n in node.linear():
                     epub.writestr(self._node_path(n), self._xhtml_content_document(n, lang))
-                for resource in node.resources():
+                epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME), self._package_document(node, lang))
+                for resource in node.resource_provider().resources():
                     epub.writestr(self._resource_path(resource), resource.get())
             except:
                 epub.close()
@@ -141,7 +141,7 @@ class EpubExporter(Exporter):
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
             add_item(n.id(), href, mediatype='application/xhtml+xml')
             add_itemref(n.id())
-        for resource in node.resources():
+        for resource in node.resource_provider().resources():
             add_item('TODO', resource.filename(), mediatype=self._guess_media_type(resource))
         # export
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
