@@ -392,6 +392,15 @@ class Html5Generator(HtmlGenerator):
                       self._DOCTYPE, '\n',
                       self._tag('html', concat(content), _attr=('xmlns',), _newlines=True, lang=lang, xmlns='http://www.w3.org/1999/xhtml'))
 
+    def audio(self, src, compatibility_content=False):
+        content = None
+        paired = False
+        if compatibility_content:
+            content = compatibility_content
+            paired = True
+        audio = self._tag('audio', compatibility_content, _attr=('src', 'controls',), _paired=paired, src=src, controls=True)
+        return audio
+
     
 class HtmlExporter(Exporter):
     Generator = HtmlGenerator
@@ -1007,6 +1016,16 @@ class Html5Exporter(HtmlExporter):
                 for lang in node.variants() if lang != context.lang()] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
+
+    def _export_inline_audio(self, context, element):
+        """Override with HTML5 audio element."""
+        g = self._generator
+        audio = element.audio()
+        # TODO image not supported
+        # TODO shared not supported
+        # TODO title not supported
+        # TODO descr not supported
+        return g.audio(src=uri)
 
 
 class HtmlFileExporter(FileExporter, HtmlExporter):
