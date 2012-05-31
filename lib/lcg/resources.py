@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009, 2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2009, 2011, 2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,15 +39,13 @@ class Resource(object):
     SUBDIR = None
     """Name of the subdirectory where files are searched on input and stored on output."""
     
-    def __init__(self, filename, title=None, descr=None, src_file=None, uri=None):
+    def __init__(self, filename, title=None, descr=None, src_file=None, uri=None, info=None):
         """Arguments:
         
-          filename -- unique string identifying the resource.
-
+          filename -- unique string identifying the resource (typisally its
+            file name).
           title -- optional user visible resource title as a string or None.
-
           descr -- optional user visible resource description as a string or None.
- 
           src_file -- absolut pathname of the source file.  If None, the resource will not be
             exported.  The source file is normally located by the resource provider and this
             argument is supplied automatically, so you usually do not need to care about it.  In
@@ -56,12 +54,14 @@ class Resource(object):
             part of the path) must not necessarily be the same as 'filename'.  This may indicate
             that a conversion is necessary on export (such as WAV to MP3; see the particular
             'Exporter' class for the supported conversions).
-
           uri -- resource's URI as a string.  If None, the URI will be supplied by the exporter
             automatically (the exporter is normally responsible for exporting the file to a
             location with a corresponding URI).  Supplying the URI directly to the resource
             constructor may be, however, needed when the resource is handled by the application
             specifically.
+          info -- additional application specific information about the
+            attachment.  No particular limitation on the content is defined and
+            LCG ignores this value alltogether.
             
         """
         super(Resource, self).__init__()
@@ -75,6 +75,7 @@ class Resource(object):
         self._descr = descr
         self._src_file = src_file
         self._uri = uri
+        self._info = info
                  
     def filename(self):
         """Return the unique resource identifier as a string."""
@@ -95,6 +96,10 @@ class Resource(object):
     def uri(self):
         """Return the resource URI passed to the constructor or None."""
         return self._uri
+
+    def info(self):
+        """Return the resource info as passed to the constructor or None."""
+        return self._info
 
     def get(self):
         """Return the resource file contents as a byte string or None if it does not exist."""
