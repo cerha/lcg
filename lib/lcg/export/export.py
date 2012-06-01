@@ -33,6 +33,7 @@ import collections
 import os
 import re
 import shutil
+import string
 
 from lcg import Anchor, Audio, concat, Container, Content, ContentNode, ContentVariants, \
      DefinitionList, FieldSet, FormattedText, Heading, HorizontalSeparator, HSpace, Image, \
@@ -414,7 +415,8 @@ class Exporter(object):
     Formatter = MarkupFormatter    
 
     _RE_SPACE_MATCHER = re.compile('  +')
-    _HFILL = u''
+    _TOC_MARKER_CHAR = u'\ue000'
+    _HFILL = u'\ue001\ue001\ue001'
     
     class Context(object):
         """Storage class containing complete data necessary for export.
@@ -459,6 +461,7 @@ class Exporter(object):
             self._toc_markers = {}
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
+            self.list_level = 0
 
         def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None):
             self._lang = lang
@@ -710,6 +713,16 @@ class Exporter(object):
     def _space(self, context, number=1):
         return u' ' * number
 
+    def _indent(self, exported, indentation, init_indentation=None):
+        if init_indentation is None:
+            init_indentation = indentation
+        lines = exported.split('\n')
+        if lines:
+            space = u' ' * indentation
+            lines = ([u' ' * init_indentation + lines[0]] +
+                     [space+l if l else '' for l in lines[1:]])
+        return string.join(lines, '\n')
+
     def _list_item_prefix(self, context):
         return u'• '
 
@@ -947,7 +960,7 @@ class Exporter(object):
         
         """
         toc_marker = context.add_toc_marker(element)
-        return self.concat(self.text(context, u'%s' % (toc_marker,)),
+        return self.concat(self.text(context, u'%s%s' % (self._TOC_MARKER_CHAR, toc_marker,)),
                            self.text(context, element.title(), element.lang()),
                            self._newline(context, 2),
                            self._export_container(context, element))
@@ -972,7 +985,7 @@ class Exporter(object):
             n = item_number[0]
             item_number[0] += 1
             if numbering == ItemizedList.NUMERIC:
-                result = u'%d.' % (n,)
+                result = u'%d. ' % (n,)
             elif numbering in (ItemizedList.LOWER_ALPHA, ItemizedList.UPPER_ALPHA,):
                 result = letters[(n-1) % n_letters]
                 while n > n_letters:
@@ -980,15 +993,19 @@ class Exporter(object):
                     result = letters[(n-1) % n_letters] + result
                 if numbering == ItemizedList.UPPER_ALPHA:
                    result = result.upper()
+                result += u'. '
             else:
                 result = self._list_item_prefix(context)
             return result
         content = []
+        context.list_level += 1
         for c in element.content():
-            content.append(self.text(context, number(), lang=lang))
-            content.append(c.export(context))
+            content.append(self._indent(self.text(context, number(), lang=lang), 0))
+            content.append(self._indent(c.export(context), 2, 0))
             content.append(self._newline(context))
-        content.append(self._newline(context))
+        context.list_level -= 1
+        if context.list_level == 0:
+            content.append(self._newline(context))
         return self.concat(*content)
 
     def _export_definition_list(self, context, element, add_newlines=False):

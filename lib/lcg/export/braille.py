@@ -32,6 +32,8 @@ class BrailleExporter(FileExporter, Exporter):
     """Transforming structured content objects to Braille output.    
     """
     _OUTPUT_FILE_EXT = 'brl'
+    _INDENTATION_CHAR = u'\ue010'
+    _NEXT_INDENTATION_CHAR = u'\ue011'
 
     class Context(Exporter.Context):
 
@@ -116,6 +118,27 @@ class BrailleExporter(FileExporter, Exporter):
                 for i in range(len(pages)):
                     lines = []
                     for line in pages[i]:
+                        prefix_len = 0
+                        while prefix_len < len(line) and line[prefix_len] == self._INDENTATION_CHAR:
+                            prefix_len += 1
+                        next_prefix_len = prefix_len
+                        while True:
+                            start = line.find(self._NEXT_INDENTATION_CHAR)
+                            if start < 0:
+                                break
+                            end = start + 1
+                            while end < len(line) and line[end] == self._NEXT_INDENTATION_CHAR:
+                                end += 1
+                            line = line[:start] + line[end:]
+                            hyphenation = hyphenation[:start] + hyphenation[end:]
+                            next_prefix_len += end - start
+                        prefix = u' ' * next_prefix_len
+                        prefix_limit = page_width / 2
+                        if next_prefix_len > prefix_limit:
+                            prefix = prefix[:prefix_limit]
+                        hyphenation_prefix = '0' * len(prefix)
+                        if prefix_len > 0:
+                            line = u' ' * prefix_len + line[prefix_len:]
                         while len(line) > page_width:
                             pos = page_width
                             if hyphenation[pos] != '2':
@@ -124,22 +147,22 @@ class BrailleExporter(FileExporter, Exporter):
                                     pos -= 1
                             if pos == 0:
                                 lines.append(line[:page_width])
-                                line = line[page_width:]
-                                hyphenation = hyphenation[page_width:]
+                                line = prefix + line[page_width:]
+                                hyphenation = hyphenation_prefix + hyphenation[page_width:]
                             elif hyphenation[pos] == '1':
                                 lines.append(line[:pos] + self.text(context, u'-', lang=lang)[0])
-                                line = line[pos:]
-                                hyphenation = hyphenation[pos:]
+                                line = prefix + line[pos:]
+                                hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == '2':
                                 lines.append(line[:pos])
-                                line = line[pos+1:]
-                                hyphenation = hyphenation[pos+1:]
+                                line = prefix + line[pos+1:]
+                                hyphenation = hyphenation_prefix + hyphenation[pos+1:]
                             else:
                                 raise Exception("Program error", hyphenation[pos])
                         pos = line.find(hfill)
                         if pos >= 0:
                             fill_len = (page_width - len(line) + len(hfill))
-                            line = (line[:pos] + ' '*fill_len + line[pos+len(hfill):])
+                            line = (line[:pos] + u' '*fill_len + line[pos+len(hfill):])
                             hyphenation = (hyphenation[:pos] + '0'*fill_len + hyphenation[pos+len(hfill):])
                         lines.append(line)
                         hyphenation = hyphenation[len(line)+1:]
@@ -159,7 +182,7 @@ class BrailleExporter(FileExporter, Exporter):
                     lines = []
                     while page and len(lines) < page_height:
                         l = page.pop()
-                        if l and l[0] == u'':
+                        if l and l[0] == self._TOC_MARKER_CHAR:
                             marker = l[1:]
                             page_number = unicode(context.page_number())
                             context.toc_element(marker).set_page_number(context, page_number)
@@ -180,7 +203,7 @@ class BrailleExporter(FileExporter, Exporter):
                 pages = new_pages
             else:
                 for i in range(len(pages)):
-                    pages[i] = [line for line in pages[i] if not line or line[0] != u'']
+                    pages[i] = [line for line in pages[i] if not line or line[0] != self._TOC_MARKER_CHAR]
             return pages
         # Two-pass export in order to get page numbers in table of contents
         run_export()
@@ -260,6 +283,38 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _newline(self, context, number=1):
         return '\n'*number, '0'*number
+    
+    def _indent(self, exported, indentation, init_indentation=None):
+        if init_indentation is None:
+            init_indentation = indentation
+        text, hyphenation = exported
+        n = 0
+        new_text = ''
+        new_hyphenation = ''
+        lines = text.split('\n')
+        if lines:
+            new_text += self._INDENTATION_CHAR * init_indentation
+            if indentation > init_indentation:
+                diff = indentation - init_indentation
+                new_text += self._NEXT_INDENTATION_CHAR * diff
+            new_text += lines[0]
+            n += len(lines[0])
+            new_hyphenation += u'0' * max(init_indentation, indentation) + hyphenation[:n]
+            space = self._INDENTATION_CHAR * indentation
+            space_hyphenation = u'0' * indentation
+            for l in lines[1:]:
+                new_text += '\n'
+                n += 1
+                new_hyphenation += u'0'
+                if l:
+                    new_text += space + l
+                    m = n
+                    n += len(l)
+                    new_hyphenation += space_hyphenation + hyphenation[m:n]
+        assert n == len(hyphenation), (n, len(hyphenation),)
+        assert len(new_text) == len(new_hyphenation), \
+               (new_text, len(new_text), new_hyphenation, len(new_hyphenation),)
+        return new_text, new_hyphenation
 
     def _list_item_prefix(self, context):
         return u'- '
