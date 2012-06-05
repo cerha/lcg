@@ -337,10 +337,20 @@ class BrailleExporter(FileExporter, Exporter):
         return self.text(context, text, form=louis.underline)
     
     def superscript(self, context, text):
-        return self.text(context, text)
+        lang = context.lang()
+        text, hyphenation = self.text(context, text)
+        if lang == 'cs':
+            text = u'⠌' + text + u'⠱'
+            hyphenation = '0' + hyphenation + '0'
+        return text, hyphenation
     
     def subscript(self, context, text):
-        return self.text(context, text)
+        lang = context.lang()
+        text, hyphenation = self.text(context, text)
+        if lang == 'cs':
+            text = u'⠡' + text + u'⠱'
+            hyphenation = '0' + hyphenation + '0'
+        return text, hyphenation
     
     def citation(self, context, text):
         return self.text(context, text)
