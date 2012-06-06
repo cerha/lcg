@@ -834,7 +834,7 @@ class Exporter(object):
             # Since formatting will destroy the translatable instances,
             # translate them before formatting.
             t = self._reformat_text(context.localize(text))
-            result = self._formatter.format(context, t, lang=element.lang())
+            result = self._formatter.format(context, t, lang=(element.lang() or context.lang()))
         else:
             result = self.text(context, '')
         return result
