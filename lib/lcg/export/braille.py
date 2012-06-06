@@ -25,12 +25,33 @@ import string
 import louis
 
 from lcg import Presentation, UFont, USpace
-from export import Exporter, FileExporter
+from export import Exporter, FileExporter, MarkupFormatter
 
+
+class BrailleFormatter(MarkupFormatter):
+
+    def _set_form(self, context, close, form):
+        if close:
+            context.unset_form(form)
+        else:
+            context.set_form(form)
+        return '', ''
+    
+    def _emphasize_formatter(self, context, close=False, **kwargs):
+        return self._set_form(context, close, louis.italic)
+
+    def _strong_formatter(self, context, close=False, **kwargs):
+        return self._set_form(context, close, louis.bold)
+
+    def _underline_formatter(self, context, close=False, **kwargs):
+        return self._set_form(context, close, louis.underline)
+    
 
 class BrailleExporter(FileExporter, Exporter):
     """Transforming structured content objects to Braille output.    
     """
+    Formatter = BrailleFormatter
+    
     _OUTPUT_FILE_EXT = 'brl'
     _INDENTATION_CHAR = u'\ue010'
     _NEXT_INDENTATION_CHAR = u'\ue011'
@@ -45,6 +66,7 @@ class BrailleExporter(FileExporter, Exporter):
             self._tables = tables
             self._hyphenation_tables = hyphenation_tables
             self._page_number = 1
+            self._form = louis.plain_text
 
         def tables(self, lang):
             if lang is None:
@@ -75,6 +97,15 @@ class BrailleExporter(FileExporter, Exporter):
 
         def reset_page_number(self):
             self._page_number = 1
+
+        def form(self):
+            return self._form
+
+        def set_form(self, form):
+            self._form = self._form | form
+
+        def unset_form(self, form):
+            self._form = self._form & ~form
 
     def export(self, context):
         # Presentation
@@ -220,7 +251,7 @@ class BrailleExporter(FileExporter, Exporter):
     def concat(self, *items):
         return string.join([i[0] for i in items], ''), string.join([i[1] for i in items], '')
 
-    def text(self, context, text, lang=None, form=louis.plain_text):
+    def text(self, context, text, lang=None):
         """Return 'text' converted to Unicode Braille characters.
 
         Arguments:
@@ -234,20 +265,50 @@ class BrailleExporter(FileExporter, Exporter):
         """
         assert isinstance(context, self.Context), context
         assert isinstance(text, basestring), text
-        assert isinstance(form, int), form
+        form = context.form()
         assert lang is None or isinstance(lang, basestring), lang
         if not text:
             return '', ''
         if self._private_char(text[0]):
             return text + '\n', '0' * (len(text) + 1)
         tables = context.tables(lang)
-        typeform = [form] * len(text)
-        braille = louis.translateString(tables, text, typeform=copy.copy(typeform), mode=louis.dotsIO+128)
+        if form != louis.plain_text and lang == 'cs':
+            # liblouis doesn't handle this so we have to handle it ourselves.
+            bold = form & louis.bold
+            italic = form & louis.italic
+            underline = form & louis.underline
+            typeform = None
+        else:
+            typeform = [form] * len(text)
+        # Using typeform without context information is incorrect since there
+        # is no guarantee that `text' isn't directly attached to another text.
+        # But hopefully this simplification here doesn't cause real use
+        # problems.
+        braille = louis.translateString(tables, text, typeform=copy.copy(typeform),
+                                       mode=louis.dotsIO+128)
+        def whitespace(c):
+            return c in string.whitespace or c == u'\u2800'
+        if typeform is None:
+            if italic:
+                braille = u'⠔⠨' + braille + u'⠨⠔'
+            if underline:
+                compact = (form == louis.underline)
+                if compact:
+                    for c in braille:
+                        if whitespace(c):
+                            compact = False
+                            break
+                if compact:
+                    braille = u'⠸' + braille
+                else:
+                    braille = u'⠔⠸' + braille + u'⠸⠔'
+            if bold:
+                braille = u'⠔⠰' + braille + u'⠰⠔'
         hyphenation_table = context.hyphenation_table(lang)
-        if hyphenation_table is None:
+        if hyphenation_table is None or form != louis.plain_text:
             hyphenation = ''
             for c in braille:
-                hyphenation += ('2' if (c in string.whitespace or c == u'\u2800') else '0')
+                hyphenation += ('2' if whitespace(c) else '0')
         else:
             hyphenation_tables = tables + [hyphenation_table]
             braille_text = louis.translateString(tables, text, typeform=copy.copy(typeform))
