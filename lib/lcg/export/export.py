@@ -370,12 +370,11 @@ class MarkupFormatter(object):
             f = self._FORMAT.get(type, '')
             if type in self._paired_on_output and f:
                 if close:
-                    transformed = f[1]
+                    result = f[1]
                 else:
-                    transformed = f[0]
+                    result = f[0]
             else:
-                transformed = f
-            result = context.exporter().text(context, transformed, lang=lang)
+                result = f
         return result
         
     def format(self, context, text, lang=None):
