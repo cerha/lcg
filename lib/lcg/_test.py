@@ -700,7 +700,7 @@ class Export(unittest.TestCase):
              r'&lt;bla&gt;'),
             ):
             result = lcg.FormattedText(text).export(context)
-            assert result == html, "\n  * %r\n  - expected: %r\n  - got:      %r" % \
+            assert result == html, "\n  - source text: %r\n  - expected:    %r\n  - got:         %r" % \
                    (text, html, result)
         
 tests.add(Export)
