@@ -919,6 +919,9 @@ class HtmlExporter(Exporter):
     def concat(self, *items):
         return self._generator.concat(*items)
     
+    def _reformat_text(self, text):
+        return text
+    
     def export(self, context):
         g = self._generator
         # Export body first to allocate all resources before generating the head.
