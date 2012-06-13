@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -629,6 +629,10 @@ class Export(unittest.TestCase):
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
         for text, html in (
+            ('*x*',
+             '<strong>x</strong>'),
+            (' x ',
+             ' x '),
             # Links
             ('[test]',
              '<a href="test" title="Some description">Test Node</a>'),
@@ -696,7 +700,7 @@ class Export(unittest.TestCase):
              r'&lt;bla&gt;'),
             ):
             result = lcg.FormattedText(text).export(context)
-            assert result == html, "\n  * %s\n  - expected: %s\n  - got:      %s" % \
+            assert result == html, "\n  * %r\n  - expected: %r\n  - got:      %r" % \
                    (text, html, result)
         
 tests.add(Export)
