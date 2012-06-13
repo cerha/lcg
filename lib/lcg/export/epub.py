@@ -48,6 +48,7 @@ class EpubExporter(Exporter):
     def dump(self, node, directory, filename=None, variant=None, **kwargs):
         variants = variant and (variant,) or node.variants() or (None,)
         for lang in variants:
+            context = self.context(node, lang, **kwargs)
             lang_ = lang and '.'+lang or ''
             epub = zipfile.ZipFile(filename + lang_, 'w', zipfile.ZIP_DEFLATED)
             try:
@@ -55,7 +56,7 @@ class EpubExporter(Exporter):
                 mimeinfo.compress_type = zipfile.ZIP_STORED
                 epub.writestr(mimeinfo, Constants.EPUB_MIMETYPE)
                 epub.writestr(self._meta_path('container.xml'), self._ocf_container(node, lang))
-                epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), self._navigation_document(node, lang))
+                epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), self._navigation_document(context))
                 for n in node.linear():
                     epub.writestr(self._node_path(n), self._xhtml_content_document(n, lang))
                 epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME), self._package_document(node, lang))
@@ -150,7 +151,12 @@ class EpubExporter(Exporter):
         #TODO
         return 'image/jpeg'
 
-    def _navigation_document(self, node, lang):
+    def _uri_node(self, context, node, lang=None):
+        return node.id() + '.xhtml'
+
+    def _navigation_document(self, context):
+        node = context.node()
+        lang = context.lang()
         doc = xml.Document()
         html = doc.appendChild(doc.createElement('html'))
         html.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml')
@@ -161,13 +167,20 @@ class EpubExporter(Exporter):
         body = html.appendChild(doc.createElement('body'))
         nav = body.appendChild(doc.createElement('nav'))
         nav.setAttribute('epub:type', 'toc')
-        ol = nav.appendChild(doc.createElement('ol'))
-        for n in node.linear():
-            li = ol.appendChild(doc.createElement('li'))
-            a = li.appendChild(doc.createElement('a'))
-            a.setAttribute('href', '/'.join(self._node_path(n).split('/')[1:])) #TODO hack to make path relative
-            a.appendChild(doc.createTextNode(n.title()))
-            # TODO section inside node?
+        def export(items, root):
+            ol = root.appendChild(doc.createElement('ol'))
+            for item, subitems in items:
+                title = item.title()
+                descr = item.descr() #TODO unused
+                uri = context.uri(item) #TODO fix relativeness, add #fragments for Sections
+                li = ol.appendChild(doc.createElement('li'))
+                a = li.appendChild(doc.createElement('a'))
+                a.setAttribute('href', uri)
+                a.appendChild(doc.createTextNode(title))
+                if subitems:
+                    export(subitems, li)
+        items = NodeIndex(node=node, detailed=True).items(context)
+        export(items, nav)
         return doc.toprettyxml(indent='', newl='', encoding='UTF-8')
 
     def _xhtml_content_document(self, node, lang):
