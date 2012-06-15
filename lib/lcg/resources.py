@@ -161,9 +161,9 @@ class Script(Resource):
     """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'
 
-class Translation(Resource):
-    """Gettext translation .po file"""
-    SUBDIR = 'translation'
+class Translations(Resource):
+    """Gettext translations .po file"""
+    SUBDIR = 'translations'
 
 class Media(Resource):
     """Media file, such as audio or video."""
@@ -240,7 +240,7 @@ class ResourceProvider(object):
                 'css':  Stylesheet,
                 'js':   Script,
                 'swf':  Flash,
-                'po':   Translation,}
+                'po':   Translations,}
     
     class OrderedDict(object):
         # Totally simplistic - just what we need to get the resources in the order of allocation.
