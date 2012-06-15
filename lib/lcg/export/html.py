@@ -454,7 +454,7 @@ class HtmlExporter(Exporter):
                 (lang, self._uri_node(context, node, lang=lang))
                 for lang in node.variants() if lang != context.lang()] + \
                ['<link rel="gettext" type="application/x-po" href="%s"</style>' % context.uri(t)
-                for t in context.node().resources(Translation)] + \
+                for t in context.node().resources(Translations)] + \
                ['<script language="Javascript" type="text/javascript"' + \
                 ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
 
