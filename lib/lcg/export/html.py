@@ -485,7 +485,8 @@ class HtmlExporter(Exporter):
         variants.sort()
         links = []
         for lang in variants:
-            label = language_name(lang) or lang
+            localizer = self.localizer(lang)
+            label = localizer.localize(language_name(lang) or lang)
             cls = 'lang-'+lang
             if lang == context.lang():
                 cls += ' current'
