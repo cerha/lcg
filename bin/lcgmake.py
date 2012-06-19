@@ -63,6 +63,9 @@ OPTIONS = (
             ('inline-styles', False,
              ("Embed styles into the HTML pages.")),
             )),
+    ("Common options", (
+            ('debug', False, "run in debugging friendly mode"),
+            )),
     )
 
 HTML = 'html'
@@ -72,12 +75,16 @@ PDF = 'pdf'
 TEXT = 'text'
 BRAILLE = 'braille'
 
+_debug = False
+
 def main(argv):
     # Process options.
     try:
         opt, args = getoptions(argv)
     except getopt.GetoptError:
         usage(argv)
+    global _debug
+    _debug = opt['debug']
     # Select the output format if options make sense.
     formats = [k for k in (HTML, IMS, HHP, PDF, TEXT, BRAILLE,) if opt[k]]
     if not formats:
@@ -336,4 +343,6 @@ if __name__ == "__main__":
         if hasattr(ex, '_lcg_processing_details'):
             sys.stderr.write(lcg_exception_details("LCG exception details",
                                                    ex._lcg_processing_details, str(ex)))
+        if _debug:
+            import pdb; pdb.post_mortem(sys.exc_info()[2])
         sys.exit(1)
