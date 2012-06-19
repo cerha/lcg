@@ -29,6 +29,11 @@ from export import Exporter, FileExporter, MarkupFormatter
 
 
 class BrailleFormatter(MarkupFormatter):
+    
+    _FORMAT = {'linebreak': (u'\n', '0',),
+               'comment': (u'', '',),
+               'dash': (u'-', '0',),
+               }
 
     def _set_form(self, context, close, form):
         if close:
@@ -45,6 +50,17 @@ class BrailleFormatter(MarkupFormatter):
 
     def _underline_formatter(self, context, close=False, **kwargs):
         return self._set_form(context, close, louis.underline)
+
+    def _formatter(self, context, type, groups, close=False, lang=None):
+        try:
+            formatter = getattr(self, '_'+type+'_formatter')
+        except AttributeError:
+            formatter = None
+        if formatter is not None:
+            result = formatter(context, close=close, lang=lang, **groups)
+        else:
+            result = self._FORMAT.get(type) or ('', '',)
+        return result
     
 
 class BrailleExporter(FileExporter, Exporter):
