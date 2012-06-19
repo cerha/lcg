@@ -2338,6 +2338,9 @@ class PDFExporter(FileExporter, Exporter):
         else:
             result = make_element(Container, content=())
         return result
+
+    def _reformat_text(self, text):
+        return text
     
     def text(self, context, text, lang=None):
         assert isinstance(text, basestring), text
