@@ -1,14 +1,16 @@
 domains := lcg test
 mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
-src_files := PYTHONPATH=../lib python -m lcg.i18n ../lib
 
 all: $(mo_files)
 
 include $(domains:%=%.d)
 
-%.d: $(shell $(src_files))
+lcg.pot: $(shell find ../lib -name "*.py" -not -name "_test.py*")
+
+test.pot: ../lib/lcg/_test.py
+
+%.d: $(shell find ../lib -name "*.py")
 	@echo "Updating rules for domain $*."
-	@printf "$*.pot: " > $@ && $(src_files) $* >> $@
 	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" >> $@
 	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po %/LC_MESSAGES" >> $@
 
