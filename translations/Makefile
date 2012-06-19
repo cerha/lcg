@@ -11,7 +11,7 @@ test.pot: ../lib/lcg/_test.py
 
 %.d: $(shell find ../lib -name "*.py")
 	@echo "Updating rules for domain $*."
-	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" >> $@
+	@echo "$(wildcard $*.*.po): $*.%.po: $*.pot" > $@
 	@echo "$(filter %/$*.mo,$(mo_files)): %/LC_MESSAGES/$*.mo: $*.%.po %/LC_MESSAGES" >> $@
 
 %/LC_MESSAGES:
