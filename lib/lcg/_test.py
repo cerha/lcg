@@ -706,6 +706,55 @@ class Export(unittest.TestCase):
 tests.add(Export)
 
 
+class BrailleExport(unittest.TestCase):
+    
+    def test_formatter(self):
+        import imp
+        presentation = lcg.Presentation()
+        filename = os.path.join(lcg_dir, 'styles/presentation-braille-test.py')
+        f = open(filename)
+        confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
+        f.close()
+        for o in dir(confmodule):
+            if o[0] in string.lowercase and hasattr(presentation, o):
+                setattr(presentation, o, confmodule.__dict__[o])
+        page_height = presentation.page_height
+        presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
+        def test(text, braille, header, footer, lang):
+            #sec = lcg.Section("Section One", anchor='sec1', content=)
+            n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+                                content=lcg.Container((lcg.FormattedText(text),)))
+            exporter = lcg.BrailleExporter()
+            context = exporter.context(n, lang=lang, presentation=presentation_set)
+            result = exporter.export(context)
+            braille = header + braille
+            n_lines = page_height.size() - len(braille.split('\n'))
+            braille = braille + '\n' * n_lines + footer
+            assert result == braille, \
+                   ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+                    (text, braille, result,))
+        for text, braille in (
+            (u'abc', u'⠁⠃⠉',),
+            (u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),
+            (u'*tučný*', u'⠔⠰⠞⠥⠩⠝⠯⠰⠔',),
+            (u'/šikmý/', u'⠔⠨⠱⠊⠅⠍⠯⠨⠔',),
+            (u'_podtržený_', u'⠸⠏⠕⠙⠞⠗⠮⠑⠝⠯',),
+            (u'_hodně podtržený_', u'⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
+            ):
+            result = test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', 'cs')
+        for text, braille in (
+            (u'abc', u'⠁⠃⠉',),
+            #(u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',), # buggy in current liblouis!
+            (u'a line to be hyphenated', u'⠁⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠏⠓⠑⠝⠤\n⠁⠞⠑⠙',),
+            (u'*bold*', u'⠸⠃⠕⠇⠙',),
+            (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
+            (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),
+            ):
+            result = test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', 'en')
+
+tests.add(BrailleExport)
+
+
 class Presentations(unittest.TestCase):
     
     def test_style_file(self):
