@@ -885,7 +885,7 @@ class Exporter(object):
 
     def _export_vspace(self, context, element):
         """Export the given 'VSpace' element."""
-        return self._newline(context, 2 if element.size() else 1)
+        return self._newline(context, 2 if element.size(context) else 1)
 
     def _export_title(self, context, element):
         """Export the given 'Title' element.
