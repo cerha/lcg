@@ -907,18 +907,23 @@ class Exporter(object):
         return self._newline(context, 2 if element.size(context) else 1)
 
     def _export_strong(self, context, element):
+        """Export the given 'Strong' element."""
         return self._export_container(context, element)
                 
     def _export_emphasized(self, context, element):
+        """Export the given 'Emphasized' element."""
         return self._export_container(context, element)
                 
     def _export_underlined(self, context, element):
+        """Export the given 'Underlined' element."""
         return self._export_container(context, element)
                 
     def _export_code(self, context, element):
+        """Export the given 'Code' element."""
         return self._export_container(context, element)
                 
     def _export_citation(self, context, element):
+        """Export the given 'Citation' element."""
         return self._export_container(context, element)
                 
     def _export_title(self, context, element):
