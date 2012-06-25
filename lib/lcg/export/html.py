@@ -118,6 +118,15 @@ class HtmlGenerator(object):
     def strong(self, text, **kwargs):
         return self._tag('strong', text, **kwargs)
      
+    def em(self, text, **kwargs):
+        return self._tag('em', text, **kwargs)
+    
+    def u(self, text, **kwargs):
+        return self._tag('u', text, **kwargs)
+    
+    def code(self, text, **kwargs):
+        return self._tag('code', text, **kwargs)
+    
     def pre(self, text, cls="lcg-preformatted-text", **kwargs):
         return self._tag('pre', text, _newlines=True, cls=cls, **kwargs)
      
@@ -532,6 +541,24 @@ class HtmlExporter(Exporter):
 
     def _export_new_page(self, context, element):
         return self._generator.hr()
+
+    def _export_strong(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.strong)
+    
+    def _export_emphasized(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.em)
+    
+    def _export_underlined(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.u)
+    
+    def _export_code(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.code)
+
+    def _export_citation(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.span,
+                                      lang=element.lang(inherited=False) or context.sec_lang(),
+                                      cls='citation')
+
     
     def _export_anchor(self, context, element):
         return self._generator.a(self._export_text_content(context, element),
@@ -542,26 +569,26 @@ class HtmlExporter(Exporter):
                                  href=context.uri(element.target()),
                                  title=element.descr(), type=element.type())
 
-    def _container_attr(self, element):
-        attr = (('cls', element.name()),
-                ('lang', element.lang(inherited=False)),
-                )
-        return dict([(key, value) for key, value in attr if value is not None])
+    def _container_attr(self, element, cls=None, lang=None, **kwargs):
+        attr = dict(cls=' '.join([x for x in (element.name(), cls) if x is not None]) or None,
+                    lang=lang or element.lang(inherited=False),
+                    **kwargs)
+        return dict([(key, value) for key, value in attr.items() if value is not None])
     
     def _exported_container_content(self, context, element):
         return [subcontent.export(context) for subcontent in element.content()]
     
-    def _export_container(self, context, element):
-        g = self._generator
+    def _export_container(self, context, element, wrap=None, **kwargs):
         result = self.concat(self._exported_container_content(context, element))
-        attr = self._container_attr(element)
-        if attr:
-            result = g.div(result, **attr)
+        attr = self._container_attr(element, **kwargs)
+        if wrap or attr:
+            if wrap is None:
+                wrap = self._generator.div
+            result = wrap(result, **attr)
         return result
     
     def _export_paragraph(self, context, element):
-        return self._generator.p(self.concat(self._exported_container_content(context, element)),
-                                 **self._container_attr(element))
+        return self._export_container(context, element, wrap=self._generator.p)
 
     def _export_section(self, context, element):
         g = self._generator
@@ -647,23 +674,19 @@ class HtmlExporter(Exporter):
         return result
     
     def _export_table(self, context, element):
-        return self._generator.table(self._exported_container_content(context, element),
-                                     cls='lcg-table', title=element.title(),
-                                     **self._container_attr(element))
+        return self._export_container(context, element, wrap=self._generator.table,
+                                      cls='lcg-table', title=element.title())
 
     def _export_table_row(self, context, element):
-        return self._generator.tr(self.concat(self._exported_container_content(context, element)),
-                                  **self._container_attr(element))
+        return self._export_container(context, element, wrap=self._generator.tr)
 
     def _export_table_cell(self, context, element):
-        return self._generator.td(self.concat(self._exported_container_content(context, element)),
-                                  align=element.align(),
-                                  **self._container_attr(element))
+        return self._export_container(context, element, wrap=self._generator.td,
+                                      align=element.align())
     
     def _export_table_heading(self, context, element):
-        return self._generator.th(self.concat(self._exported_container_content(context, element)),
-                                  align=element.align(),
-                                  **self._container_attr(element))
+        return self._export_container(context, element, wrap=self._generator.th,
+                                      align=element.align())
 
     def _export_inline_image(self, context, element):
         g = self._generator
