@@ -616,7 +616,7 @@ class MacroParser(unittest.TestCase):
 tests.add(MacroParser)
 
 
-class Export(unittest.TestCase):
+class HtmlExport(unittest.TestCase):
     
     def test_formatter(self):
         resources=(lcg.Media('xx.mp3'),
@@ -702,8 +702,28 @@ class Export(unittest.TestCase):
             result = lcg.FormattedText(text).export(context)
             assert result == html, "\n  - source text: %r\n  - expected:    %r\n  - got:         %r" % \
                    (text, html, result)
-        
-tests.add(Export)
+
+    def test_export(self):
+    	n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
+                            globals=dict(x='value of x'))
+        context = lcg.HtmlExporter().context(n, None, sec_lang='es')
+        for content, html in (
+            (('a', ' ', lcg.strong('b ', lcg.em('c'), ' ', lcg.u('d')), ' ', lcg.code('e')),
+             'a <strong>b <em>c</em> <u>d</u></strong> <code>e</code>'),
+            (lcg.cite('x'),
+             '<span lang="es" class="citation">x</span>'),
+            (lcg.br(),
+             '<br>'),
+            (lcg.hr(),
+             '<hr>'),
+            (lcg.Variable('x'),
+             'value of x'),
+            ):
+            result = lcg.coerce(content).export(context)
+            assert result == html, "\n  - content:  %r\n  - expected: %r\n  - got:      %r" % \
+                (content, html, result)
+            
+tests.add(HtmlExport)
 
 
 class BrailleExport(unittest.TestCase):
