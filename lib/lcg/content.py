@@ -42,12 +42,18 @@ _ = TranslatableTextFactory('lcg')
 class Content(object):
     """Generic base class for all types of content.
 
-    One instance always makes a part of one document/node -- it cannot be split
-    over multiple output nodes.  On the other hand, one node usually consists
-    of multiple 'Content' instances (elements).  Each content element may be
-    contained in another content element (see the 'Container' class) and thus
-    they make a hierarchical structure.
+    All (more specific) content element classes are derived from this class.
 
+    Each content element instance may be contained in another content element
+    instance (see the 'Container' class) and thus they make a hierarchical
+    structure.
+
+    Each content element instance belongs to a particular ContentNode instance
+    (it cannot be split over multiple output nodes).  The parent node is not
+    known in constructuion time (content is created first and organized into
+    nodes later), but is must be established before export (see
+    'set_parent()').
+    
     """
     _ALLOWED_CONTAINER = None
     
@@ -56,8 +62,7 @@ class Content(object):
 
         Arguments:
 
-          lang -- content language as an ISO 639-1 Alpha-2
-            language code (lowercase).
+          lang -- content language as a lowercase ISO 639-1 Alpha-2 language code.
 
         """
         self._parent = None
@@ -66,6 +71,79 @@ class Content(object):
         self._page_number = ''
         super(Content, self).__init__()
         
+    def set_container(self, container):
+        """Set the parent 'Container' to 'container'.
+
+        This method is normally called automatically by the container
+        constructor to inform the contained 'Content' elements about their
+        position in content hierarchy.  You only need to care about calling
+        this method if you implement your own 'Container' class and don't call
+        the default constructor for all the contained elements for some reason.
+        Otherwise it is always called automatically by LCG behind the scenes.
+
+        """
+        if __debug__:
+            cls = self._ALLOWED_CONTAINER or Container
+            assert isinstance(container, cls), "Not a '%s' instance: %s" % (cls.__name__,container)
+        self._container = container
+
+    def set_parent(self, node):
+        """Set the parent 'ContentNode' to 'node'.
+
+        This method is called automatically by the 'ContentNode' constructor
+        when the content is assigned to a node.  The parent node is normally
+        not known (and not needed) in the time of content construction.  It is,
+        however, needed in the export time, so you will need to call it
+        manually before attempting to export any content which was not assigned
+        to a 'ContentNode' before.  Content which is contained within a
+        container will automatically determine its parent node recursively so
+        it is only needed to set the parent explicitly of top level elements or
+        for unbound elements.
+
+        """
+        assert isinstance(node, ContentNode), \
+               "Not a 'ContentNode' instance: %s" % node
+        #assert self._parent is None or self._parent is node, \
+        #       "Reparenting not allowed: %s -> %s" % (self._parent, node)
+        self._parent = node
+
+    def set_page_number(self, context, number):
+        """Set page number of the content element.
+
+        This is to be used in table of contents.
+
+        Arguments:
+        
+          context -- formatting context as a 'Exporter.Context' instance
+            created and returned by 'Exporter.context' method
+          number -- the page number; basestring
+          
+        """
+        assert isinstance(number, basestring), number
+        self._page_number = number
+
+    def parent(self):
+        """Return the parent 'ContentNode' of this content element."""
+        parent = self._parent or self._container and self._container.parent()
+        assert parent is not None, "Parent unknown: %s" % self
+        return parent
+
+    def lang(self, inherited=True):
+        """Return the content language as lowercase ISO 639-1 Alpha-2 language code.
+
+        Arguments:
+        
+          inherited -- iff True, the language will be determined from the
+            parent element in the hierarchy if this element doesn't define
+            'lang' explicitly.  When False, the value of 'lang' passed to the
+            constructor is returned.
+
+        """
+        lang = self._lang
+        if lang is None and inherited and self._container:
+            lang = self._container.lang()
+        return lang
+
     def container_path(self):
         """Return a list of containers of the given element
 
@@ -95,61 +173,6 @@ class Content(object):
         """
         return ()
         
-    def set_container(self, container):
-        """Set the parent 'Container' to 'container'.
-
-        This method is normally called automatically by the container constructor to inform the
-        contained 'Content' elements about their position in content hierarchy.  You only need to
-        care about calling this method if you implement your own 'Container' class and don't call
-        the default constructor for all the contained elements for some reason.  Otherwise it is
-        always called automatically by LCG behind the scenes.
-
-        """
-        if __debug__:
-            cls = self._ALLOWED_CONTAINER or Container
-            assert isinstance(container, cls), "Not a '%s' instance: %s" % (cls.__name__,container)
-        self._container = container
-
-    def set_parent(self, node):
-        """Set the parent 'ContentNode' to 'node'.
-
-        This method is called automatically by the 'ContentNode' constructor when the content is
-        assigned to a node.  The parent node is normally not known (and not needed) in the time of
-        content construction.  It is, however, needed in the export time, so you will need to call
-        it manually before attempting to export any content which was not assigned to a
-        'ContentNode' before.  Content which is contained within a container will automatically
-        determine its parent node recursively so it is only needed to set the parent explicitly of
-        top level elements or for unbound elements.
-
-        """
-        assert isinstance(node, ContentNode), \
-               "Not a 'ContentNode' instance: %s" % node
-        #assert self._parent is None or self._parent is node, \
-        #       "Reparenting not allowed: %s -> %s" % (self._parent, node)
-        self._parent = node
-
-    def parent(self):
-        """Return the parent 'ContentNode' of this content element."""
-        parent = self._parent or self._container and self._container.parent()
-        assert parent is not None, "Parent unknown: %s" % self
-        return parent
-
-    def lang(self, inherited=True):
-        """Return the content language as lowercase ISO 639-1 Alpha-2 language code.
-
-        Arguments:
-        
-          inherited -- iff True, the language will be determined from the
-            parent element in the hierarchy if this element doesn't define
-            'lang' explicitly.  When False, the value of 'lang' passed to the
-            constructor is returned.
-
-        """
-        lang = self._lang
-        if lang is None and inherited and self._container:
-            lang = self._container.lang()
-        return lang
-
     def page_number(self, context):
         """Return page number of the content element.
 
@@ -162,21 +185,6 @@ class Content(object):
             
         """
         return self._page_number
-
-    def set_page_number(self, context, number):
-        """Set page number of the content element.
-
-        This is to be used in table of contents.
-
-        Arguments:
-        
-          context -- formatting context as a 'Exporter.Context' instance
-            created and returned by 'Exporter.context' method
-          number -- the page number; basestring
-          
-        """
-        assert isinstance(number, basestring), number
-        self._page_number = number
 
     def export(self, context):
         """Return the formatted content in an output specific form.
@@ -191,99 +199,128 @@ class Content(object):
         """
         return context.exporter().export_element(context, self)
 
+
+class Container(Content):
+    """Container of other content elements.
+
+    Containers allow to build a hierarchy of 'Content' instances inside the
+    scope of one node.  This is an addition to the hierarchy of the nodes
+    themselves.
+
+    All the contained (wrapped) content elements will be notified about the
+    fact, that they are contained within this container and thus belong to the
+    hierarchy.
+
+    """
+    _ALLOWED_CONTENT = Content
+    _SUBSEQUENCES = False
+    _SUBSEQUENCE_LENGTH = None
     
-class HorizontalSeparator(Content):
-    """Horizontal separator of document section.
+    def __init__(self, content, name=None, id=None, halign=None, valign=None, orientation=None,
+                 presentation=None, **kwargs):
+        """Initialize the instance.
 
-    Typically it may be a page separator in paged documents or a horizontal
-    separator in documents without pages.
-
-    """
-    pass
-
-
-class NewPage(Content):
-    """New page starts here."""
-    pass
-
-
-class PageNumber(Content):
-    """Current page number.
-
-    The page number is generated as an ordinal arabic number starting from one.
-
-    This content may be used only inside page headers and footers.
-
-    """
-    def __init__(self, total=False, separator=None, lang=None):
-        """
         Arguments:
-
-          total -- iff true, output not only the page number, but also the
-            total number of pages; if 'separator' is 'None', output only the
-            total number of pages
-          separator -- basestring or 'None'; if it is a basestring and 'total'
-            is true, insert it betwenn the page numebr and the total number of
-            pages
-          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
-
-        """
-        super(PageNumber, self).__init__(lang=lang)
-        self._total = total
-        self._separator = separator
         
-    def total(self):
-        """Return the value of 'total' as passed to the constructor."""
-        return self._total
+          content -- the actual content wrapped into this container as a
+            sequence of 'Content' instances in the order in which they should
+            appear in the output.
+          name -- optional string identifier which may be used as output
+            presentation selector (for example as a 'class' attribute in HTML).
+          id -- depracated, use 'name' instead.
+          halign -- horizontal alignment of the container content; one of the
+            'HorizontalAlignment' constants or 'None' (default alignment).
+          valign -- vertical alignment of the container content; one of the
+            'VerticalAlignment' constants or 'None' (default alignment).
+          orientation -- orientation of the container content; one of the
+            'Orientation' constants or 'None' (default orientation).
+          presentation -- 'Presentation' instance defining various presentation
+            properties; if 'None' then no explicit presentation for this container
+            is defined.
 
-    def separator(self):
-        """Return the value of 'separator' as passed to the constructor."""
-        return self._separator
+        Note that 'halign', 'valign', 'orientation' and 'presentation'
+        parameters may be ignored by some exporters.
 
-
-class PageHeading(Content):
-    """Current page heading.
-
-    This content may be used only inside page headers and footers.
-
-    """
-    pass
-
-
-class HSpace(Content):
-    """Horizontal space of given size.
-
-    This should be used only in places where explicit space is needed.  In many
-    cases better means such as higher level elements, alignment or style sheets
-    can be used.
-
-    """
-    def __init__(self, size, lang=None):
         """
-        @type: L{Unit}
-        @param: Size of the space.
-        @type: string
-        @param: Content language as an ISO 639-1 Alpha-2 language code (lowercase).
+        super(Container, self).__init__(**kwargs)
+        self._name = name or id
+        assert name is None or isinstance(name, (str, unicode)), name
+        assert halign is None or isinstance(halign, str), halign
+        assert valign is None or isinstance(valign, str), valign
+        assert orientation is None or isinstance(orientation, str), orientation
+        assert presentation is None or isinstance(presentation, Presentation), presentation
+        super(Container, self).__init__(**kwargs)
+        if name:
+            assert id == None, id
+        else:
+            # For backwards compatibility ('name' was formely named 'id').
+            name = id
+        self._name = name
+        self._halign = halign
+        self._valign = valign
+        self._orientation = orientation
+        self._presentation = presentation
+        if self._SUBSEQUENCES:
+            assert isinstance(content, (list, tuple)), "Not a sequence: %s" % content
+            self._content = tuple([tuple(subseq) for subseq in content])
+            for subseq in content:
+                assert isinstance(subseq, (list, tuple)), "Not a sequence: %s" % subseq
+                if self._SUBSEQUENCE_LENGTH is not None:
+                    assert len(subseq) == self._SUBSEQUENCE_LENGTH
+                for c in subseq:
+                    assert isinstance(c, self._ALLOWED_CONTENT), \
+                           "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, c)
+                    c.set_container(self)
+        elif isinstance(content, (list, tuple)):
+            assert is_sequence_of(content, self._ALLOWED_CONTENT), \
+                   "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT, content)
+            self._content = tuple(content)
+            for c in content:
+                c.set_container(self)
+        else:
+            assert isinstance(content, self._ALLOWED_CONTENT), \
+                   "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, content)
+            self._content = (content,)
+            content.set_container(self)
+            
+    def content(self):
+        """Return the sequence of contained content elements.
         """
-        super(HSpace, self).__init__(lang=lang)
-        assert isinstance(size, Unit), size
-        self._size = size
+        return self._content
+            
+    def sections(self, context):
+        result = []
+        for c in self._content:
+            if isinstance(c, Section):
+                result.append(c)
+            elif isinstance(c, Container):
+                result.extend(c.sections(context))
+        return result
+    
+    def name(self):
+        """Return the value of 'name' as passed to the constructor."""
+        return self._name
+    
+    def halign(self):
+        """Return the value of 'halign' as passed to the constructor."""
+        return self._halign
+    
+    def valign(self):
+        """Return the value of 'valign' as passed to the constructor."""
+        return self._valign
+    
+    def orientation(self):
+        """Return the value of 'orientation' as passed to the constructor."""
+        return self._orientation
+    
+    def presentation(self):
+        """Return the value of 'presentation' as passed to the constructor."""
+        return self._presentation
 
-    def size(self, context):
-        """Return the value of 'size' as passed to the constructor."""
-        return self._size
-        
+    
+# ======================== Inline content elements ========================
 
-class VSpace(HSpace):
-    """Vertical space of given size.
-
-    This should be used only in places where explicit space is needed.  In many
-    cases better means such as higher level elements, alignment or style sheets
-    can be used.
-
-    """
-
-
+    
 class TextContent(Content):
     """A simple piece of text."""
 
@@ -315,67 +352,96 @@ class TextContent(Content):
         """Return the value of 'text' as passed to the constructor."""
         return self._text
 
-
-class HtmlContent(TextContent):
-    """LCG content class for wrapping already exported HTML text.
-
-    This class allows embedding HTML content directly into the LCG content
-    hierarchy.  Its export in HTML is a noop, but it is only implemented for the
-    HTML output.  Attempt to export this type of content to any other target
-    format will lead to an error.
-
-    At the same time, this class demonstrates a content element, which exports
-    itself actively and doesn't rely on the exporter as the other generic
-    elements defined in this module.
     
-    """
-    def export(self, context):
-        assert isinstance(context.exporter(), HtmlExporter), \
-               "Only HTML export is supported for this element."
-        return self._text
-
+class Link(Container):
+    """Link to internal or external location."""
     
-class FormattedText(TextContent):
-    """Formatted text using a simple wiki-based inline markup.
+    class ExternalTarget(object):
+        """Representation of an external target specified by its URI."""
+        def __init__(self, uri, title, descr=None, lang=None):
+            """Arguments:
 
-    See 'MarkupFormatter' for more information about the formatting rules.
+              uri -- URI of the link target as a string
+              title -- title of the target as a string or unicode
+              descr -- ???
+              lang -- lowercase ISO 639-1 Alpha-2 language code
+              
+            """
+            self._uri = uri
+            self._title = title
+            self._descr = descr
+            self._lang = lang
+        def uri(self):
+            return self._uri
+        def title(self):
+            return self._title
+        def descr(self):
+            return self._descr
+        def lang(self):
+            return self._lang
     
-    """
-    pass
+    def __init__(self, target, label=None, descr=None, type=None, lang=None):
+        """Arguments:
 
-# Backwards compatibility alias.        
-WikiText = FormattedText
-
-class Heading(FormattedText):
-    """Heading, e.g. heading of a section.
-
-    Purpose of this element is twofold: to provide information about level of
-    the heading and to distinguish the element from other parts of a document
-    for the purpose of applying specific styles to its content.
-
-    """
-    def __init__(self, text, level, **kwargs):
-        """
-        Arguments:
+          target -- target of the link, it may be either a 'Section' instance
+            or a 'ContentNode' instance, a 'Link.ExternalTarget' instance or a
+            'Resource' instance
+          label -- link label text as a string or a 'Content' instance (such as
+            'InlineImage' for image links)
+          descr -- breif target description text.  If none the description is
+             taken from the 'target' instance depending on its type
+          type -- ???
+          lang -- lowercase ISO 639-1 Alpha-2 language code
         
-          text -- the actual text content of this element as a string or
-            unicode
-          level -- level of the heading, positive integer, starting from 1
-          kwargs -- keyword arguments for parent class constructor
-          
         """
-        assert isinstance(level, int) and level > 0, level
-        super(Heading, self).__init__(text, **kwargs)
-        self._level = level
+        assert isinstance(target, (Section, ContentNode, self.ExternalTarget, Resource)), target
+        assert label is None or isinstance(label, (basestring, Content)), label
+        assert descr is None or isinstance(descr, basestring), descr
+        assert type is None or isinstance(type, basestring), type
+        assert lang is None or isinstance(lang, basestring), lang
+        if label is None:
+            if isinstance(target, (ContentNode, Section)):
+                label = target.heading()
+            elif isinstance(target, Resource):
+                label = target.title() or target.filename()
+            elif isinstance(target, self.ExternalTarget):
+                label = target.title() or target.uri()
+        if isinstance(label, (str, unicode)):
+            content = TextContent(label)
+        elif label is not None:
+            content = label
+        else:
+            content = ()
+        self._target = target
+        self._descr = descr
+        self._type = type
+        super(Link, self).__init__(content, lang=lang)
 
-    def level(self):
-        "Return level of the heading, positive integer, starting from 1."
-        return self._level
+    def target(self):
+        """Return the value of 'target' as passed to the constructor."""
+        return self._target
 
-    
-class PreformattedText(TextContent):
-    """Preformatted text."""
-    pass
+    def descr(self):
+        """Return the link description as a string.
+
+        If 'descr' was passed to the constructor and is not 'None', it is used.
+        Otherwise the description is taken from target description if it was
+        defined.
+
+        """
+        descr = self._descr
+        if descr is None:
+            target = self._target
+            if isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
+                descr = target.descr()
+            elif target.parent() is not self.parent():
+                descr = target.title() + ' ('+ target.parent().title() +')'
+        return descr
+
+    def type(self):
+        """Return the value of 'type' as passed to the constructor."""
+        return self._type
+
 
 class Anchor(TextContent):
     """Target of a link (an anchor)."""
@@ -621,124 +687,196 @@ class InlineExternalVideo(Content):
     def size(self):
         """Return the video size in pixels as a pair of integers or None."""
         return self._size
+    
 
+class Title(Content):
+    """Inline element, which is substituted by the title of the requested item in export time.
 
-class Container(Content):
-    """Container of multiple parts, each of which is a 'Content' instance.
+    It may not be possible to find out what is the title of the current node or some other element
+    in the time of content construction.  So this symbolic element may be used to refer to the item
+    an it will be simply replaced by the title text in export time.
 
-    Containers allow to build a hierarchy of 'Content' instances inside the
-    scope of one node.  This is an addition to the hierarchy of the actual
-    nodes (separate pages).
-
-    All the contained (wrapped) content elements will be notified about the
-    fact, that they are contained within this container and thus belong to the
-    hierarchy.
+    The constructor argument 'id' may be used to refer to the required item.  It may be a section
+    id in the current page or an identifier of another node.  The default value (None) refers to
+    the title of the current node.  If the item refered by id can not be found, the id itself is
+    used for substitution.
 
     """
-    _ALLOWED_CONTENT = Content
-    _SUBSEQUENCES = False
-    _SUBSEQUENCE_LENGTH = None
-    
-    def __init__(self, content, name=None, id=None, halign=None, valign=None, orientation=None,
-                 presentation=None, **kwargs):
-        """Initialize the instance.
+    def __init__(self, id=None):
+        """Arguments:
 
+          id -- reference to the item providing the required title; it may be a
+            section id (??? what is it ???) in the current page or an
+            identifier of another node (??? what is it ???).  'None' refers to
+            the title of the current node.  If the item refered by 'id' cannot
+            be found, the id itself is used for substitution.
+
+        """
+        super(Title, self).__init__()
+        self._id = id
+
+    def id(self):
+        """Return the value of 'id' as passed to the constructor."""
+        return self._id
+
+    
+class HorizontalSeparator(Content):
+    """Horizontal separator of document section.
+
+    Typically it may be a page separator in paged documents or a horizontal
+    separator in documents without pages.
+
+    """
+    pass
+
+
+class NewPage(Content):
+    """New page starts here."""
+    pass
+
+
+class PageNumber(Content):
+    """Current page number.
+
+    The page number is generated as an ordinal arabic number starting from one.
+
+    This content may be used only inside page headers and footers.
+
+    """
+    def __init__(self, total=False, separator=None, lang=None):
+        """
+        Arguments:
+
+          total -- iff true, output not only the page number, but also the
+            total number of pages; if 'separator' is 'None', output only the
+            total number of pages
+          separator -- basestring or 'None'; if it is a basestring and 'total'
+            is true, insert it betwenn the page numebr and the total number of
+            pages
+          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
+
+        """
+        super(PageNumber, self).__init__(lang=lang)
+        self._total = total
+        self._separator = separator
+        
+    def total(self):
+        """Return the value of 'total' as passed to the constructor."""
+        return self._total
+
+    def separator(self):
+        """Return the value of 'separator' as passed to the constructor."""
+        return self._separator
+
+
+class PageHeading(Content):
+    """Current page heading.
+
+    This content may be used only inside page headers and footers.
+
+    """
+    pass
+
+
+class HSpace(Content):
+    """Horizontal space of given size.
+
+    This should be used only in places where explicit space is needed.  In many
+    cases better means such as higher level elements, alignment or style sheets
+    can be used.
+
+    """
+    def __init__(self, size, lang=None):
+        """
+        @type: L{Unit}
+        @param: Size of the space.
+        @type: string
+        @param: Content language as an ISO 639-1 Alpha-2 language code (lowercase).
+        """
+        super(HSpace, self).__init__(lang=lang)
+        assert isinstance(size, Unit), size
+        self._size = size
+
+    def size(self, context):
+        """Return the value of 'size' as passed to the constructor."""
+        return self._size
+        
+
+class VSpace(HSpace):
+    """Vertical space of given size.
+
+    This should be used only in places where explicit space is needed.  In many
+    cases better means such as higher level elements, alignment or style sheets
+    can be used.
+
+    """
+
+
+class HtmlContent(TextContent):
+    """LCG content class for wrapping already exported HTML text.
+
+    This class allows embedding HTML content directly into the LCG content
+    hierarchy.  Its export in HTML is a noop, but it is only implemented for the
+    HTML output.  Attempt to export this type of content to any other target
+    format will lead to an error.
+
+    At the same time, this class demonstrates a content element, which exports
+    itself actively and doesn't rely on the exporter as the other generic
+    elements defined in this module.
+    
+    """
+    def export(self, context):
+        assert isinstance(context.exporter(), HtmlExporter), \
+               "Only HTML export is supported for this element."
+        return self._text
+
+    
+class FormattedText(TextContent):
+    """Formatted text using a simple wiki-based inline markup.
+
+    See 'MarkupFormatter' for more information about the formatting rules.
+    
+    """
+    pass
+
+# Backwards compatibility alias.        
+WikiText = FormattedText
+
+
+class Heading(FormattedText):
+    """Heading, e.g. heading of a section.
+
+    Purpose of this element is twofold: to provide information about level of
+    the heading and to distinguish the element from other parts of a document
+    for the purpose of applying specific styles to its content.
+
+    """
+    def __init__(self, text, level, **kwargs):
+        """
         Arguments:
         
-          content -- the actual content wrapped into this container as a
-            sequence of 'Content' instances in the order in which they should
-            appear in the output.
-          name -- optional string identifier which may be used as output
-            presentation selector (for example as a 'class' attribute in HTML).
-          id -- depracated, use 'name' instead.
-          halign -- horizontal alignment of the container content; one of the
-            'HorizontalAlignment' constants or 'None' (default alignment).
-          valign -- vertical alignment of the container content; one of the
-            'VerticalAlignment' constants or 'None' (default alignment).
-          orientation -- orientation of the container content; one of the
-            'Orientation' constants or 'None' (default orientation).
-          presentation -- 'Presentation' instance defining various presentation
-            properties; if 'None' then no explicit presentation for this container
-            is defined.
-
-        Note that 'halign', 'valign', 'orientation' and 'presentation'
-        parameters may be ignored by some exporters.
-
+          text -- the actual text content of this element as a string or
+            unicode
+          level -- level of the heading, positive integer, starting from 1
+          kwargs -- keyword arguments for parent class constructor
+          
         """
-        super(Container, self).__init__(**kwargs)
-        self._name = name or id
-        assert name is None or isinstance(name, (str, unicode)), name
-        assert halign is None or isinstance(halign, str), halign
-        assert valign is None or isinstance(valign, str), valign
-        assert orientation is None or isinstance(orientation, str), orientation
-        assert presentation is None or isinstance(presentation, Presentation), presentation
-        super(Container, self).__init__(**kwargs)
-        if name:
-            assert id == None, id
-        else:
-            # For backwards compatibility ('name' was formely named 'id').
-            name = id
-        self._name = name
-        self._halign = halign
-        self._valign = valign
-        self._orientation = orientation
-        self._presentation = presentation
-        if self._SUBSEQUENCES:
-            assert isinstance(content, (list, tuple)), "Not a sequence: %s" % content
-            self._content = tuple([tuple(subseq) for subseq in content])
-            for subseq in content:
-                assert isinstance(subseq, (list, tuple)), "Not a sequence: %s" % subseq
-                if self._SUBSEQUENCE_LENGTH is not None:
-                    assert len(subseq) == self._SUBSEQUENCE_LENGTH
-                for c in subseq:
-                    assert isinstance(c, self._ALLOWED_CONTENT), \
-                           "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, c)
-                    c.set_container(self)
-        elif isinstance(content, (list, tuple)):
-            assert is_sequence_of(content, self._ALLOWED_CONTENT), \
-                   "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT, content)
-            self._content = tuple(content)
-            for c in content:
-                c.set_container(self)
-        else:
-            assert isinstance(content, self._ALLOWED_CONTENT), \
-                   "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, content)
-            self._content = (content,)
-            content.set_container(self)
-            
-    def content(self):
-        """Return the sequence of contained content elements.
-        """
-        return self._content
-            
-    def sections(self, context):
-        result = []
-        for c in self._content:
-            if isinstance(c, Section):
-                result.append(c)
-            elif isinstance(c, Container):
-                result.extend(c.sections(context))
-        return result
+        assert isinstance(level, int) and level > 0, level
+        super(Heading, self).__init__(text, **kwargs)
+        self._level = level
+
+    def level(self):
+        "Return level of the heading, positive integer, starting from 1."
+        return self._level
+
     
-    def name(self):
-        """Return the value of 'name' as passed to the constructor."""
-        return self._name
-    
-    def halign(self):
-        """Return the value of 'halign' as passed to the constructor."""
-        return self._halign
-    
-    def valign(self):
-        """Return the value of 'valign' as passed to the constructor."""
-        return self._valign
-    
-    def orientation(self):
-        """Return the value of 'orientation' as passed to the constructor."""
-        return self._orientation
-    
-    def presentation(self):
-        """Return the value of 'presentation' as passed to the constructor."""
-        return self._presentation
+class PreformattedText(TextContent):
+    """Preformatted text."""
+    pass
+
+
+# ======================== Block level elements ========================
+
 
 SectionContainer = Container
 """Deprecated: Use 'Container' instead."""
@@ -1162,127 +1300,6 @@ class RootIndex(NodeIndex):
         return self.parent().root()
 
 
-class Link(Container):
-    """Link to internal or external location."""
-    
-    class ExternalTarget(object):
-        """Representation of an external target specified by its URI."""
-        def __init__(self, uri, title, descr=None, lang=None):
-            """Arguments:
-
-              uri -- URI of the link target as a string
-              title -- title of the target as a string or unicode
-              descr -- ???
-              lang -- lowercase ISO 639-1 Alpha-2 language code
-              
-            """
-            self._uri = uri
-            self._title = title
-            self._descr = descr
-            self._lang = lang
-        def uri(self):
-            return self._uri
-        def title(self):
-            return self._title
-        def descr(self):
-            return self._descr
-        def lang(self):
-            return self._lang
-    
-    def __init__(self, target, label=None, descr=None, type=None, lang=None):
-        """Arguments:
-
-          target -- target of the link, it may be either a 'Section' instance
-            or a 'ContentNode' instance, a 'Link.ExternalTarget' instance or a
-            'Resource' instance
-          label -- link label text as a string or a 'Content' instance (such as
-            'InlineImage' for image links)
-          descr -- breif target description text.  If none the description is
-             taken from the 'target' instance depending on its type
-          type -- ???
-          lang -- lowercase ISO 639-1 Alpha-2 language code
-        
-        """
-        assert isinstance(target, (Section, ContentNode, self.ExternalTarget, Resource)), target
-        assert label is None or isinstance(label, (basestring, Content)), label
-        assert descr is None or isinstance(descr, basestring), descr
-        assert type is None or isinstance(type, basestring), type
-        assert lang is None or isinstance(lang, basestring), lang
-        if label is None:
-            if isinstance(target, (ContentNode, Section)):
-                label = target.heading()
-            elif isinstance(target, Resource):
-                label = target.title() or target.filename()
-            elif isinstance(target, self.ExternalTarget):
-                label = target.title() or target.uri()
-        if isinstance(label, (str, unicode)):
-            content = TextContent(label)
-        elif label is not None:
-            content = label
-        else:
-            content = ()
-        self._target = target
-        self._descr = descr
-        self._type = type
-        super(Link, self).__init__(content, lang=lang)
-
-    def target(self):
-        """Return the value of 'target' as passed to the constructor."""
-        return self._target
-
-    def descr(self):
-        """Return the link description as a string.
-
-        If 'descr' was passed to the constructor and is not 'None', it is used.
-        Otherwise the description is taken from target description if it was
-        defined.
-
-        """
-        descr = self._descr
-        if descr is None:
-            target = self._target
-            if isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
-                descr = target.descr()
-            elif target.parent() is not self.parent():
-                descr = target.title() + ' ('+ target.parent().title() +')'
-        return descr
-
-    def type(self):
-        """Return the value of 'type' as passed to the constructor."""
-        return self._type
-
-
-class Title(Content):
-    """Inline element, which is substituted by the title of the requested item in export time.
-
-    It may not be possible to find out what is the title of the current node or some other element
-    in the time of content construction.  So this symbolic element may be used to refer to the item
-    an it will be simply replaced by the title text in export time.
-
-    The constructor argument 'id' may be used to refer to the required item.  It may be a section
-    id in the current page or an identifier of another node.  The default value (None) refers to
-    the title of the current node.  If the item refered by id can not be found, the id itself is
-    used for substitution.
-
-    """
-    def __init__(self, id=None):
-        """Arguments:
-
-          id -- reference to the item providing the required title; it may be a
-            section id (??? what is it ???) in the current page or an
-            identifier of another node (??? what is it ???).  'None' refers to
-            the title of the current node.  If the item refered by 'id' cannot
-            be found, the id itself is used for substitution.
-
-        """
-        super(Title, self).__init__()
-        self._id = id
-
-    def id(self):
-        """Return the value of 'id' as passed to the constructor."""
-        return self._id
-
-
 class NoneContent(Content):
     """Deprecated.
 
@@ -1365,6 +1382,7 @@ class ContentVariants(Container):
         """
         return self._variants[lang]
     
+
     
 # Convenience functions for simple content construction.
 
