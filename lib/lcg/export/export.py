@@ -36,12 +36,11 @@ import shutil
 import string
 
 from lcg import Anchor, Audio, concat, Container, Content, ContentNode, ContentVariants, \
-     DefinitionList, FieldSet, FormattedText, Heading, HorizontalSeparator, HSpace, Image, \
+     DefinitionList, FieldSet, FormattedText, Heading, HorizontalSeparator, HSpace, VSpace, Image, \
      InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, Link, Localizable, \
-     Localizer, log, NewPage, PageHeading, PageNumber, Paragraph, PreformattedText, Resource, Section, \
-     SetVariable, Table, TableCell, TableHeading, TableOfContents, TableRow, TextContent, \
-     Title, Video, VSpace
-
+     Localizer, log, NewLine, NewPage, PageHeading, PageNumber, Paragraph, PreformattedText, \
+     Resource, Section, Variable, SetVariable, Table, TableCell, TableHeading, TableOfContents, \
+     TableRow, TextContent, Title, Video, Strong, Emphasized, Underlined, Code, Citation
 
 class SubstitutionIterator(object):
     """Supporting object for multiple-value substitution variables.
@@ -548,11 +547,17 @@ class Exporter(object):
         return {Content: self._export_content,
                 HorizontalSeparator: self._export_horizontal_separator,
                 NewPage: self._export_new_page,
+                NewLine: self._export_new_line,
                 PageNumber: self._export_page_number,
                 PageHeading: self._export_page_heading,
                 Title: self._export_title,
                 HSpace: self._export_hspace,
                 VSpace: self._export_vspace,
+                Strong: self._export_strong,
+                Emphasized: self._export_emphasized,
+                Underlined: self._export_underlined,
+                Code: self._export_code,
+                Citation: self._export_citation,
                 TextContent: self._export_text_content,
                 FormattedText: self._export_formatted_text,
                 PreformattedText: self._export_preformatted_text,
@@ -576,6 +581,7 @@ class Exporter(object):
                 InlineVideo: self._export_inline_video,
                 InlineExternalVideo: self._export_inline_external_video,
                 SetVariable: self._export_set_variable,
+                Variable: self._export_variable,
                 }
     
     def _export(self, node, context):
@@ -854,6 +860,14 @@ class Exporter(object):
         """
         return '\f'
 
+    def _export_new_line(self, context):
+        """Export the given 'NewLine' element.
+
+        In this class the method just returns the page break character.
+        
+        """
+        return '\n'
+
     def _export_horizontal_separator(self, context, element, width=64, in_table=False):
         """Export the given 'HorizontalSeparator' element."""
         separator = u'─' * width
@@ -887,6 +901,21 @@ class Exporter(object):
         """Export the given 'VSpace' element."""
         return self._newline(context, 2 if element.size(context) else 1)
 
+    def _export_strong(self, context, element):
+        return self._export_container(context, element)
+                
+    def _export_emphasized(self, context, element):
+        return self._export_container(context, element)
+                
+    def _export_underlined(self, context, element):
+        return self._export_container(context, element)
+                
+    def _export_code(self, context, element):
+        return self._export_container(context, element)
+                
+    def _export_citation(self, context, element):
+        return self._export_container(context, element)
+                
     def _export_title(self, context, element):
         """Export the given 'Title' element.
 
@@ -924,6 +953,16 @@ class Exporter(object):
         output_lines.append(self._newline(context))
         return self.concat(*output_lines)
 
+    def _export_variable(self, context, element):
+        """Set node variable defined by 'element'.
+
+        The method returns export of an empty content.
+
+        """
+        value = context.node().globals().get(element.name(), '')
+        return self.text(context, value)
+        
+    
     def _export_set_variable(self, context, element):
         """Set node variable defined by 'element'.
 

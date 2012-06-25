@@ -320,7 +320,32 @@ class Container(Content):
     
 # ======================== Inline content elements ========================
 
+
+class Strong(Container):
+    """Text emphasized by bold font face."""
+    pass
+
+
+class Emphasized(Container):
+    """Text emphasized by slanted font face."""
+    pass
     
+
+class Underlined(Container):
+    """Underlined text."""
+    pass
+
+
+class Code(Container):
+    """Text representing a piece of computer code."""
+    pass
+
+
+class Citation(Container):
+    """Citation of a text in another language."""
+    pass
+
+
 class TextContent(Content):
     """A simple piece of text."""
 
@@ -732,6 +757,11 @@ class HorizontalSeparator(Content):
 
 class NewPage(Content):
     """New page starts here."""
+    pass
+
+
+class NewLine(Content):
+    """Explicit line break."""
     pass
 
 
@@ -1339,6 +1369,25 @@ class SetVariable(Content):
         """Return value of the variable as a 'Content' instance."""
         return self._value
 
+
+class Variable(Content):
+    """Element replaced by the actual variable value on export."""
+    
+    def __init__(self, name):
+        """
+        Arguments:
+
+          name -- name of the variable, string
+
+        """
+        assert isinstance(name, str), str
+        self._name = name
+
+    def name(self):
+        """Return name of the variable."""
+        return self._name
+    
+    
 
 class ContentVariants(Container):
     """Container of multiple language variants of the same content.
