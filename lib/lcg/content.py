@@ -1535,3 +1535,29 @@ def join(items, separator=' '):
             result.append(sep)
         result.append(coerce(item))
     return coerce(result)
+
+def strong(*items, **kwargs):
+    """Create a 'Strong' instance by coercing all arguments."""
+    return Strong([coerce(item, **kwargs) for item in items])
+
+def em(*items, **kwargs):
+    """Create an 'Emphasized' instance by coercing all arguments."""
+    return Emphasized([coerce(item, **kwargs) for item in items])
+
+def u(*items, **kwargs):
+    """Create an 'Underlined' instance by coercing all arguments."""
+    return Underlined([coerce(item, **kwargs) for item in items])
+
+def code(*items, **kwargs):
+    """Create an 'Code' instance by coercing all arguments."""
+    return Code([coerce(item, **kwargs) for item in items])
+
+def cite(*items, **kwargs):
+    """Create an 'Citation' instance by coercing all arguments."""
+    return Citation([coerce(item, **kwargs) for item in items])
+
+def br():
+    return NewLine()
+
+def hr():
+    return HorizontalSeparator()
