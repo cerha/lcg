@@ -35,12 +35,17 @@ import re
 import shutil
 import string
 
-from lcg import Anchor, Audio, concat, Container, Content, ContentNode, ContentVariants, \
-     DefinitionList, FieldSet, FormattedText, Heading, HorizontalSeparator, HSpace, VSpace, Image, \
-     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, Link, Localizable, \
-     Localizer, log, NewLine, NewPage, PageHeading, PageNumber, Paragraph, PreformattedText, \
-     Resource, Section, Variable, SetVariable, Table, TableCell, TableHeading, TableOfContents, \
-     TableRow, TextContent, Title, Video, Strong, Emphasized, Underlined, Code, Citation
+from lcg import log, concat, Localizable, Localizer, \
+    Resource, Image, Audio, Video, \
+    ContentNode, Content, Container, ContentVariants, \
+    Paragraph, PreformattedText, Section, TableOfContents, \
+    DefinitionList, FieldSet, FormattedText,  \
+    Table, TableCell, TableHeading, TableRow, \
+    TextContent, Heading, Title, Anchor, Link, \
+    Strong, Emphasized, Underlined, Code, Citation, \
+    InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
+    NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
+    Substitution, SetVariable
 
 class SubstitutionIterator(object):
     """Supporting object for multiple-value substitution variables.
@@ -581,7 +586,7 @@ class Exporter(object):
                 InlineVideo: self._export_inline_video,
                 InlineExternalVideo: self._export_inline_external_video,
                 SetVariable: self._export_set_variable,
-                Variable: self._export_variable,
+                Substitution: self._export_substitution,
                 }
     
     def _export(self, node, context):
@@ -953,10 +958,10 @@ class Exporter(object):
         output_lines.append(self._newline(context))
         return self.concat(*output_lines)
 
-    def _export_variable(self, context, element):
-        """Set node variable defined by 'element'.
+    def _export_substitution(self, context, element):
+        """Substitute the node variable defined by 'element'.
 
-        The method returns export of an empty content.
+        The method returns export of the variable value.
 
         """
         value = context.node().globals().get(element.name(), '')

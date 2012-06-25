@@ -1370,8 +1370,8 @@ class SetVariable(Content):
         return self._value
 
 
-class Variable(Content):
-    """Element replaced by the actual variable value on export."""
+class Substitution(Content):
+    """Variable to be substituted by the actual value on export."""
     
     def __init__(self, name):
         """

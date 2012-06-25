@@ -716,7 +716,7 @@ class HtmlExport(unittest.TestCase):
              '<br>'),
             (lcg.hr(),
              '<hr>'),
-            (lcg.Variable('x'),
+            (lcg.Substitution('x'),
              'value of x'),
             ):
             result = lcg.coerce(content).export(context)
