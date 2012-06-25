@@ -559,6 +559,12 @@ class HtmlExporter(Exporter):
                                       lang=element.lang(inherited=False) or context.sec_lang(),
                                       cls='citation')
 
+    def _export_superscript(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.sup)
+
+    def _export_subscript(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.sub)
+
     
     def _export_anchor(self, context, element):
         return self._generator.a(self._export_text_content(context, element),

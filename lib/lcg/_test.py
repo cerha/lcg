@@ -718,6 +718,8 @@ class HtmlExport(unittest.TestCase):
              '<hr>'),
             (lcg.Substitution('x'),
              'value of x'),
+            ((lcg.Subscript(lcg.TextContent('sub')), lcg.Superscript(lcg.TextContent('sup'))),
+             '<sub>sub</sub><sup>sup</sup>'),
             ):
             result = lcg.coerce(content).export(context)
             assert result == html, "\n  - content:  %r\n  - expected: %r\n  - got:      %r" % \

@@ -345,6 +345,15 @@ class Citation(Container):
     """Citation of a text in another language."""
     pass
 
+class Superscript(Container):
+    """Text vertically aligned above the normal line level."""
+    pass
+
+class Subscript(Container):
+    """Text vertically aligned below the normal line level."""
+    pass
+
+
 
 class TextContent(Content):
     """A simple piece of text."""
