@@ -134,8 +134,16 @@ class MarkupFormatter(object):
     single paragraph or other non-structured piece of text).  Parsing the
     higher level document structure (headings, paragraphs, bullet lists etc.)
     is done on the LCG input.  Formatting the inline markup, on the other hand,
-    is done on LCG output (export).
+    is done on LCG output (export).  The inline markup is represented by a
+    'FormattedText' content element.  'MarkupFormatter' is actually used to
+    export the 'FormattedText' instance.
 
+    NOTE: Markup formatter is DEPRECATED.  Inline constructs are now handled as
+    standard LCG 'Content' elements.  The 'Parser' should be extended to parse
+    inline texts and produce a hierarchy of inline elements instead of a
+    'FormattedText' instance.  The 'FormattedText' class (and 'MarkupFormatter'
+    as well) will not be necessary when this is done.
+    
     """
     _IMG_EXT = r'\.(?:jpe?g|png|gif)'
     _MARKUP = (('linebreak', '//'),

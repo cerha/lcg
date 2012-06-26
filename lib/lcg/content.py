@@ -874,6 +874,9 @@ class FormattedText(TextContent):
     """Formatted text using a simple wiki-based inline markup.
 
     See 'MarkupFormatter' for more information about the formatting rules.
+
+    NOTE: Using 'FormattedText' is DEPRECATED.  Inline constructs are now
+    represented by standard LCG 'Content' elements.
     
     """
     pass
