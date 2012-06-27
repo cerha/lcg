@@ -461,3 +461,40 @@ class BrailleExporter(FileExporter, Exporter):
     def _page_formatter(self, context, **kwargs):
         return self.text(context, str(context.page_number()))
     
+    # Inline constructs (text styles).
+
+    def _export_emphasize(self, context, element):
+        text = self._export_container(context, element)
+        return self.text(context, text, form=louis.italic)
+
+    def _export_strong(self, context, element):
+        text = self._export_container(context, element)
+        return self.text(context, text, form=louis.bold)
+
+    def _export_code(self, context, element):
+        text = self._export_container(context, element)
+        return self.text(context, text)
+     
+    def _export_underline(self, context, element):
+        text = self._export_container(context, element)
+        return self.text(context, text, form=louis.underline)
+    
+    def _export_superscript(self, context, element):
+        lang = context.lang()
+        text, hyphenation = self.text(context, self._export_container(context, element))
+        if lang == 'cs':
+            text = u'⠌' + text + u'⠱'
+            hyphenation = '0' + hyphenation + '0'
+        return text, hyphenation
+    
+    def _export_subscript(self, context, element):
+        lang = context.lang()
+        text, hyphenation = self.text(context, self._export_container(context, element))
+        if lang == 'cs':
+            text = u'⠡' + text + u'⠱'
+            hyphenation = '0' + hyphenation + '0'
+        return text, hyphenation
+    
+    def _export_citation(self, context, element):
+        return self.text(context, text)
+
