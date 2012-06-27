@@ -2560,6 +2560,32 @@ class PDFExporter(FileExporter, Exporter):
                             halign=element.halign(), valign=element.valign(),
                             presentation=element.presentation())
 
+    def _markup_container(self, context, element, tag, **attributes):
+        exported_content = self._content_export(context, element, collapse=False)
+        return make_element(MarkedText, content=exported_content, tag=tag, attributes=attributes)
+    
+    def _export_emphasize(self, context, element):
+        return self._markup_container(context, element, 'i')
+
+    def _export_strong(self, context, element):
+        return self._markup_container(context, element, 'strong')
+    
+    def _export_code(self, context, element):
+        face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, False, False)
+        return self._markup_container(context, element, 'font', face=face)
+     
+    def _export_underline(self, context, element):
+        return self._markup_container(context, element, 'u')
+    
+    def _export_superscript(self, context, element):
+        return self._markup_container(context, element, 'super')
+    
+    def _export_subscript(self, context, element):
+        return self._markup_container(context, element, 'sub')
+    
+    def _export_citation(self, context, element):
+        return self._export_emphasize(context, element)
+    
     def _export_link(self, context, element):
         target = element.target()
         content = self._content_export(context, element)
