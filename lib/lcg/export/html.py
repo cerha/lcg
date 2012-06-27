@@ -571,9 +571,22 @@ class HtmlExporter(Exporter):
                                  name=element.anchor())
     
     def _export_link(self, context, element):
-        return self._generator.a(self.concat(self._exported_container_content(context, element)),
-                                 href=context.uri(element.target()),
-                                 title=element.descr(), type=element.type())
+        target = element.target(context)
+        label = self.concat(self._exported_container_content(context, element))
+        descr = element.descr()
+        if not label:
+            if isinstance(target, (ContentNode, Section)):
+                label = target.heading().export(context)
+            elif isinstance(target, Resource):
+                label = target.title() or target.filename()
+            elif isinstance(target, element.ExternalTarget):
+                label = target.title() or target.uri()
+        if descr is None:
+            if isinstance(target, (ContentNode, element.ExternalTarget, Resource)):
+                descr = target.descr()
+            elif isinstance(target, Section) and target.parent() is not element.parent():
+                descr = target.title() + ' ('+ target.parent().title() +')'
+        return self._generator.a(label, href=context.uri(target), title=descr, type=element.type())
 
     def _container_attr(self, element, cls=None, lang=None, **kwargs):
         attr = dict(cls=' '.join([x for x in (element.name(), cls) if x is not None]) or None,
@@ -696,7 +709,7 @@ class HtmlExporter(Exporter):
 
     def _export_inline_image(self, context, element):
         g = self._generator
-        image = element.image()
+        image = element.image(context)
         thumbnail = image.thumbnail()
         link = None
         if thumbnail:
@@ -752,8 +765,8 @@ class HtmlExporter(Exporter):
         """
         if element.shared():
             g = self._generator
-            audio = element.audio()
-            image = element.image()
+            audio = element.audio(context)
+            image = element.image(context)
             title = element.title()
             descr = element.descr()
             uri = context.uri(audio)
@@ -781,8 +794,8 @@ class HtmlExporter(Exporter):
             width, height = (200, 200)
         else:
             width, height = element.size()
-        video = element.video()
-        image = element.image()
+        video = element.video(context)
+        image = element.image(context)
         uri = context.uri(video)
         title = element.title() or video.title()
         descr = element.descr() or video.descr()

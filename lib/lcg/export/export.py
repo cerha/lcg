@@ -1136,7 +1136,7 @@ class Exporter(object):
         In this class the method returns just the escaped image title.
         
         """
-        return self._inline_export(context, element, element.image(), lang=element.lang())
+        return self._inline_export(context, element, element.image(context), lang=element.lang())
 
     def _export_inline_audio(self, context, element):
         """Export embedded audio player for given 'InlineAudio' element.
@@ -1144,7 +1144,7 @@ class Exporter(object):
         In this class the method returns just the escaped audio title.
 
         """
-        return self._inline_export(context, element, element.audio(), lang=element.lang())
+        return self._inline_export(context, element, element.audio(context), lang=element.lang())
 
     def _export_inline_video(self, context, element):
         """Export embedded video player for given 'InlineVideo' element.
@@ -1152,7 +1152,7 @@ class Exporter(object):
         In this class the method returns just the escaped video title.
 
         """
-        return self._inline_export(context, element, element.video(), lang=element.lang())
+        return self._inline_export(context, element, element.video(context), lang=element.lang())
 
     def _export_inline_external_video(self, context, element):
         """Export embedded video player for given 'InlineExternalVideo' element.

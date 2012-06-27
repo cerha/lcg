@@ -413,33 +413,32 @@ class Link(Container):
             return self._descr
         def lang(self):
             return self._lang
-    
+
     def __init__(self, target, label=None, descr=None, type=None, lang=None):
         """Arguments:
 
-          target -- target of the link, it may be either a 'Section' instance
-            or a 'ContentNode' instance, a 'Link.ExternalTarget' instance or a
-            'Resource' instance
+          target -- target of the link, instance of 'Section', 'ContentNode',
+            'Resource', 'Link.ExternalTarget' or 'basestring'.  If a string is
+            used, it is a temporary reference to be resolved in export time.
+            It allows creation of links which refer to objects, which can not
+            be resolved at the time of Link instance creation (their instances
+            may not exist yet when the source text is parsed).  The reference
+            is then automatically resolved by the method 'target()' into one of
+            the other allowed link targets.
           label -- link label text as a string or a 'Content' instance (such as
             'InlineImage' for image links)
           descr -- breif target description text.  If none the description is
-             taken from the 'target' instance depending on its type
+            taken from the 'target' instance depending on its type
           type -- ???
           lang -- lowercase ISO 639-1 Alpha-2 language code
         
         """
-        assert isinstance(target, (Section, ContentNode, self.ExternalTarget, Resource)), target
+        assert isinstance(target, (Section, ContentNode, Resource, self.ExternalTarget,
+                                   basestring)), target
         assert label is None or isinstance(label, (basestring, Content)), label
         assert descr is None or isinstance(descr, basestring), descr
         assert type is None or isinstance(type, basestring), type
         assert lang is None or isinstance(lang, basestring), lang
-        if label is None:
-            if isinstance(target, (ContentNode, Section)):
-                label = target.heading()
-            elif isinstance(target, Resource):
-                label = target.title() or target.filename()
-            elif isinstance(target, self.ExternalTarget):
-                label = target.title() or target.uri()
         if isinstance(label, (str, unicode)):
             content = TextContent(label)
         elif label is not None:
@@ -451,26 +450,39 @@ class Link(Container):
         self._type = type
         super(Link, self).__init__(content, lang=lang)
 
-    def target(self):
-        """Return the value of 'target' as passed to the constructor."""
-        return self._target
+    def target(self, context):
+        """Return the link target.
+
+        If a string reference was passed to the constructor argument 'target',
+        it is automatically resolved, so the returned instance is always one of
+        'Section', 'ContentNode', 'Resource' or 'Link.ExternalTarget'.
+        
+        """
+        target = self._target
+        if isinstance(target, basestring):
+            reference = target
+            target = context.resource(reference, warn=False)
+            if target is None:
+                if '#' in reference:
+                    node_id, section_id = reference.split('#', 1)
+                else:
+                    node_id, section_id = reference, None
+                parent = context.node()
+                if not node_id:
+                    node = parent
+                elif '@' not in node_id and '/' not in node_id:
+                    node = parent.root().find_node(node_id)
+                if node and section_id:
+                    target = node.find_section(section_id, context)
+                else:
+                    target = node
+            if target is None:
+                target = self.ExternalTarget(reference, reference)
+        return target
 
     def descr(self):
-        """Return the link description as a string.
-
-        If 'descr' was passed to the constructor and is not 'None', it is used.
-        Otherwise the description is taken from target description if it was
-        defined.
-
-        """
-        descr = self._descr
-        if descr is None:
-            target = self._target
-            if isinstance(target, (ContentNode, self.ExternalTarget, Resource)):
-                descr = target.descr()
-            elif target.parent() is not self.parent():
-                descr = target.title() + ' ('+ target.parent().title() +')'
-        return descr
+        """Return the link description as passed to the constructor argument 'descr'."""
+        return self._descr
 
     def type(self):
         """Return the value of 'type' as passed to the constructor."""
@@ -518,6 +530,16 @@ class _InlineObject(Content):
         self._descr = descr
         self._name = name
         super(_InlineObject, self).__init__(lang=lang)
+
+    def _resource_instance(self, context, resource, cls):
+        if isinstance(resource, (str, unicode)):
+            filename = resource
+            resource = context.resource(filename)
+            if resource is None:
+                resource = cls(filename, uri=filename)
+            else:
+                assert isinstance(resource, cls), resource
+        return resource
 
     def title(self):
         """Return the value of 'title' as passed to the constructor."""
@@ -578,15 +600,20 @@ class InlineImage(_SizedInlineObject):
         All other keyword arguments are passed to the parent class constructor.
 
         """
-        assert isinstance(image, Image), image
+        assert isinstance(image, (Image, basestring)), image
         assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
         self._image = image
         self._align = align
         super(InlineImage, self).__init__(**kwargs)
 
-    def image(self):
-        """Return the value of 'image' as passed to the constructor."""
-        return self._image
+    def image(self, context):
+        """Return the value of 'image' passed to the constructor.
+
+        If the 'image' was passed as a string reference, it is automatically
+        converted into an 'Image' instance.
+
+        """
+        return self._resource_instance(context, self._image, Image)
         
     def align(self):
         """Return the value of 'align' as passed to the constructor."""
@@ -610,21 +637,31 @@ class InlineAudio(_InlineObject):
         All other arguments are passed to the parent class constructor.
         
         """
-        assert isinstance(audio, Audio), audio
-        assert image is None or isinstance(image, Image), image
+        assert isinstance(audio, (Audio, basestring)), audio
+        assert image is None or isinstance(image, (Image, basestring)), image
         assert isinstance(shared, bool)
         self._audio = audio
         self._image = image
         self._shared = shared
         super(InlineAudio, self).__init__(**kwargs)
 
-    def audio(self):
-        """Return the value of 'audio' as passed to the constructor."""
-        return self._audio
+    def audio(self, context):
+        """Return the value of 'audio' as passed to the constructor.
+
+        If the 'audio' was passed as a string reference, it is automatically
+        converted into an 'Audio' instance.
+
+        """
+        return self._resource_instance(context, self._audio, Audio)
     
-    def image(self):
-        """Return the value of 'image' as passed to the constructor."""
-        return self._image
+    def image(self, context):
+        """Return the value of 'image' as passed to the constructor.
+
+        If the 'image' was passed as a string reference, it is automatically
+        converted into an 'Image' instance.
+
+        """
+        return self._resource_instance(context, self._image, Image)
     
     def shared(self):
         """Return the value of 'shared' as passed to the constructor."""
@@ -647,19 +684,29 @@ class InlineVideo(_SizedInlineObject):
         All other keyword arguments are passed to the parent class constructor.
         
         """
-        assert isinstance(video, Video), video
-        assert image is None or isinstance(image, Image), image
+        assert isinstance(video, (Video, basestring)), video
+        assert image is None or isinstance(image, (Image, basestring)), image
         self._video = video
         self._image = image
         super(InlineVideo, self).__init__(**kwargs)
 
-    def video(self):
-        """Return the value of 'video' as passed to the constructor."""
-        return self._video
+    def video(self, context):
+        """Return the value of 'video' as passed to the constructor.
+
+        If the 'video' was passed as a string reference, it is automatically
+        converted into an 'Video' instance.
+
+        """
+        return self._resource_instance(context, self._video, Video)
     
-    def image(self):
-        """Return the value of 'image' as passed to the constructor."""
-        return self._image
+    def image(self, context):
+        """Return the value of 'image' as passed to the constructor.
+
+        If the 'image' was passed as a string reference, it is automatically
+        converted into an 'Image' instance.
+
+        """
+        return self._resource_instance(context, self._image, Image)
     
 
 

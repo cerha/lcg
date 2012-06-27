@@ -2579,8 +2579,17 @@ class PDFExporter(FileExporter, Exporter):
         return self._export_emphasize(context, element)
     
     def _export_link(self, context, element):
-        target = element.target()
-        content = self._content_export(context, element)
+        target = element.target(context)
+        if element.content():
+            content = self._content_export(context, element)
+        else:
+            if isinstance(target, (ContentNode, Section)):
+                content = target.heading().export(context)
+            elif isinstance(target, Resource):
+                content = make_element(Text, content=(target.title() or target.filename()))
+            elif isinstance(target, element.ExternalTarget):
+                content = make_element(Text, content=target.title() or target.uri())
+        # TODO: Show link (or target) 'descr()' as a tooltip or something similar (see html export).
         uri = context.uri(target)
         if isinstance(content, Container):
             def filter_(c):
@@ -2735,4 +2744,4 @@ class PDFExporter(FileExporter, Exporter):
     # Media (represented by resources wrapped in inline content elements)
 
     def _export_inline_image(self, context, element):
-        return make_element(Image, image=element.image(), text=element.title())
+        return make_element(Image, image=element.image(context), text=element.title())

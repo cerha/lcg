@@ -133,7 +133,51 @@ class Parser(object):
                    'noindent': ('presentation', 'noindent', _bool,),
                    'line_spacing': ('presentation', 'line_spacing', float,),
                    }
+
+    _INLINE_MARKUP = (
+        ('newline',    '//'),
+        ('emphasized', ('/',  '/')),
+        ('strong',     ('\*', '\*')),
+        ('code',       ('=',  '=')),
+        ('underlined', ('_',  '_')),
+        ('citation',   ('>>', '<<')),
+        ('quotation',  ('``', "''")),
+        # Link to an internal or external (http) target via [ ].
+        ('link', (r'\['
+                  r'(?P<align>[<>])?'                     # Left/right Image aligment e.g. [<imagefile], [>imagefile]
+                  r'(?P<href>[^\[\]\|\s]*?)'               # The link target e.g. [src]
+                  r'(?::(?P<size>\d+x\d+))?'              # Optional explicit image (or video) size e.g. [image.jpg:30x40])
+                  r'(?:(?:\s*\|\s*|\s+)'                  # Separator (pipe is enabled for backwards compatibility, but space is the official separator)
+                  r'(?P<label>[^\[\]\|]*))?'              # Label text
+                  r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?' # Description after | [src Label | Description] 
+                  r'\]')),
+        # Link directly in the text starting with http(s)/ftp://, see _uri_formatter()
+        ('uri', (r'(?:https?|ftp)://\S+?(?=[\),.:;]*(\s|$))')), # ?!? SOS!
+        ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
+        ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
+                              "|\{[^\}]+\})")),
+        ('comment', r'^#.*'),
+        ('dash', r'(^|(?<=\s))--($|(?=\s))'),
+        ('nbsp', '~'),
+        ('page_number', '@PAGE@'),
+        ('total_pages', '@PAGES@'),
+        ('escape', '\\\\(?P<char>[-*@])'),
+        )
     
+    _INLINE_MARKUP_PARAMETERS = ('align', 'href', 'label', 'descr', 'subst', 'size')
+
+    _VIMEO_VIDEO_MATCHER = re.compile(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
+    _YOUTUBE_VIDEO_MATCHER = re.compile(
+        r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)")
+    _IMAGE_EXTENSIONS = ('jpg', 'jpeg', 'gif', 'png')
+    _AUDIO_EXTENSIONS = ('mp3',)
+    _VIDEO_EXTENSIONS = ('flv',)
+    
+    class _StackEntry(object):
+        def __init__(self, name):
+            self.name = name
+            self.content = []
+            
     def __init__(self):
         self._processors = (self._alignment_processor,
                             self._field_processor,
@@ -150,7 +194,15 @@ class Parser(object):
                             self._space_processor,
                             self._paragraph_processor,
                             )
-
+        regexp = r"(?P<%s>\\*%s)"
+        pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
+                                regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
+        regexps = [isinstance(markup, str) and regexp % (name, markup)
+                   or pair_regexp % (name, markup[1], name, markup[0])
+                   for name, markup in self._INLINE_MARKUP]
+        self._inline_markup = re.compile('(?:' +'|'.join(regexps)+ ')',
+                                         re.MULTILINE|re.UNICODE|re.IGNORECASE)
+    
     def _prune_kwargs(self, kwargs, prune):
         kwargs = copy.copy(kwargs)
         for k in prune:
@@ -632,6 +684,230 @@ class Parser(object):
                 return result
         else:
             raise Exception('Unhandled text', text[position:])
+
+    def _substitution_markup_handler(self, subst):
+        exporter = context.exporter()
+        # get the substitution value for _SUBSTITUTION_REGEX match
+        if subst.startswith('{') and subst.endswith('}'):
+            text = subst[1:-1]
+        else:
+            text = subst
+        if not text:
+            return exporter.escape('$' + subst)
+        names = text.split('.')
+        value = context.node().global_(str(names[0]))
+        for name in names[1:]:
+            if value is None:
+                break
+            if isinstance(value, SubstitutionIterator):
+                value = value.value()
+            key = str(name)
+            dictionary = value
+            try:
+                value = value.get(key)
+            except:
+                dictionary = None
+                break
+            if isinstance(value, collections.Callable):
+                value = value()
+                # It is necessary to store the computed value in order to
+                # prevent repeated object initializations in it.  Otherwise it
+                # fails e.g. with substitution iterators.
+                dictionary[key] = value
+        if value is None:
+            result = exporter.escape('$' + subst)
+        elif isinstance(value, Content):
+            result = value.export(context)
+        else:
+            if not isinstance(value, Localizable):
+                value = unicode(value)
+            result = exporter.escape(value)
+        return result
+    
+    def _link_markup_handler(self, link, href=None, size=None, label=None, descr=None, align=None):
+        def split_filename(filename):
+            if filename:
+                if '/' in filename:
+                    filename = filename.split('/')[-1]
+                if '.' in filename:
+                    filename, ext = filename.rsplit('.', 1)
+                    return filename, ext.lower()
+            return None, None
+        label_image, label_image_basename = None, None
+        if label:
+            label = label.strip()
+            if ' ' in label:
+                image, label_ = label.split(' ', 1)
+                image_basename, image_ext = split_filename(image)
+                if image_ext in self._IMAGE_EXTENSIONS:
+                    label_image = image
+                    label_image_basename = image_basename
+                    label = label_.strip()
+            else:
+                image_basename, image_ext = split_filename(label)
+                if image_ext in self._IMAGE_EXTENSIONS:
+                    label_image = label
+                    label_image_basename = image_basename
+                    label = None
+        if size:
+            size = tuple(map(int, size.split('x')))
+        if align:
+            align = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}.get(align)
+        basename, ext = split_filename(href)
+        match = self._YOUTUBE_VIDEO_MATCHER.match(href)
+        if match:
+            video_service = 'youtube'
+            video_id = match.group("video_id")
+        else:
+            match = self._VIMEO_VIDEO_MATCHER.match(href)
+            if match:
+                video_service = 'vimeo'
+                video_id = match.group("video_id")
+            else:
+                video_service = None
+        if video_service:
+            result = InlineExternalVideo(video_service, video_id, size=size)
+        elif ext in self._IMAGE_EXTENSIONS and not label_image:
+            result = InlineImage(href, title=label, descr=descr, name=basename, align=align, size=size)
+        elif ext in self._AUDIO_EXTENSIONS:
+            result = InlineAudio(href, title=label, descr=descr, name=basename, image=label_image, shared=True)
+        elif ext == self._VIDEO_EXTENSIONS:
+            result = InlineVideo(href, title=label, descr=descr, name=basename, image=label_image, size=size)
+        else:
+            if label_image:
+                label = InlineImage(label_image, title=label, name=label_image_basename, align=align)
+            if href.startswith('http://') or href.startswith('https://') or href.startswith('ftp://'):
+                target = Link.ExternalTarget(href, label)
+            else:
+                target = href
+            result = Link(target, label=label, descr=descr)
+        return result
+    
+    def _uri_markup_handler(self, uri):
+        return self._link_markup_handler(uri, href=uri)
+
+    def _page_number_markup_handler(self):
+        return 
+    
+    def _total_pages_markup_handler(self):
+        return 
+
+    def _escape_markup_handler(self):
+        return 
+    
+    def _email_markup_handler(self, email):
+        return 
+
+    def _newline_markup_handler(self):
+        return Newline()
+
+    def _comment_markup_handler(self, text):
+        return Content()
+
+    def _dash_markup_handler(self):
+        return
+
+    def _nbsp_markup_handler(self):
+        return 
+
+    def _emphasized_markup_handler(self, content):
+        return Emphasized(content)
+
+    def _strong_markup_handler(self, content):
+        return Strong(content)
+
+    def _code_markup_handler(self, content):
+        return Code(content)
+
+    def _underlined_markup_handler(self, content):
+        return Underlined(content)
+
+    def _citation_markup_handler(self, content):
+        return Citation(content)
+    
+    def _markup_handler(self, stack, match, append):
+        name, markup, kwargs = None, None, {}
+        for key, value in match.groupdict().items():
+            if value is not None:
+                if key in self._INLINE_MARKUP_PARAMETERS:
+                    kwargs[key] = value
+                else:
+                    name = key
+                    markup = value
+        number_of_backslashes = markup.count('\\')
+        markup = markup[number_of_backslashes:]
+        initial_backslashes = number_of_backslashes / 2 * '\\'
+        if number_of_backslashes % 2:
+            # If the number of backslashes is odd, the markup is escaped (printed as is).
+            return [TextContent(initial_backslashes + markup)]
+        if initial_backslashes:
+            append(TextContent(initial_backslashes))
+        result = []
+        # We need two variables (start and end), because both can be False for
+        # unpaired markup.
+        start = False
+        end = False
+        if name.endswith('_start'):
+            name = name[:-6]
+            start = True
+        elif name.endswith('_end'):
+            name = name[:-4]
+            end = True
+        if start and name not in [entry.name for entry in stack]:
+            # Opening markup.
+            stack.append(self._StackEntry(name))
+        elif end and stack and name == stack[-1].name:
+            # Closing an open markup.
+            entry = stack.pop()
+            handler = getattr(self, '_'+name+'_markup_handler')
+            x = handler(entry.content, **kwargs)
+            result.append(x)
+        elif not start and not end:
+            # Unpaired markup.
+            handler = getattr(self, '_'+name+'_markup_handler')
+            result.append(handler(markup, **kwargs))
+        elif markup:
+            # Markup in an invalid context is just printed as is.
+            # This can be end markup, which was not opened or start markup,
+            # which was already opened.
+            result.append(TextContent(markup))
+        return result
+
+    def parse_inline_markup(self, text):
+        """Parse inline constructs within given source text and return a 'Container' instance.
+
+        As opposed to 'parse()', which parses block level constructs, this
+        method only parses inline constructs within the blocks processed by
+        'parse()'.  The inline constructs are links, text emphasizing etc.
+
+        NOTE: The method is currently unused, but the goal is to replace usage
+        of FormattedText elements within the content returned by 'parse()' by a
+        hierarchy of inline elements returned by this method.
+
+        """
+        stack = []
+        result = []
+        pos = 0
+        def append(*content):
+            if stack:
+                stack[-1].content.extend(content)
+            else:
+                result.extend(content)
+        for match in self._inline_markup.finditer(text):
+            preceding_text = text[pos:match.start()]
+            if preceding_text:
+                append(TextContent(preceding_text))
+            append(*self._markup_handler(stack, match, append))
+            pos = match.end()
+        final_text = text[pos:]
+        if final_text:
+            append(TextContent(final_text))
+        while stack:
+            entry = stack.pop()
+            handler = getattr(self, '_'+entry.name+'_markup_handler')
+            append(handler(entry.content))
+        return Container(result)
+        
 
     def parse(self, text, parameters=None):
         """Parse given 'text' and return corresponding content.
