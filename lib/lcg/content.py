@@ -496,7 +496,63 @@ class Anchor(TextContent):
         return self._anchor
 
 
-class InlineImage(Content):
+class _InlineObject(Content):
+    """Super class for embedded objects, such as images, audio and video."""
+    
+    def __init__(self, title=None, descr=None, name=None, lang=None):
+        """Arguments:
+        
+          title -- object title as a string or unicode.  If not None, overrides
+            'resource.title()' for this particular use.
+          descr -- object description a string or unicode.  If not None, overrides
+            'resource.descr()' for this particular use.
+          name -- arbitrary name (string) identifying the object.  Used as CSS
+            class name in HTML to allow individual styling.
+          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
+
+        """
+        assert title is None or isinstance(title, (str, unicode)), title
+        assert descr is None or isinstance(descr, (str, unicode)), descr
+        assert name is None or isinstance(name, (str, unicode)), name
+        self._title = title
+        self._descr = descr
+        self._name = name
+        super(_InlineObject, self).__init__(lang=lang)
+
+    def title(self):
+        """Return the value of 'title' as passed to the constructor."""
+        return self._title
+    
+    def descr(self):
+        """Return the value of 'descr' as passed to the constructor."""
+        return self._descr
+    
+    def name(self):
+        """Return the value of 'name' as passed to the constructor."""
+        return self._name
+
+
+    
+class _SizedInlineObject(_InlineObject):
+    
+    def __init__(self, size=None, **kwargs):
+        """Arguments:
+
+          size -- size in pixels as a tuple of two integers (WIDTH, HEIGHT)
+
+        All other arguments are passed to the parent class constructor.
+          
+        """
+        assert size is None or isinstance(size, tuple), size
+        self._size = size
+        super(_SizedInlineObject, self).__init__(**kwargs)
+    
+    def size(self):
+        """Return the value of 'size' as passed to the constructor."""
+        return self._size
+    
+    
+class InlineImage(_SizedInlineObject):
     """Image embedded inside the document.
 
     It is unspecified whether the image is floating or to be put directly into
@@ -510,68 +566,34 @@ class InlineImage(Content):
     BOTTOM = 'bottom'
     MIDDLE = 'middle'
     
-    def __init__(self, image, title=None, descr=None, name=None, align=None, size=None, lang=None):
+    def __init__(self, image, align=None, **kwargs):
         """Arguments:
 
-          image -- 'Image' resource instance.
-          title -- image title as a string or unicode.  The
-            title used for example as alternative text in HTML.
-          descr -- image description a string or unicode.  Currently
-            unused in HTML.
-          name -- arbitrary name (string) identifying the image.  Used as CSS
-            class name in HTML to allow individual image styling.
+          image -- the displayed image as an 'Image' resource instance.
           align -- requested alignment of the image to the surrounding text;
             one of the constants 'InlineImage.LEFT', 'InlineImage.RIGHT',
             'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
             'None'
-          size -- image size in pixels as a tuple of two integers (WIDTH, HEIGHT)
-          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
+            
+        All other keyword arguments are passed to the parent class constructor.
 
-        If 'title' or 'descr' is None, the title/description defined by the
-        'Image' resource instance is used.
-
-          
         """
         assert isinstance(image, Image), image
-        assert title is None or isinstance(title, (str, unicode)), title
-        assert descr is None or isinstance(descr, (str, unicode)), descr
-        assert name is None or isinstance(name, (str, unicode)), name
         assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
-        assert size is None or isinstance(size, tuple), size
         self._image = image
         self._align = align
-        self._title = title
-        self._descr = descr
-        self._name = name
-        self._size = size
-        super(InlineImage, self).__init__(lang=lang)
+        super(InlineImage, self).__init__(**kwargs)
 
     def image(self):
         """Return the value of 'image' as passed to the constructor."""
         return self._image
-
-    def title(self):
-        """Return the value of 'title' as passed to the constructor."""
-        return self._title
-    
-    def descr(self):
-        """Return the value of 'descr' as passed to the constructor."""
-        return self._descr
-    
-    def name(self):
-        """Return the value of 'name' as passed to the constructor."""
-        return self._name
-    
+        
     def align(self):
         """Return the value of 'align' as passed to the constructor."""
         return self._align
     
-    def size(self):
-        """Return the value of 'size' as passed to the constructor."""
-        return self._size
-    
 
-class InlineAudio(Content):
+class InlineAudio(_InlineObject):
     """Audio file embedded inside the document.
 
     For example in HTML, this might be exported as a play button using a
@@ -579,41 +601,26 @@ class InlineAudio(Content):
     
     """
        
-    def __init__(self, audio, title=None, descr=None, image=None, shared=True, lang=None):
+    def __init__(self, audio, image=None, shared=True, **kwargs):
         """Arguments:
 
-          audio -- 'Audio' resource instance.
-          title -- audio file title as a string.
-          descr -- audio file description as a string.
           image -- visual presentation image as an 'Image' resource instance or None.
           shared -- boolean flag indicating whether using a shared audio player is desired.
-          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
-
-        If 'title' or 'descr' is None, the title/description defined by the
-        resource instance is used.
         
+        All other arguments are passed to the parent class constructor.
         
         """
         assert isinstance(audio, Audio), audio
+        assert image is None or isinstance(image, Image), image
         assert isinstance(shared, bool)
         self._audio = audio
-        self._title = title
-        self._descr = descr
         self._image = image
         self._shared = shared
-        super(InlineAudio, self).__init__(lang=lang)
+        super(InlineAudio, self).__init__(**kwargs)
 
     def audio(self):
         """Return the value of 'audio' as passed to the constructor."""
         return self._audio
-
-    def title(self):
-        """Return the value of 'title' as passed to the constructor."""
-        return self._title
-    
-    def descr(self):
-        """Return the value of 'descr' as passed to the constructor."""
-        return self._descr
     
     def image(self):
         """Return the value of 'image' as passed to the constructor."""
@@ -624,54 +631,36 @@ class InlineAudio(Content):
         return self._shared
 
 
-class InlineVideo(Content):
+class InlineVideo(_SizedInlineObject):
     """Video file embedded inside the document.
 
     For example in HTML, this might be exported as an embedded video player.
     
     """
-       
-    def __init__(self, video, title=None, descr=None, image=None, size=None, lang=None):
+    
+    def __init__(self, video, image=None, **kwargs):
         """Arguments:
 
           video -- 'Video' resource instance.
-          title -- video file title as a string.  
-          descr -- video file description as a string.
           image -- video thumbnail image as an 'Image' resource instance or None.
-          size -- video size in pixels as a tuple of two integers (WIDTH, HEIGHT)
-          lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
-
-        If 'title' or 'descr' is None, the title/description defined by the
-        resource instance is used.
+        
+        All other keyword arguments are passed to the parent class constructor.
         
         """
         assert isinstance(video, Video), video
+        assert image is None or isinstance(image, Image), image
         self._video = video
-        self._title = title
-        self._descr = descr
         self._image = image
-        self._size = size
-        super(InlineVideo, self).__init__(lang=lang)
+        super(InlineVideo, self).__init__(**kwargs)
 
     def video(self):
         """Return the value of 'video' as passed to the constructor."""
         return self._video
-
-    def title(self):
-        """Return the value of 'title' as passed to the constructor."""
-        return self._title
-    
-    def descr(self):
-        """Return the value of 'descr' as passed to the constructor."""
-        return self._descr
     
     def image(self):
         """Return the value of 'image' as passed to the constructor."""
         return self._image
     
-    def size(self):
-        """Return the value of 'size' as passed to the constructor."""
-        return self._size
 
 
 class InlineExternalVideo(Content):
