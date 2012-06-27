@@ -399,42 +399,6 @@ class BrailleExporter(FileExporter, Exporter):
     def _separator(self, context):
         return u' - '
 
-    # Inline constructs (text styles).
-
-    def emphasize(self, context, text):
-        return self.text(context, text, form=louis.italic)
-
-    def strong(self, context, text):
-        return self.text(context, text, form=louis.bold)
-
-    def fixed(self, context, text):
-        return self.text(context, text)
-     
-    def underline(self, context, text):
-        return self.text(context, text, form=louis.underline)
-    
-    def superscript(self, context, text):
-        lang = context.lang()
-        text, hyphenation = self.text(context, text)
-        if lang == 'cs':
-            text = u'⠌' + text + u'⠱'
-            hyphenation = '0' + hyphenation + '0'
-        return text, hyphenation
-    
-    def subscript(self, context, text):
-        lang = context.lang()
-        text, hyphenation = self.text(context, text)
-        if lang == 'cs':
-            text = u'⠡' + text + u'⠱'
-            hyphenation = '0' + hyphenation + '0'
-        return text, hyphenation
-    
-    def citation(self, context, text):
-        return self.text(context, text)
-    
-    def quotation(self, context, text):
-        return self.text(context, text)
-
     # Content element export methods (defined by _define_export_methods).
     
     def _export_new_page(self, context):

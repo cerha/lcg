@@ -2208,13 +2208,34 @@ class PDFMarkupFormatter(MarkupFormatter):
             self.markup = markup
             self.content = []
 
+    def _markup(self, text, tag, **attributes):
+        return make_element(MarkedText, content=text, tag=tag, attributes=attributes)
+
+    def _markup_emphasize(self, context, text):
+        return self._markup(text, 'i')
+
+    def _markup_strong(self, context, text):
+        return self._markup(text, 'strong')
+    
+    def _markup_fixed(self, context, text):
+        face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, False, False)
+        return self._markup(text, 'font', face=face)
+     
+    def _markup_underline(self, context, text):
+        return self._markup(text, 'u')
+    
+    def _markup_citation(self, context, text):
+        return self._markup_emphasize(context, text)
+    
+    def _markup_quotation(self, context, text):
+        return self._markup_emphasize(context, text)
+    
     def _handle_open_close_markup(self, markup, context, close=False, **kwargs):
         if close:
             entry = context.pdf_markup_stack.pop()
             assert entry.markup == markup, ('markup mismatch', entry.markup, markup,)
             exported = make_element(TextContainer, content=entry.content)
-            e = context.exporter()
-            method = getattr(e, markup)
+            method = getattr(self, '_markup_' + markup)
             result = method(context, exported)
         else:
             context.pdf_markup_stack.append(self._StackEntry(markup))
@@ -2243,8 +2264,7 @@ class PDFMarkupFormatter(MarkupFormatter):
         return make_element(SimpleMarkup, content='br')
 
     def _email_formatter(self, context, email, **kwargs):
-        e = context.exporter()
-        return e.fixed(context, email)
+        return self._markup_fixed(context, email)
 
     def _page_formatter(self, context, **kwargs):
         return make_element(PageNumber)
@@ -2311,9 +2331,6 @@ class PDFExporter(FileExporter, Exporter):
                                               presentation=presentation)
         return result_content
 
-    def _markup(self, text, tag, **attributes):
-        return make_element(MarkedText, content=text, tag=tag, attributes=attributes)
-
     def concat(self, *exported):
         # This method should be considered a temporary hack.
         # Its semantics is undefined.
@@ -2352,31 +2369,6 @@ class PDFExporter(FileExporter, Exporter):
     
     def escape(self, text):
         return make_element(Text, content=text)
-
-    def emphasize(self, context, text):
-        return self._markup(text, 'i')
-
-    def strong(self, context, text):
-        return self._markup(text, 'strong')
-    
-    def fixed(self, context, text):
-        face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, False, False)
-        return self._markup(text, 'font', face=face)
-     
-    def underline(self, context, text):
-        return self._markup(text, 'u')
-    
-    def superscript(self, context, text):
-        return self._markup(text, 'super')
-    
-    def subscript(self, context, text):
-        return self._markup(text, 'sub')
-    
-    def citation(self, context, text):
-        return self.emphasize(context, text)
-    
-    def quotation(self, context, text):
-        return self.emphasize(context, text)
 
     # Classic exports
         
@@ -2682,7 +2674,9 @@ class PDFExporter(FileExporter, Exporter):
             result = make_element(TableOfContents)
             title = element.title()
             if title:
-                heading = make_element(Paragraph, content=[self.strong(context, title)],
+                heading = make_element(Paragraph,
+                                       content=[make_element(MarkedText, content=title,
+                                                             tag='strong')],
                                        noindent=True)
                 result = self.concat(heading, result)
             result = self.concat(make_element(Space, height=UFont(1)), result)
