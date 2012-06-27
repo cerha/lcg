@@ -371,8 +371,8 @@ class HtmlFormatter(MarkupFormatter):
     
     _FORMAT = {'emphasize': ('<em>', '</em>'),
                'strong': ('<strong>', '</strong>'),
-               'fixed': ('<tt>', '</tt>'),
-               'underline': ('<span class="underline">', '</span>'),
+               'fixed': ('<code>', '</code>'),
+               'underline': ('<u>', '</u>'),
                'citation': ('<span class="citation">', '</span>'),
                'quotation': (u'“<span class="quotation">', u'</span>”'),
                'comment': '',
