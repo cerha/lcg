@@ -1124,7 +1124,10 @@ class Exporter(object):
 
     # Media (represented by resources wrapped in inline content elements)
 
-    def _inline_export(self, context, label, lang=None):
+    def _inline_export(self, context, element, resource, lang=None):
+        label = element.title()
+        if label is None and resource is not None:
+            label = resource.title() or resource.filename()
         return self.text(context, label, lang=lang)
 
     def _export_inline_image(self, context, element):
@@ -1133,8 +1136,7 @@ class Exporter(object):
         In this class the method returns just the escaped image title.
         
         """
-        label = element.title() or element.image().title() or element.image().filename()
-        return self._inline_export(context, label, lang=element.lang())
+        return self._inline_export(context, element, element.image(), lang=element.lang())
 
     def _export_inline_audio(self, context, element):
         """Export embedded audio player for given 'InlineAudio' element.
@@ -1142,8 +1144,7 @@ class Exporter(object):
         In this class the method returns just the escaped audio title.
 
         """
-        label = element.title() or element.audio().title() or element.audio().filename()
-        return self._inline_export(context, label, lang=element.lang())
+        return self._inline_export(context, element, element.audio(), lang=element.lang())
 
     def _export_inline_video(self, context, element):
         """Export embedded video player for given 'InlineVideo' element.
@@ -1151,8 +1152,7 @@ class Exporter(object):
         In this class the method returns just the escaped video title.
 
         """
-        label = element.title() or element.video().title() or element.video().filename()
-        return self._inline_export(context, label, lang=element.lang())
+        return self._inline_export(context, element, element.video(), lang=element.lang())
 
     def _export_inline_external_video(self, context, element):
         """Export embedded video player for given 'InlineExternalVideo' element.
@@ -1161,7 +1161,7 @@ class Exporter(object):
         
         """
         label = element.title() or "Embedded Video %s id=%s" % (element.service(), element.video_id())
-        return self._inline_export(context, label, lang=element.lang())
+        return self._inline_export(context, label, None, lang=element.lang())
     
         
 class FileExporter(object):
