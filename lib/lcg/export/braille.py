@@ -51,6 +51,13 @@ class BrailleFormatter(MarkupFormatter):
     def _underline_formatter(self, context, close=False, **kwargs):
         return self._set_form(context, close, louis.underline)
 
+    def _citation_formatter(self, context, close=False, **kwargs):
+        if close:
+            context.unset_secondary_language()
+        else:
+            context.set_secondary_language()
+        return '', ''
+
     def _formatter(self, context, type, groups, close=False, lang=None):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
@@ -283,6 +290,8 @@ class BrailleExporter(FileExporter, Exporter):
         assert isinstance(text, basestring), text
         form = context.form()
         assert lang is None or isinstance(lang, basestring), lang
+        if lang is None:
+            lang = context.lang()
         if not text:
             return '', ''
         if self._private_char(text[0]):
@@ -460,5 +469,6 @@ class BrailleExporter(FileExporter, Exporter):
         return text, hyphenation
     
     def _export_citation(self, context, element):
-        return self.text(context, text)
+        lang = (element.lang(inherited=False) or context.sec_lang())
+        return self.text(context, text, lang=lang)
 

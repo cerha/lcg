@@ -371,6 +371,13 @@ class MarkupFormatter(object):
     def _email_formatter(self, context, email, close=False, **kwargs):
         return context.exporter().text(context, email)
 
+    def _citation_formatter(self, context, close=False, **kwargs):
+        if close:
+            context.unset_secondary_language()
+        else:
+            context.set_secondary_language()
+        return ''
+
     def _formatter(self, context, type, groups, close=False, lang=None):
         try:
             formatter = getattr(self, '_'+type+'_formatter')
@@ -472,6 +479,7 @@ class Exporter(object):
             self._toc_markers = {}
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
+            self._secondary_language_active = False
             self.list_level = 0
 
         def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None):
@@ -487,7 +495,11 @@ class Exporter(object):
             return self._formatter
         
         def lang(self):
-            return self._lang
+            if self._secondary_language_active:
+                lang = self._sec_lang or self._lang
+            else:
+                lang = self._lang
+            return lang
 
         def sec_lang(self):
             return self._sec_lang
@@ -525,6 +537,12 @@ class Exporter(object):
 
         def set_page_heading(self, heading):
             self._page_heading = heading
+
+        def set_secondary_language(self):
+            self._secondary_language_active = True
+
+        def unset_secondary_language(self):
+            self._secondary_language_active = False
             
     def __init__(self, translations=()):
         self._formatter = self.Formatter()
@@ -788,7 +806,7 @@ class Exporter(object):
             # Since formatting will destroy the translatable instances,
             # translate them before formatting.
             t = self._reformat_text(context.localize(text))
-            result = self._formatter.format(context, t, lang=(element.lang() or context.lang()))
+            result = self._formatter.format(context, t, lang=element.lang())
         else:
             result = self.text(context, '')
         return result

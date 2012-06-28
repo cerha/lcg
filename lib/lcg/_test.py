@@ -756,8 +756,8 @@ tests.add(HtmlExport)
 
 
 class BrailleExport(unittest.TestCase):
-    
-    def test_formatter(self):
+
+    def _load_presentation(self):
         import imp
         presentation = lcg.Presentation()
         filename = os.path.join(lcg_dir, 'styles/presentation-braille-test.py')
@@ -767,21 +767,25 @@ class BrailleExport(unittest.TestCase):
         for o in dir(confmodule):
             if o[0] in string.lowercase and hasattr(presentation, o):
                 setattr(presentation, o, confmodule.__dict__[o])
+        return presentation
+
+    def _test(self, text, braille, header, footer, presentation, lang, sec_lang=None):
         page_height = presentation.page_height
         presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
-        def test(text, braille, header, footer, lang):
-            #sec = lcg.Section("Section One", anchor='sec1', content=)
-            n = lcg.ContentNode('test', title='Test Node', descr="Some description",
-                                content=lcg.Container((lcg.FormattedText(text),)))
-            exporter = lcg.BrailleExporter()
-            context = exporter.context(n, lang=lang, presentation=presentation_set)
-            result = exporter.export(context)
-            braille = header + braille
-            n_lines = page_height.size() - len(braille.split('\n'))
-            braille = braille + '\n' * n_lines + footer
-            assert result == braille, \
-                   ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
-                    (text, braille, result,))
+        n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+                            content=lcg.Container((lcg.FormattedText(text),)))
+        exporter = lcg.BrailleExporter()
+        context = exporter.context(n, lang=lang, sec_lang=sec_lang, presentation=presentation_set)
+        result = exporter.export(context)
+        braille = header + braille
+        n_lines = page_height.size() - len(braille.split('\n'))
+        braille = braille + '\n' * n_lines + footer
+        assert result == braille, \
+               ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+                (text, braille, result,))
+
+    def test_formatter(self):
+        presentation = self._load_presentation()
         for text, braille in (
             (u'abc', u'⠁⠃⠉',),
             (u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),
@@ -790,7 +794,7 @@ class BrailleExport(unittest.TestCase):
             (u'_podtržený_', u'⠸⠏⠕⠙⠞⠗⠮⠑⠝⠯',),
             (u'_hodně podtržený_', u'⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
             ):
-            result = test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', 'cs')
+            result = self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs')
         for text, braille in (
             (u'abc', u'⠁⠃⠉',),
             #(u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',), # buggy in current liblouis!
@@ -799,7 +803,11 @@ class BrailleExport(unittest.TestCase):
             (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
             (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),
             ):
-            result = test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', 'en')
+            result = self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'en')
+
+    def test_languages(self):
+        presentation = self._load_presentation()
+        self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs', 'en')
 
 tests.add(BrailleExport)
 
