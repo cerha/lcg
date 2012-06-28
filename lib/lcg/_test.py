@@ -801,7 +801,7 @@ class BrailleExport(unittest.TestCase):
             ):
             result = test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', 'en')
 
-#tests.add(BrailleExport)
+tests.add(BrailleExport)
 
 
 class Presentations(unittest.TestCase):
