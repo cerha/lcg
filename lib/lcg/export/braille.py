@@ -32,7 +32,7 @@ class BrailleFormatter(MarkupFormatter):
     
     _FORMAT = {'linebreak': (u'\n', '0',),
                'comment': (u'', '',),
-               'dash': (u'-', '0',),
+               'dash': (u'⠤', '0',),
                }
 
     def _set_form(self, context, close, form):
