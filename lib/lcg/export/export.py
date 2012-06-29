@@ -477,9 +477,9 @@ class Exporter(object):
             self._formatter = formatter
             self._node = node
             self._toc_markers = {}
+            self._secondary_language_active = False
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
-            self._secondary_language_active = False
             self.list_level = 0
 
         def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None):
