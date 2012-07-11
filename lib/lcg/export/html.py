@@ -883,8 +883,6 @@ class HtmlExporter(Exporter):
         if flash_js is None:
             return None
         g = self._generator
-        flashvars = '&'.join(['='.join((name, escape(value)))
-                              for name, value in vars.items()])
         if isinstance(alternative_content, tuple):
             no_flash_content, no_js_content = alternative_content
             no_flash_content = context.localize(no_flash_content)
@@ -910,7 +908,7 @@ class HtmlExporter(Exporter):
         # the flash object when page is loaded into browser and js is working.
         return (g.div(no_js_content or '', id=element_id) + 
                 g.script(g.js_call('embed_swf_object', context.uri(flash_object), element_id,
-                                   width, height, flashvars, min_flash_version, no_flash_content)))
+                                   width, height, vars, min_flash_version, no_flash_content)))
 
     def export_media_player(self, context, player_id, width, height, shared=False):
         """Export Flash media player
