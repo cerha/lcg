@@ -153,7 +153,7 @@ class HtmlGenerator(object):
         return self._tag('hr', _paired=False, **kwargs)
 
     def a(self, label, **kwargs):
-        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'rel')
+        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'rel', 'onclick')
         return self._tag('a', label, attr, **kwargs)
 
     def link(self, label, uri, title=None, target=None, hotkey=None, cls=None, **kwargs):
