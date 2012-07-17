@@ -266,6 +266,14 @@ class ContentNode(object):
         """
         return self._children.index(node)
 
+    def top(self):
+        """Return the top level node in the hierarchy as a 'ContentNode' instance."""
+        parent = self._parent
+        if parent is None:
+            return self
+        else:
+            return parent.top()
+        
     def variants(self):
         """Return the tuple of available language variants of this node.
 
