@@ -385,10 +385,11 @@ class LocalizableDateTime(Localizable):
         """Initialize the instance.
 
         Arguments:
-          string -- the input date/datetime value as an ISO formatted string,
-            such as 'yyyy-mm-dd' for date values and 'yyyy-mm-dd HH:MM' or
-            'yyyy-mm-dd HH:MM:SS' for datetime values.  The time precision used
-            on input is respected on output.
+        
+          string -- the input date/datetime string in format 'yyyy-mm-dd' for
+            date values and 'yyyy-mm-dd HH:MM' or 'yyyy-mm-dd HH:MM:SS' for
+            datetime values.  The time precision used on input is respected on
+            output.
           show_weekday -- if true, abbreviated localized week day name is added
             to the date/datetime value on output.
           show_time -- if true and the 'string' contains the time part (it is a
