@@ -997,7 +997,16 @@ class Exporter(object):
         In this class the method just returns the exported inner content (link label).
         
         """
-        return self._export_container(context, element)
+        label = self._export_container(context, element)
+        if not label:
+            target = element.target(context)
+            if isinstance(target, (ContentNode, Section)):
+                label = target.heading().export(context)
+            elif isinstance(target, Resource):
+                label = target.title() or target.filename()
+            elif isinstance(target, element.ExternalTarget):
+                label = target.title() or target.uri()
+        return label
 
     def _export_section(self, context, element):
         """Export given 'Section' element.

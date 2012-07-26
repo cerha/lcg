@@ -24,7 +24,7 @@ import string
 
 import louis
 
-from lcg import Presentation, UFont, USpace
+from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource
 from export import Exporter, FileExporter, MarkupFormatter
 
 
@@ -479,3 +479,14 @@ class BrailleExporter(FileExporter, Exporter):
         lang = (element.lang(inherited=False) or context.sec_lang())
         return self.text(context, text, lang=lang)
 
+    def _export_link(self, context, element):
+        label = self._export_container(context, element)
+        if not label[0]:
+            target = element.target(context)
+            if isinstance(target, (ContentNode, Section)):
+                label = target.heading().export(context)
+            elif isinstance(target, Resource):
+                label = self.text(context, target.title() or target.filename())
+            elif isinstance(target, element.ExternalTarget):
+                label = self.text(context, target.title() or target.uri())
+        return label
