@@ -793,6 +793,7 @@ class BrailleExport(unittest.TestCase):
             (u'/šikmý/', u'⠔⠨⠱⠊⠅⠍⠯⠨⠔',),
             (u'_podtržený_', u'⠸⠏⠕⠙⠞⠗⠮⠑⠝⠯',),
             (u'_hodně podtržený_', u'⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
+            (u'zkouška českého dělení slov', u'⠵⠅⠕⠥⠱⠅⠁⠀⠩⠑⠎⠅⠜⠓⠕⠀⠙⠣⠤\n⠇⠑⠝⠌⠀⠎⠇⠕⠧',),
             ):
             result = self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs')
         for text, braille in (

@@ -23,7 +23,8 @@ import lcg
 
 braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': ['cs-g1.ctb']}
-braille_hyphenation_tables = {'en': 'hyph_en_US.dic'}
+braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
+                              'cs': 'hyph_cs_CZ.dic'}
 page_width = lcg.UFont(20)
 page_height = lcg.UFont(10)
 left_page_footer = lcg.Container((lcg.PageNumber(),

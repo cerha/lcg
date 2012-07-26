@@ -23,7 +23,8 @@ import lcg
 
 braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': ['cs-g1.ctb']}
-braille_hyphenation_tables = {'en': 'hyph_en_US.dic'}
+braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
+                              'cs': 'hyph_cs_CZ.dic'}
 # Hyphenation is quite buggy in current liblouis,
 # so let's disable it for now.
 braille_hyphenation_tables = {}
