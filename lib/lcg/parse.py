@@ -686,44 +686,14 @@ class Parser(object):
         else:
             raise Exception('Unhandled text', text[position:])
 
-    def _substitution_markup_handler(self, subst):
-        exporter = context.exporter()
+    def _substitution_markup_handler(self, markup, subst):
         # get the substitution value for _SUBSTITUTION_REGEX match
         if subst.startswith('{') and subst.endswith('}'):
-            text = subst[1:-1]
+            subst = subst[1:-1]
+        if subst:
+            return Substitution(subst, markup=markup)
         else:
-            text = subst
-        if not text:
-            return exporter.escape('$' + subst)
-        names = text.split('.')
-        value = context.node().global_(str(names[0]))
-        for name in names[1:]:
-            if value is None:
-                break
-            if isinstance(value, SubstitutionIterator):
-                value = value.value()
-            key = str(name)
-            dictionary = value
-            try:
-                value = value.get(key)
-            except:
-                dictionary = None
-                break
-            if isinstance(value, collections.Callable):
-                value = value()
-                # It is necessary to store the computed value in order to
-                # prevent repeated object initializations in it.  Otherwise it
-                # fails e.g. with substitution iterators.
-                dictionary[key] = value
-        if value is None:
-            result = exporter.escape('$' + subst)
-        elif isinstance(value, Content):
-            result = value.export(context)
-        else:
-            if not isinstance(value, Localizable):
-                value = unicode(value)
-            result = exporter.escape(value)
-        return result
+            return TextContent(markup)
     
     def _link_markup_handler(self, link, href=None, size=None, label=None, descr=None, align=None):
         def split_filename(filename):

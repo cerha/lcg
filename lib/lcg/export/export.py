@@ -939,9 +939,38 @@ class Exporter(object):
         The method returns export of the variable value.
 
         """
-        value = context.node().globals().get(element.name(), '')
-        return self.text(context, value)
-        
+        name = element.name()
+        if not name:
+            return self.escape(element.markup())
+        names = name.split('.')
+        value = context.node().global_(str(names[0]))
+        for xname in names[1:]:
+            if value is None:
+                break
+            if isinstance(value, SubstitutionIterator):
+                value = value.value()
+            key = str(xname)
+            dictionary = value
+            try:
+                value = value.get(key)
+            except:
+                dictionary = None
+                break
+            if isinstance(value, collections.Callable):
+                value = value()
+                # It is necessary to store the computed value in order to
+                # prevent repeated object initializations in it.  Otherwise it
+                # fails e.g. with substitution iterators.
+                dictionary[key] = value
+        if value is None:
+            result = self.escape(element.markup())
+        elif isinstance(value, Content):
+            result = value.export(context)
+        else:
+            if not isinstance(value, Localizable):
+                value = unicode(value)
+            result = self.escape(value)
+        return result
     
     def _export_set_variable(self, context, element):
         """Set node variable defined by 'element'.

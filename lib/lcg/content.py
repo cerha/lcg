@@ -1404,7 +1404,7 @@ class SetVariable(Content):
           value -- value of the variable, 'Content' instance
 
         """
-        assert isinstance(name, str), str
+        assert isinstance(name, basestring), str
         assert isinstance(value, Content), value
         self._name = name
         self._value = value
@@ -1421,20 +1421,29 @@ class SetVariable(Content):
 class Substitution(Content):
     """Variable to be substituted by the actual value on export."""
     
-    def __init__(self, name):
+    def __init__(self, name, markup=None):
         """
         Arguments:
 
-          name -- name of the variable, string
+          name -- name of the variable, string, without $, may contain dots for
+            nested variable lookup, eg. 'x.y'.
+          markup -- original source markup (to be substituted if the value
+            doesn't exist), eg. '$x.y' or '${x.y}'.
 
         """
-        assert isinstance(name, str), str
+        assert isinstance(name, basestring), name
+        assert markup is None or isinstance(markup, basestring), markup
         self._name = name
+        self._markup = markup or '$'+name
 
     def name(self):
         """Return name of the variable."""
         return self._name
     
+    def markup(self):
+        """Return source text representation of the variable."""
+        return self._markup
+
     
 
 class ContentVariants(Container):
