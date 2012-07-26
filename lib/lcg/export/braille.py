@@ -303,7 +303,10 @@ class BrailleExporter(FileExporter, Exporter):
         if not text:
             return '', ''
         if self._private_char(text[0]):
-            return text + '\n', '0' * (len(text) + 1)
+            if text[0] == self._TOC_MARKER_CHAR:
+                return text + '\n', '0' * (len(text) + 1)
+            else:
+                return text, '0' * len(text)
         tables = context.tables(lang)
         if form != louis.plain_text and lang == 'cs':
             # liblouis doesn't handle this so we have to handle it ourselves.
