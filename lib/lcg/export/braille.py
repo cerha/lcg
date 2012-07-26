@@ -162,7 +162,7 @@ class BrailleExporter(FileExporter, Exporter):
         right_status_line = presentation.right_page_footer or node.right_page_footer(lang)
         device_table = presentation.device_output
         if device_table is None:
-            device_table = {' ': ' ', '\n': '\n', '\f': '\f'}
+            device_table = {' ': u'⠀', '\n': '\n', '\f': '\f'}
             for c in self._braille_characters():
                 device_table[c] = c
         braille_tables = presentation.braille_tables
