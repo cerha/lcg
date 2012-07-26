@@ -172,6 +172,7 @@ class Parser(object):
     _IMAGE_EXTENSIONS = ('jpg', 'jpeg', 'gif', 'png')
     _AUDIO_EXTENSIONS = ('mp3',)
     _VIDEO_EXTENSIONS = ('flv',)
+    _BLANK_MATCHER = re.compile(r'\s+', re.MULTILINE)
     
     class _StackEntry(object):
         def __init__(self, name):
@@ -736,8 +737,9 @@ class Parser(object):
         label_image, label_image_basename = None, None
         if label:
             label = label.strip()
-            if ' ' in label:
-                image, label_ = label.split(' ', 1)
+            label_parts = self._BLANK_MATCHER.split(label, 1)
+            if len(label_parts) == 2:
+                image, label_ = label_parts
                 image_basename, image_ext = split_filename(image)
                 if image_ext in self._IMAGE_EXTENSIONS:
                     label_image = image
