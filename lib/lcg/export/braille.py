@@ -130,6 +130,14 @@ class BrailleExporter(FileExporter, Exporter):
         def unset_form(self, form):
             self._form = self._form & ~form
 
+    def __init__(self, *args, **kwargs):
+        super(BrailleExporter, self).__init__(*args, **kwargs)
+        self._unbreakable_characters = string.punctuation + string.digits + self._braille_characters()
+        self._whitespace = string.whitespace + u' \u2800'
+
+    def _braille_characters(self):
+        return string.join([unichr(i) for i in range(10240, 10496)], '')
+
     def export(self, context):
         # Presentation
         presentation_set = context.presentation()
@@ -155,8 +163,8 @@ class BrailleExporter(FileExporter, Exporter):
         device_table = presentation.device_output
         if device_table is None:
             device_table = {' ': ' ', '\n': '\n', '\f': '\f'}
-            for i in range(10240, 10496):
-                device_table[unichr(i)] = unichr(i)
+            for c in self._braille_characters():
+                device_table[c] = c
         braille_tables = presentation.braille_tables
         hyphenation_tables = presentation.braille_hyphenation_tables
         context.set_tables(braille_tables, hyphenation_tables)
@@ -311,8 +319,7 @@ class BrailleExporter(FileExporter, Exporter):
         # problems.
         braille = louis.translateString(tables, text, typeform=copy.copy(typeform),
                                        mode=louis.dotsIO+128)
-        def whitespace(c):
-            return c in string.whitespace or c == u'\u2800'
+        whitespace = self._whitespace
         if typeform is None:
             if italic:
                 braille = u'⠔⠨' + braille + u'⠨⠔'
@@ -320,7 +327,7 @@ class BrailleExporter(FileExporter, Exporter):
                 compact = (form == louis.underline)
                 if compact:
                     for c in braille:
-                        if whitespace(c):
+                        if c in whitespace:
                             compact = False
                             break
                 if compact:
@@ -333,7 +340,7 @@ class BrailleExporter(FileExporter, Exporter):
         if hyphenation_table is None or form != louis.plain_text:
             hyphenation = ''
             for c in braille:
-                hyphenation += ('2' if whitespace(c) else '0')
+                hyphenation += ('2' if c in whitespace else '0')
         else:
             hyphenation_tables = tables + [hyphenation_table]
             braille_text = louis.translateString(tables, text, typeform=copy.copy(typeform))
@@ -341,12 +348,12 @@ class BrailleExporter(FileExporter, Exporter):
             length = len(braille_text)
             hyphenation = ''
             hyphenation_forbidden = False
-            unbreakable_characters = string.punctuation + string.digits
+            unbreakable_characters = self._unbreakable_characters
             while end < length:
                 if braille_text[end] in unbreakable_characters:
                     hyphenation_forbidden = True
                     end += 1
-                elif braille_text[end] not in string.whitespace:
+                elif braille_text[end] not in whitespace:
                     end += 1
                 else:
                     if end > start:
