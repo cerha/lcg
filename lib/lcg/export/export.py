@@ -23,8 +23,6 @@ The module contains the following important classes:
   'Exporter' :: Generic exporter class defining the common interface that must
     be supported by derived exporters for particular output formats.
 
-  'MarkupFormatter' :: 
-
 See documentation of the individual classes for more details.
 
 """
@@ -39,7 +37,7 @@ from lcg import log, concat, Localizable, Localizer, \
     Resource, Image, Audio, Video, \
     ContentNode, Content, Container, ContentVariants, \
     Paragraph, PreformattedText, Section, TableOfContents, \
-    DefinitionList, FieldSet, FormattedText,  \
+    DefinitionList, FieldSet, \
     Table, TableCell, TableHeading, TableRow, \
     TextContent, Heading, Title, Anchor, Link, \
     Strong, Emphasized, Underlined, Code, Citation, Superscript, Subscript, \
@@ -127,310 +125,21 @@ class SubstitutionIterator(object):
         pass
 
 
-class MarkupFormatter(object):
-    """Simple inline ASCII markup formatter.
-
-    This simple formatter can only format the markup within one block (ie. a
-    single paragraph or other non-structured piece of text).  Parsing the
-    higher level document structure (headings, paragraphs, bullet lists etc.)
-    is done on the LCG input.  Formatting the inline markup, on the other hand,
-    is done on LCG output (export).  The inline markup is represented by a
-    'FormattedText' content element.  'MarkupFormatter' is actually used to
-    export the 'FormattedText' instance.
-
-    NOTE: Markup formatter is DEPRECATED.  Inline constructs are now handled as
-    standard LCG 'Content' elements.  The 'Parser' should be extended to parse
-    inline texts and produce a hierarchy of inline elements instead of a
-    'FormattedText' instance.  The 'FormattedText' class (and 'MarkupFormatter'
-    as well) will not be necessary when this is done.
-    
-    """
-    _IMG_EXT = r'\.(?:jpe?g|png|gif)'
-    _MARKUP = (('linebreak', '//'),
-               ('emphasize', ('/',  '/')),
-               ('strong',    ('\*', '\*')),
-               ('fixed',     ('=',  '=')),
-               ('underline', ('_',  '_')),
-               ('citation',  ('>>', '<<')),
-               ('quotation', ('``', "''")),
-               # Link to an inside or outside (http) source via [ ], see _link_formatter()
-               ('link', (r'\['
-                         r'(?P<align>[<>])?'                                # Left/right Image aligment e.g. [<imagefile], [>imagefile]
-                         r'(?P<href>[^\[\]\|\#\s]*?'                        # The link target e.g. [src]
-                         r'(?:(?P<imgname>[^\[\]\|\#\s/]+)'+_IMG_EXT+')?)'  # If the target is an image, imgname is its file name without extension.  It is used for CSS class to allow individual image styling.
-                         r'(?:#(?P<anchor>[^\[\]\|\s]*))?'                  # Anchor ex. [#topic11]
-                         r'(?::(?P<size>\d+x\d+))?'                         # Optional explicit image (or video) size e.g. [image.jpg:30x40])
-                         r'(?:(?:\s*\|\s*|\s+)'                             # Separator (pipe is enabled for backwards compatibility, but space is the official separator)
-                         r'(?:(?P<label_img>[^\[\]\|\s]+'+_IMG_EXT+'))?'    # Link label image (a link displayed as a clickable image)
-                         r'(?P<label>[^\[\]\|]*))?'                         # Label text
-                         r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'            # Description after | [src Label | Description] 
-                         r'\]')),
-               # Link directly in the text starting with http(s)/ftp://, see _uri_formatter()
-               ('uri', (r'(?:https?|ftp)://\S+?(?:(?P<imgname_>[^\#\s/]+)'+ _IMG_EXT +\
-                        r')?(?=[\),.:;]*(\s|$))')),   # ?!? SOS!
-               ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
-               ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
-                                 "|\{[^\}]+\})")),
-               ('comment', r'^#.*'),
-               ('dash', r'(^|(?<=\s))--($|(?=\s))'),
-               ('nbsp', '~'),
-               ('page', '@PAGE@'),
-               ('total_pages', '@PAGES@'),
-               ('escape', '\\\\(?P<char>[-*@])'),
-               )
-    
-    _HELPER_PATTERNS = ('align', 'href', 'imgname', 'imgname_', 'anchor', 'label', 'label_img',
-                        'descr', 'subst', 'size')
-
-    _FORMAT = {'linebreak': '\n',
-               'comment': '',
-               'dash': u'—',
-               'nbsp': u' ',
-               'emphasize': ('', ''),
-               'strong': ('', ''),
-               'fixed': ('', ''),
-               'underline': ('', ''),
-               'citation': ('', ''),
-               'quotation': ('', ''),
-               }
-
-    _BLANK_MATCHER = re.compile('\s+')
-    _IMAGE_ALIGN_MAPPING = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}
-    _VIMEO_VIDEO_MATCHER = re.compile(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
-    _YOUTUBE_VIDEO_MATCHER = re.compile(
-        r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)")
-
-    def __init__(self):
-        regexp = r"(?P<%s>\\*%s)"
-        pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
-                                regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
-        regexps = [isinstance(markup, str) and regexp % (type, markup)
-                   or pair_regexp % (type, markup[1], type, markup[0])
-                   for type, markup in self._MARKUP]
-        self._rules = re.compile('(?:' +'|'.join(regexps)+ ')',
-                                 re.MULTILINE|re.UNICODE|re.IGNORECASE)
-        self._paired_on_output = [type for type, format in self._FORMAT.items()
-                                  if isinstance(format, tuple)]
-    
-    def _markup_handler(self, context, match, lang=None):
-        exporter = context.exporter()
-        type = [key for key, m in match.groupdict().items()
-                if m and not key in self._HELPER_PATTERNS][0]
-        markup_group = match.group(type)
-        backslashes = markup_group.count('\\')
-        markup = exporter.text(context, markup_group[backslashes:], lang=lang)
-        prefix = exporter.text(context, backslashes / 2 * '\\', lang=lang)
-        if backslashes % 2:
-            return exporter.concat(prefix, markup)
-        # We need two variables (start and end), because both can be False for
-        # unpaired markup.
-        start = False
-        end = False
-        if type.endswith('_start'):
-            type = type[:-6]
-            start = True
-        elif type.endswith('_end'):
-            type = type[:-4]
-            end = True
-        if not start and self._open and type == self._open[-1]:
-            # Closing an open markup.
-            self._open.pop()
-            result = self._formatter(context, type, match.groupdict(), close=True, lang=lang)
-        elif not end and not (start and type in self._open):
-            # Start markup or an unpaired markup.
-            if start:
-                self._open.append(type)
-            result = self._formatter(context, type, match.groupdict(), lang=lang)
-        else:
-            # Markup in an invalid context is just printed as is.
-            # This can be end markup, which was not opened or start markup,
-            # which was already opened.
-            result = markup
-        return exporter.concat(prefix, result)
-
-    def _substitution_formatter(self, context, subst, **kwargs):
-        exporter = context.exporter()
-        # get the substitution value for _SUBSTITUTION_REGEX match
-        if subst.startswith('{') and subst.endswith('}'):
-            text = subst[1:-1]
-        else:
-            text = subst
-        if not text:
-            return exporter.escape('$' + subst)
-        names = text.split('.')
-        value = context.node().global_(str(names[0]))
-        for name in names[1:]:
-            if value is None:
-                break
-            if isinstance(value, SubstitutionIterator):
-                value = value.value()
-            key = str(name)
-            dictionary = value
-            try:
-                value = value.get(key)
-            except:
-                dictionary = None
-                break
-            if isinstance(value, collections.Callable):
-                value = value()
-                # It is necessary to store the computed value in order to
-                # prevent repeated object initializations in it.  Otherwise it
-                # fails e.g. with substitution iterators.
-                dictionary[key] = value
-        if value is None:
-            result = exporter.escape('$' + subst)
-        elif isinstance(value, Content):
-            result = value.export(context)
-        else:
-            if not isinstance(value, Localizable):
-                value = unicode(value)
-            result = exporter.escape(value)
-        return result
-    
-    def _link_formatter(self, context, href=None, imgname=None, anchor=None, size=None,
-                        label_img=None, label=None, descr=None, align=None, lang=None, **kwargs):
-        parent = context.node()
-        target = None
-        # Prepare the link data like name, description, target
-        # TODO: This fails to prepare an Audio() object if the file
-        # is link to audio file via http://
-        if label:
-            label=label.strip()
-        if href and not anchor:
-            target = parent.resource(href, warn=False)
-            if not target and imgname:
-                target = Image(href, uri=href)
-        if target is None:
-            node = None
-            if not href:
-                node = parent
-            elif href.find('@') == href.find('/') == -1:
-                node = parent.root().find_node(href)
-                if not node:
-                    log("%s: Unknown node: %s" % (parent.id(), href))
-            target = node
-            if node and anchor:
-                target = node.find_section(anchor, context)
-                if target is None:
-                    log("%s: Unknown section: %s:%s" %
-                        (parent.id(), node.id(), anchor))
-        if target is None:
-            if anchor is not None:
-                href += '#'+anchor
-            target = Link.ExternalTarget(href, label or href, lang=lang)
-        if size:
-            size = tuple(map(int, size.split('x')))
-        if label_img:
-            label_image = parent.resource(label_img, warn=False)
-            if label_image is None or not isinstance(label_image, Image):
-                label_image = Image(label_img, uri=label_img)
-        else:
-            label_image = None
-        # Create the resulting content element and return its exported string.
-        if not label_image and isinstance(target, Image):
-            result = InlineImage(target, title=label, descr=descr, name=imgname,
-                                 align=self._IMAGE_ALIGN_MAPPING.get(align), size=size, lang=lang)
-        elif isinstance(target, Audio):
-            result = InlineAudio(target, title=label, descr=descr, image=label_image, shared=True,
-                                 lang=lang)
-        elif isinstance(target, Video):
-            result = InlineVideo(target, title=label, descr=descr, image=label_image, size=size,
-                                 lang=lang)
-        else:
-            youtube_match = self._YOUTUBE_VIDEO_MATCHER.match(href)
-            vimeo_match = self._VIMEO_VIDEO_MATCHER.match(href)
-            if youtube_match:
-                video_id = youtube_match.group("video_id")
-                result = InlineExternalVideo('youtube', video_id, size=size, lang=lang)
-            elif vimeo_match:
-                video_id = vimeo_match.group("video_id")
-                result = InlineExternalVideo('vimeo', video_id, size=size, lang=lang)
-            else:
-                if label_image:
-                    name = os.path.splitext(os.path.basename(label_img))[0]
-                    label = InlineImage(label_image, title=label, name=name,
-                                        align=self._IMAGE_ALIGN_MAPPING.get(align))
-                #if isinstance(target, Link.ExternalTarget):
-                #    target = Link.ExternalTarget(href, label or href)
-                result = Link(target, label=label, descr=descr, lang=lang)
-        result.set_parent(parent)
-        return result.export(context)
-    
-    def _uri_formatter(self, context, uri, imgname_, close=False, lang=None, **kwargs):
-        return self._link_formatter(context, href=uri, label=None, imgname=imgname_, lang=lang)
-
-    def _page_formatter(self, context, **kwargs):
-        return context.exporter().text(context, '')
-    
-    def _total_pages_formatter(self, context, **kwargs):
-        return context.exporter().text(context, '')
-
-    def _escape_formatter(self, context, type, groups, lang=None, **kwargs):
-        return context.exporter().text(context, groups['char'], lang=lang)
-    
-    def _email_formatter(self, context, email, close=False, **kwargs):
-        return context.exporter().text(context, email)
-
-    def _citation_formatter(self, context, close=False, **kwargs):
-        if close:
-            context.unset_secondary_language()
-        else:
-            context.set_secondary_language()
-        return ''
-
-    def _formatter(self, context, type, groups, close=False, lang=None):
-        try:
-            formatter = getattr(self, '_'+type+'_formatter')
-        except AttributeError:
-            formatter = None
-        if formatter is not None:
-            result = formatter(context, close=close, lang=lang, **groups)
-        else:
-            f = self._FORMAT.get(type, '')
-            if type in self._paired_on_output and f:
-                if close:
-                    result = f[1]
-                else:
-                    result = f[0]
-            else:
-                result = f
-        return result
-        
-    def format(self, context, text, lang=None):
-        exporter = context.exporter()
-        self._open = []
-        result = []
-        pos = 0
-        for match in self._rules.finditer(text):
-            starting_text = exporter.text(context, text[pos:match.start()], lang=lang)
-            markup = self._markup_handler(context, match, lang=lang)
-            result.extend((starting_text, markup))
-            pos = match.end()
-        final_text = exporter.text(context, text[pos:], lang=lang)
-        result.append(final_text)
-        self._open.reverse()
-        x = self._open[:]
-        for type in x:
-            result.append(self._formatter(context, type, {}, close=True))
-        return exporter.concat(*result)
-
-
 class Exporter(object):
     """Transforming structured content objects to various output formats.
 
     This class is a base class of all exporters.  It provides basic exporting
     framework to be extended and customized for particular kinds of outputs.
-    When defining a real exporter you should define the nested class
-    'Formatter' and override the necessary export methods.  You may also wish
-    to extend the 'Context' which is passed throughout the export process (see
-    below).
+    When defining a real exporter you may wish to extend the 'Context' which is
+    passed throughout the export process (see below) to be able to pass otput
+    format specific information or provide specific functionality.  For example
+    in web server invironment, it might be practical to pass the request object
+    along with the context (this is done in Wiking Exporter).
 
     The exporting process itself is run by subsequent calls to the 'export()'
     method, passing it a context created by the 'context()' method.
     
     """
-
-    Formatter = MarkupFormatter    
 
     _RE_SPACE_MATCHER = re.compile('  +')
     _TOC_MARKER_CHAR = u'\ue000'
@@ -442,8 +151,8 @@ class Exporter(object):
         An instance of this class is passed to export methods of content
         classes.  It is possible to access all information about the current
         context (exported node, target language, etc) and also all the
-        components involved in the export process (the exporter, formatter,
-        generator and localizer instances).
+        components involved in the export process (the exporter, generator and
+        localizer instances).
 
         The class is designed to be extensible.  The derived classes may accept
         additional constructor arguments to expose additional context
@@ -456,13 +165,12 @@ class Exporter(object):
         attribute of the derived 'Exporter' class (it is a nested class).
 
         """
-        def __init__(self, exporter, formatter, node, lang, **kwargs):
+        def __init__(self, exporter, node, lang, **kwargs):
             """Initialize the export context.
 
             Arguments:
             
               exporter -- 'Exporter' instance to which this context belongs.
-              formatter -- The exporter's 'Formatter' instance.
               node -- 'ContentNode' instance to be exported.
               lang -- Target language as an ISO 639-1 Alpha-2 lowercase
                 language code or None.  If None, the export will be language
@@ -474,7 +182,6 @@ class Exporter(object):
             
             """
             self._exporter = exporter
-            self._formatter = formatter
             self._node = node
             self._toc_markers = {}
             self._secondary_language_active = False
@@ -490,9 +197,6 @@ class Exporter(object):
             
         def exporter(self):
             return self._exporter
-        
-        def formatter(self):
-            return self._formatter
         
         def lang(self):
             if self._secondary_language_active:
@@ -545,7 +249,6 @@ class Exporter(object):
             self._secondary_language_active = False
             
     def __init__(self, translations=()):
-        self._formatter = self.Formatter()
         self._translation_path = translations
         self._export_method = self._define_export_methods()
 
@@ -592,7 +295,6 @@ class Exporter(object):
                 Superscript: self._export_superscript,
                 Subscript: self._export_subscript,
                 TextContent: self._export_text_content,
-                FormattedText: self._export_formatted_text,
                 PreformattedText: self._export_preformatted_text,
                 Anchor: self._export_anchor,
                 Container: self._export_container,
@@ -669,7 +371,7 @@ class Exporter(object):
         information).
 
         """
-        return self.Context(self, self._formatter, node, lang, **kwargs)
+        return self.Context(self, node, lang, **kwargs)
 
     def export_element(self, context, element):
         """Export the given content element and return its output representation.
@@ -793,24 +495,6 @@ class Exporter(object):
         """
         t = self._reformat_text(element.text())
         return self.text(context, t, lang=element.lang())
-
-    def _export_formatted_text(self, context, element):
-        """Export the given 'FormattedText' element.
-
-        This method uses the 'Exporter.Formatter' instance to export the
-        element's text.  If a derived class implements the Formatter correctly,
-        there should be no need to override this method.
-        
-        """
-        text = element.text()
-        if text:
-            # Since formatting will destroy the translatable instances,
-            # translate them before formatting.
-            t = self._reformat_text(context.localize(text))
-            result = self._formatter.format(context, t, lang=element.lang())
-        else:
-            result = self.text(context, '')
-        return result
         
     def _export_anchor(self, context, element):
         """Export the given 'Anchor' element.

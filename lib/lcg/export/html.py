@@ -366,34 +366,9 @@ class HtmlGenerator(object):
     def js_call(self, fname, *args):
         fargs = concat([self.js_value(arg) for arg in args], separator=", ")
         return '%s(%s)' % (fname, fargs)
-    
-class HtmlFormatter(MarkupFormatter):
-    
-    _FORMAT = {'emphasize': ('<em>', '</em>'),
-               'strong': ('<strong>', '</strong>'),
-               'fixed': ('<code>', '</code>'),
-               'underline': ('<u>', '</u>'),
-               'citation': ('<span class="citation">', '</span>'),
-               'quotation': (u'“<span class="quotation">', u'</span>”'),
-               'comment': '',
-               'linebreak': '<br>',
-               'dash': '&ndash;',
-               'nbsp': '&nbsp;'}
-    
-    def _citation_formatter(self, context, close=False, **kwargs):
-        if not close:
-            lang = context.sec_lang()
-            langattr = lang and ' lang="%s"' % lang or ''
-            return '<span%s class="citation">' % langattr
-        else:
-            return '</span>'
 
-    def _email_formatter(self, context, email, close=False, **kwargs):
-        return self._link_formatter(context, href='mailto:'+email, label=email)
 
-    
 class HtmlExporter(Exporter):
-    Formatter = HtmlFormatter
     Generator = HtmlGenerator
 
     class Context(Exporter.Context):

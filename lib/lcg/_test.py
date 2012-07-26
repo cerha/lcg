@@ -440,9 +440,8 @@ class Parser(unittest.TestCase):
         assert 'page_footer' in parameters, parameters
         assert 'first_page_header' not in parameters, parameters
         header = parameters['page_header']
-        assert header.content()[0].content()[0].text() == 'hello', header.content()[0].content()[0].text()
+        assert header.content()[0].content()[0].content()[0].text() == 'hello', header.content()[0].content()[0].content()[0].text()
         footer = parameters['page_footer']
-        assert footer.content()[0].content()[0].text() == '@PAGE@', footer.content()[0].content()[0].text()
         assert footer.content()[0].halign() == lcg.HorizontalAlignment.CENTER, footer.content()[0].content().halign()
 
     def test_hrule(self):
@@ -615,7 +614,7 @@ tests.add(MacroParser)
 
 class HtmlExport(unittest.TestCase):
     
-    def test_formatter(self):
+    def test_formatting(self):
         def check(result, expected_result):
             if isinstance(expected_result, basestring):
                 ok = result == expected_result
@@ -707,9 +706,8 @@ class HtmlExport(unittest.TestCase):
             # Audio player links
             ('[xx.mp3]',
              re.compile(r'<a href="media/xx.mp3" id="[\da-z]+" class="media-control-link">xx.mp3</a>')),
-            # This currently only works for parsed result, not for FormattedText.
-            #('[/somewhere/some.mp3]',
-            # re.compile(r'<a href="/somewhere/some.mp3" id="[\da-z]+" class="media-control-link">/somewhere/some.mp3</a>')),
+            ('[/somewhere/some.mp3]',
+             re.compile(r'<a href="/somewhere/some.mp3" id="[\da-z]+" class="media-control-link">/somewhere/some.mp3</a>')),
             # Internal Reference Links
             ('[text.txt]',
              '<a href="/resources/texts/text.txt">text.txt</a>'),
@@ -723,8 +721,6 @@ class HtmlExport(unittest.TestCase):
             (r'<bla>',
              r'&lt;bla&gt;'),
             ):
-            formatted_result = lcg.FormattedText(text).export(context)
-            check(formatted_result, html)
             content = lcg.Parser().parse_inline_markup(text)
             content.set_parent(n)
             parsed_result = content.export(context)
@@ -773,7 +769,7 @@ class BrailleExport(unittest.TestCase):
         page_height = presentation.page_height
         presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
         n = lcg.ContentNode('test', title='Test Node', descr="Some description",
-                            content=lcg.Container((lcg.FormattedText(text),)))
+                            content=lcg.Container((lcg.Parser().parse_inline_markup(text),)))
         exporter = lcg.BrailleExporter()
         context = exporter.context(n, lang=lang, sec_lang=sec_lang, presentation=presentation_set)
         result = exporter.export(context)
@@ -784,7 +780,7 @@ class BrailleExport(unittest.TestCase):
                ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
                 (text, braille, result,))
 
-    def test_formatter(self):
+    def test_formatting(self):
         presentation = self._load_presentation()
         for text, braille in (
             (u'abc', u'⠁⠃⠉',),

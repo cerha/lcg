@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2006, 2007, 2008, 2010 Brailcom, o.p.s.
+# Copyright (C) 2006, 2007, 2008, 2010, 2012 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -102,9 +102,6 @@ class _Header(_MetaFile):
     
 class HhpExporter(HtmlFileExporter):
     
-    class Formatter(HtmlFormatter):
-        _FORMAT = dict(HtmlFormatter._FORMAT, underline=('<u>', '</u>'))
-        
     class Generator(HtmlGenerator):
         def hr(self, **kwargs):
             return '<hr>' # We don't want XHTML tag syntax (<hr/>).

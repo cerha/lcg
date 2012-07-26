@@ -27,49 +27,6 @@ import string
 import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource
-from export import Exporter, FileExporter, MarkupFormatter
-import entities
-
-class BrailleFormatter(MarkupFormatter):
-    
-    _FORMAT = {'linebreak': ('\n', '0',),
-               'comment': ('', '',),
-               'dash': ('⠤', '0',),
-               }
-
-    def _set_form(self, context, close, form):
-        if close:
-            context.unset_form()
-        else:
-            context.set_form(form)
-        return '', ''
-    
-    def _emphasize_formatter(self, context, close=False, **kwargs):
-        return self._set_form(context, close, louis.italic)
-
-    def _strong_formatter(self, context, close=False, **kwargs):
-        return self._set_form(context, close, louis.bold)
-
-    def _underline_formatter(self, context, close=False, **kwargs):
-        return self._set_form(context, close, louis.underline)
-
-    def _citation_formatter(self, context, close=False, **kwargs):
-        if close:
-            context.unset_secondary_language()
-        else:
-            context.set_secondary_language()
-        return '', ''
-
-    def _formatter(self, context, type, groups, close=False, lang=None):
-        try:
-            formatter = getattr(self, '_'+type+'_formatter')
-        except AttributeError:
-            formatter = None
-        if formatter is not None:
-            result = formatter(context, close=close, lang=lang, **groups)
-        else:
-            result = self._FORMAT.get(type) or ('', '',)
-        return result
 
 _inf = 'infix'
 _pre = 'prefix'
@@ -93,10 +50,11 @@ _mathml_operators = {
     '∉': (_inf, ' ⠈⠘⠑ ', '00000',),
     }
 
+from export import Exporter, FileExporter
+
 class BrailleExporter(FileExporter, Exporter):
     """Transforming structured content objects to Braille output.    
     """
-    Formatter = BrailleFormatter
     
     _OUTPUT_FILE_EXT = 'brl'
     _INDENTATION_CHAR = '\ue010'
@@ -104,9 +62,9 @@ class BrailleExporter(FileExporter, Exporter):
 
     class Context(Exporter.Context):
 
-        def __init__(self, exporter, formatter, node, lang, tables={}, hyphenation_tables={},
+        def __init__(self, exporter, node, lang, tables={}, hyphenation_tables={},
                      **kwargs):
-            super(BrailleExporter.Context, self).__init__(exporter, formatter, node, lang, **kwargs)
+            super(BrailleExporter.Context, self).__init__(exporter, node, lang, **kwargs)
             assert isinstance(tables, dict), tables
             assert isinstance(hyphenation_tables, dict), hyphenation_tables
             self._tables = tables

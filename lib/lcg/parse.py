@@ -91,10 +91,11 @@ class Parser(object):
     """Structured text (wiki) document parser.
 
     This parser parses the structure of the document and builds the
-    corresponding 'Content' element hierarchy.  This parser doesn't care about
-    inline markup at all.  Only higher-level constructs are recognized here.
-    Formatting the inline markup is done by the 'MarkupFormatter' on LCG output
-    (as opposed to parsing, which is done on LCG input).
+    corresponding 'Content' element hierarchy.  Complete documents (including
+    block level constructs, such as paraghaphs, sections, itemized lists, etc
+    are processed by the method 'parse()'.  Inline markup (text emphasizing,
+    links, substitutions) are processed by a separate method
+    'parse_inline_markup().
 
     """
     _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *\r?$', re.MULTILINE)
@@ -239,7 +240,7 @@ class Parser(object):
                     return None
                 break
             groups = match.groupdict()
-            fields.append((FormattedText(groups['label']), FormattedText(groups['value']),))
+            fields.append((self.parse_inline_markup(groups['label']), self.parse_inline_markup(groups['value']),))
             position += match.end() + 1
         return FieldSet(fields), position
 
@@ -269,7 +270,7 @@ class Parser(object):
                 isinstance(parsed_description[0], ItemizedList)):
                 self._old_position = old_position
                 return None
-            definitions.append((FormattedText(term), Container(parsed_description),))
+            definitions.append((self.parse_inline_markup(term), Container(parsed_description),))
             match = self._DEFINITION_MATCHER.match(text[position:])
         return DefinitionList(definitions), position
         
@@ -303,7 +304,7 @@ class Parser(object):
             if content is not None:
                 section_content.append(content)
         container = Container(section_content)
-        return Section(title=title, heading=FormattedText(title),
+        return Section(title=title, heading=self.parse_inline_markup(title),
                        content=container, anchor=anchor), position
 
     def _literal_processor(self, text, position, **kwargs):
@@ -475,7 +476,7 @@ class Parser(object):
             if (not table_rows and
                 all([not cell or cell.startswith("*") and cell.endswith("*")
                      for cell in stripped_cells])):
-                row_cells = [TableHeading(FormattedText(cell and cell[1:-1]))
+                row_cells = [TableHeading(self.parse_inline_markup(cell and cell[1:-1]))
                              for cell in stripped_cells]
             else:
                 # Well, it's just a standard line
@@ -486,7 +487,7 @@ class Parser(object):
                     if match_iterate:
                         iterated = True
                         cell = cell[match_iterate.end():]
-                    row_cells.append(TableCell(FormattedText(cell.strip()),
+                    row_cells.append(TableCell(self.parse_inline_markup(cell.strip()),
                                                align=align(i, cell.expandtabs())))
                     i += 1
             table_rows.append(TableRow(row_cells, line_above=line_above, iterated=iterated))
@@ -547,7 +548,7 @@ class Parser(object):
             position += 1
         if value:
             value = value.strip()
-            variable_content = FormattedText(value)
+            variable_content = self.parse_inline_markup(value)
         else:
             match = re.search('^@end %s *\r?$' % (identifier,), text[position:], re.MULTILINE)
             if match:
@@ -607,14 +608,14 @@ class Parser(object):
                                            compressed=compressed)
         if next_position == position:
             return None
-        content = Paragraph(FormattedText(text[position:next_position]), halign=halign)
+        content = Paragraph(self.parse_inline_markup(text[position:next_position]), halign=halign)
         return content, next_position
 
     def _whitespace_processor(self, text, position, **kwargs):
         next_position = position
         while text[next_position:] and text[next_position] in string.whitespace:
             next_position += 1
-        content = Paragraph(FormattedText(''))
+        content = Paragraph(self.parse_inline_markup(''))
         return content, next_position
 
     def _strip_comments(self, text):
@@ -853,10 +854,6 @@ class Parser(object):
         method only parses inline constructs within the blocks processed by
         'parse()'.  The inline constructs are links, text emphasizing etc.
 
-        NOTE: The method is currently unused, but the goal is to replace usage
-        of FormattedText elements within the content returned by 'parse()' by a
-        hierarchy of inline elements returned by this method.
-
         """
         stack = []
         result = []
@@ -1060,9 +1057,7 @@ def add_processing_info(exception, caption, information):
 def _log(*args):
     """Just for internal debugging purposes..."""
     def _str(x):
-        if isinstance(x, FormattedText):
-            return '"'+str(x._text.encode('ascii', 'replace'))+'"'
-        elif isinstance(x, Container):
+        if isinstance(x, Container):
             return "<%s %s>" % (x.__class__.__name__, _str(x._content))
         elif isinstance(x, (types.ListType, types.TupleType)):
             result = ', '.join([_str(i) for i in x])

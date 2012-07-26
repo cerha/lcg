@@ -911,21 +911,6 @@ class HtmlContent(TextContent):
         return self._text
 
     
-class FormattedText(TextContent):
-    """Formatted text using a simple wiki-based inline markup.
-
-    See 'MarkupFormatter' for more information about the formatting rules.
-
-    NOTE: Using 'FormattedText' is DEPRECATED.  Inline constructs are now
-    represented by standard LCG 'Content' elements.
-    
-    """
-    pass
-
-# Backwards compatibility alias.        
-WikiText = FormattedText
-
-
 class Heading(Container):
     """Heading, e.g. heading of a section.
 
@@ -1441,7 +1426,8 @@ class Substitution(Content):
           name -- name of the variable, string, without $, may contain dots for
             nested variable lookup, eg. 'x.y'.
           markup -- original source markup (to be substituted if the value
-            doesn't exist), eg. '$x.y' or '${x.y}'.
+            doesn't exist), eg. '$x.y' or '${x.y}'.  If None, '$'+name is
+            supposed.
 
         """
         assert isinstance(name, basestring), name
@@ -1634,15 +1620,18 @@ def coerce(content, formatted=False):
 
     Arguments:
 
-      content -- can be a sequence, string or a Content instance.  A sequence is turned to a
-        'Container' of the items.  Moreover each item is coerced recursively and 'None' items are
-        omitted.  A string is turned into a 'TextContent' or 'FormattedText' instance according to
-        the 'formatted' argument.  A 'Content' instance is returned as is.  Any other argument
-        raises AssertionError.
+      content -- can be a sequence, string or a Content instance.  A sequence
+        is turned to a 'Container' of the items.  Moreover each item is coerced
+        recursively and 'None' items are omitted.  A string is parsed for
+        inline markup or simply turned into 'TextContent' instance depending on
+        the 'formatted' argument.  A 'Content' instance is returned as is.  Any
+        other argument raises AssertionError.
         
-      formatted -- a boolean flag indicating that strings should be treated as formatted, so
-        'FormattedText' is used instead of plain 'TextContent'.  Applies recursively if a sequence
-        is passed as the 'content' argument.
+      formatted -- a boolean flag indicating how strings should treated.  If
+        False (the default) strings are parsed for inline markup using
+        'lcg.Parser.parse_inline_markup()'.  If True strings are simply turned
+        into 'TextContent' instances.  Applies recursively if a sequence is
+        passed as the 'content' argument.
 
     """
     assert isinstance(formatted, bool)
@@ -1657,7 +1646,7 @@ def coerce(content, formatted=False):
         return container(items)
     elif isinstance(content, (str, unicode)):
         if formatted:
-            return FormattedText(content)
+            return Parser().parse_inline_markup(content)
         else:
             return TextContent(content)
     else:

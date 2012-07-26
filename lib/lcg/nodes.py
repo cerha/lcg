@@ -71,10 +71,11 @@ class ContentNode(object):
             application specific and there is currently no difference in behavior of LCG in respect
             to this flag, except for marking the links by css class 'inactive' on export.
           resource_provider -- a 'ResourceProvider' instance or None.
-          globals -- node global variables as a dictionary keyed by variable names.  The variables
-            are allowed to contain nested dictionaries.  The variables are used for substitution
-            within `MarkupFormatter', but they may be also used for other purposes depending on the
-            application.
+          globals -- node global variables as a dictionary keyed by variable
+            names.  The variables are allowed to contain nested dictionaries.
+            The variables are used for substitution by `Substitution'
+            instances, but they may be also used for other purposes depending
+            on the application.
           page_header -- dictionary of 'Content' instances, with language codes
             as keys, to be inserted at the top of each generated page.  If content is
             'None', no page header is inserted.
