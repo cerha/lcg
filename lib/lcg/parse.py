@@ -303,7 +303,8 @@ class Parser(object):
             if content is not None:
                 section_content.append(content)
         container = Container(section_content)
-        return Section(title=title, content=container, anchor=anchor), position
+        return Section(title=title, heading=FormattedText(title),
+                       content=container, anchor=anchor), position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])

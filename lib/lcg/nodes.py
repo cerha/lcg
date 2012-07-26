@@ -39,9 +39,10 @@ class ContentNode(object):
     
     """
 
-    def __init__(self, id, title=None, brief_title=None, descr=None, variants=(), content=None,
-                 children=(), hidden=False, active=True, resource_provider=None, globals=None,
-                 page_header=None, page_footer=None, left_page_footer=None, right_page_footer=None,
+    def __init__(self, id, title=None, brief_title=None, heading=None, descr=None, variants=(),
+                 content=None, children=(), hidden=False, active=True, resource_provider=None,
+                 globals=None, page_header=None, page_footer=None,
+                 left_page_footer=None, right_page_footer=None,
                  first_page_header=None, page_background=None, presentation=None):
         """Initialize the instance.
 
@@ -52,6 +53,10 @@ class ContentNode(object):
           brief_title -- the brief (shorter) form of title of this node (as a unicode string).  If
             given, this title will be used to refer to this node from places, where brevity
             matters.  If None, the 'title' will be used instead.
+          heading -- content to be used as node heading.  By default (when
+            None), the content is created automatically as TextContent(title),
+            but you may pass any lcg.Content instance when some more fancy
+            content is desired.
           descr -- a short textual description of this node (as a uni code string).  Additional
             information, which may determine the content of the node in addition to the title.
           variants -- a sequence of all available language variants of this node.  The
@@ -94,6 +99,7 @@ class ContentNode(object):
         self._id = id
         self._parent = None #parent
         self._title = title or brief_title or id
+        self._heading = heading or TextContent(self._title)
         self._brief_title = brief_title or title
         self._descr = descr
         self._hidden = hidden
@@ -163,13 +169,8 @@ class ContentNode(object):
         return brief and self._brief_title or self._title
     
     def heading(self):
-        """Return formatted node title as a 'Content' instance.
-
-        The title is interpreted as a markup text and corresponding 'Content'
-        instance was created.
-
-        """
-        return FormattedText(self.title())
+        """Return node heading as a 'Content' instance (see constructor)."""
+        return self._heading
     
     def descr(self):
         """Return a short description of this node as a string or None."""

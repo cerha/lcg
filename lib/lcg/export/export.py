@@ -599,7 +599,7 @@ class Exporter(object):
                 Paragraph: self._export_paragraph,
                 Link: self._export_link,
                 Section: self._export_section, 
-                Heading: self._export_formatted_text, 
+                Heading: self._export_heading, 
                 ContentVariants: self._export_content_variants,
                 TableOfContents: self._export_table_of_contents,
                 ItemizedList: self._export_itemized_list,
@@ -1012,6 +1012,10 @@ class Exporter(object):
                            self._newline(context, 2),
                            self._export_container(context, element))
 
+    def _export_heading(self, context, element):
+        """Export given 'Heading' element."""
+        return self._export_container(context, element)
+        
     def _export_content_variants(self, context, element):
         """Export the proper language variant of 'ContentVariants' element.
 

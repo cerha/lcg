@@ -924,7 +924,7 @@ class FormattedText(TextContent):
 WikiText = FormattedText
 
 
-class Heading(FormattedText):
+class Heading(Container):
     """Heading, e.g. heading of a section.
 
     Purpose of this element is twofold: to provide information about level of
@@ -932,18 +932,18 @@ class Heading(FormattedText):
     for the purpose of applying specific styles to its content.
 
     """
-    def __init__(self, text, level, **kwargs):
+    def __init__(self, content, level, **kwargs):
         """
         Arguments:
         
-          text -- the actual text content of this element as a string or
-            unicode
+          cotnent -- the actual content of this element as lcg.Content element
+            or their sequence
           level -- level of the heading, positive integer, starting from 1
           kwargs -- keyword arguments for parent class constructor
           
         """
         assert isinstance(level, int) and level > 0, level
-        super(Heading, self).__init__(text, **kwargs)
+        super(Heading, self).__init__(content, **kwargs)
         self._level = level
 
     def level(self):
@@ -1155,13 +1155,18 @@ class Section(Container):
     """
     _ANCHOR_PREFIX = 'sec'
     
-    def __init__(self, title, content, anchor=None, descr=None, in_toc=True, **kwargs):
+    def __init__(self, title, content, heading=None, anchor=None,
+                 descr=None, in_toc=True, **kwargs):
         """Arguments:
 
           title -- plain text section title; basestring
           content -- the actual content wrapped into this section as a
             sequence of 'Content' instances in the order in which they should
             appear in the output
+          heading -- content to be used as section heading.  By default (when
+            None), the content is created automatically as TextContent(title),
+            but you may pass any lcg.Content instance when some more fancy
+            content is desired.
           anchor -- section link target name as a string.  If 'None' (default)
             the link target name will be generated automatically.  If you want
             to refer to a section explicitly from somewhere, you will probably
@@ -1173,6 +1178,7 @@ class Section(Container):
             
         """
         assert isinstance(title, basestring), title
+        assert heading is None or isinstance(heading, Content), heading
         assert isinstance(anchor, basestring) or anchor is None, anchor
         assert isinstance(in_toc, bool), in_toc
         self._title = title
@@ -1180,6 +1186,7 @@ class Section(Container):
         self._anchor = anchor
         self._descr = descr
         self._backref = None
+        self._heading = heading or TextContent(title)
         super(Section, self).__init__(content, **kwargs)
 
     def section_path(self):
@@ -1205,13 +1212,14 @@ class Section(Container):
         return self._descr
 
     def heading(self):
-        """Return formatted section title as a 'Content' instance.
+        """Return section heading as a 'Heading' instance.
 
-        The title is interpreted as a markup text and corresponding 'Content'
-        instance was created.
+        Return the content passed as 'heading' argument wrapped in the
+        'Heading' element (denoting the actual section heading level depending
+        on section position in the document).
 
         """
-        return Heading(self.title(), level=len(self.section_path())+1)
+        return Heading(self._heading, level=len(self.section_path())+1)
 
     def in_toc(self):
         """Return true if the section is supposed to appear in TOC."""
