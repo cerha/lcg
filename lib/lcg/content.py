@@ -534,11 +534,14 @@ class _InlineObject(Content):
     def _resource_instance(self, context, resource, cls):
         if isinstance(resource, (str, unicode)):
             filename = resource
-            resource = context.resource(filename)
-            if resource is None:
+            if filename.startswith('http:') or filename.startswith('https:') or filename.startswith('ftp:'):
                 resource = cls(filename, uri=filename)
             else:
-                assert isinstance(resource, cls), resource
+                resource = context.resource(filename)
+                if resource is None:
+                    resource = cls(filename, uri=filename)
+                else:
+                    assert isinstance(resource, cls), resource
         return resource
 
     def title(self):
