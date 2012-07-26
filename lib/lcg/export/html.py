@@ -613,14 +613,13 @@ class HtmlExporter(Exporter):
         g = self._generator
         level = len(element.section_path()) + 1
         anchor = element.anchor()
-        title = self.escape(element.title())
+        heading = element.heading().export(context)
         backref = element.backref()
         if backref:
             href = "#" + backref
         else:
             href = None
-        heading = g.h(g.a(title, href=href, name=anchor, cls='backref'), level)
-        return g.div((heading,
+        return g.div((g.h(g.a(heading, href=href, name=anchor, cls='backref'), level),
                       self.concat(self._exported_container_content(context, element))),
                      id='section-' + anchor,
                      **self._container_attr(element))
