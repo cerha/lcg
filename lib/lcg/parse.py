@@ -151,7 +151,7 @@ class Parser(object):
                   r'(?P<label>[^\[\]\|]*))?'              # Label text
                   r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?' # Description after | [src Label | Description] 
                   r'\]')),
-        # Link directly in the text starting with http(s)/ftp://, see _uri_formatter()
+        # Link directly in the text starting with http(s)/ftp://
         ('uri', (r'(?:https?|ftp)://\S+?(?=[\),.:;]*(\s|$))')), # ?!? SOS!
         ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
         ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
@@ -164,7 +164,7 @@ class Parser(object):
         ('escape', '\\\\(?P<char>[-*@])'),
         )
     
-    _INLINE_MARKUP_PARAMETERS = ('align', 'href', 'label', 'descr', 'subst', 'size')
+    _INLINE_MARKUP_PARAMETERS = ('align', 'href', 'label', 'descr', 'subst', 'size', 'char')
 
     _VIMEO_VIDEO_MATCHER = re.compile(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
     _YOUTUBE_VIDEO_MATCHER = re.compile(
@@ -786,29 +786,29 @@ class Parser(object):
     def _uri_markup_handler(self, uri):
         return self._link_markup_handler(uri, href=uri)
 
-    def _page_number_markup_handler(self):
-        return 
+    def _page_number_markup_handler(self, markup):
+        return PageNumber()
     
-    def _total_pages_markup_handler(self):
-        return 
+    def _total_pages_markup_handler(self, markup):
+        return TotalPages()
 
-    def _escape_markup_handler(self):
-        return 
+    def _escape_markup_handler(self, markup):
+        return TextContent(markup)
     
     def _email_markup_handler(self, email):
-        return 
+        return lcg.Link(lcg.Link.ExternalTarget('mailto:'+email, email))
 
-    def _newline_markup_handler(self):
-        return Newline()
+    def _newline_markup_handler(self, markup):
+        return NewLine()
 
     def _comment_markup_handler(self, text):
         return Content()
 
-    def _dash_markup_handler(self):
-        return
+    def _dash_markup_handler(self, markup):
+        return TextContent(u'—')
 
-    def _nbsp_markup_handler(self):
-        return 
+    def _nbsp_markup_handler(self, markup):
+        return TextContent(u' ')
 
     def _emphasized_markup_handler(self, content):
         return Emphasized(content)
@@ -908,7 +908,6 @@ class Parser(object):
             append(handler(entry.content))
         return Container(result)
         
-
     def parse(self, text, parameters=None):
         """Parse given 'text' and return corresponding content.
 
