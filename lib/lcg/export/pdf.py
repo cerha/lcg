@@ -2341,7 +2341,7 @@ class PDFExporter(FileExporter, Exporter):
                 if not isinstance(e, Text):
                     def transform(item):
                         if isinstance(item, basestring):
-                            item = make_element(Text, content=[item])
+                            item = make_element(Text, content=item)
                         if isinstance(item, Text):
                             result = make_element(Paragraph, content=[item])
                         else:
