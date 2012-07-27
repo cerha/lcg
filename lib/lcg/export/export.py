@@ -510,13 +510,13 @@ class Exporter(object):
         """
         return '\f'
 
-    def _export_new_line(self, context):
+    def _export_new_line(self, context, element):
         """Export the given 'NewLine' element.
 
         In this class the method just returns the page break character.
         
         """
-        return '\n'
+        return self._newline(context)
 
     def _export_horizontal_separator(self, context, element, width=64, in_table=False):
         """Export the given 'HorizontalSeparator' element."""
