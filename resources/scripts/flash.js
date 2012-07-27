@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Brailcom, o.p.s.
+/* Copyright (C) 2009, 2012 Brailcom, o.p.s.
  * Author: Tomas Cerha
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ function embed_swf_object(uri, id, width, height, flashvars, min_flash_version,
       id -- target HTML element id
       width -- width in pixels
       height -- height in pixels
-      flashvars -- array of variables to pass as flashvars
+      flashvars -- associative array of variables to pass as to the flash object as flashvars
       min_flash_version -- minimal required Flash version as a string, such as '9' or '9.0.25'
       alternative_content -- content to display (put inside the target HTML element) when Flash
         is not available or its version doesn't match min_flash_version.

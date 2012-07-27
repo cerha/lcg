@@ -801,8 +801,8 @@ class HtmlExporter(Exporter):
         link = g.link(title, uri, title=descr)
         player = self.export_swf_object(context, 'mediaplayer.swf', '%x' % positive_id(video),
                                         width, height, min_flash_version='9.0.115',
-                                        vars=dict(file=uri, title=title, description=descr,
-                                                  image=(image and context.uri(image))),
+                                        flashvars=dict(file=uri, title=title, description=descr,
+                                                       image=(image and context.uri(image))),
                                         alternative_content=link)
         return g.div(player or link, cls='video-player')
 
@@ -829,7 +829,7 @@ class HtmlExporter(Exporter):
             title=element.title() or _("Flash movie object"),
             data=video_uri, width=width, height=height)
 
-    def export_swf_object(self, context, filename, element_id, width, height, vars={},
+    def export_swf_object(self, context, filename, element_id, width, height, flashvars={},
                           min_flash_version=None, alternative_content=None, warning=None):
         """Export an arbitrary SWF object.
         
@@ -845,7 +845,7 @@ class HtmlExporter(Exporter):
           element_id -- HTML id to use for the flash object HTML element  
             (necessary for communication via Javascript)
           width, height -- size of the HTML element in pixels
-          vars -- dictionary of variables to pass to the flash object (through
+          flashvars -- dictionary of variables to pass to the flash object (through
             SWFObject's 'flashvars' parameter).
           min_flash_version -- minimal required Flash version as a string, such
             as '9' or '9.0.25'
@@ -908,7 +908,7 @@ class HtmlExporter(Exporter):
         # the flash object when page is loaded into browser and js is working.
         return (g.div(no_js_content or '', id=element_id) + 
                 g.script(g.js_call('embed_swf_object', context.uri(flash_object), element_id,
-                                   width, height, vars, min_flash_version, no_flash_content)))
+                                   width, height, flashvars, min_flash_version, no_flash_content)))
 
     def export_media_player(self, context, player_id, width, height, shared=False):
         """Export Flash media player
