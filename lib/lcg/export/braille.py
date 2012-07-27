@@ -71,6 +71,7 @@ class BrailleExporter(FileExporter, Exporter):
             self._hyphenation_tables = hyphenation_tables
             self._page_number = 1
             self._form = [louis.plain_text]
+            self._hyphenate = True
 
         def tables(self, lang):
             if lang is None:
@@ -110,6 +111,11 @@ class BrailleExporter(FileExporter, Exporter):
 
         def unset_form(self):
             self._form.pop()
+
+        def set_hyphenate(self, hyphenate):
+            old_hyphenate = self._hyphenate
+            self._hyphenate = hyphenate
+            return old_hyphenate
 
     def __init__(self, *args, **kwargs):
         super(BrailleExporter, self).__init__(*args, **kwargs)
@@ -441,12 +447,16 @@ class BrailleExporter(FileExporter, Exporter):
     
     # Inline constructs (text styles).
 
-    def _inline_braille_export(self, context, element, form=None, lang=None):
+    def _inline_braille_export(self, context, element, form=None, lang=None, hyphenate=None):
         if lang is not None:
             orig_lang = context.set_lang(lang)
         if form is not None:
             orig_form = context.add_form(form)
+        if hyphenate is not None:
+            orig_hyphenate = context.set_hyphenate(hyphenate)
         exported = self._export_container(context, element)
+        if hyphenate is not None:
+            context.set_hyphenate(orig_hyphenate)
         if form is not None:
             context.set_form(orig_form)
         if lang is not None:
@@ -483,7 +493,10 @@ class BrailleExporter(FileExporter, Exporter):
     
     def _export_citation(self, context, element):
         lang = element.lang(inherited=False) or context.sec_lang()
-        return self._inline_braille_export(context, element, lang=lang)
+        # We have to disable hyphenation as there is currently no easy way to
+        # handle multilingual hyphenation characters in the export code.
+        hyphenate = (lang == context.lang())
+        return self._inline_braille_export(context, element, lang=lang, hyphenate=False)
 
     def _export_link(self, context, element):
         label = self._export_container(context, element)
