@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005, 2006, 2007 Brailcom, o.p.s.
+# Copyright (c) 2005, 2006, 2007, 2012 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -693,21 +693,6 @@ Będzie to miało taki wygląd:
 LCG -- autostradą do doskonałości.
 
 #==== Citations ====
-
-
-==== Cudzysłowia ====
-
-Cudzysłów rozpoczynają dwa znaki akcentu a kończą dwa znaki apostrofu.
-
-*Przykład:*
-
-------
-Powiedział: ``Kto wie?''
-------
-
-Będzie to miało taki wygląd:
-
-Powiedział: ``Kto wie?''
 
 
 === Inne funkcje ===
