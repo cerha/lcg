@@ -441,25 +441,33 @@ class BrailleExporter(FileExporter, Exporter):
     
     # Inline constructs (text styles).
 
-    def _export_emphasize(self, context, element):
-        text = self._export_container(context, element)
-        return self.text(context, text, form=louis.italic)
+    def _inline_braille_export(self, context, element, form=None, lang=None):
+        if lang is not None:
+            orig_lang = context.set_lang(lang)
+        if form is not None:
+            orig_form = context.add_form(form)
+        exported = self._export_container(context, element)
+        if form is not None:
+            context.set_form(orig_form)
+        if lang is not None:
+            context.set_lang(orig_lang)
+        return exported
+
+    def _export_emphasized(self, context, element):
+        return self._inline_braille_export(context, element, louis.italic)
 
     def _export_strong(self, context, element):
-        text = self._export_container(context, element)
-        return self.text(context, text, form=louis.bold)
+        return self._inline_braille_export(context, element, louis.bold)
 
     def _export_code(self, context, element):
-        text = self._export_container(context, element)
-        return self.text(context, text)
+        return self._inline_braille_export(context, element)
      
-    def _export_underline(self, context, element):
-        text = self._export_container(context, element)
-        return self.text(context, text, form=louis.underline)
+    def _export_underlined(self, context, element):
+        return self._inline_braille_export(context, element, louis.underline)
     
     def _export_superscript(self, context, element):
         lang = context.lang()
-        text, hyphenation = self.text(context, self._export_container(context, element))
+        text, hyphenation = self._inline_braille_export(context, element)
         if lang == 'cs':
             text = '⠌' + text + '⠱'
             hyphenation = '0' + hyphenation + '0'
@@ -467,16 +475,15 @@ class BrailleExporter(FileExporter, Exporter):
     
     def _export_subscript(self, context, element):
         lang = context.lang()
-        text, hyphenation = self.text(context, self._export_container(context, element))
+        text, hyphenation = self._inline_braille_export(context, element)
         if lang == 'cs':
             text = '⠡' + text + '⠱'
             hyphenation = '0' + hyphenation + '0'
         return text, hyphenation
     
     def _export_citation(self, context, element):
-        lang = (element.lang(inherited=False) or context.sec_lang())
-        text = self._export_container(context, element)
-        return self.text(context, text, lang=lang)
+        lang = element.lang(inherited=False) or context.sec_lang()
+        return self._inline_braille_export(context, element, lang=lang)
 
     def _export_link(self, context, element):
         label = self._export_container(context, element)

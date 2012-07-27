@@ -207,6 +207,11 @@ class Exporter(object):
 
         def sec_lang(self):
             return self._sec_lang
+
+        def set_lang(self, lang):
+            orig_lang = self._lang
+            self._lang = lang
+            return orig_lang
     
         def node(self):
             return self._node
@@ -241,12 +246,6 @@ class Exporter(object):
 
         def set_page_heading(self, heading):
             self._page_heading = heading
-
-        def set_secondary_language(self):
-            self._secondary_language_active = True
-
-        def unset_secondary_language(self):
-            self._secondary_language_active = False
             
     def __init__(self, translations=()):
         self._translation_path = translations
@@ -445,7 +444,6 @@ class Exporter(object):
         text = text.replace('\r', ' ')
         text = text.replace('\t', ' ')
         text = self._RE_SPACE_MATCHER.sub(' ', text)
-        text = text.strip()
         return text
 
     def _newline(self, context, number=1):
