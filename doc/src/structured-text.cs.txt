@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005-2011 Brailcom, o.p.s.
+# Copyright (c) 2005-2012 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -1190,11 +1190,4 @@ vlnek, které již v budoucnu nebudou interpretovány jako nedělitelné mezery.
 Dvojitá pomlčka (znak mínus) je interpretován jako dlouhá pomlčka.  Použijte
 příslušný znak Unicode „EM DASH“ (+U00A0) pro vytvoření pomlčky šířky písmene
 M.  Vyvarujte se použití dvojitých obyčejných pomlček ve významu dlouhé pomlčky.
-
-=== Citace ===
-
-Citace začíná dvěma zpětnými apostrofy a končí dvěma obyčejnými apostrofy a na
-výstupu jsou zobrazeny pomocí příslušných (jazykově závislých) uvozovek.
-Používejte v textu přímo Unicode znaky uvozovek obvyklých v příslušném národním
-prostředí a vyvarujte se použití dvojitých apostrofů.
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (c) 2005-2011 Brailcom, o.p.s.
+# Copyright (c) 2005-2012 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
@@ -1172,11 +1172,3 @@ Please avoid using tildes since they may not be recognized in future.
 Double dash (two minus signs) produce a long dash on the output, but is now
 deprecated in favor of the Unicode character "EM DASH" (U+00A0).  Please avoid
 using double dashes since they may not be recognized in future.
-
-==== Quotations ====
-
-Quotations begin with two reverse apostrophes and end with two single
-apostrophes.  They are supposed to be replaced by relevant national quotation
-characters on the output, but are now deprecated in favor of language dependent
-Unicode characters for quotes.  Please avoid using quotations since they may
-not be recognized in future.

@@ -142,7 +142,6 @@ class Parser(object):
         ('code',       ('=',  '=')),
         ('underlined', ('_',  '_')),
         ('citation',   ('>>', '<<')),
-        ('quotation',  ('``', "''")),
         # Link to an internal or external (http) target via [ ].
         ('link', (r'\['
                   r'(?P<align>[<>])?'                     # Left/right Image aligment e.g. [<imagefile], [>imagefile]
@@ -784,6 +783,9 @@ class Parser(object):
     def _nbsp_markup_handler(self, markup):
         return TextContent(u' ')
 
+    # The following handlers receive the already parsed lcg.Content instance as
+    # argument (as they have paired markup on input).
+
     def _emphasized_markup_handler(self, content):
         return Emphasized(content)
 
@@ -1059,6 +1061,8 @@ def _log(*args):
     def _str(x):
         if isinstance(x, Container):
             return "<%s %s>" % (x.__class__.__name__, _str(x._content))
+        elif isinstance(x, Content):
+            return str(x)
         elif isinstance(x, (types.ListType, types.TupleType)):
             result = ', '.join([_str(i) for i in x])
             if isinstance(x, types.ListType):
