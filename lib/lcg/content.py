@@ -472,6 +472,8 @@ class Link(Container):
                     node = parent
                 elif '@' not in node_id and '/' not in node_id:
                     node = parent.root().find_node(node_id)
+                else:
+                    node = None
                 if node and section_id:
                     target = node.find_section(section_id, context)
                 else:
