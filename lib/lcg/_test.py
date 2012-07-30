@@ -548,7 +548,11 @@ blah blah
         assert isinstance(item_content[0], lcg.Paragraph), item_content[0]
         assert isinstance(item_content[1], lcg.ItemizedList), item_content[1]
         assert item_content[1].order() == lcg.ItemizedList.LOWER_ALPHA, item_content[1].order()
-        assert len(item_content[1].content()) == 2, item_content[1].content()        
+        assert len(item_content[1].content()) == 2, item_content[1].content()
+
+    def test_paragraph_newline(self):
+        c = self._parser.parse('hello\n\nworld')
+        assert c[0].content()[0].content()[0].text()[-1] == 'o', "Extra newline after paragraph?"
                 
 tests.add(Parser)
 
