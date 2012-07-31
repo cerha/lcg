@@ -607,7 +607,8 @@ class Parser(object):
                                            compressed=compressed)
         if next_position == position:
             return None
-        content = Paragraph(self.parse_inline_markup(text[position:next_position]), halign=halign)
+        paragraph_text = text[position:next_position].strip()
+        content = Paragraph(self.parse_inline_markup(paragraph_text), halign=halign)
         return content, next_position
 
     def _whitespace_processor(self, text, position, **kwargs):
