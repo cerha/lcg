@@ -498,6 +498,16 @@ class BrailleExporter(FileExporter, Exporter):
         hyphenate = (lang == context.lang())
         return self._inline_braille_export(context, element, lang=lang, hyphenate=False)
 
+    def _transform_link_content(self, context, element):
+        return self._export_container(context, element)[0]
+
+    def _transform_link_heading(self, context, heading):
+        return heading.export(context)[0]
+    
+    def _link_content_is_url(self, context, label):
+        http_prefix = self.text(context, 'http:')[0]
+        return label.startswith(http_prefix)
+        
     def _export_link(self, context, element):
         label = self._export_container(context, element)
         if not label[0]:

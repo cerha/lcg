@@ -674,21 +674,42 @@ class Exporter(object):
         """
         return self.concat(*[content.export(context) for content in element.content()])
 
+    def _transform_link_content(self, context, element):
+        return self._export_container(context, element)
+
+    def _transform_link_heading(self, context, heading):
+        return heading.export(context)
+
+    def _link_content_is_url(self, context, label):
+        return label.startswith('http:')
+        
     def _export_link(self, context, element):
         """Export given 'Link' element.
 
-        In this class the method just returns the exported inner content (link label).
+        In this class the method returns link description (if available) and
+        the link target URL.
         
         """
-        label = self._export_container(context, element)
+        label = element.descr()
         if not label:
-            target = element.target(context)
+            label = self._transform_link_content(context, element)
+        target = element.target(context)
+        if not label:
             if isinstance(target, (ContentNode, Section)):
-                label = target.heading().export(context)
+                label = self._transform_link_heading(context, target.heading())
             elif isinstance(target, Resource):
                 label = target.title() or target.filename()
-            elif isinstance(target, element.ExternalTarget):
-                label = target.title() or target.uri()
+        if isinstance(target, element.ExternalTarget):
+            uri = target.uri()
+            if uri and label and self._link_content_is_url(context, label):
+                # Try to prevent displaying image URLs
+                label = uri
+            else:
+                if label is None:
+                    title = target.title()
+                    label = title or uri
+                if uri and label != uri:
+                    label = '%s (%s)' % (label, uri,)
         return label
 
     def _export_section(self, context, element):
