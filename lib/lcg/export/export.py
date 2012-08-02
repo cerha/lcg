@@ -45,7 +45,7 @@ from lcg import log, concat, Localizable, Localizer, \
     Strong, Emphasized, Underlined, Code, Citation, Superscript, Subscript, \
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
-    Substitution, SetVariable
+    Substitution, SetVariable, MathML
 
 class SubstitutionIterator(object):
     """Supporting object for multiple-value substitution variables.
@@ -615,6 +615,7 @@ class Exporter(object):
                 InlineExternalVideo: self._export_inline_external_video,
                 SetVariable: self._export_set_variable,
                 Substitution: self._export_substitution,
+                MathML: self._export_mathml,
                 }
     
     def _export(self, node, context):
@@ -1222,6 +1223,16 @@ class Exporter(object):
         """
         label = element.title() or "Embedded Video %s id=%s" % (element.service(), element.video_id())
         return self._inline_export(context, label, None, lang=element.lang())
+
+    # Special constructs
+
+    def _export_mathml(self, context, element):
+        """Export 'MathML' element.
+
+        In this class the method returns just an empty unicode.
+        
+        """
+        return u''
     
         
 class FileExporter(object):

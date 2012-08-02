@@ -16,6 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from __future__ import unicode_literals
+
 """Export to Braille notation.
 """
 
@@ -30,9 +32,9 @@ from export import Exporter, FileExporter, MarkupFormatter
 
 class BrailleFormatter(MarkupFormatter):
     
-    _FORMAT = {'linebreak': (u'\n', '0',),
-               'comment': (u'', '',),
-               'dash': (u'⠤', '0',),
+    _FORMAT = {'linebreak': ('\n', '0',),
+               'comment': ('', '',),
+               'dash': ('⠤', '0',),
                }
 
     def _set_form(self, context, close, form):
@@ -76,8 +78,8 @@ class BrailleExporter(FileExporter, Exporter):
     Formatter = BrailleFormatter
     
     _OUTPUT_FILE_EXT = 'brl'
-    _INDENTATION_CHAR = u'\ue010'
-    _NEXT_INDENTATION_CHAR = u'\ue011'
+    _INDENTATION_CHAR = '\ue010'
+    _NEXT_INDENTATION_CHAR = '\ue011'
 
     class Context(Exporter.Context):
 
@@ -133,7 +135,7 @@ class BrailleExporter(FileExporter, Exporter):
     def __init__(self, *args, **kwargs):
         super(BrailleExporter, self).__init__(*args, **kwargs)
         self._unbreakable_characters = string.punctuation + string.digits + self._braille_characters()
-        self._whitespace = string.whitespace + u' \u2800'
+        self._whitespace = string.whitespace + ' \u2800'
 
     def _braille_characters(self):
         return string.join([unichr(i) for i in range(10240, 10496)], '')
@@ -162,7 +164,7 @@ class BrailleExporter(FileExporter, Exporter):
         right_status_line = presentation.right_page_footer or node.right_page_footer(lang)
         device_table = presentation.device_output
         if device_table is None:
-            device_table = {' ': u'⠀', '\n': '\n', '\f': '\f'}
+            device_table = {' ': '⠀', '\n': '\n', '\f': '\f'}
             for c in self._braille_characters():
                 device_table[c] = c
         braille_tables = presentation.braille_tables
@@ -194,13 +196,13 @@ class BrailleExporter(FileExporter, Exporter):
                             line = line[:start] + line[end:]
                             hyphenation = hyphenation[:start] + hyphenation[end:]
                             next_prefix_len += end - start
-                        prefix = u' ' * next_prefix_len
+                        prefix = ' ' * next_prefix_len
                         prefix_limit = page_width / 2
                         if next_prefix_len > prefix_limit:
                             prefix = prefix[:prefix_limit]
                         hyphenation_prefix = '0' * len(prefix)
                         if prefix_len > 0:
-                            line = u' ' * prefix_len + line[prefix_len:]
+                            line = ' ' * prefix_len + line[prefix_len:]
                         while len(line) > page_width:
                             pos = page_width
                             if hyphenation[pos] != '2':
@@ -212,19 +214,23 @@ class BrailleExporter(FileExporter, Exporter):
                                 line = prefix + line[page_width:]
                                 hyphenation = hyphenation_prefix + hyphenation[page_width:]
                             elif hyphenation[pos] == '1':
-                                lines.append(line[:pos] + self.text(context, u'-', lang=lang)[0])
+                                lines.append(line[:pos] + self.text(context, '-', lang=lang)[0])
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == '2':
                                 lines.append(line[:pos])
                                 line = prefix + line[pos+1:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos+1:]
+                            elif hyphenation[pos] == '3':
+                                lines.append(line[:pos+1])
+                                line = prefix + line[pos:]
+                                hyphenation = hyphenation_prefix + hyphenation[pos:]
                             else:
                                 raise Exception("Program error", hyphenation[pos])
                         pos = line.find(hfill)
                         if pos >= 0:
                             fill_len = (page_width - len(line) + len(hfill))
-                            line = (line[:pos] + u' '*fill_len + line[pos+len(hfill):])
+                            line = (line[:pos] + ' '*fill_len + line[pos+len(hfill):])
                             hyphenation = (hyphenation[:pos] + '0'*fill_len + hyphenation[pos+len(hfill):])
                         lines.append(line)
                         hyphenation = hyphenation[len(line)+1:]
@@ -289,7 +295,6 @@ class BrailleExporter(FileExporter, Exporter):
 
           context -- current 'Context' instance
           text -- text to convert; unicode
-          form -- 'louis' typeform flags; integer
           lang -- target language as an ISO 639-1 Alpha-2 lowercase
             language code or 'None'
 
@@ -325,7 +330,7 @@ class BrailleExporter(FileExporter, Exporter):
         whitespace = self._whitespace
         if typeform is None:
             if italic:
-                braille = u'⠔⠨' + braille + u'⠨⠔'
+                braille = '⠔⠨' + braille + '⠨⠔'
             if underline:
                 compact = (form == louis.underline)
                 if compact:
@@ -334,11 +339,11 @@ class BrailleExporter(FileExporter, Exporter):
                             compact = False
                             break
                 if compact:
-                    braille = u'⠸' + braille
+                    braille = '⠸' + braille
                 else:
-                    braille = u'⠔⠸' + braille + u'⠸⠔'
+                    braille = '⠔⠸' + braille + '⠸⠔'
             if bold:
-                braille = u'⠔⠰' + braille + u'⠰⠔'
+                braille = '⠔⠰' + braille + '⠰⠔'
         hyphenation_table = context.hyphenation_table(lang)
         if hyphenation_table is None or form != louis.plain_text:
             hyphenation = ''
@@ -395,13 +400,13 @@ class BrailleExporter(FileExporter, Exporter):
                 new_text += self._NEXT_INDENTATION_CHAR * diff
             new_text += lines[0]
             n += len(lines[0])
-            new_hyphenation += u'0' * max(init_indentation, indentation) + hyphenation[:n]
+            new_hyphenation += '0' * max(init_indentation, indentation) + hyphenation[:n]
             space = self._INDENTATION_CHAR * indentation
-            space_hyphenation = u'0' * indentation
+            space_hyphenation = '0' * indentation
             for l in lines[1:]:
                 new_text += '\n'
                 n += 1
-                new_hyphenation += u'0'
+                new_hyphenation += '0'
                 if l:
                     new_text += space + l
                     m = n
@@ -413,10 +418,10 @@ class BrailleExporter(FileExporter, Exporter):
         return new_text, new_hyphenation
 
     def _list_item_prefix(self, context):
-        return u'- '
+        return '- '
 
     def _separator(self, context):
-        return u' - '
+        return ' - '
 
     # Content element export methods (defined by _define_export_methods).
     
@@ -429,7 +434,7 @@ class BrailleExporter(FileExporter, Exporter):
         return '\n', '0'
 
     def _vertical_cell_separator(self, context):
-        return (u' ', '1',), 1
+        return (' ', '1',), 1
     
     def _export_title(self, context, element):
         title = super(BrailleExporter, self)._export_title(context, element)
@@ -466,7 +471,7 @@ class BrailleExporter(FileExporter, Exporter):
         lang = context.lang()
         text, hyphenation = self.text(context, self._export_container(context, element))
         if lang == 'cs':
-            text = u'⠌' + text + u'⠱'
+            text = '⠌' + text + '⠱'
             hyphenation = '0' + hyphenation + '0'
         return text, hyphenation
     
@@ -474,7 +479,7 @@ class BrailleExporter(FileExporter, Exporter):
         lang = context.lang()
         text, hyphenation = self.text(context, self._export_container(context, element))
         if lang == 'cs':
-            text = u'⠡' + text + u'⠱'
+            text = '⠡' + text + '⠱'
             hyphenation = '0' + hyphenation + '0'
         return text, hyphenation
     
@@ -494,3 +499,250 @@ class BrailleExporter(FileExporter, Exporter):
             elif isinstance(target, element.ExternalTarget):
                 label = self.text(context, target.title() or target.uri())
         return label
+
+    def _export_mathml(self, context, element):
+        dom = element.dom_content()
+        top_elements = dom.getElementsByTagName('math')
+        assert len(top_elements) == 1
+        top = top_elements[0]
+        exporters = {}
+        flags = []
+        op_translation = {'(': ('⠦', '0'), ')': ('⠴', '0'), '[': ('⠠⠦', '00'), ']': ('⠠⠴', '00'),
+                          '{': ('⠨⠦', '00'), '}': ('⠨⠴', '00'), '|': ('⠸', '3'),
+                          '=': ('⠶', '3'), '<': ('⠁⠀⠣⠃', '0000'), '>': ('⠁⠀⠜⠃', '0000'),
+                          '+': ('⠲', '3'), '-': ('⠤', '3'),}
+        def current_style():
+            for i in range(len(flags) - 1, -1, -1):
+                if flags[i].startswith('style:'):
+                    return flags[i]
+            return ''
+        def set_style(node):
+            variant = node.getAttribute('mathvariant')
+            if variant:
+                bold = variant.find('bold') >= 0
+                italic = variant.find('italic') >= 0
+                if bold and italic:
+                    f = 'style:bold+italic'
+                elif bold:
+                    f = 'style:bold'
+                elif italic:
+                    f = 'style:italic'
+                else:
+                    f = 'style:normal'
+                flags.append(f)
+            elif node.tagName == 'mi':
+                # <mi> content should be in italic but it would make the
+                # Braille output only larger and harder to read.
+                #f = 'style:italic'
+                f = ''
+            else:
+                f = ''
+            flags.append(f)
+        def unset_style():
+            flags.pop()
+        def node_value(node):
+            assert len(node.childNodes) == 1
+            assert node.childNodes[0].nodeType == node.TEXT_NODE
+            return node.childNodes[0].nodeValue
+        def child_nodes(node, exported=False):
+            return [export(n) if exported else n for n in node.childNodes if n.nodeType != node.TEXT_NODE]
+        def text_export(text, node=None):
+            if node is not None:
+                set_style(node)
+            style = current_style()
+            form = 0
+            if style.find('bold') >= 0:
+                form |= louis.bold
+            elif style.find('italic') >= 0:
+                form |= louis.italic
+            orig_form = context.form()
+            context.set_form(louis.italic)
+            braille = self.text(context, text)[0]
+            context.set_form(orig_form)
+            if node is not None:
+                unset_style()
+            return braille, '0' * len(braille)
+        def export(node):
+            if node.nodeType == node.TEXT_NODE:
+                assert not [c for c in node.nodeValue if c not in string.whitespace]
+                return '', ''
+            tag = node.tagName
+            e = exporters.get(tag)
+            if e is None:
+                result = text_export('<%s>' % (tag,))
+            else:
+                variant = node.getAttribute('mathvariant')
+                if variant:
+                    bold = variant.find('bold') >= 0
+                    italic = variant.find('italic') >= 0
+                    if bold and italic:
+                        f = 'bold+italic'
+                    elif bold:
+                        f = 'bold'
+                    elif italic:
+                        f = 'italic'
+                    else:
+                        f = 'normal'
+                    flags.append(f)
+                result = e(node)
+                if variant:
+                    flags.pop()
+            return result
+        def child_export(node, separator=None):
+            exported = ''
+            hyphenation = ''
+            if separator:
+                hyph_separator = '3' if len(separator == 1) else '0' * len(separator)
+            for n in child_nodes(node):
+                if exported and separator:
+                    exported += separator
+                    hyphenation += hyph_separator
+                e, h = export(n)
+                exported += e
+                hyphenation += h
+            return exported, hyphenation
+        def export_mi(node):
+            text = node_value(node).strip()
+            return text_export(text, node=node)
+        def export_mn(node):
+            text = node_value(node).replace(' ', '')
+            return text_export(text)
+        def export_mo(node):
+            form = node.getAttribute('form') # prefix, infix, postfix
+            separator = node.getAttribute('separator') # true, false
+            # We should probably ignore these as Braille script has its own
+            # rules of math line breaking:
+            # linebreak = node.getAttribute('linebreak') # auto, newline, nobreak, goodbreak, badbreak
+            # linebreakstyle = node.getAttribute('linebreakstyle') # before, after, duplicate, infixlinebreakstyle
+            op = node_value(node).strip()
+            translation = op_translation.get(op)
+            if translation is None:
+                op_braille, hyphenation = text_export(op, node=node)
+            else:
+                op_braille, hyphenation = translation
+            if separator == 'true':
+                op_braille = op_braille + ' '
+                hyphenation = hyphenation + '0'
+            elif form == 'infix':
+                op_braille = ' ' + op_braille
+                hyphenation = '0' + hyphenation
+            return op_braille, hyphenation
+        def export_mtext(node):
+            text = node_value(node).strip()
+            return text_export(text, node=node)
+        def export_mspace(node):
+            return text_export(' ')
+        def export_ms (node):
+            text = '"%s"' % (node_value(node).strip(),)
+            return text_export(text, node=node)
+        def export_mrow(node):
+            return child_export(node)
+        def export_mfrac(node):
+            child_1, child_2 = child_nodes(node, exported=True)
+            mfrac_flag = 'mfrac'
+            flags.append(mfrac_flag)
+            flags.pop()
+            if mfrac_flag in flags:
+                line = '⠻⠻'
+                l_hyphenation = '00'
+            else:
+                line = '⠻'
+                l_hyphenation = '3'
+            braille = '⠆%s%s%s⠰' % (child_1[0], line, child_2[0],)
+            hyphenation = '0%s%s%s0' % (child_1[1], l_hyphenation, child_2[1],)
+            return braille, hyphenation
+        def export_msqrt(node):
+            exported, hyphenation = child_export(node)
+            return '⠩' + exported, '3' + hyphenation
+        def export_mroot(node):
+            base, root = child_nodes(node, exported=True)
+            braille = '⠠⠌%s⠩%s⠱' % (root[0], base[0],)
+            hyphenation = '00%s3%s0' % (root[1], base[1],)
+            return braille, hyphenation
+        def export_mstyle(node):
+            break_style = node.getAttribute('infixlinebreakstyle')
+            if break_style: # before, after, duplicate
+                flags.append('infixlinebreakstyle:' + break_style)
+            set_style(node)
+            result = child_export(node)
+            unset_style()
+            if break_style:
+                flags.pop()
+            return result
+        def export_merror(node):
+            return child_export(node)
+        def export_mpadded(node):
+            return child_export(node)
+        def export_mphantom(node):
+            exported, hyphenation = child_export(node)
+            n = len(exported)
+            return '⠀' * n, '0' * n
+        def export_mfenced(node):
+            open_string = node.getAttribute('open', '(')
+            close_string = node.getAttribute('close', ')')
+            separator = node.getAttribute('separator')
+            if separator:
+                separator = text_export(separator, node=node)[0]
+            exported, e_hyphenation = child_export(node, separator=separator)
+            open_braille, o_hyphenation = text_export(open_string, node=node)
+            close_braille, c_hyphenation = text_export(close_string, node=node)
+            braille = open_braille + exported + close_braille
+            hyphenation = o_hyphenation + e_hyphenation + c_hyphenation
+            return braille, hyphenation
+        def export_menclose(node):
+            return child_export(node)
+        def export_msub(node):
+            base, sub = child_nodes(node, exported=True)
+            braille = '%s⠡%s⠱' % (base[0], sub[0],)
+            hyphenation = '%s0%s0' % (base[1], sub[1],)
+            return braille, hyphenation
+        def export_msup(node):
+            base, sup = child_nodes(node, exported=True)
+            braille = '%s⠌%s⠱' % (base[0], sup[0],)
+            hyphenation = '%s0%s0' % (base[1], sup[1],)
+            return braille, hyphenation
+        def export_msubsup(node):
+            base, sub, sup = child_nodes(node, exported=True)
+            braille = '%s⠌%s⠱⠡%s⠱' % (base[0], sub[0], sup[0],)
+            hyphenation = '%s0%s00%s0' % (base[1], sub[1], sup[1],)
+            return braille, hyphenation
+        def export_munder(node):
+            base, under = child_nodes(node, exported=True)
+            braille = '%s⠠⠡%s⠱' % (base[0], under[0],)
+            hyphenation = '%s00%s0' % (base[1], under[1],)
+            return braille, hyphenation
+        def export_mover(node):
+            base, over = child_nodes(node, exported=True)
+            braille = '%s⠠⠌%s⠱' % (base[0], over[0],)
+            hyphenation = '%s00%s0' % (base[1], over[1],)
+            return braille, hyphenation
+        def export_munder_mover(node):
+            base, under, over = child_nodes(node, exported=True)
+            braille = '%s⠠⠡%s⠱⠠⠌%s⠱' % (base[0], under[0], over[0],)
+            hyphenation = '%s00%s000%s0' % (base[1], under[1], over[1],)
+            return braille, hyphenation
+        def export_maction(node):
+            selection = node.getAttribute('selection')
+            if not selection:
+                selection = 1
+            return export(child_nodes(node)[selection-1])
+        #def export_mmultiscripts(node):
+        #def export_mtable(node):
+        #def export_mtr(node):
+        #def export_mlabeledtr(node):
+        #def export_mtd(node):
+        #def export_maligngroup(node):
+        #def export_mstack(node):
+        #def export_msgroup(node):
+        #def export_msrow(node):
+        #def export_msline(node):
+        #def export_mscarries(node):
+        #def export_mscarry(node):
+        #def export_mlongdiv(node):
+        for k, v in locals().items():
+            if k.startswith('export_'):
+                exporters[k[len('export_'):]] = v
+        result = child_export(top)
+        assert len(result[0]) == len(result[1])
+        return result
+        

@@ -810,6 +810,34 @@ class BrailleExport(unittest.TestCase):
         presentation = self._load_presentation()
         self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs', 'en')
 
+    def test_mathml(self):
+        example = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" 
+  "http://www.w3.org/TR/MathML2/dtd/xhtml-math11-f.dtd" [
+ <!ENTITY mathml "http://www.w3.org/1998/Math/MathML">
+ ]>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>untitled</title></head>
+<body>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow>
+<msub><mi>x</mi><mtext>1,2</mtext></msub><mo>=</mo>
+<mfrac><mrow>
+<mo>-</mo><mi>b</mi><mo>&#xB1;</mo>
+<msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt></mrow>
+<mrow><mn>2</mn><mi>a</mi>
+</mrow></mfrac>
+</mrow></math>
+</body></html>
+'''
+        content = lcg.MathML(example)
+        presentation = self._load_presentation()
+        presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
+        n = lcg.ContentNode('test', title='Test Node', descr="Some description", content=content)
+        exporter = lcg.BrailleExporter()
+        context = exporter.context(n, lang='cs', presentation=presentation_set)
+        # Just test for crashes for now
+        result = exporter.export(context)
+        
 tests.add(BrailleExport)
 
 

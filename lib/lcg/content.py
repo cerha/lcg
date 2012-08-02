@@ -1500,9 +1500,41 @@ class ContentVariants(Container):
 
         """
         return self._variants[lang]
-    
 
+
+class MathML(Content):
+    """Representation of MathML content for inclusion in LCG documents.
+
+    It works by making an instance containing a unicode representation of the
+    MathML object.  You can access the MathML content either by using
+    'content()' method which returns the unicode or by using 'dom_content()'
+    which returns a parsed DOM structure to work with.
+
+    It is expected that the MathML content is a presentation form of MathML 3.
     
+    """
+
+    def __init__(self, content):
+        """
+        Arguments:
+
+          content -- the MathML content represented as a MathML XML unicode
+        
+        """
+        super(MathML, self).__init__()
+        self._content = content
+
+    def content(self):
+        """Return the XML unicode content given in the constructor."""
+        return self._content
+
+    def dom_content(self):
+        """Return a parsed DOM 'Document' instance of the content."""
+        # TODO: This can't handle entity references (e.g. &PlusMinus;).
+        from xml.dom.minidom import parseString
+        return parseString(self._content)
+
+
 # Convenience functions for simple content construction.
 
 def coerce(content, formatted=False):
