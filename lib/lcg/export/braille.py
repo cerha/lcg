@@ -480,6 +480,7 @@ class BrailleExporter(FileExporter, Exporter):
     
     def _export_citation(self, context, element):
         lang = (element.lang(inherited=False) or context.sec_lang())
+        text = self._export_container(context, element)
         return self.text(context, text, lang=lang)
 
     def _export_link(self, context, element):
