@@ -501,23 +501,27 @@ class BrailleExporter(FileExporter, Exporter):
         return label
 
     def _export_mathml(self, context, element):
-        dom = element.dom_content()
-        top_elements = dom.getElementsByTagName('math')
-        assert len(top_elements) == 1
-        top = top_elements[0]
+        class EntityHandler(element.EntityHandler):
+            def __getitem__(self, key):
+                # Just a demo for now
+                if key == 'PlusMinus':
+                    return '±'
+                return '?'
+        entity_handler = EntityHandler()
+        top = element.tree_content(entity_handler)
         exporters = {}
         flags = []
         op_translation = {'(': ('⠦', '0'), ')': ('⠴', '0'), '[': ('⠠⠦', '00'), ']': ('⠠⠴', '00'),
                           '{': ('⠨⠦', '00'), '}': ('⠨⠴', '00'), '|': ('⠸', '3'),
                           '=': ('⠶', '3'), '<': ('⠁⠀⠣⠃', '0000'), '>': ('⠁⠀⠜⠃', '0000'),
-                          '+': ('⠲', '3'), '-': ('⠤', '3'),}
+                          '+': ('⠲', '3'), '-': ('⠤', '3'), '±': ('⠲⠤', '00')}
         def current_style():
             for i in range(len(flags) - 1, -1, -1):
                 if flags[i].startswith('style:'):
                     return flags[i]
             return ''
         def set_style(node):
-            variant = node.getAttribute('mathvariant')
+            variant = node.get('mathvariant')
             if variant:
                 bold = variant.find('bold') >= 0
                 italic = variant.find('italic') >= 0
@@ -530,7 +534,7 @@ class BrailleExporter(FileExporter, Exporter):
                 else:
                     f = 'style:normal'
                 flags.append(f)
-            elif node.tagName == 'mi':
+            elif node.tag == 'mi':
                 # <mi> content should be in italic but it would make the
                 # Braille output only larger and harder to read.
                 #f = 'style:italic'
@@ -541,11 +545,16 @@ class BrailleExporter(FileExporter, Exporter):
         def unset_style():
             flags.pop()
         def node_value(node):
-            assert len(node.childNodes) == 1
-            assert node.childNodes[0].nodeType == node.TEXT_NODE
-            return node.childNodes[0].nodeValue
+            value = node.text
+            if value is None:
+                # this may happen with unresolved entities
+                value = '?'
+            return value
         def child_nodes(node, exported=False):
-            return [export(n) if exported else n for n in node.childNodes if n.nodeType != node.TEXT_NODE]
+            children = node.getchildren()
+            if exported:
+                children = [export(c) for c in children]
+            return children
         def text_export(text, node=None):
             if node is not None:
                 set_style(node)
@@ -563,15 +572,12 @@ class BrailleExporter(FileExporter, Exporter):
                 unset_style()
             return braille, '0' * len(braille)
         def export(node):
-            if node.nodeType == node.TEXT_NODE:
-                assert not [c for c in node.nodeValue if c not in string.whitespace]
-                return '', ''
-            tag = node.tagName
+            tag = node.tag
             e = exporters.get(tag)
             if e is None:
                 result = text_export('<%s>' % (tag,))
             else:
-                variant = node.getAttribute('mathvariant')
+                variant = node.get('mathvariant')
                 if variant:
                     bold = variant.find('bold') >= 0
                     italic = variant.find('italic') >= 0
@@ -608,8 +614,8 @@ class BrailleExporter(FileExporter, Exporter):
             text = node_value(node).replace(' ', '')
             return text_export(text)
         def export_mo(node):
-            form = node.getAttribute('form') # prefix, infix, postfix
-            separator = node.getAttribute('separator') # true, false
+            form = node.get('form') # prefix, infix, postfix
+            separator = node.get('separator') # true, false
             # We should probably ignore these as Braille script has its own
             # rules of math line breaking:
             # linebreak = node.getAttribute('linebreak') # auto, newline, nobreak, goodbreak, badbreak
@@ -660,7 +666,7 @@ class BrailleExporter(FileExporter, Exporter):
             hyphenation = '00%s3%s0' % (root[1], base[1],)
             return braille, hyphenation
         def export_mstyle(node):
-            break_style = node.getAttribute('infixlinebreakstyle')
+            break_style = node.get('infixlinebreakstyle')
             if break_style: # before, after, duplicate
                 flags.append('infixlinebreakstyle:' + break_style)
             set_style(node)
@@ -678,9 +684,9 @@ class BrailleExporter(FileExporter, Exporter):
             n = len(exported)
             return '⠀' * n, '0' * n
         def export_mfenced(node):
-            open_string = node.getAttribute('open', '(')
-            close_string = node.getAttribute('close', ')')
-            separator = node.getAttribute('separator')
+            open_string = node.get('open', '(')
+            close_string = node.get('close', ')')
+            separator = node.get('separator')
             if separator:
                 separator = text_export(separator, node=node)[0]
             exported, e_hyphenation = child_export(node, separator=separator)
@@ -722,7 +728,7 @@ class BrailleExporter(FileExporter, Exporter):
             hyphenation = '%s00%s000%s0' % (base[1], under[1], over[1],)
             return braille, hyphenation
         def export_maction(node):
-            selection = node.getAttribute('selection')
+            selection = node.get('selection')
             if not selection:
                 selection = 1
             return export(child_nodes(node)[selection-1])
@@ -745,4 +751,3 @@ class BrailleExporter(FileExporter, Exporter):
         result = child_export(top)
         assert len(result[0]) == len(result[1])
         return result
-        

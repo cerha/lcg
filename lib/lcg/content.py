@@ -1513,6 +1513,23 @@ class MathML(Content):
     It is expected that the MathML content is a presentation form of MathML 3.
     
     """
+    class EntityHandler(object):
+        """Entity dictionary to be used in 'tree_content()' method.
+
+        This class provides just trivial implementation which always returns
+        the entity name itself.  Subclasses (or different) classes may provide
+        other mechanisms, e.g. mapping the entities to the corresponding
+        Unicode characters.
+
+        """
+        def __getitem__(self, key):
+            return key
+
+        def get(self, key, default=None):
+            try:
+                return self[key]
+            except KeyError:
+                return default
 
     def __init__(self, content):
         """
@@ -1528,11 +1545,78 @@ class MathML(Content):
         """Return the XML unicode content given in the constructor."""
         return self._content
 
-    def dom_content(self):
-        """Return a parsed DOM 'Document' instance of the content."""
-        # TODO: This can't handle entity references (e.g. &PlusMinus;).
+    def _dom_content(self, element):
+        from xml.etree import ElementTree
+        top_elements = element.getElementsByTagName('math')
+        assert len(top_elements) == 1
+        top = top_elements[0]
+        tree = ElementTree.Element(top.tagName)
+        def export(parent_tree, node):
+            node_type = node.nodeType
+            if node_type == node.ELEMENT_NODE:
+                tree = ElementTree.SubElement(parent_tree, node.tagName)
+                attributes = node.attributes
+                for i in range(attributes.length):
+                    a = attributes.item(i)
+                    tree.set(a.name, a.value)
+                for n in node.childNodes:
+                    export(tree, n)
+            elif node_type == node.TEXT_NODE or node_type == node.ENTITY_NODE:
+                value = node.nodeValue.strip()
+                if value:
+                    assert not parent_tree.text, node
+                    parent_tree.text = node.nodeValue
+            elif node_type == node.COMMENT_NODE:
+                pass
+            else:
+                raise Exception('Unhandled node type', node, node.nodeType)
+        for n in top.childNodes:
+            export(tree, n)
+        return tree
+        
+    def _dom_tree_content(self):
+        # This can't handle entity references (e.g. &PlusMinus;).
         from xml.dom.minidom import parseString
-        return parseString(self._content)
+        return self._dom_content(parseString(self._content))
+        
+    def _tree_content(self, entity_dictionary):
+        from xml.etree import ElementTree
+        import cStringIO
+        parser = ElementTree.XMLParser()
+        parser.parser.UseForeignDTD(True)
+        if entity_dictionary is None:
+            entity_dictionary = self.EntityHandler()
+        parser.entity = entity_dictionary
+        etree = ElementTree.ElementTree()
+        tree = etree.parse(cStringIO.StringIO(self._content), parser=parser)
+        regexp = re.compile('{.*}')
+        for e in tree.getiterator():
+            match = regexp.match(e.tag)
+            if match:
+                e.tag = e.tag[match.end():]
+        return tree
+        
+    def tree_content(self, entity_dictionary=None):
+        """Return a parsed 'xml.etree.ElementTree' instance of the math content.
+
+        Arguments:
+
+          entity_dictionary -- an object providing common dictionary access
+            methods, 'get()' and '__getitem__()', mapping entity names to
+            values.  There are no requirements on the returned values, they are
+            completely implementation dependent.  Typical values may be
+            unchanged entity names or unicodes corresponding to the given
+            entities.  If not given, 'MathML.EntityHandler' instance is used.
+
+        """
+        try:
+            tree = self._tree_content(entity_dictionary)
+        except AttributeError:
+            # Python < 2.7
+            tree = self._dom_tree_content()
+        for e in tree.getiterator('math'):
+            return e
+        raise Exception("No math element found", tree)
 
 
 # Convenience functions for simple content construction.

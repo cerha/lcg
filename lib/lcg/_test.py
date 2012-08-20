@@ -822,7 +822,7 @@ class BrailleExport(unittest.TestCase):
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow>
 <msub><mi>x</mi><mtext>1,2</mtext></msub><mo>=</mo>
 <mfrac><mrow>
-<mo>-</mo><mi>b</mi><mo>&#xB1;</mo>
+<mo>-</mo><mi>b</mi><mo>&PlusMinus;</mo>
 <msqrt><msup><mi>b</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn><mi>a</mi><mi>c</mi></msqrt></mrow>
 <mrow><mn>2</mn><mi>a</mi>
 </mrow></mfrac>
