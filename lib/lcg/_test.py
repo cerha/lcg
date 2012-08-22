@@ -873,7 +873,24 @@ class BrailleExport(unittest.TestCase):
 </body></html>
 ''', u'''⠭⠡⠼⠁⠂⠀⠼⠃⠱⠀⠶⠆⠤⠃⠀⠲⠤⠩
 ⠩⠃⠌⠼⠃⠱⠀⠤⠼⠙⠐⠁⠉⠱⠻⠼⠃⠐⠁⠰''')
-        
+
+    def test_inline_mathml(self):
+        mathml = u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow>
+</math>'''
+        mathml_content = lcg.MathML(mathml)
+        content = lcg.p(u"Trocha matematiky (", mathml_content, u") neuškodí.")
+        presentation = self._load_presentation()
+        presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
+        n = lcg.ContentNode('test', title='Test Node', descr="Some description", content=content)
+        exporter = lcg.BrailleExporter()
+        context = exporter.context(n, lang='cs', presentation=presentation_set)
+        exported = exporter.export(context)
+        result = exported.split('\n\n')[1]
+        assert result == u'''⠠⠞⠗⠕⠉⠓⠁⠀⠍⠁⠞⠑⠍⠁⠞⠊⠅⠽
+⠦⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃⠴
+⠝⠑⠥⠱⠅⠕⠙⠌⠄''', repr(result)
+
 tests.add(BrailleExport)
 
 
