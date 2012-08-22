@@ -342,25 +342,6 @@ class ResourceProvider(object):
             nodes.append(node_id) 
         return resource
     
-    def add_resource(self, resource):
-        """Add given resource instance to the cache if it was not cached yet.
-
-        The method has the same effect as passing statically allocated
-        resources to the constructor.
-        
-        Returns True if the resource was added or False if the resource of the
-        same filename already exists.
-
-        """
-        filename = resource.filename()
-        try:
-            self._cache[filename]
-        except KeyError:
-            self._cache[filename] = (resource, [None])
-            return True
-        else:
-            return False
-
     def resources(self, cls=None, node=None):
         """Return the list of all resources matching the query.
 
