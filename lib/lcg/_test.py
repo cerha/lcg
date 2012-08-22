@@ -811,7 +811,50 @@ class BrailleExport(unittest.TestCase):
         self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs', 'en')
 
     def test_mathml(self):
-        example = '''<?xml version="1.0" encoding="UTF-8"?>
+        def test(mathml, expected_result):
+            content = lcg.MathML(mathml)
+            presentation = self._load_presentation()
+            presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
+            n = lcg.ContentNode('test', title='Test Node', descr="Some description", content=content)
+            exporter = lcg.BrailleExporter()
+            context = exporter.context(n, lang='cs', presentation=presentation_set)
+            exported = exporter.export(context)
+            result = exported.split('\n\n')[1]
+            assert result == expected_result, (mathml, expected_result, result,)
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>3,14</mn></mrow>
+</math>''', u'⠼⠉⠂⠁⠙')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1 000,5</mn></mrow>
+</math>''', u'⠼⠁⠚⠚⠚⠂⠑')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow>
+</math>''', u'⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>a</mi><mo>=</mo><mo>-</mo><mn>7</mn></mrow>
+</math>''', u'⠁⠀⠶⠤⠼⠛')
+        test(u'''<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow>
+  <mfrac>
+    <mrow><mfrac><mrow><mn>1</mn></mrow><mrow><mn>2</mn></mrow></mfrac></mrow>
+    <mrow><mfrac><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mrow><mn>5</mn></mrow></mfrac></mrow>
+  </mfrac>
+</mrow>
+</math>''',u'''⠆⠆⠼⠁⠻⠼⠃⠰⠻⠻⠆⠼⠉⠀⠲⠼⠙⠻
+⠻⠼⠑⠰⠰''')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>12</mn><mi>a</mi></mrow>
+</math>''', u'⠼⠁⠃⠐⠁')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>12</mn></mrow><mrow><mi>a</mi></mrow>
+</math>''', u'⠼⠁⠃⠐⠁')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>12</mn><mi>k</mi></mrow>
+</math>''', u'⠼⠁⠃⠅')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>12</mn></mrow><mrow><mi mathvariant="bold">a</mi><mi>b</mi></mrow>
+</math>''', u'⠼⠁⠃⠔⠰⠁⠰⠔⠃')
+        test(u'''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" 
   "http://www.w3.org/TR/MathML2/dtd/xhtml-math11-f.dtd" [
  <!ENTITY mathml "http://www.w3.org/1998/Math/MathML">
@@ -828,15 +871,8 @@ class BrailleExport(unittest.TestCase):
 </mrow></mfrac>
 </mrow></math>
 </body></html>
-'''
-        content = lcg.MathML(example)
-        presentation = self._load_presentation()
-        presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
-        n = lcg.ContentNode('test', title='Test Node', descr="Some description", content=content)
-        exporter = lcg.BrailleExporter()
-        context = exporter.context(n, lang='cs', presentation=presentation_set)
-        # Just test for crashes for now
-        result = exporter.export(context)
+''', u'''⠭⠡⠼⠁⠂⠀⠼⠃⠱⠀⠶⠆⠤⠃⠀⠲⠤⠩
+⠩⠃⠌⠼⠃⠱⠀⠤⠼⠙⠐⠁⠉⠱⠻⠼⠃⠐⠁⠰''')
         
 tests.add(BrailleExport)
 
