@@ -28,7 +28,7 @@ import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource
 from export import Exporter, FileExporter, MarkupFormatter
-
+import entities
 
 class BrailleFormatter(MarkupFormatter):
     
@@ -503,11 +503,11 @@ class BrailleExporter(FileExporter, Exporter):
     def _export_mathml(self, context, element):
         # Only Czech MathML processing is available
         class EntityHandler(element.EntityHandler):
+            def __init__(self, *args, **kwargs):
+                super(EntityHandler, self).__init__(*args, **kwargs)
+                self._data = entities.entities
             def __getitem__(self, key):
-                # Just a demo for now
-                if key == 'PlusMinus':
-                    return '±'
-                return '?'
+                return self._data.get(key, '?')
         entity_handler = EntityHandler()
         top = element.tree_content(entity_handler)
         exporters = {}
