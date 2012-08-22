@@ -1419,7 +1419,7 @@ class SetVariable(Content):
     variables at proper places.
     
     """
-    def __init__(self, name, value):
+    def __init__(self, name, value, **kwargs):
         """
         Arguments:
 
@@ -1431,6 +1431,7 @@ class SetVariable(Content):
         assert isinstance(value, Content), value
         self._name = name
         self._value = value
+        super(SetVariable, self).__init__(**kwargs)
 
     def name(self):
         """Return name of the variable."""
@@ -1444,7 +1445,7 @@ class SetVariable(Content):
 class Substitution(Content):
     """Variable to be substituted by the actual value on export."""
     
-    def __init__(self, name, markup=None):
+    def __init__(self, name, markup=None, **kwargs):
         """
         Arguments:
 
@@ -1459,6 +1460,7 @@ class Substitution(Content):
         assert markup is None or isinstance(markup, basestring), markup
         self._name = name
         self._markup = markup or '$'+name
+        super(Substitution, self).__init__(**kwargs)
 
     def name(self):
         """Return name of the variable."""
