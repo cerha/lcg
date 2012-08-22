@@ -328,13 +328,18 @@ class ContentNode(object):
         (class).
         
         """
+        resources = self._content.resources()
+        if cls is not None:
+            resources = tuple([r for r in resources if isinstance(r, cls)])
         if self._resource_provider:
-            return self._resource_provider.resources(cls=cls, node=self)
-        else:
-            return ()
+            resources += tuple(self._resource_provider.resources(cls=cls, node=self))
+        return resources
         
     def resource(self, filename, **kwargs):
         """Get the resource instance by its type and relative filename."""
+        for resource in self._content.resources():
+            if resource.filename() == filename:
+                return resource
         if self._resource_provider:
             return self._resource_provider.resource(filename, node=self, **kwargs)
         else:

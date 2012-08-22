@@ -57,18 +57,24 @@ class Content(object):
     """
     _ALLOWED_CONTAINER = None
     
-    def __init__(self, lang=None):
+    def __init__(self, lang=None, resources=()):
         """Initialize the instance.
 
         Arguments:
 
           lang -- content language as a lowercase ISO 639-1 Alpha-2 language code.
+          resources -- sequence of resource instances associated with the
+            content.  This allows passing resource instances explicitly with
+            content rather than relying on their allocation through resource
+            provider.
 
         """
+        assert resources is None or isinstance(resources, (tuple, list)), resources
         self._parent = None
         self._container = None
         self._lang = lang
         self._page_number = ''
+        self._resources = tuple(resources)
         super(Content, self).__init__()
         
     def set_container(self, container):
@@ -144,6 +150,10 @@ class Content(object):
             lang = self._container.lang()
         return lang
 
+    def resources(self):
+        """Return the value of 'resources' passed to the constructor as a tuple."""
+        return self._resources
+        
     def container_path(self):
         """Return a list of containers of the given element
 
@@ -260,6 +270,7 @@ class Container(Content):
         self._valign = valign
         self._orientation = orientation
         self._presentation = presentation
+        self._contained_resources = None
         if self._SUBSEQUENCES:
             assert isinstance(content, (list, tuple)), "Not a sequence: %s" % content
             self._content = tuple([tuple(subseq) for subseq in content])
@@ -282,7 +293,7 @@ class Container(Content):
                    "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, content)
             self._content = (content,)
             content.set_container(self)
-            
+
     def content(self):
         """Return the sequence of contained content elements.
         """
@@ -316,6 +327,20 @@ class Container(Content):
     def presentation(self):
         """Return the value of 'presentation' as passed to the constructor."""
         return self._presentation
+
+    def resources(self):
+        """Return the value of 'resources' as passed to the constructor."""
+        if self._contained_resources is None:
+            resources = []
+            if self._SUBSEQUENCES:
+                content = self._content
+            else:
+                content = (self._content,)
+            for subseq in content:
+                for c in subseq:
+                    resources.extend(c.resources())
+            self._contained_resources = tuple(resources)
+        return self._resources + self._contained_resources
 
     
 # ======================== Inline content elements ========================
