@@ -1539,6 +1539,7 @@ class MathML(Content):
         
         """
         super(MathML, self).__init__()
+        assert isinstance(content, basestring), content
         self._content = content
 
     def content(self):
@@ -1588,7 +1589,10 @@ class MathML(Content):
             entity_dictionary = self.EntityHandler()
         parser.entity = entity_dictionary
         etree = ElementTree.ElementTree()
-        tree = etree.parse(cStringIO.StringIO(self._content), parser=parser)
+        content = self._content
+        if isinstance(content, unicode):
+            content = content.encode('utf-8')
+        tree = etree.parse(cStringIO.StringIO(content), parser=parser)
         regexp = re.compile('{.*}')
         for e in tree.getiterator():
             match = regexp.match(e.tag)
