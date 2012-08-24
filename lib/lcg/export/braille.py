@@ -70,7 +70,28 @@ class BrailleFormatter(MarkupFormatter):
         else:
             result = self._FORMAT.get(type) or ('', '',)
         return result
-    
+
+_inf = 'infix'
+_pre = 'prefix'
+_pos = 'postfix'
+_mathml_operators = {
+    # operator, form, Braille code, hyphenation
+    '(': (_pre, '⠦', '0',),
+    ')': (_pos, '⠴', '0',),
+    '[': (_pre, '⠠⠦', '00',),
+    ']': (_pos, '⠠⠴', '00',),
+    '{': (_pre, '⠨⠦', '00',),
+    '}': (_pos, '⠨⠴', '00',),
+    '|': (None, '⠸', '3',),
+    '=': (_inf, '⠶', '3',),
+    '<': (_inf, '⠁⠀⠣⠃', '0000',),
+    '>': (_inf, '⠁⠀⠜⠃', '0000',),
+    '+': (None, '⠲', '3',),
+    '-': (None, '⠤', '3',),
+    '±': (None, '⠲⠤', '00',),
+    '∈': (_inf, ' ⠘⠑ ', '0000',),
+    '∉': (_inf, ' ⠈⠘⠑ ', '00000',),
+    }
 
 class BrailleExporter(FileExporter, Exporter):
     """Transforming structured content objects to Braille output.    
@@ -512,10 +533,6 @@ class BrailleExporter(FileExporter, Exporter):
         top = element.tree_content(entity_handler)
         exporters = {}
         flags = []
-        op_translation = {'(': ('⠦', '0'), ')': ('⠴', '0'), '[': ('⠠⠦', '00'), ']': ('⠠⠴', '00'),
-                          '{': ('⠨⠦', '00'), '}': ('⠨⠴', '00'), '|': ('⠸', '3'),
-                          '=': ('⠶', '3'), '<': ('⠁⠀⠣⠃', '0000'), '>': ('⠁⠀⠜⠃', '0000'),
-                          '+': ('⠲', '3'), '-': ('⠤', '3'), '±': ('⠲⠤', '00')}
         def current_style():
             for i in range(len(flags) - 1, -1, -1):
                 if flags[i].startswith('style:'):
@@ -608,7 +625,7 @@ class BrailleExporter(FileExporter, Exporter):
                     elif i == len(children) - 1:
                         op_form = 'postfix'
                     else:
-                        op_form = 'infix'
+                        op_form = _mathml_operators.get((n.text or '').strip(), ('infix',))[0] or 'infix'
                 else:
                     op_form = None
                 if exported and separator:
@@ -638,17 +655,21 @@ class BrailleExporter(FileExporter, Exporter):
             # linebreak = node.getAttribute('linebreak') # auto, newline, nobreak, goodbreak, badbreak
             # linebreakstyle = node.getAttribute('linebreakstyle') # before, after, duplicate, infixlinebreakstyle
             op = node_value(node).strip()
-            translation = op_translation.get(op)
+            translation = _mathml_operators.get(op)
             if translation is None:
                 op_braille, hyphenation = text_export(op, node=node)
             else:
-                op_braille, hyphenation = translation
+                op_form, op_braille, hyphenation = translation
+                if form is None:
+                    form = op_form
             if separator == 'true':
-                op_braille = op_braille + ' '
-                hyphenation = hyphenation + '0'
+                if op_braille[-1] not in (' ', '⠀',):
+                    op_braille = op_braille + '⠀'
+                    hyphenation = hyphenation + '0'
             elif form == 'infix':
-                op_braille = ' ' + op_braille
-                hyphenation = '0' + hyphenation
+                if op_braille[0] not in (' ', '⠀',):
+                    op_braille = '⠀' + op_braille
+                    hyphenation = '0' + hyphenation
             return op_braille, hyphenation
         def export_mtext(node, **kwargs):
             text = node_value(node).strip()

@@ -874,6 +874,15 @@ class BrailleExport(unittest.TestCase):
 ''', u'''⠭⠡⠼⠁⠂⠀⠼⠃⠱⠀⠶⠆⠤⠃⠀⠲⠤⠩
 ⠩⠃⠌⠼⠃⠱⠀⠤⠼⠙⠐⠁⠉⠱⠻⠼⠃⠐⠁⠰''')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msqrt><mn>2</mn></msqrt><mo>+</mo><mroot><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mroot></mrow>
+</math>''', u'⠩⠼⠃⠱⠀⠲⠠⠌⠼⠉⠩⠼⠃⠱')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>x</mi><mo>&#x2208;</mo><mi>R</mi></mrow>
+</math>''', u'⠭⠀⠘⠑⠀⠠⠗')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>x</mi><mo>∈</mo><mi>R</mi></mrow>
+</math>''', u'⠭⠀⠘⠑⠀⠠⠗')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>α</mi><mo>+</mo><mi>β</mi></mrow>
 </math>''', u'⠘⠁⠀⠲⠘⠃')
 
