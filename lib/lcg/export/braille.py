@@ -770,9 +770,16 @@ class BrailleExporter(FileExporter, Exporter):
             hyphenation = '%s00%s0' % (base[1], under[1],)
             return braille, hyphenation
         def export_mover(node, **kwargs):
-            base, over = child_nodes(node, exported=True)
-            braille = '%s⠠⠌%s⠱' % (base[0], over[0],)
-            hyphenation = '%s00%s0' % (base[1], over[1],)
+            base_child, over_child = child_nodes(node)
+            base = export(base_child)
+            if (over_child.tag == 'mo' and over_child.text.strip() == '¯' and
+                base_child.tag == 'mn'):
+                braille = base[0] + base[0] + '⠤'
+                hyphenation = base[1] + base[1] + '0'
+            else:
+                over = export(over_child)
+                braille = '%s⠠⠌%s⠱' % (base[0], over[0],)
+                hyphenation = '%s00%s0' % (base[1], over[1],)
             return braille, hyphenation
         def export_munder_mover(node, **kwargs):
             base, under, over = child_nodes(node, exported=True)
@@ -808,6 +815,11 @@ class BrailleExporter(FileExporter, Exporter):
                 braille = braille[:i] + braille[i+1:]
                 hyphenation = hyphenation[:i] + hyphenation[i+1:]
                 l -= 1
+                if i  < l and braille[i] == '⠼':
+                    # This can happen in periodic numbers (see export_mover)
+                    braille = braille[:i] + braille[i+1:]
+                    hyphenation = hyphenation[:i] + hyphenation[i+1:]
+                    l -= 1
             i += 1
         result = braille, hyphenation
         assert len(result[0]) == len(result[1])
