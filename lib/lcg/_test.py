@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import unittest, os, re, string, datetime
+import unittest, os, re, string, sys, datetime
 import lcg
 
 _ = lcg.TranslatableTextFactory('test')
@@ -811,7 +811,26 @@ class BrailleExport(unittest.TestCase):
         self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs', 'en')
 
     def test_mathml(self):
-        def test(mathml, expected_result):
+        import louis
+        python_version = sys.version_info
+        louis_version = louis.version().split()[0].split('.')
+        can_parse_entities = (python_version[0] >= 3 or
+                             python_version[0] == 2 and python_version[1] >= 7)
+        entity_regexp = re.compile('&[a-zA-Z]+;')
+        def test(mathml, expected_result, min_louis=None):
+            if not can_parse_entities and entity_regexp.search(mathml):
+                return
+            if min_louis:
+                min_louis_list = min_louis.split('.')
+                for i in range(len(min_louis_list)):
+                    if i >= len(louis_version):
+                        break
+                    v_min = int(min_louis_list[i])
+                    v_louis = int(louis_version[i])
+                    if v_min > v_louis:
+                        return
+                    if v_min < v_louis:
+                        break
             content = lcg.MathML(mathml)
             presentation = self._load_presentation()
             presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
@@ -884,7 +903,7 @@ class BrailleExport(unittest.TestCase):
 </math>''', u'⠭⠀⠘⠑⠀⠠⠗')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>α</mi><mo>+</mo><mi>β</mi></mrow>
-</math>''', u'⠘⠁⠀⠲⠘⠃')
+</math>''', u'⠘⠁⠀⠲⠘⠃', min_louis='2.4.2')
 
     def test_inline_mathml(self):
         mathml = u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
