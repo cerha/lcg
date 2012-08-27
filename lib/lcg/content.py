@@ -1546,6 +1546,12 @@ class MathML(Content):
         """Return the XML unicode content given in the constructor."""
         return self._content
 
+    def _str_content(self):
+        content = self._content
+        if isinstance(content, unicode):
+            content = content.encode('utf-8')        
+        return content
+
     def _dom_content(self, element):
         from xml.etree import ElementTree
         top_elements = element.getElementsByTagName('math')
@@ -1578,7 +1584,7 @@ class MathML(Content):
     def _dom_tree_content(self):
         # This can't handle entity references (e.g. &PlusMinus;).
         from xml.dom.minidom import parseString
-        return self._dom_content(parseString(self._content))
+        return self._dom_content(parseString(self._str_content()))
         
     def _tree_content(self, entity_dictionary):
         from xml.etree import ElementTree
@@ -1589,9 +1595,7 @@ class MathML(Content):
             entity_dictionary = self.EntityHandler()
         parser.entity = entity_dictionary
         etree = ElementTree.ElementTree()
-        content = self._content
-        if isinstance(content, unicode):
-            content = content.encode('utf-8')
+        content = self._str_content()
         tree = etree.parse(cStringIO.StringIO(content), parser=parser)
         regexp = re.compile('{.*}')
         for e in tree.getiterator():
