@@ -904,7 +904,7 @@ class BrailleExport(unittest.TestCase):
 </math>''', u'⠭⠀⠘⠑⠀⠠⠗')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>α</mi><mo>+</mo><mi>β</mi></mrow>
-</math>''', u'⠘⠁⠀⠲⠘⠃', min_louis='2.4.2')
+</math>''', u'⠘⠁⠀⠲⠘⠃')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>2,</mn><mover accent="true"><mn>32</mn><mo>&macr;</mo></mover></mrow>
 </math>''', u'⠼⠃⠂⠉⠃⠉⠃⠤')
