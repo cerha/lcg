@@ -309,6 +309,8 @@ class BrailleExporter(FileExporter, Exporter):
     def concat(self, *items):
         return string.join([i[0] for i in items], ''), string.join([i[1] for i in items], '')
 
+    _per_cent_regexp = re.compile('([ ⠀]+)⠼[⠏⠗]')
+    
     def text(self, context, text, lang=None):
         """Return 'text' converted to Unicode Braille characters.
 
@@ -400,6 +402,15 @@ class BrailleExporter(FileExporter, Exporter):
                 else:
                     hyphenation += louis.hyphenate(hyphenation_tables,
                                                    braille_text[start:end], mode=1)
+        # Per cent & per mille formatting may not work properly for Czech in
+        # liblouis so let's fix it here:
+        while True:
+            match = self._per_cent_regexp.search(braille)
+            if not match:
+                break
+            start, end = match.span(1)
+            braille = braille[:start] + braille[end:]
+            hyphenation = hyphenation[:start] + hyphenation[end:]            
         assert len(braille) == len(hyphenation), (braille, hyphenation,)
         return braille, hyphenation
 
@@ -815,7 +826,7 @@ class BrailleExporter(FileExporter, Exporter):
                 braille = braille[:i] + braille[i+1:]
                 hyphenation = hyphenation[:i] + hyphenation[i+1:]
                 l -= 1
-                if i  < l and braille[i] == '⠼':
+                if i + 1 < l and braille[i] == '⠼' and braille[i+1] not in '⠏⠗':
                     # This can happen in periodic numbers (see export_mover)
                     braille = braille[:i] + braille[i+1:]
                     hyphenation = hyphenation[:i] + hyphenation[i+1:]

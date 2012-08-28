@@ -810,6 +810,10 @@ class BrailleExport(unittest.TestCase):
         presentation = self._load_presentation()
         self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs', 'en')
 
+    def test_special_formatting(self):
+        presentation = self._load_presentation()
+        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs')
+    
     def test_mathml(self):
         import louis
         python_version = sys.version_info
