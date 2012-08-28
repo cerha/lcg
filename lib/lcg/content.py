@@ -1552,7 +1552,7 @@ class MathML(Content):
         
         """
         super(MathML, self).__init__()
-        assert isinstance(content, basestring), content
+        assert isinstance(content, unicode), content
         self._content = content
 
     def content(self):
@@ -1561,8 +1561,27 @@ class MathML(Content):
 
     def _str_content(self):
         content = self._content
-        if isinstance(content, unicode):
-            content = content.encode('utf-8')        
+        # Unfortunately even the etree parser doesn't work very well with
+        # "custom" entities -- it discards them in attributes.  So we have to
+        # expand the entities manualy.
+        regexp = re.compile('&([a-zA-Z]+);')
+        i = 0
+        while True:
+            match = regexp.search(content[i:], re.M)
+            if not match:
+                break
+            entity = match.group(1)
+            start, end = match.span()
+            if entity in ('amp', 'lt', 'gt', 'quot', 'apos', 'bsol', 'newline',):
+                i += end
+            else:
+                expansion = entities.entities.get(entity)
+                if expansion is None:
+                    i += end
+                else:
+                    content = content[:i+start] + expansion + content[i+end:]
+                    i += start + len(expansion)
+        content = content.encode('utf-8')        
         return content
 
     def _dom_content(self, element):
