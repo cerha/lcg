@@ -370,13 +370,14 @@ class BrailleExporter(FileExporter, Exporter):
                                                    braille_text[start:end], mode=1)
         # Per cent & per mille formatting may not work properly for Czech in
         # liblouis so let's fix it here:
-        while True:
-            match = self._per_cent_regexp.search(braille)
-            if not match:
-                break
-            start, end = match.span(1)
-            braille = braille[:start] + braille[end:]
-            hyphenation = hyphenation[:start] + hyphenation[end:]            
+        if lang == 'cs':
+            while True:
+                match = self._per_cent_regexp.search(braille)
+                if not match:
+                    break
+                start, end = match.span(1)
+                braille = braille[:start] + braille[end:]
+                hyphenation = hyphenation[:start] + hyphenation[end:]            
         assert len(braille) == len(hyphenation), (braille, hyphenation,)
         return braille, hyphenation
 
