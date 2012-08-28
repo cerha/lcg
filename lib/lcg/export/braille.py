@@ -574,6 +574,8 @@ class BrailleExporter(FileExporter, Exporter):
             if exported:
                 children = [export(c) for c in children]
             return children
+        def attribute(node, name, default=None):
+            return node.attrib.get(name, default)
         def text_export(text, node=None):
             if node is not None:
                 set_style(node)
@@ -595,7 +597,7 @@ class BrailleExporter(FileExporter, Exporter):
             if e is None:
                 result = text_export('<%s>' % (tag,))
             else:
-                variant = node.get('mathvariant')
+                variant = attribute(node, 'mathvariant')
                 if variant:
                     bold = variant.find('bold') >= 0
                     italic = variant.find('italic') >= 0
@@ -650,12 +652,12 @@ class BrailleExporter(FileExporter, Exporter):
             hyphenation += '0'
             return braille, hyphenation
         def export_mo(node, op_form=None, **kwargs):
-            form = node.get('form', op_form) # prefix, infix, postfix
-            separator = node.get('separator') # true, false
+            form = attribute(node, 'form', op_form) # prefix, infix, postfix
+            separator = attribute(node, 'separator') # true, false
             # We should probably ignore these as Braille script has its own
             # rules of math line breaking:
-            # linebreak = node.getAttribute('linebreak') # auto, newline, nobreak, goodbreak, badbreak
-            # linebreakstyle = node.getAttribute('linebreakstyle') # before, after, duplicate, infixlinebreakstyle
+            # linebreak = attribute(node, 'linebreak') # auto, newline, nobreak, goodbreak, badbreak
+            # linebreakstyle = attribute(node, 'linebreakstyle') # before, after, duplicate, infixlinebreakstyle
             op = node_value(node).strip()
             translation = _mathml_operators.get(op)
             if translation is None:
@@ -715,7 +717,7 @@ class BrailleExporter(FileExporter, Exporter):
             hyphenation = '00%s3%s0' % (root[1], base[1],)
             return braille, hyphenation
         def export_mstyle(node, **kwargs):
-            break_style = node.get('infixlinebreakstyle')
+            break_style = attribute(node, 'infixlinebreakstyle')
             if break_style: # before, after, duplicate
                 flags.append('infixlinebreakstyle:' + break_style)
             set_style(node)
@@ -733,9 +735,9 @@ class BrailleExporter(FileExporter, Exporter):
             n = len(exported)
             return '⠀' * n, '0' * n
         def export_mfenced(node, **kwargs):
-            open_string = node.get('open', '(')
-            close_string = node.get('close', ')')
-            separator = node.get('separator')
+            open_string = attribute(node, 'open', '(')
+            close_string = attribute(node, 'close', ')')
+            separator = attribute(node, 'separator')
             if separator:
                 if separator == ',':
                     # It's not clear what we should do with spaces in separators.
@@ -789,7 +791,7 @@ class BrailleExporter(FileExporter, Exporter):
             hyphenation = '%s00%s000%s0' % (base[1], under[1], over[1],)
             return braille, hyphenation
         def export_maction(node, **kwargs):
-            selection = node.get('selection')
+            selection = attribute(node, 'selection')
             if not selection:
                 selection = 1
             return export(child_nodes(node)[selection-1])
