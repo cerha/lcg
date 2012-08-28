@@ -22,11 +22,13 @@ from __future__ import unicode_literals
 """
 
 import copy
+import re
 import string
 
 import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource
+import entities
 
 _inf = 'infix'
 _pre = 'prefix'
@@ -451,14 +453,14 @@ class BrailleExporter(FileExporter, Exporter):
         if lang is not None:
             orig_lang = context.set_lang(lang)
         if form is not None:
-            orig_form = context.add_form(form)
+            context.set_form(form)
         if hyphenate is not None:
             orig_hyphenate = context.set_hyphenate(hyphenate)
         exported = self._export_container(context, element)
         if hyphenate is not None:
             context.set_hyphenate(orig_hyphenate)
         if form is not None:
-            context.set_form(orig_form)
+            context.unset_form()
         if lang is not None:
             context.set_lang(orig_lang)
         return exported
