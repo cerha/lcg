@@ -839,7 +839,8 @@ class BrailleExport(unittest.TestCase):
             context = exporter.context(n, lang='cs', presentation=presentation_set)
             exported = exporter.export(context)
             result = exported.split('\n\n')[1]
-            assert result == expected_result, (mathml, expected_result, result,)
+            assert result == expected_result, ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+                                               (mathml, expected_result, result,))
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,14</mn></mrow>
 </math>''', u'⠼⠉⠂⠁⠙')
