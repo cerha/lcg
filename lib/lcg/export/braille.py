@@ -578,11 +578,29 @@ class BrailleExporter(FileExporter, Exporter):
             return node.attrib.get(name, default)
         def op_translation(operator, node=None):
             translation = _mathml_operators.get(operator)
-            if translation is None:
-                op_braille, hyphenation = text_export(operator, node=node)
-                op_form = None
+            op_form = None if translation is None else translation[0]
+            op_braille, hyphenation = text_export(operator, node=node)
+            # We prefer using liblouis translation since it should be the
+            # primary source of Braille formatting and it should work for more
+            # languages than just Czech.  But it returns something like
+            # character code on unknown characters, we try to identify and
+            # handle such a situation here.
+            if ((not op_braille or op_braille.find(u'⠈⠀⠭') >= 0) and
+                translation is not None):
+                __, op_braille, hyphenation = translation
             else:
-                op_form, op_braille, hyphenation = translation
+                # We use our own hyphenation rules, just to be sure (at least
+                # for Czech).
+                if len(op_braille) == 1:
+                    hyphenation = '3'
+                else:
+                    hyphenation = '0' * len(op_braille)
+            if translation is not None:
+                t_braille = translation[1]
+                if t_braille[-1] in (' ', '⠀',) and op_braille[-1] not in (' ', '⠀',):
+                    # We don't handle spacing in liblouis yet.
+                    op_braille += '⠀'
+                    hyphenation += '3'
             return op_form, op_braille, hyphenation
         def text_export(text, node=None):
             if node is not None:
