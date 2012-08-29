@@ -910,6 +910,12 @@ class BrailleExport(unittest.TestCase):
 <mrow><mi>α</mi><mo>+</mo><mi>β</mi></mrow>
 </math>''', u'⠘⠁⠀⠲⠘⠃')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfrac><mrow><mn>5</mn></mrow><mrow><mn>6</mn></mrow></mfrac><mo>-</mo><mfrac><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>5</mn><mo>-</mo><mn>4</mn></mrow><mrow><mn>6</mn></mrow></mfrac></mrow>
+</math>''', u'⠆⠼⠑⠻⠼⠋⠰⠀⠤⠆⠼⠃⠻⠼⠉⠰⠀⠶\n⠶⠆⠼⠑⠀⠤⠼⠙⠻⠼⠋⠰')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>5</mn><mfrac><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mfrac></mrow>
+</math>''', u'⠼⠑⠆⠼⠃⠻⠼⠉⠰')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>2,</mn><mover accent="true"><mn>32</mn><mo>&macr;</mo></mover></mrow>
 </math>''', u'⠼⠃⠂⠉⠃⠉⠃⠤')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
