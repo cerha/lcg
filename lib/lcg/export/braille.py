@@ -532,7 +532,7 @@ class BrailleExporter(FileExporter, Exporter):
             def __getitem__(self, key):
                 return self._data.get(key, '?')
         entity_handler = EntityHandler()
-        top = element.tree_content(entity_handler)
+        top = element.tree_content(entity_handler, transform=True)
         exporters = {}
         flags = []
         def current_style():
@@ -576,6 +576,14 @@ class BrailleExporter(FileExporter, Exporter):
             return children
         def attribute(node, name, default=None):
             return node.attrib.get(name, default)
+        def op_translation(operator, node=None):
+            translation = _mathml_operators.get(operator)
+            if translation is None:
+                op_braille, hyphenation = text_export(operator, node=node)
+                op_form = None
+            else:
+                op_form, op_braille, hyphenation = translation
+            return op_form, op_braille, hyphenation
         def text_export(text, node=None):
             if node is not None:
                 set_style(node)
@@ -614,11 +622,9 @@ class BrailleExporter(FileExporter, Exporter):
                 if variant:
                     flags.pop()
             return result
-        def child_export(node, separator=None):
+        def child_export(node, separators=None):
             exported = ''
             hyphenation = ''
-            if separator:
-                hyph_separator = '3' if len(separator == 1) else '0' * len(separator)
             children = child_nodes(node)
             op_form = None
             for i in range(len(children)):
@@ -632,8 +638,10 @@ class BrailleExporter(FileExporter, Exporter):
                         op_form = _mathml_operators.get((n.text or '').strip(), ('infix',))[0] or 'infix'
                 else:
                     op_form = None
-                if exported and separator:
+                if exported and separators:
+                    separator = separators[-1] if i > len(separators) else separators[i-1]
                     exported += separator
+                    hyph_separator = '3' if len(separator) == 1 else '0' * len(separator)
                     hyphenation += hyph_separator
                 e, h = export(n, op_form=op_form)
                 exported += e
@@ -659,13 +667,9 @@ class BrailleExporter(FileExporter, Exporter):
             # linebreak = attribute(node, 'linebreak') # auto, newline, nobreak, goodbreak, badbreak
             # linebreakstyle = attribute(node, 'linebreakstyle') # before, after, duplicate, infixlinebreakstyle
             op = node_value(node).strip()
-            translation = _mathml_operators.get(op)
-            if translation is None:
-                op_braille, hyphenation = text_export(op, node=node)
-            else:
-                op_form, op_braille, hyphenation = translation
-                if form is None:
-                    form = op_form
+            op_form, op_braille, hyphenation = op_translation(op)
+            if form is None and op_form is not None:
+                form = op_form
             if separator == 'true':
                 if op_braille[-1] not in (' ', '⠀',):
                     op_braille = op_braille + '⠀'
@@ -734,23 +738,6 @@ class BrailleExporter(FileExporter, Exporter):
             exported, hyphenation = child_export(node)
             n = len(exported)
             return '⠀' * n, '0' * n
-        def export_mfenced(node, **kwargs):
-            open_string = attribute(node, 'open', '(')
-            close_string = attribute(node, 'close', ')')
-            separator = attribute(node, 'separator')
-            if separator:
-                if separator == ',':
-                    # It's not clear what we should do with spaces in separators.
-                    # But it's clear that at least comma should be transformed
-                    # to a spaced version to distinguish it from decimal point.
-                    separator = ', '
-                separator = text_export(separator, node=node)[0]
-            exported, e_hyphenation = child_export(node, separator=separator)
-            open_braille, o_hyphenation = text_export(open_string, node=node)
-            close_braille, c_hyphenation = text_export(close_string, node=node)
-            braille = open_braille + exported + close_braille
-            hyphenation = o_hyphenation + e_hyphenation + c_hyphenation
-            return braille, hyphenation
         def export_menclose(node, **kwargs):
             return child_export(node)
         def export_msub(node, **kwargs):

@@ -912,6 +912,12 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>2,</mn><mover accent="true"><mn>32</mn><mo>&macr;</mo></mover></mrow>
 </math>''', u'⠼⠃⠂⠉⠃⠉⠃⠤')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfenced open="&langle;" close="&rangle;" separators="|"><mi>a</mi><mi>b</mi><mi>c</mi></mfenced></mrow>
+</math>''', u'⠈⠣⠁⠸⠀⠃⠸⠀⠉⠈⠜')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfenced open="&langle;" close="&rangle;" separators=","><mi>a</mi><mi>b</mi></mfenced></mrow>
+</math>''', u'⠈⠣⠁⠂⠀⠃⠈⠜')
 
     def test_inline_mathml(self):
         mathml = u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">

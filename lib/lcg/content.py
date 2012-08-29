@@ -1635,8 +1635,30 @@ class MathML(Content):
             if match:
                 e.tag = e.tag[match.end():]
         return tree
+
+    def _transform_content(self, math):
+        from xml.etree import ElementTree
+        math = math.copy()
+        for node in math.getiterator('mfenced'):
+            opening = node.attrib.get('open', '(')
+            closing = node.attrib.get('close', ')')
+            separators = node.attrib.get('separators', ',').split()
+            children = node.getchildren()
+            node.clear()
+            node.tag = 'mrow'
+            ElementTree.SubElement(node, 'mo', dict(fence='true')).text = opening
+            mrow = ElementTree.SubElement(node, 'mrow')
+            i = 0
+            for c in children:
+                if separators and i > 0:
+                    s = separators[-1] if i > len(separators) else separators[i-1]
+                    ElementTree.SubElement(mrow, 'mo', dict(separator='true')).text = s
+                mrow.append(c)
+                i += 1
+            ElementTree.SubElement(node, 'mo', dict(fence='true')).text = closing
+        return math
         
-    def tree_content(self, entity_dictionary=None):
+    def tree_content(self, entity_dictionary=None, transform=False):
         """Return a parsed 'xml.etree.ElementTree' instance of the math content.
 
         Arguments:
@@ -1647,6 +1669,8 @@ class MathML(Content):
             completely implementation dependent.  Typical values may be
             unchanged entity names or unicodes corresponding to the given
             entities.  If not given, 'MathML.EntityHandler' instance is used.
+          transform -- iff true then expand elements which can be expressed
+            using other elements (e.g. mfenced)
 
         """
         try:
@@ -1654,10 +1678,14 @@ class MathML(Content):
         except AttributeError:
             # Python < 2.7
             tree = self._dom_tree_content()
-        for e in tree.getiterator('math'):
-            return e
-        raise Exception("No math element found", tree)
-
+        try:
+            math = tree.getiterator('math').pop()
+        except IndexError:
+            raise Exception("No math element found", tree)
+        if transform:
+            math = self._transform_content(math)
+        return math
+    
 
 # Convenience functions for simple content construction.
 
