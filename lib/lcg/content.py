@@ -34,6 +34,8 @@ the hierarchy of the nodes themselves.
 
 """
 
+import copy
+
 from lcg import *
 
 _ = TranslatableTextFactory('lcg')
@@ -1638,7 +1640,7 @@ class MathML(Content):
 
     def _transform_content(self, math):
         from xml.etree import ElementTree
-        math = math.copy()
+        math = copy.copy(math)
         for node in math.getiterator('mfenced'):
             opening = node.attrib.get('open', '(')
             closing = node.attrib.get('close', ')')
