@@ -1641,6 +1641,19 @@ class MathML(Content):
     def _transform_content(self, math):
         from xml.etree import ElementTree
         math = copy.copy(math)
+        for node in math.getiterator():
+            children = node.getchildren()
+            for i in range(len(children)):
+                c = children[i]
+                if c.tag == 'semantics':
+                    c_children = c.getchildren()
+                    if c_children:
+                        node.insert(i, c_children[0])
+                        node.remove(c)
+                    else:
+                        # Not valid, but let's handle it some way
+                        c.clear()
+                        c.tag = 'mrow'
         for node in math.getiterator('mfenced'):
             opening = node.attrib.get('open', '(')
             closing = node.attrib.get('close', ')')
