@@ -19,9 +19,12 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import copy
+import HTMLParser
+import htmlentitydefs
 import re
 import string
 import types
+import xml.etree.ElementTree
 
 from lcg import *
 
@@ -1030,6 +1033,337 @@ class MacroParser(object):
             else:
                 current.append(t)
         return unicode(result)
+
+
+class HTMLProcessor(object):
+    """Convertor from LCG HTML to LCG Content.
+
+    LCG HTML is an HTML text in the form defined here.  The following rules
+    apply (this is just a starting set for now, to be expanded in future):
+
+    - 'h*' elements introduce new sections.  The element content makes a
+      section title while all following elements until the next 'h*' element of
+      the same or higher level (or the end of the HTML text) make the section
+      content.
+
+    The conversion process consists of two basic parts: HTML parsing and
+    transforming the parsed content to LCG Content structures.  HTML parsing
+    creates an etree structure corresponding to the input HTML.  Tag elements
+    are represented by etree Elements; text elements are represented by etree
+    Elements with special tag '_text'.  'math' element is handled in a special
+    way.  The parsing process is performed by '_HTMLParser' inner class and
+    here is probably nothing you would need to customize there.
+
+    The more interesting part is transformation of the resulting etree to LCG
+    structures.  It is performed by '_Transformer' inner class.  By changing or
+    subclassing it you can influence the transformation process.
+
+    The most important customization method is '_Transformer._matchers' which
+    defines the transformation rules.  The method returns sequence of pairs
+    (MATCHER, HANDLER).  MATCHER is a tuple of the form (TAG-REGEXP,
+    (ATTRIBUTE-NAME, ATTRIBUTE-REGEXP), ...).  TAG-REGEXP is a regular
+    expression matching the whole tag name; ATTRIBUTE-REGEXP is a regular
+    expression matching the whole value of attribute ATTRIBUTE-NAME, undefined
+    attributes are handled as empty strings.  Alternatively MATCHER can be also
+    a function of single argument, the element, returning True iff the element
+    matches.  The first matching pair is used for transformation of each of the
+    elements.  It is an error if an element doesn't match any of the matchers
+    -- such elements couldn't be transformed.
+
+    HANDLER is a pair of the form (FUNCTION, KWARGS).  Function is a function
+    of two non-optional arguments: The handled element and a sequence of the
+    following elements (siblings) on the same level (this argument is useful
+    when the content of the corresponding LCG element consists not only of the
+    handled element but also from some elements following it, e.g. in case of
+    sections).  Dictionary of additional KWARGS to be passed to the called
+    function may be provided.  The handler function is responsible for
+    processing element's subelements, typically '_Transformer.transform' method
+    is applied on them and the returned 'Content' instances are inserted into
+    the transformed element.  Several typical handling functions (methods) are
+    predefined in '_Transformer' class.
+
+    """
+
+    class _HTMLParser(HTMLParser.HTMLParser):
+
+        def reset(self):
+            HTMLParser.HTMLParser.reset(self)
+            self._hp_tree = xml.etree.ElementTree.Element('html')
+            self._hp_elements = [self._hp_tree]
+            self._hp_open_tags = []
+            self._hp_current_text = ''
+            self._hp_raw = False
+
+        def _hp_finish_text(self):
+            if self._hp_current_text:
+                element = xml.etree.ElementTree.SubElement(self._hp_elements[-1], '_text')
+                element.text = self._hp_current_text
+                self._hp_current_text = ''
+
+        def handle_starttag(self, tag, attrs):
+            if self._hp_raw:
+                self._hp_current_text += self.get_starttag_text()
+                return
+            self._hp_finish_text()
+            if tag == 'math':
+                if not self._hp_raw and self._hp_current_text:
+                    element = xml.etree.ElementTree.SubElement(self._hp_elements[-1], '_text')
+                    element.text = self._hp_current_text
+                self._hp_raw = True
+            if self._hp_raw:
+                self._hp_current_text = self.get_starttag_text()
+            element = xml.etree.ElementTree.SubElement(self._hp_elements[-1], tag, dict(attrs))
+            self._hp_elements.append(element)
+            self._hp_open_tags.append(tag)
+
+        def handle_endtag(self, tag):
+            if self._hp_raw:
+                self._hp_current_text += '</%s>' % (tag,)
+                if tag != self._hp_open_tags[-1]:
+                    return
+            while self._hp_open_tags[-1] != tag:
+                self.handle_endtag(self._hp_open_tags[-1])
+            if self._hp_raw:
+                self._hp_elements[-1].text = self._hp_current_text
+                self._hp_current_text = ''
+            else:
+                self._hp_finish_text()
+            self._hp_elements.pop()
+            self._hp_open_tags.pop()
+            self._hp_raw = False
+
+        def handle_data(self, data):
+            self._hp_current_text += data
+
+        def handle_charref(self, name):
+            expanded = unichr(int(name))
+            self.handle_data(expanded)
+            
+        def handle_entityref(self, name):
+            if self._hp_raw:
+                self._handle_data('&'+name+';')
+            else:
+                expanded = htmlentitydefs.entitydefs[name]
+                if expanded[0] == '&' and expanded[-1] == ';':
+                    self.handle_charref(expanded)
+                else:
+                    self.handle_data(unicode(expanded, 'iso-8859-1'))
+
+        def close(self):
+            while self._open_tags:
+                self.handle_endtag(self._open_tags[-1])
+            HTMLParser.HTMLParser.close()
+
+        def tree(self):
+            return self._hp_tree
+
+    class _Transformer(object):
+
+        def __init__(self):
+            object.__init__(self)
+            self._make_matchers()
+            self._in_table_heading = False
+
+        def _matchers(self):
+            return (
+                (('div', ('style', '.*page-break-after: always;.*')), (self._single, dict(class_=NewPage))),
+                ('(html|div|span|strike|li|dt|dd)', self._container),
+                ('p', (self._container, dict(class_=Paragraph))),
+                ('blockquote', (self._container, dict(class_=Citation))),
+                ('strong', (self._container, dict(class_=Strong))),
+                ('em', (self._container, dict(class_=Emphasized))),
+                ('u', (self._container, dict(class_=Underlined))),
+                ('sub', (self._container, dict(class_=Subscript))),
+                ('sup', (self._container, dict(class_=Superscript))),
+                ('h[0-9]', self._section),
+                ('pre', (self._text, dict(class_=PreformattedText))),
+                ('ul', (self._list, dict(order=None))),
+                (('ol', ('style', '.* lower-alpha;.*')), (self._list, dict(order=ItemizedList.LOWER_ALPHA))),
+                (('ol', ('style', '.* upper-alpha;.*')), (self._list, dict(order=ItemizedList.UPPER_ALPHA))),
+                ('ol', (self._list, dict(order=ItemizedList.NUMERIC))),
+                ('dl', self._definition_list),
+                (('a', ('name', '.+')), self._anchor),
+                ('a', self._link),
+                ('table', self._table),
+                ('tr', (self._container, dict(class_=TableRow))),
+                ('t[dh]', self._table_cell),
+                ('hr', (self._single, dict(class_=HorizontalSeparator))),
+                ('math', (self._plain, dict(class_=MathML))),
+                ('_text', self._text),
+                )
+
+        def _first_text(self, element):
+            text = element.text
+            if text:
+                return text
+            for c in element.getchildren():
+                text = self._first_text(c)
+                if text:
+                    return text
+            return ''
+
+        def _transform_sub(self, obj, nowhitespace=True):
+            if isinstance(obj, xml.etree.ElementTree.Element):
+                obj = obj.getchildren()
+            content = [self.transform(c) for c in obj]
+            if nowhitespace:
+                content = [c for c in content if not isinstance(c, TextContent) or c.text().strip()]
+            return content
+
+        def _container(self, element, followers, class_=Container):
+            content = self._transform_sub(element)
+            return class_(content)
+
+        def _section(self, element, followers):
+            level = element.tag[1]
+            followers = copy.copy(followers)
+            section_children = []
+            while followers:
+                c = followers[0]
+                if c.tag[0] == 'h' and c.tag[1] <= level:
+                    break
+                section_children.append(c)
+                followers.pop(0)
+            title_content = self._transform_sub(section_children)
+            if title_content:
+                title_content = Content(title_content)
+            else:
+                title_content = None
+            text_title = self._first_text(element)
+            content = self._transform_sub(followers)
+            return Section(text_title, content, heading=title_content)
+
+        def _list(self, element, followers, order=None):
+            items = self._transform_sub(element)
+            return ItemizedList(items, order=order)
+
+        def _definition_list(self, element, followers):
+            items = self._transform_sub(element)
+            paired_items = []
+            while items:
+                paired_items.append((items.pop(0), items.pop(0),))
+            return DefinitionList(paired_items)
+
+        def _text(self, element, followers, class_=TextContent):
+            return class_(self._first_text(element))
+
+        def _plain(self, element, followers, class_=Content):
+            return class_(element.text)
+
+        def _single(self, element, followers, class_=Content):
+            return class_()
+
+        def _anchor(self, element, followers):
+            name = element.attrib['name']
+            text = self._first_text(element)
+            return Anchor(anchor=name, text=text)
+
+        def _link(self, element, followers):
+            target = element.attrib['href']
+            label = Container(self._transform_sub(element))
+            return Link(target=target, label=label)
+
+        def _table(self, element, followers):
+            content = []
+            title = None
+            for c in element.getchildren():
+                tag = c.tag
+                if tag == 'caption':
+                    title = self._first_text(c).strip()
+                elif tag == 'thead':
+                    self._in_table_heading = True
+                    content += self._transform_sub(c.getchildren())
+                    self._in_table_heading = False
+                elif tag == 'tbody':
+                    content += self._transform_sub(c.getchildren())
+            return Table(content, title=title)
+
+        def _table_cell(self, element, followers):
+            content = Container(self._transform_sub(element))
+            style = element.attrib.get('style', '')
+            align = None
+            if style.find('text-align: left;') >= 0:
+                align = TableCell.LEFT
+            elif style.find('text-align: right;') >= 0:
+                align = TableCell.RIGHT
+            elif style.find('text-align: center;') >= 0:
+                align = TableCell.CENTER
+            class_ = TableHeading if self._in_table_heading else TableCell
+            return class_(content, align=align)
+
+        def _make_matchers(self):
+            matchers = self._matchers()
+            compiled_matchers = []
+            for test, handler in matchers:
+                if isinstance(test, basestring):
+                    test = (test,)
+                if isinstance(test, (tuple, list,)):
+                    tag_regexp = re.compile(test[0]+'$')
+                    attr_tests = [(a, re.compile(r),) for a, r in test[1:]]
+                    def test_function(element, tag_regexp=tag_regexp, attr_tests=attr_tests):
+                        if not tag_regexp.match(element.tag):
+                            return False
+                        for attr, regexp in attr_tests:
+                            try:
+                                value = element.attrib[attr]
+                            except KeyError:
+                                return False
+                            if not regexp.match(value+'$'):
+                                return False
+                        return True
+                elif isinstance(test, collections.Callable):
+                    test_function = test
+                else:
+                    raise Exception("Invalid matcher test specification", test)
+                if not isinstance(handler, (tuple, list,)):
+                    handler = (handler, {})
+                compiled_matchers.append((test_function, handler))
+            self._compiled_matchers = compiled_matchers
+
+        def transform(self, element):
+            for test, handler in self._compiled_matchers:
+                if test(element):
+                    function, kwargs = handler
+                    return function(element, (), **kwargs)
+            raise Exception("No transformation available for element", element)
+
+    def _tree_content(self, html):
+        parser = self._HTMLParser()
+        parser.feed(html)
+        return parser.tree()
+
+    def _lcg_content(self, tree):
+        transformer = self._Transformer()
+        return transformer.transform(tree)
+
+    def html2lcg(self, html):
+        """Return LCG Content corresponding to given LCG 'html'.
+
+        Arguments:
+
+          html -- unicode containing input LCG HTML
+          
+        """
+        assert isinstance(html, unicode), html
+        tree = self._tree_content(html)
+        lcg = self._lcg_content(tree)
+        return lcg
+
+
+def html2lcg(html):
+    """Convenience function to convert LCG HTML to LCG Content.
+
+    Arguments:
+
+      html -- unicode containing input LCG HTML
+
+    Return corresponding 'Content' instance.
+    
+    See 'HTMLProcessor' for more information and information about LCG HTML.
+
+    """
+    processor = HTMLProcessor()
+    return processor.html2lcg(html)
 
 
 def add_processing_info(exception, caption, information):

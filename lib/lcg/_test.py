@@ -616,6 +616,98 @@ class MacroParser(unittest.TestCase):
 tests.add(MacroParser)
 
 
+class HtmlImport(unittest.TestCase):
+
+    def test_html(self):
+        html = u''' <p>
+         some text <span class="lcg-mathml" contenteditable="false" style="display: inline-block;"><math contenteditable="false" style="display:inline-block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mstyle><annotation encoding="ASCII">x^2 + y^2</annotation></semantics></math></span></p>
+ <ol start="1" style="list-style-type: lower-alpha;">
+         <li>
+                 jedna</li>
+         <li>
+                 dvě</li>
+ </ol>
+ <ul>
+         <li>
+                 psi</li>
+         <li>
+                 kočky</li>
+ </ul>
+ <ol>
+         <li>
+                 za prvé</li>
+         <li>
+                 za druhé</li>
+ </ol>
+ <hr />
+ <p>
+         Písmo <strong>tučné</strong>, <em>zvýrazněné</em>, <u>podtržené</u>, <strike>škrtnuté</strike>, index<sub>dolní</sub> , index<sup>horní</sup>.</p>
+ <h1>
+         Sekce nová</h1>
+ <p>
+         Odstavec sekce.</p>
+ <pre>
+ předformátovaný 
+ řádkovaný text</pre>
+ <div>
+         obecný blok</div>
+ <p>
+         a zase jeden odstavec</p>
+ <p>
+         <a href="http://www.brailcom.org">Vložíme link na http://www.brailcom.org</a>, a uděláme <a name="kotva">kotvu</a>.</p>
+ <p>
+         Teď se odkážeme na tu <a href="#kotva">kotvu</a>. Budeme taky <a href="mailto:info@brailcom.org?subject=LCG%20testing">mailovat</a>.</p>
+ <h1>
+         Další sekce</h1>
+ <p style="text-align: center;">
+         Odstavec na střed.</p>
+ <blockquote>
+         <p>
+                 Hello, world!</p>
+ </blockquote>
+ <p style="text-align: right;">
+         anonymous</p>
+ <div style="page-break-after: always;">
+         <span style="display: none;">&nbsp;</span></div>
+ <table border="1" cellpadding="1" cellspacing="1" style="width: 500px;">
+         <caption>
+                 tabulka</caption>
+         <thead>
+                 <tr>
+                         <th scope="col">
+                                 a</th>
+                         <th scope="col">
+                                 b</th>
+                 </tr>
+         </thead>
+         <tbody>
+                 <tr>
+                         <td>
+                                 c</td>
+                         <td style="text-align: right;">
+                                 d</td>
+                 </tr>
+                 <tr>
+                         <td>
+                                 e</td>
+                         <td>
+                                 f</td>
+                 </tr>
+         </tbody>
+ </table>
+ '''
+        content = lcg.html2lcg(html)
+        p = lcg.ResourceProvider()
+        sec = lcg.Section("Section One", anchor='sec1', content=lcg.Content())
+    	n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+                            content=lcg.Container((sec,)), resource_provider=p)
+        context = lcg.HtmlExporter().context(n, None)
+        content.set_parent(n)
+        content.export(context)
+
+tests.add(HtmlImport)
+
+
 class HtmlExport(unittest.TestCase):
     
     def test_formatting(self):
