@@ -528,7 +528,7 @@ class Anchor(TextContent):
           text -- text of the target place as a string or unicode.
 
         """
-        assert isinstance(anchor, str)
+        assert isinstance(anchor, basestring), anchor
         self._anchor = anchor
         super(Anchor, self).__init__(text, **kwargs)
 
