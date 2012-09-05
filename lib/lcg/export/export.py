@@ -932,10 +932,10 @@ class Exporter(object):
     def _export_mathml(self, context, element):
         """Export 'MathML' element.
 
-        In this class the method returns just an empty unicode.
+        In this class the method returns the raw MathML content.
         
         """
-        return u''
+        return element.content()
     
         
 class FileExporter(object):
