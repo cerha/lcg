@@ -1742,6 +1742,16 @@ def coerce(content, formatted=False):
         assert isinstance(content, Content), ('Invalid content', content,)
         return content
 
+def join(items, separator=' '):
+    """Coerce all items and put the coerced separator in between them."""
+    sep = coerce(separator)
+    result = []
+    for item in items:
+        if result:
+            result.append(sep)
+        result.append(coerce(item))
+    return coerce(result)
+
 def link(target, label=None, type=None, descr=None):
     """Return a 'Link' instance.
 
@@ -1794,39 +1804,32 @@ def fieldset(pairs, title=None, formatted=False):
     fields = [(coerce(label), coerce(value, formatted=formatted)) for label, value in pairs]
     return FieldSet(fields, title=title)
 
+def _container(container, items, formatted=False, **kwargs):
+    return Paragraph([coerce(item, formatted=formatted) for item in items], **kwargs)
+
 def p(*items, **kwargs):
     """Create a 'Paragraph' by coercing all arguments."""
-    return Paragraph([coerce(item, **kwargs) for item in items])
-
-def join(items, separator=' '):
-    """Coerce all items and put the coerced separator in between them."""
-    sep = coerce(separator)
-    result = []
-    for item in items:
-        if result:
-            result.append(sep)
-        result.append(coerce(item))
-    return coerce(result)
+    return _container(Paragraph, items, **kwargs)
 
 def strong(*items, **kwargs):
     """Create a 'Strong' instance by coercing all arguments."""
-    return Strong([coerce(item, **kwargs) for item in items])
+    return _container(Strong, items, **kwargs)
 
 def em(*items, **kwargs):
     """Create an 'Emphasized' instance by coercing all arguments."""
-    return Emphasized([coerce(item, **kwargs) for item in items])
+    return _container(Emphasized, items, **kwargs)
 
 def u(*items, **kwargs):
     """Create an 'Underlined' instance by coercing all arguments."""
-    return Underlined([coerce(item, **kwargs) for item in items])
+    return _container(Underlined, items, **kwargs)
 
 def code(*items, **kwargs):
     """Create an 'Code' instance by coercing all arguments."""
-    return Code([coerce(item, **kwargs) for item in items])
+    return _container(Code, items, **kwargs)
 
 def cite(*items, **kwargs):
     """Create an 'Citation' instance by coercing all arguments."""
-    return Citation([coerce(item, **kwargs) for item in items])
+    return _container(Citation, items, **kwargs)
 
 def br():
     return NewLine()
