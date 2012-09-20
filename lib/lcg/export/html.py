@@ -376,11 +376,22 @@ class HtmlExporter(Exporter):
         def __init__(self, *args, **kwargs):
             self._generator = kwargs['generator']
             self._shared_player_controls = []
+            self._unique_id = 0
             del kwargs['generator']
             super(HtmlExporter.Context, self).__init__(*args, **kwargs)
             
         def generator(self):
             return self._generator
+
+        def unique_id(self):
+            """Return a unique id string in the curent context.
+            
+            The returned string may typically be used as a unique HTML element
+            id.
+            
+            """
+            self._unique_id += 1
+            return 'id%d' % self._unique_id
     
         def connect_shared_player(self, *args):
             """Connect given player controls to the shared player.
@@ -744,7 +755,7 @@ class HtmlExporter(Exporter):
             title = element.title()
             descr = element.descr()
             uri = context.uri(audio)
-            link_id = '%x' % positive_id(audio)
+            link_id = context.unique_id()
             context.connect_shared_player(uri, link_id)
             if image:
                 label = g.img(context.uri(image), alt=title)
@@ -774,7 +785,7 @@ class HtmlExporter(Exporter):
         title = element.title() or video.title()
         descr = element.descr() or video.descr()
         link = g.link(title, uri, title=descr)
-        player = self.export_swf_object(context, 'mediaplayer.swf', '%x' % positive_id(video),
+        player = self.export_swf_object(context, 'mediaplayer.swf', context.unique_id(),
                                         width, height, min_flash_version='9.0.115',
                                         flashvars=dict(file=uri, title=title, description=descr,
                                                        image=(image and context.uri(image))),
