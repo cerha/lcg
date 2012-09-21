@@ -386,8 +386,15 @@ class Exporter(object):
 
         """
         cls = element.__class__
-        while cls not in self._export_method and cls.__bases__:
-            cls = cls.__bases__[0]
+        if cls not in self._export_method:
+            def base_classes(cls):
+                result = list(cls.__bases__)
+                for x in result:
+                    result.extend(base_classes(x))
+                return result
+            bases = base_classes(cls)
+            while bases and cls not in self._export_method:
+                cls = bases.pop(0)
         try:
             method = self._export_method[cls]
         except KeyError:

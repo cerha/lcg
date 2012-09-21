@@ -40,8 +40,8 @@ class ContentNode(object):
     """
 
     def __init__(self, id, title=None, brief_title=None, heading=None, descr=None, variants=(),
-                 content=None, children=(), hidden=False, active=True, resource_provider=None,
-                 globals=None, page_header=None, page_footer=None,
+                 content=None, children=(), hidden=False, active=True, foldable=False,
+                 resource_provider=None, globals=None, page_header=None, page_footer=None,
                  left_page_footer=None, right_page_footer=None,
                  first_page_header=None, page_background=None, presentation=None):
         """Initialize the instance.
@@ -67,9 +67,12 @@ class ContentNode(object):
           hidden -- a boolean flag indicating, that this node should not appear in the
             automatically generated Indexes (Tables of Contents).  Such a node will usually be
             refered explicitely.
-          active -- a boolean flag indicating, that this node is active.  Usage of this flag may be
-            application specific and there is currently no difference in behavior of LCG in respect
-            to this flag, except for marking the links by css class 'inactive' on export.
+          active -- a boolean flag indicating, that this node is active.  Usage
+            of this flag may be application specific and there is currently no
+            difference in behavior of LCG in respect to this flag, except for
+            marking the links by css class 'inactive' on export.
+          foldable -- iff true, the node's submenu will be presented as a
+            foldable in foldable tree presentations which support it.
           resource_provider -- a 'ResourceProvider' instance or None.
           globals -- node global variables as a dictionary keyed by variable
             names.  The variables are allowed to contain nested dictionaries.
@@ -96,6 +99,7 @@ class ContentNode(object):
         assert isinstance(id, basestring), repr(id)
         assert isinstance(hidden, bool), hidden
         assert isinstance(active, bool), active
+        assert isinstance(foldable, bool), foldable
         assert isinstance(variants, (list, tuple))
         self._id = id
         self._parent = None #parent
@@ -105,6 +109,7 @@ class ContentNode(object):
         self._descr = descr
         self._hidden = hidden
         self._active = active
+        self._foldable = foldable
         self._variants = tuple(variants)
         assert page_header is None or isinstance(page_header, dict) and all ([x is None or isinstance(x, Content) for x in page_header.values()]), page_header
         self._page_header = page_header
@@ -185,6 +190,10 @@ class ContentNode(object):
         """Return the value of the 'active' flag as passed in the constructor.."""
         return self._active
         
+    def foldable(self):
+        """Return the value of the 'foldable' flag as passed in the constructor.."""
+        return self._foldable
+    
     def children(self):
         """Return the list of all subordinate nodes as a tuple."""
         return tuple(self._children)

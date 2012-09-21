@@ -31,6 +31,7 @@ from resources import *
 from units import Unit, UAny, UFont, UMm, UPoint, USpace, FontFamily, \
      HorizontalAlignment, VerticalAlignment, Orientation
 from content import *
+from widgets import Widget, FoldableTree, Notebook, PopupMenuCtrl, PopupMenuItem
 from presentation import *
 from export import *
 from parse import *
