@@ -1213,7 +1213,9 @@ class HTMLProcessor(object):
                 obj = obj.getchildren()
             content = [self.transform(c) for c in obj]
             if nowhitespace:
-                content = [c for c in content if not isinstance(c, TextContent) or c.text().strip()]
+                content = [c for c in content
+                           if not isinstance(c, TextContent) or c.text().strip()
+                           or isinstance(c, Anchor)]
             return content
 
         def _container(self, element, followers, class_=Container, **kwargs):
