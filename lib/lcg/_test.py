@@ -695,6 +695,13 @@ class HtmlImport(unittest.TestCase):
                  </tr>
          </tbody>
  </table>
+
+ Inline Resource Image: <img data-lcg-resource="popup-arrow.png" src="/whatever/popup-arrow.png" />
+ Inline External Image: <img src="http://www.freebsoft.org/img/logo.gif" />
+ Image link: <a href="http://www.freebsoft.org"><img src="http://www.freebsoft.org/img/logo.gif" /></a>
+ Audio: <a class="lcg-audio" data-lcg-resource="my-song.mp3" href="/whatever/my-song.mp3">My Song</a>
+ Video: <a class="lcg-video" data-lcg-resource="my-video.flv" href="/whatever/my-video.flv">My Video</a>
+
  '''
         content = lcg.html2lcg(html)
         p = lcg.ResourceProvider()
