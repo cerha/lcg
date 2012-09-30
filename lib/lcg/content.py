@@ -1805,7 +1805,7 @@ def fieldset(pairs, title=None, formatted=False):
     return FieldSet(fields, title=title)
 
 def _container(container, items, formatted=False, **kwargs):
-    return Paragraph([coerce(item, formatted=formatted) for item in items], **kwargs)
+    return container([coerce(item, formatted=formatted) for item in items], **kwargs)
 
 def p(*items, **kwargs):
     """Create a 'Paragraph' by coercing all arguments."""
