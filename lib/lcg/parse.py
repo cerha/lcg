@@ -1194,6 +1194,7 @@ class HTMLProcessor(object):
                 ('t[dh]', self._table_cell),
                 ('hr', (self._single, dict(class_=HorizontalSeparator))),
                 ('math', (self._plain, dict(class_=MathML))),
+                ('img', self._image),
                 ('_text', self._text),
                 )
 
@@ -1264,10 +1265,24 @@ class HTMLProcessor(object):
             return Anchor(anchor=name, text=text)
 
         def _link(self, element, followers):
-            target = element.attrib['href']
             label = Container(self._transform_sub(element))
-            return Link(target=target, label=label)
+            if 'enlarge-image' in element.attrib.get('class', ''):
+                # Temporary hack to ignore link around images enlarged on click.
+                return label
+            else:
+                target = element.attrib['href']
+                return Link(target=target, label=label)
 
+        def _image(self, element, followers):
+            resource = element.attrib.get('data-lcg-resource')
+            if resource:
+                target = resource
+            else:
+                target = element.attrib['src']
+            align = element.attrib.get('align')
+            basename = target.split('/')[-1].rsplit('.', 1)[0]
+            return InlineImage(target, align=align, name=basename)
+        
         def _table(self, element, followers):
             content = []
             title = None
