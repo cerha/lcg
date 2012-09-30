@@ -835,10 +835,14 @@ class HtmlExport(unittest.TestCase):
              '<br>'),
             (lcg.hr(),
              '<hr>'),
+            (lcg.NewPage(),
+             '<hr class="lcg-new-page">'),
             (lcg.Substitution('x'),
              'value of x'),
             ((lcg.Subscript(lcg.TextContent('sub')), lcg.Superscript(lcg.TextContent('sup'))),
              '<sub>sub</sub><sup>sup</sup>'),
+            (lcg.p('Kotva: ', lcg.Anchor('x', text='zde'), halign=lcg.HorizontalAlignment.RIGHT),
+             '<p style="text-align: right;">Kotva: <a name="x">zde</a></p>'),
             ):
             result = lcg.coerce(content).export(context)
             assert result == html, "\n  - content:  %r\n  - expected: %r\n  - got:      %r" % \
