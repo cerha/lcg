@@ -1274,7 +1274,11 @@ class HTMLProcessor(object):
                 # Temporary hack to ignore link around images enlarged on click.
                 return label
             else:
-                target = element.attrib['href']
+                resource = element.attrib.get('data-lcg-resource')
+                if resource:
+                    target = resource
+                else:
+                    target = element.attrib['href']
                 return Link(target=target, label=label)
 
         def _media(self, element, followers, class_=None):
