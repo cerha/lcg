@@ -1136,7 +1136,8 @@ class HTMLProcessor(object):
             self._hp_current_text += data
 
         def handle_charref(self, name):
-            expanded = unichr(int(name))
+            num = name.lstrip('&#').rstrip(';')
+            expanded = unichr(int(num))
             self.handle_data(expanded)
             
         def handle_entityref(self, name):
