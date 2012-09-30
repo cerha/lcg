@@ -1188,13 +1188,15 @@ class HTMLProcessor(object):
                 ('ol', (self._list, dict(order=ItemizedList.NUMERIC))),
                 ('dl', self._definition_list),
                 (('a', ('name', '.+')), self._anchor),
+                (('a', ('class', 'lcg-audio')), (self._media, dict(class_=InlineAudio))),
+                (('a', ('class', 'lcg-video')), (self._media, dict(class_=InlineVideo))),
                 ('a', self._link),
                 ('table', self._table),
                 ('tr', (self._container, dict(class_=TableRow))),
                 ('t[dh]', self._table_cell),
                 ('hr', (self._single, dict(class_=HorizontalSeparator))),
                 ('math', (self._plain, dict(class_=MathML))),
-                ('img', self._image),
+                ('img', (self._media, dict(class_=InlineImage))),
                 ('_text', self._text),
                 )
 
@@ -1275,15 +1277,21 @@ class HTMLProcessor(object):
                 target = element.attrib['href']
                 return Link(target=target, label=label)
 
-        def _image(self, element, followers):
+        def _media(self, element, followers, class_=None):
+            if class_ == InlineImage:
+                uri = element.attrib['src']
+                align = {'left': InlineImage.LEFT, 'right': InlineImage.RIGHT}
+                kwargs = dict(align=align.get(element.attrib.get('align')))
+            else:
+                uri = element.attrib['href']
+                kwargs = dict()
             resource = element.attrib.get('data-lcg-resource')
             if resource:
                 target = resource
             else:
-                target = element.attrib['src']
-            align = element.attrib.get('align')
+                target = uri
             basename = target.split('/')[-1].rsplit('.', 1)[0]
-            return InlineImage(target, align=align, name=basename)
+            return class_(target, name=basename, **kwargs)
         
         def _table(self, element, followers):
             content = []
