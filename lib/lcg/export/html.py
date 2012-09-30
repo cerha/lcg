@@ -144,7 +144,7 @@ class HtmlGenerator(object):
             if content and content[0].strip().startswith('<div') \
                    and content[-1].strip().endswith('</div>'):
                 return concat(content, separator='\n')
-        return self._tag('p', content, _newlines=True, **kwargs)
+        return self._tag('p', content, **kwargs)
      
     def br(self, **kwargs):
         return self._tag('br', _paired=False, **kwargs)
