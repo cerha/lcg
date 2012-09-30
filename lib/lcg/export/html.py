@@ -494,10 +494,10 @@ class HtmlExporter(Exporter):
                     label += g.img(image, border=None)
                 else:
                     label = g.img(image, alt=label, border=None)
-            links.append(g.link(label, self._uri_node(context, node, lang=lang),
-                                lang=lang, cls=cls)+sign)
-        return concat(g.link(self._LANGUAGE_SELECTION_LABEL, None,
-                             id='language-selection-anchor', name='language-selection-anchor'),
+            links.append(g.a(label, href=self._uri_node(context, node, lang=lang),
+                             lang=lang, cls=cls)+sign)
+        return concat(g.a(self._LANGUAGE_SELECTION_LABEL,
+                          id='language-selection-anchor', name='language-selection-anchor'),
                       "\n", concat(links, separator=" "+g.span('|', cls='sep')+"\n"))
 
     def _language_selection_image(self, context, lang):
@@ -769,7 +769,7 @@ class HtmlExporter(Exporter):
                 descr = descr or title
             else:
                 label = title or audio.title() or audio.filename()
-            return g.link(label, uri, id=link_id, title=descr, cls='media-control-link')
+            return g.a(label, href=uri, id=link_id, title=descr, cls='media-control-link')
         else:
             raise NotImplementedError
         
@@ -791,7 +791,7 @@ class HtmlExporter(Exporter):
         uri = context.uri(video)
         title = element.title() or video.title() or video.filename()
         descr = element.descr() or video.descr()
-        link = g.link(title, uri, title=descr)
+        link = g.a(title, href=uri, title=descr)
         player = self.export_swf_object(context, 'mediaplayer.swf', context.unique_id(),
                                         width, height, min_flash_version='9.0.115',
                                         flashvars=dict(file=uri, title=title, description=descr,
@@ -888,8 +888,8 @@ class HtmlExporter(Exporter):
                      version=min_flash_version or '9',
                      # Translators: Title of the link to Adobe website used in
                      # the Flash warning.
-                     plugin=g.link(_("Adobe Flash plugin"),
-                                   'http://www.adobe.com/products/flash/about/'))
+                     plugin=g.a(_("Adobe Flash plugin"),
+                                href='http://www.adobe.com/products/flash/about/'))
             msg2 = _("Use a JavaScript enabled browser.")
             no_flash_content = context.localize(g.strong(_("Warning:")) +' '+ warning +' '+ msg1)
             no_js_content = g.strong(_("Warning:")) +' '+ warning +' '+ msg2
@@ -1083,12 +1083,12 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                     if target == root:
                         key = 'index'
                         if target == parent:
-                            hidden = g.link('', self.uri(context, target),
-                                            hotkey=self._hotkey['up'], cls='hidden')
+                            hidden = g.a('', href=self.uri(context, target),
+                                         hotkey=self._hotkey['up'], cls='hidden')
                     elif target == parent:
                         key = 'up'
-                return g.link(label, self.uri(context, target), title=target.title(),
-                              hotkey=key and self._hotkey[key]) + hidden
+                return g.a(label, href=self.uri(context, target), title=target.title(),
+                           hotkey=key and self._hotkey[key]) + hidden
             else:
                 # Translators: Label used instead of a link when the target does not exist.  For
                 # example sequential navigation may contain: "Previous: Introduction, Next: None".
