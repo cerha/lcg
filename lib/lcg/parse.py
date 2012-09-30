@@ -1169,6 +1169,10 @@ class HTMLProcessor(object):
             return (
                 (('div', ('style', '.*page-break-after: always;.*')), (self._single, dict(class_=NewPage))),
                 ('(html|div|span|strike|li|dt|dd)', self._container),
+                (('p', ('style', 'text-align: right;')),
+                 (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.RIGHT))),
+                (('p', ('style', 'text-align: center;')),
+                 (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.CENTER))),
                 ('p', (self._container, dict(class_=Paragraph))),
                 ('blockquote', (self._container, dict(class_=Citation))),
                 ('strong', (self._container, dict(class_=Strong))),
@@ -1211,9 +1215,9 @@ class HTMLProcessor(object):
                 content = [c for c in content if not isinstance(c, TextContent) or c.text().strip()]
             return content
 
-        def _container(self, element, followers, class_=Container):
+        def _container(self, element, followers, class_=Container, **kwargs):
             content = self._transform_sub(element)
-            return class_(content)
+            return class_(content, **kwargs)
 
         def _section(self, element, followers):
             level = element.tag[1]
