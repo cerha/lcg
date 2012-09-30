@@ -789,7 +789,7 @@ class HtmlExporter(Exporter):
         video = element.video(context)
         image = element.image(context)
         uri = context.uri(video)
-        title = element.title() or video.title()
+        title = element.title() or video.title() or video.filename()
         descr = element.descr() or video.descr()
         link = g.link(title, uri, title=descr)
         player = self.export_swf_object(context, 'mediaplayer.swf', context.unique_id(),
