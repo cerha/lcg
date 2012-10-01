@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2010, 2011 Brailcom, o.p.s.
+# Copyright (C) 2010, 2011, 2012 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -111,6 +111,7 @@ class HorizontalAlignment(object):
     CENTER = 'CENTER'
     LEFT = 'LEFT'
     RIGHT = 'RIGHT'
+    JUSTIFY = 'JUSTIFY'
 
 class VerticalAlignment(object):
     """Enumeration of vertical alignment kinds."""

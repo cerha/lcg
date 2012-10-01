@@ -1173,6 +1173,8 @@ class HTMLProcessor(object):
                  (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.RIGHT))),
                 (('p', ('style', 'text-align: center;')),
                  (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.CENTER))),
+                (('p', ('style', 'text-align: justify;')),
+                 (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.JUSTIFY))),
                 ('p', (self._container, dict(class_=Paragraph))),
                 ('blockquote', (self._container, dict(class_=Citation))),
                 ('strong', (self._container, dict(class_=Strong))),

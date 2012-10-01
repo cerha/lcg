@@ -579,6 +579,8 @@ class HtmlExporter(Exporter):
             style = 'text-align: right;'
         elif element.halign() == HorizontalAlignment.CENTER:
             style = 'text-align: center;'
+        elif element.halign() == HorizontalAlignment.JUSTIFY:
+            style = 'text-align: justify;'
         else:
             style = None
         attr = dict(cls=' '.join([x for x in (element.name(), cls) if x is not None]) or None,
