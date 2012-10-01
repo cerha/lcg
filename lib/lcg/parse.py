@@ -1196,7 +1196,7 @@ class HTMLProcessor(object):
                 ('t[dh]', self._table_cell),
                 ('hr', (self._single, dict(class_=HorizontalSeparator))),
                 ('math', (self._plain, dict(class_=MathML))),
-                ('img', (self._media, dict(class_=InlineImage))),
+                ('img', self._image),
                 ('_text', self._text),
                 )
 
@@ -1281,22 +1281,21 @@ class HTMLProcessor(object):
                     target = element.attrib['href']
                 return Link(target=target, label=label)
 
-        def _media(self, element, followers, class_=None):
-            if class_ == InlineImage:
-                uri = element.attrib['src']
-                align = {'left': InlineImage.LEFT, 'right': InlineImage.RIGHT}
-                kwargs = dict(align=align.get(element.attrib.get('align')))
-            else:
-                uri = element.attrib['href']
-                kwargs = dict()
+        def _media(self, element, followers, class_=None, uri=None, **kwargs):
             resource = element.attrib.get('data-lcg-resource')
             if resource:
                 target = resource
             else:
-                target = uri
+                target = uri or element.attrib['href']
             basename = target.split('/')[-1].rsplit('.', 1)[0]
             return class_(target, name=basename, **kwargs)
-        
+
+        def _image(self, element, followers):
+            align = {'left': InlineImage.LEFT,
+                     'right': InlineImage.RIGHT}.get(element.attrib.get('align'))
+            return self._media(element, followers, class_=InlineImage,
+                               uri=element.attrib['src'], align=align)
+
         def _table(self, element, followers):
             content = []
             title = None
