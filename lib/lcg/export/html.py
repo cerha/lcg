@@ -526,7 +526,7 @@ class HtmlExporter(Exporter):
         return self._generator.br()
 
     def _export_new_page(self, context, element):
-        return self._generator.hr(cls='lcg-new-page')
+        return self._generator.hr(cls='new-page')
 
     def _export_strong(self, context, element):
         return self._export_container(context, element, wrap=self._generator.strong)
