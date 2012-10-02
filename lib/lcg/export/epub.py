@@ -49,22 +49,32 @@ class EpubExporter(Exporter):
         variants = variant and (variant,) or node.variants() or (None,)
         for lang in variants:
             context = self.context(node, lang, **kwargs)
-            lang_ = lang and '.'+lang or ''
-            epub = zipfile.ZipFile(filename + lang_, 'w', zipfile.ZIP_DEFLATED)
-            try:
-                mimeinfo = zipfile.ZipInfo('mimetype')
-                mimeinfo.compress_type = zipfile.ZIP_STORED
-                epub.writestr(mimeinfo, Constants.EPUB_MIMETYPE)
-                epub.writestr(self._meta_path('container.xml'), self._ocf_container(node, lang))
-                epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), self._navigation_document(context))
-                for n in node.linear():
-                    epub.writestr(self._node_path(n), self._xhtml_content_document(n, lang))
-                epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME), self._package_document(node, lang))
-                for resource in node.resources():
-                    epub.writestr(self._resource_path(resource), resource.get())
-            except:
-                epub.close()
-                raise
+            ext = lang and '.'+lang or ''
+            f = open(filename+ext, 'w')
+            f.write(self.export(context))
+
+    def export(self, context):
+        """Return the exported E-pub archive as a binary string."""
+        import cStringIO as StringIO
+        fileobject = StringIO.StringIO()
+        epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
+        node = context.node()
+        lang = context.lang()
+        try:
+            mimeinfo = zipfile.ZipInfo('mimetype')
+            mimeinfo.compress_type = zipfile.ZIP_STORED
+            epub.writestr(mimeinfo, Constants.EPUB_MIMETYPE)
+            epub.writestr(self._meta_path('container.xml'), self._ocf_container(node, lang))
+            epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), self._navigation_document(context))
+            for n in node.linear():
+                epub.writestr(self._node_path(n), self._xhtml_content_document(n, lang))
+            epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME), self._package_document(node, lang))
+            for resource in node.resources():
+                epub.writestr(self._resource_path(resource), resource.get())
+        except:
+            epub.close()
+            raise
+        return fileobject.getvalue()
 
     def _container_path(self, *components):
         #TODO replace forbidden characters as per spec
