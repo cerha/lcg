@@ -1379,33 +1379,6 @@ class Empty(Text):
     def init(self):
         self.content = ''
 
-class MarkedText(Text):
-    """Text wrapped by an in-paragraph markup.
-
-    'content' must be a 'Text' instance.  Additionaly, 'tag' name of the markup
-    is required, optionally accompanied by 'attributes' dictionary providing
-    tag attribute names and values.
-
-    """
-    tag = None
-    attributes = {}
-    def init(self):
-        super(MarkedText, self).init()
-        assert isinstance(self.tag, str), ('type error', self.tag,)
-        assert isinstance(self.attributes, dict)
-    def _export(self, context):
-        exported = super(MarkedText, self)._export(context)
-        start_mark = self.tag
-        for k, v in self.attributes.items():
-            start_mark += ' %s="%s"' % (k, v,)
-        result = u'<%s>%s</%s>' % (start_mark, exported, self.tag,)
-        return result
-    def prepend_text(self, text):
-        assert isinstance(text, Text), ('type error', text,)
-        self.content.prepend_text(text)
-    def plain_text(self):
-        return False
-
 class SimpleMarkup(Text):
     """In-paragraph markup without content.
 
@@ -1444,7 +1417,7 @@ class TextContainer(Text):
     def _expand_content(self):
         content = []
         for c in self.content:
-            if isinstance(c, TextContainer):
+            if isinstance(c, TextContainer) and not isinstance(c, MarkedText):
                 content += c._expand_content()
             else:
                 content.append(c)
@@ -1454,15 +1427,14 @@ class TextContainer(Text):
         content = self._expand_content()
         result = u''
         for c in content:
-            if isinstance(c, TextContainer):
-                result += c.export(context)
-            else:
-                result += c.export(context)                
+            result += c.export(context)
         if (not pdf_context.in_paragraph and
             not all([c.plain_text() for c in content])):
             style = pdf_context.style()
             style.firstLineIndent = 0
             result = reportlab.platypus.Paragraph(result, style)
+        elif isinstance(result, basestring) and self.style:
+            result = RLText(result, style=self.style, halign=self.halign)
         assert _ok_export_result(result), ('wrong export', result,)
         return result
     def prepend_text(self, text):
@@ -1475,6 +1447,35 @@ class TextContainer(Text):
                 result = False
                 break
         return result
+
+class MarkedText(TextContainer):
+    """Text wrapped by an in-paragraph markup.
+
+    'content' must be a sequence of 'Text' instances.  Additionaly, 'tag' name
+    of the markup is required, optionally accompanied by 'attributes'
+    dictionary providing tag attribute names and values.
+
+    """
+    tag = None
+    attributes = {}
+    def init(self):
+        super(MarkedText, self).init()
+        assert isinstance(self.tag, str), ('type error', self.tag,)
+        assert isinstance(self.attributes, dict)
+    def export(self, context):
+        return super(MarkedText, self).export(context)
+    def _export(self, context):
+        exported = super(MarkedText, self)._export(context)
+        start_mark = self.tag
+        for k, v in self.attributes.items():
+            start_mark += ' %s="%s"' % (k, v,)
+        result = u'<%s>%s</%s>' % (start_mark, exported, self.tag,)
+        return result
+    def prepend_text(self, text):
+        assert isinstance(text, Text), ('type error', text,)
+        self.content.prepend_text(text)
+    def plain_text(self):
+        return False
     
 class PreformattedText(Element):
     """Text to be output verbatim.
@@ -1843,13 +1844,14 @@ class List(Element):
             seqid = pdf_context.get_seqid()
             seq_string = make_element(SimpleMarkup, content='seq', attributes=dict(id='list%d'%(seqid,)))
             dot_string = make_element(Text, content=u'.')
-            bullet_string = make_element(TextContainer, content=[seq_string, dot_string])
+            bullet_element = make_element(TextContainer, content=[seq_string, dot_string])
         else:
             if list_nesting_level == 0:
                 bullet_string = u'•'
             else:
                 bullet_string = u'-'
-        bullet = make_element(MarkedText, content=bullet_string, tag='bullet')
+            bullet_element = make_element(Text, content=bullet_string)
+        bullet = make_element(MarkedText, content=[bullet_element], tag='bullet')
         next_pdf_context = copy.copy(pdf_context)
         next_pdf_context.inc_nesting_level()
         next_pdf_context.inc_list_nesting_level()
@@ -2196,6 +2198,19 @@ def make_element(cls, **kwargs):
     element.init()
     return element
 
+def make_marked_text(text, **kwargs):
+    """Returned MarkedText instance containing just 'text'.
+
+    Arguments:
+
+      text -- text content of the MarkedText instance; basestring
+      kwargs -- kwargs to pass to MarkedText constructor
+      
+    """
+    assert isinstance(text, basestring), text
+    text_element = make_element(Text, content=text)
+    return make_element(MarkedText, content=[text_element], **kwargs)
+
 
 class PDFExporter(FileExporter, Exporter):
     
@@ -2256,6 +2271,12 @@ class PDFExporter(FileExporter, Exporter):
     def text(self, context, text, lang=None):
         assert isinstance(text, basestring), text
         if text:
+            # We should get reasonable input from the parsers but this is
+            # currently not the case.
+            if text[0] == '\n':
+                text = ' ' + text[1:]
+            if text[-1] == '\n':
+                text = text[:-1] + ' '
             result = make_element(Text, content=text)
         else:
             result = make_element(Empty)
@@ -2425,6 +2446,9 @@ class PDFExporter(FileExporter, Exporter):
     def _export_new_page(self, context, element):
         return make_element(PageBreak)
 
+    def _export_new_line(self, context, element):
+        return make_element(Text, content='\n')
+
     def _export_horizontal_separator(self, context, element):
         return make_element(HorizontalRule)
 
@@ -2440,7 +2464,46 @@ class PDFExporter(FileExporter, Exporter):
     # Container elements
     
     def _export_container(self, context, element):
+        # This is going to be a really wild guesswork.  There can be two very
+        # distinct kinds of containers: 1. alignment containers; 2. paragraphs
+        # (Containers inside Paragraphs).  And of course there are many common
+        # (often useless) containers with no special purpose in typical LCG
+        # content.
+        plain_container = (element.presentation() is None and element.orientation() is None and
+                           element.halign() is None and element.valign() is None)
         exported_content = self._content_export(context, element, collapse=False)
+        assert isinstance(exported_content, (list, tuple,)), exported_content
+        texts = [isinstance(c, (Text, basestring,)) for c in exported_content]
+        if plain_container:
+            # Just a container without any special purpose.  Maybe we can avoid
+            # it.
+            if all(texts):
+                # Nothing but texts, this is good.  We can simply collapse them.
+                return self.concat(*exported_content)
+            else:
+                # There are other elements present, we can't make single
+                # Paragraph from this.
+                if any(texts):
+                    mixed_content = exported_content
+                    exported_content = []
+                    while mixed_content:
+                        text_p = isinstance(mixed_content[0], Text)
+                        i = 1
+                        while i < len(mixed_content) and text_p == isinstance(mixed_content[i], Text):
+                            i += 1
+                        # TODO: This doesn't check for Paragraphs inside Paragraph
+                        exported_content.append(make_element(Paragraph if text_p else Container,
+                                                             content=mixed_content[:i]))
+                        mixed_content = mixed_content[i:]
+        else:
+            # We can't make anything else than common Container.  But in some
+            # places it isn't expected to contain texts, so we must replace
+            # them.
+            def wrap(c):
+                if isinstance(c, Text) and not isinstance(c, TextContainer):
+                    c = make_element(TextContainer, content=[c])
+                return c
+            exported_content = [wrap(c) for c in exported_content]
         return make_element(Container, content=exported_content,
                             vertical=(element.orientation() != 'HORIZONTAL'),
                             halign=element.halign(), valign=element.valign(),
@@ -2450,7 +2513,7 @@ class PDFExporter(FileExporter, Exporter):
         exported_content = self._content_export(context, element, collapse=False)
         return make_element(MarkedText, content=exported_content, tag=tag, attributes=attributes)
     
-    def _export_emphasize(self, context, element):
+    def _export_emphasized(self, context, element):
         return self._markup_container(context, element, 'i')
 
     def _export_strong(self, context, element):
@@ -2460,7 +2523,7 @@ class PDFExporter(FileExporter, Exporter):
         face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, False, False)
         return self._markup_container(context, element, 'font', face=face)
      
-    def _export_underline(self, context, element):
+    def _export_underlined(self, context, element):
         return self._markup_container(context, element, 'u')
     
     def _export_superscript(self, context, element):
@@ -2512,7 +2575,10 @@ class PDFExporter(FileExporter, Exporter):
             if isinstance(content, TextContainer):
                 c = content.content
                 for i in range(len(c)):
-                    if isinstance(c[i], Text) and c[i].content.strip():
+                    if isinstance(c[i], TextContainer):
+                        if update_text(c[i], function):
+                            return True
+                    elif isinstance(c[i], Text) and c[i].content.strip():
                         c[i] = function(c[i])
                         return True
             elif isinstance(content, Container):
@@ -2550,6 +2616,8 @@ class PDFExporter(FileExporter, Exporter):
 
     def _export_definition_list(self, context, element):
         def make_item(title, description):
+            while isinstance(title, Container) and len(title.content) == 1:
+                title = title.content[0]
             if isinstance(title, Text):
                 title = make_element(Label, content=[title])
             presentation = Presentation()
@@ -2566,9 +2634,25 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Container, content=result_items)
     
     def _export_field_set(self, context, element):
+        def has_markup(element):
+            if isinstance(element, (MarkedText, Link,)):
+                return True
+            if not isinstance(element, Element):
+                return False
+            content = element.content
+            if not isinstance(content, (list, tuple,)):
+                content = (content,)
+            for c in content:
+                if has_markup(c):
+                    return True
+            return False
+        def make_cell(element):
+            exported = element.export(context)
+            if has_markup(exported):
+                exported = make_element(Paragraph, content=[exported])
+            return make_element(TableCell, content=[exported])
         def make_item(label, value):
-            content = [make_element(TableCell, content=[label.export(context)]),
-                       make_element(TableCell, content=[value.export(context)])]
+            content = [make_cell(label), make_cell(value)]
             return make_element(TableRow, content=content)
         rows = [make_item(*c) for c in element.content()]
         return make_element(Table, content=rows, compact=False)
@@ -2577,6 +2661,7 @@ class PDFExporter(FileExporter, Exporter):
         # LCG interpretation of "paragraph" is very wide, we have to expect
         # anything containing anything.  The only "paragraph" meaning we use
         # here is that the content should be separated from other text.
+        pdf_context = context.pdf_context
         content = self._content_export(context, element)
         halign = element.halign()
         if isinstance(content, Text):
@@ -2596,8 +2681,7 @@ class PDFExporter(FileExporter, Exporter):
             title = element.title()
             if title:
                 heading = make_element(Paragraph,
-                                       content=[make_element(MarkedText, content=title,
-                                                             tag='strong')],
+                                       content=[make_marked_text(title, tag='strong')],
                                        noindent=True)
                 result = self.concat(heading, result)
             result = self.concat(make_element(Space, height=UFont(1)), result)

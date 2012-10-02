@@ -1050,6 +1050,22 @@ class BrailleExport(unittest.TestCase):
 tests.add(BrailleExport)
 
 
+class PDFExport(unittest.TestCase):
+
+    def test_export(self):
+        # Just test for crashes
+        path = os.path.join(lcg_dir, 'doc/src')
+        name = 'structured-text'
+        reader = lcg.reader(path, name, ext='txt', recourse=False)
+        node = reader.build()
+        from lcg import pdf
+        exporter = pdf.PDFExporter()
+        context = exporter.context(node, 'cs')
+        exporter.export(context)
+
+tests.add(PDFExport)
+
+
 class Presentations(unittest.TestCase):
     
     def test_style_file(self):
