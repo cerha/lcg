@@ -42,7 +42,7 @@ class EpubExporter(Exporter):
         UID_ID = 'uid'
         
     def __init__(self, *args, **kwargs):
-        kwargs.pop('force_lang_ext')
+        kwargs.pop('force_lang_ext', None)
         super(EpubExporter, self).__init__(*args, **kwargs)
 
     def dump(self, node, directory, filename=None, variant=None, **kwargs):
