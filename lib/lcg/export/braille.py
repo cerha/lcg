@@ -22,6 +22,8 @@ from __future__ import unicode_literals
 """
 
 import copy
+import imp
+import os
 import re
 import string
 
@@ -67,6 +69,24 @@ _mathml_operators = {
     }
 
 from export import Exporter, FileExporter
+
+def braille_presentation(presentation_file='presentation-braille.py'):
+    """Return default braille presentation.
+
+    Arguments:
+
+      presentation_file -- base name of the presentation file to be used; string
+      
+    """
+    presentation = Presentation()
+    filename = os.path.join(os.path.dirname(__file__), 'styles', presentation_file)
+    f = open(filename)
+    confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
+    f.close()
+    for o in dir(confmodule):
+        if o[0] in string.lowercase and hasattr(presentation, o):
+            setattr(presentation, o, confmodule.__dict__[o])
+    return presentation
 
 class BrailleExporter(FileExporter, Exporter):
     """Transforming structured content objects to Braille output.    

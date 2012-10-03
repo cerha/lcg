@@ -25,9 +25,6 @@ braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': ['cs-g1.ctb']}
 braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
                               'cs': 'hyph_cs_CZ.dic'}
-# Hyphenation is quite buggy in current liblouis,
-# so let's disable it for now.
-braille_hyphenation_tables = {}
 page_width = lcg.UFont(40)
 page_height = lcg.UFont(25)
 left_page_footer = lcg.Container((lcg.PageNumber(),
@@ -139,7 +136,7 @@ debug_device_output_en = {
     u'⡝': u'n7',      
     u'⡞': u't7',      
     u'⡟': u'q7',      
-    u'⡠': u7',7',      
+    u'⡠': u',7',
     u'⡡': u'*7',      
     u'⡢': u'<26>7',   
     u'⡣': u'<7',      
@@ -203,7 +200,7 @@ debug_device_output_en = {
     u'⢝': u'n8',      
     u'⢞': u't8',      
     u'⢟': u'q8',      
-    u'⢠': u8',8',      
+    u'⢠': u',8',      
     u'⢡': u'*8',      
     u'⢢': u'<26>8',   
     u'⢣': u'<8',      
@@ -267,7 +264,7 @@ debug_device_output_en = {
     u'⣝': u'n78',      
     u'⣞': u't78',      
     u'⣟': u'q78',      
-    u'⣠': u78',78',      
+    u'⣠': u',78',      
     u'⣡': u'*78',      
     u'⣢': u'<26>78',   
     u'⣣': u'<78',      
@@ -564,4 +561,3 @@ debug_device_output_cs = {
     u'⣾': u'ů78',   
     u'⣿': u'<+>78'
 }
-device_output = debug_device_output_cs

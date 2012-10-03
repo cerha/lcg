@@ -861,16 +861,7 @@ tests.add(HtmlExport)
 class BrailleExport(unittest.TestCase):
 
     def _load_presentation(self):
-        import imp
-        presentation = lcg.Presentation()
-        filename = os.path.join(lcg_dir, 'styles/presentation-braille-test.py')
-        f = open(filename)
-        confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
-        f.close()
-        for o in dir(confmodule):
-            if o[0] in string.lowercase and hasattr(presentation, o):
-                setattr(presentation, o, confmodule.__dict__[o])
-        return presentation
+        return lcg.braille_presentation(presentation_file='presentation-braille-test.py')
 
     def _test(self, text, braille, header, footer, presentation, lang, sec_lang=None):
         page_height = presentation.page_height
