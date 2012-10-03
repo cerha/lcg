@@ -843,7 +843,7 @@ class HtmlExport(unittest.TestCase):
             (lcg.hr(),
              '<hr>'),
             (lcg.NewPage(),
-             '<hr class="lcg-new-page">'),
+             '<hr class="new-page">'),
             (lcg.Substitution('x'),
              'value of x'),
             ((lcg.Subscript(lcg.TextContent('sub')), lcg.Superscript(lcg.TextContent('sup'))),
