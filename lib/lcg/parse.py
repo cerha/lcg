@@ -1168,6 +1168,7 @@ class HTMLProcessor(object):
         def _matchers(self):
             return (
                 (('div', ('style', '.*page-break-after: always;.*')), (self._single, dict(class_=NewPage))),
+                ('br', (self._single, dict(class_=NewLine))),
                 ('(html|div|span|strike|li|dt|dd)', self._container),
                 (('p', ('style', 'text-align: right;')),
                  (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.RIGHT))),
