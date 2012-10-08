@@ -74,6 +74,7 @@ class EpubExporter(Exporter):
         except:
             epub.close()
             raise
+        epub.close()
         return fileobject.getvalue()
 
     def _container_path(self, *components):
