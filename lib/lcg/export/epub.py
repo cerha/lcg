@@ -40,6 +40,10 @@ class EpubExporter(Exporter):
         PACKAGE_DOC_FILENAME = 'pkg.opf'
         NAV_DOC_FILENAME = 'nav.xhtml'
         UID_ID = 'uid'
+
+    class Html5Exporter(Html5Exporter):
+        def _export_table_of_contents(self, context, element):
+            return ''
         
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
@@ -195,7 +199,7 @@ class EpubExporter(Exporter):
         return doc.toprettyxml(indent='', newl='', encoding='UTF-8')
 
     def _xhtml_content_document(self, node, lang):
-        exporter = Html5Exporter()
+        exporter = self.Html5Exporter()
         context = exporter.context(node, lang)
         data = context.localize(exporter.export(context))
         return data.encode('UTF-8')
