@@ -646,7 +646,13 @@ class HTML2XML(Processor):
             return ''
 
         def _transform_sub(self, obj, nowhitespace=True):
-            if isinstance(obj, xml.etree.ElementTree.Element):
+            if type(xml.etree.ElementTree.Element) == type(object):
+                # Python >= 2.7
+                element_class = xml.etree.ElementTree.Element
+            else:
+                # Python 2.6
+                element_class = xml.etree.ElementTree._ElementInterface
+            if isinstance(obj, element_class):
                 obj = obj.getchildren()
             content = [self.transform(c) for c in obj]
             if nowhitespace:
