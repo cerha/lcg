@@ -1212,6 +1212,12 @@ class HTMLProcessor(object):
                 if text:
                     return text
             return ''
+        
+        def _plain_text(self, element):
+            text = element.text or ''
+            for c in element.getchildren():
+                text += self._plain_text(c)
+            return text
 
         def _transform_sub(self, obj, nowhitespace=True):
             if type(xml.etree.ElementTree.Element) == type(object):
@@ -1222,7 +1228,11 @@ class HTMLProcessor(object):
                 element_class = xml.etree.ElementTree._ElementInterface
             if isinstance(obj, element_class):
                 obj = obj.getchildren()
-            content = [self.transform(c) for c in obj]
+            obj = list(obj)
+            content = []
+            while obj:
+                c = obj.pop(0)
+                content.append(self.transform(c, obj))
             if nowhitespace:
                 content = [c for c in content
                            if not isinstance(c, TextContent) or c.text().strip()
@@ -1235,7 +1245,6 @@ class HTMLProcessor(object):
 
         def _section(self, element, followers):
             level = element.tag[1]
-            followers = copy.copy(followers)
             section_children = []
             while followers:
                 c = followers[0]
@@ -1243,13 +1252,12 @@ class HTMLProcessor(object):
                     break
                 section_children.append(c)
                 followers.pop(0)
-            title_content = self._transform_sub(section_children)
-            if title_content:
-                title_content = Content(title_content)
-            else:
-                title_content = None
-            text_title = self._first_text(element).strip()
-            content = self._transform_sub(followers)
+            transformed_title = self._transform_sub(element)
+            if not transformed_title:
+                transformed_title = lcg.TextContent('')
+            title_content = lcg.Heading(transformed_title, int(level))
+            text_title = self._plain_text(element).strip()
+            content = self._transform_sub(section_children)
             return Section(text_title, content, heading=title_content)
 
         def _list(self, element, followers, order=None):
@@ -1362,11 +1370,13 @@ class HTMLProcessor(object):
                 compiled_matchers.append((test_function, handler))
             self._compiled_matchers = compiled_matchers
 
-        def transform(self, element):
+        def transform(self, element, _followers=None):
+            if _followers is None:
+                _followers = []
             for test, handler in self._compiled_matchers:
                 if test(element):
                     function, kwargs = handler
-                    return function(element, (), **kwargs)
+                    return function(element, _followers, **kwargs)
             raise Exception("No transformation available for element", element)
 
     def _tree_content(self, html):
