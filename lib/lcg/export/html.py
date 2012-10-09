@@ -766,7 +766,12 @@ class HtmlExporter(Exporter):
             alt = title
         else:
             alt = ''
-        img = g.img(uri, alt=alt, align=element.align(), cls=element.name(),
+        cls = ['lcg-image']
+        if element.align():
+            cls.append(element.align() + '-aligned')
+        if element.name():
+            cls.append('image-'+element.name())
+        img = g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
                     width=width, height=height)
         if link:
             # The rel='lightbox[gallery]' attribute is actually a quick hack.
