@@ -1248,7 +1248,7 @@ class HTMLProcessor(object):
                 title_content = Content(title_content)
             else:
                 title_content = None
-            text_title = self._first_text(element)
+            text_title = self._first_text(element).strip()
             content = self._transform_sub(followers)
             return Section(text_title, content, heading=title_content)
 
