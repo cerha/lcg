@@ -458,7 +458,7 @@ class BrailleExporter(FileExporter, Exporter):
 
     # Content element export methods (defined by _define_export_methods).
     
-    def _export_new_page(self, context):
+    def _export_new_page(self, context, element):
         return '\f', '0'
 
     def _export_horizontal_separator(self, context, element, width=64, in_table=False):

@@ -509,7 +509,7 @@ class Exporter(object):
         """
         return self._export_text_content(context, element)
     
-    def _export_new_page(self, context):
+    def _export_new_page(self, context, element):
         """Export the given 'NewPage' element.
 
         In this class the method just returns the page break character.
