@@ -145,7 +145,7 @@ class Processor(object):
                 element.text = text
             return element
 
-        def transform(self, element):
+        def transform(self, element, _followers=None):
             """Transform 'element' and return the result.
 
             The method transforms the first element in 'element' (including
@@ -160,10 +160,12 @@ class Processor(object):
             subclass.
 
             """
+            if _followers is None:
+                _followers = []
             for test, handler in self._compiled_matchers:
                 if test(element):
                     function, kwargs = handler
-                    return function(element, (), **kwargs)
+                    return function(element, _followers, **kwargs)
             raise Exception("No transformation available for element", element)
 
     def transform(self, data):
@@ -297,7 +299,11 @@ class XML2Content(XMLProcessor):
             text_title = element.attrib.get('title', '')
             children = element.getchildren()
             if children and children[0].tag == 'heading':
-                heading = self.transform(children[0])
+                heading_content = self._transform_sub(children[0])
+                if len(heading_content) == 1:
+                    heading = heading_content[0]
+                else:
+                    heading = lcg.Container(heading_content)
                 children = children[1:]
             else:
                 heading = None
@@ -431,7 +437,7 @@ class XML2HTML(XMLProcessor):
         def _section(self, element, followers):
             children = element.getchildren()
             if children and children[0].tag == 'heading':
-                heading = self.transform(children[0])
+                heading = self._transform_sub(children[0])
                 children = children[1:]
             else:
                 heading = ()
@@ -654,7 +660,11 @@ class HTML2XML(Processor):
                 element_class = xml.etree.ElementTree._ElementInterface
             if isinstance(obj, element_class):
                 obj = obj.getchildren()
-            content = [self.transform(c) for c in obj]
+            obj = list(obj)
+            content = []
+            while obj:
+                c = obj.pop(0)
+                content.append(self.transform(c, obj))
             if nowhitespace:
                 content = [c for c in content if c.tag != 'text' or c.text.strip()]
             return content
@@ -665,7 +675,6 @@ class HTML2XML(Processor):
 
         def _section(self, element, followers):
             level = element.tag[1]
-            followers = list(followers)
             section_children = []
             while followers:
                 c = followers[0]
@@ -673,13 +682,13 @@ class HTML2XML(Processor):
                     break
                 section_children.append(c)
                 followers.pop(0)
-            title_content = self._transform_sub(section_children)
-            if title_content:
-                title_content = self._make_content('heading', {}, title_content)
-            else:
-                title_content = None
+            transformed_title = self._transform_sub(element)
+            if not transformed_title:
+                import pdb; pdb.set_trace()
+                transformed_title = self._make_content('text', {}, (), u'')
+            title_content = self._make_content('heading', {}, transformed_title)
             text_title = self._first_text(element)
-            content = [title_content] + self._transform_sub(followers)
+            content = [title_content] + self._transform_sub(section_children)
             return self._make_content('section', dict(title=text_title), content)
 
         def _list(self, element, followers, order=None):
