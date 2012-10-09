@@ -84,7 +84,13 @@ class Localizable(unicode):
     def __new__(cls, text, _transforms=(), **kwargs):
         for f in _transforms:
             text = f(text)
-        return unicode.__new__(cls, text)
+        try:
+            return unicode.__new__(cls, text)
+        except UnicodeDecodeError:
+            # Necessary to display some tracebacks
+            def escape(text):
+                return re.sub(r'[^\x01-\x7F]', '?', text)
+            return unicode.__new__(cls, escape(text))
 
     def __init__(self, _transforms=()):
         assert isinstance(_transforms, tuple), _transforms
@@ -567,12 +573,22 @@ class Concatenation(Localizable):
     
     """
     def __new__(cls, items, separator='', **kwargs):
+        def escape(text):
+            return re.sub(r'[^\x01-\x7F]', '?', text)
         def x(item):
             if isinstance(item, (list, tuple)):
-                return separator.join(item)
+                try:
+                    return separator.join(item)
+                except UnicodeDecodeError:
+                    # Necessary to display some tracebacks
+                    return separator.join([escape(i) for i in item])
             else:
                 return item
-        return Localizable.__new__(cls, separator.join([x(item) for item in items]), **kwargs)
+        try:
+            return Localizable.__new__(cls, separator.join([x(item) for item in items]), **kwargs)
+        except UnicodeDecodeError:
+            # Necessary to display some tracebacks
+            return Localizable.__new__(cls, separator.join([escape(x(item)) for item in items]), **kwargs)
     
     def __init__(self, items, separator='', **kwargs):
         """Initialize the instance.
@@ -628,7 +644,13 @@ class Concatenation(Localizable):
         return (self._items,)
     
     def _localize(self, localizer):
-        return ''.join([localizer.localize(item) for item in self._items])
+        try:
+            return ''.join([localizer.localize(item) for item in self._items])
+        except UnicodeDecodeError:
+            # Necessary to display some tracebacks
+            def escape(text):
+                return re.sub(r'[^\x01-\x7F]', '?', text)
+            return ''.join([escape(localizer.localize(item)) for item in self._items])        
     
     def startswith(self, *args, **kwargs):
         """Return the result of 'startswidth()' call the method on the first item."""
