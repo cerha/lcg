@@ -324,7 +324,8 @@ class Exporter(object):
         context.set_page_heading(heading)
         return self.concat(heading,
                            self._newline(context, 2),
-                           node.content().export(context))
+                           node.content().export(context),
+                           *[c.content().export(context) for c in node.children()])
 
     def uri(self, context, target, **kwargs):
         """Return the URI of the target as string.
@@ -817,7 +818,15 @@ class Exporter(object):
                 item_list.append(self._newline(context))
                 if subitems:
                     export(subitems)
-        export(element.items(context))
+        items = []
+        def add_item(node, subitems):
+            if isinstance(node, ContentNode):
+                items.append((node.heading(), (),))
+            else:
+                items.append((node, subitems,))
+        for node, subitems in element.items(context):
+            add_item(node, subitems)
+        export(items)
         return self.concat(self.text(context, element.title(), lang=lang),
                            self._newline(context, 2),
                            self.concat(*item_list),
