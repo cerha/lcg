@@ -651,6 +651,12 @@ class HTML2XML(Processor):
                     return text
             return ''
 
+        def _plain_text(self, element):
+            text = element.text or ''
+            for c in element.getchildren():
+                text += self._plain_text(c)
+            return text
+
         def _transform_sub(self, obj, nowhitespace=True):
             if type(xml.etree.ElementTree.Element) == type(object):
                 # Python >= 2.7
@@ -684,10 +690,9 @@ class HTML2XML(Processor):
                 followers.pop(0)
             transformed_title = self._transform_sub(element)
             if not transformed_title:
-                import pdb; pdb.set_trace()
                 transformed_title = self._make_content('text', {}, (), u'')
             title_content = self._make_content('heading', {}, transformed_title)
-            text_title = self._first_text(element)
+            text_title = self._plain_text(element)
             content = [title_content] + self._transform_sub(section_children)
             return self._make_content('section', dict(title=text_title), content)
 
