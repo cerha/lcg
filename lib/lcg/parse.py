@@ -1255,6 +1255,10 @@ class HTMLProcessor(object):
             transformed_title = self._transform_sub(element)
             if not transformed_title:
                 transformed_title = lcg.TextContent('')
+            if (isinstance(transformed_title, (tuple, list,)) and
+                len(transformed_title) == 1 and
+                isinstance(transformed_title[0], lcg.TextContent)):
+                transformed_title = lcg.TextContent(transformed_title[0].text().strip())
             title_content = lcg.Heading(transformed_title, int(level))
             text_title = self._plain_text(element).strip()
             content = self._transform_sub(section_children)
