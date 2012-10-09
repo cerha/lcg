@@ -1279,7 +1279,7 @@ class HTMLProcessor(object):
 
         def _link(self, element, followers):
             label = Container(self._transform_sub(element))
-            if 'enlarge-image' in element.attrib.get('class', ''):
+            if 'enlarge' in element.attrib.get('data-lcg-link-type', ''):
                 # Temporary hack to ignore link around images enlarged on click.
                 return label
             else:
