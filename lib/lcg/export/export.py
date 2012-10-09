@@ -319,13 +319,20 @@ class Exporter(object):
                 MathML: self._export_mathml,
                 }
     
-    def _export(self, node, context):
+    def _export(self, node, context, recursive=False):
         heading = node.heading().export(context)
         context.set_page_heading(heading)
+        content = node.content().export(context)
+        if recursive:
+            # FIXME: The context should be cloned here with the correct node in
+            # it, but it doesn't seem to matter in Braille output, which is
+            # currently the only use case for the recursive export.
+            content = self.concat(content,
+                                  *[self._export(n, context, recursive=True)
+                                    for n in node.children()])
         return self.concat(heading,
                            self._newline(context, 2),
-                           node.content().export(context),
-                           *[c.content().export(context) for c in node.children()])
+                           content)
 
     def uri(self, context, target, **kwargs):
         """Return the URI of the target as string.
@@ -402,7 +409,7 @@ class Exporter(object):
             raise UnsupportedElementType(element.__class__)
         return method(context, element)
         
-    def export(self, context):
+    def export(self, context, recursive=False):
         """Export the node represented by 'context' and return the corresponding output string.
 
         'context' is the exporter 'Context' instance as returned by the
@@ -410,7 +417,7 @@ class Exporter(object):
         instance to be exported.
 
         """
-        return self._export(context.node(), context)
+        return self._export(context.node(), context, recursive=recursive)
 
     # Basic utilitites
 

@@ -161,7 +161,7 @@ class BrailleExporter(FileExporter, Exporter):
     def _braille_characters(self):
         return string.join([unichr(i) for i in range(10240, 10496)], '')
 
-    def export(self, context):
+    def export(self, context, recursive=False):
         # Presentation
         presentation_set = context.presentation()
         node = context.node()
@@ -193,7 +193,7 @@ class BrailleExporter(FileExporter, Exporter):
         context.set_tables(braille_tables, hyphenation_tables)
         # Export
         def run_export(page_height=page_height):
-            text, hyphenation = super(BrailleExporter, self).export(context)
+            text, hyphenation = super(BrailleExporter, self).export(context, recursive=recursive)
             assert len(text) == len(hyphenation)
             # Line breaking
             hfill = self._HFILL
