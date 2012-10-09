@@ -398,7 +398,7 @@ class Html5Generator(HtmlGenerator):
         if compatibility_content:
             content = compatibility_content
             paired = True
-        audio = self._tag('audio', compatibility_content, _attr=('src', 'controls',), _paired=paired, src=src, controls=True)
+        audio = self._tag('audio', content, _attr=('src', 'controls',), _paired=paired, src=src, controls=True)
         return audio
 
     
@@ -1025,12 +1025,12 @@ class Html5Exporter(HtmlExporter):
     def _export_inline_audio(self, context, element):
         """Override with HTML5 audio element."""
         g = self._generator
-        audio = element.audio()
+        audio = element.audio(context)
         # TODO image not supported
         # TODO shared not supported
         # TODO title not supported
         # TODO descr not supported
-        return g.audio(src=uri)
+        return g.audio(src=audio.uri())
 
 
 class HtmlFileExporter(FileExporter, HtmlExporter):
