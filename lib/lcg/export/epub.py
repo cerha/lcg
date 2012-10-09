@@ -74,13 +74,26 @@ class EpubExporter(Exporter):
                 epub.writestr(self._node_path(n), self._xhtml_content_document(n, lang))
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME), self._package_document(node, lang))
             for resource in node.resources():
-                epub.writestr(self._resource_path(resource), resource.get())
+                data = self._get_resource_data(context, resource)
+                if data:
+                    epub.writestr(self._resource_path(resource), data)
         except:
             epub.close()
             raise
         epub.close()
         return fileobject.getvalue()
 
+    def _get_resource_data(self, context, resource):
+        """Return the resource file data as a (binary) string.
+
+        The base class implementation only handles resources with src_file.
+        Retrieving the file data for other resources is usually application
+        specific.  Thus this method may be implemented to support such
+        application specific resource retrieval.
+        
+        """
+        return resource.get()
+    
     def _container_path(self, *components):
         #TODO replace forbidden characters as per spec
         def ensure_pathenc(component):
