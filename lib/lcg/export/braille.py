@@ -195,6 +195,15 @@ class BrailleExporter(FileExporter, Exporter):
         def run_export(page_height=page_height):
             text, hyphenation = super(BrailleExporter, self).export(context, recursive=recursive)
             assert len(text) == len(hyphenation)
+            # Fix marker chars not preceded by newlines
+            toc_marker_regexp = re.compile('[^\n]' + self._TOC_MARKER_CHAR, re.MULTILINE)
+            while True:
+                match = toc_marker_regexp.search(text)
+                if match is None:
+                    break
+                n = match.start() + 1
+                text = text[:n] + '\n' + text[n:]
+                hyphenation = hyphenation[:n] + '0' + hyphenation[n:]
             # Line breaking
             hfill = self._HFILL
             page_strings = text.split('\f')
