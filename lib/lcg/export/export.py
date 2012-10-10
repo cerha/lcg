@@ -834,7 +834,7 @@ class Exporter(object):
         for node, subitems in element.items(context):
             add_item(node, subitems)
         export(items)
-        return self.concat(self.text(context, element.title(), lang=lang),
+        return self.concat(self.text(context, element.title() or '???', lang=lang),
                            self._newline(context, 2),
                            self.concat(*item_list),
                            self._newline(context))
@@ -1036,7 +1036,8 @@ class FileExporter(object):
                     raise IOError("Subprocess returned a non-zero exit status.")
         
     
-    def dump(self, node, directory, filename=None, variant=None, **kwargs):
+    def dump(self, node, directory, filename=None, variant=None, recursive=False,
+             **kwargs):
         """Write node's content into the output file.
 
         Arguments:
@@ -1050,6 +1051,8 @@ class FileExporter(object):
              language code corresponding to one of the node's available
              language variants.  If None, all available variants will be
              written.
+           recursive -- iff true, perform recursive export, i.e. export the
+             whole set of documents
 
         All other keyword arguments will be passed to the exporter context
         constructor (See the .
@@ -1058,7 +1061,10 @@ class FileExporter(object):
         variants = variant and (variant,) or node.variants() or (None,)
         for lang in variants:
             context = self.context(node, lang, **kwargs)
-            data = context.localize(self.export(context))
+            export_kwargs = {}
+            if recursive:
+                export_kwargs['recursive'] = True
+            data = context.localize(self.export(context, **export_kwargs))
             if filename:
                 fn = filename
             else:

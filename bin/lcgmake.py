@@ -149,17 +149,21 @@ def main(argv):
         return
     # Decide which exporter to use.
     kwargs = {}
+    export_kwargs = {}
     if output_format == PDF:
         from lcg import pdf
         cls = pdf.PDFExporter
+        export_kwargs['recursive'] = True
     elif output_format == HHP:
         from lcg import hhp
         cls = hhp.HhpExporter
     elif output_format == TEXT:
         cls = lcg.TextExporter
+        export_kwargs['recursive'] = True
     elif output_format == BRAILLE:
         from lcg import braille
         cls = lcg.BrailleExporter
+        export_kwargs['recursive'] = True
     elif output_format == EPUB:
         from lcg import EpubExporter
         cls = EpubExporter
@@ -192,7 +196,7 @@ def main(argv):
     else:
         presentation = read_style(presentation_option)
     exporter.dump(node, dst, filename=filename, variant=lang, sec_lang=opt['sec-lang'],
-                  presentation=presentation)
+                  presentation=presentation, **export_kwargs)
 
 def read_presentation(filename):
     presentation = lcg.Presentation()

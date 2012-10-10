@@ -2287,7 +2287,7 @@ class PDFExporter(FileExporter, Exporter):
 
     # Classic exports
         
-    def export(self, context, old_contexts=None, global_presentation=None):
+    def export(self, context, old_contexts=None, global_presentation=None, recursive=False):
         Context.reset()
         first_pass = (old_contexts is None)
         if old_contexts is None:
