@@ -608,17 +608,18 @@ class HtmlExporter(Exporter):
         return self._generator.a(label, href=context.uri(target), title=descr, type=element.type())
 
     def _container_attr(self, element, cls=None, lang=None, **kwargs):
-        if element.halign() == HorizontalAlignment.RIGHT:
-            style = 'text-align: right;'
-        elif element.halign() == HorizontalAlignment.CENTER:
-            style = 'text-align: center;'
-        elif element.halign() == HorizontalAlignment.JUSTIFY:
-            style = 'text-align: justify;'
-        else:
-            style = None
+        style = {}
+        if element.halign():
+            style['text-align'] = {HorizontalAlignment.RIGHT: 'right',
+                                   HorizontalAlignment.CENTER: 'center',
+                                   HorizontalAlignment.JUSTIFY: 'justify',
+                                   }[element.halign()]
+        presentation = element.presentation()
+        if presentation and presentation.indent_left:
+            style['margin-left'] = '%dem' % element.presentation().indent_left.size()
         attr = dict(cls=' '.join([x for x in (element.name(), cls) if x is not None]) or None,
                     lang=lang or element.lang(inherited=False),
-                    style=style,
+                    style=style and ' '.join(['%s: %s;' % x for x in style.items()]) or None,
                     **kwargs)
         return dict([(key, value) for key, value in attr.items() if value is not None])
     

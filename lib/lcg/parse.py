@@ -1170,12 +1170,6 @@ class HTMLProcessor(object):
                 (('div', ('style', '.*page-break-after: always;.*')), (self._single, dict(class_=NewPage))),
                 ('br', (self._single, dict(class_=NewLine))),
                 ('(html|div|span|strike|li|dt|dd)', self._container),
-                (('p', ('style', 'text-align: right;')),
-                 (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.RIGHT))),
-                (('p', ('style', 'text-align: center;')),
-                 (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.CENTER))),
-                (('p', ('style', 'text-align: justify;')),
-                 (self._container, dict(class_=Paragraph, halign=HorizontalAlignment.JUSTIFY))),
                 ('p', (self._container, dict(class_=Paragraph))),
                 ('blockquote', (self._container, dict(class_=Citation))),
                 ('strong', (self._container, dict(class_=Strong))),
@@ -1240,6 +1234,20 @@ class HTMLProcessor(object):
             return content
 
         def _container(self, element, followers, class_=Container, **kwargs):
+            if element.tag == 'p' and 'style' in element.attrib:
+                styles = dict([[xx.strip() for xx in x.split(':', 2)]
+                               for x in element.attrib['style'].strip(';').split(';')])
+                align = styles.get('text-align')
+                if align:
+                    kwargs['halign'] = {'right': HorizontalAlignment.RIGHT,
+                                        'center': HorizontalAlignment.CENTER,
+                                        'justify': HorizontalAlignment.JUSTIFY}.get(align)
+                margin = styles.get('margin-left')
+                if margin:
+                    margin = margin.strip('px')
+                    if margin.isdigit():
+                        kwargs['presentation'] = presentation = Presentation()
+                        presentation.indent_left = UFont(int(margin)/12)
             content = self._transform_sub(element)
             return class_(content, **kwargs)
 
