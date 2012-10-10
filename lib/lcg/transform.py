@@ -593,8 +593,25 @@ class HTML2XML(Processor):
                 self.handle_endtag(self._open_tags[-1])
             HTMLParser.HTMLParser.close()
 
+        def _hp_strip(self, tree):
+            if tree.tag == 'pre':
+                return
+            children = tree.getchildren()
+            if len(children) > 0:
+                first = children[0]
+                if first.tag == '_text':
+                    first.text = first.text.lstrip()
+            if len(children) > 1:
+                last = children[-1]
+                if last.tag == '_text':
+                    last.text = last.text.rstrip()
+            for c in children:
+                if c.tag != '_text':
+                    self._hp_strip(c)
+            
         def lcg_parse(self, html):
             self.feed(html)
+            self._hp_strip(self._hp_tree)
             return self._hp_tree
         
     class Transformer(Processor.Transformer):
