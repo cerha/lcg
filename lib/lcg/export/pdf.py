@@ -2447,7 +2447,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(PageBreak)
 
     def _export_new_line(self, context, element):
-        return make_element(Text, content='\n')
+        return make_element(SimpleMarkup, content='br')
 
     def _export_horizontal_separator(self, context, element):
         return make_element(HorizontalRule)
