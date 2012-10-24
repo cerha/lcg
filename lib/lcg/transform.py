@@ -751,7 +751,7 @@ class HTML2XML(Processor):
                     target = resource
                 else:
                     target = element.attrib['href']
-                return self._make_content('link', dict(target=target), (content,))
+                return self._make_content('link', dict(target=target), content)
 
         def _media(self, element, followers, tag=None, uri=None, **kwargs):
             resource = element.attrib.get('data-lcg-resource')

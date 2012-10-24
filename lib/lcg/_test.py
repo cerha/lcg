@@ -711,7 +711,8 @@ class HtmlImport(unittest.TestCase):
         context = lcg.HtmlExporter().context(n, None)
         content.set_parent(n)
         content.export(context)
-
+        lcg.html2data(html, lcg.HTML2XML)
+        
 tests.add(HtmlImport)
 
 
