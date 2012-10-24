@@ -196,7 +196,14 @@ class XMLProcessor(Processor):
             from xml.etree import ElementTree
             top = element
             tree = ElementTree.Element('_lcg')
-            def export(parent_tree, node):
+            def subexport(tree, node):
+                last_node = tree
+                for n in node.childNodes:
+                    export(tree, n, last_node)
+                    tree_children = tree.getchildren()
+                    if tree_children:
+                        last_node = tree_children[-1]
+            def export(parent_tree, node, preceding_node):
                 node_type = node.nodeType
                 if node_type == node.ELEMENT_NODE:
                     tree = ElementTree.SubElement(parent_tree, node.tagName)
@@ -204,20 +211,22 @@ class XMLProcessor(Processor):
                     for i in range(attributes.length):
                         a = attributes.item(i)
                         tree.set(a.name, a.value)
-                    for n in node.childNodes:
-                        export(tree, n)
+                    subexport(tree, node)
                 elif node_type == node.TEXT_NODE or node_type == node.ENTITY_NODE:
-                    value = node.nodeValue.strip()
-                    if value:
-                        assert not parent_tree.text, node
-                        parent_tree.text = node.nodeValue
+                    value = node.nodeValue
+                    if value.strip():
+                        if preceding_node is parent_tree:
+                            assert not parent_tree.text, node
+                            parent_tree.text = value
+                        else:
+                            assert not preceding_node.tail, preceding_node
+                            preceding_node.tail = value
                 elif node_type == node.COMMENT_NODE:
                     pass
                 else:
                     raise Exception('Unhandled node type', node, node.nodeType)
             assert len(top.childNodes) == 1, top.childNodes
-            for n in top.childNodes:
-                export(tree, n)
+            subexport(tree, top)
             return tree.getchildren()[0]
 
         def lcg_parse(self, xml_):
@@ -285,6 +294,19 @@ class XML2Content(XMLProcessor):
                 ('row', (self._container, dict(class_=lcg.TableRow))),
                 ('cell', self._table_cell),
                 )
+        
+        def _transform_sub(self, element, children=None):
+            if children is None:
+                children = element.getchildren()
+            transformed = []
+            def add_text(text):
+                if text:
+                    transformed.append(lcg.TextContent(text))
+            add_text(element.text)
+            for c in children:
+                transformed.append(self.transform(c))
+                add_text(c.tail)
+            return transformed
 
         def _container(self, element, followers, class_=lcg.Container, **kwargs):
             return class_(self._transform_sub(element), **kwargs)
