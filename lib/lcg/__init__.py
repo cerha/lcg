@@ -36,7 +36,7 @@ from presentation import *
 from export import *
 from parse import *
 from read import *
-from transform import data2content, data2html, html2data
+from transform import data2content, data2html, html2data, HTML2XML, XML2HTML, XML2Content
 
 # Resolve cyclic dependencies.
 
