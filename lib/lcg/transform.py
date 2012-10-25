@@ -209,20 +209,30 @@ class XMLProcessor(Processor):
 
     class Parser(Processor.Parser):
 
+        _TAG_PRESERVE_WHITESPACE = {'preformatted': True,
+                                    'list': False,
+                                    'definitions': False,
+                                    'table': False,
+                                    'row': False}
+
         def _lcg_dom_content(self, element):
             from xml.etree import ElementTree
             top = element
             tree = ElementTree.Element('_lcg')
             def subexport(tree, node):
+                if hasattr(node, 'tagName'):
+                    spacing = self._TAG_PRESERVE_WHITESPACE.get(node.tagName)
+                else:
+                    spacing = False
                 child_nodes = node.childNodes
                 last_node = tree
                 final_node = child_nodes and child_nodes[-1]
                 for n in child_nodes:
-                    export(tree, n, last_node, final_node)
+                    export(tree, n, last_node, final_node, spacing)
                     tree_children = tree.getchildren()
                     if tree_children:
                         last_node = tree_children[-1]
-            def export(parent_tree, node, preceding_node, final_node):
+            def export(parent_tree, node, preceding_node, final_node, spacing):
                 node_type = node.nodeType
                 if node_type == node.ELEMENT_NODE:
                     tree = ElementTree.SubElement(parent_tree, node.tagName)
@@ -233,10 +243,18 @@ class XMLProcessor(Processor):
                     subexport(tree, node)
                 elif node_type == node.TEXT_NODE or node_type == node.ENTITY_NODE:
                     value = node.nodeValue
-                    if preceding_node is parent_tree:
-                        value = value.lstrip()
-                    if node is final_node:
-                        value = value.rstrip()
+                    if spacing is True:
+                        if preceding_node is parent_tree and value and value[0] == '\n':
+                            value = value[1:]
+                        if node is final_node and value and value[-1] == '\n':
+                            value = value[:-1]
+                    elif spacing is False:
+                        value = value.strip()
+                    else:
+                        if preceding_node is parent_tree:
+                            value = value.lstrip()
+                        if node is final_node:
+                            value = value.rstrip()
                     if value:
                         if preceding_node is parent_tree:
                             assert not parent_tree.text, node
