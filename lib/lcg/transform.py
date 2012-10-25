@@ -197,13 +197,15 @@ class XMLProcessor(Processor):
             top = element
             tree = ElementTree.Element('_lcg')
             def subexport(tree, node):
+                child_nodes = node.childNodes
                 last_node = tree
-                for n in node.childNodes:
-                    export(tree, n, last_node)
+                final_node = child_nodes and child_nodes[-1]
+                for n in child_nodes:
+                    export(tree, n, last_node, final_node)
                     tree_children = tree.getchildren()
                     if tree_children:
                         last_node = tree_children[-1]
-            def export(parent_tree, node, preceding_node):
+            def export(parent_tree, node, preceding_node, final_node):
                 node_type = node.nodeType
                 if node_type == node.ELEMENT_NODE:
                     tree = ElementTree.SubElement(parent_tree, node.tagName)
@@ -214,7 +216,11 @@ class XMLProcessor(Processor):
                     subexport(tree, node)
                 elif node_type == node.TEXT_NODE or node_type == node.ENTITY_NODE:
                     value = node.nodeValue
-                    if value.strip():
+                    if preceding_node is parent_tree:
+                        value = value.lstrip()
+                    if node is final_node:
+                        value = value.rstrip()
+                    if value:
                         if preceding_node is parent_tree:
                             assert not parent_tree.text, node
                             parent_tree.text = value
