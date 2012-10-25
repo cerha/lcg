@@ -134,6 +134,23 @@ class Processor(object):
             self._compiled_matchers = compiled_matchers
 
         def _make_content(self, tag, attributes, children, text=None):
+            """Make and return new 'xml.etree.ElementTree.Element'.
+
+            Arguments:
+
+              tag -- tag of the element; string
+              attributes -- dictionary of attribute names (keys; strings) and
+                attribute values (values; basestrings) of the newly created
+                element
+              childern -- sequence of 'xml.etree.ElementTree.Element' instances
+                to be set as children of the newly created element.
+              text -- if not 'None' then add the text (basestring) to the
+                element.  Note this represents just the text immediately after
+                the opening tag in XML serialization; it is often a good idea
+                not to make elements combining both text and children (although
+                there is nothing wrong if they do).
+
+            """
             attr = {}
             for k, v in attributes.items():
                 if v is not None:
@@ -246,6 +263,21 @@ class XMLProcessor(Processor):
             return ()
 
         def _transform_sub(self, element, children=None):
+            """Transform 'element' children and return the result.
+
+            Arguments:
+
+              element -- element whose children should be transformed;
+                'xml.etree.ElementTree.Element' instance
+              children -- if 'None' then transform 'element' children,
+                otherwise transform the given sequence of
+                'xml.etree.ElementTree.Element' instances
+
+
+            The return value is a sequence of transformed children, each of the
+            values is as returned from 'transform()' method.
+            
+            """
             if children is None:
                 children = element.getchildren()
             return [self.transform(c) for c in children]
@@ -687,6 +719,18 @@ class HTML2XML(Processor):
                 )
             
         def _first_text(self, element):
+            """Return first text found in 'element'.
+
+            If element doesn't contain non-empty text then look for the text in
+            its children (including their whole subtrees but not attributes) in
+            depth-first order.  If no text is found anywhere, return an empty
+            string.
+
+            Arguments:
+
+              element -- 'xml.etree.ElementTree.Element' instance
+
+            """
             text = element.text
             if text:
                 return text
@@ -697,6 +741,19 @@ class HTML2XML(Processor):
             return ''
 
         def _plain_text(self, element):
+            """Return all text found in element.
+
+            Take the text of the element and all texts of its children
+            including the whole subtrees.  Concatenate the texts in depth-first
+            order and return the resulting text (empty string if no text is
+            found).  Texts are taken just from element texts, not from
+            attributes.
+
+            Arguments:
+
+              element -- 'xml.etree.ElementTree.Element' instance
+              
+            """
             text = element.text or ''
             for c in element.getchildren():
                 text += self._plain_text(c)
