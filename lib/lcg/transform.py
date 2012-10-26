@@ -389,8 +389,7 @@ class XML2Content(XMLProcessor):
             return lcg.Section(text_title, content, heading=heading)
 
         def _definitions(self, element, followers):
-            items = self._transform_sub(element)
-            paired_items = [i.getchildren() for i in items]
+            paired_items = [self._transform_sub(e) for e in element.getchildren()]
             return lcg.DefinitionList(paired_items)
             
         def _anchor(self, element, followers):
