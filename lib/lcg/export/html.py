@@ -611,6 +611,7 @@ class HtmlExporter(Exporter):
         style = {}
         if element.halign():
             style['text-align'] = {HorizontalAlignment.RIGHT: 'right',
+                                   HorizontalAlignment.LEFT: 'left',
                                    HorizontalAlignment.CENTER: 'center',
                                    HorizontalAlignment.JUSTIFY: 'justify',
                                    }[element.halign()]
