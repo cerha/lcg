@@ -146,6 +146,12 @@ class HtmlGenerator(object):
                 return concat(content, separator='\n')
         return self._tag('p', content, **kwargs)
      
+    def blockquote(self, content, **kwargs):
+        return self._tag('blockquote', content, **kwargs)
+    
+    def footer(self, content, **kwargs):
+        return self._tag('footer', content, **kwargs)
+    
     def br(self, **kwargs):
         return self._tag('br', _paired=False, **kwargs)
      
@@ -576,7 +582,23 @@ class HtmlExporter(Exporter):
     def _export_citation(self, context, element):
         return self._export_container(context, element, wrap=self._generator.span,
                                       lang=element.lang(inherited=False) or context.sec_lang(),
-                                      cls='citation')
+                                      cls='lcg-citation')
+    
+    def _export_quotation(self, context, element):
+        g = self._generator
+        def wrap(content, cls='lcg-quotation', **kwargs):
+            uri = element.uri()
+            if uri:
+                source = g.a(element.source(), href=uri)
+            else:
+                source = element.source()
+            if source or uri:
+                content += g.footer(u'— ' + source)
+            return g.blockquote(content, cls=cls, **kwargs)
+        return self._export_container(context, element, wrap=wrap)
+
+    def _export_footer(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.footer)
 
     def _export_superscript(self, context, element):
         return self._export_container(context, element, wrap=self._generator.sup)

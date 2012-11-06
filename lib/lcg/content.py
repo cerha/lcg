@@ -372,6 +372,32 @@ class Citation(Container):
     """Citation of a text in another language."""
     pass
 
+class Quotation(Container):
+    """Quotation of content from other source."""
+
+    def __init__(self, content, source=None, uri=None, **kwargs):
+        """Arguments:
+
+          content -- quoted content as lcg.Content instance
+          source -- reference to the source of the quotation, such as the
+            original author, publication, web page etc. (basestring)
+          uri -- link to the source (basestring)
+            
+        """
+        assert source is None or isinstance(source, basestring), source
+        assert uri is None or isinstance(uri, basestring), uri
+        self._source = source
+        self._uri = uri
+        super(Quotation, self).__init__(content, **kwargs)
+
+    def source(self):
+        """Return the qoutation source as passed to the constructor."""
+        return self._source
+
+    def uri(self):
+        """Return the qoutation source URI as passed to the constructor."""
+        return self._uri
+        
 class Superscript(Container):
     """Text vertically aligned above the normal line level."""
     pass

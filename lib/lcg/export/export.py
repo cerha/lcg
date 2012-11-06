@@ -40,7 +40,7 @@ from lcg import log, concat, Localizable, Localizer, \
     DefinitionList, FieldSet, \
     Table, TableCell, TableHeading, TableRow, \
     TextContent, Heading, Title, Anchor, Link, \
-    Strong, Emphasized, Underlined, Code, Citation, Superscript, Subscript, \
+    Strong, Emphasized, Underlined, Code, Citation, Quotation, Superscript, Subscript, \
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
     Substitution, SetVariable, MathML
@@ -291,6 +291,7 @@ class Exporter(object):
                 Underlined: self._export_underlined,
                 Code: self._export_code,
                 Citation: self._export_citation,
+                Quotation: self._export_quotation,
                 Superscript: self._export_superscript,
                 Subscript: self._export_subscript,
                 TextContent: self._export_text_content,
@@ -584,6 +585,10 @@ class Exporter(object):
                 
     def _export_citation(self, context, element):
         """Export the given 'Citation' element."""
+        return self._export_container(context, element)
+                
+    def _export_quotation(self, context, element):
+        """Export the given 'Quotation' element."""
         return self._export_container(context, element)
                 
     def _export_superscript(self, context, element):

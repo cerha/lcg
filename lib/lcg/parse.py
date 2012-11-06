@@ -1171,7 +1171,7 @@ class HTMLProcessor(object):
                 ('br', (self._single, dict(class_=NewLine))),
                 ('(html|div|span|strike|li|dt|dd)', self._container),
                 ('p', (self._container, dict(class_=Paragraph))),
-                ('blockquote', (self._container, dict(class_=Citation))),
+                ('blockquote', self._blockquote),
                 ('strong', (self._container, dict(class_=Strong))),
                 ('em', (self._container, dict(class_=Emphasized))),
                 ('u', (self._container, dict(class_=Underlined))),
@@ -1251,6 +1251,24 @@ class HTMLProcessor(object):
             content = self._transform_sub(element)
             return class_(content, **kwargs)
 
+        def _blockquote(self, element, followers):
+            kwargs = {}
+            footer = element.find('footer')
+            if footer:
+                # Convert the <footer> content inside <blockquote> into Quotation 'kwargs'.
+                element.remove(footer)
+                link = footer.find('a')
+                if link:
+                    kwargs['source'] = self._first_text(link)
+                    kwargs['uri'] = link.attrib.get('href')
+                else:
+                    text = self._first_text(footer)
+                    if text.startswith(u'— '):
+                        text = text[2:]
+                    kwargs['source'] = text
+            content = self._transform_sub(element)
+            return lcg.Quotation(content, **kwargs)
+            
         def _section(self, element, followers):
             level = element.tag[1]
             section_children = []
