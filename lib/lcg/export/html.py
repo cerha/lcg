@@ -661,17 +661,30 @@ class HtmlExporter(Exporter):
     def _export_paragraph(self, context, element):
         return self._export_container(context, element, wrap=self._generator.p)
 
+    def _export_heading(self, context, element):
+        return self._export_container(context, element, wrap=self._generator.p)
+
     def _export_section(self, context, element):
         g = self._generator
         level = len(element.section_path()) + 1
         anchor = element.anchor()
-        heading = element.heading().export(context)
         backref = element.backref()
         if backref:
             href = "#" + backref
         else:
             href = None
-        return g.div((g.h(g.a(heading, href=href, name=anchor, cls='backref'), level),
+        # Get rid of the outer Heading instance and only consider the contained content.
+        heading = element.heading()
+        lang = None
+        if len(heading.content()) == 1 and isinstance(heading.content()[0], lcg.Container):
+            # In this case, we want replace the Container created in
+            # HTMLProcessor._section() and may have the lang attribute set by a
+            # container with no lang (to avoid <div> tag when calling
+            # heading.export()) and use the lang for the <h> tag.
+            lang = heading.content()[0].lang()
+            heading = lcg.Container(heading.content()[0].content())
+        return g.div((g.h(g.a(heading.export(context), href=href, name=anchor, cls='backref'),
+                          level, lang=lang),
                       self.concat(self._exported_container_content(context, element))),
                      id='section-' + anchor,
                      **self._container_attr(element))

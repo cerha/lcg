@@ -1249,7 +1249,7 @@ class HTMLProcessor(object):
                         kwargs['presentation'] = presentation = Presentation()
                         presentation.indent_left = UFont(int(margin)/12)
             content = self._transform_sub(element)
-            return class_(content, **kwargs)
+            return class_(content, lang=element.attrib.get('lang'), **kwargs)
 
         def _blockquote(self, element, followers):
             kwargs = {}
@@ -1278,17 +1278,15 @@ class HTMLProcessor(object):
                     break
                 section_children.append(c)
                 followers.pop(0)
-            transformed_title = self._transform_sub(element)
-            if not transformed_title:
-                transformed_title = lcg.TextContent('')
-            if (isinstance(transformed_title, (tuple, list,)) and
-                len(transformed_title) == 1 and
-                isinstance(transformed_title[0], lcg.TextContent)):
-                transformed_title = lcg.TextContent(transformed_title[0].text().strip())
-            title_content = lcg.Heading(transformed_title, int(level))
-            text_title = self._plain_text(element).strip()
+            title_text = self._plain_text(element).strip()
+            title_content = self._transform_sub(element)
+            if not title_content:
+                title_content = (lcg.TextContent(title_text),)
+            elif len(title_content) == 1 and isinstance(title_content[0], lcg.TextContent):
+                title_content = lcg.TextContent(title_content[0].text().strip())
+            title_content = lcg.Container(title_content, lang=element.attrib.get('lang'))
             content = self._transform_sub(section_children)
-            return Section(text_title, content, heading=title_content)
+            return Section(title_text, content, heading=title_content)
 
         def _list(self, element, followers, order=None):
             items = self._transform_sub(element)
