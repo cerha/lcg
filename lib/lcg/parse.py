@@ -1262,7 +1262,7 @@ class HTMLProcessor(object):
                     kwargs['source'] = self._first_text(link)
                     kwargs['uri'] = link.attrib.get('href')
                 else:
-                    text = self._first_text(footer)
+                    text = self._first_text(footer).lstrip()
                     if text.startswith(u'— '):
                         text = text[2:]
                     kwargs['source'] = text
