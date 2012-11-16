@@ -662,7 +662,7 @@ class HtmlExporter(Exporter):
         return self._export_container(context, element, wrap=self._generator.p)
 
     def _export_heading(self, context, element):
-        return self._export_container(context, element, wrap=self._generator.p)
+        return self._export_container(context, element)
 
     def _export_section(self, context, element):
         g = self._generator
