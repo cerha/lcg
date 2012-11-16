@@ -22,6 +22,7 @@ from lcg import *
 from lcg.export import *
 
 from xml.sax import saxutils
+import random
 
 _ = TranslatableTextFactory('lcg')
 
@@ -416,7 +417,13 @@ class HtmlExporter(Exporter):
         def __init__(self, *args, **kwargs):
             self._generator = kwargs['generator']
             self._shared_player_controls = []
-            self._unique_id = 0
+            # We generate a random string prefix for all unique identifiers.
+            # This makes the identifiers unique even if we compose a page from
+            # pieces exported in different contexts, which is typical when
+            # using AJAX.
+            self._unique_id_prefix = (random.choice(string.ascii_lowercase) +
+                                      ''.join(random.sample(string.digits + string.ascii_lowercase + '-', 11)))
+            self._unique_id_index = 0
             del kwargs['generator']
             super(HtmlExporter.Context, self).__init__(*args, **kwargs)
             
@@ -430,8 +437,8 @@ class HtmlExporter(Exporter):
             id.
             
             """
-            self._unique_id += 1
-            return 'id%d' % self._unique_id
+            self._unique_id_index += 1
+            return '%s%x' % (self._unique_id_prefix, self._unique_id_index)
     
         def connect_shared_player(self, *args):
             """Connect given player controls to the shared player.
