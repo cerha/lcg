@@ -227,7 +227,7 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
     /* Notebook widget with tabs.
      *
      * This is the Javascript counterpart of the Python class `lcg.Notebook'.
-     * The notebook has tabs at the top and there is a content belonging to
+     * The notebook has tabs at the top and there is a content page belonging to
      * each tab.  Switching the tabs switches the visible content below the tab
      * switcher.  There may be multiple instances on one page.
      *
@@ -251,11 +251,12 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	$super(li, id, prev, parent);
 	var link = li.down('a');
 	var href = link.getAttribute('href'); // The href always starts with '#'.
-	var tab = $('section-'+href.substr(1));
-	li._lcg_notebook_tab = tab;
-	tab._lcg_notebook_item = li;
-	tab.down('h1,h2,h3,h4,h5,h6').hide();
-	tab.hide();
+	var page = $('section-'+href.substr(1));
+	li._lcg_notebook_page = page;
+	page._lcg_notebook_item = li;
+	page.down('h1,h2,h3,h4,h5,h6').hide();
+	page.hide();
+	page.addClassName('notebook-page');
     },
 
     current_location_active_item: function() {
@@ -263,9 +264,9 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	var match = self.location.href.match('#');
 	if (match != null) {
 	    var parts = self.location.href.split('#', 2);
-	    var tab = this.node.down('#section-'+parts[1]);
-	    if (tab && tab._lcg_notebook_item) {
-		return tab._lcg_notebook_item;
+	    var page = this.node.down('#section-'+parts[1]);
+	    if (page && page._lcg_notebook_item) {
+		return page._lcg_notebook_item;
 	    }
 	}
     },
@@ -287,9 +288,9 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	    if (cookie) {
 		var parts = cookie.split(':', 2);
 		if (parts[0] == cls) {
-		    var tab = this.node.down('#'+parts[1]);
-		    if (tab && tab._lcg_notebook_item) {
-			return tab._lcg_notebook_item;
+		    var page = this.node.down('#'+parts[1]);
+		    if (page && page._lcg_notebook_item) {
+			return page._lcg_notebook_item;
 		    }
 		}
 	    }
@@ -303,24 +304,66 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	if (previously_active_item != item) {
 	    if (previously_active_item) {
 		previously_active_item.down('a').removeClassName('current');
-		previously_active_item._lcg_notebook_tab.hide();
+		previously_active_item._lcg_notebook_page.hide();
 	    }
 	    item.down('a').addClassName('current');
-	    item._lcg_notebook_tab.show();
+	    var page = item._lcg_notebook_page;
 	    var cls = this.node.getAttribute('class');
 	    if (cls) {
-		var cookie = cls+':'+item._lcg_notebook_tab.getAttribute('id');
+		var cookie = cls+':'+item._lcg_notebook_page.getAttribute('id');
 		lcg.cookies.set(this.COOKIE, cookie);
 	    }
+	    page.show();
+	    var callbacks = lcg.Notebook._activation_callbacks[page.id];
+	    if (callbacks)
+		for (var i = callbacks.length - 1; i >= 0; i--) {
+		    // Process in reverse to be able to simply remove callbacks
+		    // which are not to be repeated.
+		    var callback = callbacks[i][0];
+		    var repeat = callbacks[i][1];
+		    callback()
+		    if (!repeat)
+			callbacks.splice(i, 1); // Remove the callback.
+		}
 	}
     },
 
     cmd_activate: function (item) {
 	this.activate_item(item);
-	this.set_focus(item._lcg_notebook_tab);
+	this.set_focus(item._lcg_notebook_page);
     }
 
 });
+
+lcg.Notebook._activation_callbacks = {};
+
+lcg.Notebook.on_activation = function (page, callback, repeat) {
+    /* Register a callback to be called on notebook tab activation.
+       
+    Arguments: 
+      page -- notebook page DOM element -- the div enclosing the
+        notebook page contents
+      callback -- javascript function to be called when the page is activated.
+        The callbacked is always called once for the initally active tab in the
+        notebook and then on each tab switch for the newly activated tab.
+      repeat -- if true, the callback will be repeated on each activation, if
+        false (by default), the callback will be called just once, when given
+        tab is activated for the first time.
+
+    Note: This is a class method, not an instance method, because the Notebook
+    instance often doesn't exist yet, when the caller needs to register a
+    callback.  The instance is created when the whole notebook contents (all
+    tabs and pages) is available, while the registration is typically done by
+    the objects which appear inside the notebook pages.
+
+    */
+    if (typeof repeat == 'undefined')
+	repeat = false;
+    var callbacks = lcg.Notebook._activation_callbacks[page.id];
+    if (!callbacks)
+	var callbacks = lcg.Notebook._activation_callbacks[page.id] = [];
+    callbacks[callbacks.length] = [callback, repeat];
+};
 
 
 lcg.FoldableTree = Class.create(lcg.Menu, {
