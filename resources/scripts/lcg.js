@@ -93,7 +93,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
     
     initialize: function ($super, element_id) {
 	$super();
-	this.node = node = $(element_id);
+	var node = this.node = $(element_id);
 	node._lcg_widget_instance = this;
 	node.setAttribute('role', 'application');
 	// Go through the menu and assign aria roles and key bindings.
