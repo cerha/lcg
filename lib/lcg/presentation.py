@@ -140,6 +140,8 @@ class Presentation(object):
     mapping Unicode Braille and whitespace characters to output device
     characters.
     """
+    device_init = None
+    """Initial string to send to the Braille printer."""
     braille_tables = None
     """Dictionary of Braille tables to use.
     Keys are language codes (strings), values are lists of Braille table names

@@ -308,9 +308,13 @@ class BrailleExporter(FileExporter, Exporter):
         pages = run_export()
         # Device character set transformation
         final_text = string.join([string.join(p, '\n') for p in pages], '\f')
+        if final_text and final_text[-1] != '\f':
+            final_text += '\f'
         output = ''
         for c in final_text:
             output += device_table[c]
+        if presentation.device_init:
+            output = presentation.device_init + output
         return output
             
     # Basic utilitites
