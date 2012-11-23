@@ -25,7 +25,7 @@ except ImportError:
     pass
 try:
     import braille
-    from braille import BrailleExporter, braille_presentation
+    from braille import BrailleError, BrailleExporter, braille_presentation
 except ImportError:
     pass
 import ims

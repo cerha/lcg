@@ -88,6 +88,29 @@ def braille_presentation(presentation_file='presentation-braille.py'):
             setattr(presentation, o, confmodule.__dict__[o])
     return presentation
 
+
+class BrailleError(Exception):
+    """Exception raised on Braille formatting errors.
+
+    The exception provides a human readable explanation message.
+
+    """
+    def __init__(self, message):
+        """
+        Arguments:
+
+          message -- message explaining the error; unicode
+          
+        """
+        assert isinstance(message, basestring), message
+        super(BrailleError, self).__init__(message)
+
+    def message(self):
+        """Return message explaining the error; basestring.
+        """
+        return self.args[0]
+
+
 class BrailleExporter(FileExporter, Exporter):
     """Transforming structured content objects to Braille output.    
     """
@@ -312,7 +335,10 @@ class BrailleExporter(FileExporter, Exporter):
             final_text += '\f'
         output = ''
         for c in final_text:
-            output += device_table[c]
+            try:
+                output += device_table[c]
+            except KeyError:
+                raise BrailleError(_("Text can't be represented on given output device."))
         if presentation.device_init:
             output = presentation.device_init + output
         return output
