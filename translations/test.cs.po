@@ -7,30 +7,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-09-30 11:24+0200\n"
+"POT-Creation-Date: 2012-11-23 15:34+0100\n"
 "PO-Revision-Date: 2008-09-30 08:59+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 
-#: ../lib/lcg/_test.py:107 ../lib/lcg/_test.py:108 ../lib/lcg/_test.py:291
-#: ../lib/lcg/_test.py:322
+#: ../lib/lcg/_test.py:108 ../lib/lcg/_test.py:109 ../lib/lcg/_test.py:313
 msgid "Bob"
 msgstr "Bobik"
 
-#: ../lib/lcg/_test.py:107
+#: ../lib/lcg/_test.py:108
 #, python-format
 msgid "His name is \"%s\""
 msgstr "Jmenuje se \"%s\""
 
-#: ../lib/lcg/_test.py:108 ../lib/lcg/_test.py:291 ../lib/lcg/_test.py:322
+#: ../lib/lcg/_test.py:109 ../lib/lcg/_test.py:313
 msgid "Joe"
 msgstr "Pepa"
 
-#: ../lib/lcg/_test.py:154 ../lib/lcg/_test.py:173
+#: ../lib/lcg/_test.py:155 ../lib/lcg/_test.py:174
 #, python-format
 msgid "I have %d problem."
 msgid_plural "I have %d problems."
@@ -38,7 +38,7 @@ msgstr[0] "Mám %d problém."
 msgstr[1] "Mám %d problémy."
 msgstr[2] "Mám %d problémů."
 
-#: ../lib/lcg/_test.py:163 ../lib/lcg/_test.py:178
+#: ../lib/lcg/_test.py:164 ../lib/lcg/_test.py:179
 #, python-format
 msgid "%(n)d record found in table %(name)s."
 msgid_plural "%(n)d records found in table %(name)s."
@@ -46,7 +46,7 @@ msgstr[0] "%(n)d záznam nalezen v tabulce %(name)s."
 msgstr[1] "%(n)d záznamy nalezeny v tabulce %(name)s."
 msgstr[2] "%(n)d záznamů nalezeno v tabulce %(name)s."
 
-#: ../lib/lcg/_test.py:291 ../lib/lcg/_test.py:322
+#: ../lib/lcg/_test.py:313
 #, python-format
 msgid "%(name1)s is smarter than %(name2)s."
 msgstr "%(name1)s je chytřejší než %(name2)s."
