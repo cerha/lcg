@@ -878,7 +878,7 @@ class BrailleExport(unittest.TestCase):
         result = exporter.export(context)
         braille = header + braille
         n_lines = page_height.size() - len(braille.split('\n'))
-        braille = braille + '\n' * n_lines + footer
+        braille = braille + '\n' * n_lines + footer + '\f'
         assert result == braille, \
                ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
                 (text, braille, result,))
