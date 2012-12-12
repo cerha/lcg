@@ -313,7 +313,23 @@ class HtmlGenerator(object):
     def textarea(self, name, value='', **kwargs):
         attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
         return self._tag('textarea', value, attr, name=name, **kwargs)
+
+    # HTML 5 Media tags
      
+    def audio(self, src, content=None, controls=True, **kwargs):
+        return self._tag('audio', content,
+                         _attr=('autoplay', 'controls', 'loop', 'preload', 'title', 'src'),
+                         _paired=content is not None, src=src, controls=controls, **kwargs)
+
+    def video(self, src, content=None, controls=True, **kwargs):
+        return self._tag('video', content,
+                         _attr=('autoplay', 'controls', 'height', 'loop', 'muted', 'poster',
+                                'preload', 'src', 'title', 'width'),
+                         _paired=content is not None, src=src, controls=controls, **kwargs)
+
+    def source(self, src, **kwargs):
+        return self._tag('source', _attr=('src', 'type'), _paired=False, src=src, **kwargs)
+
     # JavaScript code generation.
      
     def script(self, code, noscript=None):
@@ -373,26 +389,12 @@ class HtmlGenerator(object):
         return '%s(%s)' % (fname, fargs)
 
 
-class Html5Generator(HtmlGenerator):
+class XhtmlGenerator(HtmlGenerator):
 
     def _attribute(self, name, value):
         if value is True:
             value = 'yes'
-        return super(Html5Generator, self)._attribute(name, value)
-
-    def audio(self, src, content=None, controls=True, **kwargs):
-        return self._tag('audio', content,
-                         _attr=('autoplay', 'controls', 'loop', 'preload', 'title', 'src'),
-                         _paired=content is not None, src=src, controls=controls, **kwargs)
-
-    def video(self, src, content=None, controls=True, **kwargs):
-        return self._tag('video', content,
-                         _attr=('autoplay', 'controls', 'height', 'loop', 'muted', 'poster',
-                                'preload', 'src', 'title', 'width'),
-                         _paired=content is not None, src=src, controls=controls, **kwargs)
-
-    def source(self, src, **kwargs):
-        return self._tag('source', _attr=('src', 'type'), _paired=False, src=src, **kwargs)
+        return super(Xhtmlgenerator, self)._attribute(name, value)
 
     
 class HtmlExporter(Exporter):
@@ -1044,7 +1046,7 @@ class HtmlExporter(Exporter):
 
 
 class Html5Exporter(HtmlExporter):
-    Generator = Html5Generator
+    Generator = XhtmlGenerator
 
     def _export_inline_audio(self, context, element):
         """Override with HTML5 audio element."""
