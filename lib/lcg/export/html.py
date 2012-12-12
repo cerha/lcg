@@ -400,6 +400,9 @@ class Html5Generator(HtmlGenerator):
                                 'preload', 'src', 'title', 'width'),
                          _paired=content is not None, src=src, controls=controls, **kwargs)
 
+    def source(self, src, **kwargs):
+        return self._tag('source', _attr=('src', 'type'), _paired=False, src=src, **kwargs)
+
     
 class HtmlExporter(Exporter):
     Generator = HtmlGenerator
