@@ -1043,13 +1043,23 @@ class Html5Exporter(HtmlExporter):
 
     def _export_inline_audio(self, context, element):
         """Override with HTML5 audio element."""
+        # TODO: shared not supported
         g = self._generator
         audio = element.audio(context)
-        # TODO image not supported
-        # TODO shared not supported
-        # TODO title not supported
-        # TODO descr not supported
-        return g.audio(src=audio.uri())
+        image = element.image(context)
+        title = element.title()
+        descr = element.descr()
+        uri = context.uri(audio)
+        if image:
+            # TODO: image not supported in AUDIO tag capable browsers (only in
+            # compatibility content).
+            label = g.img(context.uri(image), alt=title)
+            descr = descr or title
+        else:
+            label = title or audio.title() or audio.filename()
+        return g.audio(src=uri, title=descr or title or audio.title() or audio.filename(),
+                       # 'content' is displayed only in browsers not supporting the audio tag.
+                       content=g.a(label, href=uri, title=descr))
 
 
 class HtmlFileExporter(FileExporter, HtmlExporter):
