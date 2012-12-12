@@ -394,6 +394,12 @@ class Html5Generator(HtmlGenerator):
                          _attr=('autoplay', 'controls', 'loop', 'preload', 'title', 'src'),
                          _paired=content is not None, src=src, controls=controls, **kwargs)
 
+    def video(self, src, content=None, controls=True, **kwargs):
+        return self._tag('video', content,
+                         _attr=('autoplay', 'controls', 'height', 'loop', 'muted', 'poster',
+                                'preload', 'src', 'title', 'width'),
+                         _paired=content is not None, src=src, controls=controls, **kwargs)
+
     
 class HtmlExporter(Exporter):
     Generator = HtmlGenerator
@@ -1061,6 +1067,32 @@ class Html5Exporter(HtmlExporter):
                        # 'content' is displayed only in browsers not supporting the audio tag.
                        content=g.a(label, href=uri, title=descr))
 
+    def _export_inline_video(self, context, element):
+        """Export emedded video player for given video file.
+
+        The 'Video' resource instance is rendered as a standalone Flash video
+        player preloaded with given video.  If Flash or Javascript is not
+        available, only a link to the video file is rendered.
+
+        """
+        video = element.video(context)
+        if video.filename().lower().endswith('.flv'):
+            return super(Html5Exporter, self)._export_inline_video(context, element)
+        g = self._generator
+        size = element.size()
+        if size is None:
+            width, height = (None, None)
+        else:
+            width, height = size
+        image = element.image(context)
+        uri = context.uri(video)
+        title = element.title() or video.title() or video.filename()
+        descr = element.descr() or video.descr()
+        return g.video(src=uri, title=descr or title, poster=image and context.uri(image),
+                       width=width, height=height,
+                       # 'content' is displayed only in browsers not supporting the audio tag.
+                       content=g.a(title, href=uri, title=descr))
+    
 
 class HtmlFileExporter(FileExporter, HtmlExporter):
     """Export the content as a set of html files."""
