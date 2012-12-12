@@ -389,10 +389,10 @@ class Html5Generator(HtmlGenerator):
                       self._tag('html', concat(content), _attr=('xmlns',), _newlines=True,
                                 lang=lang, xmlns='http://www.w3.org/1999/xhtml'))
 
-    def audio(self, src, compatibility_content=None):
-        return self._tag('audio', compatibility_content, _attr=('src', 'controls',),
-                         _paired=compatibility_content is not None,
-                         src=src, controls=True)
+    def audio(self, src, content=None, controls=True, **kwargs):
+        return self._tag('audio', content,
+                         _attr=('autoplay', 'controls', 'loop', 'preload', 'title', 'src'),
+                         _paired=content is not None, src=src, controls=controls, **kwargs)
 
     
 class HtmlExporter(Exporter):
