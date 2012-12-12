@@ -748,7 +748,7 @@ class Parser(object):
             result = InlineImage(href, title=label, descr=descr, name=basename, align=align, size=size)
         elif ext in self._AUDIO_EXTENSIONS:
             result = InlineAudio(href, title=label, descr=descr, name=basename, image=label_image, shared=True)
-        elif ext == self._VIDEO_EXTENSIONS:
+        elif ext in self._VIDEO_EXTENSIONS:
             result = InlineVideo(href, title=label, descr=descr, name=basename, image=label_image, size=size)
         else:
             if label_image:
