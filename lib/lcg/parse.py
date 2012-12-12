@@ -173,8 +173,8 @@ class Parser(object):
     _YOUTUBE_VIDEO_MATCHER = re.compile(
         r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)")
     _IMAGE_EXTENSIONS = ('jpg', 'jpeg', 'gif', 'png')
-    _AUDIO_EXTENSIONS = ('mp3',)
-    _VIDEO_EXTENSIONS = ('flv',)
+    _AUDIO_EXTENSIONS = ('mp3', 'ogg')
+    _VIDEO_EXTENSIONS = ('flv', 'ogv', 'mp4')
     _BLANK_MATCHER = re.compile(r'\s+', re.MULTILINE)
     
     class _StackEntry(object):
