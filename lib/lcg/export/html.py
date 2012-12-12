@@ -93,12 +93,11 @@ class HtmlGenerator(object):
 
     # HTML tags
 
-    def html(self, content, lang=None):
-        return concat(self._DOCTYPE, '\n\n',
-                      self._tag('html', concat(content), _newlines=True, lang=lang))
+    def html(self, content, **kwargs):
+        return self._tag('html', content, ('xmlns',), _newlines=True, **kwargs)
     
-    def head(self, tags):
-        content = concat('  ', concat(tags, separator='\n  ')),
+    def head(self, content):
+        content = concat('  ', concat(content, separator='\n  ')),
         return self._tag('head', content, _newlines=True)
     
     def body(self, content, **kwargs):
@@ -376,18 +375,10 @@ class HtmlGenerator(object):
 
 class Html5Generator(HtmlGenerator):
 
-    _DOCTYPE = '<!DOCTYPE html>'
-    
     def _attribute(self, name, value):
         if value is True:
             value = 'yes'
         return super(Html5Generator, self)._attribute(name, value)
-
-    def html(self, content, lang=None):
-        return concat('<?xml version="1.0" encoding="UTF-8"?>', '\n',
-                      self._DOCTYPE, '\n',
-                      self._tag('html', concat(content), _attr=('xmlns',), _newlines=True,
-                                lang=lang, xmlns='http://www.w3.org/1999/xhtml'))
 
     def audio(self, src, content=None, controls=True, **kwargs):
         return self._tag('audio', content,
@@ -1036,15 +1027,20 @@ class HtmlExporter(Exporter):
     
     def _reformat_text(self, text):
         return text
+
+    def _html_conetnt(self, context):
+        g = self._generator
+        # Export body first to allocate all resources before generating the head.
+        body = g.body(self._body_content(context), **self._body_attr(context))
+        head = g.head(self._head(context))
+        return concat(head, body)
     
     def export(self, context):
         g = self._generator
-        # Export body first to allocate all resources before generating the head.
-        body = self._body_content(context)
-        attr = self._body_attr(context)
-        parts = (g.head(self._head(context)),
-                 g.body(body, **attr))
-        return g.html(parts, lang=context.lang())
+        return concat('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">',
+                      #'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
+                      '\n\n',
+                      g.html(self._html_conetnt(context), lang=context.lang()))
 
 
 class Html5Exporter(HtmlExporter):
@@ -1096,6 +1092,13 @@ class Html5Exporter(HtmlExporter):
                        # 'content' is displayed only in browsers not supporting the audio tag.
                        content=g.a(title, href=uri, title=descr))
     
+    def export(self, context):
+        g = self._generator
+        return concat('<?xml version="1.0" encoding="UTF-8"?>', '\n',
+                      '<!DOCTYPE html>', '\n',
+                      g.html(self._html_conetnt(context), lang=context.lang(),
+                             xmlns='http://www.w3.org/1999/xhtml'))
+                      
 
 class HtmlFileExporter(FileExporter, HtmlExporter):
     """Export the content as a set of html files."""
