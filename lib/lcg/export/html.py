@@ -29,47 +29,47 @@ _ = TranslatableTextFactory('lcg')
 class HtmlGenerator(object):
 
     _DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
-    #DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    #_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
 
-    def _attr(self, valid, **kwargs):
-        result = ''
-        #if kwargs.get('lang'):
-        #    kwargs['style'] = 'color: red;' + (kwargs.get('style') or '')
-        for name in valid + ('id', 'lang', 'tabindex', 'cls', 'style'):
-            if not kwargs:
-                break
-            value = kwargs.pop(name, None)
-            if name == 'cls':
-                name = 'class'
-            if value is None or value is False:
-                continue
-            elif value is True:
-                result += ' ' + name
+    def _attribute(self, name, value):
+        if value is True:
+            return name
+        else:
+            if isinstance(value, int):
+                value = '"%d"' % value
+            elif isinstance(value, Localizable):
+                value = value.transform(saxutils.quoteattr)
             else:
-                if isinstance(value, int):
-                    value = '"%d"' % value
-                elif isinstance(value, Localizable):
-                    value = value.transform(saxutils.quoteattr)
-                else:
-                    value = saxutils.quoteattr(value)
-                result += ' ' + name + '=' + value
+                value = saxutils.quoteattr(value)
+            return name + '=' + value
+    
+    def _attributes(self, valid, **kwargs):
+        result = ''
+        for name in valid + ('id', 'lang', 'tabindex', 'cls', 'style'):
+            if kwargs:
+                value = kwargs.pop(name, None)
+                if not (value is None or value is False):
+                    if name == 'cls':
+                        name = 'class'
+                    result += ' ' + self._attribute(name, value)
+            else:
+                break
         assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
 
     def _tag(self, tag, content=None, _attr=(), _newlines=False, _paired=True, **kwargs):
         separator = _newlines and "\n" or ""
-        start = '<' + tag + self._attr(_attr, **kwargs) + '>' + separator
+        attributes = self._attributes(_attr, **kwargs)
         if not _paired:
             assert content is None
-            return start
+            return '<' + tag + attributes + '/>' + separator
         else:
             assert content is not None
-            end = '</' + tag + '>' + separator
             if isinstance(content, (tuple, list)):
                 content = concat(content, separator=separator)
-            if _newlines and not content.endswith('\n'):
-                end = separator + end
-            return concat(start, content, end)
+            if _newlines and not content.endswith(separator):
+                content += separator
+            return concat('<', tag, attributes, '>', separator, content, '</', tag, '>', separator)
      
     def _input(self, type, _attr=(), **kwargs):
         attr = ('type', 'name', 'value', 'title', 'size', 'maxlength', 'accesskey',
@@ -375,37 +375,24 @@ class HtmlGenerator(object):
 
 
 class Html5Generator(HtmlGenerator):
-    _DOCTYPE='<!DOCTYPE html>'
-    def _attr(self, valid, **kwargs):
-        kwargs_ = dict()
-        for name, value in kwargs.iteritems():
-            if value == True:
-                value = 'yes'
-            kwargs_[name] = value
-        return super(Html5Generator, self)._attr(valid, **kwargs_)
 
-    def _tag(self, tag, content=None, _attr=(), _newlines=False, _paired=True, **kwargs):
-        if not _paired:
-            print "Unpaired tag: " + tag
-            assert content is None
-            separator = _newlines and "\n" or ""
-            start = '<' + tag + self._attr(_attr, **kwargs) + '/>' + separator
-            return start
-        return super(Html5Generator, self)._tag(tag, content, _attr, _newlines, _paired, **kwargs)
+    _DOCTYPE = '<!DOCTYPE html>'
+    
+    def _attribute(self, name, value):
+        if value is True:
+            value = 'yes'
+        return super(Html5Generator, self)._attribute(name, value)
 
     def html(self, content, lang=None):
         return concat('<?xml version="1.0" encoding="UTF-8"?>', '\n',
                       self._DOCTYPE, '\n',
-                      self._tag('html', concat(content), _attr=('xmlns',), _newlines=True, lang=lang, xmlns='http://www.w3.org/1999/xhtml'))
+                      self._tag('html', concat(content), _attr=('xmlns',), _newlines=True,
+                                lang=lang, xmlns='http://www.w3.org/1999/xhtml'))
 
-    def audio(self, src, compatibility_content=False):
-        content = None
-        paired = False
-        if compatibility_content:
-            content = compatibility_content
-            paired = True
-        audio = self._tag('audio', content, _attr=('src', 'controls',), _paired=paired, src=src, controls=True)
-        return audio
+    def audio(self, src, compatibility_content=None):
+        return self._tag('audio', compatibility_content, _attr=('src', 'controls',),
+                         _paired=compatibility_content is not None,
+                         src=src, controls=True)
 
     
 class HtmlExporter(Exporter):
@@ -1053,17 +1040,6 @@ class HtmlExporter(Exporter):
 
 class Html5Exporter(HtmlExporter):
     Generator = Html5Generator
-    def _head(self, context):
-        node = context.node()
-        return [concat('<title>', self._title(context), '</title>')] + \
-               ['<meta http-equiv="%s" content="%s"/>' % pair
-                for pair in (('X-UA-Compatible', 'edge'),)] + \
-               ['<meta name="%s" content="%s"/>' % pair for pair in self._meta(context)] + \
-               ['<link rel="alternate" lang="%s" href="%s"/>' % \
-                (lang, self._uri_node(context, node, lang=lang))
-                for lang in node.variants() if lang != context.lang()] + \
-               ['<script language="Javascript" type="text/javascript"' + \
-                ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
 
     def _export_inline_audio(self, context, element):
         """Override with HTML5 audio element."""

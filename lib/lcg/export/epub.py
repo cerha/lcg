@@ -42,6 +42,18 @@ class EpubExporter(Exporter):
         UID_ID = 'uid'
 
     class Html5Exporter(Html5Exporter):
+        def _head(self, context):
+            node = context.node()
+            return [concat('<title>', self._title(context), '</title>')] + \
+                ['<meta http-equiv="%s" content="%s"/>' % pair
+                 for pair in (('X-UA-Compatible', 'edge'),)] + \
+                 ['<meta name="%s" content="%s"/>' % pair for pair in self._meta(context)] + \
+                 ['<link rel="alternate" lang="%s" href="%s"/>' % \
+                      (lang, self._uri_node(context, node, lang=lang))
+                  for lang in node.variants() if lang != context.lang()] + \
+                  ['<script language="Javascript" type="text/javascript"' + \
+                       ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
+                  
         def _export_table_of_contents(self, context, element):
             return ''
         
