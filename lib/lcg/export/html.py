@@ -27,9 +27,50 @@ import random
 _ = TranslatableTextFactory('lcg')
 
 class HtmlGenerator(object):
+    """Generate HTML tags through a simple Pythonic API.
 
-    _DOCTYPE = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">'
-    #_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+    Generator produces strings in HTML syntax.  The API methods usually map 1:1
+    to HTML tags and their arguments to the attributes.  There are exceptions,
+    such as the 'input' tag, where the generator has methods for different
+    input types, rather than one 'input()' method with type arguments.  Another
+    exception is the HTML attribute "class" which corresponds to the argument
+    "cls" to avoid conflict with the python keyword.
+
+    Example usage:
+
+    def _export_something(self, context, element):
+        # Generator instance is typically obtained from the export context
+        # and aliassed locally as 'g'.
+        g = context.generator()
+        return g.div((g.p(g.strong("Some text"), ' ',
+                          g.a("Link label", href="/link/uri", title="Link tooltip")),
+                      g.ul(g.li("First list item"),
+                           g.li("Second list item")),
+                      ),
+                     cls="div-class-name")
+
+    Produced HTML:
+                     
+    <div class="div-class-name">
+    <p><strong>Some text</strong> <a title="Link tooltip" href="/link/uri">Link label</a></p>
+    <ul>
+      <li>First list item</li>
+      <li>Second list item</li>
+    </ul>
+    </div>
+
+    Generator is by purpose ignorant about HTML semantics.  The semantics
+    should be handled by the 'Exporter'.  For example, if there are different
+    HTML tags or attributes to be used in differnt HTML versions for a certain
+    content element, it is the responsibility of the exporter to call the
+    genarator appropriately.  The generator should only care about the syntax.
+    
+    The scope of supported tags and their attributes is incomplete.  It is
+    limited to the tags and attributes which are actually used by LCG's export
+    methods when exporting LCG content into HTML.  If you miss a method or an
+    attribute, please help your self and add it.
+    
+    """
 
     def _attribute(self, name, value):
         if value is True:
