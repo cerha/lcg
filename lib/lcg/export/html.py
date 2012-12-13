@@ -162,15 +162,6 @@ class HtmlGenerator(object):
         attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'rel', 'onclick')
         return self._tag('a', label, attr, **kwargs)
 
-    def link(self, label, uri, title=None, target=None, hotkey=None, cls=None, **kwargs):
-        """Deprecated!  Just for backwards compatibility."""
-        if hotkey and title:
-            title += ' (%s)' % hotkey
-        if target:
-            cls = (cls and cls+' ' or '') + 'external-link'
-        return self.a(label, href=uri, title=title, target=target, accesskey=hotkey, cls=cls,
-                      **kwargs)
-
     def ol(self, *content, **kwargs):
         return self._tag('ol', content, **kwargs)
     
@@ -179,14 +170,6 @@ class HtmlGenerator(object):
     
     def li(self, content, **kwargs):
         return self._tag('li', content, **kwargs)
-    
-    def list(self, items, indent=0, ordered=False, style=None, **kwargs):
-        """Deprecated!  Just for backwards compatibility."""
-        spaces = ' ' * indent
-        items = [concat(spaces, '  ', self.li(i), '\n') for i in items]
-        tag = ordered and self.ol or self.ul
-        style = style and 'list-style-type: %s' % style
-        return spaces + tag(concat('\n', items, spaces), style=style, **kwargs)+'\n'
     
     def dl(self, *content, **kwargs):
         return self._tag('dl', content, _newlines=True, **kwargs)
