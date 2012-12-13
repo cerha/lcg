@@ -164,8 +164,8 @@ class FoldableTree(Widget, lcg.Content):
             # trees in the same manner for consistency.  The CSS class 'bullet' represents either
             # fixed tree items or leaves in foldable trees (where no further folding is possible).
             content = g.span(node.title(), cls=not is_foldable(node) and 'bullet' or None)
-            return g.link(content, context.uri(node), title=node.descr(),
-                          cls=' '.join(cls) or None)
+            return g.a(content, href=context.uri(node), title=node.descr(),
+                       cls=' '.join(cls) or None)
         def menu(node, indent=0):
             spaces = ' ' * indent
             items = [g.concat(spaces, '  ',
