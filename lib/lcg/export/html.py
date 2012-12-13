@@ -815,7 +815,11 @@ class HtmlExporter(Exporter):
             img = g.a(img, href=link, title=title, rel='lightbox[gallery]')
         return img
 
-
+    def _allow_flash_audio_player(self, context, audio):
+        # OGG Vorbis is not supported by Flash, so we use the HTML 5 audio tag
+        # at least for OGG now.
+        return not audio.filename().lower().endswith('.ogg')
+    
     def _export_inline_audio(self, context, element):
         """Export emedded audio player for given audio file.
 
@@ -834,14 +838,21 @@ class HtmlExporter(Exporter):
             title = element.title()
             descr = element.descr()
             uri = context.uri(audio)
-            link_id = context.unique_id()
-            context.connect_shared_player(uri, link_id)
             if image:
                 label = g.img(context.uri(image), alt=title)
                 descr = descr or title
             else:
                 label = title or audio.title() or audio.filename()
-            return g.a(label, href=uri, id=link_id, title=descr, cls='media-control-link')
+            if self._allow_flash_audio_player(context, audio):
+                link_id = context.unique_id()
+                context.connect_shared_player(uri, link_id)
+                return g.a(label, href=uri, id=link_id, title=descr, cls='media-control-link')
+            else:
+                # TODO: The HTML 5 player is currently not shared.
+                return g.audio(src=uri, title=descr or title or audio.title() or audio.filename(),
+                               # 'content' is displayed only in browsers not
+                               # supporting the audio tag.
+                               content=g.a(label, href=uri, title=descr))
         else:
             raise NotImplementedError
         
@@ -855,21 +866,31 @@ class HtmlExporter(Exporter):
         """
         g = self._generator
         if element.size() is None:
-            width, height = (200, 200)
+            width, height = (None, None)
         else:
             width, height = element.size()
         video = element.video(context)
-        image = element.image(context)
         uri = context.uri(video)
         title = element.title() or video.title() or video.filename()
         descr = element.descr() or video.descr()
         link = g.a(title, href=uri, title=descr)
-        player = self.export_swf_object(context, 'mediaplayer.swf', context.unique_id(),
-                                        width, height, min_flash_version='9.0.115',
-                                        flashvars=dict(file=uri, title=title, description=descr,
-                                                       image=(image and context.uri(image))),
-                                        alternative_content=link)
-        return g.div(player or link, cls='video-player')
+        image = element.image(context)
+        image_uri = image and context.uri(image)
+        if video.filename().lower().endswith('.flv'):
+            player = self.export_swf_object(context, 'mediaplayer.swf', context.unique_id(),
+                                            width or 200, height or 200,
+                                            min_flash_version='9.0.115',
+                                            flashvars=dict(file=uri, title=title,
+                                                           description=descr,
+                                                           image=image_uri),
+                                            alternative_content=link)
+            return g.div(player or link, cls='video-player')
+        else:
+            # Use HTML 5 video tag.
+            return g.video(src=uri, title=descr or title, poster=image_uri,
+                           width=width, height=height,
+                           # 'content' is displayed only in browsers not supporting the audio tag.
+                           content=g.a(title, href=uri, title=descr))
 
     def _export_inline_external_video(self, context, element):
         """Export emedded video player for external services such as YouTube or Vimeo.
@@ -1048,52 +1069,6 @@ class HtmlExporter(Exporter):
 class Html5Exporter(HtmlExporter):
     Generator = XhtmlGenerator
 
-    def _export_inline_audio(self, context, element):
-        """Override with HTML5 audio element."""
-        # TODO: shared not supported
-        g = self._generator
-        audio = element.audio(context)
-        image = element.image(context)
-        title = element.title()
-        descr = element.descr()
-        uri = context.uri(audio)
-        if image:
-            # TODO: image not supported in AUDIO tag capable browsers (only in
-            # compatibility content).
-            label = g.img(context.uri(image), alt=title)
-            descr = descr or title
-        else:
-            label = title or audio.title() or audio.filename()
-        return g.audio(src=uri, title=descr or title or audio.title() or audio.filename(),
-                       # 'content' is displayed only in browsers not supporting the audio tag.
-                       content=g.a(label, href=uri, title=descr))
-
-    def _export_inline_video(self, context, element):
-        """Export emedded video player for given video file.
-
-        The 'Video' resource instance is rendered as a standalone Flash video
-        player preloaded with given video.  If Flash or Javascript is not
-        available, only a link to the video file is rendered.
-
-        """
-        video = element.video(context)
-        if video.filename().lower().endswith('.flv'):
-            return super(Html5Exporter, self)._export_inline_video(context, element)
-        g = self._generator
-        size = element.size()
-        if size is None:
-            width, height = (None, None)
-        else:
-            width, height = size
-        image = element.image(context)
-        uri = context.uri(video)
-        title = element.title() or video.title() or video.filename()
-        descr = element.descr() or video.descr()
-        return g.video(src=uri, title=descr or title, poster=image and context.uri(image),
-                       width=width, height=height,
-                       # 'content' is displayed only in browsers not supporting the audio tag.
-                       content=g.a(title, href=uri, title=descr))
-    
     def export(self, context):
         g = self._generator
         return concat('<?xml version="1.0" encoding="UTF-8"?>', '\n',

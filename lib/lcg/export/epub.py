@@ -61,6 +61,9 @@ class EpubExporter(Exporter):
         kwargs.pop('force_lang_ext', None)
         super(EpubExporter, self).__init__(*args, **kwargs)
 
+    def _allow_flash_audio_player(context, audio):
+        return False
+        
     def dump(self, node, directory, filename=None, variant=None, **kwargs):
         variants = variant and (variant,) or node.variants() or (None,)
         for lang in variants:
