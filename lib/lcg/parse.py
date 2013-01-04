@@ -1236,7 +1236,7 @@ class HTMLProcessor(object):
         def _container(self, element, followers, class_=Container, **kwargs):
             if element.tag == 'p' and 'style' in element.attrib:
                 styles = dict([[xx.strip() for xx in x.split(':', 2)]
-                               for x in element.attrib['style'].strip(';').split(';')])
+                               for x in element.attrib['style'].strip('\t ;').split(';')])
                 align = styles.get('text-align')
                 if align:
                     kwargs['halign'] = {'right': HorizontalAlignment.RIGHT,
