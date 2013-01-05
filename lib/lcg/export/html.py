@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -418,7 +418,7 @@ class XhtmlGenerator(HtmlGenerator):
     def _attribute(self, name, value):
         if value is True:
             value = 'yes'
-        return super(Xhtmlgenerator, self)._attribute(name, value)
+        return super(XhtmlGenerator, self)._attribute(name, value)
 
     
 class HtmlExporter(Exporter):
