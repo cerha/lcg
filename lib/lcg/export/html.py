@@ -1153,7 +1153,7 @@ class StyledHtmlExporter(object):
 class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
     """Export the content as a set of static web pages with navigation."""
 
-    _hotkey = {
+    _accesskey = {
         'prev': '1',
         'next': '3',
         'up': '2',
@@ -1217,11 +1217,11 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                         key = 'index'
                         if target == parent:
                             hidden = g.a('', href=self.uri(context, target),
-                                         hotkey=self._hotkey['up'], cls='hidden')
+                                         accesskey=self._accesskey['up'], cls='hidden')
                     elif target == parent:
                         key = 'up'
                 return g.a(label, href=self.uri(context, target), title=target.title(),
-                           hotkey=key and self._hotkey[key]) + hidden
+                           accesskey=key and self._accesskey[key]) + hidden
             else:
                 # Translators: Label used instead of a link when the target does not exist.  For
                 # example sequential navigation may contain: "Previous: Introduction, Next: None".
