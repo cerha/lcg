@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1142,7 +1142,7 @@ class HTMLProcessor(object):
             
         def handle_entityref(self, name):
             if self._hp_raw:
-                self._handle_data('&'+name+';')
+                self.handle_data('&'+name+';')
             else:
                 expanded = htmlentitydefs.entitydefs[name]
                 if expanded[0] == '&' and expanded[-1] == ';':
