@@ -119,7 +119,7 @@ class Parser(object):
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
                                 r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?$', re.MULTILINE)
     _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
-                                     r'(?P<description>([\t ]+[^\r\n]+\r?\n)*([\t ]+[^\r\n]+\r?\n?))')
+                                     r'(?P<description>([\t ]+\S+\r?\n)*([\t ]+\S+\r?\n?))')
     _LIST_MATCHER = re.compile(r'( *)\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.)) +')
     _STYLE_MATCHER = re.compile(r'@style +([a-z_]+)[\t ]*\r?$', re.MULTILINE)
     _TAB_MATCHER = re.compile(r'^\t')
