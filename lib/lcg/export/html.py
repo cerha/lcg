@@ -71,7 +71,10 @@ class HtmlGenerator(object):
     attribute, please help your self and add it.
     
     """
-
+    class _JavaScriptCode(unicode):
+        def __new__(cls, text):
+            return unicode.__new__(cls, text)
+    
     def _attribute(self, name, value):
         if value is True:
             return name
@@ -378,6 +381,8 @@ class HtmlGenerator(object):
     def js_value(self, var):
         if var is None:
             return 'null'
+        elif isinstance(var, self._JavaScriptCode):
+            return var
         elif isinstance(var, (str, unicode)):
             return "'" + var.replace("'", "\\'").replace('</', '<\\/').replace('\n','\\n') + "'"
         elif isinstance(var, bool):
@@ -409,8 +414,8 @@ class HtmlGenerator(object):
         return concat([self.js_value(arg) for arg in args], separator=", ")
      
     def js_call(self, fname, *args):
-        fargs = concat([self.js_value(arg) for arg in args], separator=", ")
-        return '%s(%s)' % (fname, fargs)
+        fargs = [self.js_value(arg) for arg in args]
+        return self._JavaScriptCode('%s(%s)' % (fname, concat(fargs, separator=", ")))
 
 
 class XhtmlGenerator(HtmlGenerator):
