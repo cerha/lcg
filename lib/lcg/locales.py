@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2012 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2012, 2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class LocaleData(object):
     positive_sign = ''
     decimal_point = '.'
     thousands_sep = None
-    grouping = (3,)
+    grouping = (3,3,3,3)
     mon_decimal_point = None
     mon_thousands_sep = None 
     mon_grouping = None
