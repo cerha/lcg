@@ -360,7 +360,7 @@ class HtmlGenerator(object):
     # JavaScript code generation.
      
     def script(self, code, noscript=None):
-        return '<script type="text/javascript" language="Javascript">\n' + \
+        return '<script type="text/javascript" language="Javascript">' + \
             (code and code.strip() + '\n' or '') + '</script>' + \
             (noscript and self.noscript(noscript) or '')
     
