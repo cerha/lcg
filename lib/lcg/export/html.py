@@ -196,6 +196,12 @@ class HtmlGenerator(object):
     def footer(self, content, **kwargs):
         return self._tag('footer', content, **kwargs)
     
+    def figure(self, content, **kwargs):
+        return self._tag('figure', content, **kwargs)
+
+    def figcaption(self, content, **kwargs):
+        return self._tag('figcaption', content, **kwargs)
+
     def br(self, **kwargs):
         return self._tag('br', _paired=False, **kwargs)
      
@@ -623,6 +629,22 @@ class HtmlExporter(Exporter):
 
     def _export_footer(self, context, element):
         return self._export_container(context, element, wrap=self._generator.footer)
+
+    def _export_figure(self, context, element):
+        g = self._generator
+        def wrap(content, **kwargs):
+            caption = element.caption()
+            if caption:
+                content += g.figcaption(caption.export(context))
+            align = element.align()
+            if align == 'left':
+                cls = 'left-aligned'
+            elif align == 'right':
+                cls = 'right-aligned'
+            else:
+                cls = None
+            return g.figure(content, cls=cls, **kwargs)
+        return self._export_container(context, element, wrap=wrap)
 
     def _export_superscript(self, context, element):
         return self._export_container(context, element, wrap=self._generator.sup)

@@ -1542,6 +1542,29 @@ class ContentVariants(Container):
         """
         return self._variants[lang]
 
+class Figure(Container):
+    """A container that can have a caption, typicaly for images"""
+
+    LEFT = 'left'
+    RIGHT = 'right'
+
+    def __init__(self, content, caption=None, align=None, **kwargs):
+        """Arguments:
+
+        caption - caption text as lcg.Content or a series of lcg.Content objects
+
+        align - alignment and text wrapping around this container,
+                possible values are 'left', 'right' or None
+        """
+        super(Figure, self).__init__(content, **kwargs)
+        self._caption = caption
+        self._align = align
+
+    def caption(self):
+        return self._caption
+
+    def align(self):
+        return self._align
 
 class MathML(Content):
     """Representation of MathML content for inclusion in LCG documents.

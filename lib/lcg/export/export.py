@@ -43,7 +43,7 @@ from lcg import log, concat, Localizable, Localizer, \
     Strong, Emphasized, Underlined, Code, Citation, Quotation, Superscript, Subscript, \
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
-    Substitution, SetVariable, MathML
+    Substitution, SetVariable, MathML, Figure
 
 class SubstitutionIterator(object):
     """Supporting object for multiple-value substitution variables.
@@ -318,6 +318,7 @@ class Exporter(object):
                 SetVariable: self._export_set_variable,
                 Substitution: self._export_substitution,
                 MathML: self._export_mathml,
+                Figure: self._export_figure,
                 }
     
     def _export(self, node, context, recursive=False):
@@ -590,7 +591,11 @@ class Exporter(object):
     def _export_quotation(self, context, element):
         """Export the given 'Quotation' element."""
         return self._export_container(context, element)
-                
+
+    def _export_figure(self, context, element):
+        """Export the given 'Figure' element."""
+        return self._export_container(context, element)
+
     def _export_superscript(self, context, element):
         """Export the given 'Superscript' element."""
         return self._export_container(context, element)

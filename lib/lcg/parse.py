@@ -1172,6 +1172,7 @@ class HTMLProcessor(object):
                 ('(html|div|span|strike|li|dt|dd)', self._container),
                 ('p', (self._container, dict(class_=Paragraph))),
                 ('blockquote', self._blockquote),
+                ('figure', self._figure),
                 ('strong', (self._container, dict(class_=Strong))),
                 ('em', (self._container, dict(class_=Emphasized))),
                 ('u', (self._container, dict(class_=Underlined))),
@@ -1266,7 +1267,20 @@ class HTMLProcessor(object):
                     kwargs['uri'] = link.attrib.get('href')
             content = self._transform_sub(element)
             return lcg.Quotation(content, **kwargs)
-            
+
+        def _figure(self, element, followers):
+            kwargs = {}
+            figcaption = element.find('figcaption')
+            body = []
+            for c in element.getchildren():
+                if c.tag == 'figcaption':
+                    kwargs['caption'] = lcg.Container(self._transform_sub(c))
+                else:
+                    body.append(c)
+            content = self._transform_sub(body)
+            kwargs['align'] = element.attrib.get('data-lcg-align')
+            return lcg.Figure(content, **kwargs)
+
         def _section(self, element, followers):
             level = element.tag[1]
             section_children = []
