@@ -430,7 +430,7 @@ class Exercise(lcg.Section):
     
     def __init__(self, tasks=(), title=None, instructions=None, reading=None, 
                  reading_instructions=None, explanation=None, example=None,
-                 template=None, points=None):
+                 template=None, media=None, points=None):
         """Initialize the instance.
 
         Arguments:
@@ -464,6 +464,10 @@ class Exercise(lcg.Section):
             with given example (a multi-line structured text using the 'wiki'
             formatting).  The formatting should usually follow the formatting
             of the tasks within the exercise.
+          media -- filename of the media file to be used with the exercise,
+            such as an audio recording.  Some exercise types may require a
+            recording, some may not.  The filename must refer to an existing
+            Resource file available within resources on export.
           template -- the tasks are rendered as a simple sequence on the
             output.  If you need something more sophisticated (e.g. have text
             and the tasks 'mixed' within it), you can use a template.  Just
@@ -480,6 +484,7 @@ class Exercise(lcg.Section):
         if title is None:
             title = self._NAME
         assert isinstance(title, basestring)
+        assert media is None or isinstance(media, basestring)
         super(Exercise, self).__init__(self._TITLE_PREFIX + title, lcg.Content(), in_toc=False)
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
@@ -497,6 +502,7 @@ class Exercise(lcg.Section):
         self._example = example
         self._reading = reading
         self._reading_instructions = reading_instructions
+        self._media = media
         self._points = points or self._POINTS
         self._template = template
         self._answer_sheet = None
@@ -585,10 +591,19 @@ class Exercise(lcg.Section):
         context.connect_shared_player(context.uri(media), button_id)
         return g.button(label, title=title, type='button', id=button_id, cls='media-control')
                   
-    def _export_media(self, context, label, media, cls=None):
-        g = context.generator()
-        content = [label, self._media_control(context, media)]
-        return g.div(content, cls="media-controls" + (cls and ' '+cls or ''))
+    def _export_media(self, context):
+        if self._media:
+            media = context.resource(self._media)
+            g = context.generator()
+            if isinstance(media, lcg.Audio):
+                label = _("Recording:")
+                cls = 'recording'
+            else:
+                label = _("Video:")
+                cls = 'recording'
+            return g.div((label, self._media_control(context, media)), cls='media-controls '+cls)
+        else:
+            return None
 
     def points(self):
         return self._points
@@ -617,6 +632,7 @@ class Exercise(lcg.Section):
         header = g.div(h, cls='exercise-header') + "\n\n"
         parts = [method(context) for method in (self._export_reading,
                                                 self._export_explanation,
+                                                self._export_media,
                                                 self._export_example,
                                                 self._export_tasks,
                                                 self._export_results,

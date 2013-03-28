@@ -1272,10 +1272,14 @@ class HTMLProcessor(object):
 
         def _exercise_param(self, element, followers):
             param = element.attrib['class'][13:]
-            if param in ('src',):
-                value = self._plain_text(element)
+            if param in ('src', 'media'):
+                value = self._plain_text(element) or None
             else:
-                value = lcg.Container(self._transform_sub(element))
+                content = self._transform_sub(element)
+                if content:
+                    value = lcg.Container(content)
+                else:
+                    value = None
             return (param, value)
 
         def _exercise(self, element, followers):
@@ -1283,10 +1287,10 @@ class HTMLProcessor(object):
             exercise_type = getattr(exercises, element.attrib.get('data-type'))
             # Rely on _transform_sub() to return only pairs processed by
             # _exercise_param() -- the exercise specification should only
-            # contain <pre class=lcg-exercise-.*> elements.
+            # contain <(pre|a) class=lcg-exercise-.*> elements.
             params = dict(self._transform_sub(element))
             src = params.pop('src')
-            params = dict([(k, v) for k, v in params.items() if v.content()])
+            params = dict([(k, v) for k, v in params.items() if v])
             parser = exercises.ExerciseParser()
             return parser.parse(exercise_type, src, **params)
 
