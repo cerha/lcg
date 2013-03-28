@@ -1180,7 +1180,7 @@ class HTMLProcessor(object):
                 ('sub', (self._container, dict(class_=Subscript))),
                 ('sup', (self._container, dict(class_=Superscript))),
                 ('h[0-9]', self._section),
-                (('pre', ('class', 'lcg-exercise-.*')), self._exercise_param),
+                (('(pre|a)', ('class', 'lcg-exercise-.*')), self._exercise_param),
                 ('pre', (self._text, dict(class_=PreformattedText))),
                 ('ul', (self._list, dict(order=None))),
                 (('ol', ('style', '.* lower-alpha;.*')), (self._list, dict(order=ItemizedList.LOWER_ALPHA))),

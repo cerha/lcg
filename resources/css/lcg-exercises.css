@@ -26,8 +26,27 @@
     position: absolute;
     bottom: 3px;
     right: 2px;
-    float: right;
     text-align: right;
+}
+
+.hidden-answers-task {
+    position: relative;
+    padding-right: 10em;
+}
+.hidden-answers-task .toggle-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.exercise.hidden-answers .results .buttons {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    padding: 3px;
+}
+.exercise.hidden-answers .display {
+    display: none;
 }
 
 .label p {

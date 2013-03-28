@@ -68,6 +68,16 @@ class Task(object):
         return self._comment
 
 
+class HiddenAnswerTask(Task):
+
+    def __init__(self, prompt, answer, **kwargs):
+        self._answer = answer
+        super(HiddenAnswerTask, self).__init__(prompt, **kwargs)
+
+    def answer(self):
+        return self._answer
+
+
 class Choice(object):
     """Representation of one choice for '_ChoiceTask'.
 
@@ -288,6 +298,7 @@ class ExerciseParser(object):
                 GapFillStatement:       self._read_gap_fill,
                 FillInTask:             self._read_pair_of_statements,
                 TransformationTask:     self._read_pair_of_statements,
+                HiddenAnswerTask:       self._read_hidden_answer,
                 TrueFalseStatement:     self._read_true_false_statement,
                 ClozeTask:              self._read_generic_task,
                 }[type]
@@ -331,15 +342,22 @@ class ExerciseParser(object):
             choices = ()
         return type(self._parse_text(prompt.strip()), choices, comment=comment)
     
-    def _read_pair_of_statements(self, type, text, comment):
+    def _split_pair_of_statements(self, text):
         lines = text.splitlines()
         assert len(lines) == 2, \
                "Task specification must consist of just 2 lines (%d given)." % \
                len(lines)
-        prompt, answer = [l.strip() for l in lines]
+        return [l.strip() for l in lines]
+
+    def _read_pair_of_statements(self, type, text, comment):
+        prompt, answer = self._split_pair_of_statements(text)
         if answer.startswith('[') and answer.endswith(']'):
             answer = answer[1:-1]
         return type(self._parse_text(prompt.strip()), answer, comment=comment)
+
+    def _read_hidden_answer(self, type, text, comment):
+        prompt, answer = self._split_pair_of_statements(text)
+        return type(self._parse_text(prompt), self._parse_text(answer), comment=comment)
 
     def _read_true_false_statement(self, type, text, comment):
         text = text.strip()
@@ -605,9 +623,8 @@ class Exercise(lcg.Section):
                                                 self._export_script)]
         content =  concat([x for x in parts if x is not None], separator="\n\n")
         if self._ALLOW_FORMS:
-            return header + g.form(content, name=self._form_name())
-        else:
-            return header + content
+            content = g.form(content, name=self._form_name())
+        return g.div((header, content), cls='exercise '+lcg.camel_case_to_lower(self.__class__.__name__))
 
     def _wrap_exported_tasks(self, context, tasks):
         return concat(tasks, separator="\n")
@@ -1133,6 +1150,37 @@ class Transformation(_FillInExercise, _NumberedTasksExercise):
         return 'A. '+ prompt +'<br/>B. '+ text
 
 
+class HiddenAnswers(_InteractiveExercise, _NumberedTasksExercise):
+    """Question and a hidden answer which the user can unhide to check."""
+
+    _NAME = _("Hidden Answers")
+    _TASK_TYPE = HiddenAnswerTask
+    _JAVASCRIPT_CLASS = 'lcg.HiddenAnswers'
+    _INSTRUCTIONS = _("Think of the correct answer and use the button next to the question"
+                      " to check.")
+    _HELP_INTRO = _("You should simply think of the correct answer and when "
+                    "you believe you know it, you can unhide the correct answer "
+                    "below each question and check whether you were right or not."),
+    _INDICATORS = ()
+    
+    _BUTTONS = ((_('Show All'), 'button', 'evaluate-button',
+                 _("Show all answers.")),
+                (_('Hide All'), 'button', 'reset-button',
+                 _("Reset all your answers and start again.")))
+
+    _MESSAGES = {"Show Answer": _("Show Answer"),
+                 "Hide Answer": _("Hide Answer")}
+
+    def _answer_sheet_link(self, context, index):
+        return ''
+
+    def _export_task_parts(self, context, task):
+        g = context.generator()
+        return (g.div(task.prompt().export(context), cls='question'),
+                g.button(_("Show Answer"), cls='toggle-button', 
+                         title=_("Show/Hide the correct answer.")),
+                g.div(task.answer().export(context), cls='answer', style='display: none;'))
+
 class Writing(_FillInExercise):
     """One big text-field for a whole exercise (mostly usable as a test, not an exercise)."""
     _POINTS = 10
@@ -1228,7 +1276,6 @@ class Cloze(_Cloze):
     
 class ExposedCloze(Cloze, _ExposedCloze):
     pass
-
 
 ################################################################################
 ##################################   Tests   ###################################
@@ -1427,3 +1474,4 @@ class NumberedClozeTest(FillInTest, NumberedCloze):
 class NumberedExposedClozeTest(FillInTest, NumberedExposedCloze):
     pass
     
+

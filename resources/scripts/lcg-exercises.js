@@ -352,6 +352,52 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
 });
 
 
+lcg.HiddenAnswers = Class.create(lcg.Exercise, {
+
+    initialize: function ($super, form_name, answers, responses, messages) {
+	$super(form_name, answers, responses, messages);
+	this._form.select('.toggle-button').each(function (b) {
+	    b.observe('click', this._on_toggle_button.bind(this));
+	}.bind(this));
+    },
+
+    _recognize_field: function(field) {
+	return false;
+    },
+
+    _show_answer: function(answer) {
+	answer.show();
+	answer.up('.task').down('.toggle-button').update(this._msg("Hide Answer"));
+    },
+
+    _hide_answer: function(answer) {
+	answer.hide();
+	answer.up('.task').down('.toggle-button').update(this._msg("Show Answer"));
+    },
+
+    _on_toggle_button: function(event) {
+	var answer = event.element().up('.task').down('.answer');
+	if (answer.visible())
+	    this._hide_answer(answer);
+	else
+	    this._show_answer(answer);
+    },
+
+    _on_evaluate_button: function(event) {
+	this._form.select('.answer').each(function (a) {
+	    this._show_answer(a);
+	}.bind(this));
+    },
+
+    _on_reset_button: function(event) {
+	this._form.select('.answer').each(function (a) {
+	    this._hide_answer(a);
+	}.bind(this));
+    }
+
+});
+
+
 lcg.Dictation = Class.create(lcg.FillInExercise, {
 
     initialize: function ($super, form_name, answers, responses, messages, recordings) {
