@@ -464,12 +464,18 @@ class HtmlExporter(Exporter):
             return '%s%x' % (self._unique_id_prefix, self._unique_id_index)
     
         def connect_shared_player(self, *args):
-            """Connect given player controls to the shared player.
+            """Allocate the shared media player for current page content.
 
-            Arguments correspond to the arguments of the JavaScript function
-            'init_player_controls()' defined in 'media.js' starting with 'uri'.  At least two
-            arguments ('uri' and 'button_id') should be passed.  The remaining arguments are
-            optional.
+            When called without arguments, the call only indicates, that the
+            shared player will be used by the content (for example the
+            JavaScript function play_media() will be called).
+
+            Otherwise the call connects the player to a particular media file
+            with particulat control element (button or link) and the arguments
+            correspond to the arguments of the JavaScript function
+            'init_player_controls()' defined in 'media.js' starting with 'uri'.
+            At least two arguments ('uri' and 'button_id') should be passed.
+            The remaining arguments are optional.
 
             If this method is called at least once during document export, a shared media player is
             exported at the bottom of the page and passed player controls are connected to the
@@ -1088,7 +1094,11 @@ class HtmlExporter(Exporter):
             content = self.export_media_player(context, player_id, 300, 20, shared=True)
             if content:
                 for args in controls:
-                    content += "\n"+ g.script(g.js_call('init_player_controls', player_id, *args))
+                    if args:
+                        # args may be an empty list when connect_shared_player
+                        # was called without arguments.
+                        content += "\n"+ g.script(g.js_call('init_player_controls',
+                                                            player_id, *args))
             return content
         else:
             return None

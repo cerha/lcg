@@ -1,0 +1,106 @@
+.recording {
+    margin: 0px 0px 10px 0px;
+}
+
+.results {
+    position: relative;
+    margin-bottom: 1em;
+    border-top: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    margin-top: .8em;
+    background-color: #eee;
+}
+
+.results .display {
+    display: inline;
+    padding: 2pt;
+}
+
+.results .display input, .results input.display {
+    border: none;
+    font-size: 1em;
+    background-color: #eee;
+}
+
+.results .buttons {
+    position: absolute;
+    bottom: 3px;
+    right: 2px;
+    float: right;
+    text-align: right;
+}
+
+.label p {
+    margin: 0;
+    padding: 0;
+}
+.explanation, .reading, .example {
+    border: 0px solid #999;
+    border-width: 1px 0px;
+    padding: 5px 15px 5px 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.reading {
+    background-color: #eee;
+}
+
+.example{
+    background-color: #f2f2f3;
+    border: 1px solid #cdcdcd;
+    padding-left: 5px;
+}
+.explanation {
+    background-color: #dee8f8;
+    border-color: #acd;
+}
+
+.example p { margin: 0.4em 0; }
+
+/* Exercise tasks */
+
+ol.tasks {
+    marker-offset: 0;
+}
+ol.tasks li {
+    padding-left: 0;
+    margin-left: 0;
+}
+div.task {
+    margin-bottom: 0.7em;
+}
+div.cloze-task, div.vocab-exercise-task {
+    margin-bottom: 0.1em;
+}
+div.choices {
+    margin-left: 1em;
+}
+div.selections-task div.choices {
+    margin-left: 0;
+}
+div.choice-based-task,
+div.transformation-task,
+div.numbered-cloze-task,
+div.numbered-exposed-cloze-task {
+    position: relative;
+    padding-right: 1em;
+}
+
+input.answer-control {
+    padding: 0;
+    font-weight: bold;
+    vertical-align: text-bottom;
+}
+
+.vocab-list {
+    margin-bottom: 1em;
+}
+
+a.exercise-help-link{
+    padding-top: 5px;
+    float: right;
+}
+
+.dictation-task{
+    margin-top: 1em;
+}

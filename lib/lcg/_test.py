@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -701,6 +701,26 @@ class HtmlImport(unittest.TestCase):
  Image link: <a href="http://www.freebsoft.org"><img src="http://www.freebsoft.org/img/logo.gif" /></a>
  Audio: <a class="lcg-audio" data-lcg-resource="my-song.mp3" href="/whatever/my-song.mp3">My Song</a>
  Video: <a class="lcg-video" data-lcg-resource="my-video.flv" href="/whatever/my-video.flv">My Video</a>
+
+<div class="lcg-exercise" contenteditable="false" data-type="MultipleChoiceQuestions" style="display: inline-block;">
+<pre class="lcg-exercise-instructions">
+Choose the correct answer
+</pre>
+<pre class="lcg-exercise-example">
+</pre>
+<pre class="lcg-exercise-src">
+A screen reader is:
+- A person.
+- A device.
++ A program.
+</pre>
+<pre class="lcg-exercise-transcript">
+</pre>
+<pre class="lcg-exercise-reading">
+</pre>
+<pre class="lcg-exercise-explanation">
+</pre>
+</div>
 
  '''
         content = lcg.html2lcg(html)
