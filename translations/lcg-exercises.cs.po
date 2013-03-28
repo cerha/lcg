@@ -1,0 +1,826 @@
+# Eurochance LCG Extension
+# Copyright (C) 2007-2009, Brailcom, o.p.s.
+# This file is distributed under the same license as the LCG package.
+# Tomas Cerha <cerha@brailcom.org>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-03-28 11:44+0100\n"
+"PO-Revision-Date: 2011-03-10 12:22+0100\n"
+"Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
+"Language-Team: Czech <cs@li.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Labels for exercise buttons. Keep in capitals.
+#: ../lib/lcg/exercises.py:147
+msgid "TRUE"
+msgstr "PRAVDA"
+
+#: ../lib/lcg/exercises.py:147
+msgid "FALSE"
+msgstr "NEPRAVDA"
+
+#: ../lib/lcg/exercises.py:395
+#, python-format
+msgid "Exercise %d"
+msgstr "Cvičení %d"
+
+#: ../lib/lcg/exercises.py:403
+msgid "Read the following text:"
+msgstr "Přečtěte si pozorně následující text:"
+
+#: ../lib/lcg/exercises.py:505
+msgid "Table of Contents:"
+msgstr "Obsah:"
+
+#: ../lib/lcg/exercises.py:508
+msgid "Instructions"
+msgstr "Instrukce"
+
+#: ../lib/lcg/exercises.py:509
+msgid "Shortcut Keys"
+msgstr "Klávesové zkratky"
+
+#: ../lib/lcg/exercises.py:510
+msgid "Indicators"
+msgstr "Indikátory"
+
+#: ../lib/lcg/exercises.py:511
+msgid "Control Panel"
+msgstr "Ovládací panel"
+
+#: ../lib/lcg/exercises.py:512
+msgid "Answer Sheets"
+msgstr "Klíč odpovědí"
+
+#: ../lib/lcg/exercises.py:528
+msgid "The indicator panel below the exercise shows the following values:"
+msgstr "Panel indikátorů na konci cvičení zobrazuje následující hodnoty:"
+
+#: ../lib/lcg/exercises.py:536
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr ""
+"Ovládací panel najdete pod každým interaktivním cvičením.  Obsahuje "
+"následující tlačítka:"
+
+#: ../lib/lcg/exercises.py:565
+msgid "Play"
+msgstr "Přehrát"
+
+#: ../lib/lcg/exercises.py:630
+msgid "Explanation:"
+msgstr "Vysvětlení:"
+
+#: ../lib/lcg/exercises.py:639
+msgid "Example:"
+msgstr "Příklad:"
+
+#: ../lib/lcg/exercises.py:724
+msgid "on first attempt"
+msgstr "na první pokus"
+
+#: ../lib/lcg/exercises.py:726
+msgid "Answered:"
+msgstr "Zodpovězeno:"
+
+#: ../lib/lcg/exercises.py:727
+msgid ""
+"Displays the number of the tasks you have already answered.  For example "
+"4/10 means, that you have answered four out of ten questions so you should "
+"finish the remaining six."
+msgstr ""
+"Zobrazuje počet úkolů (otázek), které již byly v daném cvičení zodpovězeny. "
+"Například údaj 4/10 znamená, že byly splněny čtyři z celkového počtu deseti "
+"úkolů, nehledě na to, zda dobře či špatně.  Zbývá tedy dokončit šest úkolů."
+
+#: ../lib/lcg/exercises.py:730
+msgid "Correct:"
+msgstr "Správně:"
+
+#: ../lib/lcg/exercises.py:731
+msgid ""
+"Displays the number and percentage of successful answers.  The first pair of "
+"numbers shows the results of all current answers.  If you didn't answer all "
+"of them correctly on first attempt, there is also a second pair of numbers "
+"showing how many answers you did succesfuly on the first try.  Use the "
+"‘Reset’ button to start again."
+msgstr ""
+"Zobrazuje celkový počet a procento úspěšných odpovědí.  První dvojice čísel "
+"ukazuje výsledek vyhodnocení všech současných odpovědí.  Pokud jste však "
+"některé odpovědi neuhodli správně na první pokus, je zobrazena ještě druhá "
+"dvojice čísel, která již zohledňuje pouze ty správné odpovědi, které byly "
+"zodpovězeny správně napoprvé.  Můžete použít tlačítko „Vymazat“, pokud "
+"chcete začít znovu."
+
+#: ../lib/lcg/exercises.py:738
+msgid "Evaluate"
+msgstr "Vyhodnotit"
+
+#: ../lib/lcg/exercises.py:739
+msgid ""
+"Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+"the first incorrect answer.  Within a text-box, the cursor is also moved to "
+"the first incorrect character of your answer."
+msgstr ""
+"Vyhodnotí celkový výsledek cvičení.  Pokud je nalezena chyba, kurzor je "
+"přesunut na první nesprávnou odpověď. V textovém poli je navíc kurzor "
+"posunut na první chybný znak Vaší odpovědi."
+
+#. Translators: Fill (a form with correct answers).
+#: ../lib/lcg/exercises.py:743
+msgid "Fill"
+msgstr "Doplnit"
+
+#: ../lib/lcg/exercises.py:744
+msgid "Fill in the whole exercise with the correct answers."
+msgstr "Vyplní celé cvičení správnými odpověďmi."
+
+#: ../lib/lcg/exercises.py:745
+msgid "Reset"
+msgstr "Vymazat"
+
+#: ../lib/lcg/exercises.py:746
+msgid "Reset all your answers and start again."
+msgstr ""
+"Vymaže všechny odpovědi i výsledky a umožní začít celé cvičení znovu od "
+"začátku."
+
+#: ../lib/lcg/exercises.py:748
+msgid ""
+"The Answer Sheets contain all the correct answers for all the exercises. You "
+"can access them from the Course Index, or more conveniently, you can use the "
+"‘?’ (question mark) link after each task. This link takes you directly to "
+"the corresponding answer in the Answer Sheet."
+msgstr ""
+"Klíč odpovědí obsahuje správné odpovědi pro všechna cvičení. Je dostupný z "
+"úvodní stránky kurzu. Mnohem pohodlnější možností je však použít odkazu ve "
+"formě otazníku, který najdete za každým jednotlivým úkolem. Tento odkaz vás "
+"přesune přímo na odpovídající správnou odpověď v klíči."
+
+#: ../lib/lcg/exercises.py:803
+msgid "Show the answer sheet."
+msgstr "Zobrazit správné odpovědi."
+
+#: ../lib/lcg/exercises.py:830
+msgid "Chose the correct answer."
+msgstr "Zvolte správnou odpověď."
+
+#: ../lib/lcg/exercises.py:833
+msgid ""
+"You will hear a response immediately after choosing the answer.  When you "
+"choose the wrong answer, you can try again until you find the correct one.  "
+"The results below the exercise will show you how many answers you got right "
+"on the first try (see the [#indicators] section below)."
+msgstr ""
+"Okamžitě po zvolení odpovědi uslyšíte odezvu, ze které se dozvíte, zda byla "
+"tato odpověď správná.  Pokud jste zvolili špatně, můžete to zkusit znovu, "
+"dokud správnou odpověď nenaleznete.  Výsledky vespod cvičení ukazují kolik "
+"odpovědí bylo zodpovězeno správně na první pokus (více viz [#indicators])."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:901
+msgid "Multiple Choice Questions"
+msgstr "Zaškrtávací test"
+
+#: ../lib/lcg/exercises.py:902
+msgid ""
+"Each question in this exercise is followed by two or more possible answers. "
+"Only one answer is correct."
+msgstr ""
+"Za každou otázkou v tomto cvičení následují dvě nebo více možných odpovědí. "
+"Pouze jedna z nich je správná."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:910
+msgid "Selections"
+msgstr "Co je správně"
+
+#: ../lib/lcg/exercises.py:911
+msgid ""
+"There are several groups of two or three similar sentences or expressions. "
+"Only one option in each group is correct. Your goal is to decide which one."
+msgstr ""
+"Ve cvičení najdete několik skupin po dvou či třech podobných větách či "
+"výrazech.  Pouze jedna možnost v každé skupině je však správná.  Vaším "
+"úkolem je rozhodnout, která to je."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:920
+msgid "True/False Statements"
+msgstr "Pravda/nepravda"
+
+#: ../lib/lcg/exercises.py:921
+msgid "For each of the statements below, choose True or False."
+msgstr "Pro každé níže uvedené tvrzení zvolte, zda je pravdivé či nikoliv."
+
+#: ../lib/lcg/exercises.py:922
+msgid ""
+"Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
+"and ‘FALSE’.  Decide whether the sentence is true or not and press the "
+"corresponding button."
+msgstr ""
+"Za každou větou v tomto cvičení následují dva ovládací prvky označené "
+"„PRAVDA“ a „NEPRAVDA“.  Rozhodněte, zda je věta pravdivá či nikoliv a "
+"stiskněte odpovídající tlačítko."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:946
+msgid "Gap Filling"
+msgstr "Doplňování s výběrem"
+
+#: ../lib/lcg/exercises.py:947
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr "Vyberte nejvhodnější možnost pro doplnění každé z následujících vět."
+
+#: ../lib/lcg/exercises.py:949
+msgid ""
+"Choose the correct word to fill in a gap in a sentence.  For each gap you "
+"have several choices.  Only one of them is correct."
+msgstr ""
+"Vyberte správné slovo, kterým doplníte mezeru ve větě.  Pro každé chybějící "
+"slovo máte několik možností.  Pouze jedna z nich je správná."
+
+#: ../lib/lcg/exercises.py:972
+msgid ""
+"You can check each answer individually using the shortcut keys (see the "
+"section [#keys] for more information).  When your answer is evaluated as "
+"incorrect and you do not know why, always check whether you have used "
+"correct punctuation and capital letters where appropriate. These two things "
+"are the cause of most confusion."
+msgstr ""
+"Můžete zkontrolovat každou odpověď samostatně pomocí klávesových zkratek "
+"(více viz sekce [#keys]). Pokud je odpověď vyhodnocena jako nesprávná a Vy "
+"nevíte proč, vždy si nejprve zkontrolujte interpunkci a správné použití "
+"velkých a malých písmen. Tyto dvě věci způsobují nejvíce nejasností."
+
+#: ../lib/lcg/exercises.py:977
+msgid ""
+"Use the [#panel] at the bottom of the exercise to evaluate all the answers "
+"at once."
+msgstr "Použijte [#panel] na konci cvičení k vyhodnocení všech odpovědí naráz."
+
+#: ../lib/lcg/exercises.py:979
+msgid ""
+"If your browser doesn't support JavaScript, the interactive features and "
+"automatic evaluation do not work.  You can still use this course, but you "
+"will have to check your answers against the answer sheet manually (see "
+"[#answer-sheets]."
+msgstr ""
+"Pokud Váš prohlížeč nepodporuje JavaScript, interaktivní vlastnosti a "
+"automatické vyhodnocování cvičení nebude fungovat. I přesto můžete tento "
+"kurz používat, ale budete si muset své odpovědi zkontrolovat sami s použitím "
+"klíče (viz [#answer-sheets])."
+
+#: ../lib/lcg/exercises.py:987
+msgid ""
+"In all the exercises where you fill in the text into a text-box you can use "
+"the two shortcut keys described below."
+msgstr ""
+"Ve všech cvičeních, kde vyplňujete text do textového vstupního pole, můžete "
+"používat následující klávesové zkratky:"
+
+#: ../lib/lcg/exercises.py:989
+msgid "Enter"
+msgstr "Enter"
+
+#: ../lib/lcg/exercises.py:990
+msgid ""
+"Use this key within the text-field to evaluate the current answer. You hear "
+"a sound response and in case of an error, the cursor is moved to the "
+"position of the first incorrect character within the text.  This way you can "
+"locate the error, fix it and evaluate again. When you don't know how to fix "
+"an error, you can use the ‘hint’ key described below."
+msgstr ""
+"Stiskem této klávesy uvnitř textového pole vyvoláte vyhodnocení Vaší "
+"odpovědi.  Uslyšíte okamžitě výsledek vyhodnocení.  V případě chybné "
+"odpovědi je navíc kurzor posunut na pozici prvního chybného znaku v rámci "
+"zadané odpovědi.  Tímto způsobem můžete nalézt chybu (například překlep), "
+"opravit ji a zkusit odpověď vyhodnotit znovu.  Pokud si z chybou nevíte "
+"rady, můžete použít „napovídací“ klávesu popsanou níže."
+
+#: ../lib/lcg/exercises.py:996
+msgid "Ctrl-Space"
+msgstr "Ctrl-mezerník"
+
+#: ../lib/lcg/exercises.py:997
+msgid ""
+"This function is called a ‘hint’.  It helps you in case you don't know the "
+"answer or you don't know how to fix an error in your answer. Just press the "
+"key combination (holding the Ctrl key, press the spacebar) and one letter of "
+"the correct answer will be filled in automatically.  If you have already "
+"entered some text, the cursor will be moved to after the last correct "
+"character and next one will be inserted.  This also means that if there is "
+"some text after the cursor, there is at least one error in it.  Try to "
+"locate this error and correct it.  Then you can evaluate your answer using "
+"the ‘Enter’ key (see above) or use ‘hint’ again, until you find the complete "
+"answer."
+msgstr ""
+"Tato funkce Vám může „napovídat“ v případě, že neznáte správnou odpověď "
+"(nemůžete si vzpomenout), nebo nevíte, jak opravit chybu nalezenou při "
+"automatickém vyhodnocování Vaší odpovědi.  Jednoduše stiskněte danou "
+"klávesovou kombinaci (Přidržte klávesu „Control“ a stiskněte mezerník) a "
+"jeden znak správné odpovědi bude doplněn automaticky.  Pokud jste již "
+"vložili nějaký text, kurzor se nejprve posune za poslední správný znak Vaší "
+"odpovědi a následující znak bude vložen.  To také znamená, že pokud je za "
+"kurzorem po vyvolání této funkce nějaký text, obsahoval tento text alespoň "
+"jednu chybu.  Pokuste se chybu najít a opravit.  Poté můžete zkusit "
+"vyhodnotit novou odpověď pomocí klávesy „Enter“ (viz výše) nebo znovu použít "
+"„napovídací“ klávesu dokud nenaleznete kompletní správnou odpověď."
+
+#: ../lib/lcg/exercises.py:1069
+msgid "Test Yourself"
+msgstr "Procvičování slovíček"
+
+#: ../lib/lcg/exercises.py:1070
+msgid "Fill in the correct translation for each of the terms below."
+msgstr "Doplňte správný překlad pro každý z následujících výrazů."
+
+#: ../lib/lcg/exercises.py:1071
+msgid ""
+"There are two ways to do the exercise: orally and written.  Do the exercise "
+"both ways to get the best results."
+msgstr ""
+"Jsou dva způsoby, jak můžete dělat toto cvičení: ústní forma a psaná forma. "
+"Využijte obou možností k dosažení nejlepších výsledků."
+
+#: ../lib/lcg/exercises.py:1073
+msgid ""
+"To do the exercise orally is simple.  Go through the vocabulary list and "
+"think of the correct translation for each word or expression. There is a "
+"‘Play’ button after the text-box for each item which allows you to hear the "
+"correct answer.  Repeat the answer to practise the correct pronunciation.  "
+"Some items have more than one correct answer, so there may be multiple "
+"buttons to play each of them.  Since there is no way of checking your oral "
+"answers, the results are not available.  If you want to see your score, you "
+"must do the written exercise."
+msgstr ""
+"Ústní forma je snadná. Procházejte seznamem slovíček a zkoušejte uhodnout "
+"správný překlad daného slova či výrazu. Za každou položkou seznamu následuje "
+"vstupní políčko a za ním najdete tlačítko, kterým si můžete přehrát správnou "
+"odpověď.  Zopakujte správnou odpověď abyste si procvičili výslovnost. "
+"Některé položky mají více správných odpovědí. V takovém případě najdete také "
+"více tlačítek k jejich přehrání. Protože není možné vaše ústní odpovědi "
+"počítačem vyhodnotit, výsledky nejsou k dispozici. Pokud chcete znát své "
+"skóre, musíte vyplnit cvičení písemnou formou."
+
+#: ../lib/lcg/exercises.py:1082
+msgid ""
+"To do the exercise in written form, simply type the translation of each item "
+"into the text-box.  Be careful to use capital letters where this is "
+"appropriate, since an answer without correct capitalization is always "
+"considered incorrect.  When the prompt is a complete sentence, you must also "
+"use correct punctuation."
+msgstr ""
+"V písemné formě jednoduše vepíšete překlad každého slovíčka do textového "
+"políčka. Věnujte zvýšenou pozornost správnému psaní velkých a malých písmen, "
+"protože odpověď s nesprávným použitím velkých a malých písmen je vždy "
+"považována za chybnou. Pokud překládáte celou větu, dbejte také správné "
+"interpunkce."
+
+#: ../lib/lcg/exercises.py:1097
+msgid "Exercise not available in this language version."
+msgstr "Cvičení není k dispozici v této jazykové verzi."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1106
+msgid "Substitution"
+msgstr "Nahrazování"
+
+#: ../lib/lcg/exercises.py:1107
+msgid "Use the text in brackets to transform each sentence."
+msgstr "Pozměňte věty s použitím textu v závorkách."
+
+#: ../lib/lcg/exercises.py:1108
+msgid ""
+"Use the prompt to produce another sentence with the same structure. Each "
+"sentence is followed by text in brackets.  Replace the corresponding part of "
+"the sentence using this text."
+msgstr ""
+"Užijte předloženého výrazu k utvoření jiné věty stejné stavby.  Každá věta "
+"je následována textem v závorkách.  Nahraďte odpovídající část věty s "
+"použitím tohoto textu."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1117
+msgid "Transformation"
+msgstr "Transformace"
+
+#: ../lib/lcg/exercises.py:1119
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr "Doplňte větu B tak, aby význam byl stejný jako u věty A."
+
+#: ../lib/lcg/exercises.py:1121
+msgid ""
+"Your goal is to transform a structure (pattern or paradigm) into a different "
+"structure, for example changing an affirmative sentence into a question."
+msgstr ""
+"Vaším úkolem je převést určitou strukturu (stavbu věty) na jinou strukturu "
+"(například větu oznamovací na otázku)."
+
+#: ../lib/lcg/exercises.py:1127
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr "Pozměňte strukturu každé věty podle modelového příkladu."
+
+#. Translators: Type of exercise
+#: ../lib/lcg/exercises.py:1140
+msgid "Writing"
+msgstr "Psaní"
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1157
+msgid "Cloze"
+msgstr "Doplňovačka"
+
+#: ../lib/lcg/exercises.py:1159
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+"Doplňte chybějící text. Pro každou vynechanou část existuje pouze jedno "
+"správné doplnění."
+
+#: ../lib/lcg/exercises.py:1161
+msgid ""
+"Your goal in this exercise is to fill in the gaps in a longer piece of text. "
+"There is just one correct answer for each gap."
+msgstr ""
+"Vaším úkolem v tomto cvičení je vyplnit vynechaná slova v delším textu. Pro "
+"každou mezeru existuje pouze jedna správná odpověď."
+
+#. Translators: Type of exercise (use language
+#. terminology). Exposed cloze is lika Cloze, where students fill
+#. in the gaps in a text. In *exposed* cloze however the student
+#. chooses from the list of offered answers.
+#: ../lib/lcg/exercises.py:1174
+msgid "Exposed Cloze"
+msgstr "Odkrytá doplňovačka"
+
+#: ../lib/lcg/exercises.py:1175
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr ""
+"Použijte slova z níže uvedeného seznamu k doplnění vynechaných částí textu."
+
+#: ../lib/lcg/exercises.py:1246
+#, python-format
+msgid "%d) "
+msgstr "%d) "
+
+#: ../lib/lcg/exercises.py:1265 ../lib/lcg/exercises.py:1301
+#: ../lib/lcg/exercises.py:1304
+msgid "Total points:"
+msgstr "Body celkem:"
+
+#: ../lib/lcg/exercises.py:1295
+msgid "Invalid value in added points!"
+msgstr "Neplatná hodnota přidaných bodů!"
+
+#: ../lib/lcg/exercises.py:1296
+msgid "Max. points exceeded!"
+msgstr "Maximální počet bodů překročen!"
+
+#: ../lib/lcg/exercises.py:1298
+msgid "Automatic evaluation:"
+msgstr "Automatické vyhodnocení:"
+
+#: ../lib/lcg/exercises.py:1299
+msgid "Additional points by tutor:"
+msgstr "Body přidané vyučujícím:"
+
+#: ../lib/lcg/exercises.py:1349
+msgid "correct answer"
+msgstr "správná odpověď"
+
+#. Translators: Incorrect (answer)
+#: ../lib/lcg/exercises.py:1354
+msgid "incorrect"
+msgstr "chyba"
+
+#~ msgid "Show transcript"
+#~ msgstr "Zobrazit přepis"
+
+#~ msgid "Hide transcript"
+#~ msgstr "Skrýt přepis"
+
+#~ msgid "answer sheet"
+#~ msgstr "klíč odpovědí"
+
+#~ msgid "See the %s to check your results."
+#~ msgstr "Použijte %s pro kontrolu správnosti odpovědí."
+
+#~ msgid ""
+#~ "This course was developed within the Eurochance project co-funded by the "
+#~ "European Leonardo da Vinci programme."
+#~ msgstr ""
+#~ "Tento kurz vznikl v rámci projektu Eurochance, který je spolufinancován "
+#~ "evropským programem Leonardo da Vinci."
+
+#~ msgid "presentation and user interface"
+#~ msgstr "prezentace a uživatelské rozhraní"
+
+#~ msgid "Copyright and License Information"
+#~ msgstr "Informace o licenci a autorských právech"
+
+#~ msgid "This course is a joint work protected by the copyright law."
+#~ msgstr ""
+#~ "Tento kurz je společným dílem podléhajícím zákonu na ochranu autorských "
+#~ "práv."
+
+#~ msgid ""
+#~ "This course can be redistributed and/or modified under the terms of the "
+#~ "GNU General Public License as published by the Free Software Foundation; "
+#~ "either version 2 of the License, or (at your option) any later version."
+#~ msgstr ""
+#~ "Tento kurz je možné šířit a modifikovat podle ustanovení GNU General "
+#~ "Public License, vydávané Free Software Foundation; a to buď verze 2 této "
+#~ "licence anebo (podle vašeho uvážení) kterékoli pozdější verze."
+
+#~ msgid ""
+#~ "This course is distributed in the hope that it will be useful, but "
+#~ "WITHOUT ANY WARRANTY; without even the implied warranty of "
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General "
+#~ "Public License for more details."
+#~ msgstr ""
+#~ "Tento kurz je šířen v naději, že bude užitečný, avšak BEZ JAKÉKOLI "
+#~ "ZÁRUKY; neposkytují se ani odvozené záruky PRODEJNOSTI anebo VHODNOSTI "
+#~ "PRO URČITÝ ÚČEL. Další podrobnosti hledejte ve GNU General Public License."
+
+#~ msgid "The source data are available on Brailcom servers."
+#~ msgstr "Zdrojové kódy jsou dostupné na serverech Brailcomu."
+
+#~ msgid "The complete license text follows in the original English version:"
+#~ msgstr "Kompletní text licence následuje v původní anglické verzi:"
+
+#~ msgid "Unit %d"
+#~ msgstr "Lekce %d"
+
+#~ msgid "Aims and Objectives"
+#~ msgstr "Cíle a zaměření"
+
+#~ msgid "Checklist"
+#~ msgstr "Kontrolní seznam"
+
+#~ msgid "The grammar focus of this unit is:"
+#~ msgstr "Gramatické zaměření této lekce:"
+
+#~ msgid "Vocabulary Practice"
+#~ msgstr "Procvičování slovní zásoby"
+
+#~ msgid "Listening Comprehension"
+#~ msgstr "Poslechová cvičení"
+
+#~ msgid "General Comprehension"
+#~ msgstr "Obecné porozumění"
+
+#~ msgid "Grammar Practice"
+#~ msgstr "Procvičování gramatiky"
+
+#~ msgid "Consolidation"
+#~ msgstr "Konsolidace"
+
+#~ msgid "Vocabulary"
+#~ msgstr "Slovní zásoba"
+
+#~ msgid "Comprehension"
+#~ msgstr "Porozumění"
+
+#~ msgid "Dictation"
+#~ msgstr "Diktát"
+
+#~ msgid "Vocabulary Index"
+#~ msgstr "Rejstřík slovní zásoby"
+
+#~ msgid "Help Index"
+#~ msgstr "Rejstřík nápovědy"
+
+#~ msgid "Help for %s"
+#~ msgstr "Nápověda: %s"
+
+#~ msgid "Answer Sheet:"
+#~ msgstr "Klíč odpovědí:"
+
+#~ msgid "Back"
+#~ msgstr "Zpět"
+
+#~ msgid "Version %s"
+#~ msgstr "Verze %s"
+
+#~ msgid "This exercise can be also done purely aurally/orally:"
+#~ msgstr "Toto cvičení je k dispozici také v čistě poslechové/ústní formě:"
+
+#~ msgid "Transcript:"
+#~ msgstr "Přepis:"
+
+#~ msgid "Recording:"
+#~ msgstr "Nahrávka:"
+
+#~ msgid "Listening"
+#~ msgstr "Poslech"
+
+#~ msgid "Listen to the recording to practice understanding native speakers."
+#~ msgstr ""
+#~ "Vyslechněte nahrávku a procvičte si schopnost porozumět rodilému mluvčímu."
+
+#~ msgid "Reading"
+#~ msgstr "Čtení"
+
+#~ msgid ""
+#~ "Read the text and try to understand as much as you can.  Use a dictionary "
+#~ "if necessary.  In many cases you will find the information relevant for "
+#~ "your own purposes, but it will also be needed in the exercises which "
+#~ "follow."
+#~ msgstr ""
+#~ "Přečtěte si text a zkuste mu porozumět jak jen to je možné.  Pokud "
+#~ "potřebujete, použijte slovník.  V mnoha případech shledáte informace "
+#~ "užitečné sami pro sebe, ale kromě toho je budete potřebovat při práci na "
+#~ "následujících cvičeních."
+
+#~ msgid "Sentence Completion"
+#~ msgstr "Dokončování vět"
+
+#~ msgid ""
+#~ "Speaking Practice.  Complete the sentences you hear, using the example as "
+#~ "a model."
+#~ msgstr ""
+#~ "Procvičte si mluvení.  Po spuštění nahrávky dokončujte věty, které "
+#~ "slyšíte, podle vzoru."
+
+#~ msgid "Press  ‘Play’ to listen to the instructions:"
+#~ msgstr "Stiskněte tlačítko „Přehrát“ pro přehrání instrukcí:"
+
+#~ msgid ""
+#~ "The aim of this exercise is to give you an opportunity to produce a "
+#~ "complete sentence and compare your pronunciation with the original. "
+#~ "Therefore the exercise is purely aural-oral, with no written tasks."
+#~ msgstr ""
+#~ "Cílem tohoto cvičení je dát studentovi příležitost utvořit kompletní větu "
+#~ "a porovnat svou výslovnost s originálem.  Cvičení je proto čistě verbálně-"
+#~ "poslechové, bez písemných úkolů."
+
+#~ msgid ""
+#~ "If you wish to check your answers against the written text, you can use "
+#~ "the transcript of the recording (the link ‘show transcript’). Since this "
+#~ "is not a written exercise, your results cannot be checked automatically."
+#~ msgstr ""
+#~ "Pokud chcete své odpovědi porovnat s psaným textem, použijte textový "
+#~ "přepis nahrávky (odkaz „zobrazit přepis“).  Protože nejde o písemné "
+#~ "cvičení, není možné Vaše výsledky vyhodnotit automaticky."
+
+#~ msgid "Exercise Help"
+#~ msgstr "Nápověda k cvičení"
+
+#~ msgid "Correct"
+#~ msgstr "Správně"
+
+#~ msgid "Error(s) found"
+#~ msgstr "Byly nalezeny chyby"
+
+#~ msgid "Result:"
+#~ msgstr "Výsledek:"
+
+#~ msgid ""
+#~ "Displays the result of the last evaluation (evaluate your answer by "
+#~ "pressing the ‘Enter’ key or by the ‘Evaluate’ button below the exercise)."
+#~ msgstr ""
+#~ "Zobrazuje výsledek posledního vyhodnocení Vaši odpovědi (vyhodnocení "
+#~ "proveďte uvnitř vstupního pole klávesou „Enter“, nebo tlačítkem "
+#~ "„Vyhodnotit“."
+
+#~ msgid ""
+#~ "Listen to the complete recording first. Then go to the textbox and use "
+#~ "the ‘>’ key to listen to the text section by section. Type what you hear "
+#~ "into the textbox. For detailed instructions, read the Exercise Help."
+#~ msgstr ""
+#~ "Nejprve si poslechněte kompletní nahrávku.  Poté přejděte do textového "
+#~ "vstupního pole a použijte klávesu „>“ k přehrávání diktátu po částech a "
+#~ "diktovaný text zapisujte.  Více informací naleznete v nápovědě ke cvičení."
+
+#~ msgid ""
+#~ "First listen to the recording once and then go to the large text entry "
+#~ "box below.  Within the box, you can use shortcut keys to play individual "
+#~ "pieces of the recording.  Typically you play one part using the ‘>’ key "
+#~ "(right angle bracket) and type what you hear. Then you press the ‘>’ key "
+#~ "again to play the next part and type it too, and so on until you reach "
+#~ "the end of the recording."
+#~ msgstr ""
+#~ "Nejprve si jednou poslechněte kompletní nahrávku a poté přejděte do "
+#~ "velkého textového vstupního pole níže.  Když je kurzor v tomto poli, "
+#~ "můžete používat klávesové zkratky k postupnému přehrávání jednotlivých "
+#~ "částí nahrávky.  Typicky si vždy přehrajete jednu část pomocí klávesy "
+#~ "„>“ (znaménko „je větší“) a zapíšete text, který jste slyšeli.  Poté "
+#~ "stisknete „>“ znovu a přehrajete tak další část a tu také zapíšete atd, "
+#~ "až dosáhnete konce nahrávky."
+
+#~ msgid "Then you can use the evaluation keys to evaluate the whole text."
+#~ msgstr ""
+#~ "K vyhodnocení správnosti celého textu pak můžete použít vyhodnocovacích "
+#~ "kláves."
+
+#~ msgid ""
+#~ "Pay special attention to punctuation and case, since these cause most of "
+#~ "the problems when evaluating your answer. Type all the sentences as you "
+#~ "hear them, using the appropriate punctuation character and one space "
+#~ "after each sentence. No space is allowed after the last sentence. "
+#~ msgstr ""
+#~ "Věnujte prosím zvýšenou pozornost interpunkci a psaní velkých a malých "
+#~ "písmen, protože ty způsobují nejčastější problémy při vyhodnocování.  "
+#~ "Pište všechny věty jak je slyšíte s odpovídajícím interpunkčním znaménkem "
+#~ "a jednou mezerou na konci každé věty.  Za poslední větou není mezera "
+#~ "přípustná."
+
+#~ msgid ""
+#~ "/Note/: Of course, you can replay the recording as many times as you need "
+#~ "in order to understand it, although two attempts should be enough for a "
+#~ "well performing student."
+#~ msgstr ""
+#~ "/Poznámka:/ Samozřejmě si můžete nahrávku přehrát tolikrát, kolikrát "
+#~ "potřebujete k plnému porozumění, nicméně dva pokusy by měly být "
+#~ "dostatečné pro dobrého studenta."
+
+#~ msgid ""
+#~ "Also, in the dictation exercise text box, you can use the following keys "
+#~ "to control the playback of the recording:"
+#~ msgstr ""
+#~ "Pokud je kurzor ve vstupním poli diktátu, můžete také využít následující "
+#~ "klávesy pro ovládání přehrávání diktátu po částech:"
+
+#~ msgid "right angle bracket, greater than sign"
+#~ msgstr "znaménko „je větší“"
+
+#~ msgid "Play next piece of the recording."
+#~ msgstr "Přehrát následující úsek diktátu."
+
+#~ msgid "left angle bracket, less than sign"
+#~ msgstr "znaménko „je menší“"
+
+#~ msgid "Play the previous piece of the recording."
+#~ msgstr "Přehrát předchozí úsek diktátu."
+
+#~ msgid "Ctrl-Enter"
+#~ msgstr "Ctrl-Enter"
+
+#~ msgid "Replay the current (last played) piece of the recording once again."
+#~ msgstr "Přehrát aktuální (naposledy přehraný) úsek diktátu ještě jednou."
+
+#~ msgid ""
+#~ "Listen to the recording carefully and then fill in the gaps in the text "
+#~ "below using the same words."
+#~ msgstr ""
+#~ "Pozorně si poslechněte nahrávku a potom vyplňte vynechaná místa v níže "
+#~ "uvedeném textu s použitím stejných slov."
+
+#~ msgid "Vocabulary Listing"
+#~ msgstr "Přehled slovní zásoby"
+
+#~ msgid ""
+#~ "The vocabulary is presented in a two-column table with a term on the left "
+#~ "and its translation on the right in each row."
+#~ msgstr ""
+#~ "Slovní zásoba je vyjádřena pomocí tabulky o dvou sloupcích.  Každý řádek "
+#~ "obsahuje jednu dvojici.  V levém sloupečku je vždy daný výraz a v pravém "
+#~ "je odpovídající překlad."
+
+#~ msgid "Terms"
+#~ msgstr "Slovíčka"
+
+#~ msgid "Phrases"
+#~ msgstr "Fráze"
+
+#~ msgid "Extended vocabulary"
+#~ msgstr "Rozšířená slovní zásoba"
+
+#~ msgid ""
+#~ "Please, visit the [http://eurochance.brailcom.org Eurochance project "
+#~ "webpage] for more information how to obtain the source data of this "
+#~ "course."
+#~ msgstr ""
+#~ "Informace o tom, jak získat zdrojová data tohoto kurzu, naleznete na "
+#~ "domovské stránce projektu [http://eurochance.brailcom.org Eurochance]."
+
+#~ msgid "Section %d"
+#~ msgstr "Kapitola %d"
+
+#~ msgid "Exercises"
+#~ msgstr "Cvičení"
+
+#~ msgid "Ordered by the English term"
+#~ msgstr "Řazeno podle anglického výrazu"
+
+#~ msgid "learning content"
+#~ msgstr "výukový obsah"
+
+#~ msgid "Your result:"
+#~ msgstr "Váš výsledek:"
+
+#~ msgid "Stop"
+#~ msgstr "Zastavit"
+
+#~ msgid "Answer Sheet for %s"
+#~ msgstr "Klíč odpovědí pro %s"

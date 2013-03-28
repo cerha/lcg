@@ -1,0 +1,797 @@
+# Eurochance LCG Extension
+# Copyright (C) 2007-2009, Brailcom, o.p.s.
+# This file is distributed under the same license as the LCG package.
+# Tomas Cerha <cerha@brailcom.org>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-03-28 11:44+0100\n"
+"PO-Revision-Date: 2009-11-24 12:59+0100\n"
+"Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Labels for exercise buttons. Keep in capitals.
+#: ../lib/lcg/exercises.py:147
+msgid "TRUE"
+msgstr "RIKTIG"
+
+#: ../lib/lcg/exercises.py:147
+msgid "FALSE"
+msgstr "FEIL"
+
+#: ../lib/lcg/exercises.py:395
+#, python-format
+msgid "Exercise %d"
+msgstr "Øvelse %d"
+
+#: ../lib/lcg/exercises.py:403
+msgid "Read the following text:"
+msgstr "Les følgende tekst:"
+
+#: ../lib/lcg/exercises.py:505
+msgid "Table of Contents:"
+msgstr "Innhold:"
+
+#: ../lib/lcg/exercises.py:508
+msgid "Instructions"
+msgstr "Instruksjon"
+
+#: ../lib/lcg/exercises.py:509
+msgid "Shortcut Keys"
+msgstr "Hurtigtaster"
+
+#: ../lib/lcg/exercises.py:510
+msgid "Indicators"
+msgstr "Indikatorer"
+
+#: ../lib/lcg/exercises.py:511
+msgid "Control Panel"
+msgstr "Kontrollpanel"
+
+#: ../lib/lcg/exercises.py:512
+msgid "Answer Sheets"
+msgstr "Løsninger"
+
+#: ../lib/lcg/exercises.py:528
+msgid "The indicator panel below the exercise shows the following values:"
+msgstr "Indikatorpanelet under oppgaven viser følgende verdier:"
+
+#: ../lib/lcg/exercises.py:536
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr "Kontrollpanelet under oppgaven inneholder følgende knapper:"
+
+#: ../lib/lcg/exercises.py:565
+msgid "Play"
+msgstr "Spill"
+
+#: ../lib/lcg/exercises.py:630
+msgid "Explanation:"
+msgstr "Forklaring:"
+
+#: ../lib/lcg/exercises.py:639
+msgid "Example:"
+msgstr "Eksempel:"
+
+#: ../lib/lcg/exercises.py:724
+msgid "on first attempt"
+msgstr "på første forsøk"
+
+#: ../lib/lcg/exercises.py:726
+msgid "Answered:"
+msgstr "Svarte:"
+
+#: ../lib/lcg/exercises.py:727
+msgid ""
+"Displays the number of the tasks you have already answered.  For example "
+"4/10 means, that you have answered four out of ten questions so you should "
+"finish the remaining six."
+msgstr ""
+"Viser hvor mange oppgaver du har allerede gjort. For eksempel betyr 4/10 at "
+"du har svart på fire av ti spørsmål, så du bør fullføre de øvrige seks."
+
+#: ../lib/lcg/exercises.py:730
+msgid "Correct:"
+msgstr "Korrekt:"
+
+#: ../lib/lcg/exercises.py:731
+msgid ""
+"Displays the number and percentage of successful answers.  The first pair of "
+"numbers shows the results of all current answers.  If you didn't answer all "
+"of them correctly on first attempt, there is also a second pair of numbers "
+"showing how many answers you did succesfuly on the first try.  Use the "
+"‘Reset’ button to start again."
+msgstr ""
+"Viser antall og prosentandel riktige svar. De første to tallene viser "
+"resultatene av alle aktuelle svar. Hvis du ikke svarte riktig på alle ved "
+"første forsøk, er det også et par tall til som viser hvor mange svar du "
+"gjorde riktig ved første forsøk. Bruk 'Tilbakestill'-knappen for å starte på "
+"nytt."
+
+#: ../lib/lcg/exercises.py:738
+msgid "Evaluate"
+msgstr "Evaluer"
+
+#: ../lib/lcg/exercises.py:739
+msgid ""
+"Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+"the first incorrect answer.  Within a text-box, the cursor is also moved to "
+"the first incorrect character of your answer."
+msgstr ""
+"Evaluer hele oppgaven. Hvis en feil blir funnet, flyttes markørentil det "
+"første gale svaret. Innenfor en tekstboks flyttes også markøren til den "
+"første gale bokstaven i svaret."
+
+#. Translators: Fill (a form with correct answers).
+#: ../lib/lcg/exercises.py:743
+msgid "Fill"
+msgstr "Fyll"
+
+#: ../lib/lcg/exercises.py:744
+msgid "Fill in the whole exercise with the correct answers."
+msgstr "Fyll ut hele oppgaven med de riktige svarene."
+
+#: ../lib/lcg/exercises.py:745
+msgid "Reset"
+msgstr "Tilbakestill"
+
+#: ../lib/lcg/exercises.py:746
+msgid "Reset all your answers and start again."
+msgstr "Tilbakestill alle svarene og begynn på nytt."
+
+#: ../lib/lcg/exercises.py:748
+msgid ""
+"The Answer Sheets contain all the correct answers for all the exercises. You "
+"can access them from the Course Index, or more conveniently, you can use the "
+"‘?’ (question mark) link after each task. This link takes you directly to "
+"the corresponding answer in the Answer Sheet."
+msgstr ""
+"Arket med løsningene inneholder alle korrekte svar for alle oppgaver. Du får "
+"tilgang til dem fra Kursindeksen, eller enklere, du kan bruke "
+"'?' (spørsmålstegn)-lenken etter hver oppgave. Denne koblingen tar deg "
+"direkte til det korresponderende svaret i Løsninger."
+
+#: ../lib/lcg/exercises.py:803
+msgid "Show the answer sheet."
+msgstr "Vis løsningene."
+
+#: ../lib/lcg/exercises.py:830
+msgid "Chose the correct answer."
+msgstr "Velg det rette svaret."
+
+#: ../lib/lcg/exercises.py:833
+msgid ""
+"You will hear a response immediately after choosing the answer.  When you "
+"choose the wrong answer, you can try again until you find the correct one.  "
+"The results below the exercise will show you how many answers you got right "
+"on the first try (see the [#indicators] section below)."
+msgstr ""
+"Du vil høre en respons rett etter at du velger et svar. Når du velger galt "
+"svar, kan du prøve igjen til du finner det riktige. Resultatene under "
+"oppgaven vil vise deg hvor mange svar du fikk på første forsøk (se [# "
+"indicators]-avsnittet nedenfor)."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:901
+msgid "Multiple Choice Questions"
+msgstr "Flervalgsoppgaver"
+
+#: ../lib/lcg/exercises.py:902
+msgid ""
+"Each question in this exercise is followed by two or more possible answers. "
+"Only one answer is correct."
+msgstr ""
+"Hvert spørsmål i denne oppgaven følges av to eller flere mulige svar. Bare "
+"ett svar er korrekt."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:910
+msgid "Selections"
+msgstr "Utvalg"
+
+#: ../lib/lcg/exercises.py:911
+msgid ""
+"There are several groups of two or three similar sentences or expressions. "
+"Only one option in each group is correct. Your goal is to decide which one."
+msgstr ""
+"Det finnes flere grupper på to eller tre lignende setninger eller uttrykk. "
+"Bare ett valg i hver gruppe er korrekt. Ditt mål er å bestemme hvilket."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:920
+msgid "True/False Statements"
+msgstr "Riktig/feil"
+
+#: ../lib/lcg/exercises.py:921
+msgid "For each of the statements below, choose True or False."
+msgstr "For hvert av utsagnene nedenfor velg Riktig eller Feil."
+
+#: ../lib/lcg/exercises.py:922
+msgid ""
+"Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
+"and ‘FALSE’.  Decide whether the sentence is true or not and press the "
+"corresponding button."
+msgstr ""
+"Hver setning i denne oppgaven er fulgt av to kontroller merket 'RIKTIG' og "
+"'FEIL'. Avgjør om setningen er sann eller ikke, og trykk den tilsvarende "
+"knappen."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:946
+msgid "Gap Filling"
+msgstr "Fyll hullene"
+
+#: ../lib/lcg/exercises.py:947
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr ""
+"Velg den riktige valgmuligheten for å fylle hullene i følgende setninger."
+
+#: ../lib/lcg/exercises.py:949
+msgid ""
+"Choose the correct word to fill in a gap in a sentence.  For each gap you "
+"have several choices.  Only one of them is correct."
+msgstr ""
+"Velg det riktige ordet for å fylle hullet i setningen. For hvert hull har du "
+"flere muligheter. Bare én er korrekt."
+
+#: ../lib/lcg/exercises.py:972
+msgid ""
+"You can check each answer individually using the shortcut keys (see the "
+"section [#keys] for more information).  When your answer is evaluated as "
+"incorrect and you do not know why, always check whether you have used "
+"correct punctuation and capital letters where appropriate. These two things "
+"are the cause of most confusion."
+msgstr ""
+"Du kan sjekke hvert svar for seg ved å bruke hurtigtastene (se seksjonen [# "
+"keys] for mer informasjon). Når ditt svar er evaluert som feil og du ikke "
+"skjønner hvorfor, sjekk alltid om du har brukt riktig tegnsetting og store "
+"bokstaver der de skal være. Feil her skaper ofte forvirring."
+
+#: ../lib/lcg/exercises.py:977
+msgid ""
+"Use the [#panel] at the bottom of the exercise to evaluate all the answers "
+"at once."
+msgstr "Bruk [#panel] nederst i oppgaven for å evaluere alle svarene samtidig."
+
+#: ../lib/lcg/exercises.py:979
+msgid ""
+"If your browser doesn't support JavaScript, the interactive features and "
+"automatic evaluation do not work.  You can still use this course, but you "
+"will have to check your answers against the answer sheet manually (see "
+"[#answer-sheets]."
+msgstr ""
+"Hvis nettleseren ikke støtter JavaScript, fungerer de interaktive "
+"funksjonene og den automatiske evalueringen ikke. Du kan fortsatt bruke "
+"kurset, men du må sjekke svarene manuelt (se [#answer-sheets]."
+
+#: ../lib/lcg/exercises.py:987
+msgid ""
+"In all the exercises where you fill in the text into a text-box you can use "
+"the two shortcut keys described below."
+msgstr ""
+"I alle oppgavene hvor du fyller inn tekst i en tekstboks kan du bruke de to "
+"hurtigtastene beskrevet nedenfor."
+
+#: ../lib/lcg/exercises.py:989
+msgid "Enter"
+msgstr "Enter"
+
+#: ../lib/lcg/exercises.py:990
+msgid ""
+"Use this key within the text-field to evaluate the current answer. You hear "
+"a sound response and in case of an error, the cursor is moved to the "
+"position of the first incorrect character within the text.  This way you can "
+"locate the error, fix it and evaluate again. When you don't know how to fix "
+"an error, you can use the ‘hint’ key described below."
+msgstr ""
+"Bruk denne tasten innen tekstfeltet for å evaluere det aktuelle svaret. Du "
+"hører et lydsvar, og hvis noe er feil, flyttes markøren til den første gale "
+"bokstaven i teksten. På denne måten kan du finne feilen, rette den og "
+"evaluere igjen. Hvis du ikke vet hvordan du kan korrigere en feil, kan du "
+"bruke 'hint'-tasten beskrevet nedenfor."
+
+#: ../lib/lcg/exercises.py:996
+msgid "Ctrl-Space"
+msgstr "Ctrl-mellomrom"
+
+#: ../lib/lcg/exercises.py:997
+msgid ""
+"This function is called a ‘hint’.  It helps you in case you don't know the "
+"answer or you don't know how to fix an error in your answer. Just press the "
+"key combination (holding the Ctrl key, press the spacebar) and one letter of "
+"the correct answer will be filled in automatically.  If you have already "
+"entered some text, the cursor will be moved to after the last correct "
+"character and next one will be inserted.  This also means that if there is "
+"some text after the cursor, there is at least one error in it.  Try to "
+"locate this error and correct it.  Then you can evaluate your answer using "
+"the ‘Enter’ key (see above) or use ‘hint’ again, until you find the complete "
+"answer."
+msgstr ""
+"Denne funksjonen kalles et ‘hint’ . Den hjelper deg i tilfelle du ikke vet "
+"svaret eller du ikke vet hvordan du korrigerer en feil i svaret. Bare trykk "
+"tastekombinasjonen (hold nede Ctrl-tasten, trykk mellomrom) og en bokstav "
+"fra det riktige svaret fylles inn automatisk. Hvis du allerede har skrevet "
+"inn tekst, flyttes markøren til etter den siste korrekte bokstaven, og neste "
+"korrekte bokstav settes inn. Dette betyr også at hvis det er tekst etter "
+"markøren, er det minst én feil i den. Prøv å finne feilen og rette den. "
+"Etterpå kan du evaluere svaret ditt ved hjelp av ‘Enter’ -tasten (se over) "
+"eller bruke ‘hint’ igjen, til du finner hele svaret."
+
+#: ../lib/lcg/exercises.py:1069
+msgid "Test Yourself"
+msgstr "Test deg selv"
+
+#: ../lib/lcg/exercises.py:1070
+msgid "Fill in the correct translation for each of the terms below."
+msgstr "Sett inn den korrekte oversettelsen av hvert uttrykk."
+
+#: ../lib/lcg/exercises.py:1071
+msgid ""
+"There are two ways to do the exercise: orally and written.  Do the exercise "
+"both ways to get the best results."
+msgstr ""
+"Der er to muligheter for å løse oppgaven: muntlig eller skriftlig. Løs "
+"oppgaven på begge måter for å få de beste resultatene."
+
+#: ../lib/lcg/exercises.py:1073
+msgid ""
+"To do the exercise orally is simple.  Go through the vocabulary list and "
+"think of the correct translation for each word or expression. There is a "
+"‘Play’ button after the text-box for each item which allows you to hear the "
+"correct answer.  Repeat the answer to practise the correct pronunciation.  "
+"Some items have more than one correct answer, so there may be multiple "
+"buttons to play each of them.  Since there is no way of checking your oral "
+"answers, the results are not available.  If you want to see your score, you "
+"must do the written exercise."
+msgstr ""
+"Å gjøre oppgaven muntlig er enkelt. Gå gjennom vokabularet og tenk på den "
+"riktige oversettelsen av hvert ord eller uttrykk. Etter hvert elements "
+"tekstboks er det en 'Spill'-knapp som gjør deg i stand til å høre det "
+"riktige svaret. Gjenta svaret for å øve på den riktige uttalen. Noen "
+"elementer har mer enn ett riktig svar, så det kan være flere knapper for å "
+"spille hvert av dem. Siden det ikke er noen måte å sjekke dine muntlige "
+"svar, er resultatene ikke tilgjengelige. For å se din poengsum, må du gjøre "
+"den skriftlige oppgaven."
+
+#: ../lib/lcg/exercises.py:1082
+msgid ""
+"To do the exercise in written form, simply type the translation of each item "
+"into the text-box.  Be careful to use capital letters where this is "
+"appropriate, since an answer without correct capitalization is always "
+"considered incorrect.  When the prompt is a complete sentence, you must also "
+"use correct punctuation."
+msgstr ""
+"For å gjøre oppgaven skriftlig, skriver du bare oversettelsen av hvert "
+"element i tekstboksen. Vær påpasselig med å bruke store bokstaver der dette "
+"er aktuelt, siden et svar uten riktig bruk av store og små bokstaver alltid "
+"vurderes som feil. Når meldingen er en hel setning, må du også bruke riktig "
+"tegnsetting."
+
+#: ../lib/lcg/exercises.py:1097
+msgid "Exercise not available in this language version."
+msgstr "Øvelse ikke tilgjengelig i denne språkversjonen."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1106
+msgid "Substitution"
+msgstr "Bytt ut"
+
+#: ../lib/lcg/exercises.py:1107
+msgid "Use the text in brackets to transform each sentence."
+msgstr "Bruk teksten i parentes for å omforme hver setning."
+
+#: ../lib/lcg/exercises.py:1108
+msgid ""
+"Use the prompt to produce another sentence with the same structure. Each "
+"sentence is followed by text in brackets.  Replace the corresponding part of "
+"the sentence using this text."
+msgstr ""
+"Bruk ledeteksten til å produsere en setning med samme struktur. Hver setning "
+"er etterfulgt av en tekst i parentes. Erstatt den tilsvarende delen av "
+"setningen ved hjelp av denne teksten."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1117
+msgid "Transformation"
+msgstr "Transformasjon"
+
+#: ../lib/lcg/exercises.py:1119
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr "Fyll hullen i setning B slik at den betyr det samme som setning A."
+
+#: ../lib/lcg/exercises.py:1121
+msgid ""
+"Your goal is to transform a structure (pattern or paradigm) into a different "
+"structure, for example changing an affirmative sentence into a question."
+msgstr ""
+"Målet ditt er å endre en struktur (mønster eller paradigme) til en annen "
+"struktur, for eksempel å endre en bekreftende setning til et spørsmål."
+
+#: ../lib/lcg/exercises.py:1127
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr ""
+"Endre strukturen og lag en ny setning ved å bruke eksemplet som modell."
+
+#. Translators: Type of exercise
+#: ../lib/lcg/exercises.py:1140
+msgid "Writing"
+msgstr "Skrive"
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1157
+msgid "Cloze"
+msgstr "Fyll ut"
+
+#: ../lib/lcg/exercises.py:1159
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+"Fyll ut hullene i teksten nedenfor. For hver hull er det bare ett riktig "
+"svar."
+
+#: ../lib/lcg/exercises.py:1161
+msgid ""
+"Your goal in this exercise is to fill in the gaps in a longer piece of text. "
+"There is just one correct answer for each gap."
+msgstr ""
+"Ditt mål i denne oppgaven er å fylle ut hullene i en lengre tekst. Det er "
+"bare ett riktig svar for hvert tomrom."
+
+#. Translators: Type of exercise (use language
+#. terminology). Exposed cloze is lika Cloze, where students fill
+#. in the gaps in a text. In *exposed* cloze however the student
+#. chooses from the list of offered answers.
+#: ../lib/lcg/exercises.py:1174
+msgid "Exposed Cloze"
+msgstr "Fyll ut med ordene fra lista"
+
+#: ../lib/lcg/exercises.py:1175
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr ""
+"Bruk det riktige ordet eller uttrykket fra listen nedenfor for å fylle ut "
+"hullene i setningene."
+
+#: ../lib/lcg/exercises.py:1246
+#, python-format
+msgid "%d) "
+msgstr "%d) "
+
+#: ../lib/lcg/exercises.py:1265 ../lib/lcg/exercises.py:1301
+#: ../lib/lcg/exercises.py:1304
+msgid "Total points:"
+msgstr "Totalpoeng:"
+
+#: ../lib/lcg/exercises.py:1295
+msgid "Invalid value in added points!"
+msgstr "Ugyldig verdi i poeng lagt til!"
+
+#: ../lib/lcg/exercises.py:1296
+msgid "Max. points exceeded!"
+msgstr "Maks. poeng overskredet!"
+
+#: ../lib/lcg/exercises.py:1298
+msgid "Automatic evaluation:"
+msgstr "Automatisk evaluering:"
+
+#: ../lib/lcg/exercises.py:1299
+msgid "Additional points by tutor:"
+msgstr "Ekstra poeng fra veileder:"
+
+#: ../lib/lcg/exercises.py:1349
+msgid "correct answer"
+msgstr "riktig svar"
+
+#. Translators: Incorrect (answer)
+#: ../lib/lcg/exercises.py:1354
+msgid "incorrect"
+msgstr "feil"
+
+#~ msgid "Show transcript"
+#~ msgstr "Vis transkripsjon"
+
+#~ msgid "Hide transcript"
+#~ msgstr "Skjul transkripsjon"
+
+#~ msgid "answer sheet"
+#~ msgstr "løsninger"
+
+#~ msgid "See the %s to check your results."
+#~ msgstr "Se %s for å kontrollere dine resultater."
+
+#~ msgid ""
+#~ "This course was developed within the Eurochance project co-funded by the "
+#~ "European Leonardo da Vinci programme."
+#~ msgstr ""
+#~ "Dette kurset ble utviklet innen Eurochance-prosjekt delfinansiert av EUs "
+#~ "Leonardo da Vinci-program."
+
+#~ msgid "presentation and user interface"
+#~ msgstr "presentasjon og brukergrensesnitt"
+
+#~ msgid "Copyright and License Information"
+#~ msgstr "Opphavsrett og lisensinformasjon"
+
+#~ msgid "This course is a joint work protected by the copyright law."
+#~ msgstr "Dette kurset er et fellesarbeid beskyttet av opphavsrett."
+
+#~ msgid ""
+#~ "This course can be redistributed and/or modified under the terms of the "
+#~ "GNU General Public License as published by the Free Software Foundation; "
+#~ "either version 2 of the License, or (at your option) any later version."
+#~ msgstr ""
+#~ "Dette kurset kan distribueres og/eller endres under GNU General Public "
+#~ "License, publisert av Free Software Foundation; enten versjon 2 av "
+#~ "lisensen, eller (om du vil) enhver senere versjon."
+
+#~ msgid ""
+#~ "This course is distributed in the hope that it will be useful, but "
+#~ "WITHOUT ANY WARRANTY; without even the implied warranty of "
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General "
+#~ "Public License for more details."
+#~ msgstr ""
+#~ "Dette kurset er distribuert i håp om at det være nyttig, men UTEN NOEN "
+#~ "FOR FOR GARANTI; uten underforståtte garantier om SALGBARHET eller "
+#~ "EGNETHET FOR ET BESTEMT FORMÅL. Se GNU General Public License for flere "
+#~ "detaljer."
+
+#~ msgid "The complete license text follows in the original English version:"
+#~ msgstr "Den fullstendige lisensteksten følger i original engelsk versjon:"
+
+#~ msgid "Unit %d"
+#~ msgstr "Leksjon %d"
+
+#~ msgid "Aims and Objectives"
+#~ msgstr "Mål og Formål"
+
+#~ msgid "Checklist"
+#~ msgstr "Sjekkliste"
+
+#~ msgid "The grammar focus of this unit is:"
+#~ msgstr "Det grammatiske fokuset for denne leksjon er:"
+
+#~ msgid "Vocabulary Practice"
+#~ msgstr "Vokabularøvelse"
+
+#~ msgid "Listening Comprehension"
+#~ msgstr "Høreforståelse"
+
+#~ msgid "General Comprehension"
+#~ msgstr "Generell forståelse"
+
+#~ msgid "Grammar Practice"
+#~ msgstr "Grammatikkøvelse"
+
+#~ msgid "Consolidation"
+#~ msgstr "Konsolidering"
+
+#~ msgid "Vocabulary"
+#~ msgstr "Vokabular"
+
+#~ msgid "Comprehension"
+#~ msgstr "Forståelse"
+
+#~ msgid "Dictation"
+#~ msgstr "Diktat"
+
+#~ msgid "Vocabulary Index"
+#~ msgstr "Vokabularregister"
+
+#~ msgid "Help Index"
+#~ msgstr "Hjelperegister"
+
+#~ msgid "Help for %s"
+#~ msgstr "Hjelp: %s"
+
+#~ msgid "Answer Sheet:"
+#~ msgstr "Løsninger:"
+
+#~ msgid "Version %s"
+#~ msgstr "Versjon %s"
+
+#~ msgid "This exercise can be also done purely aurally/orally:"
+#~ msgstr "Denne øvelsen kan også gjøres bare ved å lytte/muntlig:"
+
+#~ msgid "Transcript:"
+#~ msgstr "Transkripsjon:"
+
+#~ msgid "Recording:"
+#~ msgstr "Opptak:"
+
+#~ msgid "Listening"
+#~ msgstr "Lytteøvelse"
+
+#~ msgid "Listen to the recording to practice understanding native speakers."
+#~ msgstr ""
+#~ "Lytt på opptaket for å øve på forståelse av de som har språket som "
+#~ "morsmål."
+
+#~ msgid "Reading"
+#~ msgstr "Leseøvelse"
+
+#~ msgid ""
+#~ "Read the text and try to understand as much as you can.  Use a dictionary "
+#~ "if necessary.  In many cases you will find the information relevant for "
+#~ "your own purposes, but it will also be needed in the exercises which "
+#~ "follow."
+#~ msgstr ""
+#~ "Les teksten og prøv å forstå så mye som mulig. Bruk ordbok hvis "
+#~ "nødvendig. I mange tilfeller finner du informasjon som er relevant for "
+#~ "dine egne behov, men den blir også nødvendig i oppgavene som følger."
+
+#~ msgid "Sentence Completion"
+#~ msgstr "Fullfør setningene"
+
+#~ msgid ""
+#~ "Speaking Practice.  Complete the sentences you hear, using the example as "
+#~ "a model."
+#~ msgstr "Taleøvelser. Fullfør setningene du hører ved å følge eksempelet."
+
+#~ msgid "Press  ‘Play’ to listen to the instructions:"
+#~ msgstr "Trykk på  ‘Spill’ for å lytte til instruksjonene:"
+
+#~ msgid ""
+#~ "The aim of this exercise is to give you an opportunity to produce a "
+#~ "complete sentence and compare your pronunciation with the original. "
+#~ "Therefore the exercise is purely aural-oral, with no written tasks."
+#~ msgstr ""
+#~ "Målet med denne oppgaven er å gi deg en mulighet til å produsere en hel "
+#~ "setning og sammenligne din uttale med originalen. Derfor er øvelsen rent "
+#~ "muntlig, uten skriftlige oppgaver."
+
+#~ msgid ""
+#~ "If you wish to check your answers against the written text, you can use "
+#~ "the transcript of the recording (the link ‘show transcript’). Since this "
+#~ "is not a written exercise, your results cannot be checked automatically."
+#~ msgstr ""
+#~ "Hvis du ønsker å sjekke svarene dine mot den skrevne teksten, kan du "
+#~ "bruke transkripsjon av opptaket (lenken ‘ Vis transkripsjon ‘). Siden "
+#~ "dette er ikke en skriftlig oppgave, kan ikke resultatene dine "
+#~ "kontrolleres automatisk."
+
+#~ msgid "Exercise Help"
+#~ msgstr "Hjelp til øvelsene"
+
+#~ msgid "Correct"
+#~ msgstr "Korrekt"
+
+#~ msgid "Error(s) found"
+#~ msgstr "Feil funnet"
+
+#~ msgid "Result:"
+#~ msgstr "Resultat:"
+
+#~ msgid ""
+#~ "Displays the result of the last evaluation (evaluate your answer by "
+#~ "pressing the ‘Enter’ key or by the ‘Evaluate’ button below the exercise)."
+#~ msgstr ""
+#~ "Viser resultatet av siste evaluering (evaluer ditt svar ved å trykke "
+#~ "'Enter'-tasten eller på 'Evaluer'-knappen under oppgaven)."
+
+#~ msgid ""
+#~ "Listen to the complete recording first. Then go to the textbox and use "
+#~ "the ‘>’ key to listen to the text section by section. Type what you hear "
+#~ "into the textbox. For detailed instructions, read the Exercise Help."
+#~ msgstr ""
+#~ "Lytt til hele innspillingen først. Gå deretter til tekstboksen og bruk "
+#~ "'>'-tasten for å høre på teksten del for del. Skriv hva du hører inn i "
+#~ "tekstboksen. For detaljerte instruksjoner, se i Hjelp-seksjonen."
+
+#~ msgid ""
+#~ "First listen to the recording once and then go to the large text entry "
+#~ "box below.  Within the box, you can use shortcut keys to play individual "
+#~ "pieces of the recording.  Typically you play one part using the ‘>’ key "
+#~ "(right angle bracket) and type what you hear. Then you press the ‘>’ key "
+#~ "again to play the next part and type it too, and so on until you reach "
+#~ "the end of the recording."
+#~ msgstr ""
+#~ "Hør først på opptaket én gang og gå deretter til den store tekstboksen "
+#~ "under. Inne i boksen kan du bruke hurtigtaster til å spille enkeltdeler "
+#~ "av opptaket. Vanligvis spiller du en del ved å bruke '>'-tasten (rett "
+#~ "vinkelparentes) og skriver inn det du hører. Deretter trykker du på '>'-"
+#~ "tasten igjen for å spille neste del og skriver den også, og så videre "
+#~ "helt til du når slutten av innspillingen."
+
+#~ msgid "Then you can use the evaluation keys to evaluate the whole text."
+#~ msgstr ""
+#~ "Deretter kan du bruke evalueringtastene for å evaluere hele teksten."
+
+#~ msgid ""
+#~ "Pay special attention to punctuation and case, since these cause most of "
+#~ "the problems when evaluating your answer. Type all the sentences as you "
+#~ "hear them, using the appropriate punctuation character and one space "
+#~ "after each sentence. No space is allowed after the last sentence. "
+#~ msgstr ""
+#~ "Vær spesielt oppmerksom på tegnsetting og kasus, siden disse forårsaker "
+#~ "de fleste problemene ved evalueringen av ditt svar. Skriv alle setningene "
+#~ "som du hører dem, bruk det riktige tegnsettingstegnet og ett mellomrom "
+#~ "etter hver setning. Det er ikke tillatt med mellomrom etter den siste "
+#~ "setningen."
+
+#~ msgid ""
+#~ "/Note/: Of course, you can replay the recording as many times as you need "
+#~ "in order to understand it, although two attempts should be enough for a "
+#~ "well performing student."
+#~ msgstr ""
+#~ "/Notat/: Du kan selvfølgelig spille opptaket så mange ganger som du "
+#~ "trenger for å forstå det, men to forsøk burde være nok for en god student."
+
+#~ msgid ""
+#~ "Also, in the dictation exercise text box, you can use the following keys "
+#~ "to control the playback of the recording:"
+#~ msgstr ""
+#~ "Dessuten kan du i diktatoppgavetekstboksen bruke følgende taster for å "
+#~ "styre avspillingen av opptaket:"
+
+#~ msgid "right angle bracket, greater than sign"
+#~ msgstr "høyre vinkelparentes, større enn-tegn"
+
+#~ msgid "Play next piece of the recording."
+#~ msgstr "Spill neste del av opptaket."
+
+#~ msgid "left angle bracket, less than sign"
+#~ msgstr "venstre vinkelparentes, mindre enn-tegn"
+
+#~ msgid "Play the previous piece of the recording."
+#~ msgstr "Spill forrige del av opptaket."
+
+#~ msgid "Ctrl-Enter"
+#~ msgstr "Ctrl-Enter"
+
+#~ msgid "Replay the current (last played) piece of the recording once again."
+#~ msgstr "Spill den aktuelle (sist spilte) delen av opptaket en gang til."
+
+#~ msgid ""
+#~ "Listen to the recording carefully and then fill in the gaps in the text "
+#~ "below using the same words."
+#~ msgstr ""
+#~ "Lytt godt på opptaket og fyll deretter ut hullene i teksten nedenfor ved "
+#~ "å bruke samme ord."
+
+#~ msgid "Vocabulary Listing"
+#~ msgstr "Vokabularliste"
+
+#~ msgid ""
+#~ "The vocabulary is presented in a two-column table with a term on the left "
+#~ "and its translation on the right in each row."
+#~ msgstr ""
+#~ "Vokabularet presenteres i en to-kolonners tabell - på hver linje finner "
+#~ "du et uttrykk på venstre side og oversettelsen av det på høyre side."
+
+#~ msgid "Terms"
+#~ msgstr "Uttrykk"
+
+#~ msgid "Phrases"
+#~ msgstr "Fraser"
+
+#~ msgid "Extended vocabulary"
+#~ msgstr "Utvidet ordforråd"
+
+#~ msgid ""
+#~ "Please, visit the [http://eurochance.brailcom.org Eurochance project "
+#~ "webpage] for more information how to obtain the source data of this "
+#~ "course."
+#~ msgstr ""
+#~ "Vennligst gå til [http://eurochance.brailcom.org Eurochance-prosjektets "
+#~ "nettsted] for mer informasjon hvordan man får kildedataene til dette "
+#~ "kurset."
+
+#~ msgid "Section %d"
+#~ msgstr "Kapittel %d"
+
+#~ msgid "Exercises"
+#~ msgstr "Øvelser"
+
+#~ msgid "Ordered by the English term"
+#~ msgstr "Sortert etter den engelske betegnelsen"
+
+#~ msgid "learning content"
+#~ msgstr "kursinnhold"

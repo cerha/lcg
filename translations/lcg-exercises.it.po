@@ -1,0 +1,840 @@
+# Eurochance LCG Extension translations
+# Copyright (C) 2009, Brailcom, o.p.s.
+# This file is distributed under the same license as the LCG package.
+# AUTHOR <EMAIL@ADDRESS>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-03-28 11:44+0100\n"
+"PO-Revision-Date: 2011-12-06 16:13+0100\n"
+"Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
+"Language-Team: Italian (reditel@mluvim.cz)\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Labels for exercise buttons. Keep in capitals.
+#: ../lib/lcg/exercises.py:147
+msgid "TRUE"
+msgstr "VERO"
+
+#: ../lib/lcg/exercises.py:147
+msgid "FALSE"
+msgstr "FALSO"
+
+#: ../lib/lcg/exercises.py:395
+#, python-format
+msgid "Exercise %d"
+msgstr "Esercizio %d"
+
+#: ../lib/lcg/exercises.py:403
+msgid "Read the following text:"
+msgstr "Leggi il seguente testo:"
+
+#: ../lib/lcg/exercises.py:505
+msgid "Table of Contents:"
+msgstr "Indice:"
+
+#: ../lib/lcg/exercises.py:508
+msgid "Instructions"
+msgstr "Istruzioni"
+
+#: ../lib/lcg/exercises.py:509
+msgid "Shortcut Keys"
+msgstr "Tasti di scelta rapida"
+
+#: ../lib/lcg/exercises.py:510
+msgid "Indicators"
+msgstr "Risposte"
+
+#: ../lib/lcg/exercises.py:511
+msgid "Control Panel"
+msgstr "Pannello dei comandi"
+
+#: ../lib/lcg/exercises.py:512
+msgid "Answer Sheets"
+msgstr "Chiavi di soluzione"
+
+#: ../lib/lcg/exercises.py:528
+msgid "The indicator panel below the exercise shows the following values:"
+msgstr ""
+"Il pannello delle risposte alla fine dell'esercizio indica i seguenti valori:"
+
+#: ../lib/lcg/exercises.py:536
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr ""
+"Troverai il pannello dei comandi in fondo ad ogni esercizio interattivo. "
+"Contiene i seguenti pulsanti:"
+
+#: ../lib/lcg/exercises.py:565
+msgid "Play"
+msgstr "Play"
+
+#: ../lib/lcg/exercises.py:630
+msgid "Explanation:"
+msgstr "Leggenda:"
+
+#: ../lib/lcg/exercises.py:639
+msgid "Example:"
+msgstr "Esempio:"
+
+#: ../lib/lcg/exercises.py:724
+msgid "on first attempt"
+msgstr "primo tentativo"
+
+#: ../lib/lcg/exercises.py:726
+msgid "Answered:"
+msgstr "Risposto:"
+
+#: ../lib/lcg/exercises.py:727
+msgid ""
+"Displays the number of the tasks you have already answered.  For example "
+"4/10 means, that you have answered four out of ten questions so you should "
+"finish the remaining six."
+msgstr ""
+"Visualizza il numero dei compiti (domande) ai quali hai già risposto "
+"nell'esercizio stesso. Per esempio l'indicazione 4/10 significa, che hai "
+"completato quattro dei dieci compiti indipendentemente dalla loro "
+"correttezza. Mancano quindi ancora 6 compiti da completare."
+
+#: ../lib/lcg/exercises.py:730
+msgid "Correct:"
+msgstr "Corretto:"
+
+#: ../lib/lcg/exercises.py:731
+msgid ""
+"Displays the number and percentage of successful answers.  The first pair of "
+"numbers shows the results of all current answers.  If you didn't answer all "
+"of them correctly on first attempt, there is also a second pair of numbers "
+"showing how many answers you did succesfuly on the first try.  Use the "
+"‘Reset’ button to start again."
+msgstr ""
+"Visualizza il numero totale e la percentuale delle risposte corrette. La "
+"prima coppia di numeri indica i risultati della valutazione di tutte le "
+"risposte attuali. Se ad alcune domande non hai risposto correttamente al "
+"primo tentativo, viene visualizzata ancora una seconda coppia di numeri che "
+"indica soltanto le risposte corrette date al primo tentativo. Premi il "
+"pulsante ‘annulla’ se desideri ricominciare dall'inizio."
+
+#: ../lib/lcg/exercises.py:738
+msgid "Evaluate"
+msgstr "Esamina"
+
+#: ../lib/lcg/exercises.py:739
+msgid ""
+"Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+"the first incorrect answer.  Within a text-box, the cursor is also moved to "
+"the first incorrect character of your answer."
+msgstr ""
+"Esamina il risultato totale dell'esercizio completato. Se si verifica un "
+"errore, il cursore passerà direttamente alla prima risposta sbagliata. In "
+"più nella casella di testo il cursore passerà alla prima lettera sbagliata "
+"della tua risposta."
+
+#. Translators: Fill (a form with correct answers).
+#: ../lib/lcg/exercises.py:743
+msgid "Fill"
+msgstr "Completa"
+
+#: ../lib/lcg/exercises.py:744
+msgid "Fill in the whole exercise with the correct answers."
+msgstr "Completa tutto l'esercizio con le risposte corrette."
+
+#: ../lib/lcg/exercises.py:745
+msgid "Reset"
+msgstr "Annulla"
+
+#: ../lib/lcg/exercises.py:746
+msgid "Reset all your answers and start again."
+msgstr "Annulla tutte le tue risposte e ricomincia dall'inizio."
+
+#: ../lib/lcg/exercises.py:748
+msgid ""
+"The Answer Sheets contain all the correct answers for all the exercises. You "
+"can access them from the Course Index, or more conveniently, you can use the "
+"‘?’ (question mark) link after each task. This link takes you directly to "
+"the corresponding answer in the Answer Sheet."
+msgstr ""
+"Le chiavi di soluzione contengono tutte le risposte corrette per tutti gli "
+"esercizi. Sono accessibili dalla pagina iniziale. Il modo più facile è "
+"quello di premere il pulsante del punto interrogativo che troverai alla fine "
+"di ogni singolo esercizio. Questo pulsante ti porta direttamente alla "
+"corrispondente risposta."
+
+#: ../lib/lcg/exercises.py:803
+msgid "Show the answer sheet."
+msgstr "Visualizza le risposte corrette."
+
+#: ../lib/lcg/exercises.py:830
+msgid "Chose the correct answer."
+msgstr "Scegli la risposta corretta."
+
+#: ../lib/lcg/exercises.py:833
+msgid ""
+"You will hear a response immediately after choosing the answer.  When you "
+"choose the wrong answer, you can try again until you find the correct one.  "
+"The results below the exercise will show you how many answers you got right "
+"on the first try (see the [#indicators] section below)."
+msgstr ""
+"Subito dopo aver scelto la risposta sentirai un segnale che ti indicherà se "
+"la risposta è corretta o no. Se non hai risposto correttamente, puoi "
+"riprovare finchè non trovi la risposta giusta. I risultati in fondo agli "
+"esercizi indicano quante erano risposte corrette al primo tentativo "
+"(visitare [#indicators] )."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:901
+msgid "Multiple Choice Questions"
+msgstr "Domande a scelta multipla"
+
+#: ../lib/lcg/exercises.py:902
+msgid ""
+"Each question in this exercise is followed by two or more possible answers. "
+"Only one answer is correct."
+msgstr ""
+"Ad ogni domanda di quest'esercizio seguono due o più risposte possibili. "
+"Soltanto una di esse è corretta."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:910
+msgid "Selections"
+msgstr "Cosa è corretto"
+
+#: ../lib/lcg/exercises.py:911
+msgid ""
+"There are several groups of two or three similar sentences or expressions. "
+"Only one option in each group is correct. Your goal is to decide which one."
+msgstr ""
+"Nell'esercizio troverai alcuni gruppi con due o tre frasi o espressioni "
+"simili. Solo un'opzione per ciascun gruppo è corretta. Il tuo compito è di "
+"decidere quale."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:920
+msgid "True/False Statements"
+msgstr "Vero/Falso"
+
+#: ../lib/lcg/exercises.py:921
+msgid "For each of the statements below, choose True or False."
+msgstr "Per ogni espressione sottomenzionata scegli se è vera o falsa."
+
+#: ../lib/lcg/exercises.py:922
+msgid ""
+"Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
+"and ‘FALSE’.  Decide whether the sentence is true or not and press the "
+"corresponding button."
+msgstr ""
+"Dopo ciascuna frase di quest'esercizio seguono due pulsanti denominati "
+"'VERO' e 'FALSO'. Decidi quale frase è giusta e premi il pulsante "
+"corrispondente."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:946
+msgid "Gap Filling"
+msgstr "Completamento a scelta"
+
+#: ../lib/lcg/exercises.py:947
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr ""
+"Scegli la possibilità più appropriata per completare ciascuna delle seguenti "
+"frasi."
+
+#: ../lib/lcg/exercises.py:949
+msgid ""
+"Choose the correct word to fill in a gap in a sentence.  For each gap you "
+"have several choices.  Only one of them is correct."
+msgstr ""
+"Scegli la parola corretta per completare lo spazio nella frase. Per ogni "
+"parola mancante hai più possibilità. Solo una di loro è corretta."
+
+#: ../lib/lcg/exercises.py:972
+msgid ""
+"You can check each answer individually using the shortcut keys (see the "
+"section [#keys] for more information).  When your answer is evaluated as "
+"incorrect and you do not know why, always check whether you have used "
+"correct punctuation and capital letters where appropriate. These two things "
+"are the cause of most confusion."
+msgstr ""
+"Puoi controllare ogni risposta separatamente usando i tasti di scelta rapida "
+"(vedi la sezione [#keys] per maggiori dettagli). Quando la risposta è "
+"valutata come sbagliata e non sai il perchè, controlla sempre se hai usato "
+"correttamente la punteggiatura e le lettere maiuscole e minuscole. Questi "
+"due elementi causano la maggior parte degli errori."
+
+#: ../lib/lcg/exercises.py:977
+msgid ""
+"Use the [#panel] at the bottom of the exercise to evaluate all the answers "
+"at once."
+msgstr ""
+"Usa il [#panel] alla fine dell'esercizio per valutare tutte le risposte in "
+"una volta sola."
+
+#: ../lib/lcg/exercises.py:979
+msgid ""
+"If your browser doesn't support JavaScript, the interactive features and "
+"automatic evaluation do not work.  You can still use this course, but you "
+"will have to check your answers against the answer sheet manually (see "
+"[#answer-sheets]."
+msgstr ""
+"Se il tuo browser non è sostenuto da JavaScript, i lineamenti interattivi e "
+"la valutazione automatica degli esercizi non funzioneranno. Nonostante "
+"questo puoi aderire a questo corso, ma devi controllare da solo le tue "
+"risposte con le chiavi di soluzione (guarda [#answer-sheets])."
+
+#: ../lib/lcg/exercises.py:987
+msgid ""
+"In all the exercises where you fill in the text into a text-box you can use "
+"the two shortcut keys described below."
+msgstr ""
+"In tutti gli esercizi dove inserisci il testo nella casella di testo "
+"iniziale puoi usare i seguenti tasti di scelta rapida."
+
+#: ../lib/lcg/exercises.py:989
+msgid "Enter"
+msgstr "Invio"
+
+#: ../lib/lcg/exercises.py:990
+msgid ""
+"Use this key within the text-field to evaluate the current answer. You hear "
+"a sound response and in case of an error, the cursor is moved to the "
+"position of the first incorrect character within the text.  This way you can "
+"locate the error, fix it and evaluate again. When you don't know how to fix "
+"an error, you can use the ‘hint’ key described below."
+msgstr ""
+"Premendo questo pulsante nella casella di testo accederai alla valutazione "
+"delle tue risposte. Ascolterai immediatamente l'esito della valutazione. Nel "
+"caso di risposta errata, il cursore passerà direttamente alla prima lettera "
+"sbagliata della risposta inserita. In questo modo puoi trovare l'errore (per "
+"esempio l'errore di battitura), correggerlo e riprovare a esaminare di nuovo "
+"la risposta. Se non sai correggere l'errore, puoi premere il pulsante di "
+"'suggerimento' descritto sotto."
+
+#: ../lib/lcg/exercises.py:996
+msgid "Ctrl-Space"
+msgstr "Ctrl-spazio"
+
+#: ../lib/lcg/exercises.py:997
+msgid ""
+"This function is called a ‘hint’.  It helps you in case you don't know the "
+"answer or you don't know how to fix an error in your answer. Just press the "
+"key combination (holding the Ctrl key, press the spacebar) and one letter of "
+"the correct answer will be filled in automatically.  If you have already "
+"entered some text, the cursor will be moved to after the last correct "
+"character and next one will be inserted.  This also means that if there is "
+"some text after the cursor, there is at least one error in it.  Try to "
+"locate this error and correct it.  Then you can evaluate your answer using "
+"the ‘Enter’ key (see above) or use ‘hint’ again, until you find the complete "
+"answer."
+msgstr ""
+"Questa funzione ti offre ‘suggerimenti’ nel caso in cui non conosci la "
+"risposta esatta (non la ricordi) oppure non sai come correggere l'errore "
+"nella valutazione automatica delle tue risposte. Premi semplicemente la "
+"corrispondente combinazione dei tasti (mantieni il pulsante Ctrl e premi lo "
+"spazio) e apparirà automaticamente una lettera della risposta corretta. Se "
+"hai già inserito un testo, il cursore passerà prima di tutto dietro "
+"all'ultima lettera corretta della tua risposta e la lettera successiva verrà "
+"inserita. Questo significa che se al cursore segue del testo, allora questo "
+"testo contiene almeno un errore. Cerca di trovarlo e di correggerlo. "
+"Dopodiché puoi riprovare a esaminare la nuova risposta usando il pulsante "
+"‘Invio’ (vedi sopra) oppure usare di nuovo il pulsante di ‘suggerimento’ se "
+"non trovi la risposta corretta completa."
+
+#: ../lib/lcg/exercises.py:1069
+msgid "Test Yourself"
+msgstr "Esamina le tue conoscenze"
+
+#: ../lib/lcg/exercises.py:1070
+msgid "Fill in the correct translation for each of the terms below."
+msgstr ""
+"Completa la traduzione corretta per ciascuna delle seguenti espressioni."
+
+#: ../lib/lcg/exercises.py:1071
+msgid ""
+"There are two ways to do the exercise: orally and written.  Do the exercise "
+"both ways to get the best results."
+msgstr ""
+"Ci sono due possibilità di eseguire l'esercizio: forma orale e forma "
+"scritta. Approfitta di entrambe per ottenere i risultati migliori."
+
+#: ../lib/lcg/exercises.py:1073
+msgid ""
+"To do the exercise orally is simple.  Go through the vocabulary list and "
+"think of the correct translation for each word or expression. There is a "
+"‘Play’ button after the text-box for each item which allows you to hear the "
+"correct answer.  Repeat the answer to practise the correct pronunciation.  "
+"Some items have more than one correct answer, so there may be multiple "
+"buttons to play each of them.  Since there is no way of checking your oral "
+"answers, the results are not available.  If you want to see your score, you "
+"must do the written exercise."
+msgstr ""
+"La forma orale è semplice. Scorri nel vocabolario e cerca di indovinare la "
+"corretta traduzione di ogni singola parola o espressione. Ogni voce della "
+"lista è seguita da una casella d'accesso e dietro di essa troverai il "
+"pulsante con il quale potrai sentire la risposta esatta. Ripetila per "
+"esercitare la pronuncia. Alcune voci hanno più risposte corrette. In questo "
+"caso troverai più pulsanti per poterle riascoltare. Siccome non è possibile "
+"valutare tramite il computer le tue risposte orali, i risultati non sono a "
+"disposizione. Se vuoi sapere il tuo punteggio, devi eseguire la prova nella "
+"forma scritta."
+
+#: ../lib/lcg/exercises.py:1082
+msgid ""
+"To do the exercise in written form, simply type the translation of each item "
+"into the text-box.  Be careful to use capital letters where this is "
+"appropriate, since an answer without correct capitalization is always "
+"considered incorrect.  When the prompt is a complete sentence, you must also "
+"use correct punctuation."
+msgstr ""
+"Nell'esercizio scritto inserisci semplicemente la traduzione di ogni parola "
+"nella casella di testo. Fai attenzione alla corretta battitura di lettere "
+"maiuscole e minuscole poichè la risposta con l'inserimento non corretto di "
+"letttere maiuscole e minuscole viene sempre valutata come sbagliata. Se "
+"traduci l'intera frase, concentrati anche sulla punteggiatura."
+
+#: ../lib/lcg/exercises.py:1097
+msgid "Exercise not available in this language version."
+msgstr "Esercizio non disponibile per questa versione linguistica."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1106
+msgid "Substitution"
+msgstr "Sostituzione"
+
+#: ../lib/lcg/exercises.py:1107
+msgid "Use the text in brackets to transform each sentence."
+msgstr "Modifica le frasi usando il testo tra parentesi."
+
+#: ../lib/lcg/exercises.py:1108
+msgid ""
+"Use the prompt to produce another sentence with the same structure. Each "
+"sentence is followed by text in brackets.  Replace the corresponding part of "
+"the sentence using this text."
+msgstr ""
+"Usa l'espresione indicata per creare un'altra frase con la stessa struttura. "
+"Ogni frase è seguita da un testo tra parentesi. Sostituisci la parte "
+"corrispondente della frase usando questo testo."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1117
+msgid "Transformation"
+msgstr "Trasformazione"
+
+#: ../lib/lcg/exercises.py:1119
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr ""
+"Completa la frase B in modo tale che abbia lo stesso significato della frase "
+"A."
+
+#: ../lib/lcg/exercises.py:1121
+msgid ""
+"Your goal is to transform a structure (pattern or paradigm) into a different "
+"structure, for example changing an affirmative sentence into a question."
+msgstr ""
+"Il tuo compito è quello di trasformare una certa struttura (il contenuto "
+"della frase) in una struttura differente (per esempio trasformando una frase "
+"affermativa in una domanda)."
+
+#: ../lib/lcg/exercises.py:1127
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr "Modifica la struttura di ogni frase secondo l'esempio."
+
+#. Translators: Type of exercise
+#: ../lib/lcg/exercises.py:1140
+msgid "Writing"
+msgstr "Scrittura"
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1157
+msgid "Cloze"
+msgstr "Completamento delle risposte"
+
+#: ../lib/lcg/exercises.py:1159
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+"Inserisci il testo mancante. Per ogni spazio libero esiste una sola risposta "
+"corretta."
+
+#: ../lib/lcg/exercises.py:1161
+msgid ""
+"Your goal in this exercise is to fill in the gaps in a longer piece of text. "
+"There is just one correct answer for each gap."
+msgstr ""
+"Il tuo compito durante quest'esercizio è di inserire le parole mancanti nel "
+"testo più lungo. Per ogni spazio vuoto esiste soltanto una sola risposta "
+"corretta."
+
+#. Translators: Type of exercise (use language
+#. terminology). Exposed cloze is lika Cloze, where students fill
+#. in the gaps in a text. In *exposed* cloze however the student
+#. chooses from the list of offered answers.
+#: ../lib/lcg/exercises.py:1174
+msgid "Exposed Cloze"
+msgstr "Completamento delle risposte suggerite"
+
+#: ../lib/lcg/exercises.py:1175
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr ""
+"Utilizza le parole dell'elenco sottomenzionato per completare le parti "
+"mancanti del testo."
+
+#: ../lib/lcg/exercises.py:1246
+#, python-format
+msgid "%d) "
+msgstr "%d) "
+
+#: ../lib/lcg/exercises.py:1265 ../lib/lcg/exercises.py:1301
+#: ../lib/lcg/exercises.py:1304
+msgid "Total points:"
+msgstr "Punteggio totale:"
+
+#: ../lib/lcg/exercises.py:1295
+msgid "Invalid value in added points!"
+msgstr "Valore invalido dei punti aggiunti!"
+
+#: ../lib/lcg/exercises.py:1296
+msgid "Max. points exceeded!"
+msgstr "Il massimo dei punti è stato superato!"
+
+#: ../lib/lcg/exercises.py:1298
+msgid "Automatic evaluation:"
+msgstr "Valutazione automatica:"
+
+#: ../lib/lcg/exercises.py:1299
+msgid "Additional points by tutor:"
+msgstr "Punti aggiunti dall'insegnante:"
+
+#: ../lib/lcg/exercises.py:1349
+msgid "correct answer"
+msgstr "risposta corretta"
+
+#. Translators: Incorrect (answer)
+#: ../lib/lcg/exercises.py:1354
+msgid "incorrect"
+msgstr "errata"
+
+#~ msgid "Show transcript"
+#~ msgstr "Visualizza la trascrizione"
+
+#~ msgid "Hide transcript"
+#~ msgstr "Nascondi la trascrizione"
+
+#~ msgid "answer sheet"
+#~ msgstr "chiavi di soluzione"
+
+#~ msgid "See the %s to check your results."
+#~ msgstr "Visita %s per controllare la correttezza delle tue risposte."
+
+#~ msgid ""
+#~ "This course was developed within the Eurochance project co-funded by the "
+#~ "European Leonardo da Vinci programme."
+#~ msgstr ""
+#~ "Questo corso è nato nell'ambito del progetto Eurochance finanziato "
+#~ "insieme con il programma europeo Leonardo da Vinci."
+
+#~ msgid "presentation and user interface"
+#~ msgstr "presentazione e interfaccia dell'utente"
+
+#~ msgid "Copyright and License Information"
+#~ msgstr "Informazione sulla licenza e sui diritti d'autore"
+
+#~ msgid "This course is a joint work protected by the copyright law."
+#~ msgstr "Questo corso è un lavoro congiunto protetto dal diritto d'autore."
+
+#~ msgid ""
+#~ "This course can be redistributed and/or modified under the terms of the "
+#~ "GNU General Public License as published by the Free Software Foundation; "
+#~ "either version 2 of the License, or (at your option) any later version."
+#~ msgstr ""
+#~ "Questo corso può essere diffuso o modificato secondo le disposizioni "
+#~ "della GNU, General Public License, pubblicate dalla Free Software "
+#~ "Foundation; il ciò o nella versione 2 di questa licenza (secondo la tua "
+#~ "decisione) oppure nella versione successiva."
+
+#~ msgid ""
+#~ "This course is distributed in the hope that it will be useful, but "
+#~ "WITHOUT ANY WARRANTY; without even the implied warranty of "
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General "
+#~ "Public License for more details."
+#~ msgstr ""
+#~ "Questo corso viene diffuso con la speranza di essere utile ma SENZA "
+#~ "ALCUNA GARANZIA; non vengono nemeno concesse le derivate garanzie di "
+#~ "COMMERCIABILITÀ o IDONEITÀ PER UNO SCOPO PARTICLARE. Visitare la GNU, "
+#~ "General Public License, per ottenere maggiori dettagli."
+
+#~ msgid "The complete license text follows in the original English version:"
+#~ msgstr ""
+#~ "Il testo completo della licenza segue nella versione originale inglese:"
+
+#~ msgid "Unit %d"
+#~ msgstr "Unità %d"
+
+#~ msgid "Aims and Objectives"
+#~ msgstr "Obiettivi e orientamento"
+
+#~ msgid "Checklist"
+#~ msgstr "Elenco di controllo"
+
+#~ msgid "The grammar focus of this unit is:"
+#~ msgstr "L'orientamento grammaticale di quest'unità è:"
+
+#~ msgid "Vocabulary Practice"
+#~ msgstr "Esercizi di lessico"
+
+#~ msgid "Listening Comprehension"
+#~ msgstr "Comprensione d'ascolto"
+
+#~ msgid "General Comprehension"
+#~ msgstr "Comprensione generale"
+
+#~ msgid "Grammar Practice"
+#~ msgstr "Esercizi di grammatica"
+
+#~ msgid "Consolidation"
+#~ msgstr "Esercizi riepilogativi"
+
+#~ msgid "Vocabulary"
+#~ msgstr "Lessico"
+
+#~ msgid "Comprehension"
+#~ msgstr "Comprensione"
+
+#~ msgid "Dictation"
+#~ msgstr "Dettato"
+
+#~ msgid "Vocabulary Index"
+#~ msgstr "Indice del lessico"
+
+#~ msgid "Help Index"
+#~ msgstr "Indice d'aiuto"
+
+#~ msgid "Help for %s"
+#~ msgstr "Aiuto %s"
+
+#~ msgid "Answer Sheet:"
+#~ msgstr "Chiavi di soluzione:"
+
+#~ msgid "Back"
+#~ msgstr "Indietro"
+
+#~ msgid "Version %s"
+#~ msgstr "Versione %s"
+
+#~ msgid "This exercise can be also done purely aurally/orally:"
+#~ msgstr ""
+#~ "Questo esercizio è disponibile anche puramente nella versione udita/orale:"
+
+#~ msgid "Transcript:"
+#~ msgstr "Trascrizione:"
+
+#~ msgid "Recording:"
+#~ msgstr "Registrazione:"
+
+#~ msgid "Listening"
+#~ msgstr "Ascolto"
+
+#~ msgid "Listen to the recording to practice understanding native speakers."
+#~ msgstr ""
+#~ "Ascolta la registrazione ed esercita la comprensione dei madrelingua."
+
+#~ msgid "Reading"
+#~ msgstr "Lettura"
+
+#~ msgid ""
+#~ "Read the text and try to understand as much as you can.  Use a dictionary "
+#~ "if necessary.  In many cases you will find the information relevant for "
+#~ "your own purposes, but it will also be needed in the exercises which "
+#~ "follow."
+#~ msgstr ""
+#~ "Leggi il testo e prova a comprendere il più possibile. Se necessario, usa "
+#~ "il vocabolario. Nella magior parte dei casi troverai le informazioni "
+#~ "utili non solo per te stesso, ma ne avrai bisogno durante il lavoro con i "
+#~ "prossimi esercizi."
+
+#~ msgid "Sentence Completion"
+#~ msgstr "Completamento della frase"
+
+#~ msgid ""
+#~ "Speaking Practice.  Complete the sentences you hear, using the example as "
+#~ "a model."
+#~ msgstr ""
+#~ "Esercita il parlare. Dopo aver udito il testo completa le frasi secondo "
+#~ "l'esempio."
+
+#~ msgid "Press  ‘Play’ to listen to the instructions:"
+#~ msgstr "Premi il pulsante ‘Play’ per riascoltare le istruzioni:"
+
+#~ msgid ""
+#~ "The aim of this exercise is to give you an opportunity to produce a "
+#~ "complete sentence and compare your pronunciation with the original. "
+#~ "Therefore the exercise is purely aural-oral, with no written tasks."
+#~ msgstr ""
+#~ "Lo scopo di questo esercizio è quello di dare allo studente  la "
+#~ "possibilità di creare una frase completa e confrontarla con la pronuncia "
+#~ "in lingua originale. L'esercizio è quindi puramente orale-uditivo, senza "
+#~ "i compiti scritti."
+
+#~ msgid ""
+#~ "If you wish to check your answers against the written text, you can use "
+#~ "the transcript of the recording (the link ‘show transcript’). Since this "
+#~ "is not a written exercise, your results cannot be checked automatically."
+#~ msgstr ""
+#~ "Se desideri confrontare le tue risposte con il testo scritto, usa la "
+#~ "versione scritta della registrazione (il link 'visualizzare la "
+#~ "trascrizione'). Siccome non si tratta di un esercizio scritto, non sarà "
+#~ "possibile verificare le tue risposte automaticamente."
+
+#~ msgid "Exercise Help"
+#~ msgstr "Aiuto per l'esercizio"
+
+#~ msgid "Correct"
+#~ msgstr "Risposte corrette"
+
+#~ msgid "Error(s) found"
+#~ msgstr "Errore(i) trovato"
+
+#~ msgid "Result:"
+#~ msgstr "Risultato:"
+
+#~ msgid ""
+#~ "Displays the result of the last evaluation (evaluate your answer by "
+#~ "pressing the ‘Enter’ key or by the ‘Evaluate’ button below the exercise)."
+#~ msgstr ""
+#~ "Visualizza il risultato dell'ultima valutazione della tua risposta "
+#~ "(inserisci la valutazione inserisci nella casella d'ingresso premendo il "
+#~ "pulsante 'Invio' o con il pulsante 'Valuta’)."
+
+#~ msgid ""
+#~ "Listen to the complete recording first. Then go to the textbox and use "
+#~ "the ‘>’ key to listen to the text section by section. Type what you hear "
+#~ "into the textbox. For detailed instructions, read the Exercise Help."
+#~ msgstr ""
+#~ "Prima ascolta l'intera registrazione. Dopo passa nella casella d'ingresso "
+#~ "di testo, premi il pulsante ‘>’ per ripetere il dettato passo dopo passo "
+#~ "e scrivi il testo. Maggiori informazioni troverai nell'aiuto per "
+#~ "l'esercizio."
+
+#~ msgid ""
+#~ "First listen to the recording once and then go to the large text entry "
+#~ "box below.  Within the box, you can use shortcut keys to play individual "
+#~ "pieces of the recording.  Typically you play one part using the ‘>’ key "
+#~ "(right angle bracket) and type what you hear. Then you press the ‘>’ key "
+#~ "again to play the next part and type it too, and so on until you reach "
+#~ "the end of the recording."
+#~ msgstr ""
+#~ "Prima ascolta una volta l'intera registrazione dopodiché passa alla "
+#~ "casella di testo sotto. Se il cursore si trova in questa casella, puoi "
+#~ "usare i tasti di scelta rapida per riascoltare gradualmente le singole "
+#~ "parti della registrazione. Riascolta sempre solo una parte premendo il "
+#~ "pulsante '>' (segno ‘più di’ ) e inserisci il testo che hai ascoltato. "
+#~ "Premi di nuovo il pulsante '>' per riascoltare e scrivere la parte "
+#~ "successiva finchè, facendo in questo modo, non arriverai alla fine della "
+#~ "registrazione."
+
+#~ msgid "Then you can use the evaluation keys to evaluate the whole text."
+#~ msgstr ""
+#~ "Dopo puoi premere il tasto di valutazione (o sui pulsanti sotto) per "
+#~ "valutare la correttezza dell'intero testo."
+
+#~ msgid ""
+#~ "Pay special attention to punctuation and case, since these cause most of "
+#~ "the problems when evaluating your answer. Type all the sentences as you "
+#~ "hear them, using the appropriate punctuation character and one space "
+#~ "after each sentence. No space is allowed after the last sentence. "
+#~ msgstr ""
+#~ "Presta una maggior attenzione alla punteggiatura e alla scrittura delle "
+#~ "lettere maiuscole e minuscole  perchè sono proprio quelle che creano i "
+#~ "problemi più frequenti nella valutazione della risposta. Scrivi tutte le "
+#~ "frasi come le senti utilizzando gli appropriati segni di interpunzione e "
+#~ "inserisci uno spazio alla fine di ogni frase. Dopo l'ultima frase lo "
+#~ "spazio non è consentito."
+
+#~ msgid ""
+#~ "/Note/: Of course, you can replay the recording as many times as you need "
+#~ "in order to understand it, although two attempts should be enough for a "
+#~ "well performing student."
+#~ msgstr ""
+#~ "/Nota/: Naturalmente puoi riascoltare la registazione quante volte ne hai "
+#~ "bisogno per la comprensione assoluta, ciò nonostante, due prove "
+#~ "dovrebbero essere sufficienti per un bravo studente."
+
+#~ msgid ""
+#~ "Also, in the dictation exercise text box, you can use the following keys "
+#~ "to control the playback of the recording:"
+#~ msgstr ""
+#~ "Se il cursore si trova nella casella d'ingresso del dettato puoi usare "
+#~ "anche il pulsante successivo per riascoltare le parti del dettato:"
+
+#~ msgid "right angle bracket, greater than sign"
+#~ msgstr "segno ‘più di’"
+
+#~ msgid "Play next piece of the recording."
+#~ msgstr "Riascolta la parte successiva del dettato."
+
+#~ msgid "left angle bracket, less than sign"
+#~ msgstr "segno ‘meno di’"
+
+#~ msgid "Play the previous piece of the recording."
+#~ msgstr "Riascolta la parte precedente del dettato."
+
+#~ msgid "Ctrl-Enter"
+#~ msgstr "Ctrl-Invio"
+
+#~ msgid "Replay the current (last played) piece of the recording once again."
+#~ msgstr ""
+#~ "Ascolta ancora una volta la parte attuale (l'ultima parte ascoltata) del "
+#~ "dettato."
+
+#~ msgid ""
+#~ "Listen to the recording carefully and then fill in the gaps in the text "
+#~ "below using the same words."
+#~ msgstr ""
+#~ "Ascolta attentamente la registrazione dopodiché completa gli spazi vuoti "
+#~ "nel testo sottoriportato usando le parole uguali."
+
+#~ msgid "Vocabulary Listing"
+#~ msgstr "Riassunto di lessico"
+
+#~ msgid ""
+#~ "The vocabulary is presented in a two-column table with a term on the left "
+#~ "and its translation on the right in each row."
+#~ msgstr ""
+#~ "Il lessico è rappresentato da una tabella con due colonne, con un termine "
+#~ "a sinistra e la sua traduzione a destra in ogni riga."
+
+#~ msgid "Terms"
+#~ msgstr "Vocaboli"
+
+#~ msgid "Phrases"
+#~ msgstr "Frasi"
+
+#~ msgid "Extended vocabulary"
+#~ msgstr "Versione approfondita del lessico"
+
+#~ msgid ""
+#~ "Please, visit the [http://eurochance.brailcom.org Eurochance project "
+#~ "webpage] for more information how to obtain the source data of this "
+#~ "course."
+#~ msgstr ""
+#~ "Visita [http://eurochance.brailcom.org Eurochance project webpage] per "
+#~ "ricevere le informazioni su come ottenere i dati originali di questo "
+#~ "corso."
+
+#~ msgid "Section %d"
+#~ msgstr "Sezione %d"
+
+#~ msgid "Exercises"
+#~ msgstr "Esercizi"
+
+#~ msgid "Ordered by the English term"
+#~ msgstr "Ordinato secondo il termine inglese"
+
+#~ msgid "learning content"
+#~ msgstr "contenuto dell'insegnamento"

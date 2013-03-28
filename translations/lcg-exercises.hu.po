@@ -1,0 +1,808 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-03-28 11:44+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Petr Topiarz <reditel@mluvim.cz>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Labels for exercise buttons. Keep in capitals.
+#: ../lib/lcg/exercises.py:147
+msgid "TRUE"
+msgstr "IGAZ"
+
+#: ../lib/lcg/exercises.py:147
+msgid "FALSE"
+msgstr "HAMIS"
+
+#: ../lib/lcg/exercises.py:395
+#, python-format
+msgid "Exercise %d"
+msgstr "Gyakorlat %d"
+
+#: ../lib/lcg/exercises.py:403
+msgid "Read the following text:"
+msgstr "Olvasd el a következő szöveget:"
+
+#: ../lib/lcg/exercises.py:505
+msgid "Table of Contents:"
+msgstr "Tartalom:"
+
+#: ../lib/lcg/exercises.py:508
+msgid "Instructions"
+msgstr "Utasítások"
+
+#: ../lib/lcg/exercises.py:509
+msgid "Shortcut Keys"
+msgstr "Gyorsbillentyűk"
+
+#: ../lib/lcg/exercises.py:510
+msgid "Indicators"
+msgstr "Mutatók"
+
+#: ../lib/lcg/exercises.py:511
+msgid "Control Panel"
+msgstr "Vezérlőpult"
+
+#: ../lib/lcg/exercises.py:512
+msgid "Answer Sheets"
+msgstr "Megoldások"
+
+#: ../lib/lcg/exercises.py:528
+msgid "The indicator panel below the exercise shows the following values:"
+msgstr "A mutatók a gyakorlatok alatt a következő értékeket mutatják:"
+
+#: ../lib/lcg/exercises.py:536
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr "A vezérlőpult a gyakorlatok alatt a következő gombokat tartalmazza:"
+
+#: ../lib/lcg/exercises.py:565
+msgid "Play"
+msgstr "Lejátszás"
+
+#: ../lib/lcg/exercises.py:630
+msgid "Explanation:"
+msgstr "Magyarázat:"
+
+#: ../lib/lcg/exercises.py:639
+msgid "Example:"
+msgstr "Például:"
+
+#: ../lib/lcg/exercises.py:724
+msgid "on first attempt"
+msgstr "első próbálkozásra"
+
+#: ../lib/lcg/exercises.py:726
+msgid "Answered:"
+msgstr "Megválaszolva:"
+
+#: ../lib/lcg/exercises.py:727
+msgid ""
+"Displays the number of the tasks you have already answered.  For example "
+"4/10 means, that you have answered four out of ten questions so you should "
+"finish the remaining six."
+msgstr ""
+"Megjeleníti az eddig megválaszolt kérdések számát. Például a 4/10 azt "
+"jelenti, hogy a tízből négy választ válaszoltál meg, és még hat hátra van."
+
+#: ../lib/lcg/exercises.py:730
+msgid "Correct:"
+msgstr "Helyes:"
+
+#: ../lib/lcg/exercises.py:731
+#, fuzzy
+msgid ""
+"Displays the number and percentage of successful answers.  The first pair of "
+"numbers shows the results of all current answers.  If you didn't answer all "
+"of them correctly on first attempt, there is also a second pair of numbers "
+"showing how many answers you did succesfuly on the first try.  Use the "
+"‘Reset’ button to start again."
+msgstr ""
+"Megjeleníti a helyes válaszok számát és arányát. Az első számpár az aktuális "
+"válaszokat eredményét mutatja. Ha nem válaszoltad meg őket elsőre jól, "
+"megjelenik még egy számpár, ami az első próbálkozásra helyes válaszok számát "
+"mutatja. Kattints a Reset gombra az újrakezdéshez."
+
+#: ../lib/lcg/exercises.py:738
+msgid "Evaluate"
+msgstr "Kiértékel"
+
+#: ../lib/lcg/exercises.py:739
+msgid ""
+"Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+"the first incorrect answer.  Within a text-box, the cursor is also moved to "
+"the first incorrect character of your answer."
+msgstr ""
+"Értékeld ki az egész feladatot. Ha hiba van benne, a kurzor az első hibához "
+"ugrik. Szövegdobozon belül a kurzor az első hibás karakterhez ugrik."
+
+#. Translators: Fill (a form with correct answers).
+#: ../lib/lcg/exercises.py:743
+msgid "Fill"
+msgstr "Töltsd ki"
+
+#: ../lib/lcg/exercises.py:744
+msgid "Fill in the whole exercise with the correct answers."
+msgstr "Töltsd ki a gyakorlatot a helyes válaszokkal."
+
+#: ../lib/lcg/exercises.py:745
+msgid "Reset"
+msgstr "Reset"
+
+#: ../lib/lcg/exercises.py:746
+msgid "Reset all your answers and start again."
+msgstr "Az összes válasz törlése és a teszt újrakezdése."
+
+#: ../lib/lcg/exercises.py:748
+#, fuzzy
+msgid ""
+"The Answer Sheets contain all the correct answers for all the exercises. You "
+"can access them from the Course Index, or more conveniently, you can use the "
+"‘?’ (question mark) link after each task. This link takes you directly to "
+"the corresponding answer in the Answer Sheet."
+msgstr ""
+"A megoldásokban az összes feladat helyes megoldása megtalálható. "
+"Hozzáférhető a Kurzus tartalomból, vagy kényelmesebb módon, a ?-re "
+"(kérdőjel) kattintva minden feladat után. Ez a link az aktuális feladat "
+"megoldásához vezet."
+
+#: ../lib/lcg/exercises.py:803
+msgid "Show the answer sheet."
+msgstr "Mutasd a megoldásokat."
+
+#: ../lib/lcg/exercises.py:830
+msgid "Chose the correct answer."
+msgstr "Válaszd ki a jó megoldást."
+
+#: ../lib/lcg/exercises.py:833
+msgid ""
+"You will hear a response immediately after choosing the answer.  When you "
+"choose the wrong answer, you can try again until you find the correct one.  "
+"The results below the exercise will show you how many answers you got right "
+"on the first try (see the [#indicators] section below)."
+msgstr ""
+"Közvetlenül a helyes válasz kiválasztása után meghallja a választ. Ha a "
+"rossz választ jelölte meg, ismételten választhat, amíg meg nem találja a "
+"helyes választ. A feladat alatti eredmények kiértékelik, hogy hány válasza "
+"volt helyes az első próbálkozásra (lásd [#indicators] rész alatt)."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:901
+msgid "Multiple Choice Questions"
+msgstr "Feleletválasztós kérdések"
+
+#: ../lib/lcg/exercises.py:902
+msgid ""
+"Each question in this exercise is followed by two or more possible answers. "
+"Only one answer is correct."
+msgstr ""
+"A feladat minden kérdését kettő vagy több lehetséges válasz követi. Mindig "
+"csak egy válasz a helyes."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:910
+msgid "Selections"
+msgstr "Választás"
+
+#: ../lib/lcg/exercises.py:911
+msgid ""
+"There are several groups of two or three similar sentences or expressions. "
+"Only one option in each group is correct. Your goal is to decide which one."
+msgstr ""
+"Több egymáshoz hasonlító mondat/kifejezéscsoport létezik, melyekből minden "
+"csoportban csak egy helyes. A cél kiválasztani, melyik az."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:920
+msgid "True/False Statements"
+msgstr "Igaz/hamis állítások"
+
+#: ../lib/lcg/exercises.py:921
+msgid "For each of the statements below, choose True or False."
+msgstr "Döntsd el az alábbi állításokról, hogy igazak vagy hamisak."
+
+#: ../lib/lcg/exercises.py:922
+#, fuzzy
+msgid ""
+"Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
+"and ‘FALSE’.  Decide whether the sentence is true or not and press the "
+"corresponding button."
+msgstr ""
+"A feladat minden mondata után IGAZ, HAMIS választási lehetőség van. Döntsd "
+"el, és válaszd ki a megfelelőt."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:946
+msgid "Gap Filling"
+msgstr "Hézag kitöltés"
+
+#: ../lib/lcg/exercises.py:947
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr ""
+"Válaszd ki a megfelelő lehetőséget a következő mondatokban levő rések "
+"kitöltéséhez."
+
+#: ../lib/lcg/exercises.py:949
+msgid ""
+"Choose the correct word to fill in a gap in a sentence.  For each gap you "
+"have several choices.  Only one of them is correct."
+msgstr ""
+"Válaszd ki a megfelelő lehetőséget a következő mondatokban levő rések "
+"kitöltéséhez. Minden hézaghoz több választási lehetőség van, de csak egy "
+"helyes."
+
+#: ../lib/lcg/exercises.py:972
+msgid ""
+"You can check each answer individually using the shortcut keys (see the "
+"section [#keys] for more information).  When your answer is evaluated as "
+"incorrect and you do not know why, always check whether you have used "
+"correct punctuation and capital letters where appropriate. These two things "
+"are the cause of most confusion."
+msgstr ""
+"Minden választ külön ellenőrízhet gyorsbillentyűk segítségével (lásd [#keys] "
+"részt bővebb információkért). Ha válasza értékelése helytelen és ön nem "
+"tudja miért, mindig ellenőrízze le, hogy helyesen használta-e a központozást "
+"és a nagy kezdőbetűket, ahol szükséges. Ezen két dolog okozza a legtöbb "
+"félreértést."
+
+#: ../lib/lcg/exercises.py:977
+msgid ""
+"Use the [#panel] at the bottom of the exercise to evaluate all the answers "
+"at once."
+msgstr ""
+"A válaszok egyszerre való kiértékeléséhez használja a [#panel] a gyakorlat "
+"alatt."
+
+#: ../lib/lcg/exercises.py:979
+msgid ""
+"If your browser doesn't support JavaScript, the interactive features and "
+"automatic evaluation do not work.  You can still use this course, but you "
+"will have to check your answers against the answer sheet manually (see "
+"[#answer-sheets]."
+msgstr ""
+"Ha böngészője nem támogatja a JavaScriptet, az interaktív funkciók és az "
+"automatikus kiértékelés nem fog működni. Emellett használhatja a kurzust, de "
+"a válaszait a válaszadólap alapján saját magának kell kiértékelnie. (lásd "
+"[#answer-sheets]."
+
+#: ../lib/lcg/exercises.py:987
+msgid ""
+"In all the exercises where you fill in the text into a text-box you can use "
+"the two shortcut keys described below."
+msgstr ""
+"Minden feladatban, ahol szövegdobozba kell szöveget kitölteni, használhatóak "
+"az alábbi gyorsbillentyű-kombinációk."
+
+#: ../lib/lcg/exercises.py:989
+msgid "Enter"
+msgstr "Beír"
+
+#: ../lib/lcg/exercises.py:990
+#, fuzzy
+msgid ""
+"Use this key within the text-field to evaluate the current answer. You hear "
+"a sound response and in case of an error, the cursor is moved to the "
+"position of the first incorrect character within the text.  This way you can "
+"locate the error, fix it and evaluate again. When you don't know how to fix "
+"an error, you can use the ‘hint’ key described below."
+msgstr ""
+"Használd a következő kulcsot a szövegdobozban a helyes válasz "
+"kiértékeléséhez. Miután meghallod a választ, hiba esetén a kurzor a hibás "
+"rész első karakteréhez ugrik a szövegben. Ezzel a módszerrel megkereshető a "
+"hiba, kijavítható, és újra kiértékelhető. Ha nem tudod, hogyan javítsd ki a "
+"hibát, használd a segítséget, lásd. lejjebb."
+
+#: ../lib/lcg/exercises.py:996
+msgid "Ctrl-Space"
+msgstr "Ctrl-Space"
+
+#: ../lib/lcg/exercises.py:997
+#, fuzzy
+msgid ""
+"This function is called a ‘hint’.  It helps you in case you don't know the "
+"answer or you don't know how to fix an error in your answer. Just press the "
+"key combination (holding the Ctrl key, press the spacebar) and one letter of "
+"the correct answer will be filled in automatically.  If you have already "
+"entered some text, the cursor will be moved to after the last correct "
+"character and next one will be inserted.  This also means that if there is "
+"some text after the cursor, there is at least one error in it.  Try to "
+"locate this error and correct it.  Then you can evaluate your answer using "
+"the ‘Enter’ key (see above) or use ‘hint’ again, until you find the complete "
+"answer."
+msgstr ""
+"Ez az ún. segítség funkció. Ez segít, ha nem tudod a helyes választ, vagy "
+"nem tudod kijavítani a hibás válaszod. Elég lenyomni a gyorsbillentyűt (ctrl"
+"+space) és egy betű a helyes megoldásból automatikusan a helyére kerül. Ha "
+"már részben kitöltötted a hézagot, a kurzor az utolsó jó karakter után "
+"ugrik, és a következő helyes betű íródik a hézagba. Ezt azt is jelenti, hogy "
+"ha még marad szöveg a kurzor után, legalább egy betű hibás benne. Próbáld "
+"megtalálni és kijavítani a hibát. Ezután kiértékelheted a válaszaidat az "
+"Enter leütésével (lásd feljebb) vagy kérhetsz még segítséget, míg meg nem "
+"találod az egész megoldást."
+
+#: ../lib/lcg/exercises.py:1069
+msgid "Test Yourself"
+msgstr "Teszteld magad"
+
+#: ../lib/lcg/exercises.py:1070
+msgid "Fill in the correct translation for each of the terms below."
+msgstr "Tölts be a helyes fordítást az alábbi egyes kifejezésekhez."
+
+#: ../lib/lcg/exercises.py:1071
+msgid ""
+"There are two ways to do the exercise: orally and written.  Do the exercise "
+"both ways to get the best results."
+msgstr ""
+"Kétféleképpen lehet megoldani a feladatot: szóban és írásban. Mindkétféle "
+"képpen oldd meg a legjobb eredmény érdekében."
+
+#: ../lib/lcg/exercises.py:1073
+#, fuzzy
+msgid ""
+"To do the exercise orally is simple.  Go through the vocabulary list and "
+"think of the correct translation for each word or expression. There is a "
+"‘Play’ button after the text-box for each item which allows you to hear the "
+"correct answer.  Repeat the answer to practise the correct pronunciation.  "
+"Some items have more than one correct answer, so there may be multiple "
+"buttons to play each of them.  Since there is no way of checking your oral "
+"answers, the results are not available.  If you want to see your score, you "
+"must do the written exercise."
+msgstr ""
+"Szóban egyszerű a feladat. Menj sorba a szavakon és gondolkozz el a helyes "
+"fordításon az egyes szavakhoz és kifejezésekhez. Minden szó után található "
+"egy Lejátszás gomb, amivel meghallgatható a helyes válasz. Ismételd el a "
+"választ a helyes kiejtést gyakorolva. Néhányszor több megoldás is jó, így "
+"több gomb is található a szavak után. Mivel, nincs lehetőség kiértékelni a "
+"szóbeli válaszokat, itt nincsenek kiértékelhető eredmények. Ha látni "
+"szeretnéd a pontszámodat, az írásbeli tesztet válaszd."
+
+#: ../lib/lcg/exercises.py:1082
+msgid ""
+"To do the exercise in written form, simply type the translation of each item "
+"into the text-box.  Be careful to use capital letters where this is "
+"appropriate, since an answer without correct capitalization is always "
+"considered incorrect.  When the prompt is a complete sentence, you must also "
+"use correct punctuation."
+msgstr ""
+"Írásban a feladatot, szimplán írd az adott szó/kifejezés fordítását a "
+"szövegdobozba. Vigyázz a kis- és nagybetűkre, mivel az is hibának számít. "
+"Mondat fordításánál a központozás is számít."
+
+#: ../lib/lcg/exercises.py:1097
+msgid "Exercise not available in this language version."
+msgstr "A gyakorlat ezen a nyelven nem elérhető."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1106
+msgid "Substitution"
+msgstr "Behelyettesítés"
+
+#: ../lib/lcg/exercises.py:1107
+msgid "Use the text in brackets to transform each sentence."
+msgstr ""
+"Az alábbi mondatok megváltoztatásához használd a zárójelekben levő "
+"szövegrészt."
+
+#: ../lib/lcg/exercises.py:1108
+msgid ""
+"Use the prompt to produce another sentence with the same structure. Each "
+"sentence is followed by text in brackets.  Replace the corresponding part of "
+"the sentence using this text."
+msgstr ""
+"Használd a súgót azonos szerkezető következő mondat megszerkesztéséhez. "
+"Minden egyes mondatot szavak követnek zárójelben. Helyettesítsd az odaillő "
+"részét a mondatnak a megfelelő szavak segítségével."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1117
+msgid "Transformation"
+msgstr "Átalakítás"
+
+#: ../lib/lcg/exercises.py:1119
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr ""
+"Töltsd ki a hézagot a B mondatban, hogy ugyanazt jelentse, mint az A mondat."
+
+#: ../lib/lcg/exercises.py:1121
+msgid ""
+"Your goal is to transform a structure (pattern or paradigm) into a different "
+"structure, for example changing an affirmative sentence into a question."
+msgstr ""
+"A cél az, hogy megváltoztassuk a mondat struktúráját, például kérdést, "
+"állításra."
+
+#: ../lib/lcg/exercises.py:1127
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr ""
+"A példa alapján változtasd meg a mondat struktúráját, és alakítsd új "
+"mondattá."
+
+#. Translators: Type of exercise
+#: ../lib/lcg/exercises.py:1140
+msgid "Writing"
+msgstr "Írás"
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1157
+msgid "Cloze"
+msgstr "Kitöltés"
+
+#: ../lib/lcg/exercises.py:1159
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+"Töltsd ki a hézagokat a alábbi szövegben. Minden egyes hézagba csak egy "
+"helyes válasz illik."
+
+#: ../lib/lcg/exercises.py:1161
+msgid ""
+"Your goal in this exercise is to fill in the gaps in a longer piece of text. "
+"There is just one correct answer for each gap."
+msgstr ""
+"Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
+"Minden egyes hézagba, egy helyek megoldás illik."
+
+#. Translators: Type of exercise (use language
+#. terminology). Exposed cloze is lika Cloze, where students fill
+#. in the gaps in a text. In *exposed* cloze however the student
+#. chooses from the list of offered answers.
+#: ../lib/lcg/exercises.py:1174
+msgid "Exposed Cloze"
+msgstr "Mondat kiegészítés (adott listából)"
+
+# Originally we had here:
+# Használd a helyes szavat vagy kifejezést az alábbi listából a mondatban levő hézag kitöltéséhez.
+# And we got reported from HU users (Eva, Movilise) that the translation is wrong, so replaced it with:
+# Írd be a hiányzó szavakat az alábbi listából a megfelelő helyre.
+#: ../lib/lcg/exercises.py:1175
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr "Írd be a hiányzó szavakat az alábbi listából a megfelelő helyre."
+
+#: ../lib/lcg/exercises.py:1246
+#, python-format
+msgid "%d) "
+msgstr "%d)"
+
+#: ../lib/lcg/exercises.py:1265 ../lib/lcg/exercises.py:1301
+#: ../lib/lcg/exercises.py:1304
+msgid "Total points:"
+msgstr "Összpontszám:"
+
+#: ../lib/lcg/exercises.py:1295
+msgid "Invalid value in added points!"
+msgstr "Hibás érték a hozzáadott pontoknál!"
+
+#: ../lib/lcg/exercises.py:1296
+msgid "Max. points exceeded!"
+msgstr "Maximális pontszám elérve!"
+
+#: ../lib/lcg/exercises.py:1298
+msgid "Automatic evaluation:"
+msgstr "Automatikus kiértékelés:"
+
+#: ../lib/lcg/exercises.py:1299
+msgid "Additional points by tutor:"
+msgstr "Oktató által hozzáadott pontok:"
+
+#: ../lib/lcg/exercises.py:1349
+msgid "correct answer"
+msgstr "helyes válasz"
+
+#. Translators: Incorrect (answer)
+#: ../lib/lcg/exercises.py:1354
+msgid "incorrect"
+msgstr "téves"
+
+#~ msgid "Show transcript"
+#~ msgstr "Mutasd a szöveget"
+
+#~ msgid "Hide transcript"
+#~ msgstr "Szöveg elrejtése"
+
+#~ msgid "answer sheet"
+#~ msgstr "megoldások"
+
+#~ msgid "See the %s to check your results."
+#~ msgstr "Az eredmények megtekintéséhez lásd %s."
+
+#~ msgid ""
+#~ "This course was developed within the Eurochance project co-funded by the "
+#~ "European Leonardo da Vinci programme."
+#~ msgstr ""
+#~ "A nyelvlecke az Eurochance projekt fejlesztése a Európai Leonardo da "
+#~ "Vinci program társfinanszírozásával."
+
+#~ msgid "presentation and user interface"
+#~ msgstr "előadó és felhasználói felület"
+
+#~ msgid "Copyright and License Information"
+#~ msgstr "Szerzői jog és engedély információk"
+
+#~ msgid "This course is a joint work protected by the copyright law."
+#~ msgstr "Ez a nyelvkurzus közös fejlesztés szerzői jogok által védve."
+
+#~ msgid ""
+#~ "This course can be redistributed and/or modified under the terms of the "
+#~ "GNU General Public License as published by the Free Software Foundation; "
+#~ "either version 2 of the License, or (at your option) any later version."
+#~ msgstr ""
+#~ "A nyelvkurzus szabadon terjeszthető és/vagy alakítható a GNU Általános "
+#~ "Nyilvános Licenc alapján, a Free Software Foundation kiadásában; ez "
+#~ "vonatkozik a Licenc 2-es és minden további verziójára."
+
+#~ msgid ""
+#~ "This course is distributed in the hope that it will be useful, but "
+#~ "WITHOUT ANY WARRANTY; without even the implied warranty of "
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General "
+#~ "Public License for more details."
+#~ msgstr ""
+#~ "A kurzus annak reményében terjesztetik, hogy hasznos és segítséget jelent "
+#~ "sokaknak, de MINDEN GARANCIA NÉLKÜL; beleértve a FORGALOMBA KERÜLÉST vagy "
+#~ "ALKALMASSÁGÁT KÜLÖNBÖZŐ CÉLRA. Bővebb információért lásd a GNU Általános "
+#~ "Szabad Licencet."
+
+#~ msgid "The complete license text follows in the original English version:"
+#~ msgstr "Az eredeti teljes licenc szöveg angol nyelven:"
+
+#~ msgid "Unit %d"
+#~ msgstr "Fejezet %d"
+
+#~ msgid "Aims and Objectives"
+#~ msgstr "Célok és szándékok"
+
+#~ msgid "Checklist"
+#~ msgstr "Ellenőrzőlista"
+
+#~ msgid "The grammar focus of this unit is:"
+#~ msgstr "A fejezet nyelvtani része:"
+
+#~ msgid "Vocabulary Practice"
+#~ msgstr "Szókincs gyakorlat"
+
+#~ msgid "Listening Comprehension"
+#~ msgstr "Szövegértés hallás után"
+
+#~ msgid "General Comprehension"
+#~ msgstr "Általános szövegértés"
+
+#~ msgid "Grammar Practice"
+#~ msgstr "Nyelvtani gyakorlatok"
+
+#~ msgid "Consolidation"
+#~ msgstr "Feleletválasztás"
+
+#~ msgid "Vocabulary"
+#~ msgstr "Szókincs"
+
+#~ msgid "Comprehension"
+#~ msgstr "Szövegértés"
+
+#~ msgid "Dictation"
+#~ msgstr "Tollbamondás"
+
+#~ msgid "Vocabulary Index"
+#~ msgstr "Szókincs tartalom"
+
+#~ msgid "Help Index"
+#~ msgstr "Súgó tartalom"
+
+#~ msgid "Help for %s"
+#~ msgstr "Súgó a %s"
+
+#~ msgid "Answer Sheet:"
+#~ msgstr "Megoldások:"
+
+#, fuzzy
+#~ msgid "Back"
+#~ msgstr "Vissza"
+
+#~ msgid "Version %s"
+#~ msgstr "Verzió %s"
+
+#~ msgid "This exercise can be also done purely aurally/orally:"
+#~ msgstr "A feladat elvégezhető pusztán szóban/gondolatban is:"
+
+#~ msgid "Transcript:"
+#~ msgstr "Átirat:"
+
+#~ msgid "Recording:"
+#~ msgstr "Felvétel:"
+
+#~ msgid "Listening"
+#~ msgstr "Szöveghallgatás"
+
+#~ msgid "Listen to the recording to practice understanding native speakers."
+#~ msgstr ""
+#~ "Hallgassa a felvételt az angol anyanyelvű lektor legjobb megértése "
+#~ "érdekében."
+
+#~ msgid "Reading"
+#~ msgstr "Olvasás"
+
+#~ msgid ""
+#~ "Read the text and try to understand as much as you can.  Use a dictionary "
+#~ "if necessary.  In many cases you will find the information relevant for "
+#~ "your own purposes, but it will also be needed in the exercises which "
+#~ "follow."
+#~ msgstr ""
+#~ "Olvasd el a szöveget és próbáld minél jobban megérteni. Ha szükséges, "
+#~ "használj szótárt. A helyes válaszok a következő feladatokban is "
+#~ "szükségesek lesznek."
+
+#~ msgid "Sentence Completion"
+#~ msgstr "Mondatkiegészítés"
+
+#~ msgid ""
+#~ "Speaking Practice.  Complete the sentences you hear, using the example as "
+#~ "a model."
+#~ msgstr ""
+#~ "Beszédgyakorlat. Fejezd be a mondatokat amiket hallasz, a példa alapján."
+
+#, fuzzy
+#~ msgid "Press  ‘Play’ to listen to the instructions:"
+#~ msgstr "Kattintson a Lejátszásra a feladat meghallgatásához:"
+
+#~ msgid ""
+#~ "The aim of this exercise is to give you an opportunity to produce a "
+#~ "complete sentence and compare your pronunciation with the original. "
+#~ "Therefore the exercise is purely aural-oral, with no written tasks."
+#~ msgstr ""
+#~ "A feladat célja, egy kész mondat megszerkesztése, és összehasonlítása a "
+#~ "kiejtésnek az eredetivel. A feladat teljesen gondolati/szóbeli, írásbeli "
+#~ "rész nélkül."
+
+#, fuzzy
+#~ msgid ""
+#~ "If you wish to check your answers against the written text, you can use "
+#~ "the transcript of the recording (the link ‘show transcript’). Since this "
+#~ "is not a written exercise, your results cannot be checked automatically."
+#~ msgstr ""
+#~ "Ha le szeretnéd ellenőrízni a válaszaidat, használhatod a hangfelvétel "
+#~ "szöveges átiratát. Mivel ez nem írásbeli feladat, az eredmények nem "
+#~ "értékelődnek ki automatikusan."
+
+#~ msgid "Exercise Help"
+#~ msgstr "Súgó a gyakorlathoz"
+
+#~ msgid "Correct"
+#~ msgstr "Helyes"
+
+#~ msgid "Error(s) found"
+#~ msgstr "Hibák"
+
+#~ msgid "Result:"
+#~ msgstr "Eredmény:"
+
+#, fuzzy
+#~ msgid ""
+#~ "Displays the result of the last evaluation (evaluate your answer by "
+#~ "pressing the ‘Enter’ key or by the ‘Evaluate’ button below the exercise)."
+#~ msgstr ""
+#~ "Jelenítsd meg az utolsó kiértékelt eredményeket (kiértékeléshez üss enter "
+#~ "billentyűt, vagy kattints a Kiértékel gombra a feladat alatt)."
+
+#, fuzzy
+#~ msgid ""
+#~ "Listen to the complete recording first. Then go to the textbox and use "
+#~ "the ‘>’ key to listen to the text section by section. Type what you hear "
+#~ "into the textbox. For detailed instructions, read the Exercise Help."
+#~ msgstr ""
+#~ "Hallgasd meg a feladat összes hangfelvételét. Azután a szövegdobozban a > "
+#~ "jel segitségével hallgasd újra részenként. Gépeld be a szövegdobozba, "
+#~ "amit hallasz. Részletes segítségért használd a Gyakorlatok Súgóját."
+
+#, fuzzy
+#~ msgid ""
+#~ "First listen to the recording once and then go to the large text entry "
+#~ "box below.  Within the box, you can use shortcut keys to play individual "
+#~ "pieces of the recording.  Typically you play one part using the ‘>’ key "
+#~ "(right angle bracket) and type what you hear. Then you press the ‘>’ key "
+#~ "again to play the next part and type it too, and so on until you reach "
+#~ "the end of the recording."
+#~ msgstr ""
+#~ "Először hallgasd meg egyszer a hangfelvételt, azután lépj a nagy "
+#~ "szövegdobozhoz lentebb. A dobozban használhatóak a "
+#~ "gyorsbillentyűkombinációk a hangfelvétel egyes részeinek lejátszásához. "
+#~ "Egy rész lejátszásához használd a > jelet és írd le amit hallasz. Majd "
+#~ "nyomd le > jelet még egyszer a következő rész lejátszásához és ismét írd "
+#~ "le. Így haladj, míg el nem jutsz a felvétel végéig."
+
+#~ msgid "Then you can use the evaluation keys to evaluate the whole text."
+#~ msgstr "Használja a kiértékelési kulcsot a szöveg kiértékeléséhez."
+
+#~ msgid ""
+#~ "Pay special attention to punctuation and case, since these cause most of "
+#~ "the problems when evaluating your answer. Type all the sentences as you "
+#~ "hear them, using the appropriate punctuation character and one space "
+#~ "after each sentence. No space is allowed after the last sentence. "
+#~ msgstr ""
+#~ "Szentelj nagy figyelmet a központozásnak, mivel gyakran okozhat problémát "
+#~ "a feladatok kiértékelésekor. Gépeld be az összes mondatot, ahogy hallod "
+#~ "őket, a megfelelő központozást használva egy üres helyet hagyva a "
+#~ "mondatok után. Az utolsó mondat után ne hagyj üres helyet."
+
+#~ msgid ""
+#~ "/Note/: Of course, you can replay the recording as many times as you need "
+#~ "in order to understand it, although two attempts should be enough for a "
+#~ "well performing student."
+#~ msgstr ""
+#~ "/Megjegyzés/: Természetesen bármennyiszer meghallgathatod a felvételt a "
+#~ "megértés céljából, habár két lehetőség egy ügyes diáknak elégnek kéne "
+#~ "lennie."
+
+#~ msgid ""
+#~ "Also, in the dictation exercise text box, you can use the following keys "
+#~ "to control the playback of the recording:"
+#~ msgstr ""
+#~ "A tollbamondás feladatnál is használhatóak a következő billentyűk a "
+#~ "felvétel lejátszásának kezeléséhez:"
+
+#~ msgid "right angle bracket, greater than sign"
+#~ msgstr "nagyobb jel"
+
+#~ msgid "Play next piece of the recording."
+#~ msgstr "Játszd le a felvétel következő részét."
+
+#~ msgid "left angle bracket, less than sign"
+#~ msgstr "kisebb jel"
+
+#~ msgid "Play the previous piece of the recording."
+#~ msgstr "Játszd le a felvétel előző részét."
+
+#~ msgid "Ctrl-Enter"
+#~ msgstr "Ctrl-Enter"
+
+#~ msgid "Replay the current (last played) piece of the recording once again."
+#~ msgstr "Játszd újra az aktuális (legutóbb lejátszott) részét a felvételnek."
+
+#~ msgid ""
+#~ "Listen to the recording carefully and then fill in the gaps in the text "
+#~ "below using the same words."
+#~ msgstr ""
+#~ "Hallgasd meg figyelmesen a hangfelvételt, azután töltsd ki a hézagokat a "
+#~ "szövegben ugyanazokkal a szavakkal."
+
+#~ msgid "Vocabulary Listing"
+#~ msgstr "Szókincslista"
+
+#~ msgid ""
+#~ "The vocabulary is presented in a two-column table with a term on the left "
+#~ "and its translation on the right in each row."
+#~ msgstr ""
+#~ "A szókincs két oszlopos táblázatba van foglalva, ahol a bal oldalon az "
+#~ "angol kifejezés a jobb oldalon pedig a fordítás áll."
+
+#~ msgid "Terms"
+#~ msgstr "Szavak"
+
+#~ msgid "Phrases"
+#~ msgstr "Kifejezések"
+
+#~ msgid "Extended vocabulary"
+#~ msgstr "Kibővített szókincs"
+
+#~ msgid ""
+#~ "Please, visit the [http://eurochance.brailcom.org Eurochance project "
+#~ "webpage] for more information how to obtain the source data of this "
+#~ "course."
+#~ msgstr ""
+#~ "Kérem további információkért a kurzus beszerzéséről látogasson el erre a "
+#~ "weboldalra: [http://eurochance.brailcom.org Eurochance project webpage]."
+
+#~ msgid "Section %d"
+#~ msgstr "Rész %d"
+
+#~ msgid "Exercises"
+#~ msgstr "Gyakorlatok"
+
+#~ msgid "Ordered by the English term"
+#~ msgstr "Az angol kifejezés szerint rendezve"

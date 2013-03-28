@@ -1,0 +1,839 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-03-28 11:44+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Labels for exercise buttons. Keep in capitals.
+#: ../lib/lcg/exercises.py:147
+msgid "TRUE"
+msgstr "ADEVĂRAT"
+
+#: ../lib/lcg/exercises.py:147
+msgid "FALSE"
+msgstr "FALS"
+
+#: ../lib/lcg/exercises.py:395
+#, python-format
+msgid "Exercise %d"
+msgstr "Exerciţiul %d"
+
+#: ../lib/lcg/exercises.py:403
+msgid "Read the following text:"
+msgstr "Citiţi cu atenţie textul următor:"
+
+#: ../lib/lcg/exercises.py:505
+msgid "Table of Contents:"
+msgstr "Cuprins:"
+
+#: ../lib/lcg/exercises.py:508
+msgid "Instructions"
+msgstr "Instrucţiuni"
+
+#: ../lib/lcg/exercises.py:509
+msgid "Shortcut Keys"
+msgstr "Taste pentru comenzi rapide"
+
+#: ../lib/lcg/exercises.py:510
+msgid "Indicators"
+msgstr "Indicatori"
+
+#: ../lib/lcg/exercises.py:511
+msgid "Control Panel"
+msgstr "Panou de control"
+
+#: ../lib/lcg/exercises.py:512
+msgid "Answer Sheets"
+msgstr "Rezolvări întrebări"
+
+#: ../lib/lcg/exercises.py:528
+msgid "The indicator panel below the exercise shows the following values:"
+msgstr ""
+"Indicatorul panoului afişează la sfârşitul exerciţiului următoarele valori:"
+
+#: ../lib/lcg/exercises.py:536
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr ""
+"Panoul de control se află sub fiecare exerciţiu interactiv. Conţine "
+"următoarele butoane:"
+
+#: ../lib/lcg/exercises.py:565
+msgid "Play"
+msgstr "Play"
+
+#: ../lib/lcg/exercises.py:630
+msgid "Explanation:"
+msgstr "Explicaţii:"
+
+#: ../lib/lcg/exercises.py:639
+msgid "Example:"
+msgstr "Exemple:"
+
+#: ../lib/lcg/exercises.py:724
+msgid "on first attempt"
+msgstr "la prima încercare"
+
+#: ../lib/lcg/exercises.py:726
+msgid "Answered:"
+msgstr "Răspunse:"
+
+#: ../lib/lcg/exercises.py:727
+msgid ""
+"Displays the number of the tasks you have already answered.  For example "
+"4/10 means, that you have answered four out of ten questions so you should "
+"finish the remaining six."
+msgstr ""
+"Afişează numărul de sarcini (întrebări) la care s-a răspuns în exerciţiul "
+"dat. De exemplu, 4/10 înseamnă că aţi răspuns patru din zece întrebări, "
+"indiferent dacă bine sau rău. Deci rămân de terminat încă şase sarcini."
+
+#: ../lib/lcg/exercises.py:730
+msgid "Correct:"
+msgstr "Corect:"
+
+#: ../lib/lcg/exercises.py:731
+#, fuzzy
+msgid ""
+"Displays the number and percentage of successful answers.  The first pair of "
+"numbers shows the results of all current answers.  If you didn't answer all "
+"of them correctly on first attempt, there is also a second pair of numbers "
+"showing how many answers you did succesfuly on the first try.  Use the "
+"‘Reset’ button to start again."
+msgstr ""
+"Afişează numărul şi procentajul de răspunsuri de succes. Prima pereche de "
+"numere arată rezultatele la toate răspunsurile curente. Dacă la unele "
+"întrebări nu aţi răspuns corect la prima încercare, se afişează şi a doua "
+"pereche de numere care arată cât de multe răspunsuri corecte aţi dat cu "
+"succes de prima dată. Folosiţi butonul Şterge pentru a începe din nou."
+
+#: ../lib/lcg/exercises.py:738
+msgid "Evaluate"
+msgstr "Evaluează"
+
+#: ../lib/lcg/exercises.py:739
+msgid ""
+"Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+"the first incorrect answer.  Within a text-box, the cursor is also moved to "
+"the first incorrect character of your answer."
+msgstr ""
+"Evaluează întregul exerciţiu. În cazul în care este găsită o greşeală, "
+"cursorul este mutat pe primul răspuns incorect. În câmpul de text cursorul, "
+"în plus, se mută la primul caracter incorect al răspunsului dumneavoastră."
+
+#. Translators: Fill (a form with correct answers).
+#: ../lib/lcg/exercises.py:743
+msgid "Fill"
+msgstr "Completează"
+
+#: ../lib/lcg/exercises.py:744
+msgid "Fill in the whole exercise with the correct answers."
+msgstr "Completează tot exerciţiul cu răspunsuri corecte."
+
+#: ../lib/lcg/exercises.py:745
+msgid "Reset"
+msgstr "Şterge"
+
+#: ../lib/lcg/exercises.py:746
+msgid "Reset all your answers and start again."
+msgstr ""
+"Şterge toate răspunsurile şi rezultatele şi permite repetarea întregului "
+"exerciţiu."
+
+#: ../lib/lcg/exercises.py:748
+#, fuzzy
+msgid ""
+"The Answer Sheets contain all the correct answers for all the exercises. You "
+"can access them from the Course Index, or more conveniently, you can use the "
+"‘?’ (question mark) link after each task. This link takes you directly to "
+"the corresponding answer in the Answer Sheet."
+msgstr ""
+"Rezolvările întrebărilor conţin răspunsurile corecte pentru toate "
+"exerciţiile. Se pot accesa la pagina introductivă a cursului. O posibilitate "
+"mult mai lejeră este folosind ? (semnul întrebării) pe care îl găsiţi după "
+"fiecare sarcină. Această trimitere vă duce direct la răspunsul corespunzător "
+"corect din rezolvări."
+
+#: ../lib/lcg/exercises.py:803
+msgid "Show the answer sheet."
+msgstr "Afişează răspunsurile corecte."
+
+#: ../lib/lcg/exercises.py:830
+msgid "Chose the correct answer."
+msgstr "Selectaţi răspunsul corect."
+
+#: ../lib/lcg/exercises.py:833
+msgid ""
+"You will hear a response immediately after choosing the answer.  When you "
+"choose the wrong answer, you can try again until you find the correct one.  "
+"The results below the exercise will show you how many answers you got right "
+"on the first try (see the [#indicators] section below)."
+msgstr ""
+"Imediat după alegerea răspunsului veţi auzi un răspuns, astfel veţi afla "
+"dacă răspunsul a fost corect. Dacă alegeţi răspunsul greşit, puteţi încerca "
+"din nou, până când îl găsiţi pe cel corect. Rezultatele de sub exerciţiu vă "
+"arată cât de multe răspunsuri au fost corecte la prima încercare (a se vedea "
+"[# indicatorii])."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:901
+msgid "Multiple Choice Questions"
+msgstr "Întrebări cu variante multiple de răspunsuri"
+
+#: ../lib/lcg/exercises.py:902
+msgid ""
+"Each question in this exercise is followed by two or more possible answers. "
+"Only one answer is correct."
+msgstr ""
+"După fiecare întrebare din acest exerciţiu urmează două sau mai multe "
+"răspunsuri posibile. Numai unul dintre ele este corect."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:910
+msgid "Selections"
+msgstr "Ce este corect"
+
+#: ../lib/lcg/exercises.py:911
+msgid ""
+"There are several groups of two or three similar sentences or expressions. "
+"Only one option in each group is correct. Your goal is to decide which one."
+msgstr ""
+"În exerciţiu găsiţi câteva grupuri de două sau trei propoziţii sau expresii "
+"asemănătoare. Însă numai o singură posibilitate din grup este întotdeauna "
+"corectă. Sarcina dumneavoastră este de a decide care."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:920
+msgid "True/False Statements"
+msgstr "Adevărat/Fals"
+
+#: ../lib/lcg/exercises.py:921
+msgid "For each of the statements below, choose True or False."
+msgstr ""
+"Pentru fiecare dintre situaţiile de mai jos, alegeţi Adevărat sau Fals."
+
+#: ../lib/lcg/exercises.py:922
+#, fuzzy
+msgid ""
+"Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
+"and ‘FALSE’.  Decide whether the sentence is true or not and press the "
+"corresponding button."
+msgstr ""
+"Fiecare propoziţie din acest exerciţiu este urmată de două elemente de "
+"control marcate ADEVĂRAT şi FALS. Decideţi dacă propoziţia este adevărată "
+"sau nu şi apăsaţi butonul corespunzător."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:946
+msgid "Gap Filling"
+msgstr "Completare prin selectare"
+
+#: ../lib/lcg/exercises.py:947
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr ""
+"Selectaţi cea mai potrivită posibilitate pentru completarea fiecăreia dintre "
+"propoziţiile următoare."
+
+#: ../lib/lcg/exercises.py:949
+msgid ""
+"Choose the correct word to fill in a gap in a sentence.  For each gap you "
+"have several choices.  Only one of them is correct."
+msgstr ""
+"Alegeţi cuvântul corect pentru a umple un spaţiu gol într-o propoziţie. "
+"Pentru fiecare spaţiu liber aveţi mai multe opţiuni. Doar una dintre ele "
+"este corectă."
+
+#: ../lib/lcg/exercises.py:972
+msgid ""
+"You can check each answer individually using the shortcut keys (see the "
+"section [#keys] for more information).  When your answer is evaluated as "
+"incorrect and you do not know why, always check whether you have used "
+"correct punctuation and capital letters where appropriate. These two things "
+"are the cause of most confusion."
+msgstr ""
+"Puteţi verifica fiecare răspuns în mod individual, folosind tastele de "
+"comenzi rapide (pentru mai multe informaţii a se vedea secţiunea [# keys]). "
+"Atunci când răspunsul dumneavoastră este evaluat ca incorect şi nu ştiţi de "
+"ce, întotdeauna să verificaţi mai întâi dacă aţi folosit o punctuaţie "
+"corectă şi litere majuscule sau minuscule, după caz. Aceste două lucruri "
+"sunt cauza celor mai adese nelămuriri."
+
+#: ../lib/lcg/exercises.py:977
+msgid ""
+"Use the [#panel] at the bottom of the exercise to evaluate all the answers "
+"at once."
+msgstr ""
+"Folosiţi [#panel] de la sfârşitul exerciţiului pentru evaluarea tuturor "
+"răspunsurilor dintr-odată."
+
+#: ../lib/lcg/exercises.py:979
+msgid ""
+"If your browser doesn't support JavaScript, the interactive features and "
+"automatic evaluation do not work.  You can still use this course, but you "
+"will have to check your answers against the answer sheet manually (see "
+"[#answer-sheets]."
+msgstr ""
+"În cazul în care browser-ul dvs. nu susţine JavaScript, caracteristicile "
+"interactive si de evaluare automată nu funcţionează. Puteţi folosi în "
+"continuare acest curs, dar va trebui să vă verificaţi răspunsurile singuri, "
+"folosind rezolvările întrebărilor (a se vedea [# answer-sheets]."
+
+#: ../lib/lcg/exercises.py:987
+msgid ""
+"In all the exercises where you fill in the text into a text-box you can use "
+"the two shortcut keys described below."
+msgstr ""
+"La toate exerciţiile, acolo unde completaţi textul în câmpul introductiv de "
+"text, puteţi folosi următoarele taste de comenzi rapide."
+
+#: ../lib/lcg/exercises.py:989
+msgid "Enter"
+msgstr "Enter"
+
+#: ../lib/lcg/exercises.py:990
+#, fuzzy
+msgid ""
+"Use this key within the text-field to evaluate the current answer. You hear "
+"a sound response and in case of an error, the cursor is moved to the "
+"position of the first incorrect character within the text.  This way you can "
+"locate the error, fix it and evaluate again. When you don't know how to fix "
+"an error, you can use the ‘hint’ key described below."
+msgstr ""
+"Utilizaţi această tastă în cadrul câmpului de text pentru a evalua răspunsul "
+"dat. Veţi auzi imediat un răspuns şi în caz de greşeală, cursorul este mutat "
+"la poziţia primului caracter incorect în cadrul răspunsului dat. În acest "
+"fel puteţi localiza greşeala, (de exemplu greşeala de ortografie), să o "
+"corectaţi şi să evaluaţi din nou răspunsul. Atunci când nu ştiţi cum să "
+"procedaţi cu greşeala, puteţi utiliza tasta de sugestii descrisă mai jos."
+
+#: ../lib/lcg/exercises.py:996
+msgid "Ctrl-Space"
+msgstr "Ctrl-Space"
+
+#: ../lib/lcg/exercises.py:997
+#, fuzzy
+msgid ""
+"This function is called a ‘hint’.  It helps you in case you don't know the "
+"answer or you don't know how to fix an error in your answer. Just press the "
+"key combination (holding the Ctrl key, press the spacebar) and one letter of "
+"the correct answer will be filled in automatically.  If you have already "
+"entered some text, the cursor will be moved to after the last correct "
+"character and next one will be inserted.  This also means that if there is "
+"some text after the cursor, there is at least one error in it.  Try to "
+"locate this error and correct it.  Then you can evaluate your answer using "
+"the ‘Enter’ key (see above) or use ‘hint’ again, until you find the complete "
+"answer."
+msgstr ""
+"Această funcţie vă poate da anumite sugestii în cazul în care nu cunoaşteţi "
+"răspunsul (nu vi-l amintiţi) sau nu ştiţi cum să corectaţi o greşeală găsită "
+"în răspunsul dumneavoastră în cadrul evaluării automate. Doar apăsaţi "
+"combinaţia respectivă de taste (ţinând apăsat tasta Ctrl, apăsaţi bara de "
+"spaţiu) şi caracterul răspunsului corect va fi completat în mod automat. "
+"Dacă aţi introdus deja un text, cursorul va fi mutat după ultimul caracter "
+"corect al răspunsului şi următorul caracter va fi introdus. Acest lucru "
+"înseamnă, de asemenea, că, dacă există un text după cursor, există cel puţin "
+"o greşeală în el. Încercaţi să găsiţi această greşeală şi să o corectaţi. "
+"Apoi, vă puteţi evalua răspunsul utilizând tasta Enter (vezi mai sus) sau "
+"folosind din nou tasta de sugestii, până când găsiţi răspunsul corect "
+"complet."
+
+#: ../lib/lcg/exercises.py:1069
+msgid "Test Yourself"
+msgstr "Exersarea cuvintelor"
+
+#: ../lib/lcg/exercises.py:1070
+msgid "Fill in the correct translation for each of the terms below."
+msgstr "Completaţi traducerea corectă pentru fiecare dintre termenii următori."
+
+#: ../lib/lcg/exercises.py:1071
+msgid ""
+"There are two ways to do the exercise: orally and written.  Do the exercise "
+"both ways to get the best results."
+msgstr ""
+"Există două moduri, cum puteţi să efectuaţi acest exerciţiu: oral şi în "
+"scris. Faceţi exerciţiile în ambele moduri pentru a obţine cele mai bune "
+"rezultate."
+
+#: ../lib/lcg/exercises.py:1073
+#, fuzzy
+msgid ""
+"To do the exercise orally is simple.  Go through the vocabulary list and "
+"think of the correct translation for each word or expression. There is a "
+"‘Play’ button after the text-box for each item which allows you to hear the "
+"correct answer.  Repeat the answer to practise the correct pronunciation.  "
+"Some items have more than one correct answer, so there may be multiple "
+"buttons to play each of them.  Since there is no way of checking your oral "
+"answers, the results are not available.  If you want to see your score, you "
+"must do the written exercise."
+msgstr ""
+"Forma orală este simplă. Vizitaţi lista de vocabular şi încercaţi să "
+"nimeriţi traducerea corectă a fiecărui cuvânt sau expresie. După fiecare "
+"element al listei urmează un câmp de intrare şi după acesta, găsiţi butonul "
+"de redare a răspunsului corect. Repetaţi răspunsul corect pentru a vă exersa "
+"pronunţia. Unele elemente au mai multe răspunsuri corecte, iar în acest caz "
+"veţi găsi, de asemenea, mai multe butoane pentru a le reda. Deoarece nu "
+"există nici o modalitate de a verifica răspunsurile orale, rezultatele nu "
+"sunt disponibile. Dacă doriţi să vă vedeţi punctajul, trebuie să faceţi "
+"exerciţiile în formă scrisă."
+
+#: ../lib/lcg/exercises.py:1082
+msgid ""
+"To do the exercise in written form, simply type the translation of each item "
+"into the text-box.  Be careful to use capital letters where this is "
+"appropriate, since an answer without correct capitalization is always "
+"considered incorrect.  When the prompt is a complete sentence, you must also "
+"use correct punctuation."
+msgstr ""
+"Pentru forma scrisă, pur şi simplu înscrieţi traducerea fiecărui cuvânt în "
+"câmpul de text. Acordaţi o atenţie deosebită la scrierea corectă a "
+"majusculelor sau a minusculelor, după caz, deoarece răspunsul, în care "
+"literele mari sau mici sunt utilizate incorect, este întotdeauna considerat "
+"a fi incorect. Dacă traduceţi o propoziţie întreagă, trebuie să utilizaţi, "
+"de asemenea, semnele de punctuaţie corecte."
+
+#: ../lib/lcg/exercises.py:1097
+msgid "Exercise not available in this language version."
+msgstr "Exerciţiul nu este disponibil în această versiune de limbă."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1106
+msgid "Substitution"
+msgstr "Substituţie"
+
+#: ../lib/lcg/exercises.py:1107
+msgid "Use the text in brackets to transform each sentence."
+msgstr "Modificaţi propoziţiile folosind textul din paranteze."
+
+#: ../lib/lcg/exercises.py:1108
+msgid ""
+"Use the prompt to produce another sentence with the same structure. Each "
+"sentence is followed by text in brackets.  Replace the corresponding part of "
+"the sentence using this text."
+msgstr ""
+"Folosiţi expresia tradusă pentru formarea unei alte propoziţii cu aceeaşi "
+"structură. Fiecare propoziţie este urmată de un text din paranteze. "
+"Înlocuiţi partea corespunzătoare a acestei propoziţii folosind acest text."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1117
+msgid "Transformation"
+msgstr "Transformare"
+
+#: ../lib/lcg/exercises.py:1119
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr ""
+"Completaţi propoziţia B, astfel încât sensul acesteia să fie acelaşi ca la "
+"propoziţia A."
+
+#: ../lib/lcg/exercises.py:1121
+msgid ""
+"Your goal is to transform a structure (pattern or paradigm) into a different "
+"structure, for example changing an affirmative sentence into a question."
+msgstr ""
+"Sarcina dumneavoastră este de a transforma o anumită structură (structura "
+"propoziţiei) într-o altă structură (de exemplu propoziţia afirmativă într-"
+"una interogativă)."
+
+#: ../lib/lcg/exercises.py:1127
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr "Modificaţi structura fiecărei propoziţii după exemplul model."
+
+#. Translators: Type of exercise
+#: ../lib/lcg/exercises.py:1140
+msgid "Writing"
+msgstr "Scriere"
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1157
+msgid "Cloze"
+msgstr "Completarea"
+
+#: ../lib/lcg/exercises.py:1159
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+"Completaţi textul care lipseşte. Pentru fiecare parte goală există numai o "
+"singură completare corectă."
+
+#: ../lib/lcg/exercises.py:1161
+msgid ""
+"Your goal in this exercise is to fill in the gaps in a longer piece of text. "
+"There is just one correct answer for each gap."
+msgstr ""
+"În acest exerciţiu, sarcina dumneavoastră este de a completa cuvintele omise "
+"din textul mai lung. Pentru fiecare spaţiu gol există numai un singur "
+"răspuns corect."
+
+#. Translators: Type of exercise (use language
+#. terminology). Exposed cloze is lika Cloze, where students fill
+#. in the gaps in a text. In *exposed* cloze however the student
+#. chooses from the list of offered answers.
+#: ../lib/lcg/exercises.py:1174
+msgid "Exposed Cloze"
+msgstr "Completarea expusă"
+
+#: ../lib/lcg/exercises.py:1175
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr ""
+"Folosiţi cuvintele din lista mai jos menţionată pentru a completa părţile "
+"goale ale textului."
+
+#: ../lib/lcg/exercises.py:1246
+#, python-format
+msgid "%d) "
+msgstr "%d)"
+
+#: ../lib/lcg/exercises.py:1265 ../lib/lcg/exercises.py:1301
+#: ../lib/lcg/exercises.py:1304
+msgid "Total points:"
+msgstr "Total de puncte:"
+
+#: ../lib/lcg/exercises.py:1295
+msgid "Invalid value in added points!"
+msgstr "Valoare invalidă a punctelor adăugate!"
+
+#: ../lib/lcg/exercises.py:1296
+msgid "Max. points exceeded!"
+msgstr "Numărul maxim de puncte depăşit!"
+
+#: ../lib/lcg/exercises.py:1298
+msgid "Automatic evaluation:"
+msgstr "Evaluare automată:"
+
+#: ../lib/lcg/exercises.py:1299
+msgid "Additional points by tutor:"
+msgstr "Puncte adăugate de meditator:"
+
+#: ../lib/lcg/exercises.py:1349
+msgid "correct answer"
+msgstr "răspuns corect"
+
+#. Translators: Incorrect (answer)
+#: ../lib/lcg/exercises.py:1354
+msgid "incorrect"
+msgstr "incorect"
+
+#~ msgid "Show transcript"
+#~ msgstr "Afişează transcrierea"
+
+#~ msgid "Hide transcript"
+#~ msgstr "Ascunde transcrierea"
+
+#~ msgid "answer sheet"
+#~ msgstr "Rezolvări întrebări"
+
+#~ msgid "See the %s to check your results."
+#~ msgstr "Folosiţi %s pentru a verifica corectitudinea răspunsurilor."
+
+#~ msgid ""
+#~ "This course was developed within the Eurochance project co-funded by the "
+#~ "European Leonardo da Vinci programme."
+#~ msgstr ""
+#~ "Acest curs a fost elaborat în cadrul proiectului  Eurochance, co-finanţat "
+#~ "de programul european Leonardo da Vinci."
+
+#~ msgid "presentation and user interface"
+#~ msgstr "prezentarea şi interfaţa utilizatorului"
+
+#~ msgid "Copyright and License Information"
+#~ msgstr "Informaţii privind licenţa şi drepturile de autor"
+
+#~ msgid "This course is a joint work protected by the copyright law."
+#~ msgstr ""
+#~ "Acest curs este o lucrare în comun supusă legii de protecţie a dreptului "
+#~ "de autor."
+
+#~ msgid ""
+#~ "This course can be redistributed and/or modified under the terms of the "
+#~ "GNU General Public License as published by the Free Software Foundation; "
+#~ "either version 2 of the License, or (at your option) any later version."
+#~ msgstr ""
+#~ "Acest curs se poate răspândi şi modifica conform prevederilor GNU General "
+#~ "Public License, emise de Free Software Foundation; şi anume, versiunea a "
+#~ "2 a a acestei licenţe sau (opţional) orice versiune ulterioară."
+
+#~ msgid ""
+#~ "This course is distributed in the hope that it will be useful, but "
+#~ "WITHOUT ANY WARRANTY; without even the implied warranty of "
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General "
+#~ "Public License for more details."
+#~ msgstr ""
+#~ "Acest curs este răspândit în speranţa că va fi util, însă, FĂRĂ NICI O "
+#~ "GARANŢIE; chiar fără garanţia implicită de VÂNDABILITATE sau POTRIVIRE "
+#~ "PENTRU UN ANUMIT SCOP. A se vedea GNU General Public License pentru mai "
+#~ "multe detalii."
+
+#~ msgid "The complete license text follows in the original English version:"
+#~ msgstr ""
+#~ "Textul complet al licenţei urmează în versiunea originală în engleză:"
+
+#~ msgid "Unit %d"
+#~ msgstr "Lecţia %d"
+
+#~ msgid "Aims and Objectives"
+#~ msgstr "Scopurile şi obiectivele"
+
+#~ msgid "Checklist"
+#~ msgstr "Lista de control"
+
+#~ msgid "The grammar focus of this unit is:"
+#~ msgstr "Această lecţie se concentrează gramatical pe:"
+
+#~ msgid "Vocabulary Practice"
+#~ msgstr "Exersarea lexicului"
+
+#~ msgid "Listening Comprehension"
+#~ msgstr "Exersarea auditivă"
+
+#~ msgid "General Comprehension"
+#~ msgstr "Înţelegere generală"
+
+#~ msgid "Grammar Practice"
+#~ msgstr "Exersarea gramaticii"
+
+#~ msgid "Consolidation"
+#~ msgstr "Consolidare"
+
+#~ msgid "Vocabulary"
+#~ msgstr "Lexic"
+
+#~ msgid "Comprehension"
+#~ msgstr "Înţelegere"
+
+#~ msgid "Dictation"
+#~ msgstr "Dictare"
+
+#~ msgid "Vocabulary Index"
+#~ msgstr "Cuprinsul lexicului"
+
+#~ msgid "Help Index"
+#~ msgstr "Indicele de ajutor"
+
+#~ msgid "Help for %s"
+#~ msgstr "Ajutor: %s"
+
+#~ msgid "Answer Sheet:"
+#~ msgstr "Rezolvări întrebări:"
+
+#~ msgid "Version %s"
+#~ msgstr "Versiunea %s"
+
+#~ msgid "This exercise can be also done purely aurally/orally:"
+#~ msgstr "Acest exerciţiu este disponibil şi în formă pur auditiv/orală:"
+
+#~ msgid "Transcript:"
+#~ msgstr "Transcriere:"
+
+#~ msgid "Recording:"
+#~ msgstr "Înregistrare:"
+
+#~ msgid "Listening"
+#~ msgstr "Audiţie"
+
+#~ msgid "Listen to the recording to practice understanding native speakers."
+#~ msgstr ""
+#~ "Ascultaţi înregistrarea şi exersaţi-vă capacitatea de a înţelege "
+#~ "vorbitorii nativi."
+
+#~ msgid "Reading"
+#~ msgstr "Citire"
+
+#~ msgid ""
+#~ "Read the text and try to understand as much as you can.  Use a dictionary "
+#~ "if necessary.  In many cases you will find the information relevant for "
+#~ "your own purposes, but it will also be needed in the exercises which "
+#~ "follow."
+#~ msgstr ""
+#~ "Citiţi textul şi încercaţi să-l înţelegeţi cât mai mult posibil. Folosiţi "
+#~ "un dicţionar, dacă este necesar. În multe cazuri, veţi găsi informaţii "
+#~ "relevante pentru scopul dumneavoastră, care vor fi, de asemenea, necesare "
+#~ "în cadrul exerciţiilor care urmează."
+
+#~ msgid "Sentence Completion"
+#~ msgstr "Terminarea propoziţiilor"
+
+#~ msgid ""
+#~ "Speaking Practice.  Complete the sentences you hear, using the example as "
+#~ "a model."
+#~ msgstr ""
+#~ "Exersaţi-vă conversarea. După pornirea înregistrării terminaţi "
+#~ "propoziţiile pe care le auziţi conform modelului."
+
+#, fuzzy
+#~ msgid "Press  ‘Play’ to listen to the instructions:"
+#~ msgstr "Apăsaţi butonul Play pentru redarea instrucţiunilor:"
+
+#~ msgid ""
+#~ "The aim of this exercise is to give you an opportunity to produce a "
+#~ "complete sentence and compare your pronunciation with the original. "
+#~ "Therefore the exercise is purely aural-oral, with no written tasks."
+#~ msgstr ""
+#~ "Scopul acestui exerciţiu este de a vă oferi prilejul de a forma o "
+#~ "propoziţie completă şi de a compara pronunţia cu originalul. Prin urmare, "
+#~ "exerciţiul este pur auditiv-oral, fără sarcini scrise."
+
+#, fuzzy
+#~ msgid ""
+#~ "If you wish to check your answers against the written text, you can use "
+#~ "the transcript of the recording (the link ‘show transcript’). Since this "
+#~ "is not a written exercise, your results cannot be checked automatically."
+#~ msgstr ""
+#~ "Dacă doriţi să vă verificaţi răspunsurile după textul scris, utilizaţi "
+#~ "transcrierea textului  înregistrării (linkul „afişează transcrierea“). "
+#~ "Deoarece nu este un exerciţiu scris, rezultatele dumneavoastră nu pot fi "
+#~ "evaluate în mod automat."
+
+#~ msgid "Exercise Help"
+#~ msgstr "Ajutor la exerciţii"
+
+#~ msgid "Correct"
+#~ msgstr "Corect"
+
+#~ msgid "Error(s) found"
+#~ msgstr "Au fost găsite greşeli"
+
+#~ msgid "Result:"
+#~ msgstr "Rezultat:"
+
+#, fuzzy
+#~ msgid ""
+#~ "Displays the result of the last evaluation (evaluate your answer by "
+#~ "pressing the ‘Enter’ key or by the ‘Evaluate’ button below the exercise)."
+#~ msgstr ""
+#~ "Afişează rezultatul ultimei evaluări a răspunsului (evaluarea o efectuaţi "
+#~ "apăsând tasta Enter sau butonul de sub exerciţiu Evaluează)."
+
+#, fuzzy
+#~ msgid ""
+#~ "Listen to the complete recording first. Then go to the textbox and use "
+#~ "the ‘>’ key to listen to the text section by section. Type what you hear "
+#~ "into the textbox. For detailed instructions, read the Exercise Help."
+#~ msgstr ""
+#~ "Ascultaţi mai întâi înregistrarea completă. Apoi, treceţi la câmpul "
+#~ "introductiv de text şi folosiţi tasta „>“ pentru a reda dictarea pe părţi "
+#~ "şi scrieţi textul dictat. Pentru instrucţiuni detaliate, citiţi Ajutor "
+#~ "Exerciţiu."
+
+#, fuzzy
+#~ msgid ""
+#~ "First listen to the recording once and then go to the large text entry "
+#~ "box below.  Within the box, you can use shortcut keys to play individual "
+#~ "pieces of the recording.  Typically you play one part using the ‘>’ key "
+#~ "(right angle bracket) and type what you hear. Then you press the ‘>’ key "
+#~ "again to play the next part and type it too, and so on until you reach "
+#~ "the end of the recording."
+#~ msgstr ""
+#~ "Mai întâi ascultaţi înregistrarea în întregime şi apoi treceţi la câmpul "
+#~ "mare introductiv de text de mai jos. Când cursorul se află în acest câmp, "
+#~ "puteţi folosi tastele pentru comenzi rapide pentru redarea succesivă a "
+#~ "părţilor individuale ale înregistrării. De regulă, întotdeauna redaţi o "
+#~ "parte cu ajutorul tastei „>“ (semnul „mai mare“) şi înscrieţi textul "
+#~ "auzit. Apoi apăsaţi din nou „>“ şi astfel redaţi partea următoare, pe "
+#~ "care, de asemenea, o veţi înscrie, etc., până ajungeţi la sfârşitul "
+#~ "înregistrării."
+
+#~ msgid "Then you can use the evaluation keys to evaluate the whole text."
+#~ msgstr ""
+#~ "Pentru evaluarea corectitudinii întregului text puteţi folosi tastele de "
+#~ "evaluare."
+
+#~ msgid ""
+#~ "Pay special attention to punctuation and case, since these cause most of "
+#~ "the problems when evaluating your answer. Type all the sentences as you "
+#~ "hear them, using the appropriate punctuation character and one space "
+#~ "after each sentence. No space is allowed after the last sentence. "
+#~ msgstr ""
+#~ "Acordaţi o atenţie deosebită semnelor de punctuaţie şi utilizării "
+#~ "literelor mari şi mici, deoarece, acestea produc cele mai multe probleme "
+#~ "la evaluarea răspunsului. Scrieţi toate propoziţiile aşa cum le auziţi, "
+#~ "folosind semnul de punctuaţie adecvat şi un spaţiu după fiecare "
+#~ "propoziţie. Nu se permite spaţiul după ultima propoziţie."
+
+#~ msgid ""
+#~ "/Note/: Of course, you can replay the recording as many times as you need "
+#~ "in order to understand it, although two attempts should be enough for a "
+#~ "well performing student."
+#~ msgstr ""
+#~ "/Note/: Bineînţeles, puteţi reda înregistrarea de atâtea ori, de câte ori "
+#~ "aveţi nevoie pentru a o înţelege pe deplin, în orice caz, două încercări "
+#~ "ar trebui să fie suficiente pentru un student bun."
+
+#~ msgid ""
+#~ "Also, in the dictation exercise text box, you can use the following keys "
+#~ "to control the playback of the recording:"
+#~ msgstr ""
+#~ "Dacă cursorul se află în câmpul introductiv al dictării, puteţi folosi "
+#~ "tastele următoare pentru redarea dictării pe părţi:"
+
+#~ msgid "right angle bracket, greater than sign"
+#~ msgstr "semnul „mai mare“"
+
+#~ msgid "Play next piece of the recording."
+#~ msgstr "Redă următoarea secţiune a dictării."
+
+#~ msgid "left angle bracket, less than sign"
+#~ msgstr "semnul „mai mic“"
+
+#~ msgid "Play the previous piece of the recording."
+#~ msgstr "Redă secţiunea anterioară a dictării."
+
+#~ msgid "Ctrl-Enter"
+#~ msgstr "Ctrl-Enter"
+
+#~ msgid "Replay the current (last played) piece of the recording once again."
+#~ msgstr "Redă."
+
+#~ msgid ""
+#~ "Listen to the recording carefully and then fill in the gaps in the text "
+#~ "below using the same words."
+#~ msgstr ""
+#~ "Ascultaţi cu atenţie înregistrarea şi apoi completaţi spaţiile goale din "
+#~ "textul de mai jos, folosind aceleaşi cuvinte."
+
+#~ msgid "Vocabulary Listing"
+#~ msgstr "Privire generală a lexicului"
+
+#~ msgid ""
+#~ "The vocabulary is presented in a two-column table with a term on the left "
+#~ "and its translation on the right in each row."
+#~ msgstr ""
+#~ "Lexicul este exprimat cu ajutorul unui tabel cu două coloane. Fiecare "
+#~ "rând conţine o pereche. În coloana din stânga se află întotdeauna "
+#~ "expresia dată şi în coloana din dreapta, traducerea corespunzătoare."
+
+#~ msgid "Terms"
+#~ msgstr "Termeni"
+
+#~ msgid "Phrases"
+#~ msgstr "Fraze"
+
+#~ msgid "Extended vocabulary"
+#~ msgstr "Lexicul extins"
+
+#~ msgid ""
+#~ "Please, visit the [http://eurochance.brailcom.org Eurochance project "
+#~ "webpage] for more information how to obtain the source data of this "
+#~ "course."
+#~ msgstr ""
+#~ "Pentru mai multe informaţii despre modul de obţinere a surselor de date "
+#~ "ale acestui curs, vă rugăm să vizitaţi [http://eurochance.brailcom.org "
+#~ "Eurochance project webpage]."
+
+#~ msgid "Section %d"
+#~ msgstr "Secţiunea %d"
+
+#~ msgid "Exercises"
+#~ msgstr "Exerciţii"
+
+#~ msgid "Ordered by the English term"
+#~ msgstr "Cuprinsul lexicului"

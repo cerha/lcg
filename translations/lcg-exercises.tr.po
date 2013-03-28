@@ -1,0 +1,807 @@
+# Eurochance LCG Extension
+# Copyright (C) 2007-2009, Brailcom, o.p.s.
+# This file is distributed under the same license as the LCG package.
+# Tomas Cerha <cerha@brailcom.org>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-03-28 11:44+0100\n"
+"PO-Revision-Date: 2011-03-10 12:23+0100\n"
+"Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
+"Language-Team: Czech <cs@li.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Labels for exercise buttons. Keep in capitals.
+#: ../lib/lcg/exercises.py:147
+msgid "TRUE"
+msgstr "DOĞRU"
+
+#: ../lib/lcg/exercises.py:147
+msgid "FALSE"
+msgstr "YANLIŞ"
+
+#: ../lib/lcg/exercises.py:395
+#, python-format
+msgid "Exercise %d"
+msgstr "Alıştırma %d"
+
+#: ../lib/lcg/exercises.py:403
+msgid "Read the following text:"
+msgstr "Aşağıdaki konuyu okuyun:"
+
+#: ../lib/lcg/exercises.py:505
+msgid "Table of Contents:"
+msgstr "İçindekiler:"
+
+#: ../lib/lcg/exercises.py:508
+msgid "Instructions"
+msgstr "Talimatlar"
+
+#: ../lib/lcg/exercises.py:509
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#: ../lib/lcg/exercises.py:510
+msgid "Indicators"
+msgstr "Göstergeler"
+
+#: ../lib/lcg/exercises.py:511
+msgid "Control Panel"
+msgstr "Denetim paneli"
+
+#: ../lib/lcg/exercises.py:512
+msgid "Answer Sheets"
+msgstr "Doğru cevap tablosu"
+
+#: ../lib/lcg/exercises.py:528
+msgid "The indicator panel below the exercise shows the following values:"
+msgstr "Alıştırmanın sonundaki gösterge paneli aşağıdaki değerleri gösterir:"
+
+#: ../lib/lcg/exercises.py:536
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr ""
+"Denetim paneli alıştırmanın sonunda bulursunuz. Aşağıdaki düğmeleri içerir:"
+
+#: ../lib/lcg/exercises.py:565
+msgid "Play"
+msgstr "Çalmak"
+
+#: ../lib/lcg/exercises.py:630
+msgid "Explanation:"
+msgstr "Açıklama:"
+
+#: ../lib/lcg/exercises.py:639
+msgid "Example:"
+msgstr "Örnek:"
+
+#: ../lib/lcg/exercises.py:724
+msgid "on first attempt"
+msgstr "ilk denemesine"
+
+#: ../lib/lcg/exercises.py:726
+msgid "Answered:"
+msgstr "Yanıtlandı:"
+
+#: ../lib/lcg/exercises.py:727
+msgid ""
+"Displays the number of the tasks you have already answered.  For example "
+"4/10 means, that you have answered four out of ten questions so you should "
+"finish the remaining six."
+msgstr ""
+"Yanıtlanan alıştırmaların sayısını gösterir. Mesela 4/10 demek ki, on "
+"sorudan dört tanesi yanıtlandı."
+
+#: ../lib/lcg/exercises.py:730
+msgid "Correct:"
+msgstr "Doğru:"
+
+#: ../lib/lcg/exercises.py:731
+msgid ""
+"Displays the number and percentage of successful answers.  The first pair of "
+"numbers shows the results of all current answers.  If you didn't answer all "
+"of them correctly on first attempt, there is also a second pair of numbers "
+"showing how many answers you did succesfuly on the first try.  Use the "
+"‘Reset’ button to start again."
+msgstr ""
+"Doğru cevapların sayısı ve yüzde oranı gösterir. İlk sayı çifti bütün "
+"yanıtlandığı cevapların sonuçlarını gösterir. Fakat bazı cevapları ilk "
+"denemesinde doğru yanıtlamadığında ikinci sayı çifti ilk denemesinde "
+"yanıtlanan doğru cevapların sayısı gösterir. ‘Yeniden başlatma' tuşu yeniden "
+"başlamak için kullanınız."
+
+#: ../lib/lcg/exercises.py:738
+msgid "Evaluate"
+msgstr "Değerlendir"
+
+#: ../lib/lcg/exercises.py:739
+msgid ""
+"Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+"the first incorrect answer.  Within a text-box, the cursor is also moved to "
+"the first incorrect character of your answer."
+msgstr ""
+"Toplam alıştırmaların sonucu gösterir. Eğer bir hata bulunursa, imleç ilk "
+"yanlış cevabınıza taşınır. Metin kutusu ise imleç birinci yanlışlığınıza "
+"taşınır."
+
+#. Translators: Fill (a form with correct answers).
+#: ../lib/lcg/exercises.py:743
+msgid "Fill"
+msgstr "Doldurmak"
+
+#: ../lib/lcg/exercises.py:744
+msgid "Fill in the whole exercise with the correct answers."
+msgstr "Doğru cevaplarıyla bütün alıştırmayı doldurur."
+
+#: ../lib/lcg/exercises.py:745
+msgid "Reset"
+msgstr "Yeniden başlat"
+
+#: ../lib/lcg/exercises.py:746
+msgid "Reset all your answers and start again."
+msgstr ""
+"Bütün cevapları ve sonuçları sıfırlar, alıştırmaya yeniden başlayabilirsiniz."
+
+#: ../lib/lcg/exercises.py:748
+msgid ""
+"The Answer Sheets contain all the correct answers for all the exercises. You "
+"can access them from the Course Index, or more conveniently, you can use the "
+"‘?’ (question mark) link after each task. This link takes you directly to "
+"the corresponding answer in the Answer Sheet."
+msgstr ""
+"Cevap tablosu alıştırmaların bütün doğru cevapları içerir. Kurs dizininden "
+"girilebilir. Ancak daha kolay yol her tek ödevin sonundaki soru işaretinden "
+"girmektir. Bu bağlantı sizi doğrudan cevap tablosunun doğru cevabına götürür."
+
+#: ../lib/lcg/exercises.py:803
+msgid "Show the answer sheet."
+msgstr "Cevap tablosu göstermek."
+
+#: ../lib/lcg/exercises.py:830
+msgid "Chose the correct answer."
+msgstr "Doğru cevabı işaretleyiniz."
+
+#: ../lib/lcg/exercises.py:833
+msgid ""
+"You will hear a response immediately after choosing the answer.  When you "
+"choose the wrong answer, you can try again until you find the correct one.  "
+"The results below the exercise will show you how many answers you got right "
+"on the first try (see the [#indicators] section below)."
+msgstr ""
+"Cevabı işaretledikten sonra hemen tepki duyacaksınız. Yanlış cevabı "
+"işaretlersiniz ise doğru cevabı bulacağınıza kadar tekrar tekrar "
+"deneyebilirsiniz. Alıştırmaların aşağıdaki sonuçları ilk denemesinde "
+"yanıtladığı doğru cevabın sayısını gösterir (daha  [#indicators])."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:901
+msgid "Multiple Choice Questions"
+msgstr "Çoktan seçmeli sınav"
+
+#: ../lib/lcg/exercises.py:902
+msgid ""
+"Each question in this exercise is followed by two or more possible answers. "
+"Only one answer is correct."
+msgstr ""
+"Bu alıştırmada bütün sorularına iki ve daha çok cevap gelir. Sadece tek bir "
+"cevap doğrudur."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:910
+msgid "Selections"
+msgstr "Seçimleri yükle"
+
+#: ../lib/lcg/exercises.py:911
+msgid ""
+"There are several groups of two or three similar sentences or expressions. "
+"Only one option in each group is correct. Your goal is to decide which one."
+msgstr ""
+"Alıştırmada ikişer ya da üçer benzer cümlelerden oluşturan birçok grup "
+"bulunur. Her bir grubunda tek bir cevap doğrudur. Siz hangisinin doğru "
+"olduğuna karar veriniz."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:920
+msgid "True/False Statements"
+msgstr "Doğru/yanlış"
+
+#: ../lib/lcg/exercises.py:921
+msgid "For each of the statements below, choose True or False."
+msgstr ""
+"Aşağıdaki ifadelerden doğru yoksa yanlış olup olmadığını işaretleyiniz."
+
+#: ../lib/lcg/exercises.py:922
+msgid ""
+"Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
+"and ‘FALSE’.  Decide whether the sentence is true or not and press the "
+"corresponding button."
+msgstr ""
+"Her tek cümlenin sonunda „DOĞRU“ ve „YANLIŞ“ cevabı gelir. Cümlenin doğru "
+"yoksa yanlış olup olmadığına karar veriniz ve sonra karşılıklı tuşa basınız."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:946
+msgid "Gap Filling"
+msgstr "Boşluk doldurma"
+
+#: ../lib/lcg/exercises.py:947
+msgid "Choose the correct option to fill the gaps in the following sentences."
+msgstr "Aşağıdakilerden en uygun bir cevap işaretleyiniz."
+
+#: ../lib/lcg/exercises.py:949
+msgid ""
+"Choose the correct word to fill in a gap in a sentence.  For each gap you "
+"have several choices.  Only one of them is correct."
+msgstr ""
+"Boşluk doldurmak için en uygun bir sözü seçiniz. Her tek boşluk için birçok "
+"seçeneğiniz var. Yalnız tek cevabı doğrudur."
+
+#: ../lib/lcg/exercises.py:972
+msgid ""
+"You can check each answer individually using the shortcut keys (see the "
+"section [#keys] for more information).  When your answer is evaluated as "
+"incorrect and you do not know why, always check whether you have used "
+"correct punctuation and capital letters where appropriate. These two things "
+"are the cause of most confusion."
+msgstr ""
+"Cevaplarınızı kısayol tuşları ([#keys]) kullanarak tek tek kontrol "
+"edebilirsiniz. Eğer cevabınız yanlış olarak değerlendirilirse ve siz "
+"nedenini bilemezsiniz, önce noktalama sonra büyük harfleri kontrol ediniz. "
+"Bu iki şey çoğunlukla şaşkınlık yaratır."
+
+#: ../lib/lcg/exercises.py:977
+msgid ""
+"Use the [#panel] at the bottom of the exercise to evaluate all the answers "
+"at once."
+msgstr ""
+"Hepsi birden değerlendirmek için alıştırmanın sonunda [#panel] kullanınız."
+
+#: ../lib/lcg/exercises.py:979
+msgid ""
+"If your browser doesn't support JavaScript, the interactive features and "
+"automatic evaluation do not work.  You can still use this course, but you "
+"will have to check your answers against the answer sheet manually (see "
+"[#answer-sheets]."
+msgstr ""
+"Eğer sizin metin sunucu JavaScript'i desteklemezse, interaktif özellikler ve "
+"otomatik değerlendirme işlemeyecek. Buna rağmen bu kursu kullanabilirsiniz, "
+"ama sonunda cevaplarınızı kendiniz cevap tablosu kullanarak kontrol etmek "
+"zorunda olacaksınız ([#answer-sheets] bak)."
+
+#: ../lib/lcg/exercises.py:987
+msgid ""
+"In all the exercises where you fill in the text into a text-box you can use "
+"the two shortcut keys described below."
+msgstr ""
+"Metni metin kutusuna doldurduğunuz bütün alıştırmalarda aşağıdaki kısayol "
+"tuşları kullanabilirsiniz."
+
+#: ../lib/lcg/exercises.py:989
+msgid "Enter"
+msgstr "Enter"
+
+#: ../lib/lcg/exercises.py:990
+msgid ""
+"Use this key within the text-field to evaluate the current answer. You hear "
+"a sound response and in case of an error, the cursor is moved to the "
+"position of the first incorrect character within the text.  This way you can "
+"locate the error, fix it and evaluate again. When you don't know how to fix "
+"an error, you can use the ‘hint’ key described below."
+msgstr ""
+"Metin alanında bu tuşa basarak cevabınız değerlendirilecek. Hemen sonucu "
+"duyacaksınız. Yanlış cevap işaretleyinizde imleç birinci yanlışlığın yerini "
+"gösterecek. Bu şekilde hata bulabilirsiniz, düzeltebilirsiniz ve yine  "
+"değerlendirilebilirsiniz. Eğer başka ne yapabileceğinizi bilmezsiniz, daha "
+"aşağıda anlatıldığı „yardım“ tuşu kullanınız."
+
+#: ../lib/lcg/exercises.py:996
+msgid "Ctrl-Space"
+msgstr "Ctrl+boşluk çubuğu"
+
+#: ../lib/lcg/exercises.py:997
+msgid ""
+"This function is called a ‘hint’.  It helps you in case you don't know the "
+"answer or you don't know how to fix an error in your answer. Just press the "
+"key combination (holding the Ctrl key, press the spacebar) and one letter of "
+"the correct answer will be filled in automatically.  If you have already "
+"entered some text, the cursor will be moved to after the last correct "
+"character and next one will be inserted.  This also means that if there is "
+"some text after the cursor, there is at least one error in it.  Try to "
+"locate this error and correct it.  Then you can evaluate your answer using "
+"the ‘Enter’ key (see above) or use ‘hint’ again, until you find the complete "
+"answer."
+msgstr ""
+"Bu fonksiyon  ‘yardımcı ipucu’dur. O size doğru cevap bilmediğiniz durumda "
+"ya da hatanızın nasıl düzeltebildiğiniz durumda yardım edebilir.  Tuş dizisi "
+"kullanınız (Ctrl tuşunu tutarak ara çubuğuna basınız) ve doğru cevabından "
+"birinci harfi otomatik olarak tamamlanacak. Eğer her hangi bir metni "
+"koyarasanız, imleç cevabınızın son doğru harfine gelip yeni harfi arasına "
+"eklenecek. Bu da demek ki, bu fonksyonu kullandıktan sonra aşağıdaki metinde "
+"en az bir hata bulunur. Hatanızı bulup düzeltmeye çalışınız. Ondan sonra "
+"yeni cevabınızı „Enter“ tuşa basarak değerlendirebilirsiniz ya da „yardım“ "
+"tuşu doğru cevabınızı buluncaya kadar kullanabilirsiniz."
+
+#: ../lib/lcg/exercises.py:1069
+msgid "Test Yourself"
+msgstr "Kendiniz test ediniz"
+
+#: ../lib/lcg/exercises.py:1070
+msgid "Fill in the correct translation for each of the terms below."
+msgstr "Aşağıdaki terimlere doğru çevirleri doldurunuz."
+
+#: ../lib/lcg/exercises.py:1071
+msgid ""
+"There are two ways to do the exercise: orally and written.  Do the exercise "
+"both ways to get the best results."
+msgstr ""
+"Alıştırma yapmanın iki yolu vardır: sözlü ve yazılı olarak. En doğru "
+"sonuçları alabilmek için ikisi de kullanınız."
+
+#: ../lib/lcg/exercises.py:1073
+msgid ""
+"To do the exercise orally is simple.  Go through the vocabulary list and "
+"think of the correct translation for each word or expression. There is a "
+"‘Play’ button after the text-box for each item which allows you to hear the "
+"correct answer.  Repeat the answer to practise the correct pronunciation.  "
+"Some items have more than one correct answer, so there may be multiple "
+"buttons to play each of them.  Since there is no way of checking your oral "
+"answers, the results are not available.  If you want to see your score, you "
+"must do the written exercise."
+msgstr ""
+"Sözlü olarak alıştırma yapmak kolaydır. Kelime listesi üzerinden gidip ve "
+"her kelime veya ifade için doğru çeviri düşününüz. Her metin kutusunun "
+"öğesinden sonra giriş tuşu bulunur ve doğru cevabı dinlemek için onun "
+"arkasındaki tuşa basınız. Doğru telaffuz için doğru cevabı tekrarlayınız. "
+"Bazı öğelerin daha çok doğru cevabı vardır. O halde onları dinlemek için "
+"birden fazla tuş bulunur. Çünkü sözlü cevapların kontrol etme imkanı yoktur, "
+"sonuçları mevcut değildir. Eğer puanları görmek isterseniz yazılı alıştırma "
+"yapmanız gerekir."
+
+#: ../lib/lcg/exercises.py:1082
+msgid ""
+"To do the exercise in written form, simply type the translation of each item "
+"into the text-box.  Be careful to use capital letters where this is "
+"appropriate, since an answer without correct capitalization is always "
+"considered incorrect.  When the prompt is a complete sentence, you must also "
+"use correct punctuation."
+msgstr ""
+"Yazılı alıştırmada her kelimenin çeviri metin kutusuna yazınız. Büyük "
+"harfler kullanmak için dikkatlı olunuz, harfleri doğru olmayan bir cevabı "
+"hep yanlış olarak kabul edilir. Eğer bütün cümleyi çevirirseniz, aynı "
+"zamanda doğru noktalama kullanmanız gerekir."
+
+#: ../lib/lcg/exercises.py:1097
+msgid "Exercise not available in this language version."
+msgstr "Alıştırma bu dilde mevcut değil."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1106
+msgid "Substitution"
+msgstr "Değiştirim"
+
+#: ../lib/lcg/exercises.py:1107
+msgid "Use the text in brackets to transform each sentence."
+msgstr "Parantez içindeki metni cümleyi değiştirmek için kullanınız."
+
+#: ../lib/lcg/exercises.py:1108
+msgid ""
+"Use the prompt to produce another sentence with the same structure. Each "
+"sentence is followed by text in brackets.  Replace the corresponding part of "
+"the sentence using this text."
+msgstr ""
+"Aynı yapısında olan başka bir cümle kurmak için belirtilen ifadeyi "
+"kullanınız. Her cümle parantez içindeki metni takip edilir. Bu metni "
+"kullanarak karşılık olan cümleyi değiştiriniz."
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1117
+msgid "Transformation"
+msgstr "Dönüşüm"
+
+#: ../lib/lcg/exercises.py:1119
+msgid "Fill in the gap in sentence B so that it means the same as sentence A."
+msgstr "B cümlesini A cümlesinin aynı anlamında doldurunuz."
+
+#: ../lib/lcg/exercises.py:1121
+msgid ""
+"Your goal is to transform a structure (pattern or paradigm) into a different "
+"structure, for example changing an affirmative sentence into a question."
+msgstr ""
+"Bir cümlenin yapısı başka cümlenin yapısına değiştirmesi amacınızdır (soru "
+"cümlesini olumlu cümlesine değiştirmek)."
+
+#: ../lib/lcg/exercises.py:1127
+msgid ""
+"Using the example as a model, change the structure and make a new sentence."
+msgstr "Model örneğine göre her cümlenin yapısını değiştiriniz."
+
+#. Translators: Type of exercise
+#: ../lib/lcg/exercises.py:1140
+msgid "Writing"
+msgstr "Yazma"
+
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:1157
+msgid "Cloze"
+msgstr "Cümle tamamlama"
+
+#: ../lib/lcg/exercises.py:1159
+msgid ""
+"Fill in the gaps in the text below. For each gap there is only one correct "
+"answer."
+msgstr ""
+"Eksik olan metni doldurunuz. Her tek boşluk için yalnız tek bir cevap "
+"doğrudur."
+
+#: ../lib/lcg/exercises.py:1161
+msgid ""
+"Your goal in this exercise is to fill in the gaps in a longer piece of text. "
+"There is just one correct answer for each gap."
+msgstr ""
+"Daha uzun bir metinde eksik olan kelimelerin doldurması amacınızdır. Her tek "
+"boşluk için tek bir doğru cevap bulunur."
+
+#. Translators: Type of exercise (use language
+#. terminology). Exposed cloze is lika Cloze, where students fill
+#. in the gaps in a text. In *exposed* cloze however the student
+#. chooses from the list of offered answers.
+#: ../lib/lcg/exercises.py:1174
+msgid "Exposed Cloze"
+msgstr "Açık cümle tamamlama"
+
+#: ../lib/lcg/exercises.py:1175
+msgid ""
+"Use the correct word or expression from the list below to fill in the gaps "
+"in the sentences."
+msgstr ""
+"Boşlukları doldurmak için aşağıdaki listeyi kullanarak kelimeleri kullanınız."
+
+#: ../lib/lcg/exercises.py:1246
+#, python-format
+msgid "%d) "
+msgstr "%d)"
+
+#: ../lib/lcg/exercises.py:1265 ../lib/lcg/exercises.py:1301
+#: ../lib/lcg/exercises.py:1304
+msgid "Total points:"
+msgstr "Toplam sayı:"
+
+#: ../lib/lcg/exercises.py:1295
+msgid "Invalid value in added points!"
+msgstr "Eklenmiş puanların değeri geçersizdir!"
+
+#: ../lib/lcg/exercises.py:1296
+msgid "Max. points exceeded!"
+msgstr "Maks. puan sayısı aşıldı!"
+
+#: ../lib/lcg/exercises.py:1298
+msgid "Automatic evaluation:"
+msgstr "Otomatik değerlendirme:"
+
+#: ../lib/lcg/exercises.py:1299
+msgid "Additional points by tutor:"
+msgstr "Öğretmen tarafından ek puanları:"
+
+#: ../lib/lcg/exercises.py:1349
+msgid "correct answer"
+msgstr "doğru cevap"
+
+#. Translators: Incorrect (answer)
+#: ../lib/lcg/exercises.py:1354
+msgid "incorrect"
+msgstr "yanlış"
+
+#~ msgid "Show transcript"
+#~ msgstr "Yazı göstermek"
+
+#~ msgid "Hide transcript"
+#~ msgstr "Yazı gizlemek"
+
+#~ msgid "answer sheet"
+#~ msgstr "cevap tablosu"
+
+#~ msgid "See the %s to check your results."
+#~ msgstr "Sonuçlarınızı kontrol etmek için %s kullanınız."
+
+#~ msgid ""
+#~ "This course was developed within the Eurochance project co-funded by the "
+#~ "European Leonardo da Vinci programme."
+#~ msgstr ""
+#~ "Bu kurs Eurochance projesi işbirliği içinde geliştirilip Avrupa Leonardo "
+#~ "da Vinci programı tarafından finanse edildi."
+
+#~ msgid "presentation and user interface"
+#~ msgstr "sunu ve kullanıcı arayüzü"
+
+#~ msgid "Copyright and License Information"
+#~ msgstr "Telif hakkı ve lisans bilgileri"
+
+#~ msgid "This course is a joint work protected by the copyright law."
+#~ msgstr "Bu kurs ortak bir çalışma telif hakkı yasasıyla korunmaktadır."
+
+#~ msgid ""
+#~ "This course can be redistributed and/or modified under the terms of the "
+#~ "GNU General Public License as published by the Free Software Foundation; "
+#~ "either version 2 of the License, or (at your option) any later version."
+#~ msgstr ""
+#~ "Bu kursu Free Software Foundation tarafından yayınlanan GNU Genel Kamu "
+#~ "Lisansı koşulları altında olarak dağıtılabilir ve değiştirilebilir; ya bu "
+#~ "lisansın 2 versyonu (tercihinizle bağlı olur) ya herhangi bir sonraki "
+#~ "versyonu."
+
+#~ msgid ""
+#~ "This course is distributed in the hope that it will be useful, but "
+#~ "WITHOUT ANY WARRANTY; without even the implied warranty of "
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General "
+#~ "Public License for more details."
+#~ msgstr ""
+#~ "Bu kurs faydalı olacağı umuduyla dağıtılmakta, ancak herhangi bir GARANTİ "
+#~ "OLAMADAN; TİCARİ ya da BİR AMACA UYGUNLUĞU için dahi zımni garanti "
+#~ "olmadan. Daha fazla bilgi için, GNU General Public License izleyiniz."
+
+#~ msgid "The complete license text follows in the original English version:"
+#~ msgstr "Tam lisans metni orijinal İngilizce sürümünde aşağıdaki gibidir:"
+
+#~ msgid "Unit %d"
+#~ msgstr "Ünite %d"
+
+#~ msgid "Aims and Objectives"
+#~ msgstr "Amaçlar ve hedefler"
+
+#~ msgid "Checklist"
+#~ msgstr "Kontrol listesi"
+
+#~ msgid "The grammar focus of this unit is:"
+#~ msgstr "Bu ünitenin gramer odak noktası:"
+
+#~ msgid "Vocabulary Practice"
+#~ msgstr "Kelimeler ile ilgili alıştırma"
+
+#~ msgid "Listening Comprehension"
+#~ msgstr "Dinleme-algılama"
+
+#~ msgid "General Comprehension"
+#~ msgstr "Genel anlama"
+
+#~ msgid "Grammar Practice"
+#~ msgstr "Gramer ile ilgili alıştırma"
+
+#~ msgid "Consolidation"
+#~ msgstr "Sağlamlaştırma"
+
+#~ msgid "Vocabulary"
+#~ msgstr "Sözlük"
+
+#~ msgid "Comprehension"
+#~ msgstr "Anlama"
+
+#~ msgid "Dictation"
+#~ msgstr "Dikte"
+
+#~ msgid "Vocabulary Index"
+#~ msgstr "Sözlük indeksi"
+
+#~ msgid "Help Index"
+#~ msgstr "Yardım dizini"
+
+#~ msgid "Help for %s"
+#~ msgstr "Yardım: %s"
+
+#~ msgid "Answer Sheet:"
+#~ msgstr "Yanıt sayfası:"
+
+#~ msgid "Back"
+#~ msgstr "Geri"
+
+#~ msgid "Version %s"
+#~ msgstr "Versyon %s"
+
+#~ msgid "This exercise can be also done purely aurally/orally:"
+#~ msgstr "Bu alıştırma da tam işitme/sözlü olarak bulunabilir:"
+
+#~ msgid "Transcript:"
+#~ msgstr "Yazı:"
+
+#~ msgid "Recording:"
+#~ msgstr "Kayıt:"
+
+#~ msgid "Listening"
+#~ msgstr "Dinleme"
+
+#~ msgid "Listen to the recording to practice understanding native speakers."
+#~ msgstr "Kaydı dinleyip anadili konuşmacısını anlamaya çalışın."
+
+#~ msgid "Reading"
+#~ msgstr "Okuma"
+
+#~ msgid ""
+#~ "Read the text and try to understand as much as you can.  Use a dictionary "
+#~ "if necessary.  In many cases you will find the information relevant for "
+#~ "your own purposes, but it will also be needed in the exercises which "
+#~ "follow."
+#~ msgstr ""
+#~ "Konuyu en iyi anlayabilmek kadar okuyunuz. Sözlük lazımsa, onu "
+#~ "kullanınız. Bir çok örneklerde faydalı bilgiler bulacaksınız ve bunun "
+#~ "yanında aşağıdaki alıştırmalarda size lazım olacaklar."
+
+#~ msgid "Sentence Completion"
+#~ msgstr "Cümle tamamlama "
+
+#~ msgid ""
+#~ "Speaking Practice.  Complete the sentences you hear, using the example as "
+#~ "a model."
+#~ msgstr ""
+#~ "Konuşma pratik yapınız. Aşağıdaki örneklere göre dinlediğiniz cümleleri "
+#~ "tamamlayınız."
+
+#~ msgid "Press  ‘Play’ to listen to the instructions:"
+#~ msgstr "„Çal“ düğmesine talimatları dinlemek için basınız:"
+
+#~ msgid ""
+#~ "The aim of this exercise is to give you an opportunity to produce a "
+#~ "complete sentence and compare your pronunciation with the original. "
+#~ "Therefore the exercise is purely aural-oral, with no written tasks."
+#~ msgstr ""
+#~ "Bu alıştırmanın hedefi öğrenciye cümleyi tamalamaya fırsat sunması ve "
+#~ "kendi telaffuz orijinal ile karşılaştırmasıdır. Bunun için bu alıştırma "
+#~ "yazılı konu olmadan sadece duyumsal-sözel şeklindedir."
+
+#~ msgid ""
+#~ "If you wish to check your answers against the written text, you can use "
+#~ "the transcript of the recording (the link ‘show transcript’). Since this "
+#~ "is not a written exercise, your results cannot be checked automatically."
+#~ msgstr ""
+#~ "Eğer cevaplarınızı yazılı konuyla karşılaştırmak isterseniz, dinlemenin "
+#~ "yazılı kaydı („yazı göstermek“ bağlantısı) kullanın. Yazılı alıştırma "
+#~ "olmadığı ise, sonuçlarınızı özdevimli denetleyemezsiniz."
+
+#~ msgid "Exercise Help"
+#~ msgstr "Alıştırma yardımı"
+
+#~ msgid "Correct"
+#~ msgstr "Doğru"
+
+#~ msgid "Error(s) found"
+#~ msgstr "Hatalar bulundu"
+
+#~ msgid "Result:"
+#~ msgstr "Sonuç:"
+
+#~ msgid ""
+#~ "Displays the result of the last evaluation (evaluate your answer by "
+#~ "pressing the ‘Enter’ key or by the ‘Evaluate’ button below the exercise)."
+#~ msgstr ""
+#~ "Son değerlendirme sonucunuzu gösterir („Enter“ veya „Değerlendir“ tuşa "
+#~ "basarak değerlendirme yapınız)."
+
+#~ msgid ""
+#~ "Listen to the complete recording first. Then go to the textbox and use "
+#~ "the ‘>’ key to listen to the text section by section. Type what you hear "
+#~ "into the textbox. For detailed instructions, read the Exercise Help."
+#~ msgstr ""
+#~ "İlk önce tam kaydı dinleyiniz, sonra metin kutusuna girip bölüm bölüm "
+#~ "dikte dinletmek için „>“  tuşu kullanıp dinlediğiniz metni yazınız. "
+#~ "Ayrıntılı talimatlar için, alıştırma için yardım okuyunuz."
+
+#~ msgid ""
+#~ "First listen to the recording once and then go to the large text entry "
+#~ "box below.  Within the box, you can use shortcut keys to play individual "
+#~ "pieces of the recording.  Typically you play one part using the ‘>’ key "
+#~ "(right angle bracket) and type what you hear. Then you press the ‘>’ key "
+#~ "again to play the next part and type it too, and so on until you reach "
+#~ "the end of the recording."
+#~ msgstr ""
+#~ "İlk önce bir defa tam kaydı dinleyiniz, ondan sonra aşağıda bulunan büyük "
+#~ "metin giriş kutusuna giriniz. İmleç kutu içinde ise,  kısayol tuşları tek "
+#~ "tek bölümler dinlemek için kullanabilirsiniz. Siz  ‘>’  (sağ açılı ayraç) "
+#~ "tuşu kullanarak metni dinleyip dinlediklerinizi yazınız. Bundan sonra "
+#~ "yine ‘>’ tuşa basınız ve ilerdeki parçasını yazınız vs. Sonuna kadar "
+#~ "devam ediniz."
+
+#~ msgid "Then you can use the evaluation keys to evaluate the whole text."
+#~ msgstr ""
+#~ "Daha sonra bütün metni değerlendirmek için değerlendirme tuşlarını "
+#~ "kullanabilirsiniz."
+
+#~ msgid ""
+#~ "Pay special attention to punctuation and case, since these cause most of "
+#~ "the problems when evaluating your answer. Type all the sentences as you "
+#~ "hear them, using the appropriate punctuation character and one space "
+#~ "after each sentence. No space is allowed after the last sentence. "
+#~ msgstr ""
+#~ "Noktalama ve büyük veya küçük harfleri yazmaya dikkat ediniz, çünkü "
+#~ "değerlendirmede problemlerin çoğu sebep olur. Bütün cümleleri duyduğunuz "
+#~ "gibi doğru noktalama ve her cümlenin sonunda ara ile yazınız. Son "
+#~ "cümleden sonra ara yapmasına izin verilmez."
+
+#~ msgid ""
+#~ "/Note/: Of course, you can replay the recording as many times as you need "
+#~ "in order to understand it, although two attempts should be enough for a "
+#~ "well performing student."
+#~ msgstr ""
+#~ "/Not:/ Tabii ki kaydı tam anlayıncaya kadar defalarca dinleyebilirsiniz, "
+#~ "ama iyi bir öğrenciye iki dinlemesi yetmelidir."
+
+#~ msgid ""
+#~ "Also, in the dictation exercise text box, you can use the following keys "
+#~ "to control the playback of the recording:"
+#~ msgstr ""
+#~ "İmleç dikte metin giriş kutusunda yer alır ise, dikte dinlemesi için "
+#~ "aşağıdaki tuşları kullanabilirsiniz:"
+
+#~ msgid "right angle bracket, greater than sign"
+#~ msgstr "sağ açılı ayraç"
+
+#~ msgid "Play next piece of the recording."
+#~ msgstr "Diktenin sonraki parçasını çal."
+
+#~ msgid "left angle bracket, less than sign"
+#~ msgstr "sol açılı ayraç"
+
+#~ msgid "Play the previous piece of the recording."
+#~ msgstr "Diktenin önceki parçasını çal."
+
+#~ msgid "Ctrl-Enter"
+#~ msgstr "Ctrl-Enter"
+
+#~ msgid "Replay the current (last played) piece of the recording once again."
+#~ msgstr "Son oynadığı diktenin parçasını tekrar çalmak."
+
+#~ msgid ""
+#~ "Listen to the recording carefully and then fill in the gaps in the text "
+#~ "below using the same words."
+#~ msgstr ""
+#~ "Kaydı dikkatlı olarak dinleyip aynı kelimeleri kullanarak aşağıdaki "
+#~ "metinde boşlukları doldurunuz."
+
+#~ msgid "Vocabulary Listing"
+#~ msgstr "Kelimeler listesi"
+
+#~ msgid ""
+#~ "The vocabulary is presented in a two-column table with a term on the left "
+#~ "and its translation on the right in each row."
+#~ msgstr ""
+#~ "Sözlük iki sütunluk tabloda sunulmaktadır. Sol satır sütunda ifade sağ "
+#~ "satır sütunda onun çevirmesi bulunur."
+
+#~ msgid "Terms"
+#~ msgstr "Kelimeler"
+
+#~ msgid "Phrases"
+#~ msgstr "Deyimler"
+
+#~ msgid "Extended vocabulary"
+#~ msgstr "Genişletilmiş sözlük"
+
+#~ msgid ""
+#~ "Please, visit the [http://eurochance.brailcom.org Eurochance project "
+#~ "webpage] for more information how to obtain the source data of this "
+#~ "course."
+#~ msgstr ""
+#~ "Lütfen, [http://eurochance.brailcom.org Eurochance projesinin ana sayfa] "
+#~ "kaynak veri gibi daha çok bilgi için ziyaret ediniz."
+
+#~ msgid "Section %d"
+#~ msgstr "Bölüm %d"
+
+#~ msgid "Exercises"
+#~ msgstr "Alıştırmalar"
+
+#~ msgid "Ordered by the English term"
+#~ msgstr "İngilizce terim göre sıralandı"
+
+#~ msgid "learning content"
+#~ msgstr "výukový obsah"
+
+#~ msgid "Your result:"
+#~ msgstr "Váš výsledek:"
+
+#~ msgid "Stop"
+#~ msgstr "Zastavit"
+
+#~ msgid "Answer Sheet for %s"
+#~ msgstr "Klíč odpovědí pro %s"
