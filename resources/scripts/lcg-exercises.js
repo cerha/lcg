@@ -181,6 +181,26 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 	this._results = new Array(this._answers.length);
 	this._first_attempt = new Array(this._answers.length);
 	this._display_results();
+    },
+
+    _slide_up: function (element, duration) {
+	if (typeof(Effect) != 'undefined') {
+	    if (typeof(duration) == 'undefined')
+		duration = 0.2;
+	    new Effect.SlideUp(element, {duration: duration});
+	} else {
+	    element.hide();
+	}
+    },
+
+    _slide_down: function (element, duration) {
+	if (typeof(Effect) != 'undefined') {
+	    if (typeof(duration) == 'undefined')
+		duration = 0.2
+	    new Effect.SlideDown(element, {duration: duration});
+	} else {
+	    element.show();
+	}
     }
 
 });
@@ -366,12 +386,12 @@ lcg.HiddenAnswers = Class.create(lcg.Exercise, {
     },
 
     _show_answer: function(answer) {
-	answer.show();
+	this._slide_down(answer);
 	answer.up('.task').down('.toggle-button').update(this._msg("Hide Answer"));
     },
 
     _hide_answer: function(answer) {
-	answer.hide();
+	this._slide_up(answer);
 	answer.up('.task').down('.toggle-button').update(this._msg("Show Answer"));
     },
 

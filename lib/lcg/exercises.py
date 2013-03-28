@@ -617,6 +617,7 @@ class Exercise(lcg.Section):
         context.resource('lcg.js')
         context.resource('lcg-exercises.js')
         context.resource('lcg-exercises.css')
+        context.resource('effects.js')
         context.resource('media.js')
         context.resource('audio.gif')
         context.resource('media-play.gif')
@@ -1195,7 +1196,10 @@ class HiddenAnswers(_InteractiveExercise, _NumberedTasksExercise):
         return (g.div(task.prompt().export(context), cls='question'),
                 g.button(_("Show Answer"), cls='toggle-button', 
                          title=_("Show/Hide the correct answer.")),
-                g.div(task.answer().export(context), cls='answer', style='display: none;'))
+                # The inner div is needed by the JavaScript effects library for
+                # the sliding effect.
+                g.div(g.div(task.answer().export(context)),
+                      cls='answer', style='display: none;'))
 
 class Writing(_FillInExercise):
     """One big text-field for a whole exercise (mostly usable as a test, not an exercise)."""
