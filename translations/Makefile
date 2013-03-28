@@ -1,13 +1,15 @@
-domains := lcg test
+domains := lcg lcg-exercises test
 mo_files := $(shell ls *.po | sed 's/\(.*\)\.\(.*\)\.po/\2\/LC_MESSAGES\/\1.mo/')
 
 all: $(mo_files)
 
 include $(domains:%=%.d)
 
-lcg.pot: $(shell find ../lib -name "*.py" -not -name "_test.py*")
+lcg.pot: $(shell find ../lib -name "*.py" -not -name "_test.py*" -not -name "exercises.py*")
 
 test.pot: ../lib/lcg/_test.py
+
+lcg-exercises.pot: ../lib/lcg/exercises.py
 
 %.d: $(shell find ../lib -name "*.py")
 	@echo "Updating rules for domain $*."
