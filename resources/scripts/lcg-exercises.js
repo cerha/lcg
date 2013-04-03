@@ -23,9 +23,9 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
     /* Generic exercise handler class.
      */ 
 
-    initialize: function ($super, form_name, answers, responses, messages) {
+    initialize: function ($super, exercise_id, answers, responses, messages) {
 	$super();
-	this._form = $(document.forms[form_name]);
+	this._form = $(exercise_id);
 	this._answers = answers;
 	this._responses = responses;
 	this._messages = messages;
