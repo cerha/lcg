@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,12 +50,6 @@ class Content(object):
     instance (see the 'Container' class) and thus they make a hierarchical
     structure.
 
-    Each content element instance belongs to a particular ContentNode instance
-    (it cannot be split over multiple output nodes).  The parent node is not
-    known in constructuion time (content is created first and organized into
-    nodes later), but is must be established before export (see
-    'set_parent()').
-    
     """
     _ALLOWED_CONTAINER = None
     
@@ -98,16 +92,12 @@ class Content(object):
     def set_parent(self, node):
         """Set the parent 'ContentNode' to 'node'.
 
-        This method is called automatically by the 'ContentNode' constructor
-        when the content is assigned to a node.  The parent node is normally
-        not known (and not needed) in the time of content construction.  It is,
-        however, needed in the export time, so you will need to call it
-        manually before attempting to export any content which was not assigned
-        to a 'ContentNode' before.  Content which is contained within a
-        container will automatically determine its parent node recursively so
-        it is only needed to set the parent explicitly of top level elements or
-        for unbound elements.
-
+        This method is deprecated.  The parent node (the node to which the
+        content belongs) should always be obtained from the export context, not
+        from the node itself.  This method is now called automatically when an
+        element is exported to keep the 'parent()' method working, but both
+        methods should be avoided in newly written code.
+        
         """
         assert isinstance(node, ContentNode), \
                "Not a 'ContentNode' instance: %s" % node
@@ -131,9 +121,8 @@ class Content(object):
         self._page_number = number
 
     def parent(self):
-        """Return the parent 'ContentNode' of this content element."""
+        """Deprecated.  Use context.node() instead."""
         parent = self._parent or self._container and self._container.parent()
-        assert parent is not None, "Parent unknown: %s" % self
         return parent
 
     def lang(self, inherited=True):

@@ -729,7 +729,6 @@ A screen reader is:
     	n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
-        content.set_parent(n)
         content.export(context)
         lcg.html2data(html, lcg.HTML2XML)
         
@@ -846,7 +845,6 @@ class HtmlExport(unittest.TestCase):
              r'&lt;bla&gt;'),
             ):
             content = lcg.Parser().parse_inline_markup(text)
-            content.set_parent(n)
             parsed_result = content.export(context)
             check(parsed_result, html)
 

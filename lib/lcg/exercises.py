@@ -637,7 +637,6 @@ class Exercise(lcg.Content):
         exported = [context.localize(self._export_task(context, exercise_id, task)) 
                     for task in self._tasks]
         if self._template:
-            self._template.set_parent(self.parent())
             template = context.localize(self._template.export(context))
             return template % tuple(exported)
         else:
@@ -646,7 +645,6 @@ class Exercise(lcg.Content):
     def _export_explanation(self, context, exercise_id):
         g = context.generator()
         if self._explanation is not None:
-            self._explanation.set_parent(self.parent())
             return _("Explanation:") + g.div(self._explanation.export(context), cls="explanation")
         else:
             return None
@@ -654,7 +652,6 @@ class Exercise(lcg.Content):
     def _export_example(self, context, exercise_id):
         g = context.generator()
         if self._example is not None:
-            self._example.set_parent(self.parent())
             return _("Example:") + g.div(self._example.export(context), cls="example")
         else:
             return None
@@ -663,11 +660,9 @@ class Exercise(lcg.Content):
         g = context.generator()
         if self._reading is not None:
             if self._reading_instructions:
-                self._reading_instructions.set_parent(self.parent())
                 instructions = self._reading_instructions.export(context)
             else:
                 instructions = self._READING_INSTRUCTIONS
-            self._reading.set_parent(self.parent())
             return (g.div(instructions, cls="label") +
                     g.div(self._reading.export(context), cls="reading"))
         else:
@@ -675,7 +670,6 @@ class Exercise(lcg.Content):
 
     def _export_instructions(self, context, exercise_id):
         if self._instructions:
-            self._instructions.set_parent(self.parent())
             return context.generator().div(self._instructions.export(context))
         else:
             return None

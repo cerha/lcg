@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -395,6 +395,8 @@ class Exporter(object):
         'element' class is not found there directly, all its base classes are searched.
 
         """
+        if element.parent() is None:
+            element.set_parent(context.node())
         cls = element.__class__
         if cls not in self._export_method:
             def base_classes(cls):
