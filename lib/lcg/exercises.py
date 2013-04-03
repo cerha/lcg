@@ -419,7 +419,6 @@ class Exercise(lcg.Section):
     _INDICATORS = ()
     _INSTRUCTIONS = None
     _READING_INSTRUCTIONS = _("Read the following text:")
-    _ANSWER_SHEET_LINK_PER_TASK = True
     _POINTS = 1
     _ALLOW_FORMS = True
     _HELP_INTRO = ()
@@ -505,7 +504,6 @@ class Exercise(lcg.Section):
         self._media = media
         self._points = points or self._POINTS
         self._template = template
-        self._answer_sheet = None
 
     def _readonly(self, context):
         return False
@@ -717,8 +715,6 @@ class Exercise(lcg.Section):
             parts = [parts]
         else:
             parts = [p for p in parts if p is not None]
-        if self._ANSWER_SHEET_LINK_PER_TASK:
-            parts.append(self._answer_sheet_link(context, self._tasks.index(task)))
         return context.generator().div(parts, cls=self._task_style_cls())
 
     def _task_name(self, task):
@@ -810,43 +806,6 @@ class _InteractiveExercise(Exercise):
                              for label, t, cls, hlp in self._BUTTONS],
                             cls='buttons')),
                      cls='results')
-        
-    def _answer_sheet_items(self):
-        return ()
-    
-    def _answer_sheet_anchor(self, index=None):
-        a = self.anchor()
-        if index is None:
-            return a
-        else:
-            return "%s-a%d" % (a, index)
-
-    def _answer_sheet_uri(self, context, index=None):
-        return context.uri(self._answer_sheet.parent()) +"#"+ self._answer_sheet_anchor(index)
-
-    def _answer_sheet_link(self, context, index):
-        if self._answer_sheet is None:
-            return ''
-        g = context.generator()
-        lnk = g.a('?', href=self._answer_sheet_uri(context, index),
-                  title=_("Show the answer sheet."), target='help', cls='answer-sheet-link')
-        b1, b2 = [g.span(b, cls='hidden') for b in ('[', ']')]
-        return concat(b1, lnk, b2)
-        
-    def answer_sheet(self):
-        i = 0
-        items = []
-        for answer, comment in self._answer_sheet_items():
-            a = lcg.Anchor(self._answer_sheet_anchor(i), answer)
-            if comment:
-                c = lcg.p(comment, formatted=True)
-                items.append(lcg.Container((a, c)))
-            else:
-                items.append(a)
-            i += 1
-        answers = lcg.ItemizedList(items, order=lcg.ItemizedList.NUMERIC)
-        self._answer_sheet = result = lcg.Container(answers)
-        return result
 
 
 ################################################################################
@@ -870,10 +829,6 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         return [t.choice_index(t.correct_choice())
                 for t in self._tasks if len(t.choices()) > 0]
     
-    def _answer_sheet_items(self):
-        return [(t.correct_choice().answer(), t.comment())
-                for t in self._tasks if len(t.choices()) > 0]
-
     def _checked(self, context, task, i):
         return False
 
@@ -1044,10 +999,6 @@ class _FillInExercise(_InteractiveExercise):
     def answers(self):
         return [t.answer() for t in self._tasks if t.answer() is not None]
         
-    def _answer_sheet_items(self):
-        return [('; '.join(t.answer().split('|')), t.comment())
-                for t in self._tasks if t.answer() is not None]
-
     def _field_value(self, context, name):
         return ""
 
@@ -1168,9 +1119,6 @@ class HiddenAnswers(_InteractiveExercise, _NumberedTasksExercise):
     _MESSAGES = {"Show Answer": _("Show Answer"),
                  "Hide Answer": _("Hide Answer")}
 
-    def _answer_sheet_link(self, context, index):
-        return ''
-
     def _export_task_parts(self, context, task):
         g = context.generator()
         return (g.div(task.prompt().export(context), cls='question'),
@@ -1241,10 +1189,6 @@ class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
 class Cloze(_Cloze):
     """Paragraphs of text including text-fields for the marked words."""
 
-    # Here we want an answer-sheet link per field (see _maike_field).
-    # Tasks and answers are not 1:1.
-    _ANSWER_SHEET_LINK_PER_TASK = False
-
     def _check_tasks(self, tasks):
         assert len(tasks) == 1
         return tasks
@@ -1252,10 +1196,6 @@ class Cloze(_Cloze):
     def answers(self):
         return self._tasks[0].answers()
         
-    def _answer_sheet_items(self):
-        t = self._tasks[0]
-        return zip(t.answers(), t.comments())
-
     def _make_field(self, context, task, text):
         g = context.generator()
         self._field_number += 1
@@ -1264,8 +1204,7 @@ class Cloze(_Cloze):
                         value=self._field_value(context, name),
                         readonly=self._readonly(context),
                         cls=self._field_cls(context, name, text))
-        result = concat(field, self._answer_sheet_link(context, self._field_number-1),
-                        self._field_result(context, name, text))
+        result = concat(field, self._field_result(context, name, text))
         return context.localize(result)
 
     def _export_task_parts(self, context, task):
