@@ -1161,7 +1161,7 @@ class Cloze(_Cloze):
         g = context.generator()
         self._field_number += 1
         name = exercise_id + '-a%d' % self._field_number
-        field = g.field(name=name, size=max(4, len(text)+1),
+        field = g.field(name=name, size=len(text),
                         value=self._field_value(context, name),
                         readonly=self._readonly(context),
                         cls=self._field_cls(context, name, text))
