@@ -651,7 +651,6 @@ class Exercise(lcg.Section):
         exported = [context.localize(self._export_task(context, t)) for t in self._tasks]
         if self._template:
             self._template.set_parent(self.parent())
-            # TODO: Wrap the template to div with lang=context.sec_lang()?
             template = context.localize(self._template.export(context))
             return template % tuple(exported)
         else:
@@ -661,8 +660,7 @@ class Exercise(lcg.Section):
         g = context.generator()
         if self._explanation is not None:
             self._explanation.set_parent(self.parent())
-            return _("Explanation:") + g.div(self._explanation.export(context), cls="explanation",
-                                             lang=context.sec_lang())
+            return _("Explanation:") + g.div(self._explanation.export(context), cls="explanation")
         else:
             return None
         
@@ -670,8 +668,7 @@ class Exercise(lcg.Section):
         g = context.generator()
         if self._example is not None:
             self._example.set_parent(self.parent())
-            return _("Example:") + g.div(self._example.export(context), cls="example",
-                                         lang=context.sec_lang())
+            return _("Example:") + g.div(self._example.export(context), cls="example")
         else:
             return None
     
@@ -681,13 +678,11 @@ class Exercise(lcg.Section):
             if self._reading_instructions:
                 self._reading_instructions.set_parent(self.parent())
                 instructions = self._reading_instructions.export(context)
-                lang = context.sec_lang()
             else:
                 instructions = self._READING_INSTRUCTIONS
-                lang = None
             self._reading.set_parent(self.parent())
-            return g.div(instructions, cls="label", lang=lang) + \
-                   g.div(self._reading.export(context), cls="reading", lang=context.sec_lang())
+            return (g.div(instructions, cls="label") +
+                    g.div(self._reading.export(context), cls="reading"))
         else:
             return None
 
@@ -896,11 +891,10 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         # navigated, which is even better than using the `readonly' attributte (which doesn't work
         # in browsers anyway).
         disabled = self._readonly(context) and not checked
-        lang = not isinstance(choice.answer(), lcg.Localizable) and context.sec_lang() or None
         ctrl = g.radio(task_name , id=choice_id, value=i,
-                       cls='answer-control', checked=checked, disabled=disabled, lang=lang)
+                       cls='answer-control', checked=checked, disabled=disabled)
         text = self._choice_text(context, task, choice)
-        return concat(ctrl, ' ', g.label(text, choice_id, lang=lang))
+        return concat(ctrl, ' ', g.label(text, choice_id))
 
     def _choice_label(self, context, task, choice):
         return chr(ord('a') + task.choice_index(choice)) + '.&nbsp;'
@@ -922,8 +916,7 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
     def _export_task_parts(self, context, task):
         prompt = task.prompt()
         if prompt:      
-            prompt = context.generator().span(context.localize(prompt.export(context)),
-                                              lang=context.sec_lang())
+            prompt = context.localize(prompt.export(context))
         return (prompt, self._format_choices(context, task))
 
     
@@ -987,8 +980,7 @@ class GapFilling(_ChoiceBasedExercise):
     def _export_task_parts(self, context, task):
         g = context.generator()
         prompt = context.localize(task.prompt().export(context))
-        return (g.span(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'), prompt),
-                       lang=context.sec_lang()),
+        return (g.span(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'), prompt)),
                 self._format_choices(context, task))
     
 
@@ -1068,7 +1060,7 @@ class _FillInExercise(_InteractiveExercise):
     def _make_field(self, context, task, text):
         g = context.generator()
         name = self._task_name(task)
-        field = g.field(name=name, id=name, size=max(4, len(text)+1), lang=context.sec_lang(),
+        field = g.field(name=name, id=name, size=max(4, len(text)+1),
                         value=self._field_value(context, name), readonly=self._readonly(context),
                         cls=self._field_cls(context, name, text))
         result = [field] + \
@@ -1076,20 +1068,17 @@ class _FillInExercise(_InteractiveExercise):
                  [self._field_result(context, name, text)]
         return context.localize(concat(result))
 
-    def _prompt_language(self, context):
-        return context.sec_lang()
-
     def _export_fill_in_task(self, context, prompt, text):
         return prompt + '<br/>' + text
         
     def _export_task_parts(self, context, task):
+        g = context.generator()
         prompt = context.localize(task.prompt().export(context))
         if not (isinstance(task, MixedTextFillInTask) and task.is_mixed()):
             # When the inputfield is embeded within the text, it is confusing to
             # have the prompt marked as a label.  Morover some screeen-readers
             # (JAWs) are confused too and present the task incorrectly.
-            prompt = context.generator().label(prompt, self._task_name(task),
-                                               lang=self._prompt_language(context))
+            prompt = g.label(prompt, self._task_name(task))
         if isinstance(task, MixedTextFillInTask):
             text = task.text(context, self._make_field)
         else:
@@ -1120,17 +1109,8 @@ class VocabExercise(_FillInExercise, _NumberedTasksExercise):
                      "you must also use correct punctuation."),
                    )
 
-    def _prompt_language(self, context):
-        return None
-
     def _export_fill_in_task(self, context, prompt, text):
         return prompt +' '+ text
-
-    def export(self, context):
-        if context.lang() == context.sec_lang():
-            return _("Exercise not available in this language version.")
-        else:
-            return super(VocabExercise, self).export(context)
 
 
 class Substitution(_FillInExercise, _NumberedTasksExercise):
@@ -1208,12 +1188,12 @@ class Writing(_FillInExercise):
     _NAME = _("Writing")
     
     def _export_task_parts(self, context, task):
+        g = context.generator()
         name = self._task_name(task)
-        ctrl = context.generator().textarea(name=name, value=self._field_value(context, name),
-                                            rows=10, cols=60, lang=context.sec_lang(),
-                                            readonly=self._readonly(context),
-                                            cls=self._field_cls(context, name, task.answer()))
-        return concat(ctrl, self._field_result(context, name, task.answer()))
+        return (g.textarea(name=name, value=self._field_value(context, name),
+                           rows=10, cols=60, readonly=self._readonly(context),
+                           cls=self._field_cls(context, name, task.answer())),
+                self._field_result(context, name, task.answer()))
         
     def _check_tasks(self, tasks):
         assert len(tasks) == 0
@@ -1230,8 +1210,7 @@ class _Cloze(_FillInExercise):
                     "text. There is just one correct answer for each gap."),
     
     def _export_task_parts(self, context, task):
-        return context.generator().div(task.text(context, self._make_field), 
-                                       lang=context.sec_lang())
+        return (task.text(context, self._make_field),)
 
 
 class _ExposedCloze(_Cloze):
@@ -1421,8 +1400,7 @@ class ChoiceBasedTest(_Test, _ChoiceBasedExercise):
                    result = _("incorrect")
             if result:
                 g = context.generator()
-                lang = not isinstance(choice.answer(), lcg.Localizable) and context.lang() or None
-                text += ' ' + g.span(('(', result, ')'), lang=lang, cls='test-answer-comment')
+                text += ' ' + g.span(('(', result, ')'), cls='test-answer-comment')
         return text
 
     
