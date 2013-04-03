@@ -414,7 +414,6 @@ class Exercise(lcg.Content):
     _READING_REQUIRED = False
     _BUTTONS = ()
     _INDICATORS = ()
-    _INSTRUCTIONS = None
     _READING_INSTRUCTIONS = _("Read the following text:")
     _POINTS = 1
     _ALLOW_FORMS = True
@@ -661,17 +660,13 @@ class Exercise(lcg.Content):
         else:
             return None
 
-    def _default_instructions(self):
-        return self._INSTRUCTIONS    
-
     def _export_instructions(self, context, exercise_id):
         """Return the HTML formatted instructions for this type of exercise."""
         if self._instructions:
             self._instructions.set_parent(self.parent())
-            instructions = self._instructions.export(context)
+            return context.generator().div(self._instructions.export(context))
         else:
-            instructions = self._default_instructions()
-        return instructions and context.generator().div(instructions)
+            return None
 
     def _export_script(self, context, exercise_id):
         return None
@@ -780,7 +775,6 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
     _JAVASCRIPT_CLASS = 'lcg.ChoiceBasedExercise'
-    _INSTRUCTIONS = _("Chose the correct answer.")
     @classmethod
     def _help_intro(cls):
         help = _("You will hear a response immediately after choosing the answer.  When "
@@ -858,7 +852,6 @@ class TrueFalseStatements(_ChoiceBasedExercise):
     _TASK_TYPE = TrueFalseStatement
     # Translators: Type of exercise (use language terminology)
     _NAME = _("True/False Statements")
-    _INSTRUCTIONS = _("For each of the statements below, choose True or False.")
     _HELP_INTRO = _("Each sentence in this exercise is followed by two controls labeled "
                     u"‘TRUE’ and ‘FALSE’.  Decide whether the sentence is true or not "
                     "and press the corresponding button."),
@@ -887,8 +880,6 @@ class GapFilling(_ChoiceBasedExercise):
     _TASK_TYPE = GapFillStatement
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Gap Filling")
-    _INSTRUCTIONS = _("Choose the correct option to fill the gaps in the "
-                      "following sentences.")
     _HELP_INTRO = _("Choose the correct word to fill in a gap in a sentence.  For each gap "
                     "you have several choices.  Only one of them is correct."),
     _GAP_MATCHER = re.compile(r"(___+)")
@@ -1002,7 +993,6 @@ class VocabExercise(_FillInExercise, _NumberedTasksExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Test Yourself")
-    _INSTRUCTIONS = _("Fill in the correct translation for each of the terms below.")
     _HELP_INTRO = (_("There are two ways to do the exercise: orally and written.  Do the "
                      "exercise both ways to get the best results."),
                    _("To do the exercise orally is simple.  Go through the vocabulary list "
@@ -1030,7 +1020,6 @@ class Substitution(_FillInExercise, _NumberedTasksExercise):
 
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Substitution")
-    _INSTRUCTIONS = _("Use the text in brackets to transform each sentence.")
     _HELP_INTRO = _("Use the prompt to produce another sentence with the same structure. "
                     "Each sentence is followed by text in brackets.  Replace the "
                     "corresponding part of the sentence using this text."),
@@ -1042,8 +1031,6 @@ class Transformation(_FillInExercise, _NumberedTasksExercise):
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Transformation")
     _TASK_TYPE = TransformationTask
-    _INSTRUCTIONS = _("Fill in the gap in sentence B so that it means the "
-                      "same as sentence A.")
     _HELP_INTRO = _("Your goal is to transform a structure (pattern or paradigm) into a "
                     "different structure, for example changing an affirmative sentence into "
                     "a question."),
@@ -1065,8 +1052,6 @@ class HiddenAnswers(_InteractiveExercise, _NumberedTasksExercise):
     _NAME = _("Hidden Answers")
     _TASK_TYPE = HiddenAnswerTask
     _JAVASCRIPT_CLASS = 'lcg.HiddenAnswers'
-    _INSTRUCTIONS = _("Think of the correct answer and use the button next to the question"
-                      " to check.")
     _HELP_INTRO = _("You should simply think of the correct answer and when "
                     "you believe you know it, you can unhide the correct answer "
                     "below each question and check whether you were right or not."),
@@ -1113,8 +1098,6 @@ class _Cloze(_FillInExercise):
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Cloze")
     _TASK_TYPE = ClozeTask
-    _INSTRUCTIONS = _("Fill in the gaps in the text below. "
-                      "For each gap there is only one correct answer.")
     _HELP_INTRO = _("Your goal in this exercise is to fill in the gaps in a longer piece of "
                     "text. There is just one correct answer for each gap."),
     
@@ -1128,15 +1111,11 @@ class _ExposedCloze(_Cloze):
     # in the gaps in a text. In *exposed* cloze however the student
     # chooses from the list of offered answers.
     _NAME = _("Exposed Cloze")
-    _INSTRUCTIONS = _("Use the correct word or expression from the list below "
-                      "to fill in the gaps in the sentences.")
 
     def _export_instructions(self, context, exercise_id):
         g = context.generator()
-        answers = self.answers()
-        answers.sort()
-        instr = super(_ExposedCloze, self)._export_instructions(context, exercise_id)
-        return instr + g.ul(*[g.li(a) for a in answers])
+        instructions = super(_ExposedCloze, self)._export_instructions(context, exercise_id) or ''
+        return instructions + g.ul(*[g.li(a) for a in sorted(self.answers())])
 
     
 class NumberedCloze(_Cloze, _NumberedTasksExercise):
