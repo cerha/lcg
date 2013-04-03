@@ -411,14 +411,38 @@ class Exercise(lcg.Content):
 
     _TASK_TYPE = None
     _NAME = None
-    _READING_REQUIRED = False
-    _BUTTONS = ()
-    _INDICATORS = ()
+    _JAVASCRIPT_CLASS = 'lcg.Exercise'
     _READING_INSTRUCTIONS = _("Read the following text:")
     _POINTS = 1
-    _ALLOW_FORMS = True
+    _RESPONSES = (('correct',   'exercise-responses/c*.mp3'),
+                  ('incorrect', 'exercise-responses/i*.mp3'),
+                  ('f0-49',     'exercise-responses/o0-49*.mp3'),
+                  ('f50-69',    'exercise-responses/o50-69*.mp3'),
+                  ('f70-84',    'exercise-responses/o70-84*.mp3'),
+                  ('f85-99',    'exercise-responses/o85-99*.mp3'),
+                  ('f100',      'exercise-responses/o100*.mp3'))
+    _MESSAGES = {"on first attempt": _("on first attempt")}
+    _INDICATORS = (('answered', _('Answered:'),
+                    _("Displays the number of the tasks you have already answered.  For "
+                      "example 4/10 means, that you have answered four out of ten "
+                      "questions so you should finish the remaining six.")),
+                   ('result', _('Correct:'),
+                    _("Displays the number and percentage of successful answers.  The "
+                      "first pair of numbers shows the results of all current answers.  If "
+                      "you didn't answer all of them correctly on first attempt, there is "
+                      "also a second pair of numbers showing how many answers you did "
+                      u"succesfuly on the first try.  Use the ‘Reset’ button to start "
+                      "again.")))
+    _BUTTONS = ((_("Evaluate"), 'button', 'evaluate-button',
+                 _("Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+                   "the first incorrect answer.  Within a text-box, the cursor is also moved to "
+                   "the first incorrect character of your answer.")),
+                # Translators: Fill (a form with correct answers).
+                (_('Fill'), 'button', 'fill-button',
+                 _("Fill in the whole exercise with the correct answers.")),
+                (_('Reset'), 'reset', 'reset-button',
+                 _("Reset all your answers and start again.")))
     _HELP_INTRO = ()
-    _HELP_ANSWERS = ()
 
     _used_types = []
     _help = None
@@ -479,8 +503,6 @@ class Exercise(lcg.Content):
             Exercise._used_types.append(self.__class__)
         assert instructions is None or isinstance(instructions, lcg.Content), instructions
         assert reading is None or isinstance(reading, (str, lcg.Content)), reading
-        if self._READING_REQUIRED:
-            assert reading is not None, "'%s' requires a reading!" % self.__class__.__name__
         assert reading_instructions is None or isinstance(reading_instructions, (str, lcg.Content))
         assert all([isinstance(t, self._TASK_TYPE) for t in tasks]), \
                "Tasks must be a sequence of '%s' instances!: %s" % (self._TASK_TYPE.__name__, tasks)
@@ -520,8 +542,7 @@ class Exercise(lcg.Content):
                     ((_("Instructions"),  'intro',         cls._help_intro()),
                      (_("Shortcut Keys"), 'keys',          cls._help_keys()),
                      (_("Indicators"),    'indicators',    cls._help_indicators()),
-                     (_("Control Panel"), 'panel',         cls._help_panel()),
-                     (_("Answer Sheets"), 'answer-sheets', cls._help_answers()))
+                     (_("Control Panel"), 'panel',         cls._help_panel()))
                     if content is not None]
         cls._help = help = lcg.Container([toc] + sections)
         return help
@@ -550,10 +571,6 @@ class Exercise(lcg.Content):
                     lcg.dl([(label, hlp) for label, t, cls, hlp in cls._BUTTONS]))
         else:
             return None
-    
-    @classmethod
-    def _help_answers(cls):
-        return [lcg.p(p) for p in cls._HELP_ANSWERS]
     
     # Instance methods
 
@@ -587,9 +604,6 @@ class Exercise(lcg.Content):
         else:
             return None
 
-    def points(self):
-        return self._points
-    
     def export(self, context):
         g = context.generator()
         context.resource('lcg.js')
@@ -609,11 +623,10 @@ class Exercise(lcg.Content):
                                                              self._export_tasks,
                                                              self._export_results)]
         content = [x for x in parts if x is not None]
-        if self._ALLOW_FORMS:
-            script = self._export_script(context, exercise_id)
-            if script:
-                content = (g.form(content, id=exercise_id), 
-                           g.script(script))
+        script = self._export_script(context, exercise_id)
+        if script:
+            content = (g.form(content, id=exercise_id), 
+                       g.script(script))
         return g.div(content, cls='exercise '+lcg.camel_case_to_lower(self.__class__.__name__))
 
     def _wrap_exported_tasks(self, context, tasks):
@@ -661,83 +674,11 @@ class Exercise(lcg.Content):
             return None
 
     def _export_instructions(self, context, exercise_id):
-        """Return the HTML formatted instructions for this type of exercise."""
         if self._instructions:
             self._instructions.set_parent(self.parent())
             return context.generator().div(self._instructions.export(context))
         else:
             return None
-
-    def _export_script(self, context, exercise_id):
-        return None
-        
-    def _task_style_cls(self):
-        return 'task %s-task' % lcg.camel_case_to_lower(self.__class__.__name__)
-        
-    def _export_task(self, context, exercise_id, task):
-        parts = [p for p in self._export_task_parts(context, exercise_id, task) if p is not None]
-        return context.generator().div(parts, cls=self._task_style_cls())
-
-    def _task_name(self, exercise_id, task):
-        return exercise_id + '-a%d' % (self._tasks.index(task)+1)
-
-    def _export_results(self, context, exercise_id):
-        return None
-    
-class _NumberedTasksExercise(Exercise):
-    
-    def _wrap_exported_tasks(self, context, tasks):
-        g = context.generator()
-        return g.ol(*[g.li(t) for t in tasks], cls="tasks")
-
-    
-class _InteractiveExercise(Exercise):
-    """A common super class for exercises which can be interactively evaluated.
-
-    These exercises allow the user to indicate his answers and the computer
-    gives him a feedback.
-    
-    """
-    _RESPONSES = (('correct',   'exercise-responses/c*.mp3'),
-                  ('incorrect', 'exercise-responses/i*.mp3'),
-                  ('f0-49',     'exercise-responses/o0-49*.mp3'),
-                  ('f50-69',    'exercise-responses/o50-69*.mp3'),
-                  ('f70-84',    'exercise-responses/o70-84*.mp3'),
-                  ('f85-99',    'exercise-responses/o85-99*.mp3'),
-                  ('f100',      'exercise-responses/o100*.mp3'))
-    
-    _JAVASCRIPT_CLASS = 'lcg.Exercise'
-    _MESSAGES = {"on first attempt": _("on first attempt")}
-
-    _INDICATORS = (('answered', _('Answered:'),
-                    _("Displays the number of the tasks you have already answered.  For "
-                      "example 4/10 means, that you have answered four out of ten "
-                      "questions so you should finish the remaining six.")),
-                   ('result', _('Correct:'),
-                    _("Displays the number and percentage of successful answers.  The "
-                      "first pair of numbers shows the results of all current answers.  If "
-                      "you didn't answer all of them correctly on first attempt, there is "
-                      "also a second pair of numbers showing how many answers you did "
-                      u"succesfuly on the first try.  Use the ‘Reset’ button to start "
-                      "again.")))
-    
-    _BUTTONS = ((_("Evaluate"), 'button', 'evaluate-button',
-                 _("Evaluate the entire exercise.  If an error is found, the cursor is moved to "
-                   "the first incorrect answer.  Within a text-box, the cursor is also moved to "
-                   "the first incorrect character of your answer.")),
-                # Translators: Fill (a form with correct answers).
-                (_('Fill'), 'button', 'fill-button',
-                 _("Fill in the whole exercise with the correct answers.")),
-                (_('Reset'), 'reset', 'reset-button',
-                 _("Reset all your answers and start again.")))
-
-    _HELP_ANSWERS = _("The Answer Sheets contain all the correct answers for all the exercises. "
-                      "You can access them from the Course Index, or more conveniently, you "
-                      u"can use the ‘?’ (question mark) link after each task. This link takes "
-                      "you directly to the corresponding answer in the Answer Sheet."),
-
-    def answers(self):
-        return ()
 
     def _export_script(self, context, exercise_id):
         g = context.generator()
@@ -754,6 +695,16 @@ class _InteractiveExercise(Exercise):
                          dict([(msg, context.localize(translation)) 
                                for msg, translation in self._MESSAGES.items()]))
 
+    def _task_style_cls(self):
+        return 'task %s-task' % lcg.camel_case_to_lower(self.__class__.__name__)
+        
+    def _export_task(self, context, exercise_id, task):
+        parts = [p for p in self._export_task_parts(context, exercise_id, task) if p is not None]
+        return context.generator().div(parts, cls=self._task_style_cls())
+
+    def _task_name(self, exercise_id, task):
+        return exercise_id + '-a%d' % (self._tasks.index(task)+1)
+
     def _export_results(self, context, exercise_id):
         g = context.generator()
         return g.div((g.div(concat([g.label(label, id=exercise_id+'.'+name) +
@@ -767,11 +718,24 @@ class _InteractiveExercise(Exercise):
                             cls='buttons')),
                      cls='results')
 
+    def answers(self):
+        return ()
+
+    def points(self):
+        return self._points
+    
+    
+class _NumberedTasksExercise(Exercise):
+    
+    def _wrap_exported_tasks(self, context, tasks):
+        g = context.generator()
+        return g.ol(*[g.li(t) for t in tasks], cls="tasks")
+
 
 ################################################################################
 ################################################################################
   
-class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
+class _ChoiceBasedExercise(_NumberedTasksExercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
     _JAVASCRIPT_CLASS = 'lcg.ChoiceBasedExercise'
@@ -894,7 +858,7 @@ class GapFilling(_ChoiceBasedExercise):
 ################################################################################
 ################################################################################
 
-class _FillInExercise(_InteractiveExercise):
+class _FillInExercise(Exercise):
     """A common base class for exercises based on writing text into fields."""
 
     _TASK_TYPE = FillInTask
@@ -1046,7 +1010,7 @@ class Transformation(_FillInExercise, _NumberedTasksExercise):
         return 'A. '+ prompt +'<br/>B. '+ text
 
 
-class HiddenAnswers(_InteractiveExercise, _NumberedTasksExercise):
+class HiddenAnswers(_NumberedTasksExercise):
     """Question and a hidden answer which the user can unhide to check."""
 
     _NAME = _("Hidden Answers")
@@ -1074,25 +1038,6 @@ class HiddenAnswers(_InteractiveExercise, _NumberedTasksExercise):
                 # the sliding effect.
                 g.div(g.div(task.answer().export(context)),
                       cls='answer', style='display: none;'))
-
-class Writing(_FillInExercise):
-    """One big text-field for a whole exercise (mostly usable as a test, not an exercise)."""
-    _POINTS = 10
-    # Translators: Type of exercise
-    _NAME = _("Writing")
-    
-    def _export_task_parts(self, context, exercise_id, task):
-        g = context.generator()
-        name = self._task_name(exercise_id, task)
-        return (g.textarea(name=name, value=self._field_value(context, name),
-                           rows=10, cols=60, readonly=self._readonly(context),
-                           cls=self._field_cls(context, name, task.answer())),
-                self._field_result(context, name, task.answer()))
-        
-    def _check_tasks(self, tasks):
-        assert len(tasks) == 0
-        return (WritingTask(),)
-    
 
 class _Cloze(_FillInExercise):
     # Translators: Type of exercise (use language terminology)
@@ -1168,7 +1113,8 @@ class _Test(object):
 
     """
     
-    _ALLOW_FORMS = False
+    def _export_script(self, context, exercise_id):
+        return None
 
     def _show_results(self, context):
         if not hasattr(context, 'req'):
@@ -1329,14 +1275,30 @@ class GapFillingTest(ChoiceBasedTest, GapFilling):
 class TransformationTest(FillInTest, Transformation):
     pass
         
-class WritingTest(FillInTest, Writing):
+class WritingTest(FillInTest):
+    _POINTS = 10
+    # Translators: Type of exercise
+    _NAME = _("Writing")
+    
+    def _export_task_parts(self, context, exercise_id, task):
+        g = context.generator()
+        name = self._task_name(exercise_id, task)
+        return (g.textarea(name=name, value=self._field_value(context, name),
+                           rows=10, cols=60, readonly=self._readonly(context),
+                           cls=self._field_cls(context, name, task.answer())),
+                self._field_result(context, name, task.answer()))
+        
+    def _field_result(self, context, name, text):
+        return ''
 
+    def _check_tasks(self, tasks):
+        assert len(tasks) == 0
+        return (WritingTask(),)
+    
     def eval(self, req):
         # Prevent returning full points on empty answer.
         return 0
     
-    def _field_result(self, context, name, text):
-        return ''
 
 class ClozeTest(FillInTest, Cloze):
     pass
