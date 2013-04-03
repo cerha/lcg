@@ -816,18 +816,11 @@ class _ChoiceBasedExercise(_InteractiveExercise, _NumberedTasksExercise):
         text = self._choice_text(context, task, choice)
         return concat(ctrl, ' ', g.label(text, choice_id))
 
-    def _choice_label(self, context, exercise_id, task, choice):
-        return chr(ord('a') + task.choice_index(choice)) + '.&nbsp;'
-
-    def _format_choice(self, context, exercise_id, task, choice):
-        return concat(self._choice_label(context, exercise_id, task, choice),
-                      self._choice_control(context, exercise_id, task, choice),
-                      '<br/>')
-
     def _format_choices(self, context, exercise_id, task):
-        formatted = [self._format_choice(context, exercise_id, task, ch)
-                     for ch in task.choices()]
-        return context.generator().div(formatted, cls='choices')
+        g = context.generator()
+        return g.ol(*[g.li(self._choice_control(context, exercise_id, task, ch))
+                      for ch in task.choices()],
+                    cls='choices')
 
     def _task_style_cls(self):
         cls = super(_ChoiceBasedExercise, self)._task_style_cls()
@@ -870,8 +863,11 @@ class TrueFalseStatements(_ChoiceBasedExercise):
                     u"‘TRUE’ and ‘FALSE’.  Decide whether the sentence is true or not "
                     "and press the corresponding button."),
     
-    def _choice_label(self, context, task, choice):
-        return ""
+    def _format_choices(self, context, exercise_id, task):
+        g = context.generator()
+        return g.div([g.div(self._choice_control(context, exercise_id, task, ch))
+                       for ch in task.choices()],
+                    cls='choices')
 
     
 class _SelectBasedExercise(_ChoiceBasedExercise):
@@ -1307,8 +1303,8 @@ class ChoiceBasedTest(_Test, _ChoiceBasedExercise):
         return text
 
     
-    def _format_choice(self, context, exercise_id, task, choice):
-        result = super(ChoiceBasedTest, self)._format_choice(context, exercise_id, task, choice)
+    def _choice_control(self, context, exercise_id, task, choice):
+        result = super(ChoiceBasedTest, self)._choice_control(context, exercise_id, task, choice)
         if self._show_results(context):
             name = self._task_name(exercise_id, task)
             if self._param(context.req(), name) == str(task.choices().index(choice)):

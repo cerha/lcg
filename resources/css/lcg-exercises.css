@@ -91,11 +91,9 @@ div.task {
 div.cloze-task, div.vocab-exercise-task {
     margin-bottom: 0.1em;
 }
-div.choices {
-    margin-left: 1em;
-}
-div.selections-task div.choices {
-    margin-left: 0;
+ol.choices {
+    padding-left: 1.4em;
+    list-style-type: lower-alpha;
 }
 div.choice-based-task,
 div.transformation-task,
