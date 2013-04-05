@@ -221,18 +221,7 @@ class MixedTextFillInTask(FillInTask):
 
     def plain_text(self):
         return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._text)
-
     
-class TransformationTask(MixedTextFillInTask):
-
-    def __init__(self, orig, transformation, comment=None):
-        if not self._FIELD_MATCHER.search(transformation):
-            transformation = '[' + transformation + ']'
-        self._text = transformation
-        assert len(self.answers()) == 1
-        answer = self.answers()[0]
-        super(TransformationTask, self).__init__(orig, answer, comment=comment)
-        
     
 class ClozeTask(MixedTextFillInTask):
         
@@ -297,7 +286,6 @@ class ExerciseParser(object):
                 MultipleChoiceQuestion: self._read_prompt_and_choices,
                 GapFillStatement:       self._read_gap_fill,
                 FillInTask:             self._read_pair_of_statements,
-                TransformationTask:     self._read_pair_of_statements,
                 HiddenAnswerTask:       self._read_hidden_answer,
                 TrueFalseStatement:     self._read_true_false_statement,
                 ClozeTask:              self._read_generic_task,
@@ -443,6 +431,8 @@ class Exercise(lcg.Content):
                 (_('Reset'), 'reset', 'reset-button',
                  _("Reset all your answers and start again.")))
     _HELP_INTRO = ()
+    _SOURCE_FORMATTING = ()
+    _SOURCE_EXAMPLE = None
 
     _used_types = []
     _help = None
@@ -536,7 +526,6 @@ class Exercise(lcg.Content):
 
     @classmethod
     def help(cls):
-        toc = lcg.TableOfContents(title=_("Table of Contents:"))
         sections = [lcg.Section(title=title, anchor=anchor, content=lcg.coerce(content))
                     for title, anchor, content in
                     ((_("Instructions"),  'intro',         cls._help_intro()),
@@ -544,8 +533,18 @@ class Exercise(lcg.Content):
                      (_("Indicators"),    'indicators',    cls._help_indicators()),
                      (_("Control Panel"), 'panel',         cls._help_panel()))
                     if content is not None]
-        cls._help = help = lcg.Container([toc] + sections)
-        return help
+        return lcg.Container(sections)
+
+    @classmethod
+    def authoring(cls):
+        content = [lcg.p(p) for p in cls._HELP_INTRO]
+        if cls._SOURCE_FORMATTING:
+            content.append(lcg.Section(title=_("Exercise Definition"),
+                                       content=[lcg.p(p) for p in cls._SOURCE_FORMATTING]))
+        if cls._SOURCE_EXAMPLE:
+            content.append(lcg.Section(title=_("Definition Example"),
+                                       content=lcg.pre(cls._SOURCE_EXAMPLE.strip())))
+        return lcg.Section(title=cls.name(), content=content)
 
     @classmethod
     def _help_intro(cls):
@@ -733,14 +732,12 @@ class _ChoiceBasedExercise(_NumberedTasksExercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
     _JAVASCRIPT_CLASS = 'lcg.ChoiceBasedExercise'
-    @classmethod
-    def _help_intro(cls):
-        help = _("You will hear a response immediately after choosing the answer.  When "
-                 "you choose the wrong answer, you can try again until you find the "
-                 "correct one.  The results below the exercise will show you how many "
-                 "answers you got right on the first try (see the [#indicators] section "
-                 "below).")
-        return [lcg.p(p, formatted=True) for p in cls._HELP_INTRO + (help,)]
+    _HELP_INTRO = (
+        _("You will hear a response immediately after choosing the answer.  When "
+          "you choose the wrong answer, you can try again until you find the "
+          "correct one.  The results below the exercise will show you how many "
+          "answers you got right on the first try."),
+        )
 
     def answers(self):
         return [t.choice_index(t.correct_choice())
@@ -791,8 +788,30 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
     _TASK_TYPE = MultipleChoiceQuestion
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Multiple Choice Questions")
-    _HELP_INTRO = _("Each question in this exercise is followed by two or more possible "
-                    "answers. Only one answer is correct."),
+    _HELP_INTRO = (
+        _("Each question in this exercise is followed by two or more possible "
+          "answers. Only one answer is correct."),
+        ) + _ChoiceBasedExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of a definition of several "
+          "questions, where each question has two or more possbile answers."),
+        _("The question and its possible answers (choices) are written each "
+          "at a separate line. The correct answer begins with a plus sign "
+          "followed by a space. Incorrect answers begin with a minus sign "
+          "and a space."),
+        _("Another question and its answers may follow after a blank line."),
+        )
+    _SOURCE_EXAMPLE = _("""
+Screen reader is:
+- a person.
+- a device.
++ a program.
+
+GNU/Linux is:
+- a word processor
++ an operating system
+- a computer manufacturer
+""")
     
 class Selections(_ChoiceBasedExercise):
     """Selecting one of several statements/sentences (the correct one)."""
@@ -800,19 +819,52 @@ class Selections(_ChoiceBasedExercise):
     _TASK_TYPE = Selection
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Selections")
-    _HELP_INTRO = _("There are several groups of two or three similar sentences or expressions. "
-                    "Only one option in each group is correct. Your goal is to decide which one."),
+    _HELP_INTRO = (
+        _("There are several groups of two or three statements. "
+          "Only one statement in each group is correct. "
+          "Your goal is to decide which one."),
+        ) + _ChoiceBasedExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("The exercise definition consists of several groups of statements, "
+          "typically two or three statements in a group."),
+        _("Each statement in a group is written at a separate line and begins "
+          "by a plus sign to mark a correct statement or a minus sign to mark "
+          "an incorrect statement.  Just one statement in each "
+          "group is correct."),
+        _("Another group of statements may follow after a blank line. There are "
+          "no blank lines between statements which belong to the same group."),
+        )
+    _SOURCE_EXAMPLE = _("""
++ India is located in Asia.
+- China is located in Africa.
 
-    
++ Australia is the smallest continent.
+- Australia is the largest continent.
+""")
+
+
 class TrueFalseStatements(_ChoiceBasedExercise):
     """Deciding whether the sentence is true or false."""
     
     _TASK_TYPE = TrueFalseStatement
     # Translators: Type of exercise (use language terminology)
     _NAME = _("True/False Statements")
-    _HELP_INTRO = _("Each sentence in this exercise is followed by two controls labeled "
-                    u"‘TRUE’ and ‘FALSE’.  Decide whether the sentence is true or not "
-                    "and press the corresponding button."),
+    _HELP_INTRO = (
+        _("Each sentence in this exercise is followed by two controls labeled "
+          u"‘TRUE’ and ‘FALSE’.  Decide whether the sentence is true or not "
+          "and press the corresponding button."),
+        ) + _ChoiceBasedExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("The exercise definition consists of several statements separated "
+          "by blank lines."),
+        _("Each statement is marked as either true using [T] or false "
+          "using [F] at the end of the line."),
+        )
+    _SOURCE_EXAMPLE = _("""
+The Microsoft Windows operating system never crashes. [F]
+
+The largest tropical rainforest in the world is in Brasil. [T]
+""")
     
     def _format_choices(self, context, exercise_id, task):
         g = context.generator()
@@ -820,9 +872,10 @@ class TrueFalseStatements(_ChoiceBasedExercise):
                        for ch in task.choices()],
                     cls='choices')
 
-    
-class _SelectBasedExercise(_ChoiceBasedExercise):
 
+class _SelectBasedExercise(_ChoiceBasedExercise):
+    # Currently unused due to problematic accessibile interactive evaluation of
+    # select boxes.
     _JAVASCRIPT_CLASS = 'lcg.SelectBasedExercise'
 
     def _format_choices(self, context, exercise_id, task):
@@ -838,16 +891,85 @@ class GapFilling(_ChoiceBasedExercise):
     _TASK_TYPE = GapFillStatement
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Gap Filling")
-    _HELP_INTRO = _("Choose the correct word to fill in a gap in a sentence.  For each gap "
-                    "you have several choices.  Only one of them is correct."),
+    _HELP_INTRO = (
+        _("Choose the correct word to fill in a gap in a sentence.  For each gap "
+          "you have several choices.  Only one of them is correct."),
+        ) + _ChoiceBasedExercise._HELP_INTRO
     _GAP_MATCHER = re.compile(r"(___+)")
     
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of a definition of several "
+          "statements, where there is one missing word in each statement."),
+        _("The missing word is replaced by a series of underscores (at "
+          "least three) and possible completions of the gap follow at "
+          "separate lines. The correct completion begins with a plus sign "
+          "followed by a space. Incorrect completions begin with a minus sign "
+          "and a space."),
+        _("Another statement and its completions may follow after a blank line."),
+        )
+    _SOURCE_EXAMPLE = _("""
+If you want to send money to somebody, you can ____ a transfer.
+- do
++ make
+- have
+
+To change money between two currencies you need to know the ____ rate.
+- success
+- interest
++ exchange
+""")
+
     def _export_task_parts(self, context, exercise_id, task):
         g = context.generator()
         prompt = context.localize(task.prompt().export(context))
         return (g.span(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'), prompt)),
                 self._format_choices(context, exercise_id, task))
     
+
+class HiddenAnswers(_NumberedTasksExercise):
+    """Question and a hidden answer which the user can unhide to check."""
+
+    _NAME = _("Hidden Answers")
+    _TASK_TYPE = HiddenAnswerTask
+    _JAVASCRIPT_CLASS = 'lcg.HiddenAnswers'
+    _INDICATORS = ()
+    
+    _BUTTONS = ((_('Show All'), 'button', 'evaluate-button',
+                 _("Show all answers.")),
+                (_('Hide All'), 'button', 'reset-button',
+                 _("Reset all your answers and start again.")))
+
+    _MESSAGES = {"Show Answer": _("Show Answer"),
+                 "Hide Answer": _("Hide Answer")}
+    _HELP_INTRO = (
+        _("You should simply think of the correct answer and when "
+          "you believe you know it, you can unhide the correct answer "
+          "below each question and check whether you were right or not."),
+        )
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of a definition of several "
+          "questions and answers."),
+        _("The question and the answer are written each at a separate line."),
+        _("Another pair or question and answer may follow after a blank line."),
+        )
+    _SOURCE_EXAMPLE = _("""
+What is the name of the highest mountain in the world?
+Mount Everest.
+
+What is its height?
+8,848m
+""")
+
+    def _export_task_parts(self, context, exercise_id, task):
+        g = context.generator()
+        return (g.div(task.prompt().export(context), cls='question'),
+                g.button(_("Show Answer"), cls='toggle-button', 
+                         title=_("Show/Hide the correct answer.")),
+                # The inner div is needed by the JavaScript effects library for
+                # the sliding effect.
+                g.div(g.div(task.answer().export(context)),
+                      cls='answer', style='display: none;'))
+
 
 ################################################################################
 ################################################################################
@@ -857,21 +979,15 @@ class _FillInExercise(Exercise):
 
     _TASK_TYPE = FillInTask
     _JAVASCRIPT_CLASS = 'lcg.FillInExercise'
-
-    @classmethod
-    def _help_intro(cls):
-        help = (_("You can check each answer individually using the shortcut keys (see "
-                  "the section [#keys] for more information).  When your answer is "
-                  "evaluated as incorrect and you do not know why, always check whether "
-                  "you have used correct punctuation and capital letters where "
-                  "appropriate. These two things are the cause of most confusion."),
-                _("Use the [#panel] at the bottom of the exercise to evaluate all the "
-                  "answers at once."),
-                _("If your browser doesn't support JavaScript, the interactive features "
-                  "and automatic evaluation do not work.  You can still use this course, "
-                  "but you will have to check your answers against the answer sheet manually "
-                  "(see [#answer-sheets]."))
-        return [lcg.p(p, formatted=True) for p in cls._HELP_INTRO + help]
+    _HELP_INTRO = (
+        _("You can check each answer individually using the shortcut keys. "
+          "When your answer is evaluated as incorrect and you do not know "
+          "why, always check whether you have used correct punctuation and "
+          "capital letters where appropriate. The evaluation will only accept "
+          "exactly matching answers."),
+        _("Use the control panel at the bottom of the exercise to evaluate all the "
+          "answers at once."),
+        )
 
     @classmethod
     def _help_keys(cls):
@@ -951,95 +1067,90 @@ class VocabExercise(_FillInExercise, _NumberedTasksExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Test Yourself")
-    _HELP_INTRO = (_("There are two ways to do the exercise: orally and written.  Do the "
-                     "exercise both ways to get the best results."),
-                   _("To do the exercise orally is simple.  Go through the vocabulary list "
-                     "and think of the correct translation for each word or expression. "
-                     u"There is a ‘Play’ button after the text-box for each item which "
-                     "allows you to hear the correct answer.  Repeat the answer to practise "
-                     "the correct pronunciation.  Some items have more than one correct "
-                     "answer, so there may be multiple buttons to play each of them.  Since "
-                     "there is no way of checking your oral answers, the results are not "
-                     "available.  If you want to see your score, you must do the written "
-                     "exercise."),
-                   _("To do the exercise in written form, simply type the translation of "
-                     "each item into the text-box.  Be careful to use capital letters where "
-                     "this is appropriate, since an answer without correct capitalization is "
-                     "always considered incorrect.  When the prompt is a complete sentence, "
-                     "you must also use correct punctuation."),
-                   )
+    _HELP_INTRO = (
+        _("There are two ways to do the exercise: orally and written.  Do the "
+          "exercise both ways to get the best results."),
+        _("To do the exercise orally is simple.  Go through the vocabulary list "
+          "and think of the correct translation for each word or expression. "
+          u"There is a ‘Play’ button after the text-box for each item which "
+          "allows you to hear the correct answer.  Repeat the answer to practise "
+          "the correct pronunciation.  Some items have more than one correct "
+          "answer, so there may be multiple buttons to play each of them.  Since "
+          "there is no way of checking your oral answers, the results are not "
+          "available.  If you want to see your score, you must do the written "
+          "exercise."),
+        _("To do the exercise in written form, simply type the translation of "
+          "each item into the text-box.  Be careful to use capital letters where "
+          "this is appropriate, since an answer without correct capitalization is "
+          "always considered incorrect.  When the prompt is a complete sentence, "
+          "you must also use correct punctuation."),
+        ) + _FillInExercise._HELP_INTRO
 
     def _export_fill_in_task(self, context, prompt, text):
         return prompt +' '+ text
 
 
-class Substitution(_FillInExercise, _NumberedTasksExercise):
+class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
     """A prompt (a sentence) and a big text-field for each task."""
 
     # Translators: Type of exercise (use language terminology)
-    _NAME = _("Substitution")
-    _HELP_INTRO = _("Use the prompt to produce another sentence with the same structure. "
-                    "Each sentence is followed by text in brackets.  Replace the "
-                    "corresponding part of the sentence using this text."),
+    _NAME = _("Written Answers")
+    _HELP_INTRO = (
+        _("Fill in the answer to the box below each question."),
+        ) + _FillInExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of a definition of several "
+          "questions and answers."),
+        _("The question and the correct answer are written each at a separate line."),
+        _("Either whole or a part of the answer is written inside square "
+          "brackets.  The text inside the brackets is supposed to be filled "
+          "into the text box by the user. The text before and after will "
+          "appear on the screen providing a hint or a templete of the "
+          "expected answer for thge user."),
+        _("If there is more than one possible correct answer, the other correct "
+          "answers may be written inside the square brackets separated by the pipeline "
+          'character "|".'),
+        _("Another pair or question and answer may follow after a blank line."),
+        )
+    _SOURCE_EXAMPLE = _("""
+What is the name of the largest continent?
+[Asia]
+
+Use the correct form of the verb "to be":
+Children [are] our future.
+""")
+
+
+class Transformation(WrittenAnswers):
+    pass
+class Substitution(WrittenAnswers):
+    pass
     
-
-class Transformation(_FillInExercise, _NumberedTasksExercise):
-    """Pairs of sentences, the later with a gap (text-field)."""
-
-    # Translators: Type of exercise (use language terminology)
-    _NAME = _("Transformation")
-    _TASK_TYPE = TransformationTask
-    _HELP_INTRO = _("Your goal is to transform a structure (pattern or paradigm) into a "
-                    "different structure, for example changing an affirmative sentence into "
-                    "a question."),
-    
-    def _default_instructions(self):
-        if self._example:
-            return _("Using the example as a model, change the structure "
-                     "and make a new sentence.")
-        else:
-            return super(Transformation, self)._default_instructions()
-
-    def _export_fill_in_task(self, context, prompt, text):
-        return 'A. '+ prompt +'<br/>B. '+ text
-
-
-class HiddenAnswers(_NumberedTasksExercise):
-    """Question and a hidden answer which the user can unhide to check."""
-
-    _NAME = _("Hidden Answers")
-    _TASK_TYPE = HiddenAnswerTask
-    _JAVASCRIPT_CLASS = 'lcg.HiddenAnswers'
-    _HELP_INTRO = _("You should simply think of the correct answer and when "
-                    "you believe you know it, you can unhide the correct answer "
-                    "below each question and check whether you were right or not."),
-    _INDICATORS = ()
-    
-    _BUTTONS = ((_('Show All'), 'button', 'evaluate-button',
-                 _("Show all answers.")),
-                (_('Hide All'), 'button', 'reset-button',
-                 _("Reset all your answers and start again.")))
-
-    _MESSAGES = {"Show Answer": _("Show Answer"),
-                 "Hide Answer": _("Hide Answer")}
-
-    def _export_task_parts(self, context, exercise_id, task):
-        g = context.generator()
-        return (g.div(task.prompt().export(context), cls='question'),
-                g.button(_("Show Answer"), cls='toggle-button', 
-                         title=_("Show/Hide the correct answer.")),
-                # The inner div is needed by the JavaScript effects library for
-                # the sliding effect.
-                g.div(g.div(task.answer().export(context)),
-                      cls='answer', style='display: none;'))
 
 class _Cloze(_FillInExercise):
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Cloze")
     _TASK_TYPE = ClozeTask
-    _HELP_INTRO = _("Your goal in this exercise is to fill in the gaps in a longer piece of "
-                    "text. There is just one correct answer for each gap."),
-    
+    _HELP_INTRO = (
+        _("Your goal in this exercise is to fill in the gaps in a longer piece of "
+          "text. There is just one correct answer for each gap."),
+        ) + _FillInExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of one or more paragraphs of text. "
+          "Selected parts of the text (typically words), which are to be replaced "
+          "by text entry fields are written in square brackets. The text inside "
+          "brackets is the correct answer."),
+        _("If there is more than one possible correct answer, the other correct "
+          "answers may be written inside the brackets separated by the pipeline "
+          'character "|".'),
+        )
+    _SOURCE_EXAMPLE = _("""
+Commercial banks and savings banks receive and hold deposits
+[in] current accounts, savings accounts and deposit accounts,
+make payments [for] their customers, lend money, [and] offer
+investment advice, foreign exchange facilities, and so on.
+""")
+
     def _export_task_parts(self, context, exercise_id, task):
         return (task.text(context, exercise_id, self._make_field),)
 
@@ -1050,19 +1161,25 @@ class _ExposedCloze(_Cloze):
     # in the gaps in a text. In *exposed* cloze however the student
     # chooses from the list of offered answers.
     _NAME = _("Exposed Cloze")
-
+    _HELP_INTRO = (
+        _("Your goal is to pick the right words from the list at the "
+          "beginning of the exercise to fill in the gaps in the following "
+          "piece of text. There is just one correct answer for each "
+          "gap. Each word in the list is used just once."),
+        ) + _FillInExercise._HELP_INTRO
+    
     def _export_instructions(self, context, exercise_id):
         g = context.generator()
         instructions = super(_ExposedCloze, self)._export_instructions(context, exercise_id) or ''
         return instructions + g.ul(*[g.li(a) for a in sorted(self.answers())])
 
     
-class NumberedCloze(_Cloze, _NumberedTasksExercise):
-    pass
+#class NumberedCloze(_Cloze, _NumberedTasksExercise):
+#    pass
 
     
-class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
-    pass
+#class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
+#    pass
     
 
 class Cloze(_Cloze):
@@ -1300,10 +1417,10 @@ class ClozeTest(FillInTest, Cloze):
 class ExposedClozeTest(FillInTest, ExposedCloze):
     pass
 
-class NumberedClozeTest(FillInTest, NumberedCloze):
-    pass
+#class NumberedClozeTest(FillInTest, NumberedCloze):
+#    pass
     
-class NumberedExposedClozeTest(FillInTest, NumberedExposedCloze):
-    pass
+#class NumberedExposedClozeTest(FillInTest, NumberedExposedCloze):
+#    pass
     
 

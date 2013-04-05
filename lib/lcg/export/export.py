@@ -396,6 +396,9 @@ class Exporter(object):
 
         """
         if element.parent() is None:
+            # Temporary hack to avoid the need to call set_parent() explicitly.
+            # The methods Content.set_parent() and Content.parent() should be
+            # removed alltogether.
             element.set_parent(context.node())
         cls = element.__class__
         if cls not in self._export_method:

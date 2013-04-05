@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -140,6 +140,16 @@ class Localizable(unicode):
 
         """
         return self.transform(lambda x: x.replace(old, new))
+
+    def strip(self, *args):
+        """Return a new 'Localizable' stripping the final string after localization.
+
+        This is just a convenience wrapper for:
+
+          x.transform(lambda string: string.strip())
+
+        """
+        return self.transform(lambda x: x.strip(*args))
 
     def localize(self, localizer):
         """Return the localized version of the instance as a string.

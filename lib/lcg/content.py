@@ -1230,7 +1230,10 @@ class Section(Container):
     
     def section_number(self):
         """Return the number of this section within its container as int."""
-        return list(self._container.sections(None)).index(self) + 1
+        if self._container:
+            return list(self._container.sections(None)).index(self) + 1
+        else:
+            return 1
     
     def title(self):
         """Return the section title as a basestring."""
@@ -1874,3 +1877,8 @@ def br():
 
 def hr():
     return HorizontalSeparator()
+
+def pre(text, **kwargs):
+    """Create an 'PreformattedText' instance by coercing all arguments."""
+    return PreformattedText(text, **kwargs)
+
