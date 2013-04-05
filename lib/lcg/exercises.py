@@ -1174,12 +1174,38 @@ class _ExposedCloze(_Cloze):
         return instructions + g.ul(*[g.li(a) for a in sorted(self.answers())])
 
     
-#class NumberedCloze(_Cloze, _NumberedTasksExercise):
-#    pass
+class NumberedCloze(_Cloze, _NumberedTasksExercise):
+    _NAME = _("Complete the Statements")
+    _HELP_INTRO = (
+        _("The goal is to fill in the gaps in given statements.  The answers "
+          "are written into a text box and there is just one correct answer "
+          "for each gap."),
+        ) + _FillInExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of several statements separated by "
+          "blank lines from each other. Certain part of each statement is "
+          "written in square brackets.  This part will be replaced by a text "
+          "entry field. The text inside brackets is the correct answer. There "
+          "is just one pair of brackets in each statement."),
+        _("If there is more than one possible correct answer, the other correct "
+          "answers may be written inside the brackets separated by the pipeline "
+          'character "|".'),
+        )
+    _SOURCE_EXAMPLE = _("""
+[London] is the capital of the United Kingdom.
+
+The city is split by the River [Thames] into North and South.
+""")
 
     
-#class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
-#    pass
+class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
+    _NAME = _("Complete the Statements with Selection")
+    _HELP_INTRO = (
+        _("Your goal is to pick the right words from the list at the "
+          "beginning of the exercise to fill in the gaps in the statements "
+          "below. There is just one correct answer for each "
+          "gap. Each word from the list is used just once."),
+        ) + _FillInExercise._HELP_INTRO
     
 
 class Cloze(_Cloze):
@@ -1417,10 +1443,10 @@ class ClozeTest(FillInTest, Cloze):
 class ExposedClozeTest(FillInTest, ExposedCloze):
     pass
 
-#class NumberedClozeTest(FillInTest, NumberedCloze):
-#    pass
-    
-#class NumberedExposedClozeTest(FillInTest, NumberedExposedCloze):
-#    pass
+class NumberedClozeTest(FillInTest, NumberedCloze):
+    pass
+   
+class NumberedExposedClozeTest(FillInTest, NumberedExposedCloze):
+    pass
     
 
