@@ -1066,7 +1066,7 @@ class _FillInExercise(Exercise):
 class VocabExercise(_FillInExercise, _NumberedTasksExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
-    _NAME = _("Test Yourself")
+    _NAME = _("Vocabulary exercise")
     _HELP_INTRO = (
         _("There are two ways to do the exercise: orally and written.  Do the "
           "exercise both ways to get the best results."),
@@ -1160,7 +1160,7 @@ class _ExposedCloze(_Cloze):
     # terminology). Exposed cloze is lika Cloze, where students fill
     # in the gaps in a text. In *exposed* cloze however the student
     # chooses from the list of offered answers.
-    _NAME = _("Exposed Cloze")
+    _NAME = _("Cloze with Selection")
     _HELP_INTRO = (
         _("Your goal is to pick the right words from the list at the "
           "beginning of the exercise to fill in the gaps in the following "
