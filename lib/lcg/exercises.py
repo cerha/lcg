@@ -1033,9 +1033,9 @@ class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
           "into the text box by the user. The text before and after will "
           "appear on the screen providing a hint or a templete of the "
           "expected answer for the user."),
-        _("If there is more than one possible correct answer, the other correct "
-          "answers may be written inside the brackets separated by the pipeline "
-          'character "|".'),
+        #_("If there is more than one possible correct answer, the other correct "
+        #  "answers may be written inside the brackets separated by the pipeline "
+        #  'character "|".'),
         _("Another pair or question and answer may follow after a blank line."),
         )
     _SOURCE_EXAMPLE = _("""
@@ -1061,9 +1061,9 @@ class _Cloze(_FillInExercise):
           "Selected parts of the text (typically words), which are to be replaced "
           "by text entry fields are written in square brackets. The text inside "
           "brackets is the correct answer."),
-        _("If there is more than one possible correct answer, the other correct "
-          "answers may be written inside the brackets separated by the pipeline "
-          'character "|".'),
+        #_("If there is more than one possible correct answer, the other correct "
+        #  "answers may be written inside the brackets separated by the pipeline "
+        # 'character "|".'),
         )
     _SOURCE_EXAMPLE = _("""
 Commercial banks and savings banks receive and hold deposits
@@ -1108,9 +1108,9 @@ class NumberedCloze(_Cloze, _NumberedTasksExercise):
           "written in square brackets.  This part will be replaced by a text "
           "entry field. The text inside brackets is the correct answer. There "
           "is just one pair of brackets in each statement."),
-        _("If there is more than one possible correct answer, the other correct "
-          "answers may be written inside the brackets separated by the pipeline "
-          'character "|".'),
+        #_("If there is more than one possible correct answer, the other correct "
+        #  "answers may be written inside the brackets separated by the pipeline "
+        #  'character "|".'),
         )
     _SOURCE_EXAMPLE = _("""
 [London] is the capital of the United Kingdom.
