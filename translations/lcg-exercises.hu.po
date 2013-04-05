@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-05 11:18+0200\n"
+"POT-Creation-Date: 2013-04-05 15:23+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Petr Topiarz <reditel@mluvim.cz>\n"
 "Language-Team: \n"
@@ -465,8 +465,9 @@ msgstr ""
 "találod az egész megoldást."
 
 #: ../lib/lcg/exercises.py:1069
-msgid "Test Yourself"
-msgstr "Teszteld magad"
+#, fuzzy
+msgid "Vocabulary exercise"
+msgstr "Szókincs gyakorlat"
 
 #: ../lib/lcg/exercises.py:1071
 msgid ""
@@ -531,7 +532,8 @@ msgid ""
 "or a templete of the expected answer for the user."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:1110 ../lib/lcg/exercises.py:1143
+#: ../lib/lcg/exercises.py:1110 ../lib/lcg/exercises.py:1138
+#: ../lib/lcg/exercises.py:1185
 msgid ""
 "If there is more than one possible correct answer, the other correct answers "
 "may be written inside the brackets separated by the pipeline character \"|\"."
@@ -548,19 +550,20 @@ msgid ""
 msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:1132
+#: ../lib/lcg/exercises.py:1126
 msgid "Cloze"
 msgstr "Kitöltés"
 
-#: ../lib/lcg/exercises.py:1135
+#: ../lib/lcg/exercises.py:1129
+#, fuzzy
 msgid ""
-"Your goal in this exercise is to fill in the gaps in a longer piece of text. "
-"There is just one correct answer for each gap."
+"The goal is to fill in the gaps in given piece of text.  The answers are "
+"written into a text box and there is just one correct answer for each gap."
 msgstr ""
 "Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
 "Minden egyes hézagba, egy helyek megoldás illik."
 
-#: ../lib/lcg/exercises.py:1139
+#: ../lib/lcg/exercises.py:1134
 msgid ""
 "One exercise typically consists of one or more paragraphs of text. Selected "
 "parts of the text (typically words), which are to be replaced by text entry "
@@ -568,7 +571,7 @@ msgid ""
 "correct answer."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:1147
+#: ../lib/lcg/exercises.py:1142
 msgid ""
 "\n"
 "Commercial banks and savings banks receive and hold deposits\n"
@@ -581,54 +584,105 @@ msgstr ""
 #. terminology). Exposed cloze is lika Cloze, where students fill
 #. in the gaps in a text. In *exposed* cloze however the student
 #. chooses from the list of offered answers.
-#: ../lib/lcg/exercises.py:1163
-msgid "Exposed Cloze"
-msgstr "Mondat kiegészítés (adott listából)"
+#: ../lib/lcg/exercises.py:1158
+#, fuzzy
+msgid "Cloze with Selection"
+msgstr "Választás"
 
-#: ../lib/lcg/exercises.py:1165
+#: ../lib/lcg/exercises.py:1160
 #, fuzzy
 msgid ""
 "Your goal is to pick the right words from the list at the beginning of the "
 "exercise to fill in the gaps in the following piece of text. There is just "
-"one correct answer for each gap. Each word in the list is used just once."
+"one correct answer for each gap. Each word from the list is used just once."
 msgstr ""
 "Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
 "Minden egyes hézagba, egy helyek megoldás illik."
 
-#: ../lib/lcg/exercises.py:1245 ../lib/lcg/exercises.py:1280
-#: ../lib/lcg/exercises.py:1283
+#: ../lib/lcg/exercises.py:1173
+msgid "Complete the Statements"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1175
+#, fuzzy
+msgid ""
+"The goal is to fill in the gaps in given statements.  The answers are "
+"written into a text box and there is just one correct answer for each gap."
+msgstr ""
+"Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
+"Minden egyes hézagba, egy helyek megoldás illik."
+
+#: ../lib/lcg/exercises.py:1180
+msgid ""
+"One exercise typically consists of several statements separated by blank "
+"lines from each other. Certain part of each statement is written in square "
+"brackets.  This part will be replaced by a text entry field. The text inside "
+"brackets is the correct answer. There is just one pair of brackets in each "
+"statement."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1189
+msgid ""
+"\n"
+"[London] is the capital of the United Kingdom.\n"
+"\n"
+"The city is split by the River [Thames] into North and South.\n"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1197
+msgid "Complete the Statements with Selection"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1199
+#, fuzzy
+msgid ""
+"Your goal is to pick the right words from the list at the beginning of the "
+"exercise to fill in the gaps in the statements below. There is just one "
+"correct answer for each gap. Each word from the list is used just once."
+msgstr ""
+"Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
+"Minden egyes hézagba, egy helyek megoldás illik."
+
+#: ../lib/lcg/exercises.py:1266 ../lib/lcg/exercises.py:1301
+#: ../lib/lcg/exercises.py:1304
 msgid "Total points:"
 msgstr "Összpontszám:"
 
-#: ../lib/lcg/exercises.py:1274
+#: ../lib/lcg/exercises.py:1295
 msgid "Invalid value in added points!"
 msgstr "Hibás érték a hozzáadott pontoknál!"
 
-#: ../lib/lcg/exercises.py:1275
+#: ../lib/lcg/exercises.py:1296
 msgid "Max. points exceeded!"
 msgstr "Maximális pontszám elérve!"
 
-#: ../lib/lcg/exercises.py:1277
+#: ../lib/lcg/exercises.py:1298
 msgid "Automatic evaluation:"
 msgstr "Automatikus kiértékelés:"
 
-#: ../lib/lcg/exercises.py:1278
+#: ../lib/lcg/exercises.py:1299
 msgid "Additional points by tutor:"
 msgstr "Oktató által hozzáadott pontok:"
 
-#: ../lib/lcg/exercises.py:1330
+#: ../lib/lcg/exercises.py:1351
 msgid "correct answer"
 msgstr "helyes válasz"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/exercises.py:1335
+#: ../lib/lcg/exercises.py:1356
 msgid "incorrect"
 msgstr "téves"
 
 #. Translators: Type of exercise
-#: ../lib/lcg/exercises.py:1392
+#: ../lib/lcg/exercises.py:1410
 msgid "Writing"
 msgstr "Írás"
+
+#~ msgid "Test Yourself"
+#~ msgstr "Teszteld magad"
+
+#~ msgid "Exposed Cloze"
+#~ msgstr "Mondat kiegészítés (adott listából)"
 
 #~ msgid "Exercise %d"
 #~ msgstr "Gyakorlat %d"
@@ -799,9 +853,6 @@ msgstr "Írás"
 
 #~ msgid "The grammar focus of this unit is:"
 #~ msgstr "A fejezet nyelvtani része:"
-
-#~ msgid "Vocabulary Practice"
-#~ msgstr "Szókincs gyakorlat"
 
 #~ msgid "Listening Comprehension"
 #~ msgstr "Szövegértés hallás után"
