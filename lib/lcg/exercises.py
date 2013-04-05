@@ -400,7 +400,6 @@ class Exercise(lcg.Content):
     _TASK_TYPE = None
     _NAME = None
     _JAVASCRIPT_CLASS = 'lcg.Exercise'
-    _READING_INSTRUCTIONS = _("Read the following text:")
     _POINTS = 1
     _RESPONSES = (('correct',   'exercise-responses/c*.mp3'),
                   ('incorrect', 'exercise-responses/i*.mp3'),
@@ -437,43 +436,14 @@ class Exercise(lcg.Content):
     _used_types = []
     _help = None
     
-    def __init__(self, tasks=(), instructions=None, reading=None, 
-                 reading_instructions=None, explanation=None, example=None,
-                 template=None, media=None, points=None):
+    def __init__(self, tasks=(), instructions=None, template=None, points=None):
         """Initialize the instance.
 
         Arguments:
 
           tasks -- sequence of 'Task' instances related to this exercise.
-          instructions -- user supplied instructions.  This is a way how to
-            include more specific instructions instead of default exercise
-            isnstructions (which are intentionally very general).  The given
-            text will be printed before the exercise tasks and should be a
-            complete sentence (usually starting with a capital letter and
-            ending with a dot or a colon).  This, in consequence, also allows
-            to use the same exercise type for different purposes.
-          reading -- specifies the reading text, which is displayed at the
-            begining of the exercise.  Some exercise types may require a
-            reading, some may not.  The text may be formatted as a structured
-            text.
-          reading_instructions -- The reading text is introduced by a brief
-            label 'Read the following text:' by default.  If you want to change
-            this, use this argument su supply any text.  Wiki formatting can be
-            used here as-well.
-          explanation -- any exercise can start with a brief explanation
-            (usually of the subject of it's tasks).  Explanations are quite
-            similar to readings texts but serve a different purpose.  When both
-            are defined, the reading goes first on the output.  They are
-            defined as a multi-line structured text using the 'wiki'
-            formatting.
-          example -- a model answer.  If defined, the tasks will be preceeded
-            with given example (a multi-line structured text using the 'wiki'
-            formatting).  The formatting should usually follow the formatting
-            of the tasks within the exercise.
-          media -- filename of the media file to be used with the exercise,
-            such as an audio recording.  Some exercise types may require a
-            recording, some may not.  The filename must refer to an existing
-            Resource file available within resources on export.
+          instructions -- Instructions for the exercise as 'lcg.Content'
+            instance.  Given content will appear before the exercise tasks.
           template -- the tasks are rendered as a simple sequence on the
             output.  If you need something more sophisticated (e.g. have text
             and the tasks 'mixed' within it), you can use a template.  Just
@@ -487,23 +457,15 @@ class Exercise(lcg.Content):
             number of points, which may be overriden by this argument.
           
         """
-        assert media is None or isinstance(media, basestring)
         super(Exercise, self).__init__()
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
         assert instructions is None or isinstance(instructions, lcg.Content), instructions
-        assert reading is None or isinstance(reading, (str, lcg.Content)), reading
-        assert reading_instructions is None or isinstance(reading_instructions, (str, lcg.Content))
         assert all([isinstance(t, self._TASK_TYPE) for t in tasks]), \
                "Tasks must be a sequence of '%s' instances!: %s" % (self._TASK_TYPE.__name__, tasks)
         assert points is None or isinstance(points, int), points
         self._tasks = list(self._check_tasks(tasks))
         self._instructions = instructions
-        self._explanation = explanation
-        self._example = example
-        self._reading = reading
-        self._reading_instructions = reading_instructions
-        self._media = media
         self._points = points or self._POINTS
         self._template = template
 
@@ -589,20 +551,6 @@ class Exercise(lcg.Content):
         context.connect_shared_player(context.uri(media), button_id)
         return g.button(label, title=title, type='button', id=button_id, cls='media-control')
                   
-    def _export_media(self, context, exercise_id):
-        if self._media:
-            media = context.resource(self._media)
-            g = context.generator()
-            if isinstance(media, lcg.Audio):
-                label = _("Recording:")
-                cls = 'recording'
-            else:
-                label = _("Video:")
-                cls = 'recording'
-            return g.div((label, self._media_control(context, media)), cls='media-controls '+cls)
-        else:
-            return None
-
     def export(self, context):
         g = context.generator()
         context.resource('lcg.js')
@@ -610,15 +558,9 @@ class Exercise(lcg.Content):
         context.resource('lcg-exercises.css')
         context.resource('effects.js')
         context.resource('media.js')
-        context.resource('audio.gif')
-        context.resource('media-play.gif')
         context.connect_shared_player()
         exercise_id = context.unique_id()
         parts = [method(context, exercise_id) for method in (self._export_instructions,
-                                                             self._export_reading,
-                                                             self._export_explanation,
-                                                             self._export_media,
-                                                             self._export_example,
                                                              self._export_tasks,
                                                              self._export_results)]
         content = [x for x in parts if x is not None]
@@ -640,32 +582,6 @@ class Exercise(lcg.Content):
             return template % tuple(exported)
         else:
             return self._wrap_exported_tasks(context, exported)
-
-    def _export_explanation(self, context, exercise_id):
-        g = context.generator()
-        if self._explanation is not None:
-            return _("Explanation:") + g.div(self._explanation.export(context), cls="explanation")
-        else:
-            return None
-        
-    def _export_example(self, context, exercise_id):
-        g = context.generator()
-        if self._example is not None:
-            return _("Example:") + g.div(self._example.export(context), cls="example")
-        else:
-            return None
-    
-    def _export_reading(self, context, exercise_id):
-        g = context.generator()
-        if self._reading is not None:
-            if self._reading_instructions:
-                instructions = self._reading_instructions.export(context)
-            else:
-                instructions = self._READING_INSTRUCTIONS
-            return (g.div(instructions, cls="label") +
-                    g.div(self._reading.export(context), cls="reading"))
-        else:
-            return None
 
     def _export_instructions(self, context, exercise_id):
         if self._instructions:
