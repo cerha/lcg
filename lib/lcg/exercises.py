@@ -190,7 +190,7 @@ class MixedTextFillInTask(FillInTask):
 
     def _fields(self):
         return [(answer.replace('\n', ' ').replace('\r',''), label)
-                for answer, label in self._FIELD_MATCHER.findall(self._text)]
+                for answer, label in self._FIELD_MATCHER.findall(self._answer)]
     
     def answers(self):
         return [answer for answer, label in self._fields()]
@@ -204,7 +204,7 @@ class MixedTextFillInTask(FillInTask):
             return None
 
     def is_mixed(self):
-        return self._FIELD_MATCHER.match(self._text) is None
+        return self._FIELD_MATCHER.match(self._answer) is None
 
     def text(self, context, exercise_id, field_maker):
         def formatter(text):
@@ -215,18 +215,26 @@ class MixedTextFillInTask(FillInTask):
                 return ''
         def make_field(match):
             return field_maker(context, exercise_id, self, match.group(1))
-        text = formatter(self._text.replace('[', '\['))
+        text = formatter(self._answer.replace('[', '\['))
         return self._FIELD_MATCHER.sub(make_field, text)
 
 
     def plain_text(self):
-        return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._text)
+        return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._answer)
+
     
+class WrittenAnswerTask(MixedTextFillInTask):
+
+    def __init__(self, question, answer, comment=None):
+        if not self._FIELD_MATCHER.search(answer):
+            answer = '[' + answer + ']'
+        super(WrittenAnswerTask, self).__init__(question, answer, comment=comment)
+        assert len(self.answers()) == 1
+
     
 class ClozeTask(MixedTextFillInTask):
         
     def __init__(self, text, comments=(), comment=None):
-        self._text = text
         if comment:
             assert comments == ()
             assert len(self.answers()) == 1
@@ -286,6 +294,7 @@ class ExerciseParser(object):
                 MultipleChoiceQuestion: self._read_prompt_and_choices,
                 GapFillStatement:       self._read_gap_fill,
                 FillInTask:             self._read_pair_of_statements,
+                WrittenAnswerTask:    self._read_pair_of_statements,
                 HiddenAnswerTask:       self._read_hidden_answer,
                 TrueFalseStatement:     self._read_true_false_statement,
                 ClozeTask:              self._read_generic_task,
@@ -932,10 +941,10 @@ class _FillInExercise(Exercise):
     def _check_tasks(self, tasks):
         for t in tasks:
             assert t.answer() is not None or \
-                   isnistance(t, MixedTextFillInTask) and \
-                   len(t.answers()) == 1, \
-                   "%s requires just one textbox per task (%d found)!" % \
-                   (self.__class__.__name__, len(t.answers())) 
+                isinstance(t, MixedTextFillInTask) and \
+                len(t.answers()) == 1, \
+                "%s requires just one textbox per task (%d found)!" % \
+                (self.__class__.__name__, len(t.answers())) 
         return tasks
     
     def answers(self):
@@ -1011,6 +1020,7 @@ class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
 
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Written Answers")
+    _TASK_TYPE = WrittenAnswerTask
     _HELP_INTRO = (
         _("Fill in the answer to the box below each question."),
         ) + _FillInExercise._HELP_INTRO
