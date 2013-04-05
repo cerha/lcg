@@ -1106,9 +1106,9 @@ class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
           "brackets.  The text inside the brackets is supposed to be filled "
           "into the text box by the user. The text before and after will "
           "appear on the screen providing a hint or a templete of the "
-          "expected answer for thge user."),
+          "expected answer for the user."),
         _("If there is more than one possible correct answer, the other correct "
-          "answers may be written inside the square brackets separated by the pipeline "
+          "answers may be written inside the brackets separated by the pipeline "
           'character "|".'),
         _("Another pair or question and answer may follow after a blank line."),
         )
