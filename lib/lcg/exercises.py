@@ -1121,12 +1121,6 @@ Children [are] our future.
 """)
 
 
-class Transformation(WrittenAnswers):
-    pass
-class Substitution(WrittenAnswers):
-    pass
-    
-
 class _Cloze(_FillInExercise):
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Cloze")
@@ -1409,9 +1403,6 @@ class TrueFalseStatementsTest(ChoiceBasedTest, TrueFalseStatements):
 class GapFillingTest(ChoiceBasedTest, GapFilling):
     pass
 
-class TransformationTest(FillInTest, Transformation):
-    pass
-        
 class WritingTest(FillInTest):
     _POINTS = 10
     # Translators: Type of exercise
