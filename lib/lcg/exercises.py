@@ -1126,8 +1126,9 @@ class _Cloze(_FillInExercise):
     _NAME = _("Cloze")
     _TASK_TYPE = ClozeTask
     _HELP_INTRO = (
-        _("Your goal in this exercise is to fill in the gaps in a longer piece of "
-          "text. There is just one correct answer for each gap."),
+        _("The goal is to fill in the gaps in given piece of text.  The answers "
+          "are written into a text box and there is just one correct answer "
+          "for each gap."),
         ) + _FillInExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of one or more paragraphs of text. "
@@ -1159,7 +1160,7 @@ class _ExposedCloze(_Cloze):
         _("Your goal is to pick the right words from the list at the "
           "beginning of the exercise to fill in the gaps in the following "
           "piece of text. There is just one correct answer for each "
-          "gap. Each word in the list is used just once."),
+          "gap. Each word from the list is used just once."),
         ) + _FillInExercise._HELP_INTRO
     
     def _export_instructions(self, context, exercise_id):
