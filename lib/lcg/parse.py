@@ -1274,7 +1274,7 @@ class HTMLProcessor(object):
             parser = exercises.ExerciseParser()
             exercise_type = getattr(exercises, element.attrib.get('data-type'))
             src = self._first_text(element)
-            return parser.parse(exercise_type, src)
+            return parser.parse(exercise_type, src.strip())
 
         def _figure(self, element, followers):
             kwargs = {}
