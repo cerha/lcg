@@ -941,10 +941,9 @@ class _FillInExercise(Exercise):
     def _check_tasks(self, tasks):
         for t in tasks:
             assert t.answer() is not None or \
-                isinstance(t, MixedTextFillInTask) and \
-                len(t.answers()) == 1, \
-                "%s requires just one textbox per task (%d found)!" % \
-                (self.__class__.__name__, len(t.answers())) 
+                isinstance(t, MixedTextFillInTask) and len(t.answers()) == 1, \
+                "%s requires just one textbox per task (%d found): %s" % \
+                (self.__class__.__name__, len(t.answers()), t.answer())
         return tasks
     
     def answers(self):
