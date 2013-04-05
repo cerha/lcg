@@ -147,7 +147,7 @@ class TrueFalseStatement(_ChoiceTask):
 
         Arguments:
         
-          statement --  exercise within the containing section.
+          statement -- exercise within the containing section.
           correct -- boolean flag indicating whether the statement is correct
             or not (true when it is correct).
           

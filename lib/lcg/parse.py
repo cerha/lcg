@@ -1169,7 +1169,7 @@ class HTMLProcessor(object):
             return (
                 (('div', ('style', '.*page-break-after: always;.*')), (self._single, dict(class_=NewPage))),
                 ('br', (self._single, dict(class_=NewLine))),
-                (('div', ('class', 'lcg-exercise'), ('data-type', '.*')), self._exercise),
+                (('pre', ('class', 'lcg-exercise'), ('data-type', '.*')), self._exercise),
                 ('(html|div|span|strike|li|dt|dd)', self._container),
                 ('p', (self._container, dict(class_=Paragraph))),
                 ('blockquote', self._blockquote),
@@ -1180,7 +1180,6 @@ class HTMLProcessor(object):
                 ('sub', (self._container, dict(class_=Subscript))),
                 ('sup', (self._container, dict(class_=Superscript))),
                 ('h[0-9]', self._section),
-                (('(pre|a)', ('class', 'lcg-exercise-.*')), self._exercise_param),
                 ('pre', (self._text, dict(class_=PreformattedText))),
                 ('ul', (self._list, dict(order=None))),
                 (('ol', ('style', '.* lower-alpha;.*')), (self._list, dict(order=ItemizedList.LOWER_ALPHA))),
@@ -1270,29 +1269,12 @@ class HTMLProcessor(object):
             content = self._transform_sub(element)
             return lcg.Quotation(content, **kwargs)
 
-        def _exercise_param(self, element, followers):
-            param = element.attrib['class'][13:]
-            if param in ('src', 'media'):
-                value = self._plain_text(element) or None
-            else:
-                content = self._transform_sub(element)
-                if content:
-                    value = lcg.Container(content)
-                else:
-                    value = None
-            return (param, value)
-
         def _exercise(self, element, followers):
             import exercises
-            exercise_type = getattr(exercises, element.attrib.get('data-type'))
-            # Rely on _transform_sub() to return only pairs processed by
-            # _exercise_param() -- the exercise specification should only
-            # contain <(pre|a) class=lcg-exercise-.*> elements.
-            params = dict(self._transform_sub(element))
-            src = params.pop('src')
-            params = dict([(k, v) for k, v in params.items() if v])
             parser = exercises.ExerciseParser()
-            return parser.parse(exercise_type, src, **params)
+            exercise_type = getattr(exercises, element.attrib.get('data-type'))
+            src = self._first_text(element)
+            return parser.parse(exercise_type, src)
 
         def _figure(self, element, followers):
             kwargs = {}
