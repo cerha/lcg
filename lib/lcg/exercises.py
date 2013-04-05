@@ -235,6 +235,7 @@ class WrittenAnswerTask(MixedTextFillInTask):
 class ClozeTask(MixedTextFillInTask):
         
     def __init__(self, text, comments=(), comment=None):
+        super(ClozeTask, self).__init__(None, text, comment=comment)
         if comment:
             assert comments == ()
             assert len(self.answers()) == 1
@@ -260,7 +261,6 @@ class ClozeTask(MixedTextFillInTask):
                 assert not dict, "Unused comments (labels don't match any field label): %s" % dict
             else:
                 self._comments = [None for x in fields]
-        super(ClozeTask, self).__init__(None, text, comment=comment)
 
     def comments(self):
         return self._comments
