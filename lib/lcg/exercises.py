@@ -943,7 +943,7 @@ class _FillInExercise(Exercise):
             assert t.answer() is not None or \
                 isinstance(t, MixedTextFillInTask) and len(t.answers()) == 1, \
                 "%s requires just one textbox per task (%d found): %s" % \
-                (self.__class__.__name__, len(t.answers()), t.answer())
+                (self.__class__.__name__, len(t.answers()), t.plain_text())
         return tasks
     
     def answers(self):
