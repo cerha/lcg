@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-28 15:36+0100\n"
+"POT-Creation-Date: 2013-04-05 11:18+0200\n"
 "PO-Revision-Date: 2011-03-10 12:23+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -25,77 +25,19 @@ msgstr "DOĞRU"
 msgid "FALSE"
 msgstr "YANLIŞ"
 
-#: ../lib/lcg/exercises.py:413
-#, python-format
-msgid "Exercise %d"
-msgstr "Alıştırma %d"
-
-#: ../lib/lcg/exercises.py:421
+#: ../lib/lcg/exercises.py:403
 msgid "Read the following text:"
 msgstr "Aşağıdaki konuyu okuyun:"
 
-#: ../lib/lcg/exercises.py:529
-msgid "Table of Contents:"
-msgstr "İçindekiler:"
-
-#: ../lib/lcg/exercises.py:532
-msgid "Instructions"
-msgstr "Talimatlar"
-
-#: ../lib/lcg/exercises.py:533
-msgid "Shortcut Keys"
-msgstr "Kısayol tuşları"
-
-#: ../lib/lcg/exercises.py:534
-msgid "Indicators"
-msgstr "Göstergeler"
-
-#: ../lib/lcg/exercises.py:535
-msgid "Control Panel"
-msgstr "Denetim paneli"
-
-#: ../lib/lcg/exercises.py:536
-msgid "Answer Sheets"
-msgstr "Doğru cevap tablosu"
-
-#: ../lib/lcg/exercises.py:552
-msgid "The indicator panel below the exercise shows the following values:"
-msgstr "Alıştırmanın sonundaki gösterge paneli aşağıdaki değerleri gösterir:"
-
-#: ../lib/lcg/exercises.py:560
-msgid "The control panel below the exercise contains the following buttons:"
-msgstr ""
-"Denetim paneli alıştırmanın sonunda bulursunuz. Aşağıdaki düğmeleri içerir:"
-
-#: ../lib/lcg/exercises.py:589
-msgid "Play"
-msgstr "Çalmak"
-
-#: ../lib/lcg/exercises.py:599
-msgid "Recording:"
-msgstr "Kayıt:"
-
-#: ../lib/lcg/exercises.py:602
-msgid "Video:"
-msgstr ""
-
-#: ../lib/lcg/exercises.py:663
-msgid "Explanation:"
-msgstr "Açıklama:"
-
-#: ../lib/lcg/exercises.py:672
-msgid "Example:"
-msgstr "Örnek:"
-
-#: ../lib/lcg/exercises.py:757
+#: ../lib/lcg/exercises.py:412
 msgid "on first attempt"
 msgstr "ilk denemesine"
 
-#: ../lib/lcg/exercises.py:759
+#: ../lib/lcg/exercises.py:413
 msgid "Answered:"
 msgstr "Yanıtlandı:"
 
-#: ../lib/lcg/exercises.py:760
+#: ../lib/lcg/exercises.py:414
 msgid ""
 "Displays the number of the tasks you have already answered.  For example "
 "4/10 means, that you have answered four out of ten questions so you should "
@@ -104,11 +46,11 @@ msgstr ""
 "Yanıtlanan alıştırmaların sayısını gösterir. Mesela 4/10 demek ki, on "
 "sorudan dört tanesi yanıtlandı."
 
-#: ../lib/lcg/exercises.py:763
+#: ../lib/lcg/exercises.py:417
 msgid "Correct:"
 msgstr "Doğru:"
 
-#: ../lib/lcg/exercises.py:764
+#: ../lib/lcg/exercises.py:418
 msgid ""
 "Displays the number and percentage of successful answers.  The first pair of "
 "numbers shows the results of all current answers.  If you didn't answer all "
@@ -122,11 +64,11 @@ msgstr ""
 "yanıtlanan doğru cevapların sayısı gösterir. ‘Yeniden başlatma' tuşu yeniden "
 "başlamak için kullanınız."
 
-#: ../lib/lcg/exercises.py:771
+#: ../lib/lcg/exercises.py:424
 msgid "Evaluate"
 msgstr "Değerlendir"
 
-#: ../lib/lcg/exercises.py:772
+#: ../lib/lcg/exercises.py:425
 msgid ""
 "Evaluate the entire exercise.  If an error is found, the cursor is moved to "
 "the first incorrect answer.  Within a text-box, the cursor is also moved to "
@@ -137,48 +79,84 @@ msgstr ""
 "taşınır."
 
 #. Translators: Fill (a form with correct answers).
-#: ../lib/lcg/exercises.py:776
+#: ../lib/lcg/exercises.py:429
 msgid "Fill"
 msgstr "Doldurmak"
 
-#: ../lib/lcg/exercises.py:777
+#: ../lib/lcg/exercises.py:430
 msgid "Fill in the whole exercise with the correct answers."
 msgstr "Doğru cevaplarıyla bütün alıştırmayı doldurur."
 
-#: ../lib/lcg/exercises.py:778
+#: ../lib/lcg/exercises.py:431
 msgid "Reset"
 msgstr "Yeniden başlat"
 
-#: ../lib/lcg/exercises.py:779 ../lib/lcg/exercises.py:1185
+#: ../lib/lcg/exercises.py:432 ../lib/lcg/exercises.py:940
 msgid "Reset all your answers and start again."
 msgstr ""
 "Bütün cevapları ve sonuçları sıfırlar, alıştırmaya yeniden başlayabilirsiniz."
 
-#: ../lib/lcg/exercises.py:781
-msgid ""
-"The Answer Sheets contain all the correct answers for all the exercises. You "
-"can access them from the Course Index, or more conveniently, you can use the "
-"‘?’ (question mark) link after each task. This link takes you directly to "
-"the corresponding answer in the Answer Sheet."
+#: ../lib/lcg/exercises.py:531
+msgid "Instructions"
+msgstr "Talimatlar"
+
+#: ../lib/lcg/exercises.py:532
+msgid "Shortcut Keys"
+msgstr "Kısayol tuşları"
+
+#: ../lib/lcg/exercises.py:533
+msgid "Indicators"
+msgstr "Göstergeler"
+
+#: ../lib/lcg/exercises.py:534
+msgid "Control Panel"
+msgstr "Denetim paneli"
+
+#: ../lib/lcg/exercises.py:542
+#, fuzzy
+msgid "Exercise Definition"
+msgstr "Alıştırma yardımı"
+
+#: ../lib/lcg/exercises.py:545
+msgid "Definition Example"
 msgstr ""
-"Cevap tablosu alıştırmaların bütün doğru cevapları içerir. Kurs dizininden "
-"girilebilir. Ancak daha kolay yol her tek ödevin sonundaki soru işaretinden "
-"girmektir. Bu bağlantı sizi doğrudan cevap tablosunun doğru cevabına götürür."
 
-#: ../lib/lcg/exercises.py:836
-msgid "Show the answer sheet."
-msgstr "Cevap tablosu göstermek."
+#: ../lib/lcg/exercises.py:560
+msgid "The indicator panel below the exercise shows the following values:"
+msgstr "Alıştırmanın sonundaki gösterge paneli aşağıdaki değerleri gösterir:"
 
-#: ../lib/lcg/exercises.py:863
-msgid "Chose the correct answer."
-msgstr "Doğru cevabı işaretleyiniz."
+#: ../lib/lcg/exercises.py:568
+msgid "The control panel below the exercise contains the following buttons:"
+msgstr ""
+"Denetim paneli alıştırmanın sonunda bulursunuz. Aşağıdaki düğmeleri içerir:"
 
-#: ../lib/lcg/exercises.py:866
+#: ../lib/lcg/exercises.py:587
+msgid "Play"
+msgstr "Çalmak"
+
+#: ../lib/lcg/exercises.py:597
+msgid "Recording:"
+msgstr "Kayıt:"
+
+#: ../lib/lcg/exercises.py:600
+msgid "Video:"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:647
+msgid "Explanation:"
+msgstr "Açıklama:"
+
+#: ../lib/lcg/exercises.py:654
+msgid "Example:"
+msgstr "Örnek:"
+
+#: ../lib/lcg/exercises.py:736
+#, fuzzy
 msgid ""
 "You will hear a response immediately after choosing the answer.  When you "
 "choose the wrong answer, you can try again until you find the correct one.  "
 "The results below the exercise will show you how many answers you got right "
-"on the first try (see the [#indicators] section below)."
+"on the first try."
 msgstr ""
 "Cevabı işaretledikten sonra hemen tepki duyacaksınız. Yanlış cevabı "
 "işaretlersiniz ise doğru cevabı bulacağınıza kadar tekrar tekrar "
@@ -186,11 +164,11 @@ msgstr ""
 "yanıtladığı doğru cevabın sayısını gösterir (daha  [#indicators])."
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:934
+#: ../lib/lcg/exercises.py:790
 msgid "Multiple Choice Questions"
 msgstr "Çoktan seçmeli sınav"
 
-#: ../lib/lcg/exercises.py:935
+#: ../lib/lcg/exercises.py:792
 msgid ""
 "Each question in this exercise is followed by two or more possible answers. "
 "Only one answer is correct."
@@ -198,31 +176,87 @@ msgstr ""
 "Bu alıştırmada bütün sorularına iki ve daha çok cevap gelir. Sadece tek bir "
 "cevap doğrudur."
 
+#: ../lib/lcg/exercises.py:796
+msgid ""
+"One exercise typically consists of a definition of several questions, where "
+"each question has two or more possbile answers."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:798
+msgid ""
+"The question and its possible answers (choices) are written each at a "
+"separate line. The correct answer begins with a plus sign followed by a "
+"space. Incorrect answers begin with a minus sign and a space."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:802
+msgid "Another question and its answers may follow after a blank line."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:804
+msgid ""
+"\n"
+"Screen reader is:\n"
+"- a person.\n"
+"- a device.\n"
+"+ a program.\n"
+"\n"
+"GNU/Linux is:\n"
+"- a word processor\n"
+"+ an operating system\n"
+"- a computer manufacturer\n"
+msgstr ""
+
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:943
+#: ../lib/lcg/exercises.py:821
 msgid "Selections"
 msgstr "Seçimleri yükle"
 
-#: ../lib/lcg/exercises.py:944
+#: ../lib/lcg/exercises.py:823
+#, fuzzy
 msgid ""
-"There are several groups of two or three similar sentences or expressions. "
-"Only one option in each group is correct. Your goal is to decide which one."
+"There are several groups of two or three statements. Only one statement in "
+"each group is correct. Your goal is to decide which one."
 msgstr ""
 "Alıştırmada ikişer ya da üçer benzer cümlelerden oluşturan birçok grup "
 "bulunur. Her bir grubunda tek bir cevap doğrudur. Siz hangisinin doğru "
 "olduğuna karar veriniz."
 
+#: ../lib/lcg/exercises.py:828
+msgid ""
+"The exercise definition consists of several groups of statements, typically "
+"two or three statements in a group."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:830
+msgid ""
+"Each statement in a group is written at a separate line and begins by a plus "
+"sign to mark a correct statement or a minus sign to mark an incorrect "
+"statement.  Just one statement in each group is correct."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:834
+msgid ""
+"Another group of statements may follow after a blank line. There are no "
+"blank lines between statements which belong to the same group."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:837
+msgid ""
+"\n"
+"+ India is located in Asia.\n"
+"- China is located in Africa.\n"
+"\n"
+"+ Australia is the smallest continent.\n"
+"- Australia is the largest continent.\n"
+msgstr ""
+
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:953
+#: ../lib/lcg/exercises.py:851
 msgid "True/False Statements"
 msgstr "Doğru/yanlış"
 
-#: ../lib/lcg/exercises.py:954
-msgid "For each of the statements below, choose True or False."
-msgstr ""
-"Aşağıdaki ifadelerden doğru yoksa yanlış olup olmadığını işaretleyiniz."
-
-#: ../lib/lcg/exercises.py:955
+#: ../lib/lcg/exercises.py:853
 msgid ""
 "Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
 "and ‘FALSE’.  Decide whether the sentence is true or not and press the "
@@ -231,16 +265,32 @@ msgstr ""
 "Her tek cümlenin sonunda „DOĞRU“ ve „YANLIŞ“ cevabı gelir. Cümlenin doğru "
 "yoksa yanlış olup olmadığına karar veriniz ve sonra karşılıklı tuşa basınız."
 
+#: ../lib/lcg/exercises.py:858
+msgid ""
+"The exercise definition consists of several statements separated by blank "
+"lines."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:860
+msgid ""
+"Each statement is marked as either true using [T] or false using [F] at the "
+"end of the line."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:863
+msgid ""
+"\n"
+"The Microsoft Windows operating system never crashes. [F]\n"
+"\n"
+"The largest tropical rainforest in the world is in Brasil. [T]\n"
+msgstr ""
+
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:979
+#: ../lib/lcg/exercises.py:893
 msgid "Gap Filling"
 msgstr "Boşluk doldurma"
 
-#: ../lib/lcg/exercises.py:980
-msgid "Choose the correct option to fill the gaps in the following sentences."
-msgstr "Aşağıdakilerden en uygun bir cevap işaretleyiniz."
-
-#: ../lib/lcg/exercises.py:982
+#: ../lib/lcg/exercises.py:895
 msgid ""
 "Choose the correct word to fill in a gap in a sentence.  For each gap you "
 "have several choices.  Only one of them is correct."
@@ -248,39 +298,123 @@ msgstr ""
 "Boşluk doldurmak için en uygun bir sözü seçiniz. Her tek boşluk için birçok "
 "seçeneğiniz var. Yalnız tek cevabı doğrudur."
 
-#: ../lib/lcg/exercises.py:1005
+#: ../lib/lcg/exercises.py:901
 msgid ""
-"You can check each answer individually using the shortcut keys (see the "
-"section [#keys] for more information).  When your answer is evaluated as "
-"incorrect and you do not know why, always check whether you have used "
-"correct punctuation and capital letters where appropriate. These two things "
-"are the cause of most confusion."
+"One exercise typically consists of a definition of several statements, where "
+"there is one missing word in each statement."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:903
+msgid ""
+"The missing word is replaced by a series of underscores (at least three) and "
+"possible completions of the gap follow at separate lines. The correct "
+"completion begins with a plus sign followed by a space. Incorrect "
+"completions begin with a minus sign and a space."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:908
+msgid "Another statement and its completions may follow after a blank line."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:910
+msgid ""
+"\n"
+"If you want to send money to somebody, you can ____ a transfer.\n"
+"- do\n"
+"+ make\n"
+"- have\n"
+"\n"
+"To change money between two currencies you need to know the ____ rate.\n"
+"- success\n"
+"- interest\n"
+"+ exchange\n"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:932
+msgid "Hidden Answers"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:937
+msgid "Show All"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:938
+#, fuzzy
+msgid "Show all answers."
+msgstr "Cevap tablosu göstermek."
+
+#: ../lib/lcg/exercises.py:939
+msgid "Hide All"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:942 ../lib/lcg/exercises.py:966
+#, fuzzy
+msgid "Show Answer"
+msgstr "Yazı göstermek"
+
+#: ../lib/lcg/exercises.py:943
+#, fuzzy
+msgid "Hide Answer"
+msgstr "Yazı gizlemek"
+
+#: ../lib/lcg/exercises.py:945
+msgid ""
+"You should simply think of the correct answer and when you believe you know "
+"it, you can unhide the correct answer below each question and check whether "
+"you were right or not."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:950 ../lib/lcg/exercises.py:1102
+msgid ""
+"One exercise typically consists of a definition of several questions and "
+"answers."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:952
+msgid "The question and the answer are written each at a separate line."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:953 ../lib/lcg/exercises.py:1113
+msgid "Another pair or question and answer may follow after a blank line."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:955
+msgid ""
+"\n"
+"What is the name of the highest mountain in the world?\n"
+"Mount Everest.\n"
+"\n"
+"What is its height?\n"
+"8,848m\n"
+msgstr ""
+
+#: ../lib/lcg/exercises.py:967
+#, fuzzy
+msgid "Show/Hide the correct answer."
+msgstr "Doğru cevabı işaretleyiniz."
+
+#: ../lib/lcg/exercises.py:983
+#, fuzzy
+msgid ""
+"You can check each answer individually using the shortcut keys. When your "
+"answer is evaluated as incorrect and you do not know why, always check "
+"whether you have used correct punctuation and capital letters where "
+"appropriate. The evaluation will only accept exactly matching answers."
 msgstr ""
 "Cevaplarınızı kısayol tuşları ([#keys]) kullanarak tek tek kontrol "
 "edebilirsiniz. Eğer cevabınız yanlış olarak değerlendirilirse ve siz "
 "nedenini bilemezsiniz, önce noktalama sonra büyük harfleri kontrol ediniz. "
 "Bu iki şey çoğunlukla şaşkınlık yaratır."
 
-#: ../lib/lcg/exercises.py:1010
+#: ../lib/lcg/exercises.py:988
+#, fuzzy
 msgid ""
-"Use the [#panel] at the bottom of the exercise to evaluate all the answers "
-"at once."
+"Use the control panel at the bottom of the exercise to evaluate all the "
+"answers at once."
 msgstr ""
 "Hepsi birden değerlendirmek için alıştırmanın sonunda [#panel] kullanınız."
 
-#: ../lib/lcg/exercises.py:1012
-msgid ""
-"If your browser doesn't support JavaScript, the interactive features and "
-"automatic evaluation do not work.  You can still use this course, but you "
-"will have to check your answers against the answer sheet manually (see "
-"[#answer-sheets]."
-msgstr ""
-"Eğer sizin metin sunucu JavaScript'i desteklemezse, interaktif özellikler ve "
-"otomatik değerlendirme işlemeyecek. Buna rağmen bu kursu kullanabilirsiniz, "
-"ama sonunda cevaplarınızı kendiniz cevap tablosu kullanarak kontrol etmek "
-"zorunda olacaksınız ([#answer-sheets] bak)."
-
-#: ../lib/lcg/exercises.py:1020
+#: ../lib/lcg/exercises.py:994
 msgid ""
 "In all the exercises where you fill in the text into a text-box you can use "
 "the two shortcut keys described below."
@@ -288,11 +422,11 @@ msgstr ""
 "Metni metin kutusuna doldurduğunuz bütün alıştırmalarda aşağıdaki kısayol "
 "tuşları kullanabilirsiniz."
 
-#: ../lib/lcg/exercises.py:1022
+#: ../lib/lcg/exercises.py:996
 msgid "Enter"
 msgstr "Enter"
 
-#: ../lib/lcg/exercises.py:1023
+#: ../lib/lcg/exercises.py:997
 msgid ""
 "Use this key within the text-field to evaluate the current answer. You hear "
 "a sound response and in case of an error, the cursor is moved to the "
@@ -306,11 +440,11 @@ msgstr ""
 "değerlendirilebilirsiniz. Eğer başka ne yapabileceğinizi bilmezsiniz, daha "
 "aşağıda anlatıldığı „yardım“ tuşu kullanınız."
 
-#: ../lib/lcg/exercises.py:1029
+#: ../lib/lcg/exercises.py:1003
 msgid "Ctrl-Space"
 msgstr "Ctrl+boşluk çubuğu"
 
-#: ../lib/lcg/exercises.py:1030
+#: ../lib/lcg/exercises.py:1004
 msgid ""
 "This function is called a ‘hint’.  It helps you in case you don't know the "
 "answer or you don't know how to fix an error in your answer. Just press the "
@@ -333,15 +467,11 @@ msgstr ""
 "yeni cevabınızı „Enter“ tuşa basarak değerlendirebilirsiniz ya da „yardım“ "
 "tuşu doğru cevabınızı buluncaya kadar kullanabilirsiniz."
 
-#: ../lib/lcg/exercises.py:1102
+#: ../lib/lcg/exercises.py:1069
 msgid "Test Yourself"
 msgstr "Kendiniz test ediniz"
 
-#: ../lib/lcg/exercises.py:1103
-msgid "Fill in the correct translation for each of the terms below."
-msgstr "Aşağıdaki terimlere doğru çevirleri doldurunuz."
-
-#: ../lib/lcg/exercises.py:1104
+#: ../lib/lcg/exercises.py:1071
 msgid ""
 "There are two ways to do the exercise: orally and written.  Do the exercise "
 "both ways to get the best results."
@@ -349,7 +479,7 @@ msgstr ""
 "Alıştırma yapmanın iki yolu vardır: sözlü ve yazılı olarak. En doğru "
 "sonuçları alabilmek için ikisi de kullanınız."
 
-#: ../lib/lcg/exercises.py:1106
+#: ../lib/lcg/exercises.py:1073
 msgid ""
 "To do the exercise orally is simple.  Go through the vocabulary list and "
 "think of the correct translation for each word or expression. There is a "
@@ -369,7 +499,7 @@ msgstr ""
 "sonuçları mevcut değildir. Eğer puanları görmek isterseniz yazılı alıştırma "
 "yapmanız gerekir."
 
-#: ../lib/lcg/exercises.py:1115
+#: ../lib/lcg/exercises.py:1082
 msgid ""
 "To do the exercise in written form, simply type the translation of each item "
 "into the text-box.  Be careful to use capital letters where this is "
@@ -382,114 +512,51 @@ msgstr ""
 "hep yanlış olarak kabul edilir. Eğer bütün cümleyi çevirirseniz, aynı "
 "zamanda doğru noktalama kullanmanız gerekir."
 
-#: ../lib/lcg/exercises.py:1130
-msgid "Exercise not available in this language version."
-msgstr "Alıştırma bu dilde mevcut değil."
-
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:1139
-msgid "Substitution"
-msgstr "Değiştirim"
-
-#: ../lib/lcg/exercises.py:1140
-msgid "Use the text in brackets to transform each sentence."
-msgstr "Parantez içindeki metni cümleyi değiştirmek için kullanınız."
-
-#: ../lib/lcg/exercises.py:1141
-msgid ""
-"Use the prompt to produce another sentence with the same structure. Each "
-"sentence is followed by text in brackets.  Replace the corresponding part of "
-"the sentence using this text."
-msgstr ""
-"Aynı yapısında olan başka bir cümle kurmak için belirtilen ifadeyi "
-"kullanınız. Her cümle parantez içindeki metni takip edilir. Bu metni "
-"kullanarak karşılık olan cümleyi değiştiriniz."
-
-#. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:1150
-msgid "Transformation"
-msgstr "Dönüşüm"
-
-#: ../lib/lcg/exercises.py:1152
-msgid "Fill in the gap in sentence B so that it means the same as sentence A."
-msgstr "B cümlesini A cümlesinin aynı anlamında doldurunuz."
-
-#: ../lib/lcg/exercises.py:1154
-msgid ""
-"Your goal is to transform a structure (pattern or paradigm) into a different "
-"structure, for example changing an affirmative sentence into a question."
-msgstr ""
-"Bir cümlenin yapısı başka cümlenin yapısına değiştirmesi amacınızdır (soru "
-"cümlesini olumlu cümlesine değiştirmek)."
-
-#: ../lib/lcg/exercises.py:1160
-msgid ""
-"Using the example as a model, change the structure and make a new sentence."
-msgstr "Model örneğine göre her cümlenin yapısını değiştiriniz."
-
-#: ../lib/lcg/exercises.py:1172
-msgid "Hidden Answers"
-msgstr ""
-
-#: ../lib/lcg/exercises.py:1175
-msgid ""
-"Think of the correct answer and use the button next to the question to check."
-msgstr ""
-
-#: ../lib/lcg/exercises.py:1177
-msgid ""
-"You should simply think of the correct answer and when you believe you know "
-"it, you can unhide the correct answer below each question and check whether "
-"you were right or not."
-msgstr ""
-
-#: ../lib/lcg/exercises.py:1182
-msgid "Show All"
-msgstr ""
-
-#: ../lib/lcg/exercises.py:1183
+#: ../lib/lcg/exercises.py:1097
 #, fuzzy
-msgid "Show all answers."
-msgstr "Cevap tablosu göstermek."
-
-#: ../lib/lcg/exercises.py:1184
-msgid "Hide All"
-msgstr ""
-
-#: ../lib/lcg/exercises.py:1187 ../lib/lcg/exercises.py:1196
-#, fuzzy
-msgid "Show Answer"
-msgstr "Yazı göstermek"
-
-#: ../lib/lcg/exercises.py:1188
-#, fuzzy
-msgid "Hide Answer"
+msgid "Written Answers"
 msgstr "Yazı gizlemek"
 
-#: ../lib/lcg/exercises.py:1197
-#, fuzzy
-msgid "Show/Hide the correct answer."
-msgstr "Doğru cevabı işaretleyiniz."
+#: ../lib/lcg/exercises.py:1099
+msgid "Fill in the answer to the box below each question."
+msgstr ""
 
-#. Translators: Type of exercise
-#: ../lib/lcg/exercises.py:1204
-msgid "Writing"
-msgstr "Yazma"
+#: ../lib/lcg/exercises.py:1104
+msgid ""
+"The question and the correct answer are written each at a separate line."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1105
+msgid ""
+"Either whole or a part of the answer is written inside square brackets.  The "
+"text inside the brackets is supposed to be filled into the text box by the "
+"user. The text before and after will appear on the screen providing a hint "
+"or a templete of the expected answer for the user."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1110 ../lib/lcg/exercises.py:1143
+msgid ""
+"If there is more than one possible correct answer, the other correct answers "
+"may be written inside the brackets separated by the pipeline character \"|\"."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1115
+msgid ""
+"\n"
+"What is the name of the largest continent?\n"
+"[Asia]\n"
+"\n"
+"Use the correct form of the verb \"to be\":\n"
+"Children [are] our future.\n"
+msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:1221
+#: ../lib/lcg/exercises.py:1132
 msgid "Cloze"
 msgstr "Cümle tamamlama"
 
-#: ../lib/lcg/exercises.py:1223
-msgid ""
-"Fill in the gaps in the text below. For each gap there is only one correct "
-"answer."
-msgstr ""
-"Eksik olan metni doldurunuz. Her tek boşluk için yalnız tek bir cevap "
-"doğrudur."
-
-#: ../lib/lcg/exercises.py:1225
+#: ../lib/lcg/exercises.py:1135
 msgid ""
 "Your goal in this exercise is to fill in the gaps in a longer piece of text. "
 "There is just one correct answer for each gap."
@@ -497,55 +564,178 @@ msgstr ""
 "Daha uzun bir metinde eksik olan kelimelerin doldurması amacınızdır. Her tek "
 "boşluk için tek bir doğru cevap bulunur."
 
+#: ../lib/lcg/exercises.py:1139
+msgid ""
+"One exercise typically consists of one or more paragraphs of text. Selected "
+"parts of the text (typically words), which are to be replaced by text entry "
+"fields are written in square brackets. The text inside brackets is the "
+"correct answer."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:1147
+msgid ""
+"\n"
+"Commercial banks and savings banks receive and hold deposits\n"
+"[in] current accounts, savings accounts and deposit accounts,\n"
+"make payments [for] their customers, lend money, [and] offer\n"
+"investment advice, foreign exchange facilities, and so on.\n"
+msgstr ""
+
 #. Translators: Type of exercise (use language
 #. terminology). Exposed cloze is lika Cloze, where students fill
 #. in the gaps in a text. In *exposed* cloze however the student
 #. chooses from the list of offered answers.
-#: ../lib/lcg/exercises.py:1238
+#: ../lib/lcg/exercises.py:1163
 msgid "Exposed Cloze"
 msgstr "Açık cümle tamamlama"
 
-#: ../lib/lcg/exercises.py:1239
+#: ../lib/lcg/exercises.py:1165
+#, fuzzy
 msgid ""
-"Use the correct word or expression from the list below to fill in the gaps "
-"in the sentences."
+"Your goal is to pick the right words from the list at the beginning of the "
+"exercise to fill in the gaps in the following piece of text. There is just "
+"one correct answer for each gap. Each word in the list is used just once."
 msgstr ""
-"Boşlukları doldurmak için aşağıdaki listeyi kullanarak kelimeleri kullanınız."
+"Daha uzun bir metinde eksik olan kelimelerin doldurması amacınızdır. Her tek "
+"boşluk için tek bir doğru cevap bulunur."
 
-#: ../lib/lcg/exercises.py:1309
-#, python-format
-msgid "%d) "
-msgstr "%d)"
-
-#: ../lib/lcg/exercises.py:1328 ../lib/lcg/exercises.py:1364
-#: ../lib/lcg/exercises.py:1367
+#: ../lib/lcg/exercises.py:1245 ../lib/lcg/exercises.py:1280
+#: ../lib/lcg/exercises.py:1283
 msgid "Total points:"
 msgstr "Toplam sayı:"
 
-#: ../lib/lcg/exercises.py:1358
+#: ../lib/lcg/exercises.py:1274
 msgid "Invalid value in added points!"
 msgstr "Eklenmiş puanların değeri geçersizdir!"
 
-#: ../lib/lcg/exercises.py:1359
+#: ../lib/lcg/exercises.py:1275
 msgid "Max. points exceeded!"
 msgstr "Maks. puan sayısı aşıldı!"
 
-#: ../lib/lcg/exercises.py:1361
+#: ../lib/lcg/exercises.py:1277
 msgid "Automatic evaluation:"
 msgstr "Otomatik değerlendirme:"
 
-#: ../lib/lcg/exercises.py:1362
+#: ../lib/lcg/exercises.py:1278
 msgid "Additional points by tutor:"
 msgstr "Öğretmen tarafından ek puanları:"
 
-#: ../lib/lcg/exercises.py:1412
+#: ../lib/lcg/exercises.py:1330
 msgid "correct answer"
 msgstr "doğru cevap"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/exercises.py:1417
+#: ../lib/lcg/exercises.py:1335
 msgid "incorrect"
 msgstr "yanlış"
+
+#. Translators: Type of exercise
+#: ../lib/lcg/exercises.py:1392
+msgid "Writing"
+msgstr "Yazma"
+
+#~ msgid "Exercise %d"
+#~ msgstr "Alıştırma %d"
+
+#~ msgid "Table of Contents:"
+#~ msgstr "İçindekiler:"
+
+#~ msgid "Answer Sheets"
+#~ msgstr "Doğru cevap tablosu"
+
+#~ msgid ""
+#~ "The Answer Sheets contain all the correct answers for all the exercises. "
+#~ "You can access them from the Course Index, or more conveniently, you can "
+#~ "use the ‘?’ (question mark) link after each task. This link takes you "
+#~ "directly to the corresponding answer in the Answer Sheet."
+#~ msgstr ""
+#~ "Cevap tablosu alıştırmaların bütün doğru cevapları içerir. Kurs "
+#~ "dizininden girilebilir. Ancak daha kolay yol her tek ödevin sonundaki "
+#~ "soru işaretinden girmektir. Bu bağlantı sizi doğrudan cevap tablosunun "
+#~ "doğru cevabına götürür."
+
+#~ msgid "Show the answer sheet."
+#~ msgstr "Cevap tablosu göstermek."
+
+#~ msgid "Chose the correct answer."
+#~ msgstr "Doğru cevabı işaretleyiniz."
+
+#~ msgid "For each of the statements below, choose True or False."
+#~ msgstr ""
+#~ "Aşağıdaki ifadelerden doğru yoksa yanlış olup olmadığını işaretleyiniz."
+
+#~ msgid ""
+#~ "Choose the correct option to fill the gaps in the following sentences."
+#~ msgstr "Aşağıdakilerden en uygun bir cevap işaretleyiniz."
+
+#~ msgid ""
+#~ "If your browser doesn't support JavaScript, the interactive features and "
+#~ "automatic evaluation do not work.  You can still use this course, but you "
+#~ "will have to check your answers against the answer sheet manually (see "
+#~ "[#answer-sheets]."
+#~ msgstr ""
+#~ "Eğer sizin metin sunucu JavaScript'i desteklemezse, interaktif özellikler "
+#~ "ve otomatik değerlendirme işlemeyecek. Buna rağmen bu kursu "
+#~ "kullanabilirsiniz, ama sonunda cevaplarınızı kendiniz cevap tablosu "
+#~ "kullanarak kontrol etmek zorunda olacaksınız ([#answer-sheets] bak)."
+
+#~ msgid "Fill in the correct translation for each of the terms below."
+#~ msgstr "Aşağıdaki terimlere doğru çevirleri doldurunuz."
+
+#~ msgid "Exercise not available in this language version."
+#~ msgstr "Alıştırma bu dilde mevcut değil."
+
+#~ msgid "Substitution"
+#~ msgstr "Değiştirim"
+
+#~ msgid "Use the text in brackets to transform each sentence."
+#~ msgstr "Parantez içindeki metni cümleyi değiştirmek için kullanınız."
+
+#~ msgid ""
+#~ "Use the prompt to produce another sentence with the same structure. Each "
+#~ "sentence is followed by text in brackets.  Replace the corresponding part "
+#~ "of the sentence using this text."
+#~ msgstr ""
+#~ "Aynı yapısında olan başka bir cümle kurmak için belirtilen ifadeyi "
+#~ "kullanınız. Her cümle parantez içindeki metni takip edilir. Bu metni "
+#~ "kullanarak karşılık olan cümleyi değiştiriniz."
+
+#~ msgid "Transformation"
+#~ msgstr "Dönüşüm"
+
+#~ msgid ""
+#~ "Fill in the gap in sentence B so that it means the same as sentence A."
+#~ msgstr "B cümlesini A cümlesinin aynı anlamında doldurunuz."
+
+#~ msgid ""
+#~ "Your goal is to transform a structure (pattern or paradigm) into a "
+#~ "different structure, for example changing an affirmative sentence into a "
+#~ "question."
+#~ msgstr ""
+#~ "Bir cümlenin yapısı başka cümlenin yapısına değiştirmesi amacınızdır "
+#~ "(soru cümlesini olumlu cümlesine değiştirmek)."
+
+#~ msgid ""
+#~ "Using the example as a model, change the structure and make a new "
+#~ "sentence."
+#~ msgstr "Model örneğine göre her cümlenin yapısını değiştiriniz."
+
+#~ msgid ""
+#~ "Fill in the gaps in the text below. For each gap there is only one "
+#~ "correct answer."
+#~ msgstr ""
+#~ "Eksik olan metni doldurunuz. Her tek boşluk için yalnız tek bir cevap "
+#~ "doğrudur."
+
+#~ msgid ""
+#~ "Use the correct word or expression from the list below to fill in the "
+#~ "gaps in the sentences."
+#~ msgstr ""
+#~ "Boşlukları doldurmak için aşağıdaki listeyi kullanarak kelimeleri "
+#~ "kullanınız."
+
+#~ msgid "%d) "
+#~ msgstr "%d)"
 
 #~ msgid "answer sheet"
 #~ msgstr "cevap tablosu"
@@ -701,9 +891,6 @@ msgstr "yanlış"
 #~ "Eğer cevaplarınızı yazılı konuyla karşılaştırmak isterseniz, dinlemenin "
 #~ "yazılı kaydı („yazı göstermek“ bağlantısı) kullanın. Yazılı alıştırma "
 #~ "olmadığı ise, sonuçlarınızı özdevimli denetleyemezsiniz."
-
-#~ msgid "Exercise Help"
-#~ msgstr "Alıştırma yardımı"
 
 #~ msgid "Correct"
 #~ msgstr "Doğru"
