@@ -740,7 +740,7 @@ class HtmlExporter(Exporter):
                       g.div(self._exported_container_content(context, element),
                             cls='section-content')),
                      id='section-' + anchor,
-                     cls='section-container',
+                     cls='section-container section-level-%d' % level,
                      **self._container_attr(element))
     
     def _export_preformatted_text(self, context, element):
