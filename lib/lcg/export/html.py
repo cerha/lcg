@@ -737,8 +737,10 @@ class HtmlExporter(Exporter):
             heading = lcg.Container(heading.content()[0].content())
         return g.div((g.h(g.a(heading.export(context), href=href, name=anchor, cls='backref'),
                           level, lang=lang),
-                      self.concat(self._exported_container_content(context, element))),
+                      g.div(self._exported_container_content(context, element),
+                            cls='section-content')),
                      id='section-' + anchor,
+                     cls='section-container',
                      **self._container_attr(element))
     
     def _export_preformatted_text(self, context, element):
