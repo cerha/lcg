@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2012 Brailcom, o.p.s.
+ * Copyright (C) 2012, 2013 Brailcom, o.p.s.
  * Author: Tomas Cerha
  *
  * This program is free software; you can redistribute it and/or modify
@@ -153,7 +153,8 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
     },
     
     active_item: function () {
-	return $(this.node.getAttribute('aria-activedescendant'));
+	var element_id = this.node.getAttribute('aria-activedescendant');
+	return (element_id ? $(element_id) : null);
     },
 
     activate_item: function (item) {
@@ -166,8 +167,10 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 
     focus: function () {
 	var item = this.active_item();
-	this.expand_item(item, true);
-	this.set_focus(item);
+	if (item) {
+	    this.expand_item(item, true);
+	    this.set_focus(item);
+	}
     },
     
     expand_item: function (item, recourse) {
