@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008, 2010, 2011, 2012 Brailcom, o.p.s.
+# Copyright (C) 2008, 2010, 2011, 2012, 2013 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -1942,11 +1942,11 @@ class Image(Element):
         assert isinstance(self.image, resources.Image), ('type error', self.image,)
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
     def _export(self, context):
-        filename = (self.image.src_file() or self.image.filename())
+        filename = self.image.src_file()
         if filename:
             result = RLImage(filename)
         else:
-            content = make_element(Text, content=(self.image.title() or '[image]'))
+            content = make_element(Text, content=(self.image.title() or self.image.filename()))
             result = make_element(Paragraph, content=[content]).export(context)
         return result
 
