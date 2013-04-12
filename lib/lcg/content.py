@@ -1836,14 +1836,14 @@ def ol(items, formatted=False, alpha=False):
     return ItemizedList([coerce(item, formatted=formatted) for item in items],
                         order=(alpha and ItemizedList.LOWER_ALPHA or ItemizedList.NUMERIC))
 
-def fieldset(pairs, title=None, formatted=False):
+def fieldset(pairs, formatted=False):
     """Create a 'FieldSet' out of given sequence of (LABEL, VALUE) pairs.
 
     Both label and value are coerced, but only value is treated as formatted.
     
     """
     fields = [(coerce(label), coerce(value, formatted=formatted)) for label, value in pairs]
-    return FieldSet(fields, title=title)
+    return FieldSet(fields)
 
 def _container(container, items, formatted=False, **kwargs):
     return container([coerce(item, formatted=formatted) for item in items], **kwargs)
