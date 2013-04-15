@@ -33,7 +33,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 	this._first_attempt = new Array(answers.length);
 	this._fields = new Array();
 	this._last_answer_index = 0;
-	for (i=0; i < this._form.elements.length; i++) {
+	for (var i=0; i < this._form.elements.length; i++) {
 	    var field = this._form.elements[i];
 	    if (this._recognize_field(field)) {
 		this._init_field(field);
@@ -123,23 +123,24 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
      		break;
             }
 	}
+	var response;
 	if (this._fields.length > 1) {
-            percentage = this._percentage()
-            if      (percentage < 50)  selector='f0-49';
-            else if (percentage < 70)  selector='f50-69';
-            else if (percentage < 85)  selector='f70-84';
-            else if (percentage < 100) selector='f85-99';
-            else selector='f100';
+            var percentage = this._percentage()
+            if      (percentage < 50)  response='f0-49';
+            else if (percentage < 70)  response='f50-69';
+            else if (percentage < 85)  response='f70-84';
+            else if (percentage < 100) response='f85-99';
+            else response='f100';
 	} else {
-            selector = this._correct() ? 'correct':'incorrect';
+            response = this._correct() ? 'correct':'incorrect';
 	}
-	play_media(this.response(selector));
+	play_media(this.response(responsel));
     },
 
     _count: function (array, value) {
         // Return the count of elements having the given value in the array.
         var count = 0;
-        for (i=0; i<array.length; i++)
+        for (var i=0; i<array.length; i++)
      	    if (array[i] == value) count++;
         return count;
     },
@@ -270,9 +271,10 @@ lcg.SelectBasedExercise = Class.create(lcg.Exercise, {
 
     _set_answer: function(i, value) {
 	var field = this._fields[i];
-	for (var i=0; i < field.options.length; i++) {
-	    var option = field.options[i];
-	    if (option.value == value) option.selected = true;
+	for (var j=0; j < field.options.length; j++) {
+	    var option = field.options[j];
+	    if (option.value == value) 
+		option.selected = true;
 	}
     }
 
