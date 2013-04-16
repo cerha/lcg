@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012 Brailcom, o.p.s.
+# Copyright (C) 2012, 2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -339,8 +339,8 @@ class BrailleExporter(FileExporter, Exporter):
                 output += device_table[c]
             except KeyError:
                 raise BrailleError(_("Text can't be represented on given output device."))
-        if presentation.device_init:
-            output = presentation.device_init + output
+        if presentation.device_init is not None:
+            output = presentation.device_init(page_width, page_height) + output
         return output
             
     # Basic utilitites

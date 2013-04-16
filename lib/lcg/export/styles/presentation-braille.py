@@ -563,9 +563,11 @@ debug_device_output_cs = {
 }
 
 # Index 4x4 Pro V2
-device_init = '0,0,0,0,x,x,x,x,x,19,0,0,0,0,4,1,0,0,x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,'
+def device_init(width, height):
+    return '0,0,0,0,x,x,x,x,x,%d,0,0,0,0,4,1,0,0,x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,' % (width - 23,)
 # Index Everest-D V4
-device_init = 'DBT0,TD0,LS50,DP2,PN0,CH46,LP43,BI0,TM0;'
+def device_init(width, height):
+    return 'DBT0,TD0,LS50,DP2,PN0,CH%d,LP%d,BI0,TM0;' % (width, height,)
 device_output = {
     # whitespace
     u'\n': u'\n',

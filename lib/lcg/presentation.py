@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2011, 2012 Brailcom, o.p.s.
+# Copyright (C) 2011, 2012, 2013 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -141,7 +141,10 @@ class Presentation(object):
     characters.
     """
     device_init = None
-    """Initial string to send to the Braille printer."""
+    """Function returning initial string to send to the Braille printer.
+    The function takes two integer arguments: page width (number of characters)
+    and page height (number of lines).
+    """
     braille_tables = None
     """Dictionary of Braille tables to use.
     Keys are language codes (strings), values are lists of Braille table names
