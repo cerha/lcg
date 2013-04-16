@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012 Brailcom, o.p.s.
+# Copyright (C) 2012, 2013 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -562,6 +562,8 @@ debug_device_output_cs = {
     u'⣿': u'<+>78'
 }
 
+# Index 4x4 Pro V2
+device_init = '0,0,0,0,x,x,x,x,x,19,0,0,0,0,4,1,0,0,x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,'
 # Index Everest-D V4
 device_init = 'DBT0,TD0,LS50,DP2,PN0,CH46,LP43,BI0,TM0;'
 device_output = {
