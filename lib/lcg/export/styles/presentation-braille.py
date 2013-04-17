@@ -25,8 +25,8 @@ braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': ['cs-g1.ctb']}
 braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
                               'cs': 'hyph_cs_CZ.dic'}
-page_width = lcg.UFont(46)
-page_height = lcg.UFont(43)
+page_width = lcg.UFont(35)
+page_height = lcg.UFont(29)
 left_page_footer = lcg.Container((lcg.PageNumber(),
                                   lcg.HSpace(lcg.UFont(3)),
                                   lcg.PageHeading(),))
@@ -562,12 +562,14 @@ debug_device_output_cs = {
     u'⣿': u'<+>78'
 }
 
-# Index 4x4 Pro V2
+# Index 4x4 Pro V2, Index Everest-D V2
 def device_init(width, height):
     return '0,0,0,0,x,x,x,x,x,%d,0,0,0,0,4,1,0,0,x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,' % (width - 23,)
-# Index Everest-D V4
+device_finish = ''
+# Index Everest-D V3/V4
 def device_init(width, height):
     return 'DBT0,TD0,LS50,DP2,PN0,CH%d,LP%d,BI0,TM0;' % (width, height,)
+device_finish = None
 device_output = {
     # whitespace
     u'\n': u'\n',

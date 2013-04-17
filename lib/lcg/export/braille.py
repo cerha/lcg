@@ -341,6 +341,8 @@ class BrailleExporter(FileExporter, Exporter):
                 raise BrailleError(_("Text can't be represented on given output device."))
         if presentation.device_init is not None:
             output = presentation.device_init(page_width, page_height) + output
+        if presentation.device_finish is not None:
+            output += presentation.device_finish
         return output
             
     # Basic utilitites

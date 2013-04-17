@@ -145,6 +145,8 @@ class Presentation(object):
     The function takes two integer arguments: page width (number of characters)
     and page height (number of lines).
     """
+    device_finish = None
+    """Final string to send to the Braille printer."""
     braille_tables = None
     """Dictionary of Braille tables to use.
     Keys are language codes (strings), values are lists of Braille table names
