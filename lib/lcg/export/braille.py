@@ -29,7 +29,7 @@ import string
 
 import louis
 
-from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource
+from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, PageNumber, Container
 import entities
 
 _inf = 'infix'
@@ -309,10 +309,32 @@ class BrailleExporter(FileExporter, Exporter):
                             context.toc_element(marker).set_page_number(context, page_number)
                         else:
                             lines.append(l)
-                    status_line = left_status_line if context.page_number() % 2 else right_status_line
+                    status_line = right_status_line if context.page_number() % 2 else left_status_line
                     lines = lines + [''] * (page_height - len(lines))
                     if status_line:
                         exported_status_line, __ = status_line.export(context)
+                        # Hack: We have to center status line text manually here.
+                        # Of course, this won't work in a generic case and we
+                        # make just basic precautions.
+                        if isinstance(status_line, Container):
+                            c = status_line.content()
+                            if c and isinstance(c[0], PageNumber):
+                                pos = exported_status_line.find(u'⠀')
+                                if pos > 0:
+                                    title = exported_status_line[pos:].strip(u'⠀ ')
+                                    text_len = len(title) + pos
+                                    fill = (page_width - text_len) / 2
+                                    exported_status_line = (exported_status_line[:pos] +
+                                                            u'⠀' * fill + title)
+                            elif c and isinstance(c[-1], PageNumber):
+                                pos = exported_status_line.rfind(u'⠀')
+                                if pos >= 0 and pos != len(exported_status_line) - 1:
+                                    title = exported_status_line[:pos].strip(u'⠀ ')
+                                    text_len = len(title) + (len(exported_status_line) - pos)
+                                    fill_2 = (page_width - text_len) / 2
+                                    fill_1 = page_width - text_len - fill_2
+                                    exported_status_line = (u'⠀' * fill_1 + title + u'⠀' * fill_2 +
+                                                            exported_status_line[pos+1:])
                         lines.append(exported_status_line)
                     new_pages.append(lines)
                     context.advance_page_number()

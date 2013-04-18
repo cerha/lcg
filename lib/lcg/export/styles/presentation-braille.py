@@ -28,10 +28,10 @@ braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
 page_width = lcg.UFont(35)
 page_height = lcg.UFont(29)
 left_page_footer = lcg.Container((lcg.PageNumber(),
-                                  lcg.HSpace(lcg.UFont(3)),
-                                  lcg.PageHeading(),))
-right_page_footer = lcg.Container((lcg.PageHeading(),
-                                   lcg.HSpace(lcg.UFont(3)),
+                                  lcg.Container((lcg.PageHeading(),),
+                                                halign=lcg.HorizontalAlignment.CENTER),))
+right_page_footer = lcg.Container((lcg.Container((lcg.PageHeading(),),
+                                                 halign=lcg.HorizontalAlignment.CENTER),
                                    lcg.PageNumber(),))
 
 debug_device_output_en = {
