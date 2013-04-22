@@ -57,6 +57,51 @@ class TranslatableTextFactory(object):
         kwargs['_domain'] = self._domain
         kwargs['_origin'] = self._origin
         return TranslatablePluralForms(*args, **kwargs)
+
+
+class TranslatedTextFactory(TranslatableTextFactory):
+    """Like 'TranslatableTextFactory', but usable also in desktop application environment.
+    
+    We need to maintain the functionality of the base class (produce
+    translatable strings), but we need to translate the strings in advance as
+    well.  This will make the translation work both in web and desktop
+    applications.  Desktop applications expect the string produced by the '_'
+    function to be already translated into the current locale's language, like
+    with the standard gettext utilities.  On the other hand, web applications
+    need a translatable string which is translated later when a client is
+    served.  Thus when we write code which defines strings which may be used
+    both in web and desktop application environment, we need something which
+    satisfies both worlds.  This class does that.
+
+    """
+    def __init__(self, domain, origin='en', lang=None, translation_path=()):
+        """Arguments:
+        
+          domain, origin -- as in base class.
+        
+          lang -- target language code as a string.
+
+          translation_path -- a sequence of directory names to search for
+            translations.  As in 'GettextTranslator'.
+        
+        """
+        # Create localizer to make use of its translator instance cache.
+        localizer = lcg.Localizer(lang=lang, translation_path=translation_path, timezone=None)
+        self._translator = localizer.translator()
+        super(TranslatedTextFactory, self).__init__(domain, origin=origin)
+
+    def _gettext(self, text):
+        return self._translator.gettext(text, domain=self._domain, origin=self._origin)
+
+    def __call__(self, text, *args, **kwargs):
+        kwargs['_orig_text'] = text
+        return super(TranslatedTextFactory, self).__call__(self._gettext(text), *args, **kwargs)
+    
+    def ngettext(self, singular, plural, *args, **kwargs):
+        kwargs['_singular_orig_text'] = singular
+        kwargs['_plural_orig_text'] = plural
+        return super(TranslatedTextFactory, self).ngettext(self._gettext(singular), self._gettext(plural), *args, 
+                                                           **kwargs)
     
 
 class Localizable(unicode):
@@ -246,10 +291,11 @@ class TranslatableText(Localizable):
         self._args = args
         self._init_kwargs(**kwargs)
 
-    def _init_kwargs(self, _domain=None, _origin='en', _interpolate=None, _transforms=(), **kwargs):
+    def _init_kwargs(self, _orig_text=None, _domain=None, _origin='en', _interpolate=None, _transforms=(), **kwargs):
         assert isinstance(_domain, basestring) or _domain is None, _domain
         assert isinstance(_origin, basestring), _origin
         assert _interpolate is None or isinstance(_interpolate, collections.Callable), _interpolate
+        self._orig_text = _orig_text or self._text
         self._domain = _domain
         self._origin = _origin
         self._interpolate = _interpolate
@@ -260,8 +306,8 @@ class TranslatableText(Localizable):
         return (self._text,) + self._args
     
     def _clone_kwargs(self):
-        return dict(super(TranslatableText, self)._clone_kwargs(), _domain=self._domain, 
-                    _origin=self._origin, _interpolate=self._interpolate, **self._kwargs)
+        return dict(super(TranslatableText, self)._clone_kwargs(), _orig_text=self._orig_text,
+                    _domain=self._domain, _origin=self._origin, _interpolate=self._interpolate, **self._kwargs)
     
     def domain(self):
         """Return the domain name bound to this instance."""
@@ -281,7 +327,7 @@ class TranslatableText(Localizable):
         
     def _translate(self, localizer):
         translator = localizer.translator()
-        return translator.gettext(self._text, domain=self._domain, origin=self._origin)
+        return translator.gettext(self._orig_text, domain=self._domain, origin=self._origin)
 
     def _localize(self, localizer):
         result = self._translate(localizer)
@@ -324,7 +370,7 @@ class SelfTranslatableText(TranslatableText):
                     translations=self._translations)
     
     def _translate(self, localizer):
-        return self._translations.get(localizer.lang(), localizer.localize(self._text))
+        return self._translations.get(localizer.lang(), localizer.localize(self._orig_text))
         
 
 class TranslatablePluralForms(TranslatableText):
@@ -362,17 +408,29 @@ class TranslatablePluralForms(TranslatableText):
         else:
             n = kwargs['n']
         text = n == 1 and singular or plural
-        super(TranslatablePluralForms, self).__init__(text, *args, **kwargs)
         self._singular = unicode(singular)
         self._plural = unicode(plural)
         self._n = n
+        super(TranslatablePluralForms, self).__init__(text, *args, **kwargs)
+
+    def _init_kwargs(self, _singular_orig_text=None, _plural_orig_text=None, **kwargs):
+        self._singular_orig_text = _singular_orig_text or self._singular
+        self._plural_orig_text = _plural_orig_text or self._plural
+        super(TranslatablePluralForms, self)._init_kwargs(**kwargs)
 
     def _clone_args(self):
         return (self._singular, self._plural) + self._args
+
+    def _clone_kwargs(self):
+        return dict(super(TranslatablePluralForms, self)._clone_kwargs(), 
+                    _singular_orig_text=self._singular_orig_text,
+                    _plural_orig_text=self._plural_orig_text,
+                    **self._kwargs)
+    
     
     def _translate(self, localizer):
         translator = localizer.translator()
-        return translator.ngettext(self._singular, self._plural, self._n,
+        return translator.ngettext(self._singular_orig_text, self._plural_orig_text, self._n,
                                    domain=self._domain, origin=self._origin)
     
     
