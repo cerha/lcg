@@ -39,8 +39,8 @@ class TranslatableTextFactory(object):
 
     """
     def __init__(self, domain, origin='en'):
-        assert isinstance(domain, str), domain
-        assert isinstance(origin, str), origin
+        assert isinstance(domain, basestring), domain
+        assert isinstance(origin, basestring), origin
         self._domain = domain
         self._origin = origin
 
@@ -97,12 +97,12 @@ class Localizable(unicode):
         self._transforms = _transforms
     
     def __add__(self, other):
-        if not isinstance(other, (str, unicode)):
+        if not isinstance(other, basestring):
             return NotImplemented
         return concat((self, other))
 
     def __radd__(self, other):
-        if not isinstance(other, (str, unicode)):
+        if not isinstance(other, basestring):
             return NotImplemented
         return concat((other, self))
 
@@ -241,14 +241,14 @@ class TranslatableText(Localizable):
         arguments didn't correspond to the format string.
         
         """
-        assert isinstance(text, (str, unicode)), (text, type(text))
+        assert isinstance(text, basestring), (text, type(text))
         self._text = text
         self._args = args
         self._init_kwargs(**kwargs)
 
     def _init_kwargs(self, _domain=None, _origin='en', _interpolate=None, _transforms=(), **kwargs):
-        assert isinstance(_domain, (str)) or _domain is None, _domain
-        assert isinstance(_origin, (str)), _origin
+        assert isinstance(_domain, basestring) or _domain is None, _domain
+        assert isinstance(_origin, basestring), _origin
         assert _interpolate is None or isinstance(_interpolate, collections.Callable), _interpolate
         self._domain = _domain
         self._origin = _origin
@@ -761,7 +761,7 @@ class GettextTranslator(Translator):
         """
         assert isinstance(lang, basestring), lang
         assert isinstance(path, (list, tuple)), path
-        assert isinstance(default_domain, str), default_domain
+        assert isinstance(default_domain, basestring), default_domain
         assert isinstance(fallback, bool), fallback
         self._default_domain = default_domain
         self._fallback = fallback
