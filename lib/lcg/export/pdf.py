@@ -173,10 +173,10 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         first_frame = Frame(self.leftMargin, bottom_margin, self.width, height, id='first')
         bottom_margin, height = frame_height(page_header, page_footer)
         later_frame = Frame(self.leftMargin, bottom_margin, self.width, height, id='later')
-        self.addPageTemplates([
-            PageTemplate(id='First', frames=first_frame, onPage=on_page, pagesize=self.pagesize),
-            PageTemplate(id='Later', frames=later_frame, onPage=on_page, pagesize=self.pagesize)
-            ])
+        self.addPageTemplates([PageTemplate(id='First', frames=first_frame,
+                                          onPage=on_page, pagesize=self.pagesize),
+                             PageTemplate(id='Later', frames=later_frame,
+                                          onPage=on_page, pagesize=self.pagesize)])
         reportlab.platypus.BaseDocTemplate.build(self, flowables,
                                                  canvasmaker=reportlab.pdfgen.canvas.Canvas)
 
@@ -341,9 +341,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 wrap(c, None, availWidth, availHeight)
             else:
                 min_width = None
-                if (not vertical and
-                    not isinstance(c, RLTable) and
-                    (not isinstance(c, RLSpacer) or c.width is not None)):
+                if ((not vertical and
+                     not isinstance(c, RLTable) and
+                     (not isinstance(c, RLSpacer) or c.width is not None))):
                     # It is necessary to call `wrap' in order to set the object
                     # minimum width in some flowables, e.g. TableOfContents.
                     # We don't do it on tables and flexible spacers, because
@@ -380,8 +380,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 spacers_started = False
             for n in range(len(variable_content)):
                 i, c, width = variable_content[n]
-                if vertical and not spacers_started and isinstance(c, RLSpacer) and c.height is None:
-                    average_avail = (avail_length - self._box_total_length) / (len(variable_content) - n)
+                if ((vertical and not spacers_started and
+                     isinstance(c, RLSpacer) and c.height is None)):
+                    average_avail = ((avail_length - self._box_total_length) /
+                                     (len(variable_content) - n))
                     if average_avail < 0:
                         average_avail = 0
                     spacers_started = True
@@ -390,12 +392,14 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 else:
                     args = [average_avail, availHeight]
                 w, h = wrap(c, i, *args)
-                if ((vertical and h > average_avail) or
-                    (not vertical and w > average_avail) or
-                    (width and width > average_avail)):
+                if (((vertical and h > average_avail) or
+                     (not vertical and w > average_avail) or
+                     (width and width > average_avail))):
                     max_avail = avail_length
                     for j in range(len(wrapped)):
-                        variable_content[j] = variable_content[j][0], unwrap(wrapped[j]), variable_content[j][2]
+                        variable_content[j] = (variable_content[j][0],
+                                               unwrap(wrapped[j]),
+                                               variable_content[j][2],)
                     for j in range(i):
                         if self._box_lengths[j] is not None:
                             max_avail -= self._box_lengths[j]
@@ -403,7 +407,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                         avail = average_avail
                         while avail < max_avail:
                             c = unwrap(i)
-                            avail = min(avail + max_avail/10, max_avail)
+                            avail = min(avail + max_avail / 10, max_avail)
                             args[length_index] = avail
                             sizes = wrap(c, i, *args)
                             if sizes[length_index] <= avail:
@@ -417,7 +421,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             self._width_height = (self._box_max_depth, self._box_total_length,)
         else:
             self._width_height = (self._box_total_length, self._box_max_depth,)
-        self._width_height = (self._width_height[0] + box_margin_size_2, self._width_height[1] + box_margin_size_2,)
+        self._width_height = (self._width_height[0] + box_margin_size_2,
+                              self._width_height[1] + box_margin_size_2,)
         return self._width_height
     def split(self, availWidth, availHeight):
         if not self._box_vertical or not self._box_content:
@@ -434,7 +439,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             height += next_height
             i += 1
         def container(content):
-            return RLContainer(content, vertical=self._box_vertical, align=self._box_align, boxed=self._box_boxed)
+            return RLContainer(content, vertical=self._box_vertical,
+                               align=self._box_align, boxed=self._box_boxed)
         content = self._box_content
         if i == self._box_lengths:
             result = [self]
@@ -572,9 +578,9 @@ class RLImage(reportlab.platypus.flowables.Image):
                 w, h = img.size
                 xdpi, ydpi = img.info.get('dpi', (None, None,))
                 if self._width is None and xdpi:
-                    self._width = w*reportlab.lib.units.inch / xdpi
+                    self._width = w * reportlab.lib.units.inch / xdpi
                 if self._height is None and ydpi:
-                    self._height = h*reportlab.lib.units.inch / ydpi
+                    self._height = h * reportlab.lib.units.inch / ydpi
             except:
                 pass
         reportlab.platypus.flowables.Image._setup_inner(self)
@@ -793,15 +799,15 @@ class Context(object):
         key = (font_name, bold, italic,)
         if key in Context._registered_fonts:
             assert Context._registered_fonts[key] == font_file, \
-                   ("Inconsistent font definition", key, font_file, Context._registered_fonts[key],)
+                ("Inconsistent font definition", key, font_file, Context._registered_fonts[key],)
             font_face_name = Context._registered_font_files[font_file]
         else:
             f = reportlab.pdfbase.ttfonts.TTFont(font_face_name, font_file)
             # ReportLab really doesn't like using the same font file more than once.
             # But beware: Already registered fonts may probably disappear from ReportLab
             # in Wiking processes.
-            if (font_file in Context._registered_font_files and
-                f.fontName in reportlab.pdfbase.pdfmetrics.getRegisteredFontNames()):
+            if ((font_file in Context._registered_font_files and
+                 f.fontName in reportlab.pdfbase.pdfmetrics.getRegisteredFontNames())):
                 font_face_name = Context._registered_font_files[font_file]
             else:
                 reportlab.pdfbase.pdfmetrics.registerFont(f)
@@ -947,7 +953,7 @@ class Context(object):
         style = copy.copy(self._label_style)
         style.fontSize *= self.relative_font_size()
         self.adjust_style_leading(style)
-        return style        
+        return style
 
     def list_style(self, order=None):
         """Return paragraph style for lists.
@@ -1054,7 +1060,7 @@ class Context(object):
         """
         self._anchors[name] = True
         if self._parent_context:
-            self._parent_context.clear_anchor_reference(name)            
+            self._parent_context.clear_anchor_reference(name)
 
     def invalid_anchor_references(self):
         """Return sequence of names of invalid anchor references.
@@ -1109,7 +1115,7 @@ class Context(object):
             presentation is used instead
         
         """
-        self._presentations.append(presentation)        
+        self._presentations.append(presentation)
 
     def remove_presentation(self):
         """Remove the current presentation from the presentation list."""
@@ -1290,7 +1296,7 @@ class Element(object):
             context.pdf_context.last_element_category = self._CATEGORY
         return result
     def _export(self, context, **kwargs):
-        raise Exception ('Not implemented')
+        raise Exception('Not implemented')
     def prepend_text(self, text):
         """Prepend given 'text' to the front of the element contents.
 
@@ -1428,8 +1434,8 @@ class TextContainer(Text):
         result = u''
         for c in content:
             result += c.export(context)
-        if (not pdf_context.in_paragraph and
-            not all([c.plain_text() for c in content])):
+        if ((not pdf_context.in_paragraph and
+             not all([c.plain_text() for c in content]))):
             style = pdf_context.style()
             style.firstLineIndent = 0
             result = reportlab.platypus.Paragraph(result, style)
@@ -1523,13 +1529,13 @@ class Paragraph(Element):
         current_presentation = pdf_context.current_presentation()
         template_style = style or self._style or pdf_context.normal_style()
         style = pdf_context.style(style=template_style)
-        if (self.noindent or
-            (current_presentation and current_presentation.noindent) or
-            halign or
-            pdf_context.last_element_category != 'paragraph'):
+        if ((self.noindent or
+             (current_presentation and current_presentation.noindent) or
+             halign or
+             pdf_context.last_element_category != 'paragraph')):
             style.firstLineIndent = 0
-        if (current_presentation and current_presentation.noindent and
-            style.name[:7] != 'Heading' and style.name != 'Label'):
+        if ((current_presentation and current_presentation.noindent and
+             style.name[:7] != 'Heading' and style.name != 'Label')):
             style.spaceBefore = style.fontSize * 1.2
         if current_presentation and current_presentation.left_indent:
             style.leftIndent += self._unit2points(current_presentation.left_indent, style)
@@ -1653,7 +1659,7 @@ class PageNumber(Text):
                 text = str(total)
             else:
                 text = '?'
-            if self.separator is not None :
+            if self.separator is not None:
                 text = str(pdf_context.page) + self.separator + text
         else:
             text = str(pdf_context.page)
@@ -1742,7 +1748,7 @@ class Container(Element):
                             assert not isinstance(e, (tuple, list)), e
                     result += exported
                 else:
-                    result.append(exported)                    
+                    result.append(exported)
             assert _ok_export_result(result), ('wrong export', result,)
             # If wrapping by a container is needed, create a ReportLab container.
             if len(result) > 1 or boxed:
@@ -1842,7 +1848,8 @@ class List(Element):
         style.leftIndent = style.bulletIndent + after_bullet * font_size
         if self.order:
             seqid = pdf_context.get_seqid()
-            seq_string = make_element(SimpleMarkup, content='seq', attributes=dict(id='list%d'%(seqid,)))
+            seq_string = make_element(SimpleMarkup, content='seq',
+                                      attributes=dict(id='list%d' % (seqid,)))
             dot_string = make_element(Text, content=u'.')
             bullet_element = make_element(TextContainer, content=[seq_string, dot_string])
         else:
@@ -1876,7 +1883,7 @@ class List(Element):
             elif isinstance(item, Container):
                 result = exported
             else:
-                raise Exception ('type error', item,)
+                raise Exception('type error', item,)
             return result
         space = reportlab.platypus.Spacer(0, self._unit2points(UFont(0.5), style))
         result = [space]
@@ -2033,7 +2040,7 @@ class Table(Element):
             p.bold = True
             pdf_context.add_presentation(p)
             header_style = pdf_context.style()
-            pdf_context.remove_presentation()        
+            pdf_context.remove_presentation()
         font_name, family, bold, italic = pdf_context.font_parameters(style.fontName)
         table_style_data.append(('FONT', (0, 0), (-1, -1), style.fontName, style.fontSize))
         i = 0
@@ -2057,9 +2064,10 @@ class Table(Element):
                         p = Presentation()
                         if column.heading:
                             p.bold = True
-                        if (column.align is not None and
-                            (not alignments or column.align != alignments[j])):
-                            table_style_data.append(('ALIGN', (j, i), (j, i), column.align.upper(),))
+                        if ((column.align is not None and
+                             (not alignments or column.align != alignments[j]))):
+                            table_style_data.append(('ALIGN', (j, i), (j, i),
+                                                     column.align.upper(),))
                         # If it is a layout table we need to work around
                         # misalignment caused by expansion of the table over
                         # the whole page width.
@@ -2137,7 +2145,7 @@ class Table(Element):
             if bar == 0:
                 table_style_data.append(('LINEBEFORE', (0, 0), (0, -1), 1, black,))
             else:
-                table_style_data.append(('LINEAFTER', (bar-1, 0), (bar-1, -1), 1, black,))
+                table_style_data.append(('LINEAFTER', (bar - 1, 0), (bar - 1, -1), 1, black,))
         # Create the table instance
         repeat_rows = 0
         if self.long:
@@ -2314,7 +2322,8 @@ class PDFExporter(FileExporter, Exporter):
                         (getattr(node_presentation, p) or getattr(global_presentation, p)))
         context.pdf_context = old_contexts[None] = pdf_context = \
                               Context(total_pages=total_pages,
-                                      first_page_header=(node.first_page_header(lang) or page_header),
+                                      first_page_header=(node.first_page_header(lang) or
+                                                         page_header),
                                       page_header=page_header,
                                       page_footer=node.page_footer(lang),
                                       page_background=node.page_background(lang),
@@ -2322,7 +2331,7 @@ class PDFExporter(FileExporter, Exporter):
                                       presentation_set=presentation_set,
                                       lang=lang)
         presentation = pdf_context.current_presentation()
-	exported_structure = []
+        exported_structure = []
         first_subcontext = None
         for node in context.node().linear():
             node_id = node.id()
@@ -2336,7 +2345,8 @@ class PDFExporter(FileExporter, Exporter):
             page_header = node.page_header(lang)
             subcontext.pdf_context = old_contexts[node_id] = \
                                      Context(parent_context=pdf_context, total_pages=total_pages,
-                                             first_page_header=(node.first_page_header(lang) or page_header),
+                                             first_page_header=(node.first_page_header(lang) or
+                                                                page_header),
                                              page_header=page_header,
                                              page_footer=node.page_footer(lang),
                                              page_background=node.page_background(lang),
@@ -2489,7 +2499,8 @@ class PDFExporter(FileExporter, Exporter):
                     while mixed_content:
                         text_p = isinstance(mixed_content[0], Text)
                         i = 1
-                        while i < len(mixed_content) and text_p == isinstance(mixed_content[i], Text):
+                        while (i < len(mixed_content) and
+                               text_p == isinstance(mixed_content[i], Text)):
                             i += 1
                         # TODO: This doesn't check for Paragraphs inside Paragraph
                         exported_content.append(make_element(Paragraph if text_p else Container,
@@ -2621,7 +2632,7 @@ class PDFExporter(FileExporter, Exporter):
             if isinstance(title, Text):
                 title = make_element(Label, content=[title])
             presentation = Presentation()
-            presentation.left_indent = UFont(2*1.2)
+            presentation.left_indent = UFont(2 * 1.2)
             if isinstance(description, Text):
                 description = make_element(Paragraph, content=[description],
                                            presentation=presentation, noindent=True)
@@ -2661,7 +2672,6 @@ class PDFExporter(FileExporter, Exporter):
         # LCG interpretation of "paragraph" is very wide, we have to expect
         # anything containing anything.  The only "paragraph" meaning we use
         # here is that the content should be separated from other text.
-        pdf_context = context.pdf_context
         content = self._content_export(context, element)
         halign = element.halign()
         if isinstance(content, Text):
