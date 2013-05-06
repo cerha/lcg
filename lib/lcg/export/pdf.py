@@ -553,6 +553,12 @@ class RLImage(reportlab.platypus.flowables.Image):
     # to respect image resolution at least for some image formats.
     def __init__(self, *args, **kwargs):
         self._last_avail_height = None
+        if 'uri' in kwargs:
+            self._uri = kwargs['uri']
+            kwargs = copy.copy(kwargs)
+            del kwargs['uri']
+        else:
+            self._uri = None
         reportlab.platypus.flowables.Image.__init__(self, *args, **kwargs)
     def wrap(self, availWidth, availHeight):
         if availWidth < self.drawWidth:
@@ -584,6 +590,15 @@ class RLImage(reportlab.platypus.flowables.Image):
             except:
                 pass
         reportlab.platypus.flowables.Image._setup_inner(self)
+    def draw(self):
+        reportlab.platypus.flowables.Image.draw(self)
+        uri = self._uri
+        if uri is not None:
+            link_rect = (getattr(self, '_offs_x', 0),
+                         getattr(self, '_offs_y', 0),
+                         self.drawWidth,
+                         self.drawHeight,)
+            self.canv.linkURL(uri, link_rect, relative=1)
 
 class Context(object):
     """Place holder for PDF backend export state.
@@ -1944,14 +1959,16 @@ class Image(Element):
     
     """
     _CATEGORY = 'block'
+    uri = None
     def init(self):
         super(Image, self).init()
         assert isinstance(self.image, resources.Image), ('type error', self.image,)
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
+        assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
     def _export(self, context):
         filename = self.image.src_file()
         if filename:
-            result = RLImage(filename)
+            result = RLImage(filename, uri=self.uri)
         else:
             content = make_element(Text, content=(self.image.title() or self.image.filename()))
             result = make_element(Paragraph, content=[content]).export(context)
@@ -2567,14 +2584,18 @@ class PDFExporter(FileExporter, Exporter):
                     result = [make_element(Text, content=c)]
                 elif isinstance(c, Image):
                     link_content = make_element(Text, content=(c.text or c.content or 'image'))
-                    uri = c.image.uri()
-                    if uri is None:
-                        result = []
+                    if c.image.src_file() is None:
+                        result = [make_element(Link, content=link_content, uri=uri)]
                     else:
                         result = [make_element(Link, content=link_content, uri=uri)]
                 else:
                     result = []
                 return result
+            container_content = content.content
+            if len(container_content) == 1 and isinstance(container_content[0], Image):
+                image = container_content[0]
+                image.uri = uri
+                return image
             filtered_content = content.expand(filter_)
             content = make_element(TextContainer, content=filtered_content)
         return make_element(Link, content=content, uri=uri)
