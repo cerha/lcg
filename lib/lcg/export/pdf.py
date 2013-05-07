@@ -1455,7 +1455,7 @@ class TextContainer(Text):
             style.firstLineIndent = 0
             result = reportlab.platypus.Paragraph(result, style)
         elif isinstance(result, basestring) and self.style:
-            result = RLText(result, style=self.style, halign=self.halign)
+            result = RLText(_unescape(result), style=self.style, halign=self.halign)
         assert _ok_export_result(result), ('wrong export', result,)
         return result
     def prepend_text(self, text):
@@ -2194,7 +2194,7 @@ class Table(Element):
                                 s = header_style
                             else:
                                 s = style
-                            row[i] = RLText(row[i], s, max_width=w_points)
+                            row[i] = RLText(_unescape(row[i]), s, max_width=w_points)
         table_style = reportlab.platypus.TableStyle(table_style_data)
         table = class_(exported_content, colWidths=column_widths, style=table_style,
                        repeatRows=repeat_rows, hAlign=(self.halign or 'CENTER'), vAlign=self.valign)
