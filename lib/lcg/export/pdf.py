@@ -53,14 +53,16 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         self._toc_sequencer = reportlab.lib.sequencer.Sequencer()
         self._toc_key_regexp = re.compile('<a name="([^"]+)"')
         self._new_lcg_context = None
+        self._context_number = 0
 
     def handle_pageEnd(self):
         if self._new_lcg_context is None:
-            next_template = 'Later'
+            next_template = 'Later%d' % (self._context_number,)
         else:
-            next_template = 'First'
             self._lcg_context = self._new_lcg_context
             self._new_lcg_context = None
+            self._make_page_templates()
+            next_template = 'First%d' % (self._context_number,)
         self._handle_nextPageTemplate(next_template)
         reportlab.platypus.BaseDocTemplate.handle_pageEnd(self)
         
@@ -90,7 +92,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                     outline_key = toc_key
                 self.canv.addOutlineEntry(text, outline_key, level=level, closed=(level>=1))
 
-    def build(self, flowables, *args, **kwargs):
+    def _make_page_templates(self):
         context = self._lcg_context
         pdf_context = context.pdf_context
         pdf_context.page = 0
@@ -170,13 +172,19 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         self._calc()
         Frame = reportlab.platypus.frames.Frame
         bottom_margin, height = frame_height((first_page_header or page_header), page_footer)
-        first_frame = Frame(self.leftMargin, bottom_margin, self.width, height, id='first')
+        n = self._context_number = self._context_number + 1
+        first_frame = Frame(self.leftMargin, bottom_margin, self.width, height,
+                            id=('first%d' % (n,)))
         bottom_margin, height = frame_height(page_header, page_footer)
-        later_frame = Frame(self.leftMargin, bottom_margin, self.width, height, id='later')
-        self.addPageTemplates([PageTemplate(id='First', frames=first_frame,
+        later_frame = Frame(self.leftMargin, bottom_margin, self.width, height,
+                            id=('later%d' % (n,)))
+        self.addPageTemplates([PageTemplate(id=('First%d' % (n,)), frames=first_frame,
                                           onPage=on_page, pagesize=self.pagesize),
-                             PageTemplate(id='Later', frames=later_frame,
+                             PageTemplate(id=('Later%d' % (n,)), frames=later_frame,
                                           onPage=on_page, pagesize=self.pagesize)])
+        
+    def build(self, flowables, *args, **kwargs):
+        self._make_page_templates()
         reportlab.platypus.BaseDocTemplate.build(self, flowables,
                                                  canvasmaker=reportlab.pdfgen.canvas.Canvas)
 
