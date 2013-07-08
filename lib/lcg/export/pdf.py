@@ -167,8 +167,8 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             if page_footer is not None:
                 add_flowable(pdf_context.page_footer(), 'bottom')
             canvas.restoreState()
-        # There is a limitation here: Sizes of all headers and footers are
-        # assumed to be the same.
+        # Sizes of all headers and footers are assumed to be the same within
+        # the same context.
         self._calc()
         Frame = reportlab.platypus.frames.Frame
         bottom_margin, height = frame_height((first_page_header or page_header), page_footer)
