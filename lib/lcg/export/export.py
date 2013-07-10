@@ -33,8 +33,7 @@ import re
 import shutil
 import string
 
-from lcg import log, concat, Localizable, Localizer, \
-    Resource, Image, Audio, Video, \
+from lcg import log, concat, Localizable, Localizer, Resource, \
     ContentNode, Content, Container, ContentVariants, \
     Paragraph, PreformattedText, Section, TableOfContents, \
     DefinitionList, FieldSet, \
@@ -300,8 +299,8 @@ class Exporter(object):
                 Container: self._export_container,
                 Paragraph: self._export_paragraph,
                 Link: self._export_link,
-                Section: self._export_section, 
-                Heading: self._export_heading, 
+                Section: self._export_section,
+                Heading: self._export_heading,
                 ContentVariants: self._export_content_variants,
                 TableOfContents: self._export_table_of_contents,
                 ItemizedList: self._export_itemized_list,
@@ -481,7 +480,7 @@ class Exporter(object):
         if lines:
             space = u' ' * indentation
             lines = ([u' ' * init_indentation + lines[0]] +
-                     [space+l if l else '' for l in lines[1:]])
+                     [space + l if l else '' for l in lines[1:]])
         return string.join(lines, '\n')
 
     def _list_item_prefix(self, context):
@@ -781,12 +780,12 @@ class Exporter(object):
             if numbering == ItemizedList.NUMERIC:
                 result = u'%d. ' % (n,)
             elif numbering in (ItemizedList.LOWER_ALPHA, ItemizedList.UPPER_ALPHA,):
-                result = letters[(n-1) % n_letters]
+                result = letters[(n - 1) % n_letters]
                 while n > n_letters:
                     n = n / n_letters
-                    result = letters[(n-1) % n_letters] + result
+                    result = letters[(n - 1) % n_letters] + result
                 if numbering == ItemizedList.UPPER_ALPHA:
-                   result = result.upper()
+                    result = result.upper()
                 result += u'. '
             else:
                 result = self._list_item_prefix(context)
@@ -862,7 +861,7 @@ class Exporter(object):
         content = element.content()
         exported_rows = []
         if content and content[0].line_above:
-            exported_rows.append(separator)            
+            exported_rows.append(separator)
         for row in element.content():
             exported_rows.append(row.export(context))
             if row.line_below:
@@ -887,8 +886,8 @@ class Exporter(object):
             total_width += w + vertical_separator_width + 1
         if widths:
             total_width += 1
-        exported_separator = self._export_horizontal_separator(context, separator, width=total_width,
-                                                               in_table=True)
+        exported_separator = self._export_horizontal_separator(context, separator,
+                                                               width=total_width, in_table=True)
         item_list = []
         for row in exported_rows:
             if isinstance(row, list):
@@ -962,7 +961,8 @@ class Exporter(object):
         In this class the method returns just the escaped video title.
         
         """
-        label = element.title() or "Embedded Video %s id=%s" % (element.service(), element.video_id())
+        label = (element.title() or
+                 "Embedded Video %s id=%s" % (element.service(), element.video_id()))
         return self._inline_export(context, label, None, lang=element.lang())
 
     # Special constructs
@@ -1008,8 +1008,8 @@ class FileExporter(object):
         if lang is None:
             lang = context.lang()
         if lang is not None and ((len(node.variants()) > 1) or (self._force_lang_ext)):
-            name += '.'+ lang
-        return name +'.'+ self._OUTPUT_FILE_EXT
+            name += '.' + lang
+        return name + '.' + self._OUTPUT_FILE_EXT
     
     def _export_resource(self, resource, dir):
         infile = resource.src_file()
@@ -1023,8 +1023,8 @@ class FileExporter(object):
                 self._write_file(outfile, data)
                 if created:
                     log("%s: file created.", outfile)
-        elif not os.path.exists(outfile) or \
-                 os.path.exists(infile) and os.path.getmtime(outfile) < os.path.getmtime(infile):
+        elif (not os.path.exists(outfile) or
+              os.path.exists(infile) and os.path.getmtime(outfile) < os.path.getmtime(infile)):
             if not os.path.isdir(os.path.dirname(outfile)):
                 os.makedirs(os.path.dirname(outfile))
             input_format = os.path.splitext(infile)[1].lower()[1:]
@@ -1034,11 +1034,12 @@ class FileExporter(object):
                 log("%s: file copied.", outfile)
             else:
                 if input_format != 'wav':
-                    raise Exception("Unsupported conversion: %s -> %s" % (input_format, output_format))
+                    raise Exception("Unsupported conversion: %s -> %s" %
+                                    (input_format, output_format))
                 var = 'LCG_%s_COMMAND' % output_format.upper()
                 def cmd_err(msg):
                     info = "Specify a command encoding %s file '%%infile' to %s file '%%outfile'."
-                    raise Exception(msg % var +"\n"+ info % (input_format, output_format))
+                    raise Exception(msg % var + "\n" + info % (input_format, output_format))
                 try:
                     cmd = os.environ[var]
                 except KeyError:
@@ -1049,7 +1050,6 @@ class FileExporter(object):
                 command = cmd.replace('%infile', infile).replace('%outfile', outfile)
                 if os.system(command):
                     raise IOError("Subprocess returned a non-zero exit status.")
-        
     
     def dump(self, node, directory, filename=None, variant=None, recursive=False,
              **kwargs):
