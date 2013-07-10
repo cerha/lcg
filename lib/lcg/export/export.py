@@ -322,6 +322,7 @@ class Exporter(object):
     
     def _export(self, node, context, recursive=False):
         heading = node.heading().export(context)
+        newline = self._newline(context, 2)
         context.set_page_heading(heading)
         content = node.content().export(context)
         if recursive:
@@ -331,9 +332,7 @@ class Exporter(object):
             content = self.concat(content,
                                   *[self._export(n, context, recursive=True)
                                     for n in node.children()])
-        return self.concat(heading,
-                           self._newline(context, 2),
-                           content)
+        return self.concat(heading, newline, content)
 
     def uri(self, context, target, **kwargs):
         """Return the URI of the target as string.
@@ -467,7 +466,7 @@ class Exporter(object):
         text = self._RE_SPACE_MATCHER.sub(' ', text)
         return text
 
-    def _newline(self, context, number=1):
+    def _newline(self, context, number=1, inline=False):
         return u'\n' * number
 
     def _space(self, context, number=1):
@@ -818,7 +817,8 @@ class Exporter(object):
             
     def _export_paragraph(self, context, element):
         """Export given 'Paragraph' element."""
-        return self.concat(self._export_container(context, element), self._newline(context, 2))
+        return self.concat(self._export_container(context, element),
+                           self._newline(context, 2, inline=True))
 
     def _export_table_of_contents(self, context, element):
         """Generate a Table of Contents for given 'TableOfContents' element."""

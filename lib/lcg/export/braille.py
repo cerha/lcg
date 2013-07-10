@@ -133,6 +133,7 @@ class BrailleExporter(FileExporter, Exporter):
             self._page_number = 1
             self._form = [louis.plain_text]
             self._hyphenate = True
+            self._removable_newlines = 0
 
         def tables(self, lang):
             if lang is None:
@@ -177,6 +178,12 @@ class BrailleExporter(FileExporter, Exporter):
             old_hyphenate = self._hyphenate
             self._hyphenate = hyphenate
             return old_hyphenate
+
+        def removable_newlines(self):
+            return self._removable_newlines
+
+        def set_removable_newlines(self, value):
+            self._removable_newlines = value
 
     def __init__(self, *args, **kwargs):
         super(BrailleExporter, self).__init__(*args, **kwargs)
@@ -347,7 +354,13 @@ class BrailleExporter(FileExporter, Exporter):
                 for page in pages:
                     while len(page) > page_height:
                         add_page(page)
-                    add_page(page)
+                    # Final page (maybe it's empty)
+                    removable_newlines = context.removable_newlines()
+                    while page and removable_newlines > 0 and not page[-1]:
+                        page = page[:-1]
+                        removable_newlines -= 1
+                    if page:
+                        add_page(page)
                 pages = new_pages
             else:
                 for i in range(len(pages)):
@@ -484,7 +497,8 @@ class BrailleExporter(FileExporter, Exporter):
         assert len(braille) == len(hyphenation), (braille, hyphenation,)
         return braille, hyphenation
 
-    def _newline(self, context, number=1):
+    def _newline(self, context, number=1, inline=False):
+        context.set_removable_newlines(number if inline else 0)
         return '\n' * number, '0' * number
     
     def _indent(self, exported, indentation, init_indentation=None):
