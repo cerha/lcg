@@ -33,7 +33,7 @@ import re
 import shutil
 import string
 
-from lcg import log, concat, Localizable, Localizer, Resource, \
+from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, \
     ContentNode, Content, Container, ContentVariants, \
     Paragraph, PreformattedText, Section, TableOfContents, \
     DefinitionList, FieldSet, \
@@ -469,6 +469,13 @@ class Exporter(object):
     def _newline(self, context, number=1, inline=False):
         return u'\n' * number
 
+    def _ensure_newlines(self, context, exported, number=1):
+        real_number = 0
+        while (real_number < number and len(exported) > real_number and
+               exported[-real_number - 1] == '\n'):
+            real_number += 1
+        return exported + '\n' * (number - real_number)
+
     def _space(self, context, number=1):
         return u' ' * number
 
@@ -700,7 +707,12 @@ class Exporter(object):
         In this class the method exports the contained content elements and concatenates them.
         
         """
-        return self.concat(*[content.export(context) for content in element.content()])
+        exported = []
+        for content in element.content():
+            if isinstance(content, (ItemizedList, DefinitionList,)) and exported:
+                exported[-1] = self._ensure_newlines(context, exported[-1])
+            exported.append(content.export(context))
+        return self.concat(*exported)
 
     def _transform_link_content(self, context, element):
         return self._export_container(context, element)
@@ -790,30 +802,35 @@ class Exporter(object):
                 result = self._list_item_prefix(context)
             return result
         content = []
-        context.list_level += 1
-        for c in element.content():
-            content.append(self._indent(self.text(context, number(), lang=lang), 0))
-            content.append(self._indent(c.export(context), 2, 0))
-            content.append(self._newline(context))
-        context.list_level -= 1
+        with attribute_value(context, 'list_level', context.list_level + 1):
+            for c in element.content():
+                content.append(self._indent(self.text(context, number(), lang=lang), 0))
+                exported = self._indent(c.export(context), 2, 0)
+                exported = self._ensure_newlines(context, exported)
+                content.append(exported)
         if context.list_level == 0:
             content.append(self._newline(context))
         return self.concat(*content)
 
-    def _export_definition_list(self, context, element, add_newlines=False):
+    def _export_definition_list(self, context, element):
         """Export given 'DefinitionList' element."""
         lang = element.lang()
-        n_newlines = 1 if add_newlines else 0
-        items = self.concat(*[self.concat(dt.export(context),
-                                          self.text(context, self._separator(context), lang=lang),
-                                          dd.export(context),
-                                          self._newline(context, n_newlines))
-                              for dt, dd in element.content()])
-        return self.concat(items, self._newline(context, n_newlines))
+        exported = []
+        for dt, dd in element.content():
+            item = self.concat(dt.export(context),
+                               self.text(context, self._separator(context), lang=lang),
+                               dd.export(context))
+            item = self._ensure_newlines(context, item)
+            exported.append(item)
+        result = self.concat(*exported)
+        if result:
+            n_newlines = 1 if context.list_level > 0 else 2
+            result = self._ensure_newlines(context, result, n_newlines)
+        return result
 
     def _export_field_set(self, context, element):
         """Export given 'FieldSet' element."""
-        return self._export_definition_list(context, element, add_newlines=True)
+        return self._export_definition_list(context, element)
             
     def _export_paragraph(self, context, element):
         """Export given 'Paragraph' element."""

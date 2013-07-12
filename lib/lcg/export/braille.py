@@ -501,6 +501,14 @@ class BrailleExporter(FileExporter, Exporter):
         context.set_removable_newlines(number if inline else 0)
         return '\n' * number, '0' * number
     
+    def _ensure_newlines(self, context, exported, number=1):
+        real_number = 0
+        text = exported[0]
+        while real_number < number and len(text) > real_number and text[-real_number - 1] == '\n':
+            real_number += 1
+        n = number - real_number
+        return text + '\n' * n, exported[1] + '0' * n
+
     def _indent(self, exported, indentation, init_indentation=None):
         if init_indentation is None:
             init_indentation = indentation

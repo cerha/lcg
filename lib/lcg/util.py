@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Author: Tomas Cerha <cerha@brailcom.org>
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,14 +18,12 @@
 
 """Various utilities"""
 
-import glob
-import os
-import string
+from contextlib import contextmanager
 import operator
 import re
 import sys
 
-from lcg import *
+from lcg import TranslatableTextFactory
 _ = TranslatableTextFactory('lcg')
 
 def is_sequence_of(seq, cls):
@@ -116,7 +114,7 @@ def log(message, *args):
         message += ', '.join([unicode(a) for a in args])
     if not message.endswith("\n"):
         message += "\n"
-    sys.stderr.write("  "+message.encode('iso-8859-2', 'replace'))
+    sys.stderr.write("  " + message.encode('iso-8859-2', 'replace'))
     sys.stderr.flush()
 
 def caller():
@@ -125,7 +123,7 @@ def caller():
     Allows logging the frame stack information with simillar formatting as the
     Python traceback.
 
-    For debugging purposes only. 
+    For debugging purposes only.
 
     """
     import inspect
@@ -614,3 +612,23 @@ def month_name(number, abbrev=False):
     else:
         names = _FULL_MONTH_NAMES
     return names[number]
+
+@contextmanager
+def attribute_value(obj, name, value):
+    """Set 'obj' attribute 'name' to 'value' and run the code.
+
+    Restore the original attribute value after the code is exited in any way.
+
+    Arguments:
+
+      obj -- any object
+      name -- attribute name; string
+      value -- value of the attribute; arbitrary object
+
+    """
+    orig_value = getattr(obj, name)
+    setattr(obj, name, value)
+    try:
+        yield
+    finally:
+        setattr(obj, name, orig_value)
