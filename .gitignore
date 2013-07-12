@@ -1,6 +1,7 @@
 *~
 *.pyc
 *.pyo
+*_flymake.py
 /doc/html/*
 /doc/pdf/*
 /doc/src/index.pdf
