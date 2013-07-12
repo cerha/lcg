@@ -35,8 +35,11 @@ the hierarchy of the nodes themselves.
 """
 
 import copy
+import re
 
-from lcg import *
+from lcg import Audio, ContentNode, HorizontalAlignment, \
+    Image, Resource, TranslatableTextFactory, Unit, Video, \
+    config, is_sequence_of
 
 _ = TranslatableTextFactory('lcg')
 
@@ -86,7 +89,8 @@ class Content(object):
         """
         if __debug__:
             cls = self._ALLOWED_CONTAINER or Container
-            assert isinstance(container, cls), "Not a '%s' instance: %s" % (cls.__name__,container)
+            assert isinstance(container, cls), \
+                "Not a '%s' instance: %s" % (cls.__name__, container,)
         self._container = container
 
     def set_parent(self, node):
@@ -100,7 +104,7 @@ class Content(object):
         
         """
         assert isinstance(node, ContentNode), \
-               "Not a 'ContentNode' instance: %s" % node
+            "Not a 'ContentNode' instance: %s" % node
         #assert self._parent is None or self._parent is node, \
         #       "Reparenting not allowed: %s -> %s" % (self._parent, node)
         self._parent = node
@@ -249,10 +253,11 @@ class Container(Content):
         assert halign is None or isinstance(halign, str), halign
         assert valign is None or isinstance(valign, str), valign
         assert orientation is None or isinstance(orientation, str), orientation
+        from lcg import Presentation
         assert presentation is None or isinstance(presentation, Presentation), presentation
         super(Container, self).__init__(**kwargs)
         if name:
-            assert id == None, id
+            assert id is None, id
         else:
             # For backwards compatibility ('name' was formely named 'id').
             name = id
@@ -271,17 +276,17 @@ class Container(Content):
                     assert len(subseq) == self._SUBSEQUENCE_LENGTH
                 for c in subseq:
                     assert isinstance(c, self._ALLOWED_CONTENT), \
-                           "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, c)
+                        "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, c)
                     c.set_container(self)
         elif isinstance(content, (list, tuple)):
             assert is_sequence_of(content, self._ALLOWED_CONTENT), \
-                   "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT, content)
+                "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT, content)
             self._content = tuple(content)
             for c in content:
                 c.set_container(self)
         else:
             assert isinstance(content, self._ALLOWED_CONTENT), \
-                   "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, content)
+                "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, content)
             self._content = (content,)
             content.set_container(self)
 
@@ -380,11 +385,11 @@ class Quotation(Container):
         super(Quotation, self).__init__(content, **kwargs)
 
     def source(self):
-        """Return the qoutation source as passed to the constructor."""
+        """Return the quotation source as passed to the constructor."""
         return self._source
 
     def uri(self):
-        """Return the qoutation source URI as passed to the constructor."""
+        """Return the quotation source URI as passed to the constructor."""
         return self._uri
         
 class Superscript(Container):
@@ -394,7 +399,6 @@ class Superscript(Container):
 class Subscript(Container):
     """Text vertically aligned below the normal line level."""
     pass
-
 
 
 class TextContent(Content):
@@ -578,7 +582,8 @@ class _InlineObject(Content):
     def _resource_instance(self, context, resource, cls):
         if isinstance(resource, (str, unicode)):
             filename = resource
-            if filename.startswith('http:') or filename.startswith('https:') or filename.startswith('ftp:'):
+            if ((filename.startswith('http:') or filename.startswith('https:') or
+                 filename.startswith('ftp:'))):
                 resource = cls(filename, uri=filename)
             else:
                 resource = context.resource(filename)
@@ -599,7 +604,6 @@ class _InlineObject(Content):
     def name(self):
         """Return the value of 'name' as passed to the constructor."""
         return self._name
-
 
     
 class _SizedInlineObject(_InlineObject):
@@ -754,7 +758,6 @@ class InlineVideo(_SizedInlineObject):
 
         """
         return self._resource_instance(context, self._image, Image)
-    
 
 
 class InlineExternalVideo(Content):
@@ -948,8 +951,9 @@ class HtmlContent(TextContent):
     
     """
     def export(self, context):
+        from lcg.export import HtmlExporter
         assert isinstance(context.exporter(), HtmlExporter), \
-               "Only HTML export is supported for this element."
+            "Only HTML export is supported for this element."
         return self._text
 
     
@@ -1251,7 +1255,7 @@ class Section(Container):
         on section position in the document).
 
         """
-        return Heading(self._heading, level=len(self.section_path())+1)
+        return Heading(self._heading, level=len(self.section_path()) + 1)
 
     def in_toc(self):
         """Return true if the section is supposed to appear in TOC."""
@@ -1269,7 +1273,7 @@ class Section(Container):
         if self._anchor is None:
             path = self.section_path()
             if len(path) >= 2:
-                self._anchor = path[-2].anchor() +'.'+ str(self.section_number())
+                self._anchor = path[-2].anchor() + '.' + str(self.section_number())
             else:
                 numbers = [str(x.section_number()) for x in path]
                 self._anchor = self._ANCHOR_PREFIX + '.'.join(numbers)
@@ -1479,7 +1483,7 @@ class Substitution(Content):
         assert isinstance(name, basestring), name
         assert markup is None or isinstance(markup, basestring), markup
         self._name = name
-        self._markup = markup or '$'+name
+        self._markup = markup or '$' + name
         super(Substitution, self).__init__(**kwargs)
 
     def name(self):
@@ -1490,7 +1494,6 @@ class Substitution(Content):
         """Return source text representation of the variable."""
         return self._markup
 
-    
 
 class ContentVariants(Container):
     """Container of multiple language variants of the same content.
@@ -1514,7 +1517,7 @@ class ContentVariants(Container):
         """
         self._variants = {}
         for lang, content in variants:
-            if isinstance(content, (list, tuple)): 
+            if isinstance(content, (list, tuple)):
                 content = Container(content)
             self._variants[lang] = content
         super(ContentVariants, self).__init__(self._variants.values())
@@ -1618,13 +1621,14 @@ class MathML(Content):
             if entity in ('amp', 'lt', 'gt', 'quot', 'apos', 'bsol', 'newline',):
                 i += end
             else:
-                expansion = entities.entities.get(entity)
+                from lcg.export.entities import entities
+                expansion = entities.get(entity)
                 if expansion is None:
                     i += end
                 else:
-                    content = content[:i+start] + expansion + content[i+end:]
+                    content = content[:i + start] + expansion + content[i + end:]
                     i += start + len(expansion)
-        content = content.encode('utf-8')        
+        content = content.encode('utf-8')
         return content
 
     def _dom_content(self, element):
@@ -1707,7 +1711,7 @@ class MathML(Content):
             i = 0
             for c in children:
                 if separators and i > 0:
-                    s = separators[-1] if i > len(separators) else separators[i-1]
+                    s = separators[-1] if i > len(separators) else separators[i - 1]
                     ElementTree.SubElement(mrow, 'mo', dict(separator='true')).text = s
                 mrow.append(c)
                 i += 1
@@ -1776,6 +1780,7 @@ def coerce(content, formatted=False):
         return container(items)
     elif isinstance(content, (str, unicode)):
         if formatted:
+            from lcg import Parser
             return Parser().parse_inline_markup(content)
         else:
             return TextContent(content)
@@ -1881,4 +1886,3 @@ def hr():
 def pre(text, **kwargs):
     """Create an 'PreformattedText' instance by coercing all arguments."""
     return PreformattedText(text, **kwargs)
-
