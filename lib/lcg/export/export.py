@@ -946,6 +946,10 @@ class Exporter(object):
         label = element.title()
         if label is None and resource is not None:
             label = resource.title() or resource.filename()
+        if resource is not None:
+            descr = resource.descr()
+            if descr:
+                label = '%s (%s)' % (label, descr,)
         return self.text(context, label, lang=lang)
 
     def _export_inline_image(self, context, element):
