@@ -460,9 +460,7 @@ class Exporter(object):
         return self.escape(text)
 
     def _reformat_text(self, text):
-        text = text.replace('\n', ' ')
-        text = text.replace('\r', ' ')
-        text = text.replace('\t', ' ')
+        text = text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
         text = self._RE_SPACE_MATCHER.sub(' ', text)
         return text
 
@@ -600,7 +598,21 @@ class Exporter(object):
                 
     def _export_quotation(self, context, element):
         """Export the given 'Quotation' element."""
-        return self._export_container(context, element)
+        exported = self._export_container(context, element)
+        source = element.source()
+        uri = element.uri()
+        if source or uri:
+            lang = element.lang()
+            extra = [self.text(context, '--', lang=lang)]
+            if source:
+                extra.append(self.text(context, u' ' + source, lang=lang))
+            if uri:
+                format_ = u' (%s)' if source else u' %s'
+                extra.append(self.text(context, format_ % (uri,), lang=lang))
+            exported = self.concat(exported, *extra)
+        exported = self._ensure_newlines(context, exported, 2)
+        exported = self._indent(exported, 1)
+        return exported
 
     def _export_figure(self, context, element):
         """Export the given 'Figure' element."""
