@@ -25,8 +25,14 @@ braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': ['cs-g1.ctb']}
 braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
                               'cs': 'hyph_cs_CZ.dic'}
+
 page_width = lcg.UFont(35)
 page_height = lcg.UFont(29)
+inner_margin = lcg.UFont(0)
+outer_margin = lcg.UFont(0)
+top_margin = lcg.UFont(0)
+bottom_margin = lcg.UFont(0)
+
 left_page_footer = lcg.Container((lcg.PageNumber(),
                                   lcg.Container((lcg.PageHeading(),),
                                                 halign=lcg.HorizontalAlignment.CENTER),))
@@ -562,18 +568,36 @@ debug_device_output_cs = {
     u'⣿': u'<+>78'
 }
 
-# Index 4x4 Pro V2, Index Everest-D V2
-def device_init(width, height):
-    return ('0,0,0,0,x,x,x,x,x,%d,0,0,0,0,4,1,0,0,' # 0-17
-            'x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,') % (width - 23,)
-device_finish = ''
+# Index Everest-D V2, Index 4x4 PRO V2
+def device_init_index_v2(width, height, inner, outer, top, bottom):
+    return (('0,0,0,0,x,x,x,x,x,' # 0-8
+             '%(width)d,%(inner)d,%(outer)d,%(top)d,%(bottom)d,4,1,0,0,' # 9-17
+             'x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,') %
+            dict(width=(width - 23), inner=inner, outer=outer, top=top, bottom=bottom))
 # Index Everest-D V3
-def device_init(width, height):
-    return 'DBT0,TD0,LS50,DP2,PN0,PW%d,PL%d,IM0,OM0,TM0,BM0;' % (width * 6, height * 10,)
+def device_init_index_v3(width, height, inner, outer, top, bottom):
+    return (('DBT0,TD0,LS50,DP2,PN0,PW%(width)d,PL%(height)d,'
+             'IM%(inner)d,OM%(outer)d,TM%(top)d,BM%(bottom)d;') %
+            dict(width=(width * 6), height=(height * 10),
+                 inner=inner, outer=outer, top=top, bottom=bottom))
 # Index Everest-D V4, Index 4x4 PRO V3
-def device_init(width, height):
-    return 'DBT0,TD0,LS50,DP2,PN0,CH%d,LP%d,BI0,TM0;' % (width, height,)
+def device_init_index_v4(width, height, inner, outer, top, bottom):
+    return (('DBT0,TD0,LS50,DP2,PN0,CH%(width)d,LP%(height)d,'
+             'BI%(inner)d,TM%(top)d;') %
+            dict(width=width, height=height, inner=inner, top=top))
+device_init = None
 device_finish = None
+
+printers = {'Index Everest-D V2, Index 4x4 PRO V2':
+            dict(device_init=device_init_index_v2,
+                 device_finish=''),
+            'Index Everest-D V3':
+            dict(device_init=device_init_index_v3),
+            'Index Everest-D V4, Index 4x4 PRO V3':
+            dict(device_init=device_init_index_v4),
+            }
+default_printer = 'Index Everest-D V2, Index 4x4 PRO V2'
+
 device_output = {
     # whitespace
     u'\n': u'\n',

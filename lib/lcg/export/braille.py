@@ -380,10 +380,20 @@ class BrailleExporter(FileExporter, Exporter):
                 output += device_table[c]
             except KeyError:
                 raise BrailleError(_("Text can't be represented on given output device."))
-        if presentation.device_init is not None:
-            output = presentation.device_init(page_width, page_height) + output
-        if presentation.device_finish is not None:
-            output += presentation.device_finish
+        if presentation.default_printer is not None:
+            printer_properties = presentation.printers[presentation.default_printer]
+        else:
+            printer_properties = {}
+        device_init = printer_properties.get('device_init', presentation.device_init)
+        if device_init is not None:
+            inner = presentation.inner_margin.size()
+            outer = presentation.outer_margin.size()
+            top = presentation.top_margin.size()
+            bottom = presentation.bottom_margin.size()
+            output = device_init(page_width, page_height, inner, outer, top, bottom) + output
+        device_finish = printer_properties.get('device_finish', presentation.device_finish)
+        if device_finish is not None:
+            output += device_finish
         return output
             
     # Basic utilitites

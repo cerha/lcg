@@ -99,12 +99,12 @@ class Presentation(object):
     top_margin = None
     """Amount of space on the top of the object, non-relative 'Unit'.
     If 'None', use the default value.
-    It currently works only for PDF pages if set for the top level node.
+    It currently works only for PDF pages and Braille if set for the top level node.
     """
     bottom_margin = None
     """Amount of space on the bottom of the object, non-relative 'Unit'.
     If 'None', use the default value.
-    It currently works only for PDF pages if set for the top level node.
+    It currently works only for PDF pages and Braille if set for the top level node.
     """
     left_margin = None
     """Amount of space on the left of the object, non-relative 'Unit'.
@@ -115,6 +115,16 @@ class Presentation(object):
     """Amount of space on the right of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
+    """
+    inner_margin = None
+    """Amount of space on the inner side of the object, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for Braille if set for the top level node.
+    """
+    outer_margin = None
+    """Amount of space on the outer side of the object, non-relative 'Unit'.
+    If 'None', use the default value.
+    It currently works only for Braille if set for the top level node.
     """
     page_width = None
     """Page width, non-relative 'Unit'.
@@ -157,6 +167,18 @@ class Presentation(object):
     """Dictionary of Braille hyphenation tables to use.
     Keys are language codes (strings), values are Braille hyphenation table
     names (strings) for liblouis.
+    Useful only for Braille output.
+    """
+    printers = {}
+    """Dictionary of printer names (keys) and their properties (values).
+    Printer properties are represented by a dictionary with property names as
+    keys and their corresponding values as values.
+    Only 'device_init' and 'device_finish' properties are currently
+    recognized.
+    Useful only for Braille output.
+    """
+    default_printer = None
+    """Default printer, one of the 'printers' keys or 'None'.
     Useful only for Braille output.
     """
     left_page_footer = None
