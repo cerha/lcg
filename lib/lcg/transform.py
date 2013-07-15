@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012 Brailcom, o.p.s.
+# Copyright (C) 2012, 2013 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -111,7 +111,7 @@ class Processor(object):
                 if isinstance(test, basestring):
                     test = (test,)
                 if isinstance(test, (tuple, list,)):
-                    tag_regexp = re.compile(test[0]+'$')
+                    tag_regexp = re.compile(test[0] + '$')
                     attr_tests = [(a, re.compile(r),) for a, r in test[1:]]
                     def test_function(element, tag_regexp=tag_regexp, attr_tests=attr_tests):
                         if not tag_regexp.match(element.tag):
@@ -121,7 +121,7 @@ class Processor(object):
                                 value = element.attrib[attr]
                             except KeyError:
                                 return False
-                            if not regexp.match(value+'$'):
+                            if not regexp.match(value + '$'):
                                 return False
                         return True
                 elif isinstance(test, collections.Callable):
@@ -326,16 +326,21 @@ class XML2Content(XMLProcessor):
                 ('preformatted', (self._text, dict(class_=lcg.PreformattedText))),
                 ('mathml', (self._text, dict(class_=lcg.MathML))),
                 (('paragraph', ('align', 'right')),
-                 (self._container, dict(class_=lcg.Paragraph, halign=lcg.HorizontalAlignment.RIGHT))),
+                 (self._container, dict(class_=lcg.Paragraph,
+                                        halign=lcg.HorizontalAlignment.RIGHT))),
                 (('paragraph', ('align', 'center')),
-                 (self._container, dict(class_=lcg.Paragraph, halign=lcg.HorizontalAlignment.CENTER))),
+                 (self._container, dict(class_=lcg.Paragraph,
+                                        halign=lcg.HorizontalAlignment.CENTER))),
                 (('paragraph', ('align', 'justify')),
-                 (self._container, dict(class_=lcg.Paragraph, halign=lcg.HorizontalAlignment.JUSTIFY))),
+                 (self._container, dict(class_=lcg.Paragraph,
+                                        halign=lcg.HorizontalAlignment.JUSTIFY))),
                 ('paragraph', (self._container, dict(class_=lcg.Paragraph))),
                 (('list', ('order', 'lower-alpha')),
-                 (self._container, dict(class_=lcg.ItemizedList, order=lcg.ItemizedList.LOWER_ALPHA))),
+                 (self._container, dict(class_=lcg.ItemizedList,
+                                        order=lcg.ItemizedList.LOWER_ALPHA))),
                 (('list', ('order', 'upper-alpha')),
-                 (self._container, dict(class_=lcg.ItemizedList, order=lcg.ItemizedList.UPPER_ALPHA))),
+                 (self._container, dict(class_=lcg.ItemizedList,
+                                        order=lcg.ItemizedList.UPPER_ALPHA))),
                 (('list', ('order', 'numeric')),
                  (self._container, dict(class_=lcg.ItemizedList, order=lcg.ItemizedList.NUMERIC))),
                 ('list', (self._container, dict(class_=lcg.ItemizedList))),
@@ -349,7 +354,7 @@ class XML2Content(XMLProcessor):
                 ('table', self._table),
                 ('row', (self._container, dict(class_=lcg.TableRow))),
                 ('cell', self._table_cell),
-                )
+            )
         
         def _transform_sub(self, element, children=None):
             if children is None:
@@ -470,7 +475,7 @@ class XML2HTML(XMLProcessor):
                 ('table', self._table),
                 ('row', (self._container, dict(class_=lcg.TableRow))),
                 ('cell', self._table_cell),
-                )
+            )
         
         def __init__(self):
             XMLProcessor.Transformer.__init__(self)
@@ -583,7 +588,7 @@ class XML2HTML(XMLProcessor):
             transformed = xml.etree.ElementTree.XML(element.text)
             for e in transformed.getiterator():
                 if e.tag.startswith('{'):
-                    e.tag = e.tag[e.tag.find('}')+1:]
+                    e.tag = e.tag[e.tag.find('}') + 1:]
             return transformed
 
     def transform(self, data):
@@ -657,7 +662,7 @@ class HTML2XML(Processor):
             
         def handle_entityref(self, name):
             if self._hp_raw:
-                self._handle_data('&'+name+';')
+                self._handle_data('&' + name + ';')
             else:
                 expanded = htmlentitydefs.entitydefs[name]
                 if expanded[0] == '&' and expanded[-1] == ';':
@@ -699,7 +704,8 @@ class HTML2XML(Processor):
 
         def _matchers(self):
             return (
-                (('div', ('style', '.*page-break-after: always;.*')), (self._single, dict(tag='new-page'))),
+                (('div', ('style', '.*page-break-after: always;.*')),
+                 (self._single, dict(tag='new-page'))),
                 ('br', (self._single, dict(tag='new-line'))),
                 ('(html|div|span|strike|li|dt|dd)', self._container),
                 (('p', ('style', 'text-align: right;')),
@@ -733,7 +739,7 @@ class HTML2XML(Processor):
                 ('math', (self._plain, dict(tag='mathml'))),
                 ('img', self._image),
                 ('_text', self._text),
-                )
+            )
             
         def _first_text(self, element):
             """Return first text found in 'element'.
@@ -788,8 +794,8 @@ class HTML2XML(Processor):
             obj = list(obj)
             content = []
             while obj:
-                c = obj.pop(0)
-                content.append(self.transform(c, obj))
+                c_ = obj.pop(0)
+                content.append(self.transform(c_, obj))
             if nowhitespace:
                 content = [c for c in content if c.tag != 'text' or c.text.strip()]
             return content
@@ -840,7 +846,7 @@ class HTML2XML(Processor):
         def _anchor(self, element, followers):
             name = element.attrib['name']
             text = self._first_text(element)
-            return self._make_content('anchor', dict (anchor=name), (), text)
+            return self._make_content('anchor', dict(anchor=name), (), text)
 
         def _link(self, element, followers):
             if 'enlarge-image' in element.attrib.get('class', ''):
