@@ -18,15 +18,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import collections
 import copy
 import HTMLParser
 import htmlentitydefs
 import re
 import string
+import sys
 import types
 import xml.etree.ElementTree
 
-from lcg import *
+import lcg
 
 class ProcessingError(Exception):
     """Exception for errors generated during processing of defective source data.
@@ -103,27 +105,29 @@ class Parser(object):
     """
     _ALIGNMENT_MATCHER = re.compile(r'@(center|centre|left|right) *\r?$', re.MULTILINE)
     _HRULE_MATCHER = re.compile(r'^----+ *\r?$', re.MULTILINE)
-    _TOC_MATCHER = re.compile(r'(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>(N?TOC|NodeIndex))(\((?P<tocdepth>\d+)\))?\@ *')
+    _TOC_MATCHER = re.compile(r'(?:(?P<title>[^\r\n]+)[\t ]+)?\@(?P<toctype>(N?TOC|NodeIndex))'
+                              r'(\((?P<tocdepth>\d+)\))?\@ *')
     _TABLE_MATCHER = re.compile(r'\|.*\| *\r?$', re.MULTILINE)
     _CELL_ALIGNMENT_MATCHER = re.compile(r'<([clr]?)([0-9]*)>')
-    _CELL_ALIGNMENT_MAPPING = {'c': TableCell.CENTER, 'l': TableCell.LEFT, 'r': TableCell.RIGHT}
+    _CELL_ALIGNMENT_MAPPING = {'c': lcg.TableCell.CENTER, 'l': lcg.TableCell.LEFT,
+                               'r': lcg.TableCell.RIGHT}
     _COMMENT_MATCHER = re.compile('^#[^\r\n]*\r?(\n|$)', re.MULTILINE)
     _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<title>.*) (?P=level)' +
                                    r'(?:[\t ]+(?:\*|(?P<anchor>[\w\d_-]+)))? *\r?$'),
                                   re.MULTILINE)
     _LINE_MATCHER = re.compile(r'^([\t ]*)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
-    _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL|re.MULTILINE)
+    _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL | re.MULTILINE)
     _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _VSPACE_MATCHER = re.compile(r'@vspace +([0-9]+(\.[0-9]+)?)mm\r?$', re.MULTILINE)
     _FIELD_MATCHER = re.compile(r':(?P<label>[^:]*\S):[\t ]*' +
                                 r'(?P<value>[^\r\n]*(?:\r?\n[\t ]+[^\r\n]+)*)\r?$', re.MULTILINE)
-    _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' + 
+    _DEFINITION_MATCHER = re.compile(r'(?P<term>\S[^\r\n]*)\r?\n' +
                                      r'(?P<description>([\t ]+\S+\r?\n)*([\t ]+\S+\r?\n?))')
     _LIST_MATCHER = re.compile(r'( *)\(?(?:\*|-|(?:[a-z]|\d+|#)(?:\)|\.)) +')
     _STYLE_MATCHER = re.compile(r'@style +([a-z_]+)[\t ]*\r?$', re.MULTILINE)
     _TAB_MATCHER = re.compile(r'^\t')
-    
+
     _PARAMETERS = {'header': ('parameter', 'page_header', None,),
                    'first_page_header': ('parameter', 'first_page_header', None,),
                    'footer': ('parameter', 'page_footer', None,),
@@ -139,34 +143,37 @@ class Parser(object):
                    }
 
     _INLINE_MARKUP = (
-        ('newline',    '//'),
-        ('emphasized', ('/',  '/')),
-        ('strong',     ('\*', '\*')),
-        ('code',       ('=',  '=')),
-        ('underlined', ('_',  '_')),
-        ('citation',   ('>>', '<<')),
+        ('newline', '//'),
+        ('emphasized', ('/', '/')),
+        ('strong', ('\*', '\*')),
+        ('code', ('=', '=')),
+        ('underlined', ('_', '_')),
+        ('citation', ('>>', '<<')),
         # Link to an internal or external (http) target via [ ].
         ('link', (r'\['
-                  r'(?P<align>[<>])?'                     # Left/right Image aligment e.g. [<imagefile], [>imagefile]
-                  r'(?P<href>[^\[\]\|\s]*?)'               # The link target e.g. [src]
-                  r'(?::(?P<size>\d+x\d+))?'              # Optional explicit image (or video) size e.g. [image.jpg:30x40])
-                  r'(?:(?:\s*\|\s*|\s+)'                  # Separator (pipe is enabled for backwards compatibility, but space is the official separator)
-                  r'(?P<label>[^\[\]\|]*))?'              # Label text
-                  r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?' # Description after | [src Label | Description] 
+                  r'(?P<align>[<>])?' # Left/right Image aligment e.g. [<imagefile], [>imagefile]
+                  r'(?P<href>[^\[\]\|\s]*?)' # The link target e.g. [src]
+                  r'(?::(?P<size>\d+x\d+))?' # Optional explicit image (or video) size
+                                             # e.g. [image.jpg:30x40])
+                  r'(?:(?:\s*\|\s*|\s+)' # Separator (pipe is enabled for backwards compatibility,
+                                         # but space is the official separator)
+                  r'(?P<label>[^\[\]\|]*))?' # Label text
+                  r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?' # Description after |
+                                                          # [src Label | Description]
                   r'\]')),
         # Link directly in the text starting with http(s)/ftp://
         ('uri', (r'(?:https?|ftp)://\S+?(?=[\),.:;]*(\s|$))')), # ?!? SOS!
         ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
-        ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" + \
-                              "|\{[^\}]+\})")),
+        ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" +
+                          "|\{[^\}]+\})")),
         ('comment', r'^#.*'),
         ('dash', r'(^|(?<=\s))--($|(?=\s))'),
         ('nbsp', '~'),
         ('page_number', '@PAGE@'),
         ('total_pages', '@PAGES@'),
         ('escape', '\\\\(?P<char>[-*@])'),
-        )
-    
+    )
+
     _INLINE_MARKUP_PARAMETERS = ('align', 'href', 'label', 'descr', 'subst', 'size', 'char')
 
     _VIMEO_VIDEO_MATCHER = re.compile(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
@@ -176,12 +183,12 @@ class Parser(object):
     _AUDIO_EXTENSIONS = ('mp3', 'ogg')
     _VIDEO_EXTENSIONS = ('flv', 'ogv', 'mp4')
     _BLANK_MATCHER = re.compile(r'\s+', re.MULTILINE)
-    
+
     class _StackEntry(object):
         def __init__(self, name):
             self.name = name
             self.content = []
-            
+
     def __init__(self):
         self._processors = (self._alignment_processor,
                             self._field_processor,
@@ -199,14 +206,14 @@ class Parser(object):
                             self._paragraph_processor,
                             )
         regexp = r"(?P<%s>\\*%s)"
-        pair_regexp = '|'.join((regexp % ("%s_end",   r"(?<=\S)%s(?!\w)"),
+        pair_regexp = '|'.join((regexp % ("%s_end", r"(?<=\S)%s(?!\w)"),
                                 regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
         regexps = [isinstance(markup, str) and regexp % (name, markup)
                    or pair_regexp % (name, markup[1], name, markup[0])
                    for name, markup in self._INLINE_MARKUP]
-        self._inline_markup = re.compile('(?:' +'|'.join(regexps)+ ')',
-                                         re.MULTILINE|re.UNICODE|re.IGNORECASE)
-    
+        self._inline_markup = re.compile('(?:' + '|'.join(regexps) + ')',
+                                         re.MULTILINE | re.UNICODE | re.IGNORECASE)
+
     def _prune_kwargs(self, kwargs, prune):
         kwargs = copy.copy(kwargs)
         for k in prune:
@@ -222,11 +229,11 @@ class Parser(object):
             return None
         identifier = match.group(1)
         if identifier in ('center', 'centre',):
-            halign = HorizontalAlignment.CENTER
+            halign = lcg.HorizontalAlignment.CENTER
         elif identifier == 'left':
-            halign = HorizontalAlignment.LEFT
+            halign = lcg.HorizontalAlignment.LEFT
         elif identifier == 'right':
-            halign = HorizontalAlignment.RIGHT                
+            halign = lcg.HorizontalAlignment.RIGHT
         position = self._find_next_block(text, position + match.end())
         kwargs = self._prune_kwargs(kwargs, ('halign',))
         return self._parse(text, position, halign=halign, **kwargs)
@@ -242,9 +249,10 @@ class Parser(object):
                     return None
                 break
             groups = match.groupdict()
-            fields.append((self.parse_inline_markup(groups['label']), self.parse_inline_markup(groups['value']),))
+            fields.append((self.parse_inline_markup(groups['label']),
+                           self.parse_inline_markup(groups['value']),))
             position += match.end() + 1
-        return FieldSet(fields), position
+        return lcg.FieldSet(fields), position
 
     def _definition_processor(self, text, position, **kwargs):
         match = self._DEFINITION_MATCHER.match(text[position:])
@@ -259,28 +267,29 @@ class Parser(object):
             next_position = position
             while True:
                 line_match = self._LINE_MATCHER.match(text[position:])
-                if (not line_match or
-                    (line_match.group(2) and not line_match.group(1)) or
-                    line_match.end() == 0):
+                if ((not line_match or
+                     (line_match.group(2) and not line_match.group(1)) or
+                     line_match.end() == 0)):
                     break
                 position += line_match.end()
             description += text[next_position:position]
             parsed_description = self.parse(description)
             # Handle backward compatibility with the old structured text constructs
-            if (not definitions and
-                len(parsed_description) == 1 and
-                isinstance(parsed_description[0], ItemizedList)):
+            if ((not definitions and
+                 len(parsed_description) == 1 and
+                 isinstance(parsed_description[0], lcg.ItemizedList))):
                 self._old_position = old_position
                 return None
-            definitions.append((self.parse_inline_markup(term), Container(parsed_description),))
+            definitions.append((self.parse_inline_markup(term),
+                                lcg.Container(parsed_description),))
             match = self._DEFINITION_MATCHER.match(text[position:])
-        return DefinitionList(definitions), position
-        
+        return lcg.DefinitionList(definitions), position
+
     def _hrule_processor(self, text, position, **kwargs):
         match = self._HRULE_MATCHER.match(text[position:])
         if not match:
             return None
-        return HorizontalSeparator(), position + match.end()
+        return lcg.HorizontalSeparator(), position + match.end()
 
     def _section_processor(self, text, position, section_level=0, **kwargs):
         # section_level is ignored now, but it may become useful if we want to
@@ -305,15 +314,15 @@ class Parser(object):
             content, position = self._parse(text, position, section_level=level, **kwargs)
             if content is not None:
                 section_content.append(content)
-        container = Container(section_content)
-        return Section(title=title, heading=self.parse_inline_markup(title),
-                       content=container, anchor=anchor), position
+        container = lcg.Container(section_content)
+        return lcg.Section(title=title, heading=self.parse_inline_markup(title),
+                           content=container, anchor=anchor), position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])
         if not match:
             return None
-        content = PreformattedText(match.group(1))
+        content = lcg.PreformattedText(match.group(1))
         return content, position + match.end()
 
     def _toc_processor(self, text, position, **kwargs):
@@ -323,9 +332,9 @@ class Parser(object):
         groups = match.groupdict()
         title = groups['title']
         if groups['toctype'] in ('NodeIndex', 'NTOC'):
-            class_ = NodeIndex
+            class_ = lcg.NodeIndex
         else:
-            class_ = TableOfContents
+            class_ = lcg.TableOfContents
         depth = None
         if groups['tocdepth']:
             depth = int(groups['tocdepth'])
@@ -341,11 +350,11 @@ class Parser(object):
             if char in ('*', '-',):
                 return None
             elif char in string.digits:
-                return ItemizedList.NUMERIC
+                return lcg.ItemizedList.NUMERIC
             elif char == char.lower():
-                return ItemizedList.LOWER_ALPHA
+                return lcg.ItemizedList.LOWER_ALPHA
             else:
-                return ItemizedList.UPPER_ALPHA
+                return lcg.ItemizedList.UPPER_ALPHA
         items = []
         kind = list_kind(text, position + match.end(1))
         list_indentation = extra_indentation + match.end(1)
@@ -370,7 +379,7 @@ class Parser(object):
                 position = self._find_next_block(text, position)
                 current_indentation = 0
                 while current_indentation < inner_indentation and position < size:
-                    if text[position+current_indentation] == ' ':
+                    if text[position + current_indentation] == ' ':
                         current_indentation += 1
                     else:
                         break
@@ -379,21 +388,22 @@ class Parser(object):
             if len(item_content) == 1:
                 element = item_content[0]
                 # Hack to prevent ugly list formatting
-                if (isinstance(element, Paragraph) and
-                    element.halign() is None and
-                    len(element.content()) == 1):
+                if ((isinstance(element, lcg.Paragraph) and
+                     element.halign() is None and
+                     len(element.content()) == 1)):
                     element = element.content()[0]
                 items.append(element)
             else:
-                items.append(Container(item_content))
+                items.append(lcg.Container(item_content))
             if position >= size or current_indentation != list_indentation: # no next item
                 break
             match = self._LIST_MATCHER.match(text[position:])
             if not match:               # this is not a (next) list item
                 break
-            if list_kind(text, position + match.end(1)) != kind: # list kind switch => start new list
+            if list_kind(text, position + match.end(1)) != kind:
+                # list kind switch => start new list
                 break
-        return ItemizedList(items, order=kind), position
+        return lcg.ItemizedList(items, order=kind), position
 
     def _table_processor(self, text, position, halign=None, **kwargs):
         if not self._TABLE_MATCHER.match(text[position:]):
@@ -407,25 +417,25 @@ class Parser(object):
                 return alignment
             length = len(cell)
             if length - len(cell.lstrip()) > length - len(cell.rstrip()):
-                return TableCell.RIGHT
+                return lcg.TableCell.RIGHT
             else:
                 return None
         table_rows = []
         line_above = 0
         re_iterate = re.compile(' *@iterate ')
-        while text[position:position+1] == '|':
+        while text[position:position + 1] == '|':
             iterated = False
             # Get the line
             start_position = position = position + 1
             eol = text[start_position:].find('\n')
             if eol >= 0:
                 position += eol + 1
-                if text[position-2] != '\r' and text[position:position+1] == '\r': # Mac
+                if text[position - 2] != '\r' and text[position:position + 1] == '\r': # Mac
                     position += 1
             else:
                 position = len(text)
             # Rule?
-            if text[start_position:start_position+1] == '-':
+            if text[start_position:start_position + 1] == '-':
                 line_above += 1
                 continue
             # Examine the cells
@@ -443,7 +453,7 @@ class Parser(object):
                     if cell in ('<', '<>',):
                         maybe_bars.append(i)
                     if cell in ('>', '<>',):
-                        maybe_bars.append(i+1)
+                        maybe_bars.append(i + 1)
                 else:
                     bars = maybe_bars
                     continue
@@ -464,7 +474,7 @@ class Parser(object):
                         width = match.group(2) or None
                         if width is not None:
                             try:
-                                width = UFont(float(width))
+                                width = lcg.UFont(float(width))
                             except ValueError:
                                 width = None
                         maybe_global_widths[i] = width
@@ -478,7 +488,7 @@ class Parser(object):
             if (not table_rows and
                 all([not cell or cell.startswith("*") and cell.endswith("*")
                      for cell in stripped_cells])):
-                row_cells = [TableHeading(self.parse_inline_markup(cell and cell[1:-1]))
+                row_cells = [lcg.TableHeading(self.parse_inline_markup(cell and cell[1:-1]))
                              for cell in stripped_cells]
             else:
                 # Well, it's just a standard line
@@ -489,10 +499,10 @@ class Parser(object):
                     if match_iterate:
                         iterated = True
                         cell = cell[match_iterate.end():]
-                    row_cells.append(TableCell(self.parse_inline_markup(cell.strip()),
-                                               align=align(i, cell.expandtabs())))
+                    row_cells.append(lcg.TableCell(self.parse_inline_markup(cell.strip()),
+                                                   align=align(i, cell.expandtabs())))
                     i += 1
-            table_rows.append(TableRow(row_cells, line_above=line_above, iterated=iterated))
+            table_rows.append(lcg.TableRow(row_cells, line_above=line_above, iterated=iterated))
             line_above = 0
         if line_above > 0 and table_rows:
             table_rows[-1].set_line_below(line_above)
@@ -503,7 +513,7 @@ class Parser(object):
             column_widths = None
         else:
             column_widths = [global_widths[i] for i in range(len(global_widths))]
-        content = Table(table_rows, bars=bars, column_widths=column_widths, halign=halign)
+        content = lcg.Table(table_rows, bars=bars, column_widths=column_widths, halign=halign)
         return content, position
 
     def _parameters_processor(self, text, position, parameters=None, presentation=None,
@@ -514,14 +524,14 @@ class Parser(object):
         identifier = match.group(1)
         value = match.group(2)
         position += match.end()
-        while text[position:position+1] in ('\r', '\n',):
+        while text[position:position + 1] in ('\r', '\n',):
             position += 1
         if value:
             value = value.strip()
         if not value:
             match = re.search('^@end %s *\r?$' % (identifier,), text[position:], re.MULTILINE)
             if match:
-                value = text[position:position+match.start()].strip()
+                value = text[position:position + match.start()].strip()
                 position += match.end()
             else:                       # unfinished parameter
                 return None, position
@@ -532,7 +542,7 @@ class Parser(object):
                 value = function(value)
             if kind == 'parameter':
                 if parameters is not None:
-                    parameters[name] = Container(Parser().parse(value))
+                    parameters[name] = lcg.Container(Parser().parse(value))
             elif kind == 'presentation':
                 setattr(presentation, name, value)
             else:
@@ -546,7 +556,7 @@ class Parser(object):
         identifier = match.group(1)
         value = match.group(2)
         position += match.end()
-        while text[position:position+1] in ('\r', '\n',):
+        while text[position:position + 1] in ('\r', '\n',):
             position += 1
         if value:
             value = value.strip()
@@ -554,12 +564,12 @@ class Parser(object):
         else:
             match = re.search('^@end %s *\r?$' % (identifier,), text[position:], re.MULTILINE)
             if match:
-                value = text[position:position+match.start()].strip()
+                value = text[position:position + match.start()].strip()
                 position += match.end()
             else:                       # unfinished variable
                 return None, position
-            variable_content = Container(self.parse(value))
-        content = SetVariable(str(identifier), variable_content)
+            variable_content = lcg.Container(self.parse(value))
+        content = lcg.SetVariable(str(identifier), variable_content)
         return content, position
 
     def _style_processor(self, text, position, **kwargs):
@@ -568,7 +578,7 @@ class Parser(object):
             return None
         name = match.group(1)
         text_start = position + match.end()
-        while text[text_start:text_start+1] in ('\r', '\n',):
+        while text[text_start:text_start + 1] in ('\r', '\n',):
             text_start += 1
         match = re.search('^@end style *\r?$', text[text_start:], re.MULTILINE)
         if not match:
@@ -591,7 +601,7 @@ class Parser(object):
             position = self._find_next_block(text, position)
         if not content_list:
             return None, end_position
-        container = Container(content_list, name=name)
+        container = lcg.Container(content_list, name=name)
         return container, end_position
 
     def _space_processor(self, text, position, **kwargs):
@@ -600,9 +610,9 @@ class Parser(object):
             return None
         value = float(match.group(1))
         position += match.end()
-        content = VSpace(UMm(value))
+        content = lcg.VSpace(lcg.UMm(value))
         return content, position
-        
+
     def _paragraph_processor(self, text, position, halign=None, indentation=0, extra_indentation=0,
                              compressed=False, **kwargs):
         next_position = self._skip_content(text, position, indentation=indentation,
@@ -611,14 +621,14 @@ class Parser(object):
         if next_position == position:
             return None
         paragraph_text = text[position:next_position].strip()
-        content = Paragraph(self.parse_inline_markup(paragraph_text), halign=halign)
+        content = lcg.Paragraph(self.parse_inline_markup(paragraph_text), halign=halign)
         return content, next_position
 
     def _whitespace_processor(self, text, position, **kwargs):
         next_position = position
         while text[next_position:] and text[next_position] in string.whitespace:
             next_position += 1
-        content = Paragraph(self.parse_inline_markup(''))
+        content = lcg.Paragraph(self.parse_inline_markup(''))
         return content, next_position
 
     def _strip_comments(self, text):
@@ -638,13 +648,13 @@ class Parser(object):
             match = self._TAB_MATCHER.search(text)
             if not match:
                 break
-            text = text[:match.start()] + ' '*8 + text[match.end():]
+            text = text[:match.start()] + ' ' * 8 + text[match.end():]
         return text
 
     def _skip_content(self, text, position, indentation=0, extra_indentation=0, compressed=False):
         while True:
-            if (self._LITERAL_MATCHER.match(text[position:]) or
-                self._LIST_MATCHER.match(text[position:])):
+            if ((self._LITERAL_MATCHER.match(text[position:]) or
+                 self._LIST_MATCHER.match(text[position:]))):
                 # some blocks don't have to be separated by blank lines
                 break
             match = self._LINE_MATCHER.match(text[position:])
@@ -652,14 +662,15 @@ class Parser(object):
                 break
             if not match.group(2):      # blank line?
                 break
-            if match.end(1) - match.start(1) + extra_indentation < indentation: # reduced indentation?
+            if match.end(1) - match.start(1) + extra_indentation < indentation:
+                # reduced indentation?
                 break
             if compressed and self._LIST_MATCHER.match(text[position:]): # inner list
                 break
             position += match.end()
             extra_indentation = 0
         return position
-        
+
     def _find_next_block(self, text, position):
         start_position = position
         size = len(text)
@@ -677,7 +688,7 @@ class Parser(object):
 
     def _parse(self, text, position, processors=None, **kwargs):
         assert position > self._old_position, \
-               (self._old_position, position, text[position:position+100],)
+            (self._old_position, position, text[position:position + 100],)
         if __debug__:
             self._old_position = position
         for processor in (processors or self._processors):
@@ -686,7 +697,7 @@ class Parser(object):
                 if __debug__:
                     position = result[1]
                     assert position >= min(self._old_position + 1, len(text)), \
-                           (self._old_position, position, text[position:position+100], processor,)
+                        (self._old_position, position, text[position:position + 100], processor,)
                 return result
         else:
             raise Exception('Unhandled text', text[position:])
@@ -696,10 +707,10 @@ class Parser(object):
         if subst.startswith('{') and subst.endswith('}'):
             subst = subst[1:-1]
         if subst:
-            return Substitution(subst, markup=markup)
+            return lcg.Substitution(subst, markup=markup)
         else:
-            return TextContent(markup)
-    
+            return lcg.TextContent(markup)
+
     def _link_markup_handler(self, link, href=None, size=None, label=None, descr=None, align=None):
         def split_filename(filename):
             if filename:
@@ -729,7 +740,7 @@ class Parser(object):
         if size:
             size = tuple(map(int, size.split('x')))
         if align:
-            align = {'>': InlineImage.RIGHT, '<': InlineImage.LEFT}.get(align)
+            align = {'>': lcg.InlineImage.RIGHT, '<': lcg.InlineImage.LEFT}.get(align)
         basename, ext = split_filename(href)
         match = self._YOUTUBE_VIDEO_MATCHER.match(href)
         if match:
@@ -743,68 +754,73 @@ class Parser(object):
             else:
                 video_service = None
         if video_service:
-            result = InlineExternalVideo(video_service, video_id, size=size)
+            result = lcg.InlineExternalVideo(video_service, video_id, size=size)
         elif ext in self._IMAGE_EXTENSIONS and not label_image:
-            result = InlineImage(href, title=label, descr=descr, name=basename, align=align, size=size)
+            result = lcg.InlineImage(href, title=label, descr=descr, name=basename, align=align,
+                                     size=size)
         elif ext in self._AUDIO_EXTENSIONS:
-            result = InlineAudio(href, title=label, descr=descr, name=basename, image=label_image, shared=True)
+            result = lcg.InlineAudio(href, title=label, descr=descr, name=basename,
+                                     image=label_image, shared=True)
         elif ext in self._VIDEO_EXTENSIONS:
-            result = InlineVideo(href, title=label, descr=descr, name=basename, image=label_image, size=size)
+            result = lcg.InlineVideo(href, title=label, descr=descr, name=basename,
+                                     image=label_image, size=size)
         else:
             if label_image:
-                label = InlineImage(label_image, title=label, name=label_image_basename, align=align)
-            if href.startswith('http://') or href.startswith('https://') or href.startswith('ftp://'):
-                target = Link.ExternalTarget(href, label)
+                label = lcg.InlineImage(label_image, title=label, name=label_image_basename,
+                                        align=align)
+            if ((href.startswith('http://') or href.startswith('https://') or
+                 href.startswith('ftp://'))):
+                target = lcg.Link.ExternalTarget(href, label)
             else:
                 target = href
-            result = Link(target, label=label, descr=descr)
+            result = lcg.Link(target, label=label, descr=descr)
         return result
-    
+
     def _uri_markup_handler(self, uri):
         return self._link_markup_handler(uri, href=uri)
 
     def _page_number_markup_handler(self, markup):
-        return PageNumber()
-    
+        return lcg.PageNumber()
+
     def _total_pages_markup_handler(self, markup):
-        return TotalPages()
+        return lcg.TotalPages()
 
     def _escape_markup_handler(self, markup):
-        return TextContent(markup)
-    
+        return lcg.TextContent(markup)
+
     def _email_markup_handler(self, email):
-        return lcg.Link(lcg.Link.ExternalTarget('mailto:'+email, email))
+        return lcg.Link(lcg.Link.ExternalTarget('mailto:' + email, email))
 
     def _newline_markup_handler(self, markup):
-        return NewLine()
+        return lcg.NewLine()
 
     def _comment_markup_handler(self, text):
-        return Content()
+        return lcg.Content()
 
     def _dash_markup_handler(self, markup):
-        return TextContent(u'—')
+        return lcg.TextContent(u'—')
 
     def _nbsp_markup_handler(self, markup):
-        return TextContent(u' ')
+        return lcg.TextContent(u' ')
 
     # The following handlers receive the already parsed lcg.Content instance as
     # argument (as they have paired markup on input).
 
     def _emphasized_markup_handler(self, content):
-        return Emphasized(content)
+        return lcg.Emphasized(content)
 
     def _strong_markup_handler(self, content):
-        return Strong(content)
+        return lcg.Strong(content)
 
     def _code_markup_handler(self, content):
-        return Code(content)
+        return lcg.Code(content)
 
     def _underlined_markup_handler(self, content):
-        return Underlined(content)
+        return lcg.Underlined(content)
 
     def _citation_markup_handler(self, content):
-        return Citation(content)
-    
+        return lcg.Citation(content)
+
     def _markup_handler(self, stack, match, append):
         name, markup, kwargs = None, None, {}
         for key, value in match.groupdict().items():
@@ -819,9 +835,9 @@ class Parser(object):
         initial_backslashes = number_of_backslashes / 2 * '\\'
         if number_of_backslashes % 2:
             # If the number of backslashes is odd, the markup is escaped (printed as is).
-            return [TextContent(initial_backslashes + markup)]
+            return [lcg.TextContent(initial_backslashes + markup)]
         if initial_backslashes:
-            append(TextContent(initial_backslashes))
+            append(lcg.TextContent(initial_backslashes))
         result = []
         # We need two variables (start and end), because both can be False for
         # unpaired markup.
@@ -839,18 +855,18 @@ class Parser(object):
         elif end and stack and name == stack[-1].name:
             # Closing an open markup.
             entry = stack.pop()
-            handler = getattr(self, '_'+name+'_markup_handler')
+            handler = getattr(self, '_' + name + '_markup_handler')
             x = handler(entry.content, **kwargs)
             result.append(x)
         elif not start and not end:
             # Unpaired markup.
-            handler = getattr(self, '_'+name+'_markup_handler')
+            handler = getattr(self, '_' + name + '_markup_handler')
             result.append(handler(markup, **kwargs))
         elif markup:
             # Markup in an invalid context is just printed as is.
             # This can be end markup, which was not opened or start markup,
             # which was already opened.
-            result.append(TextContent(markup))
+            result.append(lcg.TextContent(markup))
         return result
 
     def parse_inline_markup(self, text):
@@ -872,18 +888,18 @@ class Parser(object):
         for match in self._inline_markup.finditer(text):
             preceding_text = text[pos:match.start()]
             if preceding_text:
-                append(TextContent(preceding_text))
+                append(lcg.TextContent(preceding_text))
             append(*self._markup_handler(stack, match, append))
             pos = match.end()
         final_text = text[pos:]
         if final_text:
-            append(TextContent(final_text))
+            append(lcg.TextContent(final_text))
         while stack:
             entry = stack.pop()
-            handler = getattr(self, '_'+entry.name+'_markup_handler')
+            handler = getattr(self, '_' + entry.name + '_markup_handler')
             append(handler(entry.content))
-        return Container(result)
-        
+        return lcg.Container(result)
+
     def parse(self, text, parameters=None):
         """Parse given 'text' and return corresponding content.
 
@@ -899,7 +915,7 @@ class Parser(object):
         assert isinstance(text, basestring), text
         if __debug__:
             self._old_position = -1
-        presentation = Presentation()
+        presentation = lcg.Presentation()
         text = self._strip_comments(text)
         text = self._expand_tabs(text)
         contents = []
@@ -978,13 +994,13 @@ class MacroParser(object):
             try:
                 result = self._evaluate(self._condition)
             except Exception as e:
-                return e.__class__.__name__+': '+unicode(e)
+                return e.__class__.__name__ + ': ' + unicode(e)
             else:
                 return ''.join([unicode(x) for x in self._content[bool(result)]])
 
     def __init__(self, globals=None, evaluate=None, include=None):
         """Arguments:
-        
+
           globals -- dictionary of variables used by default inclusion and
             evaluation methods.
           evaluate -- None for the default evaluation method or a function of
@@ -1139,10 +1155,10 @@ class HTMLProcessor(object):
             num = name.lstrip('&#').rstrip(';')
             expanded = unichr(int(num))
             self.handle_data(expanded)
-            
+
         def handle_entityref(self, name):
             if self._hp_raw:
-                self.handle_data('&'+name+';')
+                self.handle_data('&' + name + ';')
             else:
                 expanded = htmlentitydefs.entitydefs[name]
                 if expanded[0] == '&' and expanded[-1] == ';':
@@ -1167,37 +1183,40 @@ class HTMLProcessor(object):
 
         def _matchers(self):
             return (
-                (('div', ('style', '.*page-break-after: always;.*')), (self._single, dict(class_=NewPage))),
-                ('br', (self._single, dict(class_=NewLine))),
+                (('div', ('style', '.*page-break-after: always;.*')),
+                 (self._single, dict(class_=lcg.NewPage))),
+                ('br', (self._single, dict(class_=lcg.NewLine))),
                 (('pre', ('class', 'lcg-exercise'), ('data-type', '.*')), self._exercise),
                 ('(html|div|span|strike|li|dt|dd)', self._container),
-                ('p', (self._container, dict(class_=Paragraph))),
+                ('p', (self._container, dict(class_=lcg.Paragraph))),
                 ('blockquote', self._blockquote),
                 ('figure', self._figure),
-                ('strong', (self._container, dict(class_=Strong))),
-                ('em', (self._container, dict(class_=Emphasized))),
-                ('u', (self._container, dict(class_=Underlined))),
-                ('sub', (self._container, dict(class_=Subscript))),
-                ('sup', (self._container, dict(class_=Superscript))),
+                ('strong', (self._container, dict(class_=lcg.Strong))),
+                ('em', (self._container, dict(class_=lcg.Emphasized))),
+                ('u', (self._container, dict(class_=lcg.Underlined))),
+                ('sub', (self._container, dict(class_=lcg.Subscript))),
+                ('sup', (self._container, dict(class_=lcg.Superscript))),
                 ('h[0-9]', self._section),
-                ('pre', (self._text, dict(class_=PreformattedText))),
+                ('pre', (self._text, dict(class_=lcg.PreformattedText))),
                 ('ul', (self._list, dict(order=None))),
-                (('ol', ('style', '.* lower-alpha;.*')), (self._list, dict(order=ItemizedList.LOWER_ALPHA))),
-                (('ol', ('style', '.* upper-alpha;.*')), (self._list, dict(order=ItemizedList.UPPER_ALPHA))),
-                ('ol', (self._list, dict(order=ItemizedList.NUMERIC))),
+                (('ol', ('style', '.* lower-alpha;.*')),
+                 (self._list, dict(order=lcg.ItemizedList.LOWER_ALPHA))),
+                (('ol', ('style', '.* upper-alpha;.*')),
+                 (self._list, dict(order=lcg.ItemizedList.UPPER_ALPHA))),
+                ('ol', (self._list, dict(order=lcg.ItemizedList.NUMERIC))),
                 ('dl', self._definition_list),
                 (('a', ('name', '.+')), self._anchor),
-                (('a', ('class', 'lcg-audio')), (self._media, dict(class_=InlineAudio))),
-                (('a', ('class', 'lcg-video')), (self._media, dict(class_=InlineVideo))),
+                (('a', ('class', 'lcg-audio')), (self._media, dict(class_=lcg.InlineAudio))),
+                (('a', ('class', 'lcg-video')), (self._media, dict(class_=lcg.InlineVideo))),
                 ('a', self._link),
                 ('table', self._table),
-                ('tr', (self._container, dict(class_=TableRow))),
+                ('tr', (self._container, dict(class_=lcg.TableRow))),
                 ('t[dh]', self._table_cell),
-                ('hr', (self._single, dict(class_=HorizontalSeparator))),
-                ('math', (self._plain, dict(class_=MathML))),
+                ('hr', (self._single, dict(class_=lcg.HorizontalSeparator))),
+                ('math', (self._plain, dict(class_=lcg.MathML))),
                 ('img', self._image),
                 ('_text', self._text),
-                )
+            )
 
         def _first_text(self, element):
             text = element.text
@@ -1208,7 +1227,7 @@ class HTMLProcessor(object):
                 if text:
                     return text
             return ''
-        
+
         def _plain_text(self, element):
             text = element.text or ''
             for c in element.getchildren():
@@ -1227,29 +1246,28 @@ class HTMLProcessor(object):
             obj = list(obj)
             content = []
             while obj:
-                c = obj.pop(0)
-                content.append(self.transform(c, obj))
+                content.append(self.transform(obj.pop(0), obj))
             if nowhitespace:
                 content = [c for c in content
-                           if not isinstance(c, TextContent) or c.text().strip()
-                           or isinstance(c, Anchor)]
+                           if not isinstance(c, lcg.TextContent) or c.text().strip()
+                           or isinstance(c, lcg.Anchor)]
             return content
 
-        def _container(self, element, followers, class_=Container, **kwargs):
+        def _container(self, element, followers, class_=lcg.Container, **kwargs):
             if element.tag == 'p' and 'style' in element.attrib:
                 styles = dict([[xx.strip() for xx in x.split(':', 2)]
                                for x in element.attrib['style'].strip('\t ;').split(';')])
                 align = styles.get('text-align')
                 if align:
-                    kwargs['halign'] = {'right': HorizontalAlignment.RIGHT,
-                                        'center': HorizontalAlignment.CENTER,
-                                        'justify': HorizontalAlignment.JUSTIFY}.get(align)
+                    kwargs['halign'] = {'right': lcg.HorizontalAlignment.RIGHT,
+                                        'center': lcg.HorizontalAlignment.CENTER,
+                                        'justify': lcg.HorizontalAlignment.JUSTIFY}.get(align)
                 margin = styles.get('margin-left')
                 if margin:
                     margin = margin.strip('px')
                     if margin.isdigit():
-                        kwargs['presentation'] = presentation = Presentation()
-                        presentation.indent_left = UFont(int(margin)/12)
+                        kwargs['presentation'] = presentation = lcg.Presentation()
+                        presentation.indent_left = lcg.UFont(int(margin) / 12)
             content = self._transform_sub(element)
             return class_(content, lang=element.attrib.get('lang'), **kwargs)
 
@@ -1278,7 +1296,6 @@ class HTMLProcessor(object):
 
         def _figure(self, element, followers):
             kwargs = {}
-            figcaption = element.find('figcaption')
             body = []
             for c in element.getchildren():
                 if c.tag == 'figcaption':
@@ -1306,35 +1323,35 @@ class HTMLProcessor(object):
                 title_content = lcg.TextContent(title_content[0].text().strip())
             title_content = lcg.Container(title_content, lang=element.attrib.get('lang'))
             content = self._transform_sub(section_children)
-            return Section(title_text, content, heading=title_content)
+            return lcg.Section(title_text, content, heading=title_content)
 
         def _list(self, element, followers, order=None):
             items = self._transform_sub(element)
-            return ItemizedList(items, order=order)
+            return lcg.ItemizedList(items, order=order)
 
         def _definition_list(self, element, followers):
             items = self._transform_sub(element)
             paired_items = []
             while items:
                 paired_items.append((items.pop(0), items.pop(0),))
-            return DefinitionList(paired_items)
+            return lcg.DefinitionList(paired_items)
 
-        def _text(self, element, followers, class_=TextContent):
+        def _text(self, element, followers, class_=lcg.TextContent):
             return class_(self._first_text(element))
 
-        def _plain(self, element, followers, class_=Content):
+        def _plain(self, element, followers, class_=lcg.Content):
             return class_(element.text)
 
-        def _single(self, element, followers, class_=Content):
+        def _single(self, element, followers, class_=lcg.Content):
             return class_()
 
         def _anchor(self, element, followers):
             name = element.attrib['name']
             text = self._first_text(element)
-            return Anchor(anchor=name, text=text)
+            return lcg.Anchor(anchor=name, text=text)
 
         def _link(self, element, followers):
-            label = Container(self._transform_sub(element))
+            label = lcg.Container(self._transform_sub(element))
             if 'enlarge' in element.attrib.get('data-lcg-link-type', ''):
                 # Temporary hack to ignore link around images enlarged on click.
                 return label
@@ -1344,7 +1361,7 @@ class HTMLProcessor(object):
                     target = resource
                 else:
                     target = element.attrib['href']
-                return Link(target=target, label=label)
+                return lcg.Link(target=target, label=label)
 
         def _media(self, element, followers, class_=None, uri=None, **kwargs):
             resource = element.attrib.get('data-lcg-resource')
@@ -1356,9 +1373,9 @@ class HTMLProcessor(object):
             return class_(target, name=basename, **kwargs)
 
         def _image(self, element, followers):
-            align = {'left': InlineImage.LEFT,
-                     'right': InlineImage.RIGHT}.get(element.attrib.get('align'))
-            return self._media(element, followers, class_=InlineImage,
+            align = {'left': lcg.InlineImage.LEFT,
+                     'right': lcg.InlineImage.RIGHT}.get(element.attrib.get('align'))
+            return self._media(element, followers, class_=lcg.InlineImage,
                                uri=element.attrib['src'], align=align)
 
         def _table(self, element, followers):
@@ -1374,19 +1391,19 @@ class HTMLProcessor(object):
                     self._in_table_heading = False
                 elif tag == 'tbody':
                     content += self._transform_sub(c.getchildren())
-            return Table(content, title=title)
+            return lcg.Table(content, title=title)
 
         def _table_cell(self, element, followers):
-            content = Container(self._transform_sub(element))
+            content = lcg.Container(self._transform_sub(element))
             style = element.attrib.get('style', '')
             align = None
             if style.find('text-align: left;') >= 0:
-                align = TableCell.LEFT
+                align = lcg.TableCell.LEFT
             elif style.find('text-align: right;') >= 0:
-                align = TableCell.RIGHT
+                align = lcg.TableCell.RIGHT
             elif style.find('text-align: center;') >= 0:
-                align = TableCell.CENTER
-            class_ = TableHeading if self._in_table_heading else TableCell
+                align = lcg.TableCell.CENTER
+            class_ = lcg.TableHeading if self._in_table_heading else lcg.TableCell
             return class_(content, align=align)
 
         def _make_matchers(self):
@@ -1396,7 +1413,7 @@ class HTMLProcessor(object):
                 if isinstance(test, basestring):
                     test = (test,)
                 if isinstance(test, (tuple, list,)):
-                    tag_regexp = re.compile(test[0]+'$')
+                    tag_regexp = re.compile(test[0] + '$')
                     attr_tests = [(a, re.compile(r),) for a, r in test[1:]]
                     def test_function(element, tag_regexp=tag_regexp, attr_tests=attr_tests):
                         if not tag_regexp.match(element.tag):
@@ -1406,7 +1423,7 @@ class HTMLProcessor(object):
                                 value = element.attrib[attr]
                             except KeyError:
                                 return False
-                            if not regexp.match(value+'$'):
+                            if not regexp.match(value + '$'):
                                 return False
                         return True
                 elif isinstance(test, collections.Callable):
@@ -1442,7 +1459,7 @@ class HTMLProcessor(object):
         Arguments:
 
           html -- unicode containing input LCG HTML
-          
+
         """
         assert isinstance(html, unicode), html
         tree = self._tree_content(html)
@@ -1458,7 +1475,7 @@ def html2lcg(html):
       html -- unicode containing input LCG HTML
 
     Return corresponding 'Content' instance.
-    
+
     See 'HTMLProcessor' for more information and information about LCG HTML.
 
     """
@@ -1471,7 +1488,7 @@ def add_processing_info(exception, caption, information):
 
     This function is used to add more informatioin to an exception during its
     propagation.
-    
+
     If the exception is a 'ProcessingError' instance, the proper mechanism is
     followed.  Raising 'ProcessingError' in the place, where the error is
     detected should be always prefered.  A special attribute
@@ -1490,13 +1507,13 @@ def add_processing_info(exception, caption, information):
         if not hasattr(exception, '_lcg_processing_details'):
             exception._lcg_processing_details = []
         exception._lcg_processing_details.append((caption, information))
-    
+
 def _log(*args):
     """Just for internal debugging purposes..."""
     def _str(x):
-        if isinstance(x, Container):
+        if isinstance(x, lcg.Container):
             return "<%s %s>" % (x.__class__.__name__, _str(x._content))
-        elif isinstance(x, Content):
+        elif isinstance(x, lcg.Content):
             return str(x)
         elif isinstance(x, (types.ListType, types.TupleType)):
             result = ', '.join([_str(i) for i in x])
@@ -1506,5 +1523,4 @@ def _log(*args):
                 return '(' + result + ')'
         else:
             return str(x.encode('ascii', 'replace'))
-    sys.stderr.write(' '.join([_str(a) for a in args])+"\n")
-   
+    sys.stderr.write(' '.join([_str(a) for a in args]) + "\n")
