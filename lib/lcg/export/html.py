@@ -739,7 +739,7 @@ class HtmlExporter(Exporter):
                           level, lang=lang),
                       g.div(self._exported_container_content(context, element),
                             cls='section-content section-level-%d' % level)),
-                     id='section-' + anchor,
+                     id='section-' + anchor.replace('.', '_'),
                      cls='section-container section-level-%d' % level,
                      **self._container_attr(element))
     
