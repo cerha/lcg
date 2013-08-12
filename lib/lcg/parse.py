@@ -1248,9 +1248,21 @@ class HTMLProcessor(object):
             while obj:
                 content.append(self.transform(obj.pop(0), obj))
             if nowhitespace:
-                content = [c for c in content
-                           if not isinstance(c, lcg.TextContent) or c.text().strip()
-                           or isinstance(c, lcg.Anchor)]
+                new_content = []
+                for c in content:
+                    if ((isinstance(c, lcg.TextContent) and
+                         not isinstance(c, lcg.Anchor) and
+                         not c.text().strip())):
+                        continue
+                    if ((isinstance(c, lcg.NewLine) and
+                         new_content and isinstance(new_content[-1], lcg.TextContent))):
+                        t = new_content[-1]
+                        new_content[-1] = t.clone(t.text().rstrip())
+                    if ((isinstance(c, lcg.TextContent) and
+                         new_content and isinstance(new_content[-1], lcg.NewLine))):
+                        c = c.clone(c.text().lstrip())
+                    new_content.append(c)
+                content = new_content
             return content
 
         def _container(self, element, followers, class_=lcg.Container, **kwargs):

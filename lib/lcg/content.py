@@ -432,6 +432,18 @@ class TextContent(Content):
         """Return the value of 'text' as passed to the constructor."""
         return self._text
 
+    def clone(self, text):
+        """Return copy of the instance with text replaced by 'text'.
+
+        Arguments:
+
+          text -- text content of the element copy; basestring
+
+        """
+        cloned = copy.copy(self)
+        cloned._text = text
+        return cloned
+
     
 class Link(Container):
     """Link to internal or external location."""
