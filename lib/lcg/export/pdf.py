@@ -185,6 +185,9 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         
     def build(self, flowables, *args, **kwargs):
         self._make_page_templates()
+        # It's necessary to reset the global ReportLab sequencer to prevent
+        # occasional invalid item numbers in ordered lists of unrelated builds.
+        reportlab.lib.sequencer.setSequencer(None)
         reportlab.platypus.BaseDocTemplate.build(self, flowables,
                                                  canvasmaker=reportlab.pdfgen.canvas.Canvas)
 
