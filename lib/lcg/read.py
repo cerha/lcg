@@ -375,7 +375,13 @@ def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, recourse
             # Just for backwards compatibility
             cls = m.IndexNode
         else:
-            cls = m.Reader
+            try:
+                cls = m.Reader
+            except AttributeError:
+                reason = (("`Reader' not found in %s file.\n"
+                           "Maybe %s is not an LCG customization file and "
+                           "should be removed to make LCG happy?") % (path, path,))
+                raise lcg.ProcessingError(reason)
     if issubclass(cls, FileReader):
         kwargs = dict(kwargs, dir=dir, encoding=encoding)
         if issubclass(cls, DocFileReader):
