@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2011 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
 
 """Tools for building the LCG 'ContentNode' hierarchy."""
 
-import os
 import codecs
+import glob
+import os
+import re
 import unicodedata
 
-from lcg import *
+import lcg
 
 
 class Reader(object):
@@ -101,7 +103,7 @@ class Reader(object):
         return ()
     
     def _resource_provider(self):
-        return ResourceProvider(dirs=self._resource_dirs())
+        return lcg.ResourceProvider(dirs=self._resource_dirs())
 
     def _globals(self):
         return {}
@@ -125,19 +127,20 @@ class Reader(object):
         """Build hierarchy of 'ContentNode' instances and return the root node."""
         variants = self.variants()
         try:
-            return ContentNode(id=self._id, title=self._title(), brief_title=self._brief_title(),
-                               descr=self._descr(), variants=variants, content=self._content(), 
-                               children=[child.build() for child in self._children()],
-                               resource_provider=self._resource_provider_,
-                               globals=self._globals(), hidden=self._hidden,
-                               **self._parameters)
+            return lcg.ContentNode(id=self._id, title=self._title(),
+                                   brief_title=self._brief_title(),
+                                   descr=self._descr(), variants=variants, content=self._content(),
+                                   children=[child.build() for child in self._children()],
+                                   resource_provider=self._resource_provider_,
+                                   globals=self._globals(), hidden=self._hidden,
+                                   **self._parameters)
         except Exception as e:
             if hasattr(self, '_source_filename'):
                 # TODO: This is a quick hack.  The attribute `_source_filename' is prefilled in
                 # 'FileReader._read_file', so it would be at least more appropriate to move this
                 # hack into the 'FileReader' class.  Even then, there is no guarantee, that the
                 # exception was actually raised during processing this file.
-                e = add_processing_info(e, 'File', self._source_filename)
+                e = lcg.add_processing_info(e, 'File', self._source_filename)
             raise
 
 class FileReader(Reader):
@@ -173,7 +176,7 @@ class FileReader(Reader):
         if lang is not None and not os.path.exists(filename):
             filename2 = self._input_file(name, ext=ext, lang=fallback_lang, dir=dir)
             if os.path.exists(filename2):
-                log("File '%s' not found. Using '%s' instead.", filename, filename2)
+                lcg.log("File '%s' not found. Using '%s' instead.", filename, filename2)
                 filename = filename2
         self._source_filename = filename
         fh = open(filename)
@@ -184,7 +187,7 @@ class FileReader(Reader):
         encoding = self._encoding
         if lines:
             if lines[0].startswith(self._BOM):
-                # Strip the Unicode marker (BOM) 
+                # Strip the Unicode marker (BOM)
                 lines[0] = lines[0][len(self._BOM):]
             match = self._ENCODING_HEADER_MATCHER.match(lines[0])
             if match:
@@ -192,8 +195,8 @@ class FileReader(Reader):
                 try:
                     codecs.lookup(enc)
                 except LookupError:
-                    log("File %s: Unknown encoding '%s' in file header, using default '%s'.",
-                        filename, enc, encoding)
+                    lcg.log("File %s: Unknown encoding '%s' in file header, using default '%s'.",
+                            filename, enc, encoding)
                 else:
                     encoding = enc
                 del lines[0]
@@ -228,7 +231,7 @@ class StructuredTextReader(FileReader):
     """
 
     def __init__(self, *args, **kwargs):
-        self._parser = Parser()
+        self._parser = lcg.Parser()
         super(StructuredTextReader, self).__init__(*args, **kwargs)
 
     def _source_text(self, lang):
@@ -242,12 +245,12 @@ class StructuredTextReader(FileReader):
 
     def _document(self, text):
         sections, parameters = self._parse_text(text)
-        if len(sections) != 1 or not isinstance(sections[0], Section):
+        if len(sections) != 1 or not isinstance(sections[0], lcg.Section):
             raise Exception("The document has no top-level section:", (self._id, sections,))
         s = sections[0]
         title = s.title()
         sections = s.content()
-        return title, Container(sections), parameters
+        return title, lcg.Container(sections), parameters
 
     def _title(self):
         # This method is called first, so we read the document here and store the content for later
@@ -263,8 +266,8 @@ class StructuredTextReader(FileReader):
             for lang in variants:
                 titles[lang], c, parameters[lang] = self._document(self._source_text(lang))
                 content_variants.append((lang, c))
-            title = SelfTranslatableText(self._id, translations=titles)
-            content = ContentVariants(content_variants)
+            title = lcg.SelfTranslatableText(self._id, translations=titles)
+            content = lcg.ContentVariants(content_variants)
         self._content_ = content
         self._parameters = {}
         for lang, parameter_set in parameters.items():
@@ -321,10 +324,10 @@ class DocDirReader(DocFileReader):
                     if item.endswith('~'):
                         continue
                     item = os.path.splitext(os.path.splitext(item)[0])[0]
-                if item and item not in items and item not in exclude \
-                       and item != 'CVS' \
-                       and not item.startswith('_') \
-                       and not item.startswith('.'):
+                if ((item and item not in items and item not in exclude and
+                     item != 'CVS' and
+                     not item.startswith('_') and
+                     not item.startswith('.'))):
                     items.append(item)
             items.sort()
             return items
