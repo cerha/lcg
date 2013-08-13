@@ -737,7 +737,8 @@ class HtmlExporter(Exporter):
             heading = lcg.Container(heading.content()[0].content())
         return g.div(g.div((g.h(g.a(heading.export(context), href=href, name=anchor, cls='backref'),
                                 level, lang=lang),
-                            g.div(self._exported_container_content(context, element),
+                            g.div(g.div(self._exported_container_content(context, element),
+                                        cls='section-content-wrapper'),
                                   cls='section-content section-level-%d' % level)),
                            cls='section-container section-level-%d' % level,
                            **self._container_attr(element)),
