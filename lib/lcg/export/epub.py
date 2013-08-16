@@ -171,11 +171,9 @@ class EpubExporter(Exporter):
         # manifest and spine
         manifest = package.appendChild(doc.createElement('manifest'))
         spine = package.appendChild(doc.createElement('spine'))
-        def add_itemref(idref):
-            spine.appendChild(doc.createElement('itemref')).setAttribute('idref', idref)
-        def add_item(id, href, mediatype, properties=()):
+        def add_item(item_id, href, mediatype, properties=()):
             item = manifest.appendChild(doc.createElement('item'))
-            item.setAttribute('id', id)
+            item.setAttribute('id', item_id)
             item.setAttribute('href', href)
             item.setAttribute('media-type', mediatype)
             properties = ' '.join(properties)
@@ -183,9 +181,10 @@ class EpubExporter(Exporter):
                 item.setAttribute('properties', properties)
         add_item('nav', self.Config.NAV_DOC_FILENAME, 'application/xhtml+xml', properties=('nav',))
         for n in node.linear():
+            item_id = 'node-'+n.id() # Prefix to avoid id's beginning with a number (invalid HTML)
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
-            add_item(n.id(), href, mediatype='application/xhtml+xml')
-            add_itemref(n.id())
+            add_item(item_id, href, mediatype='application/xhtml+xml')
+            spine.appendChild(doc.createElement('itemref')).setAttribute('idref', item_id)
         for resource in node.resources():
             add_item('TODO', resource.filename(), mediatype=self._guess_media_type(resource))
         # export
