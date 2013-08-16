@@ -45,11 +45,19 @@ class EpubExporter(Exporter):
         UID_ID = 'uid'
 
     class Html5Exporter(Html5Exporter):
+                
+        def __init__(self, *args, **kwargs):
+            self._epub_exporter = kwargs.pop('epub_exporter')
+            super(EpubExporter.Html5Exporter, self).__init__(*args, **kwargs)
+
         def _head(self, context):
             return [context.generator().title(self._title(context))]
 
         def _export_table_of_contents(self, context, element):
             return ''
+        
+        def uri(self, context, target, **kwargs):
+            return self._epub_exporter.uri(context, target, **kwargs)
         
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
@@ -123,16 +131,17 @@ class EpubExporter(Exporter):
     def _publication_resource_path(self, *components):
         return self._container_path(self.Config.RESOURCEDIR, *components)
 
-    def _resource_path(self, resource):
-        components = [resource.filename()]
+    def _resource_uri(self, resource):
+        uri = resource.filename()
         if resource.SUBDIR:
-            components.insert(0, resource.SUBDIR)
-        return self._publication_resource_path(*components)
+            uri = resource.SUBDIR + '/' + uri
+        return uri
+
+    def _resource_path(self, resource):
+        return self._publication_resource_path(self._resource_uri(resource))
 
     def _node_path(self, node):
-        filename = node.id()
-        filename += '.xhtml'
-        return self._publication_resource_path(filename)
+        return self._publication_resource_path(node.id() + '.xhtml')
 
     def _ocf_container(self, node, lang):
         doc = xml.Document()
@@ -193,6 +202,15 @@ class EpubExporter(Exporter):
     def _uri_node(self, context, node, lang=None):
         return node.id() + '.xhtml'
 
+    def _uri_resource(self, context, resource):
+        return self._resource_uri(resource)
+
+    def _uri_section(self, context, section, local=False):
+        result = "#section-" + section.anchor()
+        if not local:
+            result = self._uri_node(context, section.parent()) + result
+        return result
+
     def _navigation_document(self, context):
         node = context.node()
         lang = context.lang()
@@ -223,7 +241,7 @@ class EpubExporter(Exporter):
         return doc.toprettyxml(indent='', newl='', encoding='UTF-8')
 
     def _xhtml_content_document(self, node, lang):
-        exporter = self.Html5Exporter()
+        exporter = self.Html5Exporter(epub_exporter=self)
         context = exporter.context(node, lang)
         data = context.localize(exporter.export(context))
         return data.encode('UTF-8')
