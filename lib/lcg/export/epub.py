@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012 by BRAILCOM,o.p.s.
+# Copyright (C) 2012, 2013 by BRAILCOM,o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ from lcg.export import *
 
 import xml.dom.minidom as xml
 import zipfile
+import cStringIO as StringIO
 import datetime
 import mimetypes
 
@@ -45,17 +46,8 @@ class EpubExporter(Exporter):
 
     class Html5Exporter(Html5Exporter):
         def _head(self, context):
-            node = context.node()
-            return [concat('<title>', self._title(context), '</title>')] + \
-                ['<meta http-equiv="%s" content="%s"/>' % pair
-                 for pair in (('X-UA-Compatible', 'edge'),)] + \
-                 ['<meta name="%s" content="%s"/>' % pair for pair in self._meta(context)] + \
-                 ['<link rel="alternate" lang="%s" href="%s"/>' % \
-                      (lang, self._uri_node(context, node, lang=lang))
-                  for lang in node.variants() if lang != context.lang()] + \
-                  ['<script language="Javascript" type="text/javascript"' + \
-                       ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
-                  
+            return [context.generator().title(self._title(context))]
+
         def _export_table_of_contents(self, context, element):
             return ''
         
@@ -76,7 +68,6 @@ class EpubExporter(Exporter):
 
     def export(self, context):
         """Return the exported E-pub archive as a binary string."""
-        import cStringIO as StringIO
         fileobject = StringIO.StringIO()
         epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
         node = context.node()
