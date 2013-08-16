@@ -21,6 +21,7 @@ from lcg.export import *
 import xml.dom.minidom as xml
 import zipfile
 import datetime
+import mimetypes
 
 class Constants(object):
     """Things mandated by EPUB 3 spec"""
@@ -185,14 +186,13 @@ class EpubExporter(Exporter):
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
             add_item(item_id, href, mediatype='application/xhtml+xml')
             spine.appendChild(doc.createElement('itemref')).setAttribute('idref', item_id)
-        for resource in node.resources():
-            add_item('TODO', resource.filename(), mediatype=self._guess_media_type(resource))
+            for resource in n.resources():
+                resource_id = 'resource-%x' % id(resource)
+                mime_type, encoding = mimetypes.guess_type(resource.filename())
+                add_item(resource_id, self._resource_uri(resource),
+                         mediatype=mime_type or 'application/octet-stream')
         # export
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
-
-    def _guess_media_type(self, resource):
-        #TODO
-        return 'image/jpeg'
 
     def _uri_node(self, context, node, lang=None):
         return node.id() + '.xhtml'
