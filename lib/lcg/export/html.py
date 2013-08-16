@@ -230,9 +230,9 @@ class HtmlGenerator(object):
     def dd(self, content, **kwargs):
         return self._tag('dd', content)
     
-    def img(self, src, alt='', border=0, **kwargs):
+    def img(self, src, alt='', **kwargs):
         attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
-        return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, border=border, **kwargs)
+        return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, **kwargs)
 
     def abbr(self, term, **kwargs):
         return self._tag('abbr', term, ('title',), **kwargs)
