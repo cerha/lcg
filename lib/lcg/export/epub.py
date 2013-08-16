@@ -238,10 +238,10 @@ class EpubExporter(Exporter):
                     export(subitems, li)
         items = NodeIndex(node=node, detailed=True).items(context)
         export(items, nav)
-        return doc.toprettyxml(indent='', newl='', encoding='UTF-8')
+        return doc.toprettyxml(indent='  ', newl='\n', encoding='UTF-8')
 
     def _xhtml_content_document(self, node, lang):
-        exporter = self.Html5Exporter(epub_exporter=self)
+        exporter = self.Html5Exporter(epub_exporter=self, translations=self._translation_path)
         context = exporter.context(node, lang)
         data = context.localize(exporter.export(context))
         return data.encode('UTF-8')
