@@ -428,7 +428,7 @@ class XhtmlGenerator(HtmlGenerator):
 
     def _attribute(self, name, value):
         if value is True:
-            value = 'yes'
+            value = name
         return super(XhtmlGenerator, self)._attribute(name, value)
 
     
