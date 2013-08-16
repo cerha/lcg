@@ -72,22 +72,27 @@ class EpubExporter(Exporter):
         epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
         node = context.node()
         lang = context.lang()
+        exported_resources = []
         try:
             mimeinfo = zipfile.ZipInfo('mimetype')
             mimeinfo.compress_type = zipfile.ZIP_STORED
             epub.writestr(mimeinfo, Constants.EPUB_MIMETYPE)
-            epub.writestr(self._meta_path('container.xml'), self._ocf_container(node, lang))
-            epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), self._navigation_document(context))
+            epub.writestr(self._meta_path('container.xml'), 
+                          self._ocf_container(node, lang))
+            epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), 
+                          self._navigation_document(context))
             for n in node.linear():
-                epub.writestr(self._node_path(n), self._xhtml_content_document(n, lang))
-            epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME), self._package_document(node, lang))
-            for resource in node.resources():
-                data = self._get_resource_data(context, resource)
-                if data:
-                    epub.writestr(self._resource_path(resource), data)
-        except:
+                epub.writestr(self._node_path(n), 
+                              self._xhtml_content_document(n, lang))
+                for resource in n.resources():
+                    if resource not in exported_resources:
+                        exported_resources.append(resource)
+                        epub.writestr(self._resource_path(resource),
+                                      self._get_resource_data(context, resource))
+            epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
+                          self._package_document(node, lang))
+        finally:
             epub.close()
-            raise
         epub.close()
         return fileobject.getvalue()
 
