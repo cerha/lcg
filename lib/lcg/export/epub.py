@@ -20,6 +20,7 @@ from lcg.export import *
 
 import xml.dom.minidom as xml
 import zipfile
+import datetime
 
 class Constants(object):
     """Things mandated by EPUB 3 spec"""
@@ -163,7 +164,7 @@ class EpubExporter(Exporter):
         dc_identifier.appendChild(doc.createTextNode(self._document_unique_identifier(node, lang)))
         metadata.appendChild(doc.createElement('dc:title')).appendChild(doc.createTextNode(node.title()))
         metadata.appendChild(doc.createElement('dc:language')).appendChild(doc.createTextNode(lang))
-        curtime = 'TODO'
+        curtime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         meta_modified = metadata.appendChild(doc.createElement('meta'))
         meta_modified.appendChild(doc.createTextNode(curtime))
         meta_modified.setAttribute('property', 'dcterms:modified')
