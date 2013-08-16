@@ -114,7 +114,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 	    base_id = parent.getAttribute('id');
 	for (var i = 0; i < ul.childNodes.length; i++) {
 	    var child = $(ul.childNodes[i]);
-	    if (child.nodeName =='LI') {
+	    if (child.nodeName == 'LI') {
 		var prev = (items.length == 0 ? null : items[items.length-1]);
 		var id = base_id + '.' + (items.length+1);
 		this.init_item(child, id, prev, parent);
