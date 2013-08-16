@@ -368,10 +368,22 @@ class HtmlGenerator(object):
 
     # JavaScript code generation.
      
-    def script(self, code, noscript=None):
-        return '<script type="text/javascript">' + \
-            (code and code.strip() + '\n' or '') + '</script>' + \
-            (noscript and self.noscript(noscript) or '')
+    def script(self, code=None, src=None, type="text/javascript", noscript=None, **kwargs):
+        if code is not None:
+            assert src is None, src
+            assert isinstance(code, basestring)
+            newlines = True
+            content = code.strip()
+        else:
+            assert isinstance(src, basestring)
+            content = ''
+            newlines = False
+        result = self._tag('script', content, _attr=('src', 'type'),
+                           _paired=True, _newlines=newlines, src=src, type=type, **kwargs)
+        if noscript:
+            # Deprecated.
+            result += self.noscript(noscript)
+        return result
     
     def noscript(self, content):
         return self._tag('noscript', content)
@@ -529,8 +541,7 @@ class HtmlExporter(Exporter):
                 for lang in node.variants() if lang != context.lang()] + \
                ['<link rel="gettext" type="application/x-po" href="%s">' % context.uri(t)
                 for t in context.node().resources(Translations)] + \
-               ['<script language="Javascript" type="text/javascript"' + \
-                ' src="%s"></script>' % context.uri(s) for s in self._scripts(context)]
+               [g.script(src=context.uri(s)) for s in self._scripts(context)]
 
     def _parts(self, context, parts):
         result = []
