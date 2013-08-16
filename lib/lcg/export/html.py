@@ -144,6 +144,9 @@ class HtmlGenerator(object):
         content = concat('  ', concat(content, separator='\n  ')),
         return self._tag('head', content, _newlines=True)
     
+    def title(self, content, **kwargs):
+        return self._tag('title', content, **kwargs)
+    
     def body(self, content, **kwargs):
         return self._tag('body', content, ('onkeydown', 'onload'), _newlines=True, **kwargs)
     
@@ -512,8 +515,9 @@ class HtmlExporter(Exporter):
         return context.node().resources(Script)
     
     def _head(self, context):
+        g = context.generator()
         node = context.node()
-        return [concat('<title>', self._title(context), '</title>')] + \
+        return [g.title(self._title(context))] + \
                ['<meta http-equiv="%s" content="%s">' % pair
                 for pair in (('Content-Language', context.lang()),
                              ('Content-Script-Type', 'text/javascript'),
