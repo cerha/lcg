@@ -169,7 +169,7 @@ class Presentation(object):
     names (strings) for liblouis.
     Useful only for Braille output.
     """
-    printers = {}
+    printers = None
     """Dictionary of printer names (keys) and their properties (values).
     Printer properties are represented by a dictionary with property names as
     keys and their corresponding values as values.
