@@ -59,6 +59,7 @@ _mathml_operators = {
     '<>': (_inf, '⠣⠜', '00',),
     '+': (None, '⠲', '3',),
     '-': (None, '⠤', '3',),
+    '−': (None, '⠤', '3',),
     '±': (None, '⠲⠤', '00',),
     '.': (_inf, '⠄', '3'),
     '⋅': (_inf, '⠄', '3'),
@@ -731,6 +732,10 @@ class BrailleExporter(FileExporter, Exporter):
                     hyphenation = '3'
                 else:
                     hyphenation = '0' * len(op_braille)
+            if op_braille.find(u'⠈⠀⠭') >= 0:
+                # Still a Unicode character?  We should do something about it.
+                op_braille = '⠿⠿⠿%s⠿⠿⠿' % (op_braille,)
+                hyphenation = '0' * len(op_braille)
             if translation is not None:
                 t_braille = translation[1]
                 if t_braille[-1] in (' ', '⠀',) and op_braille[-1] not in (' ', '⠀',):
