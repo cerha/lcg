@@ -142,12 +142,12 @@ class EpubExporter(Exporter):
                 epub.writestr(self._node_path(n), 
                               self._xhtml_content_document(n, lang))
                 for resource in n.resources():
-                    if resource not in exported_resources:
-                        exported_resources.append(resource)
+                    if resource not in resources:
                         epub.writestr(self._resource_path(resource),
                                       self._get_resource_data(context, resource))
+                        resources.append(resource)
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
-                          self._package_document(node, lang))
+                          self._package_document(node, lang, resources))
         finally:
             epub.close()
         epub.close()
@@ -198,7 +198,7 @@ class EpubExporter(Exporter):
         rootfile.setAttribute('media-type', Constants.PACKAGE_DOC_MIMETYPE)
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
 
-    def _package_document(self, node, lang):
+    def _package_document(self, node, lang, resources):
         doc = xml.Document()
         package = doc.appendChild(doc.createElement('package'))
         package.setAttribute('xmlns', Constants.OPF_NS)
@@ -234,11 +234,11 @@ class EpubExporter(Exporter):
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
             add_item(item_id, href, mediatype='application/xhtml+xml')
             spine.appendChild(doc.createElement('itemref')).setAttribute('idref', item_id)
-            for resource in n.resources():
-                resource_id = 'resource-%x' % id(resource)
-                mime_type, encoding = mimetypes.guess_type(resource.filename())
-                add_item(resource_id, self._html_exporter.resource_uri(resource),
-                         mediatype=mime_type or 'application/octet-stream')
+        for resource in resources:
+            resource_id = 'resource-%x' % id(resource)
+            mime_type, encoding = mimetypes.guess_type(resource.filename())
+            add_item(resource_id, self._html_exporter.resource_uri(resource),
+                     mediatype=mime_type or 'application/octet-stream')
         # export
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
 
