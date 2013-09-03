@@ -150,7 +150,6 @@ class EpubExporter(Exporter):
                           self._package_document(node, lang, resources))
         finally:
             epub.close()
-        epub.close()
         return fileobject.getvalue()
 
     def _get_resource_data(self, context, node, resource):
