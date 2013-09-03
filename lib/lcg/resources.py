@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009, 2011, 2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2009, 2011, 2012, 2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -339,7 +339,7 @@ class ResourceProvider(object):
         else:
             node_id = node
         if node_id not in nodes:
-            nodes.append(node_id) 
+            nodes.append(node_id)
         return resource
     
     def resources(self, cls=None, node=None):
