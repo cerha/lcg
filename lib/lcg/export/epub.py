@@ -125,6 +125,7 @@ class EpubExporter(Exporter):
 
     def export(self, context):
         """Return the exported E-pub archive as a binary string."""
+        config.allow_backref = False
         fileobject = StringIO.StringIO()
         epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
         node = context.node()
