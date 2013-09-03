@@ -72,7 +72,7 @@ class EpubHtml5Exporter(Html5Exporter):
                 alt = descr
         else:
             alt = title
-        cls = ['lcg-image-xxx']
+        cls = ['lcg-image']
         if element.align():
             cls.append(element.align() + '-aligned')
         if element.name():
