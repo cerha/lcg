@@ -144,7 +144,7 @@ class EpubExporter(Exporter):
                 for resource in n.resources():
                     if resource not in resources:
                         epub.writestr(self._resource_path(resource),
-                                      self._get_resource_data(context, resource))
+                                      self._get_resource_data(context, n, resource))
                         resources.append(resource)
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
                           self._package_document(node, lang, resources))
@@ -153,7 +153,7 @@ class EpubExporter(Exporter):
         epub.close()
         return fileobject.getvalue()
 
-    def _get_resource_data(self, context, resource):
+    def _get_resource_data(self, context, node, resource):
         """Return the resource file data as a (binary) string.
 
         The base class implementation only handles resources with src_file.
