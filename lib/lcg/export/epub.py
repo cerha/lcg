@@ -36,6 +36,69 @@ class Constants(object):
     DC_NS = 'http://purl.org/dc/elements/1.1/'
     
 
+class EpubHtml5Exporter(Html5Exporter):
+                
+    def _head(self, context):
+        return [context.generator().title(self._title(context))]
+
+    def _export_table_of_contents(self, context, element):
+        return ''
+        
+    def _export_inline_image(self, context, element):
+        g = self._generator
+        image = element.image(context)
+        title = element.title()
+        descr = element.descr()
+        size = element.size()
+        uri = context.uri(image)
+        if size is None:
+            thumbnail = image.thumbnail()
+            if thumbnail:
+                size = thumbnail.size()
+            else:
+                size = image.size()
+        if title is None:
+            title = image.title()
+        if descr is None:
+            descr = image.descr()
+        if size is not None:
+            width, height = size
+        else:
+            width, height = None, None
+        if descr:
+            if title:
+                alt = self.concat(title, ': ', descr)
+            else:
+                alt = descr
+        else:
+            alt = title
+        cls = ['lcg-image-xxx']
+        if element.align():
+            cls.append(element.align() + '-aligned')
+        if element.name():
+            cls.append('image-'+element.name())
+        return g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
+                     width=width, height=height)
+
+    def _uri_node(self, context, node, lang=None):
+        return node.id() + '.xhtml'
+
+    def _uri_resource(self, context, resource):
+        return self.resource_uri(resource)
+
+    def _uri_section(self, context, section, local=False):
+        result = "#section-" + section.anchor()
+        if not local:
+            result = self._uri_node(context, section.parent()) + result
+        return result
+
+    def resource_uri(self, resource):
+        uri = resource.filename()
+        if resource.SUBDIR:
+            uri = resource.SUBDIR + '/' + uri
+        return uri
+
+
 class EpubExporter(Exporter):
     class Config(object):
         """Specifies implementation-defined EPUB parameters"""
@@ -44,24 +107,10 @@ class EpubExporter(Exporter):
         NAV_DOC_FILENAME = 'nav.xhtml'
         UID_ID = 'uid'
 
-    class Html5Exporter(Html5Exporter):
-                
-        def __init__(self, *args, **kwargs):
-            self._epub_exporter = kwargs.pop('epub_exporter')
-            super(EpubExporter.Html5Exporter, self).__init__(*args, **kwargs)
-
-        def _head(self, context):
-            return [context.generator().title(self._title(context))]
-
-        def _export_table_of_contents(self, context, element):
-            return ''
-        
-        def uri(self, context, target, **kwargs):
-            return self._epub_exporter.uri(context, target, **kwargs)
-        
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
         super(EpubExporter, self).__init__(*args, **kwargs)
+        self._html_exporter = EpubHtml5Exporter(translations=self._translation_path)
 
     def _allow_flash_audio_player(context, audio):
         return False
@@ -80,7 +129,7 @@ class EpubExporter(Exporter):
         epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
         node = context.node()
         lang = context.lang()
-        exported_resources = []
+        resources = []
         try:
             mimeinfo = zipfile.ZipInfo('mimetype')
             mimeinfo.compress_type = zipfile.ZIP_STORED
@@ -131,14 +180,8 @@ class EpubExporter(Exporter):
     def _publication_resource_path(self, *components):
         return self._container_path(self.Config.RESOURCEDIR, *components)
 
-    def _resource_uri(self, resource):
-        uri = resource.filename()
-        if resource.SUBDIR:
-            uri = resource.SUBDIR + '/' + uri
-        return uri
-
     def _resource_path(self, resource):
-        return self._publication_resource_path(self._resource_uri(resource))
+        return self._publication_resource_path(self._html_exporter.resource_uri(resource))
 
     def _node_path(self, node):
         return self._publication_resource_path(node.id() + '.xhtml')
@@ -187,29 +230,17 @@ class EpubExporter(Exporter):
                 item.setAttribute('properties', properties)
         add_item('nav', self.Config.NAV_DOC_FILENAME, 'application/xhtml+xml', properties=('nav',))
         for n in node.linear():
-            item_id = 'node-'+n.id() # Prefix to avoid id's beginning with a number (invalid HTML)
+            item_id = 'node-'+n.id() # Prefix to avoid ids beginning with a number (invalid HTML)
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
             add_item(item_id, href, mediatype='application/xhtml+xml')
             spine.appendChild(doc.createElement('itemref')).setAttribute('idref', item_id)
             for resource in n.resources():
                 resource_id = 'resource-%x' % id(resource)
                 mime_type, encoding = mimetypes.guess_type(resource.filename())
-                add_item(resource_id, self._resource_uri(resource),
+                add_item(resource_id, self._html_exporter.resource_uri(resource),
                          mediatype=mime_type or 'application/octet-stream')
         # export
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
-
-    def _uri_node(self, context, node, lang=None):
-        return node.id() + '.xhtml'
-
-    def _uri_resource(self, context, resource):
-        return self._resource_uri(resource)
-
-    def _uri_section(self, context, section, local=False):
-        result = "#section-" + section.anchor()
-        if not local:
-            result = self._uri_node(context, section.parent()) + result
-        return result
 
     def _navigation_document(self, context):
         node = context.node()
@@ -241,7 +272,7 @@ class EpubExporter(Exporter):
         return doc.toprettyxml(indent='  ', newl='\n', encoding='UTF-8')
 
     def _xhtml_content_document(self, node, lang):
-        exporter = self.Html5Exporter(epub_exporter=self, translations=self._translation_path)
+        exporter = self._html_exporter
         context = exporter.context(node, lang)
         data = context.localize(exporter.export(context))
         return data.encode('UTF-8')
@@ -249,3 +280,6 @@ class EpubExporter(Exporter):
     def _document_unique_identifier(self, node, lang):
         #TODO
         return 'urn:uuid:%s' % ('073a5060-6629-11e1-b86c-0800200c9a66',)
+
+    def uri(self, context, target, **kwargs):
+        return self._html_exporter.uri(context, target, **kwargs)
