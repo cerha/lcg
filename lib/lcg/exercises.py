@@ -561,9 +561,9 @@ class Exercise(lcg.Content):
         return g.button(label, title=title, type='button', id=button_id, cls='media-control')
                   
     def export(self, context):
-        if not isinstance(context.exporter(), lcg.HtmlExporter):
-            # Temporary hack to avoid traceback in Braille and PDF export.
-            return ''
+        if context.exporter().__class__.__name__ == 'BrailleExporter':
+            # Temporary hack to avoid traceback in Braille export.
+            return ['', '']
         g = context.generator()
         context.resource('lcg.js')
         context.resource('lcg-exercises.js')
