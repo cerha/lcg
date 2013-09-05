@@ -513,8 +513,6 @@ class BrailleExporter(FileExporter, Exporter):
         return '\n' * number, '0' * number
     
     def _ensure_newlines(self, context, exported, number=1):
-        if not exported:
-            return exported
         real_number = 0
         text = exported[0]
         while real_number < number and len(text) > real_number and text[-real_number - 1] == '\n':
