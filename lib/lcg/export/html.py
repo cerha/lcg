@@ -74,7 +74,21 @@ class HtmlGenerator(object):
     class _JavaScriptCode(unicode):
         def __new__(cls, text):
             return unicode.__new__(cls, text)
-    
+
+    # Characters to be replaced in Javascript string literals for their 
+    # safe usage within HTML <script> tags.
+    _JAVASCRIPT_ESCAPES = {'<': '\u003c',
+                           '>': '\u003e',
+                           '&': '\u0026',
+                           '"': '\u0022',
+                           '\'': '\u0027',
+                           '\\': '\u005c',
+                           '\n': '\\n'}
+    _JAVASCRIPT_ESCAPE_REGEX = re.compile('[<>&"\'\\\n]')
+
+    def _js_escape_char(self, match):
+        return self._JAVASCRIPT_ESCAPES[match.group(0)] 
+
     def _attribute(self, name, value):
         if value is True:
             return name
@@ -398,14 +412,14 @@ class HtmlGenerator(object):
             if condition:
                 content = 'if (' + condition + ') ' + content
         return self.script(content, noscript)
-     
+    
     def js_value(self, var):
         if var is None:
             return 'null'
         elif isinstance(var, self._JavaScriptCode):
             return var
         elif isinstance(var, (str, unicode)):
-            return "'" + var.replace("'", "\\'").replace('</', '<\\/').replace('\n','\\n') + "'"
+            return "'" + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, var) + "'"
         elif isinstance(var, bool):
             return (var and 'true' or 'false')
         elif isinstance(var, int):
