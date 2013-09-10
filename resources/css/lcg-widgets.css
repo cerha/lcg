@@ -127,9 +127,12 @@
     min-width: 100px;
     margin: 3px -4px;
 }
-.popup-menu-widget li a {
+.popup-menu-widget li a,
+.popup-menu-widget li a:active,
+.popup-menu-widget li a:hover,
+.popup-menu-widget li a:visited {
     display: block;
-    color: #000;
+    color: #777;
     padding: 2px 10px;
     text-decoration: none;
     min-height: 14px;

@@ -598,8 +598,10 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
     },
 
     cmd_activate: function (item) {
-	this.remove();
-	self.location = item.down('a').getAttribute('href');
+	if (item.hasClassName('active')) {
+	    this.remove();
+	    self.location = item.down('a').getAttribute('href');
+	}
     },
 
     cmd_quit: function (item) {
