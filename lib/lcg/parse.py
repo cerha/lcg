@@ -262,7 +262,8 @@ class Parser(object):
         while match:
             groups = match.groupdict()
             term, description = groups['term'], groups['description']
-            old_position = self._old_position
+            if __debug__:
+                old_position = self._old_position
             position += match.end()
             next_position = position
             while True:
