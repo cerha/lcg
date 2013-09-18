@@ -28,6 +28,7 @@ import lcg
 
 import collections
 import datetime
+import operator
 import os
 import re
 import sys
@@ -961,6 +962,17 @@ def concat(*args, **kwargs):
     See 'Concatenation' constructor for more information about the arguments.
 
     """
+    # Optimization: It may slow down processing in some cases but I guess it
+    # usually helps a bit.
+    if not kwargs:
+        if len(args) == 1 and isinstance(args[0], (list, tuple,)):
+            args = args[0]
+        for a in args:
+            if not isinstance(a, basestring) or isinstance(a, Localizable):
+                break
+        else:
+            return reduce(operator.add, args, u'')
+    # Standard processing
     result = Concatenation(args, **kwargs)
     items = result.items()
     if len(items) == 1 and not isinstance(items[0], Localizable):
