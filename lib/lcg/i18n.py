@@ -24,11 +24,13 @@ allows us to decide for the output language at the export time.
 
 """
 
-from lcg import *
+import lcg
 
 import collections
 import datetime
+import os
 import re
+import sys
 
 class TranslatableTextFactory(object):
     """A helper for defining the '_' identifier bound to a certain domain.
@@ -100,8 +102,9 @@ class TranslatedTextFactory(TranslatableTextFactory):
     def ngettext(self, singular, plural, *args, **kwargs):
         kwargs['_singular_orig_text'] = singular
         kwargs['_plural_orig_text'] = plural
-        return super(TranslatedTextFactory, self).ngettext(self._gettext(singular), self._gettext(plural), *args, 
-                                                           **kwargs)
+        return super(TranslatedTextFactory, self).ngettext(self._gettext(singular),
+                                                           self._gettext(plural),
+                                                           *args, **kwargs)
     
 
 class Localizable(unicode):
@@ -249,11 +252,11 @@ class TranslatableText(Localizable):
     
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
-            substitution_dict = dict([(k,v) for k,v in kwargs.items()
+            substitution_dict = dict([(k, v) for k, v in kwargs.items()
                                       if not k.startswith('_') and not k in cls._RESERVED_ARGS])
             assert not args or not substitution_dict, \
-                   "Can not pass both positional and keyword substitution variables: " + \
-                   "(%s, %s, %s)" % (text, args, substitution_dict)
+                ("Cannot pass both positional and keyword substitution variables: " +
+                 "(%s, %s, %s)" % (text, args, substitution_dict))
         else:
             substitution_dict = {}
         values = args or substitution_dict
@@ -273,7 +276,7 @@ class TranslatableText(Localizable):
         If 'args' or 'kwargs' are passed, the 'text' is considered a format
         string and it will be automatically interpolated after translation.
         
-        Only 'args' or only 'kwargs' may be passed (not both at once).  This 
+        Only 'args' or only 'kwargs' may be passed (not both at once).  This
         depends whether you are using named variables in the format string or
         just positional substitution.  It is recommended to use named format
         variables (with keyword arguments), especially when there is more than
@@ -284,14 +287,15 @@ class TranslatableText(Localizable):
         recursively before interpolation, if they are 'Localizable' instances.
         TypeError may be raised during localization, when the constructor
         arguments didn't correspond to the format string.
-        
+
         """
         assert isinstance(text, basestring), (text, type(text))
         self._text = text
         self._args = args
         self._init_kwargs(**kwargs)
 
-    def _init_kwargs(self, _orig_text=None, _domain=None, _origin='en', _interpolate=None, _transforms=(), **kwargs):
+    def _init_kwargs(self, _orig_text=None, _domain=None, _origin='en', _interpolate=None,
+                     _transforms=(), **kwargs):
         assert isinstance(_domain, basestring) or _domain is None, _domain
         assert isinstance(_origin, basestring), _origin
         assert _interpolate is None or isinstance(_interpolate, collections.Callable), _interpolate
@@ -304,15 +308,16 @@ class TranslatableText(Localizable):
 
     def _clone_args(self):
         return (self._text,) + self._args
-    
+
     def _clone_kwargs(self):
         return dict(super(TranslatableText, self)._clone_kwargs(), _orig_text=self._orig_text,
-                    _domain=self._domain, _origin=self._origin, _interpolate=self._interpolate, **self._kwargs)
-    
+                    _domain=self._domain, _origin=self._origin, _interpolate=self._interpolate,
+                    **self._kwargs)
+
     def domain(self):
         """Return the domain name bound to this instance."""
         return self._domain
-        
+
     def interpolate(self, func):
         """Return a new TranslatableText instance using given interpolation function.
 
@@ -324,7 +329,7 @@ class TranslatableText(Localizable):
 
         """
         return self._clone(_interpolate=func)
-        
+
     def _translate(self, localizer):
         translator = localizer.translator()
         return translator.gettext(self._orig_text, domain=self._domain, origin=self._origin)
@@ -359,7 +364,7 @@ class SelfTranslatableText(TranslatableText):
 
     """
     _RESERVED_ARGS = ('translations',)
-    
+
     def _init_kwargs(self, translations=None, **kwargs):
         assert isinstance(translations, dict), translations
         self._translations = translations
@@ -368,10 +373,10 @@ class SelfTranslatableText(TranslatableText):
     def _clone_kwargs(self):
         return dict(super(SelfTranslatableText, self)._clone_kwargs(),
                     translations=self._translations)
-    
+
     def _translate(self, localizer):
         return self._translations.get(localizer.lang(), localizer.localize(self._orig_text))
-        
+
 
 class TranslatablePluralForms(TranslatableText):
     """Translatable string with plural forms.
@@ -401,7 +406,7 @@ class TranslatablePluralForms(TranslatableText):
         assert isinstance(n, int)
         text = n == 1 and singular or plural
         return TranslatableText.__new__(cls, text, *args, **kwargs)
-    
+
     def __init__(self, singular, plural, *args, **kwargs):
         if args:
             n = args[0]
@@ -422,24 +427,23 @@ class TranslatablePluralForms(TranslatableText):
         return (self._singular, self._plural) + self._args
 
     def _clone_kwargs(self):
-        return dict(super(TranslatablePluralForms, self)._clone_kwargs(), 
+        return dict(super(TranslatablePluralForms, self)._clone_kwargs(),
                     _singular_orig_text=self._singular_orig_text,
                     _plural_orig_text=self._plural_orig_text,
                     **self._kwargs)
-    
-    
+
     def _translate(self, localizer):
         translator = localizer.translator()
         return translator.ngettext(self._singular_orig_text, self._plural_orig_text, self._n,
                                    domain=self._domain, origin=self._origin)
-    
-    
+
+
 class LocalizableDateTime(Localizable):
     """Date/time string which can be converted to a localized format.
-    
+
     See the rules in 'Localizable' class documentation for more information
     about mixing instances of this class with other strings.
-    
+
     """
     _RE = re.compile(r'^(\d\d\d\d)-(\d\d)-(\d\d)(?: (\d\d):(\d\d)(?::(\d\d))?)?$')
     _LEADING_ZEROS = re.compile(r'(?<!\d)0+')
@@ -459,7 +463,7 @@ class LocalizableDateTime(Localizable):
         """Initialize the instance.
 
         Arguments:
-        
+
           string -- the input date/datetime string in format 'yyyy-mm-dd' for
             date values and 'yyyy-mm-dd HH:MM' or 'yyyy-mm-dd HH:MM:SS' for
             datetime values.  The time precision used on input is respected on
@@ -476,7 +480,7 @@ class LocalizableDateTime(Localizable):
             converted to the local time zone on translation.  If false, the
             time is supposed to be in local time zone and no conversion
             applies.
-          
+
         """
         super(LocalizableDateTime, self).__init__(**kwargs)
         m = self._RE.match(string)
@@ -494,14 +498,14 @@ class LocalizableDateTime(Localizable):
         self._show_time = show_time
         self._show_seconds = len(numbers) > 5
         self._utc = utc
-    
+
     def _clone_kwargs(self):
         return dict(super(LocalizableDateTime, self)._clone_kwargs(),
                     show_weekday=self._show_weekday,
                     show_time=self._show_time,
                     leading_zeros=self._leading_zeros,
                     utc=self._utc)
-    
+
     def _localize(self, localizer):
         data = localizer.locale_data()
         dt = self._datetime
@@ -517,19 +521,19 @@ class LocalizableDateTime(Localizable):
             result = self._LEADING_ZEROS.sub('', result)
         if self._has_time and self._show_time:
             time_format = (self._show_seconds and data.exact_time_format or data.time_format)
-            result += ' '+ dt.strftime(time_format)
+            result += ' ' + dt.strftime(time_format)
         if self._show_weekday:
-            weekday = localizer.localize(week_day_name(dt.weekday(), abbrev=True))
+            weekday = localizer.localize(lcg.week_day_name(dt.weekday(), abbrev=True))
             result = weekday + ' ' + result
         return result + displayed_timezone
 
 
 class LocalizableTime(Localizable):
     """Time string which can be converted to a localized format.
-    
+
     See the rules in 'Localizable' class documentation for more information
     about mixing instances of this class with other strings.
-    
+
     """
     _RE = re.compile(r'^(\d\d):(\d\d)(?::(\d\d))?$')
 
@@ -541,7 +545,7 @@ class LocalizableTime(Localizable):
         numbers = [int(n) for n in m.groups() if n is not None]
         self._time = datetime.time(*numbers)
         self._show_seconds = len(numbers) > 2
-    
+
     def _localize(self, localizer):
         data = localizer.locale_data()
         time_format = (self._show_seconds and data.exact_time_format or data.time_format)
@@ -550,7 +554,7 @@ class LocalizableTime(Localizable):
 
 class Decimal(Localizable):
     """Localizable decimal number."""
-    
+
     def __new__(cls, value, precision=None, **kwargs):
         if isinstance(value, int):
             format = '%d'
@@ -573,18 +577,18 @@ class Decimal(Localizable):
 
     def _clone_args(self):
         return (self._value,)
-    
+
     def _clone_kwargs(self):
         return dict(super(Decimal, self)._clone_kwargs(),
                     precision=self._precision)
-    
+
     def _locales(self, data):
         return data.decimal_point, data.grouping, data.thousands_sep
-    
+
     def _group(self, grouping, thousands_sep, string):
         if not grouping or not thousands_sep:
             return string
-        result=""
+        result = ""
         while string and grouping:
             if grouping[0] == -1:
                 break
@@ -605,7 +609,7 @@ class Decimal(Localizable):
         if string:
             result = string + thousands_sep + result
         return result
-      
+
     def _localize(self, localizer):
         data = localizer.locale_data()
         formatted = self._format % self._value
@@ -620,10 +624,10 @@ class Decimal(Localizable):
         else:
             return pre
 
-            
+
 class Monetary(Decimal):
     """Localizable monetary amount."""
-    
+
     def __init__(self, value, precision=2, **kwargs):
         super(Monetary, self).__init__(value, precision=precision, **kwargs)
 
@@ -638,7 +642,7 @@ class Concatenation(Localizable):
     and 'Localizable' instances are concatenated to make the final text.
 
     See 'Localizable' documentation for more information.
-    
+
     """
     def __new__(cls, items, separator='', **kwargs):
         def escape(text):
@@ -656,8 +660,9 @@ class Concatenation(Localizable):
             return Localizable.__new__(cls, separator.join([x(item) for item in items]), **kwargs)
         except UnicodeDecodeError:
             # Necessary to display some tracebacks
-            return Localizable.__new__(cls, separator.join([escape(x(item)) for item in items]), **kwargs)
-    
+            return Localizable.__new__(cls, separator.join([escape(x(item)) for item in items]),
+                                       **kwargs)
+
     def __init__(self, items, separator='', **kwargs):
         """Initialize the instance.
 
@@ -666,7 +671,7 @@ class Concatenation(Localizable):
           items -- a sequence of items composing the concatenation.  Each item
             may be a string, a unicode string, a 'Localizable' instance, tuple
             or list.
- 
+
           separator -- this optional argument may be a string or a unicode
             string.  If specified, the items will be concatenated using this
             string between them.  By default the separator is an empty string,
@@ -683,7 +688,7 @@ class Concatenation(Localizable):
         produce a unicode string on output (as the result of 'localize()'.  If
         all the input items (including the separator) are plain strings, a plain
         string is produced.
-            
+
         """
         super(Concatenation, self).__init__(**kwargs)
         def append(array, item):
@@ -692,10 +697,10 @@ class Concatenation(Localizable):
                     append(array, p)
             else:
                 assert isinstance(item, basestring), repr(item)
-                if not isinstance(item, Localizable) and array \
-                       and not isinstance(array[-1], Localizable):
-                    array[-1] +=  item
-                else:                
+                if ((not isinstance(item, Localizable) and array and
+                     not isinstance(array[-1], Localizable))):
+                    array[-1] += item
+                else:
                     array.append(item)
         self._items = myitems = []
         last = len(items) - 1
@@ -707,10 +712,10 @@ class Concatenation(Localizable):
             append(myitems, item)
             if i != last:
                 append(myitems, separator)
-        
+
     def _clone_args(self):
         return (self._items,)
-    
+
     def _localize(self, localizer):
         try:
             return ''.join([localizer.localize(item) for item in self._items])
@@ -718,8 +723,8 @@ class Concatenation(Localizable):
             # Necessary to display some tracebacks
             def escape(text):
                 return re.sub(r'[^\x01-\x7F]', '?', text)
-            return ''.join([escape(localizer.localize(item)) for item in self._items])        
-    
+            return ''.join([escape(localizer.localize(item)) for item in self._items])
+
     def startswith(self, *args, **kwargs):
         """Return the result of 'startswidth()' call the method on the first item."""
         return self._items and self._items[0].startswith(*args, **kwargs)
@@ -738,7 +743,7 @@ class Concatenation(Localizable):
 
         The items returned byt this method are always either strings, unicode
         strings or other 'Localizable' instances.
-        
+
         """
         return self._items
 
@@ -756,7 +761,7 @@ class Translator(object):
     """
     def __init__(self, lang=None):
         self._lang = lang
-        
+
     def gettext(self, text, domain=None, origin=None):
         """Return the translation of the string 'text' from given domain.
 
@@ -767,7 +772,7 @@ class Translator(object):
           domain -- the name of the domain, form which this text origins.
 
         Returns a unicode string.
-        
+
         """
         pass
 
@@ -780,24 +785,24 @@ class Translator(object):
           domain -- the name of the domain, form which this text origins.
 
         Returns a unicode string.
-        
+
         """
         pass
 
 
 class NullTranslator(Translator):
     """A translator which just returns identical strings as translations."""
-    
+
     def gettext(self, text, domain=None, origin=None):
         return text
 
     def ngettext(self, singular, plural, n, domain=None, origin=None):
         return n == 1 and singular or plural
 
-    
+
 class GettextTranslator(Translator):
     """Translator based on the GNU gettext interface."""
-    
+
     def __init__(self, lang, path=(), default_domain='lcg', fallback=False, **kwargs):
         """Initialize the instance.
 
@@ -815,7 +820,7 @@ class GettextTranslator(Translator):
 
           fallback -- if true, the translator will silently use a null translation in case the
             desired translation files are not found.
-        
+
         """
         assert isinstance(lang, basestring), lang
         assert isinstance(path, (list, tuple)), path
@@ -832,14 +837,14 @@ class GettextTranslator(Translator):
         for dir in self._path:
             try:
                 return gettext.translation(domain, dir, (self._lang,))
-            except IOError as e:
+            except IOError:
                 continue
         # The MO file was not found.
         msg = "No translation file found: domain=%r, path=%r, lang=%r, origin=%r" % \
               (domain, self._path, self._lang, origin)
         if self._fallback or self._lang == origin:
             if self._lang != origin:
-                log(msg)
+                lcg.log(msg)
             return gettext.NullTranslations()
         else:
             raise IOError(msg)
@@ -850,7 +855,7 @@ class GettextTranslator(Translator):
         except KeyError:
             gettext = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
         return gettext
-        
+
     def gettext(self, text, domain=None, origin=None):
         domain = domain or self._default_domain
         gettext = self._cached_gettext_instance(domain, origin)
@@ -875,7 +880,7 @@ class Localizer(object):
     """
     _translator_cache = {}
     _locale_data_cache = {}
-    
+
     @classmethod
     def _get_translator(cls, lang, translation_path):
         key = (lang, tuple(translation_path))
@@ -894,10 +899,10 @@ class Localizer(object):
         try:
             locale_data = cls._locale_data_cache[lang]
         except KeyError:
-            locale_data = globals().get('LocaleData_'+(lang or ''), LocaleData)()
+            locale_data = globals().get('LocaleData_' + (lang or ''), lcg.LocaleData)()
             cls._locale_data_cache[lang] = locale_data
         return locale_data
-    
+
     def __init__(self, lang=None, translation_path=(), timezone=None):
         assert lang is None or isinstance(lang, basestring)
         assert timezone is None or isinstance(timezone, datetime.tzinfo)
@@ -905,7 +910,7 @@ class Localizer(object):
         self._timezone = timezone
         self._translator = self._get_translator(lang, translation_path)
         self._locale_data = self._get_locale_data(lang)
-        
+
     def lang(self):
         """Return the target language of this localizer."""
         return self._lang
@@ -930,7 +935,7 @@ class Localizer(object):
 
         Returns a string or unicode depending if there was a unicode type
         within the input (as well as 'Concatenation.localize()'.
-        
+
         """
         if isinstance(text, Localizable):
             return text.localize(self)
@@ -939,8 +944,8 @@ class Localizer(object):
 
     translate = localize
     """Deprecated backwards compatibility alias - please use 'localize' instead."""
-    
-        
+
+
 def concat(*args, **kwargs):
     """Concatenate the 'args' into a 'Concatenation' or a string.
 
@@ -967,7 +972,7 @@ def format(template, *args, **kwargs):
 
     Positional interpolation variables are passed as positional arguments,
     named variables are passed as keyword arguments.
-    
+
     This is a translatable replacement of Python's built in string formatting
     operator %.  Python's built in formatting returns a plain Python string or
     unicode object and thus destroys the translatability.  Use this function if
@@ -989,7 +994,7 @@ def source_files_by_domain(basedir, domain=None):
 
       basedir -- base directory where the source files are searched
         recursively.
-    
+
       domain -- the name of the translation domain as a string.  This domain
         corresponds to the 'domain' argument of the 'TranslatableTextFactory'
         used within the source file to define the '_' identifier.  In no domain
@@ -1002,8 +1007,7 @@ def source_files_by_domain(basedir, domain=None):
         result = []
         for item in os.listdir(searchpath):
             path = os.path.join(searchpath, item)
-            if os.path.isfile(path) and item.endswith('.py') \
-                   and item not in ('__init__.py'):
+            if os.path.isfile(path) and item.endswith('.py') and item not in ('__init__.py'):
                 result.append(path)
             elif os.path.isdir(path):
                 result.extend(find(path))
@@ -1013,7 +1017,7 @@ def source_files_by_domain(basedir, domain=None):
         return files
     else:
         result = []
-        import imp, lcg
+        import imp
         for filename in files:
             name = os.path.splitext(os.path.basename(filename))[0]
             path = os.path.dirname(filename)
@@ -1046,7 +1050,7 @@ if __name__ == '__main__':
 
     """
     assert len(sys.argv) in (2, 3), \
-           "Usage: python -m lcg/i18n directory [domain]"
+        "Usage: python -m lcg/i18n directory [domain]"
     directory = sys.argv[1]
     domain = len(sys.argv) == 3 and sys.argv[2] or None
     print " ".join(source_files_by_domain(directory, domain=domain))
