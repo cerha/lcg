@@ -339,23 +339,28 @@ class HtmlGenerator(object):
             return self._tag('button', label, attr, value=value, **kwargs)
             
     def select(self, name, options, selected=None, **kwargs):
-        found = []
+        if __debug__:
+            found = []
         def opt(label, value, enabled=True, cls=None):
             if isinstance(value, (list, tuple)):
-                return self._tag('optgroup', [opt(*x) for x in value], ('label',), label=label,
-                                 _newlines=True)
+                return self.optgroup([opt(*x) for x in value], label=label)
             else:
                 if __debug__:
                     if selected == value:
                         found.append(value)
-                return self._tag('option', label, ('value', 'selected', 'disabled'),
-                                 value=value, selected=(value == selected), disabled=not enabled,
-                                 cls=not enabled and (cls and cls+' ' or '')+'disabled' or cls)
+                return self.option(label, value=value, selected=(value == selected),
+                                   disabled=not enabled, cls=cls)
         opts = [opt(*x) for x in options]
         assert selected is None or found, "Value %r not found in options: %r" % (selected, options)
         # TODO: check also for duplicate `selected' values?
         attr = ('name', 'title', 'onchange', 'disabled', 'readonly')
         return self._tag('select', opts, attr, _newlines=True, name=name, **kwargs)
+
+    def optgroup(self, content, **kwargs):
+        return self._tag('optgroup', content, _attr=('label',), _newlines=True, **kwargs)
+
+    def option(self, label, **kwargs):
+        return self._tag('option', label, _attr=('value', 'selected', 'disabled'), **kwargs)
      
     def checkbox(self, name, **kwargs):
         return self._input('checkbox', _attr=('checked',), name=name, **kwargs)
