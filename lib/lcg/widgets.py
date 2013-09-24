@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -166,18 +166,11 @@ class FoldableTree(Widget, lcg.Content):
             content = g.span(node.title(), cls=not is_foldable(node) and 'bullet' or None)
             return g.a(content, href=context.uri(node), title=node.descr(),
                        cls=' '.join(cls) or None)
-        def menu(node, indent=0):
-            spaces = ' ' * indent
-            items = [g.concat(spaces, '  ',
-                              g.li(g.concat(item(n),
-                                            menu(n, indent+4)),
-                                   cls=li_cls(n)),
-                              '\n')
+        def menu(node):
+            items = [g.li(item(n) + menu(n), cls=li_cls(n))
                      for n in node.children() if not n.hidden()]
             if items:
-                return g.concat("\n", spaces,
-                                g.ul(g.concat('\n', items, spaces)),
-                                '\n', ' '*(indent-2))
+                return g.ul(*items)
             else:
                 return ''
         return menu(self._node or current.root())
