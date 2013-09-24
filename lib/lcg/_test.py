@@ -786,9 +786,9 @@ class HtmlExport(unittest.TestCase):
              '<a href="http://www.freebsoft.org" title="descr">label</a>'),
             # Video service links
             ('http://www.youtube.com/watch?v=xyz123',
-             u'<object data="http://www.youtube.com/v/xyz123?rel=0" height="300" type="application/x-shockwave-flash" width="500" title="Flash movie object">\n<param name="movie" value="http://www.youtube.com/v/xyz123?rel=0"/>\n<param name="wmode" value="opaque"/>\n</object>\n'),
+             u'<object data="http://www.youtube.com/v/xyz123?rel=0" height="300" type="application/x-shockwave-flash" width="500" title="Flash movie object"><param name="movie" value="http://www.youtube.com/v/xyz123?rel=0"/><param name="wmode" value="opaque"/></object>'),
             ('http://www.vimeo.com/xyz123',
-             u'<object data="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com" height="300" type="application/x-shockwave-flash" width="500" title="Flash movie object">\n<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com"/>\n<param name="wmode" value="opaque"/>\n</object>\n'),
+             u'<object data="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com" height="300" type="application/x-shockwave-flash" width="500" title="Flash movie object"><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com"/><param name="wmode" value="opaque"/></object>'),
             # Inline images
             ('[aa.jpg]',
              '<img src="images/aa.jpg" alt="" class="lcg-image image-aa"/>'),

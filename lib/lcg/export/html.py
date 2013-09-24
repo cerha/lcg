@@ -115,25 +115,21 @@ class HtmlGenerator(object):
         assert not kwargs, "Invalid attributes: %s" % kwargs
         return result
 
-    def _tag(self, tag, content=None, _attr=(), _newlines=False, _paired=True, **kwargs):
-        separator = _newlines and "\n" or ""
+    def _tag(self, tag, content=None, _attr=(), _paired=True, **kwargs):
         attributes = self._attributes(_attr, **kwargs)
         if not _paired:
             assert content is None
-            return '<' + tag + attributes + '/>' + separator
+            return concat('<', tag, attributes, '/>') # + separator
         else:
-            assert content is not None
             if isinstance(content, (tuple, list)):
-                content = concat(content, separator=separator)
-            if _newlines and not content.endswith(separator):
-                content += separator
-            return concat('<', tag, attributes, '>', separator, content, '</', tag, '>', separator)
+                content = concat(content)
+            return concat('<', tag, attributes, '>', content, '</', tag, '>')
      
     def _input(self, type, _attr=(), **kwargs):
-        attr = ('type', 'name', 'value', 'title', 'size', 'maxlength', 'accesskey',
-                'onclick', 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
-                'readonly', 'disabled')
-        return self._tag('input', _attr=attr+_attr, _paired=False, type=type, **kwargs)
+        _attr += ('type', 'name', 'value', 'title', 'size', 'maxlength', 'accesskey',
+                  'onclick', 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
+                  'readonly', 'disabled')
+        return self._tag('input', None, _attr, _paired=False, type=type, **kwargs)
     
     def uri(self, base, *args, **kwargs):
         uri = urllib.quote(base.encode('utf-8'))
@@ -152,20 +148,20 @@ class HtmlGenerator(object):
     # HTML tags
 
     def html(self, content, **kwargs):
-        return self._tag('html', content, ('xmlns',), _newlines=True, **kwargs)
+        return self._tag('html', content, ('xmlns',), **kwargs)
     
     def head(self, content):
         content = concat('  ', concat(content, separator='\n  ')),
-        return self._tag('head', content, _newlines=True)
+        return self._tag('head', content)
     
     def title(self, content, **kwargs):
         return self._tag('title', content, **kwargs)
     
     def body(self, content, **kwargs):
-        return self._tag('body', content, ('onkeydown', 'onload'), _newlines=True, **kwargs)
+        return self._tag('body', content, ('onkeydown', 'onload'), **kwargs)
     
     def div(self, content, **kwargs):
-        return self._tag('div', content, ('title',), _newlines=True, **kwargs)
+        return self._tag('div', content, ('title',), **kwargs)
      
     def span(self, text, **kwargs):
         return self._tag('span', text, ('title',), **kwargs)
@@ -174,7 +170,7 @@ class HtmlGenerator(object):
         return self._tag('h%d' % level, title, **kwargs)
     
     def map(self, content, **kwargs):
-        return self._tag('map', content, ('name', 'title'), _newlines=True, **kwargs)
+        return self._tag('map', content, ('name', 'title'), **kwargs)
 
     def strong(self, text, **kwargs):
         return self._tag('strong', text, **kwargs)
@@ -189,7 +185,7 @@ class HtmlGenerator(object):
         return self._tag('code', text, **kwargs)
     
     def pre(self, text, cls="lcg-preformatted-text", **kwargs):
-        return self._tag('pre', text, _newlines=True, cls=cls, **kwargs)
+        return self._tag('pre', text, cls=cls, **kwargs)
      
     def sup(self, text, **kwargs):
         return self._tag('sup', text, **kwargs)
@@ -239,7 +235,7 @@ class HtmlGenerator(object):
         return self._tag('li', content, **kwargs)
     
     def dl(self, *content, **kwargs):
-        return self._tag('dl', content, _newlines=True, **kwargs)
+        return self._tag('dl', content, **kwargs)
 
     def dt(self, content, **kwargs):
         return self._tag('dt', content)
@@ -249,14 +245,14 @@ class HtmlGenerator(object):
     
     def img(self, src, alt='', **kwargs):
         attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
-        return self._tag('img', _attr=attr, _paired=False, src=src, alt=alt, **kwargs)
+        return self._tag('img', None, attr, _paired=False, src=src, alt=alt, **kwargs)
 
     def abbr(self, term, **kwargs):
         return self._tag('abbr', term, ('title',), **kwargs)
 
     def table(self, content, **kwargs):
         attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
-        return self._tag('table', content, attr, _newlines=True, **kwargs)
+        return self._tag('table', content, attr, **kwargs)
     
     def tr(self, content, **kwargs):
         return self._tag('tr', content, **kwargs)
@@ -274,21 +270,20 @@ class HtmlGenerator(object):
         return self._tag('tfoot', content)
     
     def tbody(self, content):
-        return self._tag('tbody', content, _newlines=True)
+        return self._tag('tbody', content)
     
     def iframe(self, src, **kwargs):
         attr = ('src', 'width', 'height', 'frameborder')
         return self._tag('iframe', self.a(src, href=src), attr, src=src, **kwargs)
      
     def object(self, content, **kwargs):
-        return self._tag('object', content, (
-                'align', 'archive', 'border', 'classid', 'codebase', 'codetype',
+        attr = ('align', 'archive', 'border', 'classid', 'codebase', 'codetype',
                 'data', 'declare', 'height', 'hspace', 'name', 'standby', 'type',
-                'usemap', 'vspace', 'width', 'dir', 'title'), 
-                         _newlines=True, **kwargs)
+                'usemap', 'vspace', 'width', 'dir', 'title')
+        return self._tag('object', content, attr, **kwargs)
 
     def param(self, **kwargs):
-        return self._tag('param', _attr=('name', 'value', 'valuetype', 'type'),
+        return self._tag('param', None, ('name', 'value', 'valuetype', 'type'),
                          _paired=False, **kwargs)
  
     # Form controls (special methods for various HTML INPUT fields are defined, so the `input'
@@ -296,12 +291,12 @@ class HtmlGenerator(object):
      
     def form(self, content, action="#", **kwargs):
         attr = ('name', 'action', 'method', 'enctype', 'onsubmit')
-        return self._tag('form', content, attr, _newlines=True, action=action, **kwargs)
+        return self._tag('form', content, attr, action=action, **kwargs)
      
     def fieldset(self, legend, content, **kwargs):
         content = (self._tag('legend', legend or '', cls=(not legend and 'empty' or None)),) +\
                    tuple(content)
-        return self._tag('fieldset', content, _newlines=True, **kwargs)
+        return self._tag('fieldset', content, **kwargs)
      
     def label(self, text, id, **kwargs):
         # We don't respect the HTML attribute name since 'for' is a Python keyword.
@@ -319,7 +314,7 @@ class HtmlGenerator(object):
         return self._input('file', name=name, size=size, cls=cls, **kwargs)
      
     def radio(self, name, **kwargs):
-        return self._input('radio', _attr=('checked',), name=name, **kwargs)
+        return self._input('radio', ('checked',), name=name, **kwargs)
      
     def hidden(self, name, value, id=None):
         return self._input('hidden', name=name, value=value, id=id)
@@ -354,16 +349,16 @@ class HtmlGenerator(object):
         assert selected is None or found, "Value %r not found in options: %r" % (selected, options)
         # TODO: check also for duplicate `selected' values?
         attr = ('name', 'title', 'onchange', 'disabled', 'readonly')
-        return self._tag('select', opts, attr, _newlines=True, name=name, **kwargs)
+        return self._tag('select', opts, attr, name=name, **kwargs)
 
     def optgroup(self, content, **kwargs):
-        return self._tag('optgroup', content, _attr=('label',), _newlines=True, **kwargs)
+        return self._tag('optgroup', content, ('label',), **kwargs)
 
     def option(self, label, **kwargs):
-        return self._tag('option', label, _attr=('value', 'selected', 'disabled'), **kwargs)
+        return self._tag('option', label, ('value', 'selected', 'disabled'), **kwargs)
      
     def checkbox(self, name, **kwargs):
-        return self._input('checkbox', _attr=('checked',), name=name, **kwargs)
+        return self._input('checkbox', ('checked',), name=name, **kwargs)
      
     def textarea(self, name, value='', **kwargs):
         attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
@@ -373,17 +368,17 @@ class HtmlGenerator(object):
      
     def audio(self, src, content=None, controls=True, **kwargs):
         return self._tag('audio', content,
-                         _attr=('autoplay', 'controls', 'loop', 'preload', 'title', 'src'),
+                         ('autoplay', 'controls', 'loop', 'preload', 'title', 'src'),
                          _paired=content is not None, src=src, controls=controls, **kwargs)
 
     def video(self, src, content=None, controls=True, **kwargs):
         return self._tag('video', content,
-                         _attr=('autoplay', 'controls', 'height', 'loop', 'muted', 'poster',
-                                'preload', 'src', 'title', 'width'),
+                         ('autoplay', 'controls', 'height', 'loop', 'muted', 'poster',
+                          'preload', 'src', 'title', 'width'),
                          _paired=content is not None, src=src, controls=controls, **kwargs)
 
     def source(self, src, **kwargs):
-        return self._tag('source', _attr=('src', 'type'), _paired=False, src=src, **kwargs)
+        return self._tag('source', None, ('src', 'type'), _paired=False, src=src, **kwargs)
 
     # JavaScript code generation.
      
@@ -391,14 +386,11 @@ class HtmlGenerator(object):
         if code is not None:
             assert src is None, src
             assert isinstance(code, basestring)
-            newlines = True
             content = code.strip()
         else:
             assert isinstance(src, basestring)
             content = ''
-            newlines = False
-        result = self._tag('script', content, _attr=('src', 'type'),
-                           _paired=True, _newlines=newlines, src=src, type=type, **kwargs)
+        result = self._tag('script', content, ('src', 'type'), src=src, type=type, **kwargs)
         if noscript:
             # Deprecated.
             result += self.noscript(noscript)
