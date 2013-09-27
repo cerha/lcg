@@ -1141,7 +1141,7 @@ class HtmlExporter(Exporter):
     def _reformat_text(self, text):
         return text
 
-    def _html_conetnt(self, context):
+    def _html_content(self, context):
         g = self._generator
         # Export body first to allocate all resources before generating the head.
         body = g.body(self._body_content(context), **self._body_attr(context))
@@ -1153,7 +1153,7 @@ class HtmlExporter(Exporter):
         return concat('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">',
                       #'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
                       '\n\n',
-                      g.html(self._html_conetnt(context), lang=context.lang()))
+                      g.html(self._html_content(context), lang=context.lang()))
 
 
 class Html5Exporter(HtmlExporter):
@@ -1163,7 +1163,7 @@ class Html5Exporter(HtmlExporter):
         g = self._generator
         return concat('<?xml version="1.0" encoding="UTF-8"?>', '\n',
                       '<!DOCTYPE html>', '\n',
-                      g.html(self._html_conetnt(context), lang=context.lang(),
+                      g.html(self._html_content(context), lang=context.lang(),
                              xmlns='http://www.w3.org/1999/xhtml'))
                       
 
