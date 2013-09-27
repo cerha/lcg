@@ -121,8 +121,6 @@ class HtmlGenerator(object):
             assert content is None
             return concat('<', tag, attributes, '/>') # + separator
         else:
-            if isinstance(content, (tuple, list)):
-                content = concat(content)
             return concat('<', tag, attributes, '>', content, '</', tag, '>')
      
     def _input(self, type, _attr=(), **kwargs):

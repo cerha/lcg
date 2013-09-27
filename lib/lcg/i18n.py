@@ -31,6 +31,7 @@ import datetime
 import operator
 import os
 import re
+import string
 import sys
 
 class TranslatableTextFactory(object):
@@ -586,11 +587,11 @@ class Decimal(Localizable):
     def _locales(self, data):
         return data.decimal_point, data.grouping, data.thousands_sep
 
-    def _group(self, grouping, thousands_sep, string):
+    def _group(self, grouping, thousands_sep, string_):
         if not grouping or not thousands_sep:
-            return string
+            return string_
         result = ""
-        while string and grouping:
+        while string_ and grouping:
             if grouping[0] == -1:
                 break
             elif grouping[0] != 0:
@@ -598,17 +599,17 @@ class Decimal(Localizable):
                 group = grouping[0]
                 grouping = grouping[1:]
             if result:
-                result = string[-group:] + thousands_sep + result
+                result = string_[-group:] + thousands_sep + result
             else:
-                result = string[-group:]
-            string = string[:-group]
-            if len(string) == 1 and string[0] not in "0123456789":
-                # the leading string is only a sign
-                return string + result
+                result = string_[-group:]
+            string_ = string_[:-group]
+            if len(string_) == 1 and string_[0] not in "0123456789":
+                # the leading string_ is only a sign
+                return string_ + result
         if not result:
-            return string
-        if string:
-            result = string + thousands_sep + result
+            return string_
+        if string_:
+            result = string_ + thousands_sep + result
         return result
 
     def _localize(self, localizer):
@@ -692,27 +693,31 @@ class Concatenation(Localizable):
 
         """
         super(Concatenation, self).__init__(**kwargs)
-        def append(array, item):
-            if isinstance(item, Concatenation) and not item._transforms:
-                for p in item.items():
-                    append(array, p)
-            else:
-                assert isinstance(item, basestring), repr(item)
-                if ((not isinstance(item, Localizable) and array and
-                     not isinstance(array[-1], Localizable))):
-                    array[-1] += item
+        self._items = flat = []
+        last = []
+        def flatten(sequence, separator=separator):
+            for x in sequence:
+                if x.__class__ in (unicode, str,):
+                    last.append(x)
+                    last.append(separator)
+                elif isinstance(x, Concatenation) and not x._transforms:
+                    flatten(x.items(), separator='')
+                    last.append(separator)
+                elif isinstance(x, Localizable):
+                    text = string.join(last, '')
+                    if text:
+                        flat.append(text)
+                    del last[:]
+                    flat.append(x)
+                    last.append(separator)
                 else:
-                    array.append(item)
-        self._items = myitems = []
-        last = len(items) - 1
-        for i, item in enumerate(items):
-            if isinstance(item, (tuple, list)):
-                item = Concatenation(item, separator=separator)
-            #if item is None or item == "":
-            #    continue
-            append(myitems, item)
-            if i != last:
-                append(myitems, separator)
+                    assert isinstance(x, (tuple, list,)), repr(x)
+                    flatten(x)
+        flatten(items)
+        if len(last) > 1:
+            text = string.join(last[:-1], '')
+            if text:
+                flat.append(text)
 
     def _clone_args(self):
         return (self._items,)
