@@ -89,39 +89,40 @@ class HtmlGenerator(object):
     def _js_escape_char(self, match):
         return self._JAVASCRIPT_ESCAPES[match.group(0)] 
 
-    def _attribute(self, name, value):
-        if value is True:
-            return name
-        else:
-            if isinstance(value, int):
-                value = '"%d"' % value
-            elif isinstance(value, Localizable):
-                value = value.transform(saxutils.quoteattr)
-            else:
-                value = saxutils.quoteattr(value)
-            return name + '=' + value
-    
-    def _attributes(self, valid, **kwargs):
-        result = ''
-        for name in valid + ('id', 'lang', 'tabindex', 'cls', 'style'):
-            if kwargs:
-                value = kwargs.pop(name, None)
-                if not (value is None or value is False):
-                    if name == 'cls':
-                        name = 'class'
-                    result += ' ' + self._attribute(name, value)
-            else:
-                break
-        assert not kwargs, "Invalid attributes: %s" % kwargs
-        return result
-
     def _tag(self, tag, content=None, _attr=(), _paired=True, **kwargs):
-        attributes = self._attributes(_attr, **kwargs)
-        if not _paired:
-            assert content is None
-            return concat('<', tag, attributes, '/>') # + separator
+        result_list = ['<', tag]
+        dirty = False
+        if __debug__:
+            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style',)
+        for name, value in kwargs.items():
+            if value is not None and value is not False:
+                assert name in valid, "Invalid attribute: %s" % (name,)
+                if name == 'cls':
+                    name = 'class'
+                result_list.append(' ')
+                result_list.append(name)
+                if value is not True:
+                    if isinstance(value, int):
+                        str_value = '"%d"' % value
+                    elif isinstance(value, Localizable):
+                        str_value = value.transform(saxutils.quoteattr)
+                        dirty = True
+                    else:
+                        str_value = saxutils.quoteattr(value)
+                    result_list.append('=')
+                    result_list.append(str_value)
+        if content is not None and content.__class__ not in (unicode, str,):
+            dirty = True
+        if _paired:
+            result_list += ['>', content, '</', tag, '>']
         else:
-            return concat('<', tag, attributes, '>', content, '</', tag, '>')
+            assert content is None, "Non-empty non-paired content"
+            result_list.append('/>')
+        if dirty:
+            result = concat(*result_list)
+        else:
+            result = string.join(result_list, '')
+        return result
      
     def _input(self, type, _attr=(), **kwargs):
         _attr += ('type', 'name', 'value', 'title', 'size', 'maxlength', 'accesskey',
@@ -449,12 +450,7 @@ class HtmlGenerator(object):
 
 
 class XhtmlGenerator(HtmlGenerator):
-
-    def _attribute(self, name, value):
-        if value is True:
-            value = name
-        return super(XhtmlGenerator, self)._attribute(name, value)
-
+    pass
     
 class HtmlExporter(Exporter):
     Generator = HtmlGenerator
