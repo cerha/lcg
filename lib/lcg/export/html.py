@@ -102,21 +102,23 @@ class HtmlGenerator(object):
             valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style',)
         for name, value in kwargs.items():
             if value is not None and value is not False:
-                assert name in valid, "Invalid attribute: %s" % (name,)
+                assert name in valid, "Invalid attribute '%s' of HTML tag '%s'." % (name, tag)
                 if name == 'cls':
                     name = 'class'
                 result_list.append(' ')
                 result_list.append(name)
-                if value is not True:
-                    if isinstance(value, int):
-                        str_value = '"%d"' % value
-                    elif isinstance(value, Localizable):
-                        str_value = value.transform(saxutils.quoteattr)
-                        dirty = True
-                    else:
-                        str_value = saxutils.quoteattr(value)
-                    result_list.append('=')
-                    result_list.append(str_value)
+                if value is True:
+                    # Use boolean value syntax, which is compatible with both HTML4 and XHTML.
+                    str_value = '"' + name + '"'
+                elif isinstance(value, int):
+                    str_value = '"%d"' % value
+                elif isinstance(value, Localizable):
+                    str_value = value.transform(saxutils.quoteattr)
+                    dirty = True
+                else:
+                    str_value = saxutils.quoteattr(value)
+                result_list.append('=')
+                result_list.append(str_value)
         if content is not None and content.__class__ not in (unicode, str,):
             dirty = True
         if _paired:
