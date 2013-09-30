@@ -710,8 +710,14 @@ class Concatenation(Localizable):
                     del last[:]
                     flat.append(x)
                     last.append(separator)
+                elif isinstance(x, (unicode, str,)):
+                    # This is a quick fix for special unicode/str subclasses, such as
+                    # HtmlExporter._JavaScriptCode.  Reordering the conditions would
+                    # make sense, but it might harm the optimization effort.
+                    last.append(x)
+                    last.append(separator)
                 else:
-                    assert isinstance(x, (tuple, list,)), repr(x)
+                    assert isinstance(x, (tuple, list,)), (x.__class__, repr(x))
                     flatten(x)
         flatten(items)
         if len(last) > 1:
