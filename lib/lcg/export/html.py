@@ -96,7 +96,7 @@ class HtmlGenerator(object):
         return self._JAVASCRIPT_ESCAPES[match.group(0)]
 
     def _tag(self, tag, content=None, _attr=(), _paired=True, **kwargs):
-        result_list = ['<', tag]
+        result_list = ['<' + tag]
         dirty = False
         if __debug__:
             valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style',)
@@ -105,8 +105,7 @@ class HtmlGenerator(object):
                 assert name in valid, "Invalid attribute '%s' of HTML tag '%s'." % (name, tag)
                 if name == 'cls':
                     name = 'class'
-                result_list.append(' ')
-                result_list.append(name)
+                result_list.append(' ' + name + '=')
                 if value is True:
                     # Use boolean value syntax, which is compatible with both HTML4 and XHTML.
                     str_value = '"' + name + '"'
@@ -117,12 +116,11 @@ class HtmlGenerator(object):
                     dirty = True
                 else:
                     str_value = saxutils.quoteattr(value)
-                result_list.append('=')
                 result_list.append(str_value)
         if content is not None and content.__class__ not in (unicode, str,):
             dirty = True
         if _paired:
-            result_list += ['>', content, '</', tag, '>']
+            result_list.extend(('>', content, '</' + tag + '>'))
         else:
             assert content is None, "Non-empty non-paired content"
             result_list.append('/>')
