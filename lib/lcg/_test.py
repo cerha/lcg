@@ -737,6 +737,48 @@ tests.add(HtmlImport)
 
 class HtmlExport(unittest.TestCase):
     
+    def test_generator(self):
+        g = lcg.HtmlGenerator()
+        localizer = lcg.Localizer('cs', translation_path=translation_path)
+        for generated, html in (
+                (g.a('X', href='x'),
+                 '<a href="x">X</a>'),
+                (g.button('X', disabled=True),
+                 '<button disabled="disabled" type="submit">X</button>'),
+        ):
+            result = localizer.localize(generated)
+            assert result == html, "\n  - expected: %r\n  - got:      %r" % (html, result)
+            
+    def test_export(self):
+    	n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
+                            globals=dict(x='value of x'))
+        context = lcg.HtmlExporter().context(n, None, sec_lang='es')
+        for content, html in (
+            (('a', ' ', lcg.strong('b ', lcg.em('c'), ' ', lcg.u('d')), ' ', lcg.code('e')),
+             'a <strong>b <em>c</em> <u>d</u></strong> <code>e</code>'),
+            (lcg.cite('x'),
+             '<span lang="es" class="lcg-citation">x</span>'),
+            (lcg.br(),
+             '<br/>'),
+            (lcg.hr(),
+             '<hr/>'),
+            (lcg.Quotation(lcg.p("blah")),
+             u'<blockquote class="lcg-quotation"><p>blah</p></blockquote>'),
+            (lcg.Quotation(lcg.TextContent("blah"), source='Hugo', uri='http://hugo.org'),
+             u'<blockquote class="lcg-quotation">blah<footer>— <a href="http://hugo.org">Hugo</a></footer></blockquote>'),
+            (lcg.NewPage(),
+             '<hr class="new-page"/>'),
+            (lcg.Substitution('x'),
+             'value of x'),
+            ((lcg.Subscript(lcg.TextContent('sub')), lcg.Superscript(lcg.TextContent('sup'))),
+             '<sub>sub</sub><sup>sup</sup>'),
+            (lcg.p('Kotva: ', lcg.Anchor('x', text='zde'), halign=lcg.HorizontalAlignment.RIGHT),
+             '<p style="text-align: right;">Kotva: <a name="x">zde</a></p>'),
+            ):
+            result = lcg.coerce(content).export(context)
+            assert result == html, "\n  - content:  %r\n  - expected: %r\n  - got:      %r" % \
+                (content, html, result)
+            
     def test_formatting(self):
         def check(result, expected_result):
             if isinstance(expected_result, basestring):
@@ -848,36 +890,6 @@ class HtmlExport(unittest.TestCase):
             parsed_result = content.export(context)
             check(parsed_result, html)
 
-    def test_export(self):
-    	n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
-                            globals=dict(x='value of x'))
-        context = lcg.HtmlExporter().context(n, None, sec_lang='es')
-        for content, html in (
-            (('a', ' ', lcg.strong('b ', lcg.em('c'), ' ', lcg.u('d')), ' ', lcg.code('e')),
-             'a <strong>b <em>c</em> <u>d</u></strong> <code>e</code>'),
-            (lcg.cite('x'),
-             '<span lang="es" class="lcg-citation">x</span>'),
-            (lcg.br(),
-             '<br/>'),
-            (lcg.hr(),
-             '<hr/>'),
-            (lcg.Quotation(lcg.p("blah")),
-             u'<blockquote class="lcg-quotation"><p>blah</p></blockquote>'),
-            (lcg.Quotation(lcg.TextContent("blah"), source='Hugo', uri='http://hugo.org'),
-             u'<blockquote class="lcg-quotation">blah<footer>— <a href="http://hugo.org">Hugo</a></footer></blockquote>'),
-            (lcg.NewPage(),
-             '<hr class="new-page"/>'),
-            (lcg.Substitution('x'),
-             'value of x'),
-            ((lcg.Subscript(lcg.TextContent('sub')), lcg.Superscript(lcg.TextContent('sup'))),
-             '<sub>sub</sub><sup>sup</sup>'),
-            (lcg.p('Kotva: ', lcg.Anchor('x', text='zde'), halign=lcg.HorizontalAlignment.RIGHT),
-             '<p style="text-align: right;">Kotva: <a name="x">zde</a></p>'),
-            ):
-            result = lcg.coerce(content).export(context)
-            assert result == html, "\n  - content:  %r\n  - expected: %r\n  - got:      %r" % \
-                (content, html, result)
-            
 tests.add(HtmlExport)
 
 
