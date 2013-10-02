@@ -16,7 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from lcg.export import *
+import lcg
+from lcg.export import Exporter, Html5Exporter
 
 import xml.dom.minidom as xml
 import zipfile
@@ -125,7 +126,7 @@ class EpubExporter(Exporter):
 
     def export(self, context):
         """Return the exported E-pub archive as a binary string."""
-        config.allow_backref = False
+        lcg.config.allow_backref = False
         fileobject = StringIO.StringIO()
         epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
         node = context.node()
@@ -267,7 +268,7 @@ class EpubExporter(Exporter):
                 a.appendChild(doc.createTextNode(title))
                 if subitems:
                     export(subitems, li)
-        items = NodeIndex(node=node, detailed=True).items(context)
+        items = lcg.NodeIndex(node=node, detailed=True).items(context)
         export(items, nav)
         return doc.toprettyxml(indent='  ', newl='\n', encoding='UTF-8')
 
