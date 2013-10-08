@@ -51,6 +51,15 @@ class Processor(object):
 
         """
 
+        _TEXT_REPLACEMENTS = ((re.compile('</(?P<tag>em|strong)>( *)<(?P=tag)>'), '\\2',),
+                              (re.compile('<(?P<tag>em|strong)>( *)</(?P=tag)>'), '\\2',),
+                              )
+
+        def _text_process(self, html):
+            for regexp, replacement in self._TEXT_REPLACEMENTS:
+                html = regexp.sub(replacement, html)
+            return html
+            
         def lcg_parse(self, data):
             """Parse 'data' and return 'xml.etree.ElementTree.Element' instance.
 
@@ -272,7 +281,8 @@ class XMLProcessor(Processor):
 
         def lcg_parse(self, xml_):
             import xml.dom.minidom
-            dom = xml.dom.minidom.parseString(xml_.encode('utf-8'))
+            xml_ = self._text_process(xml_.encode('utf-8'))
+            dom = xml.dom.minidom.parseString(xml_)
             return self._lcg_dom_content(dom)
 
     class Transformer(Processor.Transformer):
@@ -692,6 +702,7 @@ class HTML2XML(Processor):
                     self._hp_strip(c)
             
         def lcg_parse(self, html):
+            html = self._text_process(html)
             self.feed(html)
             self._hp_strip(self._hp_tree)
             return self._hp_tree

@@ -1457,7 +1457,17 @@ class HTMLProcessor(object):
                     return function(element, _followers, **kwargs)
             raise Exception("No transformation available for element", element)
 
+    _TEXT_REPLACEMENTS = ((re.compile('</(?P<tag>em|strong)>( *)<(?P=tag)>'), '\\2',),
+                          (re.compile('<(?P<tag>em|strong)>( *)</(?P=tag)>'), '\\2',),
+                          )
+
+    def _text_process(self, html):
+        for regexp, replacement in self._TEXT_REPLACEMENTS:
+            html = regexp.sub(replacement, html)
+        return html
+
     def _tree_content(self, html):
+        html = self._text_process(html)
         parser = self._HTMLParser()
         parser.feed(html)
         return parser.tree()
