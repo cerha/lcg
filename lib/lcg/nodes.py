@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2012 Brailcom, o.p.s.
+# Copyright (C) 2004-2013 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ class ContentNode(object):
 
     def __init__(self, id, title=None, brief_title=None, heading=None, descr=None, variants=(),
                  content=None, children=(), hidden=False, active=True, foldable=False,
-                 resource_provider=None, globals=None, page_header=None, page_footer=None,
-                 left_page_footer=None, right_page_footer=None,
+                 resource_provider=None, globals=None, cover_image=None,
+                 page_header=None, page_footer=None, left_page_footer=None, right_page_footer=None,
                  first_page_header=None, page_background=None, presentation=None):
         """Initialize the instance.
 
@@ -79,6 +79,7 @@ class ContentNode(object):
             The variables are used for substitution by `Substitution'
             instances, but they may be also used for other purposes depending
             on the application.
+          cover_image -- 'lcg.Resource' instance to be used as a cover image.
           page_header -- dictionary of 'Content' instances, with language codes
             as keys, to be inserted at the top of each generated page.  If content is
             'None', no page header is inserted.
@@ -123,6 +124,8 @@ class ContentNode(object):
         self._right_page_footer = right_page_footer
         assert page_background is None or isinstance(page_background, dict) and all ([x is None or isinstance(x, Content) for x in page_background.values()]), page_background
         self._page_background = page_background
+        assert cover_image is None or isinstance(cover_image, lcg.Image), cover_image
+        self._cover_image = cover_image
         assert presentation is None or isinstance(presentation, dict) and all ([x is None or isinstance(x, Presentation) for x in presentation.values()]), presentation
         self._presentation = presentation
         if isinstance(content, (tuple, list)):
@@ -357,6 +360,10 @@ class ContentNode(object):
     def resource_provider(self):
         """Get the 'ResourceProvider' instance associated with this node."""
         return self._resource_provider
+
+    def cover_image(self):
+        """Return the cover image."""
+        return self._cover_image
 
     def _lang_parameter(self, dictionary, lang):
         if dictionary is None:

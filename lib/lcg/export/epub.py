@@ -148,6 +148,8 @@ class EpubExporter(Exporter):
                         epub.writestr(self._resource_path(resource),
                                       self._get_resource_data(context, n, resource))
                         resources.append(resource)
+            if node.cover_image() not in resources:
+                resources.append(node.cover_image())
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
                           self._package_document(node, lang, resources))
         finally:
@@ -238,8 +240,11 @@ class EpubExporter(Exporter):
         for resource in resources:
             resource_id = 'resource-%x' % id(resource)
             mime_type, encoding = mimetypes.guess_type(resource.filename())
+            properties = []
+            if resource is node.cover_image():
+                properties.append('cover-image')
             add_item(resource_id, self._html_exporter.resource_uri(resource),
-                     mediatype=mime_type or 'application/octet-stream')
+                     mediatype=mime_type or 'application/octet-stream', properties=properties)
         # export
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
 
