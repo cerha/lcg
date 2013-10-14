@@ -279,7 +279,8 @@ class Parser(object):
             if ((not definitions and
                  len(parsed_description) == 1 and
                  isinstance(parsed_description[0], lcg.ItemizedList))):
-                self._old_position = old_position
+                if __debug__:
+                    self._old_position = old_position
                 return None
             definitions.append((self.parse_inline_markup(term),
                                 lcg.Container(parsed_description),))
