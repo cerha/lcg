@@ -769,7 +769,7 @@ class HtmlExporter(Exporter):
                                   cls='section-content section-level-%d' % level)),
                            cls='section-container section-level-%d' % level,
                            **self._container_attr(element)),
-                     id='section-' + anchor.replace('.', '_'))
+                     id='section-' + anchor)
 
     def _export_preformatted_text(self, context, element):
         return self._generator.pre(self.escape(element.text()))
