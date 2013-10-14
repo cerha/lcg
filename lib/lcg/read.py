@@ -202,7 +202,8 @@ class FileReader(Reader):
                 del lines[0]
             if comment is not None:
                 # This is a hack (it breaks line numbering).
-                lines = [l for l in lines if not re.compile(comment).match(l)]
+                comment_matcher = re.compile(comment)
+                lines = [l for l in lines if not comment_matcher.match(l)]
         content = ''.join(lines)
         try:
             return unicode(content, encoding=encoding)
