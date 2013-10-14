@@ -774,13 +774,10 @@ class HtmlExporter(Exporter):
     def _export_preformatted_text(self, context, element):
         return self._generator.pre(self.escape(element.text()))
 
-    def _itemized_list(self, items, order=None, _indent=0):
+    def _export_itemized_list(self, context, element):
         g = self._generator
-        spaces = ' ' * _indent
-        items = [concat(spaces, '  ', g.li(item, cls="i%d" % (i + 1,)), '\n')
-                 for i, item in enumerate(items)]
         style = None
-        if order is None:
+        if element.order() is None:
             method = g.ul
         else:
             method = g.ol
@@ -788,11 +785,9 @@ class HtmlExporter(Exporter):
                 style = 'list-style-type: lower-alpha'
             elif order == 'upper-alpha':
                 style = 'list-style-type: upper-alpha'
-        return spaces + method(concat('\n', items, spaces), style=style) + '\n'
-
-    def _export_itemized_list(self, context, element):
-        return self._itemized_list([item.export(context) for item in element.content()],
-                                   order=element.order())
+        return method(*[g.li(item.export(context), cls="i%d" % (i + 1,))
+                        for i, item in enumerate(element.content())],
+                      style=style)
 
     def _export_definition_list(self, context, element):
         g = self._generator
@@ -810,26 +805,25 @@ class HtmlExporter(Exporter):
     def _export_table_of_contents(self, context, element):
         g = self._generator
         parent = element.parent()
-        def make_toc(items, _indent=0):
+        def toc_link(item):
+            if isinstance(item, ContentNode):
+                descr = item.descr()
+                name = None
+                uri_kwargs = {}
+            else:
+                assert isinstance(item, Section)
+                descr = None
+                name = item.create_backref(parent)
+                uri_kwargs = dict(local=(parent is item.parent()))
+            uri = context.uri(item, **uri_kwargs)
+            return g.a(item.heading().export(context), href=uri, name=name, title=descr)
+        def make_toc(items):
             if len(items) == 0:
                 return g.escape('')
-            links = []
-            for item, subitems in items:
-                if isinstance(item, ContentNode):
-                    descr = item.descr()
-                    name = None
-                    uri_kwargs = {}
-                else:
-                    assert isinstance(item, Section)
-                    descr = None
-                    name = item.create_backref(parent)
-                    uri_kwargs = dict(local=(parent is item.parent()))
-                uri = context.uri(item, **uri_kwargs)
-                link = g.a(item.heading().export(context), href=uri, name=name, title=descr)
-                subtoc = make_toc(subitems, _indent=(_indent + 4))
-                links.append(g.concat(link, subtoc))
-            return concat("\n", self._itemized_list(links, _indent=_indent), ' ' * (_indent - 2))
-        result = make_toc(element.items(context), _indent=0)
+            else:
+                return g.ul(*[g.li((toc_link(item), make_toc(subitems)), cls="i%d" % (i + 1,))
+                              for i, (item, subitems) in enumerate(items)])
+        result = make_toc(element.items(context))
         title = element.title()
         if title is not None:
             g = self._generator
