@@ -168,6 +168,9 @@ class HtmlGenerator(object):
     def div(self, content, **kwargs):
         return self._tag('div', content, ('title',), **kwargs)
 
+    def section(self, content, **kwargs):
+        return self._tag('section', content, ('title',), **kwargs)
+
     def span(self, text, **kwargs):
         return self._tag('span', text, ('title',), **kwargs)
 
@@ -743,6 +746,10 @@ class HtmlExporter(Exporter):
     def _export_heading(self, context, element):
         return self._export_container(context, element)
 
+    def _exported_section_wrapper(self, g):
+        # Use div in HTML4, but allow overriding for HTML 5.
+        return g.div
+
     def _export_section(self, context, element):
         g = self._generator
         level = len(element.section_path()) + 1
@@ -762,14 +769,15 @@ class HtmlExporter(Exporter):
             # heading.export()) and use the lang for the <h> tag.
             lang = heading.content()[0].lang()
             heading = lcg.Container(heading.content()[0].content())
-        return g.div(g.div((g.h(g.a(heading.export(context), href=href, name=anchor, cls='backref'),
-                                level, lang=lang),
-                            g.div(g.div(self._exported_container_content(context, element),
-                                        cls='section-content-wrapper'),
-                                  cls='section-content section-level-%d' % level)),
-                           cls='section-container section-level-%d' % level,
-                           **self._container_attr(element)),
-                     id='section-' + anchor)
+        wrap = self._exported_section_wrapper(g)
+        return wrap(g.div((g.h(g.a(heading.export(context), href=href, name=anchor, cls='backref'),
+                               level, lang=lang),
+                           g.div(g.div(self._exported_container_content(context, element),
+                                       cls='section-content-wrapper'),
+                                 cls='section-content section-level-%d' % level)),
+                          cls='section-container section-level-%d' % level,
+                          **self._container_attr(element)),
+                    id='section-' + anchor)
 
     def _export_preformatted_text(self, context, element):
         return self._generator.pre(self.escape(element.text()))
@@ -1157,6 +1165,9 @@ class HtmlExporter(Exporter):
 
 class Html5Exporter(HtmlExporter):
     Generator = XhtmlGenerator
+
+    def _exported_section_wrapper(self, g):
+        return g.section
 
     def export(self, context):
         g = self._generator
