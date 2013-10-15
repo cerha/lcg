@@ -148,8 +148,9 @@ class EpubExporter(Exporter):
                         epub.writestr(self._resource_path(resource),
                                       self._get_resource_data(context, n, resource))
                         resources.append(resource)
-            if node.cover_image() not in resources:
-                resources.append(node.cover_image())
+            cover_image = node.cover_image()
+            if cover_image and cover_image not in resources:
+                resources.append(cover_image)
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
                           self._package_document(node, lang, resources))
         finally:
