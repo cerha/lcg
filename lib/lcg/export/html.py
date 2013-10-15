@@ -784,15 +784,18 @@ class HtmlExporter(Exporter):
 
     def _export_itemized_list(self, context, element):
         g = self._generator
-        style = None
-        if element.order() is None:
+        order = element.order()
+        if order is None:
             method = g.ul
+            style = None
         else:
             method = g.ol
             if order == 'lower-alpha':
                 style = 'list-style-type: lower-alpha'
             elif order == 'upper-alpha':
                 style = 'list-style-type: upper-alpha'
+            else:
+                style = None
         return method(*[g.li(item.export(context), cls="i%d" % (i + 1,))
                         for i, item in enumerate(element.content())],
                       style=style)
