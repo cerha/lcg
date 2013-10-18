@@ -565,6 +565,7 @@ class Exercise(lcg.Content):
             # Temporary hack to avoid traceback in Braille export.
             return ['', '']
         g = context.generator()
+        context.resource('prototype.js')
         context.resource('lcg.js')
         context.resource('lcg-exercises.js')
         context.resource('lcg-exercises.css')
