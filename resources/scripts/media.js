@@ -198,9 +198,11 @@ function _media_player_play(player_id, uri, duration, position) {
 		};
 	    }
 	}
-    } else {
-	// Play the sound through the system if the player is not available.
-	self.location = uri;
+    } else if (typeof Audio != 'undefined') {
+	var audio = new Audio();
+	audio.src = uri;
+	audio.load();
+	audio.play();
     }
 }
 
