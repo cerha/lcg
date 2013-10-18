@@ -104,7 +104,7 @@ class ContentNode(object):
         assert isinstance(variants, (list, tuple))
         self._id = id
         self._parent = None #parent
-        self._title = title or brief_title or id
+        self._title = title if title is not None else brief_title or id
         self._heading = heading or TextContent(self._title)
         self._brief_title = brief_title or title
         self._descr = descr
