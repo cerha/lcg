@@ -156,7 +156,6 @@ class HtmlGenerator(object):
         return self._tag('html', content, ('xmlns',), **kwargs)
 
     def head(self, content):
-        content = concat('  ', concat(content, separator='\n  ')),
         return self._tag('head', content)
 
     def title(self, content, **kwargs):
@@ -1257,7 +1256,7 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                                       ('next', node.next()),
                                       ('parent', node.parent()))
                       if n is not None and n is not node]
-        return concat(base, additional, separator='\n  ')
+        return base + additional
 
     def _language_selection(self, context):
         if context.node() is not context.node().root():
