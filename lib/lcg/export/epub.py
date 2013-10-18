@@ -38,9 +38,22 @@ class Constants(object):
     
 
 class EpubHtml5Exporter(Html5Exporter):
+    
+    class Generator(Html5Exporter.Generator):
+        # We need to be able to find out, whether a script was used
+        # within a particular node export.  Thus we use this variable,
+        # which is reset before each node export and checked after it.
+        scripted = False
+
+        def script(self, *args, **kwargs):
+            self.scripted = True
+            return super(EpubHtml5Exporter.Generator, self).script(*args, **kwargs)
                 
     def _head(self, context):
-        return [context.generator().title(self._title(context))]
+        g = context.generator()
+        return ([g.title(self._title(context))] + 
+                [g.script(src=context.uri(s)) for s in self._scripts(context)])
+
 
     def _export_table_of_contents(self, context, element):
         return ''
@@ -132,6 +145,7 @@ class EpubExporter(Exporter):
         node = context.node()
         lang = context.lang()
         resources = []
+        scripted_nodes = []
         try:
             mimeinfo = zipfile.ZipInfo('mimetype')
             mimeinfo.compress_type = zipfile.ZIP_STORED
@@ -141,8 +155,10 @@ class EpubExporter(Exporter):
             epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), 
                           self._navigation_document(context))
             for n in node.linear():
-                epub.writestr(self._node_path(n), 
-                              self._xhtml_content_document(n, lang))
+                exported_content, scripted = self._xhtml_content_document(n, lang)
+                epub.writestr(self._node_path(n), exported_content)
+                if scripted:
+                    scripted_nodes.append(n)
                 for resource in n.resources():
                     if resource not in resources:
                         epub.writestr(self._resource_path(resource),
@@ -152,7 +168,7 @@ class EpubExporter(Exporter):
             if cover_image and cover_image not in resources:
                 resources.append(cover_image)
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
-                          self._package_document(node, lang, resources))
+                          self._package_document(node, lang, resources, scripted_nodes))
         finally:
             epub.close()
         return fileobject.getvalue()
@@ -202,7 +218,7 @@ class EpubExporter(Exporter):
         rootfile.setAttribute('media-type', Constants.PACKAGE_DOC_MIMETYPE)
         return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
 
-    def _package_document(self, node, lang, resources):
+    def _package_document(self, node, lang, resources, scripted_nodes):
         doc = xml.Document()
         package = doc.appendChild(doc.createElement('package'))
         package.setAttribute('xmlns', Constants.OPF_NS)
@@ -236,7 +252,10 @@ class EpubExporter(Exporter):
         for n in node.linear():
             item_id = 'node-'+n.id() # Prefix to avoid ids beginning with a number (invalid HTML)
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
-            add_item(item_id, href, mediatype='application/xhtml+xml')
+            properties = []
+            if n in scripted_nodes:
+                properties.append('scripted')
+            add_item(item_id, href, mediatype='application/xhtml+xml', properties=properties)
             spine.appendChild(doc.createElement('itemref')).setAttribute('idref', item_id)
         for resource in resources:
             resource_id = 'resource-%x' % id(resource)
@@ -281,8 +300,10 @@ class EpubExporter(Exporter):
     def _xhtml_content_document(self, node, lang):
         exporter = self._html_exporter
         context = exporter.context(node, lang)
+        context.generator().scripted = False
         data = context.localize(exporter.export(context))
-        return data.encode('UTF-8')
+        scripted = context.generator().scripted
+        return (data.encode('UTF-8'), scripted)
 
     def _document_unique_identifier(self, node, lang):
         #TODO
