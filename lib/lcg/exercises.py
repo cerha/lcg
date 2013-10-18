@@ -685,7 +685,7 @@ class _ChoiceBasedExercise(_NumberedTasksExercise):
         checked = self._checked(context, task, i)
         # Disable only the unchecked fields in the read-only mode.  This makes the selection
         # unchangable in practice and has also the advantage that the checked fields can be
-        # navigated, which is even better than using the `readonly' attributte (which doesn't work
+        # navigated, which is even better than using the `readonly' attribute (which doesn't work
         # in browsers anyway).
         disabled = self._readonly(context) and not checked
         ctrl = g.radio(task_name , id=choice_id, value=i,
