@@ -134,7 +134,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 	} else {
             response = this._correct() ? 'correct':'incorrect';
 	}
-	play_media(this.response(responsel));
+	play_media(this.response(response));
     },
 
     _count: function (array, value) {
