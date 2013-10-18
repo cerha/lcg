@@ -317,6 +317,18 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
 	field.answer_index = this._last_answer_index++;
 	field.observe('keydown', this.on_key_down.bind(this));
 	field.observe('dblclick', this._on_eval_answer.bind(this));
+	field.observe('touchstart', this._on_touch_start.bind(this));
+    },
+
+    _on_touch_start: function(event) {
+	// This is necessary in iBooks on iPhone/iPad as iBooks probably makes all
+	// text fields ineditable by default so the keyboard doesnt show up when
+	// the field is touched to type.
+	var element = event.element();
+	if (element.disabled)
+	    element.disabled = false;
+	element.focus();
+	event.stop();
     },
 
     _find_answer: function(field) {
