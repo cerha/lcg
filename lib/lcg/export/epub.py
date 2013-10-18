@@ -106,6 +106,12 @@ class EpubHtml5Exporter(Html5Exporter):
             result = self._uri_node(context, section.parent()) + result
         return result
 
+    def _allow_flash_audio_player(context, audio):
+        return False
+        
+    def _media_player(self, context):
+        return None
+
     def resource_uri(self, resource):
         uri = resource.filename()
         if resource.SUBDIR:
@@ -126,9 +132,6 @@ class EpubExporter(Exporter):
         super(EpubExporter, self).__init__(*args, **kwargs)
         self._html_exporter = EpubHtml5Exporter(translations=self._translation_path)
 
-    def _allow_flash_audio_player(context, audio):
-        return False
-        
     def dump(self, node, directory, filename=None, variant=None, **kwargs):
         variants = variant and (variant,) or node.variants() or (None,)
         for lang in variants:
