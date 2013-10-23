@@ -673,7 +673,7 @@ lcg.PopupMenuCtrl = Class.create({
     
     initialize: function (element_id, items, tooltip, selector) {
 	this.items = items
-	var link = new Element('a', {href: '#'});
+	var link = new Element('a');
         $(element_id).insert(link);
         link.observe('click', this.popup_menu.bind(this));
         if (tooltip)
