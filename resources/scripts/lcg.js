@@ -689,6 +689,67 @@ lcg.PopupMenuCtrl = Class.create({
 
 });
 
+lcg.Tooltip = Class.create({
+    // Tooltip widget with asynchronlusly loaded content.
+    // The content returned by the URL passed to constructor can be either an image or html
+
+    initialize: function (uri) {
+	// uri -- The URI from which the tooltip content should be loaded
+	this.tooltip = null;
+	this.show_when_ready = null;
+	new Ajax.Request(uri, {
+	    method: 'GET',
+	    onSuccess: function(transport) {
+		try {
+		    var element = new Element('div', {'class': 'tooltip-widget'});
+		    var content_type = transport.getHeader('Content-Type');
+		    if (content_type == 'text/html') {
+			element.update(transport.responseText);
+		    } else if (content_type.substring(0, 6) == 'image/') {
+			// The AJAX request was redundant in this case (the image will 
+			// be loaded again by the browser for the new img tag) but 
+			// there's no better way to tell automatically what the URL
+			// points to and thanks to browser caching it should not
+			// normally be a serious problem.
+			element.insert(new Element('img', {'src': uri, 'border': 0,
+							   'style': 'vertical-align: middle;'}));
+		    } else {
+			return;
+		    }
+		    element.hide(); // Necessary to make visible() work before first shown.
+		    $(document.body).insert(element);
+		    this.tooltip = element;
+		    if (this.show_when_ready)
+			this.show(this.show_when_ready[0], this.show_when_ready[1]);
+		}
+		catch (e) {
+		    // Errors in asynchronous handlers are otherwise silently
+		    // ignored.  This will only work in Firefox with Firebug,
+		    // but it is only useful for debugging anyway...
+		    console.log(e);
+		}
+	    }.bind(this),
+	});
+    },
+
+    show: function(x, y) {
+	if (this.tooltip) {
+	    var left = x + 3; // Show a little on right to avoid onmouseout and infinite loop.
+	    var top = y  - this.tooltip.getHeight();
+	    this.tooltip.setStyle({left: left+'px', top: top+'px', display: 'block'});
+	    this.show_when_ready = null;
+	} else {
+	    this.show_when_ready = [x, y];
+	}
+    },
+
+    hide: function() {
+	if (this.tooltip)
+	    this.tooltip.hide();
+	this.show_when_ready = null;
+    }
+
+});
 
 lcg.Cookies = Class.create({
     // This class is taken from 
@@ -735,6 +796,7 @@ lcg.Cookies = Class.create({
             this.clear(key);
         }.bind(this));
     }
+
 });
 
 lcg.cookies = new lcg.Cookies();
