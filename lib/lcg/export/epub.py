@@ -296,7 +296,7 @@ class EpubExporter(Exporter):
                 a.appendChild(doc.createTextNode(title))
                 if subitems:
                     export(subitems, li)
-        items = lcg.NodeIndex(node=node, detailed=True).items(context)
+        items = lcg.NodeIndex(node=node).items(context)
         export(items, nav)
         return doc.toprettyxml(indent='  ', newl='\n', encoding='UTF-8')
 
