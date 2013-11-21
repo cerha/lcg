@@ -207,6 +207,10 @@ class BrailleExporter(FileExporter, Exporter):
                              presentation_set.presentation(None, lang),
                              node.presentation(lang),)
             presentation = presentation_set.merge_presentations(presentations)
+        if presentation.default_printer is not None:
+            printer_properties = presentation.printers[presentation.default_printer]
+        else:
+            printer_properties = {}
         page_width = presentation.page_width
         if page_width:
             assert isinstance(page_width, (UFont, USpace,)), page_width
@@ -217,7 +221,7 @@ class BrailleExporter(FileExporter, Exporter):
             page_height = page_height.size()
         left_status_line = presentation.left_page_footer or node.left_page_footer(lang)
         right_status_line = presentation.right_page_footer or node.right_page_footer(lang)
-        device_table = presentation.device_output
+        device_table = printer_properties.get('device_output', presentation.device_output)
         if device_table is None:
             device_table = {' ': '⠀', '\n': '\n', '\f': '\f'}
             for c in self._braille_characters():
@@ -381,10 +385,6 @@ class BrailleExporter(FileExporter, Exporter):
                 output += device_table[c]
             except KeyError:
                 raise BrailleError(_("Text can't be represented on given output device."))
-        if presentation.default_printer is not None:
-            printer_properties = presentation.printers[presentation.default_printer]
-        else:
-            printer_properties = {}
         device_init = printer_properties.get('device_init', presentation.device_init)
         if device_init is not None:
             inner = presentation.inner_margin.size()
