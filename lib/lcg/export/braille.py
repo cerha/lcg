@@ -485,8 +485,11 @@ class BrailleExporter(FileExporter, Exporter):
                             hyphenation += '0' * (end - start)
                             hyphenation_forbidden = False
                         else:
-                            hyphenation += louis.hyphenate(hyphenation_tables,
-                                                           braille_text[start:end], mode=1)
+                            try:
+                                hyphenation += louis.hyphenate(hyphenation_tables,
+                                                               braille_text[start:end], mode=1)
+                            except RuntimeError:
+                                hyphenation += '0' * (end - start)
                     hyphenation += '2'
                     start = end = end + 1
             if end > start:
