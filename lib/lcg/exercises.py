@@ -37,8 +37,10 @@ allow using interactive exercises within any LCG content.  Some functionality
 present in the code may still not be fully supported.
 
 """
+
 import lcg
-import re, random
+import re
+
 from lcg import concat
 
 _ = lcg.TranslatableTextFactory('lcg-exercises')
@@ -166,9 +168,9 @@ class FillInTask(Task):
         assert isinstance(answer, basestring)
         if isinstance(media, lcg.Media):
             media = (media, )
-        else: 
+        else:
             assert all([isinstance(m, lcg.Media) for m in media])
-        self._answer = answer.replace('\n', ' ').replace('\r','')
+        self._answer = answer.replace('\n', ' ').replace('\r', '')
         self._media = media
         super(FillInTask, self).__init__(prompt, comment=comment)
 
@@ -180,21 +182,21 @@ class FillInTask(Task):
 
 
 class WritingTask(FillInTask):
-    
+
     def __init__(self):
         super(WritingTask, self).__init__(None, '')
 
-    
+
 class MixedTextFillInTask(FillInTask):
     _FIELD_MATCHER = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
 
     def _fields(self):
-        return [(answer.replace('\n', ' ').replace('\r',''), label)
+        return [(answer.replace('\n', ' ').replace('\r', ''), label)
                 for answer, label in self._FIELD_MATCHER.findall(self._answer)]
-    
+
     def answers(self):
         return [answer for answer, label in self._fields()]
-    
+
     def answer(self):
         answers = self.answers()
         if answers:
@@ -218,11 +220,10 @@ class MixedTextFillInTask(FillInTask):
         text = formatter(self._answer.replace('[', '\['))
         return self._FIELD_MATCHER.sub(make_field, text)
 
-
     def plain_text(self):
         return self._FIELD_MATCHER.sub(lambda match: match.group(1), self._answer)
 
-    
+
 class WrittenAnswerTask(MixedTextFillInTask):
 
     def __init__(self, question, answer, comment=None):
@@ -231,9 +232,9 @@ class WrittenAnswerTask(MixedTextFillInTask):
         super(WrittenAnswerTask, self).__init__(question, answer, comment=comment)
         assert len(self.answers()) == 1
 
-    
+
 class ClozeTask(MixedTextFillInTask):
-        
+
     def __init__(self, text, comments=(), comment=None):
         super(ClozeTask, self).__init__(None, text, comment=comment)
         if comment:
@@ -272,7 +273,7 @@ class ExerciseParser(object):
     This is an intermediate solution to use the old text based exercise
     specifications known from the Eurochance project to define exercises within
     the LCG HTML source code (processed by 'lcg.HTMLProcessor').
-    
+
     """
 
     _BLANK_LINE_SPLITTER = re.compile(r"\r?\n\s*\r?\n")
@@ -285,20 +286,20 @@ class ExerciseParser(object):
         return self._parser.parse_inline_markup(text)
     def _split(self, text):
         return [piece.strip() for piece in self._BLANK_LINE_SPLITTER.split(text)]
-    
+
     def _read_task(self, type, text, comment):
         # Read a task specification using a method according to given task type.
         try:
             method = {
-                Selection:              self._read_choices,
+                Selection: self._read_choices,
                 MultipleChoiceQuestion: self._read_prompt_and_choices,
-                GapFillStatement:       self._read_gap_fill,
-                FillInTask:             self._read_pair_of_statements,
-                WrittenAnswerTask:    self._read_pair_of_statements,
-                HiddenAnswerTask:       self._read_hidden_answer,
-                TrueFalseStatement:     self._read_true_false_statement,
-                ClozeTask:              self._read_generic_task,
-                }[type]
+                GapFillStatement: self._read_gap_fill,
+                FillInTask: self._read_pair_of_statements,
+                WrittenAnswerTask: self._read_pair_of_statements,
+                HiddenAnswerTask: self._read_hidden_answer,
+                TrueFalseStatement: self._read_true_false_statement,
+                ClozeTask: self._read_generic_task,
+            }[type]
         except KeyError:
             raise Exception("Unknown type:", type)
         return method(type, text, comment)
@@ -307,16 +308,16 @@ class ExerciseParser(object):
         # split the list of choices
         def choice(text):
             assert text.startswith('+ ') or text.startswith('- '), \
-                   "A choice must start with a + or minus sign and a space!"
+                "A choice must start with a + or minus sign and a space!"
             correct = text.startswith('+ ')
             return Choice(text[2:].strip(), correct=correct)
         choices = map(choice, lines)
         correct = filter(lambda ch: ch.correct(), choices)
         assert len(correct) == 1, \
-               "Number of correct choices must be exactly one! " + \
-               "%d out of %d found." % (len(correct), len(choices))
+            "Number of correct choices must be exactly one! " + \
+            "%d out of %d found." % (len(correct), len(choices))
         return choices
-    
+
     def _read_generic_task(self, type, text, comment):
         return type(text, comment=comment)
 
@@ -327,7 +328,7 @@ class ExerciseParser(object):
         lines = text.splitlines()
         return type(self._parse_text(lines[0]),
                     self._process_choices(lines[1:]), comment=comment)
-    
+
     def _read_gap_fill(self, type, text, comment):
         lines = text.splitlines()
         if lines[0].find('___') != -1:
@@ -338,12 +339,12 @@ class ExerciseParser(object):
             prompt = text
             choices = ()
         return type(self._parse_text(prompt.strip()), choices, comment=comment)
-    
+
     def _split_pair_of_statements(self, text):
         lines = text.splitlines()
         assert len(lines) == 2, \
-               "Task specification must consist of just 2 lines (%d given)." % \
-               len(lines)
+            "Task specification must consist of just 2 lines (%d given)." % \
+            len(lines)
         return [l.strip() for l in lines]
 
     def _read_pair_of_statements(self, type, text, comment):
@@ -377,26 +378,26 @@ class ExerciseParser(object):
                 comments = []
             tasks = (task_type(src, comments=comments), )
         elif src:
-            assert not kwargs.has_key('template')
+            assert 'template' not in kwargs
             pieces = self._split(src)
             i = 0
             while i < len(pieces):
                 t = pieces[i]
-                if i+1<len(pieces) and pieces[i+1].startswith('.. '):
-                    comment = pieces[i+1][3:]
+                if i + 1 < len(pieces) and pieces[i + 1].startswith('.. '):
+                    comment = pieces[i + 1][3:]
                     i += 2
                 else:
                     comment = None
                     i += 1
                 tasks.append(self._read_task(task_type, t, comment))
-        elif kwargs.has_key('template'):
+        elif 'template' in kwargs:
             def maketask(match):
                 tasks.append(self._read_task(task_type, match.group(1), None))
                 return "%s"
             m = self._TEMPLATE_TASK_MATCHER
             kwargs['template'] = m.sub(maketask, kwargs['template'].replace('%', '%%'))
         return exercise_type(tasks, **kwargs)
-    
+
 
 ################################################################################
 ################################   Exercises   #################################
@@ -410,13 +411,13 @@ class Exercise(lcg.Content):
     _NAME = None
     _JAVASCRIPT_CLASS = 'lcg.Exercise'
     _POINTS = 1
-    _RESPONSES = (('correct',   'exercise-responses/c*.mp3'),
+    _RESPONSES = (('correct', 'exercise-responses/c*.mp3'),
                   ('incorrect', 'exercise-responses/i*.mp3'),
-                  ('f0-49',     'exercise-responses/o0-49*.mp3'),
-                  ('f50-69',    'exercise-responses/o50-69*.mp3'),
-                  ('f70-84',    'exercise-responses/o70-84*.mp3'),
-                  ('f85-99',    'exercise-responses/o85-99*.mp3'),
-                  ('f100',      'exercise-responses/o100*.mp3'))
+                  ('f0-49', 'exercise-responses/o0-49*.mp3'),
+                  ('f50-69', 'exercise-responses/o50-69*.mp3'),
+                  ('f70-84', 'exercise-responses/o70-84*.mp3'),
+                  ('f85-99', 'exercise-responses/o85-99*.mp3'),
+                  ('f100', 'exercise-responses/o100*.mp3'))
     _MESSAGES = {"on first attempt": _("on first attempt")}
     _INDICATORS = (('answered', _('Answered:'),
                     _("Displays the number of the tasks you have already answered.  For "
@@ -444,7 +445,7 @@ class Exercise(lcg.Content):
 
     _used_types = []
     _help = None
-    
+
     def __init__(self, tasks=(), instructions=None, template=None, points=None):
         """Initialize the instance.
 
@@ -464,14 +465,14 @@ class Exercise(lcg.Content):
           points -- number of points per task. Used in tests to count the final
             result in points.  Each exercise type may have a different default
             number of points, which may be overriden by this argument.
-          
+
         """
         super(Exercise, self).__init__()
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
         assert instructions is None or isinstance(instructions, lcg.Content), instructions
         assert all([isinstance(t, self._TASK_TYPE) for t in tasks]), \
-               "Tasks must be a sequence of '%s' instances!: %s" % (self._TASK_TYPE.__name__, tasks)
+            "Tasks must be a sequence of '%s' instances!: %s" % (self._TASK_TYPE.__name__, tasks)
         assert points is None or isinstance(points, int), points
         self._tasks = list(self._check_tasks(tasks))
         self._instructions = instructions
@@ -480,13 +481,13 @@ class Exercise(lcg.Content):
 
     def _readonly(self, context):
         return False
-    
+
     # Class methods
-        
+
     @classmethod
     def task_type(cls):
         return cls._TASK_TYPE
-    
+
     @classmethod
     def name(cls):
         return cls._NAME
@@ -499,10 +500,10 @@ class Exercise(lcg.Content):
     def help(cls):
         sections = [lcg.Section(title=title, anchor=anchor, content=lcg.coerce(content))
                     for title, anchor, content in
-                    ((_("Instructions"),  'intro',         cls._help_intro()),
-                     (_("Shortcut Keys"), 'keys',          cls._help_keys()),
-                     (_("Indicators"),    'indicators',    cls._help_indicators()),
-                     (_("Control Panel"), 'panel',         cls._help_panel()))
+                    ((_("Instructions"), 'intro', cls._help_intro()),
+                     (_("Shortcut Keys"), 'keys', cls._help_keys()),
+                     (_("Indicators"), 'indicators', cls._help_indicators()),
+                     (_("Control Panel"), 'panel', cls._help_panel()))
                     if content is not None]
         return lcg.Container(sections)
 
@@ -532,16 +533,16 @@ class Exercise(lcg.Content):
                     lcg.dl([(label, help) for name, label, help in cls._INDICATORS]))
         else:
             return None
-    
+
     @classmethod
     def _help_panel(cls):
         if cls._BUTTONS:
             return (lcg.p(_("The control panel below the exercise contains the following "
                             "buttons:")),
-                    lcg.dl([(label, hlp) for label, t, cls, hlp in cls._BUTTONS]))
+                    lcg.dl([(label, hlp) for label, t, class_, hlp in cls._BUTTONS]))
         else:
             return None
-    
+
     # Instance methods
 
     def _check_tasks(self, tasks):
@@ -551,7 +552,7 @@ class Exercise(lcg.Content):
         g = context.generator()
         if inline:
             img = context.resource('media-play.gif')
-            title = label
+            title = media.title()
             label = g.img(context.uri(img))
         else:
             title = None
@@ -559,7 +560,7 @@ class Exercise(lcg.Content):
         button_id = context.unique_id()
         context.connect_shared_player(context.uri(media), button_id)
         return g.button(label, title=title, type='button', id=button_id, cls='media-control')
-                  
+
     def export(self, context):
         if context.exporter().__class__.__name__ == 'BrailleExporter':
             # Temporary hack to avoid traceback in Braille export.
@@ -579,16 +580,15 @@ class Exercise(lcg.Content):
         content = [x for x in parts if x is not None]
         script = self._export_script(context, exercise_id)
         if script:
-            content = (g.form(content, id=exercise_id), 
+            content = (g.form(content, id=exercise_id),
                        g.script(script))
-        return g.div(content, cls='exercise '+lcg.camel_case_to_lower(self.__class__.__name__))
+        return g.div(content, cls='exercise ' + lcg.camel_case_to_lower(self.__class__.__name__))
 
     def _wrap_exported_tasks(self, context, tasks):
         return concat(tasks, separator="\n")
-    
+
     def _export_tasks(self, context, exercise_id):
-        g = context.generator()
-        exported = [context.localize(self._export_task(context, exercise_id, task)) 
+        exported = [context.localize(self._export_task(context, exercise_id, task))
                     for task in self._tasks]
         if self._template:
             template = context.localize(self._template.export(context))
@@ -614,23 +614,23 @@ class Exercise(lcg.Content):
             responses[key] = [context.uri(m) for m in media]
         return g.js_call('new %s' % self._JAVASCRIPT_CLASS,
                          exercise_id, self.answers(), responses,
-                         dict([(msg, context.localize(translation)) 
+                         dict([(msg, context.localize(translation))
                                for msg, translation in self._MESSAGES.items()]))
 
     def _task_style_cls(self):
         return 'task %s-task' % lcg.camel_case_to_lower(self.__class__.__name__)
-        
+
     def _export_task(self, context, exercise_id, task):
         parts = [p for p in self._export_task_parts(context, exercise_id, task) if p is not None]
         return context.generator().div(parts, cls=self._task_style_cls())
 
     def _task_name(self, exercise_id, task):
-        return exercise_id + '-a%d' % (self._tasks.index(task)+1)
+        return exercise_id + '-a%d' % (self._tasks.index(task) + 1)
 
     def _export_results(self, context, exercise_id):
         g = context.generator()
-        return g.div((g.div(concat([g.label(label, id=exercise_id+'.'+name) +
-                                    g.field(name=name, id=exercise_id+'.'+name, size=30,
+        return g.div((g.div(concat([g.label(label, id=exercise_id + '.' + name) +
+                                    g.field(name=name, id=exercise_id + '.' + name, size=30,
                                             readonly=True)
                                     for name, label, help in self._INDICATORS],
                                    separator=g.br()),
@@ -645,10 +645,10 @@ class Exercise(lcg.Content):
 
     def points(self):
         return self._points
-    
-    
+
+
 class _NumberedTasksExercise(Exercise):
-    
+
     def _wrap_exported_tasks(self, context, tasks):
         g = context.generator()
         return g.ol(*[g.li(t) for t in tasks], cls="tasks")
@@ -656,7 +656,7 @@ class _NumberedTasksExercise(Exercise):
 
 ################################################################################
 ################################################################################
-  
+
 class _ChoiceBasedExercise(_NumberedTasksExercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
@@ -666,12 +666,12 @@ class _ChoiceBasedExercise(_NumberedTasksExercise):
           "you choose the wrong answer, you can try again until you find the "
           "correct one.  The results below the exercise will show you how many "
           "answers you got right on the first try."),
-        )
+    )
 
     def answers(self):
         return [t.choice_index(t.correct_choice())
                 for t in self._tasks if len(t.choices()) > 0]
-    
+
     def _checked(self, context, task, i):
         return False
 
@@ -682,14 +682,14 @@ class _ChoiceBasedExercise(_NumberedTasksExercise):
         g = context.generator()
         i = task.choices().index(choice)
         task_name = self._task_name(exercise_id, task)
-        choice_id = task_name + '-ch%d' % (i+1)
+        choice_id = task_name + '-ch%d' % (i + 1,)
         checked = self._checked(context, task, i)
         # Disable only the unchecked fields in the read-only mode.  This makes the selection
         # unchangable in practice and has also the advantage that the checked fields can be
         # navigated, which is even better than using the `readonly' attribute (which doesn't work
         # in browsers anyway).
         disabled = self._readonly(context) and not checked
-        ctrl = g.radio(task_name , id=choice_id, value=i,
+        ctrl = g.radio(task_name, id=choice_id, value=i,
                        cls='answer-control', checked=checked, disabled=disabled)
         text = self._choice_text(context, task, choice)
         return concat(ctrl, ' ', g.label(text, choice_id))
@@ -703,24 +703,24 @@ class _ChoiceBasedExercise(_NumberedTasksExercise):
     def _task_style_cls(self):
         cls = super(_ChoiceBasedExercise, self)._task_style_cls()
         return cls + ' choice-based-task'
-    
+
     def _export_task_parts(self, context, exercise_id, task):
         prompt = task.prompt()
-        if prompt:      
+        if prompt:
             prompt = context.localize(prompt.export(context))
         return (prompt, self._format_choices(context, exercise_id, task))
 
-    
+
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
     """Choosing one of several answers for a given question."""
-    
+
     _TASK_TYPE = MultipleChoiceQuestion
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Multiple Choice Questions")
     _HELP_INTRO = (
         _("Each question in this exercise is followed by two or more possible "
           "answers. Only one answer is correct."),
-        ) + _ChoiceBasedExercise._HELP_INTRO
+    ) + _ChoiceBasedExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of a definition of several "
           "questions, where each question has two or more possbile answers."),
@@ -729,7 +729,7 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
           "followed by a space. Incorrect answers begin with a minus sign "
           "and a space."),
         _("Another question and its answers may follow after a blank line."),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 Screen reader is:
 - a person.
@@ -741,10 +741,10 @@ GNU/Linux is:
 + an operating system
 - a computer manufacturer
 """)
-    
+
 class Selections(_ChoiceBasedExercise):
     """Selecting one of several statements/sentences (the correct one)."""
-    
+
     _TASK_TYPE = Selection
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Selections")
@@ -752,7 +752,7 @@ class Selections(_ChoiceBasedExercise):
         _("There are several groups of two or three statements. "
           "Only one statement in each group is correct. "
           "Your goal is to decide which one."),
-        ) + _ChoiceBasedExercise._HELP_INTRO
+    ) + _ChoiceBasedExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("The exercise definition consists of several groups of statements, "
           "typically two or three statements in a group."),
@@ -762,7 +762,7 @@ class Selections(_ChoiceBasedExercise):
           "group is correct."),
         _("Another group of statements may follow after a blank line. There are "
           "no blank lines between statements which belong to the same group."),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 + India is located in Asia.
 - China is located in Africa.
@@ -774,7 +774,7 @@ class Selections(_ChoiceBasedExercise):
 
 class TrueFalseStatements(_ChoiceBasedExercise):
     """Deciding whether the sentence is true or false."""
-    
+
     _TASK_TYPE = TrueFalseStatement
     # Translators: Type of exercise (use language terminology)
     _NAME = _("True/False Statements")
@@ -782,23 +782,23 @@ class TrueFalseStatements(_ChoiceBasedExercise):
         _("Each sentence in this exercise is followed by two controls labeled "
           u"‘TRUE’ and ‘FALSE’.  Decide whether the sentence is true or not "
           "and press the corresponding button."),
-        ) + _ChoiceBasedExercise._HELP_INTRO
+    ) + _ChoiceBasedExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("The exercise definition consists of several statements separated "
           "by blank lines."),
         _("Each statement is marked as either true using [T] or false "
           "using [F] at the end of the line."),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 The Microsoft Windows operating system never crashes. [F]
 
 The largest tropical rainforest in the world is in Brasil. [T]
 """)
-    
+
     def _format_choices(self, context, exercise_id, task):
         g = context.generator()
         return g.div([g.div(self._choice_control(context, exercise_id, task, ch))
-                       for ch in task.choices()],
+                      for ch in task.choices()],
                     cls='choices')
 
 
@@ -813,7 +813,7 @@ class _SelectBasedExercise(_ChoiceBasedExercise):
         return g.select(task_name, id=task_name, readonly=self._readonly(context),
                         options=[(ch.answer(), task.choice_index(ch)) for ch in task.choices()])
 
-    
+
 class GapFilling(_ChoiceBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 
@@ -823,9 +823,9 @@ class GapFilling(_ChoiceBasedExercise):
     _HELP_INTRO = (
         _("Choose the correct word to fill in a gap in a sentence.  For each gap "
           "you have several choices.  Only one of them is correct."),
-        ) + _ChoiceBasedExercise._HELP_INTRO
+    ) + _ChoiceBasedExercise._HELP_INTRO
     _GAP_MATCHER = re.compile(r"(___+)")
-    
+
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of a definition of several "
           "statements, where there is one missing word in each statement."),
@@ -835,7 +835,7 @@ class GapFilling(_ChoiceBasedExercise):
           "followed by a space. Incorrect completions begin with a minus sign "
           "and a space."),
         _("Another statement and its completions may follow after a blank line."),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 If you want to send money to somebody, you can ____ a transfer.
 - do
@@ -853,7 +853,7 @@ To change money between two currencies you need to know the ____ rate.
         prompt = context.localize(task.prompt().export(context))
         return (g.span(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'), prompt)),
                 self._format_choices(context, exercise_id, task))
-    
+
 
 class HiddenAnswers(_NumberedTasksExercise):
     """Question and a hidden answer which the user can unhide to check."""
@@ -862,7 +862,7 @@ class HiddenAnswers(_NumberedTasksExercise):
     _TASK_TYPE = HiddenAnswerTask
     _JAVASCRIPT_CLASS = 'lcg.HiddenAnswers'
     _INDICATORS = ()
-    
+
     _BUTTONS = ((_('Show All'), 'button', 'evaluate-button',
                  _("Show all answers.")),
                 (_('Hide All'), 'button', 'reset-button',
@@ -874,13 +874,13 @@ class HiddenAnswers(_NumberedTasksExercise):
         _("You should simply think of the correct answer and when "
           "you believe you know it, you can unhide the correct answer "
           "below each question and check whether you were right or not."),
-        )
+    )
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of a definition of several "
           "questions and answers."),
         _("The question and the answer are written each at a separate line."),
         _("Another pair or question and answer may follow after a blank line."),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 What is the name of the highest mountain in the world?
 Mount Everest.
@@ -892,7 +892,7 @@ What is its height?
     def _export_task_parts(self, context, exercise_id, task):
         g = context.generator()
         return (g.div(task.prompt().export(context), cls='question'),
-                g.button(_("Show Answer"), cls='toggle-button', 
+                g.button(_("Show Answer"), cls='toggle-button',
                          title=_("Show/Hide the correct answer.")),
                 # The inner div is needed by the JavaScript effects library for
                 # the sliding effect.
@@ -916,7 +916,7 @@ class _FillInExercise(Exercise):
           "exactly matching answers."),
         _("Use the control panel at the bottom of the exercise to evaluate all the "
           "answers at once."),
-        )
+    )
 
     @classmethod
     def _help_keys(cls):
@@ -941,7 +941,7 @@ class _FillInExercise(Exercise):
                            "and correct it.  Then you can evaluate your answer using the "
                            u"‘Enter’ key (see above) or use ‘hint’ again, until you find the "
                            "complete answer.")))),)
-    
+
     def _check_tasks(self, tasks):
         for t in tasks:
             assert t.answer() is not None or \
@@ -949,23 +949,23 @@ class _FillInExercise(Exercise):
                 "%s requires just one textbox per task (%d found): %s" % \
                 (self.__class__.__name__, len(t.answers()), t.plain_text())
         return tasks
-    
+
     def answers(self):
         return [t.answer() for t in self._tasks if t.answer() is not None]
-        
+
     def _field_value(self, context, name):
         return ""
 
     def _field_cls(self, context, name, text):
         return 'fill-in-task'
-    
+
     def _field_result(self, context, name, text):
         return ''
-    
+
     def _make_field(self, context, exercise_id, task, text):
         g = context.generator()
         name = self._task_name(exercise_id, task)
-        field = g.field(name=name, id=name, size=max(4, len(text)+1),
+        field = g.field(name=name, id=name, size=max(4, len(text) + 1),
                         value=self._field_value(context, name), readonly=self._readonly(context),
                         cls=self._field_cls(context, name, text))
         result = [field] + \
@@ -975,7 +975,7 @@ class _FillInExercise(Exercise):
 
     def _export_fill_in_task(self, context, prompt, text):
         return prompt + '<br/>' + text
-        
+
     def _export_task_parts(self, context, exercise_id, task):
         g = context.generator()
         prompt = context.localize(task.prompt().export(context))
@@ -989,8 +989,8 @@ class _FillInExercise(Exercise):
         else:
             text = self._make_field(context, exercise_id, task, task.answer())
         return (self._export_fill_in_task(context, prompt, text),)
-                                       
-    
+
+
 class VocabExercise(_FillInExercise, _NumberedTasksExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
@@ -1012,10 +1012,10 @@ class VocabExercise(_FillInExercise, _NumberedTasksExercise):
           "this is appropriate, since an answer without correct capitalization is "
           "always considered incorrect.  When the prompt is a complete sentence, "
           "you must also use correct punctuation."),
-        ) + _FillInExercise._HELP_INTRO
+    ) + _FillInExercise._HELP_INTRO
 
     def _export_fill_in_task(self, context, prompt, text):
-        return prompt +' '+ text
+        return prompt + ' ' + text
 
 
 class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
@@ -1026,7 +1026,7 @@ class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
     _TASK_TYPE = WrittenAnswerTask
     _HELP_INTRO = (
         _("Fill in the answer to the box below each question."),
-        ) + _FillInExercise._HELP_INTRO
+    ) + _FillInExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of a definition of several "
           "questions and answers."),
@@ -1040,7 +1040,7 @@ class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
         #  "answers may be written inside the brackets separated by the pipeline "
         #  'character "|".'),
         _("Another pair or question and answer may follow after a blank line."),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 What is the name of the largest continent?
 [Asia]
@@ -1058,7 +1058,7 @@ class _Cloze(_FillInExercise):
         _("The goal is to fill in the gaps in given piece of text.  The answers "
           "are written into a text box and there is just one correct answer "
           "for each gap."),
-        ) + _FillInExercise._HELP_INTRO
+    ) + _FillInExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of one or more paragraphs of text. "
           "Selected parts of the text (typically words), which are to be replaced "
@@ -1067,7 +1067,7 @@ class _Cloze(_FillInExercise):
         #_("If there is more than one possible correct answer, the other correct "
         #  "answers may be written inside the brackets separated by the pipeline "
         # 'character "|".'),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 Commercial banks and savings banks receive and hold deposits
 [in] current accounts, savings accounts and deposit accounts,
@@ -1090,21 +1090,21 @@ class _ExposedCloze(_Cloze):
           "beginning of the exercise to fill in the gaps in the following "
           "piece of text. There is just one correct answer for each "
           "gap. Each word from the list is used just once."),
-        ) + _FillInExercise._HELP_INTRO
-    
+    ) + _FillInExercise._HELP_INTRO
+
     def _export_instructions(self, context, exercise_id):
         g = context.generator()
         instructions = super(_ExposedCloze, self)._export_instructions(context, exercise_id) or ''
         return instructions + g.ul(*[g.li(a) for a in sorted(self.answers())])
 
-    
+
 class NumberedCloze(_Cloze, _NumberedTasksExercise):
     _NAME = _("Complete the Statements")
     _HELP_INTRO = (
         _("The goal is to fill in the gaps in given statements.  The answers "
           "are written into a text box and there is just one correct answer "
           "for each gap."),
-        ) + _FillInExercise._HELP_INTRO
+    ) + _FillInExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of several statements separated by "
           "blank lines from each other. Certain part of each statement is "
@@ -1114,14 +1114,14 @@ class NumberedCloze(_Cloze, _NumberedTasksExercise):
         #_("If there is more than one possible correct answer, the other correct "
         #  "answers may be written inside the brackets separated by the pipeline "
         #  'character "|".'),
-        )
+    )
     _SOURCE_EXAMPLE = _("""
 [London] is the capital of the United Kingdom.
 
 The city is split by the River [Thames] into North and South.
 """)
 
-    
+
 class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
     _NAME = _("Complete the Statements with Selection")
     _HELP_INTRO = (
@@ -1129,8 +1129,8 @@ class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
           "beginning of the exercise to fill in the gaps in the statements "
           "below. There is just one correct answer for each "
           "gap. Each word from the list is used just once."),
-        ) + _FillInExercise._HELP_INTRO
-    
+    ) + _FillInExercise._HELP_INTRO
+
 
 class Cloze(_Cloze):
     """Paragraphs of text including text-fields for the marked words."""
@@ -1138,10 +1138,10 @@ class Cloze(_Cloze):
     def _check_tasks(self, tasks):
         assert len(tasks) == 1
         return tasks
-    
+
     def answers(self):
         return self._tasks[0].answers()
-        
+
     def _make_field(self, context, exercise_id, task, text):
         g = context.generator()
         self._field_number += 1
@@ -1157,7 +1157,7 @@ class Cloze(_Cloze):
         self._field_number = 0
         return (task.text(context, exercise_id, self._make_field),)
 
-    
+
 class ExposedCloze(Cloze, _ExposedCloze):
     pass
 
@@ -1173,7 +1173,7 @@ class _Test(object):
     exercises and leaving out everything, what is not necesarry...
 
     """
-    
+
     def _export_script(self, context, exercise_id):
         return None
 
@@ -1193,7 +1193,7 @@ class _Test(object):
     def _result_fields(self, context):
         points = self.eval(context.req())
         return [(_("Total points:"), 'total-points', True, '%d/%d' % (points, self.max_points()))]
-        
+
     def _export_results(self, context, exercise_id):
         if not self._show_results(context):
             return None
@@ -1204,10 +1204,10 @@ class _Test(object):
         added = self.added_points(context.req())
         max = self.max_points()
         def field(label, name, value, size=6, readonly=True, **kwargs):
-            id = exercise_id +'-'+ name
-            return g.label(label, id=id) +' '+\
-                   g.field(value, name=id, id=id, size=size, readonly=readonly,
-                           cls=(readonly and 'display' or None), **kwargs)
+            id = exercise_id + '-' + name
+            return g.label(label, id=id) + ' ' + \
+                g.field(value, name=id, id=id, size=size, readonly=readonly,
+                        cls=(readonly and 'display' or None), **kwargs)
         if points < max and isinstance(self, FillInTest):
             if added is None:
                 total_points = points
@@ -1231,8 +1231,8 @@ class _Test(object):
                             size=40)]
         else:
             fields = [field(_("Total points:"), 'total-points', '%d/%d' % (points, max))]
-        return g.div(concat(fields, separator=g.br()+"\n"), cls='results')
-    
+        return g.div(concat(fields, separator=g.br() + "\n"), cls='results')
+
     def _readonly(self, context):
         return self._show_results(context)
 
@@ -1240,7 +1240,7 @@ class _Test(object):
         """Evaluate the answers of given request and return the number of points."""
         points = 0
         for i, correct_answer in enumerate(self.answers()):
-            name = '%s-a%d' % (self.anchor(), i+1)
+            name = '%s-a%d' % (self.anchor(), i + 1,)
             answer = self._param(req, name)
             # Correct answer is a numer or string.
             if answer == unicode(correct_answer):
@@ -1248,29 +1248,30 @@ class _Test(object):
             #elif not answer:
             #    empty += self.points()
         return points
- 
+
     def added_points(self, req):
         # TODO: _exercise_id() doesn't exist anymore. Another identification
         # must be used if this is ever needed...
         if req.has_param('--added-points'):
             return req.param('--added-points').get(self._exercise_id(), 0)
-        elif req.has_param(self._exercise_id()+'-added-points'):
-            points = req.param(self._exercise_id()+'-added-points')
+        elif req.has_param(self._exercise_id() + '-added-points'):
+            points = req.param(self._exercise_id() + '-added-points')
             try:
                 return int(points)
             except ValueError:
                 return None
         else:
             return 0
-    
+
     def max_points(self):
         return self.points() * len(self.answers())
-    
+
 
 class ChoiceBasedTest(_Test, _ChoiceBasedExercise):
-    
+
     def _checked(self, context, task, i):
-        return self._param(context.req(), self._task_name(exercise_id, task), False) == str(i)
+        return self._param(context.req(),
+                           self._task_name(self._exercise_id(), task), False) == str(i)
 
     def _choice_text(self, context, task, choice):
         text = super(ChoiceBasedTest, self)._choice_text(context, task, choice)
@@ -1279,16 +1280,15 @@ class ChoiceBasedTest(_Test, _ChoiceBasedExercise):
             if choice.correct():
                 result = _("correct answer")
             else:
-                name = self._task_name(exercise_id, task)
+                name = self._task_name(self._exercise_id(), task)
                 if self._param(context.req(), name) == str(task.choices().index(choice)):
                     # Translators: Incorrect (answer)
-                   result = _("incorrect")
+                    result = _("incorrect")
             if result:
                 g = context.generator()
                 text += ' ' + g.span(('(', result, ')'), cls='test-answer-comment')
         return text
 
-    
     def _choice_control(self, context, exercise_id, task, choice):
         result = super(ChoiceBasedTest, self)._choice_control(context, exercise_id, task, choice)
         if self._show_results(context):
@@ -1299,13 +1299,13 @@ class ChoiceBasedTest(_Test, _ChoiceBasedExercise):
                 cls = 'non-selected-answer'
             result = context.generator().span(result, cls=cls)
         return result
-               
+
 
 class FillInTest(_Test, _FillInExercise):
-    
+
     def _field_value(self, context, name):
         return self._param(context.req(), name, "")
-        
+
     def _field_cls(self, context, name, text):
         cls = 'fill-in-task'
         if self._show_results(context):
@@ -1314,22 +1314,22 @@ class FillInTest(_Test, _FillInExercise):
             else:
                 cls += ' incorrect-answer'
         return cls
-    
+
     def _field_result(self, context, name, text):
         if self._show_results(context) and self._param(context.req(), name) != text:
             return context.generator().span((' (', text, ')'), cls='test-answer-comment')
         return ''
 
-        
+
 class MultipleChoiceQuestionsTest(ChoiceBasedTest, MultipleChoiceQuestions):
     pass
-    
+
 class SelectionsTest(ChoiceBasedTest, Selections):
     pass
-    
+
 class TrueFalseStatementsTest(ChoiceBasedTest, TrueFalseStatements):
     pass
-    
+
 class GapFillingTest(ChoiceBasedTest, GapFilling):
     pass
 
@@ -1337,7 +1337,7 @@ class WritingTest(FillInTest):
     _POINTS = 10
     # Translators: Type of exercise
     _NAME = _("Writing")
-    
+
     def _export_task_parts(self, context, exercise_id, task):
         g = context.generator()
         name = self._task_name(exercise_id, task)
@@ -1345,29 +1345,27 @@ class WritingTest(FillInTest):
                            rows=10, cols=60, readonly=self._readonly(context),
                            cls=self._field_cls(context, name, task.answer())),
                 self._field_result(context, name, task.answer()))
-        
+
     def _field_result(self, context, name, text):
         return ''
 
     def _check_tasks(self, tasks):
         assert len(tasks) == 0
         return (WritingTask(),)
-    
+
     def eval(self, req):
         # Prevent returning full points on empty answer.
         return 0
-    
+
 
 class ClozeTest(FillInTest, Cloze):
     pass
-    
+
 class ExposedClozeTest(FillInTest, ExposedCloze):
     pass
 
 class NumberedClozeTest(FillInTest, NumberedCloze):
     pass
-   
+
 class NumberedExposedClozeTest(FillInTest, NumberedExposedCloze):
     pass
-    
-
