@@ -25,6 +25,9 @@ import urllib
 import lcg
 from lcg import ContentNode, HorizontalAlignment, Localizable, Resource, Script, Section, \
     Stylesheet, TranslatableTextFactory, Translations, concat, is_sequence_of, language_name, log
+from lcg.exercises import _Test, _Cloze, _FillInExercise, _ExposedCloze, ChoiceBasedTest, \
+    FillInTest, HiddenAnswers, VocabExercise, TrueFalseStatements, GapFilling, Cloze, \
+    MixedTextFillInTask, WritingTest, _NumberedTasksExercise
 from lcg.export import Exporter, FileExporter
 
 from xml.sax import saxutils
@@ -229,7 +232,7 @@ class HtmlGenerator(object):
         return self._tag('hr', _paired=False, **kwargs)
 
     def a(self, label, **kwargs):
-        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'rel', 
+        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'rel',
                 'onclick', 'onmouseover', 'onmouseout')
         return self._tag('a', label, attr, **kwargs)
 
@@ -1007,6 +1010,291 @@ class HtmlExporter(Exporter):
             type="application/x-shockwave-flash",
             title=element.title() or _("Flash movie object"),
             data=video_uri, width=width, height=height)
+        
+    def _export_exercise(self, context, element):
+        g = context.generator()
+        context.resource('prototype.js')
+        context.resource('lcg.js')
+        context.resource('lcg-exercises.js')
+        context.resource('lcg-exercises.css')
+        context.resource('effects.js')
+        context.resource('media.js')
+        context.connect_shared_player()
+        exercise_id = context.unique_id()
+        content = []
+        # Instructions
+        instructions = element.instructions()
+        if instructions:
+            exported_instructions = g.div(instructions.export(context))
+        else:
+            exported_instructions = None
+        if isinstance(element, _ExposedCloze):
+            if exported_instructions is None:
+                exported_instructions = ''
+            exported_instructions += g.ul(*[g.li(a) for a in sorted(element.answers())])
+        if exported_instructions is not None:
+            content.append(exported_instructions)
+        # Tasks
+        req = context.req() if hasattr(context, 'req') else None
+        def param(name, default=None):
+            if req is None:
+                return None
+            answers = req.param('--answers')
+            if answers is not None:
+                return answers.get(name, default)
+            else:
+                return req.param(name, default)
+        def is_checked(task, i):
+            if isinstance(element, ChoiceBasedTest):
+                return param(req, element.task_name(exercise_id, task), False) == str(i)
+            else:
+                return False
+        def show_results():
+            if req is None:
+                return True
+            return req.has_param('--evaluate')
+        def readonly():
+            if isinstance(element, _Test):
+                return show_results()
+            else:
+                return False
+        def choice_text(task, choice):
+            text = choice.answer()
+            if isinstance(element, ChoiceBasedTest):
+                if show_results():
+                    result = None
+                    if choice.correct():
+                        result = _("correct answer")
+                    else:
+                        name = element.task_name(exercise_id, task)
+                        if param(name) == str(task.choices().index(choice)):
+                            # Translators: Incorrect (answer)
+                            result = _("incorrect")
+                    if result:
+                        text += ' ' + g.span(('(', result, ')'), cls='test-answer-comment')
+            return text
+        def choice_control(task, choice):
+            i = task.choices().index(choice)
+            task_name = element.task_name(exercise_id, task)
+            choice_id = task_name + '-ch%d' % (i + 1,)
+            checked = is_checked(task, i)
+            # Disable only the unchecked fields in the read-only mode.  This makes the selection
+            # unchangable in practice and has also the advantage that the checked fields can be
+            # navigated, which is even better than using the `readonly' attribute
+            # (which doesn't work in browsers anyway).
+            disabled = readonly() and not checked
+            ctrl = g.radio(task_name, id=choice_id, value=i,
+                           cls='answer-control', checked=checked, disabled=disabled)
+            text = choice_text(task, choice)
+            result = concat(ctrl, ' ', g.label(text, choice_id))
+            if isinstance(element, ChoiceBasedTest):
+                if show_results():
+                    name = element.task_name(task)
+                    if param(name) == str(task.choices().index(choice)):
+                        cls = choice.correct() and 'correct-answer' or 'incorrect-answer'
+                    else:
+                        cls = 'non-selected-answer'
+                    result = g.span(result, cls=cls)
+            return result
+        def format_choices(task):
+            if isinstance(element, TrueFalseStatements):
+                return g.div([g.div(choice_control(task, ch)) for ch in task.choices()],
+                             cls='choices')
+            else:
+                return g.ol(*[g.li(choice_control(task, ch)) for ch in task.choices()],
+                            cls='choices')
+        def fill_in_task(prompt, text):
+            if isinstance(element, VocabExercise):
+                return prompt + ' ' + text
+            else:
+                return prompt + '<br/>' + text
+        def field_value(name):
+            if isinstance(element, FillInTest):
+                return param(name, "")
+            else:
+                return ""
+        def field_cls(name, text):
+            if isinstance(element, FillInTest):
+                cls = 'fill-in-task'
+                if show_results():
+                    if param(name) == text:
+                        cls += ' correct-answer'
+                    else:
+                        cls += ' incorrect-answer'
+                return cls
+            else:
+                return 'fill-in-task'
+        def field_result(name, text):
+            if isinstance(element, FillInTest):
+                if show_results() and param(name) != text:
+                    return g.span((' (', text, ')'), cls='test-answer-comment')
+            return ''
+        def make_field(context, task, text):
+            if isinstance(element, Cloze):
+                context.field_number += 1
+                name = exercise_id + '-a%d' % (context.field_number,)
+                field = g.field(name=name, size=len(text),
+                                value=field_value(name),
+                                readonly=readonly(),
+                                cls=field_cls(name, text))
+                result = concat(field, field_result(name, text))
+                return context.localize(result)
+            else:
+                name = element.task_name(exercise_id, task)
+                field = g.field(name=name, id=name, size=max(4, len(text) + 1),
+                                value=field_value(name), readonly=readonly(),
+                                cls=field_cls(name, text))
+                def media_control(media):
+                    img = context.resource('media-play.gif')
+                    title = media.title()
+                    label = g.img(context.uri(img))
+                    button_id = context.unique_id()
+                    context.connect_shared_player(context.uri(media), button_id)
+                    return g.button(label, title=title, type='button', id=button_id,
+                                    cls='media-control')
+                result = ([field] +
+                          [self._media_control(m) for m in task.media()] +
+                          [field_result(name, text)])
+                return context.localize(concat(result))
+        def format_task_text(context, task, field_maker):
+            def formatter(text):
+                if text:
+                    content = lcg.Parser().parse_inline_markup(text)
+                    return context.localize(content.export(context))
+                else:
+                    return ''
+            def make_field(match):
+                return field_maker(context, task, match.group(1))
+            text = formatter(task.task_answer().replace('[', '\['))
+            return task.field_matcher().sub(make_field, text)
+        def export_task_parts(task):
+            if isinstance(element, WritingTest):
+                name = element.task_name(task)
+                return (g.textarea(name=name, value=field_value(name),
+                                   rows=10, cols=60, readonly=readonly(),
+                                   cls=field_cls(name, task.answer())),
+                        field_result(name, task.answer()))
+            elif isinstance(element, _Cloze):
+                if isinstance(element, Cloze):
+                    context.field_number = 0
+                return (format_task_text(context, task, make_field),)
+            elif isinstance(element, _FillInExercise):
+                prompt = context.localize(task.prompt().export(context))
+                if not (isinstance(task, MixedTextFillInTask) and task.is_mixed()):
+                    # When the inputfield is embeded within the text, it is confusing to
+                    # have the prompt marked as a label.  Morover some screeen-readers
+                    # (JAWs) are confused too and present the task incorrectly.
+                    prompt = g.label(prompt, element.task_name(exercise_id, task))
+                if isinstance(task, MixedTextFillInTask):
+                    text = format_task_text(context, task, make_field)
+                else:
+                    text = make_field(context, task, task.answer())
+                return (fill_in_task(prompt, text),)
+            elif isinstance(element, HiddenAnswers):
+                return (g.div(task.prompt().export(context), cls='question'),
+                        g.button(_("Show Answer"), cls='toggle-button',
+                                 title=_("Show/Hide the correct answer.")),
+                        # The inner div is needed by the JavaScript effects library for
+                        # the sliding effect.
+                        g.div(g.div(task.answer().export(context)),
+                              cls='answer', style='display: none;'))
+            elif isinstance(element, GapFilling):
+                prompt = context.localize(task.prompt().export(context))
+                return (g.span(element.gap_matcher().sub(g.span("____", cls='exercise-gap'),
+                                                         prompt)),
+                        format_choices(task))
+            else:
+                prompt = task.prompt()
+                if prompt:
+                    prompt = context.localize(prompt.export(context))
+                return (prompt, format_choices(task))
+        def export_task(task):
+            parts = [p for p in export_task_parts(task) if p is not None]
+            return g.div(parts, cls=element.task_style_cls())
+        exported_tasks = [context.localize(export_task(task)) for task in element.tasks()]
+        template = element.template()
+        if template:
+            exported_template = context.localize(template.export(context))
+            exported_tasks = exported_template % tuple(exported_tasks)
+        else:
+            if isinstance(element, _NumberedTasksExercise):
+                exported_tasks = g.ol(*[g.li(t) for t in exported_tasks], cls="tasks")
+            else:
+                exported_tasks = concat(exported_tasks, separator="\n")
+        if exported_tasks is not None:
+            content.append(exported_tasks)
+        # Results
+        results = None
+        if isinstance(element, _Test):
+            if show_results():
+                points = element.eval(req)
+                # TODO: Display invalid value of entered added points within tutor's evaluation
+                # (to let the tutor fix it).
+                added = element.added_points(req)
+                max_ = element.max_points()
+                def field(label, name, value, size=6, readonly=True, **kwargs):
+                    id = exercise_id + '-' + name
+                    return g.label(label, id=id) + ' ' + \
+                        g.field(value, name=id, id=id, size=size, readonly=readonly,
+                                cls=('display' if readonly else None), **kwargs)
+                if points < max_ and isinstance(element, FillInTest):
+                    if added is None:
+                        total_points = points
+                    else:
+                        total_points = points + added
+                    # Javascript code to update the displayed total points dynamically.
+                    onchange = ("if (this.value=='') { points = 0; err='' } "
+                                "else if (isNaN(this.value)) "
+                                "{ points = 0; err=' %(err_invalid)s' } "
+                                "else { points = parseInt(this.value); err='' }; "
+                                "if (points+%(points)d > %(max)d) "
+                                "{ points=0; err=' %(err_exceed)s' } "
+                                "this.form.elements['%(exercise_id)s-total-points'].value = "
+                                "(points + %(points)d) + '/%(max)d'+err" %
+                                dict(points=points, max=max_, exercise_id=exercise_id,
+                                     err_invalid=_("Invalid value in added points!"),
+                                     err_exceed=_("Max. points exceeded!")))
+                    ro = param('--allow-tutor-evaluation') is not True
+                    fields = [field(_("Automatic evaluation:"), 'points', points),
+                              field(_("Additional points by tutor:"), 'added-points', added or 0,
+                                    readonly=ro, onchange=(not ro and onchange or None)),
+                              field(_("Total points:"), 'total-points', '%d/%d' %
+                                    (total_points, max_,),
+                                    size=40)]
+                else:
+                    fields = [field(_("Total points:"), 'total-points', '%d/%d' % (points, max_))]
+                return g.div(concat(fields, separator=g.br() + "\n"), cls='results')
+        else:
+            results = g.div((g.div(concat([g.label(label, id=exercise_id + '.' + name) +
+                                           g.field(name=name, id=exercise_id + '.' + name, size=30,
+                                                   readonly=True)
+                                           for name, label, help in element.indicators()],
+                                          separator=g.br()),
+                                   cls='display'),
+                             g.div([g.button(label, type=t, cls=cls, title=hlp)
+                                    for label, t, cls, hlp in element.buttons()],
+                                   cls='buttons')),
+                            cls='results')
+        if results is not None:
+            content.append(results)
+        # Scripts
+        if not isinstance(element, _Test):
+            responses = {}
+            for key, filename in element.responses():
+                media = context.resource(filename)
+                if media is None:
+                    media = (lcg.Media(filename),)
+                elif isinstance(media, lcg.Media):
+                    media = (media,)
+                responses[key] = [context.uri(m) for m in media]
+            script = g.js_call('new %s' % (element.javascript_class(),),
+                               exercise_id, element.answers(), responses,
+                               dict([(msg, context.localize(translation))
+                                     for msg, translation in element.messages().items()]))
+            if script:
+                content = (g.form(content, id=exercise_id),
+                           g.script(script))
+        return g.div(content, cls='exercise ' + lcg.camel_case_to_lower(element.__class__.__name__))
 
     def export_swf_object(self, context, filename, element_id, width, height, flashvars={},
                           min_flash_version=None, alternative_content=None, warning=None):

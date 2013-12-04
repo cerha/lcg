@@ -43,6 +43,8 @@ from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, 
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
     Substitution, SetVariable, MathML, Figure
+from lcg.exercises import Exercise
+
 
 class SubstitutionIterator(object):
     """Supporting object for multiple-value substitution variables.
@@ -318,6 +320,7 @@ class Exporter(object):
                 Substitution: self._export_substitution,
                 MathML: self._export_mathml,
                 Figure: self._export_figure,
+                Exercise: self._export_exercise,
                 }
     
     def _export(self, node, context, recursive=False):
