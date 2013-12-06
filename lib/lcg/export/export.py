@@ -33,6 +33,7 @@ import re
 import shutil
 import string
 
+import lcg
 from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, \
     ContentNode, Content, Container, ContentVariants, \
     Paragraph, PreformattedText, Section, TableOfContents, \
@@ -43,7 +44,9 @@ from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, 
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
     Substitution, SetVariable, MathML, Figure
-from lcg.exercises import Exercise
+from lcg.exercises import _Cloze, _FillInExercise, _ExposedCloze, ChoiceBasedTest, \
+    FillInTest, HiddenAnswers, VocabExercise, GapFilling, Cloze, \
+    MixedTextFillInTask, WritingTest, _NumberedTasksExercise, Exercise
 
 
 class SubstitutionIterator(object):
@@ -189,12 +192,15 @@ class Exporter(object):
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
             self.list_level = 0
+            self.text_preprocessor = None
 
-        def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None):
+        def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None,
+                         text_preprocessor=None):
             self._lang = lang
             self._sec_lang = sec_lang
             self._presentation = presentation
             self._localizer = self._exporter.localizer(lang, timezone=timezone)
+            self._text_preprocessor = text_preprocessor
             
         def exporter(self):
             return self._exporter
@@ -460,6 +466,8 @@ class Exporter(object):
         assert isinstance(text, basestring), text
         if text and self._private_char(text[0]):
             text = ''
+        elif context.text_preprocessor is not None:
+            text = context.text_preprocessor(text)
         return self.escape(text)
 
     def _reformat_text(self, text):
@@ -1000,6 +1008,127 @@ class Exporter(object):
         label = (element.title() or
                  "Embedded Video %s id=%s" % (element.service(), element.video_id()))
         return self._inline_export(context, label, None, lang=element.lang())
+
+    # Exercises
+
+    def _export_exercise(self, context, element):
+        content = []
+        # Instructions
+        instructions = element.instructions()
+        if instructions:
+            exported_instructions = [self.concat(instructions.export(context),
+                                                 self._newline(context, 1))]
+        else:
+            exported_instructions = []
+        if isinstance(element, _ExposedCloze):
+            for a in sorted(element.answers()):
+                exported_instructions.append(self.text(context, a))
+                exported_instructions.append(self._newline(context))
+        if exported_instructions:
+            content.append(self.concat(*exported_instructions))
+        # Tasks
+        fill_in_char = u'_'
+        fill_in_area = fill_in_char * 3
+        def choice_text(task, choice, show_answers):
+            if show_answers or not isinstance(element, ChoiceBasedTest) or choice.correct():
+                return self.text(context, choice.answer())
+            else:
+                return None
+        def format_choices(task, show_answers):
+            choices = []
+            for ch in task.choices():
+                output = choice_text(task, ch, show_answers)
+                if output is not None:
+                    choices.append(output)
+            return self.concat(*choices)
+        def format_task_text(context, task, field_maker):
+            answer = task.task_answer()
+            if answer:
+                answer = answer.replace('[', '\[')
+                def make_field(match):
+                    return field_maker(context, task, match.group(1))
+                answer = task.field_matcher().sub(make_field, answer)
+                content = lcg.Parser().parse_inline_markup(answer)
+                text = context.localize(content.export(context))
+            else:
+                text = self.text(context, '')
+            return text
+        def make_field(show_answers, context, task, text):
+            filler = fill_in_char * len(text)
+            if not show_answers or not isinstance(element, FillInTest):
+                text = ''
+            return filler + text
+        def export_task_parts(task, show_answers):
+            if isinstance(element, WritingTest):
+                return (None if show_answers else self.text(context, fill_in_area),)
+            elif isinstance(element, _Cloze):
+                if isinstance(element, Cloze):
+                    context.field_number = 0
+                return (format_task_text(context, task,
+                                         lambda *args: make_field(show_answers, *args)),)
+            elif isinstance(element, _FillInExercise):
+                prompt = context.localize(task.prompt().export(context))
+                if isinstance(task, MixedTextFillInTask):
+                    text = format_task_text(context, task,
+                                            lambda *args: make_field(show_answers, *args))
+                else:
+                    text = self.text(context,
+                                     make_field(show_answers, context, task, task.answer()))
+                if isinstance(element, VocabExercise):
+                    separator = self.text(context, ' ')
+                else:
+                    separator = self._newline(context)
+                return (self.concat(prompt, separator, text),)
+            elif isinstance(element, HiddenAnswers):
+                if show_answers:
+                    result = (task.answer().export(context),)
+                else:
+                    result = (task.prompt().export(context),)
+                return result
+            elif isinstance(element, GapFilling):
+                def text_preprocessor(text):
+                    return element.gap_matcher().sub(fill_in_area, text)
+                with attribute_value(context, 'text_preprocessor', text_preprocessor):
+                    prompt = context.localize(task.prompt().export(context))
+                return (prompt, format_choices(task, show_answers),)
+            else:
+                result = []
+                if not show_answers:
+                    prompt = task.prompt()
+                    if prompt:
+                        prompt = context.localize(prompt.export(context))
+                        result.append(prompt)
+                result.append(format_choices(task, show_answers))
+                return result
+        def export_task(task):
+            result = [self.concat(p, self._newline(context))
+                      for p in export_task_parts(task, False) if p is not None]
+            with_answers = [self.concat(p, self._newline(context))
+                            for p in export_task_parts(task, True) if p is not None]
+            if with_answers:
+                result.append(self.text(context, u'-----------------'))
+                result.append(self._newline(context))
+                result.append(self.concat(*with_answers))
+            return self.concat(*result)
+        exported_tasks = [context.localize(export_task(task)) for task in element.tasks()]
+        template = element.template()
+        if template:
+            exported_template = context.localize(template.export(context))
+            exported_tasks = exported_template % tuple(exported_tasks)
+        else:
+            separated_tasks = []
+            numbered = isinstance(element, _NumberedTasksExercise)
+            n = 1
+            for t in exported_tasks:
+                if numbered:
+                    separated_tasks.append(self.text(context, u'%d. ' % (n,)))
+                    n += 1
+                separated_tasks.append(t)
+                separated_tasks.append(self._newline(context))
+            exported_tasks = self.concat(*separated_tasks)
+        if exported_tasks is not None:
+            content.append(exported_tasks)
+        return self.concat(*content)
 
     # Special constructs
 
