@@ -44,8 +44,8 @@ from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, 
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
     Substitution, SetVariable, MathML, Figure
-from lcg.exercises import _Cloze, _FillInExercise, _ExposedCloze, ChoiceBasedTest, \
-    FillInTest, HiddenAnswers, VocabExercise, GapFilling, Cloze, \
+from lcg.exercises import _Cloze, _FillInExercise, _ExposedCloze, \
+    HiddenAnswers, VocabExercise, GapFilling, Cloze, \
     MixedTextFillInTask, WritingTest, _NumberedTasksExercise, Exercise
 
 
@@ -1030,17 +1030,23 @@ class Exporter(object):
         fill_in_char = u'_'
         fill_in_area = fill_in_char * 3
         def choice_text(task, choice, show_answers):
-            if show_answers or not isinstance(element, ChoiceBasedTest) or choice.correct():
+            if not show_answers or choice.correct():
                 return self.text(context, choice.answer())
             else:
                 return None
         def format_choices(task, show_answers):
             choices = []
-            for ch in task.choices():
-                output = choice_text(task, ch, show_answers)
+            for c in task.choices():
+                output = choice_text(task, c, show_answers)
                 if output is not None:
                     choices.append(output)
-            return self.concat(*choices)
+            choices_nl = []
+            for c in choices[:-1]:
+                choices_nl.append(c)
+                choices_nl.append(self._newline(context))
+            if choices:
+                choices_nl.append(choices[-1])
+            return self.concat(*choices_nl)
         def format_task_text(context, task, field_maker):
             answer = task.task_answer()
             if answer:
@@ -1054,10 +1060,11 @@ class Exporter(object):
                 text = self.text(context, '')
             return text
         def make_field(show_answers, context, task, text):
-            filler = fill_in_char * len(text)
-            if not show_answers or not isinstance(element, FillInTest):
-                text = ''
-            return filler + text
+            if show_answers:
+                result = fill_in_char + text + fill_in_char
+            else:
+                result = fill_in_area
+            return result
         def export_task_parts(task, show_answers):
             if isinstance(element, WritingTest):
                 return (None if show_answers else self.text(context, fill_in_area),)
@@ -1067,18 +1074,23 @@ class Exporter(object):
                 return (format_task_text(context, task,
                                          lambda *args: make_field(show_answers, *args)),)
             elif isinstance(element, _FillInExercise):
-                prompt = context.localize(task.prompt().export(context))
                 if isinstance(task, MixedTextFillInTask):
                     text = format_task_text(context, task,
                                             lambda *args: make_field(show_answers, *args))
                 else:
                     text = self.text(context,
                                      make_field(show_answers, context, task, task.answer()))
-                if isinstance(element, VocabExercise):
-                    separator = self.text(context, ' ')
+                if not show_answers:
+                    prompt = context.localize(task.prompt().export(context))
+                    prompt = self._ensure_newlines(context, prompt)
+                    if isinstance(element, VocabExercise):
+                        separator = self.text(context, ' ')
+                    else:
+                        separator = self._newline(context)
+                    result = (self.concat(prompt, separator, text),)
                 else:
-                    separator = self._newline(context)
-                return (self.concat(prompt, separator, text),)
+                    result = (text,)
+                return result
             elif isinstance(element, HiddenAnswers):
                 if show_answers:
                     result = (task.answer().export(context),)
@@ -1087,16 +1099,32 @@ class Exporter(object):
                 return result
             elif isinstance(element, GapFilling):
                 def text_preprocessor(text):
-                    return element.gap_matcher().sub(fill_in_area, text)
+                    if show_answers:
+                        for c in task.choices():
+                            if c.correct():
+                                replacement = fill_in_char + c.answer() + fill_in_char
+                                break
+                        else:
+                            raise Exception("No correct answer found", text)
+                    else:
+                        replacement = fill_in_area
+                    return element.gap_matcher().sub(replacement, text)
                 with attribute_value(context, 'text_preprocessor', text_preprocessor):
-                    prompt = context.localize(task.prompt().export(context))
-                return (prompt, format_choices(task, show_answers),)
+                    task_prompt = task.prompt()
+                    prompt = context.localize(task_prompt.export(context))
+                prompt = self._ensure_newlines(context, prompt)
+                if show_answers:
+                    result = (prompt,)
+                else:
+                    result = (prompt, format_choices(task, show_answers),)
+                return result
             else:
                 result = []
                 if not show_answers:
                     prompt = task.prompt()
                     if prompt:
                         prompt = context.localize(prompt.export(context))
+                        prompt = self._ensure_newlines(context, prompt)
                         result.append(prompt)
                 result.append(format_choices(task, show_answers))
                 return result
