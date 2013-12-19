@@ -40,8 +40,9 @@ import reportlab.platypus.flowables
 import reportlab.platypus.tableofcontents
 
 import lcg
-from lcg import *
-from lcg.export import *
+from lcg import FontFamily, UMm, UPoint, UFont, USpace, UAny, HorizontalAlignment
+from export import Exporter, FileExporter
+
 
 class PageTemplate(reportlab.platypus.PageTemplate):
     pass
@@ -90,7 +91,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                     self.canv.bookmarkPage(outline_key)
                 else:
                     outline_key = toc_key
-                self.canv.addOutlineEntry(text, outline_key, level=level, closed=(level>=1))
+                self.canv.addOutlineEntry(text, outline_key, level=level, closed=(level >= 1))
 
     def _make_page_templates(self):
         context = self._lcg_context
@@ -114,7 +115,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                     flowable = flowable[0]
                 else:
                     flowable = RLContainer(flowable, vertical=True)
-            max_height = self.height / 3  # so that header, footer and content have all chance to fit
+            max_height = self.height / 3 # so that header, footer and content have all chance to fit
             width, height = flowable.wrap(self.width, max_height)
             return flowable, width, height
         def frame_height(header, footer):
@@ -456,7 +457,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         if i == self._box_lengths:
             result = [self]
         elif isinstance(content[i], (RLContainer, reportlab.platypus.tables.LongTable,)):
-            result = [container(content[:i]), content[i], container(content[i+1:])]
+            result = [container(content[:i]), content[i], container(content[i + 1:])]
         elif i > 0:
             result = [container(content[:i]), container(content[i:])]
         else:
@@ -1973,7 +1974,7 @@ class Image(Element):
     uri = None
     def init(self):
         super(Image, self).init()
-        assert isinstance(self.image, resources.Image), ('type error', self.image,)
+        assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
     def _export(self, context):
@@ -2068,7 +2069,7 @@ class Table(Element):
         black = reportlab.lib.colors.black
         style = pdf_context.style()
         if header_row_p:
-            p = Presentation()
+            p = lcg.Presentation()
             p.bold = True
             pdf_context.add_presentation(p)
             header_style = pdf_context.style()
@@ -2093,7 +2094,7 @@ class Table(Element):
                     kwargs = {}
                     p = None
                     if isinstance(column, TableCell):
-                        p = Presentation()
+                        p = lcg.Presentation()
                         if column.heading:
                             p.bold = True
                         if ((column.align is not None and
@@ -2353,15 +2354,14 @@ class PDFExporter(FileExporter, Exporter):
                 setattr(node_presentation, p,
                         (getattr(node_presentation, p) or getattr(global_presentation, p)))
         context.pdf_context = old_contexts[None] = pdf_context = \
-                              Context(total_pages=total_pages,
-                                      first_page_header=(node.first_page_header(lang) or
-                                                         page_header),
-                                      page_header=page_header,
-                                      page_footer=node.page_footer(lang),
-                                      page_background=node.page_background(lang),
-                                      presentation=node_presentation,
-                                      presentation_set=presentation_set,
-                                      lang=lang)
+            Context(total_pages=total_pages,
+                    first_page_header=(node.first_page_header(lang) or page_header),
+                    page_header=page_header,
+                    page_footer=node.page_footer(lang),
+                    page_background=node.page_background(lang),
+                    presentation=node_presentation,
+                    presentation_set=presentation_set,
+                    lang=lang)
         presentation = pdf_context.current_presentation()
         exported_structure = []
         first_subcontext = None
@@ -2376,15 +2376,14 @@ class PDFExporter(FileExporter, Exporter):
                 total_pages = old.page
             page_header = node.page_header(lang)
             subcontext.pdf_context = old_contexts[node_id] = \
-                                     Context(parent_context=pdf_context, total_pages=total_pages,
-                                             first_page_header=(node.first_page_header(lang) or
-                                                                page_header),
-                                             page_header=page_header,
-                                             page_footer=node.page_footer(lang),
-                                             page_background=node.page_background(lang),
-                                             presentation=presentation,
-                                             presentation_set=context.presentation(),
-                                             lang=lang)
+                Context(parent_context=pdf_context, total_pages=total_pages,
+                        first_page_header=(node.first_page_header(lang) or page_header),
+                        page_header=page_header,
+                        page_footer=node.page_footer(lang),
+                        page_background=node.page_background(lang),
+                        presentation=presentation,
+                        presentation_set=context.presentation(),
+                        lang=lang)
             subcontext.pdf_context.add_presentation(node.presentation(lang))
             # The subcontext serves twice: 1. when exporting node content;
             # 2. when exporting to ReportLab.  The question is how to transfer
@@ -2424,7 +2423,7 @@ class PDFExporter(FileExporter, Exporter):
             page_size = reportlab.lib.pagesizes.landscape(page_size)
         else:
             page_size = reportlab.lib.pagesizes.portrait(page_size)
-        def presentation_size(attr, default=10*reportlab.lib.units.mm):
+        def presentation_size(attr, default=(10 * reportlab.lib.units.mm)):
             try:
                 size = getattr(global_presentation, attr)
                 if isinstance(size, UMm):
@@ -2450,10 +2449,10 @@ class PDFExporter(FileExporter, Exporter):
                 if str(e).find('too large') >= 0:
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
-                        log("Page content extremely large, giving up")
+                        lcg.log("Page content extremely large, giving up")
                         raise Exception("Content too large", e)
-                    log("Page content too large, reducing it by %s" %
-                        (pdf_context.relative_font_size(),))
+                    lcg.log("Page content too large, reducing it by %s" %
+                            (pdf_context.relative_font_size(),))
                 else:
                     raise
             else:
@@ -2583,9 +2582,9 @@ class PDFExporter(FileExporter, Exporter):
         if element.content():
             content = self._content_export(context, element)
         else:
-            if isinstance(target, (ContentNode, Section)):
+            if isinstance(target, (lcg.ContentNode, lcg.Section)):
                 content = target.heading().export(context)
-            elif isinstance(target, Resource):
+            elif isinstance(target, lcg.Resource):
                 content = make_element(Text, content=(target.title() or target.filename()))
             elif isinstance(target, element.ExternalTarget):
                 content = make_element(Text, content=target.title() or target.uri())
@@ -2642,7 +2641,7 @@ class PDFExporter(FileExporter, Exporter):
         backref = element.backref()
         if backref:
             def make_backref(content):
-                make_element(iLink, uri="#"+backref, content=content.content,
+                make_element(lcg.Link, uri=("#" + backref), content=content.content,
                              style=content.style, halign=content.halign)
             assert update_text(content, make_backref)
         level = pdf_context.heading_level
@@ -2667,7 +2666,7 @@ class PDFExporter(FileExporter, Exporter):
                 title = title.content[0]
             if isinstance(title, Text):
                 title = make_element(Label, content=[title])
-            presentation = Presentation()
+            presentation = lcg.Presentation()
             presentation.left_indent = UFont(2 * 1.2)
             if isinstance(description, Text):
                 description = make_element(Paragraph, content=[description],
@@ -2759,10 +2758,10 @@ class PDFExporter(FileExporter, Exporter):
             iterator = None
             try:
                 make_row()
-            except SubstitutionIterator.NotStartedError as e:
+            except lcg.SubstitutionIterator.NotStartedError as e:
                 iterator = e.iterator()
             if iterator is None:
-                raise SubstitutionIterator.IteratorError("No table row iterator found")
+                raise lcg.SubstitutionIterator.IteratorError("No table row iterator found")
             rows = []
             while iterator.next():
                 rows.append(make_row())
