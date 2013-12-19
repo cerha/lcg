@@ -1977,6 +1977,10 @@ class Image(Element):
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
     def _export(self, context):
+        if self.image is None:
+            lcg.log("Missing image: %s" % (self.uri,))
+            dummy_comment = [make_element(Text, content='[image]')]
+            return make_element(Paragraph, content=dummy_comment).export(context)
         filename = self.image.src_file()
         if filename:
             result = RLImage(filename, uri=self.uri)
