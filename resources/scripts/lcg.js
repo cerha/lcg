@@ -563,8 +563,8 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	var ul = new Element('ul');
 	for (var i = 0; i < items.length; i++) {
 	    var item = items[i];
-	    var a = new Element('a', {'href': item.uri, 
-				      'title': item.tooltip, 
+	    var a = new Element('a', {'href': (item.uri ? item.uri : 'javascript:void(0)'),
+				      'title': item.tooltip,
 				      'onclick': item.onclick});
 	    a.update(item.label);
 	    var enabled = (typeof item.enabled == 'undefined' || item.enabled);
@@ -584,7 +584,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
     init_item: function ($super, li, id, prev, parent) {
 	$super(li, id, prev, parent);
 	li.setAttribute('role', 'menuitem');
-	li.down('a').onclick = (function() { this.cmd_activate(li); return false; }).bind(this);
+	li.down('a').observe('click', function(event) { this.cmd_activate(li); }.bind(this));
     },
 
     keymap: function () {
@@ -600,7 +600,13 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
     cmd_activate: function (item) {
 	if (item.hasClassName('active')) {
 	    this.remove();
-	    self.location = item.down('a').getAttribute('href');
+	    var a = item.down('a');
+	    var href = a.getAttribute('href');
+	    var onclick = a.getAttribute('onclick');
+	    if (href)
+		self.location = href;
+	    else if (onclick)
+		eval(onclick);
 	}
     },
 
