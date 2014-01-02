@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -475,7 +475,7 @@ class Exporter(object):
         text = self._RE_SPACE_MATCHER.sub(' ', text)
         return text
 
-    def _newline(self, context, number=1, inline=False):
+    def _newline(self, context, number=1, inline=False, page_start=None, page_end=False):
         return u'\n' * number
 
     def _ensure_newlines(self, context, exported, number=1):
@@ -1012,23 +1012,23 @@ class Exporter(object):
     # Exercises
 
     def _export_exercise(self, context, element):
-        content = []
+        content = [self._newline(context, 0, page_start=1)]
         # Instructions
         instructions = element.instructions()
         if instructions:
             exported_instructions = [self.concat(instructions.export(context),
-                                                 self._newline(context, 1))]
+                                                 self._newline(context, 1, page_start=3))]
         else:
             exported_instructions = []
         if isinstance(element, _ExposedCloze):
             for a in sorted(element.answers()):
                 exported_instructions.append(self.text(context, a))
-                exported_instructions.append(self._newline(context))
+                exported_instructions.append(self._newline(context, page_start=4))
         if exported_instructions:
             content.append(self.concat(*exported_instructions))
         # Tasks
         fill_in_char = u'_'
-        fill_in_area = fill_in_char * 3
+        fill_in_area = fill_in_char * 4
         def choice_text(task, choice, show_answers):
             if not show_answers or choice.correct():
                 return self.text(context, choice.answer())
@@ -1129,13 +1129,20 @@ class Exporter(object):
                 result.append(format_choices(task, show_answers))
                 return result
         def export_task(task):
-            result = [self.concat(p, self._newline(context))
-                      for p in export_task_parts(task, False) if p is not None]
-            with_answers = [self.concat(p, self._newline(context))
-                            for p in export_task_parts(task, True) if p is not None]
+            def add_part(with_answers, add_page_start):
+                parts = [p for p in export_task_parts(task, with_answers) if p is not None]
+                result = []
+                if parts:
+                    last_part = parts[-1]
+                    for p in parts:
+                        page_start = 2 if add_page_start and p is last_part else None
+                        result.append(self.concat(p, self._newline(context, page_start=page_start)))
+                return result
+            with_answers = add_part(True, True)
+            result = add_part(False, not with_answers)
             if with_answers:
                 result.append(self.text(context, u'-----------------'))
-                result.append(self._newline(context))
+                result.append(self._newline(context, page_start=3))
                 result.append(self.concat(*with_answers))
             return self.concat(*result)
         exported_tasks = [context.localize(export_task(task)) for task in element.tasks()]
@@ -1156,6 +1163,7 @@ class Exporter(object):
             exported_tasks = self.concat(*separated_tasks)
         if exported_tasks is not None:
             content.append(exported_tasks)
+        content.append(self._newline(context, 0, page_end=True))
         return self.concat(*content)
 
     # Special constructs

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012, 2013 Brailcom, o.p.s.
+# Copyright (C) 2012, 2013, 2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -121,6 +121,8 @@ class BrailleExporter(FileExporter, Exporter):
     _OUTPUT_FILE_EXT = 'brl'
     _INDENTATION_CHAR = '\ue010'
     _NEXT_INDENTATION_CHAR = '\ue011'
+    _PAGE_START_CHAR = '\ue012'
+    _PAGE_END_CHAR = '\ue013'
 
     class Context(Exporter.Context):
 
@@ -315,15 +317,40 @@ class BrailleExporter(FileExporter, Exporter):
                     page_height -= 1
                 new_pages = []
                 def add_page(page):
+                    line_limit = page_height
+                    page_len = len(page)
+                    best_priority = '9'
+                    n = 0
+                    i = 0
+                    while i < page_height and n < page_len:
+                        l = page[n]
+                        n += 1
+                        if l:
+                            if l[0] == self._TOC_MARKER_CHAR:
+                                continue
+                            if l[0] == self._PAGE_START_CHAR:
+                                priority = l[1]
+                                if priority <= best_priority:
+                                    line_limit = i
+                                best_priority = priority
+                            elif l[0] == self._PAGE_END_CHAR:
+                                line_limit = page_height
+                                best_priority = '9'
+                        i += 1
                     page.reverse()
                     lines = []
-                    while page and len(lines) < page_height:
+                    while page and len(lines) < line_limit:
                         l = page.pop()
                         if l and l[0] == self._TOC_MARKER_CHAR:
                             marker = l[1:]
                             page_number = unicode(context.page_number())
                             context.toc_element(marker).set_page_number(context, page_number)
                         else:
+                            if l:
+                                if l[0] == self._PAGE_START_CHAR:
+                                    l = l[2:]
+                                elif l[0] == self._PAGE_END_CHAR:
+                                    l = l[1:]
                             lines.append(l)
                     page_number = context.page_number()
                     status_line = right_status_line if page_number % 2 else left_status_line
@@ -511,9 +538,17 @@ class BrailleExporter(FileExporter, Exporter):
         assert len(braille) == len(hyphenation), (braille, hyphenation,)
         return braille, hyphenation
 
-    def _newline(self, context, number=1, inline=False):
+    def _newline(self, context, number=1, inline=False, page_start=None, page_end=False):
         context.set_removable_newlines(number if inline else 0)
-        return '\n' * number, '0' * number
+        text = '\n' * number
+        hyphenation = '0' * number
+        if page_start is not None:
+            text += self._PAGE_START_CHAR + str(page_start)[0]
+            hyphenation += '00'
+        if page_end:
+            text += self._PAGE_END_CHAR
+            hyphenation += '0'
+        return text, hyphenation
     
     def _ensure_newlines(self, context, exported, number=1):
         real_number = 0
