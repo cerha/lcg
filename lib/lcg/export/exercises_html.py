@@ -6,7 +6,7 @@
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -86,7 +86,7 @@ class ExerciseExporter(object):
         if cls._BUTTONS:
             return (lcg.p(_("The control panel below the exercise contains the following "
                             "buttons:")),
-                    lcg.dl([(label, hlp) for label, t, cls, hlp in cls._BUTTONS]))
+                    lcg.dl([(label, hlp) for label, t, name, hlp in cls._BUTTONS]))
         else:
             return None
     
@@ -99,21 +99,18 @@ class ExerciseExporter(object):
         g = context.generator()
         if inline:
             img = context.resource('media-play.gif')
-            title = label
             label = g.img(context.uri(img))
         else:
-            title = None
             label = _("Play")
         button_id = context.unique_id()
         context.connect_shared_player(context.uri(media), button_id)
-        return g.button(label, title=title, type='button', id=button_id, cls='media-control')
+        return g.button(label, type='button', id=button_id, cls='media-control')
 
     def _wrap_exported_tasks(self, context, tasks):
         return concat(tasks, separator="\n")
     
     def _export_tasks(self, context, exercise, exercise_id):
-        g = context.generator()
-        exported_tasks = [context.localize(self._export_task(context, exercise, exercise_id, task)) 
+        exported_tasks = [context.localize(self._export_task(context, exercise, exercise_id, task))
                           for task in exercise.tasks()]
         template = exercise.template()
         if template:
@@ -141,7 +138,7 @@ class ExerciseExporter(object):
             responses[key] = [context.uri(m) for m in media]
         return g.js_call('new %s' % self._JAVASCRIPT_CLASS,
                          exercise_id, exercise.answers(), responses,
-                         dict([(msg, context.localize(translation)) 
+                         dict([(msg, context.localize(translation))
                                for msg, translation in self._MESSAGES.items()]))
 
     def _task_style_cls(self, exercise):
@@ -153,18 +150,18 @@ class ExerciseExporter(object):
         return context.generator().div(parts, cls=self._task_style_cls(exercise))
 
     def _task_name(self, exercise, exercise_id, task):
-        return exercise_id + '-a%d' % (exercise.tasks().index(task)+1)
+        return exercise_id + '-a%d' % (exercise.tasks().index(task) + 1)
 
     def _export_results(self, context, exercise, exercise_id):
         g = context.generator()
-        return g.div((g.div(concat([g.label(label, id=exercise_id+'.'+name) +
-                                    g.field(name=name, id=exercise_id+'.'+name, size=30,
+        return g.div((g.div(concat([g.label(label, id=exercise_id + '.' + name) +
+                                    g.field(name=name, id=exercise_id + '.' + name, size=30,
                                             readonly=True)
                                     for name, label, help in self._INDICATORS],
                                    separator=g.br()),
                             cls='display'),
-                      g.div([g.button(label, type=t, cls=cls, title=hlp)
-                             for label, t, cls, hlp in self._BUTTONS],
+                      g.div([g.button(label, type=t, cls=name, title=hlp)
+                             for label, t, name, hlp in self._BUTTONS],
                             cls='buttons')),
                      cls='results')
 
@@ -184,9 +181,10 @@ class ExerciseExporter(object):
         content = [x for x in parts if x is not None]
         script = self._export_script(context, exercise, exercise_id)
         if script:
-            content = (g.form(content, id=exercise_id), 
+            content = (g.form(content, id=exercise_id),
                        g.script(script))
-        return g.div(content, cls='exercise '+lcg.camel_case_to_lower(exercise.__class__.__name__))
+        return g.div(content,
+                     cls='exercise ' + lcg.camel_case_to_lower(exercise.__class__.__name__))
 
 
 class _NumberedTasksExerciseExporter(ExerciseExporter):
@@ -211,14 +209,14 @@ class _ChoiceBasedExerciseExporter(_NumberedTasksExerciseExporter):
         g = context.generator()
         i = task.choices().index(choice)
         task_name = self._task_name(exercise, exercise_id, task)
-        choice_id = task_name + '-ch%d' % (i+1)
+        choice_id = task_name + '-ch%d' % (i + 1)
         checked = self._checked(context, task, i)
         # Disable only the unchecked fields in the read-only mode.  This makes the selection
         # unchangable in practice and has also the advantage that the checked fields can be
         # navigated, which is even better than using the `readonly' attribute (which doesn't work
         # in browsers anyway).
         disabled = self._readonly(context) and not checked
-        ctrl = g.radio(task_name , id=choice_id, value=i,
+        ctrl = g.radio(task_name, id=choice_id, value=i,
                        cls='answer-control', checked=checked, disabled=disabled)
         text = self._choice_text(context, task, choice)
         return concat(ctrl, ' ', g.label(text, choice_id))
@@ -235,7 +233,7 @@ class _ChoiceBasedExerciseExporter(_NumberedTasksExerciseExporter):
     
     def _export_task_parts(self, context, exercise, exercise_id, task):
         prompt = task.prompt()
-        if prompt:      
+        if prompt:
             prompt = context.localize(prompt.export(context))
         return (prompt, self._format_choices(context, exercise, exercise_id, task))
 
@@ -250,7 +248,7 @@ class TrueFalseStatementsExporter(_ChoiceBasedExerciseExporter):
     def _format_choices(self, context, exercise, exercise_id, task):
         g = context.generator()
         return g.div([g.div(self._choice_control(context, exercise, exercise_id, task, ch))
-                       for ch in task.choices()],
+                      for ch in task.choices()],
                     cls='choices')
 
 
@@ -293,7 +291,7 @@ class HiddenAnswersExporter(_NumberedTasksExerciseExporter):
     def _export_task_parts(self, context, exercise, exercise_id, task):
         g = context.generator()
         return (g.div(task.prompt().export(context), cls='question'),
-                g.button(_("Show Answer"), cls='toggle-button', 
+                g.button(_("Show Answer"), cls='toggle-button',
                          title=_("Show/Hide the correct answer.")),
                 # The inner div is needed by the JavaScript effects library for
                 # the sliding effect.
@@ -382,7 +380,7 @@ class VocabExerciseExporter(_FillInExerciseExporter, _NumberedTasksExerciseExpor
     """A small text-field for each vocabulary item on a separate row."""
 
     def _export_fill_in_task(self, context, prompt, text):
-        return prompt +' '+ text
+        return prompt + ' ' + text
 
 
 class WrittenAnswersExporter(_FillInExerciseExporter, _NumberedTasksExerciseExporter):
@@ -399,9 +397,9 @@ class _ExposedClozeExporter(_ClozeExporter):
     
     def _export_instructions(self, context, exercise, exercise_id):
         g = context.generator()
-        instr = super(_ExposedClozeExporter, self)._export_instructions(context, exercise,
-                                                                        exercise_id)
-        return (instructions or '' )+ g.ul(*[g.li(a) for a in sorted(exercise.answers())])
+        instructions = super(_ExposedClozeExporter, self)._export_instructions(context, exercise,
+                                                                               exercise_id)
+        return (instructions or '') + g.ul(*[g.li(a) for a in sorted(exercise.answers())])
 
     
 class NumberedClozeExporter(_ClozeExporter, _NumberedTasksExerciseExporter):
@@ -479,11 +477,11 @@ class _TestExporter(object):
         added = self.added_points(context.req())
         max = self.max_points()
         def field(label, name, value, size=6, readonly=True, **kwargs):
-            id = exercise_id +'-'+ name
-            return g.label(label, id=id) +' '+\
-                   g.field(value, name=id, id=id, size=size, readonly=readonly,
-                           cls=(readonly and 'display' or None), **kwargs)
-        if points < max and isinstance(self, FillInTest):
+            id = exercise_id + '-' + name
+            return (g.label(label, id=id) + ' ' +
+                    g.field(value, name=id, id=id, size=size, readonly=readonly,
+                            cls=(readonly and 'display' or None), **kwargs))
+        if points < max and isinstance(self, FillInTestExporter):
             if added is None:
                 total_points = points
             else:
@@ -506,7 +504,7 @@ class _TestExporter(object):
                             size=40)]
         else:
             fields = [field(_("Total points:"), 'total-points', '%d/%d' % (points, max))]
-        return g.div(concat(fields, separator=g.br()+"\n"), cls='results')
+        return g.div(concat(fields, separator=g.br() + "\n"), cls='results')
     
     def _readonly(self, context):
         return self._show_results(context)
@@ -515,7 +513,7 @@ class _TestExporter(object):
         """Evaluate the answers of given request and return the number of points."""
         points = 0
         for i, correct_answer in enumerate(exercise.answers()):
-            name = '%s-a%d' % (self.anchor(), i+1)
+            name = '%s-a%d' % (self.anchor(), i + 1)
             answer = self._param(req, name)
             # Correct answer is a numer or string.
             if answer == unicode(correct_answer):
@@ -529,8 +527,8 @@ class _TestExporter(object):
         # must be used if this is ever needed...
         if req.has_param('--added-points'):
             return req.param('--added-points').get(self._exercise_id(), 0)
-        elif req.has_param(self._exercise_id()+'-added-points'):
-            points = req.param(self._exercise_id()+'-added-points')
+        elif req.has_param(self._exercise_id() + '-added-points'):
+            points = req.param(self._exercise_id() + '-added-points')
             try:
                 return int(points)
             except ValueError:
@@ -558,14 +556,15 @@ class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
                 name = self._task_name(exercise, exercise_id, task)
                 if self._param(context.req(), name) == str(task.choices().index(choice)):
                     # Translators: Incorrect (answer)
-                   result = _("incorrect")
+                    result = _("incorrect")
             if result:
                 g = context.generator()
                 text += ' ' + g.span(('(', result, ')'), cls='test-answer-comment')
         return text
 
     def _choice_control(self, context, exercise, exercise_id, task, choice):
-        result = super(ChoiceBasedTest, self)._choice_control(context, exercise, exercise_id, task, choice)
+        result = super(ChoiceBasedTestExporter, self)._choice_control(context, exercise,
+                                                                      exercise_id, task, choice)
         if self._show_results(context):
             name = self._task_name(exercise, exercise_id, task)
             if self._param(context.req(), name) == str(task.choices().index(choice)):
