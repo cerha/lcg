@@ -1,0 +1,617 @@
+# -*- coding: utf-8 -*-
+#
+# Author: Tomas Cerha <cerha@brailcom.org>
+#
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+import re
+import lcg
+from lcg import concat
+
+_ = lcg.TranslatableTextFactory('lcg')
+class ExerciseExporter(object):
+    _JAVASCRIPT_CLASS = 'lcg.Exercise'
+    _RESPONSES = (
+        ('correct', 'exercise-responses/c*.mp3'),
+        ('incorrect', 'exercise-responses/i*.mp3'),
+        ('f0-49', 'exercise-responses/o0-49*.mp3'),
+        ('f50-69', 'exercise-responses/o50-69*.mp3'),
+        ('f70-84', 'exercise-responses/o70-84*.mp3'),
+        ('f85-99', 'exercise-responses/o85-99*.mp3'),
+        ('f100', 'exercise-responses/o100*.mp3'),
+    )
+    _MESSAGES = {"on first attempt": _("on first attempt")}
+    _INDICATORS = (('answered', _('Answered:'),
+                    _("Displays the number of the tasks you have already answered.  For "
+                      "example 4/10 means, that you have answered four out of ten "
+                      "questions so you should finish the remaining six.")),
+                   ('result', _('Correct:'),
+                    _("Displays the number and percentage of successful answers.  The "
+                      "first pair of numbers shows the results of all current answers.  If "
+                      "you didn't answer all of them correctly on first attempt, there is "
+                      "also a second pair of numbers showing how many answers you did "
+                      u"succesfuly on the first try.  Use the ‘Reset’ button to start "
+                      "again.")))
+    _BUTTONS = ((_("Evaluate"), 'button', 'evaluate-button',
+                 _("Evaluate the entire exercise.  If an error is found, the cursor is moved to "
+                   "the first incorrect answer.  Within a text-box, the cursor is also moved to "
+                   "the first incorrect character of your answer.")),
+                # Translators: Fill (a form with correct answers).
+                (_('Fill'), 'button', 'fill-button',
+                 _("Fill in the whole exercise with the correct answers.")),
+                (_('Reset'), 'reset', 'reset-button',
+                 _("Reset all your answers and start again.")))
+    
+    # Class methods
+
+    @classmethod
+    def help(cls):
+        sections = [lcg.Section(title=title, anchor=anchor, content=lcg.coerce(content))
+                    for title, anchor, content in
+                    ((_("Instructions"), 'intro', cls._EXERCISE_CLASS.help_intro()),
+                     (_("Shortcut Keys"), 'keys', cls._help_keys()),
+                     (_("Indicators"), 'indicators', cls._help_indicators()),
+                     (_("Control Panel"), 'panel', cls._help_panel()))
+                    if content is not None]
+        return lcg.Container(sections)
+
+    @classmethod
+    def _help_keys(cls):
+        return None
+
+    @classmethod
+    def _help_indicators(cls):
+        if cls._INDICATORS:
+            return (lcg.p(_("The indicator panel below the exercise shows the following values:")),
+                    lcg.dl([(label, help) for name, label, help in cls._INDICATORS]))
+        else:
+            return None
+    
+    @classmethod
+    def _help_panel(cls):
+        if cls._BUTTONS:
+            return (lcg.p(_("The control panel below the exercise contains the following "
+                            "buttons:")),
+                    lcg.dl([(label, hlp) for label, t, cls, hlp in cls._BUTTONS]))
+        else:
+            return None
+    
+    # Instance methods
+
+    def _readonly(self, context):
+        return False
+    
+    def _media_control(self, context, media, inline=False):
+        g = context.generator()
+        if inline:
+            img = context.resource('media-play.gif')
+            title = label
+            label = g.img(context.uri(img))
+        else:
+            title = None
+            label = _("Play")
+        button_id = context.unique_id()
+        context.connect_shared_player(context.uri(media), button_id)
+        return g.button(label, title=title, type='button', id=button_id, cls='media-control')
+
+    def _wrap_exported_tasks(self, context, tasks):
+        return concat(tasks, separator="\n")
+    
+    def _export_tasks(self, context, exercise, exercise_id):
+        g = context.generator()
+        exported_tasks = [context.localize(self._export_task(context, exercise, exercise_id, task)) 
+                          for task in exercise.tasks()]
+        template = exercise.template()
+        if template:
+            localized_template = context.localize(template.export(context))
+            return localized_template % tuple(exported_tasks)
+        else:
+            return self._wrap_exported_tasks(context, exported_tasks)
+
+    def _export_instructions(self, context, exercise, exercise_id):
+        instructions = exercise.instructions()
+        if instructions:
+            return context.generator().div(instructions.export(context))
+        else:
+            return None
+
+    def _export_script(self, context, exercise, exercise_id):
+        g = context.generator()
+        responses = {}
+        for key, filename in self._RESPONSES:
+            media = context.resource(filename)
+            if media is None:
+                media = (lcg.Media(filename),)
+            elif isinstance(media, lcg.Media):
+                media = (media,)
+            responses[key] = [context.uri(m) for m in media]
+        return g.js_call('new %s' % self._JAVASCRIPT_CLASS,
+                         exercise_id, exercise.answers(), responses,
+                         dict([(msg, context.localize(translation)) 
+                               for msg, translation in self._MESSAGES.items()]))
+
+    def _task_style_cls(self, exercise):
+        return 'task %s-task' % lcg.camel_case_to_lower(exercise.__class__.__name__)
+        
+    def _export_task(self, context, exercise, exercise_id, task):
+        parts = [p for p in self._export_task_parts(context, exercise, exercise_id, task)
+                 if p is not None]
+        return context.generator().div(parts, cls=self._task_style_cls(exercise))
+
+    def _task_name(self, exercise, exercise_id, task):
+        return exercise_id + '-a%d' % (exercise.tasks().index(task)+1)
+
+    def _export_results(self, context, exercise, exercise_id):
+        g = context.generator()
+        return g.div((g.div(concat([g.label(label, id=exercise_id+'.'+name) +
+                                    g.field(name=name, id=exercise_id+'.'+name, size=30,
+                                            readonly=True)
+                                    for name, label, help in self._INDICATORS],
+                                   separator=g.br()),
+                            cls='display'),
+                      g.div([g.button(label, type=t, cls=cls, title=hlp)
+                             for label, t, cls, hlp in self._BUTTONS],
+                            cls='buttons')),
+                     cls='results')
+
+    def export(self, context, exercise):
+        g = context.generator()
+        context.resource('prototype.js')
+        context.resource('lcg.js')
+        context.resource('lcg-exercises.js')
+        context.resource('lcg-exercises.css')
+        context.resource('effects.js')
+        context.resource('media.js')
+        context.connect_shared_player()
+        exercise_id = context.unique_id()
+        parts = [method(context, exercise, exercise_id) for method in (self._export_instructions,
+                                                                       self._export_tasks,
+                                                                       self._export_results)]
+        content = [x for x in parts if x is not None]
+        script = self._export_script(context, exercise, exercise_id)
+        if script:
+            content = (g.form(content, id=exercise_id), 
+                       g.script(script))
+        return g.div(content, cls='exercise '+lcg.camel_case_to_lower(exercise.__class__.__name__))
+
+
+class _NumberedTasksExerciseExporter(ExerciseExporter):
+    
+    def _wrap_exported_tasks(self, context, tasks):
+        g = context.generator()
+        return g.ol(*[g.li(t) for t in tasks], cls="tasks")
+
+
+class _ChoiceBasedExerciseExporter(_NumberedTasksExerciseExporter):
+    "A superclass for all exercises based on choosing from predefined answers."
+
+    _JAVASCRIPT_CLASS = 'lcg.ChoiceBasedExercise'
+
+    def _checked(self, context, task, i):
+        return False
+
+    def _choice_text(self, context, task, choice):
+        return choice.answer()
+
+    def _choice_control(self, context, exercise, exercise_id, task, choice):
+        g = context.generator()
+        i = task.choices().index(choice)
+        task_name = self._task_name(exercise, exercise_id, task)
+        choice_id = task_name + '-ch%d' % (i+1)
+        checked = self._checked(context, task, i)
+        # Disable only the unchecked fields in the read-only mode.  This makes the selection
+        # unchangable in practice and has also the advantage that the checked fields can be
+        # navigated, which is even better than using the `readonly' attribute (which doesn't work
+        # in browsers anyway).
+        disabled = self._readonly(context) and not checked
+        ctrl = g.radio(task_name , id=choice_id, value=i,
+                       cls='answer-control', checked=checked, disabled=disabled)
+        text = self._choice_text(context, task, choice)
+        return concat(ctrl, ' ', g.label(text, choice_id))
+
+    def _format_choices(self, context, exercise, exercise_id, task):
+        g = context.generator()
+        return g.ol(*[g.li(self._choice_control(context, exercise, exercise_id, task, ch))
+                      for ch in task.choices()],
+                    cls='choices')
+
+    def _task_style_cls(self, exercise):
+        cls = super(_ChoiceBasedExerciseExporter, self)._task_style_cls(exercise)
+        return cls + ' choice-based-task'
+    
+    def _export_task_parts(self, context, exercise, exercise_id, task):
+        prompt = task.prompt()
+        if prompt:      
+            prompt = context.localize(prompt.export(context))
+        return (prompt, self._format_choices(context, exercise, exercise_id, task))
+
+class MultipleChoiceQuestionsExporter(_ChoiceBasedExerciseExporter):
+    pass
+   
+class SelectionsExporter(_ChoiceBasedExerciseExporter):
+    pass
+
+class TrueFalseStatementsExporter(_ChoiceBasedExerciseExporter):
+    
+    def _format_choices(self, context, exercise, exercise_id, task):
+        g = context.generator()
+        return g.div([g.div(self._choice_control(context, exercise, exercise_id, task, ch))
+                       for ch in task.choices()],
+                    cls='choices')
+
+
+class _SelectBasedExerciseExporter(_ChoiceBasedExerciseExporter):
+    # Currently unused due to problematic accessibile interactive evaluation of
+    # select boxes.
+    _JAVASCRIPT_CLASS = 'lcg.SelectBasedExercise'
+
+    def _format_choices(self, context, exercise, exercise_id, task):
+        g = context.generator()
+        task_name = self._task_name(exercise, exercise_id, task)
+        return g.select(task_name, id=task_name, readonly=self._readonly(context),
+                        options=[(ch.answer(), task.choice_index(ch)) for ch in task.choices()])
+
+    
+class GapFillingExporter(_ChoiceBasedExerciseExporter):
+
+    _GAP_MATCHER = re.compile(r"(___+)")
+    
+    def _export_task_parts(self, context, exercise, exercise_id, task):
+        g = context.generator()
+        prompt = context.localize(task.prompt().export(context))
+        return (g.span(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'), prompt)),
+                self._format_choices(context, exercise, exercise_id, task))
+    
+
+class HiddenAnswersExporter(_NumberedTasksExerciseExporter):
+
+    _JAVASCRIPT_CLASS = 'lcg.HiddenAnswers'
+    _INDICATORS = ()
+    
+    _BUTTONS = ((_('Show All'), 'button', 'evaluate-button',
+                 _("Show all answers.")),
+                (_('Hide All'), 'button', 'reset-button',
+                 _("Reset all your answers and start again.")))
+
+    _MESSAGES = {"Show Answer": _("Show Answer"),
+                 "Hide Answer": _("Hide Answer")}
+
+    def _export_task_parts(self, context, exercise, exercise_id, task):
+        g = context.generator()
+        return (g.div(task.prompt().export(context), cls='question'),
+                g.button(_("Show Answer"), cls='toggle-button', 
+                         title=_("Show/Hide the correct answer.")),
+                # The inner div is needed by the JavaScript effects library for
+                # the sliding effect.
+                g.div(g.div(task.answer().export(context)),
+                      cls='answer', style='display: none;'))
+
+
+class _FillInExerciseExporter(ExerciseExporter):
+    """A common base class for exercises based on writing text into fields."""
+
+    _JAVASCRIPT_CLASS = 'lcg.FillInExercise'
+    
+    @classmethod
+    def _help_keys(cls):
+        return (lcg.p(_("In all the exercises where you fill in the text into a text-box "
+                        "you can use the two shortcut keys described below.")),
+                lcg.dl(((_("Enter"),
+                         _("Use this key within the text-field to evaluate the current answer. "
+                           "You hear a sound response and in case of an error, the cursor is "
+                           "moved to the position of the first incorrect character within the "
+                           "text.  This way you can locate the error, fix it and evaluate again. "
+                           u"When you don't know how to fix an error, you can use the ‘hint’ "
+                           "key described below.")),
+                        (_("Ctrl-Space"),
+                         _(u"This function is called a ‘hint’.  It helps you in case you don't "
+                           "know the answer or you don't know how to fix an error in your answer. "
+                           "Just press the key combination (holding the Ctrl key, press the "
+                           "spacebar) and one letter of the correct answer will be filled in "
+                           "automatically.  If you have already entered some text, the cursor "
+                           "will be moved to after the last correct character and next one will "
+                           "be inserted.  This also means that if there is some text after the "
+                           "cursor, there is at least one error in it.  Try to locate this error "
+                           "and correct it.  Then you can evaluate your answer using the "
+                           u"‘Enter’ key (see above) or use ‘hint’ again, until you find the "
+                           "complete answer.")))),)
+    
+    def _export_task_text(self, context, exercise, exercise_id, task):
+        def make_field(match):
+            return self._make_field(context, exercise, exercise_id, task, match.group(1))
+        text = task.text().replace('[', '\[')
+        if text:
+            content = lcg.Parser().parse_inline_markup(text)
+            html = context.localize(content.export(context))
+        else:
+            html = ''
+        return exercise.FIELD_MATCHER.sub(make_field, html)
+
+    def _field_value(self, context, name):
+        return ''
+
+    def _field_cls(self, context, name, text):
+        return 'fill-in-task'
+
+    def _field_result(self, context, name, text):
+        return ''
+
+    def _make_field(self, context, exercise, exercise_id, task, text):
+        g = context.generator()
+        name = self._task_name(exercise, exercise_id, task)
+        field = g.field(name=name, id=name, size=max(4, len(text) + 1),
+                        value=self._field_value(context, name), readonly=self._readonly(context),
+                        cls=self._field_cls(context, name, text))
+        result = [field] + \
+                 [self._media_control(context, m, inline=True) for m in task.media()] + \
+                 [self._field_result(context, name, text)]
+        return context.localize(concat(result))
+
+    def _export_fill_in_task(self, context, prompt, text):
+        return prompt + '<br/>' + text
+
+    def _export_task_parts(self, context, exercise, exercise_id, task):
+        g = context.generator()
+        prompt = context.localize(task.prompt().export(context))
+        if exercise.FIELD_MATCHER.search(task.text()) is not None:
+            text = self._export_task_text(context, exercise, exercise_id, task)
+            # When the inputfield is embeded within the text, it is confusing to
+            # have the prompt marked as a label.  Morover some screeen-readers
+            # (JAWs) are confused too and present the task incorrectly.
+        else:
+            text = self._make_field(context, exercise, exercise_id, task, task.text())
+            prompt = g.label(prompt, self._task_name(exercise, exercise_id, task))
+        return (self._export_fill_in_task(context, prompt, text),)
+                                       
+    
+class VocabExerciseExporter(_FillInExerciseExporter, _NumberedTasksExerciseExporter):
+    """A small text-field for each vocabulary item on a separate row."""
+
+    def _export_fill_in_task(self, context, prompt, text):
+        return prompt +' '+ text
+
+
+class WrittenAnswersExporter(_FillInExerciseExporter, _NumberedTasksExerciseExporter):
+    """A prompt (a sentence) and a big text-field for each task."""
+
+
+class _ClozeExporter(_FillInExerciseExporter):
+
+    def _export_task_parts(self, context, exercise, exercise_id, task):
+        return (self._export_task_text(context, exercise, exercise_id, task),)
+
+
+class _ExposedClozeExporter(_ClozeExporter):
+    
+    def _export_instructions(self, context, exercise, exercise_id):
+        g = context.generator()
+        instr = super(_ExposedClozeExporter, self)._export_instructions(context, exercise,
+                                                                        exercise_id)
+        return (instructions or '' )+ g.ul(*[g.li(a) for a in sorted(exercise.answers())])
+
+    
+class NumberedClozeExporter(_ClozeExporter, _NumberedTasksExerciseExporter):
+    pass
+    
+class NumberedExposedClozeExporter(NumberedClozeExporter, _ExposedClozeExporter):
+    pass
+
+class ClozeExporter(_ClozeExporter):
+
+    def _make_field(self, context, exercise, exercise_id, task, text):
+        g = context.generator()
+        self._field_number += 1
+        name = exercise_id + '-a%d' % self._field_number
+        field = g.field(name=name, size=len(text),
+                        value=self._field_value(context, name),
+                        readonly=self._readonly(context),
+                        cls=self._field_cls(context, name, text))
+        result = concat(field, self._field_result(context, name, text))
+        return context.localize(result)
+
+    def _export_task_parts(self, context, exercise, exercise_id, task):
+        self._field_number = 0
+        return (self._export_task_text(context, exercise, exercise_id, task),)
+
+    
+class ExposedClozeExporter(ClozeExporter, _ExposedClozeExporter):
+    pass
+
+################################################################################
+##################################   Tests   ###################################
+################################################################################
+
+class _TestExporter(object):
+    """Tests are similar to exercises, but instead of practise, they are used for testing.
+
+    It would be more logical to derive exercises from tests, since tests are simpler (they are not
+    interactive).  Due to historical reasons, however, they are implemented by overriding
+    exercises and leaving out everything, what is not necesarry...
+
+    """
+    
+    _POINTS = 1
+
+    def points(self):
+        return self._points
+
+    def _export_script(self, context, exercise, exercise_id):
+        return None
+
+    def _show_results(self, context):
+        if not hasattr(context, 'req'):
+            return False
+        else:
+            return context.req().has_param('--evaluate')
+
+    def _param(self, req, name, default=None):
+        answers = req.param('--answers')
+        if answers is not None:
+            return answers.get(name, default)
+        else:
+            return req.param(name, default)
+
+    def _result_fields(self, context):
+        points = self.eval(context.req())
+        return [(_("Total points:"), 'total-points', True, '%d/%d' % (points, self.max_points()))]
+        
+    def _export_results(self, context, exercise, exercise_id):
+        if not self._show_results(context):
+            return None
+        g = context.generator()
+        points = self.eval(context.req())
+        # TODO: Display invalid value of entered added points within tutor's evaluation
+        # (to let the tutor fix it).
+        added = self.added_points(context.req())
+        max = self.max_points()
+        def field(label, name, value, size=6, readonly=True, **kwargs):
+            id = exercise_id +'-'+ name
+            return g.label(label, id=id) +' '+\
+                   g.field(value, name=id, id=id, size=size, readonly=readonly,
+                           cls=(readonly and 'display' or None), **kwargs)
+        if points < max and isinstance(self, FillInTest):
+            if added is None:
+                total_points = points
+            else:
+                total_points = points + added
+            # Javascript code to update the displayed total points dynamically.
+            onchange = ("if (this.value=='') { points = 0; err='' } "
+                        "else if (isNaN(this.value)) { points = 0; err=' %(err_invalid)s' } "
+                        "else { points = parseInt(this.value); err='' }; "
+                        "if (points+%(points)d > %(max)d) { points=0; err=' %(err_exceed)s' } "
+                        "this.form.elements['%(exercise_id)s-total-points'].value = "
+                        "(points + %(points)d) + '/%(max)d'+err" %
+                        dict(points=points, max=max, exercise_id=exercise_id,
+                             err_invalid=_("Invalid value in added points!"),
+                             err_exceed=_("Max. points exceeded!")))
+            readonly = context.req().param('--allow-tutor-evaluation') is not True
+            fields = [field(_("Automatic evaluation:"), 'points', points),
+                      field(_("Additional points by tutor:"), 'added-points', added or 0,
+                            readonly=readonly, onchange=(not readonly and onchange or None)),
+                      field(_("Total points:"), 'total-points', '%d/%d' % (total_points, max),
+                            size=40)]
+        else:
+            fields = [field(_("Total points:"), 'total-points', '%d/%d' % (points, max))]
+        return g.div(concat(fields, separator=g.br()+"\n"), cls='results')
+    
+    def _readonly(self, context):
+        return self._show_results(context)
+
+    def eval(self, req):
+        """Evaluate the answers of given request and return the number of points."""
+        points = 0
+        for i, correct_answer in enumerate(exercise.answers()):
+            name = '%s-a%d' % (self.anchor(), i+1)
+            answer = self._param(req, name)
+            # Correct answer is a numer or string.
+            if answer == unicode(correct_answer):
+                points += self.points()
+            #elif not answer:
+            #    empty += self.points()
+        return points
+ 
+    def added_points(self, req):
+        # TODO: _exercise_id() doesn't exist anymore. Another identification
+        # must be used if this is ever needed...
+        if req.has_param('--added-points'):
+            return req.param('--added-points').get(self._exercise_id(), 0)
+        elif req.has_param(self._exercise_id()+'-added-points'):
+            points = req.param(self._exercise_id()+'-added-points')
+            try:
+                return int(points)
+            except ValueError:
+                return None
+        else:
+            return 0
+    
+    def max_points(self):
+        return self.points() * len(exercise.answers())
+    
+
+class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
+    
+    def _checked(self, context, task, i):
+        task_name = self._task_name(exercise, exercise_id, task)
+        return self._param(context.req(), task_name, False) == str(i)
+
+    def _choice_text(self, context, task, choice):
+        text = super(ChoiceBasedTest, self)._choice_text(context, task, choice)
+        if self._show_results(context):
+            result = None
+            if choice.correct():
+                result = _("correct answer")
+            else:
+                name = self._task_name(exercise, exercise_id, task)
+                if self._param(context.req(), name) == str(task.choices().index(choice)):
+                    # Translators: Incorrect (answer)
+                   result = _("incorrect")
+            if result:
+                g = context.generator()
+                text += ' ' + g.span(('(', result, ')'), cls='test-answer-comment')
+        return text
+
+    def _choice_control(self, context, exercise, exercise_id, task, choice):
+        result = super(ChoiceBasedTest, self)._choice_control(context, exercise, exercise_id, task, choice)
+        if self._show_results(context):
+            name = self._task_name(exercise, exercise_id, task)
+            if self._param(context.req(), name) == str(task.choices().index(choice)):
+                cls = choice.correct() and 'correct-answer' or 'incorrect-answer'
+            else:
+                cls = 'non-selected-answer'
+            result = context.generator().span(result, cls=cls)
+        return result
+               
+
+class FillInTestExporter(_TestExporter, _FillInExerciseExporter):
+    
+    def _field_value(self, context, name):
+        return self._param(context.req(), name, "")
+        
+    def _field_cls(self, context, name, text):
+        cls = super(FillInTestExporter, self)._field_cls(context, name, text)
+        if self._show_results(context):
+            if self._param(context.req(), name) == text:
+                cls += ' correct-answer'
+            else:
+                cls += ' incorrect-answer'
+        return cls
+    
+    def _field_result(self, context, name, text):
+        if self._show_results(context) and self._param(context.req(), name) != text:
+            return context.generator().span((' (', text, ')'), cls='test-answer-comment')
+        return ''
+
+
+class WritingTestExporter(FillInTestExporter):
+    _POINTS = 10
+    
+    def _export_task_parts(self, context, exercise, exercise_id, task):
+        g = context.generator()
+        name = self._task_name(exercise, exercise_id, task)
+        return (g.textarea(name=name, value=self._field_value(context, name),
+                           rows=10, cols=60, readonly=self._readonly(context),
+                           cls=self._field_cls(context, name, task.answer())),
+                self._field_result(context, name, task.answer()))
+        
+    def _field_result(self, context, name, text):
+        return ''
+
+    def eval(self, req):
+        # Prevent returning full points on empty answer.
+        return 0
+    
+

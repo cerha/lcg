@@ -46,7 +46,7 @@ from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, 
     Substitution, SetVariable, MathML, Figure
 from lcg.exercises import _Cloze, _FillInExercise, _ExposedCloze, \
     HiddenAnswers, VocabExercise, GapFilling, Cloze, \
-    MixedTextFillInTask, WritingTest, _NumberedTasksExercise, Exercise
+    WritingTest, _NumberedTasksExercise, Exercise
 
 
 class SubstitutionIterator(object):
