@@ -93,6 +93,36 @@ def braille_presentation(presentation_file='presentation-braille.py'):
     return presentation
 
 
+class _Braille(object):
+    
+    def __init__(self, text, hyphenation):
+        assert isinstance(text, basestring), text
+        assert isinstance(hyphenation, basestring), hyphenation
+        assert len(text) == len(hyphenation), (text, hyphenation,)
+        self._text = text
+        self._hyphenation = hyphenation
+
+    def text(self):
+        return self._text
+
+    def hyphenation(self):
+        return self._hyphenation
+
+    def __len__(self):
+        return len(self._text)
+
+    def __nonzero__(self):
+        return not not self._text
+
+    def append(self, text, hyphenation):
+        self._text += text
+        self._hyphenation += hyphenation
+
+    def prepend(self, text, hyphenation):
+        self._text = text + self._text
+        self._hyphenation = hyphenation + self._hyphenation
+    
+
 class BrailleError(Exception):
     """Exception raised on Braille formatting errors.
 
@@ -233,8 +263,9 @@ class BrailleExporter(FileExporter, Exporter):
         context.set_tables(braille_tables, hyphenation_tables)
         # Export
         def run_export(page_height=page_height):
-            text, hyphenation = super(BrailleExporter, self).export(context, recursive=recursive)
-            assert len(text) == len(hyphenation)
+            braille = super(BrailleExporter, self).export(context, recursive=recursive)
+            text = braille.text()
+            hyphenation = braille.hyphenation()
             # Fix marker chars not preceded by newlines
             toc_marker_regexp = re.compile('[^\n]' + self._TOC_MARKER_CHAR, re.MULTILINE)
             while True:
@@ -284,7 +315,7 @@ class BrailleExporter(FileExporter, Exporter):
                                 line = prefix + line[page_width:]
                                 hyphenation = hyphenation_prefix + hyphenation[page_width:]
                             elif hyphenation[pos] == '1':
-                                lines.append(line[:pos] + self.text(context, '-', lang=lang)[0])
+                                lines.append(line[:pos] + self.text(context, '-', lang=lang).text())
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == '2':
@@ -356,7 +387,7 @@ class BrailleExporter(FileExporter, Exporter):
                     status_line = right_status_line if page_number % 2 else left_status_line
                     lines = lines + [''] * (page_height - len(lines))
                     if status_line:
-                        exported_status_line, __ = status_line.export(context)
+                        exported_status_line = status_line.export(context).text()
                         # Hack: We have to center status line text manually here.
                         # Of course, this won't work in a generic case and we
                         # make just basic precautions.
@@ -427,7 +458,8 @@ class BrailleExporter(FileExporter, Exporter):
     # Basic utilitites
 
     def concat(self, *items):
-        return string.join([i[0] for i in items], ''), string.join([i[1] for i in items], '')
+        return _Braille(string.join([i.text() for i in items], ''),
+                        string.join([i.hyphenation() for i in items], ''))
 
     _per_cent_regexp = re.compile('([ ⠀]+)⠼[⠏⠗]')
     
@@ -449,12 +481,12 @@ class BrailleExporter(FileExporter, Exporter):
         if lang is None:
             lang = context.lang()
         if not text:
-            return '', ''
+            return _Braille('', '')
         if self._private_char(text[0]):
             if text[0] == self._TOC_MARKER_CHAR:
-                return text + '\n', '0' * (len(text) + 1)
+                return _Braille(text + '\n', '0' * (len(text) + 1))
             else:
-                return text, '0' * len(text)
+                return _Braille(text, '0' * len(text))
         tables = context.tables(lang)
         if form != louis.plain_text and lang == 'cs':
             # liblouis doesn't handle this so we have to handle it ourselves.
@@ -536,32 +568,31 @@ class BrailleExporter(FileExporter, Exporter):
                 braille = braille[:start] + braille[end:]
                 hyphenation = hyphenation[:start] + hyphenation[end:]
         assert len(braille) == len(hyphenation), (braille, hyphenation,)
-        return braille, hyphenation
+        return _Braille(braille, hyphenation)
 
     def _newline(self, context, number=1, inline=False, page_start=None, page_end=False):
         context.set_removable_newlines(number if inline else 0)
-        text = '\n' * number
-        hyphenation = '0' * number
+        braille = _Braille('\n' * number, '0' * number)
         if page_start is not None:
-            text += self._PAGE_START_CHAR + str(page_start)[0]
-            hyphenation += '00'
+            assert page_start >= 0 and page_start < 10, page_start
+            braille.append(self._PAGE_START_CHAR + str(page_start)[0], '00')
         if page_end:
-            text += self._PAGE_END_CHAR
-            hyphenation += '0'
-        return text, hyphenation
+            braille.append(self._PAGE_END_CHAR, '0')
+        return braille
     
     def _ensure_newlines(self, context, exported, number=1):
         real_number = 0
-        text = exported[0]
+        text = exported.text()
         while real_number < number and len(text) > real_number and text[-real_number - 1] == '\n':
             real_number += 1
         n = number - real_number
-        return text + '\n' * n, exported[1] + '0' * n
+        return _Braille(text + '\n' * n, exported.hyphenation() + '0' * n)
 
     def _indent(self, exported, indentation, init_indentation=None):
         if init_indentation is None:
             init_indentation = indentation
-        text, hyphenation = exported
+        text = exported.text()
+        hyphenation = exported.hyphenation()
         n = 0
         new_text = ''
         new_hyphenation = ''
@@ -588,7 +619,7 @@ class BrailleExporter(FileExporter, Exporter):
         assert n == len(hyphenation), (n, len(hyphenation),)
         assert len(new_text) == len(new_hyphenation), \
             (new_text, len(new_text), new_hyphenation, len(new_hyphenation),)
-        return new_text, new_hyphenation
+        return _Braille(new_text, new_hyphenation)
 
     def _list_item_prefix(self, context):
         return '- '
@@ -599,15 +630,15 @@ class BrailleExporter(FileExporter, Exporter):
     # Content element export methods (defined by _define_export_methods).
     
     def _export_new_page(self, context, element):
-        return '\f', '0'
+        return _Braille('\f', '0')
 
     def _export_horizontal_separator(self, context, element, width=64, in_table=False):
         if in_table:
             return None
-        return '\n', '0'
+        return _Braille('\n', '0')
 
     def _vertical_cell_separator(self, context):
-        return (' ', '1',), 1
+        return _Braille(' ', '1',), 1
     
     def _export_title(self, context, element):
         title = super(BrailleExporter, self)._export_title(context, element)
@@ -654,19 +685,19 @@ class BrailleExporter(FileExporter, Exporter):
     
     def _export_superscript(self, context, element):
         lang = context.lang()
-        text, hyphenation = self._inline_braille_export(context, element)
+        braille = self._inline_braille_export(context, element)
         if lang == 'cs':
-            text = '⠌' + text + '⠱'
-            hyphenation = '0' + hyphenation + '0'
-        return text, hyphenation
+            braille.prepend('⠌', '0')
+            braille.append('⠱', '0')
+        return braille
     
     def _export_subscript(self, context, element):
         lang = context.lang()
-        text, hyphenation = self._inline_braille_export(context, element)
+        braille = self._inline_braille_export(context, element)
         if lang == 'cs':
-            text = '⠡' + text + '⠱'
-            hyphenation = '0' + hyphenation + '0'
-        return text, hyphenation
+            braille.prepend('⠡', '0')
+            braille.append('⠱', '0')
+        return braille
     
     def _export_citation(self, context, element):
         lang = element.lang(inherited=False) or context.sec_lang()
@@ -688,7 +719,7 @@ class BrailleExporter(FileExporter, Exporter):
         
     def _export_link(self, context, element):
         label = self._export_container(context, element)
-        if not label[0]:
+        if not label:
             target = element.target(context)
             if isinstance(target, (ContentNode, Section)):
                 label = target.heading().export(context)
@@ -1011,6 +1042,4 @@ class BrailleExporter(FileExporter, Exporter):
                     hyphenation = hyphenation[:i] + hyphenation[i + 1:]
                     l -= 1
             i += 1
-        result = braille, hyphenation
-        assert len(result[0]) == len(result[1])
-        return result
+        return _Braille(braille, hyphenation)
