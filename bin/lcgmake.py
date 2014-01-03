@@ -114,8 +114,8 @@ def main(argv):
         src, filename = os.path.split(src)
         basename, master_ext = os.path.splitext(filename)
         name, lang_ext = os.path.splitext(basename)
-        lang = lang_ext and lang_ext[1:] or None
-        ext = master_ext and master_ext[1:] or None
+        lang = lang_ext[1:] if lang_ext else opt['lang']
+        ext = master_ext[1:] if master_ext else None
         recourse = False
     else:
         name = opt['root']
