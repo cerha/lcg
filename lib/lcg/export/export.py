@@ -898,13 +898,12 @@ class Exporter(object):
     def _export_table(self, context, element):
         """Export given 'Table' element."""
         separator = HorizontalSeparator()
-        content = element.content()
         exported_rows = []
-        if content and content[0].line_above:
-            exported_rows.append(separator)
         for row in element.content():
+            if row.line_above():
+                exported_rows.append(separator)
             exported_rows.append(row.export(context))
-            if row.line_below:
+            if row.line_below():
                 exported_rows.append(separator)
         widths = []
         n_cells = 0
