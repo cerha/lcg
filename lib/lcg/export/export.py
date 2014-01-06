@@ -1067,13 +1067,13 @@ class Exporter(object):
                 choices_nl.append(choices[-1])
             return self.concat(*choices_nl)
         def format_task_text(context, task, field_maker):
-            answer = task.task_answer()
-            if answer:
-                answer = answer.replace('[', '\[')
+            text = task.text()
+            if text:
+                text = text.replace('[', '\[')
                 def make_field(match):
                     return field_maker(context, task, match.group(1))
-                answer = task.field_matcher().sub(make_field, answer)
-                content = lcg.Parser().parse_inline_markup(answer)
+                text = element.FIELD_MATCHER.sub(make_field, text)
+                content = lcg.Parser().parse_inline_markup(text)
                 text = context.localize(content.export(context))
             else:
                 text = self.text(context, '')
@@ -1093,12 +1093,12 @@ class Exporter(object):
                 return (format_task_text(context, task,
                                          lambda *args: make_field(show_answers, *args)),)
             elif isinstance(element, _FillInExercise):
-                if isinstance(task, MixedTextFillInTask):
+                if element.FIELD_MATCHER.search(task.text()) is not None:
                     text = format_task_text(context, task,
                                             lambda *args: make_field(show_answers, *args))
                 else:
                     text = self.text(context,
-                                     make_field(show_answers, context, task, task.answer()))
+                                     make_field(show_answers, context, task, task.text()))
                 if not show_answers:
                     prompt = context.localize(task.prompt().export(context))
                     prompt = self._ensure_newlines(context, prompt)
