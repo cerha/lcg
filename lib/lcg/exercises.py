@@ -55,11 +55,18 @@ class Task(object):
     
     """
 
-    def __init__(self, prompt, comment=None):
+    def __init__(self, prompt, comment=None, media=None):
         assert isinstance(prompt, lcg.Content) or prompt is None, prompt
         assert isinstance(comment, unicode) or comment is None, comment
+        if media is None:
+            media = ()
+        elif isinstance(media, lcg.Media):
+            media = (media,)
+        else:
+            assert all([isinstance(m, lcg.Media) for m in media])
         self._comment = comment
         self._prompt = prompt
+        self._media = media
 
     def prompt(self):
         return self._prompt
@@ -67,19 +74,53 @@ class Task(object):
     def comment(self):
         return self._comment
 
+    def media(self):
+        return self._media
 
-class HiddenAnswerTask(Task):
 
+class TextTask(Task):
+    """Tasks, where the answer is a piece of text.
+
+    The answer is typically filled into a text box.  Some exercise types may
+    further process the task text.  For example only a part of the text may be
+    the answer to be filled in a text box or one task may even include several
+    such text boxes (Cloze).
+
+    See TODO in ContentTask docstring for possible future changes.
+
+    """
+
+    def __init__(self, prompt, text, **kwargs):
+        super(TextTask, self).__init__(prompt, **kwargs)
+        assert isinstance(text, basestring)
+        self._text = text.replace('\n', ' ').replace('\r', '')
+
+    def text(self):
+        return self._text
+
+
+class ContentTask(Task):
+    """Tasks, where the answer is LCG Content.
+
+    This task type is currently used just for hidden answers, where the answer
+    itself has no interactivity.
+
+    TODO: It would make sense to use this task type also for cloze and similar
+    exercises.  Fill-in boxes would be LCG elements and we wouldn't need to
+    parse the answer text during export.
+
+    """
     def __init__(self, prompt, answer, **kwargs):
+        super(ContentTask, self).__init__(prompt, **kwargs)
+        assert isinstance(answer, lcg.Content)
         self._answer = answer
-        super(HiddenAnswerTask, self).__init__(prompt, **kwargs)
 
     def answer(self):
         return self._answer
 
 
 class Choice(object):
-    """Representation of one choice for '_ChoiceTask'.
+    """Representation of one choice for 'ChoiceTask'.
 
     This is the answer text with an information whether it is correct or not.
 
@@ -97,7 +138,7 @@ class Choice(object):
         return self._correct
 
         
-class _ChoiceTask(Task):
+class ChoiceTask(Task):
     """Abstract base class for all choice-based tasks."""
     
     def __init__(self, prompt, choices, **kwargs):
@@ -111,7 +152,7 @@ class _ChoiceTask(Task):
         assert all([isinstance(choice, Choice) for choice in choices])
         assert len([ch for ch in choices if ch.correct()]) == 1 or not choices
         self._choices = list(choices)
-        super(_ChoiceTask, self).__init__(prompt, **kwargs)
+        super(ChoiceTask, self).__init__(prompt, **kwargs)
 
     def choices(self):
         return self._choices
@@ -126,23 +167,9 @@ class _ChoiceTask(Task):
         return self._choices.index(choice)
         
         
-class MultipleChoiceQuestion(_ChoiceTask):
-    pass
+class TrueFalseTask(ChoiceTask):
 
-
-class Selection(_ChoiceTask):
-    
-    def __init__(self, choices, **kwargs):
-        super(Selection, self).__init__(None, choices, **kwargs)
-
-        
-class GapFillStatement(_ChoiceTask):
-    pass
-    
-
-class TrueFalseStatement(_ChoiceTask):
-
-    def __init__(self, statement, correct=True, comment=None):
+    def __init__(self, statement, correct=True, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -155,52 +182,8 @@ class TrueFalseStatement(_ChoiceTask):
         assert isinstance(correct, bool)
         # Translators: Labels for exercise buttons. Keep in capitals.
         choices = (Choice(_('TRUE'), correct), Choice(_('FALSE'), not correct))
-        super(TrueFalseStatement, self).__init__(statement, choices,
-                                                 comment=comment)
+        super(TrueFalseTask, self).__init__(statement, choices, **kwargs)
 
-
-class FillInTask(Task):
-    """Tasks, where the answer is to be filled into a text box."""
-    
-    def __init__(self, prompt, text, comment=None, media=()):
-        assert isinstance(text, basestring)
-        if isinstance(media, lcg.Media):
-            media = (media, )
-        else:
-            assert all([isinstance(m, lcg.Media) for m in media])
-        self._text = text.replace('\n', ' ').replace('\r', '')
-        self._media = media
-        super(FillInTask, self).__init__(prompt, comment=comment)
-
-    def text(self):
-        return self._text
-
-    def media(self):
-        return self._media
-
-
-class WritingTask(FillInTask):
-    """Fill-in task with no predefined answer.""" 
-
-    def __init__(self):
-        super(WritingTask, self).__init__(None, '')
-
-class SimpleFillInTask(FillInTask):
-    """Fill-in task with no prompt, just text with a single textbox.""" 
-
-    def __init__(self, text, comment=None):
-        super(SimpleFillInTask, self).__init__(None, text, comment=comment)
-
-class ClozeTask(FillInTask):
-    """Fill in task, which may contain more than one answer."""
-
-    def __init__(self, text, comments=()):
-        super(ClozeTask, self).__init__(None, text)
-        assert isinstance(comments, (list, tuple))
-        self._comments = comments
-
-    def comments(self):
-        return self._comments
 
 
 class ExerciseParser(object):
@@ -220,25 +203,29 @@ class ExerciseParser(object):
 
     def _parse_text(self, text):
         return self._parser.parse_inline_markup(text)
+
     def _split(self, text):
         return [piece.strip() for piece in self._BLANK_LINE_SPLITTER.split(text)]
 
-    def _read_task(self, type, text, comment):
+    def _read_task(self, exercise_type, text, comment):
         # Read a task specification using a method according to given task type.
         try:
             method = {
-                Selection: self._read_choices,
-                MultipleChoiceQuestion: self._read_prompt_and_choices,
-                GapFillStatement: self._read_gap_fill,
-                FillInTask: self._read_pair_of_statements,
-                SimpleFillInTask: self._read_simple_fillin_task,
-                HiddenAnswerTask: self._read_hidden_answer,
-                TrueFalseStatement: self._read_true_false_statement,
-                ClozeTask: self._read_cloze_task,
-            }[type]
+                MultipleChoiceQuestions: self._read_multiple_choice_task,
+                GapFilling: self._read_gap_filling_task,
+                Selections: self._read_selections_task,
+                TrueFalseStatements: self._read_true_false_statements_task,
+                HiddenAnswers: self._read_hidden_answers_task,
+                WrittenAnswers: self._read_written_answers_task,
+                VocabExercise: self._read_vocab_exercise_task,
+                NumberedCloze: self._read_numbered_cloze_task,
+                NumberedExposedCloze: self._read_numbered_cloze_task,
+                Cloze: self._read_cloze_task,
+                ExposedCloze: self._read_cloze_task,
+            }[exercise_type]
         except KeyError:
-            raise Exception("Unknown type:", type)
-        return method(type, text, comment)
+            raise Exception("Unknown exercise type:", type)
+        return method(text, comment)
 
     def _process_choices(self, lines):
         # split the list of choices
@@ -254,10 +241,10 @@ class ExerciseParser(object):
             "%d out of %d found." % (len(correct), len(choices))
         return choices
 
-    def _read_simple_fillin_task(self, type, text, comment):
-        return type(text, comment=comment)
+    def _read_numbered_cloze_task(self, text, comment):
+        return TextTask(None, text, comment=comment)
 
-    def _read_cloze_task(self, type, text, comment):
+    def _read_cloze_task(self, text, comment):
         comments = ()
         cstart = text.find("\n.. ") + 1
         if cstart != 0:
@@ -280,26 +267,22 @@ class ExerciseParser(object):
                         return None
                 comments = [_comment(cdict, label) for a, label in fields]
                 assert not cdict, "Unused comments (labels don't match any field label): %s" % cdict
-        return type(text, comments=comments)
+        return TextTask(None, text)
 
-    def _read_choices(self, type, text, comment):
-        return type(self._process_choices(text.splitlines()), comment=comment)
-
-    def _read_prompt_and_choices(self, type, text, comment):
+    def _read_multiple_choice_task(self, text, comment):
         lines = text.splitlines()
-        return type(self._parse_text(lines[0]),
-                    self._process_choices(lines[1:]), comment=comment)
+        return ChoiceTask(self._parse_text(lines[0]),
+                          self._process_choices(lines[1:]), comment=comment)
 
-    def _read_gap_fill(self, type, text, comment):
+    def _read_gap_filling_task(self, text, comment):
         lines = text.splitlines()
-        if lines[0].find('___') != -1:
-            assert len(self._GAP_MATCHER.findall(lines[0])) == 1, lines[0]
-            prompt = self._GAP_MATCHER.sub("\____", lines[0])
-            choices = self._process_choices(lines[1:])
-        else:
-            prompt = text
-            choices = ()
-        return type(self._parse_text(prompt.strip()), choices, comment=comment)
+        assert len(self._GAP_MATCHER.findall(lines[0])) == 1, lines[0]
+        prompt = self._GAP_MATCHER.sub("\____", lines[0])
+        choices = self._process_choices(lines[1:])
+        return ChoiceTask(self._parse_text(prompt), choices, comment=comment)
+
+    def _read_selections_task(self, text, comment):
+        return ChoiceTask(None, self._process_choices(text.splitlines()), comment=comment)
 
     def _split_pair_of_statements(self, text):
         lines = text.splitlines()
@@ -308,31 +291,35 @@ class ExerciseParser(object):
             len(lines)
         return [l.strip() for l in lines]
 
-    def _read_pair_of_statements(self, type, text, comment):
+    def _read_written_answers_task(self, text, comment):
         prompt, answer = self._split_pair_of_statements(text)
         if answer.startswith('[') and answer.endswith(']'):
             answer = answer[1:-1]
-        return type(self._parse_text(prompt.strip()), answer, comment=comment)
+        return TextTask(self._parse_text(prompt.strip()), answer, comment=comment)
 
-    def _read_hidden_answer(self, type, text, comment):
+    def _read_vocab_exercise_task(self, text, comment):
+        prompt, answer = text.split(':', 1)
+        return TextTask(self._parse_text(prompt.strip()), answer.strip(), comment=comment)
+
+    def _read_hidden_answers_task(self, text, comment):
         prompt, answer = self._split_pair_of_statements(text)
-        return type(self._parse_text(prompt), self._parse_text(answer), comment=comment)
+        answer = answer.strip().replace('\n', ' ').replace('\r', '')
+        return ContentTask(self._parse_text(prompt), self._parse_text(answer), comment=comment)
 
-    def _read_true_false_statement(self, type, text, comment):
+    def _read_true_false_statements_task(self, text, comment):
         text = text.strip()
         assert text.endswith('[T]') or text.endswith('[F]'), \
             "A true/false statement must end with '[T]' or '[F]'!"
         correct = text.endswith('[T]')
         text = ' '.join([line.strip() for line in text.splitlines()])[:-3].strip()
-        return type(self._parse_text(text), correct=correct, comment=comment)
+        return TrueFalseTask(self._parse_text(text), correct=correct, comment=comment)
 
     def parse(self, exercise_type, src, **kwargs):
         """Convert textual exercise specification into an Exercise instance."""
         tasks = []
-        task_type = exercise_type.task_type()
         if src:
             assert 'template' not in kwargs
-            if issubclass(task_type, ClozeTask):
+            if issubclass(exercise_type, Cloze):
                 pieces = (src,)
             else:
                 pieces = self._split(src)
@@ -345,10 +332,10 @@ class ExerciseParser(object):
                 else:
                     comment = None
                     i += 1
-                tasks.append(self._read_task(task_type, t, comment))
+                tasks.append(self._read_task(exercise_type, t, comment))
         elif 'template' in kwargs:
             def maketask(match):
-                tasks.append(self._read_task(task_type, match.group(1), None))
+                tasks.append(self._read_task(exercise_type, match.group(1), None))
                 return "%s"
             m = self._TEMPLATE_TASK_MATCHER
             kwargs['template'] = m.sub(maketask, kwargs['template'].replace('%', '%%'))
@@ -401,9 +388,6 @@ class Exercise(lcg.Content):
 
     # Class methods
 
-    @classmethod
-    def task_type(cls):
-        return cls._TASK_TYPE
 
     @classmethod
     def name(cls):
@@ -469,6 +453,7 @@ class _NumberedTasksExercise(Exercise):
 class _ChoiceBasedExercise(_NumberedTasksExercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
+    _TASK_TYPE = ChoiceTask
     _HELP_INTRO = (
         _("You will hear a response immediately after choosing the answer.  When "
           "you choose the wrong answer, you can try again until you find the "
@@ -484,7 +469,6 @@ class _ChoiceBasedExercise(_NumberedTasksExercise):
 class MultipleChoiceQuestions(_ChoiceBasedExercise):
     """Choosing one of several answers for a given question."""
 
-    _TASK_TYPE = MultipleChoiceQuestion
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Multiple Choice Questions")
     _HELP_INTRO = (
@@ -515,7 +499,6 @@ GNU/Linux is:
 class Selections(_ChoiceBasedExercise):
     """Selecting one of several statements/sentences (the correct one)."""
 
-    _TASK_TYPE = Selection
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Selections")
     _HELP_INTRO = (
@@ -545,7 +528,7 @@ class Selections(_ChoiceBasedExercise):
 class TrueFalseStatements(_ChoiceBasedExercise):
     """Deciding whether the sentence is true or false."""
 
-    _TASK_TYPE = TrueFalseStatement
+    _TASK_TYPE = TrueFalseTask
     # Translators: Type of exercise (use language terminology)
     _NAME = _("True/False Statements")
     _HELP_INTRO = (
@@ -581,7 +564,6 @@ class _SelectBasedExercise(_ChoiceBasedExercise):
 class GapFilling(_ChoiceBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 
-    _TASK_TYPE = GapFillStatement
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Gap Filling")
     _HELP_INTRO = (
@@ -616,7 +598,7 @@ class HiddenAnswers(_NumberedTasksExercise):
     """Question and a hidden answer which the user can unhide to check."""
 
     _NAME = _("Hidden Answers")
-    _TASK_TYPE = HiddenAnswerTask
+    _TASK_TYPE = ContentTask
 
     _HELP_INTRO = (
         _("You should simply think of the correct answer and when "
@@ -644,7 +626,7 @@ What is its height?
 class _FillInExercise(Exercise):
     """A common base class for exercises based on writing text into fields."""
 
-    _TASK_TYPE = FillInTask
+    _TASK_TYPE = TextTask
     _HELP_INTRO = (
         _("You can check each answer individually using the shortcut keys. "
           "When your answer is evaluated as incorrect and you do not know "
@@ -751,7 +733,6 @@ Children [are] our future.
 class _Cloze(_FillInExercise):
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Cloze")
-    _TASK_TYPE = SimpleFillInTask
     _HELP_INTRO = (
         _("The goal is to fill in the gaps in given piece of text.  The answers "
           "are written into a text box and there is just one correct answer "
@@ -824,8 +805,6 @@ class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
 
 class Cloze(_Cloze):
     """Paragraphs of text including text-fields for the marked words."""
-
-    _TASK_TYPE = ClozeTask
 
     def _check_tasks(self, tasks):
         assert len(tasks) == 1
@@ -934,7 +913,7 @@ class WritingTest(FillInTest):
 
     def _check_tasks(self, tasks):
         assert len(tasks) == 0
-        return (WritingTask(),)
+        return (TextTask(None, ''),)
 
     def eval(self, req):
         # Prevent returning full points on empty answer.
