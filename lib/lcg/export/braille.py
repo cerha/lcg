@@ -363,7 +363,7 @@ class BrailleExporter(FileExporter, Exporter):
                                 priority = l[1]
                                 if priority <= best_priority:
                                     line_limit = i
-                                best_priority = priority
+                                    best_priority = priority
                             elif l[0] == self._PAGE_END_CHAR:
                                 line_limit = page_height
                                 best_priority = '9'
