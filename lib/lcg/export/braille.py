@@ -632,13 +632,8 @@ class BrailleExporter(FileExporter, Exporter):
     def _export_new_page(self, context, element):
         return _Braille('\f', '0')
 
-    def _export_horizontal_separator(self, context, element, width=64, in_table=False):
-        if in_table:
-            return None
+    def _export_horizontal_separator(self, context, element, width=64):
         return _Braille('\n', '0')
-
-    def _vertical_cell_separator(self, context):
-        return _Braille(' ', '1',), 1
     
     def _export_title(self, context, element):
         title = super(BrailleExporter, self)._export_title(context, element)
@@ -729,6 +724,31 @@ class BrailleExporter(FileExporter, Exporter):
                 label = self.text(context, target.title() or target.uri())
         return label
 
+    # Tables
+
+    def _vertical_cell_separator(self, context, position):
+        return _Braille('', '') if position <= 0 else _Braille('  ', '00')
+
+    def _table_row_separator(self, context, width, cell_widths, row_number, vertical_separator,
+                             last_row):
+        if row_number <= 0:
+            filler = u'⠶' if row_number == 0 else u'⠛'
+            separator = self.concat(_Braille(filler * width, '0' * width), self._newline(context))
+        elif row_number == 1 and cell_widths:
+            cell_separators = [_Braille(u'⠐' + u'⠒' * (w - 1) if c else ' ' * w, '0' * w)
+                               for w, c in zip(cell_widths, last_row)]
+            elements = [cell_separators[0]]
+            for c in cell_separators[1:]:
+                elements.append(vertical_separator)
+                elements.append(c)
+            elements.append(self._newline(context))
+            separator = self.concat(*elements)
+        else:
+            separator = None
+        return separator
+    
+    # Special constructs
+    
     def _export_mathml(self, context, element):
         # Only Czech MathML processing is available
         class EntityHandler(element.EntityHandler):
