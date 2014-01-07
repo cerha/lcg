@@ -420,12 +420,6 @@ class Exercise(lcg.Content):
     def instructions(self):
         return self._instructions
 
-    def _task_name(self, exercise_id, task):
-        return exercise_id + '-a%d' % (self._tasks.index(task) + 1)
-        
-    def task_name(self, exercise_id, task):
-        return self._task_name(exercise_id, task)
-
     def answers(self):
         """Return all correct answers for all tasks within the exercise.
         
