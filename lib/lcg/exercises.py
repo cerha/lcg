@@ -549,18 +549,6 @@ The largest tropical rainforest in the world is in Brasil. [T]
 """)
 
 
-class _SelectBasedExercise(_ChoiceBasedExercise):
-    # Currently unused due to problematic accessibile interactive evaluation of
-    # select boxes.
-    pass
-    # HTML formatting moved to HTML formatter.
-    # def _format_choices(self, context, exercise_id, task):
-    #     g = context.generator()
-    #     task_name = self._task_name(exercise_id, task)
-    #     return g.select(task_name, id=task_name, readonly=self._readonly(context),
-    #                     options=[(ch.answer(), task.choice_index(ch)) for ch in task.choices()])
-
-
 class GapFilling(_ChoiceBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 

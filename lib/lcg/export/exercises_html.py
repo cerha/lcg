@@ -237,6 +237,18 @@ class _ChoiceBasedExerciseExporter(_NumberedTasksExerciseExporter):
             prompt = context.localize(prompt.export(context))
         return (prompt, self._format_choices(context, exercise, exercise_id, task))
 
+
+class _SelectBasedExerciseExporter(_ChoiceBasedExerciseExporter):
+    # Currently unused due to problematic accessibile interactive evaluation of
+    # select boxes.
+
+    def _format_choices(self, context, exercise_id, task):
+        g = context.generator()
+        task_name = self._task_name(exercise_id, task)
+        return g.select(task_name, id=task_name, readonly=self._readonly(context),
+                        options=[(ch.answer(), task.choice_index(ch)) for ch in task.choices()])
+
+
 class MultipleChoiceQuestionsExporter(_ChoiceBasedExerciseExporter):
     pass
    
