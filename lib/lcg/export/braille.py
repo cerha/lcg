@@ -359,7 +359,7 @@ class BrailleExporter(FileExporter, Exporter):
                         if l:
                             if l[0] == self._TOC_MARKER_CHAR:
                                 continue
-                            if l[0] == self._PAGE_START_CHAR:
+                            if l[0] == self._PAGE_START_CHAR and i > 0:
                                 priority = l[1]
                                 if priority <= best_priority:
                                     line_limit = i
