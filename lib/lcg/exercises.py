@@ -644,7 +644,7 @@ class _SingleTextBoxFillInExercise(FillInExercise):
 class VocabExercise(_SingleTextBoxFillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
-    _NAME = _("Vocabulary exercise")
+    _NAME = _("Vocabulary Exercise")
     _HELP_INTRO = (
         _("There are two ways to do the exercise: orally and written.  Do the "
           "exercise both ways to get the best results."),
