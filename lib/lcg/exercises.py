@@ -185,7 +185,6 @@ class TrueFalseTask(ChoiceTask):
         super(TrueFalseTask, self).__init__(statement, choices, **kwargs)
 
 
-
 class ExerciseParser(object):
     """Turns a textual exercise spec. into an 'Exercise' instance.
 
@@ -219,9 +218,7 @@ class ExerciseParser(object):
                 WrittenAnswers: self._read_written_answers_task,
                 VocabExercise: self._read_vocab_exercise_task,
                 NumberedCloze: self._read_numbered_cloze_task,
-                NumberedExposedCloze: self._read_numbered_cloze_task,
                 Cloze: self._read_cloze_task,
-                ExposedCloze: self._read_cloze_task,
             }[exercise_type]
         except KeyError:
             raise Exception("Unknown exercise type:", type)
@@ -380,9 +377,8 @@ class Exercise(lcg.Content):
         if self.__class__ not in Exercise._used_types:
             Exercise._used_types.append(self.__class__)
         assert instructions is None or isinstance(instructions, lcg.Content), instructions
-        assert all([isinstance(t, self._TASK_TYPE) for t in tasks]), \
-            "Tasks must be a sequence of '%s' instances!: %s" % (self._TASK_TYPE.__name__, tasks)
-        self._tasks = list(self._check_tasks(tasks))
+        self._check_tasks(tasks)
+        self._tasks = tuple(tasks)
         self._instructions = instructions
         self._template = template
 
@@ -415,8 +411,13 @@ class Exercise(lcg.Content):
     # Instance methods
 
     def _check_tasks(self, tasks):
-        return tasks
+        for task in tasks:
+            self._check_task(task)
 
+    def _check_task(self, task):
+        assert isinstance(task, self._TASK_TYPE), \
+            "Not a sequence of '%s' instances!: %r" % (self._TASK_TYPE.__name__, tasks)
+        
     def instructions(self):
         return self._instructions
 
@@ -438,13 +439,12 @@ class Exercise(lcg.Content):
         return self._template
 
 
-class _NumberedTasksExercise(Exercise):
+class NumberedTasksExercise(Exercise):
+    """Mixin class to indicate, that the tasks should be numbered on output."""
     pass
 
-################################################################################
-################################################################################
 
-class _ChoiceBasedExercise(_NumberedTasksExercise):
+class _ChoiceBasedExercise(Exercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
     _TASK_TYPE = ChoiceTask
@@ -460,7 +460,7 @@ class _ChoiceBasedExercise(_NumberedTasksExercise):
                 for t in self._tasks if len(t.choices()) > 0]
 
 
-class MultipleChoiceQuestions(_ChoiceBasedExercise):
+class MultipleChoiceQuestions(_ChoiceBasedExercise, NumberedTasksExercise):
     """Choosing one of several answers for a given question."""
 
     # Translators: Type of exercise (use language terminology)
@@ -490,7 +490,8 @@ GNU/Linux is:
 - a computer manufacturer
 """)
 
-class Selections(_ChoiceBasedExercise):
+
+class Selections(_ChoiceBasedExercise, NumberedTasksExercise):
     """Selecting one of several statements/sentences (the correct one)."""
 
     # Translators: Type of exercise (use language terminology)
@@ -519,7 +520,7 @@ class Selections(_ChoiceBasedExercise):
 """)
 
 
-class TrueFalseStatements(_ChoiceBasedExercise):
+class TrueFalseStatements(_ChoiceBasedExercise, NumberedTasksExercise):
     """Deciding whether the sentence is true or false."""
 
     _TASK_TYPE = TrueFalseTask
@@ -543,7 +544,7 @@ The largest tropical rainforest in the world is in Brasil. [T]
 """)
 
 
-class GapFilling(_ChoiceBasedExercise):
+class GapFilling(_ChoiceBasedExercise, NumberedTasksExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 
     # Translators: Type of exercise (use language terminology)
@@ -576,7 +577,7 @@ To change money between two currencies you need to know the ____ rate.
 """)
 
 
-class HiddenAnswers(_NumberedTasksExercise):
+class HiddenAnswers(NumberedTasksExercise):
     """Question and a hidden answer which the user can unhide to check."""
 
     _NAME = _("Hidden Answers")
@@ -602,10 +603,7 @@ What is its height?
 """)
 
 
-################################################################################
-################################################################################
-
-class _FillInExercise(Exercise):
+class FillInExercise(Exercise):
     """A common base class for exercises based on writing text into fields."""
 
     _TASK_TYPE = TextTask
@@ -620,38 +618,35 @@ class _FillInExercise(Exercise):
     )
     FIELD_MATCHER = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
 
-    def _task_fields(self, task):
-        return [(answer.replace('\n', ' ').replace('\r', ''), label)
+    def _task_answers(self, task):
+        return [answer.replace('\n', ' ').replace('\r', '')
                 for answer, label in self.FIELD_MATCHER.findall(task.text())]
 
-    def _task_answers(self, task):
-        fields = self._task_fields(task)
-        if fields:
-            return [answer for answer, label in fields]
-        else:
-            return (task.text(),)
-
-    def _task_answer(self, task):
-        answers = self._task_answers(task)
-        if answers and len(answers) == 1:
-            return answers[0]
-        else:
-            return None
-
-    def _check_tasks(self, tasks):
-        for task in tasks:
-            answers = self._task_answers(task)
-            assert len(answers) == 1, \
-                "%s requires just one textbox per task (%d found): %s" % \
-                (self.__class__.__name__, len(answers), task.text())
-        return tasks
-
     def answers(self):
-        return [self._task_answer(t) for t in self._tasks if t.text() is not None]
+        answers = []
+        for task in self._tasks:
+            answers.extend(self._task_answers(task))
+        return tuple(answers)
+
+
+class _SingleTextBoxFillInExercise(FillInExercise):
+    """Fill In Exercise with one text box per task.""" 
+
+    def _task_answers(self, task):
+        answers = super(_SingleTextBoxFillInExercise, self)._task_answers(task)
+        if not answers:
+            # The whole text is the answer when there is no explicit text box.
+            answers = (task.text(),)
+        return answers
+        
+    def _check_task(self, task):
+        answers = self._task_answers(task)
+        assert len(answers) == 1, \
+            "%s requires just one textbox per task (%d found): %s" % \
+            (self.__class__.__name__, len(answers), task.text())
     
 
-
-class VocabExercise(_FillInExercise, _NumberedTasksExercise):
+class VocabExercise(_SingleTextBoxFillInExercise, NumberedTasksExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Vocabulary exercise")
@@ -672,17 +667,17 @@ class VocabExercise(_FillInExercise, _NumberedTasksExercise):
           "this is appropriate, since an answer without correct capitalization is "
           "always considered incorrect.  When the prompt is a complete sentence, "
           "you must also use correct punctuation."),
-    ) + _FillInExercise._HELP_INTRO
+    ) + FillInExercise._HELP_INTRO
 
 
-class WrittenAnswers(_FillInExercise, _NumberedTasksExercise):
+class WrittenAnswers(_SingleTextBoxFillInExercise, NumberedTasksExercise):
     """A prompt (a sentence) and a big text-field for each task."""
 
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Written Answers")
     _HELP_INTRO = (
         _("Fill in the answer to the box below each question."),
-    ) + _FillInExercise._HELP_INTRO
+    ) + _SingleTextBoxFillInExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of a definition of several "
           "questions and answers."),
@@ -704,22 +699,41 @@ What is the name of the largest continent?
 Use the correct form of the verb "to be":
 Children [are] our future.
 """)
+
+
+class NumberedCloze(_SingleTextBoxFillInExercise, NumberedTasksExercise):
+    _NAME = _("Complete the Statements")
+    _HELP_INTRO = (
+        _("The goal is to fill in the gaps in given statements.  The answers "
+          "are written into a text box and there is just one correct answer "
+          "for each gap."),
+    ) + FillInExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of several statements separated by "
+          "blank lines from each other. Certain part of each statement is "
+          "written in square brackets.  This part will be replaced by a text "
+          "entry field. The text inside brackets is the correct answer. There "
+          "is just one pair of brackets in each statement."),
+        #_("If there is more than one possible correct answer, the other correct "
+        #  "answers may be written inside the brackets separated by the pipeline "
+        #  'character "|".'),
+    )
+    _SOURCE_EXAMPLE = _("""
+[London] is the capital of the United Kingdom.
+
+The city is split by the River [Thames] into North and South.
+""")
     
-    def _check_tasks(self, tasks):
-        for task in tasks:
-            answers = self._task_answers(task)
-            assert len(answers) == 1
-        return tasks
 
-
-class _Cloze(_FillInExercise):
+class Cloze(FillInExercise):
+    """Paragraphs of text including text-fields for the marked words."""
     # Translators: Type of exercise (use language terminology)
     _NAME = _("Cloze")
     _HELP_INTRO = (
         _("The goal is to fill in the gaps in given piece of text.  The answers "
           "are written into a text box and there is just one correct answer "
           "for each gap."),
-    ) + _FillInExercise._HELP_INTRO
+    ) + FillInExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of one or more paragraphs of text. "
           "Selected parts of the text (typically words), which are to be replaced "
@@ -736,68 +750,6 @@ make payments [for] their customers, lend money, [and] offer
 investment advice, foreign exchange facilities, and so on.
 """)
 
-
-class _ExposedCloze(_Cloze):
-    # Translators: Type of exercise (use language
-    # terminology). Exposed cloze is lika Cloze, where students fill
-    # in the gaps in a text. In *exposed* cloze however the student
-    # chooses from the list of offered answers.
-    _NAME = _("Cloze with Selection")
-    _HELP_INTRO = (
-        _("Your goal is to pick the right words from the list at the "
-          "beginning of the exercise to fill in the gaps in the following "
-          "piece of text. There is just one correct answer for each "
-          "gap. Each word from the list is used just once."),
-    ) + _FillInExercise._HELP_INTRO
-
-
-class NumberedCloze(_Cloze, _NumberedTasksExercise):
-    _NAME = _("Complete the Statements")
-    _HELP_INTRO = (
-        _("The goal is to fill in the gaps in given statements.  The answers "
-          "are written into a text box and there is just one correct answer "
-          "for each gap."),
-    ) + _FillInExercise._HELP_INTRO
-    _SOURCE_FORMATTING = (
-        _("One exercise typically consists of several statements separated by "
-          "blank lines from each other. Certain part of each statement is "
-          "written in square brackets.  This part will be replaced by a text "
-          "entry field. The text inside brackets is the correct answer. There "
-          "is just one pair of brackets in each statement."),
-        #_("If there is more than one possible correct answer, the other correct "
-        #  "answers may be written inside the brackets separated by the pipeline "
-        #  'character "|".'),
-    )
-    _SOURCE_EXAMPLE = _("""
-[London] is the capital of the United Kingdom.
-
-The city is split by the River [Thames] into North and South.
-""")
-
-
-class NumberedExposedCloze(NumberedCloze, _ExposedCloze):
-    _NAME = _("Complete the Statements with Selection")
-    _HELP_INTRO = (
-        _("Your goal is to pick the right words from the list at the "
-          "beginning of the exercise to fill in the gaps in the statements "
-          "below. There is just one correct answer for each "
-          "gap. Each word from the list is used just once."),
-    ) + _FillInExercise._HELP_INTRO
-
-
-class Cloze(_Cloze):
-    """Paragraphs of text including text-fields for the marked words."""
-
-    def _check_tasks(self, tasks):
-        assert len(tasks) == 1
-        return tasks
-
-    def answers(self):
-        return self._task_answers(self._tasks[0])
-
-
-class ExposedCloze(Cloze, _ExposedCloze):
-    pass
 
 ################################################################################
 ##################################   Tests   ###################################
@@ -870,7 +822,7 @@ class _Test(object):
 class ChoiceBasedTest(_Test, _ChoiceBasedExercise):
     pass
 
-class FillInTest(_Test, _FillInExercise):
+class FillInTest(_Test, FillInExercise):
     pass
 
 class MultipleChoiceQuestionsTest(ChoiceBasedTest, MultipleChoiceQuestions):
@@ -890,12 +842,12 @@ class WritingTest(FillInTest):
     # Translators: Type of exercise
     _NAME = _("Writing")
 
+    def __init__(self, tasks=(), **kwargs):
+        assert len(tasks) == 0
+        super(WritingTest, self).__init__(tasks=(TextTask(None, ''),), **kwargs)
+
     def _field_result(self, context, name, text):
         return ''
-
-    def _check_tasks(self, tasks):
-        assert len(tasks) == 0
-        return (TextTask(None, ''),)
 
     def eval(self, req):
         # Prevent returning full points on empty answer.
@@ -905,11 +857,6 @@ class WritingTest(FillInTest):
 class ClozeTest(FillInTest, Cloze):
     pass
 
-class ExposedClozeTest(FillInTest, ExposedCloze):
-    pass
-
 class NumberedClozeTest(FillInTest, NumberedCloze):
     pass
 
-class NumberedExposedClozeTest(FillInTest, NumberedExposedCloze):
-    pass

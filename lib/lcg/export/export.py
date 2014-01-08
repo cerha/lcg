@@ -44,9 +44,8 @@ from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, 
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
     Substitution, SetVariable, MathML, Figure
-from lcg.exercises import _Cloze, _FillInExercise, _ExposedCloze, \
-    HiddenAnswers, VocabExercise, GapFilling, Cloze, \
-    WritingTest, _NumberedTasksExercise, Exercise
+from lcg.exercises import Exercise, FillInExercise, HiddenAnswers, VocabExercise, GapFilling, \
+    WritingTest, NumberedTasksExercise, Cloze, NumberedCloze
 
 
 class SubstitutionIterator(object):
@@ -1035,16 +1034,8 @@ class Exporter(object):
         # Instructions
         instructions = element.instructions()
         if instructions:
-            exported_instructions = [self.concat(instructions.export(context),
-                                                 self._newline(context, 1, page_start=3))]
-        else:
-            exported_instructions = []
-        if isinstance(element, _ExposedCloze):
-            for a in sorted(element.answers()):
-                exported_instructions.append(self.text(context, a))
-                exported_instructions.append(self._newline(context, page_start=4))
-        if exported_instructions:
-            content.append(self.concat(*exported_instructions))
+            content.append(self.concat(instructions.export(context),
+                                       self._newline(context, 1, page_start=3)))
         # Tasks
         fill_in_char = u'_'
         fill_in_area = fill_in_char * 4
@@ -1087,19 +1078,14 @@ class Exporter(object):
         def export_task_parts(task, show_answers):
             if isinstance(element, WritingTest):
                 return (None if show_answers else self.text(context, fill_in_area),)
-            elif isinstance(element, _Cloze):
-                if isinstance(element, Cloze):
-                    context.field_number = 0
-                return (format_task_text(context, task,
-                                         lambda *args: make_field(show_answers, *args)),)
-            elif isinstance(element, _FillInExercise):
+            elif isinstance(element, FillInExercise):
                 if element.FIELD_MATCHER.search(task.text()) is not None:
                     text = format_task_text(context, task,
                                             lambda *args: make_field(show_answers, *args))
                 else:
                     text = self.text(context,
                                      make_field(show_answers, context, task, task.text()))
-                if not show_answers:
+                if not show_answers and task.prompt():
                     prompt = context.localize(task.prompt().export(context))
                     prompt = self._ensure_newlines(context, prompt)
                     if isinstance(element, VocabExercise):
@@ -1117,6 +1103,7 @@ class Exporter(object):
                     result = (task.prompt().export(context),)
                 return result
             elif isinstance(element, GapFilling):
+                gap_matcher = re.compile(r"(___+)")
                 def text_preprocessor(text):
                     if show_answers:
                         for c in task.choices():
@@ -1127,7 +1114,7 @@ class Exporter(object):
                             raise Exception("No correct answer found", text)
                     else:
                         replacement = fill_in_area
-                    return element.gap_matcher().sub(replacement, text)
+                    return gap_matcher.sub(replacement, text)
                 with attribute_value(context, 'text_preprocessor', text_preprocessor):
                     task_prompt = task.prompt()
                     prompt = context.localize(task_prompt.export(context))
@@ -1171,7 +1158,7 @@ class Exporter(object):
             exported_tasks = exported_template % tuple(exported_tasks)
         else:
             separated_tasks = []
-            numbered = isinstance(element, _NumberedTasksExercise)
+            numbered = isinstance(element, NumberedTasksExercise)
             n = 1
             for t in exported_tasks:
                 if numbered:
