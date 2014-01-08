@@ -22,8 +22,6 @@ import re
 import lcg
 from lcg import concat
 
-from lcg.exercises import NumberedTasksExercise
-
 _ = lcg.TranslatableTextFactory('lcg')
 class ExerciseExporter(object):
     _JAVASCRIPT_CLASS = 'lcg.Exercise'
@@ -116,11 +114,13 @@ class ExerciseExporter(object):
             localized_template = context.localize(template.export(context))
             return localized_template % tuple(exported_tasks)
         else:
-            if isinstance(exercise, NumberedTasksExercise):
+            if len(exported_tasks) > 1:
                 g = context.generator()
                 return g.ol(*[g.li(t) for t in exported_tasks], cls="tasks")
+            elif exported_tasks:
+                return exported_tasks[0]
             else:
-                return concat(exported_tasks, separator="\n")
+                return None
 
     def _export_instructions(self, context, exercise, exercise_id):
         instructions = exercise.instructions()

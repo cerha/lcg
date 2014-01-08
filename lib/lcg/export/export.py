@@ -45,7 +45,7 @@ from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, 
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
     Substitution, SetVariable, MathML, Figure
 from lcg.exercises import Exercise, FillInExercise, HiddenAnswers, VocabExercise, GapFilling, \
-    WritingTest, NumberedTasksExercise, Cloze, NumberedCloze
+    WritingTest, Cloze, NumberedCloze
 
 
 class SubstitutionIterator(object):
@@ -1158,7 +1158,7 @@ class Exporter(object):
             exported_tasks = exported_template % tuple(exported_tasks)
         else:
             separated_tasks = []
-            numbered = isinstance(element, NumberedTasksExercise)
+            numbered = len(exported_tasks) > 1
             n = 1
             for t in exported_tasks:
                 if numbered:

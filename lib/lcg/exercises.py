@@ -439,11 +439,6 @@ class Exercise(lcg.Content):
         return self._template
 
 
-class NumberedTasksExercise(Exercise):
-    """Mixin class to indicate, that the tasks should be numbered on output."""
-    pass
-
-
 class _ChoiceBasedExercise(Exercise):
     "A superclass for all exercises based on choosing from predefined answers."
 
@@ -460,7 +455,7 @@ class _ChoiceBasedExercise(Exercise):
                 for t in self._tasks if len(t.choices()) > 0]
 
 
-class MultipleChoiceQuestions(_ChoiceBasedExercise, NumberedTasksExercise):
+class MultipleChoiceQuestions(_ChoiceBasedExercise):
     """Choosing one of several answers for a given question."""
 
     # Translators: Type of exercise (use language terminology)
@@ -491,7 +486,7 @@ GNU/Linux is:
 """)
 
 
-class Selections(_ChoiceBasedExercise, NumberedTasksExercise):
+class Selections(_ChoiceBasedExercise):
     """Selecting one of several statements/sentences (the correct one)."""
 
     # Translators: Type of exercise (use language terminology)
@@ -520,7 +515,7 @@ class Selections(_ChoiceBasedExercise, NumberedTasksExercise):
 """)
 
 
-class TrueFalseStatements(_ChoiceBasedExercise, NumberedTasksExercise):
+class TrueFalseStatements(_ChoiceBasedExercise):
     """Deciding whether the sentence is true or false."""
 
     _TASK_TYPE = TrueFalseTask
@@ -544,7 +539,7 @@ The largest tropical rainforest in the world is in Brasil. [T]
 """)
 
 
-class GapFilling(_ChoiceBasedExercise, NumberedTasksExercise):
+class GapFilling(_ChoiceBasedExercise):
     """Choosing from a list of words to fill in a gap in a sentence."""
 
     # Translators: Type of exercise (use language terminology)
@@ -577,7 +572,7 @@ To change money between two currencies you need to know the ____ rate.
 """)
 
 
-class HiddenAnswers(NumberedTasksExercise):
+class HiddenAnswers(Exercise):
     """Question and a hidden answer which the user can unhide to check."""
 
     _NAME = _("Hidden Answers")
@@ -646,7 +641,7 @@ class _SingleTextBoxFillInExercise(FillInExercise):
             (self.__class__.__name__, len(answers), task.text())
     
 
-class VocabExercise(_SingleTextBoxFillInExercise, NumberedTasksExercise):
+class VocabExercise(_SingleTextBoxFillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
 
     _NAME = _("Vocabulary exercise")
@@ -670,7 +665,7 @@ class VocabExercise(_SingleTextBoxFillInExercise, NumberedTasksExercise):
     ) + FillInExercise._HELP_INTRO
 
 
-class WrittenAnswers(_SingleTextBoxFillInExercise, NumberedTasksExercise):
+class WrittenAnswers(_SingleTextBoxFillInExercise):
     """A prompt (a sentence) and a big text-field for each task."""
 
     # Translators: Type of exercise (use language terminology)
@@ -701,7 +696,7 @@ Children [are] our future.
 """)
 
 
-class NumberedCloze(_SingleTextBoxFillInExercise, NumberedTasksExercise):
+class NumberedCloze(_SingleTextBoxFillInExercise):
     _NAME = _("Complete the Statements")
     _HELP_INTRO = (
         _("The goal is to fill in the gaps in given statements.  The answers "
