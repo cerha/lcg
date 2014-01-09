@@ -121,3 +121,17 @@ a.exercise-help-link{
 .dictation-task{
     margin-top: 1em;
 }
+
+.exercise-specification-error {
+    color: #a00;
+    border: solid #faa 1px;
+    background: #fcc;
+    padding: 6px;
+}
+.exercise-specification-error .error-message {
+    padding: 0 1px 4px 1px;
+    margin: 0;
+}
+.exercise-specification-error pre {
+    margin: 0;
+}

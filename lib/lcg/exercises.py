@@ -149,19 +149,18 @@ class ChoiceTask(Task):
           choices -- sequence of 'Choice' instances related to this Task.
           
         """
-        assert all([isinstance(choice, Choice) for choice in choices])
-        assert len([ch for ch in choices if ch.correct()]) == 1 or not choices
+        assert all(isinstance(choice, Choice) for choice in choices)
+        correct_choices = [choice for choice in choices if choice.correct()]
+        assert choices and len(correct_choices) == 1
         self._choices = list(choices)
+        self._correct_choice = correct_choices[0]
         super(ChoiceTask, self).__init__(prompt, **kwargs)
 
     def choices(self):
         return self._choices
 
     def correct_choice(self):
-        for choice in self._choices:
-            if choice.correct():
-                return choice
-        raise Exception("No correct choice found!")
+        return self._correct_choice
 
     def choice_index(self, choice):
         return self._choices.index(choice)
@@ -193,6 +192,15 @@ class ExerciseParser(object):
     the LCG HTML source code (processed by 'lcg.HTMLProcessor').
 
     """
+    class ExerciseParserError(Exception):
+        """Exception raised when exercise parsing fails due to invalid input data."""
+        def __init__(self, message, task_number=None):
+            self._message = message
+            self._task_number = task_number
+        def message(self):
+            return self._message
+        def task_number(self):
+            return self._task_number
 
     _BLANK_LINE_SPLITTER = re.compile(r"\r?\n\s*\r?\n")
     _GAP_MATCHER = re.compile(r"(___+)")
@@ -201,69 +209,64 @@ class ExerciseParser(object):
         self._parser = lcg.Parser()
 
     def _parse_text(self, text):
-        return self._parser.parse_inline_markup(text)
+        return self._parser.parse_inline_markup(text.strip())
+
+    def _error(self, message):
+        raise self.ExerciseParserError(message)
+
+    def _check_single_text_box(self, text):
+        fields = FillInExercise.FIELD_MATCHER.findall(text)
+        if len(fields) > 1:
+            # No textbox is ok, the whole text is the answer in this case.
+            self._error(_("Just one textbox per task allowed, but %d found.", len(fields)))
 
     def _split(self, text):
         return [piece.strip() for piece in self._BLANK_LINE_SPLITTER.split(text)]
 
-    def _read_task(self, exercise_type, text, comment):
-        # Read a task specification using a method according to given task type.
-        try:
-            method = {
-                MultipleChoiceQuestions: self._read_multiple_choice_task,
-                GapFilling: self._read_gap_filling_task,
-                Selections: self._read_selections_task,
-                TrueFalseStatements: self._read_true_false_statements_task,
-                HiddenAnswers: self._read_hidden_answers_task,
-                WrittenAnswers: self._read_written_answers_task,
-                VocabExercise: self._read_vocab_exercise_task,
-                NumberedCloze: self._read_numbered_cloze_task,
-                Cloze: self._read_cloze_task,
-            }[exercise_type]
-        except KeyError:
-            raise Exception("Unknown exercise type:", type)
-        return method(text, comment)
-
     def _process_choices(self, lines):
-        # split the list of choices
         def choice(text):
-            assert text.startswith('+ ') or text.startswith('- '), \
-                "A choice must start with a + or minus sign and a space!"
             correct = text.startswith('+ ')
+            if not correct and not text.startswith('- '):
+                self._error(_("All choices must start with a plus or minus sign and a space."))
             return Choice(text[2:].strip(), correct=correct)
+        if not lines:
+            self._error(_("No choices defined."))
         choices = map(choice, lines)
-        correct = filter(lambda ch: ch.correct(), choices)
-        assert len(correct) == 1, \
-            "Number of correct choices must be exactly one! " + \
-            "%d out of %d found." % (len(correct), len(choices))
+        correct_choices = [ch for ch in choices if ch.correct()]
+        if len(correct_choices) == 0:
+            self._error(_("None of the choices is correct."))
+        if len(correct_choices) != 1:
+            self._error(_("More than one choice is correct."))
         return choices
 
     def _read_numbered_cloze_task(self, text, comment):
+        self._check_single_text_box(text)
         return TextTask(None, text, comment=comment)
 
     def _read_cloze_task(self, text, comment):
-        comments = ()
-        cstart = text.find("\n.. ") + 1
-        if cstart != 0:
-            src_comments = [c[3:] for c in self._split(text[cstart:])]
-            text = text[0:cstart].rstrip()
-            if src_comments:
-                cdict = {}
-                fields = [] # Comments unsupported for now.
-                for c in src_comments:
-                    match = re.search("^<(?P<label>[\w\d]+)>\s*", c)
-                    assert match, ('Cloze comments must begin with a label ' +
-                                   '(e.g. <1> to refer to a field [xxx<1>]).', c)
-                    cdict[match.group('label')] = c[match.end():]
-                def _comment(cdict, label):
-                    try:
-                        c = cdict[label]
-                        del cdict[label]
-                        return c
-                    except KeyError:
-                        return None
-                comments = [_comment(cdict, label) for a, label in fields]
-                assert not cdict, "Unused comments (labels don't match any field label): %s" % cdict
+        # Cloze comments unsupported for now.
+        #comments = ()
+        #cstart = text.find("\n.. ") + 1
+        #if cstart != 0:
+        #    src_comments = [c[3:] for c in self._split(text[cstart:])]
+        #    text = text[0:cstart].rstrip()
+        #    if src_comments:
+        #        cdict = {}
+        #        fields = []
+        #        for c in src_comments:
+        #            match = re.search("^<(?P<label>[\w\d]+)>\s*", c)
+        #            assert match, ('Cloze comments must begin with a label ' +
+        #                           '(e.g. <1> to refer to a field [xxx<1>]).', c)
+        #            cdict[match.group('label')] = c[match.end():]
+        #        def _comment(cdict, label):
+        #            try:
+        #                c = cdict[label]
+        #                del cdict[label]
+        #                return c
+        #            except KeyError:
+        #                return None
+        #        comments = [_comment(cdict, label) for a, label in fields]
+        #        assert not cdict, "Unused comments (labels don't match any field label): %s" % cdict
         return TextTask(None, text)
 
     def _read_multiple_choice_task(self, text, comment):
@@ -273,7 +276,8 @@ class ExerciseParser(object):
 
     def _read_gap_filling_task(self, text, comment):
         lines = text.splitlines()
-        assert len(self._GAP_MATCHER.findall(lines[0])) == 1, lines[0]
+        if len(self._GAP_MATCHER.findall(lines[0])) != 1:
+            self._error(_("Gap mark (three or more underscores) not found statement."))
         prompt = self._GAP_MATCHER.sub("\____", lines[0])
         choices = self._process_choices(lines[1:])
         return ChoiceTask(self._parse_text(prompt), choices, comment=comment)
@@ -283,59 +287,88 @@ class ExerciseParser(object):
 
     def _split_pair_of_statements(self, text):
         lines = text.splitlines()
-        assert len(lines) == 2, \
-            "Task specification must consist of just 2 lines (%d given)." % \
-            len(lines)
+        if len(lines) != 2:
+            self._error(_("Task specification must consist of 2 lines (%d given).", len(lines)))
         return [l.strip() for l in lines]
 
     def _read_written_answers_task(self, text, comment):
         prompt, answer = self._split_pair_of_statements(text)
-        if answer.startswith('[') and answer.endswith(']'):
-            answer = answer[1:-1]
-        return TextTask(self._parse_text(prompt.strip()), answer, comment=comment)
+        self._check_single_text_box(answer)
+        return TextTask(self._parse_text(prompt), answer.strip(), comment=comment)
 
     def _read_vocab_exercise_task(self, text, comment):
         prompt, answer = text.split(':', 1)
-        return TextTask(self._parse_text(prompt.strip()), answer.strip(), comment=comment)
+        self._check_single_text_box(answer)
+        return TextTask(self._parse_text(prompt), answer.strip(), comment=comment)
 
     def _read_hidden_answers_task(self, text, comment):
         prompt, answer = self._split_pair_of_statements(text)
-        answer = answer.strip().replace('\n', ' ').replace('\r', '')
         return ContentTask(self._parse_text(prompt), self._parse_text(answer), comment=comment)
 
     def _read_true_false_statements_task(self, text, comment):
         text = text.strip()
-        assert text.endswith('[T]') or text.endswith('[F]'), \
-            "A true/false statement must end with '[T]' or '[F]'!"
         correct = text.endswith('[T]')
+        if not correct and not text.endswith('[F]'):
+            self._error(_("A true/false statement must end with '[T]' or '[F]'."))
         text = ' '.join([line.strip() for line in text.splitlines()])[:-3].strip()
         return TrueFalseTask(self._parse_text(text), correct=correct, comment=comment)
 
     def parse(self, exercise_type, src, **kwargs):
-        """Convert textual exercise specification into an Exercise instance."""
-        tasks = []
-        if src:
-            assert 'template' not in kwargs
-            if issubclass(exercise_type, Cloze):
-                pieces = (src,)
+        """Convert textual exercise specification into an Exercise instance.
+        
+        Returns 'lcg.Exercise' instance on success or 'lcg.Container' instance
+        with error information if the exercise specification is invalid.
+
+        """
+        try:
+            try:
+                read_task = {
+                    MultipleChoiceQuestions: self._read_multiple_choice_task,
+                    GapFilling: self._read_gap_filling_task,
+                    Selections: self._read_selections_task,
+                    TrueFalseStatements: self._read_true_false_statements_task,
+                    HiddenAnswers: self._read_hidden_answers_task,
+                    WrittenAnswers: self._read_written_answers_task,
+                    VocabExercise: self._read_vocab_exercise_task,
+                    NumberedCloze: self._read_numbered_cloze_task,
+                    Cloze: self._read_cloze_task,
+                }[exercise_type]
+            except KeyError:
+                return error_content(_("Unknown exercise type: %s", exercise_type))
+            tasks = []
+            try:
+                if src:
+                    assert 'template' not in kwargs
+                    if issubclass(exercise_type, Cloze):
+                        pieces = (src,)
+                    else:
+                        pieces = self._split(src)
+                    i = 0
+                    while i < len(pieces):
+                        t = pieces[i]
+                        if i + 1 < len(pieces) and pieces[i + 1].startswith('.. '):
+                            comment = pieces[i + 1][3:]
+                            i += 2
+                        else:
+                            comment = None
+                            i += 1
+                        tasks.append(read_task(t, comment))
+                elif 'template' in kwargs:
+                    def maketask(match):
+                        tasks.append(read_task(match.group(1), None))
+                        return "%s"
+                    m = self._TEMPLATE_TASK_MATCHER
+                    kwargs['template'] = m.sub(maketask, kwargs['template'].replace('%', '%%'))
+            except self.ExerciseParserError as e:
+                raise self.ExerciseParserError(e.message(), task_number=len(tasks)+1)
+        except self.ExerciseParserError as e:
+            if e.task_number() is not None:
+                message = _("Error in task %d: %s", e.task_number(), e.message())
             else:
-                pieces = self._split(src)
-            i = 0
-            while i < len(pieces):
-                t = pieces[i]
-                if i + 1 < len(pieces) and pieces[i + 1].startswith('.. '):
-                    comment = pieces[i + 1][3:]
-                    i += 2
-                else:
-                    comment = None
-                    i += 1
-                tasks.append(self._read_task(exercise_type, t, comment))
-        elif 'template' in kwargs:
-            def maketask(match):
-                tasks.append(self._read_task(exercise_type, match.group(1), None))
-                return "%s"
-            m = self._TEMPLATE_TASK_MATCHER
-            kwargs['template'] = m.sub(maketask, kwargs['template'].replace('%', '%%'))
+                message = _("Error: %s", e.message())
+            return lcg.Container((lcg.p(message, name='error-message'),
+                                  lcg.PreformattedText(src)),                                  
+                                 name='exercise-specification-error')
         return exercise_type(tasks, **kwargs)
 
 
@@ -416,7 +449,7 @@ class Exercise(lcg.Content):
 
     def _check_task(self, task):
         assert isinstance(task, self._TASK_TYPE), \
-            "Not a sequence of '%s' instances!: %r" % (self._TASK_TYPE.__name__, tasks)
+            "Not a %s instance: %r" % (self._TASK_TYPE.__name__, task)
         
     def instructions(self):
         return self._instructions
@@ -635,11 +668,9 @@ class _SingleTextBoxFillInExercise(FillInExercise):
         return answers
         
     def _check_task(self, task):
-        answers = self._task_answers(task)
-        assert len(answers) == 1, \
-            "%s requires just one textbox per task (%d found): %s" % \
-            (self.__class__.__name__, len(answers), task.text())
-    
+        super(_SingleTextBoxFillInExercise, self)._check_task(task)
+        assert len(self._task_answers(task)) == 1
+            
 
 class VocabExercise(_SingleTextBoxFillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
