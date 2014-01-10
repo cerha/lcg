@@ -22,7 +22,8 @@ import re
 import lcg
 from lcg import concat
 
-_ = lcg.TranslatableTextFactory('lcg')
+_ = lcg.TranslatableTextFactory('lcg-exercises')
+
 class ExerciseExporter(object):
     _JAVASCRIPT_CLASS = 'lcg.Exercise'
     _RESPONSES = (

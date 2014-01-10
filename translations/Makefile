@@ -5,11 +5,11 @@ all: $(mo_files)
 
 include $(domains:%=%.d)
 
-lcg.pot: $(shell find ../lib -name "*.py" -not -name "_test.py*" -not -name "exercises.py*")
+lcg.pot: $(shell find ../lib -name "*.py" -not -name "_test.py*" -not -name "exercises*.py*")
 
 test.pot: ../lib/lcg/_test.py
 
-lcg-exercises.pot: ../lib/lcg/exercises.py
+lcg-exercises.pot: ../lib/lcg/exercises.py ../lib/lcg/export/exercises_html.py
 
 %.d: $(shell find ../lib -name "*.py")
 	@echo "Updating rules for domain $*."
