@@ -234,9 +234,9 @@ class ExerciseParser(object):
         choices = map(choice, lines)
         correct_choices = [ch for ch in choices if ch.correct()]
         if len(correct_choices) == 0:
-            self._error(_("None of the choices is correct."))
+            self._error(_("None of the choices is marked as correct."))
         if len(correct_choices) != 1:
-            self._error(_("More than one choice is correct."))
+            self._error(_("More than one choice is marked as correct."))
         return choices
 
     def _read_numbered_cloze_task(self, text, comment):
