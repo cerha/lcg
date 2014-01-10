@@ -329,15 +329,19 @@ class _FillInExerciseExporter(ExerciseExporter):
                            "complete answer.")))),)
     
     def _export_task_text(self, context, exercise, exercise_id, task):
-        def make_field(match):
-            return self._make_field(context, exercise, exercise_id, task, match.group(1))
+        def make_field(answer, label, word_start, word_end):
+            field = self._make_field(context, exercise, exercise_id, task, answer)
+            if word_start or word_end:
+                return context.generator().span(word_start + field + word_end, cls='nowrap')
+            else:
+                return field
         text = task.text().replace('[', '\[')
         if text:
             content = lcg.Parser().parse_inline_markup(text)
             html = context.localize(content.export(context))
         else:
             html = ''
-        return exercise.FIELD_MATCHER.sub(make_field, html)
+        return task.substitute_fields(html, make_field)
 
     def _field_value(self, context, field_id):
         return ''
@@ -374,7 +378,7 @@ class _FillInExerciseExporter(ExerciseExporter):
             prompt = context.localize(task.prompt().export(context))
         else:
             prompt = None
-        if exercise.FIELD_MATCHER.search(task.text()) is not None:
+        if task.has_fields_in_text():
             text = self._export_task_text(context, exercise, exercise_id, task)
             # When the inputfield is embeded within the text, it is confusing to
             # have the prompt marked as a label.  Morover some screeen-readers

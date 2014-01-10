@@ -81,22 +81,80 @@ class Task(object):
 class TextTask(Task):
     """Tasks, where the answer is a piece of text.
 
-    The answer is typically filled into a text box.  Some exercise types may
-    further process the task text.  For example only a part of the text may be
-    the answer to be filled in a text box or one task may even include several
-    such text boxes (Cloze).
+    The answer is typically filled into a text box.  The task may either
+    contain explicit text boxes marked by square brackets (the brackets contain
+    the correct answer for the text box) or if the text doesn't contain such
+    boxes, the whole text is the answer.
 
     See TODO in ContentTask docstring for possible future changes.
 
     """
+    _FIELD_MATCHER = re.compile(r"([\w\d.,;?!/%$@=*+-]*)"
+                               r"\[([^\]]*?)(?:\<([\w\d]+)\>)?\]"
+                               r"([\w\d.,;?!/%$@=*+-]*)",
+                               flags=re.UNICODE)
+    _NEWLINE_MATCHER = re.compile(r"\r?\n")
 
     def __init__(self, prompt, text, **kwargs):
         super(TextTask, self).__init__(prompt, **kwargs)
         assert isinstance(text, basestring)
-        self._text = text.replace('\n', ' ').replace('\r', '')
+        self._text = self._NEWLINE_MATCHER.sub(' ', text)
 
     def text(self):
+        """Return the task answer text as is."""
         return self._text
+
+    def answers(self):
+        """Return all answers from all fields found within the task text.
+        
+        Returns the whole task text if it doesn't contain explicitly marked
+        text fields (the wole text is the answer in this case).
+
+        """
+        answers = [answer for word_start, answer, label, word_end
+                   in self._FIELD_MATCHER.findall(self._text)]
+        if not answers:
+            # The whole text is the answer when there is no explicit text box.
+            answers = (self._text,)
+        return answers
+
+    def has_fields_in_text(self):
+        """Return true iff the task text contains explicitly marked text boxes."""
+        return self._FIELD_MATCHER.search(self._text) is not None
+
+    def substitute_fields(self, text, make_field):
+        """Substitute text boxes within task text.
+
+        Arguments:
+  
+          text - the text to be substituted containing textbox markup (answers
+            in square brackets).  This is usually the task text as returned by
+            'text()', but various export formats may require various
+            preprocessing, so the text si passed as argument.
+
+          make_field -- function of four arguments: 'answer', 'label',
+            'word_start' and 'word_end', where 'answer' is the correct answer
+            for the field (text inside the square brackets without label),
+            'label' is the field label if the markup contains it (after a colon
+            inside the square brackets) 'word_start' is any text immediately
+            preceeding the field and 'word_end' is any text immediately
+            following the field.  They are not empty if the field adjoins text
+            without interleaving whitespace.  They are processed together with
+            the field because it might be appropriate in certain output formats
+            to mark these parts together (for example to avoid word wrapping on
+            field boundary).  They are empty strings if the field doesn't
+            adjoin text immediately.  The function must return the field
+            representation for given output format as a string to be
+            substituted within 'text'.
+
+        Returns the 'text' with all fields replaced by the results returned by
+        'make_field()'.
+
+        """
+        def subst(match):
+            word_start, answer, label, word_end = match.groups()
+            return make_field(answer, label, word_start, word_end)
+        return self._FIELD_MATCHER.sub(subst, text)
 
 
 class ContentTask(Task):
@@ -213,12 +271,12 @@ class ExerciseParser(object):
 
     def _parse_text(self, text):
         return self._parser.parse_inline_markup(text.strip())
-
-    def _check_single_text_box(self, text):
-        fields = FillInExercise.FIELD_MATCHER.findall(text)
-        if len(fields) > 1:
-            # No textbox is ok, the whole text is the answer in this case.
-            self._error(_("Just one textbox per task allowed, but %d found.", len(fields)))
+    
+    def _single_text_box_task(self, prompt, text, **kwargs):
+        task = TextTask(prompt, text.strip(), **kwargs)
+        if len(task.answers()) != 1:
+            self._error(_("Just one textbox per task allowed, but %d found.", len(task.answers())))
+        return task
 
     def _split(self, text):
         return [piece.strip() for piece in self._BLANK_LINE_SPLITTER.split(text)]
@@ -240,8 +298,7 @@ class ExerciseParser(object):
         return choices
 
     def _read_numbered_cloze_task(self, text, comment):
-        self._check_single_text_box(text)
-        return TextTask(None, text, comment=comment)
+        return self._single_text_box_task(None, text, comment=comment)
 
     def _read_cloze_task(self, text, comment):
         # Cloze comments unsupported for now.
@@ -294,13 +351,11 @@ class ExerciseParser(object):
 
     def _read_written_answers_task(self, text, comment):
         prompt, answer = self._split_pair_of_statements(text)
-        self._check_single_text_box(answer)
-        return TextTask(self._parse_text(prompt), answer.strip(), comment=comment)
+        return self._single_text_box_task(self._parse_text(prompt), answer, comment=comment)
 
     def _read_vocab_exercise_task(self, text, comment):
         prompt, answer = text.split(':', 1)
-        self._check_single_text_box(answer)
-        return TextTask(self._parse_text(prompt), answer.strip(), comment=comment)
+        return self._single_text_box_task(self._parse_text(prompt), answer, comment=comment)
 
     def _read_hidden_answers_task(self, text, comment):
         prompt, answer = self._split_pair_of_statements(text)
@@ -310,6 +365,8 @@ class ExerciseParser(object):
         text = text.strip()
         correct = text.endswith('[T]')
         if not correct and not text.endswith('[F]'):
+            # Translators: Error message. Don't translate [T] and [F].
+            # They mean True and False but don't change with localization.
             self._error(_("A true/false statement must end with '[T]' or '[F]'."))
         text = ' '.join([line.strip() for line in text.splitlines()])[:-3].strip()
         return TrueFalseTask(self._parse_text(text), correct=correct, comment=comment)
@@ -644,32 +701,20 @@ class FillInExercise(Exercise):
         _("Use the control panel at the bottom of the exercise to evaluate all the "
           "answers at once."),
     )
-    FIELD_MATCHER = re.compile(r"\[([^\]]*?)(?:\<(?P<label>[\w\d]+)\>)?\]")
-
-    def _task_answers(self, task):
-        return [answer.replace('\n', ' ').replace('\r', '')
-                for answer, label in self.FIELD_MATCHER.findall(task.text())]
 
     def answers(self):
         answers = []
         for task in self._tasks:
-            answers.extend(self._task_answers(task))
+            answers.extend(task.answers())
         return tuple(answers)
 
 
 class _SingleTextBoxFillInExercise(FillInExercise):
     """Fill In Exercise with one text box per task."""
 
-    def _task_answers(self, task):
-        answers = super(_SingleTextBoxFillInExercise, self)._task_answers(task)
-        if not answers:
-            # The whole text is the answer when there is no explicit text box.
-            answers = (task.text(),)
-        return answers
-        
     def _check_task(self, task):
         super(_SingleTextBoxFillInExercise, self)._check_task(task)
-        assert len(self._task_answers(task)) == 1
+        assert len(task.answers()) == 1
             
 
 class VocabExercise(_SingleTextBoxFillInExercise):

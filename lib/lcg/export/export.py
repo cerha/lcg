@@ -1061,10 +1061,9 @@ class Exporter(object):
         def format_task_text(context, task, field_maker):
             text = task.text()
             if text:
-                text = text.replace('[', '\[')
-                def make_field(match):
-                    return field_maker(context, task, match.group(1))
-                text = element.FIELD_MATCHER.sub(make_field, text)
+                def make_field(answer, label, word_start, word_end):
+                    return word_start + field_maker(context, task, answer) + word_end
+                text = task.substitute_fields(text.replace('[', '\['), make_field)
                 content = lcg.Parser().parse_inline_markup(text)
                 text = context.localize(content.export(context))
             else:
@@ -1080,7 +1079,7 @@ class Exporter(object):
             if isinstance(element, WritingTest):
                 return (None if show_answers else self.text(context, fill_in_area),)
             elif isinstance(element, FillInExercise):
-                if element.FIELD_MATCHER.search(task.text()) is not None:
+                if task.has_fields_in_text():
                     text = format_task_text(context, task,
                                             lambda *args: make_field(show_answers, *args))
                 else:
