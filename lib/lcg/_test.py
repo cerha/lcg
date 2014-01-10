@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,13 +19,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import unittest, os, re, string, sys, datetime
+import datetime
+import os
+import re
+import string
+import sys
+import unittest
+
 import lcg
 
 _ = lcg.TranslatableTextFactory('test')
 
 class TestSuite(unittest.TestSuite):
-    def add(self, cls, prefix = 'test_'):
+    def add(self, cls, prefix='test_'):
         tests = [cls(attr) for attr in dir(cls) if attr.startswith(prefix)]
         self.addTests(tests)
 
@@ -42,7 +48,7 @@ class TranslatableText(unittest.TestCase):
         b = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.",
                                  person1="Joe", person2="Bob")
         c0 = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.")
-        c = c0.interpolate(lambda key: '-'+key+'-')
+        c = c0.interpolate(lambda key: '-' + key + '-')
         a1 = a.localize(lcg.Localizer())
         b1 = b.localize(lcg.Localizer())
         c1 = c.localize(lcg.Localizer())
@@ -99,18 +105,18 @@ class TranslatableText(unittest.TestCase):
         cx = c.localize(lcg.Localizer())
         dx = d.localize(lcg.Localizer())
         assert str(a) == ax == 'Version xox-yoy', (a, ax)
-        assert str(b) == bx == 'Versi-n x-x',     (b, bx)
+        assert str(b) == bx == 'Versi-n x-x', (b, bx)
         assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
         assert str(d) == dx == 'versi-n x-x-y-y', (d, dx)
 
     def test_transform(self):
         from xml.sax import saxutils
         a = _('His name is "%s"', _("Bob"))
-        b = _("Bob") +' + '+ _("Joe")
+        b = _("Bob") + ' + ' + _("Joe")
         c = a.transform(saxutils.quoteattr)
         d = b.transform(saxutils.quoteattr)
         e = "attr=" + d # Test transformed Concatenation nesting!
-        f = lcg.concat('<tag '+ e +'>')
+        f = lcg.concat('<tag ' + e + '>')
         assert isinstance(c, lcg.TranslatableText), c
         assert isinstance(d, lcg.Concatenation), d
         loc = lcg.Localizer('cs', translation_path=translation_path)
@@ -193,7 +199,7 @@ class SelfTranslatableText(unittest.TestCase):
         translations = {'cs': u"%(person1)s je chytřejší než %(person2)s."}
         a = lcg.SelfTranslatableText(text, person1="Joe", person2="Ann", translations=translations)
         a2 = lcg.SelfTranslatableText(text, translations=translations)
-        a3 = a2.interpolate(lambda key: '-'+key+'-')
+        a3 = a2.interpolate(lambda key: '-' + key + '-')
         b = a.localize(lcg.Localizer())
         c = a.localize(lcg.Localizer('cs', translation_path=translation_path))
         assert b == "Joe is smarter than Ann.", b
@@ -213,15 +219,14 @@ class LocalizableDateTime(unittest.TestCase):
             return datetime.timedelta(minutes=self._offset)
         def tzname(self, dt):
             offset = self._offset
-            sign = offset/abs(offset)
+            sign = offset / abs(offset)
             div, mod = divmod(abs(offset), 60)
             if mod:
-                return "GMT %+d:%d" % (div*sign, mod)
+                return "GMT %+d:%d" % (div * sign, mod)
             else:
-                return "GMT %+d" % div*sign
+                return "GMT %+d" % div * sign
         def dst(self, dt):
             return datetime.timedelta(0)
-
     
     def test_localize(self):
         d1 = lcg.LocalizableDateTime("2006-12-21")
@@ -360,7 +365,7 @@ class ContentNode(unittest.TestCase):
     
     def test_misc(self):
         b = lcg.ContentNode('b', content=lcg.TextContent("B"))
-    	a = lcg.ContentNode('a', content=lcg.TextContent("A"), children=(b,))
+        a = lcg.ContentNode('a', content=lcg.TextContent("A"), children=(b,))
         assert a.id() == 'a'
         assert a.root() == b.root() == a
 
@@ -390,8 +395,8 @@ class Resources(unittest.TestCase):
     def test_dependencies(self):
         p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),
                                             lcg.Audio('sound2.ogg')))
-    	a = lcg.ContentNode('a', content=lcg.Content(), resource_provider=p)
-    	b = lcg.ContentNode('b', content=lcg.Content(), resource_provider=p)
+        a = lcg.ContentNode('a', content=lcg.Content(), resource_provider=p)
+        b = lcg.ContentNode('b', content=lcg.Content(), resource_provider=p)
         a.resource('default.css')
         b.resource('media.js')
         ar = [r.filename() for r in a.resources()]
@@ -399,7 +404,7 @@ class Resources(unittest.TestCase):
         assert 'default.css' in ar and 'sound1.ogg' in ar and 'sound2.ogg' in ar, ar
         br = [r.filename() for r in b.resources()]
         assert len(br) == 3, br
-        assert 'media.js' in br and 'sound1.ogg' in br and 'sound2.ogg' in br , br
+        assert 'media.js' in br and 'sound1.ogg' in br and 'sound2.ogg' in br, br
 
 tests.add(Resources)
 
@@ -412,8 +417,8 @@ class Parser(unittest.TestCase):
     def test_simple_text(self):
         text = "Hallo, how are you?\n\n  * one\n  * two\n  * three\n"
         c = self._parser.parse(text)
-        assert len(c) == 2 and isinstance(c[0], lcg.Paragraph) and \
-               isinstance(c[1], lcg.ItemizedList), c
+        assert (len(c) == 2 and isinstance(c[0], lcg.Paragraph) and
+                isinstance(c[1], lcg.ItemizedList)), c
         assert len(c[1].content()) == 3, c[1].content()
         assert c[1].order() is None, c[1].order()
 
@@ -423,8 +428,8 @@ class Parser(unittest.TestCase):
         assert len(c) == 1 and isinstance(c[0], lcg.Section), c
         s = c[0].sections(None)
         assert len(s) == 3 and isinstance(s[0], lcg.Section) and \
-               len(s[0].sections(None)) == 0 and len(s[1].sections(None)) == 1 and \
-               len(s[2].sections(None)) == 0, s
+            len(s[0].sections(None)) == 0 and len(s[1].sections(None)) == 1 and \
+            len(s[2].sections(None)) == 0, s
 
     def test_parameters(self):
         text = '''
@@ -440,9 +445,11 @@ class Parser(unittest.TestCase):
         assert 'page_footer' in parameters, parameters
         assert 'first_page_header' not in parameters, parameters
         header = parameters['page_header']
-        assert header.content()[0].content()[0].content()[0].text() == 'hello', header.content()[0].content()[0].content()[0].text()
+        assert header.content()[0].content()[0].content()[0].text() == 'hello', \
+            header.content()[0].content()[0].content()[0].text()
         footer = parameters['page_footer']
-        assert footer.content()[0].halign() == lcg.HorizontalAlignment.CENTER, footer.content()[0].content().halign()
+        assert footer.content()[0].halign() == lcg.HorizontalAlignment.CENTER, \
+            footer.content()[0].content().halign()
 
     def test_hrule(self):
         text = '''
@@ -470,9 +477,9 @@ blah blah
 ''' % (alignment,)
             c = self._parser.parse(text)
             assert len(c) == 3, c
-            assert c[0].halign() == None, c[0].content()[0].content()[0].halign()
+            assert c[0].halign() is None, c[0].content()[0].content()[0].halign()
             assert c[1].halign() == constant, c[0].content()[0].content()[0].halign()
-            assert c[2].halign() == None, c[0].content()[0].content()[0].halign()
+            assert c[2].halign() is None, c[0].content()[0].content()[0].halign()
 
     def test_table(self):
         text = '''
@@ -492,7 +499,7 @@ blah blah
 '''
         c = self._parser.parse(text)
         assert len(c) == 3, c
-        assert all([isinstance (x, lcg.Table) for x in c]), c
+        assert all([isinstance(x, lcg.Table) for x in c]), c
         for i in range(3):
             rows = c[i].content()
             assert len(rows) == 2, rows
@@ -565,7 +572,7 @@ class MacroParser(unittest.TestCase):
 
     def test_condition(self):
         def check(contidion, expected_result, **globals):
-            text = ("@if "+ contidion +"\nTrue\n@else\nFalse\n@endif")
+            text = ("@if " + contidion + "\nTrue\n@else\nFalse\n@endif")
             parser = lcg.MacroParser(globals=globals)
             result = parser.parse(text).strip() == 'True'
             assert result == expected_result, (contidion, globals, result)
@@ -590,7 +597,7 @@ class MacroParser(unittest.TestCase):
 
     def test_nested_condition(self):
         def join(*lines):
-            return "".join([line+"\n" for line in lines])
+            return "".join([line + "\n" for line in lines])
         text = join("A",
                     "@if b",
                     "B",
@@ -726,7 +733,7 @@ A screen reader is:
         content = lcg.html2lcg(html)
         p = lcg.ResourceProvider()
         sec = lcg.Section("Section One", anchor='sec1', content=lcg.Content())
-    	n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+        n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
         content.export(context)
@@ -750,7 +757,7 @@ class HtmlExport(unittest.TestCase):
             assert result == html, "\n  - expected: %r\n  - got:      %r" % (html, result)
             
     def test_export(self):
-    	n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
+        n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
                             globals=dict(x='value of x'))
         context = lcg.HtmlExporter().context(n, None, sec_lang='es')
         for content, html in (
@@ -765,7 +772,8 @@ class HtmlExport(unittest.TestCase):
             (lcg.Quotation(lcg.p("blah")),
              u'<blockquote class="lcg-quotation"><p>blah</p></blockquote>'),
             (lcg.Quotation(lcg.TextContent("blah"), source='Hugo', uri='http://hugo.org'),
-             u'<blockquote class="lcg-quotation">blah<footer>— <a href="http://hugo.org">Hugo</a></footer></blockquote>'),
+             (u'<blockquote class="lcg-quotation">blah<footer>— '
+              u'<a href="http://hugo.org">Hugo</a></footer></blockquote>')),
             (lcg.NewPage(),
              '<hr class="new-page"/>'),
             (lcg.Substitution('x'),
@@ -774,7 +782,7 @@ class HtmlExport(unittest.TestCase):
              '<sub>sub</sub><sup>sup</sup>'),
             (lcg.p('Kotva: ', lcg.Anchor('x', text='zde'), halign=lcg.HorizontalAlignment.RIGHT),
              '<p style="text-align: right;">Kotva: <a name="x">zde</a></p>'),
-            ):
+        ):
             result = lcg.coerce(content).export(context)
             assert result == html, "\n  - content:  %r\n  - expected: %r\n  - got:      %r" % \
                 (content, html, result)
@@ -789,14 +797,14 @@ class HtmlExport(unittest.TestCase):
             assert ok, ("\n  - source text: %r"
                         "\n  - expected:    %r"
                         "\n  - got:         %r" % (text, expected_result, result))
-        resources=(lcg.Resource('text.txt', uri='/resources/texts/text.txt'),
-                   lcg.Audio('xx.mp3'),
-                   lcg.Image('aa.jpg'),
-                   lcg.Image('bb.jpg'),
-                   lcg.Image('cc.png', title="Image C", descr="Nice picture"))
+        resources = (lcg.Resource('text.txt', uri='/resources/texts/text.txt'),
+                     lcg.Audio('xx.mp3'),
+                     lcg.Image('aa.jpg'),
+                     lcg.Image('bb.jpg'),
+                     lcg.Image('cc.png', title="Image C", descr="Nice picture"))
         p = lcg.ResourceProvider(resources=resources)
         sec = lcg.Section("Section One", anchor='sec1', content=lcg.Content())
-    	n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+        n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
         for text, html in (
@@ -828,9 +836,16 @@ class HtmlExport(unittest.TestCase):
              '<a href="http://www.freebsoft.org" title="descr">label</a>'),
             # Video service links
             ('http://www.youtube.com/watch?v=xyz123',
-             u'<object type="application/x-shockwave-flash" title="Flash movie object" data="http://www.youtube.com/v/xyz123?rel=0" width="500" height="300"><param name="movie" value="http://www.youtube.com/v/xyz123?rel=0"/><param name="wmode" value="opaque"/></object>'),
+             (u'<object type="application/x-shockwave-flash" title="Flash movie object" '
+              u'data="http://www.youtube.com/v/xyz123?rel=0" width="500" height="300">'
+              u'<param name="movie" value="http://www.youtube.com/v/xyz123?rel=0"/>'
+              u'<param name="wmode" value="opaque"/></object>')),
             ('http://www.vimeo.com/xyz123',
-             u'<object type="application/x-shockwave-flash" title="Flash movie object" data="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com" width="500" height="300"><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com"/><param name="wmode" value="opaque"/></object>'),
+             (u'<object type="application/x-shockwave-flash" title="Flash movie object" '
+              u'data="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com" '
+              u'width="500" height="300">'
+              u'<param name="movie" value="http://vimeo.com/moogaloop.swf?'
+              u'clip_id=&amp;server=vimeo.com"/><param name="wmode" value="opaque"/></object>')),
             # Inline images
             ('[aa.jpg]',
              '<img src="images/aa.jpg" alt="" class="lcg-image image-aa"/>'),
@@ -839,40 +854,58 @@ class HtmlExport(unittest.TestCase):
             ('[aa.jpg label]',
              '<img src="images/aa.jpg" alt="label" class="lcg-image image-aa"/>'),
             ('[aa.jpg:20x30 label]',
-             '<img src="images/aa.jpg" height="30" width="20" alt="label" class="lcg-image image-aa"/>'),
+             ('<img src="images/aa.jpg" height="30" width="20" alt="label" '
+              'class="lcg-image image-aa"/>')),
             ('[>aa.jpg]',
-             '<img src="images/aa.jpg" align="right" alt="" class="lcg-image right-aligned image-aa"/>'),
+             ('<img src="images/aa.jpg" align="right" alt="" '
+              'class="lcg-image right-aligned image-aa"/>')),
             ('[<aa.jpg]',
-             '<img src="images/aa.jpg" align="left" alt="" class="lcg-image left-aligned image-aa"/>'),
+             ('<img src="images/aa.jpg" align="left" alt="" '
+              'class="lcg-image left-aligned image-aa"/>')),
             ('[aa.jpg label | descr]',
              '<img src="images/aa.jpg" alt="label: descr" class="lcg-image image-aa"/>'),
             ('[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
-             '<img src="http://www.freebsoft.org/img/logo.gif" alt="Free(b)soft logo" class="lcg-image image-logo"/>'),
+             ('<img src="http://www.freebsoft.org/img/logo.gif" alt="Free(b)soft logo" '
+              'class="lcg-image image-logo"/>')),
             ('[cc.png]',
              '<img src="images/cc.png" alt="Image C: Nice picture" class="lcg-image image-cc"/>'),
             # Image links (links with an image instead of a label)
             ('[aa.jpg bb.jpg label | descr]',
-             '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" alt="label" class="lcg-image image-bb"/></a>'),
+             ('<a href="images/aa.jpg" title="descr">'
+              '<img src="images/bb.jpg" alt="label" class="lcg-image image-bb"/></a>')),
             ('[aa.jpg bb.jpg | descr]',
-             '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" alt="" class="lcg-image image-bb"/></a>'),
+             ('<a href="images/aa.jpg" title="descr">'
+              '<img src="images/bb.jpg" alt="" class="lcg-image image-bb"/></a>')),
             ('[>aa.jpg bb.jpg label | descr]',
-             '<a href="images/aa.jpg" title="descr"><img src="images/bb.jpg" align="right" alt="label" class="lcg-image right-aligned image-bb"/></a>'),
+             ('<a href="images/aa.jpg" title="descr">'
+              '<img src="images/bb.jpg" align="right" alt="label" '
+              'class="lcg-image right-aligned image-bb"/></a>')),
             ('[test bb.jpg bb]',
-             '<a href="test" title="Some description"><img src="images/bb.jpg" alt="bb" class="lcg-image image-bb"/></a>'),
+             ('<a href="test" title="Some description">'
+              '<img src="images/bb.jpg" alt="bb" class="lcg-image image-bb"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif]',
-             '<a href="http://www.freebsoft.org"><img src="/img/logo.gif" alt="" class="lcg-image image-logo"/></a>'),
+             ('<a href="http://www.freebsoft.org">'
+              '<img src="/img/logo.gif" alt="" class="lcg-image image-logo"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website]',
-             '<a href="http://www.freebsoft.org"><img src="/img/logo.gif" alt="Free(b)soft website" class="lcg-image image-logo"/></a>'),
-            ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website | Go to Free(b)soft website]',
-             '<a href="http://www.freebsoft.org" title="Go to Free(b)soft website"><img src="/img/logo.gif" alt="Free(b)soft website" class="lcg-image image-logo"/></a>'),
+             ('<a href="http://www.freebsoft.org">'
+              '<img src="/img/logo.gif" alt="Free(b)soft website" '
+              'class="lcg-image image-logo"/></a>')),
+            (('[http://www.freebsoft.org /img/logo.gif Free(b)soft website | '
+              'Go to Free(b)soft website]'),
+             ('<a href="http://www.freebsoft.org" title="Go to Free(b)soft website">'
+              '<img src="/img/logo.gif" alt="Free(b)soft website" '
+              'class="lcg-image image-logo"/></a>')),
             # Absolute image links
             ('http://www.freebsoft.org/img/logo.gif',
-             '<img src="http://www.freebsoft.org/img/logo.gif" alt="" class="lcg-image image-logo"/>'),
+             ('<img src="http://www.freebsoft.org/img/logo.gif" alt="" '
+              'class="lcg-image image-logo"/>')),
             # Audio player links
             ('[xx.mp3]',
-             re.compile(r'<a href="media/xx.mp3" id="[a-z0-9-]+" class="media-control-link">xx.mp3</a>')),
+             re.compile(r'<a href="media/xx.mp3" id="[a-z0-9-]+" '
+                        r'class="media-control-link">xx.mp3</a>')),
             ('[/somewhere/some.mp3]',
-             re.compile(r'<a href="/somewhere/some.mp3" id="[a-z0-9-]+" class="media-control-link">/somewhere/some.mp3</a>')),
+             re.compile(r'<a href="/somewhere/some.mp3" id="[a-z0-9-]+" '
+                        r'class="media-control-link">/somewhere/some.mp3</a>')),
             # Internal Reference Links
             ('[text.txt]',
              '<a href="/resources/texts/text.txt">text.txt</a>'),
@@ -885,7 +918,7 @@ class HtmlExport(unittest.TestCase):
             # HTML special
             (r'<bla>',
              r'&lt;bla&gt;'),
-            ):
+        ):
             content = lcg.Parser().parse_inline_markup(text)
             parsed_result = content.export(context)
             check(parsed_result, html)
@@ -910,8 +943,8 @@ class BrailleExport(unittest.TestCase):
         n_lines = page_height.size() - len(braille.split('\n'))
         braille = braille + '\n' * n_lines + footer + '\f'
         assert result == braille, \
-               ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
-                (text, braille, result,))
+            ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+             (text, braille, result,))
 
     def test_formatting(self):
         presentation = self._load_presentation()
@@ -923,8 +956,8 @@ class BrailleExport(unittest.TestCase):
             (u'_podtržený_', u'⠸⠏⠕⠙⠞⠗⠮⠑⠝⠯',),
             (u'_hodně podtržený_', u'⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
             (u'zkouška českého dělení slov', u'⠵⠅⠕⠥⠱⠅⠁⠀⠩⠑⠎⠅⠜⠓⠕⠀⠙⠣⠤\n⠇⠑⠝⠌⠀⠎⠇⠕⠧',),
-            ):
-            result = self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs')
+        ):
+            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs')
         for text, braille in (
             (u'abc', u'⠁⠃⠉',),
             #(u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',), # buggy in current liblouis!
@@ -932,16 +965,18 @@ class BrailleExport(unittest.TestCase):
             (u'*bold*', u'⠸⠃⠕⠇⠙',),
             (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
             (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),
-            ):
-            result = self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'en')
+        ):
+            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'en')
 
     def test_languages(self):
         presentation = self._load_presentation()
-        self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs', 'en')
+        self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑',
+                   presentation, 'cs', 'en')
 
     def test_special_formatting(self):
         presentation = self._load_presentation()
-        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs')
+        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑',
+                   presentation, 'cs')
     
     def test_mathml(self):
         import louis
@@ -967,12 +1002,14 @@ class BrailleExport(unittest.TestCase):
             content = lcg.MathML(mathml)
             presentation = self._load_presentation()
             presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
-            n = lcg.ContentNode('test', title='Test Node', descr="Some description", content=content)
+            n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+                                content=content)
             exporter = lcg.BrailleExporter()
             context = exporter.context(n, lang='cs', presentation=presentation_set)
             exported = exporter.export(context)
             result = exported.split('\n\n')[1]
-            assert result == expected_result, ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+            assert result == expected_result, (("\n  - source text: %r\n  - expected:    %r\n  - "
+                                                "got:         %r") %
                                                (mathml, expected_result, result,))
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,14</mn></mrow>
@@ -993,7 +1030,7 @@ class BrailleExport(unittest.TestCase):
     <mrow><mfrac><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mrow><mn>5</mn></mrow></mfrac></mrow>
   </mfrac>
 </mrow>
-</math>''',u'''⠆⠆⠼⠁⠻⠼⠃⠰⠻⠻⠆⠼⠉⠀⠲⠼⠙⠻
+</math>''', u'''⠆⠆⠼⠁⠻⠼⠃⠰⠻⠻⠆⠼⠉⠀⠲⠼⠙⠻
 ⠻⠼⠑⠰⠰''')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>12</mn><mi>a</mi></mrow>
