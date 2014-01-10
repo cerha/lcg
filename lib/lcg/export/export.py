@@ -933,6 +933,7 @@ class Exporter(object):
         n = 0
         for row in exported_rows:
             if isinstance(row, list):
+                item_list.append(self._newline(context, number=0, page_start=2))
                 n += 1
                 last_row = row
                 if n_cells > 0:
