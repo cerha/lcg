@@ -136,3 +136,6 @@ a.exercise-help-link{
     margin: 0;
     border: solid #faa 1px;
 }
+.nowrap {
+    white-space: nowrap;
+}
