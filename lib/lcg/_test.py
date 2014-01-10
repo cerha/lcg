@@ -957,7 +957,8 @@ class BrailleExport(unittest.TestCase):
             (u'_hodně podtržený_', u'⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
             (u'zkouška českého dělení slov', u'⠵⠅⠕⠥⠱⠅⠁⠀⠩⠑⠎⠅⠜⠓⠕⠀⠙⠣⠤\n⠇⠑⠝⠌⠀⠎⠇⠕⠧',),
         ):
-            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'cs')
+            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
+                       presentation, 'cs')
         for text, braille in (
             (u'abc', u'⠁⠃⠉',),
             #(u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',), # buggy in current liblouis!
@@ -966,16 +967,17 @@ class BrailleExport(unittest.TestCase):
             (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
             (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),
         ):
-            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑', presentation, 'en')
+            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
+                       presentation, 'en')
 
     def test_languages(self):
         presentation = self._load_presentation()
-        self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑',
-                   presentation, 'cs', 'en')
+        self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
+                   u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', 'en')
 
     def test_special_formatting(self):
         presentation = self._load_presentation()
-        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠼⠁⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑',
+        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
                    presentation, 'cs')
     
     def test_mathml(self):
