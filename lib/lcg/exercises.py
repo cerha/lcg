@@ -208,11 +208,11 @@ class ExerciseParser(object):
     def __init__(self):
         self._parser = lcg.Parser()
 
+    def _error(self, *args, **kwargs):
+        raise self.ExerciseParserError(*args, **kwargs)
+
     def _parse_text(self, text):
         return self._parser.parse_inline_markup(text.strip())
-
-    def _error(self, message):
-        raise self.ExerciseParserError(message)
 
     def _check_single_text_box(self, text):
         fields = FillInExercise.FIELD_MATCHER.findall(text)
@@ -334,7 +334,7 @@ class ExerciseParser(object):
                     Cloze: self._read_cloze_task,
                 }[exercise_type]
             except KeyError:
-                return error_content(_("Unknown exercise type: %s", exercise_type))
+                self._error(_("Unknown exercise type: %s", exercise_type))
             tasks = []
             try:
                 if src:
@@ -360,7 +360,7 @@ class ExerciseParser(object):
                     m = self._TEMPLATE_TASK_MATCHER
                     kwargs['template'] = m.sub(maketask, kwargs['template'].replace('%', '%%'))
             except self.ExerciseParserError as e:
-                raise self.ExerciseParserError(e.message(), task_number=len(tasks)+1)
+                self._error(e.message(), task_number=len(tasks) + 1)
         except self.ExerciseParserError as e:
             if e.task_number() is not None:
                 message = _("Error in task %d: %s", e.task_number(), e.message())
