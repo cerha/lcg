@@ -123,15 +123,16 @@ a.exercise-help-link{
 }
 
 .exercise-specification-error {
-    color: #a00;
+    color: #800;
     border: solid #faa 1px;
     background: #fcc;
     padding: 6px;
 }
 .exercise-specification-error .error-message {
-    padding: 0 1px 4px 1px;
+    padding: 0 1px 5px 1px;
     margin: 0;
 }
 .exercise-specification-error pre {
     margin: 0;
+    border: solid #faa 1px;
 }
