@@ -266,7 +266,8 @@ class ExerciseParser(object):
         #            except KeyError:
         #                return None
         #        comments = [_comment(cdict, label) for a, label in fields]
-        #        assert not cdict, "Unused comments (labels don't match any field label): %s" % cdict
+        #        assert not cdict,
+        #            "Unused comments (labels don't match any field label): %s" % cdict
         return TextTask(None, text)
 
     def _read_multiple_choice_task(self, text, comment):
@@ -367,7 +368,7 @@ class ExerciseParser(object):
             else:
                 message = _("Error: %s", e.message())
             return lcg.Container((lcg.p(message, name='error-message'),
-                                  lcg.PreformattedText(src)),                                  
+                                  lcg.PreformattedText(src)),
                                  name='exercise-specification-error')
         return exercise_type(tasks, **kwargs)
 
@@ -416,7 +417,6 @@ class Exercise(lcg.Content):
         self._template = template
 
     # Class methods
-
 
     @classmethod
     def name(cls):
@@ -658,7 +658,7 @@ class FillInExercise(Exercise):
 
 
 class _SingleTextBoxFillInExercise(FillInExercise):
-    """Fill In Exercise with one text box per task.""" 
+    """Fill In Exercise with one text box per task."""
 
     def _task_answers(self, task):
         answers = super(_SingleTextBoxFillInExercise, self)._task_answers(task)
@@ -803,8 +803,8 @@ class _Test(object):
         Other arguments are the same as in parent class.
 
         """
-        assert points is None or isinstance(points, int), points
-        self._points = kwargs.pop(points, self._POINTS)
+        self._points = points = kwargs.pop('points', self._POINTS)
+        assert isinstance(points, int), points
         super(_Test, self).__init__(*args, **kwargs)
 
     def _result_fields(self, context):
@@ -885,4 +885,3 @@ class ClozeTest(FillInTest, Cloze):
 
 class NumberedClozeTest(FillInTest, NumberedCloze):
     pass
-
