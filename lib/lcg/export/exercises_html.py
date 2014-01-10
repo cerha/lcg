@@ -478,36 +478,6 @@ class _TestExporter(object):
     def _readonly(self, context):
         return self._show_results(context)
 
-    def eval(self, req):
-        """Evaluate the answers of given request and return the number of points."""
-        points = 0
-        for i, correct_answer in enumerate(exercise.answers()):
-            name = '%s-a%d' % (self.anchor(), i + 1)
-            answer = self._param(req, name)
-            # Correct answer is a numer or string.
-            if answer == unicode(correct_answer):
-                points += self.points()
-            #elif not answer:
-            #    empty += self.points()
-        return points
- 
-    def added_points(self, req):
-        # TODO: _exercise_id() doesn't exist anymore. Another identification
-        # must be used if this is ever needed...
-        if req.has_param('--added-points'):
-            return req.param('--added-points').get(self._exercise_id(), 0)
-        elif req.has_param(self._exercise_id() + '-added-points'):
-            points = req.param(self._exercise_id() + '-added-points')
-            try:
-                return int(points)
-            except ValueError:
-                return None
-        else:
-            return 0
-    
-    def max_points(self):
-        return self.points() * len(exercise.answers())
-    
 
 class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
     
@@ -576,9 +546,3 @@ class WritingTestExporter(FillInTestExporter):
         
     def _field_result(self, context, name, text):
         return ''
-
-    def eval(self, req):
-        # Prevent returning full points on empty answer.
-        return 0
-    
-
