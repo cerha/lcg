@@ -196,10 +196,10 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
 
     _JAVASCRIPT_CLASS = 'lcg.ChoiceBasedExercise'
 
-    def _checked(self, context, task, i):
+    def _checked(self, context, exercise, exercise_id, task, i):
         return False
 
-    def _choice_text(self, context, task, choice):
+    def _choice_text(self, context, exercise, exercise_id, task, choice):
         return choice.answer()
 
     def _choice_control(self, context, exercise, exercise_id, task, choice):
@@ -207,7 +207,7 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
         i = task.choices().index(choice)
         task_name = self._task_id(exercise, exercise_id, task)
         choice_id = task_name + '-ch%d' % (i + 1)
-        checked = self._checked(context, task, i)
+        checked = self._checked(context, exercise, exercise_id, task, i)
         # Disable only the unchecked fields in the read-only mode.  This makes the selection
         # unchangable in practice and has also the advantage that the checked fields can be
         # navigated, which is even better than using the `readonly' attribute (which doesn't work
@@ -215,7 +215,7 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
         disabled = self._readonly(context) and not checked
         ctrl = g.radio(task_name, id=choice_id, value=i,
                        cls='answer-control', checked=checked, disabled=disabled)
-        text = self._choice_text(context, task, choice)
+        text = self._choice_text(context, exercise, exercise_id, task, choice)
         return concat(ctrl, ' ', g.label(text, choice_id))
 
     def _format_choices(self, context, exercise, exercise_id, task):
@@ -354,7 +354,7 @@ class _FillInExerciseExporter(ExerciseExporter):
         field_id = self._task_id(exercise, exercise_id, task) + '-f%d' % self._field_number
         return context.localize(concat(
             g.field(name=field_id, id=field_id, size=len(text),
-                    value=self._field_value(context, field_id), 
+                    value=self._field_value(context, field_id),
                     readonly=self._readonly(context),
                     cls=self._field_cls(context, field_id, text)),
             [self._media_control(context, m, inline=True) for m in task.media()],
@@ -481,12 +481,13 @@ class _TestExporter(object):
 
 class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
     
-    def _checked(self, context, task, i):
+    def _checked(self, context, exercise, exercise_id, task, i):
         task_name = self._task_id(exercise, exercise_id, task)
         return self._param(context.req(), task_name, False) == str(i)
 
-    def _choice_text(self, context, task, choice):
-        text = super(ChoiceBasedTest, self)._choice_text(context, task, choice)
+    def _choice_text(self, context, exercise, exercise_id, task, choice):
+        text = super(ChoiceBasedTestExporter, self)._choice_text(context, exercise, exercise_id,
+                                                                 task, choice)
         if self._show_results(context):
             result = None
             if choice.correct():
