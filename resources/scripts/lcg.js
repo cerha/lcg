@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2012, 2013 Brailcom, o.p.s.
+ * Copyright (C) 2012, 2013, 2014 Brailcom, o.p.s.
  * Author: Tomas Cerha
  *
  * This program is free software; you can redistribute it and/or modify
@@ -679,7 +679,7 @@ lcg.PopupMenuCtrl = Class.create({
     
     initialize: function (element_id, items, tooltip, selector) {
 	this.items = items
-	var link = new Element('a');
+	var link = new Element('a', {'aria-haspopup': 'true'});
         $(element_id).insert(link);
         link.observe('click', this.popup_menu.bind(this));
         if (tooltip)
