@@ -418,8 +418,13 @@ class BrailleExporter(FileExporter, Exporter):
                     context.advance_page_number()
                     page.reverse()
                 for page in pages:
-                    while len(page) > page_height:
+                    page_len = len(page)
+                    while page_len > page_height:
                         add_page(page)
+                        new_page_len = len(page)
+                        if new_page_len == page_len:
+                            raise Exception("Page breaking failed", page_height)
+                        page_len = new_page_len
                     # Final page (maybe it's empty)
                     removable_newlines = context.removable_newlines()
                     while page and removable_newlines > 0 and not page[-1]:
