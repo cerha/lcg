@@ -897,6 +897,11 @@ class Exporter(object):
     def _export_table(self, context, element):
         """Export given 'Table' element."""
         content = element.content()
+        heading_present = False
+        if content:
+            row_content = content[0].content()
+            if row_content and isinstance(row_content[0], TableHeading):
+                heading_present = True
         separator = HorizontalSeparator()
         exported_rows = []
         for row in content:
@@ -951,7 +956,7 @@ class Exporter(object):
             elif row is separator:
                 row_number = -1 if n == n_real_rows else n
                 s = self._table_row_separator(context, total_width, widths, row_number,
-                                              vertical_separator, last_row)
+                                              vertical_separator, last_row, heading_present)
                 if s is not None:
                     item_list.append(s)
             else:
@@ -979,7 +984,8 @@ class Exporter(object):
         else:
             return u' │ '
 
-    def _table_row_separator(self, context, width, cell_widths, outer, vertical_separator):
+    def _table_row_separator(self, context, width, cell_widths, outer, vertical_separator,
+                             last_row, heading_present):
         return self._export_horizontal_separator(context, width=width)
 
     # Media (represented by resources wrapped in inline content elements)

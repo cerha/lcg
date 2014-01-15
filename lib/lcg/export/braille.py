@@ -738,11 +738,11 @@ class BrailleExporter(FileExporter, Exporter):
         return _Braille('', '') if position <= 0 else _Braille('  ', '00')
 
     def _table_row_separator(self, context, width, cell_widths, row_number, vertical_separator,
-                             last_row):
+                             last_row, heading_present):
         if row_number <= 0:
             filler = u'⠶' if row_number == 0 else u'⠛'
             separator = self.concat(_Braille(filler * width, '0' * width), self._newline(context))
-        elif row_number == 1 and cell_widths:
+        elif row_number == 1 and cell_widths and heading_present:
             cell_separators = [_Braille(u'⠐' + u'⠒' * (w - 1) if c else ' ' * w, '0' * w)
                                for w, c in zip(cell_widths, last_row)]
             elements = [cell_separators[0]]
