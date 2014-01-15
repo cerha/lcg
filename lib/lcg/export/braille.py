@@ -154,8 +154,9 @@ class BrailleExporter(FileExporter, Exporter):
     _OUTPUT_FILE_EXT = 'brl'
     _INDENTATION_CHAR = '\ue010'
     _NEXT_INDENTATION_CHAR = '\ue011'
-    _PAGE_START_CHAR = '\ue012'
-    _PAGE_END_CHAR = '\ue013'
+    _PAGE_START_CHAR = '\ue012' # recommended page break + priority
+    _PAGE_END_CHAR = '\ue013' # end of a single-page object
+    _PAGE_START_REPEAT_CHAR = '\ue014' # end of repeating lines from the first page start (headers)
 
     class Context(Exporter.Context):
 
@@ -350,35 +351,61 @@ class BrailleExporter(FileExporter, Exporter):
                 if left_status_line or right_status_line:
                     page_height -= 1
                 new_pages = []
+                repeated_lines = []
+                repeated_lines_activated = [False]
                 def add_page(page):
+                    lines = []
                     line_limit = page_height
                     page_len = len(page)
                     best_priority = '9'
                     n = 0
-                    i = 0
+                    i = n_repeated_lines = len(repeated_lines) if repeated_lines_activated[0] else 0
+                    if i > 0:
+                        if i >= page_height:
+                            i = 0
+                        else:
+                            for l in repeated_lines:
+                                if l:
+                                    if l[0] == self._TOC_MARKER_CHAR:
+                                        continue
+                                    elif l[0] == self._PAGE_START_CHAR:
+                                        l = l[2:]
+                                    elif l[0] == self._PAGE_END_CHAR:
+                                        l = l[1:]
+                                lines.append(l)
+                    page_start = None
                     while i < page_height and n < page_len:
                         l = page[n]
                         n += 1
                         if l:
                             if l[0] == self._TOC_MARKER_CHAR:
                                 continue
-                            if l[0] == self._PAGE_START_CHAR and i > 0:
-                                priority = l[1]
-                                if priority <= best_priority:
-                                    line_limit = i
-                                    best_priority = priority
+                            if l[0] == self._PAGE_START_CHAR:
+                                if page_start is None:
+                                    page_start = n
+                                if i > n_repeated_lines:
+                                    priority = l[1]
+                                    if priority <= best_priority:
+                                        line_limit = i
+                                        best_priority = priority
                             elif l[0] == self._PAGE_END_CHAR:
                                 line_limit = page_height
                                 best_priority = '9'
+                                repeated_lines[:] = []
+                            elif l[0] == self._PAGE_START_REPEAT_CHAR:
+                                repeated_lines[:] = page[page_start:n - 1]
+                                repeated_lines_activated[0] = False
+                                continue
                         i += 1
                     page.reverse()
-                    lines = []
                     while page and len(lines) < line_limit:
                         l = page.pop()
                         if l and l[0] == self._TOC_MARKER_CHAR:
                             marker = l[1:]
                             page_number = unicode(context.page_number())
                             context.toc_element(marker).set_page_number(context, page_number)
+                        elif l and l[0] == self._PAGE_START_REPEAT_CHAR:
+                            repeated_lines_activated[0] = True
                         else:
                             if l:
                                 if l[0] == self._PAGE_START_CHAR:
@@ -749,6 +776,8 @@ class BrailleExporter(FileExporter, Exporter):
             for c in cell_separators[1:]:
                 elements.append(vertical_separator)
                 elements.append(c)
+            elements.append(self._newline(context))
+            elements.append(_Braille(self._PAGE_START_REPEAT_CHAR, '0'))
             elements.append(self._newline(context))
             separator = self.concat(*elements)
         else:
