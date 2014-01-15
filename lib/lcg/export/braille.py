@@ -132,7 +132,7 @@ class BrailleError(Exception):
     The exception provides a human readable explanation message.
 
     """
-    def __init__(self, message):
+    def __init__(self, message, *args):
         """
         Arguments:
 
@@ -140,7 +140,7 @@ class BrailleError(Exception):
           
         """
         assert isinstance(message, basestring), message
-        super(BrailleError, self).__init__(message)
+        super(BrailleError, self).__init__(message, *args)
 
     def message(self):
         """Return message explaining the error; basestring.
@@ -450,7 +450,7 @@ class BrailleExporter(FileExporter, Exporter):
             try:
                 output += device_table[c]
             except KeyError:
-                raise BrailleError(_("Text can't be represented on given output device."))
+                raise BrailleError(_("Text can't be represented on given output device."), c)
         device_init = printer_properties.get('device_init', presentation.device_init)
         if device_init is not None:
             inner = presentation.inner_margin.size()
