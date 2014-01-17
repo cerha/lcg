@@ -16,6 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/*jslint browser: true */
+/*jslint bitwise: true */
+/*jslint unparam: true */
+/*global Class */
+/*global Event */
+/*global Element */
+/*global Ajax */
+/*global $ */
+/*global $break */
+/*global self */
+/*global escape */
+/*global unescape */
+
+"use strict";
 
 var lcg = new Object();
 
@@ -47,18 +61,21 @@ lcg.KeyHandler = Class.create({
 	    40: 'Down'
 	};
 	var key = null;
-	if (code >= 65 && code <= 90) key = String.fromCharCode(code).toLowerCase();
-	else key = map[code];
-	if (key != null) {
+	if (code >= 65 && code <= 90) {
+	    key = String.fromCharCode(code).toLowerCase();
+	} else {
+	    key = map[code];
+	}
+	if (key) {
 	    var modifiers = '';
 	    if (document.all || document.getElementById) {
-		if (event.ctrlKey) modifiers += 'Ctrl-';
-		if (event.altKey) modifiers += 'Alt-';
-		if (event.shiftKey) modifiers += 'Shift-';
+		if (event.ctrlKey) { modifiers += 'Ctrl-'; }
+		if (event.altKey) { modifiers += 'Alt-'; }
+		if (event.shiftKey) { modifiers += 'Shift-'; }
 	    } else if (document.layers) {
-		if (event.modifiers & Event.CONTROL_MASK) modifiers += 'Ctrl-';
-		if (event.modifiers & Event.ALT_MASK) modifiers += 'Alt-';
-		if (event.modifiers & Event.SHIFT_MASK) modifiers += 'Shift-';
+		if (event.modifiers & Event.CONTROL_MASK) { modifiers += 'Ctrl-'; }
+		if (event.modifiers & Event.ALT_MASK) { modifiers += 'Alt-'; }
+		if (event.modifiers & Event.SHIFT_MASK) { modifiers += 'Shift-'; }
 	    }
 	    key = modifiers+key;
 	}
@@ -72,12 +89,13 @@ lcg.KeyHandler = Class.create({
 	    var element = event.element();
 	    command.bind(this)(element);
 	    event.stop();
-	};
+	}
     },
 
     set_focus: function (element) {
-	if (element != null) 
-	    setTimeout(function () { try { element.focus(); } catch (e) {} }, 0);
+	if (element) {
+	    setTimeout(function () { try { element.focus(); } catch (ignore) {} }, 0);
+	}
     }
     
 });
@@ -93,7 +111,8 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
     
     initialize: function ($super, element_id) {
 	$super();
-	var node = this.node = $(element_id);
+	var node = $(element_id);
+	this.node = node;
 	node._lcg_widget_instance = this;
 	node.setAttribute('role', 'application');
 	// Go through the menu and assign aria roles and key bindings.
@@ -101,22 +120,24 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 	this.items = this.init_items(ul, null);
 	// Set the active item.
 	var active = this.initially_active_item();
-	if (active != null)
+	if (active) {
 	    this.activate_item(active);
+	}
     },
 
     init_items: function (ul, parent) {
 	var items = [];
-	var base_id;
-	if (parent == null)
+	var base_id, i, child, prev, id;
+	if (parent === null) {
 	    base_id = this.node.getAttribute('id')+'-item';
-	else
+	} else {
 	    base_id = parent.getAttribute('id');
-	for (var i = 0; i < ul.childNodes.length; i++) {
-	    var child = $(ul.childNodes[i]);
-	    if (child.nodeName == 'LI') {
-		var prev = (items.length == 0 ? null : items[items.length-1]);
-		var id = base_id + '.' + (items.length+1);
+	}
+	for (i = 0; i < ul.childNodes.length; i++) {
+	    child = $(ul.childNodes[i]);
+	    if (child.nodeName === 'LI') {
+		prev = (items.length === 0 ? null : items[items.length-1]);
+		id = base_id + '.' + (items.length+1);
 		this.init_item(child, id, prev, parent);
 		items[items.length] = child;
 	    }
@@ -135,21 +156,25 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 	li._lcg_menu_parent = parent;
 	li._lcg_submenu = null;
 	li._lcg_menu = this;
-	if (prev != null)
+	if (prev) {
 	    prev._lcg_menu_next = li;
+	}
 	li.observe('keydown', this.on_key_down.bind(this));
     },
     
     initially_active_item: function () {
-	if (this.items.length != 0) {
+	var item;
+	if (this.items.length !== 0) {
 	    var current = this.node.down('a.current');
-	    if (current)
-		return current.up('li');
-	    else
-		return this.items[0];
+	    if (current) {
+		item = current.up('li');
+	    } else {
+		item = this.items[0];
+	    }
 	} else {
-	    return null;
+	    item = null;
 	}
+	return item;
     },
     
     active_item: function () {
@@ -158,9 +183,10 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
     },
 
     activate_item: function (item) {
-	var previously_active_item = this.active_item()
-	if (previously_active_item != null)
+	var previously_active_item = this.active_item();
+	if (previously_active_item) {
 	    previously_active_item.setAttribute('tabindex', '-1');
+	}
 	this.node.setAttribute('aria-activedescendant', item.getAttribute('id'));
 	item.setAttribute('tabindex', '0');
     },
@@ -186,6 +212,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
     },
     
     cmd_activate: function (item) {
+	return;
     }
 
 });
@@ -208,7 +235,9 @@ lcg.NotebookMenu = Class.create(lcg.Menu, {
     init_item: function ($super, li, id, prev, parent) {
 	$super(li, id, prev, parent);
 	li.setAttribute('role', 'tab');
-	li.down('a').onclick = (function() { this.cmd_activate(li); return false; }).bind(this);
+	li.down('a').onclick = function() {
+	    this.cmd_activate(li); return false; 
+	}.bind(this);
     },
     
     keymap: function () {
@@ -241,12 +270,12 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	// The active item set in the python code (marked as 'current' in HTML)
 	// has the highest precedence.
 	var current = this.node.down('.notebook-switcher li a.current');
-	if (current)
+	if (current) {
 	    return current.up('li');
-	else
-	    return (this.current_location_active_item() || // the tab may be referenced by anchor.
-		    this.last_saved_active_item() || // the most recently active tab.
-		    this.items[0]); // finally the first item is used with the lowest precedence.
+	}
+	return (this.current_location_active_item() || // the tab may be referenced by anchor.
+		this.last_saved_active_item() || // the most recently active tab.
+		this.items[0]); // finally the first item is used with the lowest precedence.
     },
 
 
@@ -265,7 +294,7 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
     current_location_active_item: function() {
 	// Get the active item if the anchor is part of the current location.
 	var match = self.location.href.match('#');
-	if (match != null) {
+	if (match) {
 	    var parts = self.location.href.split('#', 2);
 	    var page = this.node.down('#section-'+parts[1]);
 	    if (page && page._lcg_notebook_item) {
@@ -290,7 +319,7 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	    var cookie = lcg.cookies.get(this.COOKIE);
 	    if (cookie) {
 		var parts = cookie.split(':', 2);
-		if (parts[0] == cls) {
+		if (parts[0] === cls) {
 		    var page = this.node.down('#'+parts[1]);
 		    if (page && page._lcg_notebook_item) {
 			return page._lcg_notebook_item;
@@ -302,9 +331,10 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
     },
 
     activate_item: function ($super, item) {
-	var previously_active_item = this.active_item()
+	var i, callback, repeat;
+	var previously_active_item = this.active_item();
 	$super(item);
-	if (previously_active_item != item) {
+	if (previously_active_item !== item) {
 	    if (previously_active_item) {
 		previously_active_item.down('a').removeClassName('current');
 		previously_active_item._lcg_notebook_page.hide();
@@ -318,16 +348,18 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	    }
 	    page.show();
 	    var callbacks = lcg.Notebook._activation_callbacks[page.id];
-	    if (callbacks)
-		for (var i = callbacks.length - 1; i >= 0; i--) {
+	    if (callbacks) {
+		for (i = callbacks.length - 1; i >= 0; i--) {
 		    // Process in reverse to be able to simply remove callbacks
 		    // which are not to be repeated.
-		    var callback = callbacks[i][0];
-		    var repeat = callbacks[i][1];
-		    callback()
-		    if (!repeat)
+		    callback = callbacks[i][0];
+		    repeat = callbacks[i][1];
+		    callback();
+		    if (!repeat) {
 			callbacks.splice(i, 1); // Remove the callback.
+		    }
 		}
+	    }
 	}
     },
 
@@ -360,11 +392,14 @@ lcg.Notebook.on_activation = function (page, callback, repeat) {
     the objects which appear inside the notebook pages.
 
     */
-    if (typeof repeat == 'undefined')
+    if (repeat === undefined) {
 	repeat = false;
+    }
     var callbacks = lcg.Notebook._activation_callbacks[page.id];
-    if (!callbacks)
-	var callbacks = lcg.Notebook._activation_callbacks[page.id] = [];
+    if (!callbacks) {
+	callbacks = [];
+	lcg.Notebook._activation_callbacks[page.id] = callbacks;
+    }
     callbacks[callbacks.length] = [callback, repeat];
 };
 
@@ -415,11 +450,12 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	li.observe('click', this.on_menu_click.bind(this));
 	li.setAttribute('role', 'treeitem');
 	var span = li.down('span');
-	if (span != null)
+	if (span) {
 	    span.setAttribute('role', 'presentation');
+	}
 	// Append hierarchical submenu if found.
 	var submenu = li.down('ul');
-	if (submenu != null) {
+	if (submenu) {
 	    if (li.hasClassName('foldable')) {
 		var hidden = (li.hasClassName('folded') ? 'true' : 'false');
 		submenu.setAttribute('aria-hidden', hidden);
@@ -432,13 +468,15 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     },
     
     toggle_item_expansion: function (item) {
-	if (item != null) {
-	    if (this.expanded)
+	if (item) {
+	    if (this.expanded) {
 		this.collapse_item(item);
-	    else
+	    } else {
 		this.expand_item(item);
-	    if (item._lcg_submenu != null)
+	    }
+	    if (item._lcg_submenu) {
 		this.toggle_item_expansion(item._lcg_submenu[0]);
+	    }
 	    this.toggle_item_expansion(item._lcg_menu_next);
 	}
     },
@@ -451,8 +489,9 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    item.setAttribute('aria-expanded', 'true');
 	    expanded = true;
 	}
-	if (recourse && item._lcg_menu_parent != null)
+	if (recourse && item._lcg_menu_parent) {
 	    this.expand_item(item._lcg_menu_parent, true);
+	}
 	return expanded;
     },
     
@@ -469,20 +508,21 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     next_item: function (item) {
 	// Recursively find the next item in sequence by traversing the hierarchy.
 	var next;
-	if (item._lcg_menu_next != null)
+	if (item._lcg_menu_next) {
 	    next = item._lcg_menu_next;
-	else if (item._lcg_menu_parent != null
-		 && item._lcg_menu_parent._lcg_menu == this)
+	} else if (item._lcg_menu_parent && item._lcg_menu_parent._lcg_menu === this) {
 	    next = this.next_item(item._lcg_menu_parent);
+	}
 	return next;
     },
     
     cmd_up: function (item) {
 	var target = null;
-	if (item._lcg_menu_prev != null) {
+	if (item._lcg_menu_prev) {
 	    target = item._lcg_menu_prev;
-	    if (target._lcg_submenu != null && !target.hasClassName('folded'))
+	    if (target._lcg_submenu && !target.hasClassName('folded')) {
 		target = target._lcg_submenu[target._lcg_submenu.length-1];
+	    }
 	} else {
 	    target = item._lcg_menu_parent;
 	}
@@ -491,21 +531,24 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
     cmd_down: function (item) {
 	var target = null;
-	if (item._lcg_submenu != null && !item.hasClassName('folded'))
+	if (item._lcg_submenu && !item.hasClassName('folded')) {
 	    target = item._lcg_submenu[0];
-	else
+	} else {
 	    target = this.next_item(item);
+	}
 	this.set_focus(target);
     },
 
     cmd_expand: function (item) {
-	if (!this.expand_item(item) && item._lcg_submenu != null)
+	if (!this.expand_item(item) && item._lcg_submenu) {
 	    this.set_focus(item._lcg_submenu[0]);
+	}
     },
 
     cmd_collapse: function (item) {
-	if (!this.collapse_item(item))
+	if (!this.collapse_item(item)) {
 	    this.set_focus(item._lcg_menu_parent);
+	}
     },
 
     cmd_activate: function (item) {
@@ -520,15 +563,16 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	this.toggle_item_expansion(this.items[0]);
 	this.expanded = !this.expanded;
 	var b = this.node.down('button.toggle-menu-expansion');
-	if (this.expanded)
+	if (this.expanded) {
 	    b.addClassName('expanded');
-	else
+	} else {
 	    b.removeClassName('expanded');
+	}
     },
     
     on_menu_click: function (event) {
 	var element = event.element();
-	if (element.nodeName == 'A' || element.nodeName == 'LI') {
+	if (element.nodeName === 'A' || element.nodeName === 'LI') {
 	    // The inner SPAN has a left margin making space for folding controls.
 	    // Then, if the user clicks inside the A or LI element, but not inside
 	    // SPAN, folding controls were clicked.  The strange hack with the inner
@@ -537,10 +581,11 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    var span = element.down('span');
 	    var item = span.parentNode.parentNode;
 	    if (event.pointerX() < span.cumulativeOffset().left) {
-		if (item.hasClassName('folded'))
+		if (item.hasClassName('folded')) { 
 		    this.expand_item(item);
-		else
+		} else {
 		    this.collapse_item(item);
+		}
 		event.stop();
 	    }
 	}
@@ -558,20 +603,21 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	//   tooltip -- item description/tooltip (string, optional)
 	//   uri -- URI where the item points to (string, optional)
 	//   enabled -- if present and false, the item will be disabled (inactive)
-	//   onclick -- JavaScript code to execute on invocation (string, optional)
 	// You will typically supply either onclick or href.
+	var i, item, a, enabled;
 	var ul = new Element('ul');
-	for (var i = 0; i < items.length; i++) {
-	    var item = items[i];
-	    var a = new Element('a', {'href': (item.uri ? item.uri : 'javascript:void(0)'),
-				      'title': item.tooltip,
-				      'onclick': item.onclick});
+	for (i = 0; i < items.length; i++) {
+	    item = items[i];
+	    a = new Element('a', {'href': '#',
+				  'title': item.tooltip,
+				  'onclick': 'return false;'});
+	    a._lcg_popup_menu_item_spec = item;
 	    a.update(item.label);
-	    var enabled = (typeof item.enabled == 'undefined' || item.enabled);
+	    enabled = (item.enabled === undefined || item.enabled);
 	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
 	}
 	var menu = new Element('div', {'class': 'popup-menu-widget'});
-	menu.insert(ul)
+	menu.insert(ul);
 	$(document.body).insert(menu);
 	$super(menu);
     },
@@ -584,7 +630,9 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
     init_item: function ($super, li, id, prev, parent) {
 	$super(li, id, prev, parent);
 	li.setAttribute('role', 'menuitem');
-	li.down('a').observe('click', function(event) { this.cmd_activate(li); }.bind(this));
+	li.down('a').observe('click', function(event) {
+	    this.cmd_activate(li);
+	}.bind(this));
     },
 
     keymap: function () {
@@ -601,19 +649,18 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	if (item.hasClassName('active')) {
 	    this.remove();
 	    var a = item.down('a');
-	    var href = a.getAttribute('href');
-	    var onclick = a.getAttribute('onclick');
-	    if (href)
-		self.location = href;
-	    else if (onclick)
-		eval(onclick);
+	    var spec = a._lcg_popup_menu_item_spec;
+	    if (spec.uri) {
+		self.location = spec.uri;
+	    }
 	}
     },
 
     cmd_quit: function (item) {
 	this.remove();
-	if (this.return_keyboard_focus != null)
+	if (this.return_keyboard_focus) {
 	    this.set_focus(this.return_keyboard_focus);
+	}
     },
 
     on_document_click: function (event) {
@@ -622,18 +669,20 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    this.ignore_next_click = false;
 	    return;
 	}
-	var outside = event.findElement('div') != this.node;
+	var outside = event.findElement('div') !== this.node;
 	this.remove();
-	if (outside)
+	if (outside) {
 	    event.stop();
+	}
     },
     
     popup: function (event) {
         // event -- JavaScript event triggering the popup -- either a mouse
         // action catched by 'contextmenu' handler or mouse/keyboard action
         // catched by 'click' handler.
-	if (lcg.popup_menu)
+	if (lcg.popup_menu) {
 	    lcg.popup_menu.remove();
+	}
 	event.stop();
 	var left, top;
 	if (event.pointerX() >=0 && event.pointerY() >= 0) {
@@ -649,15 +698,18 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	lcg.popup_menu = this;
 	var menu = this.node;
 	var window_size = document.viewport.getDimensions();
-	if (left + menu.getWidth() > window_size.width)
+	if (left + menu.getWidth() > window_size.width) {
 	    left = window_size.width - menu.getWidth() - 30;
-	if (top + menu.getHeight() > window_size.height)
+	}
+	if (top + menu.getHeight() > window_size.height) {
 	    top -= menu.getHeight();
+	}
 	menu.setStyle({left: left+'px', top: top+'px', display: 'block'});
 	this.ignore_next_click = !event.isLeftClick();
-	if (this.return_keyboard_focus != null)
+	if (this.return_keyboard_focus) {
 	    this.set_focus(menu.down('li'));
-	this.on_click_handler = this.on_document_click.bind(this)
+	}
+	this.on_click_handler = this.on_document_click.bind(this);
 	$(document).observe('click', this.on_click_handler);
     },
 
@@ -678,14 +730,16 @@ lcg.PopupMenuCtrl = Class.create({
      */
     
     initialize: function (element_id, items, tooltip, selector) {
-	this.items = items
+	this.items = items;
 	var link = new Element('a', {'aria-haspopup': 'true'});
         $(element_id).insert(link);
         link.observe('click', this.popup_menu.bind(this));
-        if (tooltip)
+        if (tooltip) {
      	    link.setAttribute('title', tooltip);
-        if (selector)
+	}
+        if (selector) {
       	    link.up(selector).observe('contextmenu', this.popup_menu.bind(this));
+	}
     },
 
     popup_menu: function (event) { 
@@ -709,9 +763,9 @@ lcg.Tooltip = Class.create({
 		try {
 		    var element = new Element('div', {'class': 'tooltip-widget'});
 		    var content_type = transport.getHeader('Content-Type');
-		    if (content_type == 'text/html') {
+		    if (content_type === 'text/html') {
 			element.update(transport.responseText);
-		    } else if (content_type.substring(0, 6) == 'image/') {
+		    } else if (content_type.substring(0, 6) === 'image/') {
 			// The AJAX request was redundant in this case (the image will 
 			// be loaded again by the browser for the new img tag) but 
 			// there's no better way to tell automatically what the URL
@@ -725,10 +779,10 @@ lcg.Tooltip = Class.create({
 		    element.hide(); // Necessary to make visible() work before first shown.
 		    $(document.body).insert(element);
 		    this.tooltip = element;
-		    if (this.show_when_ready)
+		    if (this.show_when_ready) {
 			this.show(this.show_when_ready[0], this.show_when_ready[1]);
-		}
-		catch (e) {
+		    }
+		} catch (e) {
 		    // Errors in asynchronous handlers are otherwise silently
 		    // ignored.  This will only work in Firefox with Firebug,
 		    // but it is only useful for debugging anyway...
@@ -750,8 +804,9 @@ lcg.Tooltip = Class.create({
     },
 
     hide: function() {
-	if (this.tooltip)
+	if (this.tooltip) {
 	    this.tooltip.hide();
+	}
 	this.show_when_ready = null;
     }
 
@@ -766,17 +821,24 @@ lcg.Cookies = Class.create({
     },
     // Sets a cookie
     set: function (key, value, days) {
-        if (typeof key != 'string') throw "Invalid key";
-        if (typeof value != 'string' && typeof value != 'number') throw "Invalid value";
-        if (days && typeof days != 'number') throw "Invalid expiration time";
-	var cookie = escape(new String(value)) + '; path=' + escape(this.path);
+        if (typeof key !== 'string') { 
+	    throw "Invalid key";
+	}
+        if (typeof value !== 'string' && typeof value !== 'number') {
+	    throw "Invalid value";
+	}
+        if (days && typeof days !== 'number') {
+	    throw "Invalid expiration time";
+	}
+	var cookie = escape(String(value)) + '; path=' + escape(this.path);
         if (days) {
             var date = new Date();
             date.setTime(date.getTime() + (days*24*60*60*1000));
             cookie += "; expires=" + date.toGMTString();
         }
-        if (this.domain)
+        if (this.domain) {
 	    cookie += '; domain=' + escape(this.domain);
+	}
         document.cookie = key +'='+ cookie;
     },
     // Returns a cookie value or false
@@ -817,8 +879,8 @@ lcg.widget_instance = function(element) {
      * JavaScript widget.
      *
      */
-    if (element._lcg_widget_instance)
+    if (element._lcg_widget_instance) {
 	return element._lcg_widget_instance;
-    else
-	return null;
+    }
+    return null;
 };
