@@ -151,6 +151,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 	li.setAttribute('role', 'presentation');
 	li.setAttribute('id', id);
 	li.setAttribute('tabindex', '-1');
+	li.setAttribute('aria-selected', 'false');
 	li._lcg_menu_prev = prev;
 	li._lcg_menu_next = null;
 	li._lcg_menu_parent = parent;
@@ -186,8 +187,10 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 	var previously_active_item = this.active_item();
 	if (previously_active_item) {
 	    previously_active_item.setAttribute('tabindex', '-1');
+	    previously_active_item.setAttribute('aria-selected', 'false');
 	}
 	this.node.setAttribute('aria-activedescendant', item.getAttribute('id'));
+	item.setAttribute('aria-selected', 'true');
 	item.setAttribute('tabindex', '0');
     },
 
