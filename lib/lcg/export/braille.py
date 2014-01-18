@@ -22,6 +22,8 @@ from __future__ import unicode_literals
 """
 
 import copy
+import ctypes
+import ctypes.util
 import imp
 import os
 import re
@@ -146,6 +148,121 @@ class BrailleError(Exception):
         """Return message explaining the error; basestring.
         """
         return self.args[0]
+
+
+_louisutdml_path = ctypes.util.find_library('liblouisutdml')
+if _louisutdml_path is None:
+    _louisutdml = None
+else:
+    _louisutdml = ctypes.CDLL(_louisutdml_path)
+
+_louisutdml_initialized = False
+_en6backmapping = {
+    u' ': u'⠀',
+    u'a': u'⠁',
+    u'1': u'⠂',
+    u'b': u'⠃',
+    u"'": u'⠄',
+    u'k': u'⠅',
+    u'2': u'⠆',
+    u'l': u'⠇',
+    u'`': u'⠈',
+    u'c': u'⠉',
+    u'i': u'⠊',
+    u'f': u'⠋',
+    u'/': u'⠌',
+    u'm': u'⠍',
+    u's': u'⠎',
+    u'p': u'⠏',
+    u'"': u'⠐',
+    u'e': u'⠑',
+    u'3': u'⠒',
+    u'h': u'⠓',
+    u'9': u'⠔',
+    u'o': u'⠕',
+    u'6': u'⠖',
+    u'r': u'⠗',
+    u'~': u'⠘',
+    u'd': u'⠙',
+    u'j': u'⠚',
+    u'g': u'⠛',
+    u'>': u'⠜',
+    u'n': u'⠝',
+    u't': u'⠞',
+    u'q': u'⠟',
+    u',': u'⠠',
+    u'*': u'⠡',
+    u'5': u'⠢',
+    u'<': u'⠣',
+    u'-': u'⠤',
+    u'u': u'⠥',
+    u'8': u'⠦',
+    u'v': u'⠧',
+    u'.': u'⠨',
+    u'%': u'⠩',
+    u'{': u'⠪',
+    u'$': u'⠫',
+    u'+': u'⠬',
+    u'x': u'⠭',
+    u'!': u'⠮',
+    u'&': u'⠯',
+    u';': u'⠰',
+    u':': u'⠱',
+    u'4': u'⠲',
+    u'|': u'⠳',
+    u'0': u'⠴',
+    u'z': u'⠵',
+    u'7': u'⠶',
+    u'(': u'⠷',
+    u'_': u'⠸',
+    u'?': u'⠹',
+    u'w': u'⠺',
+    u'}': u'⠻',
+    u'#': u'⠼',
+    u'y': u'⠽',
+    u')': u'⠾',
+    u'=': u'⠿',
+}
+def xml2braille(xml):
+    if _louisutdml is None:
+        return None
+    # Preprocess entities
+    entity_table = entities.entities
+    def replace_entity(match):
+        entity = match.group(1)
+        replacement = entity_table.get(entity)
+        if replacement is None:
+            replacement = '&' + entity + ';'
+        return replacement
+    input_xml = re.sub('&([A-Za-z]+);', replace_entity, xml)
+    # Allocate foreign call arguments
+    inbuf = input_xml.encode('utf-8')
+    maxlen = 2 ** 12 - 1
+    outlen = ctypes.c_int(maxlen)
+    outbuf_class = ctypes.c_short * (outlen.value + 1)
+    outbuf = outbuf_class()
+    global _louisutdml_initialized
+    if _louisutdml_initialized:
+        mode = 0
+    else:
+        mode = 1 << 30
+    # Make the foreign call and process the results
+    result = _louisutdml.lbu_translateString(str("preferences.cfg"), inbuf, len(inbuf) + 1,
+                                            outbuf, ctypes.byref(outlen), None, None, mode)
+    if not result:
+        raise BrailleError("XML processing failed", xml)
+    _louisutdml_initialized = True
+    if outlen.value == maxlen:
+        raise BrailleError("Braille output too long", xml)
+    # We don't know how to get dots from liblouisutdml directly, so we have to
+    # translate the output here.  Additionally we remove spaces from the
+    # beginning of the output which are put there by liblouisutdml for an
+    # unknown reason.
+    def make_dot_char(i):
+        c = unichr(i)
+        return _en6backmapping.get(c, c)
+    output = ''.join([make_dot_char(i) for i in outbuf[:outlen.value]])
+    return output.strip(string.whitespace + '⠀')
 
 
 class BrailleExporter(FileExporter, Exporter):
