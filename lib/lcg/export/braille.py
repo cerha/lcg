@@ -150,7 +150,7 @@ class BrailleError(Exception):
         return self.args[0]
 
 
-_louisutdml_path = ctypes.util.find_library('liblouisutdml')
+_louisutdml_path = ctypes.util.find_library('louisutdml')
 if _louisutdml_path is None:
     _louisutdml = None
 else:
