@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2011, 2012, 2013 Brailcom, o.p.s.
+# Copyright (C) 2011, 2012, 2013, 2014 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -191,7 +191,7 @@ class ContentMatcher(object):
     """Matcher for presentations.
 
     This is a base class to be subclassed by classes implementing different
-    matching algorithms.  Matching is performed using 'matches()' method.  
+    matching algorithms.  Matching is performed using 'matches()' method.
 
     """
     def matches(self, content, lang):
@@ -391,7 +391,7 @@ class PresentationSet(object):
         presentation = self._merge_cache.get(key)
         if presentation is None:
             presentation = self._merge_cache[key] = \
-                           self.merge_presentations(applicable_presentations)
+                self.merge_presentations(applicable_presentations)
         return presentation
 
 
@@ -498,7 +498,7 @@ class StyleFile(object):
                 if inherits == ['']:
                     inherits = []
                 for s in inherits:
-                    if not names_styles.has_key(s):
+                    if s not in names_styles:
                         raise self.ParseError("Unknown style `%s' in style file on line %s" %
                                          (s, line_number,))
                 style = names_styles[name] = self._Style()
@@ -555,7 +555,7 @@ class StyleFile(object):
                     str_value = unicode(value)
                 else:
                     raise Exception("Unsupported value type", value)
-                file.write('%s = %s\n' % (identifier, str_value,))                
+                file.write('%s = %s\n' % (identifier, str_value,))
 
     def presentations(self):
         """Return presentations corresponding to the style.
