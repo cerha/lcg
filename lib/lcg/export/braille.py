@@ -239,7 +239,7 @@ def xml2braille(xml):
     inbuf = input_xml.encode('utf-8')
     maxlen = 2 ** 12 - 1
     outlen = ctypes.c_int(maxlen)
-    outbuf_class = ctypes.c_short * (outlen.value + 1)
+    outbuf_class = ctypes.c_int * (outlen.value + 1)
     outbuf = outbuf_class()
     global _louisutdml_initialized
     if _louisutdml_initialized:
