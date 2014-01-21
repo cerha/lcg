@@ -653,7 +653,7 @@ class BrailleExporter(FileExporter, Exporter):
         # But hopefully this simplification here doesn't cause real use
         # problems.
         braille = louis.translateString(tables, text, typeform=copy.copy(typeform),
-                                       mode=(louis.dotsIO + 128))
+                                       mode=(louis.dotsIO + louis.ucBrl))
         whitespace = self._whitespace
         if typeform is None:
             if italic:
