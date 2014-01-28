@@ -100,7 +100,7 @@ class HtmlGenerator(object):
         result_list = ['<' + tag]
         dirty = False
         if __debug__:
-            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style',)
+            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role')
         for name, value in kwargs.items():
             if value is not None and value is not False:
                 assert name in valid, "Invalid attribute '%s' of HTML tag '%s'." % (name, tag)
