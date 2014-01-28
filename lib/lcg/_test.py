@@ -1047,7 +1047,7 @@ class BrailleExport(unittest.TestCase):
 <mrow><mn>12</mn></mrow><mrow><mi mathvariant="bold">a</mi><mi>b</mi></mrow>
 </math>''', u'⠼⠁⠃⠔⠰⠁⠰⠔⠃')
         test(u'''<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"
   "http://www.w3.org/TR/MathML2/dtd/xhtml-math11-f.dtd" [
  <!ENTITY mathml "http://www.w3.org/1998/Math/MathML">
  ]>
@@ -1066,7 +1066,8 @@ class BrailleExport(unittest.TestCase):
 ''', u'''⠭⠡⠼⠁⠂⠀⠼⠃⠱⠀⠶⠆⠤⠃⠀⠲⠤⠩
 ⠩⠃⠌⠼⠃⠱⠀⠤⠼⠙⠐⠁⠉⠱⠻⠼⠃⠐⠁⠰''')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-<mrow><msqrt><mn>2</mn></msqrt><mo>+</mo><mroot><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mroot></mrow>
+<mrow><msqrt><mn>2</mn></msqrt><mo>+</mo><mroot><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow>
+</mroot></mrow>
 </math>''', u'⠩⠼⠃⠱⠀⠲⠠⠌⠼⠉⠩⠼⠃⠱')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>&#x2208;</mo><mi>R</mi></mrow>
@@ -1078,7 +1079,9 @@ class BrailleExport(unittest.TestCase):
 <mrow><mi>α</mi><mo>+</mo><mi>β</mi></mrow>
 </math>''', u'⠘⠁⠀⠲⠘⠃')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-<mrow><mfrac><mrow><mn>5</mn></mrow><mrow><mn>6</mn></mrow></mfrac><mo>-</mo><mfrac><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>5</mn><mo>-</mo><mn>4</mn></mrow><mrow><mn>6</mn></mrow></mfrac></mrow>
+<mrow><mfrac><mrow><mn>5</mn></mrow><mrow><mn>6</mn></mrow></mfrac><mo>-</mo><mfrac><mrow><mn>2</mn>
+</mrow><mrow><mn>3</mn></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>5</mn><mo>-</mo><mn>4</mn></mrow>
+<mrow><mn>6</mn></mrow></mfrac></mrow>
 </math>''', u'⠆⠼⠑⠻⠼⠋⠰⠀⠤⠆⠼⠃⠻⠼⠉⠰⠀⠶\n⠶⠆⠼⠑⠀⠤⠼⠙⠻⠼⠋⠰')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>5</mn><mfrac><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mfrac></mrow>
@@ -1087,12 +1090,16 @@ class BrailleExport(unittest.TestCase):
 <mrow><mn>2,</mn><mover accent="true"><mn>32</mn><mo>&macr;</mo></mover></mrow>
 </math>''', u'⠼⠃⠂⠉⠃⠉⠃⠤')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-<mrow><mfenced open="&langle;" close="&rangle;" separators="|"><mi>a</mi><mi>b</mi><mi>c</mi></mfenced></mrow>
+<mrow><mfenced open="&langle;" close="&rangle;" separators="|"><mi>a</mi><mi>b</mi><mi>c</mi>
+</mfenced></mrow>
 </math>''', u'⠈⠣⠁⠸⠀⠃⠸⠀⠉⠈⠜')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="&langle;" close="&rangle;" separators=","><mi>a</mi><mi>b</mi></mfenced></mrow>
 </math>''', u'⠈⠣⠁⠂⠀⠃⠈⠜')
-        test(u'''<math contenteditable="false" style="display:inline-block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mstyle><annotation encoding="ASCII">x^2 + y^2</annotation></semantics></math>''',
+        test(u'''<math contenteditable="false" style="display:inline-block"
+        xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true">
+<msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mstyle>
+<annotation encoding="ASCII">x^2 + y^2</annotation></semantics></math>''',
              u'⠭⠌⠼⠃⠱⠀⠲⠽⠌⠼⠃⠱')
 
     def test_inline_mathml(self):
@@ -1111,6 +1118,43 @@ class BrailleExport(unittest.TestCase):
         assert result == u'''⠠⠞⠗⠕⠉⠓⠁⠀⠍⠁⠞⠑⠍⠁⠞⠊⠅⠽
 ⠦⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃⠴
 ⠝⠑⠥⠱⠅⠕⠙⠌⠄''', repr(result)
+
+    def test_mathml_nemeth(self):
+        # We don't aim to test correctness of liblouisutdml here, just that the
+        # bindings to it work and that there is no big problem.
+        def test(mathml, expected_result):
+            content = lcg.MathML(mathml)
+            presentation = self._load_presentation()
+            presentation.braille_math_rules = 'nemeth'
+            presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
+            n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+                                content=content)
+            exporter = lcg.BrailleExporter()
+            context = exporter.context(n, lang='cs', presentation=presentation_set)
+            exported = exporter.export(context)
+            result = exported.split('\n\n')[1]
+            assert result == expected_result, (("\n  - source text: %r\n  - expected:    %r\n  - "
+                                                "got:         %r") %
+                                               (mathml, expected_result, result,))
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>3.76</mn></mrow>
+</math>''', u'⠼⠒⠨⠶⠖')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1</mn><mo>+</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>0</mn></mrow>
+</math>''', u'⠼⠂⠬⠭⠬⠽⠀⠨⠅⠀⠼⠴')
+        # Of course, comma is not recognized as a decimal point, how could
+        # liblouisutdml know about that?
+#         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+# <mrow><mn>3,76</mn></mrow>
+# </math>''', u'⠼⠒⠨⠶⠖')
+        # Doesn't work correctly in liblouisutdml:
+#         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+# <mrow><msub><mi>log</mi><mtext>10</mtext></msub><mn>2</mn></mrow>
+# </math>''', u'⠇⠕⠛⠂⠴⠀⠼⠆')
+        # Doesn't work correctly in liblouisutdml:
+#         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+# <mfrac><mfrac><mn>3</mn><mn>8</mn></mfrac><mn>5</mn></mfrac>
+# </math>''', u'⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼')
 
 tests.add(BrailleExport)
 

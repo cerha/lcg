@@ -25,6 +25,7 @@ braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': ['cs-g1.ctb']}
 braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
                               'cs': 'hyph_cs_CZ.dic'}
+braille_math_rules = 'czech' # 'nemeth', 'czech'
 
 page_width = lcg.UFont(35)
 page_height = lcg.UFont(29)

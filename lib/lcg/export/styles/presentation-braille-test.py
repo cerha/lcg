@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012 Brailcom, o.p.s.
+# Copyright (C) 2012, 2014 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -23,7 +23,8 @@ import lcg
 import os
 
 braille_tables = {'en': ['en-us-g1.ctb'],
-                  'cs': [os.path.join(os.path.dirname(lcg.__file__), 'export/braille-tables/cs-g1.ctb')]}
+                  'cs': [os.path.join(os.path.dirname(lcg.__file__),
+                                      'export/braille-tables/cs-g1.ctb')]}
 braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
                               'cs': 'hyph_cs_CZ.dic'}
 page_width = lcg.UFont(20)
@@ -34,3 +35,5 @@ left_page_footer = lcg.Container((lcg.PageNumber(),
 right_page_footer = lcg.Container((lcg.PageHeading(),
                                    lcg.HSpace(lcg.UFont(3)),
                                    lcg.PageNumber(),))
+
+braille_math_rules = 'czech' # 'nemeth', 'czech'

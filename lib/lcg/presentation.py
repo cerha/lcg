@@ -169,6 +169,11 @@ class Presentation(object):
     names (strings) for liblouis.
     Useful only for Braille output.
     """
+    braille_math_rules = 'czech'
+    """System to use for typesetting mathematics in Braille.
+    Currently supported values are 'nemeth' and 'czech'.
+    Useful only for Braille output.
+    """
     printers = None
     """Dictionary of printer names (keys) and their properties (values).
     Printer properties are represented by a dictionary with property names as

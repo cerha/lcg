@@ -284,6 +284,7 @@ class BrailleExporter(FileExporter, Exporter):
             assert isinstance(hyphenation_tables, dict), hyphenation_tables
             self._tables = tables
             self._hyphenation_tables = hyphenation_tables
+            self._node_presentation = None
             self._page_number = 1
             self._form = [louis.plain_text]
             self._hyphenate = True
@@ -307,6 +308,21 @@ class BrailleExporter(FileExporter, Exporter):
             assert isinstance(hyphenation_tables, dict), hyphenation_tables
             self._tables = tables
             self._hyphenation_tables = hyphenation_tables
+
+        def node_presentation(self):
+            if self._node_presentation is None:
+                presentation_set = self.presentation()
+                node = self.node()
+                lang = self.lang()
+                if presentation_set is None:
+                    presentation = node.presentation(lang) or Presentation()
+                else:
+                    presentations = (Presentation(),
+                                     presentation_set.presentation(None, lang),
+                                     node.presentation(lang),)
+                    presentation = presentation_set.merge_presentations(presentations)
+                self._node_presentation = presentation
+            return self._node_presentation
 
         def page_number(self):
             return self._page_number
@@ -350,16 +366,9 @@ class BrailleExporter(FileExporter, Exporter):
 
     def export(self, context, recursive=False):
         # Presentation
-        presentation_set = context.presentation()
         node = context.node()
         lang = context.lang()
-        if presentation_set is None:
-            presentation = node.presentation(lang) or Presentation()
-        else:
-            presentations = (Presentation(),
-                             presentation_set.presentation(None, lang),
-                             node.presentation(lang),)
-            presentation = presentation_set.merge_presentations(presentations)
+        presentation = context.node_presentation()
         if presentation.default_printer is not None:
             printer_properties = presentation.printers[presentation.default_printer]
         else:
@@ -904,7 +913,21 @@ class BrailleExporter(FileExporter, Exporter):
     # Special constructs
     
     def _export_mathml(self, context, element):
-        # Only Czech MathML processing is available
+        math_rules = context.node_presentation().braille_math_rules
+        if math_rules == 'nemeth':
+            return self._export_mathml_nemeth(context, element)
+        elif math_rules == 'czech':
+            return self._export_mathml_czech(context, element)
+        else:
+            raise Exception("Unsupported math rules", math_rules)
+
+    def _export_mathml_nemeth(self, context, element):
+        xml = element.content()
+        braille = xml2braille(xml)
+        hyphenation_list = ['2' if c == '⠀' else '0' for c in braille]
+        return _Braille(braille, string.join(hyphenation_list, ''))
+        
+    def _export_mathml_czech(self, context, element):
         class EntityHandler(element.EntityHandler):
             def __init__(self, *args, **kwargs):
                 super(EntityHandler, self).__init__(*args, **kwargs)
