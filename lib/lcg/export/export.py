@@ -978,9 +978,9 @@ class Exporter(object):
 
     def _vertical_cell_separator(self, context, position):
         if position == 0:
-            return u'| '
+            return u'│ '
         elif position == -1:
-            return u' |'
+            return u' │'
         else:
             return u' │ '
 
