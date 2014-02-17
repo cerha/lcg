@@ -172,7 +172,12 @@ class EpubExporter(Exporter):
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
                           self._package_document(node, lang, resources, scripted_nodes))
         finally:
-            epub.close()
+            try:
+                epub.close()
+            except:
+                # Closing may fail after a prior exception.
+                # This prevents the later exception to take over.
+                pass
         return fileobject.getvalue()
 
     def _get_resource_data(self, context, node, resource):
