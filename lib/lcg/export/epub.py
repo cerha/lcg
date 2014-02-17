@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012, 2013 by BRAILCOM,o.p.s.
+# Copyright (C) 2012-2014 by BRAILCOM,o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,9 +51,8 @@ class EpubHtml5Exporter(Html5Exporter):
                 
     def _head(self, context):
         g = context.generator()
-        return ([g.title(self._title(context))] + 
+        return ([g.title(self._title(context))] +
                 [g.script(src=context.uri(s)) for s in self._scripts(context)])
-
 
     def _export_table_of_contents(self, context, element):
         return ''
@@ -90,7 +89,7 @@ class EpubHtml5Exporter(Html5Exporter):
         if element.align():
             cls.append(element.align() + '-aligned')
         if element.name():
-            cls.append('image-'+element.name())
+            cls.append('image-' + element.name())
         return g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
                      width=width, height=height)
 
@@ -136,8 +135,8 @@ class EpubExporter(Exporter):
         variants = variant and (variant,) or node.variants() or (None,)
         for lang in variants:
             context = self.context(node, lang, **kwargs)
-            ext = lang and '.'+lang or ''
-            f = open(filename+ext, 'w')
+            ext = lang and '.' + lang or ''
+            f = open(filename + ext, 'w')
             f.write(self.export(context))
 
     def export(self, context):
@@ -153,9 +152,9 @@ class EpubExporter(Exporter):
             mimeinfo = zipfile.ZipInfo('mimetype')
             mimeinfo.compress_type = zipfile.ZIP_STORED
             epub.writestr(mimeinfo, Constants.EPUB_MIMETYPE)
-            epub.writestr(self._meta_path('container.xml'), 
+            epub.writestr(self._meta_path('container.xml'),
                           self._ocf_container(node, lang))
-            epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME), 
+            epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME),
                           self._navigation_document(context))
             for n in node.linear():
                 exported_content, scripted = self._xhtml_content_document(n, lang)
@@ -219,27 +218,31 @@ class EpubExporter(Exporter):
         packagedoc_path = self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME)
         rootfile.setAttribute('full-path', packagedoc_path)
         rootfile.setAttribute('media-type', Constants.PACKAGE_DOC_MIMETYPE)
-        return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
+        return doc.toprettyxml(indent=4 * '', newl='', encoding='UTF-8')
 
     def _package_document(self, node, lang, resources, scripted_nodes):
         doc = xml.Document()
         package = doc.appendChild(doc.createElement('package'))
-        package.setAttribute('xmlns', Constants.OPF_NS)
-        package.setAttribute('version', '3.0')
-        package.setAttribute('unique-identifier', self.Config.UID_ID)
-        package.setAttribute('xml:lang', lang)
+        for name, value in (
+                ('xmlns', Constants.OPF_NS),
+                ('version', '3.0'),
+                ('unique-identifier', self.Config.UID_ID),
+                ('xml:lang', lang)):
+            package.setAttribute(name, value)
         # metadata
         metadata = package.appendChild(doc.createElement('metadata'))
         metadata.setAttribute('xmlns:dc', Constants.DC_NS)
-        dc_identifier = metadata.appendChild(doc.createElement('dc:identifier'))
-        dc_identifier.setAttribute('id', self.Config.UID_ID)
-        dc_identifier.appendChild(doc.createTextNode(self._document_unique_identifier(node, lang)))
-        metadata.appendChild(doc.createElement('dc:title')).appendChild(doc.createTextNode(node.title()))
-        metadata.appendChild(doc.createElement('dc:language')).appendChild(doc.createTextNode(lang))
-        curtime = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
-        meta_modified = metadata.appendChild(doc.createElement('meta'))
-        meta_modified.appendChild(doc.createTextNode(curtime))
-        meta_modified.setAttribute('property', 'dcterms:modified')
+        for name, value, attr in (
+                ('dc:identifier', self._document_unique_identifier(node, lang),
+                 (('id', self.Config.UID_ID),)),
+                ('dc:title', node.title(), ()),
+                ('dc:language', lang, ()),
+                ('meta', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                 (('property', 'dcterms:modified'),))):
+            element = metadata.appendChild(doc.createElement(name))
+            for aname, avalue in attr:
+                element.setAttribute(aname, avalue)
+            element.appendChild(doc.createTextNode(value))
         # manifest and spine
         manifest = package.appendChild(doc.createElement('manifest'))
         spine = package.appendChild(doc.createElement('spine'))
@@ -253,7 +256,7 @@ class EpubExporter(Exporter):
                 item.setAttribute('properties', properties)
         add_item('nav', self.Config.NAV_DOC_FILENAME, 'application/xhtml+xml', properties=('nav',))
         for n in node.linear():
-            item_id = 'node-'+n.id() # Prefix to avoid ids beginning with a number (invalid HTML)
+            item_id = 'node-' + n.id() # Prefix to avoid ids beginning with a number (invalid HTML)
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
             properties = []
             if n in scripted_nodes:
@@ -269,7 +272,7 @@ class EpubExporter(Exporter):
             add_item(resource_id, self._html_exporter.resource_uri(resource),
                      mediatype=mime_type or 'application/octet-stream', properties=properties)
         # export
-        return doc.toprettyxml(indent=4*'', newl='', encoding='UTF-8')
+        return doc.toprettyxml(indent=4 * '', newl='', encoding='UTF-8')
 
     def _navigation_document(self, context):
         node = context.node()
@@ -288,7 +291,7 @@ class EpubExporter(Exporter):
             ol = root.appendChild(doc.createElement('ol'))
             for item, subitems in items:
                 title = item.title()
-                descr = item.descr() #TODO unused
+                # descr = item.descr() TODO: unused
                 uri = context.uri(item) #TODO fix relativeness, add #fragments for Sections
                 li = ol.appendChild(doc.createElement('li'))
                 a = li.appendChild(doc.createElement('a'))
