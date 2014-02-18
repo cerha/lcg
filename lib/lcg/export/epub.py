@@ -305,6 +305,7 @@ class EpubExporter(Exporter):
                 if subitems:
                     export(subitems, li)
         items = lcg.NodeIndex(node=node).items(context)
+        items.insert(0, (node, ())) # Add the top level node as the first navigation item.
         export(items, nav)
         return doc.toprettyxml(indent='  ', newl='\n', encoding='UTF-8')
 
