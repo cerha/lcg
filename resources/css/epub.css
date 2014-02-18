@@ -1,0 +1,15 @@
+/* Minimalistic style sheet used specifically for the EPUB export */
+
+table.lcg-fieldset {
+    margin-bottom: .4em;
+}
+table.lcg-fieldset th {
+    white-space: nowrap;
+}
+
+table.lcg-table {
+    border-collapse: collapse;
+}
+table.lcg-table td, table.lcg-table th {
+    padding: .4em;
+}

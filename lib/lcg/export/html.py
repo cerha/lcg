@@ -162,6 +162,9 @@ class HtmlGenerator(object):
     def title(self, content, **kwargs):
         return self._tag('title', content, **kwargs)
 
+    def link(self, **kwargs):
+        return self._tag('link', None, ('rel', 'type', 'href', 'media'), _paired=False, **kwargs)
+
     def body(self, content, **kwargs):
         return self._tag('body', content, ('onkeydown', 'onload'), **kwargs)
 

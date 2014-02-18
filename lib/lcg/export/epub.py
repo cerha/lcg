@@ -51,7 +51,9 @@ class EpubHtml5Exporter(Html5Exporter):
                 
     def _head(self, context):
         g = context.generator()
-        return ([g.title(self._title(context))] +
+        stylesheet = context.resource('epub.css')
+        return ([g.title(self._title(context)),
+                 g.link(rel="stylesheet", type="text/css", href=context.uri(stylesheet))] +
                 [g.script(src=context.uri(s)) for s in self._scripts(context)])
 
     def _export_table_of_contents(self, context, element):
