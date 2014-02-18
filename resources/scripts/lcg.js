@@ -31,7 +31,7 @@
 
 "use strict";
 
-var lcg = new Object();
+var lcg = {};
 
 lcg.KeyHandler = Class.create({
 
