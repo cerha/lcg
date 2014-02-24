@@ -103,7 +103,8 @@ class HtmlGenerator(object):
             valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role')
         for name, value in kwargs.items():
             if value is not None and value is not False:
-                assert name in valid, "Invalid attribute '%s' of HTML tag '%s'." % (name, tag)
+                assert name in valid or name.startswith('data-'), \
+                    "Invalid attribute '%s' of HTML tag '%s'." % (name, tag)
                 if name == 'cls':
                     name = 'class'
                 result_list.append(' ' + name + '=')
