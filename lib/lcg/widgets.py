@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -220,20 +220,28 @@ class Notebook(Widget, lcg.Container):
 class PopupMenuItem(Widget, lcg.Content):
     """Popup menu item specification."""
 
-    def __init__(self, label, tooltip=None, uri=None, enabled=True, onclick=None):
+    def __init__(self, label, tooltip=None, uri=None, enabled=True, callback=None, 
+                 callback_args=()):
         """Arguments:
           label -- item title (string)
-          tooltip -- item description/tooltip (string)
-          uri -- URI where the item points to (string)
-          enabled -- indicates whether the item is active
-          onclick -- JavaScript code to execute on invocation (string)
-        
+          tooltip -- item description/tooltip (string).
+          enabled -- indicates whether the item is active.
+          uri -- URI where the item points to (string).  If None, 'callback'
+            must be defined.
+          callback -- JavaScript function name to execute (string).  This
+            function will be called with the element on which the menu was
+            invoked as the first argument.  Additional arguments may be
+            optionally specified by 'callback_args'.
+          callback_args -- Additional JavaScript callback function arguments
+            (tuple of values capable of JSON conversion).
+
         """
         self._label = label
         self._tooltip = tooltip
         self._uri = uri
         self._enabled = enabled
-        self._onclick = onclick
+        self._callback = callback
+        self._callback_args = callback_args
     def label(self):
         return self._label
     def tooltip(self):
@@ -242,8 +250,10 @@ class PopupMenuItem(Widget, lcg.Content):
         return self._uri
     def enabled(self):
         return self._enabled
-    def onclick(self):
-        return self._onclick
+    def callback(self):
+        return self._callback
+    def callback_args(self):
+        return self._callback_args
 
     
 class PopupMenuCtrl(Widget, lcg.Content):
@@ -290,7 +300,8 @@ class PopupMenuCtrl(Widget, lcg.Content):
                       tooltip=context.translate(item.tooltip()),
                       enabled=item.enabled(),
                       uri=item.uri(),
-                      onclick=item.onclick())
+                      callback=item.callback(),
+                      callback_args=item.callback_args())
                  for item in self._items]
         return (items, context.translate(self._tooltip), self._active_area_selector)
 

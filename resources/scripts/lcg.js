@@ -600,13 +600,19 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
     // Popup menu widget.
     
     initialize: function ($super, items) {
-	// items -- array of menu items.  Each item is a dictionary with the
-	// following keys:
+	// items -- array of menu items.  Each item is an object with the
+	// following attributes:
 	//   label -- item title (string)
 	//   tooltip -- item description/tooltip (string, optional)
 	//   uri -- URI where the item points to (string, optional)
 	//   enabled -- if present and false, the item will be disabled (inactive)
-	// You will typically supply either onclick or href.
+	//   callback_args -- array of additional calback function arguments
+        //   callback -- name of the function to be called (string).  This
+        //    function will be called with the element on which the menu was
+        //    invoked as the first argument.  Additional arguments may be
+        //    optionally specified by 'callback_args'.
+        //  callback_args -- Additional arguments to pass to the callback function
+	// You will typically supply either uri or callback, but both can be used.
 	var i, item, a, enabled;
 	var ul = new Element('ul');
 	for (i = 0; i < items.length; i++) {
@@ -653,6 +659,22 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    this.remove();
 	    var a = item.down('a');
 	    var spec = a._lcg_popup_menu_item_spec;
+	    if (spec.callback) {
+		var namespaces = spec.callback.split(".");
+		var func = namespaces.pop();
+		var context = window;
+		for (var i = 0; i < namespaces.length; i++) {
+		    var context = context[namespaces[i]];
+		}
+		var args = [this.popup_element];
+		if (spec.callback_args) {
+		    for (var i = 0; i < spec.callback_args.length; i++) {
+			args[i + 1] = spec.callback_args[i];
+		    }
+		}
+		console.log('::', args, spec.callback_args);
+		return context[func].apply(this, args);
+	    }
 	    if (spec.uri) {
 		self.location = spec.uri;
 	    }
@@ -661,8 +683,8 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 
     cmd_quit: function (item) {
 	this.remove();
-	if (this.return_keyboard_focus) {
-	    this.set_focus(this.return_keyboard_focus);
+	if (this.popup_element) {
+	    this.set_focus(this.popup_element);
 	}
     },
 
@@ -687,16 +709,15 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    lcg.popup_menu.remove();
 	}
 	event.stop();
+	var element = event.element();
 	var left, top;
 	if (event.pointerX() >=0 && event.pointerY() >= 0) {
-	    this.return_keyboard_focus = null;
 	    left = event.pointerX();
 	    top = event.pointerY();
 	} else {
-	    this.return_keyboard_focus = event.element();
-	    var pos = event.element().cumulativeOffset();
-	    left = pos.left;
-	    top = pos.top+10;
+	    var offset = element.cumulativeOffset();
+	    left = offset.left;
+	    top = offset.top+10;
 	}
 	lcg.popup_menu = this;
 	var menu = this.node;
@@ -708,10 +729,9 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    top -= menu.getHeight();
 	}
 	menu.setStyle({left: left+'px', top: top+'px', display: 'block'});
+	this.popup_element = element;
 	this.ignore_next_click = !event.isLeftClick();
-	if (this.return_keyboard_focus) {
-	    this.set_focus(menu.down('li'));
-	}
+	this.set_focus(menu.down('li'));
 	this.on_click_handler = this.on_document_click.bind(this);
 	$(document).observe('click', this.on_click_handler);
     },
