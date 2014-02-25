@@ -29,14 +29,14 @@ from lcg import *
 import functools
 
 class ContentNode(object):
-    """Representation of one output document within an LCG publication.
+    """Representation of one node within an LCG publication.
 
-    This class represents a generic node of the document structure.  Each node
-    has its 'Content' and may have several child nodes.
+    This class represents a generic node of publication structure.  Each node
+    has its 'Content' and may have several child nodes.  The meaning of one
+    node is not strictly defined.  It is typically used for top level chapters,
+    but it may be used flexibly together with 'Content' sections to express the
+    content structure to fit a particular application.
 
-    By instantiating a node, the content is ready for export (see 'Content' for
-    more details).
-    
     """
 
     def __init__(self, id, title=None, brief_title=None, heading=None, descr=None, variants=(),
