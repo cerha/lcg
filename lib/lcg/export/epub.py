@@ -126,7 +126,6 @@ class EpubExporter(Exporter):
         RESOURCEDIR = 'rsrc'
         PACKAGE_DOC_FILENAME = 'pkg.opf'
         NAV_DOC_FILENAME = 'nav.xhtml'
-        UID_ID = 'uid'
 
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
@@ -230,26 +229,38 @@ class EpubExporter(Exporter):
     def _package_document(self, node, lang, resources, scripted_nodes):
         doc = xml.Document()
         package = doc.appendChild(doc.createElement('package'))
+        uid_id = 'uid'
         for name, value in (
                 ('xmlns', Constants.OPF_NS),
                 ('version', '3.0'),
-                ('unique-identifier', self.Config.UID_ID),
+                ('unique-identifier', uid_id),
                 ('xml:lang', lang)):
             package.setAttribute(name, value)
         # metadata
-        metadata = package.appendChild(doc.createElement('metadata'))
-        metadata.setAttribute('xmlns:dc', Constants.DC_NS)
-        for name, value, attr in (
-                ('dc:identifier', self._document_unique_identifier(node, lang),
-                 (('id', self.Config.UID_ID),)),
-                ('dc:title', node.title(), ()),
-                ('dc:language', lang, ()),
-                ('meta', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
-                 (('property', 'dcterms:modified'),))):
-            element = metadata.appendChild(doc.createElement(name))
-            for aname, avalue in attr:
-                element.setAttribute(aname, avalue)
-            element.appendChild(doc.createTextNode(value))
+        metadata = node.metadata() or lcg.Metadata()
+        metadata_element = package.appendChild(doc.createElement('metadata'))
+        metadata_element.setAttribute('xmlns:dc', Constants.DC_NS)
+        def add_meta(name, value, **kwargs):
+            if value:
+                element = metadata_element.appendChild(doc.createElement(name))
+                for k, v in kwargs.items():
+                    element.setAttribute(k, v)
+                element.appendChild(doc.createTextNode(value))
+        if metadata.isbn:
+            identifier = 'urn:isbn:' + metadata.isbn
+        else:
+            # TODO: generate a unique identifier?
+            identifier = 'urn:uuid:073a5060-6629-11e1-b86c-0800200c9a66'
+        add_meta('dc:identifier', identifier)
+        add_meta('dc:source', metadata.original_isbn and 'urn:isbn:' + metadata.original_isbn)
+        add_meta('dc:title', node.title())
+        add_meta('dc:publisher', metadata.publisher)
+        add_meta('dc:date', metadata.published)
+        add_meta('dc:language', lang)
+        for author in metadata.authors:
+            add_meta('dc:creator', author)
+        add_meta('meta', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+                 property='dcterms:modified')
         # manifest and spine
         manifest = package.appendChild(doc.createElement('manifest'))
         spine = package.appendChild(doc.createElement('spine'))
@@ -318,10 +329,6 @@ class EpubExporter(Exporter):
         data = context.localize(exporter.export(context))
         scripted = context.generator().scripted
         return (data.encode('UTF-8'), scripted)
-
-    def _document_unique_identifier(self, node, lang):
-        #TODO
-        return 'urn:uuid:%s' % ('073a5060-6629-11e1-b86c-0800200c9a66',)
 
     def uri(self, context, target, **kwargs):
         return self._html_exporter.uri(context, target, **kwargs)

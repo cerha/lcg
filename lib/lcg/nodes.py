@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,7 +43,8 @@ class ContentNode(object):
                  content=None, children=(), hidden=False, active=True, foldable=False,
                  resource_provider=None, globals=None, cover_image=None,
                  page_header=None, page_footer=None, left_page_footer=None, right_page_footer=None,
-                 first_page_header=None, page_background=None, presentation=None):
+                 first_page_header=None, page_background=None, presentation=None,
+                 metadata=None):
         """Initialize the instance.
 
         Arguments:
@@ -95,6 +96,8 @@ class ContentNode(object):
             'None', nothing is put on the background.
           presentation -- dictionary of 'Presentation' instances (or 'None'
             values) associated with this node, with language codes as keys.
+          metadata -- an instance of 'lcg.Metadata' defining the publication meta data; 
+            Only relevant for the root node of the publication.
           
         """
         assert isinstance(id, basestring), repr(id)
@@ -102,6 +105,7 @@ class ContentNode(object):
         assert isinstance(active, bool), active
         assert isinstance(foldable, bool), foldable
         assert isinstance(variants, (list, tuple))
+        assert metadata is None or isinstance(metadata, Metadata)
         self._id = id
         self._parent = None #parent
         self._title = title if title is not None else brief_title or id
@@ -149,6 +153,7 @@ class ContentNode(object):
         #        assert nid not in seen, \
         #               "Duplicate node id: %s, %s" % (n, seen[nid])
         #        seen[nid] = n
+        self._metadata = metadata
         
     def __str__(self):
         return "<%s[%x] id='%s'>" % (self.__class__.__name__, positive_id(self), self.id())
@@ -403,3 +408,39 @@ class ContentNode(object):
     def presentation(self, lang):
         """Return presentation of this node."""
         return self._lang_parameter(self._presentation, lang)
+
+    def metadata(self):
+        """Return metadata of this node."""
+        return self._metadata
+
+
+class Metadata(object):
+    """Meta data describing a publication."""
+    authors = ()
+    """A sequence of full names of publication content authors."""
+    isbn = None
+    """ISBN identifier of the publication."""
+    original_isbn = None
+    """ISBN identifier of the original work the publication was derived from."""
+    publisher = None
+    """Publisher of the original."""
+    published = None
+    """Date of publication of the original work."""
+    # TODO: Year as a string is currenty expected for publication date.
+
+    def __init__(self, **kwargs):
+        """Call with keyword arguments to assign values to instance attributes."""
+        if __debug__:
+            for key, value in kwargs.items():
+                assert hasattr(self, key), "Unknown meta data attribute: %s" % key 
+                if key == 'authors':
+                    assert isinstance(value, (tuple, list)) and \
+                        all(isinstance(name, basestring) for name in value), \
+                        "Invalid value for meta data attribute %s: %s" % (key, value) 
+                else:
+                    assert value is None or isinstance(value, basestring), \
+                    "Invalid value for meta data attribute %s: %s" % (key, value) 
+            self.__dict__.update(**kwargs)
+
+        
+
