@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1210,7 +1210,8 @@ class HTMLProcessor(object):
                 (('a', ('name', '.+')), self._anchor),
                 (('a', ('class', 'lcg-audio')), (self._media, dict(class_=lcg.InlineAudio))),
                 (('a', ('class', 'lcg-video')), (self._media, dict(class_=lcg.InlineVideo))),
-                ('a', self._link),
+                (('a', ('href', '.+')), self._link),
+                ('a', self._container),
                 ('table', self._table),
                 ('tr', (self._container, dict(class_=lcg.TableRow))),
                 ('t[dh]', self._table_cell),
