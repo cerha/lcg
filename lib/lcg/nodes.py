@@ -154,6 +154,7 @@ class ContentNode(object):
         #               "Duplicate node id: %s, %s" % (n, seen[nid])
         #        seen[nid] = n
         self._metadata = metadata
+        self._used_content_resources = []
         
     def __str__(self):
         return "<%s[%x] id='%s'>" % (self.__class__.__name__, positive_id(self), self.id())
@@ -345,7 +346,7 @@ class ContentNode(object):
         (class).
         
         """
-        resources = self._content.resources()
+        resources = tuple(self._used_content_resources)
         if cls is not None:
             resources = tuple([r for r in resources if isinstance(r, cls)])
         if self._resource_provider:
@@ -356,6 +357,8 @@ class ContentNode(object):
         """Get the resource instance by its type and relative filename."""
         for resource in self._content.resources():
             if resource.filename() == filename:
+                if resource not in self._used_content_resources:
+                    self._used_content_resources.append(resource)
                 return resource
         if self._resource_provider:
             return self._resource_provider.resource(filename, node=self, **kwargs)
