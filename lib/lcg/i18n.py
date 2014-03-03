@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -569,12 +569,12 @@ class Decimal(Localizable):
     def __init__(self, value, precision=None, **kwargs):
         self._value = value
         self._precision = precision
-        if isinstance(value, int):
-            self._format = '%d'
-        elif precision is None:
-            self._format = '%f'
-        else:
+        if precision is not None:
             self._format = '%%.%df' % precision
+        elif isinstance(value, int):
+            self._format = '%d'
+        else:
+            self._format = '%f'
         super(Decimal, self).__init__(**kwargs)
 
     def _clone_args(self):
