@@ -238,9 +238,10 @@ lcg.NotebookMenu = Class.create(lcg.Menu, {
     init_item: function ($super, li, id, prev, parent) {
 	$super(li, id, prev, parent);
 	li.setAttribute('role', 'tab');
-	li.down('a').onclick = function() {
-	    this.cmd_activate(li); return false; 
-	}.bind(this);
+	li.down('a').observe('click', function(event) {
+	    this.cmd_activate(li);
+	    event.stop();
+	}.bind(this));
     },
     
     keymap: function () {
