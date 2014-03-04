@@ -5,6 +5,11 @@ table.lcg-fieldset {
 }
 table.lcg-fieldset th {
     white-space: nowrap;
+    vertical-align: top;
+    text-align: left;
+}
+table.lcg-fieldset td {
+    vertical-align: top;
 }
 
 table.lcg-table {
