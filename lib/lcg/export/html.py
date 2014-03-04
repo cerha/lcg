@@ -607,9 +607,9 @@ class HtmlExporter(Exporter):
             links.append(g.a(label, href=self._uri_node(context, node, lang=lang),
                              lang=lang, cls=cls) + sign)
         return concat(g.a(self._LANGUAGE_SELECTION_LABEL,
-                          id='language-selection-anchor', name='language-selection-anchor'),
-                      "\n", concat(links, separator=" " + g.span('|', cls='sep') + "\n"))
-
+                          id='language-selection-anchor', name='language-selection-anchor'), ' ',
+                      concat(links, separator=(' ' + g.span('|', cls='sep') + ' ')))
+        
     def _language_selection_image(self, context, lang):
         #return context.uri(context.resource('flags/%s.gif' % lang))
         return None
