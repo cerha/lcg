@@ -732,7 +732,7 @@ A screen reader is:
  '''
         content = lcg.html2lcg(html)
         p = lcg.ResourceProvider()
-        sec = lcg.Section("Section One", anchor='sec1', content=lcg.Content())
+        sec = lcg.Section("Section One", id='sec1', content=lcg.Content())
         n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
@@ -803,7 +803,7 @@ class HtmlExport(unittest.TestCase):
                      lcg.Image('bb.jpg'),
                      lcg.Image('cc.png', title="Image C", descr="Nice picture"))
         p = lcg.ResourceProvider(resources=resources)
-        sec = lcg.Section("Section One", anchor='sec1', content=lcg.Content())
+        sec = lcg.Section("Section One", id='sec1', content=lcg.Content())
         n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)

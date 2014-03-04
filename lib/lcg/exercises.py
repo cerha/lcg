@@ -860,7 +860,7 @@ class _Test(object):
         """Evaluate the answers of given request and return the number of points."""
         points = 0
         for i, correct_answer in enumerate(self.answers()):
-            name = '%s-a%d' % (self.anchor(), i + 1,)
+            name = '%s-a%d' % (self.id(), i+1)
             answer = self._param(req, name)
             # Correct answer is a numer or string.
             if answer == unicode(correct_answer):

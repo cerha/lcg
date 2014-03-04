@@ -61,8 +61,8 @@ class ExerciseExporter(object):
 
     @classmethod
     def help(cls):
-        sections = [lcg.Section(title=title, anchor=anchor, content=lcg.coerce(content))
-                    for title, anchor, content in
+        sections = [lcg.Section(title=title, id=section_id, content=lcg.coerce(content))
+                    for title, section_id, content in
                     ((_("Instructions"), 'intro', cls._EXERCISE_CLASS.help_intro()),
                      (_("Shortcut Keys"), 'keys', cls._help_keys()),
                      (_("Indicators"), 'indicators', cls._help_indicators()),

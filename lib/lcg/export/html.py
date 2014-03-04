@@ -757,7 +757,7 @@ class HtmlExporter(Exporter):
     def _export_section(self, context, element):
         g = self._generator
         level = len(element.section_path()) + 1
-        anchor = element.anchor()
+        section_id = element.id()
         backref = element.backref()
         if backref:
             href = "#" + backref
@@ -774,14 +774,15 @@ class HtmlExporter(Exporter):
             lang = heading.content()[0].lang()
             heading = lcg.Container(heading.content()[0].content())
         wrap = self._exported_section_wrapper(g)
-        return wrap(g.div((g.h(g.a(heading.export(context), href=href, name=anchor, cls='backref'),
+        return wrap(g.div((g.h(g.a(heading.export(context), href=href, name=section_id,
+                                   cls='backref'),
                                level, lang=lang),
                            g.div(g.div(self._exported_container_content(context, element),
                                        cls='section-content-wrapper'),
                                  cls='section-content section-level-%d' % level)),
                           cls='section-container section-level-%d' % level,
                           **self._container_attr(element)),
-                    id='section-' + anchor)
+                    id='section-' + section_id)
 
     def _export_preformatted_text(self, context, element):
         return self._generator.pre(self.escape(element.text()))

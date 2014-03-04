@@ -261,7 +261,7 @@ class Exporter(object):
         return node.id()
 
     def _uri_section(self, context, section, local=False):
-        result = "#" + section.anchor()
+        result = "#" + section.id()
         if not local:
             result = self._uri_node(context, section.parent()) + result
         return result

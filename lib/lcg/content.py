@@ -231,7 +231,8 @@ class Container(Content):
             sequence of 'Content' instances in the order in which they should
             appear in the output.
           name -- optional string identifier which may be used as output
-            presentation selector (for example as a 'class' attribute in HTML).
+            presentation selector (for example in HTML it is the value for
+            the 'class' attribute ).
           id -- depracated, use 'name' instead.
           halign -- horizontal alignment of the container content; one of the
             'HorizontalAlignment' constants or 'None' (default alignment).
@@ -1188,19 +1189,19 @@ class Section(Container):
       * Every section has a title, which appears in the output document as a
         heading.
 
-      * Link targets (anchors) are attached to sections.  You may define the
-        anchor name explicitly or it is assigned automatically.  The
-        automatically assigned link targets are based on section order and
-        hierarchy, so they will not change across several LCG invocations as
-        long as the hierarchy remains unchanged.
+      * Sections can be used as link targets.  You can define section id
+        explicitly or it is assigned automatically.  The automatically assigned
+        ids are based on section order and hierarchy, so they will not change
+        across several LCG invocations as long as the hierarchy remains
+        unchanged.
 
       * Sections are numbered.  Each section knows its number within its
         container.
 
     """
-    _ANCHOR_PREFIX = 'sec'
+    _ID_PREFIX = 'sec'
     
-    def __init__(self, title, content, heading=None, anchor=None,
+    def __init__(self, title, content, heading=None, id=None, anchor=None,
                  descr=None, in_toc=True, **kwargs):
         """Arguments:
 
@@ -1212,23 +1213,31 @@ class Section(Container):
             None), the content is created automatically as TextContent(title),
             but you may pass any lcg.Content instance when some more fancy
             content is desired.
-          anchor -- section link target name as a string.  If 'None' (default)
-            the link target name will be generated automatically.  If you want
-            to refer to a section explicitly from somewhere, you will probably
-            not rely on the default anchor name, so that's how you can define
-            your own.  This also allows you to find a section by its anchor
-            name in the hierarchy (see 'ContentNode.find_section()').
+          id -- unique section identifier as a string.  If 'None' (default) the
+            identifier will be generated automatically based on section order
+            and hierarchy, so it will not change across several LCG invocations
+            as long as the hierarchy remains unchanged.  However if you want to
+            refer to a section explicitly from outside the document, it is
+            better to set the identifier explicitly to maintain consistency.
+            The identifier must be, however, unique within the whole content
+            hierarchy (of one 'ContentNode').  See also 'ContentNode.find_section(),
+            which allows you to find a section of given id in content
+            hierarchy.
+          anchor -- deprecated - use 'id' instead.
           in_toc -- a boolean flag indicating whether this section is supposed
             to be included in the Table of Contents
-            
+
         """
+        if anchor:
+            assert id is None
+            id = anchor
         assert isinstance(title, basestring), title
         assert heading is None or isinstance(heading, Content), heading
-        assert isinstance(anchor, basestring) or anchor is None, anchor
+        assert isinstance(id, basestring) or id is None, id
         assert isinstance(in_toc, bool), in_toc
         self._title = title
         self._in_toc = in_toc
-        self._anchor = anchor
+        self._id = id
         self._descr = descr
         self._backref = None
         self._heading = heading or TextContent(title)
@@ -1273,23 +1282,27 @@ class Section(Container):
         """Return true if the section is supposed to appear in TOC."""
         return self._in_toc
     
-    def anchor(self):
-        """Return the link target name of this section as a string.
+    def id(self):
+        """Return the unique section identifier as a string.
 
-        If 'anchor' was passed to the constructor, it is used.  Otherwise the
-        anchor name is automatically generated.  The generated name is unique
-        within the parent node and does not change when the section structure
-        remains the same (links will work throughout multiple exports).
+        If 'id' was passed to the constructor, it is used.  Otherwise the
+        identifier is automatically generated.  The generated id is unique
+        within the parent node and does not change if the section structure
+        remains unchanged (external references should work throughout multiple
+        exports in this case).
 
         """
-        if self._anchor is None:
+        if self._id is None:
             path = self.section_path()
             if len(path) >= 2:
-                self._anchor = path[-2].anchor() + '.' + str(self.section_number())
+                self._id = path[-2].id() + '.' + str(self.section_number())
             else:
                 numbers = [str(x.section_number()) for x in path]
-                self._anchor = self._ANCHOR_PREFIX + '.'.join(numbers)
-        return self._anchor
+                self._id = self._ID_PREFIX + '.'.join(numbers)
+        return self._id
+
+    # Temporary backwards compatibility.
+    anchor = id
 
     def create_backref(self, node):
         """Create a back reference anchor for the section and return it as a string.
@@ -1310,13 +1323,13 @@ class Section(Container):
 
         """
         if node is self.parent() and self._backref is None and config.allow_backref:
-            self._backref = "backref-" + self.anchor()
+            self._backref = "backref-" + self.id()
             return self._backref
         else:
             return None
     
     def backref(self):
-        """Return the anchor name if a back reference was previously created successfully."""
+        """Return the back reference if it was previously created successfully."""
         return self._backref
 
 

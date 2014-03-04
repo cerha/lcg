@@ -102,7 +102,7 @@ class EpubHtml5Exporter(Html5Exporter):
         return self.resource_uri(resource)
 
     def _uri_section(self, context, section, local=False):
-        result = "#section-" + section.anchor()
+        result = "#section-" + section.id()
         if not local:
             result = self._uri_node(context, section.parent()) + result
         return result

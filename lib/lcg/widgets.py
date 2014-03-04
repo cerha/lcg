@@ -196,7 +196,7 @@ class Notebook(Widget, lcg.Container):
         """Arguments:
 
            content -- sequence of 'lcg.Section' instances representing the tabs
-           active -- id (anchor name) of the active tab or None
+           active -- id of the active tab or None
            **kwargs -- other arguments defined by the parent class
            
         """
@@ -209,8 +209,8 @@ class Notebook(Widget, lcg.Container):
     
     def _export_widget(self, context):
         g = context.generator()
-        switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#'+s.anchor(), title=s.descr(),
-                                           cls=(s.anchor()==self._active and 'current' or None)),
+        switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#section-'+s.id(), title=s.descr(),
+                                           cls=(s.id()==self._active and 'current' or None)),
                                        cls="notebook-tab")
                                   for s in self.sections(context)]),
                         cls='notebook-switcher')

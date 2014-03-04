@@ -214,16 +214,16 @@ class ContentNode(object):
         """Return all the top-level sections within this node's content."""
         return self._content.sections(context)
     
-    def find_section(self, anchor, context):
-        def find(anchor, sections):
+    def find_section(self, section_id, context):
+        def find(section_id, sections):
             for s in sections:
-                if s.anchor() == anchor:
+                if s.id() == section_id:
                     return s
-                found = find(anchor, s.sections(context))
+                found = find(section_id, s.sections(context))
                 if found:
                     return found
             return None
-        return find(anchor, self.sections(context))
+        return find(section_id, self.sections(context))
 
     def find_node(self, id):
         def find(id, node):
