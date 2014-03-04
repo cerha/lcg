@@ -330,7 +330,7 @@ class _FillInExerciseExporter(ExerciseExporter):
     
     def _export_task_text(self, context, exercise, exercise_id, task):
         def make_field(answer, label, word_start, word_end):
-            field = self._make_field(context, exercise, exercise_id, task, answer)
+            field, field_id = self._make_field(context, exercise, exercise_id, task, answer)
             if word_start or word_end:
                 return context.generator().span(word_start + field + word_end, cls='nowrap')
             else:
@@ -356,15 +356,16 @@ class _FillInExerciseExporter(ExerciseExporter):
         g = context.generator()
         self._field_number += 1
         field_id = self._task_id(exercise, exercise_id, task) + '-f%d' % self._field_number
-        return context.localize(concat(
+        field = concat(
             g.field(name=field_id, id=field_id, size=len(text),
                     value=self._field_value(context, field_id),
                     readonly=self._readonly(context),
                     cls=self._field_cls(context, field_id, text)),
             [self._media_control(context, m, inline=True) for m in task.media()],
             self._field_result(context, field_id, text)
-        ))
-
+        )
+        return (context.localize(field), field_id)
+                
     def _export_fill_in_task(self, context, prompt, text):
         if prompt:
             return prompt + '<br/>' + text
@@ -384,9 +385,9 @@ class _FillInExerciseExporter(ExerciseExporter):
             # have the prompt marked as a label.  Morover some screeen-readers
             # (JAWs) are confused too and present the task incorrectly.
         else:
-            text = self._make_field(context, exercise, exercise_id, task, task.text())
+            text, field_id = self._make_field(context, exercise, exercise_id, task, task.text())
             if prompt:
-                prompt = g.label(prompt, self._task_id(exercise, exercise_id, task))
+                prompt = g.label(prompt, field_id)
         return (self._export_fill_in_task(context, prompt, text),)
                                        
     
