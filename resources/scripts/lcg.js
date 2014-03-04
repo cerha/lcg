@@ -282,12 +282,11 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 		this.items[0]); // finally the first item is used with the lowest precedence.
     },
 
-
     init_item: function ($super, li, id, prev, parent) {
 	$super(li, id, prev, parent);
 	var link = li.down('a');
 	var href = link.getAttribute('href'); // The href always starts with '#'.
-	var page = $('section-'+href.substr(1));
+	var page = $(href.substr(1));
 	li._lcg_notebook_page = page;
 	page._lcg_notebook_item = li;
 	page.down('h1,h2,h3,h4,h5,h6').hide();
@@ -300,7 +299,7 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	var match = self.location.href.match('#');
 	if (match) {
 	    var parts = self.location.href.split('#', 2);
-	    var page = this.node.down('#section-'+parts[1]);
+	    var page = this.node.down('#'+parts[1]);
 	    if (page && page._lcg_notebook_item) {
 		return page._lcg_notebook_item;
 	    }

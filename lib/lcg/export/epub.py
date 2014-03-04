@@ -101,12 +101,6 @@ class EpubHtml5Exporter(Html5Exporter):
     def _uri_resource(self, context, resource):
         return self.resource_uri(resource)
 
-    def _uri_section(self, context, section, local=False):
-        result = "#section-" + section.id()
-        if not local:
-            result = self._uri_node(context, section.parent()) + result
-        return result
-
     def _allow_flash_audio_player(self, context, audio):
         return False
         

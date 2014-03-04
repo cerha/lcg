@@ -694,8 +694,8 @@ class HtmlExporter(Exporter):
         return self._export_container(context, element, wrap=self._generator.sub)
 
     def _export_anchor(self, context, element):
-        return self._generator.a(self._export_text_content(context, element),
-                                 name=element.anchor())
+        g = self._generator
+        return g.span(self._export_text_content(context, element), id=element.anchor())
 
     def _export_link(self, context, element):
         target = element.target(context)
@@ -750,22 +750,17 @@ class HtmlExporter(Exporter):
     def _export_heading(self, context, element):
         return self._export_container(context, element)
 
-    def _exported_section_wrapper(self, g):
-        # Use div in HTML4, but allow overriding for HTML 5.
-        return g.div
-
     def _export_section(self, context, element):
+        # Use div in HTML4, but allow overriding for HTML 5.
+        g = self._generator
+        return g.div(self._export_section_container(context, element), id=element.id())
+
+    def _export_section_container(self, context, element):
         g = self._generator
         level = len(element.section_path()) + 1
-        section_id = element.id()
-        backref = element.backref()
-        if backref:
-            href = "#" + backref
-        else:
-            href = None
         # Get rid of the outer Heading instance and only consider the contained content.
-        heading = element.heading()
         lang = None
+        heading = element.heading()
         if len(heading.content()) == 1 and isinstance(heading.content()[0], lcg.Container):
             # In this case, we want replace the Container created in
             # HTMLProcessor._section() and may have the lang attribute set by a
@@ -773,16 +768,17 @@ class HtmlExporter(Exporter):
             # heading.export()) and use the lang for the <h> tag.
             lang = heading.content()[0].lang()
             heading = lcg.Container(heading.content()[0].content())
-        wrap = self._exported_section_wrapper(g)
-        return wrap(g.div((g.h(g.a(heading.export(context), href=href, name=section_id,
-                                   cls='backref'),
-                               level, lang=lang),
-                           g.div(g.div(self._exported_container_content(context, element),
-                                       cls='section-content-wrapper'),
-                                 cls='section-content section-level-%d' % level)),
-                          cls='section-container section-level-%d' % level,
-                          **self._container_attr(element)),
-                    id='section-' + section_id)
+        exported_heading = heading.export(context)
+        backref = element.backref()
+        if backref:
+            exported_heading = self._generator.a(exported_heading, href="#" + backref, 
+                                                 cls='backref')
+        return g.div((g.h(exported_heading, level, lang=lang),
+                      g.div(g.div(self._exported_container_content(context, element),
+                                  cls='section-content-wrapper'),
+                            cls='section-content section-level-%d' % level)),
+                     cls='section-container section-level-%d' % level,
+                     **self._container_attr(element))
 
     def _export_preformatted_text(self, context, element):
         return self._generator.pre(self.escape(element.text()))
@@ -1180,8 +1176,9 @@ class HtmlExporter(Exporter):
 class Html5Exporter(HtmlExporter):
     Generator = XhtmlGenerator
 
-    def _exported_section_wrapper(self, g):
-        return g.section
+    def _export_section(self, context, element):
+        g = self._generator
+        return g.section(self._export_section_container(context, element), id=element.id())
 
     def export(self, context):
         g = self._generator

@@ -209,7 +209,7 @@ class Notebook(Widget, lcg.Container):
     
     def _export_widget(self, context):
         g = context.generator()
-        switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#section-'+s.id(), title=s.descr(),
+        switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#'+s.id(), title=s.descr(),
                                            cls=(s.id()==self._active and 'current' or None)),
                                        cls="notebook-tab")
                                   for s in self.sections(context)]),
