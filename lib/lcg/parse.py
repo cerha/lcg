@@ -1284,7 +1284,20 @@ class HTMLProcessor(object):
                         kwargs['presentation'] = presentation = lcg.Presentation()
                         presentation.indent_left = lcg.UFont(int(margin) / 12)
             content = self._transform_sub(element)
+            if class_ == lcg.Paragraph and self._find_element(content, lcg.Paragraph):
+                class_ = lcg.Container
             return class_(content, lang=element.attrib.get('lang'), **kwargs)
+
+        def _find_element(self, content, cls):
+            if isinstance(content, cls):
+                return True
+            elif isinstance(content, lcg.Container):
+                return self._find_element(content.content(), cls)
+            elif isinstance(content, (list, tuple)):
+                for item in content:
+                    if self._find_element(item, cls):
+                        return True
+            return False
 
         def _blockquote(self, element, followers):
             kwargs = {}
