@@ -421,6 +421,12 @@ class Metadata(object):
     """Meta data describing a publication."""
     authors = ()
     """A sequence of full names of publication content authors."""
+    contributors = None
+    """A sequence of full names of publication content contributors.
+
+    Contributors are authors with less significant.
+
+    """
     isbn = None
     """ISBN identifier of the publication."""
     original_isbn = None
@@ -435,14 +441,14 @@ class Metadata(object):
         """Call with keyword arguments to assign values to instance attributes."""
         if __debug__:
             for key, value in kwargs.items():
-                assert hasattr(self, key), "Unknown meta data attribute: %s" % key 
-                if key == 'authors':
+                assert hasattr(self, key), "Unknown meta data attribute: %s" % key
+                if key in ('authors', 'contributors'):
                     assert isinstance(value, (tuple, list)) and \
                         all(isinstance(name, basestring) for name in value), \
-                        "Invalid value for meta data attribute %s: %s" % (key, value) 
+                        "Invalid value for meta data attribute %s: %s" % (key, value)
                 else:
                     assert value is None or isinstance(value, basestring), \
-                    "Invalid value for meta data attribute %s: %s" % (key, value) 
+                    "Invalid value for meta data attribute %s: %s" % (key, value)
             self.__dict__.update(**kwargs)
 
         

@@ -252,8 +252,10 @@ class EpubExporter(Exporter):
         add_meta('dc:publisher', metadata.publisher)
         add_meta('dc:date', metadata.published)
         add_meta('dc:language', lang)
-        for author in metadata.authors:
-            add_meta('dc:creator', author)
+        for name in metadata.authors:
+            add_meta('dc:creator', name)
+        for name in metadata.contributors:
+            add_meta('dc:contributor', name)
         add_meta('meta', datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
                  property='dcterms:modified')
         # manifest and spine
