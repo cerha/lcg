@@ -24,9 +24,9 @@ document in the hierarchy is represented by a single 'ContentNode' instance (def
 
 """
 
-from lcg import *
-
+import lcg
 import functools
+import copy
 
 class ContentNode(object):
     """Representation of one node within an LCG publication.
@@ -109,7 +109,7 @@ class ContentNode(object):
         self._id = id
         self._parent = None #parent
         self._title = title if title is not None else brief_title or id
-        self._heading = heading or TextContent(self._title)
+        self._heading = heading or lcg.TextContent(self._title)
         self._brief_title = brief_title or title
         self._descr = descr
         self._hidden = hidden
@@ -117,38 +117,45 @@ class ContentNode(object):
         self._foldable = foldable
         self._variants = tuple(variants)
         assert (page_header is None or isinstance(page_header, dict) and
-                all ([x is None or isinstance(x, Content) for x in page_header.values()])), \
+                all([x is None or isinstance(x, lcg.Content)
+                     for x in page_header.values()])), \
             page_header
         self._page_header = page_header
-        assert (first_page_header is None or isinstance(first_page_header, dict) and 
-                all ([x is None or isinstance(x, Content) for x in first_page_header.values()])), \
+        assert (first_page_header is None or isinstance(first_page_header, dict) and
+                all([x is None or isinstance(x, lcg.Content)
+                     for x in first_page_header.values()])), \
             first_page_header
         self._first_page_header = first_page_header
         assert (page_footer is None or isinstance(page_footer, dict) and
-                all ([x is None or isinstance(x, Content) for x in page_footer.values()])), \
+                all([x is None or isinstance(x, lcg.Content)
+                     for x in page_footer.values()])), \
             page_footer
         self._page_footer = page_footer
         assert (left_page_footer is None or isinstance(left_page_footer, dict) and
-                all ([x is None or isinstance(x, Content) for x in left_page_footer.values()])), \
+                all([x is None or isinstance(x, lcg.Content)
+                     for x in left_page_footer.values()])), \
             left_page_footer
         self._left_page_footer = left_page_footer
         assert (right_page_footer is None or isinstance(right_page_footer, dict) and
-                all ([x is None or isinstance(x, Content) for x in right_page_footer.values()])), \
+                all([x is None or isinstance(x, lcg.Content)
+                     for x in right_page_footer.values()])), \
             right_page_footer
         self._right_page_footer = right_page_footer
         assert (page_background is None or isinstance(page_background, dict) and
-                all ([x is None or isinstance(x, Content) for x in page_background.values()])), \
+                all([x is None or isinstance(x, lcg.Content)
+                     for x in page_background.values()])), \
             page_background
         self._page_background = page_background
         assert cover_image is None or isinstance(cover_image, lcg.Image), cover_image
         self._cover_image = cover_image
         assert (presentation is None or isinstance(presentation, dict) and
-                all ([x is None or isinstance(x, Presentation) for x in presentation.values()])), \
+                all([x is None or isinstance(x, lcg.Presentation)
+                     for x in presentation.values()])), \
             presentation
         self._presentation = presentation
         if isinstance(content, (tuple, list)):
-            content = Container(content)
-        assert isinstance(content, Content), content
+            content = lcg.Container(content)
+        assert isinstance(content, lcg.Content), content
         content.set_parent(self)
         self._content = content
         for child in children:
@@ -171,7 +178,7 @@ class ContentNode(object):
         self._used_content_resources = []
         
     def __str__(self):
-        return "<%s[%x] id='%s'>" % (self.__class__.__name__, positive_id(self), self.id())
+        return "<%s[%x] id='%s'>" % (self.__class__.__name__, lcg.positive_id(self), self.id())
 
     def _set_parent(self, node):
         assert isinstance(node, ContentNode)
@@ -343,7 +350,7 @@ class ContentNode(object):
 
         """
         assert isinstance(name, str), name
-        assert isinstance(value, Content), value
+        assert isinstance(value, lcg.Content), value
         node = self
         if top:
             while True:
@@ -462,8 +469,5 @@ class Metadata(object):
                         "Invalid value for meta data attribute %s: %s" % (key, value)
                 else:
                     assert value is None or isinstance(value, basestring), \
-                    "Invalid value for meta data attribute %s: %s" % (key, value)
+                        "Invalid value for meta data attribute %s: %s" % (key, value)
             self.__dict__.update(**kwargs)
-
-        
-
