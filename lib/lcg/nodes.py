@@ -61,9 +61,9 @@ class ContentNode(object):
           descr -- a short textual description of this node (as a uni code string).  Additional
             information, which may determine the content of the node in addition to the title.
           variants -- a sequence of all available language variants of this node.  The
-            sequence contains lowercase ISO 639-1 Alpha-2 language codes as strings.  
+            sequence contains lowercase ISO 639-1 Alpha-2 language codes as strings.
           content -- a content element hierarchy.  This is the actual content of this node.  The
-            value can be a `Content' instance or a sequence of `Content' instances.            
+            value can be a `Content' instance or a sequence of `Content' instances.
           children -- a sequence of child nodes in the hierarchy.
           hidden -- a boolean flag indicating, that this node should not appear in the
             automatically generated Indexes (Tables of Contents).  Such a node will usually be
@@ -96,7 +96,7 @@ class ContentNode(object):
             'None', nothing is put on the background.
           presentation -- dictionary of 'Presentation' instances (or 'None'
             values) associated with this node, with language codes as keys.
-          metadata -- an instance of 'lcg.Metadata' defining the publication meta data; 
+          metadata -- an instance of 'lcg.Metadata' defining the publication meta data;
             Only relevant for the root node of the publication.
           
         """
@@ -116,21 +116,35 @@ class ContentNode(object):
         self._active = active
         self._foldable = foldable
         self._variants = tuple(variants)
-        assert page_header is None or isinstance(page_header, dict) and all ([x is None or isinstance(x, Content) for x in page_header.values()]), page_header
+        assert (page_header is None or isinstance(page_header, dict) and
+                all ([x is None or isinstance(x, Content) for x in page_header.values()])), \
+            page_header
         self._page_header = page_header
-        assert first_page_header is None or isinstance(first_page_header, dict) and all ([x is None or isinstance(x, Content) for x in first_page_header.values()]), first_page_header
+        assert (first_page_header is None or isinstance(first_page_header, dict) and 
+                all ([x is None or isinstance(x, Content) for x in first_page_header.values()])), \
+            first_page_header
         self._first_page_header = first_page_header
-        assert page_footer is None or isinstance(page_footer, dict) and all ([x is None or isinstance(x, Content) for x in page_footer.values()]), page_footer
+        assert (page_footer is None or isinstance(page_footer, dict) and
+                all ([x is None or isinstance(x, Content) for x in page_footer.values()])), \
+            page_footer
         self._page_footer = page_footer
-        assert left_page_footer is None or isinstance(left_page_footer, dict) and all ([x is None or isinstance(x, Content) for x in left_page_footer.values()]), left_page_footer
+        assert (left_page_footer is None or isinstance(left_page_footer, dict) and
+                all ([x is None or isinstance(x, Content) for x in left_page_footer.values()])), \
+            left_page_footer
         self._left_page_footer = left_page_footer
-        assert right_page_footer is None or isinstance(right_page_footer, dict) and all ([x is None or isinstance(x, Content) for x in right_page_footer.values()]), right_page_footer
+        assert (right_page_footer is None or isinstance(right_page_footer, dict) and
+                all ([x is None or isinstance(x, Content) for x in right_page_footer.values()])), \
+            right_page_footer
         self._right_page_footer = right_page_footer
-        assert page_background is None or isinstance(page_background, dict) and all ([x is None or isinstance(x, Content) for x in page_background.values()]), page_background
+        assert (page_background is None or isinstance(page_background, dict) and
+                all ([x is None or isinstance(x, Content) for x in page_background.values()])), \
+            page_background
         self._page_background = page_background
         assert cover_image is None or isinstance(cover_image, lcg.Image), cover_image
         self._cover_image = cover_image
-        assert presentation is None or isinstance(presentation, dict) and all ([x is None or isinstance(x, Presentation) for x in presentation.values()]), presentation
+        assert (presentation is None or isinstance(presentation, dict) and
+                all ([x is None or isinstance(x, Presentation) for x in presentation.values()])), \
+            presentation
         self._presentation = presentation
         if isinstance(content, (tuple, list)):
             content = Container(content)
@@ -263,8 +277,8 @@ class ContentNode(object):
         """Return the node following this node in the linearized structure."""
         linear = self.root().linear()
         i = linear.index(self)
-        if i < len(linear)-1:
-            return linear[i+1]
+        if i < len(linear) - 1:
+            return linear[i + 1]
         else:
             return None
     
@@ -273,7 +287,7 @@ class ContentNode(object):
         linear = self.root().linear()
         i = linear.index(self)
         if i > 0:
-            return linear[i-1]
+            return linear[i - 1]
         else:
             return None
 
@@ -380,7 +394,7 @@ class ContentNode(object):
             result = dictionary[lang]
         else:
             result = dictionary.get(None)
-        return result            
+        return result
         
     def page_header(self, lang):
         """Return the page header."""
