@@ -1284,7 +1284,9 @@ class HTMLProcessor(object):
                         kwargs['presentation'] = presentation = lcg.Presentation()
                         presentation.indent_left = lcg.UFont(int(margin) / 12)
             content = self._transform_sub(element)
-            if class_ == lcg.Paragraph and self._find_element(content, lcg.Paragraph):
+            if class_ == lcg.Paragraph and self._find_element(content, (lcg.Section, 
+                                                                        lcg.Paragraph)):
+                # Suppress nested paragraphs or sections nested in paragraphs.
                 class_ = lcg.Container
             return class_(content, lang=element.attrib.get('lang'), **kwargs)
 
