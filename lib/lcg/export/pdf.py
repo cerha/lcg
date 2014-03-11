@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008, 2010, 2011, 2012, 2013 Brailcom, o.p.s.
+# Copyright (C) 2008, 2010, 2011, 2012, 2013, 2014 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -20,10 +20,12 @@
 import codecs
 import copy
 import cStringIO
+import os
 import re
 import string
 import subprocess
 import sys
+import time
 
 import reportlab.lib.colors
 import reportlab.lib.enums
@@ -624,6 +626,7 @@ class Context(object):
                  presentation_set=None, lang=None):
         self._lang = lang
         self._presentations = []
+        self._fontconfig_broken = False
         self._init_fonts()
         self._init_styles()
         self._anchors = {}
@@ -740,6 +743,8 @@ class Context(object):
             language_pattern = ':lang=' + lang
         pattern = (':family=%s:weight=%s:slant=%s%s' %
                    (family_pattern, bold_pattern, italic_pattern, language_pattern,))
+        font_file = None
+        default_font_file = None
         # Retrieve preferred font.
         # Fontconfig is very weird.  For instance, in Fontconfig 2.8.0
         # `fc-match PATTERN' returns other result than the first item in
@@ -750,10 +755,20 @@ class Context(object):
         # Fontconfig versions, there is nothing like stable documented output
         # format there.
         def read_from_process(process_args):
+            if self._fontconfig_broken:
+                return None
             p = subprocess.Popen(process_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                  close_fds=True)
             output = ''
             decode = codecs.getdecoder('utf-8')
+            t = time.time()
+            while True:
+                if p.poll() is not None:
+                    break
+                if time.time() - t > 3:
+                    self._fontconfig_broken = True
+                    return None
+                time.sleep(0.1)
             while True:
                 data = decode(p.stdout.read())[0]
                 if not data:
@@ -762,35 +777,34 @@ class Context(object):
             p.stdout.close()
             return output
         output = read_from_process(['fc-match', '-v', pattern])
-        re_file = re.compile('.*file: *"([^"]+\.ttf)"')
-        for line in output.splitlines():
-            match = re_file.match(line)
-            if match:
-                preferred_font_file = match.group(1)
-                break
-        else:
-            preferred_font_file = None
-        # Retrieve candidates
-        output = read_from_process(['fc-match', '-v', '--sort', pattern])
-        # Find matching font
-        font_file = None
-        default_font_file = None
-        family_match = False
-        family_string = 'family: "%s' % (name or '',)
-        for line in output.splitlines():
-            if line.find('family: ') >= 0:
-                family_match = (line.find(family_string) >= 0)
-            else:
+        if output:
+            re_file = re.compile('.*file: *"([^"]+\.ttf)"')
+            for line in output.splitlines():
                 match = re_file.match(line)
                 if match:
-                    file_ = match.group(1)
-                    if family_match:
-                        if font_file is None or file_ == preferred_font_file:
-                            font_file = file_
-                            if file_ == preferred_font_file:
-                                break
-                    elif default_font_file is None:
-                        default_font_file = file_
+                    preferred_font_file = match.group(1)
+                    break
+            else:
+                preferred_font_file = None
+            # Retrieve candidates
+            output = read_from_process(['fc-match', '-v', '--sort', pattern])
+            # Find matching font
+            family_match = False
+            family_string = 'family: "%s' % (name or '',)
+            for line in output.splitlines():
+                if line.find('family: ') >= 0:
+                    family_match = (line.find(family_string) >= 0)
+                else:
+                    match = re_file.match(line)
+                    if match:
+                        file_ = match.group(1)
+                        if family_match:
+                            if font_file is None or file_ == preferred_font_file:
+                                font_file = file_
+                                if file_ == preferred_font_file:
+                                    break
+                        elif default_font_file is None:
+                            default_font_file = file_
         # If there is no match, use a fallback font
         if font_file is None:
             font_file = default_font_file
@@ -812,8 +826,14 @@ class Context(object):
                     italic_name = 'Oblique'
             else:
                 italic_name = ''
-            font_file = ('/usr/share/fonts/truetype/freefont/Free%s%s%s.ttf' %
-                         (family_name, bold_name, italic_name,))
+            for directory in ('/usr/share/fonts/truetype/freefont', '/Library/Fonts'):
+                if os.access(directory, os.F_OK):
+                    break
+            else:
+                raise Exception("Font directory not found")
+            font_file = ('%s/Free%s%s%s.ttf' % (directory, family_name, bold_name, italic_name,))
+            if not os.access(font_file, os.R_OK):
+                raise Exception("No matching font found")
         # That's all
         return font_file
 
