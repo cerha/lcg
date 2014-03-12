@@ -789,22 +789,23 @@ class Context(object):
             # Retrieve candidates
             output = read_from_process(['fc-match', '-v', '--sort', pattern])
             # Find matching font
-            family_match = False
-            family_string = 'family: "%s' % (name or '',)
-            for line in output.splitlines():
-                if line.find('family: ') >= 0:
-                    family_match = (line.find(family_string) >= 0)
-                else:
-                    match = re_file.match(line)
-                    if match:
-                        file_ = match.group(1)
-                        if family_match:
-                            if font_file is None or file_ == preferred_font_file:
-                                font_file = file_
-                                if file_ == preferred_font_file:
-                                    break
-                        elif default_font_file is None:
-                            default_font_file = file_
+            if output:
+                family_match = False
+                family_string = 'family: "%s' % (name or '',)
+                for line in output.splitlines():
+                    if line.find('family: ') >= 0:
+                        family_match = (line.find(family_string) >= 0)
+                    else:
+                        match = re_file.match(line)
+                        if match:
+                            file_ = match.group(1)
+                            if family_match:
+                                if font_file is None or file_ == preferred_font_file:
+                                    font_file = file_
+                                    if file_ == preferred_font_file:
+                                        break
+                            elif default_font_file is None:
+                                default_font_file = file_
         # If there is no match, use a fallback font
         if font_file is None:
             font_file = default_font_file
