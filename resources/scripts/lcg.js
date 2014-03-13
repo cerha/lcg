@@ -672,7 +672,6 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 			args[i + 1] = spec.callback_args[i];
 		    }
 		}
-		console.log('::', args, spec.callback_args);
 		return context[func].apply(this, args);
 	    }
 	    if (spec.uri) {
