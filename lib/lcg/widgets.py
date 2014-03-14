@@ -102,7 +102,7 @@ class Widget(object):
         return g.concat(self._wrap_exported_widget(context,
                                                    self._export_widget(context),
                                                    id=element_id,
-                                                   cls=lcg.camel_case_to_lower(name)+'-widget'),
+                                                   cls=lcg.camel_case_to_lower(name) + '-widget'),
                         g.script(g.js_call('new lcg.%s' % name, element_id,
                                            *self._javascript_widget_arguments(context))))
     
@@ -209,7 +209,7 @@ class Notebook(Widget, lcg.Container):
     
     def _export_widget(self, context):
         g = context.generator()
-        switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#'+s.id(), title=s.descr(),
+        switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#' + s.id(), title=s.descr(),
                                            cls=(s.id()==self._active and 'current' or None)),
                                        cls="notebook-tab")
                                   for s in self.sections(context)]),
@@ -220,7 +220,7 @@ class Notebook(Widget, lcg.Container):
 class PopupMenuItem(Widget, lcg.Content):
     """Popup menu item specification."""
 
-    def __init__(self, label, tooltip=None, uri=None, enabled=True, callback=None, 
+    def __init__(self, label, tooltip=None, uri=None, enabled=True, callback=None,
                  callback_args=()):
         """Arguments:
           label -- item title (string)
