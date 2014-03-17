@@ -317,7 +317,7 @@ class EpubExporter(Exporter):
         items = list(lcg.NodeIndex(node=node).items(context))
         items.insert(0, (node, ())) # Add the top level node as the first navigation item.
         export(items, nav)
-        return doc.toprettyxml(indent='  ', newl='\n', encoding='UTF-8')
+        return doc.toprettyxml(indent='', newl='', encoding='UTF-8')
 
     def _xhtml_content_document(self, node, lang):
         exporter = self._html_exporter
