@@ -163,8 +163,24 @@ class EpubExporter(Exporter):
             if cover_image and cover_image not in resources:
                 resources.append(cover_image)
             for resource in resources:
-                epub.writestr(self._resource_path(resource),
-                              self._get_resource_data(context, resource))
+                data = self._get_resource_data(context, resource)
+                if isinstance(resource, lcg.Image):
+                    import PIL.Image
+                    import cStringIO
+                    image = PIL.Image.open(cStringIO.StringIO(data))
+                    width, height = image.size
+                    # The iBooks (iOS) image size limit is 2 megapixels.  It also seems an
+                    # acceptable general limit to keep the total EPUB size reasonable.
+                    if width * height > 2000000:
+                        import math
+                        scale = math.sqrt(float(1999999) / (width * height))
+                        size = (int(width * scale), int(height * scale))
+                        image.thumbnail(size, PIL.Image.ANTIALIAS)
+                        stream = cStringIO.StringIO()
+                        image.save(stream, image.format)
+                        data = stream.getvalue()
+                epub.writestr(self._resource_path(resource), data)
+                              
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
                           self._package_document(node, lang, resources, scripted_nodes))
         finally:
