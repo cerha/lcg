@@ -120,6 +120,10 @@ class EpubExporter(Exporter):
         RESOURCEDIR = 'rsrc'
         PACKAGE_DOC_FILENAME = 'pkg.opf'
         NAV_DOC_FILENAME = 'nav.xhtml'
+        MAX_IMAGE_RESOLUTION = 3200000
+        # iBooks has image size limitation.  The iOS version will not display larger
+        # images at all.  The OSX version doesn't seem to care.  However it stil seems an
+        # acceptable general limit to keep the total EPUB size reasonable.
 
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
@@ -169,11 +173,10 @@ class EpubExporter(Exporter):
                     import cStringIO
                     image = PIL.Image.open(cStringIO.StringIO(data))
                     width, height = image.size
-                    # The iBooks (iOS) image size limit is 2 megapixels.  It also seems an
-                    # acceptable general limit to keep the total EPUB size reasonable.
-                    if width * height > 2000000:
+                    max_resolution = self.Config.MAX_IMAGE_RESOLUTION
+                    if width * height > max_resolution:
                         import math
-                        scale = math.sqrt(float(1999999) / (width * height))
+                        scale = math.sqrt(float(max_resolution - 1) / (width * height))
                         size = (int(width * scale), int(height * scale))
                         image.thumbnail(size, PIL.Image.ANTIALIAS)
                         stream = cStringIO.StringIO()
