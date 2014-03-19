@@ -26,15 +26,6 @@ _ = lcg.TranslatableTextFactory('lcg-exercises')
 
 class ExerciseExporter(object):
     _JAVASCRIPT_CLASS = 'lcg.Exercise'
-    _RESPONSES = (
-        ('correct', 'exercise-responses/c*.mp3'),
-        ('incorrect', 'exercise-responses/i*.mp3'),
-        ('f0-49', 'exercise-responses/o0-49*.mp3'),
-        ('f50-69', 'exercise-responses/o50-69*.mp3'),
-        ('f70-84', 'exercise-responses/o70-84*.mp3'),
-        ('f85-99', 'exercise-responses/o85-99*.mp3'),
-        ('f100', 'exercise-responses/o100*.mp3'),
-    )
     _MESSAGES = {"on first attempt": _("on first attempt")}
     _INDICATORS = (('answered', _('Answered:'),
                     _("Displays the number of the tasks you have already answered.  For "
@@ -133,7 +124,9 @@ class ExerciseExporter(object):
     def _export_script(self, context, exercise, exercise_id):
         g = context.generator()
         responses = {}
-        for key, filename in self._RESPONSES:
+        lang = context.lang()
+        for key in ('correct', 'incorrect', 'poor', 'sufficient', 'good', 'excellent', 'perfect'):
+            filename = 'exercise-responses/%s/%s-*.mp3' % (lang, key)
             media = context.resource(filename)
             if media is None:
                 media = (lcg.Media(filename),)

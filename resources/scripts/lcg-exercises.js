@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2004-2013 Brailcom, o.p.s.
+ * Copyright (C) 2004-2014 Brailcom, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,11 +126,11 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 	var response;
 	if (this._fields.length > 1) {
             var percentage = this._percentage()
-            if      (percentage < 50)  response='f0-49';
-            else if (percentage < 70)  response='f50-69';
-            else if (percentage < 85)  response='f70-84';
-            else if (percentage < 100) response='f85-99';
-            else response='f100';
+            if      (percentage < 50)  response='poor';
+            else if (percentage < 70)  response='sufficient';
+            else if (percentage < 85)  response='good';
+            else if (percentage < 100) response='excellent';
+            else response='perfect';
 	} else {
             response = this._correct() ? 'correct':'incorrect';
 	}
