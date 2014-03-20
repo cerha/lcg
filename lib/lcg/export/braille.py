@@ -94,15 +94,17 @@ def braille_presentation(presentation_file='presentation-braille.py'):
             setattr(presentation, o, confmodule.__dict__[o])
     return presentation
 
-
 class _Braille(object):
     
-    def __init__(self, text, hyphenation):
+    def __init__(self, text, hyphenation=None):
         assert isinstance(text, basestring), text
-        assert isinstance(hyphenation, basestring), hyphenation
-        assert len(text) == len(hyphenation), (text, hyphenation,)
+        assert hyphenation is None or isinstance(hyphenation, basestring), hyphenation
         self._text = text
-        self._hyphenation = hyphenation
+        self._hyphenation = hyphenation or self._default_hyphenation(text)
+        assert len(self._text) == len(self._hyphenation), (self._text, self._hyphenation,)
+
+    def _default_hyphenation(self, text):
+        return '0' * len(text)
 
     def text(self):
         return self._text
@@ -119,13 +121,15 @@ class _Braille(object):
     def __add__(self, braille):
         return _Braille(self.text() + braille.text(), self.hyphenation() + braille.hyphenation())
 
-    def append(self, text, hyphenation):
+    def append(self, text, hyphenation=None):
         self._text += text
-        self._hyphenation += hyphenation
+        self._hyphenation += hyphenation or self._default_hyphenation(text)
+        assert len(self._text) == len(self._hyphenation), (self._text, self._hyphenation,)
 
-    def prepend(self, text, hyphenation):
+    def prepend(self, text, hyphenation=None):
         self._text = text + self._text
-        self._hyphenation = hyphenation + self._hyphenation
+        self._hyphenation = (hyphenation or self._default_hyphenation(text)) + self._hyphenation
+        assert len(self._text) == len(self._hyphenation), (self._text, self._hyphenation,)
     
 
 class BrailleError(Exception):
