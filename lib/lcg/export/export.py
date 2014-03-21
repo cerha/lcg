@@ -341,8 +341,12 @@ class Exporter(object):
             content = self.concat(content,
                                   *[self._export(n, context, recursive=True)
                                     for n in node.children()])
-        return self.concat(heading, newline, content)
+        exported = self.concat(heading, newline, content)
+        return self._adjusted_export(context, exported)
 
+    def _adjusted_export(self, context, exported):
+        return exported
+        
     def uri(self, context, target, **kwargs):
         """Return the URI of the target as string.
 
@@ -465,7 +469,7 @@ class Exporter(object):
         """
         assert isinstance(text, basestring), text
         if self._text_mark(text):
-            return None
+            return ''
         if context.text_preprocessor is not None:
             text = context.text_preprocessor(text)
         return self.escape(text)
@@ -561,7 +565,7 @@ class Exporter(object):
         """
         return self._newline(context)
 
-    def _export_horizontal_separator(self, context, width=64):
+    def _export_horizontal_separator(self, context, element, width=64):
         """Export the given 'HorizontalSeparator' element."""
         separator = u'─' * width
         return self.concat(self.text(context, separator), self._newline(context))
@@ -994,7 +998,7 @@ class Exporter(object):
 
     def _table_row_separator(self, context, width, cell_widths, outer, vertical_separator,
                              last_row, heading_present):
-        return self._export_horizontal_separator(context, width=width)
+        return self._export_horizontal_separator(context, None, width=width)
 
     def _table_cell_width(self, context, table, cell):
         return len(cell)
@@ -1329,3 +1333,8 @@ class UnsupportedElementType(Exception):
 
 class TextExporter(FileExporter, Exporter):
     _OUTPUT_FILE_EXT = 'text'
+    
+    def _adjusted_export(self, context, exported):
+        return string.join([line for line in exported.split('\n')
+                            if self._text_mark(line) is None],
+                           '\n')
