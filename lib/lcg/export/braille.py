@@ -121,6 +121,9 @@ class _Braille(object):
     def __add__(self, braille):
         return _Braille(self.text() + braille.text(), self.hyphenation() + braille.hyphenation())
 
+    def __mul__(self, n):
+        return _Braille(self.text() * n, self.hyphenation() * n)
+
     def append(self, text, hyphenation=None):
         self._text += text
         self._hyphenation += hyphenation or self._default_hyphenation(text)
@@ -816,15 +819,15 @@ class BrailleExporter(FileExporter, Exporter):
         return _Braille(braille, hyphenation)
 
     def _newline(self, context, number=1, soft=False, page_start=None, page_end=False):
-        text = ''
+        braille = _Braille('')
         if page_end:
-            text += self._marker(self._PAGE_END_CHAR)
-        newline = self._marker(self._SOFT_NEWLINE_CHAR) if soft else '\n'
-        text += newline * number
+            braille += self._marker(self._PAGE_END_CHAR)
+        newline = self._marker(self._SOFT_NEWLINE_CHAR) if soft else _Braille('\n')
+        braille += newline * number
         if page_start is not None:
             assert page_start >= 0 and page_start < 10, page_start
-            text += self._marker(self._PAGE_START_CHAR, page_start)
-        return _Braille(text)
+            braille += self._marker(self._PAGE_START_CHAR, page_start)
+        return braille
     
     def _ensure_newlines(self, context, exported, number=1):
         real_number = 0
@@ -872,6 +875,10 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _separator(self, context):
         return ' - '
+        
+    def _marker(self, marker, argument=''):
+        mark = super(BrailleExporter, self)._marker(marker, argument)
+        return _Braille(mark)
 
     # Content element export methods (defined by _define_export_methods).
     
@@ -993,7 +1000,7 @@ class BrailleExporter(FileExporter, Exporter):
                 elements.append(vertical_separator)
                 elements.append(c)
             elements.append(self._newline(context))
-            elements.append(_Braille(self._marker(self._PAGE_START_REPEAT_CHAR)))
+            elements.append(self._marker(self._PAGE_START_REPEAT_CHAR))
             elements.append(self._newline(context))
             separator = self.concat(*elements)
         else:
@@ -1091,7 +1098,7 @@ class BrailleExporter(FileExporter, Exporter):
             intro_text = context.localize(_("The table is read across facing pages."))
             table_intro = self.text(context, intro_text)
             table_intro += self._newline(context)
-            table_intro.append(self._marker(self._DOUBLE_PAGE_CHAR))
+            table_intro += self._marker(self._DOUBLE_PAGE_CHAR)
         context_compactness.clear()
         context_compactness.update(orig_context_compactness)
         context.set_table_column_compactness(column_compactness)
