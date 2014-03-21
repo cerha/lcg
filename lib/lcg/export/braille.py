@@ -32,7 +32,7 @@ import string
 import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, PageNumber, \
-    Container, TranslatableTextFactory
+    Container, TranslatableTextFactory, TableRow, TableHeading
 import entities
 
 _ = TranslatableTextFactory('lcg')
@@ -273,11 +273,14 @@ class BrailleExporter(FileExporter, Exporter):
     "Transforming structured content objects to Braille output."
     
     _OUTPUT_FILE_EXT = 'brl'
-    _INDENTATION_CHAR = '\ue010'
-    _NEXT_INDENTATION_CHAR = '\ue011'
-    _PAGE_START_CHAR = '\ue012' # recommended page break + priority
-    _PAGE_END_CHAR = '\ue013' # end of a single-page object
-    _PAGE_START_REPEAT_CHAR = '\ue014' # end of repeating lines from the first page start (headers)
+    _PAGE_START_CHAR = '\ue010' # recommended page break + priority
+    _PAGE_END_CHAR = '\ue011' # end of a single-page object
+    _PAGE_START_REPEAT_CHAR = '\ue012' # end of repeating lines from the first page start (headers)
+    _DOUBLE_PAGE_CHAR = '\ue013' # left and right pages composing a single page (e.g. wide table)
+    _SOFT_NEWLINE_CHAR = '\ue014' # removable newline
+    _NEW_PAGE_CHAR = '\ue015' # new page if not at the beginning of new page
+    _INDENTATION_CHAR = '\uf010'
+    _NEXT_INDENTATION_CHAR = '\uf011'
 
     class Context(Exporter.Context):
 
@@ -292,7 +295,9 @@ class BrailleExporter(FileExporter, Exporter):
             self._page_number = 1
             self._form = [louis.plain_text]
             self._hyphenate = True
-            self._removable_newlines = 0
+            self._compactness = {}
+            self._table_column_compactness = {}
+            self._double_page = None
 
         def tables(self, lang):
             if lang is None:
@@ -353,11 +358,23 @@ class BrailleExporter(FileExporter, Exporter):
             self._hyphenate = hyphenate
             return old_hyphenate
 
-        def removable_newlines(self):
-            return self._removable_newlines
+        def compactness(self):
+            return self._compactness
 
-        def set_removable_newlines(self, value):
-            self._removable_newlines = value
+        def set_compactness(self, compactness):
+            self._compactness = compactness
+
+        def table_column_compactness(self):
+            return self._table_column_compactness
+
+        def set_table_column_compactness(self, compactness):
+            self._table_column_compactness = compactness
+
+        def double_page(self):
+            return self._double_page
+
+        def set_double_page(self, flag):
+            self._double_page = flag
 
     def __init__(self, *args, **kwargs):
         super(BrailleExporter, self).__init__(*args, **kwargs)
@@ -412,11 +429,29 @@ class BrailleExporter(FileExporter, Exporter):
             # Line breaking
             hfill = self._HFILL
             page_strings = text.split('\f')
-            pages = [p.split('\n') for p in page_strings]
+            def split(page):
+                lines = page.split('\n')
+                if lines[-1] == u'':
+                    lines = lines[:-1]
+                return lines
+            pages = [split(p) for p in page_strings]
+            double_page = False
             if page_width:
                 for i in range(len(pages)):
                     lines = []
+                    def add_line(l):
+                        lines.append(l)
                     for line in pages[i]:
+                        mark = self._text_mark(line)
+                        if mark:
+                            marker, arg = mark
+                            if marker == self._DOUBLE_PAGE_CHAR:
+                                double_page = True
+                            elif marker == self._PAGE_END_CHAR:
+                                double_page = False
+                            add_line(line)
+                            hyphenation = hyphenation[len(line) + 1:]
+                            continue
                         prefix_len = 0
                         while prefix_len < len(line) and line[prefix_len] == self._INDENTATION_CHAR:
                             prefix_len += 1
@@ -438,26 +473,26 @@ class BrailleExporter(FileExporter, Exporter):
                         hyphenation_prefix = '0' * len(prefix)
                         if prefix_len > 0:
                             line = ' ' * prefix_len + line[prefix_len:]
-                        while len(line) > page_width:
+                        while len(line) > page_width and not double_page:
                             pos = page_width
                             if hyphenation[pos] != '2':
                                 pos -= 1
                                 while pos > 0 and hyphenation[pos] == '0':
                                     pos -= 1
                             if pos == 0:
-                                lines.append(line[:page_width])
+                                add_line(line[:page_width])
                                 line = prefix + line[page_width:]
                                 hyphenation = hyphenation_prefix + hyphenation[page_width:]
                             elif hyphenation[pos] == '1':
-                                lines.append(line[:pos] + self.text(context, '-', lang=lang).text())
+                                add_line(line[:pos] + self.text(context, '-', lang=lang).text())
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == '2':
-                                lines.append(line[:pos])
+                                add_line(line[:pos])
                                 line = prefix + line[pos + 1:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos + 1:]
                             elif hyphenation[pos] == '3':
-                                lines.append(line[:pos + 1])
+                                add_line(line[:pos + 1])
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
                             else:
@@ -468,7 +503,7 @@ class BrailleExporter(FileExporter, Exporter):
                             line = (line[:pos] + ' ' * fill_len + line[pos + len(hfill):])
                             hyphenation = (hyphenation[:pos] + '0' * fill_len +
                                            hyphenation[pos + len(hfill):])
-                        lines.append(line)
+                        add_line(line)
                         hyphenation = hyphenation[len(line) + 1:]
                     pages[i] = lines
                     hyphenation = hyphenation[1:]
@@ -485,64 +520,93 @@ class BrailleExporter(FileExporter, Exporter):
                 repeated_lines_activated = [False]
                 def add_page(page):
                     lines = []
+                    def add_line(l, line_list):
+                        line_list.append(l)
                     line_limit = page_height
+                    while page:
+                        mark = self._text_mark(page[0])
+                        if ((mark is not None and
+                             mark[0] in (self._SOFT_NEWLINE_CHAR, self._NEW_PAGE_CHAR))):
+                            page.pop(0)
+                        else:
+                            break
                     page_len = len(page)
+                    if page_len == 0:
+                        return
                     best_priority = '9'
                     n = 0
                     i = n_repeated_lines = len(repeated_lines) if repeated_lines_activated[0] else 0
+                    if context.double_page() == 'left' and context.page_number() % 2 == 0:
+                        line_limit = 0
                     if i > 0:
                         if i >= page_height:
                             i = 0
                         else:
                             for l in repeated_lines:
-                                if l:
-                                    if l[0] == self._TOC_MARKER_CHAR:
-                                        continue
-                                    elif l[0] == self._PAGE_START_CHAR:
-                                        l = l[2:]
-                                    elif l[0] == self._PAGE_END_CHAR:
-                                        l = l[1:]
-                                lines.append(l)
+                                if self._text_mark(l) is not None:
+                                    add_line(l, lines)
                     page_start = None
                     while i < page_height and n < page_len:
                         l = page[n]
                         n += 1
-                        if l:
-                            if l[0] == self._TOC_MARKER_CHAR:
-                                continue
-                            if l[0] == self._PAGE_START_CHAR:
+                        mark = self._text_mark(l)
+                        if mark is None:
+                            i += 1
+                        else:
+                            marker, arg = mark
+                            if marker == self._PAGE_START_CHAR:
                                 if page_start is None:
                                     page_start = n
                                 if i > n_repeated_lines:
-                                    priority = l[1]
+                                    priority = arg
                                     if priority <= best_priority:
                                         line_limit = i
                                         best_priority = priority
-                            elif l[0] == self._PAGE_END_CHAR:
+                            elif marker == self._PAGE_END_CHAR:
                                 line_limit = page_height
                                 best_priority = '9'
                                 repeated_lines[:] = []
-                            elif l[0] == self._PAGE_START_REPEAT_CHAR:
+                            elif marker == self._PAGE_START_REPEAT_CHAR:
                                 repeated_lines[:] = page[page_start:n - 1]
                                 repeated_lines_activated[0] = False
-                                continue
-                        i += 1
+                            elif marker == self._DOUBLE_PAGE_CHAR:
+                                if i > 0:
+                                    line_limit = i
+                                    break
+                            elif marker == self._NEW_PAGE_CHAR:
+                                line_limit = i
+                                break
+                            elif marker == self._SOFT_NEWLINE_CHAR:
+                                i += 1
                     page.reverse()
+                    facing_lines = []
                     while page and len(lines) < line_limit:
                         l = page.pop()
-                        if l and l[0] == self._TOC_MARKER_CHAR:
-                            marker = l[1:]
-                            page_number = unicode(context.page_number())
-                            context.toc_element(marker).set_page_number(context, page_number)
-                        elif l and l[0] == self._PAGE_START_REPEAT_CHAR:
-                            repeated_lines_activated[0] = True
+                        mark = self._text_mark(l)
+                        if mark is None or mark == (self._SOFT_NEWLINE_CHAR, ''):
+                            if mark is not None:
+                                l = ''
+                            if context.double_page() == 'left':
+                                add_line(l[:page_width], lines)
+                                add_line(l[page_width:], facing_lines)
+                            else:
+                                add_line(l, lines)
                         else:
-                            if l:
-                                if l[0] == self._PAGE_START_CHAR:
-                                    l = l[2:]
-                                elif l[0] == self._PAGE_END_CHAR:
-                                    l = l[1:]
-                            lines.append(l)
+                            marker, arg = mark
+                            if marker == self._TOC_MARKER_CHAR:
+                                page_number = unicode(context.page_number())
+                                context.toc_element(arg).set_page_number(context, page_number)
+                            elif marker == self._PAGE_START_REPEAT_CHAR:
+                                repeated_lines_activated[0] = True
+                            elif marker == self._PAGE_END_CHAR:
+                                if context.double_page() == 'left':
+                                    add_line(mark, facing_lines)
+                                    break
+                                elif context.double_page() == 'right':
+                                    context.set_double_page(None)
+                                    break
+                            elif marker == self._DOUBLE_PAGE_CHAR:
+                                context.set_double_page('left')
                     page_number = context.page_number()
                     status_line = right_status_line if page_number % 2 else left_status_line
                     lines = lines + [''] * (page_height - len(lines))
@@ -570,30 +634,28 @@ class BrailleExporter(FileExporter, Exporter):
                                     fill_1 = page_width - text_len - fill_2
                                     exported_status_line = (u'⠀' * fill_1 + title + u'⠀' * fill_2 +
                                                             exported_status_line[pos + 1:])
-                        lines.append(exported_status_line)
+                        add_line(exported_status_line, lines)
                     new_pages.append(lines)
                     context.advance_page_number()
                     page.reverse()
+                    if facing_lines:
+                        page[0:0] = facing_lines
+                    if context.double_page() == 'left':
+                        context.set_double_page('right')
+                    elif context.double_page() == 'right':
+                        context.set_double_page('left')
                 for page in pages:
-                    page_len = len(page)
-                    while page_len > page_height:
+                    page_lengths = [len(page)]
+                    while page_lengths[-1] > 0:
                         add_page(page)
-                        new_page_len = len(page)
-                        if new_page_len == page_len:
+                        page_lengths.append(len(page))
+                        if ((len(page_lengths) >= 3 and
+                             page_lengths[-1] == page_lengths[-2] == page_lengths[-3])):
                             raise Exception("Page breaking failed", page_height)
-                        page_len = new_page_len
-                    # Final page (maybe it's empty)
-                    removable_newlines = context.removable_newlines()
-                    while page and removable_newlines > 0 and not page[-1]:
-                        page = page[:-1]
-                        removable_newlines -= 1
-                    if page:
-                        add_page(page)
                 pages = new_pages
             else:
                 for i in range(len(pages)):
-                    pages[i] = [line for line in pages[i]
-                                if not line or line[0] != self._TOC_MARKER_CHAR]
+                    pages[i] = [line for line in pages[i] if self._text_mark(line) is None]
             return pages
         # Two-pass export in order to get page numbers in table of contents
         run_export()
@@ -641,17 +703,22 @@ class BrailleExporter(FileExporter, Exporter):
         """
         assert isinstance(context, self.Context), context
         assert isinstance(text, basestring), text
-        form = context.form()
         assert lang is None or isinstance(lang, basestring), lang
         if lang is None:
             lang = context.lang()
         if not text:
             return _Braille('', '')
-        if self._private_char(text[0]):
-            if text[0] == self._TOC_MARKER_CHAR:
-                return _Braille(text + '\n', '0' * (len(text) + 1))
-            else:
-                return _Braille(text, '0' * len(text))
+        mark = self._text_mark(text)
+        if mark is not None:
+            return _Braille(text)
+        compactness = context.compactness()
+        if compactness.get('lower'):
+            text = text.lower()
+        if compactness.get('plain'):
+            form = louis.plain_text
+        else:
+            form = context.form()
+        discarded_prefix = compactness.get('prefix')
         tables = context.tables(lang)
         if form != louis.plain_text and lang == 'cs':
             # liblouis doesn't handle this so we have to handle it ourselves.
@@ -733,17 +800,31 @@ class BrailleExporter(FileExporter, Exporter):
                 braille = braille[:start] + braille[end:]
                 hyphenation = hyphenation[:start] + hyphenation[end:]
         assert len(braille) == len(hyphenation), (braille, hyphenation,)
+        if discarded_prefix and braille.startswith(discarded_prefix):
+            n = len(discarded_prefix)
+            braille, hyphenation = braille[n:], hyphenation[n:]
+        discarded_suffix = compactness.get('suffix')
+        if discarded_suffix and braille.endswith(discarded_suffix):
+            n = len(discarded_suffix)
+            braille, hyphenation = braille[:-n], hyphenation[:-n]
+        xprefix = compactness.get('xprefix')
+        if xprefix:
+            braille, hyphenation = xprefix + '⠀' + braille, (len(xprefix) + 1) * '0' + hyphenation
+        xsuffix = compactness.get('xsuffix')
+        if xsuffix:
+            braille, hyphenation = braille + '⠀' + xsuffix, (len(xsuffix) + 1) * '0' + hyphenation
         return _Braille(braille, hyphenation)
 
-    def _newline(self, context, number=1, inline=False, page_start=None, page_end=False):
-        context.set_removable_newlines(number if inline else 0)
-        braille = _Braille('\n' * number, '0' * number)
+    def _newline(self, context, number=1, soft=False, page_start=None, page_end=False):
+        text = ''
+        if page_end:
+            text += self._marker(self._PAGE_END_CHAR)
+        newline = self._marker(self._SOFT_NEWLINE_CHAR) if soft else '\n'
+        text += newline * number
         if page_start is not None:
             assert page_start >= 0 and page_start < 10, page_start
-            braille.append(self._PAGE_START_CHAR + str(page_start)[0], '00')
-        if page_end:
-            braille.append(self._PAGE_END_CHAR, '0')
-        return braille
+            text += self._marker(self._PAGE_START_CHAR, page_start)
+        return _Braille(text)
     
     def _ensure_newlines(self, context, exported, number=1):
         real_number = 0
@@ -891,6 +972,11 @@ class BrailleExporter(FileExporter, Exporter):
 
     # Tables
 
+    def _export_table(self, context, element):
+        result = super(BrailleExporter, self)._export_table(context, element)
+        context.table_column_compactness().clear()
+        return result
+
     def _vertical_cell_separator(self, context, position):
         return _Braille('', '') if position <= 0 else _Braille('  ', '00')
 
@@ -907,13 +993,139 @@ class BrailleExporter(FileExporter, Exporter):
                 elements.append(vertical_separator)
                 elements.append(c)
             elements.append(self._newline(context))
-            elements.append(_Braille(self._PAGE_START_REPEAT_CHAR, '0'))
+            elements.append(_Braille(self._marker(self._PAGE_START_REPEAT_CHAR)))
             elements.append(self._newline(context))
             separator = self.concat(*elements)
         else:
             separator = None
         return separator
-    
+
+    def _set_table_column_widths(self, context, element, extra_width, widths):
+        max_width = context.node_presentation().page_width.size()
+        super(BrailleExporter, self)._set_table_column_widths(context, element, extra_width, widths)
+        simple_total_width = sum(widths, extra_width)
+        if simple_total_width <= max_width:
+            return
+        # Table too wide, let's try to shorten the columns
+        cells = [r.content() for r in element.content() if isinstance(r, TableRow)]
+        n_cells = len(widths)
+        context_compactness = context.compactness()
+        orig_context_compactness = copy.copy(context_compactness)
+        column_compactness = {}
+        total_width = simple_total_width
+        export = self._export_table_cell
+        table_cell_width = self._table_cell_width
+        table_intro = None
+        def prefix(cell, common):
+            for i in range(max(len(cell), len(common))):
+                if cell[i] != common[i]:
+                    break
+            return common[:i]
+        def suffix(cell, common):
+            for i in range(max(len(cell), len(common))):
+                if cell[-i - 1] != common[-i - 1]:
+                    break
+            return common[len(common) - i:]
+        def export_cells(column, compactness):
+            context_compactness.clear()
+            context_compactness.update(compactness)
+            return [export(context, row[column]) for row in cells]
+        def adjust_widths(max_w, total_width=total_width):
+            if total_width <= max_w:
+                return True
+            ws = copy.copy(widths)
+            for level in ('plain', 'lower', 'prefix', 'suffix',):
+                for i in range(n_cells):
+                    w = new_w = ws[i]
+                    compactness = column_compactness.get(i, {})
+                    c = copy.copy(compactness)
+                    if level in ('plain', 'lower',):
+                        c[level] = True
+                        exported_column = export_cells(i, c)
+                        new_w = max([table_cell_width(context, element, cell)
+                                     for cell in exported_column])
+                    elif level in ('prefix', 'suffix',):
+                        if isinstance(cells[0][i], TableHeading):
+                            exported_column = export_cells(i, c)
+                            braille_column = [b.text() for b in exported_column]
+                            n_rows = len(braille_column)
+                            if n_rows > 1:
+                                heading_width = table_cell_width(context, element,
+                                                                 exported_column[0])
+                                heading_available = w - heading_width - 1
+                                if heading_available > 0:
+                                    if level == 'prefix':
+                                        f = prefix
+                                        common = braille_column[1][:heading_available]
+                                    elif level == 'suffix':
+                                        f = suffix
+                                        common = braille_column[1][-heading_available:]
+                                    else:
+                                        raise Exception("Program error", level)
+                                    for j in range(2, n_rows):
+                                        common = f(braille_column[j], common)
+                                        if not common:
+                                            break
+                                    else:
+                                        c[level] = common
+                                        exported_column = export_cells(i, c)
+                                        new_w = max([table_cell_width(context, element, cell)
+                                                     for cell in exported_column[1:]]) - len(common)
+                                        new_w = max(new_w,
+                                                    heading_width + len(common.strip('⠀')) + 1)
+                    else:
+                        raise Exception("Invalid compactness level", level)
+                    if new_w < w:
+                        total_width -= (w - new_w)
+                        column_compactness[i] = c
+                        ws[i] = new_w
+                        if total_width <= max_w:
+                            for i in range(len(widths)):
+                                widths[i] = ws[i]
+                            return True
+            return False
+        if not adjust_widths(max_width):
+            if not adjust_widths(max_width * 2):
+                # Future option: Try to use double-line rows.
+                raise BrailleError("Table too wide")
+            intro_text = context.localize(_("The table is read across facing pages."))
+            table_intro = self.text(context, intro_text)
+            table_intro += self._newline(context)
+            table_intro.append(self._marker(self._DOUBLE_PAGE_CHAR))
+        context_compactness.clear()
+        context_compactness.update(orig_context_compactness)
+        context.set_table_column_compactness(column_compactness)
+        return table_intro
+
+    def _export_table_row(self, context, element):
+        content = element.content()
+        orig_compactness = copy.copy(context.compactness())
+        table_column_compactness = context.table_column_compactness()
+        exported = []
+        for i in range(len(content)):
+            compactness = copy.copy(orig_compactness)
+            compactness.update(table_column_compactness.get(i, {}))
+            context.set_compactness(compactness)
+            exported.append(content[i].export(context))
+            context.set_compactness(orig_compactness)
+        return exported
+        
+    def _export_table_heading(self, context, element):
+        compactness = context.compactness()
+        prefix = compactness.get('prefix')
+        suffix = compactness.get('suffix')
+        if prefix or suffix:
+            c = copy.copy(compactness)
+            if prefix:
+                c['xprefix'] = prefix.strip('⠀')
+            if suffix:
+                c['xsuffix'] = suffix.strip('⠀')
+            context.set_compactness(c)
+        exported = super(BrailleExporter, self)._export_table_heading(context, element)
+        if prefix or suffix:
+            context.set_compactness(compactness)
+        return exported
+        
     # Special constructs
     
     def _export_mathml(self, context, element):

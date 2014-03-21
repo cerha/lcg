@@ -147,6 +147,7 @@ class Exporter(object):
     _RE_SPACE_MATCHER = re.compile('  +')
     _TOC_MARKER_CHAR = u'\ue000'
     _HFILL = u'\ue001\ue001\ue001'
+    _END_MARKER_CHAR = u'\n'
     
     class Context(object):
         """Storage class containing complete data necessary for export.
@@ -463,9 +464,9 @@ class Exporter(object):
 
         """
         assert isinstance(text, basestring), text
-        if text and self._private_char(text[0]):
-            text = ''
-        elif context.text_preprocessor is not None:
+        if self._text_mark(text):
+            return None
+        if context.text_preprocessor is not None:
             text = context.text_preprocessor(text)
         return self.escape(text)
 
@@ -474,7 +475,7 @@ class Exporter(object):
         text = self._RE_SPACE_MATCHER.sub(' ', text)
         return text
 
-    def _newline(self, context, number=1, inline=False, page_start=None, page_end=False):
+    def _newline(self, context, number=1, soft=False, page_start=None, page_end=False):
         return u'\n' * number
 
     def _ensure_newlines(self, context, exported, number=1):
@@ -503,9 +504,16 @@ class Exporter(object):
     def _separator(self, context, lang=None):
         return self.text(context, u' — ', lang=lang)
 
-    def _private_char(self, char):
-        char_code = ord(char)
-        return 57344 <= char_code and char_code <= 63743
+    def _marker(self, marker, argument=''):
+        return u'%s%s%s' % (marker, argument, self._END_MARKER_CHAR,)
+
+    def _text_mark(self, text):
+        if text:
+            char = text[0]
+            char_code = ord(char)
+            if 57344 <= char_code and char_code <= 63743:
+                return char, text[1:]
+        return None
 
     # Content element export methods (defined by _define_export_methods).
 
@@ -782,7 +790,7 @@ class Exporter(object):
         
         """
         toc_marker = context.add_toc_marker(element)
-        return self.concat(self.text(context, u'%s%s' % (self._TOC_MARKER_CHAR, toc_marker,)),
+        return self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker),
                            self.text(context, element.title(), element.lang()),
                            self._newline(context, 2),
                            self._export_container(context, element))
@@ -857,7 +865,8 @@ class Exporter(object):
     def _export_paragraph(self, context, element):
         """Export given 'Paragraph' element."""
         return self.concat(self._export_container(context, element),
-                           self._newline(context, 2, inline=True))
+                           self._newline(context),
+                           self._newline(context, soft=True))
 
     def _export_table_of_contents(self, context, element):
         """Generate a Table of Contents for given 'TableOfContents' element."""
@@ -903,6 +912,27 @@ class Exporter(object):
             if row_content and isinstance(row_content[0], TableHeading):
                 heading_present = True
         separator = HorizontalSeparator()
+        vertical_separator = self._vertical_cell_separator(context, 1)
+        first_vertical_separator = self._vertical_cell_separator(context, 0)
+        last_vertical_separator = self._vertical_cell_separator(context, -1)
+        widths = []
+        n_cells = 0
+        for row in content:
+            if isinstance(row, TableRow):
+                n_cells = len(row.content())
+                widths = [0] * n_cells
+                break
+        else:
+            raise Exception("No row found in the table", content)
+        total_width = len(first_vertical_separator) + len(last_vertical_separator)
+        if widths:
+            total_width += len(vertical_separator) * (len(widths) - 1)
+        table_intro = self._set_table_column_widths(context, element, total_width, widths)
+        total_width += sum(widths)
+        item_list = []
+        if table_intro:
+            item_list.append(table_intro)
+        item_list.append(self._newline(context, number=0, page_start=1))
         exported_rows = []
         for row in content:
             if row.line_above():
@@ -910,29 +940,6 @@ class Exporter(object):
             exported_rows.append(row.export(context))
             if row.line_below():
                 exported_rows.append(separator)
-        widths = []
-        n_cells = 0
-        for row in exported_rows:
-            if isinstance(row, list):
-                n_cells = len(row)
-                widths = [0] * n_cells
-                break
-        else:
-            return self.concat(*exported_rows)
-        for row in exported_rows:
-            if isinstance(row, list):
-                for i in range(n_cells):
-                    widths[i] = max(widths[i], len(row[i]))
-        total_width = 0
-        vertical_separator = self._vertical_cell_separator(context, 1)
-        first_vertical_separator = self._vertical_cell_separator(context, 0)
-        last_vertical_separator = self._vertical_cell_separator(context, -1)
-        total_width = len(first_vertical_separator) + len(last_vertical_separator)
-        for w in widths:
-            total_width += w
-        if widths:
-            total_width += len(vertical_separator) * (len(widths) - 1)
-        item_list = [self._newline(context, number=0, page_start=1)]
         n_real_rows = len(content)
         last_row = None
         n = 0
@@ -962,7 +969,7 @@ class Exporter(object):
                     item_list.append(s)
             else:
                 item_list.append(row)
-        item_list.append(self._newline(context, page_end=True))
+        item_list.append(self._newline(context, soft=True, page_end=True))
         return self.concat(*item_list)
 
     def _export_table_row(self, context, element):
@@ -988,6 +995,19 @@ class Exporter(object):
     def _table_row_separator(self, context, width, cell_widths, outer, vertical_separator,
                              last_row, heading_present):
         return self._export_horizontal_separator(context, width=width)
+
+    def _table_cell_width(self, context, table, cell):
+        return len(cell)
+
+    def _set_table_column_widths(self, context, element, extra_width, widths):
+        n_cells = len(widths)
+        exported_rows = [r.content() for r in element.content() if isinstance(r, TableRow)]
+        for row in exported_rows:
+            if isinstance(row, (tuple, list,)):
+                for i in range(n_cells):
+                    cell_width = self._table_cell_width(context, element, row[i].export(context))
+                    widths[i] = max(widths[i], cell_width)
+        return None
 
     # Media (represented by resources wrapped in inline content elements)
 
