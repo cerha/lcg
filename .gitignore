@@ -16,3 +16,6 @@
 /TAGS
 /.ropeproject
 /lib/lcg/export/styles/presentation-braille-local.py
+/.project
+/.pydevproject
+/.settings/
