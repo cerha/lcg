@@ -74,6 +74,7 @@ OPTIONS = (
     )),
     ("Common options", (
         ('debug', False, "run in debugging friendly mode"),
+        ('plain', False, "avoid all the bells and whistles"),
     )),
 )
 
@@ -87,12 +88,7 @@ EPUB = 'epub'
 
 _debug = False
 
-def main(argv):
-    # Process options.
-    try:
-        opt, args = getoptions(argv)
-    except getopt.GetoptError:
-        usage(argv)
+def main(argv, opt, args):
     global _debug
     _debug = opt['debug']
     # Select the output format if options make sense.
@@ -144,7 +140,10 @@ def main(argv):
         translations.extend([os.path.abspath(d) for d in opt['translations'].split(':')])
     #######################################################################################
     # Read the source files (first real action after processing options).
-    reader = lcg.reader(src, name, ext=ext, recourse=recourse, encoding=opt['encoding'])
+    kwargs = {}
+    if opt['plain']:
+        kwargs['cls'] = lcg.DocFileReader
+    reader = lcg.reader(src, name, ext=ext, recourse=recourse, encoding=opt['encoding'], **kwargs)
     try:
         node = reader.build()
     except IOError as e:
@@ -241,7 +240,6 @@ def read_style(filename):
 
 def getoptions(argv):
     optspec = functools.reduce(operator.add, [optspec for section, optspec in OPTIONS], ())
-    import getopt
     opts, args = getopt.getopt(argv[1:], '', [x[0] for x in optspec])
     optdict = dict(opts)
     options = {}
@@ -332,9 +330,13 @@ def lcg_exception_details(title, details=[], reason=None):
     return """\n\n%s:\n%s\n\nError: %s\n""" % \
            (title, "\n".join([format(line) for line in reversed(details)]), reason)
 
-if __name__ == "__main__":
+def run(argv):
     try:
-        main(sys.argv)
+        opt, args = getoptions(argv)
+    except getopt.GetoptError:
+        usage(argv)
+    try:
+        main(sys.argv, opt, args)
     except KeyboardInterrupt:
         raise
     except SystemExit:
@@ -347,6 +349,8 @@ if __name__ == "__main__":
                                                p.info(), p.reason()))
         sys.exit(1)
     except Exception as ex:
+        if opt['plain']:
+            raise
         einfo = sys.exc_info()
         try:
             import cgitb
@@ -368,3 +372,6 @@ if __name__ == "__main__":
             import pdb
             pdb.post_mortem(sys.exc_info()[2])
         sys.exit(1)
+    
+if __name__ == "__main__":
+    run(sys.argv)

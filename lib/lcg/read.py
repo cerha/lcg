@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -351,38 +351,40 @@ class DocDirReader(DocFileReader):
         return children
 
     
-def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, recourse=True, **kwargs):
+def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, recourse=True, cls=None,
+           **kwargs):
     """Create an instance of sensible reader class for given source directory and document name.
 
     All the keyword arguments are passed to the reader, if they make sense to it.
 
     """
-    import imp
-    try:
-        file, path, descr = imp.find_module(name, [dir])
-    except ImportError:
-        if parent is None and recourse:
-            cls = DocDirReader
-        else:
-            subdir = os.path.join(dir, name)
-            if os.path.isdir(subdir):
-                dir = subdir
+    if cls is None:
+        import imp
+        try:
+            file, path, descr = imp.find_module(name, [dir])
+        except ImportError:
+            if parent is None and recourse:
                 cls = DocDirReader
             else:
-                cls = DocFileReader
-    else:
-        m = imp.load_module(name, file, path, descr)
-        if hasattr(m, 'IndexNode'):
-            # Just for backwards compatibility
-            cls = m.IndexNode
+                subdir = os.path.join(dir, name)
+                if os.path.isdir(subdir):
+                    dir = subdir
+                    cls = DocDirReader
+                else:
+                    cls = DocFileReader
         else:
-            try:
-                cls = m.Reader
-            except AttributeError:
-                reason = (("`Reader' not found in %s file.\n"
-                           "Maybe %s is not an LCG customization file and "
-                           "should be removed to make LCG happy?") % (path, path,))
-                raise lcg.ProcessingError(reason)
+            m = imp.load_module(name, file, path, descr)
+            if hasattr(m, 'IndexNode'):
+                # Just for backwards compatibility
+                cls = m.IndexNode
+            else:
+                try:
+                    cls = m.Reader
+                except AttributeError:
+                    reason = (("`Reader' not found in %s file.\n"
+                               "Maybe %s is not an LCG customization file and "
+                               "should be removed to make LCG happy?") % (path, path,))
+                    raise lcg.ProcessingError(reason)
     if issubclass(cls, FileReader):
         kwargs = dict(kwargs, dir=dir, encoding=encoding)
         if issubclass(cls, DocFileReader):
