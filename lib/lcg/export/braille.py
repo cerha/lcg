@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 """Export to Braille notation.
 """
 
+from contextlib import contextmanager
 import copy
 import ctypes
 import ctypes.util
@@ -36,6 +37,8 @@ from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, Pag
 import entities
 
 _ = TranslatableTextFactory('lcg')
+
+_braille_whitespace = ' ⠀'
 
 _inf = 'infix'
 _pre = 'prefix'
@@ -133,7 +136,7 @@ class _Braille(object):
         self._text = text + self._text
         self._hyphenation = (hyphenation or self._default_hyphenation(text)) + self._hyphenation
         assert len(self._text) == len(self._hyphenation), (self._text, self._hyphenation,)
-    
+
 
 class BrailleError(Exception):
     """Exception raised on Braille formatting errors.
@@ -272,6 +275,8 @@ def xml2braille(xml):
     return output.strip(string.whitespace + '⠀')
 
 
+from nemeth import mathml_nemeth
+
 class BrailleExporter(FileExporter, Exporter):
     "Transforming structured content objects to Braille output."
     
@@ -350,16 +355,25 @@ class BrailleExporter(FileExporter, Exporter):
         def form(self):
             return self._form[-1]
 
-        def set_form(self, form):
-            self._form.append(self._form[-1] | form)
+        @contextmanager
+        def let_form(self, form):
+            if form is not None:
+                self._form.append(self._form[-1] | form)
+            try:
+                yield None
+            finally:
+                if form is not None:
+                    self._form.pop()
 
-        def unset_form(self):
-            self._form.pop()
-
-        def set_hyphenate(self, hyphenate):
+        @contextmanager
+        def let_hyphenate(self, hyphenate):
             old_hyphenate = self._hyphenate
-            self._hyphenate = hyphenate
-            return old_hyphenate
+            if hyphenate is not None:
+                self._hyphenate = hyphenate
+            try:
+                yield None
+            finally:
+                self._hyphenate = old_hyphenate
 
         def compactness(self):
             return self._compactness
@@ -486,18 +500,28 @@ class BrailleExporter(FileExporter, Exporter):
                                 add_line(line[:page_width])
                                 line = prefix + line[page_width:]
                                 hyphenation = hyphenation_prefix + hyphenation[page_width:]
-                            elif hyphenation[pos] == '1':
+                            elif hyphenation[pos] == '1': # word break
                                 add_line(line[:pos] + self.text(context, '-', lang=lang).text())
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
-                            elif hyphenation[pos] == '2':
+                            elif hyphenation[pos] == '2': # whitespace
                                 add_line(line[:pos])
                                 line = prefix + line[pos + 1:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos + 1:]
-                            elif hyphenation[pos] == '3':
+                            elif hyphenation[pos] == '3': # Czech math breaking
                                 add_line(line[:pos + 1])
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
+                            elif hyphenation[pos] == '4': # Nemeth
+                                if line[pos] in _braille_whitespace:
+                                    add_line(line[:pos])
+                                    line = line[pos + 1:]
+                                else:
+                                    pos += 1
+                                    add_line(line[:pos])
+                                    line = line[pos:]
+                                if line:
+                                    line = (prefix + '⠀') * 2 + line
                             else:
                                 raise Exception("Program error", hyphenation[pos])
                         pos = line.find(hfill)
@@ -904,19 +928,10 @@ class BrailleExporter(FileExporter, Exporter):
     # Inline constructs (text styles).
 
     def _inline_braille_export(self, context, element, form=None, lang=None, hyphenate=None):
-        if lang is not None:
-            orig_lang = context.set_lang(lang)
-        if form is not None:
-            context.set_form(form)
-        if hyphenate is not None:
-            orig_hyphenate = context.set_hyphenate(hyphenate)
-        exported = self._export_container(context, element)
-        if hyphenate is not None:
-            context.set_hyphenate(orig_hyphenate)
-        if form is not None:
-            context.unset_form()
-        if lang is not None:
-            context.set_lang(orig_lang)
+        with context.let_lang(lang):
+            with context.let_form(form):
+                with context.let_hyphenate(hyphenate):
+                    exported = self._export_container(context, element)
         return exported
 
     def _export_emphasized(self, context, element):
@@ -1142,22 +1157,28 @@ class BrailleExporter(FileExporter, Exporter):
             context.set_compactness(compactness)
         return exported
         
-    # Special constructs
+    # Mathematics
     
     def _export_mathml(self, context, element):
         math_rules = context.node_presentation().braille_math_rules
         if math_rules == 'nemeth':
-            return self._export_mathml_nemeth(context, element)
+            result = self._export_mathml_nemeth(context, element)
+            return result
+        elif math_rules == 'nemeth-liblouis':
+            return self._export_mathml_nemeth_liblouis(context, element)
         elif math_rules == 'czech':
             return self._export_mathml_czech(context, element)
         else:
             raise Exception("Unsupported math rules", math_rules)
 
-    def _export_mathml_nemeth(self, context, element):
+    def _export_mathml_nemeth_liblouis(self, context, element):
         xml = element.content()
         braille = xml2braille(xml)
         hyphenation_list = ['2' if c == '⠀' else '0' for c in braille]
         return _Braille(braille, string.join(hyphenation_list, ''))
+        
+    def _export_mathml_nemeth(self, context, element):
+        return mathml_nemeth(self, context, element)
         
     def _export_mathml_czech(self, context, element):
         class EntityHandler(element.EntityHandler):
@@ -1191,7 +1212,7 @@ class BrailleExporter(FileExporter, Exporter):
             elif node.tag == 'mi':
                 # <mi> content should be in italic but it would make the
                 # Braille output only larger and harder to read.
-                #f = 'style:italic'
+                # f = 'style:italic'
                 f = ''
             else:
                 f = ''
@@ -1250,9 +1271,8 @@ class BrailleExporter(FileExporter, Exporter):
                 form |= louis.bold
             elif style.find('italic') >= 0:
                 form |= louis.italic
-            context.set_form(form)
-            braille = self.text(context, text).text()
-            context.unset_form()
+            with context.let_form(form):
+                braille = self.text(context, text).text()
             if node is not None:
                 unset_style()
             return _Braille(braille, '0' * len(braille))
@@ -1307,9 +1327,9 @@ class BrailleExporter(FileExporter, Exporter):
         def export_mn(node, **kwargs):
             text = node_value(node).replace(' ', '')
             braille = text_export(text)
-            # We don't know what follows so we put the small letter prefix
-            # here.  It should be present here only if small a-h follows; this
-            # will be fixed in final MathML result processing.
+            # We don't know what follows so we put the lower case letter prefix
+            # here.  It should be present here only if lower case a-h follows;
+            # this will be fixed in final MathML result processing.
             braille.append(u'⠐', '0')
             return braille
         def export_mo(node, op_form=None, **kwargs):
@@ -1417,19 +1437,19 @@ class BrailleExporter(FileExporter, Exporter):
             if not selection:
                 selection = 1
             return export(child_nodes(node)[selection - 1])
-        #def export_mmultiscripts(node, **kwargs):
-        #def export_mtable(node, **kwargs):
-        #def export_mtr(node, **kwargs):
-        #def export_mlabeledtr(node, **kwargs):
-        #def export_mtd(node, **kwargs):
-        #def export_maligngroup(node, **kwargs):
-        #def export_mstack(node, **kwargs):
-        #def export_msgroup(node, **kwargs):
-        #def export_msrow(node, **kwargs):
-        #def export_msline(node, **kwargs):
-        #def export_mscarries(node, **kwargs):
-        #def export_mscarry(node, **kwargs):
-        #def export_mlongdiv(node, **kwargs):
+        # def export_mmultiscripts(node, **kwargs):
+        # def export_mtable(node, **kwargs):
+        # def export_mtr(node, **kwargs):
+        # def export_mlabeledtr(node, **kwargs):
+        # def export_mtd(node, **kwargs):
+        # def export_maligngroup(node, **kwargs):
+        # def export_mstack(node, **kwargs):
+        # def export_msgroup(node, **kwargs):
+        # def export_msrow(node, **kwargs):
+        # def export_msline(node, **kwargs):
+        # def export_mscarries(node, **kwargs):
+        # def export_mscarry(node, **kwargs):
+        # def export_mlongdiv(node, **kwargs):
         for k, v in locals().items():
             if k.startswith('export_'):
                 exporters[k[len('export_'):]] = v

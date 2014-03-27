@@ -1189,12 +1189,89 @@ class BrailleExport(unittest.TestCase):
 ⠝⠑⠥⠱⠅⠕⠙⠌⠄''', repr(result)
 
     def test_mathml_nemeth(self):
+        python_version = sys.version_info
+        can_parse_entities = (python_version[0] >= 3 or
+                             python_version[0] == 2 and python_version[1] >= 7)
+        entity_regexp = re.compile('&[a-zA-Z]+;')
+        def test(mathml, expected_result, lang='cs'):
+            if not can_parse_entities and entity_regexp.search(mathml):
+                return
+            content = lcg.MathML(mathml)
+            presentation = self._load_presentation()
+            presentation.braille_math_rules = 'nemeth'
+            presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
+            n = lcg.ContentNode('test', title='Test Node', descr="Some description",
+                                content=content)
+            exporter = lcg.BrailleExporter()
+            context = exporter.context(n, lang=lang, presentation=presentation_set)
+            exported = exporter.export(context)
+            result = exported.split('\n\n')[1]
+            assert result == expected_result, (("\n  - source text: %r\n  - expected:    %r\n  - "
+                                                "got:         %r") %
+                                               (mathml, expected_result, result,))
+        # §8
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>3,76</mn></mrow>
+</math>''', u'⠼⠒⠨⠶⠖', lang='cs') # decimal point
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>3.76</mn></mrow>
+</math>''', u'⠼⠒⠨⠶⠖', lang='cs') # decimal point
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1,378</mn></mrow>
+</math>''', u'⠼⠂⠠⠒⠶⠦', lang='en') # comma
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>3.76</mn></mrow>
+</math>''', u'⠼⠒⠨⠶⠖', lang='en') # decimal point
+        # §9
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mn>1</mn></mrow>
+</math>''', u'⠎⠊⠝⠀⠼⠂')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>-1</mn></mrow>
+</math>''', u'⠤⠼⠂')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>-.3</mn></mrow>
+</math>''', u'⠤⠼⠨⠒')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>3</mn><mo>*</mo><mn>4</mn></mrow>
+</math>''', u'⠼⠒⠈⠼⠼⠲')
+        # §10
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mo>[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>]</mo></mrow>
+</math>''', u'⠈⠷⠴⠠⠀⠂⠈⠾')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfenced open="[" close="]" separators=","><mn>0</mn><mn>1</mn></mfenced></mrow>
+</math>''', u'⠈⠷⠴⠠⠀⠂⠈⠾')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfenced open="(" close=")" separators=",">
+  <mrow><mn>1</mn><mo>+</mo><mi>h</mi></mrow>
+  <mrow><mn>2</mn><mo>+</mo><mi>k</mi></mrow>
+  <mrow><mn>0</mn></mrow>
+</mfenced></mrow></math>''', u'⠷⠂⠬⠓⠠⠀⠆⠬⠅⠠⠀⠴⠾')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfenced open="(" close=")" separators=",">
+ <mrow><mn>0</mn></mrow><mrow><mo>-</mo><mn>1</mn></mrow><mrow><mo>&PlusMinus;</mo><mn>2</mn></mrow>
+</mfenced></mrow></math>''', u'⠷⠴⠠⠀⠤⠂⠠⠀⠬⠤⠆⠾')
+        if False:
+            # Closing parenthesis rendered incorrectly:
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfenced open="(" close=")" separators=",">
+  <mrow><mn>2</mn><mi>sin</mi><mo>&ApplyFunction;</mo><mn>30</mn><mo>°</mo></mrow>
+  <mrow><mn>3</mn><mi>cos</mi><mo>&ApplyFunction;</mo><mn>60</mn><mo>°</mo></mrow>
+</mfenced></mrow></math>''', u'⠷⠆⠎⠊⠝⠀⠼⠒⠴⠘⠨⠡⠠⠀⠒⠉⠕⠎\n⠀⠀⠼⠖⠴⠘⠨⠡⠐⠾')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfenced open="(" close=")" separators=",">
+  <mrow><mi>x</mi></mrow><mrow><mn>7</mn></mrow><mrow><mn mathvariant="bold">8</mn></mrow>
+  <mrow><mi>y</mi></mrow>
+</mfenced></mrow></math>''', u'⠷⠭⠠⠀⠶⠠⠀⠸⠼⠦⠠⠀⠽⠾')
+
+    def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
         # bindings to it work and that there is no big problem.
         def test(mathml, expected_result):
             content = lcg.MathML(mathml)
             presentation = self._load_presentation()
-            presentation.braille_math_rules = 'nemeth'
+            presentation.braille_math_rules = 'nemeth-liblouis'
             presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
             n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                                 content=content)

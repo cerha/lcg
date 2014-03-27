@@ -24,7 +24,8 @@ import os
 
 braille_tables = {'en': ['en-us-g1.ctb'],
                   'cs': [os.path.join(os.path.dirname(lcg.__file__),
-                                      'export/braille-tables/cs-g1.ctb')]}
+                                      'export/braille-tables/cs-g1.ctb')],
+                  'nemeth': ['nemeth.ctb']}
 braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
                               'cs': 'hyph_cs_CZ.dic'}
 page_width = lcg.UFont(20)
