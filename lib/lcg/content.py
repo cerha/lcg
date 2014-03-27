@@ -1739,13 +1739,12 @@ class MathML(Content):
             node.clear()
             node.tag = 'mrow'
             ElementTree.SubElement(node, 'mo', dict(fence='true')).text = opening
-            mrow = ElementTree.SubElement(node, 'mrow')
             i = 0
             for c in children:
                 if separators and i > 0:
                     s = separators[-1] if i > len(separators) else separators[i - 1]
-                    ElementTree.SubElement(mrow, 'mo', dict(separator='true')).text = s
-                mrow.append(c)
+                    ElementTree.SubElement(node, 'mo', dict(separator='true')).text = s
+                node.append(c)
                 i += 1
             ElementTree.SubElement(node, 'mo', dict(fence='true')).text = closing
         return math
