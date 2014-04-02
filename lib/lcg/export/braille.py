@@ -1094,7 +1094,16 @@ class BrailleExporter(FileExporter, Exporter):
         if not adjust_widths(max_width):
             if not adjust_widths(max_width * 2):
                 # Future option: Try to use double-line rows.
-                raise BrailleError("Table too wide")
+                max_row = None
+                max_len = -1
+                for row in cells:
+                    e = [export(context, c) for c in row]
+                    e_len = sum([len(i) for i in e])
+                    if e_len > max_len:
+                        max_row = e
+                        max_len = e_len
+                info = string.join([c.text() for c in max_row], '⠀')
+                raise BrailleError("Table too wide (%s)" % (info,))
             intro_text = context.localize(_("The table is read across facing pages."))
             table_intro = self.text(context, intro_text)
             table_intro += self._newline(context)
