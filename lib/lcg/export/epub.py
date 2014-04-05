@@ -24,6 +24,7 @@ import zipfile
 import cStringIO as StringIO
 import datetime
 import mimetypes
+import re
 
 class Constants(object):
     """Things mandated by EPUB 3 spec"""
@@ -48,6 +49,8 @@ class EpubHtml5Exporter(Html5Exporter):
         def script(self, *args, **kwargs):
             self.scripted = True
             return super(EpubHtml5Exporter.Generator, self).script(*args, **kwargs)
+
+    _INVALID_MATHML_ATTRIBUTES = re.compile(r' ((fontfamily|mathcolor)=""|contenteditable="false")')
                 
     def _head(self, context):
         g = context.generator()
@@ -94,6 +97,9 @@ class EpubHtml5Exporter(Html5Exporter):
             cls.append('image-' + element.name())
         return g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
                      width=width, height=height)
+
+    def _export_mathml(self, context, element):
+        return self._INVALID_MATHML_ATTRIBUTES.sub(element.content(), '')
 
     def _uri_node(self, context, node, lang=None):
         return node.id() + '.xhtml'
