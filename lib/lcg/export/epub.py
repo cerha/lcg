@@ -99,7 +99,7 @@ class EpubHtml5Exporter(Html5Exporter):
                      width=width, height=height)
 
     def _export_mathml(self, context, element):
-        return self._INVALID_MATHML_ATTRIBUTES.sub(element.content(), '')
+        return self._INVALID_MATHML_ATTRIBUTES.sub('', element.content())
 
     def _uri_node(self, context, node, lang=None):
         return node.id() + '.xhtml'
