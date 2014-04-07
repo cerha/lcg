@@ -41,13 +41,12 @@ class Constants(object):
 class EpubHtml5Exporter(Html5Exporter):
     
     class Generator(Html5Exporter.Generator):
-        # We need to be able to find out, whether a script was used
-        # within a particular node export.  Thus we use this variable,
-        # which is reset before each node export and checked after it.
-        scripted = False
 
         def script(self, *args, **kwargs):
-            self.scripted = True
+            # We need to be able to find out, whether a script was used
+            # within a particular node export.  Thus we assign the current context
+            # to the generator in _xhtml_content_document to be able to access it here.
+            self.context.scripted = True
             return super(EpubHtml5Exporter.Generator, self).script(*args, **kwargs)
 
     _INVALID_MATHML_ATTRIBUTES = re.compile(r' ((fontfamily|mathcolor)=""|contenteditable="false")')
@@ -99,6 +98,7 @@ class EpubHtml5Exporter(Html5Exporter):
                      width=width, height=height)
 
     def _export_mathml(self, context, element):
+        context.mathml = True
         return self._INVALID_MATHML_ATTRIBUTES.sub('', element.content())
 
     def _uri_node(self, context, node, lang=None):
@@ -152,7 +152,7 @@ class EpubExporter(Exporter):
         node = context.node()
         lang = context.lang()
         resources = []
-        scripted_nodes = []
+        node_properties = {}
         try:
             mimeinfo = zipfile.ZipInfo('mimetype')
             mimeinfo.compress_type = zipfile.ZIP_STORED
@@ -162,13 +162,12 @@ class EpubExporter(Exporter):
             epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME),
                           self._navigation_document(context))
             for n in node.linear():
-                exported_content, scripted = self._xhtml_content_document(n, lang)
+                exported_content, properties = self._xhtml_content_document(n, lang)
                 epub.writestr(self._node_path(n), exported_content)
-                if scripted:
-                    scripted_nodes.append(n)
                 for resource in n.resources():
                     if resource not in resources:
                         resources.append(resource)
+                node_properties[n] = properties
             cover_image = node.cover_image()
             if cover_image and cover_image not in resources:
                 resources.append(cover_image)
@@ -191,7 +190,7 @@ class EpubExporter(Exporter):
                 epub.writestr(self._resource_path(resource), data)
                               
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
-                          self._package_document(node, lang, resources, scripted_nodes))
+                          self._package_document(node, lang, resources, node_properties))
         finally:
             try:
                 epub.close()
@@ -246,7 +245,7 @@ class EpubExporter(Exporter):
         rootfile.setAttribute('media-type', Constants.PACKAGE_DOC_MIMETYPE)
         return doc.toprettyxml(indent=4 * '', newl='', encoding='UTF-8')
 
-    def _package_document(self, node, lang, resources, scripted_nodes):
+    def _package_document(self, node, lang, resources, node_properties):
         doc = xml.Document()
         package = doc.appendChild(doc.createElement('package'))
         uid_id = 'uid'
@@ -291,17 +290,14 @@ class EpubExporter(Exporter):
             item.setAttribute('id', item_id)
             item.setAttribute('href', href)
             item.setAttribute('media-type', mediatype)
-            properties = ' '.join(properties)
             if properties:
-                item.setAttribute('properties', properties)
+                item.setAttribute('properties', ' '.join(properties))
         add_item('nav', self.Config.NAV_DOC_FILENAME, 'application/xhtml+xml', properties=('nav',))
         for n in node.linear():
             item_id = 'node-' + n.id() # Prefix to avoid ids beginning with a number (invalid HTML)
             href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
-            properties = []
-            if n in scripted_nodes:
-                properties.append('scripted')
-            add_item(item_id, href, mediatype='application/xhtml+xml', properties=properties)
+            add_item(item_id, href, mediatype='application/xhtml+xml',
+                     properties=node_properties.get(n, ()))
             spine.appendChild(doc.createElement('itemref')).setAttribute('idref', item_id)
         for resource in resources:
             resource_id = 'resource-%x' % id(resource)
@@ -347,10 +343,16 @@ class EpubExporter(Exporter):
     def _xhtml_content_document(self, node, lang):
         exporter = self._html_exporter
         context = exporter.context(node, lang)
-        context.generator().scripted = False
+        context.generator().context = context
+        context.scripted = False
+        context.mathml = False
         data = context.localize(exporter.export(context))
-        scripted = context.generator().scripted
-        return (data.encode('UTF-8'), scripted)
+        properties = []
+        if context.scripted:
+            properties.append('scripted')
+        if context.mathml:
+            properties.append('mathml')
+        return (data.encode('UTF-8'), properties)
 
     def uri(self, context, target, **kwargs):
         return self._html_exporter.uri(context, target, **kwargs)
