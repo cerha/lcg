@@ -1153,7 +1153,7 @@ class HtmlExporter(Exporter):
     def concat(self, *items):
         return self._generator.concat(*items)
 
-    def _reformat_text(self, text):
+    def _reformat_text(self, context, text):
         return text
 
     def _html_content(self, context):

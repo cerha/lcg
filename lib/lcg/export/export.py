@@ -474,7 +474,8 @@ class Exporter(object):
             text = context.text_preprocessor(text)
         return self.escape(text)
 
-    def _reformat_text(self, text):
+    def _reformat_text(self, context, text):
+        text = context.localize(text)
         text = text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
         text = self._RE_SPACE_MATCHER.sub(' ', text)
         return text
@@ -538,7 +539,7 @@ class Exporter(object):
         should not be necessary to override this method in derived classes.
         
         """
-        t = self._reformat_text(element.text())
+        t = self._reformat_text(context, element.text())
         return self.text(context, t, lang=element.lang())
         
     def _export_anchor(self, context, element):

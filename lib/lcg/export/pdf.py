@@ -2327,7 +2327,7 @@ class PDFExporter(FileExporter, Exporter):
             result = make_element(Container, content=())
         return result
 
-    def _reformat_text(self, text):
+    def _reformat_text(self, context, text):
         return text
     
     def text(self, context, text, lang=None):
