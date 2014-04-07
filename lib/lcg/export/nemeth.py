@@ -30,9 +30,12 @@ import entities
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
-                   '.': '⠨', ',': '⠠'}
+                   ' ': '⠀', '.': '⠨', ',': '⠠'}
 _nemeth_operators = {
     '*': '⠈⠼',
+    '=': '⠀⠨⠅⠀',
+    ',': '⠠⠀',
+    '…': '⠀⠄⠄⠄⠀',
     '\u2061': '⠀',              # function application
 }
 _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍≏≏̸≐≐̸≑≓≗≜≟≠≡≢≤≥≦≦̸≧≧̸≨≩≪≪̸≫≫̸≮≯≰≱≲≳≴≵≶≷≸'
@@ -118,7 +121,7 @@ def mathml_nemeth(exporter, context, element):
     entity_handler = EntityHandler()
     top_node = element.tree_content(entity_handler, transform=True)
     variables = _Variables()
-    braille = _child_export(top_node, exporter, context, variables)
+    braille = _child_export(top_node, exporter, context, variables).strip()
     return _Braille(braille.text(), braille.hyphenation().replace('2', '4'))
 
 _exporters = {}
@@ -202,13 +205,11 @@ def _op_export(operator, exporter, context, variables, node=None):
             op_braille = '⠿⠿⠿%s⠿⠿⠿' % (op_braille,)
             hyphenation = '0' * len(op_braille)
     if hyphenation is None:
-        if len(op_braille) == 1:
-            hyphenation = '4'
-        else:
-            hyphenation = '0' * len(op_braille)
-    if operator == ',':
-        op_braille += '⠀'
-        hyphenation += '4'
+        hyphenation = '0' * len(op_braille)
+    if op_braille[0] == '⠀' and hyphenation[0] == '0':
+        hyphenation = '4' + hyphenation[1:]
+    if op_braille[-1] == '⠀' and hyphenation[-1] == '0':
+        hyphenation = hyphenation[:-1] + '4'
     return _Braille(op_braille, hyphenation)
 
 
@@ -216,10 +217,10 @@ def _op_export(operator, exporter, context, variables, node=None):
 
 def _export_mi(node, exporter, context, variables, **kwargs):
     text = _node_value(node).strip()
-    return _text_export(text, exporter, context, variables, node=node, plain=True)
+    return _text_export(text, exporter, context, variables, node=node)
 
 def _export_mn(node, exporter, context, variables, **kwargs):
-    text = _node_value(node).replace(' ', '')
+    text = _node_value(node).strip()
     prefix = ''
     style_applied = False
     with _style(node, variables):

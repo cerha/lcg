@@ -137,6 +137,17 @@ class _Braille(object):
         self._hyphenation = (hyphenation or self._default_hyphenation(text)) + self._hyphenation
         assert len(self._text) == len(self._hyphenation), (self._text, self._hyphenation,)
 
+    def strip(self):
+        text = self._text
+        i = 0
+        n = len(text)
+        j = n
+        while i < n and text[i] == '⠀':
+            i += 1
+        while j > 0 and text[j - 1] == '⠀':
+            j -= 1
+        return _Braille(text[i:j], self._hyphenation[i:j])
+
 
 class BrailleError(Exception):
     """Exception raised on Braille formatting errors.
@@ -492,7 +503,7 @@ class BrailleExporter(FileExporter, Exporter):
                             line = ' ' * prefix_len + line[prefix_len:]
                         while len(line) > page_width and not double_page:
                             pos = page_width
-                            if hyphenation[pos] != '2':
+                            if hyphenation[pos] not in '24':
                                 pos -= 1
                                 while pos > 0 and hyphenation[pos] == '0':
                                     pos -= 1
