@@ -734,21 +734,20 @@ class Context(object):
                 italic_name = 'Oblique'
         else:
             italic_name = ''
-        for directory in ('/usr/share/fonts/truetype/ttf-dejavu',
-                          '/usr/share/fonts/truetype/freefont',
-                          '/Library/Fonts'):
-            if os.access(directory, os.F_OK):
-                break
-        else:
-            raise Exception("Font directory not found")
         if name == 'DejaVu':
             if bold:
                 bold_name = '-' + bold_name
             elif italic:
                 italic_name = '-' + italic_name
-        font_file = ('%s/%s%s%s%s.ttf' % (directory, name, family_name, bold_name, italic_name,))
-        if not os.access(font_file, os.R_OK):
-            raise Exception("No matching font found")
+        for directory in ('/usr/share/fonts/truetype/ttf-dejavu',
+                          '/usr/share/fonts/truetype/freefont',
+                          '/Library/Fonts'):
+            font_file = ('%s/%s%s%s%s.ttf' % (directory, name, family_name,
+                                              bold_name, italic_name,))
+            if os.access(font_file, os.R_OK):
+                break
+        else:
+            raise Exception("No matching font found", (name, family_name, bold_name, italic_name,))
         return font_file
 
     def _register_font(self, name, family, bold, italic, font_file):
