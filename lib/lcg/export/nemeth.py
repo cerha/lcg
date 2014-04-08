@@ -122,7 +122,8 @@ def mathml_nemeth(exporter, context, element):
     top_node = element.tree_content(entity_handler, transform=True)
     variables = _Variables()
     braille = _child_export(top_node, exporter, context, variables).strip()
-    return _Braille(braille.text(), braille.hyphenation().replace('2', '4'))
+    hyphenation = braille.hyphenation().replace(exporter.HYPH_WS, exporter.HYPH_NEMETH_WS)
+    return _Braille(braille.text(), hyphenation)
 
 _exporters = {}
 def _exporter(tag):
@@ -152,7 +153,7 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
         lang = 'en' if plain else 'nemeth'
         with context.let_form(form):
             braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
-    return _Braille(braille, '0' * len(braille))
+    return _Braille(braille)
     
 def _child_export(node, exporter, context, variables, separators=None):
     braille = _Braille('', '')
@@ -187,7 +188,7 @@ def _child_export(node, exporter, context, variables, separators=None):
             op_form = None
         if braille and separators:
             separator = separators[-1] if i > len(separators) else separators[i - 1]
-            hyph_separator = '3' if len(separator) == 1 else '0' * len(separator)
+            hyph_separator = self._HYPH_NEMETH_WS if len(separator) == 1 else None
             braille.append(separator, hyph_separator)
         with variables.let('enclosed-list', enclosed_list):
             braille = braille + _export(n, exporter, context, variables, op_form=op_form)
@@ -203,13 +204,13 @@ def _op_export(operator, exporter, context, variables, node=None):
         # situation here.
         if op_braille is None or op_braille.find(u'⠈⠀⠭') >= 0:
             op_braille = '⠿⠿⠿%s⠿⠿⠿' % (op_braille,)
-            hyphenation = '0' * len(op_braille)
+            hyphenation = exporter.HYPH_NO * len(op_braille)
     if hyphenation is None:
-        hyphenation = '0' * len(op_braille)
-    if op_braille[0] == '⠀' and hyphenation[0] == '0':
-        hyphenation = '4' + hyphenation[1:]
-    if op_braille[-1] == '⠀' and hyphenation[-1] == '0':
-        hyphenation = hyphenation[:-1] + '4'
+        hyphenation = exporter.HYPH_NO * len(op_braille)
+    if op_braille[0] == '⠀' and hyphenation[0] == exporter.HYPH_NO:
+        hyphenation = exporter.HYPH_NEMETH_WS + hyphenation[1:]
+    if op_braille[-1] == '⠀' and hyphenation[-1] == exporter.HYPH_NO:
+        hyphenation = hyphenation[:-1] + exporter.HYPH_NEMETH_WS
     return _Braille(op_braille, hyphenation)
 
 
@@ -240,7 +241,9 @@ def _export_mn(node, exporter, context, variables, **kwargs):
             text = text.replace(',', '.')
         translated = prefix + string.join([_nemeth_numbers[c] for c in text], '')
     variables.set('enclosed-list', 'no')
-    return _Braille(translated)
+    hyphenation = string.join([exporter.HYPH_NEMETH_WS if c == '⠀' else exporter.HYPH_NEMETH_NUMBER
+                               for c in translated], '')
+    return _Braille(translated, hyphenation)
 
 def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
     # form = _attribute(node, 'form', op_form) # prefix, infix, postfix
@@ -254,7 +257,7 @@ def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
     op_braille = _op_export(op, exporter, context, variables)
     if separator == 'true':
         if op_braille.text()[-1] not in (' ', '⠀',):
-            op_braille.append('⠀', '0')
+            op_braille.append('⠀')
     return op_braille
 
 def _export_mtext(node, exporter, context, variables, **kwargs):
