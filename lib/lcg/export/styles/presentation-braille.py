@@ -572,7 +572,7 @@ debug_device_output_cs = {
 # Index Everest-D V2, Index 4x4 PRO V2
 def device_init_index_v2(width, height, inner, outer, top, bottom):
     return (('0,0,0,0,x,x,x,x,x,' # 0-8
-             '%(width)d,%(inner)d,%(outer)d,%(top)d,%(bottom)d,4,1,0,0,' # 9-17
+             '%(width)d,%(outer)d,%(inner)d,%(top)d,%(bottom)d,4,1,0,0,' # 9-17
              'x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,') %
             dict(width=(width - 23), inner=inner, outer=outer, top=top, bottom=bottom))
 # Index Everest-D V3
