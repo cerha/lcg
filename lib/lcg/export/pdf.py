@@ -734,7 +734,9 @@ class Context(object):
                 italic_name = 'Oblique'
         else:
             italic_name = ''
-        for directory in ('/usr/share/fonts/truetype/freefont', '/Library/Fonts'):
+        for directory in ('/usr/share/fonts/truetype/ttf-dejavu',
+                          '/usr/share/fonts/truetype/freefont',
+                          '/Library/Fonts'):
             if os.access(directory, os.F_OK):
                 break
         else:
