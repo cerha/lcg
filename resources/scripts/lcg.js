@@ -23,6 +23,7 @@
 /*global Event */
 /*global Element */
 /*global Ajax */
+/*global Effect */
 /*global $ */
 /*global $break */
 /*global self */
@@ -834,6 +835,51 @@ lcg.Tooltip = Class.create({
     }
 
 });
+
+
+lcg.CollapsiblePane = Class.create({
+    /* Collapsible Pane.
+     *
+     * This is the Javascript counterpart of the Python class `lcg.CollapsiblePanel'.
+     * The panel content can be collapsed or expanded.  When collapsed, only a one
+     * line panel title is displayed.  The title may be clicked to toggle the content
+     * expansion state.
+     *
+     */
+    initialize: function (element_id, collapsed) {
+	var element = $(element_id);
+	this.element = element;
+	this.content = element.down('div.section-content');
+	if (collapsed) {
+	    element.addClassName('collapsed');
+	    this.content.hide();
+	} else {
+	    element.addClassName('expanded');
+	}
+	element.down('h1,h2,h3,h4,h5,h6').observe('click', this.on_toggle_expansion.bind(this));
+    },
+
+    on_toggle_expansion: function(event) {
+	if (this.element.hasClassName('collapsed')) {
+	    this.element.removeClassName('collapsed');
+	    this.element.addClassName('expanded');
+	    if (Effect !== undefined) {
+		new Effect.SlideDown(this.content, {duration: 0.2});
+	    } else {
+		this.content.show();
+	    }
+	} else {
+	    this.element.removeClassName('expanded');
+	    this.element.addClassName('collapsed');
+	    if (Effect !== undefined) {
+		new Effect.SlideUp(this.content, {duration: 0.2});
+	    } else {
+		this.content.hide();
+	    }
+	}
+    }
+});
+
 
 lcg.Cookies = Class.create({
     // This class is taken from 

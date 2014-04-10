@@ -305,3 +305,30 @@ class PopupMenuCtrl(Widget, lcg.Content):
                  for item in self._items]
         return (items, context.translate(self._tooltip), self._active_area_selector)
 
+
+class CollapsiblePane(Widget, lcg.Section):
+    """HTML Collapsible pane widget.
+
+    The pane content can be collapsed or expanded.  When collapsed, only a one
+    line pane title is displayed.  The title may be clicked to toggle the
+    content expansion state.
+
+    """
+    
+    def __init__(self, title, content, collapsed=True, **kwargs):
+        """Arguments:
+         
+           title -- pane title as a basestring
+           content -- 'lcg.Content' instance representing collapsible pane content
+           collapsed -- pass False to make the pane initially expanded
+           **kwargs -- other arguments defined by the parent class
+           
+        """
+        self._collapsed = collapsed
+        super(CollapsiblePane, self).__init__(title, content, in_toc=False, **kwargs)
+    
+    def _javascript_widget_arguments(self, context):
+        return (self._collapsed,)
+
+    def _export_widget(self, context):
+        return context.exporter().export_element(context, self)

@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ from resources import *
 from units import Unit, UAny, UFont, UMm, UPoint, USpace, FontFamily, \
      HorizontalAlignment, VerticalAlignment, Orientation
 from content import *
-from widgets import Widget, FoldableTree, Notebook, PopupMenuCtrl, PopupMenuItem
+from widgets import Widget, FoldableTree, Notebook, PopupMenuCtrl, PopupMenuItem, CollapsiblePane
 from presentation import *
 from export import *
 from parse import *
