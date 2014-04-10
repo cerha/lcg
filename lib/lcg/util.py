@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Author: Tomas Cerha <cerha@brailcom.org>
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2013 Brailcom, o.p.s.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2013, 2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ from contextlib import contextmanager
 import operator
 import re
 import sys
+import unicodedata
 
 from lcg import TranslatableTextFactory
 _ = TranslatableTextFactory('lcg')
@@ -43,6 +44,19 @@ def camel_case_to_lower(string, separator='-'):
     words = _CAMEL_CASE_WORD.findall(string)
     return separator.join([w.lower() for w in words])
 
+def text_to_id(string, separator='-'):
+    """Convert any text to an identifier.
+    
+    The returned identifier consists only of safe characters, such as lower
+    case letters of English alphabet, numbers and separators, but it attempts
+    to keep as much of the input text as possible.  Upper case characters are
+    converted to lower case, accents are removed from accented characters,
+    spaces are replaced by the 'separator' (dash by default) and other
+    characters are removed.
+
+    """
+    without_accents = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
+    return re.sub(r'[^a-z0-9 ]', '', without_accents.lower()).replace(' ', separator)
 
 def unindent_docstring(docstring):
     """Trim indentation and blank lines from docstring text and return it."""
