@@ -655,20 +655,21 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
     },
 
     cmd_activate: function (item) {
+	var a, spec, namespaces, func, context, i, args;
 	if (item.hasClassName('active')) {
 	    this.remove();
-	    var a = item.down('a');
-	    var spec = a._lcg_popup_menu_item_spec;
+	    a = item.down('a');
+	    spec = a._lcg_popup_menu_item_spec;
 	    if (spec.callback) {
-		var namespaces = spec.callback.split(".");
-		var func = namespaces.pop();
-		var context = window;
-		for (var i = 0; i < namespaces.length; i++) {
-		    var context = context[namespaces[i]];
+		namespaces = spec.callback.split(".");
+		func = namespaces.pop();
+		context = window;
+		for (i = 0; i < namespaces.length; i++) {
+		    context = context[namespaces[i]];
 		}
-		var args = [this.popup_element];
+		args = [this.popup_element];
 		if (spec.callback_args) {
-		    for (var i = 0; i < spec.callback_args.length; i++) {
+		    for (i = 0; i < spec.callback_args.length; i++) {
 			args[i + 1] = spec.callback_args[i];
 		    }
 		}
@@ -841,6 +842,7 @@ lcg.Cookies = Class.create({
         this.path = path || '/';
         this.domain = domain || null;
     },
+
     // Sets a cookie
     set: function (key, value, days) {
         if (typeof key !== 'string') { 
