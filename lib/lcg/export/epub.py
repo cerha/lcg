@@ -268,8 +268,8 @@ class EpubExporter(Exporter):
         if metadata.isbn:
             identifier = 'urn:isbn:' + metadata.isbn
         else:
-            # TODO: generate a unique identifier?
-            identifier = 'urn:uuid:073a5060-6629-11e1-b86c-0800200c9a66'
+            import uuid
+            identifier = 'urn:uuid:%s' % uuid.uuid1()
         add_meta('dc:identifier', identifier, id=uid_id)
         add_meta('dc:source', metadata.original_isbn and 'urn:isbn:' + metadata.original_isbn)
         add_meta('dc:title', node.title())
