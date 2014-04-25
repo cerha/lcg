@@ -96,7 +96,7 @@ class ExerciseExporter(object):
             label = _("Play")
         button_id = context.unique_id()
         context.connect_shared_player(context.uri(media), button_id)
-        return g.button(label, type='button', id=button_id, cls='media-control')
+        return g.button(label, id=button_id, cls='media-control')
     
     def _export_tasks(self, context, exercise, exercise_id):
         exported_tasks = [context.localize(self._export_task(context, exercise, exercise_id, task))

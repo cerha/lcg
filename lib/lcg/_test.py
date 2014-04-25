@@ -751,7 +751,7 @@ class HtmlExport(unittest.TestCase):
                 (g.a('X', href='x'),
                  '<a href="x">X</a>'),
                 (g.button('X', disabled=True),
-                 '<button disabled="disabled" type="submit">X</button>'),
+                 '<button disabled="disabled" type="button">X</button>'),
         ):
             result = localizer.localize(generated)
             assert result == html, "\n  - expected: %r\n  - got:      %r" % (html, result)

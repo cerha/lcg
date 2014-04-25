@@ -332,7 +332,7 @@ class HtmlGenerator(object):
     def hidden(self, name, value, id=None):
         return self._input('hidden', name=name, value=value, id=id)
 
-    def button(self, content, type='submit', **kwargs):
+    def button(self, content, type='button', **kwargs):
         attr = ('name', 'value', 'type', 'onclick', 'cls', 'disabled', 'title')
         return self._tag('button', content, attr, type=type, **kwargs)
 
