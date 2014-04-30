@@ -452,6 +452,8 @@ class Metadata(object):
     """ISBN identifier of the publication."""
     original_isbn = None
     """ISBN identifier of the original work the publication was derived from."""
+    uuid = None
+    """UUID of the publication (used when ISBN is not assigned)."""
     publisher = None
     """Publisher of the original."""
     published = None

@@ -267,6 +267,8 @@ class EpubExporter(Exporter):
                 element.appendChild(doc.createTextNode(value))
         if metadata.isbn:
             identifier = 'urn:isbn:' + metadata.isbn
+        elif metadata.uuid:
+            identifier = 'urn:uuid:%s' % metadata.uuid
         else:
             import uuid
             identifier = 'urn:uuid:%s' % uuid.uuid1()
