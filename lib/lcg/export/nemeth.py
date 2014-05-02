@@ -23,8 +23,6 @@ from contextlib import contextmanager
 import re
 import string
 
-import louis
-
 from braille import _Braille, _braille_whitespace
 import entities
 
@@ -120,8 +118,8 @@ def _node_value(node):
 # Common export functions
 
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - II
-    # Missing: Rule III -- Rule XXV
+    # Implemented: Rule I - III (partially)
+    # Missing: Rule IV -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -171,15 +169,20 @@ def _export(node, exporter, context, variables, **kwargs):
 
 def _text_export(text, exporter, context, variables, node=None, plain=False):
     with _style(node, variables):
+        # liblouis doesn't handle typeforms and letter prefixes (correctly) in
+        # Nemeth so we can't relay that to it
+        prefix = ''
         style = variables.get('style', '')
-        form = 0
         if style.find('bold') >= 0:
-            form |= louis.bold
+            prefix += '⠸'
         if style.find('italic') >= 0:
-            form |= louis.italic
+            prefix += '⠨'
+        if style and not plain and text and text[0] in string.ascii_letters:
+            prefix += '⠰'
         lang = 'en' if plain else 'nemeth'
-        with context.let_form(form):
-            braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
+        braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
+        if prefix:
+            braille = prefix + braille
     return _Braille(braille)
     
 def _child_export(node, exporter, context, variables, separators=None):
