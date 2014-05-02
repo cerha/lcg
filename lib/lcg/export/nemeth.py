@@ -20,6 +20,7 @@
 from __future__ import unicode_literals
 
 from contextlib import contextmanager
+import re
 import string
 
 import louis
@@ -28,14 +29,23 @@ from braille import _Braille, _braille_whitespace
 import entities
 
 
+_CONDITIONAL_NUM_PREFIX = '\ue020'
+_NUM_PREFIX_REQUIRED = '\ue021'
+
+_num_prefix_regexp = re.compile('(^|[\n⠀%s])(⠤?)(%s)' %
+                                (_NUM_PREFIX_REQUIRED, _CONDITIONAL_NUM_PREFIX,),
+                                re.M)
+
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
                    ' ': '⠀', '.': '⠨', ',': '⠠'}
 _nemeth_operators = {
-    '*': '⠈⠼',
+    '*': '⠈⠼' + _NUM_PREFIX_REQUIRED,
+    '#': '⠨⠼' + _NUM_PREFIX_REQUIRED,
     '=': '⠀⠨⠅⠀',
     ',': '⠠⠀',
     '…': '⠀⠄⠄⠄⠀',
+    '×': '⠈⠡',
     '\u2061': '⠀',              # function application
 }
 _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍≏≏̸≐≐̸≑≓≗≜≟≠≡≢≤≥≦≦̸≧≧̸≨≩≪≪̸≫≫̸≮≯≰≱≲≳≴≵≶≷≸'
@@ -110,8 +120,8 @@ def _node_value(node):
 # Common export functions
 
 def mathml_nemeth(exporter, context, element):
-    # Implemented: nothing yet
-    # Missing: Rule II -- Rule XXV
+    # Implemented: Rule I - II
+    # Missing: Rule III -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -122,8 +132,25 @@ def mathml_nemeth(exporter, context, element):
     top_node = element.tree_content(entity_handler, transform=True)
     variables = _Variables()
     braille = _child_export(top_node, exporter, context, variables).strip()
+    text = braille.text()
     hyphenation = braille.hyphenation().replace(exporter.HYPH_WS, exporter.HYPH_NEMETH_WS)
-    return _Braille(braille.text(), hyphenation)
+    # Handle numeric prefixes
+    while True:
+        match = _num_prefix_regexp.search(text)
+        if match is None:
+            break
+        start, end = match.start(3), match.end(3)
+        text = text[:start] + '⠼' + text[end:]
+        hyphenation = hyphenation[:start] + '0' + hyphenation[end:]
+    for c in (_CONDITIONAL_NUM_PREFIX, _NUM_PREFIX_REQUIRED,):
+        while True:
+            pos = text.find(c)
+            if pos == -1:
+                break
+            text = text[:pos] + text[pos + 1:]
+            hyphenation = hyphenation[:pos] + hyphenation[pos + 1:]
+    # Done
+    return _Braille(text, hyphenation)
 
 _exporters = {}
 def _exporter(tag):
@@ -186,10 +213,10 @@ def _child_export(node, exporter, context, variables, separators=None):
                            'infix')
         else:
             op_form = None
-        if braille and separators:
-            separator = separators[-1] if i > len(separators) else separators[i - 1]
-            hyph_separator = self._HYPH_NEMETH_WS if len(separator) == 1 else None
-            braille.append(separator, hyph_separator)
+        # if braille and separators:
+        #     separator = separators[-1] if i > len(separators) else separators[i - 1]
+        #     hyph_separator = self._HYPH_NEMETH_WS if len(separator) == 1 else None
+        #     braille.append(separator, hyph_separator)
         with variables.let('enclosed-list', enclosed_list):
             braille = braille + _export(n, exporter, context, variables, op_form=op_form)
     return braille
@@ -235,8 +262,10 @@ def _export_mn(node, exporter, context, variables, **kwargs):
         if text and text[0] == '-':
             prefix += '⠤'
             text = text[1:]
-        if variables.get('enclosed-list') != 'yes' or style_applied:
+        if style_applied:
             prefix += '⠼'
+        if variables.get('enclosed-list') != 'yes':
+            prefix += _CONDITIONAL_NUM_PREFIX
         if context.lang() == 'cs':
             text = text.replace(',', '.')
         translated = prefix + string.join([_nemeth_numbers[c] for c in text], '')

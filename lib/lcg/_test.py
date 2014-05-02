@@ -978,14 +978,15 @@ class BrailleExport(unittest.TestCase):
         ):
             self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
                        presentation, 'cs')
-        for text, braille in (
-            (u'abc', u'⠁⠃⠉',),
-            #(u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',), # buggy in current liblouis!
-            (u'a line to be hyphenated', u'⠁⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠏⠓⠑⠝⠤\n⠁⠞⠑⠙',),
-            (u'*bold*', u'⠸⠃⠕⠇⠙',),
-            (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
-            (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),
-        ):
+        tests = ((u'abc', u'⠁⠃⠉',),
+                 (u'a line to be hyphenated', u'⠁⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠏⠓⠑⠝⠤\n⠁⠞⠑⠙',),
+                 (u'*bold*', u'⠸⠃⠕⠇⠙',),
+                 (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
+                 (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),)
+        if False:
+            # buggy in current liblouis
+            tests += ((u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),)
+        for text, braille in tests:
             self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
                        presentation, 'en')
 
@@ -1232,6 +1233,16 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>-.3</mn></mrow>
 </math>''', u'⠤⠼⠨⠒')
+        if False:
+            # Determinant: not yet implemented
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mfenced open="|" close="|" separators=","><mtable>
+ <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr>
+ <mtr><mtd><mi>-3</mi></mtd><mtd><mi>-4</mi></mtd></mtr>
+</mtable></mfenced></math>''', u'⠠⠳⠼⠂⠀⠀⠼⠆⠀⠠⠳\n⠠⠳⠤⠼⠒⠀⠤⠼⠲⠠⠳')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>3</mn><mo>#</mo><mn>4</mn></mrow>
+</math>''', u'⠼⠒⠨⠼⠼⠲')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3</mn><mo>*</mo><mn>4</mn></mrow>
 </math>''', u'⠼⠒⠈⠼⠼⠲')
@@ -1270,7 +1281,30 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>&pi;</mi><mo>=</mo><mn>3,14159 26535 9</mn></mrow>
 </math>''', u'⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢\n⠀⠀⠼⠔')
-
+        if False:
+            # Not yet supported
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msup><mi>x</mi><mn>2</mn></msup></mrow>
+</math>''', u'⠭⠘⠆')
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mfrac><mrow><mn>3</mn></mrow><mrow><mi>x</mi></mrow></mfrac>
+</math>''', u'⠹⠒⠌⠭⠼')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>x</mi><mo>-</mo><mn>5</mn></mrow>
+</math>''', u'⠭⠤⠢')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>2</mn><mo>&times;</mo><mn>4</mn></mrow>
+</math>''', u'⠼⠆⠈⠡⠲')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mn>10,000</mn>
+</math>''', u'⠼⠂⠴⠠⠴⠴⠴', lang='en') # comma
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mfenced open="|" close="|" separators=","><mrow><mo>-</mo><mn>3</mn></mrow></mfenced>
+</math>''', u'⠳⠤⠒⠳')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mfenced open="|" close="|" separators=","><mrow><mn>-3</mn></mrow></mfenced>
+</math>''', u'⠳⠤⠒⠳')
+    
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
         # bindings to it work and that there is no big problem.
