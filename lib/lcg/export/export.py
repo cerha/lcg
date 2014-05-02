@@ -28,6 +28,7 @@ See documentation of the individual classes for more details.
 """
 
 import collections
+from contextlib import contextmanager
 import os
 import re
 import shutil
@@ -215,10 +216,15 @@ class Exporter(object):
         def sec_lang(self):
             return self._sec_lang
 
-        def set_lang(self, lang):
-            orig_lang = self._lang
-            self._lang = lang
-            return orig_lang
+        @contextmanager
+        def let_lang(self, lang):
+            old_lang = self._lang
+            if lang is not None:
+                self._lang = lang
+            try:
+                yield None
+            finally:
+                self._lang = old_lang
     
         def node(self):
             return self._node
