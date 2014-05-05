@@ -781,7 +781,7 @@ class HtmlExport(unittest.TestCase):
             ((lcg.Subscript(lcg.TextContent('sub')), lcg.Superscript(lcg.TextContent('sup'))),
              '<sub>sub</sub><sup>sup</sup>'),
             (lcg.p('Kotva: ', lcg.Anchor('x', text='zde'), halign=lcg.HorizontalAlignment.RIGHT),
-             '<p style="text-align: right;">Kotva: <a name="x">zde</a></p>'),
+             '<p style="text-align: right;">Kotva: <span id="x">zde</span></p>'),
         ):
             result = lcg.coerce(content).export(context)
             assert result == html, "\n  - content:  %r\n  - expected: %r\n  - got:      %r" % \
