@@ -349,7 +349,7 @@ def _export_mtext(node, exporter, context, variables, **kwargs):
     return _text_export(text, exporter, context, variables, node=node, plain=True)
 
 def _export_mspace(node, exporter, context, variables, **kwargs):
-    return _text_export(' ', exporter, context, variables, plain=True)
+    return _Braille('⠀')
 
 def _export_ms(node, exporter, context, variables, **kwargs):
     text = '"%s"' % (_node_value(node).strip(),)
