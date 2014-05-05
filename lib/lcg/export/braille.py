@@ -244,6 +244,7 @@ _en6backmapping = {
     u')': u'⠾',
     u'=': u'⠿',
 }
+_entity_regexp = re.compile('&([A-Za-z]+);')
 def xml2braille(xml):
     if _louisutdml is None:
         return None
@@ -255,7 +256,7 @@ def xml2braille(xml):
         if replacement is None:
             replacement = '&' + entity + ';'
         return replacement
-    input_xml = re.sub('&([A-Za-z]+);', replace_entity, xml)
+    input_xml = _entity_regexp.sub(replace_entity, xml)
     # Allocate foreign call arguments
     inbuf = input_xml.encode('utf-8')
     maxlen = 2 ** 12 - 1
