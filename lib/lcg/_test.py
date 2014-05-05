@@ -1322,13 +1322,32 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>&alpha;&beta;</mi></mrow>
 </math>''', u'⠨⠁⠨⠃')
-        # §27
+        # §25
+        if False:
+            # Not yet supported
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msup><mi>x</mi><mo>&prime;</mo></msup><mo>,</mo><msup><mi>x</mi><mo>&Prime;</mo></msup>
+<mo>,</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mi>a</mi></msub><mo>,</mo>
+<msup><mi>x</mi><mn>2</mn></msup><mo>,</mo><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover>
+</mrow>
+</math>''', u'⠭⠄⠠⠀⠭⠄⠄⠠⠀⠭⠂⠠⠀⠭⠰⠁⠠⠀⠭⠘⠰⠠⠀⠭⠱')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>x</mi><mspace width="1em"/><mi>x</mi><mspace width="1em"/>
+<mfenced open="(" close=")" separators=","><mrow><mi>x</mi></mrow></mfenced></mrow>
+</math>''', u'⠭⠀⠰⠭⠀⠷⠭⠾')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow>
+</math>''', u'⠭⠬⠽')
+        # §26
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi mathvariant="bold">A</mi><mi mathvariant="bold">B</mi></mrow>
 </math>''', u'⠸⠰⠠⠁⠸⠰⠠⠃')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi mathvariant="italic">a</mi><mi mathvariant="italic">b</mi></mrow>
 </math>''', u'⠨⠰⠁⠨⠰⠃')
+        #...
+        # 27
+        #...
     
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the

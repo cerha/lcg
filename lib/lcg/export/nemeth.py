@@ -29,10 +29,10 @@ import entities
 
 _CONDITIONAL_NUM_PREFIX = '\ue020'
 _NUM_PREFIX_REQUIRED = '\ue021'
-
-_num_prefix_regexp = re.compile('(^|[\n⠀%s])(⠤?)(%s)' %
-                                (_NUM_PREFIX_REQUIRED, _CONDITIONAL_NUM_PREFIX,),
-                                re.M)
+_SINGLE_LETTER_START = '\ue022'
+_SINGLE_LETTER_END = '\ue023'
+_SINGLE_LETTER_KILLER_PREFIX = '\ue023'
+_SINGLE_LETTER_KILLER_SUFFIX = '\ue024'
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
@@ -44,12 +44,14 @@ _nemeth_operators = {
     ',': '⠠⠀',
     '…': '⠀⠄⠄⠄⠀',
     '×': '⠈⠡',
-    '\u2061': '⠀',              # function application
+    '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
 _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍≏≏̸≐≐̸≑≓≗≜≟≠≡≢≤≥≦≦̸≧≧̸≨≩≪≪̸≫≫̸≮≯≰≱≲≳≴≵≶≷≸'
                               '≹≺≻≼≽≾≿≿̸⊀⊁⊴⊵⋍⋖⋗⋘⋘̸⋙⋙̸⋚⋛⋞⋟⋠⋡⋦⋧⋨⋩⋪⋫⋬⋭'
                               '⦔⩭⩭̸⩯⩰⩰̸⩵⩸⩹⩺⩻⩼⩽⩽̸⩾⩾̸⩿⪀⪁⪂⪃⪄⪅⪆⪇⪈⪉⪊⪋⪌⪍⪎⪏⪐⪑⪒⪓⪔⪕⪖⪗⪘⪙⪚⪝⪞⪟⪠⪡⪡̸⪢⪢̸⪦⪨⪩⪬⪮⪯⪯̸⪰⪰'
                               '̸⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼')
+_signs_of_shape = ''
+_signs_of_shape_and_omission = ''
 
 
 # General utilities
@@ -117,6 +119,10 @@ def _node_value(node):
 
 # Common export functions
 
+_num_prefix_regexp = re.compile('(^|[\n⠀%s])(%s?⠤?)(%s)' %
+                                (_NUM_PREFIX_REQUIRED, _SINGLE_LETTER_KILLER_PREFIX,
+                                 _CONDITIONAL_NUM_PREFIX,),
+                                re.M)
 def mathml_nemeth(exporter, context, element):
     # Implemented: Rule I - III (partially)
     # Missing: Rule IV -- Rule XXV
@@ -140,13 +146,35 @@ def mathml_nemeth(exporter, context, element):
         start, end = match.start(3), match.end(3)
         text = text[:start] + '⠼' + text[end:]
         hyphenation = hyphenation[:start] + '0' + hyphenation[end:]
-    for c in (_CONDITIONAL_NUM_PREFIX, _NUM_PREFIX_REQUIRED,):
-        while True:
-            pos = text.find(c)
-            if pos == -1:
-                break
-            text = text[:pos] + text[pos + 1:]
-            hyphenation = hyphenation[:pos] + hyphenation[pos + 1:]
+    # Handle letter prefixes
+    space_or_punctuation = '⠀⠨⠠⠰'
+    while True:
+        pos = text.find(_SINGLE_LETTER_START)
+        if pos == -1:
+            break
+        pos_end = text.find(_SINGLE_LETTER_END)
+        assert pos_end >= 0 and pos_end > pos, text
+        if ((pos > 0 and pos_end < len(text) - 1 and
+             text[pos - 1] in space_or_punctuation and
+             text[pos_end + 1] in space_or_punctuation)):
+            prefix = '⠰'
+            prefix_hyph = '0'
+        else:
+            prefix = prefix_hyph = ''
+        text = text[:pos] + prefix + text[pos + 1:pos_end] + text[pos_end + 1:]
+        hyphenation = (hyphenation[:pos] + prefix_hyph + hyphenation[pos + 1:pos_end] +
+                       hyphenation[pos_end + 1:])
+    # Cleanup
+    text_len = len(text)
+    i = 0
+    while i < text_len:
+        if text[i] in (_CONDITIONAL_NUM_PREFIX, _NUM_PREFIX_REQUIRED,
+                       _SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX,):
+            text = text[:i] + text[i + 1:]
+            hyphenation = hyphenation[:i] + hyphenation[i + 1:]
+            text_len -= 1
+        else:
+            i += 1
     # Done
     return _Braille(text, hyphenation)
 
@@ -171,18 +199,31 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
     with _style(node, variables):
         # liblouis doesn't handle typeforms and letter prefixes (correctly) in
         # Nemeth so we can't relay that to it
-        prefix = ''
+        prefix = suffix = ''
         style = variables.get('style', '')
         if style.find('bold') >= 0:
             prefix += '⠸'
         if style.find('italic') >= 0:
             prefix += '⠨'
-        if style and not plain and text and text[0] in string.ascii_letters:
+        if style and not plain and text and all(c in string.ascii_letters for c in text):
             prefix += '⠰'
+        elif (not style and text and all(c in string.ascii_letters for c in text) and
+              variables.get('enclosed-list') != 'yes' and
+              variables.get('direct-delimiters') != 'yes' and
+              text not in ('cd',)): # short-form combinations
+            prefix = _SINGLE_LETTER_START + prefix
+            suffix += _SINGLE_LETTER_END
+        else:
+            if text in _signs_of_shape or text in _math_comparison_operators:
+                suffix += _SINGLE_LETTER_KILLER_SUFFIX
+            if text in _signs_of_shape_and_omission or text in _math_comparison_operators:
+                prefix = _SINGLE_LETTER_KILLER_PREFIX + prefix
         lang = 'en' if plain else 'nemeth'
         braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
         if prefix:
             braille = prefix + braille
+        if suffix:
+            braille += suffix
     return _Braille(braille)
     
 def _child_export(node, exporter, context, variables, separators=None):
@@ -202,6 +243,16 @@ def _child_export(node, exporter, context, variables, separators=None):
              all([c.text.strip() not in _math_comparison_operators
                   for c in node.findall('mi')]))):
             enclosed_list = 'yes'
+    # Check for direct contact with opening and closing group signs
+    direct_delimiters = None
+    if len(children) == 3:
+        first = children[0]
+        last = children[-1]
+        content = children[1]
+        if ((first.tag == 'mo' and first.text.strip() in ('(', '[', '{',) and
+             last.tag == 'mo' and last.text.strip() in (')', ']', '}',) and
+             content.tag == 'mi')):
+            direct_delimiters = 'yes'
     # Export
     op_form = None
     for i in range(len(children)):
@@ -221,7 +272,8 @@ def _child_export(node, exporter, context, variables, separators=None):
         #     hyph_separator = self._HYPH_NEMETH_WS if len(separator) == 1 else None
         #     braille.append(separator, hyph_separator)
         with variables.let('enclosed-list', enclosed_list):
-            braille = braille + _export(n, exporter, context, variables, op_form=op_form)
+            with variables.let('direct-delimiters', direct_delimiters):
+                braille = braille + _export(n, exporter, context, variables, op_form=op_form)
     return braille
 
 def _op_export(operator, exporter, context, variables, node=None):
