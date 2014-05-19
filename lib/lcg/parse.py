@@ -1477,7 +1477,7 @@ class HTMLProcessor(object):
 
     _TEXT_REPLACEMENTS = (
         (re.compile('</(?P<tag>em|strong)>( *)<(?P=tag)>'), '\\2',),
-        (re.compile('<(?P<tag>em|strong)>( *)</(?P=tag)>'), '\\2',),
+        (re.compile('<(?P<tag>em|strong|p)>(( |&nbsp;)*)</(?P=tag)>'), '\\2',),
         # Filter out all special characters (simply use the valid XML character ranges).
         (re.compile(u'[^\u0020-\uD7FF\x09\x0A\x0D\uE000-\uFFFD\u10000-\u10FFFF]', re.U), u'')
     )
