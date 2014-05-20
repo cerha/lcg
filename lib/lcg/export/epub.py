@@ -25,6 +25,8 @@ import cStringIO as StringIO
 import datetime
 import mimetypes
 import re
+import unicodedata
+import os
 
 class Constants(object):
     """Things mandated by EPUB 3 spec"""
@@ -50,7 +52,12 @@ class EpubHtml5Exporter(Html5Exporter):
             return super(EpubHtml5Exporter.Generator, self).script(*args, **kwargs)
 
     _INVALID_MATHML_ATTRIBUTES = re.compile(r' ((fontfamily|mathcolor)=""|contenteditable="false")')
-                
+    _INVALID_RESOURCE_URI_CHARACTERS = re.compile(r'[^a-z0-9;,_+*/=\-\.\(\)]')
+ 
+    def __init__(self, *args, **kwargs):
+        super(EpubHtml5Exporter, self).__init__(*args, **kwargs)
+        self._renamed_resource_dict = {}
+
     def _head(self, context):
         g = context.generator()
         stylesheet = context.resource('epub.css')
@@ -117,7 +124,21 @@ class EpubHtml5Exporter(Html5Exporter):
         uri = resource.filename()
         if resource.SUBDIR:
             uri = resource.SUBDIR + '/' + uri
-        return uri
+        # Normalize and disambiguate the URI (several source URIs may have
+        # the same normalized form).
+        safe_uri = uri
+        if isinstance(safe_uri, unicode):
+            safe_uri = unicodedata.normalize('NFKD', safe_uri).encode('ascii', 'ignore')
+        safe_uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', safe_uri.lower())
+        if uri != safe_uri:
+            n = 0
+            base, ext = os.path.splitext(safe_uri)
+            safe_uri_template = base + '-%d' + ext
+            while self._renamed_resource_dict.get(safe_uri, resource) is not resource:
+                n += 1
+                safe_uri = safe_uri_template % n
+            self._renamed_resource_dict[safe_uri] = resource
+        return safe_uri
 
 
 class EpubExporter(Exporter):
