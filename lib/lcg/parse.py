@@ -1286,8 +1286,9 @@ class HTMLProcessor(object):
             content = self._transform_sub(element)
             if class_ == lcg.Paragraph and self._find_element(content, (lcg.Section, 
                                                                         lcg.Paragraph,
+                                                                        lcg.Table,
                                                                         lcg.Figure)):
-                # Suppress nested paragraphs or sections or figures nested in paragraphs.
+                # Suppress nested paragraphs or sections, figures or tables nested in paragraphs.
                 class_ = lcg.Container
             return class_(content, lang=element.attrib.get('lang'), **kwargs)
 
