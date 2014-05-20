@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -149,6 +149,10 @@ class Content(object):
         """Return the value of 'resources' passed to the constructor as a tuple."""
         return self._resources
         
+    def container(self):
+        """Return the direct container of this element."""
+        return self._container
+
     def container_path(self):
         """Return a list of containers of the given element
 
@@ -1254,9 +1258,12 @@ class Section(Container):
         return [c for c in self.container_path() if isinstance(c, Section)]
     
     def section_number(self):
-        """Return the number of this section within its container as int."""
-        if self._container:
-            return list(self._container.sections(None)).index(self) + 1
+        """Return the number of this section within its container section as int."""
+        parent_section = self._container
+        while not isinstance(parent_section, Section) and parent_section.container():
+            parent_section = parent_section.container()
+        if parent_section:
+            return list(parent_section.sections(None)).index(self) + 1
         else:
             return 1
     
