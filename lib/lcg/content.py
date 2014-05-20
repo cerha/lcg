@@ -1259,11 +1259,11 @@ class Section(Container):
     
     def section_number(self):
         """Return the number of this section within its container section as int."""
-        parent_section = self._container
-        while not isinstance(parent_section, Section) and parent_section.container():
-            parent_section = parent_section.container()
-        if parent_section:
-            return list(parent_section.sections(None)).index(self) + 1
+        container = self._container
+        while container and not isinstance(container, Section) and container.container():
+            container = container.container()
+        if container:
+            return list(container.sections(None)).index(self) + 1
         else:
             return 1
     
