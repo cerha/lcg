@@ -390,6 +390,7 @@ class ExerciseParser(object):
                     VocabExercise: self._read_vocab_exercise_task,
                     NumberedCloze: self._read_numbered_cloze_task,
                     Cloze: self._read_cloze_task,
+                    ModelCloze: self._read_cloze_task,
                 }[exercise_type]
             except KeyError:
                 self._error(_("Unknown exercise type: %s", exercise_type))
@@ -802,7 +803,7 @@ class Cloze(FillInExercise):
     _NAME = _("Cloze")
     _HELP_INTRO = (
         _("The goal is to fill in the gaps in given piece of text.  The answers "
-          "are written into a text box and there is just one correct answer "
+          "are written into text boxes and there is just one correct answer "
           "for each gap."),
     ) + FillInExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
@@ -813,6 +814,30 @@ class Cloze(FillInExercise):
         #_("If there is more than one possible correct answer, the other correct "
         #  "answers may be written inside the brackets separated by the pipeline "
         # 'character "|".'),
+    )
+    _SOURCE_EXAMPLE = _("""
+Commercial banks and savings banks receive and hold deposits
+[in] current accounts, savings accounts and deposit accounts,
+make payments [for] their customers, lend money, [and] offer
+investment advice, foreign exchange facilities, and so on.
+""")
+
+
+class ModelCloze(FillInExercise):
+    """Same as Cloze, but with model answers (more correct answers are possible)."""
+    # Translators: Type of exercise (use language terminology)
+    _NAME = _("Cloze with Model Answers")
+    _HELP_INTRO = (
+        _("The goal is to fill in the gaps in given piece of text.  The answers "
+          "are written into text boxes.  The provided model answers are just "
+          "suggestions.  Other answers may be correct as well so the exercise is "
+          "not evaluated automatically.  Model answers may be unhidden."),
+    ) + FillInExercise._HELP_INTRO
+    _SOURCE_FORMATTING = (
+        _("One exercise typically consists of one or more paragraphs of text. "
+          "Selected parts of the text (typically words), which are to be replaced "
+          "by text entry fields are written in square brackets. The text inside "
+          "brackets is the model answer."),
     )
     _SOURCE_EXAMPLE = _("""
 Commercial banks and savings banks receive and hold deposits

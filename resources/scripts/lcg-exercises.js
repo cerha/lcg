@@ -432,6 +432,28 @@ lcg.HiddenAnswers = Class.create(lcg.Exercise, {
 });
 
 
+lcg.ModelCloze = Class.create(lcg.Exercise, {
+
+    initialize: function ($super, form_name, answers, responses, messages) {
+	$super(form_name, answers, responses, messages);
+	this._form.down('.model-answers').hide();
+    },
+
+    _recognize_field: function(field) {
+	return false;
+    },
+
+    _on_evaluate_button: function(event) {
+	this._form.down('.model-answers').show();
+    },
+
+    _on_reset_button: function(event) {
+	this._form.down('.model-answers').hide();
+    }
+
+});
+
+
 lcg.Dictation = Class.create(lcg.FillInExercise, {
 
     initialize: function ($super, form_name, answers, responses, messages, recordings) {

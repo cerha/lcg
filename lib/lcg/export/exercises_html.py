@@ -401,6 +401,39 @@ class NumberedClozeExporter(_FillInExerciseExporter):
 class ClozeExporter(NumberedClozeExporter):
     pass
 
+
+class ModelClozeExporter(ClozeExporter):
+    _JAVASCRIPT_CLASS = 'lcg.ModelCloze'
+    _INDICATORS = ()
+    
+    _BUTTONS = ((_('Show Answers'), 'button', 'evaluate-button',
+                 _("Show model answers.")),
+                (_('Reset'), 'reset', 'reset-button',
+                 _("Reset all your answers and start again.")))
+
+    _MESSAGES = {"Show Answer": _("Show Answer"),
+                 "Hide Answer": _("Hide Answer")}
+
+    def _export_tasks(self, context, exercise, exercise_id):
+        g = context.generator()
+        def make_field(answer, label, word_start, word_end):
+            field = g.span(answer, cls='model-answer')
+            if word_start or word_end:
+                return g.span(word_start + field + word_end, cls='nowrap')
+            else:
+                return field
+        def export_task(task):
+            text = task.text().replace('[', '\[')
+            if text:
+                content = lcg.Parser().parse_inline_markup(text)
+                html = context.localize(content.export(context))
+            else:
+                html = ''
+            return task.substitute_fields(html, make_field)
+        return (super(ModelClozeExporter, self)._export_tasks(context, exercise, exercise_id) +
+                g.div([export_task(task) for task in exercise.tasks()],
+                      cls='model-answers'))
+
     
 ################################################################################
 ##################################   Tests   ###################################
