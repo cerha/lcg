@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-21 15:26+0100\n"
-"PO-Revision-Date: 2014-01-09 16:52+0100\n"
+"POT-Creation-Date: 2014-05-22 16:04+0200\n"
+"PO-Revision-Date: 2014-05-22 16:11+0200\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "Language: cs\n"
@@ -61,30 +61,30 @@ msgstr "Definice úkolu se musí mít právě dva řádky (nalezeno %d)."
 msgid "A true/false statement must end with '[T]' or '[F]'."
 msgstr "Věta musí být zakončena značkou [T] (pravda) nebo [F] (nepravda)."
 
-#: ../lib/lcg/exercises.py:395
+#: ../lib/lcg/exercises.py:396
 #, python-format
 msgid "Unknown exercise type: %s"
 msgstr "Neznámý typ cvičení: %s"
 
-#: ../lib/lcg/exercises.py:424
+#: ../lib/lcg/exercises.py:425
 #, python-format
 msgid "Error in task %d: %s"
 msgstr "Chyba v úkolu č. %d: %s"
 
-#: ../lib/lcg/exercises.py:426
+#: ../lib/lcg/exercises.py:427
 #, python-format
 msgid "Error: %s"
 msgstr "Chyba: %s"
 
-#: ../lib/lcg/exercises.py:494
+#: ../lib/lcg/exercises.py:495
 msgid "Exercise Definition"
 msgstr "Definice cvičení"
 
-#: ../lib/lcg/exercises.py:497
+#: ../lib/lcg/exercises.py:498
 msgid "Definition Example"
 msgstr "Příklad definice"
 
-#: ../lib/lcg/exercises.py:537
+#: ../lib/lcg/exercises.py:538
 msgid ""
 "You will hear a response immediately after choosing the answer.  When you "
 "choose the wrong answer, you can try again until you find the correct one.  "
@@ -97,11 +97,11 @@ msgstr ""
 "odpovědí bylo zodpovězeno správně na první pokus."
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:552
+#: ../lib/lcg/exercises.py:553
 msgid "Multiple Choice Questions"
 msgstr "Zaškrtávací test"
 
-#: ../lib/lcg/exercises.py:554
+#: ../lib/lcg/exercises.py:555
 msgid ""
 "Each question in this exercise is followed by two or more possible answers. "
 "Only one answer is correct."
@@ -109,7 +109,7 @@ msgstr ""
 "Za každou otázkou v tomto cvičení následují dvě nebo více možných odpovědí. "
 "Pouze jedna z nich je správná."
 
-#: ../lib/lcg/exercises.py:558
+#: ../lib/lcg/exercises.py:559
 msgid ""
 "One exercise typically consists of a definition of several questions, where "
 "each question has two or more possbile answers."
@@ -118,7 +118,7 @@ msgstr ""
 "existují\n"
 "dvě nebo více možných odpovědí."
 
-#: ../lib/lcg/exercises.py:560
+#: ../lib/lcg/exercises.py:561
 msgid ""
 "The question and its possible answers (choices) are written each at a "
 "separate line. The correct answer begins with a plus sign followed by a "
@@ -128,13 +128,13 @@ msgstr ""
 "Správná odpověď začíná znaménkem plus a mezerou.  Nesprávné odpovědi "
 "začínají znaménkem mínus a mezerou."
 
-#: ../lib/lcg/exercises.py:564
+#: ../lib/lcg/exercises.py:565
 msgid "Another question and its answers may follow after a blank line."
 msgstr ""
 "Další otázka a její odpovědi mohou následovat oddělené alespoň jedním "
 "prázdným řádkem."
 
-#: ../lib/lcg/exercises.py:566
+#: ../lib/lcg/exercises.py:567
 msgid ""
 "\n"
 "Screen reader is:\n"
@@ -159,11 +159,11 @@ msgstr ""
 "- Název počítače\n"
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:583
+#: ../lib/lcg/exercises.py:584
 msgid "Selections"
 msgstr "Co je správně"
 
-#: ../lib/lcg/exercises.py:585
+#: ../lib/lcg/exercises.py:586
 msgid ""
 "There are several groups of two or three statements. Only one statement in "
 "each group is correct. Your goal is to decide which one."
@@ -172,7 +172,7 @@ msgstr ""
 "jeden výrok v každé skupině je však pravdivý. Vaším úkolem je rozhodnout, "
 "který to je."
 
-#: ../lib/lcg/exercises.py:590
+#: ../lib/lcg/exercises.py:591
 msgid ""
 "The exercise definition consists of several groups of statements, typically "
 "two or three statements in a group."
@@ -180,7 +180,7 @@ msgstr ""
 "Definice cvičení se skládá z několika skupin výroků, typicky dva až tři "
 "výroky v jedné skupině."
 
-#: ../lib/lcg/exercises.py:592
+#: ../lib/lcg/exercises.py:593
 msgid ""
 "Each statement in a group is written at a separate line and begins by a plus "
 "sign to mark a correct statement or a minus sign to mark an incorrect "
@@ -190,7 +190,7 @@ msgstr ""
 "plus označujícím pravdivý výrok nebo znaménkem mínus označujícím nepravdivý "
 "výrok. Pouze jeden výrok v každé skupině je pravdivý."
 
-#: ../lib/lcg/exercises.py:596
+#: ../lib/lcg/exercises.py:597
 msgid ""
 "Another group of statements may follow after a blank line. There are no "
 "blank lines between statements which belong to the same group."
@@ -198,7 +198,7 @@ msgstr ""
 "Další skupina výroků může následovat oddělena alespoň jedním prázdným "
 "řádkem. Mezi výroky patřícími do stejné skupiny prázdné řádky být nemohou."
 
-#: ../lib/lcg/exercises.py:599
+#: ../lib/lcg/exercises.py:600
 msgid ""
 "\n"
 "+ India is located in Asia.\n"
@@ -215,11 +215,11 @@ msgstr ""
 "- Austrálie je největší kontinent.\n"
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:613
+#: ../lib/lcg/exercises.py:614
 msgid "True/False Statements"
 msgstr "Pravda/nepravda"
 
-#: ../lib/lcg/exercises.py:615
+#: ../lib/lcg/exercises.py:616
 msgid ""
 "Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
 "and ‘FALSE’.  Decide whether the sentence is true or not and press the "
@@ -229,14 +229,14 @@ msgstr ""
 "„PRAVDA“ a „NEPRAVDA“.  Rozhodněte, zda je věta pravdivá či nikoliv a "
 "stiskněte odpovídající tlačítko."
 
-#: ../lib/lcg/exercises.py:620
+#: ../lib/lcg/exercises.py:621
 msgid ""
 "The exercise definition consists of several statements separated by blank "
 "lines."
 msgstr ""
 "Definice cvičení se skládá z několika výroků oddělených prázdnými řádky."
 
-#: ../lib/lcg/exercises.py:622
+#: ../lib/lcg/exercises.py:623
 msgid ""
 "Each statement is marked as either true using [T] or false using [F] at the "
 "end of the line."
@@ -245,7 +245,7 @@ msgstr ""
 "True) nebo jako nepravdivý pomocí značky [F] (z anglického False). Značka je "
 "umístěna na konci řádku."
 
-#: ../lib/lcg/exercises.py:625
+#: ../lib/lcg/exercises.py:626
 msgid ""
 "\n"
 "The Microsoft Windows operating system never crashes. [F]\n"
@@ -258,11 +258,11 @@ msgstr ""
 "Největší tropický deštný les na světě je v Brazílii. [T]\n"
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:636
+#: ../lib/lcg/exercises.py:637
 msgid "Gap Filling"
 msgstr "Doplňování s výběrem"
 
-#: ../lib/lcg/exercises.py:638
+#: ../lib/lcg/exercises.py:639
 msgid ""
 "Choose the correct word to fill in a gap in a sentence.  For each gap you "
 "have several choices.  Only one of them is correct."
@@ -270,7 +270,7 @@ msgstr ""
 "Vyberte správné slovo, kterým doplníte mezeru ve větě.  Pro každé chybějící "
 "slovo máte několik možností.  Pouze jedna z nich je správná."
 
-#: ../lib/lcg/exercises.py:643
+#: ../lib/lcg/exercises.py:644
 msgid ""
 "One exercise typically consists of a definition of several statements, where "
 "there is one missing word in each statement."
@@ -278,7 +278,7 @@ msgstr ""
 "Jedno cvičení se obvykle skládá z několika samostatných vět, kde v každé "
 "větě chybí jedno slovo nebo skupina slov."
 
-#: ../lib/lcg/exercises.py:645
+#: ../lib/lcg/exercises.py:646
 msgid ""
 "The missing word is replaced by a series of underscores (at least three) and "
 "possible completions of the gap follow at separate lines. The correct "
@@ -290,13 +290,13 @@ msgstr ""
 "doplnění začíná znaménkem plus a mezerou.  Nesprávná doplnění začínají "
 "znaménkem mínus a mezerou."
 
-#: ../lib/lcg/exercises.py:650
+#: ../lib/lcg/exercises.py:651
 msgid "Another statement and its completions may follow after a blank line."
 msgstr ""
 "Další věta a možnosti pro její doplnění mohou následovat odděleny alespoň "
 "jedním prázdným řádkem."
 
-#: ../lib/lcg/exercises.py:652
+#: ../lib/lcg/exercises.py:653
 msgid ""
 "\n"
 "If you want to send money to somebody, you can ____ a transfer.\n"
@@ -320,11 +320,11 @@ msgstr ""
 "- úrok\n"
 "+ kurz\n"
 
-#: ../lib/lcg/exercises.py:668
+#: ../lib/lcg/exercises.py:669
 msgid "Hidden Answers"
 msgstr "Skryté odpovědi"
 
-#: ../lib/lcg/exercises.py:672
+#: ../lib/lcg/exercises.py:673
 msgid ""
 "You should simply think of the correct answer and when you believe you know "
 "it, you can unhide the correct answer below each question and check whether "
@@ -335,7 +335,7 @@ msgstr ""
 "správnou odpověd pod každou otázkou pro kontrolu, zda byla vaše zamýšlená\n"
 "odpověď správná či nikoliv."
 
-#: ../lib/lcg/exercises.py:677 ../lib/lcg/exercises.py:753
+#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:754
 msgid ""
 "One exercise typically consists of a definition of several questions and "
 "answers."
@@ -343,16 +343,16 @@ msgstr ""
 "Jedno cvičení se obvykle skládá z definice několika otázek a správných "
 "odpovědí."
 
-#: ../lib/lcg/exercises.py:679
+#: ../lib/lcg/exercises.py:680
 msgid "The question and the answer are written each at a separate line."
 msgstr "Otázka a odpověď jsou zapsány každá na samostatném řádku."
 
-#: ../lib/lcg/exercises.py:680 ../lib/lcg/exercises.py:764
+#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:765
 msgid "Another pair or question and answer may follow after a blank line."
 msgstr ""
 "Další dvojice otázek a odpovědí mohou následovat odděleny prázdnými řádky."
 
-#: ../lib/lcg/exercises.py:682
+#: ../lib/lcg/exercises.py:683
 msgid ""
 "\n"
 "What is the name of the highest mountain in the world?\n"
@@ -368,7 +368,7 @@ msgstr ""
 "Jaká je její výška?\n"
 "8 848 m\n"
 
-#: ../lib/lcg/exercises.py:696
+#: ../lib/lcg/exercises.py:697
 msgid ""
 "You can check each answer individually using the shortcut keys. When your "
 "answer is evaluated as incorrect and you do not know why, always check "
@@ -380,18 +380,18 @@ msgstr ""
 "nejprve zkontrolujte interpunkci a správné použití velkých a malých písmen. "
 "Automatické vyhodnocování přijme pouze přesně se shodující odpověď."
 
-#: ../lib/lcg/exercises.py:701
+#: ../lib/lcg/exercises.py:702
 msgid ""
 "Use the control panel at the bottom of the exercise to evaluate all the "
 "answers at once."
 msgstr ""
 "Použijte ovládací panel na konci cvičení k vyhodnocení všech odpovědí naráz."
 
-#: ../lib/lcg/exercises.py:723
+#: ../lib/lcg/exercises.py:724
 msgid "Vocabulary Exercise"
 msgstr "Procvičování slovní zásoby"
 
-#: ../lib/lcg/exercises.py:725
+#: ../lib/lcg/exercises.py:726
 msgid ""
 "There are two ways to do the exercise: orally and written.  Do the exercise "
 "both ways to get the best results."
@@ -399,7 +399,7 @@ msgstr ""
 "Jsou dva způsoby, jak můžete dělat toto cvičení: ústní forma a psaná forma. "
 "Využijte obou možností k dosažení nejlepších výsledků."
 
-#: ../lib/lcg/exercises.py:727
+#: ../lib/lcg/exercises.py:728
 msgid ""
 "To do the exercise orally is simple.  Go through the vocabulary list and "
 "think of the correct translation for each word or expression. There is a "
@@ -419,7 +419,7 @@ msgstr ""
 "počítačem vyhodnotit, výsledky nejsou k dispozici. Pokud chcete znát své "
 "skóre, musíte vyplnit cvičení písemnou formou."
 
-#: ../lib/lcg/exercises.py:736
+#: ../lib/lcg/exercises.py:737
 msgid ""
 "To do the exercise in written form, simply type the translation of each item "
 "into the text-box.  Be careful to use capital letters where this is "
@@ -434,20 +434,20 @@ msgstr ""
 "interpunkce."
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:748
+#: ../lib/lcg/exercises.py:749
 msgid "Written Answers"
 msgstr "Vyplňování odpovědí"
 
-#: ../lib/lcg/exercises.py:750
+#: ../lib/lcg/exercises.py:751
 msgid "Fill in the answer to the box below each question."
 msgstr "Vyplňte odpověď do textového pole pod každou otázkou."
 
-#: ../lib/lcg/exercises.py:755
+#: ../lib/lcg/exercises.py:756
 msgid ""
 "The question and the correct answer are written each at a separate line."
 msgstr "Otázka a správná odpověď jsou zapsány každá na samostatném řádku."
 
-#: ../lib/lcg/exercises.py:756
+#: ../lib/lcg/exercises.py:757
 msgid ""
 "Either whole or a part of the answer is written inside square brackets.  The "
 "text inside the brackets is supposed to be filled into the text box by the "
@@ -459,7 +459,7 @@ msgstr ""
 "políčka. Text před a za bude viditelný na obrazovce a může tak sloužit jako "
 "nápověda nebo šablona pro správnou odpověď."
 
-#: ../lib/lcg/exercises.py:766
+#: ../lib/lcg/exercises.py:767
 msgid ""
 "\n"
 "What is the name of the largest continent?\n"
@@ -475,11 +475,11 @@ msgstr ""
 "Použijte správný tvar slovesa „být“:\n"
 "Děti [jsou] naše budoucnost.\n"
 
-#: ../lib/lcg/exercises.py:776
+#: ../lib/lcg/exercises.py:777
 msgid "Complete the Statements"
 msgstr "Doplňování vět"
 
-#: ../lib/lcg/exercises.py:778
+#: ../lib/lcg/exercises.py:779
 msgid ""
 "The goal is to fill in the gaps in given statements.  The answers are "
 "written into a text box and there is just one correct answer for each gap."
@@ -487,7 +487,7 @@ msgstr ""
 "Úkolem je vyplnit vynechaná slova v daných větách. Odpovědi se zapisují do "
 "textových polí a pro každou mezeru existuje pouze jedna správná odpověď."
 
-#: ../lib/lcg/exercises.py:783
+#: ../lib/lcg/exercises.py:784
 msgid ""
 "One exercise typically consists of several statements separated by blank "
 "lines from each other. Certain part of each statement is written in square "
@@ -500,7 +500,7 @@ msgstr ""
 "nahrazena textovým vstupním políčkem. Text uvnitř závorky je správnou "
 "odpovědí pro dané políčko. V každé větě je právě jeden pár závorek."
 
-#: ../lib/lcg/exercises.py:792
+#: ../lib/lcg/exercises.py:793
 msgid ""
 "\n"
 "[London] is the capital of the United Kingdom.\n"
@@ -513,32 +513,28 @@ msgstr ""
 "Řeka [Temže] město rozděluje na severní a jižní část.\n"
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:802
+#: ../lib/lcg/exercises.py:803
 msgid "Cloze"
 msgstr "Doplňovačka"
 
-#: ../lib/lcg/exercises.py:804
+#: ../lib/lcg/exercises.py:805
 msgid ""
 "The goal is to fill in the gaps in given piece of text.  The answers are "
-"written into a text box and there is just one correct answer for each gap."
+"written into text boxes and there is just one correct answer for each gap."
 msgstr ""
 "Úkolem je vyplnit vynechaná slova v daném textu. Odpovědi se zapisují do "
 "textových polí uvnitř textu a pro každou chybějící část existuje pouze jedna "
 "správná odpověď."
 
-#: ../lib/lcg/exercises.py:809
+#: ../lib/lcg/exercises.py:810
 msgid ""
 "One exercise typically consists of one or more paragraphs of text. Selected "
 "parts of the text (typically words), which are to be replaced by text entry "
 "fields are written in square brackets. The text inside brackets is the "
 "correct answer."
-msgstr ""
-"Cvičení se obvykle skládá z jednoho nebo více odstavců textu. Vybrané části "
-"textu (typicky jednotlivá slova) jsou zapsány uvnitř hranatých závorek, čímž "
-"budou ve cvičení nahrazený textovými vstupními políčky. Text uvnitř závorky "
-"je správnou odpovědí pro dané políčko."
+msgstr "Cvičení se obvykle skládá z jednoho nebo více odstavců textu. Vybrané části textu (typicky jednotlivá slova) jsou zapsány uvnitř hranatých závorek, čímž budou ve cvičení nahrazeny textovými vstupními políčky. Text uvnitř závorky je správnou odpovědí pro dané políčko."
 
-#: ../lib/lcg/exercises.py:817
+#: ../lib/lcg/exercises.py:818 ../lib/lcg/exercises.py:842
 msgid ""
 "\n"
 "Commercial banks and savings banks receive and hold deposits\n"
@@ -552,14 +548,35 @@ msgstr ""
 "poskytují rady, půjčují peníze a poskytují konzultace investic. Banky\n"
 "mohou také [směňovat] peníze do cizích měn.\n"
 
-#: ../lib/lcg/exercises.py:857 ../lib/lcg/export/exercises_html.py:435
-#: ../lib/lcg/export/exercises_html.py:470
-#: ../lib/lcg/export/exercises_html.py:473
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:829
+msgid "Cloze with Model Answers"
+msgstr "Doplňovačka se vzorovými odpověďmi"
+
+#: ../lib/lcg/exercises.py:831
+msgid ""
+"The goal is to fill in the gaps in given piece of text.  The answers are "
+"written into text boxes.  The provided model answers are just suggestions.  "
+"Other answers may be correct as well so the exercise is not evaluated "
+"automatically.  Model answers may be unhidden."
+msgstr "Úkolem je vyplnit vynechaná slova v daném textu. Odpovědi se zapisují do textových polí uvnitř textu.  Vzorové odpovědi jsou pouze návrhy.  Může existovat více různých správných odpovědí, takže cvičení není vyhodnoceno automaticky, pouze umožňuje odkrýt vzorové odpovědi."
+
+#: ../lib/lcg/exercises.py:837
+msgid ""
+"One exercise typically consists of one or more paragraphs of text. Selected "
+"parts of the text (typically words), which are to be replaced by text entry "
+"fields are written in square brackets. The text inside brackets is the model "
+"answer."
+msgstr "Cvičení se obvykle skládá z jednoho nebo více odstavců textu. Vybrané části textu (typicky jednotlivá slova) jsou zapsány uvnitř hranatých závorek, čímž budou ve cvičení nahrazeny textovými vstupními políčky. Text uvnitř závorky je vzorová odpověď."
+
+#: ../lib/lcg/exercises.py:882 ../lib/lcg/export/exercises_html.py:468
+#: ../lib/lcg/export/exercises_html.py:503
+#: ../lib/lcg/export/exercises_html.py:506
 msgid "Total points:"
 msgstr "Body celkem:"
 
 #. Translators: Type of exercise
-#: ../lib/lcg/exercises.py:914
+#: ../lib/lcg/exercises.py:939
 msgid "Writing"
 msgstr "Psaní"
 
@@ -624,11 +641,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Vyplní celé cvičení správnými odpověďmi."
 
 #: ../lib/lcg/export/exercises_html.py:48
+#: ../lib/lcg/export/exercises_html.py:411
 msgid "Reset"
 msgstr "Vymazat"
 
 #: ../lib/lcg/export/exercises_html.py:49
 #: ../lib/lcg/export/exercises_html.py:279
+#: ../lib/lcg/export/exercises_html.py:412
 msgid "Reset all your answers and start again."
 msgstr ""
 "Vymaže všechny odpovědi i výsledky a umožní začít celé cvičení znovu od "
@@ -678,10 +697,12 @@ msgstr "Skrýt vše"
 
 #: ../lib/lcg/export/exercises_html.py:281
 #: ../lib/lcg/export/exercises_html.py:287
+#: ../lib/lcg/export/exercises_html.py:414
 msgid "Show Answer"
 msgstr "Zobrazit odpověď"
 
 #: ../lib/lcg/export/exercises_html.py:282
+#: ../lib/lcg/export/exercises_html.py:415
 msgid "Hide Answer"
 msgstr "Skrýt odpověď"
 
@@ -745,28 +766,36 @@ msgstr ""
 "vyhodnotit novou odpověď pomocí klávesy „Enter“ (viz výše) nebo znovu použít "
 "„napovídací“ klávesu dokud nenaleznete kompletní správnou odpověď."
 
-#: ../lib/lcg/export/exercises_html.py:464
+#: ../lib/lcg/export/exercises_html.py:409
+msgid "Show Answers"
+msgstr "Zobrazit odpověďi"
+
+#: ../lib/lcg/export/exercises_html.py:410
+msgid "Show model answers."
+msgstr "Zobrazit vzorové odpovědi."
+
+#: ../lib/lcg/export/exercises_html.py:497
 msgid "Invalid value in added points!"
 msgstr "Neplatná hodnota přidaných bodů!"
 
-#: ../lib/lcg/export/exercises_html.py:465
+#: ../lib/lcg/export/exercises_html.py:498
 msgid "Max. points exceeded!"
 msgstr "Maximální počet bodů překročen!"
 
-#: ../lib/lcg/export/exercises_html.py:467
+#: ../lib/lcg/export/exercises_html.py:500
 msgid "Automatic evaluation:"
 msgstr "Automatické vyhodnocení:"
 
-#: ../lib/lcg/export/exercises_html.py:468
+#: ../lib/lcg/export/exercises_html.py:501
 msgid "Additional points by tutor:"
 msgstr "Body přidané vyučujícím:"
 
-#: ../lib/lcg/export/exercises_html.py:492
+#: ../lib/lcg/export/exercises_html.py:525
 msgid "correct answer"
 msgstr "správná odpověď"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:497
+#: ../lib/lcg/export/exercises_html.py:530
 msgid "incorrect"
 msgstr "chyba"
 
@@ -793,9 +822,6 @@ msgstr "chyba"
 #~ "Pokud existuje více než jedna správná odpověď (více možností zápisu "
 #~ "téhož), můžete další formy odpovědi zapsat uvnitř závorek za sebe "
 #~ "oddělené znakem svislé čáry „|“."
-
-#~ msgid "Cloze with Selection"
-#~ msgstr "Doplňovačka s výběrem"
 
 #~ msgid ""
 #~ "Your goal is to pick the right words from the list at the beginning of "

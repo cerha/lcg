@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-21 15:26+0100\n"
+"POT-Creation-Date: 2014-05-22 16:04+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Petr Topiarz <reditel@mluvim.cz>\n"
 "Language-Team: \n"
@@ -56,31 +56,31 @@ msgstr ""
 msgid "A true/false statement must end with '[T]' or '[F]'."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:395
+#: ../lib/lcg/exercises.py:396
 #, python-format
 msgid "Unknown exercise type: %s"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:424
+#: ../lib/lcg/exercises.py:425
 #, python-format
 msgid "Error in task %d: %s"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:426
+#: ../lib/lcg/exercises.py:427
 #, python-format
 msgid "Error: %s"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:494
+#: ../lib/lcg/exercises.py:495
 #, fuzzy
 msgid "Exercise Definition"
 msgstr "Súgó a gyakorlathoz"
 
-#: ../lib/lcg/exercises.py:497
+#: ../lib/lcg/exercises.py:498
 msgid "Definition Example"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:537
+#: ../lib/lcg/exercises.py:538
 #, fuzzy
 msgid ""
 "You will hear a response immediately after choosing the answer.  When you "
@@ -94,11 +94,11 @@ msgstr ""
 "volt helyes az első próbálkozásra (lásd [#indicators] rész alatt)."
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:552
+#: ../lib/lcg/exercises.py:553
 msgid "Multiple Choice Questions"
 msgstr "Feleletválasztós kérdések"
 
-#: ../lib/lcg/exercises.py:554
+#: ../lib/lcg/exercises.py:555
 msgid ""
 "Each question in this exercise is followed by two or more possible answers. "
 "Only one answer is correct."
@@ -106,24 +106,24 @@ msgstr ""
 "A feladat minden kérdését kettő vagy több lehetséges válasz követi. Mindig "
 "csak egy válasz a helyes."
 
-#: ../lib/lcg/exercises.py:558
+#: ../lib/lcg/exercises.py:559
 msgid ""
 "One exercise typically consists of a definition of several questions, where "
 "each question has two or more possbile answers."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:560
+#: ../lib/lcg/exercises.py:561
 msgid ""
 "The question and its possible answers (choices) are written each at a "
 "separate line. The correct answer begins with a plus sign followed by a "
 "space. Incorrect answers begin with a minus sign and a space."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:564
+#: ../lib/lcg/exercises.py:565
 msgid "Another question and its answers may follow after a blank line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:566
+#: ../lib/lcg/exercises.py:567
 msgid ""
 "\n"
 "Screen reader is:\n"
@@ -138,11 +138,11 @@ msgid ""
 msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:583
+#: ../lib/lcg/exercises.py:584
 msgid "Selections"
 msgstr "Választás"
 
-#: ../lib/lcg/exercises.py:585
+#: ../lib/lcg/exercises.py:586
 #, fuzzy
 msgid ""
 "There are several groups of two or three statements. Only one statement in "
@@ -151,26 +151,26 @@ msgstr ""
 "Több egymáshoz hasonlító mondat/kifejezéscsoport létezik, melyekből minden "
 "csoportban csak egy helyes. A cél kiválasztani, melyik az."
 
-#: ../lib/lcg/exercises.py:590
+#: ../lib/lcg/exercises.py:591
 msgid ""
 "The exercise definition consists of several groups of statements, typically "
 "two or three statements in a group."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:592
+#: ../lib/lcg/exercises.py:593
 msgid ""
 "Each statement in a group is written at a separate line and begins by a plus "
 "sign to mark a correct statement or a minus sign to mark an incorrect "
 "statement.  Just one statement in each group is correct."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:596
+#: ../lib/lcg/exercises.py:597
 msgid ""
 "Another group of statements may follow after a blank line. There are no "
 "blank lines between statements which belong to the same group."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:599
+#: ../lib/lcg/exercises.py:600
 msgid ""
 "\n"
 "+ India is located in Asia.\n"
@@ -181,11 +181,11 @@ msgid ""
 msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:613
+#: ../lib/lcg/exercises.py:614
 msgid "True/False Statements"
 msgstr "Igaz/hamis állítások"
 
-#: ../lib/lcg/exercises.py:615
+#: ../lib/lcg/exercises.py:616
 #, fuzzy
 msgid ""
 "Each sentence in this exercise is followed by two controls labeled ‘TRUE’ "
@@ -195,19 +195,19 @@ msgstr ""
 "A feladat minden mondata után IGAZ, HAMIS választási lehetőség van. Döntsd "
 "el, és válaszd ki a megfelelőt."
 
-#: ../lib/lcg/exercises.py:620
+#: ../lib/lcg/exercises.py:621
 msgid ""
 "The exercise definition consists of several statements separated by blank "
 "lines."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:622
+#: ../lib/lcg/exercises.py:623
 msgid ""
 "Each statement is marked as either true using [T] or false using [F] at the "
 "end of the line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:625
+#: ../lib/lcg/exercises.py:626
 msgid ""
 "\n"
 "The Microsoft Windows operating system never crashes. [F]\n"
@@ -216,11 +216,11 @@ msgid ""
 msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:636
+#: ../lib/lcg/exercises.py:637
 msgid "Gap Filling"
 msgstr "Hézag kitöltés"
 
-#: ../lib/lcg/exercises.py:638
+#: ../lib/lcg/exercises.py:639
 msgid ""
 "Choose the correct word to fill in a gap in a sentence.  For each gap you "
 "have several choices.  Only one of them is correct."
@@ -229,13 +229,13 @@ msgstr ""
 "kitöltéséhez. Minden hézaghoz több választási lehetőség van, de csak egy "
 "helyes."
 
-#: ../lib/lcg/exercises.py:643
+#: ../lib/lcg/exercises.py:644
 msgid ""
 "One exercise typically consists of a definition of several statements, where "
 "there is one missing word in each statement."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:645
+#: ../lib/lcg/exercises.py:646
 msgid ""
 "The missing word is replaced by a series of underscores (at least three) and "
 "possible completions of the gap follow at separate lines. The correct "
@@ -243,11 +243,11 @@ msgid ""
 "completions begin with a minus sign and a space."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:650
+#: ../lib/lcg/exercises.py:651
 msgid "Another statement and its completions may follow after a blank line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:652
+#: ../lib/lcg/exercises.py:653
 msgid ""
 "\n"
 "If you want to send money to somebody, you can ____ a transfer.\n"
@@ -261,32 +261,32 @@ msgid ""
 "+ exchange\n"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:668
+#: ../lib/lcg/exercises.py:669
 msgid "Hidden Answers"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:672
+#: ../lib/lcg/exercises.py:673
 msgid ""
 "You should simply think of the correct answer and when you believe you know "
 "it, you can unhide the correct answer below each question and check whether "
 "you were right or not."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:677 ../lib/lcg/exercises.py:753
+#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:754
 msgid ""
 "One exercise typically consists of a definition of several questions and "
 "answers."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:679
+#: ../lib/lcg/exercises.py:680
 msgid "The question and the answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:680 ../lib/lcg/exercises.py:764
+#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:765
 msgid "Another pair or question and answer may follow after a blank line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:682
+#: ../lib/lcg/exercises.py:683
 msgid ""
 "\n"
 "What is the name of the highest mountain in the world?\n"
@@ -296,7 +296,7 @@ msgid ""
 "8,848m\n"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:696
+#: ../lib/lcg/exercises.py:697
 #, fuzzy
 msgid ""
 "You can check each answer individually using the shortcut keys. When your "
@@ -310,7 +310,7 @@ msgstr ""
 "és a nagy kezdőbetűket, ahol szükséges. Ezen két dolog okozza a legtöbb "
 "félreértést."
 
-#: ../lib/lcg/exercises.py:701
+#: ../lib/lcg/exercises.py:702
 #, fuzzy
 msgid ""
 "Use the control panel at the bottom of the exercise to evaluate all the "
@@ -319,12 +319,12 @@ msgstr ""
 "A válaszok egyszerre való kiértékeléséhez használja a [#panel] a gyakorlat "
 "alatt."
 
-#: ../lib/lcg/exercises.py:723
+#: ../lib/lcg/exercises.py:724
 #, fuzzy
 msgid "Vocabulary Exercise"
 msgstr "Szókincs gyakorlat"
 
-#: ../lib/lcg/exercises.py:725
+#: ../lib/lcg/exercises.py:726
 msgid ""
 "There are two ways to do the exercise: orally and written.  Do the exercise "
 "both ways to get the best results."
@@ -332,7 +332,7 @@ msgstr ""
 "Kétféleképpen lehet megoldani a feladatot: szóban és írásban. Mindkétféle "
 "képpen oldd meg a legjobb eredmény érdekében."
 
-#: ../lib/lcg/exercises.py:727
+#: ../lib/lcg/exercises.py:728
 #, fuzzy
 msgid ""
 "To do the exercise orally is simple.  Go through the vocabulary list and "
@@ -352,7 +352,7 @@ msgstr ""
 "szóbeli válaszokat, itt nincsenek kiértékelhető eredmények. Ha látni "
 "szeretnéd a pontszámodat, az írásbeli tesztet válaszd."
 
-#: ../lib/lcg/exercises.py:736
+#: ../lib/lcg/exercises.py:737
 msgid ""
 "To do the exercise in written form, simply type the translation of each item "
 "into the text-box.  Be careful to use capital letters where this is "
@@ -365,21 +365,21 @@ msgstr ""
 "Mondat fordításánál a központozás is számít."
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:748
+#: ../lib/lcg/exercises.py:749
 #, fuzzy
 msgid "Written Answers"
 msgstr "Szöveg elrejtése"
 
-#: ../lib/lcg/exercises.py:750
+#: ../lib/lcg/exercises.py:751
 msgid "Fill in the answer to the box below each question."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:755
+#: ../lib/lcg/exercises.py:756
 msgid ""
 "The question and the correct answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:756
+#: ../lib/lcg/exercises.py:757
 msgid ""
 "Either whole or a part of the answer is written inside square brackets.  The "
 "text inside the brackets is supposed to be filled into the text box by the "
@@ -387,7 +387,7 @@ msgid ""
 "or a templete of the expected answer for the user."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:766
+#: ../lib/lcg/exercises.py:767
 msgid ""
 "\n"
 "What is the name of the largest continent?\n"
@@ -397,11 +397,11 @@ msgid ""
 "Children [are] our future.\n"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:776
+#: ../lib/lcg/exercises.py:777
 msgid "Complete the Statements"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:778
+#: ../lib/lcg/exercises.py:779
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given statements.  The answers are "
@@ -410,7 +410,7 @@ msgstr ""
 "Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
 "Minden egyes hézagba, egy helyek megoldás illik."
 
-#: ../lib/lcg/exercises.py:783
+#: ../lib/lcg/exercises.py:784
 msgid ""
 "One exercise typically consists of several statements separated by blank "
 "lines from each other. Certain part of each statement is written in square "
@@ -419,7 +419,7 @@ msgid ""
 "statement."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:792
+#: ../lib/lcg/exercises.py:793
 msgid ""
 "\n"
 "[London] is the capital of the United Kingdom.\n"
@@ -428,20 +428,20 @@ msgid ""
 msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:802
+#: ../lib/lcg/exercises.py:803
 msgid "Cloze"
 msgstr "Kitöltés"
 
-#: ../lib/lcg/exercises.py:804
+#: ../lib/lcg/exercises.py:805
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given piece of text.  The answers are "
-"written into a text box and there is just one correct answer for each gap."
+"written into text boxes and there is just one correct answer for each gap."
 msgstr ""
 "Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
 "Minden egyes hézagba, egy helyek megoldás illik."
 
-#: ../lib/lcg/exercises.py:809
+#: ../lib/lcg/exercises.py:810
 msgid ""
 "One exercise typically consists of one or more paragraphs of text. Selected "
 "parts of the text (typically words), which are to be replaced by text entry "
@@ -449,7 +449,7 @@ msgid ""
 "correct answer."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:817
+#: ../lib/lcg/exercises.py:818 ../lib/lcg/exercises.py:842
 msgid ""
 "\n"
 "Commercial banks and savings banks receive and hold deposits\n"
@@ -458,14 +458,39 @@ msgid ""
 "investment advice, foreign exchange facilities, and so on.\n"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:857 ../lib/lcg/export/exercises_html.py:435
-#: ../lib/lcg/export/exercises_html.py:470
-#: ../lib/lcg/export/exercises_html.py:473
+#. Translators: Type of exercise (use language terminology)
+#: ../lib/lcg/exercises.py:829
+#, fuzzy
+msgid "Cloze with Model Answers"
+msgstr "Választás"
+
+#: ../lib/lcg/exercises.py:831
+#, fuzzy
+msgid ""
+"The goal is to fill in the gaps in given piece of text.  The answers are "
+"written into text boxes.  The provided model answers are just suggestions.  "
+"Other answers may be correct as well so the exercise is not evaluated "
+"automatically.  Model answers may be unhidden."
+msgstr ""
+"Ennek a feladatnak a célja kitölteni a hézagokat hosszabb szövegrésszel. "
+"Minden egyes hézagba, egy helyek megoldás illik."
+
+#: ../lib/lcg/exercises.py:837
+msgid ""
+"One exercise typically consists of one or more paragraphs of text. Selected "
+"parts of the text (typically words), which are to be replaced by text entry "
+"fields are written in square brackets. The text inside brackets is the model "
+"answer."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:882 ../lib/lcg/export/exercises_html.py:468
+#: ../lib/lcg/export/exercises_html.py:503
+#: ../lib/lcg/export/exercises_html.py:506
 msgid "Total points:"
 msgstr "Összpontszám:"
 
 #. Translators: Type of exercise
-#: ../lib/lcg/exercises.py:914
+#: ../lib/lcg/exercises.py:939
 msgid "Writing"
 msgstr "Írás"
 
@@ -527,11 +552,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Töltsd ki a gyakorlatot a helyes válaszokkal."
 
 #: ../lib/lcg/export/exercises_html.py:48
+#: ../lib/lcg/export/exercises_html.py:411
 msgid "Reset"
 msgstr "Reset"
 
 #: ../lib/lcg/export/exercises_html.py:49
 #: ../lib/lcg/export/exercises_html.py:279
+#: ../lib/lcg/export/exercises_html.py:412
 msgid "Reset all your answers and start again."
 msgstr "Az összes válasz törlése és a teszt újrakezdése."
 
@@ -580,11 +607,13 @@ msgstr "Szöveg elrejtése"
 
 #: ../lib/lcg/export/exercises_html.py:281
 #: ../lib/lcg/export/exercises_html.py:287
+#: ../lib/lcg/export/exercises_html.py:414
 #, fuzzy
 msgid "Show Answer"
 msgstr "Mutasd a szöveget"
 
 #: ../lib/lcg/export/exercises_html.py:282
+#: ../lib/lcg/export/exercises_html.py:415
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Szöveg elrejtése"
@@ -649,28 +678,38 @@ msgstr ""
 "Enter leütésével (lásd feljebb) vagy kérhetsz még segítséget, míg meg nem "
 "találod az egész megoldást."
 
-#: ../lib/lcg/export/exercises_html.py:464
+#: ../lib/lcg/export/exercises_html.py:409
+#, fuzzy
+msgid "Show Answers"
+msgstr "Mutasd a szöveget"
+
+#: ../lib/lcg/export/exercises_html.py:410
+#, fuzzy
+msgid "Show model answers."
+msgstr "Mutasd a megoldásokat."
+
+#: ../lib/lcg/export/exercises_html.py:497
 msgid "Invalid value in added points!"
 msgstr "Hibás érték a hozzáadott pontoknál!"
 
-#: ../lib/lcg/export/exercises_html.py:465
+#: ../lib/lcg/export/exercises_html.py:498
 msgid "Max. points exceeded!"
 msgstr "Maximális pontszám elérve!"
 
-#: ../lib/lcg/export/exercises_html.py:467
+#: ../lib/lcg/export/exercises_html.py:500
 msgid "Automatic evaluation:"
 msgstr "Automatikus kiértékelés:"
 
-#: ../lib/lcg/export/exercises_html.py:468
+#: ../lib/lcg/export/exercises_html.py:501
 msgid "Additional points by tutor:"
 msgstr "Oktató által hozzáadott pontok:"
 
-#: ../lib/lcg/export/exercises_html.py:492
+#: ../lib/lcg/export/exercises_html.py:525
 msgid "correct answer"
 msgstr "helyes válasz"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:497
+#: ../lib/lcg/export/exercises_html.py:530
 msgid "incorrect"
 msgstr "téves"
 
@@ -685,10 +724,6 @@ msgstr "téves"
 
 #~ msgid "Example:"
 #~ msgstr "Például:"
-
-#, fuzzy
-#~ msgid "Cloze with Selection"
-#~ msgstr "Választás"
 
 #, fuzzy
 #~ msgid ""
