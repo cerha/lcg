@@ -839,12 +839,8 @@ class ModelCloze(FillInExercise):
           "by text entry fields are written in square brackets. The text inside "
           "brackets is the model answer."),
     )
-    _SOURCE_EXAMPLE = _("""
-Commercial banks and savings banks receive and hold deposits
-[in] current accounts, savings accounts and deposit accounts,
-make payments [for] their customers, lend money, [and] offer
-investment advice, foreign exchange facilities, and so on.
-""")
+    _SOURCE_EXAMPLE = _("The [sun] is shining. Mom has bought a [yogurt]. "
+                        "The sailor holds a [telescope].")
 
 
 ################################################################################
