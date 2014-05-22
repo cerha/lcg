@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-22 16:04+0200\n"
+"POT-Creation-Date: 2014-05-22 16:21+0200\n"
 "PO-Revision-Date: 2009-11-24 12:59+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -454,7 +454,7 @@ msgid ""
 "correct answer."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:818 ../lib/lcg/exercises.py:842
+#: ../lib/lcg/exercises.py:818
 msgid ""
 "\n"
 "Commercial banks and savings banks receive and hold deposits\n"
@@ -488,14 +488,20 @@ msgid ""
 "answer."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:882 ../lib/lcg/export/exercises_html.py:468
+#: ../lib/lcg/exercises.py:842
+msgid ""
+"The [sun] is shining. Mom has bought a [yogurt]. The sailor holds a "
+"[telescope]."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:468
 #: ../lib/lcg/export/exercises_html.py:503
 #: ../lib/lcg/export/exercises_html.py:506
 msgid "Total points:"
 msgstr "Body celkom:"
 
 #. Translators: Type of exercise
-#: ../lib/lcg/exercises.py:939
+#: ../lib/lcg/exercises.py:935
 msgid "Writing"
 msgstr "Písanie"
 

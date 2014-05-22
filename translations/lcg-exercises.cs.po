@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-22 16:04+0200\n"
-"PO-Revision-Date: 2014-05-22 16:11+0200\n"
+"POT-Creation-Date: 2014-05-22 16:21+0200\n"
+"PO-Revision-Date: 2014-05-22 16:22+0200\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "Language: cs\n"
@@ -532,9 +532,13 @@ msgid ""
 "parts of the text (typically words), which are to be replaced by text entry "
 "fields are written in square brackets. The text inside brackets is the "
 "correct answer."
-msgstr "Cvičení se obvykle skládá z jednoho nebo více odstavců textu. Vybrané části textu (typicky jednotlivá slova) jsou zapsány uvnitř hranatých závorek, čímž budou ve cvičení nahrazeny textovými vstupními políčky. Text uvnitř závorky je správnou odpovědí pro dané políčko."
+msgstr ""
+"Cvičení se obvykle skládá z jednoho nebo více odstavců textu. Vybrané části "
+"textu (typicky jednotlivá slova) jsou zapsány uvnitř hranatých závorek, čímž "
+"budou ve cvičení nahrazeny textovými vstupními políčky. Text uvnitř závorky "
+"je správnou odpovědí pro dané políčko."
 
-#: ../lib/lcg/exercises.py:818 ../lib/lcg/exercises.py:842
+#: ../lib/lcg/exercises.py:818
 msgid ""
 "\n"
 "Commercial banks and savings banks receive and hold deposits\n"
@@ -559,7 +563,11 @@ msgid ""
 "written into text boxes.  The provided model answers are just suggestions.  "
 "Other answers may be correct as well so the exercise is not evaluated "
 "automatically.  Model answers may be unhidden."
-msgstr "Úkolem je vyplnit vynechaná slova v daném textu. Odpovědi se zapisují do textových polí uvnitř textu.  Vzorové odpovědi jsou pouze návrhy.  Může existovat více různých správných odpovědí, takže cvičení není vyhodnoceno automaticky, pouze umožňuje odkrýt vzorové odpovědi."
+msgstr ""
+"Úkolem je vyplnit vynechaná slova v daném textu. Odpovědi se zapisují do "
+"textových polí uvnitř textu.  Vzorové odpovědi jsou pouze návrhy.  Může "
+"existovat více různých správných odpovědí, takže cvičení není vyhodnoceno "
+"automaticky, pouze umožňuje odkrýt vzorové odpovědi."
 
 #: ../lib/lcg/exercises.py:837
 msgid ""
@@ -567,16 +575,26 @@ msgid ""
 "parts of the text (typically words), which are to be replaced by text entry "
 "fields are written in square brackets. The text inside brackets is the model "
 "answer."
-msgstr "Cvičení se obvykle skládá z jednoho nebo více odstavců textu. Vybrané části textu (typicky jednotlivá slova) jsou zapsány uvnitř hranatých závorek, čímž budou ve cvičení nahrazeny textovými vstupními políčky. Text uvnitř závorky je vzorová odpověď."
+msgstr ""
+"Cvičení se obvykle skládá z jednoho nebo více odstavců textu. Vybrané části "
+"textu (typicky jednotlivá slova) jsou zapsány uvnitř hranatých závorek, čímž "
+"budou ve cvičení nahrazeny textovými vstupními políčky. Text uvnitř závorky "
+"je vzorová odpověď."
 
-#: ../lib/lcg/exercises.py:882 ../lib/lcg/export/exercises_html.py:468
+#: ../lib/lcg/exercises.py:842
+msgid ""
+"The [sun] is shining. Mom has bought a [yogurt]. The sailor holds a "
+"[telescope]."
+msgstr "Svítí [sluníčko]. Maminka koupila [jogurt]. Námořník drží [dalekohled]."
+
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:468
 #: ../lib/lcg/export/exercises_html.py:503
 #: ../lib/lcg/export/exercises_html.py:506
 msgid "Total points:"
 msgstr "Body celkem:"
 
 #. Translators: Type of exercise
-#: ../lib/lcg/exercises.py:939
+#: ../lib/lcg/exercises.py:935
 msgid "Writing"
 msgstr "Psaní"
 
