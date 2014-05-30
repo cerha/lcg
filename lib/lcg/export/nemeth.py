@@ -241,7 +241,7 @@ def _child_export(node, exporter, context, variables, separators=None):
              all([c.tag != 'mspace' for c in children]) and
              node.find('mtext') is None and
              all([c.text.strip() not in _math_comparison_operators
-                  for c in node.findall('mi')]))):
+                  for c in node.findall('.//mo')]))):
             enclosed_list = 'yes'
     # Check for direct contact with opening and closing group signs
     direct_delimiters = None
