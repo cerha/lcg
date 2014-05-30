@@ -1321,3 +1321,44 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
             # Translators: Label of a link to the next page in sequential navigation.
             g.span(_('Previous') + ': ' + link(node.prev(), key='prev'), cls='prev')]
         return breadcrumbs + concat(nav, separator=g.span(' |\n', cls='separator'))
+
+
+_URL_MATCHER = re.compile(r'(https?://.+?)(?=[\),.:;?!\]]?\.*(\s|&nbsp;|&lt;|&gt;|<br/?>|$))')
+
+def format_text(text):
+    """Format given string into HTML preserving linebreaks and indentation in multiline text.
+
+    Returns the input text with all special characters correctly escaped and
+    whitespace preserved.
+
+    """
+    nbsp = '&nbsp;'
+    len_nbsp = len(nbsp)
+    def convert_line(line):
+        line_length = len(line)
+        i = 0
+        while i < line_length and line[i] == ' ':
+            i += 1
+        if i > 0:
+            line = nbsp * i + line[i:]
+            line_length += (len_nbsp - 1) * i
+            i = len_nbsp * i
+        while i < line_length:
+            if line[i] == ' ':
+                j = i + 1
+                while j < line_length and line[j] == ' ':
+                    j += 1
+                if j > i + 1:
+                    line = line[:i] + nbsp * (j - i) + line[j:]
+                    line_length += (len_nbsp - 1) * (j - i)
+                    i += len_nbsp * (j - i)
+                else:
+                    i += 1
+            else:
+                i += 1
+        return line
+    # Join lines and substitute links for HTML links
+    lines = saxutils.escape(text).splitlines()
+    converted_text = '<br>\n'.join(convert_line(l) for l in lines)
+    formatted_text = _URL_MATCHER.sub(r'<a href="\1">\1</a>', converted_text)
+    return formatted_text 
