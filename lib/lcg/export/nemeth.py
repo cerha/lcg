@@ -134,8 +134,8 @@ _num_prefix_regexp = re.compile('(^|[\n⠀%s])([%s%s]?⠤?)(%s)' %
                                  _SINGLE_LETTER_KILLER_SUFFIX, _CONDITIONAL_NUM_PREFIX,),
                                 re.M)
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - IV (partially)
-    # Missing: Rule V -- Rule XXV
+    # Implemented: Rule I - V (partially)
+    # Missing: Rule VI -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)

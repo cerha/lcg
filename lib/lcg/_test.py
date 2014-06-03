@@ -1422,6 +1422,10 @@ class BrailleExport(unittest.TestCase):
             test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msubsup><mrow><mi>s</mi><mo>]</mo></mrow><mi>a</mi><mi>b</mi></msubsup></mrow>
 </math>''', u'⠎⠈⠾⠰⠁⠘⠃')
+        # §32
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn mathvariant="bold">0</mn></mrow>
+</math>''', u'⠸⠼⠴')
             
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
