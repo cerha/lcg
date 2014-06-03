@@ -31,19 +31,29 @@ _CONDITIONAL_NUM_PREFIX = '\ue020'
 _NUM_PREFIX_REQUIRED = '\ue021'
 _SINGLE_LETTER_START = '\ue022'
 _SINGLE_LETTER_END = '\ue023'
-_SINGLE_LETTER_KILLER_PREFIX = '\ue023'
-_SINGLE_LETTER_KILLER_SUFFIX = '\ue024'
+_SINGLE_LETTER_KILLER_PREFIX = '\ue024'
+_SINGLE_LETTER_KILLER_SUFFIX = '\ue025'
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
                    ' ': '⠀', '.': '⠨', ',': '⠠'}
+
+def _comparison(op):
+    return _SINGLE_LETTER_KILLER_PREFIX + op + _SINGLE_LETTER_KILLER_SUFFIX
+def _shape(op):
+    return _SINGLE_LETTER_KILLER_PREFIX + op + _SINGLE_LETTER_KILLER_SUFFIX
 _nemeth_operators = {
     '*': '⠈⠼' + _NUM_PREFIX_REQUIRED,
     '#': '⠨⠼' + _NUM_PREFIX_REQUIRED,
-    '=': '⠀⠨⠅⠀',
+    '=': _comparison('⠀⠨⠅⠀'),
     ',': '⠠⠀',
-    '…': '⠀⠄⠄⠄⠀',
+    '…': '⠄⠄⠄',
     '×': '⠈⠡',
+    '∠': _shape('⠫⠪⠀'),
+    '▵': _shape('⠫⠞⠀'),
+    '□': _shape('⠀⠫⠲⠀'),
+    '◽': _shape('⠀⠫⠲⠀'),
+    '∥': '⠳⠳',
     '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
 _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍≏≏̸≐≐̸≑≓≗≜≟≠≡≢≤≥≦≦̸≧≧̸≨≩≪≪̸≫≫̸≮≯≰≱≲≳≴≵≶≷≸'
@@ -119,13 +129,13 @@ def _node_value(node):
 
 # Common export functions
 
-_num_prefix_regexp = re.compile('(^|[\n⠀%s])(%s?⠤?)(%s)' %
+_num_prefix_regexp = re.compile('(^|[\n⠀%s])([%s%s]?⠤?)(%s)' %
                                 (_NUM_PREFIX_REQUIRED, _SINGLE_LETTER_KILLER_PREFIX,
-                                 _CONDITIONAL_NUM_PREFIX,),
+                                 _SINGLE_LETTER_KILLER_SUFFIX, _CONDITIONAL_NUM_PREFIX,),
                                 re.M)
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - III (partially)
-    # Missing: Rule IV -- Rule XXV
+    # Implemented: Rule I - IV (partially)
+    # Missing: Rule V -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -153,10 +163,24 @@ def mathml_nemeth(exporter, context, element):
         if pos == -1:
             break
         pos_end = text.find(_SINGLE_LETTER_END)
-        assert pos_end >= 0 and pos_end > pos, text
-        if ((pos > 0 and pos_end < len(text) - 1 and
-             text[pos - 1] in space_or_punctuation and
-             text[pos_end + 1] in space_or_punctuation)):
+        assert pos_end > pos, text
+        # I don't understand Nemeth definition of "single letters" very well.
+        # The definitions seem to contradict the examples, especially as for
+        # parentheses.  As we use the examples in tests, we try to be
+        # consistent with them.  The most important "clarification" rules we
+        # add here are:
+        # - Single letters may occur at the beginning or at the end of the
+        #   whole math construct.
+        # - Single letters may be preceeded or succeeded by parentheses, but
+        #   not from both the sides -- this is explicitly prohibited by Nemeth,
+        #   see §25.a.v-vi, while being explicitly applied in the examples,
+        #   see §26.b.(4)-(5).
+        pre_punctuation = '' if pos == 0 else text[pos - 1]
+        post_punctuation = '' if pos_end >= len(text) - 1 else text[pos_end + 1]
+        if ((pre_punctuation == '' or
+             pre_punctuation in space_or_punctuation or pre_punctuation == '⠷') and
+            (post_punctuation == '' or
+             post_punctuation in space_or_punctuation or post_punctuation == '⠾')):
             prefix = '⠰'
             prefix_hyph = '0'
         else:
@@ -209,8 +233,8 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
             prefix += '⠰'
         elif (not style and text and all(c in string.ascii_letters for c in text) and
               variables.get('enclosed-list') != 'yes' and
-              variables.get('direct-delimiters') != 'yes' and
-              text not in ('cd',)): # short-form combinations
+              variables.get('no-letter-prefix') != 'yes' and
+              (len(text) == 1 or text in ('cd',))): # short-form combinations
             prefix = _SINGLE_LETTER_START + prefix
             suffix += _SINGLE_LETTER_END
         else:
@@ -219,7 +243,11 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
             if text in _signs_of_shape_and_omission or text in _math_comparison_operators:
                 prefix = _SINGLE_LETTER_KILLER_PREFIX + prefix
         lang = 'en' if plain else 'nemeth'
-        braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
+        if text == 'cos':
+            # It gets translated wrong in liblouis
+            braille = '⠉⠕⠎'
+        else:
+            braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
         if prefix:
             braille = prefix + braille
         if suffix:
@@ -349,7 +377,16 @@ def _export_mtext(node, exporter, context, variables, **kwargs):
     return _text_export(text, exporter, context, variables, node=node, plain=True)
 
 def _export_mspace(node, exporter, context, variables, **kwargs):
-    return _Braille('⠀')
+    # Just basic support
+    width = _attribute(node, 'width', default='0')
+    try:
+        n = int(width)
+    except ValueError:
+        if width.endswith('em'):
+            n = int(width[:-2])
+        else:
+            raise
+    return _Braille('⠀' * n, '4' * n)
 
 def _export_ms(node, exporter, context, variables, **kwargs):
     text = '"%s"' % (_node_value(node).strip(),)
