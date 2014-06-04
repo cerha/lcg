@@ -23,6 +23,7 @@ import lcg
 import os
 
 braille_tables = {'en': ['en-us-g1.ctb'],
+                  'en2': ['en-us-g2.ctb'],
                   'cs': [os.path.join(os.path.dirname(lcg.__file__),
                                       'export/braille-tables/cs-g1.ctb')],
                   'nemeth': ['nemeth.ctb']}

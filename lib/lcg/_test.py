@@ -1193,10 +1193,17 @@ class BrailleExport(unittest.TestCase):
         can_parse_entities = (python_version[0] >= 3 or
                              python_version[0] == 2 and python_version[1] >= 7)
         entity_regexp = re.compile('&[a-zA-Z]+;')
-        def test(mathml, expected_result, lang='cs', page_width=None):
+        def test(mathml, expected_result, lang='cs', page_width=None, pre=None, post=None):
             if not can_parse_entities and entity_regexp.search(mathml):
                 return
             content = lcg.MathML(mathml)
+            if pre is not None or post is not None:
+                content = (content,)
+                if pre is not None:
+                    content = (lcg.TextContent(pre),) + content
+                if post is not None:
+                    content = content + (lcg.TextContent(post),)
+                content = lcg.Container(content)
             presentation = self._load_presentation()
             presentation.braille_math_rules = 'nemeth'
             if page_width is not None:
@@ -1226,8 +1233,40 @@ class BrailleExport(unittest.TestCase):
 </math>''', u'⠼⠒⠨⠶⠖', lang='en') # decimal point
         # §9
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>27</mn></mrow>
+</math>''', u'⠼⠆⠶')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>7</mn></mrow>
+</math>''', u'⠠⠐⠮⠀⠶⠀⠼⠶⠀⠃⠁⠇⠇⠎⠲', lang='en2', pre="There were ", post=" balls.")
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1</mn><mo>+</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>0</mn></mrow>
+</math>''', u'⠼⠂⠬⠭⠬⠽⠀⠨⠅⠀⠼⠴')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>y</mi><mo>=</mo><mn>2</mn><mi>sin</mi><mo>&ApplyFunction;</mo><mi>x</mi></mrow>
+</math>''', u'⠽⠀⠨⠅⠀⠼⠆⠎⠊⠝⠀⠭')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mn>1</mn></mrow>
 </math>''', u'⠎⠊⠝⠀⠼⠂')
+        if False:
+            # Not yet supported
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msup><mi>sin</mi><mn>2</mn></msup><mo>&ApplyFunction;</mo><mn>2</mn><mi>x</mi></mrow>
+</math>''', u'⠎⠊⠝⠘⠆⠀⠼⠆⠭')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>0.333</mn><mspace width="1"/><mo>&hellip;</mo><mspace width="1"/><mn>3</mn>
+<mspace width="1"/><mo>&hellip;</mo></mrow>
+</math>''', u'⠼⠴⠨⠒⠒⠒⠀⠄⠄⠄⠀⠼⠒⠀⠄⠄⠄', lang='en')
+        if False:
+            # Not yet supported
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msub><mi>log</mi><mn>10</mn></msub><mo>&ApplyFunction;</mo><mn>2</mn></mrow>
+</math>''', u'⠇⠕⠛⠂⠶⠀⠼⠆')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mo>&angle;</mo><mn>1</mn></mrow>
+</math>''', u'⠫⠪⠀⠼⠂')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mo>(</mo><mi>x</mi><mo>=</mo><mn>0</mn><mo>)</mo></mrow>
+</math>''', u'⠷⠭⠀⠨⠅⠀⠼⠴⠾')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>-1</mn></mrow>
 </math>''', u'⠤⠼⠂')
@@ -1247,6 +1286,9 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3</mn><mo>*</mo><mn>4</mn></mrow>
 </math>''', u'⠼⠒⠈⠼⠼⠲')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn mathvariant="italic">3</mn></mrow>
+</math>''', u'⠨⠼⠒')
         # §11
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>]</mo></mrow>
@@ -1347,7 +1389,6 @@ class BrailleExport(unittest.TestCase):
 <mrow><mi>y</mi><mo>=</mo><mi>z</mi></mrow></mfenced>
 </math>''', u'⠷⠰⠁⠠⠀⠼⠆⠭⠠⠀⠽⠀⠨⠅⠀⠵⠾')
         # §27
-        print '***'
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>cos</mi><mo>&ApplyFunction;</mo><mi>A</mi></mrow>
 </math>''', u'⠉⠕⠎⠀⠠⠁')

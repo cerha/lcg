@@ -165,6 +165,41 @@ class Content(object):
             path.insert(0, path[0]._container)
         return tuple(path)
 
+    def _neighbor_element(self, direction, stop_classes):
+        element = self
+        container = self.container()
+        while True:
+            if container is None:
+                return None
+            content = container.content()
+            index = content.index(element)
+            if direction < 0:
+                if index > 0:
+                    neighbor = content[index - 1]
+                    break
+            else:
+                if index < len(content) - 1:
+                    neighbor = content[index + 1]
+                    break
+            if isinstance(container, stop_classes):
+                return None
+            element = container
+            container = container.container()
+        while isinstance(neighbor, Container):
+            content = neighbor.content()
+            if not content:
+                return neighbor
+            neighbor = content[-1]
+        return neighbor
+        
+    def previous_element(self, stop_classes=()):
+        """ """
+        return self._neighbor_element(-1, stop_classes)
+
+    def next_element(self, stop_classes=()):
+        """ """
+        return self._neighbor_element(1, stop_classes)
+
     def sections(self, context):
         """Return the contained sections as a sequence of 'Section' instances.
 

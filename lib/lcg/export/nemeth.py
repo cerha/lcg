@@ -144,6 +144,8 @@ def mathml_nemeth(exporter, context, element):
             return self._data.get(key, '?')
     entity_handler = EntityHandler()
     top_node = element.tree_content(entity_handler, transform=True)
+    pre = element.previous_element()
+    post = element.next_element()
     variables = _Variables()
     braille = _child_export(top_node, exporter, context, variables).strip()
     text = braille.text()
