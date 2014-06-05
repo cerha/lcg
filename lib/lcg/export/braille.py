@@ -326,6 +326,8 @@ class BrailleExporter(FileExporter, Exporter):
             self._compactness = {}
             self._table_column_compactness = {}
             self._double_page = None
+            self._content_to_alter = None
+            self._alternate_text = None
 
         def tables(self, lang):
             if lang is None:
@@ -412,6 +414,17 @@ class BrailleExporter(FileExporter, Exporter):
 
         def set_double_page(self, flag):
             self._double_page = flag
+
+        def alternate_text(self, content):
+            text = content.text()
+            if content is self._content_to_alter:
+                text = self._alternate_text
+                self.set_alternate_text(None, None)
+            return text
+
+        def set_alternate_text(self, content, text):
+            self._content_to_alter = content
+            self._alternate_text = text
 
     def __init__(self, *args, **kwargs):
         super(BrailleExporter, self).__init__(*args, **kwargs)
@@ -945,6 +958,11 @@ class BrailleExporter(FileExporter, Exporter):
         return _Braille(mark)
 
     # Content element export methods (defined by _define_export_methods).
+
+    def _export_text_content(self, context, element):
+        text = context.alternate_text(element)
+        t = self._reformat_text(context, text)
+        return self.text(context, t, lang=element.lang())
     
     def _export_new_page(self, context, element):
         return _Braille('\f', self.HYPH_NO)

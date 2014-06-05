@@ -23,6 +23,8 @@ from contextlib import contextmanager
 import re
 import string
 
+import lcg
+
 from braille import _Braille, _braille_whitespace
 import entities
 
@@ -49,10 +51,12 @@ _nemeth_operators = {
     ',': '⠠⠀',
     '…': '⠄⠄⠄',
     '×': '⠈⠡',
-    '∠': _shape('⠫⠪⠀'),
-    '▵': _shape('⠫⠞⠀'),
-    '□': _shape('⠀⠫⠲⠀'),
-    '◽': _shape('⠀⠫⠲⠀'),
+    '∠': _shape('⠫⠪'),
+    '△': _shape('⠫⠞'),
+    '▵': _shape('⠫⠞'),
+    '□': _shape('⠫⠲'),
+    '◽': _shape('⠫⠲'),
+    '◯': _shape('⠫⠉'),
     '∥': '⠳⠳',
     '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
@@ -60,8 +64,8 @@ _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍
                               '≹≺≻≼≽≾≿≿̸⊀⊁⊴⊵⋍⋖⋗⋘⋘̸⋙⋙̸⋚⋛⋞⋟⋠⋡⋦⋧⋨⋩⋪⋫⋬⋭'
                               '⦔⩭⩭̸⩯⩰⩰̸⩵⩸⩹⩺⩻⩼⩽⩽̸⩾⩾̸⩿⪀⪁⪂⪃⪄⪅⪆⪇⪈⪉⪊⪋⪌⪍⪎⪏⪐⪑⪒⪓⪔⪕⪖⪗⪘⪙⪚⪝⪞⪟⪠⪡⪡̸⪢⪢̸⪦⪨⪩⪬⪮⪯⪯̸⪰⪰'
                               '̸⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼')
-_signs_of_shape = ''
-_signs_of_shape_and_omission = ''
+_signs_of_shape = '∠△▵□◽◯'
+_signs_of_shape_and_omission = _signs_of_shape
 
 
 # General utilities
@@ -133,6 +137,10 @@ _num_prefix_regexp = re.compile('(^|[\n⠀%s])([%s%s]?⠤?)(%s)' %
                                 (_NUM_PREFIX_REQUIRED, _SINGLE_LETTER_KILLER_PREFIX,
                                  _SINGLE_LETTER_KILLER_SUFFIX, _CONDITIONAL_NUM_PREFIX,),
                                 re.M)
+_prefixed_punctuation = "':.!-?‘“’”;\""
+_punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
+
+_braille_number_regexp = re.compile('⠼[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+$')
 def mathml_nemeth(exporter, context, element):
     # Implemented: Rule I - V (partially)
     # Missing: Rule VI -- Rule XXV
@@ -158,6 +166,8 @@ def mathml_nemeth(exporter, context, element):
         start, end = match.start(3), match.end(3)
         text = text[:start] + '⠼' + text[end:]
         hyphenation = hyphenation[:start] + '0' + hyphenation[end:]
+    # Punctuation indicator -- part 1
+    single_letter = text and text[-1] == _SINGLE_LETTER_END
     # Handle letter prefixes
     space_or_punctuation = '⠀⠨⠠⠰'
     while True:
@@ -201,6 +211,50 @@ def mathml_nemeth(exporter, context, element):
             text_len -= 1
         else:
             i += 1
+    # Punctuation indicator -- part 2
+    if isinstance(post, lcg.TextContent):
+        post_text = post.text()
+        punctuated = False
+        if post_text:
+            if post_text[0] in _prefixed_punctuation:
+                punctuated = True
+            else:
+                m = _punctuation_regexp.match(post_text)
+                if m is not None:
+                    pos = m.end(1)
+                    context.set_alternate_text(post, post_text[:pos] + u'_' + post_text[pos:])
+        if punctuated:
+            indicate = single_letter
+            # Test for braille indicators, the tested set should be improved to
+            # exclude indicators that can't appear at the end of an expression
+            # and then to add those previously included by those.
+            for indicator in ('⠘', '⠸', '⠨', '⠰', '⠘', '⠣', '⠩', '⠸', '⠪', '⠻', '⠠', '⠶⠶⠶', '⠹',
+                              '⠼', '⠐', '⠣', '⠈', '⠨', '⠫', '⠸⠠⠄', '⠨⠠⠄', '⠿',):
+                if text.endswith(indicator):
+                    indicate = True
+                    break
+            if not indicate and _braille_number_regexp.search(text):
+                indicate = True
+            if not indicate:
+                last_element = top_node
+                children = last_children = last_element.getchildren()
+                while last_element.tag not in ('mi', 'mo', 'mn',) and children:
+                    last_children = children
+                    children = last_element.getchildren()
+                    last_element = children[-1]
+                if last_element.tag == 'mo' and last_element.text in ',-–—':
+                    if len(last_children) > 1:
+                        last_element = last_children[-2]
+                if last_element.tag == 'mo':
+                    op = last_element.text.strip()
+                    if op in _signs_of_shape or op in _math_comparison_operators:
+                        indicate = True
+                if ((not indicate and last_element.tag == 'mi' and
+                     last_element.text.strip() in ('sin', 'cos', 'tg', 'cotg',))):
+                    indicate = True
+            if indicate:
+                text += '⠸'
+                hyphenation += '0'
     # Done
     return _Braille(text, hyphenation)
 
