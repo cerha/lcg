@@ -342,7 +342,8 @@ def mathml_nemeth(exporter, context, element):
                 if last_element.tag == 'mo' and last_element.text in ',-–—':
                     if len(last_children) > 1:
                         last_element = last_children[-2]
-                if last_element.tag == 'mo':
+                if ((last_element.tag == 'mo' or
+                     (last_element.tag == 'mi' and last_element.text == '…'))):
                     op = last_element.text.strip()
                     if op in ('–—…' + _signs_of_shape + _math_comparison_operators):
                         indicate = True
@@ -523,6 +524,8 @@ def _op_export(operator, exporter, context, variables, node=None):
 
 def _export_mi(node, exporter, context, variables, **kwargs):
     text = _node_value(node).strip()
+    if text == '…':
+        return _export_mo(node, exporter, context, variables, **kwargs)
     return _text_export(text, exporter, context, variables, node=node)
 
 def _export_mn(node, exporter, context, variables, **kwargs):

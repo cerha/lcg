@@ -1516,7 +1516,7 @@ class BrailleExport(unittest.TestCase):
 </math>''', u'⠷⠤⠤⠤⠤⠠⠀⠲⠠⠀⠖⠠⠀⠦⠠⠀⠤⠤⠤⠤⠾', page_width=lcg.USpace(40))
         # §43
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-<mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mo>&hellip;</mo></mrow>
+<mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mi>&hellip;</mi></mrow>
 </math>''', u'⠭⠬⠽⠬⠀⠄⠄⠄⠸⠲', lang='en2', post='.')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="" close="" separators=","><mn>1</mn><mn>3</mn><mn>5</mn><mo>&hellip;</mo>
