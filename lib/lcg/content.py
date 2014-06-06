@@ -1773,7 +1773,8 @@ class MathML(Content):
             children = node.getchildren()
             node.clear()
             node.tag = 'mrow'
-            ElementTree.SubElement(node, 'mo', dict(fence='true')).text = opening
+            if opening:
+                ElementTree.SubElement(node, 'mo', dict(fence='true')).text = opening
             i = 0
             for c in children:
                 if separators and i > 0:
@@ -1781,7 +1782,8 @@ class MathML(Content):
                     ElementTree.SubElement(node, 'mo', dict(separator='true')).text = s
                 node.append(c)
                 i += 1
-            ElementTree.SubElement(node, 'mo', dict(fence='true')).text = closing
+            if closing:
+                ElementTree.SubElement(node, 'mo', dict(fence='true')).text = closing
         return math
         
     def tree_content(self, entity_dictionary=None, transform=False):
