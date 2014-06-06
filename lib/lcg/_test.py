@@ -1332,7 +1332,7 @@ class BrailleExport(unittest.TestCase):
             test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mn>2</mn></msup></mrow>
 </math>''', u'⠭⠘⠆')
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfrac><mrow><mn>3</mn></mrow><mrow><mi>x</mi></mrow></mfrac>
 </math>''', u'⠹⠒⠌⠭⠼')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1481,14 +1481,12 @@ class BrailleExport(unittest.TestCase):
 <mrow><mn mathvariant="bold">0</mn></mrow>
 </math>''', u'⠸⠼⠴')
         # §37
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-    <mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow>
-    </math>''', u'⠹⠂⠌⠆⠼⠠', lang='en2', post=',')
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-    <mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow>
-    </math>''', u'⠹⠒⠌⠲⠼⠸⠲', lang='en2', post='.')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow>
+</math>''', u'⠹⠂⠌⠆⠼⠠', lang='en2', post=',')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow>
+</math>''', u'⠹⠒⠌⠲⠼⠸⠲', lang='en2', post='.')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>0</mn></mrow>
 </math>''', u'⠼⠴⠸⠲', lang='en2', post='.')
@@ -1505,9 +1503,7 @@ class BrailleExport(unittest.TestCase):
 <mrow><mn>0</mn></mrow>
 </math>''', u'⠼⠴⠠⠸⠴', lang='en2', post=u',”')
         # §42
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mo>&mdash;</mo><mn>15</mn></mfrac><mo>=</mo><mfrac><mn>2</mn><mn>3</mn></mfrac></mrow>
 </math>''', u'⠹⠤⠤⠤⠤⠀⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1539,6 +1535,18 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>?</mo><mo>+</mo><mo>?</mo><mo>=</mo><mn>10</mn></mrow>
 </math>''', u'⠿⠬⠿⠀⠨⠅⠀⠼⠂⠴')
+        # §62
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow>
+</math>''', u'⠹⠂⠌⠒⠼')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mi>c</mi></mfrac></mrow>
+</math>''', u'⠹⠁⠬⠃⠌⠉⠼')
+        if False:
+            # Not yet supported
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mfrac><msup><mi>x</mi><mfrac><mn>1</mn><mn>2</mn></mfrac></msup><mn>2</mn></mfrac></mrow>
+</math>''', u'⠹⠭⠘⠹⠂⠌⠆⠼⠆⠼') # fixed: there is an error in the specification example
             
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the

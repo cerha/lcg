@@ -213,11 +213,8 @@ def _style(node, variables):
     with variables.let('style', style):
         yield None
 
-def _child_nodes(node, exported=False):
-    children = node.getchildren()
-    if exported:
-        children = [_export(c) for c in children]
-    return children
+def _child_nodes(node):
+    return node.getchildren()
 
 def _attribute(node, name, default=None):
     return node.get(name, default)
@@ -615,8 +612,11 @@ def _export_maction(node, exporter, context, variables, **kwargs):
 def _export_mfenced(node, exporter, context, variables, **kwargs):
     raise Exception('debug')
 
-def _export_mfrac(node, **kwargs):
-    child_1, child_2 = child_nodes(node, exported=True)
+def _export_mfrac(node, exporter, context, variables, **kwargs):
+    numerator, denominator = _child_nodes(node)
+    return (_Braille('⠹') + _export(numerator, exporter, context, variables, **kwargs) +
+            _Braille('⠌') + _export(denominator, exporter, context, variables, **kwargs) +
+            _Braille('⠼'))
     # mfrac_flag = 'mfrac'
     # if len(node.getiterator(mfrac_flag)) > 1:
     #     line = _Braille('⠻⠻', '00')
