@@ -144,13 +144,13 @@ _rgrouping(None, '⠨⠨⠠⠾')        # enlarged right angle bracket
 _rgrouping('〛', '⠈⠸⠾')
 _rgrouping(None, '⠈⠸⠠⠾')        # enlarged right barred bracket
 _rgrouping('⦄', '⠨⠸⠾')
-_rgrouping(None, '⠨⠸⠠⠾')          # enlarged right barred brace
-_rgrouping('', '⠈⠘⠾')             # upper right half bracket
-_rgrouping('', '⠈⠘⠠⠾')            # enlarged upper right half bracket
-_rgrouping('', '⠈⠰⠾')             # lower right half bracket
-_rgrouping('', '⠈⠰⠠⠾')            # enlarged lower right half bracket
-_rgrouping('', '⠠⠄')            # right transcriber's grouping symbol
-_rgrouping('', '⠠⠄⠾')           # enlarged right transcriber's grouping symbol
+_rgrouping(None, '⠨⠸⠠⠾')        # enlarged right barred brace
+_rgrouping(None, '⠈⠘⠾')         # upper right half bracket
+_rgrouping(None, '⠈⠘⠠⠾')        # enlarged upper right half bracket
+_rgrouping(None, '⠈⠰⠾')         # lower right half bracket
+_rgrouping(None, '⠈⠰⠠⠾')        # enlarged lower right half bracket
+_rgrouping(None, '⠠⠄')          # right transcriber's grouping symbol
+_rgrouping(None, '⠠⠄⠾')         # enlarged right transcriber's grouping symbol
     
 _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍≏≏̸≐≐̸≑≓≗≜≟≠≡≢≤≥≦≦̸≧≧̸≨≩≪≪̸≫≫̸≮≯≰≱≲≳≴≵≶≷≸'
                               '≹≺≻≼≽≾≿≿̸⊀⊁⊴⊵⋍⋖⋗⋘⋘̸⋙⋙̸⋚⋛⋞⋟⋠⋡⋦⋧⋨⋩⋪⋫⋬⋭'
