@@ -35,37 +35,135 @@ _SINGLE_LETTER_START = '\ue022'
 _SINGLE_LETTER_END = '\ue023'
 _SINGLE_LETTER_KILLER_PREFIX = '\ue024'
 _SINGLE_LETTER_KILLER_SUFFIX = '\ue025'
+_LEFT_WHITESPACE_42 = '\ue026' # Nemeth §42
+_RIGHT_WHITESPACE_42 = '\ue027' # Nemeth §42
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
                    ' ': '⠀', '.': '⠨', ',': '⠠'}
 
+_signs_of_shape = ''
+_braille_punctuation = ('⠂',)
+_braille_left_grouping = ()
+_braille_right_grouping = ()
 def _comparison(op):
     return _SINGLE_LETTER_KILLER_PREFIX + op + _SINGLE_LETTER_KILLER_SUFFIX
-def _shape(op):
-    return _SINGLE_LETTER_KILLER_PREFIX + op + _SINGLE_LETTER_KILLER_SUFFIX
+def _punctuation(symbol, braille):
+    global _braille_punctuation, _nemeth_operators
+    if braille not in _braille_punctuation:
+        _braille_punctuation += (braille,)
+    _nemeth_operators[symbol] = braille
+def _shape(symbol, braille):
+    global _signs_of_shape, _nemeth_operators
+    if symbol not in _signs_of_shape:
+        _signs_of_shape += symbol
+    translated = _SINGLE_LETTER_KILLER_PREFIX + braille + _SINGLE_LETTER_KILLER_SUFFIX
+    _nemeth_operators[symbol] = translated
+def _lgrouping(symbol, braille):
+    global _braille_left_grouping, _nemeth_operators
+    if braille not in _braille_left_grouping:
+        _braille_left_grouping += (braille,)
+    if symbol is not None:
+        _nemeth_operators[symbol] = braille
+def _rgrouping(symbol, braille):
+    global _braille_right_grouping, _nemeth_operators
+    if braille not in _braille_right_grouping:
+        _braille_right_grouping += (braille,)
+    if symbol is not None:
+        _nemeth_operators[symbol] = braille
 _nemeth_operators = {
     '*': '⠈⠼' + _NUM_PREFIX_REQUIRED,
     '#': '⠨⠼' + _NUM_PREFIX_REQUIRED,
     '=': _comparison('⠀⠨⠅⠀'),
-    ',': '⠠⠀',
-    '…': '⠄⠄⠄',
     '×': '⠈⠡',
-    '∠': _shape('⠫⠪'),
-    '△': _shape('⠫⠞'),
-    '▵': _shape('⠫⠞'),
-    '□': _shape('⠫⠲'),
-    '◽': _shape('⠫⠲'),
-    '◯': _shape('⠫⠉'),
     '∥': '⠳⠳',
     '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
+_punctuation("'", '⠄')
+_punctuation(':', '⠒')
+_punctuation(',', '⠠⠀')
+_punctuation('–', '⠤⠤')
+_punctuation('—', '⠤⠤⠤⠤')
+_punctuation('…', '⠄⠄⠄')
+_punctuation('!', '⠖')
+_punctuation('-', '⠤')
+_punctuation('.', '⠲')
+_punctuation('?', '⠦')
+_punctuation('‘', '⠠⠦')
+_punctuation('“', '⠦')
+_punctuation('’', '⠴⠄')
+_punctuation('”', '⠴')
+_punctuation(';', '⠆')
+_shape('∠', '⠫⠪')
+_shape('△', '⠫⠞')
+_shape('▵', '⠫⠞')
+_shape('□', '⠫⠲')
+_shape('◽', '⠫⠲')
+_shape('◯', '⠫⠉')
+_lgrouping('(', '⠷')
+_lgrouping(None, '⠠⠷')          # enlarged left parenthesis
+_lgrouping('[', '⠈⠷')
+_lgrouping(None, '⠈⠠⠷')         # enlarged left bracket
+_lgrouping(None, '⠸⠈⠷')         # bold left bracket
+_lgrouping('{', '⠨⠷')
+_lgrouping(None, '⠨⠠⠷')         # enlarged left brace
+_lgrouping('|', '⠳')
+_lgrouping(None, '⠠⠳')          # enlarged vertical bar
+_lgrouping('‖', '⠳⠳')
+_lgrouping(None, '⠠⠳⠠⠳')        # enlarged double vertical bar
+_lgrouping(None, '⠸⠳')          # bold vertical bar
+_lgrouping(None, '⠸⠳⠸⠳')        # bold double vertical bar
+_lgrouping('〈', '⠨⠨⠷')
+_lgrouping(None, '⠨⠨⠠⠷')        # enlarged left angle bracket
+_lgrouping('〚', '⠈⠸⠷')
+_lgrouping(None, '⠈⠸⠠⠷')        # enlarged left barred bracket
+_lgrouping('⦃', '⠨⠸⠷')
+_lgrouping(None, '⠨⠸⠠⠷')        # enlarged left barred brace
+_lgrouping(None, '⠈⠘⠷')         # upper left half bracket
+_lgrouping(None, '⠈⠘⠠⠷')        # enlarged upper left half bracket
+_lgrouping(None, '⠈⠰⠷')         # lower left half bracket
+_lgrouping(None, '⠈⠰⠠⠷')        # enlarged lower left half bracket
+_lgrouping(None, '⠠⠄')          # left transcriber's grouping symbol
+_lgrouping(None, '⠠⠄⠷')         # enlarged left transcriber's grouping symbol
+_rgrouping(')', '⠾')
+_rgrouping(None, '⠠⠾')          # enlarged right parenthesis
+_rgrouping(']', '⠈⠾')
+_rgrouping(None, '⠈⠠⠾')         # enlarged right bracket
+_rgrouping(None, '⠸⠈⠾')         # bold right bracket
+_rgrouping('}', '⠨⠾')
+_rgrouping(None, '⠨⠠⠾')         # enlarged right brace
+_rgrouping('|', '⠳')
+_rgrouping(None, '⠠⠳')          # enlarged vertical bar
+_rgrouping('‖', '⠳⠳')
+_rgrouping(None, '⠠⠳⠠⠳')        # enlarged double vertical bar
+_rgrouping(None, '⠸⠳')          # bold vertical bar
+_rgrouping(None, '⠸⠳⠸⠳')        # bold double vertical bar
+_rgrouping('〉', '⠨⠨⠾')
+_rgrouping(None, '⠨⠨⠠⠾')        # enlarged right angle bracket
+_rgrouping('〛', '⠈⠸⠾')
+_rgrouping(None, '⠈⠸⠠⠾')        # enlarged right barred bracket
+_rgrouping('⦄', '⠨⠸⠾')
+_rgrouping(None, '⠨⠸⠠⠾')          # enlarged right barred brace
+_rgrouping('', '⠈⠘⠾')             # upper right half bracket
+_rgrouping('', '⠈⠘⠠⠾')            # enlarged upper right half bracket
+_rgrouping('', '⠈⠰⠾')             # lower right half bracket
+_rgrouping('', '⠈⠰⠠⠾')            # enlarged lower right half bracket
+_rgrouping('', '⠠⠄')            # right transcriber's grouping symbol
+_rgrouping('', '⠠⠄⠾')           # enlarged right transcriber's grouping symbol
+    
 _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍≏≏̸≐≐̸≑≓≗≜≟≠≡≢≤≥≦≦̸≧≧̸≨≩≪≪̸≫≫̸≮≯≰≱≲≳≴≵≶≷≸'
                               '≹≺≻≼≽≾≿≿̸⊀⊁⊴⊵⋍⋖⋗⋘⋘̸⋙⋙̸⋚⋛⋞⋟⋠⋡⋦⋧⋨⋩⋪⋫⋬⋭'
                               '⦔⩭⩭̸⩯⩰⩰̸⩵⩸⩹⩺⩻⩼⩽⩽̸⩾⩾̸⩿⪀⪁⪂⪃⪄⪅⪆⪇⪈⪉⪊⪋⪌⪍⪎⪏⪐⪑⪒⪓⪔⪕⪖⪗⪘⪙⪚⪝⪞⪟⪠⪡⪡̸⪢⪢̸⪦⪨⪩⪬⪮⪯⪯̸⪰⪰'
                               '̸⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼')
-_signs_of_shape = '∠△▵□◽◯'
 _signs_of_shape_and_omission = _signs_of_shape
+
+_braille_left_indicators = ('⠰', '⠸', '⠨', '⠨⠈', '⠠⠠', '⠈⠈', '⠘', '⠣', '⠩', '⠪', '⠻', '⠠',
+                            '⠶⠶⠶', '⠹', '⠠⠹', '⠠⠠⠹', '⠸⠹', '⠈⠻', '⠐', '⠘', '⠘⠘', '⠘⠰', '⠘⠘⠘',
+                            '⠘⠘⠰', '⠘⠰⠘', '⠘⠰⠰', '⠰', '⠰⠘', '⠰⠰', '⠰⠘⠘', '⠰⠘⠰', '⠰⠰⠘', '⠰⠰⠰',
+                            '⠣', '⠣⠣', '⠩', '⠩⠩', '⠈', '⠼', '⠣', '⠨', '⠨⠨', '⠨⠨⠨', '⠫', '⠸⠫',
+                            '⠠⠨', '⠠⠄⠸', '⠠⠄⠨',)
+_braille_right_indicators = ('⠼', '⠠⠼', '⠠⠠⠼', '⠸⠼', '⠻', '⠸⠠⠄', '⠨⠠⠄',)
+_braille_symbols_42 = ()        # TODO: not yet defined
 
 
 # General utilities
@@ -133,17 +231,19 @@ def _node_value(node):
 
 # Common export functions
 
-_num_prefix_regexp = re.compile('(^|[\n⠀%s])([%s%s]?⠤?)(%s)' %
-                                (_NUM_PREFIX_REQUIRED, _SINGLE_LETTER_KILLER_PREFIX,
-                                 _SINGLE_LETTER_KILLER_SUFFIX, _CONDITIONAL_NUM_PREFIX,),
+_num_prefix_regexp = re.compile('(^|[\n⠀%s%s])([%s%s%s]*⠤?)(%s)' %
+                                (_NUM_PREFIX_REQUIRED, _RIGHT_WHITESPACE_42,
+                                 _SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX,
+                                 _LEFT_WHITESPACE_42, _CONDITIONAL_NUM_PREFIX,),
                                 re.M)
 _prefixed_punctuation = "':.!-?‘“’”;\""
 _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 
-_braille_number_regexp = re.compile('⠼[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+$')
+_braille_number_regexp = re.compile('⠼[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+$')
+_braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - V (partially)
-    # Missing: Rule VI -- Rule XXV
+    # Implemented: Rule I - VI (partially)
+    # Missing: Rule VII -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -225,11 +325,7 @@ def mathml_nemeth(exporter, context, element):
                     context.set_alternate_text(post, post_text[:pos] + u'_' + post_text[pos:])
         if punctuated:
             indicate = single_letter
-            # Test for braille indicators, the tested set should be improved to
-            # exclude indicators that can't appear at the end of an expression
-            # and then to add those previously included by those.
-            for indicator in ('⠘', '⠸', '⠨', '⠰', '⠘', '⠣', '⠩', '⠸', '⠪', '⠻', '⠠', '⠶⠶⠶', '⠹',
-                              '⠼', '⠐', '⠣', '⠈', '⠨', '⠫', '⠸⠠⠄', '⠨⠠⠄', '⠿',):
+            for indicator in _braille_right_indicators:
                 if text.endswith(indicator):
                     indicate = True
                     break
@@ -255,6 +351,48 @@ def mathml_nemeth(exporter, context, element):
             if indicate:
                 text += '⠸'
                 hyphenation += '0'
+    # Whitespace
+    text_len = len(text)
+    i = 0
+    while i < text_len:
+        space = True
+        if text[i] == _LEFT_WHITESPACE_42:
+            t = text[:i]
+            if not post and _braille_empty_regexp.match(t):
+                space = False
+            elif not _braille_number_regexp.search(t): # numbers may look like punctuation
+                for b in (_braille_punctuation + _braille_right_indicators +
+                          _braille_left_grouping + _braille_right_grouping + _braille_symbols_42 +
+                          ('⠀',)):
+                    if b != '⠤' and t.endswith(b):
+                        space = False
+                        break
+        elif text[i] == _RIGHT_WHITESPACE_42:
+            t = text[i + 1:]
+            if not post and _braille_empty_regexp.match(t):
+                space = False
+            else:
+                for b in (_braille_punctuation + _braille_left_indicators +
+                          _braille_left_grouping + _braille_right_grouping + _braille_symbols_42 +
+                          ('⠀',)):
+                    if b != '⠤' and b != '⠼' and t.startswith(b):
+                        # We do insert space before numeric indicator.  It
+                        # seems to contradict §42-43 but it respects the
+                        # example in §9 (we prefer the examples in case of
+                        # conflicts).
+                        space = False
+                        break
+        else:
+            i += 1
+            continue
+        if space:
+            text = text[:i] + '⠀' + text[i + 1:]
+            hyphenation = hyphenation[:i] + '4' + hyphenation[i + 1:]
+            i += 1
+        else:
+            text = text[:i] + text[i + 1:]
+            hyphenation = hyphenation[:i] + hyphenation[i + 1:]
+            text_len -= 1
     # Done
     return _Braille(text, hyphenation)
 
@@ -414,18 +552,11 @@ def _export_mn(node, exporter, context, variables, **kwargs):
     return _Braille(translated, hyphenation)
 
 def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
-    # form = _attribute(node, 'form', op_form) # prefix, infix, postfix
-    separator = _attribute(node, 'separator') # true, false
-    # We should probably ignore these as Braille script has its own
-    # rules of math line breaking:
-    # linebreak = attribute(node, 'linebreak') # auto, newline, nobreak, goodbreak, badbreak
-    # linebreakstyle = attribute(node, 'linebreakstyle')
-    #                  # before, after, duplicate, infixlinebreakstyle
     op = _node_value(node).strip()
     op_braille = _op_export(op, exporter, context, variables)
-    if separator == 'true':
-        if op_braille.text()[-1] not in (' ', '⠀',):
-            op_braille.append('⠀')
+    if op in '—…':
+        op_braille.prepend(_LEFT_WHITESPACE_42)
+        op_braille.append(_RIGHT_WHITESPACE_42)
     return op_braille
 
 def _export_mtext(node, exporter, context, variables, **kwargs):
