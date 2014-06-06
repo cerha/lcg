@@ -89,6 +89,7 @@ _punctuation('!', '⠖')
 _punctuation('-', '⠤')
 _punctuation('.', '⠲')
 _punctuation('?', '⠦')
+_punctuation('?', '⠿')          # we interpret question mark as an omission character
 _punctuation('‘', '⠠⠦')
 _punctuation('“', '⠦')
 _punctuation('’', '⠴⠄')
@@ -242,8 +243,8 @@ _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 _braille_number_regexp = re.compile('⠼[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+$')
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - VI (partially)
-    # Missing: Rule VII -- Rule XXV
+    # Implemented: Rule I - X (partially)
+    # Missing: Rule XI -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
