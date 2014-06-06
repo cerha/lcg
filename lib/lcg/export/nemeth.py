@@ -247,7 +247,7 @@ def mathml_nemeth(exporter, context, element):
                         last_element = last_children[-2]
                 if last_element.tag == 'mo':
                     op = last_element.text.strip()
-                    if op in _signs_of_shape or op in _math_comparison_operators:
+                    if op in ('–—…' + _signs_of_shape + _math_comparison_operators):
                         indicate = True
                 if ((not indicate and last_element.tag == 'mi' and
                      last_element.text.strip() in ('sin', 'cos', 'tg', 'cotg',))):
