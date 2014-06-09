@@ -180,7 +180,20 @@ class _Variables(list):
         finally:
             if value is not None:
                 self.pop()
-
+                
+    @contextmanager
+    def xlet(self, *definitions):
+        n = 0
+        for k, v in definitions:
+            if v is not None:
+                self.append([k, v])
+                n += 1
+        try:
+            yield None
+        finally:
+            for i in range(n):
+                self.pop()
+        
     def get(self, name, default=None):
         for i in range(len(self) - 1, -1, -1):
             if self[i][0] == name:
@@ -489,14 +502,10 @@ def _child_export(node, exporter, context, variables, separators=None):
                            'infix')
         else:
             op_form = None
-        # if braille and separators:
-        #     separator = separators[-1] if i > len(separators) else separators[i - 1]
-        #     hyph_separator = self._HYPH_NEMETH_WS if len(separator) == 1 else None
-        #     braille.append(separator, hyph_separator)
-        with variables.let('enclosed-list', enclosed_list):
-            with variables.let('direct-delimiters', direct_delimiters):
-                with variables.let('left-node', left_node):
-                    braille = braille + _export(n, exporter, context, variables, op_form=op_form)
+        with variables.xlet(('enclosed-list', enclosed_list),
+                            ('direct-delimiters', direct_delimiters),
+                            ('left-node', left_node)):
+            braille = braille + _export(n, exporter, context, variables, op_form=op_form)
         left_node = n
     return braille
 
