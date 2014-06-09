@@ -1251,19 +1251,15 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mn>1</mn></mrow>
 </math>''', u'⠎⠊⠝⠀⠼⠂')
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>sin</mi><mn>2</mn></msup><mo>&ApplyFunction;</mo><mn>2</mn><mi>x</mi></mrow>
 </math>''', u'⠎⠊⠝⠘⠆⠀⠼⠆⠭')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>0.333</mn><mo>&hellip;</mo><mn>3</mn><mo>&hellip;</mo></mrow>
 </math>''', u'⠼⠴⠨⠒⠒⠒⠀⠄⠄⠄⠀⠼⠒⠀⠄⠄⠄', lang='en')
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>log</mi><mn>10</mn></msub><mo>&ApplyFunction;</mo><mn>2</mn></mrow>
-</math>''', u'⠇⠕⠛⠂⠶⠀⠼⠆')
+</math>''', u'⠇⠕⠛⠂⠴⠀⠼⠆')
         if False:
             # Proper spacing not yet implemented
             test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1329,9 +1325,7 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>&pi;</mi><mo>=</mo><mn>3,14159 26535 9</mn></mrow>
 </math>''', u'⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢\n⠀⠀⠼⠔')
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mn>2</mn></msup></mrow>
 </math>''', u'⠭⠘⠆')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1406,9 +1400,7 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>arc</mi><mo>&ApplyFunction;</mo><mi>a</mi><mi>b</mi></mrow>
 </math>''', u'⠁⠗⠉⠀⠁⠃')
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>e</mi><mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mi>x</mi></mrow></msup></mrow>
 </math>''', u'⠑⠘⠎⠊⠝⠀⠭')
         if False:
@@ -1473,9 +1465,7 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><mi>a</mi><mi>b</mi><mo>=</mo><mi>c</mi><mi>d</mi><mo>)</mo></mrow>
 </math>''', u'⠷⠁⠃⠀⠨⠅⠀⠉⠙⠾')
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msubsup><mrow><mi>s</mi><mo>]</mo></mrow><mi>a</mi><mi>b</mi></msubsup></mrow>
 </math>''', u'⠎⠈⠾⠰⠁⠘⠃')
         # §32
@@ -1528,7 +1518,7 @@ class BrailleExport(unittest.TestCase):
 <mo>&hellip;</mo>
 <msup><msub><mi>p</mi><mi>r</mi></msub><msub><mi>&alpha;</mi><mi>r</mi></msub></msup>
 </mrow>
-</math>''', u'⠏⠂⠘⠨⠁⠘⠰⠂⠐⠄⠄⠄⠀⠏⠰⠗⠘⠨⠁⠘⠰⠗')
+</math>''', u'⠏⠂⠘⠨⠁⠘⠰⠂⠐⠄⠄⠄⠀⠏⠰⠗⠘⠨⠁⠘⠰⠗', page_width=lcg.USpace(40))
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=","><mo>&hellip;</mo><mn>-1</mn><mn>0</mn><mn>1</mn>
 <mo>&hellip;</mo></mfenced></mrow>
@@ -1544,11 +1534,9 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mi>c</mi></mfrac></mrow>
 </math>''', u'⠹⠁⠬⠃⠌⠉⠼')
-        if False:
-            # Not yet supported
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><msup><mi>x</mi><mfrac><mn>1</mn><mn>2</mn></mfrac></msup><mn>2</mn></mfrac></mrow>
-</math>''', u'⠹⠭⠘⠹⠂⠌⠆⠼⠆⠼') # fixed: there is an error in the specification example
+</math>''', u'⠹⠭⠘⠹⠂⠌⠆⠼⠌⠆⠼') # fixed: there is an error in the specification example
         # §64
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>4</mn><mfrac><mn>3</mn><mn>8</mn></mfrac></mrow>
@@ -1569,7 +1557,67 @@ class BrailleExport(unittest.TestCase):
             test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfrac><mi>a</mi><msup><mi>b</mi>
 <mfrac><mfrac><mn>3</mn><mn>4</mn></mfrac><mfrac><mn>5</mn><mn>6</mn></mfrac></mfrac></msup></mfrac>
-</math>''', u'⠹⠁⠌⠃⠘⠠⠹⠹⠒⠌⠲⠼⠠⠌⠹⠢⠌⠖⠼⠠⠼⠐⠼')
+</math>''', u'⠹⠁⠌⠃⠘⠠⠹⠹⠒⠌⠲⠼⠠⠌⠹⠢⠌⠖⠼⠠⠼⠐⠼', page_width=lcg.USpace(40))
+        # §74
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msup><mi>x</mi><mn>2</mn></msup>
+</math>''', u'⠭⠘⠆')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msup><mi>x</mi><mo>*</mo></msup>
+</math>''', u'⠭⠘⠈⠼')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msup><mi>x</mi><mn>-2</mn></msup>
+</math>''', u'⠭⠘⠤⠆')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>x</mi><mi>a</mi></msub>
+</math>''', u'⠭⠰⠁')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>x</mi><mn>-2</mn></msub>
+</math>''', u'⠭⠰⠤⠆')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msup><mi>n</mi><msup><mi>x</mi><mi>y</mi></msup></msup>
+</math>''', u'⠝⠘⠭⠘⠘⠽')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>x</mi><msup><mi>n</mi><mi>a</mi></msup></msub>
+</math>''', u'⠭⠰⠝⠰⠘⠁')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msup><mi>x</mi><msub><mi>y</mi><msup><mi>a</mi><mi>n</mi></msup></msub></msup>
+</math>''', u'⠭⠘⠽⠘⠰⠁⠘⠰⠘⠝')
+        # §77
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>x</mi><mn>1</mn></msub>
+</math>''', u'⠭⠂')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>x</mi><mn>11</mn></msub>
+</math>''', u'⠭⠂⠂')
+        if False:
+            # Not yet supported
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><msup><mi>x</mi><mo>&prime;</mo></msup><mn>1</mn></msub>
+</math>''', u'⠭⠄⠂')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>x</mi><msub><mi>i</mi><mn>1</mn></msub></msub>
+</math>''', u'⠭⠰⠊⠰⠰⠂')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msub><mi>log</mi><mn>2</mn></msub><mo>&ApplyFunction;</mo><mi>x</mi></mrow>
+</math>''', u'⠇⠕⠛⠆⠀⠭')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mn>12</mn><mn>7</mn></msub>
+</math>''', u'⠼⠂⠆⠰⠶')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mrow><mo>(</mo><mi>C</mi><msub><mi>O</mi><mn>3</mn></msub><mo>)</mo></mrow><mi>2</mi></msub>
+</math>''', u'⠷⠠⠉⠠⠕⠒⠾⠰⠆')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msub><mi>Na</mi><mn>2</mn></msub><mi>C</mi><msub><mi>O</mi><mn>3</mn></msub></mrow>
+</math>''', u'⠠⠝⠁⠆⠠⠉⠠⠕⠒')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>seven</mi><mn>3</mn></msub>
+</math>''', u'⠎⠑⠧⠑⠝⠰⠒')
+        if False:
+            # Not yet supported
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><msubsup><mo>&Sum;</mo><mn>0</mn><mi>n</mi></msubsup><msub><mi>a</mi><mi>k</mi></msub></mrow>
+</math>''', u'⠨⠠⠎⠴⠘⠝⠐⠁⠰⠅')
             
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the

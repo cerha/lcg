@@ -449,10 +449,9 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
             if text in _signs_of_shape_and_omission or text in _math_comparison_operators:
                 prefix = _SINGLE_LETTER_KILLER_PREFIX + prefix
         lang = 'en' if plain else 'nemeth'
-        if text == 'cos':
-            # It gets translated wrong in liblouis
-            braille = '⠉⠕⠎'
-        else:
+        trans_fixes = {'cos': '⠉⠕⠎', 'log': '⠇⠕⠛'}
+        braille = trans_fixes.get(text) # check for wrong translations from liblouis
+        if braille is None:
             braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
         if prefix:
             braille = prefix + braille
@@ -657,18 +656,44 @@ def _export_mroot(node, **kwargs):
     base, root = child_nodes(node, exported=True)
     # return _Braille('⠠⠌', '00') + root + _Braille('⠩', '3') + base + _Braille('⠱', '0')
 
-def _export_msub(node, **kwargs):
-    base, sub = child_nodes(node, exported=True)
-    # return base + _Braille('⠡', '0') + sub + _Braille('⠱', '0')
+def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
+    base, index = _child_nodes(node)
+    subsup = variables.get('subsup', _Braille(''))
+    indicate = True
+    if indicator == '⠰' and not subsup.text() and index.tag == 'mn':
+        base_node = _child_nodes(base)[0] if base.tag == 'msup' else base
+        base_text = base_node.text.strip()
+        index_text = index.text.strip()
+        if index_text and index_text[0] != '-':
+            if ((base_node.tag == 'mi' and
+                 (len(base_text) == 1 or base_text in ('sin', 'cos', 'tg', 'cotg', 'log', 'Na',)))):
+                indicate = False
+            elif base_node.tag == 'mo' and base_text in '∑∏':
+                indicate = False
+    if indicate:
+        subsup += _Braille(indicator)
+    with variables.let('no-letter-prefix', 'yes'): # probably not *completely* correct
+        with variables.let('subsup', subsup):
+            exported_index = _export(index, exporter, context, variables, **kwargs)
+        return _export(base, exporter, context, variables, **kwargs) + subsup + exported_index
+    
+def _export_msup(node, exporter, context, variables, **kwargs):
+    return __export_subsup('⠘', node, exporter, context, variables, **kwargs)
 
-def _export_msup(node, **kwargs):
-    base, sup = child_nodes(node, exported=True)
-    # return base + _Braille('⠌', '0') + sup + _Braille('⠱', '0')
+def _export_msub(node, exporter, context, variables, **kwargs):
+    return __export_subsup('⠰', node, exporter, context, variables, **kwargs)
 
-def _export_msubsup(node, **kwargs):
-    base, sub, sup = child_nodes(node, exported=True)
-    # return base + _Braille('⠌', '0') + sub + _Braille('⠱⠡', '00') + sup + \
-    #     _Braille('⠱', '0')
+def _export_msubsup(node, exporter, context, variables, **kwargs):
+    base, sub, sup = _child_nodes(node)
+    from xml.etree import ElementTree
+    node.clear()
+    node.tag = 'msup'
+    ElementTree.SubElement(node, 'msub')
+    node.append(sup)
+    c = node.getchildren()[0]
+    c.append(base)
+    c.append(sub)
+    return _export_msup(node, exporter, context, variables, **kwargs)
 
 def _export_munder(node, **kwargs):
     base, under = child_nodes(node, exported=True)
