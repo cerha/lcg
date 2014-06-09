@@ -476,6 +476,7 @@ def _child_export(node, exporter, context, variables, separators=None):
             direct_delimiters = 'yes'
     # Export
     op_form = None
+    left_node = None
     for i in range(len(children)):
         n = children[i]
         if False and n.tag == 'mo':
@@ -494,7 +495,9 @@ def _child_export(node, exporter, context, variables, separators=None):
         #     braille.append(separator, hyph_separator)
         with variables.let('enclosed-list', enclosed_list):
             with variables.let('direct-delimiters', direct_delimiters):
-                braille = braille + _export(n, exporter, context, variables, op_form=op_form)
+                with variables.let('left-node', left_node):
+                    braille = braille + _export(n, exporter, context, variables, op_form=op_form)
+        left_node = n
     return braille
 
 def _op_export(operator, exporter, context, variables, node=None):
@@ -614,9 +617,16 @@ def _export_mfenced(node, exporter, context, variables, **kwargs):
 
 def _export_mfrac(node, exporter, context, variables, **kwargs):
     numerator, denominator = _child_nodes(node)
-    return (_Braille('⠹') + _export(numerator, exporter, context, variables, **kwargs) +
+    left_node = variables.get('left-node')
+    if left_node is not None and left_node.tag == 'mn':
+        opening = _Braille('⠸⠹')
+        closing = _Braille('⠸⠼')
+    else:
+        opening = _Braille('⠹')
+        closing = _Braille('⠼')
+    return (opening + _export(numerator, exporter, context, variables, **kwargs) +
             _Braille('⠌') + _export(denominator, exporter, context, variables, **kwargs) +
-            _Braille('⠼'))
+            closing)
     # mfrac_flag = 'mfrac'
     # if len(node.getiterator(mfrac_flag)) > 1:
     #     line = _Braille('⠻⠻', '00')
