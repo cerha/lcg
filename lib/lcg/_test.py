@@ -1217,6 +1217,8 @@ class BrailleExport(unittest.TestCase):
             result = exported.split('\n\n')[1]
             if post == '.':
                 result = result[:-2] + u'⠲'
+            elif post == ',':
+                result = result[:-2] + u'⠠'
             assert result == expected_result, (("\n  - source text: %r\n  - expected:    %r\n  - "
                                                 "got:         %r") %
                                                (mathml, expected_result, result,))
