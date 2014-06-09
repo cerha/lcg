@@ -253,8 +253,8 @@ _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 _braille_number_regexp = re.compile('⠼[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+$')
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - X (partially)
-    # Missing: Rule XI -- Rule XXV
+    # Implemented: Rule I - XII (partially)
+    # Missing: Rule XIII -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -630,18 +630,24 @@ def _export_mfrac(node, exporter, context, variables, **kwargs):
     if left_node is not None and left_node.tag == 'mn':
         opening = _Braille('⠸⠹')
         closing = _Braille('⠸⠼')
+        line = _Braille('⠌')
     else:
-        opening = _Braille('⠹')
-        closing = _Braille('⠼')
-    return (opening + _export(numerator, exporter, context, variables, **kwargs) +
-            _Braille('⠌') + _export(denominator, exporter, context, variables, **kwargs) +
-            closing)
-    # mfrac_flag = 'mfrac'
-    # if len(node.getiterator(mfrac_flag)) > 1:
-    #     line = _Braille('⠻⠻', '00')
-    # else:
-    #     line = _Braille('⠻', '3')
-    # return _Braille('⠆', '0') + child_1 + line + child_2 + _Braille('⠰', '0')
+        def fraction_level(node):
+            level = 0
+            for c in _child_nodes(node):
+                if c.tag not in ('msub', 'msup'):
+                    level = max(level, fraction_level(c))
+            if node.tag == 'mfrac':
+                level += 1
+            return level
+        level = fraction_level(node) - 1
+        if level > 2:
+            raise Exception("Overcomplex fraction")
+        opening = _Braille('⠠' * level + '⠹')
+        closing = _Braille('⠠' * level + '⠼')
+        line = _Braille('⠠' * level + '⠌')
+    return (opening + _export(numerator, exporter, context, variables, **kwargs) + line +
+            _export(denominator, exporter, context, variables, **kwargs) + closing)
 
 def _export_msqrt(node, **kwargs):
     pass
