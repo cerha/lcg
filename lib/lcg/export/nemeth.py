@@ -37,6 +37,7 @@ _SINGLE_LETTER_KILLER_PREFIX = '\ue024'
 _SINGLE_LETTER_KILLER_SUFFIX = '\ue025'
 _LEFT_WHITESPACE_42 = '\ue026' # Nemeth §42
 _RIGHT_WHITESPACE_42 = '\ue027' # Nemeth §42
+_END_SUBSUP = '\ue028'
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
@@ -46,8 +47,12 @@ _signs_of_shape = ''
 _braille_punctuation = ('⠂',)
 _braille_left_grouping = ()
 _braille_right_grouping = ()
-def _comparison(op):
-    return _SINGLE_LETTER_KILLER_PREFIX + op + _SINGLE_LETTER_KILLER_SUFFIX
+_braille_comparison = ()
+def _comparison(braille):
+    global _braille_comparison
+    if braille not in _braille_comparison:
+        _braille_comparison += (braille,)
+    return _SINGLE_LETTER_KILLER_PREFIX + braille + _SINGLE_LETTER_KILLER_SUFFIX
 def _punctuation(symbol, braille):
     global _braille_punctuation, _nemeth_operators
     if braille not in _braille_punctuation:
@@ -157,13 +162,14 @@ _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍
                               '⦔⩭⩭̸⩯⩰⩰̸⩵⩸⩹⩺⩻⩼⩽⩽̸⩾⩾̸⩿⪀⪁⪂⪃⪄⪅⪆⪇⪈⪉⪊⪋⪌⪍⪎⪏⪐⪑⪒⪓⪔⪕⪖⪗⪘⪙⪚⪝⪞⪟⪠⪡⪡̸⪢⪢̸⪦⪨⪩⪬⪮⪯⪯̸⪰⪰'
                               '̸⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼')
 _signs_of_shape_and_omission = _signs_of_shape
+_function_names = ('log', 'sin', 'cos', 'tg', 'cotg',)
 
 _braille_left_indicators = ('⠰', '⠸', '⠨', '⠨⠈', '⠠⠠', '⠈⠈', '⠘', '⠣', '⠩', '⠪', '⠻', '⠠',
-                            '⠶⠶⠶', '⠹', '⠠⠹', '⠠⠠⠹', '⠸⠹', '⠈⠻', '⠐', '⠘', '⠘⠘', '⠘⠰', '⠘⠘⠘',
+                            '⠶⠶⠶', '⠹', '⠠⠹', '⠠⠠⠹', '⠸⠹', '⠈⠻', '⠘', '⠘⠘', '⠘⠰', '⠘⠘⠘',
                             '⠘⠘⠰', '⠘⠰⠘', '⠘⠰⠰', '⠰', '⠰⠘', '⠰⠰', '⠰⠘⠘', '⠰⠘⠰', '⠰⠰⠘', '⠰⠰⠰',
                             '⠣', '⠣⠣', '⠩', '⠩⠩', '⠈', '⠼', '⠣', '⠨', '⠨⠨', '⠨⠨⠨', '⠫', '⠸⠫',
                             '⠠⠨', '⠠⠄⠸', '⠠⠄⠨',)
-_braille_right_indicators = ('⠼', '⠠⠼', '⠠⠠⠼', '⠸⠼', '⠻', '⠸⠠⠄', '⠨⠠⠄', '⠹', '⠠⠹', '⠠⠠⠹',)
+_braille_right_indicators = ('⠼', '⠠⠼', '⠠⠠⠼', '⠸⠼', '⠻', '⠸⠠⠄', '⠨⠠⠄', '⠹', '⠠⠹', '⠠⠠⠹', '⠐',)
 _braille_symbols_42 = ()        # TODO: not yet defined
 
 
@@ -250,7 +256,7 @@ _num_prefix_regexp = re.compile('(^|[\n⠀%s%s])([%s%s%s]*⠤?)(%s)' %
 _prefixed_punctuation = "':.!-?‘“’”;\""
 _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 
-_braille_number_regexp = re.compile('⠼[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+$')
+_braille_number_regexp = re.compile('[⠼⠰⠘][⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' % (_END_SUBSUP,))
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 def mathml_nemeth(exporter, context, element):
     # Implemented: Rule I - XII (partially)
@@ -263,7 +269,6 @@ def mathml_nemeth(exporter, context, element):
             return self._data.get(key, '?')
     entity_handler = EntityHandler()
     top_node = element.tree_content(entity_handler, transform=True)
-    pre = element.previous_element()
     post = element.next_element()
     variables = _Variables()
     braille = _child_export(top_node, exporter, context, variables).strip()
@@ -358,11 +363,41 @@ def mathml_nemeth(exporter, context, element):
                     if op in ('–—…' + _signs_of_shape + _math_comparison_operators):
                         indicate = True
                 if ((not indicate and last_element.tag == 'mi' and
-                     last_element.text.strip() in ('sin', 'cos', 'tg', 'cotg',))):
+                     last_element.text.strip() in _function_names)):
                     indicate = True
             if indicate:
                 text += '⠸'
                 hyphenation += '0'
+    # Subscript/superscript base level
+    while True:
+        pos = text.find(_END_SUBSUP)
+        if pos == -1:
+            break
+        indicate = True
+        if pos >= len(text) - 1:
+            indicate = False
+        elif text[pos + 1] in '⠸⠠%s' % (_END_SUBSUP,):
+            indicate = False
+        else:
+            p = pos + 1
+            text_len = len(text)
+            while p < text_len and text[p] in '\n⠀':
+                p += 1
+            if p > pos + 1:
+                next_text = text[p:]
+                for o in _braille_comparison:
+                    if next_text.startswith(o.strip('⠀')):
+                        indicate = False
+                        break
+        pos0 = pos
+        while pos0 > 0 and text[pos0 - 1] in '⠰⠘':
+            pos0 -= 1
+        if indicate:
+            text = text[:pos0] + '⠐' + text[pos + 1:]
+            hyphenation = hyphenation[:pos0] + '0' + hyphenation[pos + 1:]
+        else:
+            text = text[:pos0] + text[pos + 1:]
+            hyphenation = hyphenation[:pos0] + hyphenation[pos + 1:]
     # Whitespace
     text_len = len(text)
     i = 0
@@ -656,32 +691,46 @@ def _export_msqrt(node, **kwargs):
     # return _Braille('⠩', '3') + child_export(node) + _Braille('⠱', '0')
 
 def _export_mroot(node, **kwargs):
-    base, root = child_nodes(node, exported=True)
+    pass
+    # base, root = child_nodes(node, exported=True)
     # return _Braille('⠠⠌', '00') + root + _Braille('⠩', '3') + base + _Braille('⠱', '0')
 
 def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
     base, index = _child_nodes(node)
+    base_node = _child_nodes(base)[0] if base.tag == 'msup' else base
+    base_tag = base_node.tag
+    base_text = (base_node.text or '').strip()
     subsup = variables.get('subsup', _Braille(''))
+    new_subsup = subsup
     indicate = True
     if indicator == '⠰' and not subsup.text() and index.tag == 'mn':
-        base_node = _child_nodes(base)[0] if base.tag == 'msup' else base
-        base_text = base_node.text.strip()
         index_text = index.text.strip()
         if index_text and index_text[0] != '-':
             if ((base_node.tag == 'mi' and
-                 (len(base_text) == 1 or base_text in ('sin', 'cos', 'tg', 'cotg', 'log', 'Na',)))):
+                 (len(base_text) == 1 or base_text in _function_names + ('Na',)))):
                 indicate = False
             elif base_node.tag == 'mo' and base_text in '∑∏':
                 indicate = False
     if indicate:
-        subsup += _Braille(indicator)
+        new_subsup += _Braille(indicator)
     for n in _child_nodes(index):
         if n.tag == 'mo' and n.text.strip() == ',':
             n.braille = _Braille('⠪')
+    if (((not new_subsup) or
+         (base_tag == 'mo' and base_text in _signs_of_shape) or
+         (base_tag == 'mi' and base_text in _function_names))):
+        terminator = _Braille('')
+    elif subsup:
+        terminator = subsup
+    else:
+        terminator = _Braille(_END_SUBSUP)
     with variables.let('no-letter-prefix', 'yes'): # probably not *completely* correct
-        with variables.let('subsup', subsup):
+        exported_base = _export(base, exporter, context, variables, **kwargs)
+        if exported_base.text().endswith(_END_SUBSUP):
+            exported_base = _Braille(exported_base.text()[:-1], exported_base.hyphenation()[:-1])
+        with variables.let('subsup', new_subsup):
             exported_index = _export(index, exporter, context, variables, **kwargs)
-        return _export(base, exporter, context, variables, **kwargs) + subsup + exported_index
+        return exported_base + new_subsup + exported_index + terminator
     
 def _export_msup(node, exporter, context, variables, **kwargs):
     return __export_subsup('⠘', node, exporter, context, variables, **kwargs)
@@ -702,11 +751,13 @@ def _export_msubsup(node, exporter, context, variables, **kwargs):
     return _export_msup(node, exporter, context, variables, **kwargs)
 
 def _export_munder(node, **kwargs):
-    base, under = child_nodes(node, exported=True)
+    pass
+    # base, under = child_nodes(node, exported=True)
     # return base + _Braille('⠠⠡', '00') + under + _Braille('⠱', '0')
 
 def _export_mover(node, **kwargs):
-    base_child, over_child = child_nodes(node)
+    pass
+    # base_child, over_child = child_nodes(node)
     # base = export(base_child)
     # if ((over_child.tag == 'mo' and over_child.text.strip() == '¯' and
     #      base_child.tag == 'mn')):
@@ -718,20 +769,21 @@ def _export_mover(node, **kwargs):
     # return braille
 
 def _export_munder_mover(node, **kwargs):
-    base, under, over = child_nodes(node, exported=True)
+    pass
+    # base, under, over = child_nodes(node, exported=True)
     # return (base + _Braille('⠠⠡', '00') + under + _Braille('⠱⠠⠌', '000') + over +
     #         _Braille('⠱', '0'))
 
-#def _export_mmultiscripts(node, **kwargs):
-#def _export_mtable(node, **kwargs):
-#def _export_mtr(node, **kwargs):
-#def _export_mlabeledtr(node, **kwargs):
-#def _export_mtd(node, **kwargs):
-#def _export_maligngroup(node, **kwargs):
-#def _export_mstack(node, **kwargs):
-#def _export_msgroup(node, **kwargs):
-#def _export_msrow(node, **kwargs):
-#def _export_msline(node, **kwargs):
-#def _export_mscarries(node, **kwargs):
-#def _export_mscarry(node, **kwargs):
-#def _export_mlongdiv(node, **kwargs):
+# def _export_mmultiscripts(node, **kwargs):
+# def _export_mtable(node, **kwargs):
+# def _export_mtr(node, **kwargs):
+# def _export_mlabeledtr(node, **kwargs):
+# def _export_mtd(node, **kwargs):
+# def _export_maligngroup(node, **kwargs):
+# def _export_mstack(node, **kwargs):
+# def _export_msgroup(node, **kwargs):
+# def _export_msrow(node, **kwargs):
+# def _export_msline(node, **kwargs):
+# def _export_mscarries(node, **kwargs):
+# def _export_mscarry(node, **kwargs):
+# def _export_mlongdiv(node, **kwargs):
