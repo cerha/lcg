@@ -773,7 +773,8 @@ class HtmlExporter(Exporter):
         if backref:
             exported_heading = self._generator.a(exported_heading, href="#" + backref, 
                                                  cls='backref')
-        return g.div((g.h(exported_heading, level, lang=lang),
+        return g.div((g.div(g.h(exported_heading, level, lang=lang),
+                            cls='section-heading section-level-%d' % level),
                       g.div(g.div(self._exported_container_content(context, element),
                                   cls='section-content-wrapper'),
                             cls='section-content section-level-%d' % level)),
