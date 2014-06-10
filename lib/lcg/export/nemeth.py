@@ -416,6 +416,9 @@ def _exporter(tag):
     return e
 
 def _export(node, exporter, context, variables, **kwargs):
+    braille = getattr(node, 'braille', None)
+    if braille is not None:
+        return braille
     tag = node.tag
     e = _exporter(tag)
     if e is None:
@@ -672,6 +675,9 @@ def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
                 indicate = False
     if indicate:
         subsup += _Braille(indicator)
+    for n in _child_nodes(index):
+        if n.tag == 'mo' and n.text.strip() == ',':
+            n.braille = _Braille('⠪')
     with variables.let('no-letter-prefix', 'yes'): # probably not *completely* correct
         with variables.let('subsup', subsup):
             exported_index = _export(index, exporter, context, variables, **kwargs)
