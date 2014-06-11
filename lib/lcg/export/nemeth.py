@@ -44,6 +44,7 @@ _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    ' ': '⠀', '.': '⠨', ',': '⠠'}
 
 _signs_of_shape = ''
+_primes = "'′″"
 _braille_punctuation = ('⠂',)
 _braille_left_grouping = ()
 _braille_right_grouping = ()
@@ -76,6 +77,11 @@ def _rgrouping(symbol, braille):
         _braille_right_grouping += (braille,)
     if symbol is not None:
         _nemeth_operators[symbol] = braille
+def _prime(symbol, braille):
+    global _primes, _nemeth_operators
+    if symbol not in _primes:
+        _primes += symbol
+    _nemeth_operators[symbol] = braille
 _nemeth_operators = {
     '*': '⠈⠼' + _NUM_PREFIX_REQUIRED,
     '#': '⠨⠼' + _NUM_PREFIX_REQUIRED,
@@ -84,6 +90,9 @@ _nemeth_operators = {
     '∥': '⠳⠳',
     '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
+_prime("'", '⠄')
+_prime('′', '⠄')
+_prime('″', '⠄⠄')
 _punctuation("'", '⠄')
 _punctuation(':', '⠒')
 _punctuation(',', '⠠⠀')
@@ -259,8 +268,8 @@ _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' % (_END_SUBSUP,))
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - XII (partially)
-    # Missing: Rule XIII -- Rule XXV
+    # Implemented: Rule I - XIII (partially)
+    # Missing: Rule XIV -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -733,6 +742,20 @@ def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
         return exported_base + new_subsup + exported_index + terminator
     
 def _export_msup(node, exporter, context, variables, **kwargs):
+    base, index = _child_nodes(node)
+    if index.tag == 'mo' and index.text.strip() in _primes:
+        return (_export(base, exporter, context, variables, **kwargs) +
+                _Braille(_nemeth_operators[index.text.strip()]))
+    if index.tag == 'mrow':
+        index_children = _child_nodes(index)
+        if ((index_children and index_children[0].tag == 'mo' and
+             index_children[0].text.strip() in _primes)):
+            base.braille = (_export(base, exporter, context, variables, **kwargs) +
+                            _Braille(_nemeth_operators[index_children[0].text.strip()]))
+            if len(index_children) > 1:
+                index.remove(index_children[0])
+            else:
+                return base.braille
     return __export_subsup('⠘', node, exporter, context, variables, **kwargs)
 
 def _export_msub(node, exporter, context, variables, **kwargs):
@@ -740,15 +763,37 @@ def _export_msub(node, exporter, context, variables, **kwargs):
 
 def _export_msubsup(node, exporter, context, variables, **kwargs):
     base, sub, sup = _child_nodes(node)
+    prime = None
+    sub_only = False
+    if sup.tag == 'mo' and sup.text.strip() in _primes:
+        prime = _nemeth_operators[sup.text.strip()]
+        sub_only = True
+    elif sup.tag == 'mrow':
+        sup_children = _child_nodes(sup)
+        if ((sup_children and sup_children[0].tag == 'mo' and
+             sup_children[0].text.strip() in _primes)):
+            prime = _nemeth_operators[sup_children[0].text.strip()]
+            if len(sup_children) > 1:
+                sup.remove(sup_children[0])
+            else:
+                sub_only = True
+    if prime is not None:
+        base.braille = _export(base, exporter, context, variables, **kwargs) + _Braille(prime)
     from xml.etree import ElementTree
     node.clear()
-    node.tag = 'msup'
-    ElementTree.SubElement(node, 'msub')
-    node.append(sup)
-    c = node.getchildren()[0]
-    c.append(base)
-    c.append(sub)
-    return _export_msup(node, exporter, context, variables, **kwargs)
+    if sub_only:
+        node.tag = 'msub'
+        node.append(base)
+        node.append(sub)
+        return _export_msub(node, exporter, context, variables, **kwargs)
+    else:
+        node.tag = 'msup'
+        ElementTree.SubElement(node, 'msub')
+        node.append(sup)
+        c = node.getchildren()[0]
+        c.append(base)
+        c.append(sub)
+        return _export_msup(node, exporter, context, variables, **kwargs)
 
 def _export_munder(node, **kwargs):
     pass
