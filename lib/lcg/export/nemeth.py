@@ -271,8 +271,8 @@ _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' %
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - XIV (partially)
-    # Missing: Rule XV -- Rule XXV
+    # Implemented (partially): Rule I - XV
+    # Missing: Rule XVI -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -517,7 +517,7 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
             braille += suffix
     return _Braille(braille)
     
-def _child_export(node, exporter, context, variables, separators=None):
+def _child_export(node, exporter, context, variables, separators=None, **kwargs):
     braille = _Braille('', '')
     children = _child_nodes(node)
     # Check for Enclosed List (simplified)
@@ -710,14 +710,27 @@ def _export_mfrac(node, exporter, context, variables, **kwargs):
         line = _Braille('⠠' * level + '⠌')
     return opening + exported_numerator + line + exported_denominator + closing
 
-def _export_msqrt(node, **kwargs):
-    pass
-    # return _Braille('⠩', '3') + child_export(node) + _Braille('⠱', '0')
+def _mroot(base, index, exporter, context, variables, **kwargs):
+    level = variables.get('root-level', 0)
+    repeater = _Braille('⠨' * level)
+    prefix = _Braille('⠜')
+    if index is not None:
+        prefix = _Braille('⠣') + _export(index, exporter, context, variables, **kwargs) + prefix
+    prefix = repeater + prefix
+    suffix = repeater + _Braille('⠻')
+    with variables.let('root-level', level + 1):
+        if index is None:
+            exported_base = _child_export(base, exporter, context, variables, **kwargs)
+        else:
+            exported_base = _export(base, exporter, context, variables, **kwargs)
+    return prefix + exported_base + suffix
+    
+def _export_msqrt(node, exporter, context, variables, **kwargs):
+    return _mroot(node, None, exporter, context, variables, **kwargs)
 
-def _export_mroot(node, **kwargs):
-    pass
-    # base, root = child_nodes(node, exported=True)
-    # return _Braille('⠠⠌', '00') + root + _Braille('⠩', '3') + base + _Braille('⠱', '0')
+def _export_mroot(node, exporter, context, variables, **kwargs):
+    base, index = _child_nodes(node)
+    return _mroot(base, index, exporter, context, variables, **kwargs)
 
 def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
     base, index = _child_nodes(node)
