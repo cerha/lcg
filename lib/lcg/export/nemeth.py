@@ -45,6 +45,8 @@ _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    ' ': '⠀', '.': '⠨', ',': '⠠'}
 
 _signs_of_shape = ''
+_signs_of_shape_lspace = ''
+_signs_of_shape_rspace = ''
 _primes = "'′″"
 _braille_punctuation = ('⠂',)
 _braille_left_grouping = ()
@@ -60,10 +62,14 @@ def _punctuation(symbol, braille):
     if braille not in _braille_punctuation:
         _braille_punctuation += (braille,)
     _nemeth_operators[symbol] = braille
-def _shape(symbol, braille):
-    global _signs_of_shape, _nemeth_operators
+def _shape(symbol, braille, lspace=True, rspace=True):
+    global _signs_of_shape, _signs_of_shape_lspace, _signs_of_shape_rspace, _nemeth_operators
     if symbol not in _signs_of_shape:
         _signs_of_shape += symbol
+    if lspace and symbol not in _signs_of_shape_lspace:
+        _signs_of_shape_lspace += symbol
+    if rspace and symbol not in _signs_of_shape_rspace:
+        _signs_of_shape_rspace += symbol
     translated = _SINGLE_LETTER_KILLER_PREFIX + braille + _SINGLE_LETTER_KILLER_SUFFIX
     _nemeth_operators[symbol] = translated
 def _lgrouping(symbol, braille):
@@ -111,7 +117,7 @@ _punctuation('“', '⠦')
 _punctuation('’', '⠴⠄')
 _punctuation('”', '⠴')
 _punctuation(';', '⠆')
-_shape('∠', '⠫⠪')
+_shape('∠', '⠫⠪', lspace=False)
 _shape('△', '⠫⠞')
 _shape('▵', '⠫⠞')
 _shape('□', '⠫⠲')
@@ -175,12 +181,13 @@ _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍
 _signs_of_shape_and_omission = _signs_of_shape
 _function_names = ('log', 'sin', 'cos', 'tg', 'cotg',)
 
-_braille_left_indicators = ('⠰', '⠸', '⠨', '⠨⠈', '⠠⠠', '⠈⠈', '⠘', '⠣', '⠩', '⠪', '⠻', '⠠',
+_braille_left_indicators = ('⠰', '⠸', '⠨', '⠨⠈', '⠠⠠', '⠈⠈', '⠘', '⠣', '⠩', '⠪', '⠻',
                             '⠶⠶⠶', '⠹', '⠠⠹', '⠠⠠⠹', '⠸⠹', '⠈⠻', '⠘', '⠘⠘', '⠘⠰', '⠘⠘⠘',
                             '⠘⠘⠰', '⠘⠰⠘', '⠘⠰⠰', '⠰', '⠰⠘', '⠰⠰', '⠰⠘⠘', '⠰⠘⠰', '⠰⠰⠘', '⠰⠰⠰',
                             '⠣', '⠣⠣', '⠩', '⠩⠩', '⠈', '⠼', '⠣', '⠨', '⠨⠨', '⠨⠨⠨', '⠫', '⠸⠫',
                             '⠠⠨', '⠠⠄⠸', '⠠⠄⠨',)
-_braille_right_indicators = ('⠼', '⠠⠼', '⠠⠠⠼', '⠸⠼', '⠻', '⠸⠠⠄', '⠨⠠⠄', '⠹', '⠠⠹', '⠠⠠⠹', '⠐',)
+_braille_right_indicators = ('⠼', '⠠⠼', '⠠⠠⠼', '⠸⠼', '⠻', '⠸⠠⠄', '⠨⠠⠄', '⠹', '⠠⠹', '⠠⠠⠹', '⠐',
+                             '⠘', '⠰',)
 _braille_symbols_42 = ()        # TODO: not yet defined
 
 
@@ -271,8 +278,8 @@ _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' %
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 def mathml_nemeth(exporter, context, element):
-    # Implemented (partially): Rule I - XV
-    # Missing: Rule XVI -- Rule XXV
+    # Implemented (partially): Rule I - XVI
+    # Missing: Rule XVII -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -624,8 +631,15 @@ def _export_mn(node, exporter, context, variables, **kwargs):
 def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
     op = _node_value(node).strip()
     op_braille = _op_export(op, exporter, context, variables)
-    if op in '—…':
+    def space(left):
+        s = _attribute(node, ('lspace' if left else 'rspace'), None)
+        if s is None:
+            return op in '—…' or op in(_signs_of_shape_lspace if left else _signs_of_shape_rspace)
+        else:
+            return not s.startswith('0')
+    if space(True):
         op_braille.prepend(_LEFT_WHITESPACE_42)
+    if space(False):
         op_braille.append(_RIGHT_WHITESPACE_42)
     return op_braille
 

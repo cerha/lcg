@@ -1267,9 +1267,7 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>log</mi><mn>10</mn></msub><mo>&ApplyFunction;</mo><mn>2</mn></mrow>
 </math>''', u'⠇⠕⠛⠂⠴⠀⠼⠆')
-        if False:
-            # Proper spacing not yet implemented
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&angle;</mo><mn>1</mn></mrow>
 </math>''', u'⠫⠪⠀⠼⠂')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1408,15 +1406,13 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>e</mi><mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mi>x</mi></mrow></msup></mrow>
 </math>''', u'⠑⠘⠎⠊⠝⠀⠭')
-        if False:
-            # Not yet supported (spacing)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&angle;</mo><mi>a</mi></mrow>
 </math>''', u'⠫⠪⠀⠁')
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&triangle;</mo><mi>a</mi><mi>c</mi><mi>r</mi></mrow>
 </math>''', u'⠫⠞⠀⠁⠉⠗')
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>&#x25FD;</mo><mi>y</mi></mrow>
 </math>''', u'⠭⠀⠫⠲⠀⠽')
         if False:
@@ -1446,9 +1442,7 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>a</mi><mi>cos</mi><mo>&ApplyFunction;</mo><mi>B</mi></mrow>
 </math>''', u'⠁⠉⠕⠎⠀⠠⠃')
-        if False:
-            # Not yet supported (spacing)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>m</mi><mo>&angle;</mo><mi>b</mi></mrow>
 </math>''', u'⠍⠫⠪⠀⠃')
         # §28
@@ -1491,7 +1485,8 @@ class BrailleExport(unittest.TestCase):
 <mrow><mi>c</mi></mrow>
 </math>''', u'⠰⠉⠸⠲', lang='en2', post='.')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-<mrow><mo>&square;</mo><mo>+</mo><mo>&bigcirc;</mo><mo>=</mo><mo>&bigtriangleup;</mo></mrow>
+<mrow><mo lspace="0" rspace="0">&square;</mo><mo>+</mo>
+<mo lspace="0" rspace="0">&bigcirc;</mo><mo>=</mo><mo>&bigtriangleup;</mo></mrow>
 </math>''', u'⠦⠫⠲⠬⠫⠉⠀⠨⠅⠀⠫⠞⠸⠴', lang='en2', pre=u'“', post=u'”')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>sin</mi></mrow>
@@ -1646,9 +1641,7 @@ class BrailleExport(unittest.TestCase):
 <msub><mi>P</mi><mfenced open="" close="" separators=",">
 <msub><mi>n</mi><mn>1</mn></msub><msub><mi>n</mi><mn>2</mn></msub><mo>&hellip;</mo></mfenced></msub>
 </math>''', u'⠠⠏⠰⠝⠰⠰⠂⠰⠪⠝⠰⠰⠆⠰⠪⠀⠄⠄⠄')
-        if False:
-            # Not yet supported (spacing)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>b</mi><mrow><mo>&triangle;</mo><mi>A</mi><mi>B</mi><mi>C</mi></mrow></msub>
 </math>''', u'⠃⠰⠫⠞⠀⠠⠁⠠⠃⠠⠉')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
