@@ -1219,9 +1219,14 @@ class BrailleExport(unittest.TestCase):
                 result = result[:-2] + u'⠲'
             elif post == ',':
                 result = result[:-2] + u'⠠'
-            assert result == expected_result, (("\n  - source text: %r\n  - expected:    %r\n  - "
-                                                "got:         %r") %
-                                               (mathml, expected_result, result,))
+            if result != expected_result:
+                print '---'
+                print mathml
+                print '---'
+                print " expected: |%s|" % (expected_result,)
+                print "      got: |%s|" % (result,)
+                print '---'
+            assert result == expected_result
         # §8
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,76</mn></mrow>
