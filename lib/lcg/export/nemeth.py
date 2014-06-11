@@ -179,7 +179,10 @@ _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍
                               '⦔⩭⩭̸⩯⩰⩰̸⩵⩸⩹⩺⩻⩼⩽⩽̸⩾⩾̸⩿⪀⪁⪂⪃⪄⪅⪆⪇⪈⪉⪊⪋⪌⪍⪎⪏⪐⪑⪒⪓⪔⪕⪖⪗⪘⪙⪚⪝⪞⪟⪠⪡⪡̸⪢⪢̸⪦⪨⪩⪬⪮⪯⪯̸⪰⪰'
                               '̸⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼')
 _signs_of_shape_and_omission = _signs_of_shape
-_function_names = ('log', 'sin', 'cos', 'tg', 'cotg',)
+_function_names = ('amp', 'antilog', 'arc', 'arg', 'colog', 'cos', 'cosh', 'cot', 'coth', 'covers',
+                   'csc', 'csch', 'ctn', 'ctnh', 'det', 'erf', 'exp', 'exsec', 'grad', 'hav', 'im',
+                   'inf', 'lim', 'ln', 'log', 'max', 'min', 'mod', 're', 'sec', 'sech', 'sin',
+                   'sinh', 'sup', 'tan', 'tanh', 'vers',)
 
 _braille_left_indicators = ('⠰', '⠸', '⠨', '⠨⠈', '⠠⠠', '⠈⠈', '⠘', '⠣', '⠩', '⠪', '⠻',
                             '⠶⠶⠶', '⠹', '⠠⠹', '⠠⠠⠹', '⠸⠹', '⠈⠻', '⠘', '⠘⠘', '⠘⠰', '⠘⠘⠘',
@@ -278,8 +281,8 @@ _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' %
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 def mathml_nemeth(exporter, context, element):
-    # Implemented (partially): Rule I - XVI
-    # Missing: Rule XVII -- Rule XXV
+    # Implemented (partially): Rule I - XVII
+    # Missing: Rule XVIII -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
