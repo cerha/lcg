@@ -88,6 +88,7 @@ _nemeth_operators = {
     '=': _comparison('⠀⠨⠅⠀'),
     '×': '⠈⠡',
     '∥': '⠳⠳',
+    '¯': '⠱',
     '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
 _prime("'", '⠄')
@@ -795,29 +796,35 @@ def _export_msubsup(node, exporter, context, variables, **kwargs):
         c.append(sub)
         return _export_msup(node, exporter, context, variables, **kwargs)
 
-def _export_munder(node, **kwargs):
-    pass
-    # base, under = child_nodes(node, exported=True)
-    # return base + _Braille('⠠⠡', '00') + under + _Braille('⠱', '0')
+def _export_munder(node, exporter, context, variables, **kwargs):
+    base, under = _child_nodes(node)
+    result = (_export(base, exporter, context, variables, **kwargs) + _Braille('⠩') +
+            _export(under, exporter, context, variables, **kwargs))
+    if not variables.get('no-under-boundaries'):
+        result = _Braille('⠐') + result + _Braille('⠻')
+    return result
+    
+def _export_mover(node, exporter, context, variables, **kwargs):
+    base, over = _child_nodes(node)
+    exported_base = _export(base, exporter, context, variables, **kwargs)
+    if ((over.tag == 'mo' and over.text.strip() == '¯' and
+         base.tag in ('mi', 'mn',) and len(base.text.strip()) == 1)):
+        return exported_base + _Braille('⠱')
+    return (_Braille('⠐') + exported_base + _Braille('⠣') +
+            _export(over, exporter, context, variables, **kwargs) + _Braille('⠻'))
 
-def _export_mover(node, **kwargs):
-    pass
-    # base_child, over_child = child_nodes(node)
-    # base = export(base_child)
-    # if ((over_child.tag == 'mo' and over_child.text.strip() == '¯' and
-    #      base_child.tag == 'mn')):
-    #     braille = base + base
-    #     braille.append('⠤', '0')
-    # else:
-    #     over = export(over_child)
-    #     braille = base + over
-    # return braille
-
-def _export_munder_mover(node, **kwargs):
-    pass
-    # base, under, over = child_nodes(node, exported=True)
-    # return (base + _Braille('⠠⠡', '00') + under + _Braille('⠱⠠⠌', '000') + over +
-    #         _Braille('⠱', '0'))
+def _export_munderover(node, exporter, context, variables, **kwargs):
+    base, under, over = _child_nodes(node)
+    from xml.etree import ElementTree
+    node.clear()
+    node.tag = 'mover'
+    ElementTree.SubElement(node, 'munder')
+    node.append(over)
+    c = node.getchildren()[0]
+    c.append(base)
+    c.append(under)
+    with variables.let('no-under-boundaries', True):
+        return _export_mover(node, exporter, context, variables, **kwargs)
 
 # def _export_mmultiscripts(node, **kwargs):
 # def _export_mtable(node, **kwargs):

@@ -1282,7 +1282,7 @@ class BrailleExport(unittest.TestCase):
 <mrow><mn>-.3</mn></mrow>
 </math>''', u'⠤⠼⠨⠒')
         if False:
-            # Determinant: not yet implemented
+            # Not yet supported (determinant)
             test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="|" close="|" separators=","><mtable>
  <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr>
@@ -1372,9 +1372,7 @@ class BrailleExport(unittest.TestCase):
 <mrow><mi>&alpha;&beta;</mi></mrow>
 </math>''', u'⠨⠁⠨⠃')
         # §25
-        if False:
-            # Not yet supported (over)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mo>&prime;</mo></msup><mo>,</mo><msup><mi>x</mi><mo>&Prime;</mo></msup>
 <mo>,</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mi>a</mi></msub><mo>,</mo>
 <msup><mi>x</mi><mn>2</mn></msup><mo>,</mo><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover>
@@ -1411,7 +1409,7 @@ class BrailleExport(unittest.TestCase):
 <mrow><msup><mi>e</mi><mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mi>x</mi></mrow></msup></mrow>
 </math>''', u'⠑⠘⠎⠊⠝⠀⠭')
         if False:
-            # Proper spacing not yet implemented
+            # Not yet supported (spacing)
             test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&angle;</mo><mi>a</mi></mrow>
 </math>''', u'⠫⠪⠀⠁')
@@ -1449,7 +1447,7 @@ class BrailleExport(unittest.TestCase):
 <mrow><mi>a</mi><mi>cos</mi><mo>&ApplyFunction;</mo><mi>B</mi></mrow>
 </math>''', u'⠁⠉⠕⠎⠀⠠⠃')
         if False:
-            # Proper spacing not yet implemented
+            # Not yet supported (spacing)
             test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>m</mi><mo>&angle;</mo><mi>b</mi></mrow>
 </math>''', u'⠍⠫⠪⠀⠃')
@@ -1698,6 +1696,51 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msubsup><mi>x</mi><mi>a</mi><mrow><mo>&prime;</mo><mi>b</mi></mrow></msubsup>
 </math>''', u'⠭⠄⠰⠁⠘⠃')
+        # §86
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<munder accentunder="true"><mi>x</mi><mo>&macr;</mo></munder>
+</math>''', u'⠐⠭⠩⠱⠻')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mover accent="true"><mrow><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mrow><mo>&macr;</mo></mover>
+</math>''', u'⠐⠭⠬⠽⠣⠱⠻')
+        if False:
+            # Not yet supported (spacing)
+            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><munder accentunder="true"><mi>lim</mi><mrow><mi>x</mi><mo>&rarr;</mo><mn>0</mn></mrow>
+</munder><mi>f</mi><mfenced open="(" close=")" separators=","><mrow><mi>x</mi></mrow></mfenced>
+</mrow>
+</math>''', u'⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠀⠋⠷⠭⠾')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mover accent="true"><msup><mi>x</mi><mn>2</mn></msup><mo>&macr;</mo></mover>
+</math>''', u'⠐⠭⠘⠆⠐⠣⠱⠻')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mover accent="true"><msup><mi>x</mi><mo>&prime;</mo></msup><mo>&macr;</mo></mover>
+</math>''', u'⠐⠭⠄⠣⠱⠻')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mover accent="true"><msub><mi>x</mi><mn>1</mn></msub><mo>&macr;</mo></mover>
+</math>''', u'⠐⠭⠂⠣⠱⠻')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mover accent="true"><mi>x</mi><mo>&macr;</mo></mover>
+</math>''', u'⠭⠱')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover><mo>+</mo>
+<mover accent="true"><mi>y</mi><mo>&macr;</mo></mover></mrow>
+</math>''', u'⠭⠱⠬⠽⠱')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msup><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover><mn>2</mn></msup>
+</math>''', u'⠭⠱⠘⠆')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msup><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover><mo>&prime;</mo></msup>
+</math>''', u'⠭⠱⠄')
+        # §88
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<munderover><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>&macr;</mo><mo>&macr;</mo></munderover>
+</math>''', u'⠐⠭⠬⠽⠩⠱⠣⠱⠻')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><munderover><mo>&Sum;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mo>&infin;</mo>
+</munderover><mfrac><mrow><mn>1</mn></mrow><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow></mfrac>
+<mo>=</mo><mn>1</mn></mrow>
+</math>''', u'⠐⠨⠠⠎⠩⠝⠀⠨⠅⠀⠼⠂⠣⠠⠿⠻⠹⠂⠌⠆⠘⠝⠐⠼⠀⠨⠅⠀⠼⠂', page_width=True)
             
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
