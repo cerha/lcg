@@ -271,8 +271,8 @@ _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' %
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 def mathml_nemeth(exporter, context, element):
-    # Implemented: Rule I - XIII (partially)
-    # Missing: Rule XIV -- Rule XXV
+    # Implemented: Rule I - XIV (partially)
+    # Missing: Rule XV -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
