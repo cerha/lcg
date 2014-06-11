@@ -1749,6 +1749,15 @@ class BrailleExport(unittest.TestCase):
 <mrow><mo>(</mo><mfrac linethickness="0"><msub><mi>g</mi><mi>j</mi></msub><msub><mi>a</mi><mi>j</mi>
 </msub></mfrac><mo>)</mo></mrow>
 </math>''', u'⠷⠛⠰⠚⠐⠩⠁⠰⠚⠐⠾')
+        # §91
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>A</mi><mrow><mover><mi>x</mi><mo>~</mo></mover><mo>+</mo><mover><mi>y</mi><mo>~</mo>
+</mover></mrow></msub>
+</math>''', u'⠠⠁⠰⠐⠭⠣⠈⠱⠻⠬⠰⠐⠽⠣⠈⠱⠻')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<msub><mi>A</mi><mrow><mover><mi>x</mi><mo>&macr;</mo></mover><mo>+</mo><mover><mi>y</mi>
+<mo>&macr;</mo></mover></mrow></msub>
+</math>''', u'⠠⠁⠰⠭⠱⠬⠽⠱')
             
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the

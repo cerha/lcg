@@ -38,6 +38,7 @@ _SINGLE_LETTER_KILLER_SUFFIX = '\ue025'
 _LEFT_WHITESPACE_42 = '\ue026' # Nemeth §42
 _RIGHT_WHITESPACE_42 = '\ue027' # Nemeth §42
 _END_SUBSUP = '\ue028'
+_INNER_SUBSUP = '\ue029'
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
@@ -268,6 +269,7 @@ _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 
 _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' % (_END_SUBSUP,))
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
+_braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 def mathml_nemeth(exporter, context, element):
     # Implemented: Rule I - XIII (partially)
     # Missing: Rule XIV -- Rule XXV
@@ -284,6 +286,14 @@ def mathml_nemeth(exporter, context, element):
     braille = _child_export(top_node, exporter, context, variables).strip()
     text = braille.text()
     hyphenation = braille.hyphenation().replace(exporter.HYPH_WS, exporter.HYPH_NEMETH_WS)
+    # Remove repeated subsup's
+    while True:
+        match = _braille_repeated_subsup_regexp.search(text)
+        if match is None:
+            break
+        start, end = match.span(1)
+        text = text[:start] + text[end:]
+        hyphenation = hyphenation[:start] + hyphenation[end:]
     # Handle numeric prefixes
     while True:
         match = _num_prefix_regexp.search(text)
@@ -331,7 +341,7 @@ def mathml_nemeth(exporter, context, element):
     i = 0
     while i < text_len:
         if text[i] in (_CONDITIONAL_NUM_PREFIX, _NUM_PREFIX_REQUIRED,
-                       _SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX,):
+                       _SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX, _INNER_SUBSUP,):
             text = text[:i] + text[i + 1:]
             hyphenation = hyphenation[:i] + hyphenation[i + 1:]
             text_len -= 1
@@ -800,12 +810,19 @@ def _export_msubsup(node, exporter, context, variables, **kwargs):
         c.append(sub)
         return _export_msup(node, exporter, context, variables, **kwargs)
 
+def _modifier(variables):
+    modifier = _Braille('⠐')
+    subsup = variables.get('subsup')
+    if subsup:
+        modifier = _Braille(_INNER_SUBSUP) + subsup + modifier
+    return modifier
+    
 def _export_munder(node, exporter, context, variables, **kwargs):
     base, under = _child_nodes(node)
     result = (_export(base, exporter, context, variables, **kwargs) + _Braille('⠩') +
             _export(under, exporter, context, variables, **kwargs))
     if not variables.get('no-under-boundaries'):
-        result = _Braille('⠐') + result + _Braille('⠻')
+        result = _modifier(variables) + result + _Braille('⠻')
     return result
     
 def _export_mover(node, exporter, context, variables, **kwargs):
@@ -814,7 +831,7 @@ def _export_mover(node, exporter, context, variables, **kwargs):
     if ((over.tag == 'mo' and over.text.strip() == '¯' and
          base.tag in ('mi', 'mn',) and len(base.text.strip()) == 1)):
         return exported_base + _Braille('⠱')
-    return (_Braille('⠐') + exported_base + _Braille('⠣') +
+    return (_modifier(variables) + exported_base + _Braille('⠣') +
             _export(over, exporter, context, variables, **kwargs) + _Braille('⠻'))
 
 def _export_munderover(node, exporter, context, variables, **kwargs):
