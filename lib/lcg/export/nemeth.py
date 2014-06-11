@@ -673,6 +673,11 @@ def _export_mfenced(node, exporter, context, variables, **kwargs):
 
 def _export_mfrac(node, exporter, context, variables, **kwargs):
     numerator, denominator = _child_nodes(node)
+    exported_numerator = _export(numerator, exporter, context, variables, **kwargs)
+    exported_denominator = _export(denominator, exporter, context, variables, **kwargs)
+    if _attribute(node, 'linethickness') == '0':
+        # something like binomical coefficient
+        return exported_numerator + _Braille('⠩') + exported_denominator
     left_node = variables.get('left-node')
     if left_node is not None and left_node.tag == 'mn':
         opening = _Braille('⠸⠹')
@@ -693,8 +698,7 @@ def _export_mfrac(node, exporter, context, variables, **kwargs):
         opening = _Braille('⠠' * level + '⠹')
         closing = _Braille('⠠' * level + '⠼')
         line = _Braille('⠠' * level + '⠌')
-    return (opening + _export(numerator, exporter, context, variables, **kwargs) + line +
-            _export(denominator, exporter, context, variables, **kwargs) + closing)
+    return opening + exported_numerator + line + exported_denominator + closing
 
 def _export_msqrt(node, **kwargs):
     pass
