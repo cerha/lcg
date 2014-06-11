@@ -256,7 +256,7 @@ _num_prefix_regexp = re.compile('(^|[\n⠀%s%s])([%s%s%s]*⠤?)(%s)' %
 _prefixed_punctuation = "':.!-?‘“’”;\""
 _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 
-_braille_number_regexp = re.compile('[⠼⠰⠘][⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' % (_END_SUBSUP,))
+_braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' % (_END_SUBSUP,))
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 def mathml_nemeth(exporter, context, element):
     # Implemented: Rule I - XII (partially)
