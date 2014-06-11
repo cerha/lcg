@@ -1677,8 +1677,8 @@ class BrailleExport(unittest.TestCase):
 </math>''', u'⠷⠂⠤⠎⠊⠝⠘⠆⠀⠭⠾⠘⠆⠀⠨⠅⠀⠉⠕⠎⠘⠲⠀⠭', page_width=lcg.USpace(40))
         # §81
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
-<mrow><mo>(</mo><msub><mi>x</mi><mi>1</mi></msub><msub><mi>y</mi><mn>1</mn></msub><mo>+</mo>
-<msub><mi>x</mi><mi>2</mi></msub><msub><mi>y</mi><mn>2</mn></msub><mo>)</mo></mrow>
+<mrow><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><msub><mi>y</mi><mn>1</mn></msub><mo>+</mo>
+<msub><mi>x</mi><mn>2</mn></msub><msub><mi>y</mi><mn>2</mn></msub><mo>)</mo></mrow>
 </math>''', u'⠷⠭⠂⠽⠂⠬⠭⠆⠽⠆⠾')
             
     def test_mathml_nemeth_liblouis(self):
