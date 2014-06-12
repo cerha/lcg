@@ -52,11 +52,14 @@ _braille_punctuation = ('⠂',)
 _braille_left_grouping = ()
 _braille_right_grouping = ()
 _braille_comparison = ()
-def _comparison(braille):
-    global _braille_comparison
+def _comparison(symbol, braille):
+    global _braille_comparison, _nemeth_operators
+    braille = braille.strip('%s%s' % (_SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX,))
+    braille = '⠀' + braille + '⠀'
     if braille not in _braille_comparison:
         _braille_comparison += (braille,)
-    return _SINGLE_LETTER_KILLER_PREFIX + braille + _SINGLE_LETTER_KILLER_SUFFIX
+    braille = _SINGLE_LETTER_KILLER_PREFIX + braille + _SINGLE_LETTER_KILLER_SUFFIX
+    _nemeth_operators[symbol] = braille
 def _punctuation(symbol, braille):
     global _braille_punctuation, _nemeth_operators
     if braille not in _braille_punctuation:
@@ -92,10 +95,10 @@ def _prime(symbol, braille):
 _nemeth_operators = {
     '*': '⠈⠼' + _NUM_PREFIX_REQUIRED,
     '#': '⠨⠼' + _NUM_PREFIX_REQUIRED,
-    '=': _comparison('⠀⠨⠅⠀'),
     '×': '⠈⠡',
     '∥': '⠳⠳',
     '¯': '⠱',
+    '!': '⠯',
     '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
 _prime("'", '⠄')
@@ -107,7 +110,6 @@ _punctuation(',', '⠠⠀')
 _punctuation('–', '⠤⠤')
 _punctuation('—', '⠤⠤⠤⠤')
 _punctuation('…', '⠄⠄⠄')
-_punctuation('!', '⠖')
 _punctuation('-', '⠤')
 _punctuation('.', '⠲')
 _punctuation('?', '⠦')
@@ -173,11 +175,11 @@ _rgrouping(None, '⠈⠰⠾')         # lower right half bracket
 _rgrouping(None, '⠈⠰⠠⠾')        # enlarged lower right half bracket
 _rgrouping(None, '⠠⠄')          # right transcriber's grouping symbol
 _rgrouping(None, '⠠⠄⠾')         # enlarged right transcriber's grouping symbol
-    
+
 _math_comparison_operators = ('<=>≂≂̸≃≄≅≆≇≈≉≊≋≋̸≌≍≏≏̸≐≐̸≑≓≗≜≟≠≡≢≤≥≦≦̸≧≧̸≨≩≪≪̸≫≫̸≮≯≰≱≲≳≴≵≶≷≸'
                               '≹≺≻≼≽≾≿≿̸⊀⊁⊴⊵⋍⋖⋗⋘⋘̸⋙⋙̸⋚⋛⋞⋟⋠⋡⋦⋧⋨⋩⋪⋫⋬⋭'
                               '⦔⩭⩭̸⩯⩰⩰̸⩵⩸⩹⩺⩻⩼⩽⩽̸⩾⩾̸⩿⪀⪁⪂⪃⪄⪅⪆⪇⪈⪉⪊⪋⪌⪍⪎⪏⪐⪑⪒⪓⪔⪕⪖⪗⪘⪙⪚⪝⪞⪟⪠⪡⪡̸⪢⪢̸⪦⪨⪩⪬⪮⪯⪯̸⪰⪰'
-                              '̸⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼')
+                              '̸⪳⪴⪵⪶⪷⪸⪹⪺⪻⪼∈⋹⋵⋴⋳∈')
 _signs_of_shape_and_omission = _signs_of_shape
 _function_names = ('amp', 'antilog', 'arc', 'arg', 'colog', 'cos', 'cosh', 'cot', 'coth', 'covers',
                    'csc', 'csch', 'ctn', 'ctnh', 'det', 'erf', 'exp', 'exsec', 'grad', 'hav', 'im',
@@ -281,8 +283,8 @@ _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' %
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 def mathml_nemeth(exporter, context, element):
-    # Implemented (partially): Rule I - XIX
-    # Missing: Rule XX -- Rule XXV
+    # Implemented (partially): Rule I - XXII
+    # Missing: Rule XXIII -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -556,24 +558,13 @@ def _child_export(node, exporter, context, variables, separators=None, **kwargs)
              content.tag == 'mi')):
             direct_delimiters = 'yes'
     # Export
-    op_form = None
     left_node = None
     for i in range(len(children)):
         n = children[i]
-        if False and n.tag == 'mo':
-            if i == 0 or op_form == 'infix':
-                op_form = 'prefix'
-            elif i == len(children) - 1:
-                op_form = 'postfix'
-            else:
-                op_form = (_nemeth_operators.get((n.text or '').strip(), ('infix',))[0] or
-                           'infix')
-        else:
-            op_form = None
         with variables.xlet(('enclosed-list', enclosed_list),
                             ('direct-delimiters', direct_delimiters),
                             ('left-node', left_node)):
-            braille = braille + _export(n, exporter, context, variables, op_form=op_form)
+            braille = braille + _export(n, exporter, context, variables)
         left_node = n
     return braille
 
@@ -588,6 +579,10 @@ def _op_export(operator, exporter, context, variables, node=None):
         if op_braille is None or op_braille.find(u'⠈⠀⠭') >= 0:
             op_braille = '⠿⠿⠿%s⠿⠿⠿' % (op_braille,)
             hyphenation = exporter.HYPH_NO * len(op_braille)
+        elif operator in _math_comparison_operators:
+            _comparison(operator, op_braille)
+            op_braille = _nemeth_operators[operator]
+            hyphenation = None
     if hyphenation is None:
         hyphenation = exporter.HYPH_NO * len(op_braille)
     if op_braille[0] == '⠀' and hyphenation[0] == exporter.HYPH_NO:
