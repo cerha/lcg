@@ -35,8 +35,8 @@ _SINGLE_LETTER_START = '\ue022'
 _SINGLE_LETTER_END = '\ue023'
 _SINGLE_LETTER_KILLER_PREFIX = '\ue024'
 _SINGLE_LETTER_KILLER_SUFFIX = '\ue025'
-_LEFT_WHITESPACE_42 = '\ue026' # Nemeth §42
-_RIGHT_WHITESPACE_42 = '\ue027' # Nemeth §42
+_LEFT_WHITESPACE_42 = '\ue026' # Nemeth §42 and similar
+_RIGHT_WHITESPACE_42 = '\ue027' # Nemeth §42 and similar
 _END_SUBSUP = '\ue028'
 _INNER_SUBSUP = '\ue029'
 
@@ -281,8 +281,8 @@ _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' %
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 def mathml_nemeth(exporter, context, element):
-    # Implemented (partially): Rule I - XVII
-    # Missing: Rule XVIII -- Rule XXV
+    # Implemented (partially): Rule I - XIX
+    # Missing: Rule XX -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -503,7 +503,8 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
             prefix += '⠸'
         if style.find('italic') >= 0:
             prefix += '⠨'
-        if style and not plain and text and all(c in string.ascii_letters for c in text):
+        if ((style and style != 'normal' and not plain and
+             text and all(c in string.ascii_letters for c in text))):
             prefix += '⠰'
         elif (not style and text and all(c in string.ascii_letters for c in text) and
               variables.get('enclosed-list') != 'yes' and
@@ -602,7 +603,11 @@ def _export_mi(node, exporter, context, variables, **kwargs):
     text = _node_value(node).strip()
     if text == '…':
         return _export_mo(node, exporter, context, variables, **kwargs)
-    return _text_export(text, exporter, context, variables, node=node)
+    exported = _text_export(text, exporter, context, variables, node=node)
+    if _attribute(node, 'mathvariant') == 'normal':
+        exported.prepend(_LEFT_WHITESPACE_42)
+        exported.append(_RIGHT_WHITESPACE_42)
+    return exported
 
 def _export_mn(node, exporter, context, variables, **kwargs):
     text = _node_value(node).strip()

@@ -1775,7 +1775,22 @@ class BrailleExport(unittest.TestCase):
 <mn>3</mn></mrow></mroot><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mrow><mrow><mn>3</mn></mrow>
 </mroot>
 </math>''', u'⠣⠒⠜⠭⠘⠆⠐⠬⠨⠣⠒⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠨⠻⠬⠽⠘⠆⠐⠻', page_width=True)
-            
+        # §138
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>x</mi><mo>=</mo><mo>-</mo><mi>y</mi></mrow>
+</math>''', u'⠭⠀⠨⠅⠀⠤⠽')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mo>-</mo><mi>x</mi></mrow>
+</math>''', u'⠎⠊⠝⠀⠤⠭')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mo>&hellip;</mo><mo>+</mo><mi>n</mi></mrow>
+</math>''', u'⠼⠂⠬⠆⠬⠀⠄⠄⠄⠀⠬⠝')
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mrow><mn>1</mn><mi mathvariant="normal">yd</mi><mo>+</mo>
+<mn>2</mn><mi mathvariant="normal">yd</mi><mo>=</mo>
+<mn>3</mn><mi mathvariant="normal">yd</mi></mrow>
+</math>''', u'⠼⠂⠀⠽⠙⠀⠬⠆⠀⠽⠙⠀⠨⠅⠀⠼⠒⠀⠽⠙', page_width=True)
+        
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
         # bindings to it work and that there is no big problem.
