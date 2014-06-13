@@ -1279,12 +1279,10 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>-.3</mn></mrow>
 </math>''', u'⠤⠼⠨⠒')
-        if False:
-            # Not yet supported (determinant)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="|" close="|" separators=","><mtable>
  <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr>
- <mtr><mtd><mi>-3</mi></mtd><mtd><mi>-4</mi></mtd></mtr>
+ <mtr><mtd><mn>-3</mn></mtd><mtd><mn>-4</mn></mtd></mtr>
 </mtable></mfenced></math>''', u'⠠⠳⠼⠂⠀⠀⠼⠆⠀⠠⠳\n⠠⠳⠤⠼⠒⠀⠤⠼⠲⠠⠳')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3</mn><mo>#</mo><mn>4</mn></mrow>
@@ -1415,12 +1413,10 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>&#x25FD;</mo><mi>y</mi></mrow>
 </math>''', u'⠭⠀⠫⠲⠀⠽')
-        if False:
-            # Not yet supported (determinant)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>|</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr>
 <mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr>
-<mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd></mtr></mtable><mo>|</mo></mrow>
+<mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd><mtd><mi>i</mi></mtd></mtr></mtable><mo>|</mo></mrow>
 </math>''', u'⠠⠳⠁⠀⠃⠀⠉⠠⠳\n⠠⠳⠙⠀⠑⠀⠋⠠⠳\n⠠⠳⠛⠀⠓⠀⠊⠠⠳')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="(" close=")" separators=","><mn>0</mn><mi>a</mi><mn>1</mn><mi>b</mi><mn>2</mn>

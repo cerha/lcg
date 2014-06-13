@@ -42,6 +42,9 @@ _INNER_SUBSUP = '\ue029'
 _IMPLICIT_SUBSCRIPT = '\ue030'  # to prevent numeric multipurpose indicator in subscripts
 _AFTER_BAR = '\ue031'
 _BEFORE_BAR = '\ue032'
+_MATRIX_START = '\ue033'
+_MATRIX_END = '\ue034'
+_MATRIX_SEPARATOR = '\ue035'
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
@@ -275,8 +278,8 @@ def _node_value(node):
 
 # Common export functions
 
-_num_prefix_regexp = re.compile('(^|[\n⠀%s%s])([%s%s%s]*⠤?)(%s)' %
-                                (_NUM_PREFIX_REQUIRED, _RIGHT_WHITESPACE_42,
+_num_prefix_regexp = re.compile('(^|[\n⠀%s%s%s])([%s%s%s]*⠤?)(%s)' %
+                                (_NUM_PREFIX_REQUIRED, _RIGHT_WHITESPACE_42, _MATRIX_SEPARATOR,
                                  _SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX,
                                  _LEFT_WHITESPACE_42, _CONDITIONAL_NUM_PREFIX,),
                                 re.M)
@@ -497,6 +500,28 @@ def mathml_nemeth(exporter, context, element):
             text = text[:i] + text[i + 1:]
             hyphenation = hyphenation[:i] + hyphenation[i + 1:]
             text_len -= 1
+    # Adjust matrices
+    while True:
+        start = text.find(_MATRIX_START)
+        if start == -1:
+            break
+        end = text.find(_MATRIX_END)
+        assert end > start + 1
+        rows = text[start + 1:end - 1].split('\n')
+        n_columns = len(rows[0].split(_MATRIX_SEPARATOR))
+        column_widths = [0] * n_columns
+        for r in rows:
+            column_widths = [max(w, len(c))
+                             for w, c in zip(column_widths, r.split(_MATRIX_SEPARATOR))]
+        matrix = ''
+        for r in rows:
+            cells = r.split(_MATRIX_SEPARATOR)
+            for i in range(n_columns):
+                c = cells[i]
+                matrix += c + '⠀' * (column_widths[i] - len(c) + (1 if i < n_columns - 2 else 0))
+            matrix += '\n'
+        text = text[:start] + matrix + text[end + 1:]
+        hyphenation = hyphenation[:start] + '0' * len(matrix) + hyphenation[end + 1:]
     # Done
     return _Braille(text, hyphenation)
 
@@ -695,6 +720,17 @@ def _export_ms(node, exporter, context, variables, **kwargs):
     return _text_export(text, exporter, context, variables, node=node, plain=True)
 
 def _export_mrow(node, exporter, context, variables, **kwargs):
+    children = _child_nodes(node)
+    if ((len(children) == 3 and children[1].tag == 'mtable' and
+         children[0].tag == 'mo' and children[2].tag == 'mo')):
+        big_prefix = '⠠'
+        matrix_start = _export(children[0], exporter, context, variables, **kwargs)
+        matrix_start.prepend(big_prefix)
+        matrix_end = _export(children[2], exporter, context, variables, **kwargs)
+        matrix_end.prepend(big_prefix)
+        with variables.xlet(('matrix-start', matrix_start),
+                            ('matrix-end', matrix_end)):
+            return _export(children[1], exporter, context, variables, **kwargs)
     return _child_export(node, exporter, context, variables)
 
 def _export_mstyle(node, exporter, context, variables, **kwargs):
@@ -907,11 +943,44 @@ def _export_munderover(node, exporter, context, variables, **kwargs):
     with variables.let('no-under-boundaries', True):
         return _export_mover(node, exporter, context, variables, **kwargs)
 
+def _export_mtable(node, exporter, context, variables, **kwargs):
+    matrix = _Braille(_MATRIX_START)
+    start, end = variables.get('matrix-start', ''), variables.get('matrix-end', '')
+    rows = _child_nodes(node)
+    n_columns = 0
+    for r in rows:
+        n_columns = max(n_columns, len(_child_nodes(r)))
+    with variables.let('matrix-n-columns', n_columns):
+        for r in rows:
+            matrix += start
+            matrix += _export(r, exporter, context, variables, **kwargs)
+            matrix += end
+            matrix.append('\n')
+    matrix.append(_MATRIX_END)
+    return matrix
+
+def _export_mtr(node, exporter, context, variables, **kwargs):
+    n_columns = variables.get('matrix-n-columns')
+    cells = _child_nodes(node)
+    from xml.etree import ElementTree
+    while len(cells) < n_columns:
+        ElementTree.SubElement(node, 'mtd')
+    cells = _child_nodes(node)
+    row = _Braille('')
+    for c in cells:
+        row += _export(c, exporter, context, variables, **kwargs)
+        row.append(_MATRIX_SEPARATOR)
+    if row.text()[0] == _CONDITIONAL_NUM_PREFIX:
+        row = _Braille('⠼' + row.text()[1:])
+    elif row.text()[:2] == '⠤' + _CONDITIONAL_NUM_PREFIX:
+        row = _Braille('⠤⠼' + row.text()[2:])
+    return row
+    
+def _export_mtd(node, exporter, context, variables, **kwargs):
+    return _child_export(node, exporter, context, variables)
+
 # def _export_mmultiscripts(node, **kwargs):
-# def _export_mtable(node, **kwargs):
-# def _export_mtr(node, **kwargs):
 # def _export_mlabeledtr(node, **kwargs):
-# def _export_mtd(node, **kwargs):
 # def _export_maligngroup(node, **kwargs):
 # def _export_mstack(node, **kwargs):
 # def _export_msgroup(node, **kwargs):
