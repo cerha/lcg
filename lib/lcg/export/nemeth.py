@@ -39,6 +39,9 @@ _LEFT_WHITESPACE_42 = '\ue026' # Nemeth §42 and similar
 _RIGHT_WHITESPACE_42 = '\ue027' # Nemeth §42 and similar
 _END_SUBSUP = '\ue028'
 _INNER_SUBSUP = '\ue029'
+_IMPLICIT_SUBSCRIPT = '\ue030'  # to prevent numeric multipurpose indicator in subscripts
+_AFTER_BAR = '\ue031'
+_BEFORE_BAR = '\ue032'
 
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
@@ -185,6 +188,7 @@ _function_names = ('amp', 'antilog', 'arc', 'arg', 'colog', 'cos', 'cosh', 'cot'
                    'csc', 'csch', 'ctn', 'ctnh', 'det', 'erf', 'exp', 'exsec', 'grad', 'hav', 'im',
                    'inf', 'lim', 'ln', 'log', 'max', 'min', 'mod', 're', 'sec', 'sech', 'sin',
                    'sinh', 'sup', 'tan', 'tanh', 'vers',)
+_vertical_bars = '|∥∦∤∣'
 
 _braille_left_indicators = ('⠰', '⠸', '⠨', '⠨⠈', '⠠⠠', '⠈⠈', '⠘', '⠣', '⠩', '⠪', '⠻',
                             '⠶⠶⠶', '⠹', '⠠⠹', '⠠⠠⠹', '⠸⠹', '⠈⠻', '⠘', '⠘⠘', '⠘⠰', '⠘⠘⠘',
@@ -282,6 +286,8 @@ _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 _braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' % (_END_SUBSUP,))
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
+_braille_separate_subscript_regexp = \
+    re.compile('([⠰%s][⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+|[⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])$' % (_IMPLICIT_SUBSCRIPT,))
 def mathml_nemeth(exporter, context, element):
     # Implemented (partially): Rule I - XXII
     # Missing: Rule XXIII -- Rule XXV
@@ -298,6 +304,13 @@ def mathml_nemeth(exporter, context, element):
     braille = _child_export(top_node, exporter, context, variables).strip()
     text = braille.text()
     hyphenation = braille.hyphenation().replace(exporter.HYPH_WS, exporter.HYPH_NEMETH_WS)
+    # Separate vertical bars
+    while True:
+        pos = text.find('%s%s' % (_AFTER_BAR, _BEFORE_BAR,))
+        if pos == -1:
+            break
+        text = text[:pos] + '⠐' + text[pos + 2:]
+        hyphenation = hyphenation[:pos] + '0' + hyphenation[pos + 2:]
     # Remove repeated subsup's
     while True:
         match = _braille_repeated_subsup_regexp.search(text)
@@ -348,12 +361,24 @@ def mathml_nemeth(exporter, context, element):
         text = text[:pos] + prefix + text[pos + 1:pos_end] + text[pos_end + 1:]
         hyphenation = (hyphenation[:pos] + prefix_hyph + hyphenation[pos + 1:pos_end] +
                        hyphenation[pos_end + 1:])
+    # Multipurpose indicator to distinguish base line numbers from subscripts
+    while True:
+        pos = text.find(_CONDITIONAL_NUM_PREFIX)
+        if pos == -1:
+            break
+        if _braille_separate_subscript_regexp.search(text[:pos]):
+            text = text[:pos] + '⠐' + text[pos + 1:]
+            hyphenation = hyphenation[:pos] + '0' + hyphenation[pos + 1:]
+        else:
+            text = text[:pos] + text[pos + 1:]
+            hyphenation = hyphenation[:pos] + hyphenation[pos + 1:]
     # Cleanup
     text_len = len(text)
     i = 0
     while i < text_len:
-        if text[i] in (_CONDITIONAL_NUM_PREFIX, _NUM_PREFIX_REQUIRED,
-                       _SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX, _INNER_SUBSUP,):
+        if text[i] in (_CONDITIONAL_NUM_PREFIX, _NUM_PREFIX_REQUIRED, _IMPLICIT_SUBSCRIPT,
+                       _SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX, _INNER_SUBSUP,
+                       _AFTER_BAR, _BEFORE_BAR,):
             text = text[:i] + text[i + 1:]
             hyphenation = hyphenation[:i] + hyphenation[i + 1:]
             text_len -= 1
@@ -644,6 +669,9 @@ def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
         op_braille.prepend(_LEFT_WHITESPACE_42)
     if space(False):
         op_braille.append(_RIGHT_WHITESPACE_42)
+    if op in _vertical_bars:
+        op_braille.prepend(_BEFORE_BAR)
+        op_braille.append(_AFTER_BAR)
     return op_braille
 
 def _export_mtext(node, exporter, context, variables, **kwargs):
@@ -784,6 +812,8 @@ def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
             exported_base = _Braille(exported_base.text()[:-1], exported_base.hyphenation()[:-1])
         with variables.let('subsup', new_subsup):
             exported_index = _export(index, exporter, context, variables, **kwargs)
+        if not indicate:
+            exported_index = _Braille(_IMPLICIT_SUBSCRIPT) + exported_index
         return exported_base + new_subsup + exported_index + terminator
     
 def _export_msup(node, exporter, context, variables, **kwargs):
