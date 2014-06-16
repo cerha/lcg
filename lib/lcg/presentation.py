@@ -169,7 +169,7 @@ class Presentation(object):
     names (strings) for liblouis.
     Useful only for Braille output.
     """
-    braille_math_rules = 'czech'
+    braille_math_rules = 'nemeth'
     """System to use for typesetting mathematics in Braille.
     Currently supported values are 'nemeth' and 'czech'.
     Useful only for Braille output.
