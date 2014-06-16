@@ -1097,12 +1097,12 @@ class BrailleExporter(FileExporter, Exporter):
         table_cell_width = self._table_cell_width
         table_intro = None
         def prefix(cell, common):
-            for i in range(max(len(cell), len(common))):
+            for i in range(min(len(cell), len(common))):
                 if cell[i] != common[i]:
                     break
             return common[:i]
         def suffix(cell, common):
-            for i in range(max(len(cell), len(common))):
+            for i in range(min(len(cell), len(common))):
                 if cell[-i - 1] != common[-i - 1]:
                     break
             return common[len(common) - i:]

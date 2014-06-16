@@ -420,7 +420,7 @@ def mathml_nemeth(exporter, context, element):
                     last_children = children
                     children = last_element.getchildren()
                     last_element = children[-1]
-                if last_element.tag == 'mo' and last_element.text in ',-–—':
+                if last_element.tag == 'mo' and (last_element.text or '') in ',-–—':
                     if len(last_children) > 1:
                         last_element = last_children[-2]
                 if ((last_element.tag == 'mo' or
@@ -634,7 +634,8 @@ def _op_export(operator, exporter, context, variables, node=None):
         # If liblouis translation returns something like character code
         # on unknown characters, we try to identify and handle such a
         # situation here.
-        if op_braille is None or op_braille.find(u'⠈⠀⠭') >= 0:
+        if op_braille is None or '⠈⠀⠭' in op_braille or '⡳' in op_braille:
+            op_braille = string.join([c for c in op_braille if c != '⡳'], '')
             op_braille = '⠿⠿⠿%s⠿⠿⠿' % (op_braille,)
             hyphenation = exporter.HYPH_NO * len(op_braille)
         elif operator in _math_comparison_operators:
