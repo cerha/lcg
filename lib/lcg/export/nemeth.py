@@ -50,6 +50,11 @@ _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
                    ' ': '⠀', '.': '⠨', ',': '⠠'}
 
+_nemeth_texts = {'cos': '⠉⠕⠎',  # wrong translation by liblouis
+                 'log': '⠇⠕⠛',  # wrong translation by liblouis
+                 'ℵ': '⠠⠠⠁',    # aleph, not supported in liblouis
+                 }
+
 _signs_of_shape = ''
 _signs_of_shape_lspace = ''
 _signs_of_shape_rspace = ''
@@ -131,6 +136,7 @@ _shape('▵', '⠫⠞')
 _shape('□', '⠫⠲')
 _shape('◽', '⠫⠲')
 _shape('◯', '⠫⠉')
+_shape('→', '⠫⠕')
 _lgrouping('(', '⠷')
 _lgrouping(None, '⠠⠷')          # enlarged left parenthesis
 _lgrouping('[', '⠈⠷')
@@ -196,10 +202,10 @@ _vertical_bars = '|∥∦∤∣'
 _braille_left_indicators = ('⠰', '⠸', '⠨', '⠨⠈', '⠠⠠', '⠈⠈', '⠘', '⠣', '⠩', '⠪', '⠻',
                             '⠶⠶⠶', '⠹', '⠠⠹', '⠠⠠⠹', '⠸⠹', '⠈⠻', '⠘', '⠘⠘', '⠘⠰', '⠘⠘⠘',
                             '⠘⠘⠰', '⠘⠰⠘', '⠘⠰⠰', '⠰', '⠰⠘', '⠰⠰', '⠰⠘⠘', '⠰⠘⠰', '⠰⠰⠘', '⠰⠰⠰',
-                            '⠣', '⠣⠣', '⠩', '⠩⠩', '⠈', '⠼', '⠣', '⠨', '⠨⠨', '⠨⠨⠨', '⠫', '⠸⠫',
+                            '⠣⠣', '⠩', '⠩⠩', '⠈', '⠼', '⠨', '⠨⠨', '⠨⠨⠨', '⠫', '⠸⠫',
                             '⠠⠨', '⠠⠄⠸', '⠠⠄⠨',)
 _braille_right_indicators = ('⠼', '⠠⠼', '⠠⠠⠼', '⠸⠼', '⠻', '⠸⠠⠄', '⠨⠠⠄', '⠹', '⠠⠹', '⠠⠠⠹', '⠐',
-                             '⠘', '⠰',)
+                             '⠘', '⠰', '⠣',)
 _braille_symbols_42 = ()        # TODO: not yet defined
 
 
@@ -560,6 +566,7 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
             prefix += '⠰'
         elif (not style and text and all(c in string.ascii_letters for c in text) and
               variables.get('enclosed-list') != 'yes' and
+              variables.get('direct-delimiters') != 'yes' and
               variables.get('no-letter-prefix') != 'yes' and
               (len(text) == 1 or text in ('cd',))): # short-form combinations
             prefix = _SINGLE_LETTER_START + prefix
@@ -570,8 +577,7 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
             if text in _signs_of_shape_and_omission or text in _math_comparison_operators:
                 prefix = _SINGLE_LETTER_KILLER_PREFIX + prefix
         lang = 'en' if plain else 'nemeth'
-        trans_fixes = {'cos': '⠉⠕⠎', 'log': '⠇⠕⠛'}
-        braille = trans_fixes.get(text) # check for wrong translations from liblouis
+        braille = _nemeth_texts.get(text)
         if braille is None:
             braille = exporter.text(context, text, lang=lang).text().strip(_braille_whitespace)
         if prefix:
@@ -603,6 +609,8 @@ def _child_export(node, exporter, context, variables, separators=None, **kwargs)
         first = children[0]
         last = children[-1]
         content = children[1]
+        while content.tag == 'mrow' and len(_child_nodes(content)) == 1:
+            content = _child_nodes(content)[0]
         if ((first.tag == 'mo' and first.text.strip() in ('(', '[', '{',) and
              last.tag == 'mo' and last.text.strip() in (')', ']', '}',) and
              content.tag == 'mi')):
@@ -697,6 +705,8 @@ def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
     if op in _vertical_bars:
         op_braille.prepend(_BEFORE_BAR)
         op_braille.append(_AFTER_BAR)
+    if op == '°' and not variables.get('subsup'):
+        op_braille.append(_END_SUBSUP)
     return op_braille
 
 def _export_mtext(node, exporter, context, variables, **kwargs):

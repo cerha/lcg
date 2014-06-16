@@ -1310,9 +1310,7 @@ class BrailleExport(unittest.TestCase):
 <mrow><mfenced open="(" close=")" separators=",">
  <mrow><mn>0</mn></mrow><mrow><mo>-</mo><mn>1</mn></mrow><mrow><mo>&PlusMinus;</mo><mn>2</mn></mrow>
 </mfenced></mrow></math>''', u'⠷⠴⠠⠀⠤⠂⠠⠀⠬⠤⠆⠾')
-        if False:
-            # Closing parenthesis rendered incorrectly:
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=",">
   <mrow><mn>2</mn><mi>sin</mi><mo>&ApplyFunction;</mo><mn>30</mn><mo>°</mo></mrow>
   <mrow><mn>3</mn><mi>cos</mi><mo>&ApplyFunction;</mo><mn>60</mn><mo>°</mo></mrow>
@@ -1356,9 +1354,7 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mi>&Sigma;</mi>
 </math>''', u'⠨⠠⠎')
-        if False:
-            # Not yet supported (alef)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>&alefsym;</mi><mn>0</mn></msub>
 </math>''', u'⠠⠠⠁⠴')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1692,11 +1688,10 @@ class BrailleExport(unittest.TestCase):
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mover accent="true"><mrow><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mrow><mo>&macr;</mo></mover>
 </math>''', u'⠐⠭⠬⠽⠣⠱⠻')
-        if False:
-            # Not yet supported (spacing)
-            test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><munder accentunder="true"><mi>lim</mi><mrow><mi>x</mi><mo>&rarr;</mo><mn>0</mn></mrow>
-</munder><mi>f</mi><mfenced open="(" close=")" separators=","><mrow><mi>x</mi></mrow></mfenced>
+</munder><mo>&ApplyFunction;</mo>
+<mi>f</mi><mfenced open="(" close=")" separators=","><mrow><mi>x</mi></mrow></mfenced>
 </mrow>
 </math>''', u'⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠀⠋⠷⠭⠾')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
