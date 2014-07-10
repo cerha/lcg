@@ -1506,7 +1506,7 @@ class HTMLProcessor(object):
           html -- unicode containing input LCG HTML
 
         """
-        assert isinstance(html, unicode), html
+        assert isinstance(html, basestring), html
         tree = self._tree_content(html)
         lcg = self._lcg_content(tree)
         return lcg
