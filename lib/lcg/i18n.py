@@ -201,6 +201,26 @@ class Localizable(unicode):
         """
         return self.transform(lambda x: x.strip(*args))
 
+    def lstrip(self, *args):
+        """Return a new 'Localizable' stripping the final string from left after localization.
+
+        This is just a convenience wrapper for:
+
+          x.transform(lambda string: string.lstrip())
+
+        """
+        return self.transform(lambda x: x.lstrip(*args))
+
+    def rstrip(self, *args):
+        """Return a new 'Localizable' stripping the final string from right after localization.
+
+        This is just a convenience wrapper for:
+
+          x.transform(lambda string: string.rstrip())
+
+        """
+        return self.transform(lambda x: x.rstrip(*args))
+
     def localize(self, localizer):
         """Return the localized version of the instance as a string.
 
