@@ -112,6 +112,7 @@ _nemeth_operators = {
     '!': '⠯',
     '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
 }
+_comparison('≐', '⠐⠨⠅⠣⠡⠻')
 _prime("'", '⠄')
 _prime('′', '⠄')
 _prime('″', '⠄⠄')
