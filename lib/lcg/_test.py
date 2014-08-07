@@ -955,7 +955,7 @@ class BrailleExport(unittest.TestCase):
         else:
             self.assertRaises(braille, exporter.export, context)
             return
-        result = exporter.export(context).split('\f')[:-1]
+        result = exporter.export(context).replace('\r\n', '\n').split('\f')[:-1]
         if result != expected:
             sys.stdout.write('*** Expected:\n')
             sys.stdout.write(string.join(expected, '\f').encode('utf-8') + '\n')
@@ -1079,7 +1079,7 @@ class BrailleExport(unittest.TestCase):
             exporter = lcg.BrailleExporter()
             context = exporter.context(n, lang='cs', presentation=presentation_set)
             exported = exporter.export(context)
-            result = exported.split('\n\n')[1]
+            result = exported.replace('\r\n', '\n').split('\n\n')[1]
             assert result == expected_result, (("\n  - source text: %r\n  - expected:    %r\n  - "
                                                 "got:         %r") %
                                                (mathml, expected_result, result,))
@@ -1183,7 +1183,7 @@ class BrailleExport(unittest.TestCase):
         exporter = lcg.BrailleExporter()
         context = exporter.context(n, lang='cs', presentation=presentation_set)
         exported = exporter.export(context)
-        result = exported.split('\n\n')[1]
+        result = exported.replace('\r\n', '\n').split('\n\n')[1]
         assert result == u'''⠠⠞⠗⠕⠉⠓⠁⠀⠍⠁⠞⠑⠍⠁⠞⠊⠅⠽
 ⠦⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃⠴
 ⠝⠑⠥⠱⠅⠕⠙⠌⠄''', repr(result)
@@ -1216,7 +1216,7 @@ class BrailleExport(unittest.TestCase):
             exporter = lcg.BrailleExporter()
             context = exporter.context(n, lang=lang, presentation=presentation_set)
             exported = exporter.export(context)
-            result = exported.split('\n\n')[1]
+            result = exported.replace('\r\n', '\n').split('\n\n')[1]
             if post == '.':
                 result = result[:-2] + u'⠲'
             elif post == ',':
@@ -1813,7 +1813,7 @@ class BrailleExport(unittest.TestCase):
             exporter = lcg.BrailleExporter()
             context = exporter.context(n, lang='cs', presentation=presentation_set)
             exported = exporter.export(context)
-            result = exported.split('\n\n')[1]
+            result = exported.replace('\r\n', '\n').split('\n\n')[1]
             assert result == expected_result, (("\n  - source text: %r\n  - expected:    %r\n  - "
                                                 "got:         %r") %
                                                (mathml, expected_result, result,))
