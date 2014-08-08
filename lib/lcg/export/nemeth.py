@@ -311,7 +311,7 @@ def mathml_nemeth(exporter, context, element):
     top_node = element.tree_content(entity_handler, transform=True)
     post = element.next_element()
     variables = _Variables()
-    braille = _child_export(top_node, exporter, context, variables).strip()
+    braille = _child_export(top_node, exporter, context, variables)
     text = braille.text()
     hyphenation = braille.hyphenation().replace(exporter.HYPH_WS, exporter.HYPH_NEMETH_WS)
     # Separate vertical bars
