@@ -20,6 +20,7 @@
 from __future__ import unicode_literals
 
 from contextlib import contextmanager
+import copy
 import re
 import string
 
@@ -299,8 +300,6 @@ _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_
 _braille_separate_subscript_regexp = \
     re.compile('([⠰%s][⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+|[⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])$' % (_IMPLICIT_SUBSCRIPT,))
 def mathml_nemeth(exporter, context, element):
-    # Implemented (partially): Rule I - XXII
-    # Missing: Rule XXIII -- Rule XXV
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
@@ -991,13 +990,116 @@ def _export_mtr(node, exporter, context, variables, **kwargs):
 def _export_mtd(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
 
+def _export_mstack(node, exporter, context, variables, **kwargs):
+    rows = _child_nodes(node)
+    widths_1 = [0]
+    widths_2 = None
+    pattern = ''
+    extra_width_1 = [0]
+    extra_width_2 = [0]
+    widths = widths_1
+    extra_width = extra_width_1
+    with variables.let('msline-present', False):
+        for r in rows:
+            exported = _export(r, exporter, context, variables, **kwargs).text()
+            if exported and exported[0] in '⠬⠤':
+                exported = exported[1:]
+                extra_width[0] = 1
+            if exported and exported[0] == _CONDITIONAL_NUM_PREFIX:
+                exported = exported[1:]
+            # Just very simplified row handling: We ignore all the MathML
+            # attributes and we assume that: 1. no row has got any special
+            # separator pattern suffix not present in other rows; 2. no two
+            # rows have distinct non-empty separator pattern prefixes.
+            parts = []
+            p = ''
+            i = j = 0
+            for op in ('⠈⠡',):
+                if exported.startswith(op):
+                    i = len(op)
+            l = len(exported)
+            while True:
+                while i < l and exported[i] in '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔':
+                    i += 1
+                parts.append(exported[j:i])
+                if i == l:
+                    break
+                p += exported[i]
+                i += 1
+                j = i
+            if not pattern.endswith(p):
+                if p.endswith(pattern):
+                    widths[0:0] = [0] * (len(p) - len(pattern))
+                    pattern = p
+                else:
+                    raise Exception("Non-matching mstack rows")
+            for i in range(-1, -len(p) - 2, -1):
+                widths[i] = max(widths[i], len(parts[i]))
+            if widths_2 is None and variables.get('msline-present'):
+                widths = widths_2 = copy.copy(widths_1)
+                extra_width = extra_width_2
+        max_width = (max(sum(widths_1) + extra_width_1[0], sum(widths_2) + extra_width_2[0]) +
+                     len(pattern))
+        msline_present = variables.get('msline-present')
+        if msline_present:
+            max_width += 2
+    widths_1 = [0] * (len(widths_2) - len(widths_1)) + widths_1
+    widths = widths_1
+    result = ''
+    with variables.xlet(('ms-widths', widths),
+                        ('ms-pattern', pattern),
+                        ('ms-max-width', max_width),
+                        ('msline-present', False),):
+        for r in rows:
+            exported = _export(r, exporter, context, variables, **kwargs).text()
+            if exported and exported[0] == _CONDITIONAL_NUM_PREFIX:
+                exported = exported[1:]
+            if len(exported) < max_width:
+                if exported and exported[0] in '⠬⠤':
+                    prefix = exported[0]
+                    exported = exported[1:]
+                    if exported and exported[0] == _CONDITIONAL_NUM_PREFIX:
+                        exported = exported[1:]
+                else:
+                    prefix = ''
+                if msline_present:
+                    prefix = '⠀' + prefix
+                formatted = ''
+                for i in range(len(pattern) - 1, -1, -1):
+                    pos = exported.rfind(pattern[i])
+                    part = exported[pos + 1:]
+                    exported = exported[:max(pos, 0)]
+                    part = '⠀' * (widths[i + 1] - len(part)) + part
+                    formatted = pattern[i] + part + formatted
+                formatted = (prefix + '⠀' * (widths[0] - len(exported)) + exported + formatted)
+                if msline_present:
+                    formatted = '⠀' * max(max_width - 1 - len(formatted), 0) + formatted
+            else:
+                formatted = exported
+            result = result + formatted + '\n'
+            if variables.get('msline-present'):
+                widths = widths_2
+    result = _Braille(result)
+    return result
+
+def _export_msgroup(node, exporter, context, variables, **kwargs):
+    return _child_export(node, exporter, context, variables)
+
+def _export_msrow(node, exporter, context, variables, **kwargs):
+    return _child_export(node, exporter, context, variables)
+
+def _export_msline(node, exporter, context, variables, **kwargs):
+    variables.set('msline-present', True)
+    width = variables.get('ms-max-width')
+    if width is None:
+        text = ''
+    else:
+        text = '⠒' * (width)
+    return _Braille(text)
+
 # def _export_mmultiscripts(node, **kwargs):
 # def _export_mlabeledtr(node, **kwargs):
 # def _export_maligngroup(node, **kwargs):
-# def _export_mstack(node, **kwargs):
-# def _export_msgroup(node, **kwargs):
-# def _export_msrow(node, **kwargs):
-# def _export_msline(node, **kwargs):
 # def _export_mscarries(node, **kwargs):
 # def _export_mscarry(node, **kwargs):
 # def _export_mlongdiv(node, **kwargs):
