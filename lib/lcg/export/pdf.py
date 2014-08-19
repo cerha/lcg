@@ -19,6 +19,7 @@
 
 import copy
 import cStringIO
+import inspect
 import os
 import re
 import string
@@ -498,7 +499,17 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         if self._box_boxed:
             width, height = self._width_height
             self.canv.rect(0, 0, width, height)
-
+    def __unicode__(self):
+        result = ('RLContainer(vertical=%s, align=%s, boxed=%s):\n' %
+                  (self._box_vertical, self._box_align, self._box_boxed,))
+        for c in self._box_content:
+            u = unicode(c)
+            if u and u[-1] != '\n':
+                u += '\n'
+            result += ('  ----\n' +
+                       string.join([' ' + l if l else '' for l in u.split('\n')], '\n'))
+        return result
+        
 class RLText(reportlab.platypus.flowables.Flowable):
     # Paragraphs have variable dimensions and they don't work well when
     # wrapping simple texts for horizontal concatenation.  Tables can handle
@@ -538,6 +549,8 @@ class RLText(reportlab.platypus.flowables.Flowable):
             tx.textLine(line)
             self.canv.drawText(tx)
             y -= self._style.leading
+    def __unicode__(self):
+        return 'RLText(%s)' % (self._text.join('\n'),)
     
 class RLSpacer(reportlab.platypus.flowables.Spacer):
     def __init__(self, *args, **kwargs):
@@ -2382,6 +2395,16 @@ class PDFExporter(FileExporter, Exporter):
                 if str(e).find('too large') >= 0:
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
+                        tb = sys.exc_info()[2]
+                        frame_locals = inspect.getinnerframes(tb)[-1][0].f_locals
+                        for v in ('flowable', 'f',):
+                            if v in frame_locals:
+                                obj = frame_locals[v]
+                                break
+                        else:
+                            obj = None
+                        if obj is not None:
+                            e = (e, unicode(obj),)
                         lcg.log("Page content extremely large, giving up")
                         raise Exception("Content too large", e)
                     lcg.log("Page content too large, reducing it by %s" %
