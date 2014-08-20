@@ -991,7 +991,20 @@ def _export_mtd(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
 
 def _export_mstack(node, exporter, context, variables, **kwargs):
-    rows = _child_nodes(node)
+    rows = []
+    for n in _child_nodes(node):
+        if n.tag == 'msgroup':
+            group_rows = _child_nodes(n)
+            shift = int(_attribute(n, 'shift', default='0'))
+            if shift > 0:
+                rows.append((0, shift,))
+            elif shift < 0:
+                rows.append((((len(group_rows) - 1) * shift), shift,))
+            rows += group_rows
+            if shift:
+                rows.append('end-shift')
+        else:
+            rows.append(n)
     widths_1 = [0]
     widths_2 = None
     pattern = ''
@@ -999,14 +1012,28 @@ def _export_mstack(node, exporter, context, variables, **kwargs):
     extra_width_2 = [0]
     widths = widths_1
     extra_width = extra_width_1
+    addition_or_subtraction = False
+    shift = None
+    shift_inc = 0
     with variables.let('msline-present', False):
         for r in rows:
+            if isinstance(r, tuple):
+                shift, shift_inc = r
+                continue
+            if r == 'end-shift':
+                shift = None
+                continue
             exported = _export(r, exporter, context, variables, **kwargs).text()
             if exported and exported[0] in '⠬⠤':
                 exported = exported[1:]
                 extra_width[0] = 1
+                addition_or_subtraction = True
             if exported and exported[0] == _CONDITIONAL_NUM_PREFIX:
                 exported = exported[1:]
+            for op in ('⠈⠡', '⠨'):
+                if exported.startswith(op + _CONDITIONAL_NUM_PREFIX):
+                    n = len(op)
+                    exported = exported[:n] + exported[n + 1:]
             # Just very simplified row handling: We ignore all the MathML
             # attributes and we assume that: 1. no row has got any special
             # separator pattern suffix not present in other rows; 2. no two
@@ -1017,6 +1044,9 @@ def _export_mstack(node, exporter, context, variables, **kwargs):
             for op in ('⠈⠡',):
                 if exported.startswith(op):
                     i = len(op)
+            if shift:
+                exported += '⠀' * shift
+                shift += shift_inc
             l = len(exported)
             while True:
                 while i < l and exported[i] in '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔':
@@ -1027,17 +1057,21 @@ def _export_mstack(node, exporter, context, variables, **kwargs):
                 p += exported[i]
                 i += 1
                 j = i
-            if not pattern.endswith(p):
+            if pattern is not None and not pattern.endswith(p):
                 if p.endswith(pattern):
                     widths[0:0] = [0] * (len(p) - len(pattern))
                     pattern = p
                 else:
-                    raise Exception("Non-matching mstack rows")
+                    pattern = None
             for i in range(-1, -len(p) - 2, -1):
                 widths[i] = max(widths[i], len(parts[i]))
             if widths_2 is None and variables.get('msline-present'):
                 widths = widths_2 = copy.copy(widths_1)
                 extra_width = extra_width_2
+        if pattern is None:
+            if addition_or_subtraction:
+                raise Exception("Non-matching mstack rows")
+            pattern = ''
         max_width = (max(sum(widths_1) + extra_width_1[0], sum(widths_2) + extra_width_2[0]) +
                      len(pattern))
         msline_present = variables.get('msline-present')
@@ -1045,15 +1079,25 @@ def _export_mstack(node, exporter, context, variables, **kwargs):
             max_width += 2
     widths_1 = [0] * (len(widths_2) - len(widths_1)) + widths_1
     widths = widths_1
+    shift = None
     result = ''
     with variables.xlet(('ms-widths', widths),
                         ('ms-pattern', pattern),
                         ('ms-max-width', max_width),
                         ('msline-present', False),):
         for r in rows:
+            if isinstance(r, tuple):
+                shift, shift_inc = r
+                continue
+            if r == 'end-shift':
+                shift = None
+                continue
             exported = _export(r, exporter, context, variables, **kwargs).text()
             if exported and exported[0] == _CONDITIONAL_NUM_PREFIX:
                 exported = exported[1:]
+            if shift is not None:
+                exported += '⠀' * shift
+                shift += shift_inc
             if len(exported) < max_width:
                 if exported and exported[0] in '⠬⠤':
                     prefix = exported[0]
@@ -1076,7 +1120,7 @@ def _export_mstack(node, exporter, context, variables, **kwargs):
                     formatted = '⠀' * max(max_width - 1 - len(formatted), 0) + formatted
             else:
                 formatted = exported
-            result = result + formatted + '\n'
+            result = result + formatted.rstrip('⠀') + '\n'
             if variables.get('msline-present'):
                 widths = widths_2
     result = _Braille(result)

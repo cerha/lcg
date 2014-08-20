@@ -1193,7 +1193,8 @@ class BrailleExport(unittest.TestCase):
         can_parse_entities = (python_version[0] >= 3 or
                              python_version[0] == 2 and python_version[1] >= 7)
         entity_regexp = re.compile('&[a-zA-Z]+;')
-        def test(mathml, expected_result, lang='cs', page_width=None, pre=None, post=None):
+        def test(mathml, expected_result, lang='cs', page_width=None, page_height=None,
+                 pre=None, post=None):
             if not can_parse_entities and entity_regexp.search(mathml):
                 return
             content = lcg.MathML(mathml)
@@ -1210,6 +1211,8 @@ class BrailleExport(unittest.TestCase):
                 presentation.page_width = lcg.USpace(40)
             elif page_width is not None:
                 presentation.page_width = page_width
+            if page_height is True:
+                presentation.page_height = lcg.USpace(25)
             presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
             n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                                 content=content)
@@ -1815,6 +1818,22 @@ class BrailleExport(unittest.TestCase):
 <mn>3.704</mn><msrow><mo>-</mo><mn>.915</mn></msrow><msline/><mn>2.789</mn>
 </mstack>
 </math>''', u'⠀⠀⠒⠨⠶⠴⠲\n⠀⠤⠀⠨⠔⠂⠢\n⠒⠒⠒⠒⠒⠒⠒⠒\n⠀⠀⠆⠨⠶⠦⠔')
+        # §179
+        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+<mstack>
+  <msgroup>
+    <mn>23</mn>
+    <msrow><mo>&times;</mo><mn>54</mn></msrow>
+  </msgroup>
+  <msline/>
+  <msgroup shift="1">
+    <mn>92</mn>
+    <mn>115</mn>
+  </msgroup>
+  <msline/>
+  <mn>1242</mn>
+</mstack>
+</math>''', u'⠀⠀⠀⠆⠒\n⠀⠈⠡⠢⠲\n⠒⠒⠒⠒⠒⠒\n⠀⠀⠀⠔⠆\n⠀⠂⠂⠢\n⠒⠒⠒⠒⠒⠒\n⠀⠂⠆⠲⠆', page_height=True)
         
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
