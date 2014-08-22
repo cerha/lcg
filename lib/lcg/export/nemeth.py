@@ -50,6 +50,7 @@ _MATRIX_SEPARATOR = '\ue035'
 _nemeth_numbers = {'0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲',
                    '5': '⠢', '6': '⠖', '7': '⠶', '8': '⠦', '9': '⠔',
                    ' ': '⠀', '.': '⠨', ',': '⠠'}
+_nemeth_digits = '⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔'
 
 _nemeth_texts = {'cos': '⠉⠕⠎',  # wrong translation by liblouis
                  'log': '⠇⠕⠛',  # wrong translation by liblouis
@@ -294,11 +295,12 @@ _num_prefix_regexp = re.compile('(^|[\n⠀%s%s%s])([%s%s%s]*⠤?)(%s)' %
 _prefixed_punctuation = "':.!-?‘“’”;\""
 _punctuation_regexp = re.compile('([,–—]+)[%s]' % (_prefixed_punctuation,))
 
-_braille_number_regexp = re.compile('[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠨]+%s?$' % (_END_SUBSUP,))
+_braille_number_regexp = re.compile('[%s⠨]+%s?$' % (_nemeth_digits, _END_SUBSUP,))
 _braille_empty_regexp = re.compile('[⠀\ue000-\ue0ff]*$')
 _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_SUBSUP,))
 _braille_separate_subscript_regexp = \
-    re.compile('([⠰%s][⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+|[⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])$' % (_IMPLICIT_SUBSCRIPT,))
+    re.compile('([⠰%s][%s]+|[⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])$' % (_IMPLICIT_SUBSCRIPT,
+                                                               _nemeth_digits,))
 def mathml_nemeth(exporter, context, element):
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
@@ -708,6 +710,9 @@ def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
         op_braille.append(_AFTER_BAR)
     if op == '°' and not variables.get('subsup'):
         op_braille.append(_END_SUBSUP)
+    if op_braille.text()[0] in _nemeth_digits:
+        op_braille.prepend('⠸')
+        op_braille.append(_NUM_PREFIX_REQUIRED)
     return op_braille
 
 def _export_mtext(node, exporter, context, variables, **kwargs):
