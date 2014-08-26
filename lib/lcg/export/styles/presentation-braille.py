@@ -598,7 +598,7 @@ printers = {'Index Everest-D V2, Index 4x4 PRO V2':
             'Index Everest-D V4, Index 4x4 PRO V3':
             dict(device_init=device_init_index_v4),
             'Test':
-            dict(device_output=None),
+            dict(device_output=(('\f', '\r\n----\r\n'),)),
             }
 default_printer = 'Index Everest-D V2, Index 4x4 PRO V2'
 

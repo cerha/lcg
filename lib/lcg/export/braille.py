@@ -455,10 +455,14 @@ class BrailleExporter(FileExporter, Exporter):
         left_status_line = presentation.left_page_footer or node.left_page_footer(lang)
         right_status_line = presentation.right_page_footer or node.right_page_footer(lang)
         device_table = printer_properties.get('device_output', presentation.device_output)
-        if device_table is None:
+        if device_table is None or isinstance(device_table, tuple):
+            spec = device_table
             device_table = {' ': '⠀', '\n': '\r\n', '\f': '\f'}
             for c in self._braille_characters():
                 device_table[c] = c
+            if device_table is not None:
+                for c, t in spec:
+                    device_table[c] = t
         braille_tables = presentation.braille_tables
         hyphenation_tables = presentation.braille_hyphenation_tables
         context.set_tables(braille_tables, hyphenation_tables)
