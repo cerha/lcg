@@ -638,7 +638,7 @@ def _op_export(operator, exporter, context, variables, node=None):
         # situation here.
         if op_braille is None or '⠈⠀⠭' in op_braille or '⡳' in op_braille:
             op_braille = string.join([c for c in op_braille if c != '⡳'], '')
-            op_braille = '⠿⠿⠿%s⠿⠿⠿' % (op_braille,)
+            op_braille = exporter.braille_unknown_char(op_braille, operator)
             hyphenation = exporter.HYPH_NO * len(op_braille)
         elif operator in _math_comparison_operators:
             _comparison(operator, op_braille)

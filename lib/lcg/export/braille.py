@@ -77,6 +77,7 @@ _mathml_operators = {
     '∉': (_inf, ' ⠈⠘⠑ ', '00000',),
 }
 
+_unknown_char_regexp = re.compile('⠄⡳⠭([⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+)') # only English version
 from export import Exporter, FileExporter
 
 def braille_presentation(presentation_file='presentation-braille.py'):
@@ -435,6 +436,9 @@ class BrailleExporter(FileExporter, Exporter):
     def _braille_characters(self):
         return string.join([unichr(i) for i in range(10240, 10496)], '')
 
+    def braille_unknown_char(self, code, report):
+        return '⠿⠿⠿%s⠿⠿⠿' % (code,)
+
     def export(self, context, recursive=False):
         # Presentation
         node = context.node()
@@ -460,7 +464,7 @@ class BrailleExporter(FileExporter, Exporter):
             device_table = {' ': '⠀', '\n': '\r\n', '\f': '\f'}
             for c in self._braille_characters():
                 device_table[c] = c
-            if device_table is not None:
+            if spec is not None:
                 for c, t in spec:
                     device_table[c] = t
         braille_tables = presentation.braille_tables
@@ -882,6 +886,14 @@ class BrailleExporter(FileExporter, Exporter):
                 start, end = match.span(1)
                 braille = braille[:start] + braille[end:]
                 hyphenation = hyphenation[:start] + hyphenation[end:]
+        while True:
+            match = _unknown_char_regexp.search(braille)
+            if match is None:
+                break
+            start, end = match.start(0), match.end(0)
+            unknown = self.braille_unknown_char(match.group(1), (text, lang,))
+            braille = braille[:start] + unknown + braille[end:]
+            hyphenation = hyphenation[:start] + '0' * len(unknown) + hyphenation[end:]
         assert len(braille) == len(hyphenation), (braille, hyphenation,)
         if discarded_prefix and braille.startswith(discarded_prefix):
             n = len(discarded_prefix)
@@ -1316,7 +1328,7 @@ class BrailleExporter(FileExporter, Exporter):
                     hyphenation = self.HYPH_NO * len(op_braille)
             if op_braille.find(u'⠈⠀⠭') >= 0:
                 # Still a Unicode character?  We should do something about it.
-                op_braille = '⠿⠿⠿%s⠿⠿⠿' % (op_braille,)
+                op_braille = self.braille_unknown_char(op_braille, operator)
                 hyphenation = self.HYPH_NO * len(op_braille)
             if translation is not None:
                 t_braille = translation[1]
