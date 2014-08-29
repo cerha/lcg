@@ -961,7 +961,8 @@ def _export_munderover(node, exporter, context, variables, **kwargs):
 
 def _export_mtable(node, exporter, context, variables, **kwargs):
     matrix = _Braille(_MATRIX_START)
-    start, end = variables.get('matrix-start', ''), variables.get('matrix-end', '')
+    start = variables.get('matrix-start', _Braille(''))
+    end = variables.get('matrix-end', _Braille(''))
     rows = _child_nodes(node)
     n_columns = 0
     for r in rows:
