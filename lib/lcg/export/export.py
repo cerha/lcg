@@ -926,15 +926,11 @@ class Exporter(object):
         vertical_separator = self._vertical_cell_separator(context, 1)
         first_vertical_separator = self._vertical_cell_separator(context, 0)
         last_vertical_separator = self._vertical_cell_separator(context, -1)
-        widths = []
-        n_cells = 0
-        for row in content:
-            if isinstance(row, TableRow):
-                n_cells = len(row.content())
-                widths = [0] * n_cells
-                break
-        else:
+        try:
+            n_cells = max([len(row.content()) for row in content if isinstance(row, TableRow)])
+        except ValueError:
             raise Exception("No row found in the table", content)
+        widths = [0] * n_cells
         total_width = len(first_vertical_separator) + len(last_vertical_separator)
         if widths:
             total_width += len(vertical_separator) * (len(widths) - 1)
@@ -963,7 +959,10 @@ class Exporter(object):
                 if n_cells > 0:
                     item_list.append(first_vertical_separator)
                 for i in range(n_cells):
-                    cell = row[i]
+                    if i < len(row):
+                        cell = row[i]
+                    else:
+                        cell = self.text(context, '')
                     item_list.append(cell)
                     space = self._space(context, widths[i] - len(cell))
                     item_list.append(self.text(context, space))
@@ -1011,11 +1010,10 @@ class Exporter(object):
         return len(cell)
 
     def _set_table_column_widths(self, context, element, extra_width, widths):
-        n_cells = len(widths)
         exported_rows = [r.content() for r in element.content() if isinstance(r, TableRow)]
         for row in exported_rows:
             if isinstance(row, (tuple, list,)):
-                for i in range(n_cells):
+                for i in range(len(row)):
                     cell_width = self._table_cell_width(context, element, row[i].export(context))
                     widths[i] = max(widths[i], cell_width)
         return None

@@ -1128,7 +1128,13 @@ class BrailleExporter(FileExporter, Exporter):
         def export_cells(column, compactness):
             context_compactness.clear()
             context_compactness.update(compactness)
-            return [export(context, row[column]) for row in cells]
+            exported = []
+            for row in cells:
+                if len(row) > column:
+                    exported.append(export(context, row[column]))
+                else:
+                    exported.append(_Braille(''))
+            return exported
         def adjust_widths(max_w, total_width=total_width):
             if total_width <= max_w:
                 return True
