@@ -1292,13 +1292,13 @@ class Section(Container):
         """
         return [c for c in self.container_path() if isinstance(c, Section)]
     
-    def section_number(self):
+    def section_number(self, context=None):
         """Return the number of this section within its container section as int."""
         container = self._container
         while container and not isinstance(container, Section) and container.container():
             container = container.container()
         if container:
-            return list(container.sections(None)).index(self) + 1
+            return list(container.sections(context)).index(self) + 1
         else:
             return 1
     
@@ -1324,7 +1324,7 @@ class Section(Container):
         """Return true if the section is supposed to appear in TOC."""
         return self._in_toc
     
-    def id(self):
+    def id(self, context=None):
         """Return the unique section identifier as a string.
 
         If 'id' was passed to the constructor, it is used.  Otherwise the
@@ -1339,7 +1339,7 @@ class Section(Container):
             if len(path) >= 2:
                 self._id = path[-2].id() + '.' + str(self.section_number())
             else:
-                numbers = [str(x.section_number()) for x in path]
+                numbers = [str(x.section_number(context)) for x in path]
                 self._id = self._ID_PREFIX + '.'.join(numbers)
         return self._id
 

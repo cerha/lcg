@@ -2588,7 +2588,7 @@ class PDFExporter(FileExporter, Exporter):
                     if update_text(c, function):
                         return True
             return False
-        anchor = element.anchor()
+        anchor = element.anchor(context)
         if anchor:
             def make_link_target(content):
                 return make_element(LinkTarget, name=anchor, content=content.content,

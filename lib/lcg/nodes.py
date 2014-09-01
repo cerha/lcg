@@ -238,7 +238,7 @@ class ContentNode(object):
     def find_section(self, section_id, context):
         def find(section_id, sections):
             for s in sections:
-                if s.id() == section_id:
+                if s.id(context) == section_id:
                     return s
                 found = find(section_id, s.sections(context))
                 if found:
