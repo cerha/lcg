@@ -476,7 +476,8 @@ class BrailleExporter(FileExporter, Exporter):
             text = braille.text()
             hyphenation = braille.hyphenation()
             # Fix marker chars not preceded by newlines
-            toc_marker_regexp = re.compile('[^\n]' + self._TOC_MARKER_CHAR, re.MULTILINE)
+            toc_marker_regexp = re.compile('[^\n]' + self._TOC_MARKER_CHAR + '[0-9]+' +
+                                           self._END_MARKER_CHAR, re.MULTILINE)
             while True:
                 match = toc_marker_regexp.search(text)
                 if match is None:
@@ -708,6 +709,12 @@ class BrailleExporter(FileExporter, Exporter):
                     lines = lines + [''] * (page_height - len(lines))
                     if status_line:
                         exported_status_line = status_line.export(context).text()
+                        while True:
+                            match = toc_marker_regexp.search(exported_status_line)
+                            if match is None:
+                                break
+                            exported_status_line = (exported_status_line[:match.start() + 1] +
+                                                    exported_status_line[match.end():])
                         # Hack: We have to center status line text manually here.
                         # Of course, this won't work in a generic case and we
                         # make just basic precautions.

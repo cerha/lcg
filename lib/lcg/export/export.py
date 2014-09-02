@@ -203,6 +203,7 @@ class Exporter(object):
             self._log = []
             self.list_level = 0
             self.text_preprocessor = None
+            self.toc_elements = ()
 
         def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None,
                          text_preprocessor=None):
@@ -479,7 +480,11 @@ class Exporter(object):
             method = self._export_method[cls]
         except KeyError:
             raise UnsupportedElementType(element.__class__)
-        return method(context, element)
+        exported = method(context, element)
+        if element in context.toc_elements:
+            toc_marker = context.add_toc_marker(element)
+            exported = self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker), exported)
+        return exported
         
     def export(self, context, recursive=False):
         """Export the node represented by 'context' and return the corresponding output string.
@@ -934,8 +939,10 @@ class Exporter(object):
         presentation = presentation_set and presentation_set.presentation(None, lang)
         page_width = presentation and presentation.page_width
         item_list = []
+        node_list = context.toc_elements = []
         def export(items):
             for node, subitems in items:
+                node_list.append(node.heading() if isinstance(node, ContentNode) else node)
                 current_lang = (node.lang() or lang)
                 if isinstance(node, Section):
                     item_list.append(self.text(context, node.title(), lang=current_lang))
