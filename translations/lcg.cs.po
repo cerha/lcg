@@ -1,5 +1,5 @@
 # Learning Content Generator translations
-# Copyright (C) 2005-2009 Brailcom, o.p.s.
+# Copyright (C) 2005-2009, 2014 Brailcom, o.p.s.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2005.
 #
@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-22 16:04+0200\n"
-"PO-Revision-Date: 2014-03-21 15:28+0100\n"
+"POT-Creation-Date: 2014-09-02 15:04+0200\n"
+"PO-Revision-Date: 2014-09-02 15:08+0200\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
 "Language: cs\n"
@@ -16,25 +16,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/export/braille.py:675
-msgid "Text can't be represented on given output device."
-msgstr "Zvolené výstupní zařízení nedokáže zpracovat tento text."
+#: ../lib/lcg/export/braille.py:758
+#, fuzzy, python-format
+msgid "Character %r can't be represented on given output device: \"%s\""
+msgstr "Znak %r nemůže být reprezentován na zvoleném výstupním zařízení: \"%s\""
 
-#: ../lib/lcg/export/braille.py:1107
+#: ../lib/lcg/export/braille.py:1207
 msgid "The table is read across facing pages."
 msgstr "Tabulka je dvoustranná."
 
-#: ../lib/lcg/export/html.py:535
+#: ../lib/lcg/export/html.py:532
 msgid "Choose your language:"
 msgstr "Zvolte jazyk:"
 
-#: ../lib/lcg/export/html.py:1012
+#: ../lib/lcg/export/html.py:1010
 msgid "Flash movie object"
 msgstr "Objekt Flash video"
 
 #. Translators: Title of the link to Adobe website used in
 #. the Flash warning.
-#: ../lib/lcg/export/html.py:1087
+#: ../lib/lcg/export/html.py:1085
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plugin"
 
@@ -42,40 +43,40 @@ msgstr "Adobe Flash plugin"
 #. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
 #. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
 #. version number.
-#: ../lib/lcg/export/html.py:1083
+#: ../lib/lcg/export/html.py:1081
 #, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr "Získejte %(plugin)s %(version)s nebo pozdější."
 
-#: ../lib/lcg/export/html.py:1089
+#: ../lib/lcg/export/html.py:1087
 msgid "Use a JavaScript enabled browser."
 msgstr "Použijte prohlížeč s podporou JavaScriptu."
 
-#: ../lib/lcg/export/html.py:1090 ../lib/lcg/export/html.py:1092
+#: ../lib/lcg/export/html.py:1088 ../lib/lcg/export/html.py:1090
 msgid "Warning:"
 msgstr "Varování:"
 
-#: ../lib/lcg/export/html.py:1123
+#: ../lib/lcg/export/html.py:1121
 msgid "Media Player unavailable."
 msgstr "Přehrávač médií nedostupný."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:1318
+#: ../lib/lcg/export/html.py:1316
 msgid "None"
 msgstr "není"
 
-#: ../lib/lcg/export/html.py:1319
+#: ../lib/lcg/export/html.py:1317
 msgid "You are here:"
 msgstr "Nacházíte se zde:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1323
+#: ../lib/lcg/export/html.py:1321
 msgid "Next"
 msgstr "Další"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1325
+#: ../lib/lcg/export/html.py:1323
 msgid "Previous"
 msgstr "Předchozí"
 
@@ -266,9 +267,8 @@ msgid "Hungarian"
 msgstr "maďarština"
 
 #: ../lib/lcg/util.py:201
-#, fuzzy
 msgid "Armenian"
-msgstr "rumunština"
+msgstr "arménština"
 
 #: ../lib/lcg/util.py:202
 msgid "Interlingua"
@@ -874,12 +874,11 @@ msgstr ""
 
 #: ../lib/lcg/util.py:368
 msgid "Czech Republic"
-msgstr ""
+msgstr "Česká republika"
 
 #: ../lib/lcg/util.py:369
-#, fuzzy
 msgid "Germany"
-msgstr "němčina"
+msgstr "Německo"
 
 #: ../lib/lcg/util.py:370
 msgid "Djibouti"
