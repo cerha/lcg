@@ -170,6 +170,14 @@ class Exporter(object):
         attribute of the derived 'Exporter' class (it is a nested class).
 
         """
+        INFO = 'INFO'
+        """Constant denoting informational (non-error) messages for 'kind' argument of 'log()'."""
+        WARNING = 'WARNING'
+        """Constant denoting warning messages for 'kind' argument of 'log()'."""
+        ERROR = 'ERROR'
+        """Constant denoting error messages for 'kind' argument of 'log()'."""
+
+
         def __init__(self, exporter, node, lang, **kwargs):
             """Initialize the export context.
 
@@ -192,6 +200,7 @@ class Exporter(object):
             self._secondary_language_active = False
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
+            self._log = []
             self.list_level = 0
             self.text_preprocessor = None
 
@@ -259,6 +268,45 @@ class Exporter(object):
 
         def set_page_heading(self, heading):
             self._page_heading = heading
+
+        def log(self, message, kind=ERROR):
+            """Record error or important information about the export progress.
+            
+            This method should be used by export backends to report problems,
+            errors or important information about the progress of the export.
+            This information will be displayed to the user who invoked the
+            export.  It should typically inform the user about the problems
+            which occured in the input data possibly in connection with export
+            paramaters or features supported by given exporter.
+
+            The kind can be one of the class constants:
+
+              'ERROR' -- for problems which make the output or its parts
+                unusable or significantly damaged.
+
+              'WARNING' -- for minor or potential problems which don't make the
+                output unusable, but may require some attention.
+ 
+              'INFO' -- to display information about normal export progress.
+
+            The problems are typically also visibly marked within the output,
+            but it would be hard to detect them for the user without logging as
+            it would require reading through the whole output.  The logged
+            messages thus serve as a summary of problems.
+
+            """
+            assert kind in (self.ERROR, self.WARNING, self.INFO)
+            assert isinstance(message, basestring)
+            self._log.append((kind, message))
+            
+        def messages(self):
+            """Return all messages logged during the export through the 'log()' method.
+        
+            Return a tuple of pairs (KIND, MESSAGE) corresponding to the
+            relevant 'log()' method arguments.
+
+            """
+            return self._log
             
     def __init__(self, translations=()):
         self._translation_path = translations
