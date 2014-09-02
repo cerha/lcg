@@ -802,7 +802,7 @@ class Exporter(object):
         """
         toc_marker = context.add_toc_marker(element)
         return self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker),
-                           self.text(context, element.title(), element.lang()),
+                           self.text(context, context.localize(element.title()), element.lang()),
                            self._newline(context, 2),
                            self._export_container(context, element))
 
@@ -907,10 +907,14 @@ class Exporter(object):
         for node, subitems in element.items(context):
             add_item(node, subitems)
         export(items)
-        return self.concat(self.text(context, element.title() or '???', lang=lang),
-                           self._newline(context, 2),
-                           self.concat(*item_list),
-                           self._newline(context))
+        result = self.concat(self.concat(*item_list),
+                             self._newline(context))
+        title = element.title()
+        if title:
+            result = self.concat(self.text(context, context.localize(element.title()), lang=lang),
+                                 self._newline(context, 2),
+                                 result)
+        return result
 
     # Tables
 
