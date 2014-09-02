@@ -486,6 +486,7 @@ class BrailleExporter(FileExporter, Exporter):
                 hyphenation = hyphenation[:n] + self.HYPH_NO + hyphenation[n:]
             # Line breaking
             hfill = self._HFILL
+            hfill_len = len(hfill)
             page_strings = text.split('\f')
             def split(page):
                 lines = page.split('\n')
@@ -498,6 +499,12 @@ class BrailleExporter(FileExporter, Exporter):
                 for i in range(len(pages)):
                     lines = []
                     def add_line(l):
+                        while True:
+                            pos = l.find(hfill)
+                            if pos < 0:
+                                break
+                            fill_len = page_width - len(l) + hfill_len
+                            l = l[:pos] + '⠀' * fill_len + l[pos + hfill_len:]
                         lines.append(l)
                     for line in pages[i]:
                         mark = self._text_mark(line)
@@ -540,9 +547,12 @@ class BrailleExporter(FileExporter, Exporter):
                                                             self.HYPH_NEMETH_NUMBER,)):
                                     pos -= 1
                             if pos == 0:
-                                add_line(line[:page_width])
-                                line = prefix + line[page_width:]
-                                hyphenation = hyphenation_prefix + hyphenation[page_width:]
+                                pos = page_width
+                                while line[pos - 1] == hfill[0]:
+                                    pos -= 1
+                                add_line(line[:pos])
+                                line = prefix + line[pos:]
+                                hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == self.HYPH_YES:
                                 add_line(line[:pos] + self.text(context, '-', lang=lang).text())
                                 line = prefix + line[pos:]
@@ -585,10 +595,10 @@ class BrailleExporter(FileExporter, Exporter):
                                                        hyphenation[n:])
                         pos = line.find(hfill)
                         if pos >= 0:
-                            fill_len = (page_width - len(line) + len(hfill))
-                            line = (line[:pos] + ' ' * fill_len + line[pos + len(hfill):])
+                            fill_len = (page_width - len(line) + hfill_len)
+                            line = (line[:pos] + '⠀' * fill_len + line[pos + hfill_len:])
                             hyphenation = (hyphenation[:pos] + self.HYPH_NO * fill_len +
-                                           hyphenation[pos + len(hfill):])
+                                           hyphenation[pos + hfill_len:])
                         add_line(line)
                         hyphenation = hyphenation[len(line) + 1:]
                     pages[i] = lines
