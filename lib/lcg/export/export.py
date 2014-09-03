@@ -177,7 +177,6 @@ class Exporter(object):
         ERROR = 'ERROR'
         """Constant denoting error messages for 'kind' argument of 'log()'."""
 
-
         def __init__(self, exporter, node, lang, **kwargs):
             """Initialize the export context.
 
@@ -387,7 +386,6 @@ class Exporter(object):
     def _export(self, node, context, recursive=False):
         heading = node.heading().export(context)
         newline = self._newline(context, 2)
-        context.set_page_heading(heading)
         content = node.content().export(context)
         if recursive:
             # FIXME: The context should be cloned here with the correct node in

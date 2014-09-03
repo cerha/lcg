@@ -472,6 +472,7 @@ class BrailleExporter(FileExporter, Exporter):
         context.set_tables(braille_tables, hyphenation_tables)
         # Export
         def run_export(page_height=page_height):
+            context.set_page_heading(_Braille(''))
             braille = super(BrailleExporter, self).export(context, recursive=recursive)
             text = braille.text()
             hyphenation = braille.hyphenation()
@@ -692,7 +693,19 @@ class BrailleExporter(FileExporter, Exporter):
                             marker, arg = mark
                             if marker == self._TOC_MARKER_CHAR:
                                 page_number = unicode(context.page_number())
-                                context.toc_element(arg).set_page_number(context, page_number)
+                                element = context.toc_element(arg)
+                                element.set_page_number(context, page_number)
+                                if isinstance(element, Section):
+                                    exported = self.text(context, element.title())
+                                else:
+                                    exported = element.export(context)
+                                text = exported.text()
+                                if text and text[0] == self._TOC_MARKER_CHAR:
+                                    text = text.split(self._END_MARKER_CHAR)[1]
+                                pos = text.find('\n')
+                                if pos >= 0:
+                                    text = text[:pos]
+                                context.set_page_heading(_Braille(text))
                             elif marker == self._PAGE_START_REPEAT_CHAR:
                                 repeated_lines_activated[0] = True
                             elif marker == self._PAGE_END_CHAR:

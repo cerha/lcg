@@ -36,10 +36,12 @@ top_margin = lcg.UFont(0)
 bottom_margin = lcg.UFont(0)
 
 left_page_footer = lcg.Container((lcg.PageNumber(),
+                                  lcg.TextContent(' '),
                                   lcg.Container((lcg.PageHeading(),),
                                                 halign=lcg.HorizontalAlignment.CENTER),))
 right_page_footer = lcg.Container((lcg.Container((lcg.PageHeading(),),
                                                  halign=lcg.HorizontalAlignment.CENTER),
+                                   lcg.TextContent(' '),
                                    lcg.PageNumber(),))
 
 debug_device_output_en = {
