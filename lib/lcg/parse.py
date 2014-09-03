@@ -1552,20 +1552,3 @@ def add_processing_info(exception, caption, information):
         if not hasattr(exception, '_lcg_processing_details'):
             exception._lcg_processing_details = []
         exception._lcg_processing_details.append((caption, information))
-
-def _log(*args):
-    """Just for internal debugging purposes..."""
-    def _str(x):
-        if isinstance(x, lcg.Container):
-            return "<%s %s>" % (x.__class__.__name__, _str(x._content))
-        elif isinstance(x, lcg.Content):
-            return str(x)
-        elif isinstance(x, (types.ListType, types.TupleType)):
-            result = ', '.join([_str(i) for i in x])
-            if isinstance(x, types.ListType):
-                return '[' + result + ']'
-            else:
-                return '(' + result + ')'
-        else:
-            return str(x.encode('ascii', 'replace'))
-    sys.stderr.write(' '.join([_str(a) for a in args]) + "\n")
