@@ -472,7 +472,7 @@ class HtmlExporter(Exporter):
     class Context(Exporter.Context):
 
         def __init__(self, *args, **kwargs):
-            self._generator = kwargs['generator']
+            self._generator = kwargs.pop('generator')
             self._shared_player_controls = []
             # We generate a random string prefix for all unique identifiers.
             # This makes the identifiers unique even if we compose a page from
@@ -484,7 +484,6 @@ class HtmlExporter(Exporter):
                                                             '-',
                                                             11)))
             self._unique_id_index = 0
-            del kwargs['generator']
             super(HtmlExporter.Context, self).__init__(*args, **kwargs)
 
         def generator(self):
