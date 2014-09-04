@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009, 2011, 2012, 2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2009, 2011, 2012, 2013, 2014 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import glob
 
 from lcg import *
 
+_ = TranslatableTextFactory('lcg')
 
 class Resource(object):
     """Generic resource representation.
@@ -303,7 +304,9 @@ class ResourceProvider(object):
                         return [cls(os.path.splitext(path[i:])[0]+ext, src_file=path)
                                 for path in pathlist]
         if warn:
-            warn("Resource file not found: %s %s" % (filename, tuple(dirs)))
+            warn(_("Resource file not found: %(filename)s %(search_path)s",
+                   filename=filename,
+                   search_path=tuple(dirs)))
         return None
 
     def resource(self, filename, node=None, searchdir=None, warn=log):

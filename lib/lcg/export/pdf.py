@@ -43,6 +43,7 @@ import lcg
 from lcg import FontFamily, UMm, UPoint, UFont, USpace, UAny, HorizontalAlignment
 from export import Exporter, FileExporter
 
+_ = lcg.TranslatableTextFactory('lcg')
 
 class PageTemplate(reportlab.platypus.PageTemplate):
     pass
@@ -1925,7 +1926,7 @@ class Image(Element):
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
     def _export(self, context):
         if self.image is None:
-            lcg.log("Missing image: %s" % (self.uri,))
+            context.log(_("Missing image: %s", self.uri), kind=lcg.ERROR)
             dummy_comment = [make_element(Text, content='[image]')]
             return make_element(Paragraph, content=dummy_comment).export(context)
         filename = self.image.src_file()
@@ -2405,10 +2406,9 @@ class PDFExporter(FileExporter, Exporter):
                             obj = None
                         if obj is not None:
                             e = (e, unicode(obj),)
-                        lcg.log("Page content extremely large, giving up")
-                        raise Exception("Content too large", e)
-                    lcg.log("Page content too large, reducing it by %s" %
-                            (pdf_context.relative_font_size(),))
+                        context.log(_("Page content extremely large, giving up"), kind=lcg.ERROR)
+                    context.log(_("Page content too large, reducing it by %s",
+                                  (pdf_context.relative_font_size())))
                 else:
                     raise
             else:

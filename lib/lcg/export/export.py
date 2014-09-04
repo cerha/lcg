@@ -274,6 +274,8 @@ class Exporter(object):
         translate = localize # For backwards compatibility...
 
         def resource(self, filename, **kwargs):
+            if 'warn' not in kwargs:
+                kwargs['warn'] = lambda m: self.log(m, kind=WARNING)
             return self._node.resource(filename, **kwargs)
         
         def uri(self, target, **kwargs):
@@ -1348,7 +1350,7 @@ class FileExporter(object):
                 created = not os.path.exists(outfile)
                 self._write_file(outfile, data)
                 if created:
-                    log("%s: file created.", outfile)
+                    context.log(_("%(filename)s: file created.", filename=outfile))
         elif (not os.path.exists(outfile) or
               os.path.exists(infile) and os.path.getmtime(outfile) < os.path.getmtime(infile)):
             if not os.path.isdir(os.path.dirname(outfile)):
@@ -1357,7 +1359,7 @@ class FileExporter(object):
             output_format = os.path.splitext(outfile)[1].lower()[1:]
             if input_format == output_format:
                 shutil.copyfile(infile, outfile)
-                log("%s: file copied.", outfile)
+                context.log(_("%(filename)s: file copied.", filename=outfile))
             else:
                 if input_format != 'wav':
                     raise Exception("Unsupported conversion: %s -> %s" %
@@ -1372,7 +1374,8 @@ class FileExporter(object):
                     cmd_err("Environment variable %s not set.")
                 if cmd.find("%infile") == -1 or cmd.find("%outfile") == -1:
                     cmd_err("Environment variable %s must refer to '%%infile' and '%%outfile'.")
-                log("%s: converting to %s: %s", outfile, output_format, cmd)
+                context.log(_("%(filename)s: converting to %(output_format)s: %(command)s",
+                              filename=outfile, output_format=output_format, command=cmd))
                 command = cmd.replace('%infile', infile).replace('%outfile', outfile)
                 if os.system(command):
                     raise IOError("Subprocess returned a non-zero exit status.")

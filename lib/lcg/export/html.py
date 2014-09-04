@@ -1054,9 +1054,9 @@ class HtmlExporter(Exporter):
 
         """
         def warn_swfobject(msg):
-            log(msg)
-            log("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
-                "and put swfobject.js to your resource path.")
+            context.log(msg, kind=lcg.WARNING)
+            context.log(_("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
+                          "and put swfobject.js to your resource path."))
         def escape(value):
             return str(value).replace('?', '%3F').replace('=', '%3D').replace('&', '%26')
         flash_object = context.resource(filename)
