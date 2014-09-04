@@ -56,7 +56,7 @@ class EpubHtml5Exporter(Html5Exporter):
  
     def __init__(self, *args, **kwargs):
         super(EpubHtml5Exporter, self).__init__(*args, **kwargs)
-        self._renamed_resource_dict = {}
+        self._resource_uri_dict = {}
 
     def _head(self, context):
         g = context.generator()
@@ -125,20 +125,18 @@ class EpubHtml5Exporter(Html5Exporter):
         if resource.SUBDIR:
             uri = resource.SUBDIR + '/' + uri
         # Normalize and disambiguate the URI (several source URIs may have
-        # the same normalized form).
-        safe_uri = uri
-        if isinstance(safe_uri, unicode):
-            safe_uri = unicodedata.normalize('NFKD', safe_uri).encode('ascii', 'ignore')
-        safe_uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', safe_uri.lower())
-        if uri != safe_uri:
-            n = 0
-            base, ext = os.path.splitext(safe_uri)
-            safe_uri_template = base + '-%d' + ext
-            while self._renamed_resource_dict.get(safe_uri, resource) is not resource:
-                n += 1
-                safe_uri = safe_uri_template % n
-            self._renamed_resource_dict[safe_uri] = resource
-        return safe_uri
+        # the same normalized form or the normalized form may match an existing
+        # resource URI).
+        if isinstance(uri, unicode):
+            uri = unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore')
+        uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', uri.lower())
+        n = 0
+        template = '%s-%%d%s' % os.path.splitext(uri)
+        while self._resource_uri_dict.get(uri, resource) is not resource:
+            n += 1
+            uri = template % n
+        self._resource_uri_dict[uri] = resource
+        return uri
 
 
 class EpubExporter(Exporter):
