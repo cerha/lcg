@@ -48,6 +48,15 @@ from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, 
 from lcg.exercises import Exercise, FillInExercise, HiddenAnswers, VocabExercise, GapFilling, \
     WritingTest
 
+_ = lcg.TranslatableTextFactory('lcg')
+
+INFO = 'INFO'
+"""Constant denoting informational messages for 'kind' argument of 'Exporter.Context.log()'."""
+WARNING = 'WARNING'
+"""Constant denoting warning messages for 'kind' argument of 'Exporter.Context.log()'."""
+ERROR = 'ERROR'
+"""Constant denoting error messages for 'kind' argument of 'Exporter.Context.log()'."""
+
 
 class SubstitutionIterator(object):
     """Supporting object for multiple-value substitution variables.
@@ -170,13 +179,6 @@ class Exporter(object):
         attribute of the derived 'Exporter' class (it is a nested class).
 
         """
-        INFO = 'INFO'
-        """Constant denoting informational (non-error) messages for 'kind' argument of 'log()'."""
-        WARNING = 'WARNING'
-        """Constant denoting warning messages for 'kind' argument of 'log()'."""
-        ERROR = 'ERROR'
-        """Constant denoting error messages for 'kind' argument of 'log()'."""
-
         def __init__(self, exporter, node, lang, **kwargs):
             """Initialize the export context.
 
@@ -191,7 +193,7 @@ class Exporter(object):
 
             The constructor should not be called directly.  Use the method
             'context()' instead.
-            
+
             """
             self._exporter = exporter
             self._node = node
@@ -279,15 +281,15 @@ class Exporter(object):
             which occured in the input data possibly in connection with export
             paramaters or features supported by given exporter.
 
-            The kind can be one of the class constants:
+            The kind can be one of following lcg constants:
 
-              'ERROR' -- for problems which make the output or its parts
+              'lcg.ERROR' -- for problems which make the output or its parts
                 unusable or significantly damaged.
 
-              'WARNING' -- for minor or potential problems which don't make the
+              'lcg.WARNING' -- for minor or potential problems which don't make the
                 output unusable, but may require some attention.
  
-              'INFO' -- to display information about normal export progress.
+              'lcg.INFO' -- to display information about normal export progress.
 
             The problems are typically also visibly marked within the output,
             but it would be hard to detect them for the user without logging as
@@ -295,7 +297,7 @@ class Exporter(object):
             messages thus serve as a summary of problems.
 
             """
-            assert kind in (self.ERROR, self.WARNING, self.INFO)
+            assert kind in (ERROR, WARNING, INFO)
             assert isinstance(message, basestring)
             self._log.append((kind, message))
             
