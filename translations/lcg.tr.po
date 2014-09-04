@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-02 15:04+0200\n"
+"POT-Creation-Date: 2014-09-04 09:17+0200\n"
 "PO-Revision-Date: 2010-03-07 20:40+0100\n"
 "Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
@@ -25,17 +25,38 @@ msgstr ""
 msgid "The table is read across facing pages."
 msgstr ""
 
-#: ../lib/lcg/export/html.py:532
+#: ../lib/lcg/export/export.py:1347
+#, python-format
+msgid "%(filename)s: file created."
+msgstr ""
+
+#: ../lib/lcg/export/export.py:1356
+#, python-format
+msgid "%(filename)s: file copied."
+msgstr ""
+
+#: ../lib/lcg/export/export.py:1371
+#, python-format
+msgid "%(filename)s: converting to %(output_format)s: %(command)s"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:531
 msgid "Choose your language:"
 msgstr "Dil seçiniz:"
 
-#: ../lib/lcg/export/html.py:1010
+#: ../lib/lcg/export/html.py:1009
 msgid "Flash movie object"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:1058
+msgid ""
+"Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
+"swfobject.js to your resource path."
 msgstr ""
 
 #. Translators: Title of the link to Adobe website used in
 #. the Flash warning.
-#: ../lib/lcg/export/html.py:1085
+#: ../lib/lcg/export/html.py:1084
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plugin"
 
@@ -43,42 +64,61 @@ msgstr "Adobe Flash plugin"
 #. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
 #. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
 #. version number.
-#: ../lib/lcg/export/html.py:1081
+#: ../lib/lcg/export/html.py:1080
 #, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr "Eklenti alın %(plugin)s %(version)s veya sonra."
 
-#: ../lib/lcg/export/html.py:1087
+#: ../lib/lcg/export/html.py:1086
 msgid "Use a JavaScript enabled browser."
 msgstr "JavaScript etkin tarayıcısı kullanınız."
 
-#: ../lib/lcg/export/html.py:1088 ../lib/lcg/export/html.py:1090
+#: ../lib/lcg/export/html.py:1087 ../lib/lcg/export/html.py:1089
 msgid "Warning:"
 msgstr "Uyarı:"
 
-#: ../lib/lcg/export/html.py:1121
+#: ../lib/lcg/export/html.py:1120
 msgid "Media Player unavailable."
 msgstr "Media Player ulaşılamıyor."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:1316
+#: ../lib/lcg/export/html.py:1315
 msgid "None"
 msgstr "Hiçbiri"
 
-#: ../lib/lcg/export/html.py:1317
+#: ../lib/lcg/export/html.py:1316
 msgid "You are here:"
 msgstr "Buradasınız:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1321
+#: ../lib/lcg/export/html.py:1320
 msgid "Next"
 msgstr "Sonraki"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1323
+#: ../lib/lcg/export/html.py:1322
 msgid "Previous"
 msgstr "Önceki"
+
+#: ../lib/lcg/export/pdf.py:1929
+#, python-format
+msgid "Missing image: %s"
+msgstr ""
+
+#: ../lib/lcg/export/pdf.py:2409
+msgid "Page content extremely large, giving up"
+msgstr ""
+
+#: ../lib/lcg/export/pdf.py:2410
+#, python-format
+msgid "Page content too large, reducing it by %s"
+msgstr ""
+
+#: ../lib/lcg/resources.py:307
+#, python-format
+msgid "Resource file not found: %(filename)s %(search_path)s"
+msgstr ""
 
 #. Translators: The following 139 strings represent names of languages.
 #. Feel free to consider which language names are worth a translation and
