@@ -183,7 +183,7 @@ class EpubExporter(Exporter):
             epub.writestr(self._publication_resource_path(self.Config.NAV_DOC_FILENAME),
                           self._navigation_document(context))
             for n in node.linear():
-                exported_content, properties = self._xhtml_content_document(n, lang)
+                exported_content, properties = self._xhtml_content_document(n, context)
                 epub.writestr(self._node_path(n), exported_content)
                 for resource in n.resources():
                     if resource not in resources:
@@ -363,9 +363,9 @@ class EpubExporter(Exporter):
         export(items, nav)
         return doc.toprettyxml(indent='', newl='', encoding='UTF-8')
 
-    def _xhtml_content_document(self, node, lang):
+    def _xhtml_content_document(self, node, root_context):
         exporter = self._html_exporter
-        context = exporter.context(node, lang)
+        context = exporter.context(node, root_context.lang(), log=root_context.log)
         context.generator().context = context
         context.scripted = False
         context.mathml = False

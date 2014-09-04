@@ -190,6 +190,12 @@ class Exporter(object):
                 language code or None.  If None, the export will be language
                 neutral (no information about the content language will be
                 present in the output and no translation will be performed).
+              log -- external logging function for export progress messages.
+                If passed, it must be a callable object with the same arguments
+                as the 'log()' method of this class.  This function will be
+                called during export.  If not passed, the default logging
+                function will store all messages internally and these massages
+                can be later obtained using the method 'messages()'.
 
             The constructor should not be called directly.  Use the method
             'context()' instead.
@@ -201,18 +207,34 @@ class Exporter(object):
             self._secondary_language_active = False
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
-            self._log = []
             self.list_level = 0
             self.text_preprocessor = None
             self.toc_elements = ()
 
-        def _init_kwargs(self, lang, sec_lang=None, presentation=None, timezone=None,
+        def _init_kwargs(self, lang, sec_lang=None, log=None, presentation=None, timezone=None,
                          text_preprocessor=None):
             self._lang = lang
             self._sec_lang = sec_lang
+            if log is not None:
+                assert isinstance(log, collections.Callable)
+                self._messages = None
+                self._log = log
+            else:
+                self._messages = []
+                self._log = self._default_logging_function
             self._presentation = presentation
             self._localizer = self._exporter.localizer(lang, timezone=timezone)
             self._text_preprocessor = text_preprocessor
+            
+        def _default_logging_function(self, message, kind=INFO):
+            assert kind in (ERROR, WARNING, INFO)
+            assert isinstance(message, basestring)
+            self._messages.append((kind, message))
+            # Temporarily make sure logged messages are also printed to STDOUT
+            # as before.  The correct solution would be to achieve this from
+            # the code which initiates the export - only there it is known
+            # where the messages should really go.
+            lcg.log(message)
             
         def exporter(self):
             return self._exporter
@@ -297,18 +319,18 @@ class Exporter(object):
             messages thus serve as a summary of problems.
 
             """
-            assert kind in (ERROR, WARNING, INFO)
-            assert isinstance(message, basestring)
-            self._log.append((kind, message))
-            
+            self._log(message, kind=kind)
+
         def messages(self):
             """Return all messages logged during the export through the 'log()' method.
         
             Return a tuple of pairs (KIND, MESSAGE) corresponding to the
-            relevant 'log()' method arguments.
+            relevant 'log()' method arguments.  Returns None when the argument
+            'log' is passed to the constructor (logging is performed through an
+            external function).
 
             """
-            return self._log
+            return self._messages
             
     def __init__(self, translations=()):
         self._translation_path = translations
@@ -392,7 +414,9 @@ class Exporter(object):
         if recursive:
             # FIXME: The context should be cloned here with the correct node in
             # it, but it doesn't seem to matter in Braille output, which is
-            # currently the only use case for the recursive export.
+            # currently the only use case for the recursive export.  When
+            # cloned, the new context should be passed the 'log' argument
+            # to forward logging to the root context (log=context.log).
             content = self.concat(content,
                                   *[self._export(n, context, recursive=True)
                                     for n in node.children()])
