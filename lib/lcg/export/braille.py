@@ -787,7 +787,7 @@ class BrailleExporter(FileExporter, Exporter):
             except KeyError:
                 context.log(_("Character %r can't be represented on "
                               'given output device: "%s"',
-                              c, output[-50:]))
+                              c, output[-50:]), kind=lcg.ERROR)
                 output += '?'
         device_init = printer_properties.get('device_init', presentation.device_init)
         if device_init is not None:

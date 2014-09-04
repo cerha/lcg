@@ -271,7 +271,7 @@ class Exporter(object):
         def set_page_heading(self, heading):
             self._page_heading = heading
 
-        def log(self, message, kind=ERROR):
+        def log(self, message, kind=INFO):
             """Record error or important information about the export progress.
             
             This method should be used by export backends to report problems,
