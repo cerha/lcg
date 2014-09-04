@@ -33,7 +33,7 @@ import string
 import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, PageNumber, \
-    Container, TranslatableTextFactory, TableRow, TableHeading
+    Container, TranslatableTextFactory, Table, TableRow, TableHeading, TextContent
 import entities
 
 _ = TranslatableTextFactory('lcg')
@@ -170,6 +170,11 @@ class BrailleError(Exception):
         """Return message explaining the error; basestring.
         """
         return self.args[0]
+
+class TableTooWideError(BrailleError):
+    "Exception raised on tables that can't be fit to the page width."
+    def __init__(self, info):
+        super(TableTooWideError, self).__init__("Table too wide (%s)" % (info,))
 
 
 _louisutdml_path = ctypes.util.find_library('louisutdml')
@@ -1102,9 +1107,41 @@ class BrailleExporter(FileExporter, Exporter):
     # Tables
 
     def _export_table(self, context, element):
-        result = super(BrailleExporter, self)._export_table(context, element)
-        context.table_column_compactness().clear()
+        exception = None
+        def reset():
+            context.table_column_compactness().clear()
+        try:
+            result = super(BrailleExporter, self)._export_table(context, element)
+        except TableTooWideError, e:
+            if 'may-be-transposed':
+                try:
+                    transposed = self._transposed_table(context, element)
+                    reset()
+                    result = super(BrailleExporter, self)._export_table(context, transposed)
+                    explanation = self.text(context, _("The following table is transposed."))
+                    result = self.concat(explanation, self._newline(context, 2), result)
+                except TableTooWideError, e:
+                    exception = e
+            else:
+                exception = e
+        if exception is not None:
+            raise exception
+        reset()
         return result
+
+    def _transposed_table(self, context, element):
+        content = [c.content() for c in element.content() if isinstance(c, TableRow)]
+        n_rows = max([len(c) for c in content])
+        transposed = []
+        for i in range(n_rows):
+            row = []
+            for c in content:
+                try:
+                    row.append(c[i])
+                except IndexError:
+                    row.append(TextContent(''))
+            transposed.append(TableRow(row))
+        return Table(transposed, title=element.title())
 
     def _vertical_cell_separator(self, context, position):
         return _Braille('', '') if position <= 0 else _Braille('  ')
@@ -1233,7 +1270,7 @@ class BrailleExporter(FileExporter, Exporter):
                         max_row = e
                         max_len = e_len
                 info = string.join([c.text() for c in max_row], '⠀')
-                raise BrailleError("Table too wide (%s)" % (info,))
+                raise TableTooWideError(info)
             intro_text = context.localize(_("The table is read across facing pages."))
             table_intro = self.text(context, intro_text)
             table_intro += self._newline(context)
