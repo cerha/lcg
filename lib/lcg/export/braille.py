@@ -1153,9 +1153,11 @@ class BrailleExporter(FileExporter, Exporter):
                                          self._export_table(context, table_2, recursive=True))
                     break
                 else:
-                    raise exception
+                    context.log(unicode(exception))
+                    return _Braille('')
             else:
-                raise exception
+                context.log(unicode(exception))
+                return _Braille('')
         return result
 
     def _transposed_table(self, context, element):
