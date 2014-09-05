@@ -33,7 +33,9 @@ import string
 import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, PageNumber, \
-    Container, TranslatableTextFactory, Table, TableRow, TableHeading, TextContent, ItemizedList
+    Container, TranslatableTextFactory, Table, TableRow, TableHeading, TextContent, \
+    ItemizedList
+import lcg
 import entities
 
 _ = TranslatableTextFactory('lcg')
@@ -1153,10 +1155,10 @@ class BrailleExporter(FileExporter, Exporter):
                                          self._export_table(context, table_2, recursive=True))
                     break
                 else:
-                    context.log(unicode(exception))
+                    context.log(unicode(exception), kind=lcg.ERROR)
                     return _Braille('')
             else:
-                context.log(unicode(exception))
+                context.log(unicode(exception), kind=lcg.ERROR)
                 return _Braille('')
         return result
 
