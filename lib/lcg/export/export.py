@@ -33,6 +33,7 @@ import os
 import re
 import shutil
 import string
+import sys
 
 import lcg
 from lcg import attribute_value, log, concat, Localizable, Localizer, Resource, \
@@ -1414,6 +1415,8 @@ class FileExporter(object):
             else:
                 fn = self._filename(node, context)
             self._write_file(os.path.join(directory, fn), data)
+            for kind, message in context.messages():
+                sys.stderr.write('%s: %s\n' % (kind, message,))
 
 
 class UnsupportedElementType(Exception):
