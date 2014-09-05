@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-04 09:17+0200\n"
+"POT-Creation-Date: 2014-09-05 17:21+0200\n"
 "PO-Revision-Date: 2010-03-07 20:40+0100\n"
 "Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
@@ -16,26 +16,42 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/export/braille.py:758
+#: ../lib/lcg/export/braille.py:796
 #, python-format
 msgid "Character %r can't be represented on given output device: \"%s\""
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1207
+#: ../lib/lcg/export/braille.py:1133
+msgid "The table is transposed."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1141
+msgid "The table is expanded by rows."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1144
+msgid "The table is expanded by columns."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1151
+msgid "The table is vertically split."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1351
 msgid "The table is read across facing pages."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1347
+#: ../lib/lcg/export/export.py:1349
 #, python-format
 msgid "%(filename)s: file created."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1356
+#: ../lib/lcg/export/export.py:1358
 #, python-format
 msgid "%(filename)s: file copied."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1371
+#: ../lib/lcg/export/export.py:1373
 #, python-format
 msgid "%(filename)s: converting to %(output_format)s: %(command)s"
 msgstr ""

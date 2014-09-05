@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-02 15:04+0200\n"
-"PO-Revision-Date: 2014-09-04 09:50+0200\n"
+"PO-Revision-Date: 2014-09-05 17:24+0200\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
 "Language: cs\n"
@@ -23,21 +23,37 @@ msgid "Character %r can't be represented on given output device: \"%s\""
 msgstr ""
 "Znak %r nemůže být reprezentován na zvoleném výstupním zařízení: \"%s\""
 
-#: ../lib/lcg/export/braille.py:1207
+#: ../lib/lcg/export/braille.py:1133
+msgid "The table is transposed."
+msgstr "Tabulka je převrácená."
+
+#: ../lib/lcg/export/braille.py:1141
+msgid "The table is expanded by rows."
+msgstr "Tabulka je rozbalená podle řádků."
+
+#: ../lib/lcg/export/braille.py:1144
+msgid "The table is expanded by columns."
+msgstr "Tabulka je rozbalená podle sloupců."
+
+#: ../lib/lcg/export/braille.py:1151
+msgid "The table is vertically split."
+msgstr "Tabulka je vertikálně rozdělená."
+
+#: ../lib/lcg/export/braille.py:1351
 msgid "The table is read across facing pages."
 msgstr "Tabulka je dvoustranná."
 
-#: ../lib/lcg/export/export.py:1347
+#: ../lib/lcg/export/export.py:1349
 #, python-format
 msgid "%(filename)s: file created."
 msgstr "%(filename)s: soubor vytvořen."
 
-#: ../lib/lcg/export/export.py:1356
+#: ../lib/lcg/export/export.py:1358
 #, python-format
 msgid "%(filename)s: file copied."
 msgstr "%(filename)s: soubor zkopírován."
 
-#: ../lib/lcg/export/export.py:1371
+#: ../lib/lcg/export/export.py:1373
 #, python-format
 msgid "%(filename)s: converting to %(output_format)s: %(command)s"
 msgstr "%(filename)s: konvertuji do %(output_format)s: %(command)s"
@@ -596,8 +612,7 @@ msgstr "tádžičtina"
 
 #: ../lib/lcg/util.py:272
 msgid "Thai"
-msgstr ""
-"thajština"
+msgstr "thajština"
 
 #: ../lib/lcg/util.py:273
 msgid "Tigrinya"
@@ -605,8 +620,7 @@ msgstr "tigrinyaština"
 
 #: ../lib/lcg/util.py:274
 msgid "Turkmen"
-msgstr ""
-"turkmenština"
+msgstr "turkmenština"
 
 #: ../lib/lcg/util.py:275
 msgid "Tagalog"
@@ -642,8 +656,7 @@ msgstr ""
 
 #: ../lib/lcg/util.py:283
 msgid "Ukrainian"
-msgstr ""
-"ukrajinština"
+msgstr "ukrajinština"
 
 #: ../lib/lcg/util.py:284
 msgid "Urdu"
