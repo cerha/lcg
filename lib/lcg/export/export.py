@@ -231,11 +231,6 @@ class Exporter(object):
             assert kind in (ERROR, WARNING, INFO)
             assert isinstance(message, basestring)
             self._messages.append((kind, message))
-            # Temporarily make sure logged messages are also printed to STDOUT
-            # as before.  The correct solution would be to achieve this from
-            # the code which initiates the export - only there it is known
-            # where the messages should really go.
-            lcg.log(message)
             
         def exporter(self):
             return self._exporter
