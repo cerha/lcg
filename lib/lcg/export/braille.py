@@ -521,9 +521,10 @@ class BrailleExporter(FileExporter, Exporter):
                                 double_page = True
                             elif marker == self._PAGE_END_CHAR:
                                 double_page = False
-                            add_line(line)
-                            hyphenation = hyphenation[len(line) + 1:]
-                            continue
+                            if marker not in (self._INDENTATION_CHAR, self._NEXT_INDENTATION_CHAR,):
+                                add_line(line)
+                                hyphenation = hyphenation[len(line) + 1:]
+                                continue
                         prefix_len = 0
                         while prefix_len < len(line) and line[prefix_len] == self._INDENTATION_CHAR:
                             prefix_len += 1
