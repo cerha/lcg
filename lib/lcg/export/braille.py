@@ -1325,25 +1325,29 @@ class BrailleExporter(FileExporter, Exporter):
                                 widths[i] = ws[i]
                             return True
             return False
-        if not adjust_widths(max_width):
-            if 'facing' not in element.transformations() or not adjust_widths(max_width * 2):
-                # Future option: Try to use double-line rows.
-                max_row = None
-                max_len = -1
-                for row in cells:
-                    e = [export(context, c) for c in row]
-                    e_len = sum([len(i) for i in e])
-                    if e_len > max_len:
-                        max_row = e
-                        max_len = e_len
-                info = string.join([c.text() for c in max_row], '⠀')
-                raise TableTooWideError(info)
+        try:
+            adjusted = adjust_widths(max_width)
+            if not adjusted:
+                if 'facing' not in element.transformations() or not adjust_widths(max_width * 2):
+                    # Future option: Try to use double-line rows.
+                    max_row = None
+                    max_len = -1
+                    for row in cells:
+                        e = [export(context, c) for c in row]
+                        e_len = sum([len(i) for i in e])
+                        if e_len > max_len:
+                            max_row = e
+                            max_len = e_len
+                    info = string.join([c.text() for c in max_row], '⠀')
+                    raise TableTooWideError(info)
+        finally:
+            context_compactness.clear()
+            context_compactness.update(orig_context_compactness)
+        if not adjusted:
             intro_text = context.localize(_("The table is read across facing pages."))
             table_intro = self.text(context, intro_text)
             table_intro += self._newline(context)
             table_intro += self._marker(self._DOUBLE_PAGE_CHAR)
-        context_compactness.clear()
-        context_compactness.update(orig_context_compactness)
         context.set_table_column_compactness(column_compactness)
         return table_intro
 
