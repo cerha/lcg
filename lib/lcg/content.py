@@ -1165,7 +1165,8 @@ class Table(Container):
     """Table is a container of 'TableRow' instances."""
     _ALLOWED_CONTENT = (TableRow, HorizontalSeparator,)
 
-    def __init__(self, content, title=None, long=False, column_widths=None, bars=(), **kwargs):
+    def __init__(self, content, title=None, long=False, column_widths=None, bars=(),
+                 transformations=('facing', 'transpose',), **kwargs):
         """Arguments:
 
           content -- sequence of 'TableRow' and 'HorizontalSeparator' instances
@@ -1186,6 +1187,13 @@ class Table(Container):
             before the first column is numbered 0, the next position is 1 and
             the position after the last column is numbered N where N is the
             number of columns in the table.
+          transformations -- permitted table transformations; currently used
+            only in Braille backend.  It's a sequence containing any of the
+            following strings: 'facing' (table may be spread across facing
+            pages), 'transpose' (table may be transposed), 'row-expand' (table
+            may be expanded by rows), 'column-expand' (table may be expanded by
+            columns), 'split' (table may be vertically split into several
+            narrower tables).
 
         """
         assert title is None or isinstance(title, (str, unicode))
@@ -1196,6 +1204,7 @@ class Table(Container):
         self._long = long
         self._column_widths = column_widths
         self._bars = bars
+        self._transformations = transformations
         super(Table, self).__init__(content, **kwargs)
         
     def title(self):
@@ -1217,6 +1226,10 @@ class Table(Container):
 
         """
         return self._bars
+
+    def transformations(self):
+        """Return the value of 'transformations' as passed to the constructor."""
+        return self._transformations
         
     
 class Section(Container):

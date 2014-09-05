@@ -33,7 +33,7 @@ import string
 import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, PageNumber, \
-    Container, TranslatableTextFactory, Table, TableRow, TableHeading, TextContent
+    Container, TranslatableTextFactory, Table, TableRow, TableHeading, TextContent, ItemizedList
 import entities
 
 _ = TranslatableTextFactory('lcg')
@@ -1107,27 +1107,55 @@ class BrailleExporter(FileExporter, Exporter):
 
     # Tables
 
-    def _export_table(self, context, element):
+    def _export_table(self, context, element, recursive=False):
         exception = None
-        def reset():
-            context.table_column_compactness().clear()
-        try:
-            result = super(BrailleExporter, self)._export_table(context, element)
-        except TableTooWideError, e:
-            if 'may-be-transposed':
+        def export(element, explanation):
+            if isinstance(element, Table):
                 try:
-                    transposed = self._transposed_table(context, element)
-                    reset()
-                    result = super(BrailleExporter, self)._export_table(context, transposed)
-                    explanation = self.text(context, _("The following table is transposed."))
-                    result = self.concat(explanation, self._newline(context, 2), result)
+                    exported = super(BrailleExporter, self)._export_table(context, element)
+                finally:
+                    context.table_column_compactness().clear()
+            else:
+                exported = self.export_element(context, element)
+            if explanation is not None and not recursive:
+                text = self.text(context, explanation)
+                exported = self.concat(text, self._newline(context, 2), exported)
+            return exported
+        transformations = element.transformations()
+        try:
+            result = export(element, None)
+        except TableTooWideError, e:
+            if 'transpose' in transformations:
+                try:
+                    result = export(self._transposed_table(context, element),
+                                    _("The table is transposed."))
                 except TableTooWideError, e:
                     exception = e
             else:
                 exception = e
         if exception is not None:
-            raise exception
-        reset()
+            if 'row-expand' in transformations:
+                result = export(self._expanded_table(context, element, 'row'),
+                                _("The table is expanded by rows."))
+            elif 'column-expand' in transformations:
+                result = export(self._expanded_table(context, element, 'column'),
+                                _("The table is expanded by columns."))
+            elif 'split' in transformations:
+                n_cols = max([len(c.content()) for c in element.content()
+                              if isinstance(c, TableRow)])
+                for i in range(n_cols - 1, 1, -1):
+                    table_1, table_2 = self._split_table(context, element, i)
+                    try:
+                        exported = export(table_1, _("The table is vertically split."))
+                    except TableTooWideError:
+                        continue
+                    result = self.concat(exported, self._newline(context),
+                                         self._export_table(context, table_2, recursive=True))
+                    break
+                else:
+                    raise exception
+            else:
+                raise exception
         return result
 
     def _transposed_table(self, context, element):
@@ -1142,7 +1170,45 @@ class BrailleExporter(FileExporter, Exporter):
                 except IndexError:
                     row.append(TextContent(''))
             transposed.append(TableRow(row))
-        return Table(transposed, title=element.title())
+        return Table(transposed, title=element.title(), transformations=('facing',))
+
+    def _expanded_table(self, context, element, direction):
+        content = [c.content() for c in element.content() if isinstance(c, TableRow)]
+        top_label = content[0][0]
+        items = []
+        def cell(label, value):
+            return Container((label, TextContent(': '), value,))
+        def add_list(label, headings, cells):
+            cells = list(cells) + [TextContent('')] * (len(headings) - len(cells))
+            subitems = [cell(*lv) for lv in zip(headings, cells)]
+            items.append(Container((cell(top_label, label), ItemizedList(subitems),)))
+        if direction == 'row':
+            headings = content[0][1:]
+            for row in content[1:]:
+                add_list(row[0], headings, row[1:])
+        elif direction == 'column':
+            headings = [c[0] for c in content[1:]]
+            for i in range(1, len(content[0])):
+                add_list(content[0][i], headings, [row[i] for row in content[1:]])
+        else:
+            raise Exception("Program Error", direction)
+        return ItemizedList(items)
+
+    def _split_table(self, context, element, split_column):
+        title = element.title()
+        content = element.content()
+        content_1 = []
+        content_2 = []
+        for row in content:
+            if isinstance(row, TableRow):
+                cells = row.content()
+                content_1.append(TableRow(cells[:split_column]))
+                content_2.append(TableRow([cells[0]] + list(cells[split_column:])))
+            else:
+                content_1.append(row)
+                content_2.append(row)
+        return (Table(content_1, title=title, transformations=()),
+                Table(content_2, title=title, transformations=('split',)))
 
     def _vertical_cell_separator(self, context, position):
         return _Braille('', '') if position <= 0 else _Braille('  ')
@@ -1260,7 +1326,7 @@ class BrailleExporter(FileExporter, Exporter):
                             return True
             return False
         if not adjust_widths(max_width):
-            if not adjust_widths(max_width * 2):
+            if 'facing' not in element.transformations() or not adjust_widths(max_width * 2):
                 # Future option: Try to use double-line rows.
                 max_row = None
                 max_len = -1
