@@ -976,7 +976,7 @@ class BrailleExport(unittest.TestCase):
             (u'_hodně podtržený_', u'⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
             (u'zkouška českého dělení slov', u'⠵⠅⠕⠥⠱⠅⠁⠀⠩⠑⠎⠅⠜⠓⠕⠀⠙⠣⠤\n⠇⠑⠝⠌⠀⠎⠇⠕⠧',),
         ):
-            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
+            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
                        presentation, 'cs')
         tests = ((u'abc', u'⠁⠃⠉',),
                  (u'a line to be hyphenated', u'⠁⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠏⠓⠑⠝⠤\n⠁⠞⠑⠙',),
@@ -987,17 +987,17 @@ class BrailleExport(unittest.TestCase):
             # buggy in current liblouis
             tests += ((u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),)
         for text, braille in tests:
-            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
+            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
                        presentation, 'en')
 
     def test_languages(self):
         presentation = self._load_presentation()
         self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
-                   u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', 'en')
+                   u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', 'en')
 
     def test_special_formatting(self):
         presentation = self._load_presentation()
-        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
+        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
                    presentation, 'cs')
 
     def test_tables(self):
@@ -1005,51 +1005,57 @@ class BrailleExport(unittest.TestCase):
         # Simple tables
         self._test(u'| first | line | x |\n| second | row | y |',
                    u'⠋⠊⠗⠎⠞⠀⠀⠀⠇⠊⠝⠑⠀⠀⠭\n⠎⠑⠉⠕⠝⠙⠀⠀⠗⠕⠷⠀⠀⠀⠽',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         self._test(u'| *heading* | *h* | *h* |\n| first | line | x |\n| second | row | y |',
                    u'⠓⠑⠁⠙⠊⠝⠛⠀⠀⠓⠀⠀⠀⠀⠀⠓\n⠋⠊⠗⠎⠞⠀⠀⠀⠀⠇⠊⠝⠑⠀⠀⠭\n⠎⠑⠉⠕⠝⠙⠀⠀⠀⠗⠕⠷⠀⠀⠀⠽',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         # Compact wide tables
         self._test(u'| Narrow | Table |', u'⠠⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         self._test(u'| Less Narrow | Table |', u'⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         self._test(u'| Less Narrow | Table |\n| Less Narrow | Table |',
                    u'⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑\n⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         self._test(u'| *a* | *b* |\n| prefixed lines | table |\n| prefixed rows | cell |\n',
                    u'⠏⠗⠑⠋⠊⠭⠑⠙⠀⠁⠀⠀⠃⠀⠀⠀⠀\n⠇⠊⠝⠑⠎⠀⠀⠀⠀⠀⠀⠀⠞⠁⠃⠇⠑\n⠗⠕⠷⠎⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠇⠇⠀',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         self._test(u'| *a* | *b* |\n| line & suffix | table |\n| row & suffix | cell |\n',
                    u'⠁⠀⠼⠯⠀⠎⠥⠋⠋⠊⠭⠀⠀⠃⠀⠀⠀⠀\n⠇⠊⠝⠑⠀⠀⠀⠀⠀⠀⠀⠀⠀⠞⠁⠃⠇⠑\n⠗⠕⠷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠇⠇⠀',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         # Double page tables
         self._test(u'| this is | a double page | table |\n| the | columns | are too wide |',
-                   (u'⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
+                   (u'⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
                     u'⠞⠓⠊⠎⠀⠊⠎⠀⠀⠁⠀⠙⠕⠥⠃⠇⠑⠀⠏⠁\n⠞⠓⠑⠀⠀⠀⠀⠀⠀⠉⠕⠇⠥⠍⠝⠎⠀⠀⠀⠀',
                     u'⠛⠑⠀⠀⠞⠁⠃⠇⠑⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠁⠗⠑⠀⠞⠕⠕⠀⠷⠊⠙⠑',),
                    u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
-                   (u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
-                    u'⠼⠃⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑',
-                    u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠉',),
+                   (u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+                    u'⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+                    u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',),
                    presentation, 'cs', full_parse=True)
         self._test((u'some text\n\n'
                     u'| this is | a double page | table |\n| the | columns | are too wide |\n\n'
                     u'another text\n'),
-                   (u'⠎⠕⠍⠑⠀⠞⠑⠭⠞\n\n⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
+                   (u'⠎⠕⠍⠑⠀⠞⠑⠭⠞\n\n⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
                     u'⠞⠓⠊⠎⠀⠊⠎⠀⠀⠁⠀⠙⠕⠥⠃⠇⠑⠀⠏⠁\n⠞⠓⠑⠀⠀⠀⠀⠀⠀⠉⠕⠇⠥⠍⠝⠎⠀⠀⠀⠀',
                     u'⠛⠑⠀⠀⠞⠁⠃⠇⠑⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠁⠗⠑⠀⠞⠕⠕⠀⠷⠊⠙⠑',
                     u'⠁⠝⠕⠞⠓⠑⠗⠀⠞⠑⠭⠞',),
                    u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
-                   (u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁',
-                    u'⠼⠃⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑',
-                    u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠉',
-                    u'⠼⠙⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑',),
+                   (u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+                    u'⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+                    u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',
+                    u'⠼⠙⠀⠀⠀⠀⠀⠀⠀⠀⠀',),
                    presentation, 'cs', full_parse=True)
         # Super wide tables
         self._test(u'| extremely wide table | very very wide table |\n| next | line |',
-                   lcg.BrailleError,
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+                   (u'⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎\n⠞⠗⠁⠝⠎⠏⠕⠎⠑⠙⠄\n\n⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
+                    u'⠑⠭⠞⠗⠑⠍⠑⠇⠽⠀⠷⠊⠙⠑⠀⠞⠁⠃⠇⠑\n⠧⠑⠗⠽⠀⠧⠑⠗⠽⠀⠷⠊⠙⠑⠀⠞⠁⠃⠇⠑',
+                    u'⠀⠀⠝⠑⠭⠞\n⠀⠀⠇⠊⠝⠑',),
+                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
+                   (u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+                    u'⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+                    u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',),
+                   presentation, 'cs', full_parse=True)
     def test_mathml(self):
         import louis
         python_version = sys.version_info
