@@ -306,7 +306,7 @@ class BrailleExporter(FileExporter, Exporter):
     _PAGE_END_CHAR = '\ue011' # end of a single-page object
     _PAGE_START_REPEAT_CHAR = '\ue012' # end of repeating lines from the first page start (headers)
     _DOUBLE_PAGE_CHAR = '\ue013' # left and right pages composing a single page (e.g. wide table)
-    _SOFT_NEWLINE_CHAR = '\ue014' # removable newline
+    _SOFT_NEWLINE_CHAR = '\ue014' # removable newline (e.g. removable at the end of a page)
     _NEW_PAGE_CHAR = '\ue015' # new page if not at the beginning of new page
     _INDENTATION_CHAR = '\uf010'
     _NEXT_INDENTATION_CHAR = '\uf011'
@@ -981,13 +981,15 @@ class BrailleExporter(FileExporter, Exporter):
         new_hyphenation = ''
         lines = text.split('\n')
         if lines:
-            new_text += self._INDENTATION_CHAR * init_indentation
-            if indentation > init_indentation:
-                diff = indentation - init_indentation
-                new_text += self._NEXT_INDENTATION_CHAR * diff
+            if lines[0] != self._SOFT_NEWLINE_CHAR:
+                new_text += self._INDENTATION_CHAR * init_indentation
+                if indentation > init_indentation:
+                    diff = indentation - init_indentation
+                    new_text += self._NEXT_INDENTATION_CHAR * diff
+                new_hyphenation += self.HYPH_NO * max(init_indentation, indentation)
             new_text += lines[0]
             n += len(lines[0])
-            new_hyphenation += self.HYPH_NO * max(init_indentation, indentation) + hyphenation[:n]
+            new_hyphenation += hyphenation[:n]
             space = self._INDENTATION_CHAR * indentation
             space_hyphenation = self.HYPH_NO * indentation
             for l in lines[1:]:
@@ -995,10 +997,13 @@ class BrailleExporter(FileExporter, Exporter):
                 n += 1
                 new_hyphenation += self.HYPH_NO
                 if l:
-                    new_text += space + l
+                    if l != self._SOFT_NEWLINE_CHAR:
+                        new_text += space
+                        new_hyphenation += space_hyphenation
+                    new_text += l
                     m = n
                     n += len(l)
-                    new_hyphenation += space_hyphenation + hyphenation[m:n]
+                    new_hyphenation += hyphenation[m:n]
         assert n == len(hyphenation), (n, len(hyphenation),)
         assert len(new_text) == len(new_hyphenation), \
             (new_text, len(new_text), new_hyphenation, len(new_hyphenation),)
