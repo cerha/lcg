@@ -955,9 +955,11 @@ class Exporter(object):
             
     def _export_paragraph(self, context, element):
         """Export given 'Paragraph' element."""
-        return self.concat(self._export_container(context, element),
-                           self._newline(context),
-                           self._newline(context, soft=True))
+        items = [self._export_container(context, element),
+                 self._newline(context)]
+        if context.list_level == 0:
+            items.append(self._newline(context, soft=True))
+        return self.concat(*items)
 
     def _export_table_of_contents(self, context, element):
         """Generate a Table of Contents for given 'TableOfContents' element."""
