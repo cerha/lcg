@@ -574,7 +574,7 @@ class Exporter(object):
     def _space(self, context, number=1):
         return u' ' * number
 
-    def _indent(self, exported, indentation, init_indentation=None):
+    def _indent(self, exported, indentation, init_indentation=None, no_page_break=False):
         if init_indentation is None:
             init_indentation = indentation
         lines = exported.split('\n')
@@ -919,8 +919,11 @@ class Exporter(object):
             return result
         content = []
         with attribute_value(context, 'list_level', context.list_level + 1):
-            for c in element.content():
-                content.append(self._indent(self.text(context, number(), lang=lang), 0))
+            element_content = element.content()
+            no_page_break = len(element_content) > 1
+            for c in element_content:
+                content.append(self._indent(number(), 0, no_page_break=no_page_break))
+                no_page_break = False
                 exported = self._indent(c.export(context), 2, 0)
                 exported = self._ensure_newlines(context, exported)
                 content.append(exported)

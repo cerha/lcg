@@ -308,6 +308,7 @@ class BrailleExporter(FileExporter, Exporter):
     _DOUBLE_PAGE_CHAR = '\ue013' # left and right pages composing a single page (e.g. wide table)
     _SOFT_NEWLINE_CHAR = '\ue014' # removable newline (e.g. removable at the end of a page)
     _NEW_PAGE_CHAR = '\ue015' # new page if not at the beginning of new page
+    _NO_PAGE_BREAK_CHAR = '\ue016' # no page break after this line
     _INDENTATION_CHAR = '\uf010'
     _NEXT_INDENTATION_CHAR = '\uf011'
     _CENTER_CHAR = '\uf012'
@@ -508,7 +509,7 @@ class BrailleExporter(FileExporter, Exporter):
             if page_width:
                 for i in range(len(pages)):
                     lines = []
-                    def add_line(l, center=False):
+                    def add_line(l, center=False, no_page_break=False):
                         while True:
                             pos = l.find(hfill)
                             if pos < 0:
@@ -518,8 +519,15 @@ class BrailleExporter(FileExporter, Exporter):
                         if center and len(l) < page_width:
                             l = l.strip(' ⠀' + self._CENTER_CHAR)
                             l = '⠀' * ((page_width - len(l)) / 2) + l
+                        if no_page_break and not l.startswith(self._NO_PAGE_BREAK_CHAR):
+                            l = self._NO_PAGE_BREAK_CHAR + l
                         lines.append(l)
                     for line in pages[i]:
+                        no_page_break = False
+                        while line.startswith(self._NO_PAGE_BREAK_CHAR):
+                            no_page_break = True
+                            line = line[1:]
+                            hyphenation = hyphenation[1:]
                         mark = self._text_mark(line)
                         if mark:
                             marker, arg = mark
@@ -527,7 +535,8 @@ class BrailleExporter(FileExporter, Exporter):
                                 double_page = True
                             elif marker == self._PAGE_END_CHAR:
                                 double_page = False
-                            if marker not in (self._INDENTATION_CHAR, self._NEXT_INDENTATION_CHAR,):
+                            if marker not in (self._INDENTATION_CHAR, self._NEXT_INDENTATION_CHAR,
+                                              self._NO_PAGE_BREAK_CHAR,):
                                 add_line(line)
                                 hyphenation = hyphenation[len(line) + 1:]
                                 continue
@@ -561,6 +570,13 @@ class BrailleExporter(FileExporter, Exporter):
                         else:
                             center = False
                             width = page_width
+                        if len(line) > prefix_len and line[prefix_len] == self._NO_PAGE_BREAK_CHAR:
+                            line = line[:prefix_len] + line[prefix_len + 1:]
+                            hyphenation = hyphenation[:prefix_len] + hyphenation[prefix_len + 1:]
+                            no_page_break = True
+                        if no_page_break:
+                            prefix = self._NO_PAGE_BREAK_CHAR + prefix
+                            hyphenation_prefix = self.HYPH_NO + hyphenation_prefix
                         while len(line) > width and not double_page:
                             pos = width
                             if hyphenation[pos] not in (self.HYPH_WS, self.HYPH_NEMETH_WS,):
@@ -573,30 +589,30 @@ class BrailleExporter(FileExporter, Exporter):
                                 pos = width
                                 while line[pos - 1] == hfill[0]:
                                     pos -= 1
-                                add_line(line[:pos], center)
+                                add_line(line[:pos], center, no_page_break)
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == self.HYPH_YES:
                                 add_line(line[:pos] + self.text(context, '-', lang=lang).text(),
-                                         center)
+                                         center, no_page_break)
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == self.HYPH_WS:
-                                add_line(line[:pos], center)
+                                add_line(line[:pos], center, no_page_break)
                                 line = prefix + line[pos + 1:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos + 1:]
                             elif hyphenation[pos] == self.HYPH_CZECH_MATH_WS:
-                                add_line(line[:pos + 1], center)
+                                add_line(line[:pos + 1], center, no_page_break)
                                 line = prefix + line[pos:]
                                 hyphenation = hyphenation_prefix + hyphenation[pos:]
                             elif hyphenation[pos] == self.HYPH_NEMETH_WS:
                                 if line[pos] in _braille_whitespace:
-                                    add_line(line[:pos], center)
+                                    add_line(line[:pos], center, no_page_break)
                                     line = line[pos + 1:]
                                     hyphenation = hyphenation[pos + 1:]
                                 else:
                                     pos += 1
-                                    add_line(line[:pos], center)
+                                    add_line(line[:pos], center, no_page_break)
                                     line = line[pos:]
                                     hyphenation = hyphenation[pos:]
                                 if line:
@@ -623,7 +639,7 @@ class BrailleExporter(FileExporter, Exporter):
                             line = (line[:pos] + '⠀' * fill_len + line[pos + hfill_len:])
                             hyphenation = (hyphenation[:pos] + self.HYPH_NO * fill_len +
                                            hyphenation[pos + hfill_len:])
-                        add_line(line, center)
+                        add_line(line, center, no_page_break)
                         hyphenation = hyphenation[len(line) + 1:]
                     pages[i] = lines
                     hyphenation = hyphenation[1:]
@@ -666,12 +682,14 @@ class BrailleExporter(FileExporter, Exporter):
                                 if self._text_mark(l) is not None:
                                     add_line(l, lines)
                     page_start = None
+                    cond_line_limit = None
                     while i < page_height and n < page_len:
                         l = page[n]
                         n += 1
                         mark = self._text_mark(l)
                         if mark is None:
                             i += 1
+                            cond_line_limit = None
                         else:
                             marker, arg = mark
                             if marker == self._PAGE_START_CHAR:
@@ -698,11 +716,22 @@ class BrailleExporter(FileExporter, Exporter):
                                 break
                             elif marker == self._SOFT_NEWLINE_CHAR:
                                 i += 1
+                            if marker == self._NO_PAGE_BREAK_CHAR:
+                                if cond_line_limit is None:
+                                    cond_line_limit = i
+                                i += 1
+                            else:
+                                cond_line_limit = None
+                    if cond_line_limit is not None and cond_line_limit > 0:
+                        line_limit = cond_line_limit
                     page.reverse()
                     facing_lines = []
                     while page and len(lines) < line_limit:
                         l = page.pop()
                         mark = self._text_mark(l)
+                        if mark is not None and mark[0] == self._NO_PAGE_BREAK_CHAR:
+                            l = l[1:]
+                            mark = self._text_mark(l)
                         if mark is None or mark == (self._SOFT_NEWLINE_CHAR, ''):
                             if mark is not None:
                                 l = ''
@@ -985,7 +1014,8 @@ class BrailleExporter(FileExporter, Exporter):
         n = number - real_number
         return _Braille(text + '\n' * n, exported.hyphenation() + self.HYPH_NO * n)
 
-    def _indent(self, exported, indentation, init_indentation=None, center=False):
+    def _indent(self, exported, indentation, init_indentation=None, center=False,
+                no_page_break=False):
         if init_indentation is None:
             init_indentation = indentation
         text = exported.text()
@@ -993,6 +1023,9 @@ class BrailleExporter(FileExporter, Exporter):
         n = 0
         new_text = ''
         new_hyphenation = ''
+        if no_page_break and not exported.text().startswith(self._NO_PAGE_BREAK_CHAR):
+            new_text += self._NO_PAGE_BREAK_CHAR
+            new_hyphenation += self.HYPH_NO
         lines = text.split('\n')
         if lines:
             if lines[0] != self._SOFT_NEWLINE_CHAR:
