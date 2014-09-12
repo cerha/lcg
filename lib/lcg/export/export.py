@@ -584,7 +584,7 @@ class Exporter(object):
                      [space + l if l else '' for l in lines[1:]])
         return string.join(lines, '\n')
 
-    def _list_item_prefix(self, context):
+    def _list_item_prefix(self, context, lang=None):
         return u'• '
 
     def _separator(self, context, lang=None):
@@ -906,6 +906,7 @@ class Exporter(object):
             item_number[0] += 1
             if numbering == ItemizedList.NUMERIC:
                 result = u'%d. ' % (n,)
+                exported = self.text(context, result, lang=lang)
             elif numbering in (ItemizedList.LOWER_ALPHA, ItemizedList.UPPER_ALPHA,):
                 result = letters[(n - 1) % n_letters]
                 while n > n_letters:
@@ -914,9 +915,10 @@ class Exporter(object):
                 if numbering == ItemizedList.UPPER_ALPHA:
                     result = result.upper()
                 result += u'. '
+                exported = self.text(context, result, lang=lang)
             else:
-                result = self._list_item_prefix(context)
-            return result
+                exported = self._list_item_prefix(context, lang=lang)
+            return exported
         content = []
         with attribute_value(context, 'list_level', context.list_level + 1):
             element_content = element.content()

@@ -1059,8 +1059,15 @@ class BrailleExporter(FileExporter, Exporter):
             (new_text, len(new_text), new_hyphenation, len(new_hyphenation),)
         return _Braille(new_text, new_hyphenation)
 
-    def _list_item_prefix(self, context):
-        return '- '
+    def _list_item_prefix(self, context, lang=None):
+        level = context.list_level
+        if level == 1:
+            prefix = _Braille('⠸⠲⠀')
+        elif level == 2:
+            prefix = _Braille('⠸⠔⠀')
+        else:
+            prefix = self.text(context, '- ', lang=lang)
+        return prefix
 
     def _separator(self, context):
         return ' - '
