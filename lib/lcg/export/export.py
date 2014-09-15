@@ -209,6 +209,7 @@ class Exporter(object):
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
             self.list_level = 0
+            self.max_list_level = 0
             self.text_preprocessor = None
             self.toc_elements = ()
 
@@ -574,14 +575,16 @@ class Exporter(object):
     def _space(self, context, number=1):
         return u' ' * number
 
-    def _indent(self, exported, indentation, init_indentation=None, no_page_break=False):
+    def _indent(self, exported, indentation, init_indentation=None, no_page_break=False,
+                first_indented=0, restart=False):
         if init_indentation is None:
             init_indentation = indentation
         lines = exported.split('\n')
         if lines:
             space = u' ' * indentation
-            lines = ([u' ' * init_indentation + lines[0]] +
-                     [space + l if l else '' for l in lines[1:]])
+            lines = (lines[:first_indented] +
+                     [u' ' * init_indentation + lines[first_indented]] +
+                     [space + l if l else '' for l in lines[first_indented + 1:]])
         return string.join(lines, '\n')
 
     def _list_item_prefix(self, context, lang=None):
@@ -919,16 +922,35 @@ class Exporter(object):
             else:
                 exported = self._list_item_prefix(context, lang=lang)
             return exported
+        list_level = context.list_level + 1
+        if list_level == 1:
+            def level(element):
+                if isinstance(element, Container) and element.content():
+                    result = max([level(c) for c in element.content()])
+                    if isinstance(element, ItemizedList):
+                        result += 1
+                else:
+                    result = 0
+                return result
+            max_list_level = level(element)
+        else:
+            max_list_level = context.max_list_level
         content = []
-        with attribute_value(context, 'list_level', context.list_level + 1):
-            element_content = element.content()
-            no_page_break = len(element_content) > 1
-            for c in element_content:
-                content.append(self._indent(number(), 0, no_page_break=no_page_break))
-                no_page_break = False
-                exported = self._indent(c.export(context), 2, 0)
-                exported = self._ensure_newlines(context, exported)
-                content.append(exported)
+        with attribute_value(context, 'list_level', list_level):
+            with attribute_value(context, 'max_list_level', max_list_level):
+                element_content = element.content()
+                no_page_break = len(element_content) > 1
+                indentation = max_list_level * 2
+                init_indentation = (list_level - 1) * 2
+                for c in element_content:
+                    content.append(self._indent(number(), indentation, init_indentation,
+                                                no_page_break=no_page_break, restart=True))
+                    no_page_break = False
+                    exported = c.export(context)
+                    exported = self._indent(exported, indentation, init_indentation,
+                                            first_indented=1, restart=True)
+                    exported = self._ensure_newlines(context, exported)
+                    content.append(exported)
         if context.list_level == 0:
             content.append(self._newline(context))
         return self.concat(*content)

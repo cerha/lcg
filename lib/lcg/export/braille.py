@@ -311,7 +311,8 @@ class BrailleExporter(FileExporter, Exporter):
     _NO_PAGE_BREAK_CHAR = '\ue016' # no page break after this line
     _INDENTATION_CHAR = '\uf010'
     _NEXT_INDENTATION_CHAR = '\uf011'
-    _CENTER_CHAR = '\uf012'
+    _RESTART_INDENTATION_CHAR = '\uf012'
+    _CENTER_CHAR = '\uf013'
 
     HYPH_NO = '0'
     HYPH_YES = '1'
@@ -536,10 +537,15 @@ class BrailleExporter(FileExporter, Exporter):
                             elif marker == self._PAGE_END_CHAR:
                                 double_page = False
                             if marker not in (self._INDENTATION_CHAR, self._NEXT_INDENTATION_CHAR,
+                                              self._RESTART_INDENTATION_CHAR,
                                               self._NO_PAGE_BREAK_CHAR,):
                                 add_line(line)
                                 hyphenation = hyphenation[len(line) + 1:]
                                 continue
+                        pos = line.rfind(self._RESTART_INDENTATION_CHAR)
+                        if pos >= 0:
+                            line = line[pos + 1:]
+                            hyphenation = hyphenation[pos + 1:]
                         prefix_len = 0
                         while prefix_len < len(line) and line[prefix_len] == self._INDENTATION_CHAR:
                             prefix_len += 1
@@ -1015,7 +1021,7 @@ class BrailleExporter(FileExporter, Exporter):
         return _Braille(text + '\n' * n, exported.hyphenation() + self.HYPH_NO * n)
 
     def _indent(self, exported, indentation, init_indentation=None, center=False,
-                no_page_break=False):
+                no_page_break=False, first_indented=0, restart=False):
         if init_indentation is None:
             init_indentation = indentation
         text = exported.text()
@@ -1023,37 +1029,41 @@ class BrailleExporter(FileExporter, Exporter):
         n = 0
         new_text = ''
         new_hyphenation = ''
-        if no_page_break and not exported.text().startswith(self._NO_PAGE_BREAK_CHAR):
+        if no_page_break and not text.startswith(self._NO_PAGE_BREAK_CHAR):
             new_text += self._NO_PAGE_BREAK_CHAR
             new_hyphenation += self.HYPH_NO
+        if center:
+            new_text += self._CENTER_CHAR
+            new_hyphenation += self.HYPH_NO
         lines = text.split('\n')
-        if lines:
-            if lines[0] != self._SOFT_NEWLINE_CHAR:
-                new_text += self._INDENTATION_CHAR * init_indentation
-                if indentation > init_indentation:
-                    diff = indentation - init_indentation
-                    new_text += self._NEXT_INDENTATION_CHAR * diff
-                new_hyphenation += self.HYPH_NO * max(init_indentation, indentation)
-            if center:
-                new_text += self._CENTER_CHAR
-                new_hyphenation += self.HYPH_NO
-            new_text += lines[0]
-            n += len(lines[0])
-            new_hyphenation += hyphenation[:n]
-            space = self._INDENTATION_CHAR * indentation
-            space_hyphenation = self.HYPH_NO * indentation
-            for l in lines[1:]:
+        # Skip initial lines
+        intro = string.join(lines[:first_indented], '\n')
+        n = len(intro)
+        new_text += intro
+        new_hyphenation += hyphenation[:n]
+        # Indent the rest of the lines
+        space = self._INDENTATION_CHAR * init_indentation
+        if restart:
+            space = self._RESTART_INDENTATION_CHAR + space
+        space_hyphenation = self.HYPH_NO * len(space)
+        if indentation > init_indentation:
+            diff = indentation - init_indentation
+            space += self._NEXT_INDENTATION_CHAR * diff
+            space_hyphenation += self.HYPH_NO * diff
+        for l in lines[first_indented:]:
+            if first_indented > 0:
                 new_text += '\n'
                 n += 1
                 new_hyphenation += self.HYPH_NO
-                if l:
-                    if l != self._SOFT_NEWLINE_CHAR:
-                        new_text += space
-                        new_hyphenation += space_hyphenation
-                    new_text += l
-                    m = n
-                    n += len(l)
-                    new_hyphenation += hyphenation[m:n]
+            if l:
+                if l != self._SOFT_NEWLINE_CHAR:
+                    new_text += space
+                    new_hyphenation += space_hyphenation
+                new_text += l
+                m = n
+                n += len(l)
+                new_hyphenation += hyphenation[m:n]
+        # All right?
         assert n == len(hyphenation), (n, len(hyphenation),)
         assert len(new_text) == len(new_hyphenation), \
             (new_text, len(new_text), new_hyphenation, len(new_hyphenation),)
