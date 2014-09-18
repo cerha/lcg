@@ -1026,7 +1026,6 @@ class BrailleExporter(FileExporter, Exporter):
             init_indentation = indentation
         text = exported.text()
         hyphenation = exported.hyphenation()
-        n = 0
         new_text = ''
         new_hyphenation = ''
         if no_page_break and not text.startswith(self._NO_PAGE_BREAK_CHAR):
@@ -1050,8 +1049,11 @@ class BrailleExporter(FileExporter, Exporter):
             diff = indentation - init_indentation
             space += self._NEXT_INDENTATION_CHAR * diff
             space_hyphenation += self.HYPH_NO * diff
+        first_line = first_indented == 0
         for l in lines[first_indented:]:
-            if first_indented > 0:
+            if first_line:
+                first_line = False
+            else:
                 new_text += '\n'
                 n += 1
                 new_hyphenation += self.HYPH_NO
