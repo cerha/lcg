@@ -55,8 +55,11 @@ def text_to_id(string, separator='-'):
     characters are removed.
 
     """
-    without_accents = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
-    return re.sub(r'[^a-z0-9 ]', '', without_accents.lower()).replace(' ', separator)
+    # Handle certain special cases.
+    string = string.replace(u'´', '').replace('_', ' ')
+    # Remove accents
+    string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
+    return re.sub(r'[^a-z0-9 ]', '', string.lower()).replace(' ', separator)
 
 def unindent_docstring(docstring):
     """Trim indentation and blank lines from docstring text and return it."""
