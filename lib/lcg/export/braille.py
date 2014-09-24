@@ -33,7 +33,7 @@ import string
 import louis
 
 from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, PageNumber, \
-    Container, TranslatableTextFactory, Table, TableRow, TableHeading, TextContent, \
+    Container, TranslatableTextFactory, Table, TableRow, TableCell, TableHeading, TextContent, \
     ItemizedList
 import lcg
 import entities
@@ -1267,7 +1267,7 @@ class BrailleExporter(FileExporter, Exporter):
                 try:
                     row.append(c[i])
                 except IndexError:
-                    row.append(TextContent(''))
+                    row.append(TableCell(TextContent('')))
             transposed.append(TableRow(row))
         return Table(transposed, title=element.title(), transformations=('facing',))
 
