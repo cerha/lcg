@@ -1374,6 +1374,7 @@ class BrailleExporter(FileExporter, Exporter):
             if total_width <= max_w:
                 return True
             ws = copy.copy(widths)
+            len_0 = len(cells[0])
             for level in ('plain', 'lower', 'prefix', 'suffix',):
                 for i in range(n_cells):
                     w = new_w = ws[i]
@@ -1385,7 +1386,7 @@ class BrailleExporter(FileExporter, Exporter):
                         new_w = max([table_cell_width(context, element, cell)
                                      for cell in exported_column])
                     elif level in ('prefix', 'suffix',):
-                        if isinstance(cells[0][i], TableHeading):
+                        if i < len_0 and isinstance(cells[0][i], TableHeading):
                             exported_column = export_cells(i, c)
                             braille_column = [b.text() for b in exported_column]
                             n_rows = len(braille_column)
