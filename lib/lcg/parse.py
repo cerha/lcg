@@ -24,8 +24,6 @@ import HTMLParser
 import htmlentitydefs
 import re
 import string
-import sys
-import types
 import xml.etree.ElementTree
 
 import lcg
@@ -1284,7 +1282,7 @@ class HTMLProcessor(object):
                         kwargs['presentation'] = presentation = lcg.Presentation()
                         presentation.indent_left = lcg.UFont(int(margin) / 12)
             content = self._transform_sub(element)
-            if class_ == lcg.Paragraph and self._find_element(content, (lcg.Section, 
+            if class_ == lcg.Paragraph and self._find_element(content, (lcg.Section,
                                                                         lcg.Paragraph,
                                                                         lcg.Table,
                                                                         lcg.Figure)):
@@ -1416,7 +1414,6 @@ class HTMLProcessor(object):
             transformations = element.attrib.get('data-lcg-transformations')
             if transformations:
                 kwargs = {'transformations': tuple(transformations.split())}
-
             else:
                 # Don't pass the argument to use the default transformations.
                 kwargs = {}
