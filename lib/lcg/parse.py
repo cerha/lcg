@@ -1413,6 +1413,13 @@ class HTMLProcessor(object):
         def _table(self, element, followers):
             content = []
             title = None
+            transformations = element.attrib.get('data-lcg-transformations')
+            if transformations:
+                kwargs = {'transformations': tuple(transformations.split())}
+
+            else:
+                # Don't pass the argument to use the default transformations.
+                kwargs = {}
             for c in element.getchildren():
                 tag = c.tag
                 if tag == 'caption':
@@ -1423,7 +1430,7 @@ class HTMLProcessor(object):
                     self._in_table_heading = False
                 elif tag == 'tbody':
                     content += self._transform_sub(c.getchildren())
-            return lcg.Table(content, title=title)
+            return lcg.Table(content, title=title, **kwargs)
 
         def _table_cell(self, element, followers):
             content = lcg.Container(self._transform_sub(element))
