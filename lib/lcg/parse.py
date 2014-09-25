@@ -1412,7 +1412,7 @@ class HTMLProcessor(object):
             content = []
             title = None
             transformations = element.attrib.get('data-lcg-transformations')
-            if transformations:
+            if transformations is not None:
                 kwargs = {'transformations': tuple(transformations.split())}
             else:
                 # Don't pass the argument to use the default transformations.
