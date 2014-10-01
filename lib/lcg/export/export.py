@@ -1138,7 +1138,9 @@ class Exporter(object):
             descr = resource.descr()
             if descr:
                 label = '%s (%s)' % (label, descr,)
-        return self.text(context, label, lang=lang)
+        exported = self.text(context, label, lang=lang)
+        exported = self._ensure_newlines(context, exported)
+        return exported
 
     def _export_inline_image(self, context, element):
         """Export embedded image for given 'InlineImage' element.
