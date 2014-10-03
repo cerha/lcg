@@ -320,7 +320,22 @@ class _FillInExerciseExporter(ExerciseExporter):
                            "and correct it.  Then you can evaluate your answer using the "
                            u"‘Enter’ key (see above) or use ‘hint’ again, until you find the "
                            "complete answer.")))),)
-    
+
+    def _has_real_answers(self, exercise):
+        # Return false if the exersice doesn't contain real answers, but only underscores
+        # to create text boxes.  In this case the exercise will not offer automatic evaluation.
+        return ''.join(exercise.answers()).replace('_', '') != ''
+
+    def _export_script(self, context, exercise, exercise_id):
+        if not self._has_real_answers(exercise):
+            return None
+        return super(_FillInExerciseExporter, self)._export_script(context, exercise, exercise_id)
+
+    def _export_results(self, context, exercise, exercise_id):
+        if not self._has_real_answers(exercise):
+            return None
+        return super(_FillInExerciseExporter, self)._export_results(context, exercise, exercise_id)
+
     def _export_task_text(self, context, exercise, exercise_id, task):
         def make_field(answer, label, word_start, word_end):
             field, field_id = self._make_field(context, exercise, exercise_id, task, answer)

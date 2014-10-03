@@ -702,7 +702,16 @@ class FillInExercise(Exercise):
         _("Use the control panel at the bottom of the exercise to evaluate all the "
           "answers at once."),
     )
-
+    _SOURCE_FORMATTING = (
+        #_("If there is more than one possible correct answer, the other correct "
+        #  "answers may be written inside the brackets separated by the pipeline "
+        #  'character "|".'),
+        _("The brackets may also contain a series of underscores instead of the "
+          "real answer. This means that the real answer is either not known or "
+          "not needed. The exercise will not offer automatic evaluation, but the "
+          "text box will allow the user to fill in any text.  The number of "
+          "underscores determines the size of the box."),
+    )
     def answers(self):
         answers = []
         for task in self._tasks:
@@ -759,11 +768,8 @@ class WrittenAnswers(_SingleTextBoxFillInExercise):
           "into the text box by the user. The text before and after will "
           "appear on the screen providing a hint or a templete of the "
           "expected answer for the user."),
-        #_("If there is more than one possible correct answer, the other correct "
-        #  "answers may be written inside the brackets separated by the pipeline "
-        #  'character "|".'),
         _("Another pair or question and answer may follow after a blank line."),
-    )
+    ) + FillInExercise._SOURCE_FORMATTING
     _SOURCE_EXAMPLE = _("""
 What is the name of the largest continent?
 [Asia]
@@ -786,10 +792,7 @@ class NumberedCloze(_SingleTextBoxFillInExercise):
           "written in square brackets.  This part will be replaced by a text "
           "entry field. The text inside brackets is the correct answer. There "
           "is just one pair of brackets in each statement."),
-        #_("If there is more than one possible correct answer, the other correct "
-        #  "answers may be written inside the brackets separated by the pipeline "
-        #  'character "|".'),
-    )
+    ) + FillInExercise._SOURCE_FORMATTING
     _SOURCE_EXAMPLE = _("""
 [London] is the capital of the United Kingdom.
 
@@ -811,10 +814,7 @@ class Cloze(FillInExercise):
           "Selected parts of the text (typically words), which are to be replaced "
           "by text entry fields are written in square brackets. The text inside "
           "brackets is the correct answer."),
-        #_("If there is more than one possible correct answer, the other correct "
-        #  "answers may be written inside the brackets separated by the pipeline "
-        # 'character "|".'),
-    )
+    ) + FillInExercise._SOURCE_FORMATTING
     _SOURCE_EXAMPLE = _("""
 Commercial banks and savings banks receive and hold deposits
 [in] current accounts, savings accounts and deposit accounts,
