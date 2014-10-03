@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-22 16:21+0200\n"
+"POT-Creation-Date: 2014-10-03 10:00+0200\n"
 "PO-Revision-Date: 2010-03-31 16:07+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: cs <wiking@lists.freebsoft.org>\n"
@@ -279,7 +279,7 @@ msgid ""
 "you were right or not."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:754
+#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:763
 msgid ""
 "One exercise typically consists of a definition of several questions and "
 "answers."
@@ -289,7 +289,7 @@ msgstr ""
 msgid "The question and the answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:765
+#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:771
 msgid "Another pair or question and answer may follow after a blank line."
 msgstr ""
 
@@ -326,12 +326,21 @@ msgstr ""
 "Utilizem [#panel] no final de cada exercício para avaliar todas as respostas "
 "de uma vez."
 
-#: ../lib/lcg/exercises.py:724
+#: ../lib/lcg/exercises.py:709
+msgid ""
+"The brackets may also contain a series of underscores instead of the real "
+"answer. This means that the real answer is either not known or not needed. "
+"The exercise will not offer automatic evaluation, but the text box will "
+"allow the user to fill in any text.  The number of underscores determines "
+"the size of the box."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:733
 #, fuzzy
 msgid "Vocabulary Exercise"
 msgstr "Exercícios de vocabulário"
 
-#: ../lib/lcg/exercises.py:726
+#: ../lib/lcg/exercises.py:735
 msgid ""
 "There are two ways to do the exercise: orally and written.  Do the exercise "
 "both ways to get the best results."
@@ -339,7 +348,7 @@ msgstr ""
 "Há duas maneiras de fazer este exercício: a forma oral e a escrita. "
 "Aproveitem das duas possibilidades para obter os melhores resultados."
 
-#: ../lib/lcg/exercises.py:728
+#: ../lib/lcg/exercises.py:737
 msgid ""
 "To do the exercise orally is simple.  Go through the vocabulary list and "
 "think of the correct translation for each word or expression. There is a "
@@ -360,7 +369,7 @@ msgstr ""
 "disposição. Se quiserem saber o sua contagem, devem preencher a forma "
 "escrita."
 
-#: ../lib/lcg/exercises.py:737
+#: ../lib/lcg/exercises.py:746
 msgid ""
 "To do the exercise in written form, simply type the translation of each item "
 "into the text-box.  Be careful to use capital letters where this is "
@@ -374,21 +383,21 @@ msgstr ""
 "fraze inteira é preciso respeitar a pontuação correcta."
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:749
+#: ../lib/lcg/exercises.py:758
 #, fuzzy
 msgid "Written Answers"
 msgstr "Esconder a transcriçaõ"
 
-#: ../lib/lcg/exercises.py:751
+#: ../lib/lcg/exercises.py:760
 msgid "Fill in the answer to the box below each question."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:756
+#: ../lib/lcg/exercises.py:765
 msgid ""
 "The question and the correct answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:757
+#: ../lib/lcg/exercises.py:766
 msgid ""
 "Either whole or a part of the answer is written inside square brackets.  The "
 "text inside the brackets is supposed to be filled into the text box by the "
@@ -396,7 +405,7 @@ msgid ""
 "or a templete of the expected answer for the user."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:767
+#: ../lib/lcg/exercises.py:773
 msgid ""
 "\n"
 "What is the name of the largest continent?\n"
@@ -406,11 +415,11 @@ msgid ""
 "Children [are] our future.\n"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:777
+#: ../lib/lcg/exercises.py:783
 msgid "Complete the Statements"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:779
+#: ../lib/lcg/exercises.py:785
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given statements.  The answers are "
@@ -419,7 +428,7 @@ msgstr ""
 "A sua tarefa neste exercício é completar as palavras que faltam no texto "
 "mais espaçoso. Para cada espaço existe apenas uma resposta certa."
 
-#: ../lib/lcg/exercises.py:784
+#: ../lib/lcg/exercises.py:790
 msgid ""
 "One exercise typically consists of several statements separated by blank "
 "lines from each other. Certain part of each statement is written in square "
@@ -428,7 +437,7 @@ msgid ""
 "statement."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:793
+#: ../lib/lcg/exercises.py:796
 msgid ""
 "\n"
 "[London] is the capital of the United Kingdom.\n"
@@ -437,11 +446,11 @@ msgid ""
 msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:803
+#: ../lib/lcg/exercises.py:806
 msgid "Cloze"
 msgstr "Jogo de completo"
 
-#: ../lib/lcg/exercises.py:805
+#: ../lib/lcg/exercises.py:808
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given piece of text.  The answers are "
@@ -450,7 +459,7 @@ msgstr ""
 "A sua tarefa neste exercício é completar as palavras que faltam no texto "
 "mais espaçoso. Para cada espaço existe apenas uma resposta certa."
 
-#: ../lib/lcg/exercises.py:810
+#: ../lib/lcg/exercises.py:813
 msgid ""
 "One exercise typically consists of one or more paragraphs of text. Selected "
 "parts of the text (typically words), which are to be replaced by text entry "
@@ -498,9 +507,9 @@ msgid ""
 "[telescope]."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:468
-#: ../lib/lcg/export/exercises_html.py:503
-#: ../lib/lcg/export/exercises_html.py:506
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:483
+#: ../lib/lcg/export/exercises_html.py:518
+#: ../lib/lcg/export/exercises_html.py:521
 msgid "Total points:"
 msgstr "Total de pontos:"
 
@@ -571,13 +580,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Completará as respostas correctas no todo exercício."
 
 #: ../lib/lcg/export/exercises_html.py:48
-#: ../lib/lcg/export/exercises_html.py:411
+#: ../lib/lcg/export/exercises_html.py:426
 msgid "Reset"
 msgstr "Apagar"
 
 #: ../lib/lcg/export/exercises_html.py:49
 #: ../lib/lcg/export/exercises_html.py:279
-#: ../lib/lcg/export/exercises_html.py:412
+#: ../lib/lcg/export/exercises_html.py:427
 msgid "Reset all your answers and start again."
 msgstr ""
 "Apagará todas as respostas e os resultados para a possibilidade de comecar a "
@@ -630,13 +639,13 @@ msgstr "Esconder a transcriçaõ"
 
 #: ../lib/lcg/export/exercises_html.py:281
 #: ../lib/lcg/export/exercises_html.py:287
-#: ../lib/lcg/export/exercises_html.py:414
+#: ../lib/lcg/export/exercises_html.py:429
 #, fuzzy
 msgid "Show Answer"
 msgstr "Afigurar transcriçaõ"
 
 #: ../lib/lcg/export/exercises_html.py:282
-#: ../lib/lcg/export/exercises_html.py:415
+#: ../lib/lcg/export/exercises_html.py:430
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Esconder a transcriçaõ"
@@ -703,38 +712,38 @@ msgstr ""
 "„Enter“ (ver acima) ou usar de novo a tecla de  „apontamentoí“ até encontrar "
 "a resposta certa inteira."
 
-#: ../lib/lcg/export/exercises_html.py:409
+#: ../lib/lcg/export/exercises_html.py:424
 #, fuzzy
 msgid "Show Answers"
 msgstr "Afigurar transcriçaõ"
 
-#: ../lib/lcg/export/exercises_html.py:410
+#: ../lib/lcg/export/exercises_html.py:425
 #, fuzzy
 msgid "Show model answers."
 msgstr "Afirmar as respostas correctas."
 
-#: ../lib/lcg/export/exercises_html.py:497
+#: ../lib/lcg/export/exercises_html.py:512
 msgid "Invalid value in added points!"
 msgstr "Pontos adicionados nao validos!"
 
-#: ../lib/lcg/export/exercises_html.py:498
+#: ../lib/lcg/export/exercises_html.py:513
 msgid "Max. points exceeded!"
 msgstr "Depassado o limite dos pontos maximos!"
 
-#: ../lib/lcg/export/exercises_html.py:500
+#: ../lib/lcg/export/exercises_html.py:515
 msgid "Automatic evaluation:"
 msgstr "Avaliação automática:"
 
-#: ../lib/lcg/export/exercises_html.py:501
+#: ../lib/lcg/export/exercises_html.py:516
 msgid "Additional points by tutor:"
 msgstr "Pontos adicionados pelo professor:"
 
-#: ../lib/lcg/export/exercises_html.py:525
+#: ../lib/lcg/export/exercises_html.py:540
 msgid "correct answer"
 msgstr "Resposta correcta"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:530
+#: ../lib/lcg/export/exercises_html.py:545
 msgid "incorrect"
 msgstr "Errada"
 

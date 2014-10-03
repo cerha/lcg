@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-05 17:21+0200\n"
+"POT-Creation-Date: 2014-10-03 10:00+0200\n"
 "PO-Revision-Date: 2009-07-13 15:57+0200\n"
 "Last-Translator: Pavel Vohnout <vohnout@officehouse.cz>\n"
 "Language-Team: German <lcg@lists.freebsoft.org>\n"
@@ -17,44 +17,44 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/export/braille.py:796
+#: ../lib/lcg/export/braille.py:845
 #, python-format
 msgid "Character %r can't be represented on given output device: \"%s\""
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1133
+#: ../lib/lcg/export/braille.py:1228
 msgid "The table is transposed."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1141
+#: ../lib/lcg/export/braille.py:1236
 msgid "The table is expanded by rows."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1144
+#: ../lib/lcg/export/braille.py:1239
 msgid "The table is expanded by columns."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1151
+#: ../lib/lcg/export/braille.py:1246
 msgid "The table is vertically split."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1351
+#: ../lib/lcg/export/braille.py:1447
 msgid "The table is read across facing pages."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1349
+#: ../lib/lcg/export/export.py:1380
 #, python-format
-msgid "%(filename)s: file created."
+msgid "%s: file created."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1358
+#: ../lib/lcg/export/export.py:1389
 #, python-format
-msgid "%(filename)s: file copied."
+msgid "%s: file copied."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1373
+#: ../lib/lcg/export/export.py:1404
 #, python-format
-msgid "%(filename)s: converting to %(output_format)s: %(command)s"
+msgid "%s: converting to %s: %s"
 msgstr ""
 
 #: ../lib/lcg/export/html.py:531
@@ -153,564 +153,564 @@ msgstr ""
 #. exotic, that a proper translation may even not exist in your language.
 #. Please, copy the untranslated string into the translation field in such
 #. cases to distinguish the "not yet" and "not to be" translated entries.
-#: ../lib/lcg/util.py:156
+#: ../lib/lcg/util.py:159
 msgid "Afar"
 msgstr ""
 
-#: ../lib/lcg/util.py:157
+#: ../lib/lcg/util.py:160
 msgid "Abkhazian"
 msgstr ""
 
-#: ../lib/lcg/util.py:158
+#: ../lib/lcg/util.py:161
 msgid "Afrikaans"
 msgstr "afrikanisch"
 
-#: ../lib/lcg/util.py:159
+#: ../lib/lcg/util.py:162
 msgid "Amharic"
 msgstr ""
 
-#: ../lib/lcg/util.py:160
+#: ../lib/lcg/util.py:163
 msgid "Arabic"
 msgstr "arabisch"
 
-#: ../lib/lcg/util.py:161
+#: ../lib/lcg/util.py:164
 msgid "Assamese"
 msgstr ""
 
-#: ../lib/lcg/util.py:162
+#: ../lib/lcg/util.py:165
 msgid "Aymara"
 msgstr ""
 
-#: ../lib/lcg/util.py:163
+#: ../lib/lcg/util.py:166
 msgid "Azerbaijani"
 msgstr ""
 
-#: ../lib/lcg/util.py:164
+#: ../lib/lcg/util.py:167
 msgid "Bashkir"
 msgstr ""
 
-#: ../lib/lcg/util.py:165
+#: ../lib/lcg/util.py:168
 msgid "Byelorussian"
 msgstr ""
 
-#: ../lib/lcg/util.py:166
+#: ../lib/lcg/util.py:169
 msgid "Bulgarian"
 msgstr "bulgarisch"
 
-#: ../lib/lcg/util.py:167
+#: ../lib/lcg/util.py:170
 msgid "Bihari"
 msgstr ""
 
-#: ../lib/lcg/util.py:168
+#: ../lib/lcg/util.py:171
 msgid "Bislama"
 msgstr ""
 
-#: ../lib/lcg/util.py:169
+#: ../lib/lcg/util.py:172
 msgid "Bengali"
 msgstr ""
 
-#: ../lib/lcg/util.py:170
+#: ../lib/lcg/util.py:173
 msgid "Tibetan"
 msgstr ""
 
-#: ../lib/lcg/util.py:171
+#: ../lib/lcg/util.py:174
 msgid "Breton"
 msgstr ""
 
-#: ../lib/lcg/util.py:172
+#: ../lib/lcg/util.py:175
 msgid "Catalan"
 msgstr "katalanisch"
 
-#: ../lib/lcg/util.py:173
+#: ../lib/lcg/util.py:176
 msgid "Corsican"
 msgstr "korsikanisch"
 
-#: ../lib/lcg/util.py:174
+#: ../lib/lcg/util.py:177
 msgid "Czech"
 msgstr "tschechisch"
 
-#: ../lib/lcg/util.py:175
+#: ../lib/lcg/util.py:178
 msgid "Welsh"
 msgstr ""
 
-#: ../lib/lcg/util.py:176
+#: ../lib/lcg/util.py:179
 msgid "Danish"
 msgstr "dänisch"
 
-#: ../lib/lcg/util.py:177
+#: ../lib/lcg/util.py:180
 msgid "German"
 msgstr "deutsch"
 
-#: ../lib/lcg/util.py:178
+#: ../lib/lcg/util.py:181
 msgid "Bhutani"
 msgstr ""
 
-#: ../lib/lcg/util.py:179
+#: ../lib/lcg/util.py:182
 msgid "Greek"
 msgstr "griechisch"
 
-#: ../lib/lcg/util.py:180
+#: ../lib/lcg/util.py:183
 msgid "English"
 msgstr "englisch"
 
-#: ../lib/lcg/util.py:181
+#: ../lib/lcg/util.py:184
 msgid "Esperanto"
 msgstr ""
 
-#: ../lib/lcg/util.py:182
+#: ../lib/lcg/util.py:185
 msgid "Spanish"
 msgstr "spanisch"
 
-#: ../lib/lcg/util.py:183
+#: ../lib/lcg/util.py:186
 msgid "Estonian"
 msgstr "estnisch"
 
-#: ../lib/lcg/util.py:184
+#: ../lib/lcg/util.py:187
 msgid "Basque"
 msgstr "baskisch"
 
-#: ../lib/lcg/util.py:185
+#: ../lib/lcg/util.py:188
 msgid "Persian"
 msgstr ""
 
-#: ../lib/lcg/util.py:186
+#: ../lib/lcg/util.py:189
 msgid "Finnish"
 msgstr "finnisch"
 
-#: ../lib/lcg/util.py:187 ../lib/lcg/util.py:383
+#: ../lib/lcg/util.py:190 ../lib/lcg/util.py:386
 msgid "Fiji"
 msgstr ""
 
-#: ../lib/lcg/util.py:188
+#: ../lib/lcg/util.py:191
 msgid "Faroese"
 msgstr ""
 
-#: ../lib/lcg/util.py:189
+#: ../lib/lcg/util.py:192
 msgid "French"
 msgstr "franzäsisch"
 
-#: ../lib/lcg/util.py:190
+#: ../lib/lcg/util.py:193
 msgid "Frisian"
 msgstr ""
 
-#: ../lib/lcg/util.py:191
+#: ../lib/lcg/util.py:194
 msgid "Irish"
 msgstr "irisch"
 
-#: ../lib/lcg/util.py:192
+#: ../lib/lcg/util.py:195
 msgid "Scots Gaelic"
 msgstr ""
 
-#: ../lib/lcg/util.py:193
+#: ../lib/lcg/util.py:196
 #, fuzzy
 msgid "Galician"
 msgstr "italienisch"
 
-#: ../lib/lcg/util.py:194
+#: ../lib/lcg/util.py:197
 msgid "Guarani"
 msgstr ""
 
-#: ../lib/lcg/util.py:195
+#: ../lib/lcg/util.py:198
 msgid "Gujarati"
 msgstr ""
 
-#: ../lib/lcg/util.py:196
+#: ../lib/lcg/util.py:199
 msgid "Hausa"
 msgstr ""
 
-#: ../lib/lcg/util.py:197
+#: ../lib/lcg/util.py:200
 msgid "Hebrew"
 msgstr ""
 
-#: ../lib/lcg/util.py:198
+#: ../lib/lcg/util.py:201
 msgid "Hindi"
 msgstr "hindisch"
 
-#: ../lib/lcg/util.py:199
+#: ../lib/lcg/util.py:202
 msgid "Croatian"
 msgstr "kroatisch"
 
-#: ../lib/lcg/util.py:200
+#: ../lib/lcg/util.py:203
 msgid "Hungarian"
 msgstr "ungarisch"
 
-#: ../lib/lcg/util.py:201
+#: ../lib/lcg/util.py:204
 #, fuzzy
 msgid "Armenian"
 msgstr "rumänisch"
 
-#: ../lib/lcg/util.py:202
+#: ../lib/lcg/util.py:205
 msgid "Interlingua"
 msgstr ""
 
-#: ../lib/lcg/util.py:203
+#: ../lib/lcg/util.py:206
 msgid "Indonesian"
 msgstr ""
 
-#: ../lib/lcg/util.py:204
+#: ../lib/lcg/util.py:207
 msgid "Interlingue"
 msgstr ""
 
-#: ../lib/lcg/util.py:205
+#: ../lib/lcg/util.py:208
 msgid "Inupiak"
 msgstr ""
 
-#: ../lib/lcg/util.py:206
+#: ../lib/lcg/util.py:209
 msgid "Icelandic"
 msgstr "islÃ¤ndisch"
 
-#: ../lib/lcg/util.py:207
+#: ../lib/lcg/util.py:210
 msgid "Italian"
 msgstr "italienisch"
 
-#: ../lib/lcg/util.py:208
+#: ../lib/lcg/util.py:211
 msgid "Inuktitut"
 msgstr ""
 
-#: ../lib/lcg/util.py:209
+#: ../lib/lcg/util.py:212
 msgid "Japanese"
 msgstr "japanisch"
 
-#: ../lib/lcg/util.py:210
+#: ../lib/lcg/util.py:213
 #, fuzzy
 msgid "Javanese"
 msgstr "japanisch"
 
-#: ../lib/lcg/util.py:211
+#: ../lib/lcg/util.py:214
 msgid "Georgian"
 msgstr "georgisch"
 
-#: ../lib/lcg/util.py:212
+#: ../lib/lcg/util.py:215
 msgid "Kazakh"
 msgstr ""
 
-#: ../lib/lcg/util.py:213
+#: ../lib/lcg/util.py:216
 #, fuzzy
 msgid "Greenlandic"
 msgstr "islÃ¤ndisch"
 
-#: ../lib/lcg/util.py:214
+#: ../lib/lcg/util.py:217
 msgid "Cambodian"
 msgstr ""
 
-#: ../lib/lcg/util.py:215
+#: ../lib/lcg/util.py:218
 msgid "Kannada"
 msgstr ""
 
-#: ../lib/lcg/util.py:216
+#: ../lib/lcg/util.py:219
 msgid "Korean"
 msgstr "koreanisch"
 
-#: ../lib/lcg/util.py:217
+#: ../lib/lcg/util.py:220
 msgid "Kashmiri"
 msgstr ""
 
-#: ../lib/lcg/util.py:218
+#: ../lib/lcg/util.py:221
 msgid "Kurdish"
 msgstr "kurdische"
 
-#: ../lib/lcg/util.py:219
+#: ../lib/lcg/util.py:222
 msgid "Kirghiz"
 msgstr ""
 
-#: ../lib/lcg/util.py:220
+#: ../lib/lcg/util.py:223
 msgid "Latin"
 msgstr ""
 
-#: ../lib/lcg/util.py:221
+#: ../lib/lcg/util.py:224
 msgid "Lingala"
 msgstr ""
 
-#: ../lib/lcg/util.py:222
+#: ../lib/lcg/util.py:225
 msgid "Laothian"
 msgstr ""
 
-#: ../lib/lcg/util.py:223
+#: ../lib/lcg/util.py:226
 msgid "Lithuanian"
 msgstr ""
 
-#: ../lib/lcg/util.py:224
+#: ../lib/lcg/util.py:227
 msgid "Latvian, Lettish"
 msgstr ""
 
-#: ../lib/lcg/util.py:225
+#: ../lib/lcg/util.py:228
 msgid "Malagasy"
 msgstr ""
 
-#: ../lib/lcg/util.py:226
+#: ../lib/lcg/util.py:229
 msgid "Maori"
 msgstr ""
 
-#: ../lib/lcg/util.py:227
+#: ../lib/lcg/util.py:230
 msgid "Macedonian"
 msgstr "mazedonisch"
 
-#: ../lib/lcg/util.py:228
+#: ../lib/lcg/util.py:231
 msgid "Malayalam"
 msgstr ""
 
-#: ../lib/lcg/util.py:229
+#: ../lib/lcg/util.py:232
 msgid "Mongolian"
 msgstr ""
 
-#: ../lib/lcg/util.py:230
+#: ../lib/lcg/util.py:233
 msgid "Moldavian"
 msgstr "moldawish"
 
-#: ../lib/lcg/util.py:231
+#: ../lib/lcg/util.py:234
 msgid "Marathi"
 msgstr ""
 
-#: ../lib/lcg/util.py:232
+#: ../lib/lcg/util.py:235
 msgid "Malay"
 msgstr ""
 
-#: ../lib/lcg/util.py:233
+#: ../lib/lcg/util.py:236
 msgid "Maltese"
 msgstr ""
 
-#: ../lib/lcg/util.py:234
+#: ../lib/lcg/util.py:237
 msgid "Burmese"
 msgstr ""
 
-#: ../lib/lcg/util.py:235 ../lib/lcg/util.py:481
+#: ../lib/lcg/util.py:238 ../lib/lcg/util.py:484
 msgid "Nauru"
 msgstr ""
 
-#: ../lib/lcg/util.py:236
+#: ../lib/lcg/util.py:239
 msgid "Nepali"
 msgstr ""
 
-#: ../lib/lcg/util.py:237
+#: ../lib/lcg/util.py:240
 msgid "Dutch"
 msgstr "niederländisch"
 
-#: ../lib/lcg/util.py:238
+#: ../lib/lcg/util.py:241
 msgid "Norwegian"
 msgstr "norwegisch"
 
-#: ../lib/lcg/util.py:239
+#: ../lib/lcg/util.py:242
 msgid "Occitan"
 msgstr ""
 
-#: ../lib/lcg/util.py:240
+#: ../lib/lcg/util.py:243
 msgid "(Afan) Oromo"
 msgstr ""
 
-#: ../lib/lcg/util.py:241
+#: ../lib/lcg/util.py:244
 msgid "Oriya"
 msgstr ""
 
-#: ../lib/lcg/util.py:242
+#: ../lib/lcg/util.py:245
 msgid "Punjabi"
 msgstr ""
 
-#: ../lib/lcg/util.py:243
+#: ../lib/lcg/util.py:246
 msgid "Polish"
 msgstr "polnisch"
 
-#: ../lib/lcg/util.py:244
+#: ../lib/lcg/util.py:247
 msgid "Pashto, Pushto"
 msgstr ""
 
-#: ../lib/lcg/util.py:245
+#: ../lib/lcg/util.py:248
 msgid "Portuguese"
 msgstr "portugiesisch"
 
-#: ../lib/lcg/util.py:246
+#: ../lib/lcg/util.py:249
 msgid "Quechua"
 msgstr ""
 
-#: ../lib/lcg/util.py:247
+#: ../lib/lcg/util.py:250
 msgid "Rhaeto-Romance"
 msgstr ""
 
-#: ../lib/lcg/util.py:248
+#: ../lib/lcg/util.py:251
 msgid "Kirundi"
 msgstr ""
 
-#: ../lib/lcg/util.py:249
+#: ../lib/lcg/util.py:252
 msgid "Romanian"
 msgstr "rumänisch"
 
-#: ../lib/lcg/util.py:250
+#: ../lib/lcg/util.py:253
 msgid "Russian"
 msgstr ""
 
-#: ../lib/lcg/util.py:251
+#: ../lib/lcg/util.py:254
 msgid "Kinyarwanda"
 msgstr ""
 
-#: ../lib/lcg/util.py:252
+#: ../lib/lcg/util.py:255
 msgid "Sanskrit"
 msgstr ""
 
-#: ../lib/lcg/util.py:253
+#: ../lib/lcg/util.py:256
 msgid "Sindhi"
 msgstr ""
 
-#: ../lib/lcg/util.py:254
+#: ../lib/lcg/util.py:257
 msgid "Sangho"
 msgstr ""
 
-#: ../lib/lcg/util.py:255
+#: ../lib/lcg/util.py:258
 #, fuzzy
 msgid "Serbo-Croatian"
 msgstr "kroatisch"
 
-#: ../lib/lcg/util.py:256
+#: ../lib/lcg/util.py:259
 msgid "Sinhalese"
 msgstr ""
 
-#: ../lib/lcg/util.py:257
+#: ../lib/lcg/util.py:260
 msgid "Slovak"
 msgstr "slowakisch"
 
-#: ../lib/lcg/util.py:258
+#: ../lib/lcg/util.py:261
 msgid "Slovenian"
 msgstr "slowenisch"
 
-#: ../lib/lcg/util.py:259
+#: ../lib/lcg/util.py:262
 msgid "Samoan"
 msgstr ""
 
-#: ../lib/lcg/util.py:260
+#: ../lib/lcg/util.py:263
 msgid "Shona"
 msgstr ""
 
-#: ../lib/lcg/util.py:261
+#: ../lib/lcg/util.py:264
 msgid "Somali"
 msgstr ""
 
-#: ../lib/lcg/util.py:262
+#: ../lib/lcg/util.py:265
 msgid "Albanian"
 msgstr "albanisch"
 
-#: ../lib/lcg/util.py:263
+#: ../lib/lcg/util.py:266
 msgid "Serbian"
 msgstr "serbisch"
 
-#: ../lib/lcg/util.py:264
+#: ../lib/lcg/util.py:267
 msgid "Siswati"
 msgstr ""
 
-#: ../lib/lcg/util.py:265
+#: ../lib/lcg/util.py:268
 msgid "Sesotho"
 msgstr ""
 
-#: ../lib/lcg/util.py:266
+#: ../lib/lcg/util.py:269
 msgid "Sundanese"
 msgstr ""
 
-#: ../lib/lcg/util.py:267
+#: ../lib/lcg/util.py:270
 msgid "Swedish"
 msgstr "schwedisch"
 
-#: ../lib/lcg/util.py:268
+#: ../lib/lcg/util.py:271
 msgid "Swahili"
 msgstr ""
 
-#: ../lib/lcg/util.py:269
+#: ../lib/lcg/util.py:272
 msgid "Tamil"
 msgstr ""
 
-#: ../lib/lcg/util.py:270
+#: ../lib/lcg/util.py:273
 msgid "Telugu"
 msgstr ""
 
-#: ../lib/lcg/util.py:271
+#: ../lib/lcg/util.py:274
 msgid "Tajik"
 msgstr ""
 
-#: ../lib/lcg/util.py:272
+#: ../lib/lcg/util.py:275
 msgid "Thai"
 msgstr "thailändisch"
 
-#: ../lib/lcg/util.py:273
+#: ../lib/lcg/util.py:276
 msgid "Tigrinya"
 msgstr ""
 
-#: ../lib/lcg/util.py:274
+#: ../lib/lcg/util.py:277
 msgid "Turkmen"
 msgstr ""
 
-#: ../lib/lcg/util.py:275
+#: ../lib/lcg/util.py:278
 msgid "Tagalog"
 msgstr ""
 
-#: ../lib/lcg/util.py:276
+#: ../lib/lcg/util.py:279
 msgid "Setswana"
 msgstr ""
 
-#: ../lib/lcg/util.py:277 ../lib/lcg/util.py:536
+#: ../lib/lcg/util.py:280 ../lib/lcg/util.py:539
 msgid "Tonga"
 msgstr ""
 
-#: ../lib/lcg/util.py:278
+#: ../lib/lcg/util.py:281
 msgid "Turkish"
 msgstr "türkisch"
 
-#: ../lib/lcg/util.py:279
+#: ../lib/lcg/util.py:282
 msgid "Tsonga"
 msgstr ""
 
-#: ../lib/lcg/util.py:280
+#: ../lib/lcg/util.py:283
 msgid "Tatar"
 msgstr ""
 
-#: ../lib/lcg/util.py:281
+#: ../lib/lcg/util.py:284
 msgid "Twi"
 msgstr ""
 
-#: ../lib/lcg/util.py:282
+#: ../lib/lcg/util.py:285
 msgid "Uighur"
 msgstr ""
 
-#: ../lib/lcg/util.py:283
+#: ../lib/lcg/util.py:286
 msgid "Ukrainian"
 msgstr "ukrainisch"
 
-#: ../lib/lcg/util.py:284
+#: ../lib/lcg/util.py:287
 msgid "Urdu"
 msgstr ""
 
-#: ../lib/lcg/util.py:285
+#: ../lib/lcg/util.py:288
 msgid "Uzbek"
 msgstr ""
 
-#: ../lib/lcg/util.py:286
+#: ../lib/lcg/util.py:289
 msgid "Vietnamese"
 msgstr ""
 
-#: ../lib/lcg/util.py:287
+#: ../lib/lcg/util.py:290
 msgid "Volapuk"
 msgstr ""
 
-#: ../lib/lcg/util.py:288
+#: ../lib/lcg/util.py:291
 msgid "Wolof"
 msgstr ""
 
-#: ../lib/lcg/util.py:289
+#: ../lib/lcg/util.py:292
 msgid "Xhosa"
 msgstr ""
 
-#: ../lib/lcg/util.py:290
+#: ../lib/lcg/util.py:293
 msgid "Yiddish"
 msgstr "jiddisch"
 
-#: ../lib/lcg/util.py:291
+#: ../lib/lcg/util.py:294
 msgid "Yoruba"
 msgstr ""
 
-#: ../lib/lcg/util.py:292
+#: ../lib/lcg/util.py:295
 msgid "Zhuang"
 msgstr ""
 
-#: ../lib/lcg/util.py:293
+#: ../lib/lcg/util.py:296
 msgid "Chinese"
 msgstr "chinesisch"
 
-#: ../lib/lcg/util.py:294
+#: ../lib/lcg/util.py:297
 msgid "Zulu"
 msgstr ""
 
@@ -720,1167 +720,1167 @@ msgstr ""
 #. exotic, that a proper translation may even not exist in your language.
 #. Please, copy the untranslated string into the translation field in such
 #. cases to distinguish the "not yet" and "not to be" translated entries.
-#: ../lib/lcg/util.py:313
+#: ../lib/lcg/util.py:316
 msgid "Andorra"
 msgstr ""
 
-#: ../lib/lcg/util.py:314
+#: ../lib/lcg/util.py:317
 msgid "United Arab Emirates"
 msgstr ""
 
-#: ../lib/lcg/util.py:315
+#: ../lib/lcg/util.py:318
 msgid "Afghanistan"
 msgstr ""
 
-#: ../lib/lcg/util.py:316
+#: ../lib/lcg/util.py:319
 msgid "Antigua and Barbuda"
 msgstr ""
 
-#: ../lib/lcg/util.py:317
+#: ../lib/lcg/util.py:320
 msgid "Anguilla"
 msgstr ""
 
-#: ../lib/lcg/util.py:318
+#: ../lib/lcg/util.py:321
 #, fuzzy
 msgid "Albania"
 msgstr "albanisch"
 
-#: ../lib/lcg/util.py:319
+#: ../lib/lcg/util.py:322
 msgid "Armenia"
 msgstr ""
 
-#: ../lib/lcg/util.py:320
+#: ../lib/lcg/util.py:323
 msgid "Angola"
 msgstr ""
 
-#: ../lib/lcg/util.py:321
+#: ../lib/lcg/util.py:324
 msgid "Antarctica"
 msgstr ""
 
-#: ../lib/lcg/util.py:322
+#: ../lib/lcg/util.py:325
 msgid "Argentina"
 msgstr ""
 
-#: ../lib/lcg/util.py:323
+#: ../lib/lcg/util.py:326
 msgid "American Samoa"
 msgstr ""
 
-#: ../lib/lcg/util.py:324
+#: ../lib/lcg/util.py:327
 msgid "Austria"
 msgstr ""
 
-#: ../lib/lcg/util.py:325
+#: ../lib/lcg/util.py:328
 #, fuzzy
 msgid "Australia"
 msgstr "italienisch"
 
-#: ../lib/lcg/util.py:326
+#: ../lib/lcg/util.py:329
 msgid "Aruba"
 msgstr ""
 
-#: ../lib/lcg/util.py:327
+#: ../lib/lcg/util.py:330
 msgid "Åland Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:328
+#: ../lib/lcg/util.py:331
 msgid "Azerbaijan"
 msgstr ""
 
-#: ../lib/lcg/util.py:329
+#: ../lib/lcg/util.py:332
 msgid "Bosnia and Herzegovina"
 msgstr ""
 
-#: ../lib/lcg/util.py:330
+#: ../lib/lcg/util.py:333
 msgid "Barbados"
 msgstr ""
 
-#: ../lib/lcg/util.py:331
+#: ../lib/lcg/util.py:334
 msgid "Bangladesh"
 msgstr ""
 
-#: ../lib/lcg/util.py:332
+#: ../lib/lcg/util.py:335
 msgid "Belgium"
 msgstr ""
 
-#: ../lib/lcg/util.py:333
+#: ../lib/lcg/util.py:336
 msgid "Burkina Faso"
 msgstr ""
 
-#: ../lib/lcg/util.py:334
+#: ../lib/lcg/util.py:337
 #, fuzzy
 msgid "Bulgaria"
 msgstr "bulgarisch"
 
-#: ../lib/lcg/util.py:335
+#: ../lib/lcg/util.py:338
 msgid "Bahrain"
 msgstr ""
 
-#: ../lib/lcg/util.py:336
+#: ../lib/lcg/util.py:339
 msgid "Burundi"
 msgstr ""
 
-#: ../lib/lcg/util.py:337
+#: ../lib/lcg/util.py:340
 msgid "Benin"
 msgstr ""
 
-#: ../lib/lcg/util.py:338
+#: ../lib/lcg/util.py:341
 msgid "Saint Barthélemy"
 msgstr ""
 
-#: ../lib/lcg/util.py:339
+#: ../lib/lcg/util.py:342
 msgid "Bermuda"
 msgstr ""
 
-#: ../lib/lcg/util.py:340
+#: ../lib/lcg/util.py:343
 msgid "Brunei Darussalam"
 msgstr ""
 
-#: ../lib/lcg/util.py:341
+#: ../lib/lcg/util.py:344
 msgid "Bolivia"
 msgstr ""
 
-#: ../lib/lcg/util.py:342
+#: ../lib/lcg/util.py:345
 msgid "Bonaire"
 msgstr ""
 
-#: ../lib/lcg/util.py:343
+#: ../lib/lcg/util.py:346
 msgid "Brazil"
 msgstr ""
 
-#: ../lib/lcg/util.py:344
+#: ../lib/lcg/util.py:347
 msgid "Bahamas"
 msgstr ""
 
-#: ../lib/lcg/util.py:345
+#: ../lib/lcg/util.py:348
 msgid "Bhutan"
 msgstr ""
 
-#: ../lib/lcg/util.py:346
+#: ../lib/lcg/util.py:349
 msgid "Bouvet Island"
 msgstr ""
 
-#: ../lib/lcg/util.py:347
+#: ../lib/lcg/util.py:350
 msgid "Botswana"
 msgstr ""
 
-#: ../lib/lcg/util.py:348
+#: ../lib/lcg/util.py:351
 msgid "Belarus"
 msgstr ""
 
-#: ../lib/lcg/util.py:349
+#: ../lib/lcg/util.py:352
 msgid "Belize"
 msgstr ""
 
-#: ../lib/lcg/util.py:350
+#: ../lib/lcg/util.py:353
 msgid "Canada"
 msgstr ""
 
-#: ../lib/lcg/util.py:351
+#: ../lib/lcg/util.py:354
 msgid "Cocos"
 msgstr ""
 
-#: ../lib/lcg/util.py:352 ../lib/lcg/util.py:354
+#: ../lib/lcg/util.py:355 ../lib/lcg/util.py:357
 msgid "Congo"
 msgstr ""
 
-#: ../lib/lcg/util.py:353
+#: ../lib/lcg/util.py:356
 msgid "Central African Republic"
 msgstr ""
 
-#: ../lib/lcg/util.py:355
+#: ../lib/lcg/util.py:358
 msgid "Switzerland"
 msgstr ""
 
-#: ../lib/lcg/util.py:356
+#: ../lib/lcg/util.py:359
 msgid "Côte d'Ivoire"
 msgstr ""
 
-#: ../lib/lcg/util.py:357
+#: ../lib/lcg/util.py:360
 msgid "Cook Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:358
+#: ../lib/lcg/util.py:361
 msgid "Chile"
 msgstr ""
 
-#: ../lib/lcg/util.py:359
+#: ../lib/lcg/util.py:362
 msgid "Cameroon"
 msgstr ""
 
-#: ../lib/lcg/util.py:360
+#: ../lib/lcg/util.py:363
 #, fuzzy
 msgid "China"
 msgstr "chinesisch"
 
-#: ../lib/lcg/util.py:361
+#: ../lib/lcg/util.py:364
 msgid "Colombia"
 msgstr ""
 
-#: ../lib/lcg/util.py:362
+#: ../lib/lcg/util.py:365
 msgid "Costa Rica"
 msgstr ""
 
-#: ../lib/lcg/util.py:363
+#: ../lib/lcg/util.py:366
 msgid "Cuba"
 msgstr ""
 
-#: ../lib/lcg/util.py:364
+#: ../lib/lcg/util.py:367
 msgid "Cape Verde"
 msgstr ""
 
-#: ../lib/lcg/util.py:365
+#: ../lib/lcg/util.py:368
 msgid "Curaçao"
 msgstr ""
 
-#: ../lib/lcg/util.py:366
+#: ../lib/lcg/util.py:369
 msgid "Christmas Island"
 msgstr ""
 
-#: ../lib/lcg/util.py:367
+#: ../lib/lcg/util.py:370
 msgid "Cyprus"
 msgstr ""
 
-#: ../lib/lcg/util.py:368
+#: ../lib/lcg/util.py:371
 msgid "Czech Republic"
 msgstr ""
 
-#: ../lib/lcg/util.py:369
+#: ../lib/lcg/util.py:372
 #, fuzzy
 msgid "Germany"
 msgstr "deutsch"
 
-#: ../lib/lcg/util.py:370
+#: ../lib/lcg/util.py:373
 msgid "Djibouti"
 msgstr ""
 
-#: ../lib/lcg/util.py:371
+#: ../lib/lcg/util.py:374
 msgid "Denmark"
 msgstr ""
 
-#: ../lib/lcg/util.py:372
+#: ../lib/lcg/util.py:375
 msgid "Dominica"
 msgstr ""
 
-#: ../lib/lcg/util.py:373
+#: ../lib/lcg/util.py:376
 msgid "Dominican Republic"
 msgstr ""
 
-#: ../lib/lcg/util.py:374
+#: ../lib/lcg/util.py:377
 msgid "Algeria"
 msgstr ""
 
-#: ../lib/lcg/util.py:375
+#: ../lib/lcg/util.py:378
 msgid "Ecuador"
 msgstr ""
 
-#: ../lib/lcg/util.py:376
+#: ../lib/lcg/util.py:379
 #, fuzzy
 msgid "Estonia"
 msgstr "estnisch"
 
-#: ../lib/lcg/util.py:377
+#: ../lib/lcg/util.py:380
 msgid "Egypt"
 msgstr ""
 
-#: ../lib/lcg/util.py:378
+#: ../lib/lcg/util.py:381
 msgid "Western Sahara"
 msgstr ""
 
-#: ../lib/lcg/util.py:379
+#: ../lib/lcg/util.py:382
 msgid "Eritrea"
 msgstr ""
 
-#: ../lib/lcg/util.py:380
+#: ../lib/lcg/util.py:383
 msgid "Spain"
 msgstr ""
 
-#: ../lib/lcg/util.py:381
+#: ../lib/lcg/util.py:384
 msgid "Ethiopia"
 msgstr ""
 
-#: ../lib/lcg/util.py:382
+#: ../lib/lcg/util.py:385
 msgid "Finland"
 msgstr ""
 
-#: ../lib/lcg/util.py:384
+#: ../lib/lcg/util.py:387
 msgid "Falkland Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:385
+#: ../lib/lcg/util.py:388
 msgid "Micronesia"
 msgstr ""
 
-#: ../lib/lcg/util.py:386
+#: ../lib/lcg/util.py:389
 msgid "Faroe Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:387
+#: ../lib/lcg/util.py:390
 msgid "France"
 msgstr ""
 
-#: ../lib/lcg/util.py:388
+#: ../lib/lcg/util.py:391
 msgid "Gabon"
 msgstr ""
 
-#: ../lib/lcg/util.py:389
+#: ../lib/lcg/util.py:392
 msgid "United Kingdom"
 msgstr ""
 
-#: ../lib/lcg/util.py:390
+#: ../lib/lcg/util.py:393
 msgid "Grenada"
 msgstr ""
 
-#: ../lib/lcg/util.py:391
+#: ../lib/lcg/util.py:394
 #, fuzzy
 msgid "Georgia"
 msgstr "georgisch"
 
-#: ../lib/lcg/util.py:392
+#: ../lib/lcg/util.py:395
 #, fuzzy
 msgid "French Guiana"
 msgstr "franzäsisch"
 
-#: ../lib/lcg/util.py:393
+#: ../lib/lcg/util.py:396
 msgid "Guernsey"
 msgstr ""
 
-#: ../lib/lcg/util.py:394
+#: ../lib/lcg/util.py:397
 msgid "Ghana"
 msgstr ""
 
-#: ../lib/lcg/util.py:395
+#: ../lib/lcg/util.py:398
 msgid "Gibraltar"
 msgstr ""
 
-#: ../lib/lcg/util.py:396
+#: ../lib/lcg/util.py:399
 msgid "Greenland"
 msgstr ""
 
-#: ../lib/lcg/util.py:397
+#: ../lib/lcg/util.py:400
 msgid "Gambia"
 msgstr ""
 
-#: ../lib/lcg/util.py:398
+#: ../lib/lcg/util.py:401
 msgid "Guinea"
 msgstr ""
 
-#: ../lib/lcg/util.py:399
+#: ../lib/lcg/util.py:402
 msgid "Guadeloupe"
 msgstr ""
 
-#: ../lib/lcg/util.py:400
+#: ../lib/lcg/util.py:403
 msgid "Equatorial Guinea"
 msgstr ""
 
-#: ../lib/lcg/util.py:401
+#: ../lib/lcg/util.py:404
 #, fuzzy
 msgid "Greece"
 msgstr "griechisch"
 
-#: ../lib/lcg/util.py:402
+#: ../lib/lcg/util.py:405
 msgid "South Georgia and the South Sandwich Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:403
+#: ../lib/lcg/util.py:406
 msgid "Guatemala"
 msgstr ""
 
-#: ../lib/lcg/util.py:404
+#: ../lib/lcg/util.py:407
 msgid "Guam"
 msgstr ""
 
-#: ../lib/lcg/util.py:405
+#: ../lib/lcg/util.py:408
 msgid "Guinea-Bissau"
 msgstr ""
 
-#: ../lib/lcg/util.py:406
+#: ../lib/lcg/util.py:409
 msgid "Guyana"
 msgstr ""
 
-#: ../lib/lcg/util.py:407
+#: ../lib/lcg/util.py:410
 msgid "Hong Kong"
 msgstr ""
 
-#: ../lib/lcg/util.py:408
+#: ../lib/lcg/util.py:411
 msgid "Heard Island and McDonald Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:409
+#: ../lib/lcg/util.py:412
 msgid "Honduras"
 msgstr ""
 
-#: ../lib/lcg/util.py:410
+#: ../lib/lcg/util.py:413
 #, fuzzy
 msgid "Croatia"
 msgstr "kroatisch"
 
-#: ../lib/lcg/util.py:411
+#: ../lib/lcg/util.py:414
 msgid "Haiti"
 msgstr ""
 
-#: ../lib/lcg/util.py:412
+#: ../lib/lcg/util.py:415
 #, fuzzy
 msgid "Hungary"
 msgstr "ungarisch"
 
-#: ../lib/lcg/util.py:413
+#: ../lib/lcg/util.py:416
 msgid "Indonesia"
 msgstr ""
 
-#: ../lib/lcg/util.py:414
+#: ../lib/lcg/util.py:417
 #, fuzzy
 msgid "Ireland"
 msgstr "islÃ¤ndisch"
 
-#: ../lib/lcg/util.py:415
+#: ../lib/lcg/util.py:418
 msgid "Israel"
 msgstr ""
 
-#: ../lib/lcg/util.py:416
+#: ../lib/lcg/util.py:419
 msgid "Isle of Man"
 msgstr ""
 
-#: ../lib/lcg/util.py:417
+#: ../lib/lcg/util.py:420
 msgid "India"
 msgstr ""
 
-#: ../lib/lcg/util.py:418
+#: ../lib/lcg/util.py:421
 msgid "British Indian Ocean Territory"
 msgstr ""
 
-#: ../lib/lcg/util.py:419
+#: ../lib/lcg/util.py:422
 msgid "Iraq"
 msgstr ""
 
-#: ../lib/lcg/util.py:420
+#: ../lib/lcg/util.py:423
 msgid "Iran"
 msgstr ""
 
-#: ../lib/lcg/util.py:421
+#: ../lib/lcg/util.py:424
 #, fuzzy
 msgid "Iceland"
 msgstr "islÃ¤ndisch"
 
-#: ../lib/lcg/util.py:422
+#: ../lib/lcg/util.py:425
 #, fuzzy
 msgid "Italy"
 msgstr "italienisch"
 
-#: ../lib/lcg/util.py:423
+#: ../lib/lcg/util.py:426
 msgid "Jersey"
 msgstr ""
 
-#: ../lib/lcg/util.py:424
+#: ../lib/lcg/util.py:427
 msgid "Jamaica"
 msgstr ""
 
-#: ../lib/lcg/util.py:425
+#: ../lib/lcg/util.py:428
 msgid "Jordan"
 msgstr ""
 
-#: ../lib/lcg/util.py:426
+#: ../lib/lcg/util.py:429
 #, fuzzy
 msgid "Japan"
 msgstr "japanisch"
 
-#: ../lib/lcg/util.py:427
+#: ../lib/lcg/util.py:430
 msgid "Kenya"
 msgstr ""
 
-#: ../lib/lcg/util.py:428
+#: ../lib/lcg/util.py:431
 msgid "Kyrgyzstan"
 msgstr ""
 
-#: ../lib/lcg/util.py:429
+#: ../lib/lcg/util.py:432
 msgid "Cambodia"
 msgstr ""
 
-#: ../lib/lcg/util.py:430
+#: ../lib/lcg/util.py:433
 msgid "Kiribati"
 msgstr ""
 
-#: ../lib/lcg/util.py:431
+#: ../lib/lcg/util.py:434
 msgid "Comoros"
 msgstr ""
 
-#: ../lib/lcg/util.py:432
+#: ../lib/lcg/util.py:435
 msgid "Saint Kitts and Nevis"
 msgstr ""
 
-#: ../lib/lcg/util.py:433 ../lib/lcg/util.py:434
+#: ../lib/lcg/util.py:436 ../lib/lcg/util.py:437
 #, fuzzy
 msgid "Korea"
 msgstr "koreanisch"
 
-#: ../lib/lcg/util.py:435
+#: ../lib/lcg/util.py:438
 msgid "Kuwait"
 msgstr ""
 
-#: ../lib/lcg/util.py:436
+#: ../lib/lcg/util.py:439
 msgid "Cayman Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:437
+#: ../lib/lcg/util.py:440
 msgid "Kazakhstan "
 msgstr ""
 
-#: ../lib/lcg/util.py:438
+#: ../lib/lcg/util.py:441
 msgid "Lao People's Democratic Republic"
 msgstr ""
 
-#: ../lib/lcg/util.py:439
+#: ../lib/lcg/util.py:442
 msgid "Lebanon"
 msgstr ""
 
-#: ../lib/lcg/util.py:440
+#: ../lib/lcg/util.py:443
 msgid "Saint Lucia"
 msgstr ""
 
-#: ../lib/lcg/util.py:441
+#: ../lib/lcg/util.py:444
 msgid "Liechtenstein"
 msgstr ""
 
-#: ../lib/lcg/util.py:442
+#: ../lib/lcg/util.py:445
 msgid "Sri Lanka"
 msgstr ""
 
-#: ../lib/lcg/util.py:443
+#: ../lib/lcg/util.py:446
 msgid "Liberia"
 msgstr ""
 
-#: ../lib/lcg/util.py:444
+#: ../lib/lcg/util.py:447
 msgid "Lesotho"
 msgstr ""
 
-#: ../lib/lcg/util.py:445
+#: ../lib/lcg/util.py:448
 msgid "Lithuania"
 msgstr ""
 
-#: ../lib/lcg/util.py:446
+#: ../lib/lcg/util.py:449
 msgid "Luxembourg"
 msgstr ""
 
-#: ../lib/lcg/util.py:447
+#: ../lib/lcg/util.py:450
 msgid "Latvia"
 msgstr ""
 
-#: ../lib/lcg/util.py:448
+#: ../lib/lcg/util.py:451
 msgid "Libyan Arab Jamahiriya"
 msgstr ""
 
-#: ../lib/lcg/util.py:449
+#: ../lib/lcg/util.py:452
 msgid "Morocco"
 msgstr ""
 
-#: ../lib/lcg/util.py:450
+#: ../lib/lcg/util.py:453
 msgid "Monaco"
 msgstr ""
 
-#: ../lib/lcg/util.py:451
+#: ../lib/lcg/util.py:454
 #, fuzzy
 msgid "Moldova"
 msgstr "moldawish"
 
-#: ../lib/lcg/util.py:452
+#: ../lib/lcg/util.py:455
 msgid "Montenegro"
 msgstr ""
 
-#: ../lib/lcg/util.py:453
+#: ../lib/lcg/util.py:456
 msgid "Saint Martin (French part)"
 msgstr ""
 
-#: ../lib/lcg/util.py:454
+#: ../lib/lcg/util.py:457
 msgid "Madagascar"
 msgstr ""
 
-#: ../lib/lcg/util.py:455
+#: ../lib/lcg/util.py:458
 msgid "Marshall Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:456
+#: ../lib/lcg/util.py:459
 #, fuzzy
 msgid "Macedonia"
 msgstr "mazedonisch"
 
-#: ../lib/lcg/util.py:457
+#: ../lib/lcg/util.py:460
 msgid "Mali"
 msgstr ""
 
-#: ../lib/lcg/util.py:458
+#: ../lib/lcg/util.py:461
 msgid "Myanmar"
 msgstr ""
 
-#: ../lib/lcg/util.py:459
+#: ../lib/lcg/util.py:462
 msgid "Mongolia"
 msgstr ""
 
-#: ../lib/lcg/util.py:460
+#: ../lib/lcg/util.py:463
 msgid "Macao"
 msgstr ""
 
-#: ../lib/lcg/util.py:461
+#: ../lib/lcg/util.py:464
 msgid "Northern Mariana Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:462
+#: ../lib/lcg/util.py:465
 msgid "Martinique"
 msgstr ""
 
-#: ../lib/lcg/util.py:463
+#: ../lib/lcg/util.py:466
 msgid "Mauritania"
 msgstr ""
 
-#: ../lib/lcg/util.py:464
+#: ../lib/lcg/util.py:467
 msgid "Montserrat"
 msgstr ""
 
-#: ../lib/lcg/util.py:465
+#: ../lib/lcg/util.py:468
 msgid "Malta"
 msgstr ""
 
-#: ../lib/lcg/util.py:466
+#: ../lib/lcg/util.py:469
 msgid "Mauritius"
 msgstr ""
 
-#: ../lib/lcg/util.py:467
+#: ../lib/lcg/util.py:470
 msgid "Maldives"
 msgstr ""
 
-#: ../lib/lcg/util.py:468
+#: ../lib/lcg/util.py:471
 msgid "Malawi"
 msgstr ""
 
-#: ../lib/lcg/util.py:469
+#: ../lib/lcg/util.py:472
 msgid "Mexico"
 msgstr ""
 
-#: ../lib/lcg/util.py:470
+#: ../lib/lcg/util.py:473
 msgid "Malaysia"
 msgstr ""
 
-#: ../lib/lcg/util.py:471
+#: ../lib/lcg/util.py:474
 msgid "Mozambique"
 msgstr ""
 
-#: ../lib/lcg/util.py:472
+#: ../lib/lcg/util.py:475
 msgid "Namibia"
 msgstr ""
 
-#: ../lib/lcg/util.py:473
+#: ../lib/lcg/util.py:476
 #, fuzzy
 msgid "New Caledonia"
 msgstr "mazedonisch"
 
-#: ../lib/lcg/util.py:474
+#: ../lib/lcg/util.py:477
 msgid "Niger"
 msgstr ""
 
-#: ../lib/lcg/util.py:475
+#: ../lib/lcg/util.py:478
 msgid "Norfolk Island"
 msgstr ""
 
-#: ../lib/lcg/util.py:476
+#: ../lib/lcg/util.py:479
 msgid "Nigeria"
 msgstr ""
 
-#: ../lib/lcg/util.py:477
+#: ../lib/lcg/util.py:480
 msgid "Nicaragua"
 msgstr ""
 
-#: ../lib/lcg/util.py:478
+#: ../lib/lcg/util.py:481
 msgid "Netherlands"
 msgstr ""
 
-#: ../lib/lcg/util.py:479
+#: ../lib/lcg/util.py:482
 #, fuzzy
 msgid "Norway"
 msgstr "norwegisch"
 
-#: ../lib/lcg/util.py:480
+#: ../lib/lcg/util.py:483
 msgid "Nepal"
 msgstr ""
 
-#: ../lib/lcg/util.py:482
+#: ../lib/lcg/util.py:485
 msgid "Niue"
 msgstr ""
 
-#: ../lib/lcg/util.py:483
+#: ../lib/lcg/util.py:486
 msgid "New Zealand"
 msgstr ""
 
-#: ../lib/lcg/util.py:484
+#: ../lib/lcg/util.py:487
 msgid "Oman"
 msgstr ""
 
-#: ../lib/lcg/util.py:485
+#: ../lib/lcg/util.py:488
 msgid "Panama"
 msgstr ""
 
-#: ../lib/lcg/util.py:486
+#: ../lib/lcg/util.py:489
 msgid "Peru"
 msgstr ""
 
-#: ../lib/lcg/util.py:487
+#: ../lib/lcg/util.py:490
 msgid "French Polynesia"
 msgstr ""
 
-#: ../lib/lcg/util.py:488
+#: ../lib/lcg/util.py:491
 msgid "Papua New Guinea"
 msgstr ""
 
-#: ../lib/lcg/util.py:489
+#: ../lib/lcg/util.py:492
 msgid "Philippines"
 msgstr ""
 
-#: ../lib/lcg/util.py:490
+#: ../lib/lcg/util.py:493
 msgid "Pakistan"
 msgstr ""
 
-#: ../lib/lcg/util.py:491
+#: ../lib/lcg/util.py:494
 msgid "Poland"
 msgstr ""
 
-#: ../lib/lcg/util.py:492
+#: ../lib/lcg/util.py:495
 msgid "Saint Pierre and Miquelon"
 msgstr ""
 
-#: ../lib/lcg/util.py:493
+#: ../lib/lcg/util.py:496
 msgid "Pitcairn"
 msgstr ""
 
-#: ../lib/lcg/util.py:494
+#: ../lib/lcg/util.py:497
 msgid "Puerto Rico"
 msgstr ""
 
-#: ../lib/lcg/util.py:495
+#: ../lib/lcg/util.py:498
 msgid "Palestinian Territory"
 msgstr ""
 
-#: ../lib/lcg/util.py:496
+#: ../lib/lcg/util.py:499
 #, fuzzy
 msgid "Portugal"
 msgstr "portugiesisch"
 
-#: ../lib/lcg/util.py:497
+#: ../lib/lcg/util.py:500
 msgid "Palau"
 msgstr ""
 
-#: ../lib/lcg/util.py:498
+#: ../lib/lcg/util.py:501
 msgid "Paraguay"
 msgstr ""
 
-#: ../lib/lcg/util.py:499
+#: ../lib/lcg/util.py:502
 msgid "Qatar"
 msgstr ""
 
-#: ../lib/lcg/util.py:500
+#: ../lib/lcg/util.py:503
 msgid "Réunion"
 msgstr ""
 
-#: ../lib/lcg/util.py:501
+#: ../lib/lcg/util.py:504
 #, fuzzy
 msgid "Romania"
 msgstr "rumänisch"
 
-#: ../lib/lcg/util.py:502
+#: ../lib/lcg/util.py:505
 #, fuzzy
 msgid "Serbia"
 msgstr "serbisch"
 
-#: ../lib/lcg/util.py:503
+#: ../lib/lcg/util.py:506
 msgid "Russian Federation"
 msgstr ""
 
-#: ../lib/lcg/util.py:504
+#: ../lib/lcg/util.py:507
 msgid "Rwanda"
 msgstr ""
 
-#: ../lib/lcg/util.py:505
+#: ../lib/lcg/util.py:508
 msgid "Saudi Arabia"
 msgstr ""
 
-#: ../lib/lcg/util.py:506
+#: ../lib/lcg/util.py:509
 msgid "Solomon Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:507
+#: ../lib/lcg/util.py:510
 msgid "Seychelles"
 msgstr ""
 
-#: ../lib/lcg/util.py:508
-msgid "Sudan"
-msgstr ""
-
-#: ../lib/lcg/util.py:509
-#, fuzzy
-msgid "Sweden"
-msgstr "schwedisch"
-
-#: ../lib/lcg/util.py:510
-msgid "Singapore"
-msgstr ""
-
 #: ../lib/lcg/util.py:511
-msgid "Saint Helena"
+msgid "Sudan"
 msgstr ""
 
 #: ../lib/lcg/util.py:512
 #, fuzzy
-msgid "Slovenia"
-msgstr "slowenisch"
+msgid "Sweden"
+msgstr "schwedisch"
 
 #: ../lib/lcg/util.py:513
-msgid "Svalbard and Jan Mayen"
+msgid "Singapore"
 msgstr ""
 
 #: ../lib/lcg/util.py:514
+msgid "Saint Helena"
+msgstr ""
+
+#: ../lib/lcg/util.py:515
+#, fuzzy
+msgid "Slovenia"
+msgstr "slowenisch"
+
+#: ../lib/lcg/util.py:516
+msgid "Svalbard and Jan Mayen"
+msgstr ""
+
+#: ../lib/lcg/util.py:517
 #, fuzzy
 msgid "Slovakia"
 msgstr "slowakisch"
 
-#: ../lib/lcg/util.py:515
+#: ../lib/lcg/util.py:518
 msgid "Sierra Leone"
 msgstr ""
 
-#: ../lib/lcg/util.py:516
+#: ../lib/lcg/util.py:519
 msgid "San Marino"
 msgstr ""
 
-#: ../lib/lcg/util.py:517
+#: ../lib/lcg/util.py:520
 msgid "Senegal"
 msgstr ""
 
-#: ../lib/lcg/util.py:518
+#: ../lib/lcg/util.py:521
 msgid "Somalia"
 msgstr ""
 
-#: ../lib/lcg/util.py:519
+#: ../lib/lcg/util.py:522
 msgid "Suriname"
 msgstr ""
 
-#: ../lib/lcg/util.py:520
+#: ../lib/lcg/util.py:523
 msgid "South Sudan"
 msgstr ""
 
-#: ../lib/lcg/util.py:521
+#: ../lib/lcg/util.py:524
 msgid "Sao Tome and Principe"
 msgstr ""
 
-#: ../lib/lcg/util.py:522
+#: ../lib/lcg/util.py:525
 msgid "El Salvador"
 msgstr ""
 
-#: ../lib/lcg/util.py:523
+#: ../lib/lcg/util.py:526
 msgid "Sint Maarten (Dutch part)"
 msgstr ""
 
-#: ../lib/lcg/util.py:524
+#: ../lib/lcg/util.py:527
 msgid "Syrian Arab Republic"
 msgstr ""
 
-#: ../lib/lcg/util.py:525
+#: ../lib/lcg/util.py:528
 msgid "Swaziland"
 msgstr ""
 
-#: ../lib/lcg/util.py:526
+#: ../lib/lcg/util.py:529
 msgid "Turks and Caicos Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:527
+#: ../lib/lcg/util.py:530
 msgid "Chad"
 msgstr ""
 
-#: ../lib/lcg/util.py:528
+#: ../lib/lcg/util.py:531
 msgid "French Southern Territories"
 msgstr ""
 
-#: ../lib/lcg/util.py:529
+#: ../lib/lcg/util.py:532
 msgid "Togo"
 msgstr ""
 
-#: ../lib/lcg/util.py:530
+#: ../lib/lcg/util.py:533
 #, fuzzy
 msgid "Thailand"
 msgstr "thailändisch"
 
-#: ../lib/lcg/util.py:531
+#: ../lib/lcg/util.py:534
 msgid "Tajikistan"
 msgstr ""
 
-#: ../lib/lcg/util.py:532
+#: ../lib/lcg/util.py:535
 msgid "Tokelau"
 msgstr ""
 
-#: ../lib/lcg/util.py:533
+#: ../lib/lcg/util.py:536
 msgid "Timor-Leste"
-msgstr ""
-
-#: ../lib/lcg/util.py:534
-#, fuzzy
-msgid "Turkmenistan"
-msgstr "türkisch"
-
-#: ../lib/lcg/util.py:535
-msgid "Tunisia"
 msgstr ""
 
 #: ../lib/lcg/util.py:537
 #, fuzzy
-msgid "Turkey"
+msgid "Turkmenistan"
 msgstr "türkisch"
 
 #: ../lib/lcg/util.py:538
-msgid "Trinidad and Tobago"
-msgstr ""
-
-#: ../lib/lcg/util.py:539
-msgid "Tuvalu"
+msgid "Tunisia"
 msgstr ""
 
 #: ../lib/lcg/util.py:540
-msgid "Taiwan"
-msgstr ""
+#, fuzzy
+msgid "Turkey"
+msgstr "türkisch"
 
 #: ../lib/lcg/util.py:541
-msgid "Tanzania"
+msgid "Trinidad and Tobago"
 msgstr ""
 
 #: ../lib/lcg/util.py:542
+msgid "Tuvalu"
+msgstr ""
+
+#: ../lib/lcg/util.py:543
+msgid "Taiwan"
+msgstr ""
+
+#: ../lib/lcg/util.py:544
+msgid "Tanzania"
+msgstr ""
+
+#: ../lib/lcg/util.py:545
 #, fuzzy
 msgid "Ukraine"
 msgstr "ukrainisch"
 
-#: ../lib/lcg/util.py:543
+#: ../lib/lcg/util.py:546
 msgid "Uganda"
 msgstr ""
 
-#: ../lib/lcg/util.py:544
+#: ../lib/lcg/util.py:547
 msgid "United States Minor Outlying Islands"
 msgstr ""
 
-#: ../lib/lcg/util.py:545
+#: ../lib/lcg/util.py:548
 msgid "United States"
 msgstr ""
 
-#: ../lib/lcg/util.py:546
+#: ../lib/lcg/util.py:549
 msgid "Uruguay"
 msgstr ""
 
-#: ../lib/lcg/util.py:547
+#: ../lib/lcg/util.py:550
 msgid "Uzbekistan"
 msgstr ""
 
-#: ../lib/lcg/util.py:548
+#: ../lib/lcg/util.py:551
 msgid "Holy See (Vatican City State)"
 msgstr ""
 
-#: ../lib/lcg/util.py:549
+#: ../lib/lcg/util.py:552
 msgid "Saint Vincent and the Grenadines"
 msgstr ""
 
-#: ../lib/lcg/util.py:550
+#: ../lib/lcg/util.py:553
 msgid "Venezuela"
 msgstr ""
 
-#: ../lib/lcg/util.py:551
+#: ../lib/lcg/util.py:554
 msgid "Virgin Islands, British"
 msgstr ""
 
-#: ../lib/lcg/util.py:552
+#: ../lib/lcg/util.py:555
 msgid "Virgin Islands, U.S."
 msgstr ""
 
-#: ../lib/lcg/util.py:553
+#: ../lib/lcg/util.py:556
 msgid "Viet Nam"
 msgstr ""
 
-#: ../lib/lcg/util.py:554
+#: ../lib/lcg/util.py:557
 msgid "Vanuatu"
 msgstr ""
 
-#: ../lib/lcg/util.py:555
+#: ../lib/lcg/util.py:558
 msgid "Wallis and Futuna"
 msgstr ""
 
-#: ../lib/lcg/util.py:556
+#: ../lib/lcg/util.py:559
 msgid "Samoa"
 msgstr ""
 
-#: ../lib/lcg/util.py:557
+#: ../lib/lcg/util.py:560
 msgid "Yemen"
 msgstr ""
 
-#: ../lib/lcg/util.py:558
+#: ../lib/lcg/util.py:561
 msgid "Mayotte"
 msgstr ""
 
-#: ../lib/lcg/util.py:559
+#: ../lib/lcg/util.py:562
 msgid "South Africa"
 msgstr ""
 
-#: ../lib/lcg/util.py:560
+#: ../lib/lcg/util.py:563
 msgid "Zambia"
 msgstr ""
 
-#: ../lib/lcg/util.py:561
+#: ../lib/lcg/util.py:564
 msgid "Zimbabwe"
 msgstr ""
 
 #. Translators: The following 7 strings represent full week day names.  Please, take care to use
 #. upper/lower case letters according to the rules of the target language.
-#: ../lib/lcg/util.py:575
+#: ../lib/lcg/util.py:578
 msgid "Monday"
 msgstr ""
 
-#: ../lib/lcg/util.py:575
+#: ../lib/lcg/util.py:578
 msgid "Tuesday"
 msgstr ""
 
-#: ../lib/lcg/util.py:575
+#: ../lib/lcg/util.py:578
 msgid "Wednesday"
 msgstr ""
 
-#: ../lib/lcg/util.py:575
+#: ../lib/lcg/util.py:578
 msgid "Thursday"
 msgstr ""
 
-#: ../lib/lcg/util.py:575
+#: ../lib/lcg/util.py:578
 msgid "Friday"
 msgstr ""
 
-#: ../lib/lcg/util.py:576
+#: ../lib/lcg/util.py:579
 msgid "Saturday"
 msgstr ""
 
-#: ../lib/lcg/util.py:576
+#: ../lib/lcg/util.py:579
 msgid "Sunday"
 msgstr ""
 
 #. Translators: The following 7 strings represent the abbreviated week day names.  The
 #. abbreviations should normally take up to three characters.  Feel free to use whatever form
 #. usual in the target language.
-#: ../lib/lcg/util.py:581
+#: ../lib/lcg/util.py:584
 msgid "Mon"
 msgstr "Mo"
 
-#: ../lib/lcg/util.py:581
+#: ../lib/lcg/util.py:584
 msgid "Tue"
 msgstr "Di"
 
-#: ../lib/lcg/util.py:581
+#: ../lib/lcg/util.py:584
 msgid "Wed"
 msgstr "Mi"
 
-#: ../lib/lcg/util.py:581
+#: ../lib/lcg/util.py:584
 msgid "Thu"
 msgstr "Do"
 
-#: ../lib/lcg/util.py:581
+#: ../lib/lcg/util.py:584
 msgid "Fri"
 msgstr "Fr"
 
-#: ../lib/lcg/util.py:581
+#: ../lib/lcg/util.py:584
 msgid "Sat"
 msgstr "Sa"
 
-#: ../lib/lcg/util.py:581
+#: ../lib/lcg/util.py:584
 msgid "Sun"
 msgstr "So"
 
 #. Translators: The following 12 strings represent full month names.  Please, take care to use
 #. upper/lower case letters according to the rules of the target language.
-#: ../lib/lcg/util.py:603
+#: ../lib/lcg/util.py:606
 msgid "January"
 msgstr ""
 
-#: ../lib/lcg/util.py:603
+#: ../lib/lcg/util.py:606
 msgid "February"
 msgstr ""
 
-#: ../lib/lcg/util.py:603
+#: ../lib/lcg/util.py:606
 msgid "March"
 msgstr ""
 
-#: ../lib/lcg/util.py:603
+#: ../lib/lcg/util.py:606
 msgid "April"
 msgstr ""
 
-#: ../lib/lcg/util.py:603 ../lib/lcg/util.py:610
+#: ../lib/lcg/util.py:606 ../lib/lcg/util.py:613
 msgid "May"
 msgstr ""
 
-#: ../lib/lcg/util.py:603
+#: ../lib/lcg/util.py:606
 msgid "June"
 msgstr ""
 
-#: ../lib/lcg/util.py:604
+#: ../lib/lcg/util.py:607
 msgid "July"
 msgstr ""
 
-#: ../lib/lcg/util.py:604
+#: ../lib/lcg/util.py:607
 msgid "August"
 msgstr ""
 
-#: ../lib/lcg/util.py:604
+#: ../lib/lcg/util.py:607
 msgid "September"
 msgstr ""
 
-#: ../lib/lcg/util.py:604
+#: ../lib/lcg/util.py:607
 msgid "October"
 msgstr ""
 
-#: ../lib/lcg/util.py:604
+#: ../lib/lcg/util.py:607
 msgid "November"
 msgstr ""
 
-#: ../lib/lcg/util.py:605
+#: ../lib/lcg/util.py:608
 msgid "December"
 msgstr ""
 
 #. Translators: The following 12 strings represent the abbreviated month names.  The
 #. abbreviations should normally take up to three characters.  Feel free to use whatever form
 #. usual in the target language.
-#: ../lib/lcg/util.py:610
+#: ../lib/lcg/util.py:613
 msgid "Jan"
 msgstr ""
 
-#: ../lib/lcg/util.py:610
+#: ../lib/lcg/util.py:613
 msgid "Feb"
 msgstr ""
 
-#: ../lib/lcg/util.py:610
+#: ../lib/lcg/util.py:613
 msgid "Mar"
 msgstr ""
 
-#: ../lib/lcg/util.py:610
+#: ../lib/lcg/util.py:613
 msgid "Apr"
 msgstr ""
 
-#: ../lib/lcg/util.py:610
+#: ../lib/lcg/util.py:613
 msgid "Jun"
 msgstr ""
 
-#: ../lib/lcg/util.py:610
+#: ../lib/lcg/util.py:613
 msgid "Jul"
 msgstr ""
 
-#: ../lib/lcg/util.py:611
+#: ../lib/lcg/util.py:614
 msgid "Aug"
 msgstr ""
 
-#: ../lib/lcg/util.py:611
+#: ../lib/lcg/util.py:614
 msgid "Sep"
 msgstr ""
 
-#: ../lib/lcg/util.py:611
+#: ../lib/lcg/util.py:614
 msgid "Oct"
 msgstr ""
 
-#: ../lib/lcg/util.py:611
+#: ../lib/lcg/util.py:614
 msgid "Nov"
 msgstr ""
 
-#: ../lib/lcg/util.py:611
+#: ../lib/lcg/util.py:614
 msgid "Dec"
 msgstr ""
 

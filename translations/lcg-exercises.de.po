@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-22 16:21+0200\n"
+"POT-Creation-Date: 2014-10-03 10:00+0200\n"
 "PO-Revision-Date: 2011-12-06 20:41+0100\n"
 "Last-Translator: Petr Topiarz <reditel@mluvim.cz>\n"
 "Language-Team: German <de@li.org>\n"
@@ -286,7 +286,7 @@ msgid ""
 "you were right or not."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:754
+#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:763
 msgid ""
 "One exercise typically consists of a definition of several questions and "
 "answers."
@@ -296,7 +296,7 @@ msgstr ""
 msgid "The question and the answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:765
+#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:771
 msgid "Another pair or question and answer may follow after a blank line."
 msgstr ""
 
@@ -334,13 +334,22 @@ msgstr ""
 "Drücken Sie die Taste [#panel] am Ende der Übung, um alle Antworten "
 "auszuwerten."
 
+#: ../lib/lcg/exercises.py:709
+msgid ""
+"The brackets may also contain a series of underscores instead of the real "
+"answer. This means that the real answer is either not known or not needed. "
+"The exercise will not offer automatic evaluation, but the text box will "
+"allow the user to fill in any text.  The number of underscores determines "
+"the size of the box."
+msgstr ""
+
 # Section title
-#: ../lib/lcg/exercises.py:724
+#: ../lib/lcg/exercises.py:733
 #, fuzzy
 msgid "Vocabulary Exercise"
 msgstr "Vokabelübungen"
 
-#: ../lib/lcg/exercises.py:726
+#: ../lib/lcg/exercises.py:735
 msgid ""
 "There are two ways to do the exercise: orally and written.  Do the exercise "
 "both ways to get the best results."
@@ -349,7 +358,7 @@ msgstr ""
 "schriftlich oder mündlich durchführen.  Arbeiten Sie mit beiden "
 "Möglichkeiten, so können Sie daraus Ihren maximalen Nutzen ziehen."
 
-#: ../lib/lcg/exercises.py:728
+#: ../lib/lcg/exercises.py:737
 msgid ""
 "To do the exercise orally is simple.  Go through the vocabulary list and "
 "think of the correct translation for each word or expression. There is a "
@@ -371,7 +380,7 @@ msgstr ""
 "überprüfbar. Wenn Sie also Ihre Bewertung wissen möchten, müssen Sie die "
 "Übung in schriflicher Form wiederholen."
 
-#: ../lib/lcg/exercises.py:737
+#: ../lib/lcg/exercises.py:746
 msgid ""
 "To do the exercise in written form, simply type the translation of each item "
 "into the text-box.  Be careful to use capital letters where this is "
@@ -388,21 +397,21 @@ msgstr ""
 
 # The link after the recording controls.
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:749
+#: ../lib/lcg/exercises.py:758
 #, fuzzy
 msgid "Written Answers"
 msgstr "Transkription verbergen"
 
-#: ../lib/lcg/exercises.py:751
+#: ../lib/lcg/exercises.py:760
 msgid "Fill in the answer to the box below each question."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:756
+#: ../lib/lcg/exercises.py:765
 msgid ""
 "The question and the correct answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:757
+#: ../lib/lcg/exercises.py:766
 msgid ""
 "Either whole or a part of the answer is written inside square brackets.  The "
 "text inside the brackets is supposed to be filled into the text box by the "
@@ -410,7 +419,7 @@ msgid ""
 "or a templete of the expected answer for the user."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:767
+#: ../lib/lcg/exercises.py:773
 msgid ""
 "\n"
 "What is the name of the largest continent?\n"
@@ -420,11 +429,11 @@ msgid ""
 "Children [are] our future.\n"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:777
+#: ../lib/lcg/exercises.py:783
 msgid "Complete the Statements"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:779
+#: ../lib/lcg/exercises.py:785
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given statements.  The answers are "
@@ -434,7 +443,7 @@ msgstr ""
 "Achten Sie darauf, dass es nur eine richtige Lösung für jede Lücke im Text "
 "gibt."
 
-#: ../lib/lcg/exercises.py:784
+#: ../lib/lcg/exercises.py:790
 msgid ""
 "One exercise typically consists of several statements separated by blank "
 "lines from each other. Certain part of each statement is written in square "
@@ -443,7 +452,7 @@ msgid ""
 "statement."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:793
+#: ../lib/lcg/exercises.py:796
 msgid ""
 "\n"
 "[London] is the capital of the United Kingdom.\n"
@@ -453,11 +462,11 @@ msgstr ""
 
 # Title for Cloze
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:803
+#: ../lib/lcg/exercises.py:806
 msgid "Cloze"
 msgstr "Lückentext"
 
-#: ../lib/lcg/exercises.py:805
+#: ../lib/lcg/exercises.py:808
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given piece of text.  The answers are "
@@ -467,7 +476,7 @@ msgstr ""
 "Achten Sie darauf, dass es nur eine richtige Lösung für jede Lücke im Text "
 "gibt."
 
-#: ../lib/lcg/exercises.py:810
+#: ../lib/lcg/exercises.py:813
 msgid ""
 "One exercise typically consists of one or more paragraphs of text. Selected "
 "parts of the text (typically words), which are to be replaced by text entry "
@@ -517,9 +526,9 @@ msgid ""
 "[telescope]."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:468
-#: ../lib/lcg/export/exercises_html.py:503
-#: ../lib/lcg/export/exercises_html.py:506
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:483
+#: ../lib/lcg/export/exercises_html.py:518
+#: ../lib/lcg/export/exercises_html.py:521
 msgid "Total points:"
 msgstr "Gesamtpunktzahl:"
 
@@ -600,13 +609,13 @@ msgstr ""
 
 # Button label.
 #: ../lib/lcg/export/exercises_html.py:48
-#: ../lib/lcg/export/exercises_html.py:411
+#: ../lib/lcg/export/exercises_html.py:426
 msgid "Reset"
 msgstr "Löschen"
 
 #: ../lib/lcg/export/exercises_html.py:49
 #: ../lib/lcg/export/exercises_html.py:279
-#: ../lib/lcg/export/exercises_html.py:412
+#: ../lib/lcg/export/exercises_html.py:427
 msgid "Reset all your answers and start again."
 msgstr ""
 "Mit dieser Auswahltaste löschen Sie alle Ergebnisse und Sie haben die "
@@ -663,14 +672,14 @@ msgstr "Transkription verbergen"
 # The link after the recording controls.
 #: ../lib/lcg/export/exercises_html.py:281
 #: ../lib/lcg/export/exercises_html.py:287
-#: ../lib/lcg/export/exercises_html.py:414
+#: ../lib/lcg/export/exercises_html.py:429
 #, fuzzy
 msgid "Show Answer"
 msgstr "Transkription zeigen"
 
 # The link after the recording controls.
 #: ../lib/lcg/export/exercises_html.py:282
-#: ../lib/lcg/export/exercises_html.py:415
+#: ../lib/lcg/export/exercises_html.py:430
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Transkription verbergen"
@@ -738,41 +747,41 @@ msgstr ""
 "haben."
 
 # The link after the recording controls.
-#: ../lib/lcg/export/exercises_html.py:409
+#: ../lib/lcg/export/exercises_html.py:424
 #, fuzzy
 msgid "Show Answers"
 msgstr "Transkription zeigen"
 
 # Link to the answer sheet (not visible in the Javascript version)
-#: ../lib/lcg/export/exercises_html.py:410
+#: ../lib/lcg/export/exercises_html.py:425
 #, fuzzy
 msgid "Show model answers."
 msgstr "Hier finden Sie die Auflösung."
 
-#: ../lib/lcg/export/exercises_html.py:497
+#: ../lib/lcg/export/exercises_html.py:512
 msgid "Invalid value in added points!"
 msgstr ""
 
-#: ../lib/lcg/export/exercises_html.py:498
+#: ../lib/lcg/export/exercises_html.py:513
 msgid "Max. points exceeded!"
 msgstr ""
 
-#: ../lib/lcg/export/exercises_html.py:500
+#: ../lib/lcg/export/exercises_html.py:515
 msgid "Automatic evaluation:"
 msgstr "Automatisch Auswertung:"
 
-#: ../lib/lcg/export/exercises_html.py:501
+#: ../lib/lcg/export/exercises_html.py:516
 msgid "Additional points by tutor:"
 msgstr ""
 
 # Instructions for MultipleChoiceQuestions and Selections
-#: ../lib/lcg/export/exercises_html.py:525
+#: ../lib/lcg/export/exercises_html.py:540
 msgid "correct answer"
 msgstr "richtige Antwort"
 
 # The label for the display field with exercise results.
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:530
+#: ../lib/lcg/export/exercises_html.py:545
 msgid "incorrect"
 msgstr "falsch"
 

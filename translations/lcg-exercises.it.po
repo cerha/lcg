@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-22 16:21+0200\n"
+"POT-Creation-Date: 2014-10-03 10:00+0200\n"
 "PO-Revision-Date: 2011-12-06 16:13+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Italian (reditel@mluvim.cz)\n"
@@ -278,7 +278,7 @@ msgid ""
 "you were right or not."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:754
+#: ../lib/lcg/exercises.py:678 ../lib/lcg/exercises.py:763
 msgid ""
 "One exercise typically consists of a definition of several questions and "
 "answers."
@@ -288,7 +288,7 @@ msgstr ""
 msgid "The question and the answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:765
+#: ../lib/lcg/exercises.py:681 ../lib/lcg/exercises.py:771
 msgid "Another pair or question and answer may follow after a blank line."
 msgstr ""
 
@@ -325,12 +325,21 @@ msgstr ""
 "Usa il [#panel] alla fine dell'esercizio per valutare tutte le risposte in "
 "una volta sola."
 
-#: ../lib/lcg/exercises.py:724
+#: ../lib/lcg/exercises.py:709
+msgid ""
+"The brackets may also contain a series of underscores instead of the real "
+"answer. This means that the real answer is either not known or not needed. "
+"The exercise will not offer automatic evaluation, but the text box will "
+"allow the user to fill in any text.  The number of underscores determines "
+"the size of the box."
+msgstr ""
+
+#: ../lib/lcg/exercises.py:733
 #, fuzzy
 msgid "Vocabulary Exercise"
 msgstr "Esercizi di lessico"
 
-#: ../lib/lcg/exercises.py:726
+#: ../lib/lcg/exercises.py:735
 msgid ""
 "There are two ways to do the exercise: orally and written.  Do the exercise "
 "both ways to get the best results."
@@ -338,7 +347,7 @@ msgstr ""
 "Ci sono due possibilità di eseguire l'esercizio: forma orale e forma "
 "scritta. Approfitta di entrambe per ottenere i risultati migliori."
 
-#: ../lib/lcg/exercises.py:728
+#: ../lib/lcg/exercises.py:737
 msgid ""
 "To do the exercise orally is simple.  Go through the vocabulary list and "
 "think of the correct translation for each word or expression. There is a "
@@ -359,7 +368,7 @@ msgstr ""
 "disposizione. Se vuoi sapere il tuo punteggio, devi eseguire la prova nella "
 "forma scritta."
 
-#: ../lib/lcg/exercises.py:737
+#: ../lib/lcg/exercises.py:746
 msgid ""
 "To do the exercise in written form, simply type the translation of each item "
 "into the text-box.  Be careful to use capital letters where this is "
@@ -374,21 +383,21 @@ msgstr ""
 "traduci l'intera frase, concentrati anche sulla punteggiatura."
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:749
+#: ../lib/lcg/exercises.py:758
 #, fuzzy
 msgid "Written Answers"
 msgstr "Nascondi la trascrizione"
 
-#: ../lib/lcg/exercises.py:751
+#: ../lib/lcg/exercises.py:760
 msgid "Fill in the answer to the box below each question."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:756
+#: ../lib/lcg/exercises.py:765
 msgid ""
 "The question and the correct answer are written each at a separate line."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:757
+#: ../lib/lcg/exercises.py:766
 msgid ""
 "Either whole or a part of the answer is written inside square brackets.  The "
 "text inside the brackets is supposed to be filled into the text box by the "
@@ -396,7 +405,7 @@ msgid ""
 "or a templete of the expected answer for the user."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:767
+#: ../lib/lcg/exercises.py:773
 msgid ""
 "\n"
 "What is the name of the largest continent?\n"
@@ -406,11 +415,11 @@ msgid ""
 "Children [are] our future.\n"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:777
+#: ../lib/lcg/exercises.py:783
 msgid "Complete the Statements"
 msgstr ""
 
-#: ../lib/lcg/exercises.py:779
+#: ../lib/lcg/exercises.py:785
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given statements.  The answers are "
@@ -420,7 +429,7 @@ msgstr ""
 "testo più lungo. Per ogni spazio vuoto esiste soltanto una sola risposta "
 "corretta."
 
-#: ../lib/lcg/exercises.py:784
+#: ../lib/lcg/exercises.py:790
 msgid ""
 "One exercise typically consists of several statements separated by blank "
 "lines from each other. Certain part of each statement is written in square "
@@ -429,7 +438,7 @@ msgid ""
 "statement."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:793
+#: ../lib/lcg/exercises.py:796
 msgid ""
 "\n"
 "[London] is the capital of the United Kingdom.\n"
@@ -438,11 +447,11 @@ msgid ""
 msgstr ""
 
 #. Translators: Type of exercise (use language terminology)
-#: ../lib/lcg/exercises.py:803
+#: ../lib/lcg/exercises.py:806
 msgid "Cloze"
 msgstr "Completamento delle risposte"
 
-#: ../lib/lcg/exercises.py:805
+#: ../lib/lcg/exercises.py:808
 #, fuzzy
 msgid ""
 "The goal is to fill in the gaps in given piece of text.  The answers are "
@@ -452,7 +461,7 @@ msgstr ""
 "testo più lungo. Per ogni spazio vuoto esiste soltanto una sola risposta "
 "corretta."
 
-#: ../lib/lcg/exercises.py:810
+#: ../lib/lcg/exercises.py:813
 msgid ""
 "One exercise typically consists of one or more paragraphs of text. Selected "
 "parts of the text (typically words), which are to be replaced by text entry "
@@ -501,9 +510,9 @@ msgid ""
 "[telescope]."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:468
-#: ../lib/lcg/export/exercises_html.py:503
-#: ../lib/lcg/export/exercises_html.py:506
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:483
+#: ../lib/lcg/export/exercises_html.py:518
+#: ../lib/lcg/export/exercises_html.py:521
 msgid "Total points:"
 msgstr "Punteggio totale:"
 
@@ -575,13 +584,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Completa tutto l'esercizio con le risposte corrette."
 
 #: ../lib/lcg/export/exercises_html.py:48
-#: ../lib/lcg/export/exercises_html.py:411
+#: ../lib/lcg/export/exercises_html.py:426
 msgid "Reset"
 msgstr "Annulla"
 
 #: ../lib/lcg/export/exercises_html.py:49
 #: ../lib/lcg/export/exercises_html.py:279
-#: ../lib/lcg/export/exercises_html.py:412
+#: ../lib/lcg/export/exercises_html.py:427
 msgid "Reset all your answers and start again."
 msgstr "Annulla tutte le tue risposte e ricomincia dall'inizio."
 
@@ -633,13 +642,13 @@ msgstr "Nascondi la trascrizione"
 
 #: ../lib/lcg/export/exercises_html.py:281
 #: ../lib/lcg/export/exercises_html.py:287
-#: ../lib/lcg/export/exercises_html.py:414
+#: ../lib/lcg/export/exercises_html.py:429
 #, fuzzy
 msgid "Show Answer"
 msgstr "Visualizza la trascrizione"
 
 #: ../lib/lcg/export/exercises_html.py:282
-#: ../lib/lcg/export/exercises_html.py:415
+#: ../lib/lcg/export/exercises_html.py:430
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Nascondi la trascrizione"
@@ -707,38 +716,38 @@ msgstr ""
 "‘Invio’ (vedi sopra) oppure usare di nuovo il pulsante di ‘suggerimento’ se "
 "non trovi la risposta corretta completa."
 
-#: ../lib/lcg/export/exercises_html.py:409
+#: ../lib/lcg/export/exercises_html.py:424
 #, fuzzy
 msgid "Show Answers"
 msgstr "Visualizza la trascrizione"
 
-#: ../lib/lcg/export/exercises_html.py:410
+#: ../lib/lcg/export/exercises_html.py:425
 #, fuzzy
 msgid "Show model answers."
 msgstr "Visualizza le risposte corrette."
 
-#: ../lib/lcg/export/exercises_html.py:497
+#: ../lib/lcg/export/exercises_html.py:512
 msgid "Invalid value in added points!"
 msgstr "Valore invalido dei punti aggiunti!"
 
-#: ../lib/lcg/export/exercises_html.py:498
+#: ../lib/lcg/export/exercises_html.py:513
 msgid "Max. points exceeded!"
 msgstr "Il massimo dei punti è stato superato!"
 
-#: ../lib/lcg/export/exercises_html.py:500
+#: ../lib/lcg/export/exercises_html.py:515
 msgid "Automatic evaluation:"
 msgstr "Valutazione automatica:"
 
-#: ../lib/lcg/export/exercises_html.py:501
+#: ../lib/lcg/export/exercises_html.py:516
 msgid "Additional points by tutor:"
 msgstr "Punti aggiunti dall'insegnante:"
 
-#: ../lib/lcg/export/exercises_html.py:525
+#: ../lib/lcg/export/exercises_html.py:540
 msgid "correct answer"
 msgstr "risposta corretta"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:530
+#: ../lib/lcg/export/exercises_html.py:545
 msgid "incorrect"
 msgstr "errata"
 
