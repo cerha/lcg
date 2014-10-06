@@ -18,10 +18,14 @@ table.lcg-table {
 table.lcg-table td, table.lcg-table th {
     padding: .4em;
 }
+.exercise {
+    margin-top: 0.8em;
+}
 .exercise ol.choices {
     list-style-type: lower-alpha;
 }
 .exercise .answers {
     color: #6a6a6a;
     font-size: 0.9em;
+    margin-top: 0.6em;
 }
