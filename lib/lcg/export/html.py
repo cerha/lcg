@@ -486,8 +486,15 @@ class HtmlExporter(Exporter):
             self._unique_id_index = 0
             super(HtmlExporter.Context, self).__init__(*args, **kwargs)
 
+        def _init_kwargs(self, allow_interactivity=True, **kwargs):
+            self._allow_interactivity = allow_interactivity
+            super(HtmlExporter.Context, self)._init_kwargs(**kwargs)
+
         def generator(self):
             return self._generator
+
+        def allow_interactivity(self):
+            return self._allow_interactivity
 
         def unique_id(self):
             """Return a unique id string in the curent context.

@@ -140,6 +140,7 @@ class EpubHtml5Exporter(Html5Exporter):
 
 
 class EpubExporter(Exporter):
+
     class Config(object):
         """Specifies implementation-defined EPUB parameters"""
         RESOURCEDIR = 'rsrc'
@@ -150,6 +151,15 @@ class EpubExporter(Exporter):
         # images at all.  The OSX version doesn't seem to care.  However it stil seems an
         # acceptable general limit to keep the total EPUB size reasonable.
 
+    class Context(Exporter.Context):
+
+        def _init_kwargs(self, allow_interactivity=True, **kwargs):
+            self._allow_interactivity = allow_interactivity
+            super(EpubExporter.Context, self)._init_kwargs(**kwargs)
+
+        def allow_interactivity(self):
+            return self._allow_interactivity
+            
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
         super(EpubExporter, self).__init__(*args, **kwargs)
@@ -363,7 +373,8 @@ class EpubExporter(Exporter):
 
     def _xhtml_content_document(self, node, root_context):
         exporter = self._html_exporter
-        context = exporter.context(node, root_context.lang(), log=root_context.log)
+        context = exporter.context(node, root_context.lang(), log=root_context.log,
+                                   allow_interactivity=root_context.allow_interactivity())
         context.generator().context = context
         context.scripted = False
         context.mathml = False

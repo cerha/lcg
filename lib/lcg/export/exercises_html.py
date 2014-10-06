@@ -162,24 +162,40 @@ class ExerciseExporter(object):
                             cls='buttons')),
                      cls='results')
 
+    def _export_task_answer(self, context, exercise, exercise_id, task):
+        return 'x'
+        
+    def _export_answers(self, context, exercise, exercise_id):
+        g = context.generator()
+        task_answers = [self._export_task_answer(context, exercise, exercise_id, task)
+                        for task in exercise.tasks()]
+        return g.div(_("Answers: %s", lcg.concat(*task_answers, separator=', ')),
+                     cls='answers')
+
     def export(self, context, exercise):
         g = context.generator()
-        context.resource('prototype.js')
-        context.resource('lcg.js')
-        context.resource('lcg-exercises.js')
-        context.resource('lcg-exercises.css')
-        context.resource('effects.js')
-        context.resource('media.js')
-        context.connect_shared_player()
         exercise_id = context.unique_id()
-        parts = [method(context, exercise, exercise_id) for method in (self._export_instructions,
-                                                                       self._export_tasks,
-                                                                       self._export_results)]
+        context.resource('lcg-exercises.css')
+        if context.allow_interactivity():
+            context.resource('prototype.js')
+            context.resource('lcg.js')
+            context.resource('lcg-exercises.js')
+            context.resource('effects.js')
+            context.resource('media.js')
+            context.connect_shared_player()
+            methods = (self._export_instructions,
+                       self._export_tasks,
+                       self._export_results)
+        else:
+            methods = (self._export_tasks,
+                       self._export_answers)
+        parts = [method(context, exercise, exercise_id) for method in methods]
         content = [x for x in parts if x is not None]
-        script = self._export_script(context, exercise, exercise_id)
-        if script:
-            content = (g.form(content, id=exercise_id),
-                       g.script(script))
+        if context.allow_interactivity():
+            script = self._export_script(context, exercise, exercise_id)
+            if script:
+                content = (g.form(content, id=exercise_id),
+                           g.script(script))
         return g.div(content,
                      cls='exercise ' + lcg.camel_case_to_lower(exercise.__class__.__name__))
 
@@ -197,19 +213,21 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
 
     def _choice_control(self, context, exercise, exercise_id, task, choice):
         g = context.generator()
-        i = task.choices().index(choice)
-        task_name = self._task_id(exercise, exercise_id, task)
-        choice_id = task_name + '-ch%d' % (i + 1)
-        checked = self._checked(context, exercise, exercise_id, task, i)
-        # Disable only the unchecked fields in the read-only mode.  This makes the selection
-        # unchangable in practice and has also the advantage that the checked fields can be
-        # navigated, which is even better than using the `readonly' attribute (which doesn't work
-        # in browsers anyway).
-        disabled = self._readonly(context) and not checked
-        ctrl = g.radio(task_name, id=choice_id, value=i,
-                       cls='answer-control', checked=checked, disabled=disabled)
-        text = self._choice_text(context, exercise, exercise_id, task, choice)
-        return concat(ctrl, ' ', g.label(text, choice_id))
+        result = self._choice_text(context, exercise, exercise_id, task, choice)
+        if context.allow_interactivity():
+            i = task.choices().index(choice)
+            task_name = self._task_id(exercise, exercise_id, task)
+            choice_id = task_name + '-ch%d' % (i + 1)
+            checked = self._checked(context, exercise, exercise_id, task, i)
+            # Disable only the unchecked fields in the read-only mode.  This makes the selection
+            # unchangable in practice and has also the advantage that the checked fields can be
+            # navigated, which is even better than using the `readonly' attribute (which doesn't work
+            # in browsers anyway).
+            disabled = self._readonly(context) and not checked
+            ctrl = g.radio(task_name, id=choice_id, value=i,
+                           cls='answer-control', checked=checked, disabled=disabled)
+            result = concat(ctrl, ' ', g.label(result, choice_id))
+        return result
 
     def _format_choices(self, context, exercise, exercise_id, task):
         g = context.generator()
@@ -227,6 +245,15 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
             prompt = context.localize(prompt.export(context))
         return (prompt, self._format_choices(context, exercise, exercise_id, task))
 
+    def _export_task_answer_name(self, context, exercise, exercise_id, task):
+        import string
+        i = task.choice_index(task.correct_choice())
+        return string.ascii_letters[i]
+
+    def _export_task_answer(self, context, exercise, exercise_id, task):
+        i = exercise.tasks().index(task)
+        answer = self._export_task_answer_name(context, exercise, exercise_id, task)
+        return lcg.format('%s. %s', i+1, answer)
 
 class MultipleChoiceQuestionsExporter(_ChoiceBasedExerciseExporter):
     pass
@@ -239,10 +266,15 @@ class SelectionsExporter(_ChoiceBasedExerciseExporter):
 class TrueFalseStatementsExporter(_ChoiceBasedExerciseExporter):
 
     def _format_choices(self, context, exercise, exercise_id, task):
+        if not context.allow_interactivity():
+            return None
         g = context.generator()
         return g.div([g.div(self._choice_control(context, exercise, exercise_id, task, ch))
                       for ch in task.choices()],
-                    cls='choices')
+                     cls='choices')
+
+    def _export_task_answer_name(self, context, exercise, exercise_id, task):
+        return task.correct_choice().answer()
 
 
 class _SelectBasedExerciseExporter(_ChoiceBasedExerciseExporter):
@@ -283,13 +315,19 @@ class HiddenAnswersExporter(ExerciseExporter):
 
     def _export_task_parts(self, context, exercise, exercise_id, task):
         g = context.generator()
-        return (g.div(task.prompt().export(context), cls='question'),
-                g.button(_("Show Answer"), cls='toggle-button',
-                         title=_("Show/Hide the correct answer.")),
-                # The inner div is needed by the JavaScript effects library for
-                # the sliding effect.
-                g.div(g.div(task.answer().export(context)),
-                      cls='answer', style='display: none;'))
+        result = (g.div(task.prompt().export(context), cls='question'),)
+        if context.allow_interactivity():
+            result += (g.button(_("Show Answer"), cls='toggle-button',
+                                title=_("Show/Hide the correct answer.")),
+                       # The inner div is needed by the JavaScript effects library for
+                       # the sliding effect.
+                       g.div(g.div(task.answer().export(context)),
+                             cls='answer', style='display: none;'))
+        return result
+
+    def _export_task_answer(self, context, exercise, exercise_id, task):
+        i = exercise.tasks().index(task)
+        return lcg.format('%s. %s', i+1, task.answer().export(context)) 
 
 
 class _FillInExerciseExporter(ExerciseExporter):
@@ -336,6 +374,11 @@ class _FillInExerciseExporter(ExerciseExporter):
             return None
         return super(_FillInExerciseExporter, self)._export_results(context, exercise, exercise_id)
 
+    def _export_answers(self, context, exercise, exercise_id):
+        if not self._has_real_answers(exercise):
+            return None
+        return super(_FillInExerciseExporter, self)._export_answers(context, exercise, exercise_id)
+
     def _export_task_text(self, context, exercise, exercise_id, task):
         def make_field(answer, label, word_start, word_end):
             field, field_id = self._make_field(context, exercise, exercise_id, task, answer)
@@ -364,14 +407,18 @@ class _FillInExerciseExporter(ExerciseExporter):
         g = context.generator()
         self._field_number += 1
         field_id = self._task_id(exercise, exercise_id, task) + '-f%d' % self._field_number
-        field = concat(
-            g.field(name=field_id, id=field_id, size=len(text),
-                    value=self._field_value(context, field_id),
-                    readonly=self._readonly(context),
-                    cls=self._field_cls(context, field_id, text)),
-            [self._media_control(context, m, inline=True) for m in task.media()],
-            self._field_result(context, field_id, text)
-        )
+        if not context.allow_interactivity():
+            field = g.span('_' * len(text), title=text,
+                           cls=self._field_cls(context, field_id, text))
+        else:
+            field = concat(
+                g.field(name=field_id, id=field_id, size=len(text),
+                        value=self._field_value(context, field_id),
+                        readonly=self._readonly(context),
+                        cls=self._field_cls(context, field_id, text)),
+                [self._media_control(context, m, inline=True) for m in task.media()],
+                self._field_result(context, field_id, text)
+            )
         return (context.localize(field), field_id)
                 
     def _export_fill_in_task(self, context, prompt, text):
@@ -397,6 +444,13 @@ class _FillInExerciseExporter(ExerciseExporter):
             if prompt:
                 prompt = g.label(prompt, field_id)
         return (self._export_fill_in_task(context, prompt, text),)
+
+    def _export_task_answer(self, context, exercise, exercise_id, task):
+        answer = ', '.join(task.answers())
+        if len(exercise.tasks()) > 1:
+            i = exercise.tasks().index(task)
+            answer = lcg.format('%s. %s', i+1, answer) 
+        return answer
                                        
     
 class VocabExerciseExporter(_FillInExerciseExporter, ExerciseExporter):
@@ -430,24 +484,25 @@ class ModelClozeExporter(ClozeExporter):
                  "Hide Answer": _("Hide Answer")}
 
     def _export_tasks(self, context, exercise, exercise_id):
-        g = context.generator()
-        def make_field(answer, label, word_start, word_end):
-            field = g.span(answer, cls='model-answer')
-            if word_start or word_end:
-                return g.span(word_start + field + word_end, cls='nowrap')
-            else:
-                return field
-        def export_task(task):
-            text = task.text().replace('[', '\[')
-            if text:
-                content = lcg.Parser().parse_inline_markup(text)
-                html = context.localize(content.export(context))
-            else:
-                html = ''
-            return task.substitute_fields(html, make_field)
-        return (super(ModelClozeExporter, self)._export_tasks(context, exercise, exercise_id) +
-                g.div([export_task(task) for task in exercise.tasks()],
-                      cls='model-answers'))
+        result = super(ModelClozeExporter, self)._export_tasks(context, exercise, exercise_id)
+        if context.allow_interactivity():
+            g = context.generator()
+            def make_field(answer, label, word_start, word_end):
+                field = g.span(answer, cls='model-answer')
+                if word_start or word_end:
+                    return g.span(word_start + field + word_end, cls='nowrap')
+                else:
+                    return field
+            def export_task(task):
+                text = task.text().replace('[', '\[')
+                if text:
+                    content = lcg.Parser().parse_inline_markup(text)
+                    html = context.localize(content.export(context))
+                else:
+                    html = ''
+                return task.substitute_fields(html, make_field)
+            result += g.div([export_task(task) for task in exercise.tasks()], cls='model-answers')
+        return result
 
     
 ################################################################################
