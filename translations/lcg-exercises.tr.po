@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 10:00+0200\n"
+"POT-Creation-Date: 2014-10-03 16:29+0200\n"
 "PO-Revision-Date: 2011-03-10 12:23+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -501,9 +501,9 @@ msgid ""
 "[telescope]."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:483
-#: ../lib/lcg/export/exercises_html.py:518
-#: ../lib/lcg/export/exercises_html.py:521
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:538
+#: ../lib/lcg/export/exercises_html.py:573
+#: ../lib/lcg/export/exercises_html.py:576
 msgid "Total points:"
 msgstr "Toplam sayı:"
 
@@ -571,13 +571,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Doğru cevaplarıyla bütün alıştırmayı doldurur."
 
 #: ../lib/lcg/export/exercises_html.py:48
-#: ../lib/lcg/export/exercises_html.py:426
+#: ../lib/lcg/export/exercises_html.py:480
 msgid "Reset"
 msgstr "Yeniden başlat"
 
 #: ../lib/lcg/export/exercises_html.py:49
-#: ../lib/lcg/export/exercises_html.py:279
-#: ../lib/lcg/export/exercises_html.py:427
+#: ../lib/lcg/export/exercises_html.py:311
+#: ../lib/lcg/export/exercises_html.py:481
 msgid "Reset all your answers and start again."
 msgstr ""
 "Bütün cevapları ve sonuçları sıfırlar, alıştırmaya yeniden başlayabilirsiniz."
@@ -611,40 +611,45 @@ msgstr ""
 msgid "Play"
 msgstr "Çalmak"
 
-#: ../lib/lcg/export/exercises_html.py:276
+#: ../lib/lcg/export/exercises_html.py:172
+#, fuzzy, python-format
+msgid "Answers: %s"
+msgstr "Yanıtlandı:"
+
+#: ../lib/lcg/export/exercises_html.py:308
 #, fuzzy
 msgid "Show All"
 msgstr "Yazı göstermek"
 
-#: ../lib/lcg/export/exercises_html.py:277
+#: ../lib/lcg/export/exercises_html.py:309
 #, fuzzy
 msgid "Show all answers."
 msgstr "Cevap tablosu göstermek."
 
-#: ../lib/lcg/export/exercises_html.py:278
+#: ../lib/lcg/export/exercises_html.py:310
 #, fuzzy
 msgid "Hide All"
 msgstr "Yazı gizlemek"
 
-#: ../lib/lcg/export/exercises_html.py:281
-#: ../lib/lcg/export/exercises_html.py:287
-#: ../lib/lcg/export/exercises_html.py:429
+#: ../lib/lcg/export/exercises_html.py:313
+#: ../lib/lcg/export/exercises_html.py:320
+#: ../lib/lcg/export/exercises_html.py:483
 #, fuzzy
 msgid "Show Answer"
 msgstr "Yazı göstermek"
 
-#: ../lib/lcg/export/exercises_html.py:282
-#: ../lib/lcg/export/exercises_html.py:430
+#: ../lib/lcg/export/exercises_html.py:314
+#: ../lib/lcg/export/exercises_html.py:484
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Yazı gizlemek"
 
-#: ../lib/lcg/export/exercises_html.py:288
+#: ../lib/lcg/export/exercises_html.py:321
 #, fuzzy
 msgid "Show/Hide the correct answer."
 msgstr "Doğru cevabı işaretleyiniz."
 
-#: ../lib/lcg/export/exercises_html.py:302
+#: ../lib/lcg/export/exercises_html.py:340
 msgid ""
 "In all the exercises where you fill in the text into a text-box you can use "
 "the two shortcut keys described below."
@@ -652,11 +657,11 @@ msgstr ""
 "Metni metin kutusuna doldurduğunuz bütün alıştırmalarda aşağıdaki kısayol "
 "tuşları kullanabilirsiniz."
 
-#: ../lib/lcg/export/exercises_html.py:304
+#: ../lib/lcg/export/exercises_html.py:342
 msgid "Enter"
 msgstr "Enter"
 
-#: ../lib/lcg/export/exercises_html.py:305
+#: ../lib/lcg/export/exercises_html.py:343
 msgid ""
 "Use this key within the text-field to evaluate the current answer. You hear "
 "a sound response and in case of an error, the cursor is moved to the "
@@ -670,11 +675,11 @@ msgstr ""
 "değerlendirilebilirsiniz. Eğer başka ne yapabileceğinizi bilmezsiniz, daha "
 "aşağıda anlatıldığı „yardım“ tuşu kullanınız."
 
-#: ../lib/lcg/export/exercises_html.py:311
+#: ../lib/lcg/export/exercises_html.py:349
 msgid "Ctrl-Space"
 msgstr "Ctrl+boşluk çubuğu"
 
-#: ../lib/lcg/export/exercises_html.py:312
+#: ../lib/lcg/export/exercises_html.py:350
 msgid ""
 "This function is called a ‘hint’.  It helps you in case you don't know the "
 "answer or you don't know how to fix an error in your answer. Just press the "
@@ -697,38 +702,38 @@ msgstr ""
 "yeni cevabınızı „Enter“ tuşa basarak değerlendirebilirsiniz ya da „yardım“ "
 "tuşu doğru cevabınızı buluncaya kadar kullanabilirsiniz."
 
-#: ../lib/lcg/export/exercises_html.py:424
+#: ../lib/lcg/export/exercises_html.py:478
 #, fuzzy
 msgid "Show Answers"
 msgstr "Yazı göstermek"
 
-#: ../lib/lcg/export/exercises_html.py:425
+#: ../lib/lcg/export/exercises_html.py:479
 #, fuzzy
 msgid "Show model answers."
 msgstr "Cevap tablosu göstermek."
 
-#: ../lib/lcg/export/exercises_html.py:512
+#: ../lib/lcg/export/exercises_html.py:567
 msgid "Invalid value in added points!"
 msgstr "Eklenmiş puanların değeri geçersizdir!"
 
-#: ../lib/lcg/export/exercises_html.py:513
+#: ../lib/lcg/export/exercises_html.py:568
 msgid "Max. points exceeded!"
 msgstr "Maks. puan sayısı aşıldı!"
 
-#: ../lib/lcg/export/exercises_html.py:515
+#: ../lib/lcg/export/exercises_html.py:570
 msgid "Automatic evaluation:"
 msgstr "Otomatik değerlendirme:"
 
-#: ../lib/lcg/export/exercises_html.py:516
+#: ../lib/lcg/export/exercises_html.py:571
 msgid "Additional points by tutor:"
 msgstr "Öğretmen tarafından ek puanları:"
 
-#: ../lib/lcg/export/exercises_html.py:540
+#: ../lib/lcg/export/exercises_html.py:595
 msgid "correct answer"
 msgstr "doğru cevap"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:545
+#: ../lib/lcg/export/exercises_html.py:600
 msgid "incorrect"
 msgstr "yanlış"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 10:00+0200\n"
+"POT-Creation-Date: 2014-10-03 16:29+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Petr Topiarz <reditel@mluvim.cz>\n"
 "Language-Team: \n"
@@ -498,9 +498,9 @@ msgid ""
 "[telescope]."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:483
-#: ../lib/lcg/export/exercises_html.py:518
-#: ../lib/lcg/export/exercises_html.py:521
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:538
+#: ../lib/lcg/export/exercises_html.py:573
+#: ../lib/lcg/export/exercises_html.py:576
 msgid "Total points:"
 msgstr "Összpontszám:"
 
@@ -567,13 +567,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Töltsd ki a gyakorlatot a helyes válaszokkal."
 
 #: ../lib/lcg/export/exercises_html.py:48
-#: ../lib/lcg/export/exercises_html.py:426
+#: ../lib/lcg/export/exercises_html.py:480
 msgid "Reset"
 msgstr "Reset"
 
 #: ../lib/lcg/export/exercises_html.py:49
-#: ../lib/lcg/export/exercises_html.py:279
-#: ../lib/lcg/export/exercises_html.py:427
+#: ../lib/lcg/export/exercises_html.py:311
+#: ../lib/lcg/export/exercises_html.py:481
 msgid "Reset all your answers and start again."
 msgstr "Az összes válasz törlése és a teszt újrakezdése."
 
@@ -605,40 +605,45 @@ msgstr "A vezérlőpult a gyakorlatok alatt a következő gombokat tartalmazza:"
 msgid "Play"
 msgstr "Lejátszás"
 
-#: ../lib/lcg/export/exercises_html.py:276
+#: ../lib/lcg/export/exercises_html.py:172
+#, fuzzy, python-format
+msgid "Answers: %s"
+msgstr "Megválaszolva:"
+
+#: ../lib/lcg/export/exercises_html.py:308
 #, fuzzy
 msgid "Show All"
 msgstr "Mutasd a szöveget"
 
-#: ../lib/lcg/export/exercises_html.py:277
+#: ../lib/lcg/export/exercises_html.py:309
 #, fuzzy
 msgid "Show all answers."
 msgstr "Mutasd a megoldásokat."
 
-#: ../lib/lcg/export/exercises_html.py:278
+#: ../lib/lcg/export/exercises_html.py:310
 #, fuzzy
 msgid "Hide All"
 msgstr "Szöveg elrejtése"
 
-#: ../lib/lcg/export/exercises_html.py:281
-#: ../lib/lcg/export/exercises_html.py:287
-#: ../lib/lcg/export/exercises_html.py:429
+#: ../lib/lcg/export/exercises_html.py:313
+#: ../lib/lcg/export/exercises_html.py:320
+#: ../lib/lcg/export/exercises_html.py:483
 #, fuzzy
 msgid "Show Answer"
 msgstr "Mutasd a szöveget"
 
-#: ../lib/lcg/export/exercises_html.py:282
-#: ../lib/lcg/export/exercises_html.py:430
+#: ../lib/lcg/export/exercises_html.py:314
+#: ../lib/lcg/export/exercises_html.py:484
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Szöveg elrejtése"
 
-#: ../lib/lcg/export/exercises_html.py:288
+#: ../lib/lcg/export/exercises_html.py:321
 #, fuzzy
 msgid "Show/Hide the correct answer."
 msgstr "Válaszd ki a jó megoldást."
 
-#: ../lib/lcg/export/exercises_html.py:302
+#: ../lib/lcg/export/exercises_html.py:340
 msgid ""
 "In all the exercises where you fill in the text into a text-box you can use "
 "the two shortcut keys described below."
@@ -646,11 +651,11 @@ msgstr ""
 "Minden feladatban, ahol szövegdobozba kell szöveget kitölteni, használhatóak "
 "az alábbi gyorsbillentyű-kombinációk."
 
-#: ../lib/lcg/export/exercises_html.py:304
+#: ../lib/lcg/export/exercises_html.py:342
 msgid "Enter"
 msgstr "Beír"
 
-#: ../lib/lcg/export/exercises_html.py:305
+#: ../lib/lcg/export/exercises_html.py:343
 #, fuzzy
 msgid ""
 "Use this key within the text-field to evaluate the current answer. You hear "
@@ -665,11 +670,11 @@ msgstr ""
 "hiba, kijavítható, és újra kiértékelhető. Ha nem tudod, hogyan javítsd ki a "
 "hibát, használd a segítséget, lásd. lejjebb."
 
-#: ../lib/lcg/export/exercises_html.py:311
+#: ../lib/lcg/export/exercises_html.py:349
 msgid "Ctrl-Space"
 msgstr "Ctrl-Space"
 
-#: ../lib/lcg/export/exercises_html.py:312
+#: ../lib/lcg/export/exercises_html.py:350
 #, fuzzy
 msgid ""
 "This function is called a ‘hint’.  It helps you in case you don't know the "
@@ -693,38 +698,38 @@ msgstr ""
 "Enter leütésével (lásd feljebb) vagy kérhetsz még segítséget, míg meg nem "
 "találod az egész megoldást."
 
-#: ../lib/lcg/export/exercises_html.py:424
+#: ../lib/lcg/export/exercises_html.py:478
 #, fuzzy
 msgid "Show Answers"
 msgstr "Mutasd a szöveget"
 
-#: ../lib/lcg/export/exercises_html.py:425
+#: ../lib/lcg/export/exercises_html.py:479
 #, fuzzy
 msgid "Show model answers."
 msgstr "Mutasd a megoldásokat."
 
-#: ../lib/lcg/export/exercises_html.py:512
+#: ../lib/lcg/export/exercises_html.py:567
 msgid "Invalid value in added points!"
 msgstr "Hibás érték a hozzáadott pontoknál!"
 
-#: ../lib/lcg/export/exercises_html.py:513
+#: ../lib/lcg/export/exercises_html.py:568
 msgid "Max. points exceeded!"
 msgstr "Maximális pontszám elérve!"
 
-#: ../lib/lcg/export/exercises_html.py:515
+#: ../lib/lcg/export/exercises_html.py:570
 msgid "Automatic evaluation:"
 msgstr "Automatikus kiértékelés:"
 
-#: ../lib/lcg/export/exercises_html.py:516
+#: ../lib/lcg/export/exercises_html.py:571
 msgid "Additional points by tutor:"
 msgstr "Oktató által hozzáadott pontok:"
 
-#: ../lib/lcg/export/exercises_html.py:540
+#: ../lib/lcg/export/exercises_html.py:595
 msgid "correct answer"
 msgstr "helyes válasz"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:545
+#: ../lib/lcg/export/exercises_html.py:600
 msgid "incorrect"
 msgstr "téves"
 

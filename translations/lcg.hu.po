@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 10:00+0200\n"
+"POT-Creation-Date: 2014-10-03 16:29+0200\n"
 "PO-Revision-Date: 2010-02-03 01:56+0100\n"
 "Last-Translator: Hostomský Károly <khostomsky@gmail.com>\n"
 "Language-Team: Hungarian <lcg@lists.freebsoft.org>\n"
@@ -56,15 +56,15 @@ msgstr ""
 msgid "%s: converting to %s: %s"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:531
+#: ../lib/lcg/export/html.py:538
 msgid "Choose your language:"
 msgstr "Válassz nyelvet:"
 
-#: ../lib/lcg/export/html.py:1009
+#: ../lib/lcg/export/html.py:1016
 msgid "Flash movie object"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1058
+#: ../lib/lcg/export/html.py:1065
 msgid ""
 "Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
 "swfobject.js to your resource path."
@@ -72,7 +72,7 @@ msgstr ""
 
 #. Translators: Title of the link to Adobe website used in
 #. the Flash warning.
-#: ../lib/lcg/export/html.py:1084
+#: ../lib/lcg/export/html.py:1091
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plugin"
 
@@ -80,40 +80,40 @@ msgstr "Adobe Flash plugin"
 #. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
 #. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
 #. version number.
-#: ../lib/lcg/export/html.py:1080
+#: ../lib/lcg/export/html.py:1087
 #, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr "Töltse le a %(version)s vagy későbbi verziójú %(plugin)s-t."
 
-#: ../lib/lcg/export/html.py:1086
+#: ../lib/lcg/export/html.py:1093
 msgid "Use a JavaScript enabled browser."
 msgstr "JavaScripttel ellátott böngészőt használjon."
 
-#: ../lib/lcg/export/html.py:1087 ../lib/lcg/export/html.py:1089
+#: ../lib/lcg/export/html.py:1094 ../lib/lcg/export/html.py:1096
 msgid "Warning:"
 msgstr "Figyelem:"
 
-#: ../lib/lcg/export/html.py:1120
+#: ../lib/lcg/export/html.py:1127
 msgid "Media Player unavailable."
 msgstr "Media Player nem elérhető."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:1315
+#: ../lib/lcg/export/html.py:1322
 msgid "None"
 msgstr "Üres"
 
-#: ../lib/lcg/export/html.py:1316
+#: ../lib/lcg/export/html.py:1323
 msgid "You are here:"
 msgstr "Ön itt található:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1320
+#: ../lib/lcg/export/html.py:1327
 msgid "Next"
 msgstr "Következő"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1322
+#: ../lib/lcg/export/html.py:1329
 msgid "Previous"
 msgstr "Előző"
 

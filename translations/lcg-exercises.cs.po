@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 10:00+0200\n"
-"PO-Revision-Date: 2014-10-03 10:07+0200\n"
+"POT-Creation-Date: 2014-10-03 16:29+0200\n"
+"PO-Revision-Date: 2014-10-03 16:30+0200\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "Language: cs\n"
@@ -394,7 +394,12 @@ msgid ""
 "The exercise will not offer automatic evaluation, but the text box will "
 "allow the user to fill in any text.  The number of underscores determines "
 "the size of the box."
-msgstr "Hranaté závorky mohou namísto správné odpovědi obsahovat pouze sérii podtržítek. Tím je řečeno, že skutečná správná odpověď buďto není známá, nebo není pro účel daného cvičení potřeba. Cvičení potom nebude nabízet automatické vyhodnocování, ale textové políčko umožní zapsání libovolného textu. Počet podtržítek potom určuje velikost vstupního políčka."
+msgstr ""
+"Hranaté závorky mohou namísto správné odpovědi obsahovat pouze sérii "
+"podtržítek. Tím je řečeno, že skutečná správná odpověď buďto není známá, "
+"nebo není pro účel daného cvičení potřeba. Cvičení potom nebude nabízet "
+"automatické vyhodnocování, ale textové políčko umožní zapsání libovolného "
+"textu. Počet podtržítek potom určuje velikost vstupního políčka."
 
 #: ../lib/lcg/exercises.py:733
 msgid "Vocabulary Exercise"
@@ -597,9 +602,9 @@ msgid ""
 msgstr ""
 "Svítí [sluníčko]. Maminka koupila [jogurt]. Námořník drží [dalekohled]."
 
-#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:483
-#: ../lib/lcg/export/exercises_html.py:518
-#: ../lib/lcg/export/exercises_html.py:521
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:538
+#: ../lib/lcg/export/exercises_html.py:573
+#: ../lib/lcg/export/exercises_html.py:576
 msgid "Total points:"
 msgstr "Body celkem:"
 
@@ -669,13 +674,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Vyplní celé cvičení správnými odpověďmi."
 
 #: ../lib/lcg/export/exercises_html.py:48
-#: ../lib/lcg/export/exercises_html.py:426
+#: ../lib/lcg/export/exercises_html.py:480
 msgid "Reset"
 msgstr "Vymazat"
 
 #: ../lib/lcg/export/exercises_html.py:49
-#: ../lib/lcg/export/exercises_html.py:279
-#: ../lib/lcg/export/exercises_html.py:427
+#: ../lib/lcg/export/exercises_html.py:311
+#: ../lib/lcg/export/exercises_html.py:481
 msgid "Reset all your answers and start again."
 msgstr ""
 "Vymaže všechny odpovědi i výsledky a umožní začít celé cvičení znovu od "
@@ -711,34 +716,39 @@ msgstr ""
 msgid "Play"
 msgstr "Přehrát"
 
-#: ../lib/lcg/export/exercises_html.py:276
+#: ../lib/lcg/export/exercises_html.py:172
+#, python-format
+msgid "Answers: %s"
+msgstr "Správné odpovědi: %s"
+
+#: ../lib/lcg/export/exercises_html.py:308
 msgid "Show All"
 msgstr "Zobrazit vše"
 
-#: ../lib/lcg/export/exercises_html.py:277
+#: ../lib/lcg/export/exercises_html.py:309
 msgid "Show all answers."
 msgstr "Zobrazit všechny správné odpovědi."
 
-#: ../lib/lcg/export/exercises_html.py:278
+#: ../lib/lcg/export/exercises_html.py:310
 msgid "Hide All"
 msgstr "Skrýt vše"
 
-#: ../lib/lcg/export/exercises_html.py:281
-#: ../lib/lcg/export/exercises_html.py:287
-#: ../lib/lcg/export/exercises_html.py:429
+#: ../lib/lcg/export/exercises_html.py:313
+#: ../lib/lcg/export/exercises_html.py:320
+#: ../lib/lcg/export/exercises_html.py:483
 msgid "Show Answer"
 msgstr "Zobrazit odpověď"
 
-#: ../lib/lcg/export/exercises_html.py:282
-#: ../lib/lcg/export/exercises_html.py:430
+#: ../lib/lcg/export/exercises_html.py:314
+#: ../lib/lcg/export/exercises_html.py:484
 msgid "Hide Answer"
 msgstr "Skrýt odpověď"
 
-#: ../lib/lcg/export/exercises_html.py:288
+#: ../lib/lcg/export/exercises_html.py:321
 msgid "Show/Hide the correct answer."
 msgstr "Zobrazit/skrýt správnou odpověď."
 
-#: ../lib/lcg/export/exercises_html.py:302
+#: ../lib/lcg/export/exercises_html.py:340
 msgid ""
 "In all the exercises where you fill in the text into a text-box you can use "
 "the two shortcut keys described below."
@@ -746,11 +756,11 @@ msgstr ""
 "Ve všech cvičeních, kde vyplňujete text do textového vstupního pole, můžete "
 "používat následující klávesové zkratky:"
 
-#: ../lib/lcg/export/exercises_html.py:304
+#: ../lib/lcg/export/exercises_html.py:342
 msgid "Enter"
 msgstr "Enter"
 
-#: ../lib/lcg/export/exercises_html.py:305
+#: ../lib/lcg/export/exercises_html.py:343
 msgid ""
 "Use this key within the text-field to evaluate the current answer. You hear "
 "a sound response and in case of an error, the cursor is moved to the "
@@ -765,11 +775,11 @@ msgstr ""
 "opravit ji a zkusit odpověď vyhodnotit znovu.  Pokud si z chybou nevíte "
 "rady, můžete použít „napovídací“ klávesu popsanou níže."
 
-#: ../lib/lcg/export/exercises_html.py:311
+#: ../lib/lcg/export/exercises_html.py:349
 msgid "Ctrl-Space"
 msgstr "Ctrl-mezerník"
 
-#: ../lib/lcg/export/exercises_html.py:312
+#: ../lib/lcg/export/exercises_html.py:350
 msgid ""
 "This function is called a ‘hint’.  It helps you in case you don't know the "
 "answer or you don't know how to fix an error in your answer. Just press the "
@@ -794,36 +804,36 @@ msgstr ""
 "vyhodnotit novou odpověď pomocí klávesy „Enter“ (viz výše) nebo znovu použít "
 "„napovídací“ klávesu dokud nenaleznete kompletní správnou odpověď."
 
-#: ../lib/lcg/export/exercises_html.py:424
+#: ../lib/lcg/export/exercises_html.py:478
 msgid "Show Answers"
 msgstr "Zobrazit odpověďi"
 
-#: ../lib/lcg/export/exercises_html.py:425
+#: ../lib/lcg/export/exercises_html.py:479
 msgid "Show model answers."
 msgstr "Zobrazit vzorové odpovědi."
 
-#: ../lib/lcg/export/exercises_html.py:512
+#: ../lib/lcg/export/exercises_html.py:567
 msgid "Invalid value in added points!"
 msgstr "Neplatná hodnota přidaných bodů!"
 
-#: ../lib/lcg/export/exercises_html.py:513
+#: ../lib/lcg/export/exercises_html.py:568
 msgid "Max. points exceeded!"
 msgstr "Maximální počet bodů překročen!"
 
-#: ../lib/lcg/export/exercises_html.py:515
+#: ../lib/lcg/export/exercises_html.py:570
 msgid "Automatic evaluation:"
 msgstr "Automatické vyhodnocení:"
 
-#: ../lib/lcg/export/exercises_html.py:516
+#: ../lib/lcg/export/exercises_html.py:571
 msgid "Additional points by tutor:"
 msgstr "Body přidané vyučujícím:"
 
-#: ../lib/lcg/export/exercises_html.py:540
+#: ../lib/lcg/export/exercises_html.py:595
 msgid "correct answer"
 msgstr "správná odpověď"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:545
+#: ../lib/lcg/export/exercises_html.py:600
 msgid "incorrect"
 msgstr "chyba"
 
