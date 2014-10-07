@@ -321,7 +321,8 @@ class HiddenAnswersExporter(ExerciseExporter):
                                 title=_("Show/Hide the correct answer.")),
                        # The inner div is needed by the JavaScript effects library for
                        # the sliding effect.
-                       g.div(g.div(task.answer().export(context)),
+                       g.div(g.div((g.span(_("Correct answer:"), cls='label'), ' ', 
+                                    task.answer().export(context))),
                              cls='answer', style='display: none;'))
         return result
 
