@@ -38,6 +38,12 @@
     top: 0;
     right: 0;
 }
+.hidden-answers-task .answer {
+    border: 1px solid #cccccc;
+    background-color: #eee;
+    padding: 0.1em 0.3em;
+    margin: 0.2em 0;
+}
 
 .exercise.hidden-answers .results .buttons,
 .exercise.model-cloze .results .buttons {
