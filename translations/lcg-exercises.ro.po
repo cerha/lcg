@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 16:29+0200\n"
+"POT-Creation-Date: 2014-10-07 10:45+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
 "Language-Team: \n"
@@ -511,9 +511,9 @@ msgid ""
 "[telescope]."
 msgstr ""
 
-#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:538
-#: ../lib/lcg/export/exercises_html.py:573
-#: ../lib/lcg/export/exercises_html.py:576
+#: ../lib/lcg/exercises.py:878 ../lib/lcg/export/exercises_html.py:539
+#: ../lib/lcg/export/exercises_html.py:574
+#: ../lib/lcg/export/exercises_html.py:577
 msgid "Total points:"
 msgstr "Total de puncte:"
 
@@ -583,13 +583,13 @@ msgid "Fill in the whole exercise with the correct answers."
 msgstr "Completează tot exerciţiul cu răspunsuri corecte."
 
 #: ../lib/lcg/export/exercises_html.py:48
-#: ../lib/lcg/export/exercises_html.py:480
+#: ../lib/lcg/export/exercises_html.py:481
 msgid "Reset"
 msgstr "Şterge"
 
 #: ../lib/lcg/export/exercises_html.py:49
 #: ../lib/lcg/export/exercises_html.py:311
-#: ../lib/lcg/export/exercises_html.py:481
+#: ../lib/lcg/export/exercises_html.py:482
 msgid "Reset all your answers and start again."
 msgstr ""
 "Şterge toate răspunsurile şi rezultatele şi permite repetarea întregului "
@@ -648,13 +648,13 @@ msgstr "Ascunde transcrierea"
 
 #: ../lib/lcg/export/exercises_html.py:313
 #: ../lib/lcg/export/exercises_html.py:320
-#: ../lib/lcg/export/exercises_html.py:483
+#: ../lib/lcg/export/exercises_html.py:484
 #, fuzzy
 msgid "Show Answer"
 msgstr "Afişează transcrierea"
 
 #: ../lib/lcg/export/exercises_html.py:314
-#: ../lib/lcg/export/exercises_html.py:484
+#: ../lib/lcg/export/exercises_html.py:485
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Ascunde transcrierea"
@@ -664,7 +664,12 @@ msgstr "Ascunde transcrierea"
 msgid "Show/Hide the correct answer."
 msgstr "Selectaţi răspunsul corect."
 
-#: ../lib/lcg/export/exercises_html.py:340
+#: ../lib/lcg/export/exercises_html.py:324
+#, fuzzy
+msgid "Correct answer:"
+msgstr "răspuns corect"
+
+#: ../lib/lcg/export/exercises_html.py:341
 msgid ""
 "In all the exercises where you fill in the text into a text-box you can use "
 "the two shortcut keys described below."
@@ -672,11 +677,11 @@ msgstr ""
 "La toate exerciţiile, acolo unde completaţi textul în câmpul introductiv de "
 "text, puteţi folosi următoarele taste de comenzi rapide."
 
-#: ../lib/lcg/export/exercises_html.py:342
+#: ../lib/lcg/export/exercises_html.py:343
 msgid "Enter"
 msgstr "Enter"
 
-#: ../lib/lcg/export/exercises_html.py:343
+#: ../lib/lcg/export/exercises_html.py:344
 #, fuzzy
 msgid ""
 "Use this key within the text-field to evaluate the current answer. You hear "
@@ -692,11 +697,11 @@ msgstr ""
 "corectaţi şi să evaluaţi din nou răspunsul. Atunci când nu ştiţi cum să "
 "procedaţi cu greşeala, puteţi utiliza tasta de sugestii descrisă mai jos."
 
-#: ../lib/lcg/export/exercises_html.py:349
+#: ../lib/lcg/export/exercises_html.py:350
 msgid "Ctrl-Space"
 msgstr "Ctrl-Space"
 
-#: ../lib/lcg/export/exercises_html.py:350
+#: ../lib/lcg/export/exercises_html.py:351
 #, fuzzy
 msgid ""
 "This function is called a ‘hint’.  It helps you in case you don't know the "
@@ -723,38 +728,38 @@ msgstr ""
 "folosind din nou tasta de sugestii, până când găsiţi răspunsul corect "
 "complet."
 
-#: ../lib/lcg/export/exercises_html.py:478
+#: ../lib/lcg/export/exercises_html.py:479
 #, fuzzy
 msgid "Show Answers"
 msgstr "Afişează transcrierea"
 
-#: ../lib/lcg/export/exercises_html.py:479
+#: ../lib/lcg/export/exercises_html.py:480
 #, fuzzy
 msgid "Show model answers."
 msgstr "Afişează răspunsurile corecte."
 
-#: ../lib/lcg/export/exercises_html.py:567
+#: ../lib/lcg/export/exercises_html.py:568
 msgid "Invalid value in added points!"
 msgstr "Valoare invalidă a punctelor adăugate!"
 
-#: ../lib/lcg/export/exercises_html.py:568
+#: ../lib/lcg/export/exercises_html.py:569
 msgid "Max. points exceeded!"
 msgstr "Numărul maxim de puncte depăşit!"
 
-#: ../lib/lcg/export/exercises_html.py:570
+#: ../lib/lcg/export/exercises_html.py:571
 msgid "Automatic evaluation:"
 msgstr "Evaluare automată:"
 
-#: ../lib/lcg/export/exercises_html.py:571
+#: ../lib/lcg/export/exercises_html.py:572
 msgid "Additional points by tutor:"
 msgstr "Puncte adăugate de meditator:"
 
-#: ../lib/lcg/export/exercises_html.py:595
+#: ../lib/lcg/export/exercises_html.py:596
 msgid "correct answer"
 msgstr "răspuns corect"
 
 #. Translators: Incorrect (answer)
-#: ../lib/lcg/export/exercises_html.py:600
+#: ../lib/lcg/export/exercises_html.py:601
 msgid "incorrect"
 msgstr "incorect"
 
