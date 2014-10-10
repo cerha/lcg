@@ -1125,16 +1125,20 @@ class BrailleExporter(FileExporter, Exporter):
         else:
             indentation = 7
         toc_marker = context.add_toc_marker(element)
-        title = self.text(context, context.localize(element.title()), element.lang())
-        if level > 1 or (element.content() and isinstance(element.content()[0], Section)):
-            n_newlines = 1
-        else:
-            n_newlines = 2
-        return self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker),
-                           self._indent(title, indentation, center=center),
-                           self._newline(context, n_newlines),
-                           self._export_container(context, element))
-    
+        context.position_info.append(element.title())
+        try:
+            title = self.text(context, context.localize(element.title()), element.lang())
+            if level > 1 or (element.content() and isinstance(element.content()[0], Section)):
+                n_newlines = 1
+            else:
+                n_newlines = 2
+            return self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker),
+                               self._indent(title, indentation, center=center),
+                               self._newline(context, n_newlines),
+                               self._export_container(context, element))
+        finally:
+            context.position_info.pop()
+            
     # Inline constructs (text styles).
 
     def _inline_braille_export(self, context, element, form=None, lang=None, hyphenate=None):

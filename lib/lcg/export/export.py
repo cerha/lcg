@@ -212,6 +212,7 @@ class Exporter(object):
             self.max_list_level = 0
             self.text_preprocessor = None
             self.toc_elements = ()
+            self.position_info = []
 
         def _init_kwargs(self, lang, sec_lang=None, log=None, presentation=None, timezone=None,
                          text_preprocessor=None):
@@ -318,6 +319,9 @@ class Exporter(object):
             messages thus serve as a summary of problems.
 
             """
+            position = string.join(self.position_info, ' / ')
+            if position:
+                message = position + ': ' + message
             self._log(message, kind=kind)
 
         def messages(self):
@@ -407,20 +411,24 @@ class Exporter(object):
                 }
     
     def _export(self, node, context, recursive=False):
-        heading = node.heading().export(context)
-        newline = self._newline(context, 2)
-        content = node.content().export(context)
-        if recursive:
-            # FIXME: The context should be cloned here with the correct node in
-            # it, but it doesn't seem to matter in Braille output, which is
-            # currently the only use case for the recursive export.  When
-            # cloned, the new context should be passed the 'log' argument
-            # to forward logging to the root context (log=context.log).
-            content = self.concat(content,
-                                  *[self._export(n, context, recursive=True)
-                                    for n in node.children()])
-        exported = self.concat(heading, newline, content)
-        return self._adjusted_export(context, exported)
+        context.position_info.append(node.heading().text())
+        try:
+            heading = node.heading().export(context)
+            newline = self._newline(context, 2)
+            content = node.content().export(context)
+            if recursive:
+                # FIXME: The context should be cloned here with the correct node in
+                # it, but it doesn't seem to matter in Braille output, which is
+                # currently the only use case for the recursive export.  When
+                # cloned, the new context should be passed the 'log' argument
+                # to forward logging to the root context (log=context.log).
+                content = self.concat(content,
+                                      *[self._export(n, context, recursive=True)
+                                        for n in node.children()])
+            exported = self.concat(heading, newline, content)
+            return self._adjusted_export(context, exported)
+        finally:
+            context.position_info.pop()
 
     def _adjusted_export(self, context, exported):
         return exported
@@ -879,10 +887,15 @@ class Exporter(object):
         
         """
         toc_marker = context.add_toc_marker(element)
-        return self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker),
-                           self.text(context, context.localize(element.title()), element.lang()),
-                           self._newline(context, 2),
-                           self._export_container(context, element))
+        context.position_info.append(element.title())
+        try:
+            return self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker),
+                               self.text(context, context.localize(element.title()),
+                                         element.lang()),
+                               self._newline(context, 2),
+                               self._export_container(context, element))
+        finally:
+            context.position_info.pop()
 
     def _export_heading(self, context, element):
         """Export given 'Heading' element."""
