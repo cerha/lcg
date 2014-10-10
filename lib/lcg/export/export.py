@@ -206,13 +206,13 @@ class Exporter(object):
             self._node = node
             self._toc_markers = {}
             self._secondary_language_active = False
+            self.position_info = []
             self._init_kwargs(lang=lang, **kwargs)
             self._page_heading = None
             self.list_level = 0
             self.max_list_level = 0
             self.text_preprocessor = None
             self.toc_elements = ()
-            self.position_info = []
 
         def _init_kwargs(self, lang, sec_lang=None, log=None, presentation=None, timezone=None,
                          text_preprocessor=None):
