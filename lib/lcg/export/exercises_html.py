@@ -151,7 +151,7 @@ class ExerciseExporter(object):
 
     def _export_results(self, context, exercise, exercise_id):
         g = context.generator()
-        return g.div((g.div(concat([g.label(label, id=exercise_id + '.' + name) +
+        return g.div((g.div(concat([g.label(label, exercise_id + '.' + name) +
                                     g.field(name=name, id=exercise_id + '.' + name, size=30,
                                             readonly=True)
                                     for name, label, help in self._INDICATORS],
@@ -548,9 +548,9 @@ class _TestExporter(object):
         added = self.added_points(context.req())
         max = self.max_points()
         def field(label, name, value, size=6, readonly=True, **kwargs):
-            id = exercise_id + '-' + name
-            return (g.label(label, id=id) + ' ' +
-                    g.field(value, name=id, id=id, size=size, readonly=readonly,
+            field_id = exercise_id + '-' + name
+            return (g.label(label, field_id) + ' ' +
+                    g.field(value, name=id, id=field_id, size=size, readonly=readonly,
                             cls=(readonly and 'display' or None), **kwargs))
         if points < max and isinstance(self, FillInTestExporter):
             if added is None:

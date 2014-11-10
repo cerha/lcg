@@ -311,10 +311,10 @@ class HtmlGenerator(object):
                    tuple(content))
         return self._tag('fieldset', content, **kwargs)
 
-    def label(self, text, id, **kwargs):
-        # We don't respect the HTML attribute name since 'for' is a Python keyword.
-        # Additionally we also intentionally force this atributte to be mandatory.
-        kwargs['for'] = id
+    def label(self, text, for_=None, **kwargs):
+        # The argument for_ may be also used as positional.  It
+        # should to be kept as the second argument in future. 
+        kwargs['for'] = for_
         return self._tag('label', text, ('for',), **kwargs)
 
     def field(self, value='', name='', size=20, password=False, cls=None, **kwargs):
