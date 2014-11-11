@@ -963,8 +963,13 @@ class BrailleExporter(FileExporter, Exporter):
                 if hyphenation_forbidden:
                     hyphenation += self.HYPH_NO * (end - start)
                 else:
-                    hyphenation += louis.hyphenate(hyphenation_tables,
-                                                   braille_text[start:end], mode=1)
+                    word = braille_text[start:end]
+                    try:
+                        hyphenation += louis.hyphenate(hyphenation_tables, word, mode=1)
+                    except Exception as e:
+                        # liblouis may crash on some patterns
+                        context.log("`%s' can't be hyphenated: %s" % (word, e,), kind=lcg.WARNING)
+                        hyphenation += '0' * (end - start)
         # Per cent & per mille formatting may not work properly for Czech in
         # liblouis so let's fix it here:
         if lang == 'cs':
