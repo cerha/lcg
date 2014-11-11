@@ -487,7 +487,8 @@ class BrailleExporter(FileExporter, Exporter):
             text = braille.text()
             hyphenation = braille.hyphenation()
             # Fix marker chars not preceded by newlines
-            toc_marker_regexp = re.compile('[^\n]' + self._TOC_MARKER_CHAR + '[0-9]+' +
+            toc_marker_regexp = re.compile('[^\n][%s%s][0-9]+' % (self._TOC_MARKER_CHAR,
+                                                                  self._PAGE_START_CHAR) +
                                            self._END_MARKER_CHAR, re.MULTILINE)
             while True:
                 match = toc_marker_regexp.search(text)
@@ -660,9 +661,13 @@ class BrailleExporter(FileExporter, Exporter):
                 new_pages = []
                 repeated_lines = []
                 repeated_lines_activated = [False]
+                marker_re = re.compile('[\ue000-\uffff]')
                 def add_page(page):
                     lines = []
-                    def add_line(l, line_list):
+                    def add_line(l, line_list, check=False):
+                        if __debug__ and check:
+                            if marker_re.search(l) is not None:
+                                raise BrailleError("Marker in output", (l, page,))
                         line_list.append(l)
                     line_limit = page_height
                     while page:
@@ -742,10 +747,10 @@ class BrailleExporter(FileExporter, Exporter):
                             if mark is not None:
                                 l = ''
                             if context.double_page() == 'left':
-                                add_line(l[:page_width], lines)
-                                add_line(l[page_width:], facing_lines)
+                                add_line(l[:page_width], lines, True)
+                                add_line(l[page_width:], facing_lines, True)
                             else:
-                                add_line(l, lines)
+                                add_line(l, lines, True)
                         else:
                             marker, arg = mark
                             if marker == self._TOC_MARKER_CHAR:
@@ -807,7 +812,7 @@ class BrailleExporter(FileExporter, Exporter):
                                     fill_1 = page_width - text_len - fill_2
                                     exported_status_line = (u'⠀' * fill_1 + title + u'⠀' * fill_2 +
                                                             exported_status_line[pos + 1:])
-                        add_line(exported_status_line, lines)
+                        add_line(exported_status_line, lines, True)
                     new_pages.append(lines)
                     context.advance_page_number()
                     page.reverse()
