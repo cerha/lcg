@@ -101,7 +101,7 @@ class EpubHtml5Exporter(Html5Exporter):
             cls.append(element.align() + '-aligned')
         if element.name():
             cls.append('image-' + element.name())
-        return g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
+        return g.img(uri, alt=alt, cls=' '.join(cls),
                      width=width, height=height)
 
     def _export_mathml(self, context, element):
