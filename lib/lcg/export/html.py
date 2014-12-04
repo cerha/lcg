@@ -96,7 +96,7 @@ class HtmlGenerator(object):
     def _js_escape_char(self, match):
         return self._JAVASCRIPT_ESCAPES[match.group(0)]
 
-    def _tag(self, tag, content=None, _attr=(), _paired=True, **kwargs):
+    def _tag(self, tag, _content=None, _attr=(), _paired=True, **kwargs):
         result_list = ['<' + tag]
         dirty = False
         if __debug__:
@@ -120,12 +120,12 @@ class HtmlGenerator(object):
                 else:
                     str_value = saxutils.quoteattr(value)
                 result_list.append(str_value)
-        if content is not None and content.__class__ not in (unicode, str,):
+        if _content is not None and _content.__class__ not in (unicode, str,):
             dirty = True
         if _paired:
-            result_list.extend(('>', content, '</' + tag + '>'))
+            result_list.extend(('>', _content, '</' + tag + '>'))
         else:
-            assert content is None, "Non-empty non-paired content"
+            assert _content is None, "Non-empty non-paired content"
             result_list.append('/>')
         if dirty:
             result = concat(*result_list)
@@ -166,6 +166,10 @@ class HtmlGenerator(object):
 
     def link(self, **kwargs):
         return self._tag('link', None, ('rel', 'type', 'href', 'media', 'title'),
+                         _paired=False, **kwargs)
+
+    def meta(self, **kwargs):
+        return self._tag('meta', None, ('content', 'property'),
                          _paired=False, **kwargs)
 
     def body(self, content, **kwargs):
