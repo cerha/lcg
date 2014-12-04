@@ -168,8 +168,11 @@ class HtmlGenerator(object):
         return self._tag('link', None, ('rel', 'type', 'href', 'media', 'title'),
                          _paired=False, **kwargs)
 
+    def style(self, content, **kwargs):
+        return self._tag('style', None, ('type', 'media', 'title'), _paired=True, **kwargs)
+
     def meta(self, **kwargs):
-        return self._tag('meta', None, ('content', 'property'),
+        return self._tag('meta', None, ('name', 'content', 'property', 'http-equiv'),
                          _paired=False, **kwargs)
 
     def body(self, content, **kwargs):
@@ -562,16 +565,15 @@ class HtmlExporter(Exporter):
         g = context.generator()
         node = context.node()
         return [g.title(self._title(context))] + \
-               ['<meta http-equiv="%s" content="%s">' % pair
-                for pair in (('Content-Language', context.lang()),
-                             ('Content-Script-Type', 'text/javascript'),
-                             ('Content-Style-Type', 'text/css'),
-                             ('X-UA-Compatible', 'edge'))] + \
-               ['<meta name="%s" content="%s">' % pair for pair in self._meta(context)] + \
-               ['<link rel="alternate" lang="%s" href="%s">' %
-                (lang, self._uri_node(context, node, lang=lang))
+               [g.meta(http_equiv=header, content=value)
+                for header, value in (('Content-Language', context.lang()),
+                                      ('Content-Script-Type', 'text/javascript'),
+                                      ('Content-Style-Type', 'text/css'),
+                                      ('X-UA-Compatible', 'edge'))] + \
+               [g.meta(name=name, content=value) for name, value in self._meta(context)] + \
+               [g.link(rel='alternate', lang=lang, href=self._uri_node(context, node, lang=lang))
                 for lang in node.variants() if lang != context.lang()] + \
-               ['<link rel="gettext" type="application/x-po" href="%s">' % context.uri(t)
+               [g.link(rel='gettext', type='application/x-po', href=context.uri(t))
                 for t in context.node().resources(Translations)] + \
                [g.script(src=context.uri(s)) for s in self._scripts(context)]
 
@@ -1231,16 +1233,17 @@ class StyledHtmlExporter(object):
         return context.node().resources(Stylesheet)
 
     def _head(self, context):
+        g = self._generator
         for style in self._styles:
             context.resource(style)
         styles = self._stylesheets(context)
         if self._inlinestyles:
-            tags = ['<style type="text/css" media="%s">\n%s</style>' % (media, content)
+            tags = [g.style(content, type='text/css', media=media)
                     for media, content in [(s.media(), s.get()) for s in styles]
                     if content is not None]
         else:
-            tags = ['<link rel="stylesheet" type="text/css" href="%s" media="%s">' %
-                    (context.uri(s), s.media()) for s in styles]
+            tags = [g.link(rel='stylesheet', type='text/css', href=context.uri(s), media=s.media())
+                    for s in styles]
         return super(StyledHtmlExporter, self)._head(context) + tags
 
     def _export_resource(self, resource, dir):
@@ -1269,10 +1272,10 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                    )
 
     def _head(self, context):
+        g = self._generator
         base = super(HtmlStaticExporter, self)._head(context)
         node = context.node()
-        additional = [concat('<link rel="%s" href="%s" title="' % (kind, self.uri(context, n)),
-                             n.title(), '">')
+        additional = [g.link(rel=kind, href=self.uri(context, n), title=n.title())
                       for kind, n in (('top', node.root()),
                                       ('prev', node.prev()),
                                       ('next', node.next()),
