@@ -561,6 +561,14 @@ class HtmlExporter(Exporter):
     def _scripts(self, context):
         """Return the list of 'Script' instances for given context/node."""
         return context.node().resources(Script)
+
+    def _script(self, context, script):
+        g = context.generator()
+        result = g.script(src=context.uri(script))
+        if script.filename() in ('jquery.js', 'jquery.min.js'):
+            result += g.script('jQuery.noConflict()')
+        return result
+
     def _head(self, context):
         g = context.generator()
         node = context.node()
@@ -575,7 +583,7 @@ class HtmlExporter(Exporter):
                 for lang in node.variants() if lang != context.lang()] + \
                [g.link(rel='gettext', type='application/x-po', href=context.uri(t))
                 for t in context.node().resources(Translations)] + \
-               [g.script(src=context.uri(s)) for s in self._scripts(context)]
+               [self._script(context, script) for script in self._scripts(context)]
 
     def _parts(self, context, parts):
         result = []
