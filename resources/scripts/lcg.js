@@ -812,7 +812,7 @@ lcg.Tooltip = Class.create({
 		    // but it is only useful for debugging anyway...
 		    console.log(e);
 		}
-	    }.bind(this),
+	    }.bind(this)
 	});
     },
 
