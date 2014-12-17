@@ -41,6 +41,9 @@ class TranslatableTextFactory(object):
 
       _ = TranslatableTextFactory('domain-name')
 
+    Note: Make sure the primary argument passed to the instance call is
+    unicode, not string, otherwise the argument may remain untranslated!
+
     """
     def __init__(self, domain, origin='en'):
         assert isinstance(domain, basestring), domain
@@ -275,7 +278,7 @@ class TranslatableText(Localizable):
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
             substitution_dict = dict([(k, v) for k, v in kwargs.items()
-                                      if not k.startswith('_') and not k in cls._RESERVED_ARGS])
+                                      if not k.startswith('_') and k not in cls._RESERVED_ARGS])
             assert not args or not substitution_dict, \
                 ("Cannot pass both positional and keyword substitution variables: " +
                  "(%s, %s, %s)" % (text, args, substitution_dict))
@@ -615,7 +618,7 @@ class Decimal(Localizable):
             if grouping[0] == -1:
                 break
             elif grouping[0] != 0:
-                #process last group
+                # Process last group
                 group = grouping[0]
                 grouping = grouping[1:]
             if result:
