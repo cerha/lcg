@@ -101,7 +101,7 @@ class HtmlGenerator(object):
         dirty = False
         if __debug__:
             valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title',
-                             'aria-label')
+                             'aria-label', 'aria-labelledby')
         for name, value in kwargs.items():
             name = name.replace('_', '-')
             if value is not None and value is not False:
