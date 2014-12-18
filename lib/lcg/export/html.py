@@ -100,7 +100,8 @@ class HtmlGenerator(object):
         result_list = ['<' + tag]
         dirty = False
         if __debug__:
-            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'aria-label')
+            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title',
+                             'aria-label')
         for name, value in kwargs.items():
             name = name.replace('_', '-')
             if value is not None and value is not False:
@@ -134,7 +135,7 @@ class HtmlGenerator(object):
         return result
 
     def _input(self, type, _attr=(), **kwargs):
-        _attr += ('type', 'name', 'value', 'title', 'size', 'maxlength', 'accesskey',
+        _attr += ('type', 'name', 'value', 'size', 'maxlength', 'accesskey',
                   'onclick', 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
                   'readonly', 'disabled')
         return self._tag('input', None, _attr, _paired=False, type=type, **kwargs)
@@ -165,11 +166,11 @@ class HtmlGenerator(object):
         return self._tag('title', content, **kwargs)
 
     def link(self, **kwargs):
-        return self._tag('link', None, ('rel', 'type', 'href', 'media', 'title'),
+        return self._tag('link', None, ('rel', 'type', 'href', 'media'),
                          _paired=False, **kwargs)
 
     def style(self, content, **kwargs):
-        return self._tag('style', None, ('type', 'media', 'title'), _paired=True, **kwargs)
+        return self._tag('style', None, ('type', 'media'), _paired=True, **kwargs)
 
     def meta(self, **kwargs):
         return self._tag('meta', None, ('name', 'content', 'property', 'http-equiv'),
@@ -179,19 +180,22 @@ class HtmlGenerator(object):
         return self._tag('body', content, ('onkeydown', 'onload'), **kwargs)
 
     def div(self, content, **kwargs):
-        return self._tag('div', content, ('title',), **kwargs)
+        return self._tag('div', content, (), **kwargs)
 
     def section(self, content, **kwargs):
-        return self._tag('section', content, ('title',), **kwargs)
+        return self._tag('section', content, (), **kwargs)
 
     def span(self, text, **kwargs):
-        return self._tag('span', text, ('title',), **kwargs)
+        return self._tag('span', text, (), **kwargs)
+
+    def time(self, text, **kwargs):
+        return self._tag('time', text, (), **kwargs)
 
     def h(self, title, level, **kwargs):
         return self._tag('h%d' % level, title, **kwargs)
 
     def map(self, content, **kwargs):
-        return self._tag('map', content, ('name', 'title'), **kwargs)
+        return self._tag('map', content, ('name',), **kwargs)
 
     def strong(self, text, **kwargs):
         return self._tag('strong', text, **kwargs)
@@ -243,7 +247,7 @@ class HtmlGenerator(object):
         return self._tag('hr', _paired=False, **kwargs)
 
     def a(self, label, **kwargs):
-        attr = ('href', 'type', 'name', 'title', 'target', 'accesskey', 'rel',
+        attr = ('href', 'type', 'name', 'target', 'accesskey', 'rel',
                 'onclick', 'onmouseover', 'onmouseout')
         return self._tag('a', label, attr, **kwargs)
 
@@ -270,10 +274,10 @@ class HtmlGenerator(object):
         return self._tag('img', None, attr, _paired=False, src=src, alt=alt, **kwargs)
 
     def abbr(self, term, **kwargs):
-        return self._tag('abbr', term, ('title',), **kwargs)
+        return self._tag('abbr', term, (), **kwargs)
 
     def table(self, content, **kwargs):
-        attr = ('title', 'summary', 'border', 'cellspacing', 'cellpadding', 'width')
+        attr = ('summary', 'border', 'cellspacing', 'cellpadding', 'width')
         return self._tag('table', content, attr, **kwargs)
 
     def tr(self, content, **kwargs):
@@ -301,7 +305,7 @@ class HtmlGenerator(object):
     def object(self, content, **kwargs):
         attr = ('align', 'archive', 'border', 'classid', 'codebase', 'codetype',
                 'data', 'declare', 'height', 'hspace', 'name', 'standby', 'type',
-                'usemap', 'vspace', 'width', 'dir', 'title')
+                'usemap', 'vspace', 'width', 'dir')
         return self._tag('object', content, attr, **kwargs)
 
     def param(self, **kwargs):
@@ -342,7 +346,7 @@ class HtmlGenerator(object):
         return self._input('hidden', name=name, value=value, id=id)
 
     def button(self, content, type='button', **kwargs):
-        attr = ('name', 'value', 'type', 'onclick', 'cls', 'disabled', 'title')
+        attr = ('name', 'value', 'type', 'onclick', 'cls', 'disabled')
         return self._tag('button', content, attr, type=type, **kwargs)
 
     def reset(self, label, onclick=None, cls=None, title=None):
@@ -352,7 +356,7 @@ class HtmlGenerator(object):
         if value is None:
             return self._input('submit', value=label, **kwargs)
         else:
-            attr = ('value', 'onclick', 'name', 'cls', 'disabled', 'title')
+            attr = ('value', 'onclick', 'name', 'cls', 'disabled')
             return self._tag('button', label, attr, value=value, **kwargs)
 
     def select(self, name, options, selected=None, **kwargs):
@@ -370,7 +374,7 @@ class HtmlGenerator(object):
         opts = [opt(*x) for x in options]
         assert selected is None or found, "Value %r not found in options: %r" % (selected, options)
         # TODO: check also for duplicate `selected' values?
-        attr = ('name', 'title', 'onchange', 'disabled', 'readonly')
+        attr = ('name', 'onchange', 'disabled', 'readonly')
         return self._tag('select', opts, attr, name=name, **kwargs)
 
     def optgroup(self, content, **kwargs):
@@ -390,13 +394,13 @@ class HtmlGenerator(object):
 
     def audio(self, src, content=None, controls=True, **kwargs):
         return self._tag('audio', content,
-                         ('autoplay', 'controls', 'loop', 'preload', 'title', 'src'),
+                         ('autoplay', 'controls', 'loop', 'preload', 'src'),
                          _paired=content is not None, src=src, controls=controls, **kwargs)
 
     def video(self, src, content=None, controls=True, **kwargs):
         return self._tag('video', content,
                          ('autoplay', 'controls', 'height', 'loop', 'muted', 'poster',
-                          'preload', 'src', 'title', 'width'),
+                          'preload', 'src', 'width'),
                          _paired=content is not None, src=src, controls=controls, **kwargs)
 
     def source(self, src, **kwargs):
