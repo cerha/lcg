@@ -483,6 +483,14 @@ class HtmlExporter(Exporter):
     Generator = HtmlGenerator
 
     class Context(Exporter.Context):
+        class IdGenerator(object):
+            """HTML identifier class for the 'id_generator()' method.""" 
+            def __init__(self, context):
+                self._context = context
+            def __getattr__(self, name):
+                id = self._context.unique_id()
+                self.__dict__[name] = id
+                return id
 
         def __init__(self, *args, **kwargs):
             self._generator = kwargs.pop('generator')
@@ -518,6 +526,39 @@ class HtmlExporter(Exporter):
             """
             self._unique_id_index += 1
             return '%s%x' % (self._unique_id_prefix, self._unique_id_index)
+            
+        def id_generator(self):
+            """Return a new instance of unique HTML id generator.
+
+            The generator may be used to generate named HTML identifiers on the
+            fly as the attributes of the instance.  When an instance attribute
+            is accessed for the first time, a new id is generated using the
+            method 'unique_id()' and saved for given attribute name.
+            Subsequent acces to the same attributte will return the same
+            identifier value.
+
+            The identifier values are unique in the scope of the current
+            context, but their names are unique in the scope of the instance
+            returned by each call of this method.
+
+            Example usage:
+        
+            g = context.generator()
+            ids = context.id_generator()
+            html = g.div((
+                g.div((
+                    g.label('Name:', for_=ids.name),
+                    g.field(name='name', id=ids.name),
+                )),
+                g.div((
+                    g.label('Age:', for_=ids.age),
+                    g.field(name='age', id=ids.age),
+                )),
+                ...
+            ))
+
+            """
+            return self.IdGenerator(self)
 
         def connect_shared_player(self, *args):
             """Allocate the shared media player for current page content.
