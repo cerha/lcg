@@ -607,12 +607,13 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	//   tooltip -- item description/tooltip (string, optional)
 	//   uri -- URI where the item points to (string, optional)
 	//   enabled -- if present and false, the item will be disabled (inactive)
-	//   callback_args -- array of additional calback function arguments
-        //   callback -- name of the function to be called (string).  This
-        //    function will be called with the element on which the menu was
-        //    invoked as the first argument.  Additional arguments may be
-        //    optionally specified by 'callback_args'.
-        //  callback_args -- Additional arguments to pass to the callback function
+        //   callback -- The JavaScript function to be called on item invocation.
+        //     May be passed also as a string (function of given name will be 
+	//     looked up in the current JavaScript name space).  The callback
+        //     function will be called with the element on which the menu was
+        //     invoked as the first argument.  Additional arguments may be
+        //     optionally specified by 'callback_args'.
+        //   callback_args -- Array of additional arguments to pass to the callback function
 	// You will typically supply either uri or callback, but both can be used.
 	var i, item, a, enabled;
 	var ul = new Element('ul');
@@ -661,12 +662,16 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    this.remove();
 	    a = item.down('a');
 	    spec = a._lcg_popup_menu_item_spec;
-	    if (spec.callback) {
-		namespaces = spec.callback.split(".");
-		func = namespaces.pop();
-		context = window;
-		for (i = 0; i < namespaces.length; i++) {
-		    context = context[namespaces[i]];
+	    var callback = spec.callback;
+	    if (callback) {
+		if (typeof(callback) === 'string') {
+		    namespaces = callback.split(".");
+		    func = namespaces.pop();
+		    context = window;
+		    for (i = 0; i < namespaces.length; i++) {
+			context = context[namespaces[i]];
+		    }
+		    callback = context[func];
 		}
 		args = [this.popup_element];
 		if (spec.callback_args) {
@@ -674,7 +679,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 			args[i + 1] = spec.callback_args[i];
 		    }
 		}
-		return context[func].apply(this, args);
+		return callback.apply(this, args);
 	    }
 	    if (spec.uri) {
 		self.location = spec.uri;
