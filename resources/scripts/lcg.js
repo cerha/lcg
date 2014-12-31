@@ -717,7 +717,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	event.stop();
 	var element = event.element();
 	var left, top;
-	if (event.pointerX() >=0 && event.pointerY() >= 0) {
+	if (event.clientX == event.pointerX() && event.clientY == event.pointerY()) {
 	    left = event.pointerX();
 	    top = event.pointerY();
 	} else {
