@@ -111,7 +111,8 @@ class Parser(object):
                                'r': lcg.TableCell.RIGHT}
     _COMMENT_MATCHER = re.compile('^#[^\r\n]*\r?(\n|$)', re.MULTILINE)
     _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<title>.*) (?P=level)' +
-                                   r'(?:[\t ]+(?:\*|(?P<section_id>[\w\d_-]+)))? *\r?$'),
+                                   r'(?:[\t ]+(?:\*|(?P<not_in_toc>\!)?' +
+                                   r'(?P<section_id>[\w\d_-]+)))? *\r?$'),
                                   re.MULTILINE)
     _LINE_MATCHER = re.compile(r'^([\t ]*)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL | re.MULTILINE)
@@ -299,6 +300,7 @@ class Parser(object):
             return None
         title = match.group('title')
         section_id = match.group('section_id')
+        in_toc = not match.group('not_in_toc')
         level = len(match.group('level'))
         section_content = []
         size = len(text)
@@ -316,7 +318,7 @@ class Parser(object):
                 section_content.append(content)
         container = lcg.Container(section_content)
         return lcg.Section(title=title, heading=self.parse_inline_markup(title),
-                           content=container, id=section_id), position
+                           content=container, id=section_id, in_toc=in_toc), position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])
