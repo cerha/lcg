@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2012, 2013, 2014 Brailcom, o.p.s.
+ * Copyright (C) 2012, 2013, 2014, 2015 Brailcom, o.p.s.
  * Author: Tomas Cerha
  *
  * This program is free software; you can redistribute it and/or modify
@@ -707,10 +707,12 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	}
     },
     
-    popup: function (event) {
+    popup: function (event, selected_item_index) {
         // event -- JavaScript event triggering the popup -- either a mouse
-        // action catched by 'contextmenu' handler or mouse/keyboard action
-        // catched by 'click' handler.
+        //   action catched by 'contextmenu' handler or mouse/keyboard action
+        //   catched by 'click' handler.
+	// selected_item_index (optional) -- index of the menu item to be
+	//   initially selected
 	if (lcg.popup_menu) {
 	    lcg.popup_menu.remove();
 	}
@@ -737,9 +739,16 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	menu.setStyle({left: left+'px', top: top+'px', display: 'block'});
 	this.popup_element = element;
 	this.ignore_next_click = !event.isLeftClick();
-	this.set_focus(menu.down('li'));
 	this.on_click_handler = this.on_document_click.bind(this);
 	$(document).observe('click', this.on_click_handler);
+	var active_item;
+	if (selected_item_index !== undefined) {
+	    active_item = menu.select('li')[selected_item_index];
+	} else {
+	    active_item = menu.down('li');
+	}
+	this.activate_item(active_item);
+	this.set_focus(active_item);
     },
 
     remove: function() {
