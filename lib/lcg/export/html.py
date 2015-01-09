@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -819,7 +819,8 @@ class HtmlExporter(Exporter):
     def _export_section(self, context, element):
         # Use div in HTML4, but allow overriding for HTML 5.
         g = self._generator
-        return g.div(self._export_section_container(context, element), id=element.id())
+        return g.div(self._export_section_container(context, element), id=element.id(),
+                     cls='section')
 
     def _export_section_container(self, context, element):
         g = self._generator
@@ -1245,7 +1246,8 @@ class Html5Exporter(HtmlExporter):
 
     def _export_section(self, context, element):
         g = self._generator
-        return g.section(self._export_section_container(context, element), id=element.id())
+        return g.section(self._export_section_container(context, element), id=element.id(),
+                         cls='section')
 
     def export(self, context):
         g = self._generator
