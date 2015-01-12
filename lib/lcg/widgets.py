@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ class Widget(object):
                                                    cls=lcg.camel_case_to_lower(name) + '-widget'),
                         g.script(g.js_call('new lcg.%s' % name, element_id,
                                            *self._javascript_widget_arguments(context))))
-    
+
 
 class FoldableTree(Widget, lcg.Content):
     """HTML interactive foldable tree menu widget.
@@ -315,7 +315,7 @@ class CollapsiblePane(Widget, lcg.Section):
 
     """
     
-    def __init__(self, title, content, collapsed=True, **kwargs):
+    def __init__(self, title, content, collapsed=True, in_toc=False, **kwargs):
         """Arguments:
          
            title -- pane title as a basestring
@@ -325,7 +325,7 @@ class CollapsiblePane(Widget, lcg.Section):
            
         """
         self._collapsed = collapsed
-        super(CollapsiblePane, self).__init__(title, content, in_toc=False, **kwargs)
+        super(CollapsiblePane, self).__init__(title, content, in_toc=in_toc, **kwargs)
     
     def _javascript_widget_arguments(self, context):
         return (self._collapsed,)

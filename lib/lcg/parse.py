@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ class Parser(object):
     _CELL_ALIGNMENT_MAPPING = {'c': lcg.TableCell.CENTER, 'l': lcg.TableCell.LEFT,
                                'r': lcg.TableCell.RIGHT}
     _COMMENT_MATCHER = re.compile('^#[^\r\n]*\r?(\n|$)', re.MULTILINE)
-    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<title>.*) (?P=level)' +
+    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<collapsible>> +)?(?P<title>.*) (?P=level)' +
                                    r'(?:[\t ]+(?:\*|(?P<not_in_toc>\!)?' +
                                    r'(?P<section_id>[\w\d_-]+)))? *\r?$'),
                                   re.MULTILINE)
@@ -306,6 +306,7 @@ class Parser(object):
         size = len(text)
         position += match.end()
         kwargs = self._prune_kwargs(kwargs, ('section_level',))
+        element = lcg.CollapsiblePane if match.group('collapsible') else lcg.Section
         while True:
             position = self._find_next_block(text, position)
             if position >= size:
@@ -316,9 +317,9 @@ class Parser(object):
             content, position = self._parse(text, position, section_level=level, **kwargs)
             if content is not None:
                 section_content.append(content)
-        container = lcg.Container(section_content)
-        return lcg.Section(title=title, heading=self.parse_inline_markup(title),
-                           content=container, id=section_id, in_toc=in_toc), position
+        return element(title=title, heading=self.parse_inline_markup(title),
+                       content=lcg.Container(section_content),
+                       id=section_id, in_toc=in_toc), position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])
