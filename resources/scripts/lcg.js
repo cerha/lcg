@@ -101,7 +101,18 @@ lcg.KeyHandler = Class.create({
     
 });
 
-lcg.Menu = Class.create(lcg.KeyHandler, {
+lcg.Widget = Class.create(lcg.KeyHandler, {
+    /* Generic base class for all LCG JavaScript widgets.
+     * 
+     */ 
+    initialize: function ($super, element_id) {
+	$super();
+	this.element = $(element_id);
+	this.element._lcg_widget_instance = this;
+    }
+});
+
+lcg.Menu = Class.create(lcg.Widget, {
     /* Generic base class for several other menu-like widgets.
      * 
      * The code here traverses the menu structure, initializes connections
@@ -111,13 +122,10 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
      */ 
     
     initialize: function ($super, element_id) {
-	$super();
-	var node = $(element_id);
-	this.node = node;
-	node._lcg_widget_instance = this;
-	node.setAttribute('role', 'application');
+	$super(element_id);
+	this.element.setAttribute('role', 'application');
 	// Go through the menu and assign aria roles and key bindings.
-	var ul = node.down('ul');
+	var ul = this.element.down('ul');
 	this.items = this.init_items(ul, null);
 	// Set the active item.
 	var active = this.initially_active_item();
@@ -130,7 +138,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 	var items = [];
 	var base_id, i, child, prev, id;
 	if (parent === null) {
-	    base_id = this.node.getAttribute('id')+'-item';
+	    base_id = this.element.getAttribute('id')+'-item';
 	} else {
 	    base_id = parent.getAttribute('id');
 	}
@@ -167,7 +175,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
     initially_active_item: function () {
 	var item;
 	if (this.items.length !== 0) {
-	    var current = this.node.down('a.current');
+	    var current = this.element.down('a.current');
 	    if (current) {
 		item = current.up('li');
 	    } else {
@@ -180,7 +188,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
     },
     
     active_item: function () {
-	var element_id = this.node.getAttribute('aria-activedescendant');
+	var element_id = this.element.getAttribute('aria-activedescendant');
 	return (element_id ? $(element_id) : null);
     },
 
@@ -190,7 +198,7 @@ lcg.Menu = Class.create(lcg.KeyHandler, {
 	    previously_active_item.setAttribute('tabindex', '-1');
 	    previously_active_item.setAttribute('aria-selected', 'false');
 	}
-	this.node.setAttribute('aria-activedescendant', item.getAttribute('id'));
+	this.element.setAttribute('aria-activedescendant', item.getAttribute('id'));
 	item.setAttribute('aria-selected', 'true');
 	item.setAttribute('tabindex', '0');
     },
@@ -274,7 +282,7 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
     initially_active_item: function () {
 	// The active item set in the python code (marked as 'current' in HTML)
 	// has the highest precedence.
-	var current = this.node.down('.notebook-switcher li a.current');
+	var current = this.element.down('.notebook-switcher li a.current');
 	if (current) {
 	    return current.up('li');
 	}
@@ -300,7 +308,7 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	var match = self.location.href.match('#');
 	if (match) {
 	    var parts = self.location.href.split('#', 2);
-	    var page = this.node.down('#'+parts[1]);
+	    var page = this.element.down('#'+parts[1]);
 	    if (page && page._lcg_notebook_item) {
 		return page._lcg_notebook_item;
 	    }
@@ -318,13 +326,13 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	// but may not identify a particulat widget and may change across
 	// requests.  So we use the class as a part of cookie value.
 	//
-	var cls = this.node.getAttribute('class');
+	var cls = this.element.getAttribute('class');
 	if (cls) {
 	    var cookie = lcg.cookies.get(this.COOKIE);
 	    if (cookie) {
 		var parts = cookie.split(':', 2);
 		if (parts[0] === cls) {
-		    var page = this.node.down('#'+parts[1]);
+		    var page = this.element.down('#'+parts[1]);
 		    if (page && page._lcg_notebook_item) {
 			return page._lcg_notebook_item;
 		    }
@@ -345,7 +353,7 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 	    }
 	    item.down('a').addClassName('current');
 	    var page = item._lcg_notebook_page;
-	    var cls = this.node.getAttribute('class');
+	    var cls = this.element.getAttribute('class');
 	    if (cls) {
 		var cookie = cls+':'+item._lcg_notebook_page.getAttribute('id');
 		lcg.cookies.set(this.COOKIE, cookie);
@@ -417,12 +425,12 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
     initialize: function ($super, element_id, toggle_button_tooltip) {
 	$super(element_id);
-	this.node.setAttribute('role', 'tree');
+	this.element.setAttribute('role', 'tree');
 	if (this.foldable && toggle_button_tooltip) {
 	    var b = new Element('button',
 				{'class': 'toggle-menu-expansion',
 				 'title': toggle_button_tooltip});
-	    this.node.down('ul').insert({after: b});
+	    this.element.down('ul').insert({after: b});
 	    b.observe('click', this.on_toggle_expansion.bind(this));
 	}
     },
@@ -566,7 +574,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     on_toggle_expansion: function (event) {
 	this.toggle_item_expansion(this.items[0]);
 	this.expanded = !this.expanded;
-	var b = this.node.down('button.toggle-menu-expansion');
+	var b = this.element.down('button.toggle-menu-expansion');
 	if (this.expanded) {
 	    b.addClassName('expanded');
 	} else {
@@ -700,7 +708,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    this.ignore_next_click = false;
 	    return;
 	}
-	var outside = event.findElement('div') !== this.node;
+	var outside = event.findElement('div') !== this.element;
 	this.remove();
 	if (outside) {
 	    event.stop();
@@ -728,7 +736,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    top = offset.top+10;
 	}
 	lcg.popup_menu = this;
-	var menu = this.node;
+	var menu = this.element;
 	var window_size = document.viewport.getDimensions();
 	if (left + menu.getWidth() > window_size.width) {
 	    left = window_size.width - menu.getWidth() - 30;
@@ -753,7 +761,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 
     remove: function() {
 	$(document).stopObserving('click', this.on_click_handler);
-	this.node.remove();
+	this.element.remove();
 	lcg.popup_menu = null;
     }
 });
@@ -790,6 +798,7 @@ lcg.PopupMenuCtrl = Class.create({
 lcg.Tooltip = Class.create({
     // Tooltip widget with asynchronlusly loaded content.
     // The content returned by the URL passed to constructor can be either an image or html
+    // TODO: The class should be probably derived from lcg.Widget.
 
     initialize: function (uri) {
 	// uri -- The URI from which the tooltip content should be loaded
@@ -851,45 +860,62 @@ lcg.Tooltip = Class.create({
 });
 
 
-lcg.CollapsiblePane = Class.create({
+lcg.CollapsiblePane = Class.create(lcg.Widget, {
     /* Collapsible Pane.
      *
-     * This is the Javascript counterpart of the Python class `lcg.CollapsiblePanel'.
+     * This is the Javascript counterpart of the Python class `lcg.CollapsiblePane'.
      * The panel content can be collapsed or expanded.  When collapsed, only a one
      * line panel title is displayed.  The title may be clicked to toggle the content
      * expansion state.
      *
      */
-    initialize: function (element_id, collapsed) {
-	var element = $(element_id);
-	this.element = element;
-	this.content = element.down('div.section-content');
+    initialize: function ($super, element_id, collapsed) {
+	$super(element_id)
+	this.content = this.element.down('div.section-content');
 	if (collapsed) {
-	    element.addClassName('collapsed');
+	    this.element.addClassName('collapsed');
 	    this.content.hide();
 	} else {
-	    element.addClassName('expanded');
+	    this.element.addClassName('expanded');
 	}
-	element.down('h1,h2,h3,h4,h5,h6').observe('click', this.on_toggle_expansion.bind(this));
+	var heading = this.element.down('h1,h2,h3,h4,h5,h6,h7,h8');
+	heading.addClassName('collapsible-pane-heading');
+	heading.on('click', function(event) {
+	    this.toggle();
+	    event.stop();
+	}.bind(this));
+	// TODO: ARIA
     },
 
-    on_toggle_expansion: function(event) {
-	if (this.element.hasClassName('collapsed')) {
-	    this.element.removeClassName('collapsed');
-	    this.element.addClassName('expanded');
-	    if (Effect !== undefined) {
-		new Effect.SlideDown(this.content, {duration: 0.2});
-	    } else {
-		this.content.show();
-	    }
+    expanded: function() {
+	return this.element.hasClassName('expanded');
+    },
+
+    expand: function() {
+	this.element.removeClassName('collapsed');
+	this.element.addClassName('expanded');
+	if (Effect !== undefined) {
+	    new Effect.SlideDown(this.content, {duration: 0.2});
 	} else {
-	    this.element.removeClassName('expanded');
-	    this.element.addClassName('collapsed');
-	    if (Effect !== undefined) {
-		new Effect.SlideUp(this.content, {duration: 0.2});
-	    } else {
-		this.content.hide();
-	    }
+	    this.content.show();
+	}
+    },
+
+    collapse: function() {
+	this.element.removeClassName('expanded');
+	this.element.addClassName('collapsed');
+	if (Effect !== undefined) {
+	    new Effect.SlideUp(this.content, {duration: 0.2});
+	} else {
+	    this.content.hide();
+	}
+    },
+
+    toggle: function() {
+	if (this.element.hasClassName('collapsed')) {
+	    this.expand();
+	} else {
+	    this.collapse();
 	}
     }
 });
