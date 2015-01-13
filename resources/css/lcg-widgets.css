@@ -161,23 +161,22 @@
     -webkit-box-shadow: #999 1px 1px 12px;
 }
 
-.collapsible-pane-widget h1, .collapsible-pane-widget h2, .collapsible-pane-widget h3,
-.collapsible-pane-widget h4, .collapsible-pane-widget h5, .collapsible-pane-widget h6 {
+.collapsible-pane-widget .collapsible-pane-heading {
     display: button;
     font-size: 1.1em;
     padding: 0;
     padding-left: 12px;
     margin-top: 0.7em;
     margin-bottom: 0.4em;
-    background-image: url(pane-collapsed.png);
     background-position: left center;
     background-repeat: no-repeat;
     border: none;
     cursor: default;
 }
 
-.collapsible-pane-widget.expanded h1, .collapsible-pane-widget.expanded h2,
-.collapsible-pane-widget.expanded h3, .collapsible-pane-widget.expanded h4,
-.collapsible-pane-widget.expanded h5, .collapsible-pane-widget.expanded h6 {
+.collapsible-pane-widget.expanded .collapsible-pane-heading {
     background-image: url(pane-expanded.png);
+}
+.collapsible-pane-widget.collapsed .collapsible-pane-heading {
+    background-image: url(pane-collapsed.png);
 }
