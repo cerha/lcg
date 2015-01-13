@@ -627,9 +627,10 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	var ul = new Element('ul');
 	for (i = 0; i < items.length; i++) {
 	    item = items[i];
-	    a = new Element('a', {'href': '#',
-				  'title': item.tooltip,
-				  'onclick': 'return false;'});
+	    a = new Element('a', {'href': '#', 'onclick': 'return false;'});
+	    if (item.tooltip) {
+		a.setAttribute('title', item.tooltip);
+	    }
 	    a._lcg_popup_menu_item_spec = item;
 	    a.update(item.label);
 	    enabled = (item.enabled === undefined || item.enabled);
