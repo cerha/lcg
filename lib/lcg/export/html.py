@@ -169,7 +169,7 @@ class HtmlGenerator(object):
                          _paired=False, **kwargs)
 
     def style(self, content, **kwargs):
-        return self._tag('style', None, ('type', 'media'), _paired=True, **kwargs)
+        return self._tag('style', content, ('type', 'media'), _paired=True, **kwargs)
 
     def meta(self, **kwargs):
         return self._tag('meta', None, ('name', 'content', 'property', 'http-equiv'),
