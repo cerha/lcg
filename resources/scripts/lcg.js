@@ -119,7 +119,8 @@ lcg.Menu = Class.create(lcg.Widget, {
      * between the hierarchical items, assigns ARIA roles to HTML tags and
      * binds keyboard event handling to support keyboard menu traversal.
      * 
-     */ 
+     */
+    _MANAGE_TABINDEX: true,
     
     initialize: function ($super, element_id) {
 	$super(element_id);
@@ -156,10 +157,12 @@ lcg.Menu = Class.create(lcg.Widget, {
 
     init_item: function (li, id, prev, parent) {
 	var link = li.down('a');
-	link.setAttribute('tabindex', '-1');
+	if (this._MANAGE_TABINDEX) {
+	    link.setAttribute('tabindex', '-1');
+	}
+	li.setAttribute('tabindex', '-1');
 	li.setAttribute('role', 'presentation');
 	li.setAttribute('id', id);
-	li.setAttribute('tabindex', '-1');
 	li.setAttribute('aria-selected', 'false');
 	li._lcg_menu_prev = prev;
 	li._lcg_menu_next = null;
@@ -195,16 +198,21 @@ lcg.Menu = Class.create(lcg.Widget, {
     activate_item: function (item) {
 	var previously_active_item = this.active_item();
 	if (previously_active_item) {
-	    previously_active_item.setAttribute('tabindex', '-1');
+	    if (this._MANAGE_TABINDEX) {
+		previously_active_item.setAttribute('tabindex', '-1');
+	    }
 	    previously_active_item.setAttribute('aria-selected', 'false');
 	}
 	this.element.setAttribute('aria-activedescendant', item.getAttribute('id'));
 	item.setAttribute('aria-selected', 'true');
-	item.setAttribute('tabindex', '0');
+	if (this._MANAGE_TABINDEX) {
+	    item.setAttribute('tabindex', '0');
+	}
     },
 
     focus: function () {
 	var item = this.active_item();
+	console.log('---', item);
 	if (item) {
 	    this.expand_item(item, true);
 	    this.set_focus(item);
@@ -229,30 +237,17 @@ lcg.Menu = Class.create(lcg.Widget, {
 
 });
 
-lcg.NotebookMenu = Class.create(lcg.Menu, {
-    /* Notebook menu widget with tabs.
-     *  
-     * This class is only intended for static notebook-like menus.  The widget
-     * has tabs but doesnt's care about their content.  Clicking a tab invokes
-     * the underlying link URL.  See also 'Notebook' for an interactive
-     * notebook widget switching the tab contents on tab click.
+lcg.Notebook = Class.create(lcg.Menu, {
+    /* Notebook widget with tabs.
+     *
+     * This is the Javascript counterpart of the Python class `lcg.Notebook'.
+     * The notebook has tabs at the top and there is a content page belonging to
+     * each tab.  Switching the tabs switches the visible content below the tab
+     * switcher.  There may be multiple instances on one page.
      *
      */
+    COOKIE: 'lcg_last_notebook_tab',
 
-    init_items: function ($super, ul, parent) {
-	ul.setAttribute('role', 'tablist');
-	return $super(ul, parent);
-    },
-
-    init_item: function ($super, li, id, prev, parent) {
-	$super(li, id, prev, parent);
-	li.setAttribute('role', 'tab');
-	li.down('a').observe('click', function(event) {
-	    this.cmd_activate(li);
-	    event.stop();
-	}.bind(this));
-    },
-    
     keymap: function () {
 	return {
 	    'Left':	    this.cmd_prev,
@@ -261,23 +256,6 @@ lcg.NotebookMenu = Class.create(lcg.Menu, {
 	    'Space':	    this.cmd_activate
 	};
     },
-
-    cmd_activate: function (item) {
-	self.location = item.down('a').getAttribute('href');
-    }
-
-});
-
-lcg.Notebook = Class.create(lcg.NotebookMenu, {
-    /* Notebook widget with tabs.
-     *
-     * This is the Javascript counterpart of the Python class `lcg.Notebook'.
-     * The notebook has tabs at the top and there is a content page belonging to
-     * each tab.  Switching the tabs switches the visible content below the tab
-     * switcher.  There may be multiple instances on one page.
-     *
-     */ 
-    COOKIE: 'lcg_last_notebook_tab',
 
     initially_active_item: function () {
 	// The active item set in the python code (marked as 'current' in HTML)
@@ -291,9 +269,19 @@ lcg.Notebook = Class.create(lcg.NotebookMenu, {
 		this.items[0]); // finally the first item is used with the lowest precedence.
     },
 
+    init_items: function ($super, ul, parent) {
+	ul.setAttribute('role', 'tablist');
+	return $super(ul, parent);
+    },
+
     init_item: function ($super, li, id, prev, parent) {
 	$super(li, id, prev, parent);
 	var link = li.down('a');
+	li.setAttribute('role', 'tab');
+	link.observe('click', function(event) {
+	    this.cmd_activate(li);
+	    event.stop();
+	}.bind(this));
 	var href = link.getAttribute('href'); // The href always starts with '#'.
 	var page = $(href.substr(1));
 	li._lcg_notebook_page = page;
