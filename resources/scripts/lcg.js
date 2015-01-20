@@ -613,7 +613,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
         //   callback_args -- Array of additional arguments to pass to the callback function
 	// You will typically supply either uri or callback, but both can be used.
 	var i, item, a, enabled;
-	var ul = new Element('ul');
+	var ul = new Element('ul', {'role': 'presentation'});
 	for (i = 0; i < items.length; i++) {
 	    item = items[i];
 	    a = new Element('a', {'href': '#', 'onclick': 'return false;'});
@@ -626,14 +626,9 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
 	}
 	var menu = new Element('div', {'class': 'popup-menu-widget'});
-	menu.insert(ul);
+	menu.insert(new Element('div', {'role': 'menu'}).update(ul));
 	$(document.body).insert(menu);
 	$super(menu);
-    },
-
-    init_items: function ($super, ul, parent) {
-	ul.setAttribute('role', 'menu');
-	return $super(ul, parent);
     },
 
     init_item: function ($super, item, prev, parent) {
@@ -652,11 +647,11 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
     },
 
     cmd_activate: function (item) {
-	var a, spec, namespaces, func, context, i, args;
-	if (item.hasClassName('active')) {
+	var li = item.up('li');
+	var spec, namespaces, func, context, i, args;
+	if (li.hasClassName('active')) {
 	    this.remove();
-	    a = item.down('a');
-	    spec = a._lcg_popup_menu_item_spec;
+	    spec = item._lcg_popup_menu_item_spec;
 	    var callback = spec.callback;
 	    if (callback) {
 		if (typeof callback === 'string') {
@@ -738,9 +733,9 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	$(document).observe('click', this.on_click_handler);
 	var active_item;
 	if (selected_item_index !== undefined) {
-	    active_item = menu.select('li')[selected_item_index];
+	    active_item = menu.down('ul').childElements()[selected_item_index].down('a');
 	} else {
-	    active_item = menu.down('li');
+	    active_item = menu.down('a');
 	}
 	this.activate_item(active_item);
 	this.set_focus(active_item);
