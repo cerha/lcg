@@ -857,20 +857,26 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
      */
     initialize: function ($super, element_id, collapsed) {
 	$super(element_id);
-	this.content = this.element.down('div.section-content');
+	var content = this.element.down('div.section-content');
+	var heading = this.element.down('h1,h2,h3,h4,h5,h6,h7,h8');
+	this.heading = heading;
+	this.content = content;
 	if (collapsed) {
 	    this.element.addClassName('collapsed');
-	    this.content.hide();
+	    content.hide();
 	} else {
 	    this.element.addClassName('expanded');
 	}
-	var heading = this.element.down('h1,h2,h3,h4,h5,h6,h7,h8');
 	heading.addClassName('collapsible-pane-heading');
 	heading.on('click', function(event) {
 	    this.toggle();
 	    event.stop();
 	}.bind(this));
-	// TODO: ARIA
+	if (!content.getAttribute('id')) {
+	    content.setAttribute('id', this.element.getAttribute('id') + '-heading');
+	}
+	heading.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+	heading.setAttribute('aria-controls', this.content.getAttribute('id'));
     },
 
     expanded: function() {
@@ -880,6 +886,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
     expand: function() {
 	this.element.removeClassName('collapsed');
 	this.element.addClassName('expanded');
+	this.heading.setAttribute('aria-expanded', 'true');
 	if (Effect !== undefined) {
 	    Effect.SlideDown(this.content, {duration: 0.2});
 	} else {
@@ -890,6 +897,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
     collapse: function() {
 	this.element.removeClassName('expanded');
 	this.element.addClassName('collapsed');
+	this.heading.setAttribute('aria-expanded', 'false');
 	if (Effect !== undefined) {
 	    Effect.SlideUp(this.content, {duration: 0.2});
 	} else {
