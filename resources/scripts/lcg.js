@@ -212,7 +212,6 @@ lcg.Menu = Class.create(lcg.Widget, {
 
     focus: function () {
 	var item = this.active_item();
-	console.log('---', item);
 	if (item) {
 	    this.expand_item(item, true);
 	    this.set_focus(item);
