@@ -19,6 +19,7 @@
 /*jslint browser: true */
 /*jslint bitwise: true */
 /*jslint unparam: true */
+/*jslint todo: true */
 /*global Class */
 /*global Event */
 /*global Element */
@@ -137,42 +138,40 @@ lcg.Menu = Class.create(lcg.Widget, {
 
     init_items: function (ul, parent) {
 	var items = [];
-	var base_id, i, child, prev, id;
+	var base_id;
 	if (parent === null) {
 	    base_id = this.element.getAttribute('id')+'-item';
 	} else {
 	    base_id = parent.getAttribute('id');
 	}
-	for (i = 0; i < ul.childNodes.length; i++) {
-	    child = $(ul.childNodes[i]);
-	    if (child.nodeName === 'LI') {
-		prev = (items.length === 0 ? null : items[items.length-1]);
-		id = base_id + '.' + (items.length+1);
-		this.init_item(child, id, prev, parent);
-		items[items.length] = child;
+	ul.childElements().each(function(li) {
+	    if (li.nodeName === 'LI') {
+		li.setAttribute('role', 'presentation');
+		var item = li.down('a');
+		var prev = (items.length === 0 ? null : items[items.length-1]);
+		item.setAttribute('id', base_id + '.' + (items.length+1));
+		this.init_item(item, prev, parent);
+		items[items.length] = item;
 	    }
-	}
+	}.bind(this));
 	return items;
     },
 
-    init_item: function (li, id, prev, parent) {
-	var link = li.down('a');
+    init_item: function (item, prev, parent) {
+	item.setAttribute('aria-selected', 'false');
+	item.observe('keydown', this.on_key_down.bind(this));
+	item.observe('click', this.on_menu_click.bind(this));
+	item._lcg_menu_prev = prev;
+	item._lcg_menu_next = null;
+	item._lcg_menu_parent = parent;
+	item._lcg_submenu = null;
+	item._lcg_menu = this;
 	if (this._MANAGE_TABINDEX) {
-	    link.setAttribute('tabindex', '-1');
+	    item.setAttribute('tabindex', '-1');
 	}
-	li.setAttribute('tabindex', '-1');
-	li.setAttribute('role', 'presentation');
-	li.setAttribute('id', id);
-	li.setAttribute('aria-selected', 'false');
-	li._lcg_menu_prev = prev;
-	li._lcg_menu_next = null;
-	li._lcg_menu_parent = parent;
-	li._lcg_submenu = null;
-	li._lcg_menu = this;
 	if (prev) {
-	    prev._lcg_menu_next = li;
+	    prev._lcg_menu_next = item;
 	}
-	li.observe('keydown', this.on_key_down.bind(this));
     },
     
     initially_active_item: function () {
@@ -180,7 +179,7 @@ lcg.Menu = Class.create(lcg.Widget, {
 	if (this.items.length !== 0) {
 	    var current = this.element.down('a.current');
 	    if (current) {
-		item = current.up('li');
+		item = current;
 	    } else {
 		item = this.items[0];
 	    }
@@ -220,6 +219,12 @@ lcg.Menu = Class.create(lcg.Widget, {
     
     expand_item: function (item, recourse) {
 	return false;
+    },
+
+    on_menu_click: function (event) {
+	var element = event.element();
+	this.cmd_activate(element.nodeName === 'A' ? element : element.down('a'));
+	event.stop();
     },
     
     cmd_prev: function (item) {
@@ -261,7 +266,7 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	// has the highest precedence.
 	var current = this.element.down('.notebook-switcher li a.current');
 	if (current) {
-	    return current.up('li');
+	    return current;
 	}
 	return (this.current_location_active_item() || // the tab may be referenced by anchor.
 		this.last_saved_active_item() || // the most recently active tab.
@@ -273,18 +278,13 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	return $super(ul, parent);
     },
 
-    init_item: function ($super, li, id, prev, parent) {
-	$super(li, id, prev, parent);
-	var link = li.down('a');
-	li.setAttribute('role', 'tab');
-	link.observe('click', function(event) {
-	    this.cmd_activate(li);
-	    event.stop();
-	}.bind(this));
-	var href = link.getAttribute('href'); // The href always starts with '#'.
+    init_item: function ($super, item, prev, parent) {
+	$super(item, prev, parent);
+	item.setAttribute('role', 'tab');
+	var href = item.getAttribute('href'); // The href always starts with '#'.
 	var page = $(href.substr(1));
-	li._lcg_notebook_page = page;
-	page._lcg_notebook_item = li;
+	item._lcg_notebook_page = page;
+	page._lcg_notebook_item = item;
 	page.down('h1,h2,h3,h4,h5,h6').hide();
 	page.hide();
 	page.addClassName('notebook-page');
@@ -335,10 +335,10 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	$super(item);
 	if (previously_active_item !== item) {
 	    if (previously_active_item) {
-		previously_active_item.down('a').removeClassName('current');
+		previously_active_item.removeClassName('current');
 		previously_active_item._lcg_notebook_page.hide();
 	    }
-	    item.down('a').addClassName('current');
+	    item.addClassName('current');
 	    var page = item._lcg_notebook_page;
 	    var cls = this.element.getAttribute('class');
 	    if (cls) {
@@ -443,15 +443,15 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	return $super(ul, parent);
     },
     
-    init_item: function ($super, li, id, prev, parent) {
-	$super(li, id, prev, parent);
-	li.down('a').setAttribute('role', 'presentation');
-	li.observe('click', this.on_menu_click.bind(this));
-	li.setAttribute('role', 'treeitem');
-	var span = li.down('span');
+    init_item: function ($super, item, prev, parent) {
+	$super(item, prev, parent);
+	item.setAttribute('role', 'treeitem');
+	var span = item.down('span');
 	if (span) {
 	    span.setAttribute('role', 'presentation');
 	}
+	var li = item.up('li');
+	li.setAttribute('role', 'presentation');
 	// Append hierarchical submenu if found.
 	var submenu = li.down('ul');
 	if (submenu) {
@@ -459,10 +459,10 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 		var hidden = (li.hasClassName('folded') ? 'true' : 'false');
 		submenu.setAttribute('aria-hidden', hidden);
 		var expanded = (li.hasClassName('folded') ? 'false' : 'true' );
-		li.setAttribute('aria-expanded', expanded);
+		item.setAttribute('aria-expanded', expanded);
 		this.foldable = true;
 	    }
-	    li._lcg_submenu = this.init_items(submenu, li);
+	    item._lcg_submenu = this.init_items(submenu, item);
 	}
     },
     
@@ -482,9 +482,10 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     
     expand_item: function (item, recourse) {
 	var expanded = false;
-	if (item.hasClassName('folded')) {
-	    item.removeClassName('folded');
-	    item.down('ul').setAttribute('aria-hidden', 'false');
+	var li = item.up('li');
+	if (li.hasClassName('folded')) {
+	    li.removeClassName('folded');
+	    li.down('ul').setAttribute('aria-hidden', 'false');
 	    item.setAttribute('aria-expanded', 'true');
 	    expanded = true;
 	}
@@ -495,9 +496,10 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     },
     
     collapse_item: function (item) {
-	if (item.hasClassName('foldable') && !item.hasClassName('folded')) {
-	    item.addClassName('folded');
-	    item.down('ul').setAttribute('aria-hidden', 'true');
+	var li = item.up('li');
+	if (li.hasClassName('foldable') && !li.hasClassName('folded')) {
+	    li.addClassName('folded');
+	    li.down('ul').setAttribute('aria-hidden', 'true');
 	    item.setAttribute('aria-expanded', 'false');
 	    return true;
 	}
@@ -519,7 +521,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	var target = null;
 	if (item._lcg_menu_prev) {
 	    target = item._lcg_menu_prev;
-	    if (target._lcg_submenu && !target.hasClassName('folded')) {
+	    if (target._lcg_submenu && !target.up('li').hasClassName('folded')) {
 		target = target._lcg_submenu[target._lcg_submenu.length-1];
 	    }
 	} else {
@@ -530,7 +532,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
     cmd_down: function (item) {
 	var target = null;
-	if (item._lcg_submenu && !item.hasClassName('folded')) {
+	if (item._lcg_submenu && !item.up('li').hasClassName('folded')) {
 	    target = item._lcg_submenu[0];
 	} else {
 	    target = this.next_item(item);
@@ -551,7 +553,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     },
 
     cmd_activate: function (item) {
-	self.location = item.down('a').getAttribute('href');
+	self.location = item.getAttribute('href');
     },
 
     cmd_quit: function (item) {
@@ -578,9 +580,9 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    // SPAN is needed to make folding work across browsers (particulartly
 	    // MSIE).
 	    var span = element.down('span');
-	    var item = span.parentNode.parentNode;
+	    var item = span.parentNode;
 	    if (event.pointerX() < span.cumulativeOffset().left) {
-		if (item.hasClassName('folded')) { 
+		if (item.up('li').hasClassName('folded')) { 
 		    this.expand_item(item);
 		} else {
 		    this.collapse_item(item);
@@ -634,12 +636,9 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	return $super(ul, parent);
     },
 
-    init_item: function ($super, li, id, prev, parent) {
-	$super(li, id, prev, parent);
-	li.setAttribute('role', 'menuitem');
-	li.down('a').observe('click', function(event) {
-	    this.cmd_activate(li);
-	}.bind(this));
+    init_item: function ($super, item, prev, parent) {
+	$super(item, prev, parent);
+	item.setAttribute('role', 'menuitem');
     },
 
     keymap: function () {
@@ -977,7 +976,7 @@ lcg.widget_instance = function(element) {
      * JavaScript widget.
      *
      */
-    if (element._lcg_widget_instance) {
+    if (element && element._lcg_widget_instance) {
 	return element._lcg_widget_instance;
     }
     return null;
