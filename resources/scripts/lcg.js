@@ -456,10 +456,14 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	var submenu = li.down('ul');
 	if (submenu) {
 	    if (li.hasClassName('foldable')) {
+		if (!submenu.getAttribute('id')) {
+		    submenu.setAttribute('id', item.getAttribute('id') + '-submenu');
+		}
 		var hidden = (li.hasClassName('folded') ? 'true' : 'false');
 		submenu.setAttribute('aria-hidden', hidden);
 		var expanded = (li.hasClassName('folded') ? 'false' : 'true' );
 		item.setAttribute('aria-expanded', expanded);
+		item.setAttribute('aria-controls', submenu.getAttribute('id'));
 		this.foldable = true;
 	    }
 	    item._lcg_submenu = this.init_items(submenu, item);
