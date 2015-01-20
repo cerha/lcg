@@ -659,7 +659,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    spec = a._lcg_popup_menu_item_spec;
 	    var callback = spec.callback;
 	    if (callback) {
-		if (typeof(callback) === 'string') {
+		if (typeof callback === 'string') {
 		    namespaces = callback.split(".");
 		    func = namespaces.pop();
 		    context = window;
@@ -714,7 +714,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	event.stop();
 	var element = event.element();
 	var left, top;
-	if (event.clientX == event.pointerX() && event.clientY == event.pointerY()) {
+	if (event.clientX === event.pointerX() && event.clientY === event.pointerY()) {
 	    left = event.pointerX();
 	    top = event.pointerY();
 	} else {
@@ -857,7 +857,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
      *
      */
     initialize: function ($super, element_id, collapsed) {
-	$super(element_id)
+	$super(element_id);
 	this.content = this.element.down('div.section-content');
 	if (collapsed) {
 	    this.element.addClassName('collapsed');
@@ -882,7 +882,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 	this.element.removeClassName('collapsed');
 	this.element.addClassName('expanded');
 	if (Effect !== undefined) {
-	    new Effect.SlideDown(this.content, {duration: 0.2});
+	    Effect.SlideDown(this.content, {duration: 0.2});
 	} else {
 	    this.content.show();
 	}
@@ -892,7 +892,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 	this.element.removeClassName('expanded');
 	this.element.addClassName('collapsed');
 	if (Effect !== undefined) {
-	    new Effect.SlideUp(this.content, {duration: 0.2});
+	    Effect.SlideUp(this.content, {duration: 0.2});
 	} else {
 	    this.content.hide();
 	}
