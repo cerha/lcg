@@ -428,18 +428,24 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     },
 
     keymap: function () {
+	// Arrow keys are duplicated with Ctrl-Shift- to get them accessible to VoiceOver
+	// users as VO doesn't pass single arrow keypresses to the application.
 	return {
-	    'Up':	    this.cmd_up,
-	    'Down':         this.cmd_down,
-	    'Shift-Up':	    this.cmd_prev,
-	    'Shift-Down':   this.cmd_next,
-	    'Shift-Right':  this.cmd_expand,
-	    'Shift-Left':   this.cmd_collapse,
-	    'Right':        this.cmd_expand,
-	    'Left':         this.cmd_collapse,
-	    'Escape':	    this.cmd_quit,
-	    'Enter':	    this.cmd_activate,
-	    'Space':	    this.cmd_activate
+	    'Up': this.cmd_up,
+	    'Ctrl-Shift-Up': this.cmd_up,
+	    'Down': this.cmd_down,
+	    'Ctrl-Shift-Down': this.cmd_down,
+	    'Shift-Up': this.cmd_prev,
+	    'Shift-Shift-Down': this.cmd_next,
+	    'Shift-Right': this.cmd_expand,
+	    'Shift-Left': this.cmd_collapse,
+	    'Right': this.cmd_expand,
+	    'Ctrl-Shift-Right': this.cmd_expand,
+	    'Left': this.cmd_collapse,
+	    'Ctrl-Shift-Left': this.cmd_collapse,
+	    'Escape': this.cmd_quit,
+	    'Enter': this.cmd_activate,
+	    'Space': this.cmd_activate
 	};
     },
     
