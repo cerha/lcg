@@ -125,7 +125,6 @@ lcg.Menu = Class.create(lcg.Widget, {
     
     initialize: function ($super, element_id) {
 	$super(element_id);
-	this.element.setAttribute('role', 'application');
 	// Go through the menu and assign aria roles and key bindings.
 	var ul = this.element.down('ul');
 	this.items = this.init_items(ul, null);
@@ -462,7 +461,6 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    span.setAttribute('role', 'presentation');
 	}
 	var li = item.up('li');
-	li.setAttribute('role', 'presentation');
 	// Append hierarchical submenu if found.
 	var submenu = li.down('ul');
 	if (submenu) {
@@ -640,8 +638,10 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    enabled = (item.enabled === undefined || item.enabled);
 	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
 	}
-	var menu = new Element('div', {'class': 'popup-menu-widget'});
-	menu.insert(new Element('div', {'role': 'menu'}).update(ul));
+	var menu = new Element('div', {'id': 'popup-menu-widget',
+				       'role': 'menu',
+				       'class': 'popup-menu-widget'});
+	menu.update(ul);
 	$(document.body).insert(menu);
 	$super(menu);
     },
