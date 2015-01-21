@@ -288,6 +288,11 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	page.down('h1,h2,h3,h4,h5,h6').hide();
 	page.hide();
 	page.addClassName('notebook-page');
+	page.setAttribute('role', 'tabpanel');
+	if (!page.getAttribute('id')) {
+	    page.setAttribute('id', item.getAttribute('id') + '-tabpanel');
+	}
+	item.setAttribute('aria-controls', page.getAttribute('id'));
     },
 
     current_location_active_item: function() {
@@ -873,10 +878,10 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 	    event.stop();
 	}.bind(this));
 	if (!content.getAttribute('id')) {
-	    content.setAttribute('id', this.element.getAttribute('id') + '-heading');
+	    content.setAttribute('id', this.element.getAttribute('id') + '-collapsible-content');
 	}
 	heading.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-	heading.setAttribute('aria-controls', this.content.getAttribute('id'));
+	heading.setAttribute('aria-controls', content.getAttribute('id'));
     },
 
     expanded: function() {
