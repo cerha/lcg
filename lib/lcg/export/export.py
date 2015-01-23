@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ from lcg import attribute_value, concat, Localizable, Localizer, Resource, \
     Paragraph, PreformattedText, Section, TableOfContents, \
     DefinitionList, FieldSet, \
     Table, TableCell, TableHeading, TableRow, \
-    TextContent, Heading, Title, Anchor, Link, \
+    TextContent, Heading, Title, Abbreviation, Anchor, Link, \
     Strong, Emphasized, Underlined, Code, Citation, Quotation, Superscript, Subscript, \
     InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
     NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
@@ -384,6 +384,7 @@ class Exporter(object):
                 Subscript: self._export_subscript,
                 TextContent: self._export_text_content,
                 PreformattedText: self._export_preformatted_text,
+                Abbreviation: self._export_abbreviation,
                 Anchor: self._export_anchor,
                 Container: self._export_container,
                 Paragraph: self._export_paragraph,
@@ -634,6 +635,14 @@ class Exporter(object):
         t = self._reformat_text(context, element.text())
         return self.text(context, t, lang=element.lang())
         
+    def _export_abbreviation(self, context, element):
+        """Export the given 'Abbreviation' element.
+
+        In this class the method just returns the escaped anchor text.
+        
+        """
+        return self._export_text_content(context, element)
+    
     def _export_anchor(self, context, element):
         """Export the given 'Anchor' element.
 

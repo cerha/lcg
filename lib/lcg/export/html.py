@@ -759,6 +759,10 @@ class HtmlExporter(Exporter):
     def _export_subscript(self, context, element):
         return self._export_container(context, element, wrap=self._generator.sub)
 
+    def _export_abbreviation(self, context, element):
+        g = self._generator
+        return g.abbr(self._export_text_content(context, element), title=element.descr())
+
     def _export_anchor(self, context, element):
         g = self._generator
         return g.span(self._export_text_content(context, element), id=element.anchor())

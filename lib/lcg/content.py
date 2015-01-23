@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -587,6 +587,25 @@ class Link(Container):
     def type(self):
         """Return the value of 'type' as passed to the constructor."""
         return self._type
+
+
+class Abbreviation(TextContent):
+    """Abbreviation with description."""
+    
+    def __init__(self, text, descr, **kwargs):
+        """Arguments:
+
+          text -- the abbreviation as a string or unicode.
+          descr -- the description as a string or unicode.
+
+        """
+        assert isinstance(descr, basestring), descr
+        self._descr = descr
+        super(Abbreviation, self).__init__(text, **kwargs)
+
+    def descr(self):
+        """Return the abbreviation description given in the constructor."""
+        return self._descr
 
 
 class Anchor(TextContent):
@@ -1967,3 +1986,7 @@ def hr():
 def pre(text, **kwargs):
     """Create an 'PreformattedText' instance by coercing all arguments."""
     return PreformattedText(text, **kwargs)
+
+def abbr(text, descr, **kwargs):
+    """Create an 'Abbreviation' instance."""
+    return Abbreviation(text, descr, **kwargs)
