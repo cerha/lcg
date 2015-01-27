@@ -844,13 +844,14 @@ class HtmlExporter(Exporter):
         if backref:
             exported_heading = self._generator.a(exported_heading, href="#" + backref, 
                                                  cls='backref')
-        return g.div((g.div(g.h(exported_heading, level, lang=lang),
-                            cls='section-heading section-level-%d' % level),
-                      g.div(g.div(self._exported_container_content(context, element),
-                                  cls='section-content-wrapper'),
-                            cls='section-content section-level-%d' % level)),
-                     cls='section-container section-level-%d' % level,
-                     **self._container_attr(element))
+        return g.div(
+            (g.div(g.h(exported_heading, level, lang=lang),
+                   cls='section-heading section-level-%d' % level),
+             g.div(g.div(self._exported_container_content(context, element),
+                         cls='section-content-wrapper'),
+                   cls='section-content section-level-%d' % level)),
+            **self._container_attr(element, cls='section-container section-level-%d' % level)
+        )
 
     def _export_preformatted_text(self, context, element):
         return self._generator.pre(self.escape(element.text()))
