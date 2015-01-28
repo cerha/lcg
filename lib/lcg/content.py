@@ -1976,7 +1976,10 @@ def code(*items, **kwargs):
 def cite(*items, **kwargs):
     """Create an 'Citation' instance by coercing all arguments."""
     return _container(Citation, items, **kwargs)
-
+    
+def container(*items, **kwargs):
+    return _container(Container, items, **kwargs)
+    
 def br():
     return NewLine()
 
