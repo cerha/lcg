@@ -260,7 +260,8 @@ class Container(Content):
     _SUBSEQUENCES = False
     _SUBSEQUENCE_LENGTH = None
     
-    def __init__(self, content, name=None, id=None, halign=None, valign=None, orientation=None,
+    def __init__(self, content, name=(), id=None, halign=None, valign=None,
+                 orientation=None,
                  presentation=None, **kwargs):
         """Initialize the instance.
 
@@ -269,16 +270,18 @@ class Container(Content):
           content -- the actual content wrapped into this container as a
             sequence of 'Content' instances in the order in which they should
             appear in the output.
-          name -- optional string identifier which may be used as output
-            presentation selector (for example in HTML it is the value for
-            the 'class' attribute ).
+          name -- optional string identifier or a sequence of them.  These
+            identifiers may be then used as output presentation selectors (for
+            example in HTML they will compose the value of the 'class'
+            attribute).
           id -- depracated, use 'name' instead.
           halign -- horizontal alignment of the container content; one of the
             'HorizontalAlignment' constants or 'None' (default alignment).
           valign -- vertical alignment of the container content; one of the
             'VerticalAlignment' constants or 'None' (default alignment).
-          orientation -- orientation of the container content; one of the
-            'Orientation' constants or 'None' (default orientation).
+          orientation -- orientation of the container content flow (vertical
+            vs.horizontalal); one of the 'Orientation' constants or 'None'
+            (default orientation).
           presentation -- 'Presentation' instance defining various presentation
             properties; if 'None' then no explicit presentation for this container
             is defined.
@@ -288,11 +291,15 @@ class Container(Content):
 
         """
         super(Container, self).__init__(**kwargs)
-        self._name = name or id
-        assert name is None or isinstance(name, (str, unicode)), name
+        assert isinstance(name, basestring) or is_sequence_of(name, basestring), name
         assert halign is None or isinstance(halign, str), halign
         assert valign is None or isinstance(valign, str), valign
         assert orientation is None or isinstance(orientation, str), orientation
+        if isinstance(name, basestring):
+            names = (name,)
+        else:
+            names = tuple(name)
+        self._names = names
         from lcg import Presentation
         assert presentation is None or isinstance(presentation, Presentation), presentation
         super(Container, self).__init__(**kwargs)
@@ -301,7 +308,6 @@ class Container(Content):
         else:
             # For backwards compatibility ('name' was formely named 'id').
             name = id
-        self._name = name
         self._halign = halign
         self._valign = valign
         self._orientation = orientation
@@ -344,9 +350,9 @@ class Container(Content):
                 result.extend(c.sections(context))
         return result
     
-    def name(self):
-        """Return the value of 'name' as passed to the constructor."""
-        return self._name
+    def names(self):
+        """Return the tuple of strings passed as 'name' to the constructor."""
+        return self._names
     
     def halign(self):
         """Return the value of 'halign' as passed to the constructor."""

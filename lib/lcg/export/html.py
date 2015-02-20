@@ -796,7 +796,7 @@ class HtmlExporter(Exporter):
         presentation = element.presentation()
         if presentation and presentation.indent_left:
             style['margin-left'] = '%dem' % element.presentation().indent_left.size()
-        attr = dict(cls=' '.join([x for x in (element.name(), cls) if x is not None]) or None,
+        attr = dict(cls=' '.join([x for x in element.names() + ((cls,) if cls else ())]) or None,
                     lang=lang or element.lang(inherited=False),
                     style=style and ' '.join(['%s: %s;' % x for x in style.items()]) or None,
                     **kwargs)
@@ -824,7 +824,7 @@ class HtmlExporter(Exporter):
         # Use div in HTML4, but allow overriding for HTML 5.
         g = self._generator
         return g.div(self._export_section_container(context, element), id=element.id(),
-                     cls='section')
+                     cls=' '.join([x for x in element.names() + ('section',)]))
 
     def _export_section_container(self, context, element):
         g = self._generator
@@ -844,13 +844,16 @@ class HtmlExporter(Exporter):
         if backref:
             exported_heading = self._generator.a(exported_heading, href="#" + backref, 
                                                  cls='backref')
+        attr = self._container_attr(element)
+        # Replace the 'cls' attribute, because it will be used in the parent HTML tag.
+        attr['cls'] = 'section-container section-level-%d' % level
         return g.div(
             (g.div(g.h(exported_heading, level, lang=lang),
                    cls='section-heading section-level-%d' % level),
              g.div(g.div(self._exported_container_content(context, element),
                          cls='section-content-wrapper'),
                    cls='section-content section-level-%d' % level)),
-            **self._container_attr(element, cls='section-container section-level-%d' % level)
+            **attr
         )
 
     def _export_preformatted_text(self, context, element):
@@ -1252,7 +1255,7 @@ class Html5Exporter(HtmlExporter):
     def _export_section(self, context, element):
         g = self._generator
         return g.section(self._export_section_container(context, element), id=element.id(),
-                         cls='section')
+                         cls=' '.join([x for x in element.names() + ('section',)]))
 
     def export(self, context):
         g = self._generator
