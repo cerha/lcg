@@ -321,7 +321,8 @@ class Parser(object):
                 section_content.append(content)
         return element(title=title, heading=self.parse_inline_markup(title),
                        content=lcg.Container(section_content),
-                       id=section_id, name=tuple(section_classes), in_toc=in_toc), position
+                       id=section_id, name=tuple(section_classes) or ('default-section',),
+                       in_toc=in_toc), position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])
