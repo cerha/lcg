@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012, 2013, 2014 Brailcom, o.p.s.
+# Copyright (C) 2012, 2013, 2014, 2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -661,12 +661,11 @@ class BrailleExporter(FileExporter, Exporter):
                 new_pages = []
                 repeated_lines = []
                 repeated_lines_activated = [False]
-                marker_re = re.compile('[\ue000-\uffff]')
                 def add_page(page):
                     lines = []
                     def add_line(l, line_list, check=False):
                         if __debug__ and check:
-                            if marker_re.search(l) is not None:
+                            if self._RE_MARKER_MATCHER.search(l) is not None:
                                 raise BrailleError("Marker in output", (l, page,))
                         line_list.append(l)
                     line_limit = page_height
@@ -758,7 +757,7 @@ class BrailleExporter(FileExporter, Exporter):
                                 element = context.toc_element(arg)
                                 element.set_page_number(context, page_number)
                                 if isinstance(element, Section):
-                                    exported = self.text(context, element.title())
+                                    exported = self.text(context, element.title(), reformat=True)
                                 else:
                                     exported = element.export(context)
                                 text = exported.text()
@@ -871,7 +870,7 @@ class BrailleExporter(FileExporter, Exporter):
 
     _per_cent_regexp = re.compile('([ ⠀]+)⠼[⠏⠗]')
     
-    def text(self, context, text, lang=None):
+    def text(self, context, text, lang=None, reformat=False):
         """Return 'text' converted to Unicode Braille characters.
 
         Arguments:
@@ -880,6 +879,7 @@ class BrailleExporter(FileExporter, Exporter):
           text -- text to convert; unicode
           lang -- target language as an ISO 639-1 Alpha-2 lowercase
             language code or 'None'
+          reformat -- iff true, make some 'text' sanitization
 
         """
         assert isinstance(context, self.Context), context
@@ -887,10 +887,11 @@ class BrailleExporter(FileExporter, Exporter):
         assert lang is None or isinstance(lang, basestring), lang
         if lang is None:
             lang = context.lang()
+        if reformat:
+            text = self._reformat_text(context, text)
         if not text:
             return _Braille('', '')
-        mark = self._text_mark(text)
-        if mark is not None:
+        if self._text_mark(text) is not None:
             return _Braille(text)
         compactness = context.compactness()
         if compactness.get('lower'):
@@ -1102,8 +1103,7 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _export_text_content(self, context, element):
         text = context.alternate_text(element)
-        t = self._reformat_text(context, text)
-        return self.text(context, t, lang=element.lang())
+        return self.text(context, text, lang=element.lang(), reformat=True)
     
     def _export_new_page(self, context, element):
         return _Braille('\f', self.HYPH_NO)
@@ -1137,7 +1137,7 @@ class BrailleExporter(FileExporter, Exporter):
         toc_marker = context.add_toc_marker(element)
         context.position_info.append(element.title())
         try:
-            title = self.text(context, context.localize(element.title()), element.lang())
+            title = self.text(context, element.title(), element.lang(), reformat=True)
             if level > 1 or (element.content() and isinstance(element.content()[0], Section)):
                 n_newlines = 1
             else:
@@ -1211,9 +1211,9 @@ class BrailleExporter(FileExporter, Exporter):
             if isinstance(target, (ContentNode, Section)):
                 label = target.heading().export(context)
             elif isinstance(target, Resource):
-                label = self.text(context, target.title() or target.filename())
+                label = self.text(context, target.title() or target.filename(), reformat=True)
             elif isinstance(target, element.ExternalTarget):
-                label = self.text(context, target.title() or target.uri())
+                label = self.text(context, target.title() or target.uri(), reformat=True)
         return label
 
     # Tables
@@ -1229,7 +1229,7 @@ class BrailleExporter(FileExporter, Exporter):
             else:
                 exported = self.export_element(context, element)
             if explanation is not None and not recursive:
-                text = self.text(context, explanation)
+                text = self.text(context, explanation, reformat=True)
                 exported = self.concat(text, self._newline(context, 2), exported)
             return exported
         transformations = element.transformations()
@@ -1609,7 +1609,7 @@ class BrailleExporter(FileExporter, Exporter):
             elif style.find('italic') >= 0:
                 form |= louis.italic
             with context.let_form(form):
-                braille = self.text(context, text).text()
+                braille = self.text(context, text, reformat=True).text()
             if node is not None:
                 unset_style()
             return _Braille(braille, self.HYPH_NO * len(braille))

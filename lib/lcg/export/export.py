@@ -156,6 +156,7 @@ class Exporter(object):
     """
 
     _RE_SPACE_MATCHER = re.compile('  +')
+    _RE_MARKER_MATCHER = re.compile(u'[\ue000-\uffff]')
     _TOC_MARKER_CHAR = u'\ue000'
     _HFILL = u'\ue001\ue001\ue001'
     _END_MARKER_CHAR = u'\n'
@@ -547,7 +548,7 @@ class Exporter(object):
         """
         return concat(*items)
 
-    def text(self, context, text, lang=None):
+    def text(self, context, text, lang=None, reformat=False):
         """Return exported 'text'.
 
         Arguments:
@@ -556,10 +557,13 @@ class Exporter(object):
           text -- text to convert; unicode
           lang -- target language as an ISO 639-1 Alpha-2 lowercase
             language code or 'None'
+          reformat -- iff true, make some 'text' sanitization
 
         """
         assert isinstance(text, basestring), text
-        if self._text_mark(text):
+        if reformat:
+            text = self._reformat_text(context, text)
+        elif self._text_mark(text):
             return ''
         if context.text_preprocessor is not None:
             text = context.text_preprocessor(text)
@@ -568,6 +572,7 @@ class Exporter(object):
     def _reformat_text(self, context, text):
         text = context.localize(text)
         text = text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
+        text = self._RE_MARKER_MATCHER.sub('', text) # prevent crashes on marker chars in input
         text = self._RE_SPACE_MATCHER.sub(' ', text)
         return text
 
@@ -632,8 +637,7 @@ class Exporter(object):
         should not be necessary to override this method in derived classes.
         
         """
-        t = self._reformat_text(context, element.text())
-        return self.text(context, t, lang=element.lang())
+        return self.text(context, element.text(), lang=element.lang(), reformat=True)
         
     def _export_abbreviation(self, context, element):
         """Export the given 'Abbreviation' element.
@@ -729,10 +733,10 @@ class Exporter(object):
             lang = element.lang()
             extra = [self.text(context, '--', lang=lang)]
             if source:
-                extra.append(self.text(context, u' ' + source, lang=lang))
+                extra.append(self.text(context, u' ' + source, lang=lang, reformat=True))
             if uri:
                 format_ = u' (%s)' if source else u' %s'
-                extra.append(self.text(context, format_ % (uri,), lang=lang))
+                extra.append(self.text(context, format_ % (uri,), lang=lang, reformat=True))
             exported = self.concat(exported, *extra)
         exported = self._ensure_newlines(context, exported, 2)
         exported = self._indent(exported, 1)
@@ -769,7 +773,7 @@ class Exporter(object):
             title = item.title()
         else:
             title = id
-        return self.text(context, title, lang=element.lang())
+        return self.text(context, title, lang=element.lang(), reformat=True)
 
     def _export_preformatted_text(self, context, element):
         """Export verbatim text of given 'PreformattedText' element.
@@ -780,6 +784,7 @@ class Exporter(object):
         text = element.text()
         lang = element.lang()
         text_lines = text.split('\n')
+        text_lines = [self._RE_MARKER_MATCHER.sub('', l) for l in text_lines]
         output_lines = [self.text(context, text_lines[0], lang=lang)]
         for l in text_lines[1:]:
             output_lines.append(self._newline(context))
@@ -899,8 +904,7 @@ class Exporter(object):
         context.position_info.append(element.title())
         try:
             return self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker),
-                               self.text(context, context.localize(element.title()),
-                                         element.lang()),
+                               self.text(context, element.title(), element.lang(), reformat=True),
                                self._newline(context, 2),
                                self._export_container(context, element))
         finally:
@@ -1018,7 +1022,8 @@ class Exporter(object):
                 node_list.append(node.heading() if isinstance(node, ContentNode) else node)
                 current_lang = (node.lang() or lang)
                 if isinstance(node, Section):
-                    item_list.append(self.text(context, node.title(), lang=current_lang))
+                    item_list.append(self.text(context, node.title(), lang=current_lang,
+                                               reformat=True))
                 else:
                     item_list.append(node.export(context))
                 item_list.append(self.text(context, self._HFILL if page_width else ' '))
@@ -1039,7 +1044,7 @@ class Exporter(object):
                              self._newline(context))
         title = element.title()
         if title:
-            result = self.concat(self.text(context, context.localize(element.title()), lang=lang),
+            result = self.concat(self.text(context, element.title(), lang=lang, reformat=True),
                                  self._newline(context, 2),
                                  result)
         return result
@@ -1160,7 +1165,7 @@ class Exporter(object):
             descr = resource.descr()
             if descr:
                 label = '%s (%s)' % (label, descr,)
-        exported = self.text(context, label, lang=lang)
+        exported = self.text(context, label, lang=lang, reformat=True)
         exported = self._ensure_newlines(context, exported)
         return exported
 
@@ -1212,7 +1217,7 @@ class Exporter(object):
         fill_in_area = fill_in_char * 4
         def choice_text(task, choice, show_answers):
             if not show_answers or choice.correct():
-                return self.text(context, choice.answer())
+                return self.text(context, choice.answer(), reformat=True)
             else:
                 return None
         def format_choices(task, show_answers):
@@ -1241,7 +1246,7 @@ class Exporter(object):
             return text
         def make_field(show_answers, context, task, text):
             if show_answers:
-                result = fill_in_char + text + fill_in_char
+                result = fill_in_char + self._reformat_text(context, text) + fill_in_char
             else:
                 result = fill_in_area
             return result
