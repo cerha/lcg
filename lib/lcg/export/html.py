@@ -823,8 +823,9 @@ class HtmlExporter(Exporter):
     def _export_section(self, context, element):
         # Use div in HTML4, but allow overriding for HTML 5.
         g = self._generator
+        level = len(element.section_path()) + 1
         return g.div(self._export_section_container(context, element), id=element.id(),
-                     cls=' '.join([x for x in element.names() + ('section',)]))
+                     cls=' '.join(('section', 'section-level-%d' % level,) + element.names()))
 
     def _export_section_container(self, context, element):
         g = self._generator
@@ -1254,8 +1255,9 @@ class Html5Exporter(HtmlExporter):
 
     def _export_section(self, context, element):
         g = self._generator
+        level = len(element.section_path()) + 1
         return g.section(self._export_section_container(context, element), id=element.id(),
-                         cls=' '.join([x for x in element.names() + ('section',)]))
+                         cls=' '.join(('section', 'section-level-%d' % level,) + element.names()))
 
     def export(self, context):
         g = self._generator
