@@ -2256,7 +2256,7 @@ class PDFExporter(FileExporter, Exporter):
     def _reformat_text(self, context, text):
         return text
     
-    def text(self, context, text, lang=None):
+    def text(self, context, text, lang=None, reformat=False):
         assert isinstance(text, basestring), text
         if text:
             # We should get reasonable input from the parsers but this is
