@@ -2256,6 +2256,11 @@ class PDFExporter(FileExporter, Exporter):
     def _reformat_text(self, context, text):
         return text
     
+    def _ensure_newlines(self, context, exported, number=1):
+        if isinstance(exported, Text):
+            exported = make_element(Paragraph, content=[exported])
+        return exported
+    
     def text(self, context, text, lang=None, reformat=False):
         assert isinstance(text, basestring), text
         if text:
@@ -2593,13 +2598,13 @@ class PDFExporter(FileExporter, Exporter):
             def make_link_target(content):
                 return make_element(LinkTarget, name=anchor, content=content.content,
                                     style=content.style, halign=content.halign)
-            assert update_text(content, make_link_target)
+            update_text(content, make_link_target)
         backref = element.backref()
         if backref:
             def make_backref(content):
                 make_element(lcg.Link, uri=("#" + backref), content=content.content,
                              style=content.style, halign=content.halign)
-            assert update_text(content, make_backref)
+            update_text(content, make_backref)
         level = pdf_context.heading_level
         heading = make_element(Heading, content=content.content, level=level)
         pdf_context.heading_level += 1
@@ -2742,3 +2747,12 @@ class PDFExporter(FileExporter, Exporter):
 
     def _export_inline_image(self, context, element):
         return make_element(Image, image=element.image(context), text=element.title())
+
+    # Special constructs
+
+    def _export_mathml(self, context, element):
+        # Just a stub to prevent crashes on MathML elements
+        xml_tree = element.tree_content()
+        annotation = xml_tree.findtext('*/annotation')
+        text = annotation or element.content()
+        return make_element(Paragraph, content=[make_element(Text, content=text)])
