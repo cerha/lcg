@@ -1825,7 +1825,7 @@ class MathML(Content):
         return math
         
     def tree_content(self, entity_dictionary=None, transform=False):
-        """Return a parsed 'xml.etree.ElementTree' instance of the math content.
+        """Return a parsed 'xml.etree.Element' instance of the math content.
 
         Arguments:
 
