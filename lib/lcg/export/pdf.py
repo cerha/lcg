@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008, 2010, 2011, 2012, 2013, 2014 Brailcom, o.p.s.
+# Copyright (C) 2008-2015 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -1389,10 +1389,13 @@ class TextContainer(Text):
     
     """
     def init(self):
-        content = self.content
+        content = self.content = copy.copy(self.content)
         assert isinstance(content, list), ('type error', content,)
-        if __debug__:
-            for c in content:
+        for i in range(len(content)):
+            c = content[i]
+            if isinstance(c, Container) and len(c.content) == 1 and isinstance(c.content[0], Image):
+                content[i] = make_element(InlineImage, image=c.content[0].image)
+            else:
                 assert isinstance(c, Text), ('type error', c,)
     def _expand_content(self):
         content = []
@@ -1910,6 +1913,27 @@ class LinkTarget(Text):
         result = u'<a name="%s"/>%s' % (self.name, exported_text,)
         return result
 
+class InlineImage(Text):
+    """Image inside a paragraph.
+
+    'image' is an Image instance.
+    
+    """
+    def init(self):
+        self.content = ''
+        super(InlineImage, self).init()
+        assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
+    def _export(self, context):
+        if self.image is None:
+            context.log(_("Missing image: %s", self.uri), kind=lcg.ERROR)
+            return ''
+        filename = self.image.src_file()
+        if filename:
+            result = u'<img src="%s"/>' % (filename,)
+        else:
+            result = self.image.title() or self.image.filename()
+        return result
+    
 class Image(Element):
     """Image taken from an Image resource instance.
 
