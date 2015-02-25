@@ -110,9 +110,10 @@ class Parser(object):
     _CELL_ALIGNMENT_MAPPING = {'c': lcg.TableCell.CENTER, 'l': lcg.TableCell.LEFT,
                                'r': lcg.TableCell.RIGHT}
     _COMMENT_MATCHER = re.compile('^#[^\r\n]*\r?(\n|$)', re.MULTILINE)
-    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<collapsible>> +)?(?P<title>.*) (?P=level)' +
-                                   r'(?:[\t ]+(?:\*|(?P<not_in_toc>\!)?' +
-                                   r'(?P<section_id>[\w\d_-]+)))? *\r?$'),
+    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<collapsible>> +)?(?P<title>.*) (?P=level)'
+                                   r'(?:[\t ]+(?:\*|(?P<not_in_toc>\!)?'
+                                   r'(?P<section_id>[\w\d_-]+)))?'
+                                   r'(?P<section_classes>(?:[\t ]+\.[\w\d_-]+)*) *\r?$'),
                                   re.MULTILINE)
     _LINE_MATCHER = re.compile(r'^([\t ]*)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL | re.MULTILINE)
@@ -300,6 +301,7 @@ class Parser(object):
             return None
         title = match.group('title')
         section_id = match.group('section_id')
+        section_classes = [x.lstrip('.') for x in match.group('section_classes').strip().split()]
         in_toc = not match.group('not_in_toc')
         level = len(match.group('level'))
         section_content = []
@@ -319,7 +321,8 @@ class Parser(object):
                 section_content.append(content)
         return element(title=title, heading=self.parse_inline_markup(title),
                        content=lcg.Container(section_content),
-                       id=section_id, in_toc=in_toc), position
+                       id=section_id, name=tuple(section_classes) or ('default-section',),
+                       in_toc=in_toc), position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])

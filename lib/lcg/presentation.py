@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2011, 2012, 2013, 2014 Brailcom, o.p.s.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 Brailcom, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -306,7 +306,7 @@ class LCGContainerMatcher(LCGClassMatcher):
 
     def matches(self, content, lang):
         return (super(LCGContainerMatcher, self).matches(content, lang) and
-                content.name() == self._name)
+                self._name in content.names())
 
     
 class PresentationSet(object):
