@@ -2562,6 +2562,22 @@ class PDFExporter(FileExporter, Exporter):
     def _export_citation(self, context, element):
         return self._export_emphasize(context, element)
     
+    def _export_quotation(self, context, element):
+        exported = self._export_paragraph(context, element)
+        source = element.source()
+        uri = element.uri()
+        if source or uri:
+            lang = element.lang()
+            extra = [self.text(context, '--', lang=lang)]
+            if source:
+                extra.append(self.text(context, u' ' + source, lang=lang, reformat=True))
+            if uri:
+                format_ = u' (%s)' if source else u' %s'
+                extra.append(self.text(context, format_ % (uri,), lang=lang, reformat=True))
+            text = self.concat(*extra)
+            exported = make_element(Paragraph, content=[text], halign=HorizontalAlignment.RIGHT)
+        return exported
+    
     def _export_link(self, context, element):
         target = element.target(context)
         if element.content():
