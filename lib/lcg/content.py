@@ -295,19 +295,19 @@ class Container(Content):
         assert halign is None or isinstance(halign, str), halign
         assert valign is None or isinstance(valign, str), valign
         assert orientation is None or isinstance(orientation, str), orientation
+        assert not name or id is None, id
         if isinstance(name, basestring):
             names = (name,)
+        elif id:
+            # For backwards compatibility ('name' was formely named 'id').
+            assert isinstance(id, basestring), id
+            names = (id,)
         else:
             names = tuple(name)
         self._names = names
         from lcg import Presentation
         assert presentation is None or isinstance(presentation, Presentation), presentation
         super(Container, self).__init__(**kwargs)
-        if name:
-            assert id is None, id
-        else:
-            # For backwards compatibility ('name' was formely named 'id').
-            name = id
         self._halign = halign
         self._valign = valign
         self._orientation = orientation
