@@ -203,9 +203,14 @@ class Notebook(Widget, lcg.Container):
         self._active = active
         super(Notebook, self).__init__(content, **kwargs)
     
-    def name(self):
+    def names(self):
         # Avoid creation of the inner div (the name is present in outer div's cls).
-        return None
+        return ()
+
+    def _wrap_exported_widget(self, context, content, **kwargs):
+        if self._names:
+            kwargs['cls'] += ' ' + ' '.join(self._names)
+        return super(Notebook, self)._wrap_exported_widget(context, content, **kwargs)
     
     def _export_widget(self, context):
         g = context.generator()
