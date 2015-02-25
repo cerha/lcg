@@ -2755,4 +2755,4 @@ class PDFExporter(FileExporter, Exporter):
         xml_tree = element.tree_content()
         annotation = xml_tree.findtext('*/annotation')
         text = annotation or element.content()
-        return make_element(Paragraph, content=[make_element(Text, content=text)])
+        return make_element(TextContainer, content=[make_element(Text, content=text)])
