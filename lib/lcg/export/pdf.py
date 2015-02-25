@@ -75,7 +75,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             if style in ('Heading1', 'Heading2', 'Heading3',):
                 text = flowable.getPlainText()
                 level = int(style[7]) - 1
-                match = self._toc_key_regexp.match(flowable.text)
+                match = self._toc_key_regexp.match(flowable.text or '')
                 if match:
                     toc_key = match.group(1)
                 else:
