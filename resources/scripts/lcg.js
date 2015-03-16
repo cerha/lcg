@@ -747,7 +747,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	this.on_click_handler = this.on_document_click.bind(this);
 	$(document).observe('click', this.on_click_handler);
 	var active_item;
-	if (selected_item_index !== undefined) {
+	if (selected_item_index !== undefined && selected_item_index !== null) {
 	    active_item = menu.down('ul').childElements()[selected_item_index].down('a');
 	} else {
 	    active_item = menu.down('a');
