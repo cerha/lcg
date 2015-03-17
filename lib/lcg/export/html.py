@@ -828,34 +828,38 @@ class HtmlExporter(Exporter):
                      cls=' '.join(('section', 'section-level-%d' % level,) + element.names()))
 
     def _export_section_container(self, context, element):
-        g = self._generator
-        level = len(element.section_path()) + 1
-        # Get rid of the outer Heading instance and only consider the contained content.
-        lang = None
-        heading = element.heading()
-        if len(heading.content()) == 1 and isinstance(heading.content()[0], lcg.Container):
-            # In this case, we want replace the Container created in
-            # HTMLProcessor._section() and may have the lang attribute set by a
-            # container with no lang (to avoid <div> tag when calling
-            # heading.export()) and use the lang for the <h> tag.
-            lang = heading.content()[0].lang()
-            heading = lcg.Container(heading.content()[0].content())
-        exported_heading = heading.export(context)
-        backref = element.backref()
-        if backref:
-            exported_heading = self._generator.a(exported_heading, href="#" + backref, 
-                                                 cls='backref')
-        attr = self._container_attr(element)
-        # Replace the 'cls' attribute, because it will be used in the parent HTML tag.
-        attr['cls'] = 'section-container section-level-%d' % level
-        return g.div(
-            (g.div(g.h(exported_heading, level, lang=lang),
-                   cls='section-heading section-level-%d' % level),
-             g.div(g.div(self._exported_container_content(context, element),
-                         cls='section-content-wrapper'),
-                   cls='section-content section-level-%d' % level)),
-            **attr
-        )
+        context.position_info.append(element.title())
+        try:
+            g = self._generator
+            level = len(element.section_path()) + 1
+            # Get rid of the outer Heading instance and only consider the contained content.
+            lang = None
+            heading = element.heading()
+            if len(heading.content()) == 1 and isinstance(heading.content()[0], lcg.Container):
+                # In this case, we want replace the Container created in
+                # HTMLProcessor._section() and may have the lang attribute set by a
+                # container with no lang (to avoid <div> tag when calling
+                # heading.export()) and use the lang for the <h> tag.
+                lang = heading.content()[0].lang()
+                heading = lcg.Container(heading.content()[0].content())
+            exported_heading = heading.export(context)
+            backref = element.backref()
+            if backref:
+                exported_heading = self._generator.a(exported_heading, href="#" + backref, 
+                                                     cls='backref')
+            attr = self._container_attr(element)
+            # Replace the 'cls' attribute, because it will be used in the parent HTML tag.
+            attr['cls'] = 'section-container section-level-%d' % level
+            return g.div(
+                (g.div(g.h(exported_heading, level, lang=lang),
+                       cls='section-heading section-level-%d' % level),
+                 g.div(g.div(self._exported_container_content(context, element),
+                             cls='section-content-wrapper'),
+                       cls='section-content section-level-%d' % level)),
+                **attr
+            )
+        finally:
+            context.position_info.pop()
 
     def _export_preformatted_text(self, context, element):
         return self._generator.pre(self.escape(element.text()))
@@ -1235,10 +1239,14 @@ class HtmlExporter(Exporter):
 
     def _html_content(self, context):
         g = self._generator
-        # Export body first to allocate all resources before generating the head.
-        body = g.body(self._body_content(context), **self._body_attr(context))
-        head = g.head(self._head(context))
-        return concat(head, body)
+        context.position_info.append(context.node().title())
+        try:
+            # Export body first to allocate all resources before generating the head.
+            body = g.body(self._body_content(context), **self._body_attr(context))
+            head = g.head(self._head(context))
+            return concat(head, body)
+        finally:
+            context.position_info.pop()
 
     def export(self, context):
         g = self._generator
