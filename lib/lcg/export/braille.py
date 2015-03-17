@@ -1270,6 +1270,12 @@ class BrailleExporter(FileExporter, Exporter):
                 context.log(unicode(exception), kind=lcg.ERROR)
                 return _Braille('')
         return result
+    
+    def _export_table_cell(self, context, element):
+        exported = super(BrailleExporter, self)._export_table_cell(context, element)
+        text, hyphenation = exported.text(), exported.hyphenation()
+        text = text.rstrip('\n' + self._SOFT_NEWLINE_CHAR)
+        return _Braille(text, hyphenation[:len(text)])
 
     def _transposed_table(self, context, element):
         content = [c.content() for c in element.content() if isinstance(c, TableRow)]
