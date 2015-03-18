@@ -609,6 +609,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
 lcg.PopupMenu = Class.create(lcg.Menu, {
     // Popup menu widget.
+    css_class: 'popup-menu-widget',
     
     initialize: function ($super, items) {
 	// items -- array of menu items.  Each item is an object with the
@@ -638,9 +639,9 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    enabled = (item.enabled === undefined || item.enabled);
 	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
 	}
-	var menu = new Element('div', {'id': 'popup-menu-widget',
-				       'role': 'menu',
-				       'class': 'popup-menu-widget'});
+	var menu = new Element('div', {'role': 'menu',
+				       'class': this.css_class,
+				       'style': 'display: none'});
 	menu.update(ul);
 	$(document.body).insert(menu);
 	$super(menu);
@@ -712,38 +713,29 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	}
     },
     
-    popup: function (event, selected_item_index) {
-        // event -- JavaScript event triggering the popup -- either a mouse
-        //   action catched by 'contextmenu' handler or mouse/keyboard action
-        //   catched by 'click' handler.
-	// selected_item_index (optional) -- index of the menu item to be
-	//   initially selected
+    show: function (element, x, y, direction, selected_item_index) {
 	if (lcg.popup_menu) {
 	    lcg.popup_menu.remove();
 	}
-	event.stop();
-	var element = event.element();
-	var left, top;
-	if (event.clientX === event.pointerX() && event.clientY === event.pointerY()) {
-	    left = event.pointerX();
-	    top = event.pointerY();
-	} else {
-	    var offset = element.cumulativeOffset();
-	    left = offset.left;
-	    top = offset.top+10;
-	}
 	lcg.popup_menu = this;
-	var menu = this.element;
-	var window_size = document.viewport.getDimensions();
-	if (left + menu.getWidth() > window_size.width) {
-	    left = window_size.width - menu.getWidth() - 30;
-	}
-	if (top + menu.getHeight() > window_size.height) {
-	    top -= menu.getHeight();
-	}
-	menu.setStyle({left: left+'px', top: top+'px', display: 'block'});
 	this.popup_element = element;
-	this.ignore_next_click = !event.isLeftClick();
+	var menu = this.element;
+	menu.setStyle({left: x + 'px', top: y + 'px'});
+	if (Effect !== undefined) {
+	    if (direction === 'up') {
+		var total_height = menu.getHeight();
+		var css_height = menu.getLayout().get('height');
+		menu.setStyle({height: 0, display: 'block', overflowY: 'hidden'});
+		new Effect.Morph(menu, {style: {height: css_height + 'px',
+						top: y - total_height + 'px'},
+					duration: 0.2});
+		setTimeout(function () { menu.setStyle({overflowY: 'auto'}); }, 200);
+	    } else {
+		Effect.SlideDown(menu, {duration: 0.2});
+	    }
+	} else {
+	    menu.show();
+	}
 	this.on_click_handler = this.on_document_click.bind(this);
 	$(document).observe('click', this.on_click_handler);
 	var active_item;
@@ -756,11 +748,71 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	this.set_focus(active_item);
     },
 
+    popup: function (event, selected_item_index) {
+	// event -- JavaScript event triggering the popup -- either a mouse
+	//   action catched by 'contextmenu' handler or mouse/keyboard action
+	//   catched by 'click' handler.
+	// selected_item_index (optional) -- index of the menu item to be
+	//   initially selected
+	event.stop();
+	var x, y, direction;
+	var element = event.element();
+	if (event.isLeftClick() || event.isRightClick()) {
+	    x = event.pointerX();
+	    y = event.pointerY();
+	} else {
+	    var offset = element.cumulativeOffset();
+	    x = offset.left;
+	    y = offset.top + 10;
+	}
+	var menu = this.element;
+	var viewport = document.viewport.getDimensions();
+	var scroll_offset = document.viewport.getScrollOffsets();
+	if (x + menu.getWidth() > viewport.width + scroll_offset.left) {
+	    x -= menu.getWidth();
+	}
+	if (y + menu.getHeight() > viewport.height + scroll_offset.top && y > menu.getHeight()) {
+	    direction = 'up';
+	} else {
+	    direction = 'down';
+	}
+	this.ignore_next_click = !event.isLeftClick();
+	this.show(element, x, y, direction, selected_item_index);
+    },
+
     remove: function() {
 	$(document).stopObserving('click', this.on_click_handler);
 	this.element.remove();
 	lcg.popup_menu = null;
     }
+
+});
+
+lcg.DropDownSelection = Class.create(lcg.PopupMenu, {
+
+    css_class: 'dropdown-selection-widget',
+
+    dropdown: function(element, selected_item_index) {
+	var offset = element.cumulativeOffset();
+	var x = offset.left;
+	var y = offset.top + element.getHeight();
+	var direction;
+	var menu = this.element;
+	var viewport = document.viewport.getDimensions();
+	var scroll_offset = document.viewport.getScrollOffsets();
+	var height = menu.getHeight();
+	if (y + height > viewport.height + scroll_offset.top && offset.top > height) {
+	    y = offset.top;
+	    direction = 'up';
+	} else {
+	    direction = 'down';
+	}
+	var padding = menu.getWidth() - menu.getLayout().get('width');
+	menu.setStyle({width: element.getWidth() - padding + 'px'});
+	this.ignore_next_click = false; //!event.isLeftClick();
+	this.show(element, x, y, direction, selected_item_index);
+    }
+
 });
 
 lcg.PopupMenuCtrl = Class.create({
