@@ -742,6 +742,9 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    }
 	    setTimeout(function () { this.set_focus(selected_item); }.bind(this), 210);
 	} else {
+	    if (direction === 'up') {
+		menu.setStyle({top: y - menu.getHeight() + 'px'});
+	    }
 	    menu.show();
 	    this.set_focus(selected_item);
 	}
