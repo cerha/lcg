@@ -609,7 +609,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
 lcg.PopupMenu = Class.create(lcg.Menu, {
     // Popup menu widget.
-    css_class: 'popup-menu-widget',
+    _CSS_CLASS: 'popup-menu-widget',
     
     initialize: function ($super, items) {
 	// items -- array of menu items.  Each item is an object with the
@@ -640,7 +640,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
 	}
 	var menu = new Element('div', {'role': 'menu',
-				       'class': this.css_class,
+				       'class': this._CSS_CLASS,
 				       'style': 'display: none'});
 	menu.update(ul);
 	$(document.body).insert(menu);
@@ -790,7 +790,7 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 
 lcg.DropDownSelection = Class.create(lcg.PopupMenu, {
 
-    css_class: 'dropdown-selection-widget',
+    _CSS_CLASS: 'dropdown-selection-widget',
 
     select_item: function ($super, item) {
 	var previously_selected_item = this.selected_item();
