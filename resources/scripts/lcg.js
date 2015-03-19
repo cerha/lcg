@@ -792,6 +792,15 @@ lcg.DropDownSelection = Class.create(lcg.PopupMenu, {
 
     css_class: 'dropdown-selection-widget',
 
+    select_item: function ($super, item) {
+	var previously_selected_item = this.selected_item();
+	$super(item);
+	if (previously_selected_item && previously_selected_item !== item) {
+	    previously_selected_item.up('li').removeClassName('selected');
+	}
+	item.up('li').addClassName('selected');
+    },
+
     dropdown: function(element, selected_item_index) {
 	var offset = element.cumulativeOffset();
 	var x = offset.left;
