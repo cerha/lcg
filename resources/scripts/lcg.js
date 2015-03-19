@@ -129,9 +129,9 @@ lcg.Menu = Class.create(lcg.Widget, {
 	var ul = this.element.down('ul');
 	this.items = this.init_items(ul, null);
 	// Set the active item.
-	var active = this.initially_active_item();
-	if (active) {
-	    this.activate_item(active);
+	var selected = this.initially_selected_item();
+	if (selected) {
+	    this.select_item(selected);
 	}
     },
 
@@ -173,7 +173,7 @@ lcg.Menu = Class.create(lcg.Widget, {
 	}
     },
     
-    initially_active_item: function () {
+    initially_selected_item: function () {
 	var item;
 	if (this.items.length !== 0) {
 	    var current = this.element.down('a.current');
@@ -188,18 +188,18 @@ lcg.Menu = Class.create(lcg.Widget, {
 	return item;
     },
     
-    active_item: function () {
+    selected_item: function () {
 	var element_id = this.element.getAttribute('aria-activedescendant');
 	return (element_id ? $(element_id) : null);
     },
 
-    activate_item: function (item) {
-	var previously_active_item = this.active_item();
-	if (previously_active_item) {
+    select_item: function (item) {
+	var previously_selected_item = this.selected_item();
+	if (previously_selected_item) {
 	    if (this._MANAGE_TABINDEX) {
-		previously_active_item.setAttribute('tabindex', '-1');
+		previously_selected_item.setAttribute('tabindex', '-1');
 	    }
-	    previously_active_item.setAttribute('aria-selected', 'false');
+	    previously_selected_item.setAttribute('aria-selected', 'false');
 	}
 	this.element.setAttribute('aria-activedescendant', item.getAttribute('id'));
 	item.setAttribute('aria-selected', 'true');
@@ -209,7 +209,7 @@ lcg.Menu = Class.create(lcg.Widget, {
     },
 
     focus: function () {
-	var item = this.active_item();
+	var item = this.selected_item();
 	if (item) {
 	    this.expand_item(item, true);
 	    this.set_focus(item);
@@ -260,15 +260,15 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	};
     },
 
-    initially_active_item: function () {
-	// The active item set in the python code (marked as 'current' in HTML)
+    initially_selected_item: function () {
+	// The selected item set in the python code (marked as 'current' in HTML)
 	// has the highest precedence.
 	var current = this.element.down('.notebook-switcher li a.current');
 	if (current) {
 	    return current;
 	}
-	return (this.current_location_active_item() || // the tab may be referenced by anchor.
-		this.last_saved_active_item() || // the most recently active tab.
+	return (this.current_location_selected_item() || // the tab may be referenced by anchor.
+		this.last_saved_selected_item() || // the most recently selected tab.
 		this.items[0]); // finally the first item is used with the lowest precedence.
     },
 
@@ -294,8 +294,8 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	item.setAttribute('aria-controls', page.getAttribute('id'));
     },
 
-    current_location_active_item: function() {
-	// Get the active item if the anchor is part of the current location.
+    current_location_selected_item: function() {
+	// Get the selected item if the anchor is part of the current location.
 	var match = self.location.href.match('#');
 	if (match) {
 	    var parts = self.location.href.split('#', 2);
@@ -306,8 +306,8 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	}
     },
 
-    last_saved_active_item: function() {
-	// Get the active item saved most recently in a browser cookie.
+    last_saved_selected_item: function() {
+	// Get the selected item saved most recently in a browser cookie.
 	//
 	// We remember the last tab only for one notebook (the one which was
 	// last switched) to avoid polution of cookies with too many values).
@@ -333,14 +333,14 @@ lcg.Notebook = Class.create(lcg.Menu, {
 	return null;
     },
 
-    activate_item: function ($super, item) {
+    select_item: function ($super, item) {
 	var i, callback, repeat;
-	var previously_active_item = this.active_item();
+	var previously_selected_item = this.selected_item();
 	$super(item);
-	if (previously_active_item !== item) {
-	    if (previously_active_item) {
-		previously_active_item.removeClassName('current');
-		previously_active_item._lcg_notebook_page.hide();
+	if (previously_selected_item !== item) {
+	    if (previously_selected_item) {
+		previously_selected_item.removeClassName('current');
+		previously_selected_item._lcg_notebook_page.hide();
 	    }
 	    item.addClassName('current');
 	    var page = item._lcg_notebook_page;
@@ -367,7 +367,7 @@ lcg.Notebook = Class.create(lcg.Menu, {
     },
 
     cmd_activate: function (item) {
-	this.activate_item(item);
+	this.select_item(item);
 	this.set_focus(item._lcg_notebook_page);
     }
 
@@ -738,14 +738,14 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	}
 	this.on_click_handler = this.on_document_click.bind(this);
 	$(document).observe('click', this.on_click_handler);
-	var active_item;
+	var selected_item;
 	if (selected_item_index !== undefined && selected_item_index !== null) {
-	    active_item = menu.down('ul').childElements()[selected_item_index].down('a');
+	    selected_item = menu.down('ul').childElements()[selected_item_index].down('a');
 	} else {
-	    active_item = menu.down('a');
+	    selected_item = menu.down('a');
 	}
-	this.activate_item(active_item);
-	this.set_focus(active_item);
+	this.select_item(selected_item);
+	this.set_focus(selected_item);
     },
 
     popup: function (event, selected_item_index) {
