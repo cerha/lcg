@@ -720,6 +720,13 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	lcg.popup_menu = this;
 	this.popup_element = element;
 	var menu = this.element;
+	var selected_item;
+	if (selected_item_index !== undefined && selected_item_index !== null) {
+	    selected_item = menu.down('ul').childElements()[selected_item_index].down('a');
+	} else {
+	    selected_item = menu.down('a');
+	}
+	this.select_item(selected_item);
 	menu.setStyle({left: x + 'px', top: y + 'px'});
 	if (Effect !== undefined) {
 	    if (direction === 'up') {
@@ -733,19 +740,13 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    } else {
 		Effect.SlideDown(menu, {duration: 0.2});
 	    }
+	    setTimeout(function () { this.set_focus(selected_item); }.bind(this), 210);
 	} else {
 	    menu.show();
+	    this.set_focus(selected_item);
 	}
 	this.on_click_handler = this.on_document_click.bind(this);
 	$(document).observe('click', this.on_click_handler);
-	var selected_item;
-	if (selected_item_index !== undefined && selected_item_index !== null) {
-	    selected_item = menu.down('ul').childElements()[selected_item_index].down('a');
-	} else {
-	    selected_item = menu.down('a');
-	}
-	this.select_item(selected_item);
-	this.set_focus(selected_item);
     },
 
     popup: function (event, selected_item_index) {
