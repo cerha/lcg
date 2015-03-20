@@ -2308,6 +2308,9 @@ class PDFExporter(FileExporter, Exporter):
     def escape(self, text):
         return make_element(Text, content=text)
 
+    def _get_resource_path(self, context, resource):
+        return None
+
     # Classic exports
         
     def export(self, context, old_contexts=None, global_presentation=None, recursive=False):
@@ -2793,7 +2796,7 @@ class PDFExporter(FileExporter, Exporter):
 
     def _export_inline_image(self, context, element):
         image = element.image(context)
-        filename = self._get_resource_data(context, image)
+        filename = self._get_resource_path(context, image)
         return make_element(Image, image=image, text=element.title(), filename=filename)
 
     # Special constructs
