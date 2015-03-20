@@ -167,7 +167,7 @@ class ContentNode(object):
             self._globals = {}
         else:
             self._globals = copy.copy(globals)
-        #if __debug__:
+        # if __debug__:
         #    seen = {}
         #    for n in self.linear():
         #        nid = n.id()
@@ -378,6 +378,7 @@ class ContentNode(object):
         """Get the resource instance by its type and relative filename."""
         for resource in self._content.resources():
             if resource.filename() == filename:
+                # Hmm, why don't have images here src_file set?
                 if resource not in self._used_content_resources:
                     self._used_content_resources.append(resource)
                 return resource

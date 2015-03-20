@@ -1943,21 +1943,27 @@ class Image(Element):
     """
     _CATEGORY = 'block'
     uri = None
+    filename = None
     def init(self):
         super(Image, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
+        assert self.filename is None or isinstance(self.filename, basestring), \
+            ('type error', self.filename,)
     def _export(self, context):
-        if self.image is None:
+        image = self.image
+        if image is None:
             context.log(_("Missing image: %s", self.uri), kind=lcg.ERROR)
             dummy_comment = [make_element(Text, content='[image]')]
             return make_element(Paragraph, content=dummy_comment).export(context)
-        filename = self.image.src_file()
+        filename = image.src_file()
+        if not filename:
+            filename = self.filename
         if filename:
             result = RLImage(filename, uri=self.uri)
         else:
-            content = make_element(Text, content=(self.image.title() or self.image.filename()))
+            content = make_element(Text, content=(image.title() or image.filename()))
             result = make_element(Paragraph, content=[content]).export(context)
         return result
 
@@ -2341,26 +2347,26 @@ class PDFExporter(FileExporter, Exporter):
         presentation = pdf_context.current_presentation()
         exported_structure = []
         first_subcontext = None
-        for node in context.node().linear():
-            node_id = node.id()
+        for n in node.linear():
+            node_id = n.id()
             if node_id[:7] == '__dummy':
                 continue
-            subcontext = self.context(node, lang)
+            subcontext = self.context(n, lang)
             old = old_contexts.get(node_id)
             total_pages = 0
             if old is not None:
                 total_pages = old.page
-            page_header = node.page_header(lang)
+            page_header = n.page_header(lang)
             subcontext.pdf_context = old_contexts[node_id] = \
                 Context(parent_context=pdf_context, total_pages=total_pages,
-                        first_page_header=(node.first_page_header(lang) or page_header),
+                        first_page_header=(n.first_page_header(lang) or page_header),
                         page_header=page_header,
-                        page_footer=node.page_footer(lang),
-                        page_background=node.page_background(lang),
+                        page_footer=n.page_footer(lang),
+                        page_background=n.page_background(lang),
                         presentation=presentation,
                         presentation_set=context.presentation(),
                         lang=lang)
-            subcontext.pdf_context.add_presentation(node.presentation(lang))
+            subcontext.pdf_context.add_presentation(n.presentation(lang))
             # The subcontext serves twice: 1. when exporting node content;
             # 2. when exporting to ReportLab.  The question is how to transfer
             # the subcontext to the proper place in ReportLab formatting.  This
@@ -2371,11 +2377,11 @@ class PDFExporter(FileExporter, Exporter):
             else:
                 new_document = make_element(NewDocument, content=subcontext)
                 exported_structure.append(new_document)
-            if node.title().strip():
-                title = subcontext.exporter().export_element(subcontext, node.heading())
+            if n.title().strip():
+                title = subcontext.exporter().export_element(subcontext, n.heading())
                 exported_heading = make_element(Heading, content=[title], level=0)
                 exported_structure.append(exported_heading)
-            exported = node.content().export(subcontext)
+            exported = n.content().export(subcontext)
             if isinstance(exported, (tuple, list,)):
                 exported = self.concat(*exported)
             exported_structure.append(exported)
@@ -2786,7 +2792,9 @@ class PDFExporter(FileExporter, Exporter):
     # Media (represented by resources wrapped in inline content elements)
 
     def _export_inline_image(self, context, element):
-        return make_element(Image, image=element.image(context), text=element.title())
+        image = element.image(context)
+        filename = self._get_resource_data(context, image)
+        return make_element(Image, image=image, text=element.title(), filename=filename)
 
     # Special constructs
 

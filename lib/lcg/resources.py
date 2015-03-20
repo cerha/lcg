@@ -47,7 +47,7 @@ class Resource(object):
             file name).
           title -- optional user visible resource title as a string or None.
           descr -- optional user visible resource description as a string or None.
-          src_file -- absolut pathname of the source file.  If None, the resource will not be
+          src_file -- absolute pathname of the source file.  If None, the resource will not be
             exported.  The source file is normally located by the resource provider and this
             argument is supplied automatically, so you usually do not need to care about it.  In
             any case, the exporter is responsible for writing the resources which have the source
@@ -368,4 +368,3 @@ class ResourceProvider(object):
                 elif isinstance(resource, cls):
                     result.append(resource)
         return result
-
