@@ -1297,6 +1297,17 @@ class Element(object):
         else:
             raise Exception('Not implemented', size)
         return points
+    def _wrapped_image(self, content):
+        if isinstance(content, Container) and len(content.content) == 1:
+            element = content.content[0]
+            if isinstance(element, Image):
+                return make_element(InlineImage, image=element.image, align=element.align,
+                                    size=element.size)
+            elif isinstance(element, Container):
+                return self._wrapped_image(element)
+            else:
+                return None
+        return None
 
 class Text(Element):
     """Basic text.
@@ -1393,10 +1404,11 @@ class TextContainer(Text):
         assert isinstance(content, list), ('type error', content,)
         for i in range(len(content)):
             c = content[i]
-            if isinstance(c, Container) and len(c.content) == 1 and isinstance(c.content[0], Image):
-                content[i] = make_element(InlineImage, image=c.content[0].image)
-            else:
+            image = self._wrapped_image(c)
+            if image is None:
                 assert isinstance(c, Text), ('type error', c,)
+            else:
+                content[i] = image
     def _expand_content(self):
         content = []
         for c in self.content:
@@ -1558,6 +1570,11 @@ class Heading(Label):
     _CATEGORY = 'heading'
     level = None
     def init(self):
+        content = self.content = copy.copy(self.content)
+        for i in range(len(content)):
+            image = self._wrapped_image(content[i])
+            if image is not None:
+                content[i] = image
         super(Heading, self).init()
         assert isinstance(self.level, int), ('type error', self.level,)
     def _style(self, context):
