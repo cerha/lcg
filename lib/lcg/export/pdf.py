@@ -1936,19 +1936,44 @@ class InlineImage(Text):
     'image' is an Image instance.
     
     """
+    align = None
+    size = None
     def init(self):
         self.content = ''
         super(InlineImage, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
+        assert self.align is None or isinstance(self.align, str), self.align
+        assert self.size is None or isinstance(self.size, tuple) and len(self.size, 2) and \
+            isinstance(self.size[0], int) and isinstance(self.size[1], int), self.size
     def _export(self, context):
-        if self.image is None:
+        image = self.image
+        if image is None:
             context.log(_("Missing image: %s", self.uri), kind=lcg.ERROR)
             return ''
-        filename = self.image.src_file()
+        filename = image.src_file()
         if filename:
-            result = u'<img src="%s"/>' % (filename,)
+            align = image.align
+            if align is None:
+                alignment = ''
+            else:
+                mapping = {lcg.InlineImage.LEFT: 'halign="left"',
+                           lcg.InlineImage.RIGHT: 'halign="right"',
+                           lcg.InlineImage.TOP: 'valign="top"',
+                           lcg.InlineImage.BOTTOM: 'valign="bottom"',
+                           lcg.InlineImage.MIDDLE: 'valign="center"',
+                           }
+                alignment = ' ' + mapping[align]
+            size = image.size
+            if size is None:
+                width = height = ''
+            else:
+                dpi = 96.0
+                width = ' %sin' % (size[0] / dpi,)
+                height = ' %sin' % (size[1] / dpi,)
+            raise Exception('debug-ok')
+            result = u'<img src="%s"%s%s%s/>' % (filename, alignment, width, height,)
         else:
-            result = self.image.title() or self.image.filename()
+            result = image.title() or image.filename()
         return result
     
 class Image(Element):
@@ -1961,9 +1986,14 @@ class Image(Element):
     _CATEGORY = 'block'
     uri = None
     filename = None
+    align = None
+    size = None
     def init(self):
         super(Image, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
+        assert self.align is None or isinstance(self.align, str), self.align
+        assert self.size is None or isinstance(self.size, tuple) and len(self.size, 2) and \
+            isinstance(self.size[0], int) and isinstance(self.size[1], int), self.size
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
         assert self.filename is None or isinstance(self.filename, basestring), \
@@ -2814,7 +2844,8 @@ class PDFExporter(FileExporter, Exporter):
     def _export_inline_image(self, context, element):
         image = element.image(context)
         filename = self._get_resource_path(context, image)
-        return make_element(Image, image=image, text=element.title(), filename=filename)
+        return make_element(Image, image=image, text=element.title(),
+                            align=element.align(), size=element.size(), filename=filename)
 
     # Special constructs
 
