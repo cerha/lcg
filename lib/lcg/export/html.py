@@ -217,7 +217,8 @@ class HtmlGenerator(object):
     def sub(self, text, **kwargs):
         return self._tag('sub', text, **kwargs)
 
-    def p(self, *content, **kwargs):
+    def p(self, *args, **kwargs):
+        content = args + tuple(kwargs.pop('content', ()))
         if content[0].find('object') != -1:
             # This is a nasty hack to suppress <p>...</p> around a video player.  In any case,
             # wrapping a block-level element in another block level element is invalid HTML, so
@@ -250,16 +251,19 @@ class HtmlGenerator(object):
                 'onclick', 'onmouseover', 'onmouseout')
         return self._tag('a', label, attr, **kwargs)
 
-    def ol(self, *content, **kwargs):
+    def ol(self, *args, **kwargs):
+        content = args + tuple(kwargs.pop('content', ()))
         return self._tag('ol', content, **kwargs)
 
-    def ul(self, *content, **kwargs):
+    def ul(self, *args, **kwargs):
+        content = args + tuple(kwargs.pop('content', ()))
         return self._tag('ul', content, **kwargs)
 
     def li(self, content, **kwargs):
         return self._tag('li', content, **kwargs)
 
-    def dl(self, *content, **kwargs):
+    def dl(self, *args, **kwargs):
+        content = args + tuple(kwargs.pop('content', ()))
         return self._tag('dl', content, **kwargs)
 
     def dt(self, content, **kwargs):
