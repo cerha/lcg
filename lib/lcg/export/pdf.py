@@ -1460,7 +1460,13 @@ class MarkedText(TextContainer):
     def export(self, context):
         return super(MarkedText, self).export(context)
     def _export(self, context):
+        pdf_context = context.pdf_context
+        in_paragraph = pdf_context.in_paragraph
+        if not in_paragraph:
+            pdf_context.in_paragraph = True
         exported = super(MarkedText, self)._export(context)
+        if not in_paragraph:
+            pdf_context.in_paragraph = in_paragraph
         start_mark = self.tag
         for k, v in self.attributes.items():
             start_mark += ' %s="%s"' % (k, v,)
