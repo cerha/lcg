@@ -1958,7 +1958,7 @@ class InlineImage(Text):
             return ''
         filename = image.src_file()
         if filename:
-            align = image.align
+            align = self.align
             if align is None:
                 alignment = ''
             else:
@@ -1969,14 +1969,13 @@ class InlineImage(Text):
                            lcg.InlineImage.MIDDLE: 'valign="center"',
                            }
                 alignment = ' ' + mapping[align]
-            size = image.size
+            size = self.size
             if size is None:
                 width = height = ''
             else:
                 dpi = 96.0
                 width = ' %sin' % (size[0] / dpi,)
                 height = ' %sin' % (size[1] / dpi,)
-            raise Exception('debug-ok')
             result = u'<img src="%s"%s%s%s/>' % (filename, alignment, width, height,)
         else:
             result = image.title() or image.filename()
