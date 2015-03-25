@@ -1997,7 +1997,7 @@ class Image(Element):
         super(Image, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.align is None or isinstance(self.align, str), self.align
-        assert self.size is None or isinstance(self.size, tuple) and len(self.size, 2) and \
+        assert self.size is None or isinstance(self.size, tuple) and len(self.size) == 2 and \
             isinstance(self.size[0], int) and isinstance(self.size[1], int), self.size
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
