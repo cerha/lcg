@@ -723,6 +723,7 @@ class Context(object):
         Context.bullet_indent = 0
         Context.last_element_category = None
         Context.in_paragraph = False
+        Context.anchor_prefix = ''
 
     def _find_font_file(self, name, family, bold, italic, lang):
         if name is None:
@@ -2402,7 +2403,14 @@ class PDFExporter(FileExporter, Exporter):
         presentation = pdf_context.current_presentation()
         exported_structure = []
         first_subcontext = None
-        for n in node.linear():
+        subnodes = node.linear()
+        if len(subnodes) > 1:
+            init_heading_level = 1
+            context_heading_level = 2
+        else:
+            init_heading_level = 0
+            context_heading_level = 1
+        for n in subnodes:
             node_id = n.id()
             if node_id[:7] == '__dummy':
                 continue
@@ -2422,6 +2430,8 @@ class PDFExporter(FileExporter, Exporter):
                         presentation_set=context.presentation(),
                         lang=lang)
             subcontext.pdf_context.add_presentation(n.presentation(lang))
+            subcontext.pdf_context.heading_level = context_heading_level
+            subcontext.pdf_context.anchor_prefix = node_id + '-'
             # The subcontext serves twice: 1. when exporting node content;
             # 2. when exporting to ReportLab.  The question is how to transfer
             # the subcontext to the proper place in ReportLab formatting.  This
@@ -2434,7 +2444,7 @@ class PDFExporter(FileExporter, Exporter):
                 exported_structure.append(new_document)
             if n.title().strip():
                 title = subcontext.exporter().export_element(subcontext, n.heading())
-                exported_heading = make_element(Heading, content=[title], level=0)
+                exported_heading = make_element(Heading, content=[title], level=init_heading_level)
                 exported_structure.append(exported_heading)
             exported = n.content().export(subcontext)
             if isinstance(exported, (tuple, list,)):
@@ -2528,7 +2538,10 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(PreformattedText, content=element.text())
         
     def _export_anchor(self, context, element):
-        return make_element(LinkTarget, content=element.text(), name=element.anchor())
+        anchor = element.anchor()
+        if anchor:
+            anchor = context.pdf_context.anchor_prefix + anchor
+        return make_element(LinkTarget, content=element.text(), name=anchor)
     
     def _export_new_page(self, context, element):
         return make_element(PageBreak)
@@ -2652,6 +2665,8 @@ class PDFExporter(FileExporter, Exporter):
                 content = make_element(Text, content=target.title() or target.uri())
         # TODO: Show link (or target) 'descr()' as a tooltip or something similar (see html export).
         uri = context.uri(target)
+        if uri and uri[0] == '#':
+            uri = '#' + context.pdf_context.anchor_prefix + uri[1:]
         if isinstance(content, Container):
             def filter_(c):
                 if isinstance(c, Text):
@@ -2696,12 +2711,14 @@ class PDFExporter(FileExporter, Exporter):
             return False
         anchor = element.anchor(context)
         if anchor:
+            anchor = context.pdf_context.anchor_prefix + anchor
             def make_link_target(content):
                 return make_element(LinkTarget, name=anchor, content=content.content,
                                     style=content.style, halign=content.halign)
             update_text(content, make_link_target)
         backref = element.backref()
         if backref:
+            backref = context.pdf_context.anchor_prefix + backref
             def make_backref(content):
                 make_element(lcg.Link, uri=("#" + backref), content=content.content,
                              style=content.style, halign=content.halign)
