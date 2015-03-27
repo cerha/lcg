@@ -2391,7 +2391,7 @@ class PDFExporter(FileExporter, Exporter):
         exported_structure = []
         first_subcontext = None
         subnodes = node.linear()
-        if len(subnodes) > 1:
+        if len([n for n in subnodes if n.id() != '__dummy']) > 1:
             init_heading_level = 1
             context_heading_level = 2
         else:
