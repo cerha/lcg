@@ -671,6 +671,7 @@ class Context(object):
         self._normal_style.bulletFontSize = self._normal_style.fontSize
         self.adjust_style_leading(self._normal_style)
         self._normal_style.firstLineIndent = self._normal_style.leading
+        self._normal_style.autoLeading = 'max'
         # Code
         self._code_style = copy.copy(self._styles['Code'])
         self._code_style.fontName = self.font(None, FontFamily.FIXED_WIDTH, False, False)
@@ -1302,8 +1303,7 @@ class Element(object):
         if isinstance(content, Container) and len(content.content) == 1:
             element = content.content[0]
             if isinstance(element, Image):
-                return make_element(InlineImage, image=element.image, align=element.align,
-                                    size=element.size)
+                return make_element(InlineImage, image=element.image, align=element.align)
             elif isinstance(element, Container):
                 return self._wrapped_image(element)
             else:
@@ -1944,14 +1944,11 @@ class InlineImage(Text):
     
     """
     align = None
-    size = None
     def init(self):
         self.content = ''
         super(InlineImage, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.align is None or isinstance(self.align, str), self.align
-        assert self.size is None or isinstance(self.size, tuple) and len(self.size, 2) and \
-            isinstance(self.size[0], int) and isinstance(self.size[1], int), self.size
     def _export(self, context):
         image = self.image
         if image is None:
@@ -1961,7 +1958,7 @@ class InlineImage(Text):
         if filename:
             align = self.align
             if align is None:
-                alignment = ''
+                alignment = ' valign="text-top"'
             else:
                 mapping = {lcg.InlineImage.LEFT: 'halign="left"',
                            lcg.InlineImage.RIGHT: 'halign="right"',
@@ -1970,14 +1967,7 @@ class InlineImage(Text):
                            lcg.InlineImage.MIDDLE: 'valign="center"',
                            }
                 alignment = ' ' + mapping[align]
-            size = self.size
-            if size is None:
-                width = height = ''
-            else:
-                dpi = 96.0
-                width = ' %sin' % (size[0] / dpi,)
-                height = ' %sin' % (size[1] / dpi,)
-            result = u'<img src="%s"%s%s%s/>' % (filename, alignment, width, height,)
+            result = u'<img src="%s"%s/>' % (filename, alignment,)
         else:
             result = image.title() or image.filename()
         return result
@@ -1993,13 +1983,10 @@ class Image(Element):
     uri = None
     filename = None
     align = None
-    size = None
     def init(self):
         super(Image, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.align is None or isinstance(self.align, str), self.align
-        assert self.size is None or isinstance(self.size, tuple) and len(self.size) == 2 and \
-            isinstance(self.size[0], int) and isinstance(self.size[1], int), self.size
         assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
         assert self.filename is None or isinstance(self.filename, basestring), \
@@ -2867,7 +2854,7 @@ class PDFExporter(FileExporter, Exporter):
         image = element.image(context)
         filename = self._get_resource_path(context, image)
         return make_element(Image, image=image, text=element.title(),
-                            align=element.align(), size=element.size(), filename=filename)
+                            align=element.align(), filename=filename)
 
     # Special constructs
 
