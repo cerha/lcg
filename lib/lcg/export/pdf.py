@@ -22,8 +22,12 @@ import cStringIO
 import inspect
 import os
 import re
+import shutil
 import string
+import subprocess
 import sys
+import tempfile
+import xml.etree.ElementTree
 
 import reportlab.lib.colors
 import reportlab.lib.enums
@@ -32,6 +36,7 @@ import reportlab.lib.pagesizes
 import reportlab.lib.sequencer
 import reportlab.lib.styles
 import reportlab.lib.units
+import reportlab.lib.utils
 import reportlab.pdfbase.pdfmetrics
 import reportlab.pdfbase.ttfonts
 import reportlab.pdfgen
@@ -44,6 +49,8 @@ from lcg import FontFamily, UMm, UPoint, UFont, USpace, UAny, HorizontalAlignmen
 from export import Exporter, FileExporter
 
 _ = lcg.TranslatableTextFactory('lcg')
+
+MATHML_FORMATTER = 'jeuclid-cli'
 
 class PageTemplate(reportlab.platypus.PageTemplate):
     pass
@@ -660,7 +667,12 @@ class Context(object):
                 self._page_footer = parent_context.page_footer()
         self._relative_font_size = 1
         self._export_notes = []
-
+        self._tempdir = None
+        
+    def __del__(self):
+        if self._tempdir is not None:
+            shutil.rmtree(self._tempdir, ignore_errors=True)
+            
     def _init_styles(self):
         self._styles = reportlab.lib.styles.getSampleStyleSheet()
         # Normal
@@ -1196,6 +1208,12 @@ class Context(object):
         """Remove the last export note from the notes stack."""
         self._export_notes.pop()
 
+    def tempdir(self):
+        "Return directory to use for storing temporary data."
+        if self._tempdir is None:
+            self._tempdir = tempfile.mkdtemp()
+        return self._tempdir
+    
 def _ok_export_result(result):
     if not isinstance(result, (tuple, list,)) or not result:
         return True
@@ -2859,8 +2877,29 @@ class PDFExporter(FileExporter, Exporter):
     # Special constructs
 
     def _export_mathml(self, context, element):
-        # Just a stub to prevent crashes on MathML elements
-        xml_tree = element.tree_content()
-        annotation = xml_tree.findtext('*/annotation')
-        text = annotation or element.content()
-        return make_element(TextContainer, content=[make_element(Text, content=text)])
+        # We have to fix mstyle attribute problem of the CMS editor first,
+        # otherwise some parts or the whole element may not be rendered.
+        root = element.tree_content()
+        for node in root.iter('mstyle'):
+            for n, v in node.items():
+                if v == '':
+                    del node.attrib[n]
+        tree = xml.etree.ElementTree.ElementTree(root)
+        # Let's try MathML rendering
+        tempdir = tempfile.mkdtemp(dir=context.pdf_context.tempdir())
+        tempfile_mml = os.path.join(tempdir, 'math.mml')
+        tempfile_png = os.path.join(tempdir, 'math.png')
+        tree.write(tempfile_mml, encoding='utf-8')
+        font_size = context.pdf_context.normal_style().fontSize
+        result = subprocess.call([MATHML_FORMATTER, tempfile_mml, tempfile_png,
+                                  '-fontSize', str(font_size)])
+        if result == 0:
+            image = lcg.Image(tempfile_png, src_file=tempfile_png)
+            result = make_element(InlineImage, image=image)
+        else:
+            # If it doesn't work then use the fallback mechanism
+            xml_tree = element.tree_content()
+            annotation = xml_tree.findtext('*/annotation')
+            text = annotation or element.content()
+            result = make_element(TextContainer, content=[make_element(Text, content=text)])
+        return result
