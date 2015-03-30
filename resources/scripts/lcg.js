@@ -607,49 +607,12 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     
 });
 
-lcg.PopupMenu = Class.create(lcg.Menu, {
-    // Popup menu widget.
-    _CSS_CLASS: 'popup-menu-widget',
-    
-    initialize: function ($super, items) {
-	// items -- array of menu items.  Each item is an object with the
-	// following attributes:
-	//   label -- item title (string)
-	//   tooltip -- item description/tooltip (string, optional)
-	//   uri -- URI where the item points to (string, optional)
-	//   enabled -- if present and false, the item will be disabled (inactive)
-        //   callback -- The JavaScript function to be called on item invocation.
-        //     May be passed also as a string (function of given name will be 
-	//     looked up in the current JavaScript name space).  The callback
-        //     function will be called with the element on which the menu was
-        //     invoked as the first argument.  Additional arguments may be
-        //     optionally specified by 'callback_args'.
-        //   callback_args -- Array of additional arguments to pass to the callback function
-	// You will typically supply either uri or callback, but both can be used.
-	var i, item, a, enabled;
-	var ul = new Element('ul', {'role': 'presentation'});
-	for (i = 0; i < items.length; i++) {
-	    item = items[i];
-	    a = new Element('a', {'href': '#', 'onclick': 'return false;'});
-	    if (item.tooltip) {
-		a.setAttribute('title', item.tooltip);
-	    }
-	    a._lcg_popup_menu_item_spec = item;
-	    a.update(item.label);
-	    enabled = (item.enabled === undefined || item.enabled);
-	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
-	}
-	var menu = new Element('div', {'role': 'menu',
-				       'class': this._CSS_CLASS,
-				       'style': 'display: none'});
-	menu.update(ul);
-	$(document.body).insert(menu);
-	$super(menu);
-    },
 
-    init_item: function ($super, item, prev, parent) {
-	$super(item, prev, parent);
-	item.setAttribute('role', 'menuitem');
+lcg.PopupMenuBase = Class.create(lcg.Menu, {
+
+    initialize: function ($super, element) {
+	$super(element);
+	this.ignore_next_click = false;
     },
 
     keymap: function () {
@@ -662,42 +625,8 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	};
     },
 
-    cmd_activate: function (item) {
-	var li = item.up('li');
-	var spec, namespaces, func, context, i, args;
-	if (li.hasClassName('active')) {
-	    this.remove();
-	    spec = item._lcg_popup_menu_item_spec;
-	    var callback = spec.callback;
-	    if (callback) {
-		if (typeof callback === 'string') {
-		    namespaces = callback.split(".");
-		    func = namespaces.pop();
-		    context = window;
-		    for (i = 0; i < namespaces.length; i++) {
-			context = context[namespaces[i]];
-		    }
-		    callback = context[func];
-		}
-		args = [this.popup_element];
-		if (spec.callback_args) {
-		    for (i = 0; i < spec.callback_args.length; i++) {
-			args[i + 1] = spec.callback_args[i];
-		    }
-		}
-		return callback.apply(this, args);
-	    }
-	    if (spec.uri) {
-		self.location = spec.uri;
-	    }
-	}
-    },
-
     cmd_quit: function (item) {
-	this.remove();
-	if (this.popup_element) {
-	    this.set_focus(this.popup_element);
-	}
+	this.dismiss();
     },
 
     on_document_click: function (event) {
@@ -707,15 +636,15 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    return;
 	}
 	var outside = event.findElement('div') !== this.element;
-	this.remove();
+	this.dismiss();
 	if (outside) {
 	    event.stop();
 	}
     },
     
-    show: function (element, x, y, direction, selected_item_index) {
+    popup: function (element, x, y, direction, selected_item_index) {
 	if (lcg.popup_menu) {
-	    lcg.popup_menu.remove();
+	    lcg.popup_menu.dismiss();
 	}
 	lcg.popup_menu = this;
 	this.popup_element = element;
@@ -752,7 +681,97 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	$(document).observe('click', this.on_click_handler);
     },
 
-    popup: function (event, selected_item_index) {
+    dismiss: function() {
+	$(document).stopObserving('click', this.on_click_handler);
+	lcg.popup_menu = null;
+	var element = this.popup_element;
+	if (element) {
+	    element.setAttribute('aria-expanded', 'false')
+	    this.set_focus(element);
+	}
+    }
+
+});
+
+lcg.popup_menu = null;
+
+
+lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
+    // Popup menu widget.
+    
+    initialize: function ($super, items) {
+	// items -- array of menu items.  Each item is an object with the
+	// following attributes:
+	//   label -- item title (string)
+	//   tooltip -- item description/tooltip (string, optional)
+	//   uri -- URI where the item points to (string, optional)
+	//   enabled -- if present and false, the item will be disabled (inactive)
+        //   callback -- The JavaScript function to be called on item invocation.
+        //     May be passed also as a string (function of given name will be 
+	//     looked up in the current JavaScript name space).  The callback
+        //     function will be called with the element on which the menu was
+        //     invoked as the first argument.  Additional arguments may be
+        //     optionally specified by 'callback_args'.
+        //   callback_args -- Array of additional arguments to pass to the callback function
+	// You will typically supply either uri or callback, but both can be used.
+	var i, item, a, enabled;
+	var ul = new Element('ul', {'role': 'presentation'});
+	for (i = 0; i < items.length; i++) {
+	    item = items[i];
+	    a = new Element('a', {'href': '#', 'onclick': 'return false;'});
+	    if (item.tooltip) {
+		a.setAttribute('title', item.tooltip);
+	    }
+	    a._lcg_popup_menu_item_spec = item;
+	    a.update(item.label);
+	    enabled = (item.enabled === undefined || item.enabled);
+	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
+	}
+	var menu = new Element('div', {'role': 'menu',
+				       'class': 'popup-menu-widget',
+				       'style': 'display: none'});
+	menu.update(ul);
+	$(document.body).insert(menu);
+	$super(menu);
+    },
+
+    init_item: function ($super, item, prev, parent) {
+	$super(item, prev, parent);
+	item.setAttribute('role', 'menuitem');
+    },
+
+    cmd_activate: function (item) {
+	var li = item.up('li');
+	var spec, namespaces, func, context, i, args;
+	if (li.hasClassName('active')) {
+	    this.dismiss();
+	    spec = item._lcg_popup_menu_item_spec;
+	    var callback = spec.callback;
+	    if (callback) {
+		if (typeof callback === 'string') {
+		    namespaces = callback.split(".");
+		    func = namespaces.pop();
+		    context = window;
+		    for (i = 0; i < namespaces.length; i++) {
+			context = context[namespaces[i]];
+		    }
+		    callback = context[func];
+		}
+		args = [this.popup_element];
+		if (spec.callback_args) {
+		    for (i = 0; i < spec.callback_args.length; i++) {
+			args[i + 1] = spec.callback_args[i];
+		    }
+		}
+		return callback.apply(this, args);
+	    }
+	    if (spec.uri) {
+		self.location = spec.uri;
+	    }
+	}
+    },
+
+    popup: function ($super, event, selected_item_index) {
 	// event -- JavaScript event triggering the popup -- either a mouse
 	//   action catched by 'contextmenu' handler or mouse/keyboard action
 	//   catched by 'click' handler.
@@ -781,20 +800,83 @@ lcg.PopupMenu = Class.create(lcg.Menu, {
 	    direction = 'down';
 	}
 	this.ignore_next_click = !event.isLeftClick();
-	this.show(element, x, y, direction, selected_item_index);
+	$super(element, x, y, direction, selected_item_index);
     },
 
-    remove: function() {
-	$(document).stopObserving('click', this.on_click_handler);
+    dismiss: function($super) {
+	$super();
 	this.element.remove();
-	lcg.popup_menu = null;
     }
 
 });
 
-lcg.DropDownSelection = Class.create(lcg.PopupMenu, {
+lcg.DropDownSelection = Class.create(lcg.PopupMenuBase, {
 
-    _CSS_CLASS: 'dropdown-selection-widget',
+    initialize: function ($super, element_id, button_id, activation_callback,
+			  get_selected_item_index) {
+	if (get_selected_item_index === undefined) {
+	    get_selected_item_index = function () { return 0 };
+	}
+	$super(element_id);
+	this.activation_callback = activation_callback;
+	this.get_selected_item_index = get_selected_item_index;
+	this.element.setAttribute('role', 'listbox');
+	var button = $(button_id);
+	this.button = button;
+	button.setAttribute('tabindex', '0');
+	button.setAttribute('role', 'button');
+        button.setAttribute('aria-haspopup', 'true');
+	button.setAttribute('aria-expanded', 'false');
+        button.setAttribute('aria-controls', this.element.getAttribute('id'));
+      	button.on('click', this.on_button_click.bind(this));
+      	button.on('keydown', this.on_button_key_down.bind(this));
+    },
+	
+    on_button_key_down: function(event) {
+	var key = this.event_key(event);
+	if (key === 'Enter' || key === 'Space' || key === 'Alt-Down') {
+	    this.dropdown()
+	    event.stop();
+	}
+    },
+
+    on_button_click: function(event) {
+	event.stop();
+	if (this.button.getAttribute('aria-expanded') === 'true') {
+	    this.dismiss();
+	} else {
+	    this.dropdown();
+	}
+    },
+
+    cmd_activate: function (item) {
+	this.dismiss();
+	this.activation_callback(item);
+    },
+
+    keymap: function () {
+	return {
+	    'Up':     this.cmd_prev,
+	    'Down':   this.cmd_next,
+	    'Enter':  this.cmd_activate,
+	    'Space':  this.cmd_activate,
+	    'Escape': this.cmd_quit
+	};
+    },
+
+    init_items: function ($super, ul, parent) {
+	var items = $super(ul, parent);
+	ul.setAttribute('role', 'presentation');
+	return items;
+    },
+
+    init_item: function ($super, item, prev, parent) {
+	$super(item, prev, parent);
+	item.setAttribute('role', 'option');
+	item.on('mouseover', function (event) {
+	    this.select_item(event.element());
+	}.bind(this));
+    },
 
     select_item: function ($super, item) {
 	var previously_selected_item = this.selected_item();
@@ -803,27 +885,33 @@ lcg.DropDownSelection = Class.create(lcg.PopupMenu, {
 	    previously_selected_item.up('li').removeClassName('selected');
 	}
 	item.up('li').addClassName('selected');
+	item.focus();
     },
 
-    dropdown: function(element, selected_item_index) {
-	var offset = element.cumulativeOffset();
-	var x = offset.left;
-	var y = offset.top + element.getHeight();
-	var direction;
+    dropdown: function() {
+	var y, direction;
 	var menu = this.element;
 	var viewport = document.viewport.getDimensions();
 	var scroll_offset = document.viewport.getScrollOffsets();
 	var height = menu.getHeight();
-	if (y + height > viewport.height + scroll_offset.top && offset.top > height) {
-	    y = offset.top;
+	var offset = this.button.cumulativeOffset().top;
+	if (offset + this.button.getHeight() + height > viewport.height + scroll_offset.top && offset > height) {
+	    y = 0;
 	    direction = 'up';
 	} else {
+	    y = this.button.getHeight();
 	    direction = 'down';
 	}
 	var padding = menu.getWidth() - menu.getLayout().get('width');
-	menu.setStyle({width: element.getWidth() - padding + 'px'});
-	this.ignore_next_click = false; //!event.isLeftClick();
-	this.show(element, x, y, direction, selected_item_index);
+	menu.setStyle({width: this.button.getWidth() - padding + 'px'});
+	this.popup(this.button, 0, y, direction, this.get_selected_item_index());
+	this.button.setAttribute('aria-expanded', 'true');
+    },
+
+    dismiss: function($super) {
+	$super();
+	this.element.hide();
+	this.button.setAttribute('aria-expanded', 'false');
     }
 
 });
@@ -892,9 +980,9 @@ lcg.Tooltip = Class.create({
 			this.show(this.show_when_ready[0], this.show_when_ready[1]);
 		    }
 		} catch (e) {
-		    // Errors in asynchronous handlers are otherwise silently
-		    // ignored.  This will only work in Firefox with Firebug,
-		    // but it is only useful for debugging anyway...
+		    // Errors in asynchronous handlers are otherwise silently ignored.
+		    // Calling console.log will raise error in some browsers but there
+		    // is a problem anyway and it helps debugging...
 		    console.log(e);
 		}
 	    }.bind(this)
@@ -1048,8 +1136,6 @@ lcg.Cookies = Class.create({
 });
 
 lcg.cookies = new lcg.Cookies();
-
-lcg.popup_menu = null;
 
 lcg.widget_instance = function(element) {
     /* Return a JavaScript widget instance for given DOM element or null.
