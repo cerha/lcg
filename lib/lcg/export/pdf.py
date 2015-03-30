@@ -1962,11 +1962,13 @@ class InlineImage(Text):
     
     """
     align = None
+    resize = None
     def init(self):
         self.content = ''
         super(InlineImage, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.align is None or isinstance(self.align, str), self.align
+        assert self.resize is None or isinstance(self.resize, float), self.resize
     def _export(self, context):
         image = self.image
         if image is None:
@@ -1985,7 +1987,15 @@ class InlineImage(Text):
                            lcg.InlineImage.MIDDLE: 'valign="center"',
                            }
                 alignment = ' ' + mapping[align]
-            result = u'<img src="%s"%s/>' % (filename, alignment,)
+            resize = self.resize
+            if resize is None:
+                size = ''
+            else:
+                img = reportlab.lib.utils.ImageReader(filename)
+                width, height = img.getSize()
+                width, height = width * resize, height * resize
+                size = ' width="%s" height="%s"' % (width, height,)
+            result = u'<img src="%s"%s%s/>' % (filename, alignment, size,)
         else:
             result = image.title() or image.filename()
         return result
@@ -2891,11 +2901,12 @@ class PDFExporter(FileExporter, Exporter):
         tempfile_png = os.path.join(tempdir, 'math.png')
         tree.write(tempfile_mml, encoding='utf-8')
         font_size = context.pdf_context.normal_style().fontSize
+        scale = 2
         result = subprocess.call([MATHML_FORMATTER, tempfile_mml, tempfile_png,
-                                  '-fontSize', str(font_size)])
+                                  '-fontSize', str(font_size * scale)])
         if result == 0:
             image = lcg.Image(tempfile_png, src_file=tempfile_png)
-            result = make_element(InlineImage, image=image)
+            result = make_element(InlineImage, image=image, resize=(1.0 / scale))
         else:
             # If it doesn't work then use the fallback mechanism
             xml_tree = element.tree_content()
