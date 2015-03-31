@@ -2888,7 +2888,30 @@ class PDFExporter(FileExporter, Exporter):
 
     # Special constructs
 
+    _simple_annotation_regexp = re.compile('^[- 0-9.,a-zA-Z+=()]+$')
     def _export_mathml(self, context, element):
+        # For simple cases, use just annotation (it's faster and may look better)
+        xml_tree = element.tree_content()
+        annotation = xml_tree.findtext('*/annotation')
+        if annotation is not None:
+            annotation = annotation.strip()
+            if self._simple_annotation_regexp.match(annotation):
+                i = 0
+                l = len(annotation)
+                content = []
+                while i < l:
+                    j = i
+                    while j < l and annotation[j] in string.ascii_letters:
+                        j += 1
+                    if j > i:
+                        content.append(make_marked_text(annotation[i:j], tag='i'))
+                        i = j
+                    while j < l and annotation[j] not in string.ascii_letters:
+                        j += 1
+                    if j > i:
+                        content.append(make_element(Text, content=annotation[i:j]))
+                        i = j
+                return make_element(TextContainer, content=content)
         # We have to fix mstyle attribute problem of the CMS editor first,
         # otherwise some parts or the whole element may not be rendered.
         root = element.tree_content()
@@ -2926,8 +2949,6 @@ class PDFExporter(FileExporter, Exporter):
             result = make_element(InlineImage, image=image, resize=(1.0 / scale), align=shift)
         else:
             # If rendering doesn't work then use the fallback mechanism
-            xml_tree = element.tree_content()
-            annotation = xml_tree.findtext('*/annotation')
             text = annotation or element.content()
             result = make_element(TextContainer, content=[make_element(Text, content=text)])
         return result
