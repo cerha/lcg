@@ -1967,7 +1967,7 @@ class InlineImage(Text):
         self.content = ''
         super(InlineImage, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
-        assert self.align is None or isinstance(self.align, str), self.align
+        assert self.align is None or isinstance(self.align, (str, int, float,)), self.align
         assert self.resize is None or isinstance(self.resize, float), self.resize
     def _export(self, context):
         image = self.image
@@ -1979,6 +1979,8 @@ class InlineImage(Text):
             align = self.align
             if align is None:
                 alignment = ' valign="text-top"'
+            elif isinstance(align, (int, float,)):
+                alignment = ' valign="%s"' % (align,)
             else:
                 mapping = {lcg.InlineImage.LEFT: 'halign="left"',
                            lcg.InlineImage.RIGHT: 'halign="right"',
@@ -2901,14 +2903,19 @@ class PDFExporter(FileExporter, Exporter):
         tempfile_png = os.path.join(tempdir, 'math.png')
         tree.write(tempfile_mml, encoding='utf-8')
         font_size = context.pdf_context.normal_style().fontSize
-        scale = 2
+        scale = 2.0
         result = subprocess.call([MATHML_FORMATTER, tempfile_mml, tempfile_png,
                                   '-fontSize', str(font_size * scale)])
         if result == 0:
             image = lcg.Image(tempfile_png, src_file=tempfile_png)
-            result = make_element(InlineImage, image=image, resize=(1.0 / scale))
+            import PIL.Image
+            pil_image = PIL.Image.open(tempfile_png)
+            height = pil_image.size[1] / scale
+            # There is some magic in the vertical positioning, we try some wild guess here
+            shift = min(0, font_size - height - 2.5)
+            result = make_element(InlineImage, image=image, resize=(1.0 / scale), align=shift)
         else:
-            # If it doesn't work then use the fallback mechanism
+            # If rendering doesn't work then use the fallback mechanism
             xml_tree = element.tree_content()
             annotation = xml_tree.findtext('*/annotation')
             text = annotation or element.content()
