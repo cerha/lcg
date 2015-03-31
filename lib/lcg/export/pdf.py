@@ -2902,10 +2902,20 @@ class PDFExporter(FileExporter, Exporter):
         tempfile_mml = os.path.join(tempdir, 'math.mml')
         tempfile_png = os.path.join(tempdir, 'math.png')
         tree.write(tempfile_mml, encoding='utf-8')
-        font_size = context.pdf_context.normal_style().fontSize
+        style = context.pdf_context.normal_style()
+        font_size = style.fontSize
         scale = 2.0
-        result = subprocess.call([MATHML_FORMATTER, tempfile_mml, tempfile_png,
-                                  '-fontSize', str(font_size * scale)])
+        args = [tempfile_mml, tempfile_png, '-fontSize', str(font_size * scale)]
+        font_name = style.fontName
+        if font_name is not None and font_name.startswith('DejaVu'):
+            args.extend(['-fontsMonospaced', 'DejaVuSansMono',
+                         '-fontsSansSerif', 'DejaVuSans',
+                         '-fontsSerif', 'DejaVuSerif'])
+        else:
+            args.extend(['-fontsMonospaced', 'FreeMono',
+                         '-fontsSansSerif', 'FreeSans',
+                         '-fontsSerif', 'FreeSerif'])
+        result = subprocess.call([MATHML_FORMATTER] + args)
         if result == 0:
             image = lcg.Image(tempfile_png, src_file=tempfile_png)
             import PIL.Image
