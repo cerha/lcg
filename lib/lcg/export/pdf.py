@@ -641,7 +641,7 @@ class Context(object):
     """
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
                  page_header=None, page_footer=None, page_background=None, presentation=None,
-                 presentation_set=None, lang=None):
+                 presentation_set=None, page_size=None, lang=None):
         self._lang = lang
         self._presentations = []
         self._init_fonts()
@@ -656,6 +656,7 @@ class Context(object):
         self._page_header = page_header
         self._page_footer = page_footer
         self._page_background = page_background
+        self._page_size = page_size
         self._presentation_set = presentation_set
         self._styled_presentations = []
         if parent_context is not None:
@@ -736,6 +737,7 @@ class Context(object):
         Context.bullet_indent = 0
         Context.last_element_category = None
         Context.in_paragraph = False
+        Context.in_figure = False
         Context.anchor_prefix = ''
 
     def _find_font_file(self, name, family, bold, italic, lang):
@@ -1170,6 +1172,10 @@ class Context(object):
     def page_background(self):
         """Return page background markup."""
         return self._page_background
+
+    def page_size(self):
+        "Return page width and height in points."
+        return self._page_size
 
     def relative_font_size(self):
         """Return global font size coefficient."""
@@ -1963,39 +1969,52 @@ class InlineImage(Text):
     """
     align = None
     resize = None
+    filename = None
     def init(self):
         self.content = ''
         super(InlineImage, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.align is None or isinstance(self.align, (str, int, float,)), self.align
         assert self.resize is None or isinstance(self.resize, float), self.resize
+        assert self.filename is None or isinstance(self.filename, basestring), \
+            ('type error', self.filename,)
     def _export(self, context):
         image = self.image
         if image is None:
             context.log(_("Missing image: %s", self.uri), kind=lcg.ERROR)
             return ''
         filename = image.src_file()
+        if not filename:
+            filename = self.filename
         if filename:
             align = self.align
-            if align is None:
+            if align in (None, lcg.InlineImage.LEFT, lcg.InlineImage.RIGHT,):
                 alignment = ' valign="text-top"'
             elif isinstance(align, (int, float,)):
                 alignment = ' valign="%s"' % (align,)
             else:
-                mapping = {lcg.InlineImage.LEFT: 'halign="left"',
-                           lcg.InlineImage.RIGHT: 'halign="right"',
-                           lcg.InlineImage.TOP: 'valign="top"',
+                mapping = {lcg.InlineImage.TOP: 'valign="top"',
                            lcg.InlineImage.BOTTOM: 'valign="bottom"',
                            lcg.InlineImage.MIDDLE: 'valign="center"',
                            }
                 alignment = ' ' + mapping[align]
             resize = self.resize
             if resize is None:
+                resize = 1
+            if resize is None:
                 size = ''
             else:
                 img = reportlab.lib.utils.ImageReader(filename)
-                width, height = img.getSize()
-                width, height = width * resize, height * resize
+                img_width, img_height = img.getSize()
+                width, height = img_width * resize, img_height * resize
+                page_width, page_height = context.pdf_context.page_size()
+                max_width, max_height = page_width / 2.0, page_height / 2.0
+                if width > max_width:
+                    height *= (max_width / width)
+                    width = max_width
+                if height > max_height:
+                    width *= (max_height / height)
+                    height = max_height
                 size = ' width="%s" height="%s"' % (width, height,)
             result = u'<img src="%s"%s%s/>' % (filename, alignment, size,)
         else:
@@ -2417,6 +2436,25 @@ class PDFExporter(FileExporter, Exporter):
                     presentation_set=presentation_set,
                     lang=lang)
         presentation = pdf_context.current_presentation()
+        page_size = reportlab.lib.pagesizes.A4
+        if presentation and presentation.landscape:
+            page_size = reportlab.lib.pagesizes.landscape(page_size)
+        else:
+            page_size = reportlab.lib.pagesizes.portrait(page_size)
+        def presentation_size(attr, default=(10 * reportlab.lib.units.mm)):
+            try:
+                size = getattr(global_presentation, attr)
+                if isinstance(size, UMm):
+                    points = size.size() * reportlab.lib.units.mm
+                elif isinstance(size, UPoint):
+                    points = size.size()
+                else:
+                    points = default
+            except:
+                points = default
+            return points
+        page_size = (presentation_size('page_width', default=page_size[0]),
+                     presentation_size('page_height', default=page_size[1]),)
         exported_structure = []
         first_subcontext = None
         subnodes = node.linear()
@@ -2444,6 +2482,7 @@ class PDFExporter(FileExporter, Exporter):
                         page_background=n.page_background(lang),
                         presentation=presentation,
                         presentation_set=context.presentation(),
+                        page_size=page_size,
                         lang=lang)
             subcontext.pdf_context.add_presentation(n.presentation(lang))
             subcontext.pdf_context.heading_level = context_heading_level
@@ -2481,25 +2520,6 @@ class PDFExporter(FileExporter, Exporter):
                 sys.stderr.write("  #%s\n" % (a,))
             return ''
         output = cStringIO.StringIO()
-        page_size = reportlab.lib.pagesizes.A4
-        if presentation and presentation.landscape:
-            page_size = reportlab.lib.pagesizes.landscape(page_size)
-        else:
-            page_size = reportlab.lib.pagesizes.portrait(page_size)
-        def presentation_size(attr, default=(10 * reportlab.lib.units.mm)):
-            try:
-                size = getattr(global_presentation, attr)
-                if isinstance(size, UMm):
-                    points = size.size() * reportlab.lib.units.mm
-                elif isinstance(size, UPoint):
-                    points = size.size()
-                else:
-                    points = default
-            except:
-                points = default
-            return points
-        page_size = (presentation_size('page_width', default=page_size[0]),
-                     presentation_size('page_height', default=page_size[1]),)
         doc = DocTemplate(output, pagesize=page_size,
                           leftMargin=presentation_size('left_margin'),
                           rightMargin=presentation_size('right_margin'),
@@ -2882,9 +2902,22 @@ class PDFExporter(FileExporter, Exporter):
     def _export_inline_image(self, context, element):
         image = element.image(context)
         filename = self._get_resource_path(context, image)
-        return make_element(Image, image=image, text=element.title(),
-                            align=element.align(), filename=filename)
-
+        kwargs = {}
+        if context.pdf_context.in_figure:
+            class_ = Image
+        else:
+            class_ = InlineImage
+            kwargs['text'] = element.title()
+        return make_element(class_, image=image, align=element.align(), filename=filename, **kwargs)
+    
+    def _export_figure(self, context, element):
+        pdf_context = context.pdf_context
+        in_figure = pdf_context.in_figure
+        pdf_context.in_figure = True
+        result = super(PDFExporter, self)._export_figure(context, element)
+        pdf_context.in_figure = in_figure
+        return result
+    
     # Special constructs
 
     _simple_annotation_regexp = re.compile('^[- 0-9.,a-zA-Z+=()]+$')
