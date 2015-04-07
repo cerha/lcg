@@ -2017,7 +2017,6 @@ class Image(Element):
         super(Image, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
         assert self.align is None or isinstance(self.align, str), self.align
-        assert self.text is None or isinstance(self.text, basestring), ('type error', self.image,)
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
         assert self.filename is None or isinstance(self.filename, basestring), \
             ('type error', self.filename,)
