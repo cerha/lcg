@@ -736,7 +736,7 @@ class Context(object):
         Context.left_indent = 0
         Context.bullet_indent = 0
         Context.last_element_category = None
-        Context.in_paragraph = False
+        Context.in_paragraph = None
         Context.in_figure = False
         Context.anchor_prefix = ''
 
@@ -1448,7 +1448,7 @@ class TextContainer(Text):
         result = u''
         for c in content:
             result += c.export(context)
-        if ((not pdf_context.in_paragraph and
+        if ((pdf_context.in_paragraph is None and
              not all([c.plain_text() for c in content]))):
             style = pdf_context.style()
             style.firstLineIndent = 0
@@ -1487,10 +1487,10 @@ class MarkedText(TextContainer):
     def _export(self, context):
         pdf_context = context.pdf_context
         in_paragraph = pdf_context.in_paragraph
-        if not in_paragraph:
-            pdf_context.in_paragraph = True
+        if in_paragraph is None:
+            pdf_context.in_paragraph = []
         exported = super(MarkedText, self)._export(context)
-        if not in_paragraph:
+        if in_paragraph is None:
             pdf_context.in_paragraph = in_paragraph
         start_mark = self.tag
         for k, v in self.attributes.items():
@@ -1543,8 +1543,8 @@ class Paragraph(Element):
         self.content = list(self.content)
     def _export(self, context, style=None):
         pdf_context = context.pdf_context
-        assert not pdf_context.in_paragraph
-        pdf_context.in_paragraph = True
+        assert pdf_context.in_paragraph is None
+        pdf_context.in_paragraph = []
         halign = self.halign
         current_presentation = pdf_context.current_presentation()
         template_style = style or self._style or pdf_context.normal_style()
@@ -1570,7 +1570,14 @@ class Paragraph(Element):
             exported += c.export(context)
         assert _ok_export_result(exported), ('wrong export', exported,)
         result = reportlab.platypus.Paragraph(exported, style)
-        pdf_context.in_paragraph = False
+        if pdf_context.in_paragraph:
+            image = pdf_context.in_paragraph.pop(0)
+            assert isinstance(image, RLImage), image
+            result = reportlab.platypus.ParagraphAndImage(result, image, side=image.rl_side)
+            if pdf_context.in_paragraph:
+                result = RLContainer(content=([result] + pdf_context.in_paragraph),
+                                     vertical=True, align=pdf_context.in_paragraph[0].rl_side)
+        pdf_context.in_paragraph = None
         return result
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
@@ -1896,11 +1903,11 @@ class List(Element):
             next_pdf_context.last_element_category = 'list-item-start'
             item.prepend_text(bullet)
             if isinstance(item, Text):
-                assert not next_pdf_context.in_paragraph
+                assert next_pdf_context.in_paragraph is None
                 next_pdf_context.in_paragraph = True
             exported = item.export(next_context)
             if isinstance(item, Text):
-                next_pdf_context.in_paragraph = False
+                next_pdf_context.in_paragraph = None
             if isinstance(item, Text):
                 result = [reportlab.platypus.Paragraph(exported, style)]
             elif isinstance(item, Paragraph):
@@ -2016,7 +2023,14 @@ class InlineImage(Text):
                     width *= (max_height / height)
                     height = max_height
                 size = ' width="%s" height="%s"' % (width, height,)
-            result = u'<img src="%s"%s%s/>' % (filename, alignment, size,)
+            if ((isinstance(context.pdf_context.in_paragraph, list) and
+                 align in (lcg.InlineImage.LEFT, lcg.InlineImage.RIGHT,))):
+                rl_image = RLImage(filename, width=width, height=height)
+                rl_image.rl_side = align
+                context.pdf_context.in_paragraph.append(rl_image)
+                result = ''
+            else:
+                result = u'<img src="%s"%s%s/>' % (filename, alignment, size,)
         else:
             result = image.title() or image.filename()
         return result
