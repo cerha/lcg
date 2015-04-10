@@ -1985,6 +1985,8 @@ class InlineImage(Text):
         assert self.resize is None or isinstance(self.resize, float), self.resize
         assert self.filename is None or isinstance(self.filename, basestring), \
             ('type error', self.filename,)
+    def plain_text(self):
+        return False
     def _export(self, context):
         image = self.image
         if image is None:
