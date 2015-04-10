@@ -716,7 +716,7 @@ class InlineImage(_SizedInlineObject):
     BOTTOM = 'bottom'
     MIDDLE = 'middle'
     
-    def __init__(self, image, align=None, **kwargs):
+    def __init__(self, image, align=None, standalone=None, **kwargs):
         """Arguments:
 
           image -- the displayed image as an 'Image' resource instance.
@@ -724,6 +724,7 @@ class InlineImage(_SizedInlineObject):
             one of the constants 'InlineImage.LEFT', 'InlineImage.RIGHT',
             'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
             'None'
+          standalone -- iff true then never put the image inside a paragraph
             
         All other keyword arguments are passed to the parent class constructor.
 
@@ -732,6 +733,7 @@ class InlineImage(_SizedInlineObject):
         assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
         self._image = image
         self._align = align
+        self._standalone = standalone
         super(InlineImage, self).__init__(**kwargs)
 
     def image(self, context):
@@ -746,6 +748,10 @@ class InlineImage(_SizedInlineObject):
     def align(self):
         """Return the value of 'align' as passed to the constructor."""
         return self._align
+
+    def standalone(self):
+        """Return the value of 'standalone' as passed to the constructor."""
+        return self._standalone
     
 
 class InlineAudio(_InlineObject):

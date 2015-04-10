@@ -2919,7 +2919,7 @@ class PDFExporter(FileExporter, Exporter):
         image = element.image(context)
         filename = self._get_resource_path(context, image)
         kwargs = {}
-        if context.pdf_context.in_figure:
+        if element.standalone() or context.pdf_context.in_figure:
             class_ = Image
         else:
             class_ = InlineImage
