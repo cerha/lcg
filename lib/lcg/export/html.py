@@ -24,7 +24,7 @@ import urllib
 
 import lcg
 from lcg import ContentNode, HorizontalAlignment, Resource, Script, Section, \
-    Stylesheet, Translations, concat, is_sequence_of, language_name, log
+    Stylesheet, Translations, concat, is_sequence_of, language_name
 
 from lcg.export import Exporter, FileExporter
 
@@ -104,7 +104,7 @@ class HtmlGenerator(object):
         for name, value in kwargs.items():
             name = name.replace('_', '-')
             if value is not None and value is not False:
-                assert name in valid  or name.startswith('aria-') or name.startswith('data-'), \
+                assert name in valid or name.startswith('aria-') or name.startswith('data-'), \
                     "Invalid attribute '%s' of HTML tag '%s'." % (name, tag)
                 if name == 'cls':
                     name = 'class'
@@ -329,7 +329,7 @@ class HtmlGenerator(object):
 
     def label(self, text, for_=None, **kwargs):
         # The argument for_ may be also used as positional.  It
-        # should to be kept as the second argument in future. 
+        # should to be kept as the second argument in future.
         kwargs['for'] = for_
         return self._tag('label', text, ('for',), **kwargs)
 
@@ -429,8 +429,6 @@ class HtmlGenerator(object):
         return self._tag('noscript', content)
 
     def script_write(self, content, noscript=None, condition=None):
-        #return content
-        #return noscript
         if content:
             c = content.replace('"', '\\"').replace("'", "\\'")
             c = c.replace('</', '<\\/').replace('\n', '\\n')
@@ -487,7 +485,7 @@ class HtmlExporter(Exporter):
 
     class Context(Exporter.Context):
         class IdGenerator(object):
-            """HTML identifier class for the 'id_generator()' method.""" 
+            """HTML identifier class for the 'id_generator()' method."""
             def __init__(self, context):
                 self._context = context
             def __getattr__(self, name):
@@ -681,7 +679,7 @@ class HtmlExporter(Exporter):
                       concat(links, separator=(' ' + g.span('|', cls='sep') + ' ')))
         
     def _language_selection_image(self, context, lang):
-        #return context.uri(context.resource('flags/%s.gif' % lang))
+        # return context.uri(context.resource('flags/%s.gif' % lang))
         return None
 
     def _content(self, context):
@@ -850,7 +848,7 @@ class HtmlExporter(Exporter):
             exported_heading = heading.export(context)
             backref = element.backref()
             if backref:
-                exported_heading = self._generator.a(exported_heading, href="#" + backref, 
+                exported_heading = self._generator.a(exported_heading, href="#" + backref,
                                                      cls='backref')
             attr = self._container_attr(element)
             # Replace the 'cls' attribute, because it will be used in the parent HTML tag.
@@ -925,7 +923,7 @@ class HtmlExporter(Exporter):
         title = element.title()
         if title is not None:
             g = self._generator
-            #TODO: add a "skip" link?
+            # TODO: add a "skip" link?
             result = g.div(g.concat(g.div(g.strong(title), cls='title'), result),
                            cls='table-of-contents')
         return result
@@ -1254,8 +1252,8 @@ class HtmlExporter(Exporter):
         g = self._generator
         return concat(('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
                        '"http://www.w3.org/TR/html4/strict.dtd">'),
-                      #('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" '
-                      #'"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'),
+                      # ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" '
+                      # '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'),
                       '\n\n',
                       g.html(self._html_content(context), lang=context.lang()))
 
@@ -1451,4 +1449,4 @@ def format_text(text):
     lines = saxutils.escape(text).splitlines()
     converted_text = '<br>\n'.join(convert_line(l) for l in lines)
     formatted_text = _URL_MATCHER.sub(r'<a href="\1">\1</a>', converted_text)
-    return formatted_text 
+    return formatted_text
