@@ -765,7 +765,8 @@ class HtmlExporter(Exporter):
 
     def _export_abbreviation(self, context, element):
         g = self._generator
-        return g.abbr(self._export_text_content(context, element), title=element.descr())
+        return g.abbr(self._export_text_content(context, element), title=element.descr(),
+                      aria_label=element.descr())
 
     def _export_anchor(self, context, element):
         g = self._generator
