@@ -885,7 +885,7 @@ lcg.DropDownSelection = Class.create(lcg.PopupMenuBase, {
 	    previously_selected_item.up('li').removeClassName('selected');
 	}
 	item.up('li').addClassName('selected');
-	item.focus();
+	this.set_focus(item);
     },
 
     dropdown: function() {
