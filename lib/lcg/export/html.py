@@ -33,6 +33,44 @@ import random
 
 _ = lcg.TranslatableTextFactory('lcg')
 
+class HtmlEscapedUnicode(unicode):
+
+    def __new__(cls, value, escape):
+        if escape and not isinstance(value, HtmlEscapedUnicode):
+            value = saxutils.escape(value)
+        return super(HtmlEscapedUnicode, cls).__new__(cls, value)
+
+    def __add__(self, other):
+        return self.__class__(unicode(self) + unicode(other), escape=False)
+
+    def __mod__(self, other):
+        if isinstance(other, basestring):
+            arguments = HtmlEscapedUnicode(other, escape=True)
+        elif isinstance(other, (tuple, list,)):
+            arguments = [HtmlEscapedUnicode(o, escape=True) for o in other]
+        elif isinstance(other, dict):
+            arguments = dict([(k, HtmlEscapedUnicode(v, escape=True)) for k, v in other.items()])
+        else:
+            # Special dictionary-like object, such as _Interpolator
+            arguments = {}
+            i = 0
+            length = len(self)
+            while i < length:
+                if self[i] == '%':
+                    i += 1
+                    if i < length:
+                        c = self[i]
+                        if c == '(':
+                            end = self.find(')', i + 1)
+                            if end > 0:
+                                key = self[i + 1:end]
+                                i = end
+                                value = HtmlEscapedUnicode(other[key], escape=True)
+                                arguments[key] = value
+                i += 1
+        result = super(HtmlEscapedUnicode, self).__mod__(arguments)
+        return HtmlEscapedUnicode(result, escape=False)
+
 class HtmlGenerator(object):
     """Generate HTML tags through a simple Pythonic API.
 
@@ -97,7 +135,7 @@ class HtmlGenerator(object):
         return self._JAVASCRIPT_ESCAPES[match.group(0)]
 
     def _tag(self, tag, _content=None, _attr=(), _paired=True, **kwargs):
-        result_list = ['<' + tag]
+        result_list = [HtmlEscapedUnicode('<' + tag, escape=False)]
         dirty = False
         if __debug__:
             valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title')
@@ -118,19 +156,24 @@ class HtmlGenerator(object):
                     str_value = value.transform(saxutils.quoteattr)
                     dirty = True
                 else:
-                    str_value = saxutils.quoteattr(value)
+                    str_value = HtmlEscapedUnicode(saxutils.quoteattr(value), escape=False)
                 result_list.append(str_value)
-        if _content is not None and _content.__class__ not in (unicode, str,):
-            dirty = True
+        if _content is not None and not isinstance(_content, HtmlEscapedUnicode):
+            if _content.__class__ in (unicode, str,):
+                _content = HtmlEscapedUnicode(_content, escape=True)
+            else:
+                dirty = True
         if _paired:
-            result_list.extend(('>', _content, '</' + tag + '>'))
+            result_list.extend((HtmlEscapedUnicode('>', escape=False),
+                                _content,
+                                HtmlEscapedUnicode('</' + tag + '>', escape=False)))
         else:
             assert _content is None, "Non-empty non-paired content"
-            result_list.append('/>')
+            result_list.append(HtmlEscapedUnicode('/>', escape=False))
         if dirty:
-            result = concat(*result_list)
+            result = self.concat(*result_list)
         else:
-            result = string.join(result_list, '')
+            result = HtmlEscapedUnicode(string.join(result_list, ''), escape=False)
         return result
 
     def _input(self, type, _attr=(), **kwargs):
@@ -148,10 +191,26 @@ class HtmlGenerator(object):
         return uri
 
     def escape(self, text):
-        return saxutils.escape(text)
+        return HtmlEscapedUnicode(text, escape=True)
+
+    def _concat_escape(self, element):
+        if isinstance(element, lcg.Concatenation):
+            result = HtmlEscapedUnicode(element, escape=False)
+        elif isinstance(element, lcg.Localizable):
+            if self._concat_escape not in element._transforms:
+                result = element.transform(self._concat_escape)
+        elif isinstance(element, HtmlEscapedUnicode):
+            result = element
+        elif isinstance(element, basestring):
+            result = HtmlEscapedUnicode(element, escape=True)
+        elif isinstance(element, (tuple, list)):
+            result = [self._concat_escape(e) for e in element]
+        else:
+            raise Exception("Unexpected concatenation element type", element)
+        return result
 
     def concat(self, *items):
-        return concat(*items)
+        return concat(*self._concat_escape(items))
 
     # HTML tags
 
@@ -225,7 +284,7 @@ class HtmlGenerator(object):
             # this should never be wrong to omit the paragraph.
             if ((content and content[0].strip().startswith('<div') and
                  content[-1].strip().endswith('</div>'))):
-                return concat(content, separator='\n')
+                return self.concat(content, separator='\n')
         return self._tag('p', content, **kwargs)
 
     def blockquote(self, content, **kwargs):
@@ -527,7 +586,7 @@ class HtmlExporter(Exporter):
             """
             self._unique_id_index += 1
             return '%s%x' % (self._unique_id_prefix, self._unique_id_index)
-            
+
         def id_generator(self):
             """Return a new instance of unique HTML id generator.
 
@@ -543,7 +602,7 @@ class HtmlExporter(Exporter):
             returned by each call of this method.
 
             Example usage:
-        
+
             g = context.generator()
             ids = context.id_generator()
             html = g.div((
@@ -674,10 +733,11 @@ class HtmlExporter(Exporter):
                     label = g.img(image, alt=label, border=None)
             links.append(g.a(label, href=self._uri_node(context, node, lang=lang),
                              lang=lang, cls=cls) + sign)
+        space = HtmlEscapedUnicode(' ', escape=True)
         return concat(g.a(self._LANGUAGE_SELECTION_LABEL,
                           id='language-selection-anchor', name='language-selection-anchor'), ' ',
-                      concat(links, separator=(' ' + g.span('|', cls='sep') + ' ')))
-        
+                      concat(links, separator=(space + g.span('|', cls='sep') + space)))
+
     def _language_selection_image(self, context, lang):
         # return context.uri(context.resource('flags/%s.gif' % lang))
         return None
@@ -732,7 +792,7 @@ class HtmlExporter(Exporter):
             else:
                 source = element.source()
             if source or uri:
-                content += g.footer(u'— ' + source)
+                content += g.footer(HtmlEscapedUnicode(u'— ', escape=True) + source)
             return g.blockquote(content, cls=cls, **kwargs)
         return self._export_container(context, element, wrap=wrap)
 
@@ -1089,7 +1149,7 @@ class HtmlExporter(Exporter):
             type="application/x-shockwave-flash",
             title=element.title() or _("Flash movie object"),
             data=video_uri, width=width, height=height)
-        
+
     def _export_exercise(self, context, element):
         import exercises_html
         exporter_cls = getattr(exercises_html, element.__class__.__name__ + 'Exporter')
@@ -1252,8 +1312,6 @@ class HtmlExporter(Exporter):
         g = self._generator
         return concat(('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
                        '"http://www.w3.org/TR/html4/strict.dtd">'),
-                      # ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" '
-                      # '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'),
                       '\n\n',
                       g.html(self._html_content(context), lang=context.lang()))
 
@@ -1449,4 +1507,4 @@ def format_text(text):
     lines = saxutils.escape(text).splitlines()
     converted_text = '<br>\n'.join(convert_line(l) for l in lines)
     formatted_text = _URL_MATCHER.sub(r'<a href="\1">\1</a>', converted_text)
-    return formatted_text
+    return HtmlEscapedUnicode(formatted_text, escape=False)

@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ class Localizable(unicode):
         """Return a copy performing given transformation after localization.
 
         Creates a copy of the instance which applies given 'function' on the
-        final string after the dalayed localization.  The function will receive
+        final string after the delayed localization.  The function will receive
         one argument -- the localized (unicode) string representing given
         instance.
         
@@ -273,7 +273,11 @@ class TranslatableText(Localizable):
             self._func = func
             self._localizer = localizer
         def __getitem__(self, key):
-            return self._localizer.localize(self._func(str(key)))
+            value = self._func(str(key))
+            localized_value = self._localizer.localize(value)
+            if isinstance(value, lcg.HtmlEscapedUnicode):
+                localized_value = lcg.HtmlEscapedUnicode(value, escape=True)
+            return localized_value
     
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
@@ -357,7 +361,10 @@ class TranslatableText(Localizable):
 
     def _translate(self, localizer):
         translator = localizer.translator()
-        return translator.gettext(self._orig_text, domain=self._domain, origin=self._origin)
+        translated = translator.gettext(self._orig_text, domain=self._domain, origin=self._origin)
+        if isinstance(self._orig_text, lcg.HtmlEscapedUnicode):
+            translated = lcg.HtmlEscapedUnicode(translated, escape=True)
+        return translated
 
     def _localize(self, localizer):
         result = self._translate(localizer)
@@ -716,19 +723,34 @@ class Concatenation(Localizable):
 
         """
         super(Concatenation, self).__init__(**kwargs)
+        def html_escaped(items):
+            if isinstance(items, (list, tuple,)):
+                for i in items:
+                    if html_escaped(i):
+                        return True
+            else:
+                return isinstance(items, lcg.HtmlEscapedUnicode)
+        h_escape = self._html_escape = html_escaped(items)
+        if h_escape:
+            separator = lcg.HtmlEscapedUnicode(separator, escape=True)
         self._items = flat = []
         last = []
         def flatten(sequence, separator=separator):
             for x in sequence:
                 if x.__class__ in (unicode, str,):
+                    if h_escape:
+                        x = lcg.HtmlEscapedUnicode(x, escape=True)
                     last.append(x)
                     last.append(separator)
                 elif isinstance(x, Concatenation) and not x._transforms:
-                    flatten(x.items(), separator='')
+                    s = lcg.HtmlEscapedUnicode('', escape=False) if h_escape else ''
+                    flatten(x.items(), separator=s)
                     last.append(separator)
                 elif isinstance(x, Localizable):
                     text = string.join(last, '')
                     if text:
+                        if h_escape:
+                            text = lcg.HtmlEscapedUnicode(text, escape=False)
                         flat.append(text)
                     del last[:]
                     flat.append(x)
@@ -737,6 +759,8 @@ class Concatenation(Localizable):
                     # This is a quick fix for special unicode/str subclasses, such as
                     # HtmlExporter._JavaScriptCode.  Reordering the conditions would
                     # make sense, but it might harm the optimization effort.
+                    if h_escape:
+                        x = lcg.HtmlEscapedUnicode(x, escape=True)
                     last.append(x)
                     last.append(separator)
                 else:
@@ -744,7 +768,7 @@ class Concatenation(Localizable):
                     flatten(x)
         flatten(items)
         if len(last) > 1:
-            text = string.join(last[:-1], '')
+            text = reduce(operator.add, last[1:-1], last[0])
             if text:
                 flat.append(text)
 
@@ -752,13 +776,25 @@ class Concatenation(Localizable):
         return (self._items,)
 
     def _localize(self, localizer):
+        h_escape = self._html_escape
+        items = []
+        for i in self._items:
+            localized = localizer.localize(i)
+            if isinstance(i, lcg.HtmlEscapedUnicode):
+                localized = lcg.HtmlEscapedUnicode(localized, escape=(i != localized))
+            elif h_escape:
+                localized = lcg.HtmlEscapedUnicode(localized, escape=True)
+            items.append(localized)
         try:
-            return ''.join([localizer.localize(item) for item in self._items])
+            result = ''.join(items)
         except UnicodeDecodeError:
             # Necessary to display some tracebacks
             def escape(text):
                 return re.sub(r'[^\x01-\x7F]', '?', text)
-            return ''.join([escape(localizer.localize(item)) for item in self._items])
+            result = ''.join(items)
+        if h_escape:
+            result = lcg.HtmlEscapedUnicode(result, escape=False)
+        return result
 
     def startswith(self, *args, **kwargs):
         """Return the result of 'startswidth()' call the method on the first item."""
@@ -1005,7 +1041,10 @@ def concat(*args, **kwargs):
             if not isinstance(a, basestring) or isinstance(a, Localizable):
                 break
         else:
-            return reduce(operator.add, args, u'')
+            if len(args) == 0:
+                return u''
+            else:
+                return reduce(operator.add, args[1:], args[0])
     # Standard processing
     result = Concatenation(args, **kwargs)
     items = result.items()

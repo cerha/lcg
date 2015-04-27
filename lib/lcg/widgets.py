@@ -172,7 +172,7 @@ class FoldableTree(Widget, lcg.Content):
             if items:
                 return g.ul(*items)
             else:
-                return ''
+                return g.escape('')
         return menu(self._node or current.root())
 
     
