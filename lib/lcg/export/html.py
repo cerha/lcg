@@ -41,7 +41,11 @@ class HtmlEscapedUnicode(unicode):
         return super(HtmlEscapedUnicode, cls).__new__(cls, value)
 
     def __add__(self, other):
-        return self.__class__(unicode(self) + unicode(other), escape=False)
+        if isinstance(other, lcg.Localizable):
+            result = concat(self, other)
+        else:
+            result = self.__class__(unicode(self) + unicode(other), escape=False)
+        return result
 
     def __mod__(self, other):
         if isinstance(other, basestring):
@@ -195,7 +199,7 @@ class HtmlGenerator(object):
 
     def _concat_escape(self, element):
         if isinstance(element, lcg.Concatenation):
-            result = HtmlEscapedUnicode(element, escape=False)
+            result = element
         elif isinstance(element, lcg.Localizable):
             if self._concat_escape not in element._transforms:
                 result = element.transform(self._concat_escape)
@@ -1310,9 +1314,10 @@ class HtmlExporter(Exporter):
 
     def export(self, context):
         g = self._generator
-        return concat(('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
-                       '"http://www.w3.org/TR/html4/strict.dtd">'),
-                      '\n\n',
+        return concat(lcg.HtmlEscapedUnicode('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
+                                             '"http://www.w3.org/TR/html4/strict.dtd">',
+                                             escape=False),
+                      lcg.HtmlEscapedUnicode('\n\n', escape=False),
                       g.html(self._html_content(context), lang=context.lang()))
 
 

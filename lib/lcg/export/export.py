@@ -567,6 +567,8 @@ class Exporter(object):
             return ''
         if context.text_preprocessor is not None:
             text = context.text_preprocessor(text)
+        if isinstance(text, lcg.Localizable):
+            text = context.localize(text)
         return self.escape(text)
 
     def _reformat_text(self, context, text):

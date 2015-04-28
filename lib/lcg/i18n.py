@@ -728,6 +728,8 @@ class Concatenation(Localizable):
                 for i in items:
                     if html_escaped(i):
                         return True
+            elif isinstance(items, Concatenation):
+                return items._html_escape
             else:
                 return isinstance(items, lcg.HtmlEscapedUnicode)
         h_escape = self._html_escape = html_escaped(items)
