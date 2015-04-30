@@ -982,7 +982,7 @@ class BrailleExport(unittest.TestCase):
             self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
                        presentation, 'cs')
         tests = ((u'abc', u'⠁⠃⠉',),
-                 (u'a line to be hyphenated', u'⠁⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠏⠓⠑⠝⠤\n⠁⠞⠑⠙',),
+                 (u'long line to be hyphenated', u'⠇⠕⠝⠛⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠤\n⠏⠓⠑⠝⠁⠞⠑⠙',),
                  (u'*bold*', u'⠸⠃⠕⠇⠙',),
                  (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
                  (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),)
