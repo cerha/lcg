@@ -197,6 +197,9 @@ class HtmlGenerator(object):
     def escape(self, text):
         return HtmlEscapedUnicode(text, escape=True)
 
+    def noescape(self, text):
+        return HtmlEscapedUnicode(text, escape=False)
+
     def _concat_escape(self, element):
         if isinstance(element, lcg.Concatenation):
             result = element
@@ -1314,10 +1317,8 @@ class HtmlExporter(Exporter):
 
     def export(self, context):
         g = self._generator
-        return concat(lcg.HtmlEscapedUnicode('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
-                                             '"http://www.w3.org/TR/html4/strict.dtd">',
-                                             escape=False),
-                      lcg.HtmlEscapedUnicode('\n\n', escape=False),
+        return concat(g.noescape('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
+                                 '"http://www.w3.org/TR/html4/strict.dtd">\n\n'),
                       g.html(self._html_content(context), lang=context.lang()))
 
 
