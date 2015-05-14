@@ -362,9 +362,7 @@ class TranslatableText(Localizable):
     def _translate(self, localizer):
         translator = localizer.translator()
         translated = translator.gettext(self._orig_text, domain=self._domain, origin=self._origin)
-        if isinstance(self._orig_text, lcg.HtmlEscapedUnicode):
-            translated = lcg.HtmlEscapedUnicode(translated, escape=True)
-        return translated
+        return lcg.HtmlEscapedUnicode(translated, escape=True)
 
     def _localize(self, localizer):
         result = self._translate(localizer)
