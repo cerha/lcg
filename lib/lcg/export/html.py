@@ -34,8 +34,23 @@ import random
 _ = lcg.TranslatableTextFactory('lcg')
 
 class HtmlEscapedUnicode(unicode):
+    """Escaping wrapper for unicodes.
 
+    In order to prevent display errors, XSS, CSRF, etc., it is necessary to
+    HTML escape all strings inserted into the HTML code.  LCG tries to escape
+    all incoming strings by default.  This wrapper can and should be used to
+    explicitly mark what should be HTML escaped and what not.
+
+    """
     def __new__(cls, value, escape):
+        """
+        Arguments:
+
+          value -- unicode to wrap
+          escape -- boolean indicating whether the wrapped unicode should be
+            HTML escaped or not
+
+        """
         if escape and not isinstance(value, HtmlEscapedUnicode):
             value = saxutils.escape(value)
         return super(HtmlEscapedUnicode, cls).__new__(cls, value)
