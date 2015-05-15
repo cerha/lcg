@@ -135,15 +135,18 @@ class Localizable(unicode):
 
     """
     def __new__(cls, text, _transforms=(), **kwargs):
+        transformed = text
         for f in _transforms:
-            text = f(text)
+            transformed = f(transformed)
         try:
-            return unicode.__new__(cls, text)
+            instance = unicode.__new__(cls, transformed)
         except UnicodeDecodeError:
             # Necessary to display some tracebacks
             def escape(text):
                 return re.sub(r'[^\x01-\x7F]', '?', text)
-            return unicode.__new__(cls, escape(text))
+            instance = unicode.__new__(cls, escape(transformed))
+        instance._text = text
+        return instance
 
     def __init__(self, _transforms=()):
         assert isinstance(_transforms, tuple), _transforms
@@ -160,7 +163,7 @@ class Localizable(unicode):
         return concat((other, self))
 
     def _clone_args(self):
-        return (unicode(self),)
+        return (self._text,)
     
     def _clone_kwargs(self):
         return dict(_transforms=self._transforms)
