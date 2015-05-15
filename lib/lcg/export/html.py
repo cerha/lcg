@@ -155,7 +155,7 @@ class HtmlGenerator(object):
         return self._JAVASCRIPT_ESCAPES[match.group(0)]
 
     def _tag(self, tag, _content=None, _attr=(), _paired=True, **kwargs):
-        result_list = [HtmlEscapedUnicode('<' + tag, escape=False)]
+        result_list = [self.noescape('<' + tag)]
         dirty = False
         if __debug__:
             valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title')
@@ -176,24 +176,24 @@ class HtmlGenerator(object):
                     str_value = value.transform(saxutils.quoteattr)
                     dirty = True
                 else:
-                    str_value = HtmlEscapedUnicode(saxutils.quoteattr(value), escape=False)
+                    str_value = self.noescape(saxutils.quoteattr(value))
                 result_list.append(str_value)
         if _content is not None and not isinstance(_content, HtmlEscapedUnicode):
             if _content.__class__ in (unicode, str,):
-                _content = HtmlEscapedUnicode(_content, escape=True)
+                _content = self.escape(_content)
             else:
                 dirty = True
         if _paired:
-            result_list.extend((HtmlEscapedUnicode('>', escape=False),
+            result_list.extend((self.noescape('>'),
                                 _content,
-                                HtmlEscapedUnicode('</' + tag + '>', escape=False)))
+                                self.noescape('</' + tag + '>')))
         else:
             assert _content is None, "Non-empty non-paired content"
-            result_list.append(HtmlEscapedUnicode('/>', escape=False))
+            result_list.append(self.noescape('/>'))
         if dirty:
             result = self.concat(*result_list)
         else:
-            result = HtmlEscapedUnicode(string.join(result_list, ''), escape=False)
+            result = self.noescape(string.join(result_list, ''))
         return result
 
     def _input(self, type, _attr=(), **kwargs):
@@ -225,7 +225,7 @@ class HtmlGenerator(object):
         elif isinstance(element, HtmlEscapedUnicode):
             result = element
         elif isinstance(element, basestring):
-            result = HtmlEscapedUnicode(element, escape=True)
+            result = self.escape(element)
         elif isinstance(element, (tuple, list)):
             result = [self._concat_escape(e) for e in element]
         else:
@@ -756,7 +756,7 @@ class HtmlExporter(Exporter):
                     label = g.img(image, alt=label, border=None)
             links.append(g.a(label, href=self._uri_node(context, node, lang=lang),
                              lang=lang, cls=cls) + sign)
-        space = HtmlEscapedUnicode(' ', escape=True)
+        space = g.escape(' ')
         return concat(g.a(self._LANGUAGE_SELECTION_LABEL,
                           id='language-selection-anchor', name='language-selection-anchor'), ' ',
                       concat(links, separator=(space + g.span('|', cls='sep') + space)))
@@ -815,7 +815,7 @@ class HtmlExporter(Exporter):
             else:
                 source = element.source()
             if source or uri:
-                content += g.footer(HtmlEscapedUnicode(u'— ', escape=True) + source)
+                content += g.footer(g.escape(u'— ') + source)
             return g.blockquote(content, cls=cls, **kwargs)
         return self._export_container(context, element, wrap=wrap)
 
