@@ -361,6 +361,9 @@ class HtmlGenerator(object):
     def abbr(self, term, **kwargs):
         return self._tag('abbr', term, (), **kwargs)
 
+    def time(self, content, **kwargs):
+        return self._tag('time', content, ('datetime',), **kwargs)
+
     def table(self, content, **kwargs):
         attr = ('summary', 'border', 'cellspacing', 'cellpadding', 'width')
         return self._tag('table', content, attr, **kwargs)
