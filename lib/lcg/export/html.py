@@ -63,16 +63,14 @@ class HtmlEscapedUnicode(unicode):
         return result
 
     def __mod__(self, other):
+        def escape(x):
+            return HtmlEscapedUnicode(x, escape=True) if isinstance(x, basestring) else x
         if isinstance(other, basestring):
-            arguments = HtmlEscapedUnicode(other, escape=True)
+            arguments = escape(other)
         elif isinstance(other, (tuple, list,)):
-            arguments = [HtmlEscapedUnicode(o, escape=True) if isinstance(o, basestring) else o
-                         for o in other]
-            arguments = tuple(arguments)
+            arguments = tuple(map(escape, other))
         elif isinstance(other, dict):
-            arguments = [(k, HtmlEscapedUnicode(v, escape=True) if isinstance(v, basestring) else v)
-                         for k, v in other.items()]
-            arguments = dict(arguments)
+            arguments = dict([(k, escape(v)) for k, v in other.items()])
         else:
             # Special dictionary-like object, such as _Interpolator
             arguments = {}
@@ -88,10 +86,7 @@ class HtmlEscapedUnicode(unicode):
                             if end > 0:
                                 key = self[i + 1:end]
                                 i = end
-                                value = other[key]
-                                if isinstance(value, basestring):
-                                    value = HtmlEscapedUnicode(other[key], escape=True)
-                                arguments[key] = value
+                                arguments[key] = escape(other[key])
                 i += 1
         result = super(HtmlEscapedUnicode, self).__mod__(arguments)
         return HtmlEscapedUnicode(result, escape=False)
