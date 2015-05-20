@@ -1352,8 +1352,8 @@ class Html5Exporter(HtmlExporter):
 
     def export(self, context):
         g = self._generator
-        return concat('<?xml version="1.0" encoding="UTF-8"?>', '\n',
-                      '<!DOCTYPE html>', '\n',
+        return concat(g.noescape('<?xml version="1.0" encoding="UTF-8"?>\n'
+                                 '<!DOCTYPE html>\n'),
                       g.html(self._html_content(context), lang=context.lang(),
                              xmlns='http://www.w3.org/1999/xhtml'))
 
@@ -1447,14 +1447,16 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
     def _top_navigation(self, context):
         navigation = self._navigation(context)
         if navigation:
-            return navigation + '<hr>\n'
+            g = self._generator
+            return navigation + g.hr()
         else:
             return None
 
     def _bottom_navigation(self, context):
         navigation = self._navigation(context)
         if navigation:
-            return '<hr>\n' + navigation
+            g = self._generator
+            return g.hr() + navigation
         else:
             return None
 
