@@ -436,7 +436,7 @@ class TranslatablePluralForms(TranslatableText):
             assert 'n' in kwargs, \
                    "A number determining the plural form must be passed as keyword argument 'n'."
             n = kwargs['n']
-        assert isinstance(n, int)
+        assert isinstance(n, (int, long,))
         text = n == 1 and singular or plural
         return TranslatableText.__new__(cls, text, *args, **kwargs)
 
