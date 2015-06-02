@@ -1307,8 +1307,13 @@ class BrailleExporter(FileExporter, Exporter):
                 add_list(row[0], headings, row[1:])
         elif direction == 'column':
             headings = [c[0] for c in content[1:]]
+            def get_cell(row, i):
+                try:
+                    return row[i]
+                except IndexError:
+                    return TableCell(TextContent(''))
             for i in range(1, len(content[0])):
-                add_list(content[0][i], headings, [row[i] for row in content[1:]])
+                add_list(content[0][i], headings, [get_cell(row, i) for row in content[1:]])
         else:
             raise Exception("Program Error", direction)
         return ItemizedList(items)
