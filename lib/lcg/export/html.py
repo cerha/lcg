@@ -197,7 +197,7 @@ class HtmlGenerator(object):
         return result
 
     def _input(self, type, _attr=(), **kwargs):
-        _attr += ('type', 'name', 'value', 'size', 'maxlength', 'accesskey',
+        _attr += ('type', 'name', 'value', 'size', 'maxlength', 'accesskey', 'autocomplete',
                   'onclick', 'onmousedown', 'onmouseup', 'onkeydown', 'onkeypress', 'onchange',
                   'readonly', 'disabled')
         return self._tag('input', None, _attr, _paired=False, type=type, **kwargs)
