@@ -419,9 +419,17 @@ class HtmlGenerator(object):
         return self._tag('label', text, ('for',), **kwargs)
 
     def field(self, value='', name='', size=20, password=False, cls=None, **kwargs):
+        # Deprecated!  Use 'input()' instead.
         type = password and 'password' or 'text'
         cls = type + (cls and ' ' + cls or '')
         return self._input(type, name=name, value=value, size=size, cls=cls, **kwargs)
+
+    def input(self, type='text', **kwargs):
+        assert type in ('button', 'checkbox', 'color', 'date', 'datetime', 'datetime-local',
+                        'email', 'file', 'hidden', 'image', 'month', 'number', 'password',
+                        'radio', 'range', 'reset', 'search', 'submit', 'tel', 'text', 'time',
+                        'url', 'week'), type
+        return self._input(type, **kwargs)
 
     def upload(self, name, size=50, cls=None, **kwargs):
         cls = 'upload' + (cls and ' ' + cls or '')
@@ -634,11 +642,11 @@ class HtmlExporter(Exporter):
             html = g.div((
                 g.div((
                     g.label('Name:', for_=ids.name),
-                    g.field(name='name', id=ids.name),
+                    g.input(name='name', id=ids.name),
                 )),
                 g.div((
                     g.label('Age:', for_=ids.age),
-                    g.field(name='age', id=ids.age),
+                    g.input(name='age', id=ids.age),
                 )),
                 ...
             ))

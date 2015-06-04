@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -152,8 +152,8 @@ class ExerciseExporter(object):
     def _export_results(self, context, exercise, exercise_id):
         g = context.generator()
         return g.div((g.div(concat([g.label(label, exercise_id + '.' + name) +
-                                    g.field(name=name, id=exercise_id + '.' + name, size=30,
-                                            readonly=True)
+                                    g.input(type='text', name=name, id=exercise_id + '.' + name,
+                                            size=30, readonly=True)
                                     for name, label, help in self._INDICATORS],
                                    separator=g.br()),
                             cls='display'),
@@ -413,7 +413,7 @@ class _FillInExerciseExporter(ExerciseExporter):
                            cls=self._field_cls(context, field_id, text))
         else:
             field = concat(
-                g.field(name=field_id, id=field_id, size=len(text),
+                g.input(type='text', name=field_id, id=field_id, size=len(text),
                         value=self._field_value(context, field_id),
                         readonly=self._readonly(context),
                         cls=self._field_cls(context, field_id, text)),
@@ -550,8 +550,8 @@ class _TestExporter(object):
         def field(label, name, value, size=6, readonly=True, **kwargs):
             field_id = exercise_id + '-' + name
             return (g.label(label, field_id) + ' ' +
-                    g.field(value, name=id, id=field_id, size=size, readonly=readonly,
-                            cls=(readonly and 'display' or None), **kwargs))
+                    g.input(type='text', name=id, value=value, id=field_id, size=size,
+                            readonly=readonly, cls=(readonly and 'display' or None), **kwargs))
         if points < max and isinstance(self, FillInTestExporter):
             if added is None:
                 total_points = points
