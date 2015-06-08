@@ -296,7 +296,8 @@ class GapFillingExporter(_ChoiceBasedExerciseExporter):
     def _export_task_parts(self, context, exercise, exercise_id, task):
         g = context.generator()
         prompt = context.localize(task.prompt().export(context))
-        return (g.span(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'), prompt)),
+        return (g.span(g.noescape(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'),
+                                                        prompt))),
                 self._format_choices(context, exercise, exercise_id, task))
     
 
@@ -381,10 +382,11 @@ class _FillInExerciseExporter(ExerciseExporter):
         return super(_FillInExerciseExporter, self)._export_answers(context, exercise, exercise_id)
 
     def _export_task_text(self, context, exercise, exercise_id, task):
+        g = context.generator()
         def make_field(answer, label, word_start, word_end):
             field, field_id = self._make_field(context, exercise, exercise_id, task, answer)
             if word_start or word_end:
-                return context.generator().span(word_start + field + word_end, cls='nowrap')
+                return g.span(g.noescape(word_start + field + word_end), cls='nowrap')
             else:
                 return field
         text = task.text().replace('[', '\[')
@@ -393,7 +395,7 @@ class _FillInExerciseExporter(ExerciseExporter):
             html = context.localize(content.export(context))
         else:
             html = ''
-        return task.substitute_fields(html, make_field)
+        return g.noescape(task.substitute_fields(html, make_field))
 
     def _field_value(self, context, field_id):
         return ''
@@ -424,7 +426,7 @@ class _FillInExerciseExporter(ExerciseExporter):
                 
     def _export_fill_in_task(self, context, prompt, text):
         if prompt:
-            return prompt + '<br/>' + text
+            return prompt + context.generator().br() + text
         else:
             return text
 
@@ -575,7 +577,7 @@ class _TestExporter(object):
                             size=40)]
         else:
             fields = [field(_("Total points:"), 'total-points', '%d/%d' % (points, max))]
-        return g.div(concat(fields, separator=g.br() + "\n"), cls='results')
+        return g.div(concat(fields, separator=g.br()), cls='results')
     
     def _readonly(self, context):
         return self._show_results(context)
