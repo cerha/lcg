@@ -307,7 +307,7 @@ class HtmlGenerator(object):
             # this should never be wrong to omit the paragraph.
             if ((content and content[0].strip().startswith('<div') and
                  content[-1].strip().endswith('</div>'))):
-                return self.concat(content, separator='\n')
+                return self.concat(content)
         return self._tag('p', content, **kwargs)
 
     def blockquote(self, content, **kwargs):
