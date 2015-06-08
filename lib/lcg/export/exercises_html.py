@@ -503,7 +503,7 @@ class ModelClozeExporter(ClozeExporter):
                     html = context.localize(content.export(context))
                 else:
                     html = ''
-                return task.substitute_fields(html, make_field)
+                return g.noescape(task.substitute_fields(html, make_field))
             result += g.div([export_task(task) for task in exercise.tasks()], cls='model-answers')
         return result
 
