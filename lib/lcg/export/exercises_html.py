@@ -493,7 +493,7 @@ class ModelClozeExporter(ClozeExporter):
             def make_field(answer, label, word_start, word_end):
                 field = g.span(answer, cls='model-answer')
                 if word_start or word_end:
-                    return g.span(word_start + field + word_end, cls='nowrap')
+                    return g.span(g.noescape(word_start + field + word_end), cls='nowrap')
                 else:
                     return field
             def export_task(task):
