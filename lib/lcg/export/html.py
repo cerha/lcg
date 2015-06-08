@@ -1190,6 +1190,9 @@ class HtmlExporter(Exporter):
         exporter = exporter_cls()
         return exporter.export(context, element)
 
+    def _export_mathml(self, context, element):
+        return self._generator.noescape(element.content())
+
     def export_swf_object(self, context, filename, element_id, width, height, flashvars={},
                           min_flash_version=None, alternative_content=None, warning=None):
         """Export an arbitrary SWF object.
