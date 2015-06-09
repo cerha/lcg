@@ -295,9 +295,8 @@ class GapFillingExporter(_ChoiceBasedExerciseExporter):
     
     def _export_task_parts(self, context, exercise, exercise_id, task):
         g = context.generator()
-        prompt = context.localize(task.prompt().export(context))
-        return (g.span(g.noescape(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'),
-                                                        prompt))),
+        html = context.localize(task.prompt().export(context))
+        return (g.span(g.noescape(self._GAP_MATCHER.sub(g.span("____", cls='exercise-gap'), html))),
                 self._format_choices(context, exercise, exercise_id, task))
     
 
@@ -336,6 +335,7 @@ class _FillInExerciseExporter(ExerciseExporter):
     """A common base class for exercises based on writing text into fields."""
 
     _JAVASCRIPT_CLASS = 'lcg.FillInExercise'
+    _UNKNOWN_ANSWER_REGEXP = re.compile(r'(_+|\?\?+)')
     
     @classmethod
     def _help_keys(cls):
@@ -363,8 +363,9 @@ class _FillInExerciseExporter(ExerciseExporter):
 
     def _has_real_answers(self, exercise):
         # Return false if the exersice doesn't contain real answers, but only underscores
-        # to create text boxes.  In this case the exercise will not offer automatic evaluation.
-        return ''.join(exercise.answers()).replace('_', '') != ''
+        # or question marks to create text boxes.  In this case the exercise will not offer
+        # automatic evaluation.
+        return all(not self._UNKNOWN_ANSWER_REGEXP.match(a) for a in exercise.answers())
 
     def _export_script(self, context, exercise, exercise_id):
         if not self._has_real_answers(exercise):
@@ -410,12 +411,17 @@ class _FillInExerciseExporter(ExerciseExporter):
         g = context.generator()
         self._field_number += 1
         field_id = self._task_id(exercise, exercise_id, task) + '-f%d' % self._field_number
+        size = len(text)
+        if size >= 2 and text == (size * '?'):
+            # If the box contains just question marks, it means an unknown answer of one
+            # word (two question marks) or one sencence (three or more question marks).
+            size = 10 if size == 2 else 50
         if not context.allow_interactivity():
-            field = g.span('_' * len(text), title=text,
+            field = g.span('_' * size, title=text,
                            cls=self._field_cls(context, field_id, text))
         else:
             field = concat(
-                g.input(type='text', name=field_id, id=field_id, size=len(text),
+                g.input(type='text', name=field_id, id=field_id, size=size,
                         value=self._field_value(context, field_id),
                         readonly=self._readonly(context),
                         cls=self._field_cls(context, field_id, text)),
