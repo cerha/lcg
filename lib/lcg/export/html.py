@@ -170,7 +170,7 @@ class HtmlGenerator(object):
                 if value is True:
                     # Use boolean value syntax, which is compatible with both HTML4 and XHTML.
                     str_value = '"' + name + '"'
-                elif isinstance(value, int):
+                elif isinstance(value, (int, long)):
                     str_value = '"%d"' % value
                 elif isinstance(value, lcg.Localizable):
                     str_value = value.transform(saxutils.quoteattr)
