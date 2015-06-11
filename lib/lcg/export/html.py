@@ -262,9 +262,6 @@ class HtmlGenerator(object):
     def span(self, text, **kwargs):
         return self._tag('span', text, (), **kwargs)
 
-    def time(self, text, **kwargs):
-        return self._tag('time', text, (), **kwargs)
-
     def h(self, title, level, **kwargs):
         return self._tag('h%d' % level, title, **kwargs)
 
