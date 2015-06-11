@@ -424,6 +424,8 @@ class _FillInExerciseExporter(ExerciseExporter):
                 g.input(type='text', name=field_id, id=field_id, size=size,
                         value=self._field_value(context, field_id),
                         readonly=self._readonly(context),
+                        # Set the width through CSS. Otherwise the fields are too wide in FF.
+                        style='box-model: content-box; width: %dem;' % size, 
                         cls=self._field_cls(context, field_id, text)),
                 [self._media_control(context, m, inline=True) for m in task.media()],
                 self._field_result(context, field_id, text)
