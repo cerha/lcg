@@ -42,6 +42,13 @@ class HtmlEscapedUnicode(unicode):
     explicitly mark what should be HTML escaped and what not.
 
     """
+    class _EscapingInterpolator(object):
+        def __init__(self, interpolator, escape):
+            self._interpolator = interpolator
+            self._escape = escape
+        def __getitem__(self, key):
+            return self._escape(self._interpolator[key])
+
     def __new__(cls, value, escape):
         """
         Arguments:
@@ -73,21 +80,7 @@ class HtmlEscapedUnicode(unicode):
             arguments = dict([(k, escape(v)) for k, v in other.items()])
         else:
             # Special dictionary-like object, such as _Interpolator
-            arguments = {}
-            i = 0
-            length = len(self)
-            while i < length:
-                if self[i] == '%':
-                    i += 1
-                    if i < length:
-                        c = self[i]
-                        if c == '(':
-                            end = self.find(')', i + 1)
-                            if end > 0:
-                                key = self[i + 1:end]
-                                i = end
-                                arguments[key] = escape(other[key])
-                i += 1
+            arguments = self._EscapingInterpolator(other, escape)
         result = super(HtmlEscapedUnicode, self).__mod__(arguments)
         return HtmlEscapedUnicode(result, escape=False)
 
