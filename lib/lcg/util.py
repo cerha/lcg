@@ -649,3 +649,7 @@ def attribute_value(obj, name, value):
         yield
     finally:
         setattr(obj, name, orig_value)
+
+class ParseError(Exception):
+    "Exception raised on various parsing errors."
+    pass

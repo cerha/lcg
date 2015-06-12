@@ -1786,7 +1786,10 @@ class MathML(Content):
         parser.entity = entity_dictionary
         etree = ElementTree.ElementTree()
         content = self._str_content()
-        tree = etree.parse(cStringIO.StringIO(content), parser=parser)
+        try:
+            tree = etree.parse(cStringIO.StringIO(content), parser=parser)
+        except ElementTree.ParseError as e:
+            raise ParseError("Error when parsing MathML element", e, content)
         regexp = re.compile('{.*}')
         for e in tree.getiterator():
             match = regexp.match(e.tag)
