@@ -38,7 +38,7 @@ import copy
 import re
 
 from lcg import Audio, ContentNode, HorizontalAlignment, \
-    Image, Resource, TranslatableTextFactory, Unit, Video, \
+    Image, ParseError, Resource, TranslatableTextFactory, Unit, Video, \
     config, is_sequence_of
 
 _ = TranslatableTextFactory('lcg')
@@ -1732,7 +1732,7 @@ class MathML(Content):
             if entity in ('amp', 'lt', 'gt', 'quot', 'apos', 'bsol', 'newline',):
                 i += end
             else:
-                from lcg.export.entities import entities
+                from lcg.export.mathml import entities
                 expansion = entities.get(entity)
                 if expansion is None:
                     i += end
@@ -1833,7 +1833,7 @@ class MathML(Content):
                 ElementTree.SubElement(node, 'mo', dict(fence='true')).text = closing
         return math
         
-    def tree_content(self, entity_dictionary=None, transform=False):
+    def tree_content(self, entity_dictionary=None, transform=False, top_only=False):
         """Return a parsed 'xml.etree.Element' instance of the math content.
 
         Arguments:
@@ -1846,20 +1846,22 @@ class MathML(Content):
             entities.  If not given, 'MathML.EntityHandler' instance is used.
           transform -- iff true then expand elements which can be expressed
             using other elements (e.g. mfenced)
+          top_only -- if true then check that the top element is 'math'
+            element, otherwise look for 'math' element in the tree content
 
         """
-        try:
-            tree = self._tree_content(entity_dictionary)
-        except AttributeError:
-            # Python < 2.7
-            tree = self._dom_tree_content()
-        try:
-            math = tree.getiterator('math').pop()
-        except IndexError:
-            raise Exception("No math element found", tree)
+        tree = self._tree_content(entity_dictionary)
+        if top_only:
+            if tree.tag != 'math':
+                raise Exception("Invalid MathML top element", tree)
+        else:
+            try:
+                tree = tree.getiterator('math').pop()
+            except IndexError:
+                raise Exception("No math element found", tree)
         if transform:
-            math = self._transform_content(math)
-        return math
+            tree = self._transform_content(tree)
+        return tree
     
 
 # Convenience functions for simple content construction.

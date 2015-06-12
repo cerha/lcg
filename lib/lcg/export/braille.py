@@ -36,7 +36,7 @@ from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, Pag
     Container, TranslatableTextFactory, Table, TableRow, TableCell, TableHeading, TextContent, \
     ItemizedList
 import lcg
-import entities
+import mathml
 
 _ = TranslatableTextFactory('lcg')
 
@@ -257,7 +257,7 @@ def xml2braille(xml):
     if _louisutdml is None:
         return None
     # Preprocess entities
-    entity_table = entities.entities
+    entity_table = mathml.entities
     def replace_entity(match):
         entity = match.group(1)
         replacement = entity_table.get(entity)
@@ -1532,7 +1532,7 @@ class BrailleExporter(FileExporter, Exporter):
         class EntityHandler(element.EntityHandler):
             def __init__(self, *args, **kwargs):
                 super(EntityHandler, self).__init__(*args, **kwargs)
-                self._data = entities.entities
+                self._data = mathml.entities
             def __getitem__(self, key):
                 return self._data.get(key, '?')
         entity_handler = EntityHandler()

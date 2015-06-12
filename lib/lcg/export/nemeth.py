@@ -27,7 +27,7 @@ import string
 import lcg
 
 from braille import _Braille, _braille_whitespace
-import entities
+import mathml
 
 
 _CONDITIONAL_NUM_PREFIX = '\ue020'
@@ -305,7 +305,7 @@ def mathml_nemeth(exporter, context, element):
     class EntityHandler(element.EntityHandler):
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
-            self._data = entities.entities
+            self._data = mathml.entities
         def __getitem__(self, key):
             return self._data.get(key, '?')
     entity_handler = EntityHandler()

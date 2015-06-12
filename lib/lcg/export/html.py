@@ -18,18 +18,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import cStringIO
+import random
 import re
 import string
 import urllib
+import xml.sax
+from xml.sax import saxutils
 
 import lcg
 from lcg import ContentNode, HorizontalAlignment, Resource, Script, Section, \
     Stylesheet, Translations, concat, is_sequence_of, language_name
-
 from lcg.export import Exporter, FileExporter
 
-from xml.sax import saxutils
-import random
+import mathml
 
 _ = lcg.TranslatableTextFactory('lcg')
 
@@ -1181,6 +1183,12 @@ class HtmlExporter(Exporter):
         return exporter.export(context, element)
 
     def _export_mathml(self, context, element):
+        # Check the element content for basic sanity before passing it to noescape.
+        mathml_elements = mathml.elements
+        top_node = element.tree_content(top_only=True)
+        for e in top_node.iter():
+            if e.tag not in mathml_elements:
+                raise lcg.ParseError("Unexpected MathML element", e)
         return self._generator.noescape(element.content())
 
     def export_swf_object(self, context, filename, element_id, width, height, flashvars={},

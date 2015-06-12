@@ -926,6 +926,31 @@ class HtmlExport(unittest.TestCase):
             parsed_result = content.export(context)
             check(parsed_result, html)
 
+    def test_mathml(self):
+        n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
+                            globals=dict(x='value of x'))
+        context = lcg.HtmlExporter().context(n, None)
+        def export(content):
+            return content.export(context)
+        content = lcg.MathML(u"""
+<math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mi>&#x03C0;<!-- π --></mi>
+  <mo>&#x2062;<!-- &InvisibleTimes; --></mo>
+  <msup>
+    <mi>r</mi>
+    <mn>2</mn>
+  </msup>
+</math>""")
+        self.assertIsInstance(export(content), basestring)
+        for xml in (u'</math><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',
+                    u'<math xmlns="http://www.w3.org/1998/Math/MathML"><script>1</script></math>',
+                    u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>' +
+                    u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',):
+            content = lcg.MathML(xml)
+            self.assertRaises(lcg.ParseError, export, content)
+        content = lcg.MathML(u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>')
+        self.assertIsInstance(export(content), basestring)
+
 tests.add(HtmlExport)
 
 
