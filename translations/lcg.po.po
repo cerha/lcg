@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-03 16:29+0200\n"
+"POT-Creation-Date: 2015-06-16 12:33+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
 "Language-Team: \n"
@@ -11,55 +11,55 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/export/braille.py:845
+#: ../lib/lcg/export/braille.py:849
 #, python-format
 msgid "Character %r can't be represented on given output device: \"%s\""
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1228
+#: ../lib/lcg/export/braille.py:1242
 msgid "The table is transposed."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1236
+#: ../lib/lcg/export/braille.py:1250
 msgid "The table is expanded by rows."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1239
+#: ../lib/lcg/export/braille.py:1253
 msgid "The table is expanded by columns."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1246
+#: ../lib/lcg/export/braille.py:1260
 msgid "The table is vertically split."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1447
+#: ../lib/lcg/export/braille.py:1472
 msgid "The table is read across facing pages."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1380
+#: ../lib/lcg/export/export.py:1409
 #, python-format
 msgid "%s: file created."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1389
+#: ../lib/lcg/export/export.py:1418
 #, python-format
 msgid "%s: file copied."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1404
+#: ../lib/lcg/export/export.py:1433
 #, python-format
 msgid "%s: converting to %s: %s"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:538
+#: ../lib/lcg/export/html.py:678
 msgid "Choose your language:"
 msgstr "Escolha a sua língua:"
 
-#: ../lib/lcg/export/html.py:1016
+#: ../lib/lcg/export/html.py:1176
 msgid "Flash movie object"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1065
+#: ../lib/lcg/export/html.py:1234
 msgid ""
 "Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
 "swfobject.js to your resource path."
@@ -67,7 +67,7 @@ msgstr ""
 
 #. Translators: Title of the link to Adobe website used in
 #. the Flash warning.
-#: ../lib/lcg/export/html.py:1091
+#: ../lib/lcg/export/html.py:1260
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plugin"
 
@@ -75,53 +75,53 @@ msgstr "Adobe Flash plugin"
 #. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
 #. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
 #. version number.
-#: ../lib/lcg/export/html.py:1087
+#: ../lib/lcg/export/html.py:1256
 #, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr "Get %(plugin)s %(version)s or later."
 
-#: ../lib/lcg/export/html.py:1093
+#: ../lib/lcg/export/html.py:1262
 msgid "Use a JavaScript enabled browser."
 msgstr "Use a JavaScript enabled browser."
 
-#: ../lib/lcg/export/html.py:1094 ../lib/lcg/export/html.py:1096
+#: ../lib/lcg/export/html.py:1263 ../lib/lcg/export/html.py:1265
 msgid "Warning:"
 msgstr "AVISO:"
 
-#: ../lib/lcg/export/html.py:1127
+#: ../lib/lcg/export/html.py:1296
 msgid "Media Player unavailable."
 msgstr "Media Player inválido."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:1322
+#: ../lib/lcg/export/html.py:1497
 msgid "None"
 msgstr "Nenhum"
 
-#: ../lib/lcg/export/html.py:1323
+#: ../lib/lcg/export/html.py:1498
 msgid "You are here:"
 msgstr "Estás aqui:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1327
+#: ../lib/lcg/export/html.py:1502
 msgid "Next"
 msgstr "Próximo"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1329
+#: ../lib/lcg/export/html.py:1504
 msgid "Previous"
 msgstr "Anterior"
 
-#: ../lib/lcg/export/pdf.py:1929
+#: ../lib/lcg/export/pdf.py:1993 ../lib/lcg/export/pdf.py:2061
 #, python-format
 msgid "Missing image: %s"
 msgstr ""
 
-#: ../lib/lcg/export/pdf.py:2409
+#: ../lib/lcg/export/pdf.py:2561
 msgid "Page content extremely large, giving up"
 msgstr ""
 
-#: ../lib/lcg/export/pdf.py:2410
+#: ../lib/lcg/export/pdf.py:2562
 #, python-format
 msgid "Page content too large, reducing it by %s"
 msgstr ""
