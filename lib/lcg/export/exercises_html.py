@@ -87,6 +87,15 @@ class ExerciseExporter(object):
     def _readonly(self, context):
         return False
     
+    def _has_real_answers(self, exercise):
+        """Return true if the exersice defines the correct answers.
+        
+        If the correct answers are unknown, the exercise will not offer
+        automatic evaluation.
+
+        """
+        return True
+
     def _media_control(self, context, media, inline=False):
         g = context.generator()
         if inline:
@@ -176,7 +185,14 @@ class ExerciseExporter(object):
         g = context.generator()
         exercise_id = context.unique_id()
         context.resource('lcg-exercises.css')
-        if context.allow_interactivity():
+        has_real_answers = self._has_real_answers(exercise)
+        allow_interactivity = context.allow_interactivity()
+        if not has_real_answers:
+            methods = (self._export_tasks,)
+        elif not allow_interactivity:
+            methods = (self._export_tasks,
+                       self._export_answers)
+        else:
             context.resource('prototype.js')
             context.resource('lcg.js')
             context.resource('lcg-exercises.js')
@@ -186,12 +202,9 @@ class ExerciseExporter(object):
             methods = (self._export_instructions,
                        self._export_tasks,
                        self._export_results)
-        else:
-            methods = (self._export_tasks,
-                       self._export_answers)
         parts = [method(context, exercise, exercise_id) for method in methods]
         content = [x for x in parts if x is not None]
-        if context.allow_interactivity():
+        if allow_interactivity and has_real_answers:
             script = self._export_script(context, exercise, exercise_id)
             if script:
                 content = (g.form(content, id=exercise_id),
@@ -204,6 +217,9 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
     "A superclass for all exercises based on choosing from predefined answers."
 
     _JAVASCRIPT_CLASS = 'lcg.ChoiceBasedExercise'
+
+    def _has_real_answers(self, exercise):
+        return all(t.correct_choice() is not None for t in exercise.tasks())
 
     def _checked(self, context, exercise, exercise_id, task, i):
         return False
@@ -362,25 +378,7 @@ class _FillInExerciseExporter(ExerciseExporter):
                            "complete answer.")))),)
 
     def _has_real_answers(self, exercise):
-        # Return false if the exersice doesn't contain real answers, but only underscores
-        # or question marks to create text boxes.  In this case the exercise will not offer
-        # automatic evaluation.
         return all(not self._UNKNOWN_ANSWER_REGEXP.match(a) for a in exercise.answers())
-
-    def _export_script(self, context, exercise, exercise_id):
-        if not self._has_real_answers(exercise):
-            return None
-        return super(_FillInExerciseExporter, self)._export_script(context, exercise, exercise_id)
-
-    def _export_results(self, context, exercise, exercise_id):
-        if not self._has_real_answers(exercise):
-            return None
-        return super(_FillInExerciseExporter, self)._export_results(context, exercise, exercise_id)
-
-    def _export_answers(self, context, exercise, exercise_id):
-        if not self._has_real_answers(exercise):
-            return None
-        return super(_FillInExerciseExporter, self)._export_answers(context, exercise, exercise_id)
 
     def _export_task_text(self, context, exercise, exercise_id, task):
         g = context.generator()

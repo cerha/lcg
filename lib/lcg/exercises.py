@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -184,8 +184,8 @@ class Choice(object):
 
     """
     def __init__(self, answer, correct=False):
-        assert isinstance(answer, (str, unicode))
-        assert isinstance(correct, bool)
+        assert isinstance(answer, (str, unicode)), answer
+        assert correct is None or isinstance(correct, bool), correct
         self._answer = answer
         self._correct = correct
 
@@ -207,11 +207,14 @@ class ChoiceTask(Task):
           choices -- sequence of 'Choice' instances related to this Task.
           
         """
-        assert all(isinstance(choice, Choice) for choice in choices)
-        correct_choices = [choice for choice in choices if choice.correct()]
-        assert choices and len(correct_choices) == 1
+        assert all(isinstance(choice, Choice) for choice in choices) and len(choices) > 1, choices
         self._choices = list(choices)
-        self._correct_choice = correct_choices[0]
+        if all(ch.correct() is None for ch in choices):
+            self._correct_choice = None
+        else:
+            correct = [choice for choice in choices if choice.correct()]
+            assert len(correct) == 1 and not any(ch.correct() is None for ch in choices)
+            self._correct_choice = correct[0]
         super(ChoiceTask, self).__init__(prompt, **kwargs)
 
     def choices(self):
@@ -283,18 +286,28 @@ class ExerciseParser(object):
 
     def _process_choices(self, lines):
         def choice(text):
-            correct = text.startswith('+ ')
-            if not correct and not text.startswith('- '):
-                self._error(_("All choices must start with a plus or minus sign and a space."))
+            if text.startswith('+ '):
+                correct = True
+            elif text.startswith('- '):
+                correct = False
+            elif text.startswith('? '):
+                correct = None
+            else:
+                self._error(_("All choices must start with +/-/? sign and a space."))
             return Choice(text[2:].strip(), correct=correct)
         if not lines:
             self._error(_("No choices defined."))
         choices = map(choice, lines)
         correct_choices = [ch for ch in choices if ch.correct()]
-        if len(correct_choices) == 0:
-            self._error(_("None of the choices is marked as correct."))
-        if len(correct_choices) != 1:
+        unknown_choices = [ch.correct() is None for ch in choices]
+        if len(correct_choices) == 1 and not any(unknown_choices) or all(unknown_choices):
+            pass
+        elif len(correct_choices) > 1:
             self._error(_("More than one choice is marked as correct."))
+        elif any(unknown_choices):
+            self._error(_("All or none choices must be marked as unknown."))
+        else:
+            self._error(_("None of the choices is marked as correct."))
         return choices
 
     def _read_numbered_cloze_task(self, text, comment):
