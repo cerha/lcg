@@ -420,8 +420,8 @@ def mathml_nemeth(exporter, context, element):
                 children = last_children = last_element.getchildren()
                 while last_element.tag not in ('mi', 'mo', 'mn',) and children:
                     last_children = children
-                    children = last_element.getchildren()
                     last_element = children[-1]
+                    children = last_element.getchildren()
                 if last_element.tag == 'mo' and (last_element.text or '') in ',-–—':
                     if len(last_children) > 1:
                         last_element = last_children[-2]
