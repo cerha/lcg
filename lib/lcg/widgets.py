@@ -63,6 +63,17 @@ class Widget(object):
 
     """
 
+    def __init__(self, label=None, **kwargs):
+        """Arguments:
+        
+           label -- text to be used for aria-label attribute or the widget's
+             root HTML element
+           **kwargs -- other arguments passed to parent classes
+
+        """
+        self._label = label
+        super(Widget, self).__init__(**kwargs)
+
     def _export_widget(self, context):
         """Export the actual widget content.
 
@@ -102,6 +113,7 @@ class Widget(object):
         return g.concat(self._wrap_exported_widget(context,
                                                    self._export_widget(context),
                                                    id=element_id,
+                                                   aria_label=self._label,
                                                    cls=lcg.camel_case_to_lower(name) + '-widget'),
                         g.script(g.js_call('new lcg.%s' % name, element_id,
                                            *self._javascript_widget_arguments(context))))
