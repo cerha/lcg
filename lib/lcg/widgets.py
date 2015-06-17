@@ -63,7 +63,7 @@ class Widget(object):
 
     """
 
-    def __init__(self, label=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         """Arguments:
         
            label -- text to be used for aria-label attribute or the widget's
@@ -71,8 +71,8 @@ class Widget(object):
            **kwargs -- other arguments passed to parent classes
 
         """
-        self._label = label
-        super(Widget, self).__init__(**kwargs)
+        self._label = kwargs.pop('label', None)
+        super(Widget, self).__init__(*args, **kwargs)
 
     def _export_widget(self, context):
         """Export the actual widget content.
