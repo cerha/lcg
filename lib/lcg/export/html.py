@@ -153,7 +153,8 @@ class HtmlGenerator(object):
         result_list = [self.noescape('<' + tag)]
         dirty = False
         if __debug__:
-            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title')
+            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title',
+                             'accesskey')
         for name, value in kwargs.items():
             name = name.replace('_', '-')
             if value is not None and value is not False:
@@ -192,7 +193,7 @@ class HtmlGenerator(object):
         return result
 
     def _input(self, type, _attr=(), **kwargs):
-        _attr += ('type', 'name', 'value', 'size', 'maxlength', 'accesskey', 'autocomplete',
+        _attr += ('type', 'name', 'value', 'size', 'maxlength', 'autocomplete',
                   'autofocus', 'onclick', 'onmousedown', 'onmouseup', 'onkeydown',
                   'onkeypress', 'onchange', 'readonly', 'disabled')
         return self._tag('input', None, _attr, _paired=False, type=type, **kwargs)
@@ -321,8 +322,7 @@ class HtmlGenerator(object):
         return self._tag('hr', _paired=False, **kwargs)
 
     def a(self, label, **kwargs):
-        attr = ('href', 'type', 'name', 'target', 'accesskey', 'rel',
-                'onclick', 'onmouseover', 'onmouseout')
+        attr = ('href', 'type', 'name', 'target', 'rel', 'onclick', 'onmouseover', 'onmouseout')
         return self._tag('a', label, attr, **kwargs)
 
     def ol(self, *args, **kwargs):
