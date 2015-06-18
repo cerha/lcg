@@ -725,7 +725,7 @@ def _export_mspace(node, exporter, context, variables, **kwargs):
     try:
         n = int(width)
     except ValueError:
-        if width.endswith('em'):
+        if width.endswith('em') or width.endswith('ex'):
             n = int(width[:-2])
         else:
             raise
