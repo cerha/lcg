@@ -369,6 +369,9 @@ class TranslatableText(Localizable):
         if isinstance(orig_text, lcg.HtmlEscapedUnicode):
             escape = translated != orig_text
             translated = lcg.HtmlEscapedUnicode(translated, escape=escape)
+        elif (any([isinstance(a, lcg.HtmlEscapedUnicode) for a in self._args]) or
+              any([isinstance(a, lcg.HtmlEscapedUnicode) for a in self._kwargs.values()])):
+            translated = lcg.HtmlEscapedUnicode(translated, escape=True)
         return translated
 
     def _localize(self, localizer):
