@@ -269,18 +269,33 @@ class TranslatableText(Localizable):
     constructor and let the instance interpolate them later.
     
     """
-    _RESERVED_ARGS = ()
+    _RESERVED_ARGS = ('escape_html',)
     
     class _Interpolator(object):
         def __init__(self, func, localizer):
             self._func = func
             self._localizer = localizer
+            self._cache = {}
+            self._contains_escaped_html = False
+
         def __getitem__(self, key):
-            value = self._func(str(key))
-            localized_value = self._localizer.localize(value)
-            if isinstance(value, lcg.HtmlEscapedUnicode):
-                localized_value = lcg.HtmlEscapedUnicode(value, escape=True)
+            # Caching is necessary to avoid calling self._func twice when
+            # HTML escaping is needed and formatting is repeated with
+            # lcg.HtmlEscapedUnicode in TranslatableText._localize().
+            try:
+                localized_value = self._cache[key]
+            except KeyError:
+                value = self._func(str(key))
+                localized_value = self._localizer.localize(value)
+                if isinstance(value, lcg.HtmlEscapedUnicode):
+                    self._contains_escaped_html = True
+                    localized_value = lcg.HtmlEscapedUnicode(value, escape=True)
+                self._cache[key] = localized_value
             return localized_value
+
+        def contains_escaped_html(self):
+            return self._contains_escaped_html
+            
     
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
@@ -302,6 +317,16 @@ class TranslatableText(Localizable):
         Arguments:
 
           text -- the actual text to translate as a string or unicode instance.
+          escape_html -- if passed as a keyword argument, it indicates, that
+            the string should be returned as 'lcg.HtmlEscapedUnicode' after
+            translation and variable interpolation.  The value (if not None) is
+            a boolean passed to lcg.HtmlEscapedUnicode constructor as the
+            argument 'escape'.  In the most typical case, you need to pass
+            False here when the translation string directly contains HTML
+            markup.  If omitted and the interpolation variables (see below),
+            contain an 'lcg.HtmlEscapedUnicode' instance, the translation
+            result is automatically returned as 'lcg.HtmlEscapedUnicode', but
+            any HTML within the translated string will be escaped in this case.
           args -- positional substitution values (see below).
           kwargs -- named substitution arguments (see below).
 
@@ -327,15 +352,17 @@ class TranslatableText(Localizable):
         self._init_kwargs(**kwargs)
 
     def _init_kwargs(self, _orig_text=None, _domain=None, _origin='en', _interpolate=None,
-                     _transforms=(), **kwargs):
+                     _transforms=(), escape_html=None, **kwargs):
         assert isinstance(_domain, basestring) or _domain is None, _domain
         assert isinstance(_origin, basestring), _origin
         assert _interpolate is None or isinstance(_interpolate, collections.Callable), _interpolate
+        assert escape_html is None or isinstance(escape_html, bool), escape_html
         self._orig_text = _orig_text or self._text
         self._domain = _domain
         self._origin = _origin
         self._interpolate = _interpolate
         self._kwargs = kwargs
+        self._escape_html = escape_html
         super(TranslatableText, self).__init__(_transforms=_transforms)
 
     def _clone_args(self):
@@ -364,25 +391,31 @@ class TranslatableText(Localizable):
 
     def _translate(self, localizer):
         translator = localizer.translator()
-        orig_text = self._orig_text
-        translated = translator.gettext(orig_text, domain=self._domain, origin=self._origin)
-        if isinstance(orig_text, lcg.HtmlEscapedUnicode):
-            escape = translated != orig_text
-            translated = lcg.HtmlEscapedUnicode(translated, escape=escape)
-        elif (any([isinstance(a, lcg.HtmlEscapedUnicode) for a in self._args]) or
-              any([isinstance(a, lcg.HtmlEscapedUnicode) for a in self._kwargs.values()])):
-            translated = lcg.HtmlEscapedUnicode(translated, escape=True)
-        return translated
+        return translator.gettext(self._orig_text, domain=self._domain, origin=self._origin)
 
     def _localize(self, localizer):
-        result = self._translate(localizer)
-        if self._args:
-            result %= tuple([localizer.localize(arg) for arg in self._args])
-        elif self._interpolate:
-            result %= self._Interpolator(self._interpolate, localizer)
-        elif self._kwargs:
-            result %= dict([(k, localizer.localize(v)) for k, v in self._kwargs.items()])
-        return result
+        translated = self._translate(localizer)
+        escape = self._escape_html
+        if escape is not None:
+            translated = lcg.HtmlEscapedUnicode(translated, escape=escape)
+        if self._interpolate and not self._args:
+            interpolator = self._Interpolator(self._interpolate, localizer)
+            interpolated = translated % interpolator
+            if escape is None and interpolator.contains_escaped_html():
+                translated = lcg.HtmlEscapedUnicode(translated, escape=True) % interpolator
+            else:
+                translated = interpolated
+        elif self._args or self._kwargs:
+            if self._args:
+                args = tuple([localizer.localize(arg) for arg in self._args])
+                values = args if escape is None else None
+            else:
+                args = dict([(k, localizer.localize(v)) for k, v in self._kwargs.items()])
+                values = args.values() if escape is None else None
+            if escape is None and any(isinstance(v, lcg.HtmlEscapedUnicode) for v in values):
+                translated = lcg.HtmlEscapedUnicode(translated, escape=True)
+            translated %= args
+        return translated
 
 
 class SelfTranslatableText(TranslatableText):
@@ -403,7 +436,7 @@ class SelfTranslatableText(TranslatableText):
       translations -- a dictionary of translations keyed by a language code.
 
     """
-    _RESERVED_ARGS = ('translations',)
+    _RESERVED_ARGS = TranslatableText._RESERVED_ARGS + ('translations',)
 
     def _init_kwargs(self, translations=None, **kwargs):
         assert isinstance(translations, dict), translations
