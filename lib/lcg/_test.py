@@ -148,6 +148,37 @@ class TranslatableText(unittest.TestCase):
                        ('Mon', '10:32'), separator=' ')
         self.assertEqual(c, "Info: Version 1.0, 2006-08-14 Mon 10:32")
 
+    def test_html_escaping(self):
+        def test(src, expected_result, escaped=True):
+            result = src.localize(lcg.Localizer())
+            self.assertEqual(result, expected_result)
+            if escaped:
+                assert isinstance(result, lcg.HtmlEscapedUnicode)
+            else:
+                assert not isinstance(result, lcg.HtmlEscapedUnicode)
+            
+        g = lcg.HtmlExporter.Generator()
+        a = lcg.TranslatableText("Hi %s, say hello to %s.", g.strong("Joe"), g.strong("Bob"))
+        test(a,
+             'Hi <strong>Joe</strong>, say hello to <strong>Bob</strong>.')
+        test(lcg.format('<a href=%s>%s</a>', 'http://www.freebsoft.org', a, escape_html=False),
+             '<a href=http://www.freebsoft.org>Hi <strong>Joe</strong>, '
+             'say hello to <strong>Bob</strong>.</a>')
+        test(lcg.format('<%s>', a),
+             '&lt;Hi <strong>Joe</strong>, say hello to <strong>Bob</strong>.&gt;')
+        test(g.div(lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.")
+                   .interpolate(lambda x: g.span(x.upper()))),
+             '<div>Hi <span>PERSON1</span>, say hello to <span>PERSON2</span>.</div>')
+        test(lcg.format('%s -> %s', 'x', 'y', escape_html=True),
+             'x -&gt; y')
+        test(lcg.format('%s', 'x'), 'x', escaped=False)
+        link = lcg.format('<a href="%s">%d</a>', 'x', 1, escape_html=False)
+        test(link, '<a href="x">1</a>')
+        post = _("post #%s", link)
+        test(post, 'post #<a href="x">1</a>')
+        test(lcg.format('<span>%s</span>', post, escape_html=False),
+             '<span>post #<a href="x">1</a></span>')
+
 tests.add(TranslatableText)
 
 
