@@ -178,6 +178,12 @@ class TranslatableText(unittest.TestCase):
         test(post, 'post #<a href="x">1</a>')
         test(lcg.format('<span>%s</span>', post, escape_html=False),
              '<span>post #<a href="x">1</a></span>')
+        # Test a specific case of pytis.web.ItemizedView export
+        template = lcg.TranslatableText("%(a)s [%(b)s]")
+        fields = dict(a=g.a(lcg.TranslatableText("a"), href='a'), b='b')
+        interpolated = template.interpolate(lambda f: fields[f])
+        test(interpolated, '<a href="a">a</a> [b]')
+
 
 tests.add(TranslatableText)
 

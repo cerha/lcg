@@ -290,6 +290,8 @@ class TranslatableText(Localizable):
                 if isinstance(value, lcg.HtmlEscapedUnicode):
                     self._contains_escaped_html = True
                     localized_value = lcg.HtmlEscapedUnicode(value, escape=True)
+                elif isinstance(value, lcg.Concatenation) and value._html_escape:
+                    self._contains_escaped_html = True
                 self._cache[key] = localized_value
             return localized_value
 
