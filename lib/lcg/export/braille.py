@@ -276,6 +276,11 @@ def xml2braille(xml):
         mode = 0
     else:
         mode = 1 << 30
+        try:
+            # latest liblouisutdml logs output with log level INFO - unexpected output fails tests; so raise the default log level
+            _louisutdml.lbu_setLogLevel(40000) # liblouis.h: LOG_ERROR = 40000
+        except AttributeError:
+            pass
     # Make the foreign call and process the results
     result = _louisutdml.lbu_translateString(str("preferences.cfg"), inbuf, len(inbuf) + 1,
                                             outbuf, ctypes.byref(outlen), None, None, mode)
