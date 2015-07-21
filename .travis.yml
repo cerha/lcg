@@ -14,7 +14,7 @@ matrix:
 install:
   - "sudo apt-get update -qq"
   - "sudo apt-get -y install gettext fontconfig ttf-freefont libxml2-dev texinfo"
-  - "pip install reportlab"
+  - "pip install reportlab coveralls"
   # install liblouis
   - "git clone https://github.com/liblouis/liblouis && cd liblouis"
   - "if [ $LOUIS_VERSION == 'debian-wheezy' ]; then git checkout liblouis_2_4_1; elif [ $LOUIS_VERSION == 'debian-jessie' ]; then git checkout liblouis_2_5_3; elif [ $LOUIS_VERSION != 'head' ]; then false; fi"
@@ -26,4 +26,6 @@ install:
   - "./configure --prefix=/usr CFLAGS='-I/usr/lib/jvm/java-7-oracle/include -I/usr/lib/jvm/java-7-oracle/include/linux' && make && sudo make install && cd .."
 script:
   - "PYTHONPATH=`pwd`/lib:$PYTHONPATH LCGDIR=`pwd` make"
-  - "PYTHONPATH=`pwd`/lib:`pwd`/liblouis/python:$PYTHONPATH LCGDIR=`pwd` make test"
+  - "PYTHONPATH=`pwd`/lib:`pwd`/liblouis/python:$PYTHONPATH LCGDIR=`pwd` coverage run --source=lib/lcg ./lib/lcg/_test.py"
+after_success:
+  - "coveralls"
