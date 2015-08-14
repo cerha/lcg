@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012-2014 by BRAILCOM,o.p.s.
+# Copyright (C) 2012-2015 by BRAILCOM,o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -106,7 +106,8 @@ class EpubHtml5Exporter(Html5Exporter):
 
     def _export_mathml(self, context, element):
         context.mathml = True
-        return self._INVALID_MATHML_ATTRIBUTES.sub('', element.content())
+        result = super(EpubHtml5Exporter, self)._export_mathml(context, element)
+        return self._generator.noescape(self._INVALID_MATHML_ATTRIBUTES.sub('', result))
 
     def _uri_node(self, context, node, lang=None):
         return node.id() + '.xhtml'
