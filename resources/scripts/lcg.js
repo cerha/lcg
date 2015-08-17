@@ -280,8 +280,8 @@ lcg.Notebook = Class.create(lcg.Menu, {
     init_item: function ($super, item, prev, parent) {
 	$super(item, prev, parent);
 	item.setAttribute('role', 'tab');
-	var href = item.getAttribute('href'); // The href always starts with '#'.
-	var page = $(href.substr(1));
+	var href = item.href; // The href always contains the '#', in MSIE 8 it is even a full asolute URI.
+	var page = $(href.substr(href.indexOf('#') + 1));
 	item._lcg_notebook_page = page;
 	page._lcg_notebook_item = item;
 	page.down('h1,h2,h3,h4,h5,h6').hide();
