@@ -3,8 +3,6 @@ python:
   - "2.7"
 env:
   # versions of liblouis and liblouisutdml
-  #- LOUIS_VERSION=debian-wheezy UTDML_VERSION=debian-wheezy
-  - LOUIS_VERSION=debian-jessie UTDML_VERSION=debian-wheezy
   - LOUIS_VERSION=debian-jessie UTDML_VERSION=debian-jessie
   - LOUIS_VERSION=head UTDML_VERSION=head # latest from git/hg
 matrix:
