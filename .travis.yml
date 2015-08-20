@@ -29,3 +29,9 @@ script:
   - "PYTHONPATH=`pwd`/lib:`pwd`/liblouis/python:$PYTHONPATH LCGDIR=`pwd` coverage run --source=lib/lcg ./lib/lcg/_test.py"
 after_success:
   - "coveralls"
+notifications:
+  email:
+    recipients:
+      - lcg-cvs@lists.freebsoft.org
+    on_success: always
+    on_failure: always
