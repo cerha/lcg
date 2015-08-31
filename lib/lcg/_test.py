@@ -988,6 +988,19 @@ class HtmlExport(unittest.TestCase):
         content = lcg.MathML(u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>')
         self.assertIsInstance(export(content), basestring)
 
+    def test_js_value(self):
+        import json
+        g = lcg.HtmlGenerator()
+        for value in ('a', 1, True,
+                      [1,2,3], [3,2,1],
+                      {'a': 'A', 'b': 'B'}, {'1': 1, '2': 2},
+                      "foo'ba{r}", '"foo"[bar]', '<a>'):
+            x = g.js_value(value)
+            y = json.loads(x)
+            self.assertEqual(value, y,
+                            "\n  - value:  %r\n  - result: %s\n  - check:  %r" %
+                            (value, x, y))
+
 tests.add(HtmlExport)
 
 
