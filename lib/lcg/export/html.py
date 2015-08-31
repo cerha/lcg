@@ -520,41 +520,31 @@ class HtmlGenerator(object):
                 content = 'if (' + condition + ') ' + content
         return self.script(content, noscript)
 
-    def js_value(self, var):
-        if var is None:
+    def js_value(self, value):
+        """Return Javascript representation of given python value as a unicode."""
+        if value is None:
             return 'null'
-        elif isinstance(var, self._JavaScriptCode):
-            return var
-        elif isinstance(var, (str, unicode)):
+        elif isinstance(value, self._JavaScriptCode):
+            return value
+        elif isinstance(value, (str, unicode)):
             # Use double quotes (not single) to make output JSON compatible!
-            return '"' + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, var) + '"'
-        elif isinstance(var, bool):
-            return (var and 'true' or 'false')
-        elif isinstance(var, int):
-            return str(var)
-        elif isinstance(var, (tuple, list)):
-            return self.js_array(var)
-        elif isinstance(var, dict):
-            return self.js_dict(var)
+            return '"' + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, value) + '"'
+        elif isinstance(value, bool):
+            return (value and 'true' or 'false')
+        elif isinstance(value, int):
+            return str(value)
+        elif isinstance(value, (tuple, list)):
+            return concat('[', concat([self.js_value(v) for v in value], separator=", "), ']')
+        elif isinstance(value, dict):
+            # Only string keys are supported in JavaScript (int works too, but is actually
+            # converted to string, which might be unexpected, so we don't support it).
+            assert is_sequence_of(value.keys(), str)
+            return concat('{', concat([concat(self.js_value(k), ': ', self.js_value(v))
+                                       for k, v in value.items()],
+                                      separator=", "),
+                          '}')
         else:
-            raise Exception("Invalid type for JavaScript conversion:", var)
-
-    def js_array(self, items):
-        assert isinstance(items, (tuple, list))
-        values = [self.js_value(i) for i in items]
-        return concat('[', concat(values, separator=", "), ']')
-
-    def js_dict(self, items):
-        if isinstance(items, dict):
-            items = items.items()
-        else:
-            assert isinstance(items, (tuple, list))
-        assert is_sequence_of(dict(items).keys(), str)
-        pairs = [concat("'%s': " % k, self.js_value(v)) for k, v in items]
-        return concat('{', concat(pairs, separator=", "), '}')
-
-    def js_args(self, *args):
-        return concat([self.js_value(arg) for arg in args], separator=", ")
+            raise Exception("Unsupported value type for JavaScript conversion:", value)
 
     def js_call(self, fname, *args):
         fargs = [self.js_value(arg) for arg in args]
