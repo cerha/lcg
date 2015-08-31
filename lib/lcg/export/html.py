@@ -526,7 +526,8 @@ class HtmlGenerator(object):
         elif isinstance(var, self._JavaScriptCode):
             return var
         elif isinstance(var, (str, unicode)):
-            return "'" + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, var) + "'"
+            # Use double quotes (not single) to make output JSON compatible!
+            return '"' + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, var) + '"'
         elif isinstance(var, bool):
             return (var and 'true' or 'false')
         elif isinstance(var, int):
