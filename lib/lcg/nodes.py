@@ -110,6 +110,7 @@ class ContentNode(object):
         assert is_sequence_of(children, ContentNode)
         assert cover_image is None or isinstance(cover_image, lcg.Image), cover_image
         assert metadata is None or isinstance(metadata, Metadata)
+        assert heading is None or isinstance(heading, lcg.Content), heading
         self._id = id
         self._parent = None #parent
         self._title = title if title is not None else brief_title or id
