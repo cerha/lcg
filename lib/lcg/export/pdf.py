@@ -2686,7 +2686,7 @@ class PDFExporter(FileExporter, Exporter):
         return self._markup_container(context, element, 'sub')
     
     def _export_citation(self, context, element):
-        return self._export_emphasize(context, element)
+        return self._export_emphasized(context, element)
     
     def _export_quotation(self, context, element):
         exported = self._export_paragraph(context, element)
