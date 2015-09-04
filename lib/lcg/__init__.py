@@ -78,7 +78,7 @@ from .export.html import HtmlEscapedUnicode, HtmlGenerator, \
     XhtmlGenerator, HtmlExporter, Html5Exporter, HtmlFileExporter, \
     StyledHtmlExporter, HtmlStaticExporter, format_text
 
-from .export.epub import EpubHtml5Exporter
+from .export.epub import EpubExporter
 from .export.ims import IMSExporter
 from .export.hhp import HhpExporter
 
