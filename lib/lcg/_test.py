@@ -400,11 +400,22 @@ tests.add(GettextTranslator)
 
 class ContentNode(unittest.TestCase):
     
-    def test_misc(self):
-        b = lcg.ContentNode('b', content=lcg.TextContent("B"))
-        a = lcg.ContentNode('a', content=lcg.TextContent("A"), children=(b,))
+    def test_node_structure(self):
+        d = lcg.ContentNode('d')
+        c = lcg.ContentNode('c', children=(d,))
+        b = lcg.ContentNode('b')
+        a = lcg.ContentNode('a', children=(b, c))
         self.assertEqual(a.id(), 'a')
-        self.assertEqual(a.root(), b.root(), a)
+        self.assertIs(a.root(), b.root())
+        self.assertIs(c.root(), a)
+        self.assertIs(d.root(), a)
+        self.assertIs(b.next(), c)
+        self.assertIs(b.prev(), a)
+        self.assertEqual(d.path(), (a, c, d))
+        self.assertEqual(b.path(), (a, b))
+        self.assertEqual(a.linear(), [a, b, c, d])
+        self.assertEqual(b.linear(), [b])
+        self.assertEqual(c.linear(), [c, d])
 
 tests.add(ContentNode)
 
