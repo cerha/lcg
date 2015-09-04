@@ -2706,6 +2706,9 @@ class PDFExporter(FileExporter, Exporter):
     
     def _export_link(self, context, element):
         target = element.target(context)
+        node_id = element.node_id()
+        if node_id and node_id != context.pdf_context.anchor_prefix:
+            return make_element(Empty)
         if element.content():
             content = self._content_export(context, element)
         else:

@@ -594,6 +594,12 @@ class Link(Container):
         """Return the value of 'type' as passed to the constructor."""
         return self._type
 
+    def node_id(self):
+        "Return target node id (basestring) or 'None'."
+        target = self._target
+        if isinstance(target, basestring) and '#' in target:
+            return target.split('#', 1)[0]
+        return None
 
 class Abbreviation(TextContent):
     """Abbreviation with description."""
