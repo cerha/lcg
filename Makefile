@@ -20,3 +20,6 @@ tags:
 	rm -f TAGS
 	find -name '*.py' -not -name '_test.py' | xargs etags --append --regex='/^[ \t]+def[ \t]+\([a-zA-Z_0-9]+\)/\1/'
 
+coverage:
+	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" coverage run --source=lib/lcg lib/lcg/_test.py
+	coverage report
