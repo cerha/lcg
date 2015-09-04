@@ -1059,8 +1059,25 @@ class EpubExport(unittest.TestCase):
         pkg_opf = archive.read('rsrc/pkg.opf')
         self.assertEqual(pkg_opf[:19], '<?xml version="1.0"')
 
-
 tests.add(EpubExport)
+
+
+class ImsExport(unittest.TestCase):
+
+    def test_export(self):
+        import zipfile
+        import cStringIO
+        #m = lcg.Metadata()
+        p = lcg.ResourceProvider()
+        d = lcg.ContentNode('d', resource_provider=p)
+        c = lcg.ContentNode('c', children=(d,), resource_provider=p)
+        b = lcg.ContentNode('b', resource_provider=p)
+        a = lcg.ContentNode('a', children=(b, c), resource_provider=p) #, metadata=m)
+        e = lcg.IMSExporter()
+        manifest = e.manifest(a).xml()
+        self.assertEqual(manifest[:19], '<?xml version="1.0"')
+
+tests.add(ImsExport)
 
 
 class BrailleExport(unittest.TestCase):

@@ -97,23 +97,23 @@ class _Manifest:
 
     # Public methods
     
-    def write(self, directory):
-        """Write the IMS Manifest into a file."""
-        filename = os.path.join(directory, 'imsmanifest.xml')
-        fh = codecs.open(filename, 'w', encoding="utf-8")
-        fh.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        self._manifest.writexml(fh, newl = '\n', addindent='  ')
-        fh.close()
+    def xml(self):
+        """Return the IMS Manifest into a file."""
+        return '<?xml version="1.0" encoding="UTF-8"?>\n' + self._manifest.toxml()
 
         
 class IMSExporter(lcg.StyledHtmlExporter, lcg.HtmlFileExporter):
     """Export the content as an IMS package."""
-   
+
+    def manifest(self, node):
+        return _Manifest(self.context(node, None))
+        
     def dump(self, node, directory, **kwargs):
         super(IMSExporter, self).dump(node, directory, **kwargs)
         if node == node.root():
-            manifest = _Manifest(self.context(node, None))
-            manifest.write(directory)
+            manifest = self.manifest(node).xml()
+            with file(os.path.join(directory, 'imsmanifest.xml'), 'w') as f:
+                f.write(manifest.encode('utf-8'))
 
     def _body_parts(self, context):
         return (context.node().content(context.lang()).export(context),)
