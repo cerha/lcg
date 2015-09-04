@@ -417,6 +417,32 @@ class ContentNode(unittest.TestCase):
         self.assertEqual(b.linear(), [b])
         self.assertEqual(c.linear(), [c, d])
 
+    def test_variants(self):
+        n = lcg.ContentNode('n', content=lcg.TextContent("C"),
+                            right_page_footer=lcg.TextContent("RF"),
+                            page_background=lcg.TextContent("B"),
+                            variants=(
+                                lcg.Variant('en', content=lcg.TextContent('EN'),
+                                            page_header=lcg.TextContent('H.EN')),
+                                lcg.Variant('cs', content=lcg.TextContent('CS'),
+                                            page_footer=lcg.TextContent('F.CS'),
+                                            right_page_footer=lcg.TextContent('RF.CS')),
+                            ))
+        self.assertEqual(n.content('en').text(), 'EN')
+        self.assertEqual(n.content('cs').text(), 'CS')
+        self.assertEqual(n.content('fr').text(), 'C')
+        self.assertEqual(n.content(None).text(), 'C')
+        self.assertEqual(n.page_header('en').text(), 'H.EN')
+        self.assertIsNone(n.page_footer('en'))
+        self.assertEqual(n.right_page_footer('en').text(), 'RF')
+        self.assertIsNone(n.page_header('cs'))
+        self.assertEqual(n.page_footer('cs').text(), 'F.CS')
+        self.assertEqual(n.right_page_footer('cs').text(), 'RF.CS')
+        self.assertIsNone(n.page_header('fr'))
+        self.assertEqual(n.page_background('en').text(), 'B')
+        self.assertEqual(n.page_background('cs').text(), 'B')
+        self.assertEqual(n.page_background('fr').text(), 'B')
+
 tests.add(ContentNode)
 
 
@@ -1018,7 +1044,7 @@ tests.add(HtmlExport)
 class BrailleExport(unittest.TestCase):
 
     def _load_presentation(self):
-        return lcg.export.braille_presentation(presentation_file='presentation-braille-test.py')
+        return lcg.braille_presentation(presentation_file='presentation-braille-test.py')
 
     def _test(self, text, braille, header, footer, presentation, lang, sec_lang=None,
               full_parse=False):
