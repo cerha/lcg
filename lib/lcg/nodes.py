@@ -122,7 +122,7 @@ class ContentNode(object):
         self._foldable = foldable
         for child in children:
             child._set_parent(self)
-        self._children = children
+        self._children = tuple(children)
         self._resource_provider = resource_provider
         if globals is None:
             self._globals = {}
@@ -194,8 +194,8 @@ class ContentNode(object):
         return self._foldable
     
     def children(self):
-        """Return the list of all subordinate nodes as a tuple."""
-        return tuple(self._children)
+        """Return all subordinate nodes as a tuple."""
+        return self._children
 
     def find_section(self, lang, section_id):
         def find(section_id, sections):
