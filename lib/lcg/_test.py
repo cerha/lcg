@@ -1041,6 +1041,28 @@ class HtmlExport(unittest.TestCase):
 tests.add(HtmlExport)
 
 
+class EpubExport(unittest.TestCase):
+
+    def test_export(self):
+        import zipfile
+        import cStringIO
+        #m = lcg.Metadata()
+        p = lcg.ResourceProvider()
+        d = lcg.ContentNode('d', resource_provider=p)
+        c = lcg.ContentNode('c', children=(d,), resource_provider=p)
+        b = lcg.ContentNode('b', resource_provider=p)
+        a = lcg.ContentNode('a', children=(b, c), resource_provider=p) #, metadata=m)
+        e = lcg.EpubExporter()
+        context = e.context(a, 'en')
+        epub = e.export(context)
+        archive = zipfile.ZipFile(cStringIO.StringIO(epub))
+        pkg_opf = archive.read('rsrc/pkg.opf')
+        self.assertEqual(pkg_opf[:19], '<?xml version="1.0"')
+
+
+tests.add(EpubExport)
+
+
 class BrailleExport(unittest.TestCase):
 
     def _load_presentation(self):
