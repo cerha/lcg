@@ -473,7 +473,7 @@ class Metadata(object):
     """Meta data describing a publication."""
     authors = ()
     """A sequence of full names of publication content authors."""
-    contributors = None
+    contributors = ()
     """A sequence of full names of publication content contributors.
 
     Contributors are authors with less significant.
