@@ -229,7 +229,7 @@ class Notebook(Widget, lcg.Container):
         switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#' + s.id(), title=s.descr(),
                                            cls=(s.id()==self._active and 'current' or None)),
                                        cls="notebook-tab")
-                                  for s in self.sections(context)]),
+                                  for s in self.sections()]),
                         cls='notebook-switcher')
         return g.concat(switcher, lcg.Container.export(self, context))
 

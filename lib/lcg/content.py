@@ -109,15 +109,13 @@ class Content(object):
         #       "Reparenting not allowed: %s -> %s" % (self._parent, node)
         self._parent = node
 
-    def set_page_number(self, context, number):
+    def set_page_number(self, number):
         """Set page number of the content element.
 
         This is to be used in table of contents.
 
         Arguments:
         
-          context -- formatting context as a 'Exporter.Context' instance
-            created and returned by 'Exporter.context' method
           number -- the page number; basestring
           
         """
@@ -200,24 +198,20 @@ class Content(object):
         """ """
         return self._neighbor_element(1, stop_classes)
 
-    def sections(self, context):
-        """Return the contained sections as a sequence of 'Section' instances.
+    def sections(self):
+        """Return the contained sections as a list of 'Section' instances.
 
-        This method allows creation of tables of contents and introspection of
-        content hierarchy.
+        This method allows introspection of content hierarchy (for example for
+        creation of a table of contents).
         
-        An empty sequence is returned in the base class.  The derived classes,
-        however, can override this method to return the sequence of contained
-        subsections.
-
-        The argument 'context' ('lcg.Exporter.Context' instance) must be passed
-        because the returned value may depend in on the current export context
-        (for example 'ContentVariants' depends on current export language).
+        An empty list is returned in the base class.  Derived classes which
+        contain sections should override this method to return the contained
+        sections.
 
         """
-        return ()
+        return []
         
-    def page_number(self, context):
+    def page_number(self):
         """Return page number of the content element.
 
         This is to be used in table of contents.
@@ -341,13 +335,13 @@ class Container(Content):
         """
         return self._content
             
-    def sections(self, context):
+    def sections(self):
         result = []
         for c in self._content:
             if isinstance(c, Section):
                 result.append(c)
             elif isinstance(c, Container):
-                result.extend(c.sections(context))
+                result.extend(c.sections())
         return result
     
     def names(self):
@@ -579,7 +573,7 @@ class Link(Container):
                 else:
                     node = None
                 if node and section_id:
-                    target = node.find_section(section_id, context)
+                    target = node.find_section(context.lang(), section_id)
                 else:
                     target = node
             if target is None:
@@ -1306,7 +1300,7 @@ class Section(Container):
             identifier will be generated automatically based on section order
             and hierarchy, so it will not change across several LCG invocations
             as long as the hierarchy remains unchanged.  However if you want to
-            refer to a section explicitly from outside the document, it is
+            refer to a section explicitly from outside of the document, it is
             better to set the identifier explicitly to maintain consistency.
             The identifier must be, however, unique within the whole content
             hierarchy (of one 'ContentNode').  See also 'ContentNode.find_section(),
@@ -1342,16 +1336,6 @@ class Section(Container):
         """
         return [c for c in self.container_path() if isinstance(c, Section)]
     
-    def section_number(self, context=None):
-        """Return the number of this section within its container section as int."""
-        container = self._container
-        while container and not isinstance(container, Section) and container.container():
-            container = container.container()
-        if container:
-            return list(container.sections(context)).index(self) + 1
-        else:
-            return 1
-    
     def title(self):
         """Return the section title as a basestring."""
         return self._title
@@ -1374,8 +1358,8 @@ class Section(Container):
         """Return true if the section is supposed to appear in TOC."""
         return self._in_toc
     
-    def id(self, context=None):
-        """Return the unique section identifier as a string.
+    def id(self):
+        """Return unique section identifier as a string.
 
         If 'id' was passed to the constructor, it is used.  Otherwise the
         identifier is automatically generated.  The generated id is unique
@@ -1384,12 +1368,20 @@ class Section(Container):
         exports in this case).
 
         """
+        def section_number(x):
+            container = x.container()
+            while container and not isinstance(container, Section) and container.container():
+                container = container.container()
+            if container:
+                return list(container.sections()).index(x) + 1
+            else:
+                return 1
         if self._id is None:
             path = self.section_path()
             if len(path) >= 2:
-                self._id = path[-2].id() + '.' + str(self.section_number())
+                self._id = path[-2].id() + '.' + str(section_number(self))
             else:
-                numbers = [str(x.section_number(context)) for x in path]
+                numbers = [str(section_number(x)) for x in path]
                 self._id = self._ID_PREFIX + '.'.join(numbers)
         return self._id
 
@@ -1440,6 +1432,7 @@ class TableOfContents(Content):
 
     """
     _TOC_ITEM_TYPE = Content
+
     def __init__(self, item=None, title=None, depth=None, detailed=True, **kwargs):
         """Arguments:
           item -- the place where to start in the content hierarchy tree as a
@@ -1480,42 +1473,44 @@ class TableOfContents(Content):
             item = self._container
         return item
 
-    def _items(self, context, item, depth=None):
-        if depth is not None:
-            if depth <= 0:
-                return ()
-            depth -= 1
-        items = ()
-        if isinstance(item, ContentNode):
-            items = [node for node in item.children() if not node.hidden()]
-        if len(items) == 0 and self._detailed:
-            if isinstance(item, (tuple, list)):
-                items = item
-            else:
-                items = [s for s in item.sections(context) if s.in_toc()]
-        if len(items) == 0:
-            return ()
-        return [(i, self._items(context, i, depth)) for i in items]
-
     def title(self):
         """Return the value of 'title' as passed to the constructor."""
         return self._title
 
-    def items(self, context):
+    def items(self, lang):
         """Return the hierarchy of items present in the table of contents.
 
-        The returned value is a recursive structure.  It is a sequence of pairs
+        The returned value is a recursive structure.  It is a list of pairs
         (tuples) ITEM, SUBITEMS, where ITEM is always either 'Section' or
-        'ContentNode' instance and SUBITEMS is a nested sequence of the same
+        'ContentNode' instance and SUBITEMS is a nested list of the same
         type if given item has subitems displayed in the table of contents.
-        Otherwise SUBITEMS is an empty sequence.
+        Otherwise SUBITEMS is an empty list.
 
         The method handles hidden items, depth limit and other conditions
         internally, so that the caller doesn't need to care which items belong
         to the table of contents.  All returned items should be displayed.
 
         """
-        return self._items(context, self._root_item(), depth=self._depth)
+        def subitems(item, depth=None):
+            if depth is not None:
+                if depth <= 0:
+                    return []
+                depth -= 1
+            if isinstance(item, ContentNode):
+                items = [node for node in item.children() if not node.hidden()]
+            else:
+                items = []
+            if len(items) == 0 and self._detailed:
+                if isinstance(item, (tuple, list)):
+                    items = item
+                else:
+                    if isinstance(item, ContentNode):
+                        sections = item.content(lang).sections()
+                    else:
+                        sections = item.sections()
+                    items = [s for s in sections if s.in_toc()]
+            return [(subitem, subitems(subitem, depth)) for subitem in items]
+        return subitems(self._root_item(), depth=self._depth)
     
     
 class NodeIndex(TableOfContents):
@@ -1611,48 +1606,6 @@ class Substitution(Content):
         """Return source text representation of the variable."""
         return self._markup
 
-
-class ContentVariants(Container):
-    """Container of multiple language variants of the same content.
-
-    This implements one of two LCG methods for creating multilingual documents.  The second method
-    uses 'TranslatableText' within the content and is mostly useful for content, which has
-    identical structure in all language variants, only the user visible texts are translated.
-    'ContentVariants', on the other hand, allows you to include a completely arbitrary subcontent
-    for each language within one document.  Only the relevant variant is used in export time (when
-    the target language is already known).
-
-    """
-    def __init__(self, variants):
-        """Arguments:
-        
-          variants -- a sequence of pairs '(LANG, CONTENT)', where 'LANG' is an
-            ISO 639-1 Alpha-2 language code and 'CONTENT' is the actual content
-            variant for this language as a 'Content' instance or a sequence of
-            'Content' instances
-            
-        """
-        self._variants = {}
-        for lang, content in variants:
-            if isinstance(content, (list, tuple)):
-                content = Container(content)
-            self._variants[lang] = content
-        super(ContentVariants, self).__init__(self._variants.values())
-
-    def sections(self, context):
-        return self._variants[context.lang()].sections(context)
-        
-    def variant(self, lang):
-        """Return the content variant for given language.
-
-        Arguments:
-          lang -- lowercase ISO 639-1 Alpha-2 language code
-
-        'KeyError' is raised when the content for given language is not
-        defined.
-
-        """
-        return self._variants[lang]
 
 class Figure(Container):
     """A container that can have a caption, typicaly for images"""

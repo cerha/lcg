@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,8 +74,6 @@ class Reader(object):
             resource_provider = root._resource_provider_
         self._root = root
         self._resource_provider_ = resource_provider
-        self._variants_ = None
-        self._parameters = {}
         
     def _title(self):
         return None
@@ -86,18 +84,17 @@ class Reader(object):
     def _descr(self):
         return None
     
-    def _content(self):
-        return None
-        
     def _children(self):
         return ()
 
     def _variants(self):
-        # This Method is meant to be overriden in derived classes.
-        if self._parent is not None:
-            return self._parent.variants()
-        else:
-            return ()
+        return ()
+
+    def _variant(self, lang):
+        return lcg.Variant(lang, content=self._content(lang))
+
+    def _content(self, lang):
+        return ()
 
     def _resource_dirs(self):
         return ()
@@ -108,32 +105,23 @@ class Reader(object):
     def _globals(self):
         return {}
 
-    def id(self):
-        return self._id
-    
     def parent(self):
         return self._parent
 
-    def variants(self):
-        if self._variants_ is None:
-            # Available variants are read in build time.
-            self._variants_ = self._variants()
-        return self._variants_
-    
     def resource(self, filename, **kwargs):
         return self._resource_provider_.resource(filename, node=self._id, **kwargs)
 
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""
-        variants = self.variants()
         try:
+            variants = [self._variant(lang) for lang in self._variants()]
             return lcg.ContentNode(id=self._id, title=self._title(),
                                    brief_title=self._brief_title(),
-                                   descr=self._descr(), variants=variants, content=self._content(),
+                                   descr=self._descr(), variants=variants,
                                    children=[child.build() for child in self._children()],
                                    resource_provider=self._resource_provider_,
-                                   globals=self._globals(), hidden=self._hidden,
-                                   **self._parameters)
+                                   globals=self._globals(), hidden=self._hidden)
+                                   
         except Exception as e:
             if hasattr(self, '_source_filename'):
                 # TODO: This is a quick hack.  The attribute `_source_filename' is prefilled in
@@ -233,6 +221,7 @@ class StructuredTextReader(FileReader):
 
     def __init__(self, *args, **kwargs):
         self._parser = lcg.Parser()
+        self._titles = {}
         super(StructuredTextReader, self).__init__(*args, **kwargs)
 
     def _source_text(self, lang):
@@ -254,31 +243,18 @@ class StructuredTextReader(FileReader):
         return title, lcg.Container(sections), parameters
 
     def _title(self):
-        # This method is called first, so we read the document here and store the content for later
-        # use.
-        variants = self.variants()
-        parameters = {}
-        if len(variants) <= 1:
-            lang = variants and variants[0] or None
-            title, content, parameters[lang] = self._document(self._source_text(lang))
+        # This method is called after _variant(), is called for each
+        # language, so the dictionary of titles is already built.
+        if len(self._titles.keys()) == 1:
+            title = self._titles.values()[0]
         else:
-            titles = {}
-            content_variants = []
-            for lang in variants:
-                titles[lang], c, parameters[lang] = self._document(self._source_text(lang))
-                content_variants.append((lang, c))
-            title = lcg.SelfTranslatableText(self._id, translations=titles)
-            content = lcg.ContentVariants(content_variants)
-        self._content_ = content
-        self._parameters = {}
-        for lang, parameter_set in parameters.items():
-            for k, v in parameter_set.items():
-                self._parameters[k] = parameters_k = self._parameters.get(k, {})
-                parameters_k[lang] = v
+            title = lcg.SelfTranslatableText(self._id, translations=self._titles)
         return title
-    
-    def _content(self):
-        return self._content_
+
+    def _variant(self, lang):
+        title, content, parameters = self._document(self._source_text(lang))
+        self._titles[lang] = title
+        return lcg.Variant(lang, content=content, **parameters)
 
     
 class DocFileReader(StructuredTextReader):
@@ -300,7 +276,7 @@ class DocFileReader(StructuredTextReader):
 
     def _variants(self):
         if self._parent is not None:
-            return self._parent.variants()
+            return self._parent._variants()
         else:
             return tuple([os.path.splitext(os.path.splitext(f)[0])[1][1:]
                           for f in glob.glob(self._input_file(self._id, lang='*', ext=self._ext))])

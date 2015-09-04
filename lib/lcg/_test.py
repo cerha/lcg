@@ -463,10 +463,10 @@ class Parser(unittest.TestCase):
         text = "= Main =\n== Sub1 ==\n== Sub2 ==\n=== SubSub1 ===\n== Sub3 =="
         c = self._parser.parse(text)
         self.assertTrue(len(c) == 1 and isinstance(c[0], lcg.Section), c)
-        s = c[0].sections(None)
+        s = c[0].sections()
         self.assertTrue(len(s) == 3 and isinstance(s[0], lcg.Section) and
-                       len(s[0].sections(None)) == 0 and len(s[1].sections(None)) == 1 and
-                       len(s[2].sections(None)) == 0, s)
+                       len(s[0].sections()) == 0 and len(s[1].sections()) == 1 and
+                       len(s[2].sections()) == 0, s)
 
     def test_parameters(self):
         text = '''

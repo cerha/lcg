@@ -758,7 +758,7 @@ class HtmlExporter(Exporter):
         return None
 
     def _content(self, context):
-        return context.node().content().export(context)
+        return context.node().content(context.lang()).export(context)
 
     def _body_attr(self, context, **kwargs):
         return kwargs
@@ -994,7 +994,7 @@ class HtmlExporter(Exporter):
             else:
                 return g.ul(*[g.li((toc_link(item), make_toc(subitems)), cls="i%d" % (i + 1,))
                               for i, (item, subitems) in enumerate(items)])
-        result = make_toc(element.items(context))
+        result = make_toc(element.items(context.lang()))
         title = element.title()
         if title is not None:
             g = self._generator

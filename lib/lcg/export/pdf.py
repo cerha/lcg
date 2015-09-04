@@ -2517,7 +2517,7 @@ class PDFExporter(FileExporter, Exporter):
                 title = subcontext.exporter().export_element(subcontext, n.heading())
                 exported_heading = make_element(Heading, content=[title], level=init_heading_level)
                 exported_structure.append(exported_heading)
-            exported = n.content().export(subcontext)
+            exported = n.content(lang).export(subcontext)
             if isinstance(exported, (tuple, list,)):
                 exported = self.concat(*exported)
             exported_structure.append(exported)
@@ -2764,7 +2764,7 @@ class PDFExporter(FileExporter, Exporter):
                     if update_text(c, function):
                         return True
             return False
-        anchor = element.anchor(context)
+        anchor = element.id()
         if anchor:
             anchor = context.pdf_context.anchor_prefix + anchor
             def make_link_target(content):

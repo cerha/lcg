@@ -760,7 +760,7 @@ class BrailleExporter(FileExporter, Exporter):
                             if marker == self._TOC_MARKER_CHAR:
                                 page_number = unicode(context.page_number())
                                 element = context.toc_element(arg)
-                                element.set_page_number(context, page_number)
+                                element.set_page_number(page_number)
                                 if isinstance(element, Section):
                                     exported = self.text(context, element.title(), reformat=True)
                                 else:

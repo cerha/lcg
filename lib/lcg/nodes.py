@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ import lcg
 import functools
 import copy
 
+from lcg import is_sequence_of
+
 class ContentNode(object):
     """Representation of one node within an LCG publication.
 
@@ -39,35 +41,31 @@ class ContentNode(object):
 
     """
 
-    def __init__(self, id, title=None, brief_title=None, heading=None, descr=None, variants=(),
-                 content=None, children=(), hidden=False, active=True, foldable=False,
-                 resource_provider=None, globals=None, cover_image=None,
-                 page_header=None, page_footer=None, left_page_footer=None, right_page_footer=None,
-                 first_page_header=None, page_background=None, presentation=None,
-                 metadata=None):
+    def __init__(self, id, title=None, brief_title=None, heading=None,
+                 descr=None, children=(), hidden=False, active=True,
+                 foldable=False, resource_provider=None, globals=None,
+                 cover_image=None, metadata=None, variants=(), **kwargs):
         """Initialize the instance.
 
         Arguments:
 
           id -- a unique textual identifier of this node (as a string).
           title -- the title of this node (as a unicode string).
-          brief_title -- the brief (shorter) form of title of this node (as a unicode string).  If
-            given, this title will be used to refer to this node from places, where brevity
-            matters.  If None, the 'title' will be used instead.
+          brief_title -- the brief (shorter) form of title of this node (as a
+            unicode string).  If given, this title will be used to refer to
+            this node from places, where brevity matters.  If None, the 'title'
+            will be used instead.
           heading -- content to be used as node heading.  By default (when
             None), the content is created automatically as TextContent(title),
             but you may pass any lcg.Content instance when some more fancy
             content is desired.
-          descr -- a short textual description of this node (as a uni code string).  Additional
-            information, which may determine the content of the node in addition to the title.
-          variants -- a sequence of all available language variants of this node.  The
-            sequence contains lowercase ISO 639-1 Alpha-2 language codes as strings.
-          content -- a content element hierarchy.  This is the actual content of this node.  The
-            value can be a `Content' instance or a sequence of `Content' instances.
+          descr -- a short textual description of this node (as a uni code
+            string).  Additional information, which may determine the content
+            of the node in addition to the title.
           children -- a sequence of child nodes in the hierarchy.
-          hidden -- a boolean flag indicating, that this node should not appear in the
-            automatically generated Indexes (Tables of Contents).  Such a node will usually be
-            refered explicitely.
+          hidden -- a boolean flag indicating, that this node should not appear
+            in the automatically generated Indexes (Tables of Contents).  Such
+            a node will usually be refered explicitely.
           active -- a boolean flag indicating, that this node is active.  Usage
             of this flag may be application specific and there is currently no
             difference in behavior of LCG in respect to this flag, except for
@@ -81,30 +79,36 @@ class ContentNode(object):
             instances, but they may be also used for other purposes depending
             on the application.
           cover_image -- 'lcg.Resource' instance to be used as a cover image.
-          page_header -- dictionary of 'Content' instances, with language codes
-            as keys, to be inserted at the top of each generated page.  If content is
-            'None', no page header is inserted.
-          page_footer -- dictionary of 'Content' instances, with language codes
-            as keys, to be inserted at the bottom of each generated page.  If
-            content is 'None', no page footer is inserted.
-          first_page_header -- dictionary of 'Content' instances, with language
-            codes as keys, to be inserted at the top of the first generated
-            page.  If content is 'None', page_header (if any) is used on all
-            pages.
-          page_background -- dictionary of 'Content' instances, with language codes
-            as keys, to be put on the background of each generated page.  If content is
-            'None', nothing is put on the background.
-          presentation -- dictionary of 'Presentation' instances (or 'None'
-            values) associated with this node, with language codes as keys.
-          metadata -- an instance of 'lcg.Metadata' defining the publication meta data;
-            Only relevant for the root node of the publication.
-          
+          metadata -- an instance of 'lcg.Metadata' defining the publication
+            meta data; Only relevant for the root node of the publication.
+          variants -- available language variants of this node as a sequence of
+            'Variant' instances.  Each item may define a language specific
+            variant of language dependent attributes, such as 'content',
+            'page_header', 'page_footer' etc. (see 'Variant' constructor
+            arguments for a complete list).  These variant specific values will
+            take precedence over the same attributes passed directly as
+            'ContentNode' arguments (see below).
+          content, page_header, first_page_header, 
+          page_footer, left_page_footer,
+          right_page_footer, page_background,
+          presentation -- default variants of node content and parameters may
+            be passed directly as node keyword arguments.  The names and
+            meaning of the arguments match the names of 'lcg.Variant'
+            constructor arguments.  These defaults are used when no matching
+            variant is found in 'variants' for given export language or where
+            that variant does not define given attribute (such as
+            'page_footer').  The most typical usage is for language independent
+            content, which consists of localizable texts (see
+            'lcg.Localizable').
+
         """
         assert isinstance(id, basestring), repr(id)
         assert isinstance(hidden, bool), hidden
         assert isinstance(active, bool), active
         assert isinstance(foldable, bool), foldable
-        assert isinstance(variants, (list, tuple))
+        assert is_sequence_of(variants, Variant)
+        assert is_sequence_of(children, ContentNode)
+        assert cover_image is None or isinstance(cover_image, lcg.Image), cover_image
         assert metadata is None or isinstance(metadata, Metadata)
         self._id = id
         self._parent = None #parent
@@ -115,51 +119,7 @@ class ContentNode(object):
         self._hidden = hidden
         self._active = active
         self._foldable = foldable
-        self._variants = tuple(variants)
-        assert (page_header is None or isinstance(page_header, dict) and
-                all([x is None or isinstance(x, lcg.Content)
-                     for x in page_header.values()])), \
-            page_header
-        self._page_header = page_header
-        assert (first_page_header is None or isinstance(first_page_header, dict) and
-                all([x is None or isinstance(x, lcg.Content)
-                     for x in first_page_header.values()])), \
-            first_page_header
-        self._first_page_header = first_page_header
-        assert (page_footer is None or isinstance(page_footer, dict) and
-                all([x is None or isinstance(x, lcg.Content)
-                     for x in page_footer.values()])), \
-            page_footer
-        self._page_footer = page_footer
-        assert (left_page_footer is None or isinstance(left_page_footer, dict) and
-                all([x is None or isinstance(x, lcg.Content)
-                     for x in left_page_footer.values()])), \
-            left_page_footer
-        self._left_page_footer = left_page_footer
-        assert (right_page_footer is None or isinstance(right_page_footer, dict) and
-                all([x is None or isinstance(x, lcg.Content)
-                     for x in right_page_footer.values()])), \
-            right_page_footer
-        self._right_page_footer = right_page_footer
-        assert (page_background is None or isinstance(page_background, dict) and
-                all([x is None or isinstance(x, lcg.Content)
-                     for x in page_background.values()])), \
-            page_background
-        self._page_background = page_background
-        assert cover_image is None or isinstance(cover_image, lcg.Image), cover_image
-        self._cover_image = cover_image
-        assert (presentation is None or isinstance(presentation, dict) and
-                all([x is None or isinstance(x, lcg.Presentation)
-                     for x in presentation.values()])), \
-            presentation
-        self._presentation = presentation
-        if isinstance(content, (tuple, list)):
-            content = lcg.Container(content)
-        assert isinstance(content, lcg.Content), content
-        content.set_parent(self)
-        self._content = content
         for child in children:
-            assert isinstance(child, ContentNode)
             child._set_parent(self)
         self._children = children
         self._resource_provider = resource_provider
@@ -167,6 +127,15 @@ class ContentNode(object):
             self._globals = {}
         else:
             self._globals = copy.copy(globals)
+        self._metadata = metadata
+        self._variants = tuple(v.lang() for v in variants)
+        self._variants_dict = dict((v.lang(), v) for v in variants)
+        self._default_variant = Variant('--', **kwargs)
+        self._cover_image = cover_image
+        for variant in tuple(variants) + (self._default_variant,):
+            if variant.content():
+                variant.content().set_parent(self)
+        self._empty_content = Content()
         # if __debug__:
         #    seen = {}
         #    for n in self.linear():
@@ -174,10 +143,9 @@ class ContentNode(object):
         #        assert nid not in seen, \
         #               "Duplicate node id: %s, %s" % (n, seen[nid])
         #        seen[nid] = n
-        self._metadata = metadata
         self._used_content_resources = []
         
-    def __str__(self):
+    def __repr__(self):
         return "<%s[%x] id='%s'>" % (self.__class__.__name__, lcg.positive_id(self), self.id())
 
     def _set_parent(self, node):
@@ -228,23 +196,16 @@ class ContentNode(object):
         """Return the list of all subordinate nodes as a tuple."""
         return tuple(self._children)
 
-    def content(self):
-        return self._content
-    
-    def sections(self, context):
-        """Return all the top-level sections within this node's content."""
-        return self._content.sections(context)
-    
-    def find_section(self, section_id, context):
+    def find_section(self, lang, section_id):
         def find(section_id, sections):
             for s in sections:
-                if s.id(context) == section_id:
+                if s.id() == section_id:
                     return s
-                found = find(section_id, s.sections(context))
+                found = find(section_id, s.sections())
                 if found:
                     return found
             return None
-        return find(section_id, self.sections(context))
+        return find(section_id, self.content(lang).sections())
 
     def find_node(self, id):
         def find(id, node):
@@ -307,15 +268,6 @@ class ContentNode(object):
         """
         return self._children.index(node)
 
-    def variants(self):
-        """Return the tuple of available language variants of this node.
-
-        The returned tuple consists of language codes including the language of
-        the current node.
-        
-        """
-        return self._variants
-        
     def globals(self):
         """Return the node variables as a dictionary keyed by variable names."""
         return self._globals
@@ -376,12 +328,13 @@ class ContentNode(object):
         
     def resource(self, filename, **kwargs):
         """Get the resource instance by its type and relative filename."""
-        for resource in self._content.resources():
-            if resource.filename() == filename:
-                # Hmm, why don't have images here src_file set?
-                if resource not in self._used_content_resources:
-                    self._used_content_resources.append(resource)
-                return resource
+        for lang in self.variants():
+            for resource in self.content(lang).resources():
+                if resource.filename() == filename:
+                    # Hmm, why don't have images here src_file set?
+                    if resource not in self._used_content_resources:
+                        self._used_content_resources.append(resource)
+                    return resource
         if self._resource_provider:
             return self._resource_provider.resource(filename, node=self, **kwargs)
         else:
@@ -393,50 +346,135 @@ class ContentNode(object):
 
     def cover_image(self):
         """Return the cover image."""
+        # TODO: Handle through variants
         return self._cover_image
-
-    def _lang_parameter(self, dictionary, lang):
-        if dictionary is None:
-            result = None
-        elif lang in dictionary:
-            result = dictionary[lang]
-        else:
-            result = dictionary.get(None)
-        return result
-        
-    def page_header(self, lang):
-        """Return the page header."""
-        return self._lang_parameter(self._page_header, lang)
-
-    def page_footer(self, lang):
-        """Return the page footer."""
-        return self._lang_parameter(self._page_footer, lang)
-
-    def left_page_footer(self, lang):
-        """Return the page footer for left pages."""
-        return (self._lang_parameter(self._left_page_footer, lang) or
-                self._lang_parameter(self._page_footer, lang))
-
-    def right_page_footer(self, lang):
-        """Return the page footer for right pages."""
-        return (self._lang_parameter(self._right_page_footer, lang) or
-                self._lang_parameter(self._page_footer, lang))
-
-    def first_page_header(self, lang):
-        """Return the first page header."""
-        return self._lang_parameter(self._first_page_header, lang)
-        
-    def page_background(self, lang):
-        """Return the page background."""
-        return self._lang_parameter(self._page_background, lang)
-
-    def presentation(self, lang):
-        """Return presentation of this node."""
-        return self._lang_parameter(self._presentation, lang)
 
     def metadata(self):
         """Return metadata of this node."""
         return self._metadata
+
+    def variants(self):
+        """Return the tuple of available language variants of this node.
+
+        The returned tuple consists of just the language codes as basestrings.
+        
+        """
+        return self._variants
+
+    def _variant(self, lang, attr):
+        for variant in (self._variants_dict.get(lang), self._default_variant,):
+            if variant:
+                method = getattr(variant, attr)
+                result = method()
+                if result is not None:
+                    return result
+        return None
+        
+    def content(self, lang):
+        """Return the main document content for given language."""
+        return self._variant(lang, 'content') or self._empty_content
+    
+    def page_header(self, lang):
+        """Return the page header content for given language."""
+        return self._variant(lang, 'page_header')
+
+    def first_page_header(self, lang):
+        """Return the first page header content for given language."""
+        return self._variant(lang, 'first_page_header') or self.page_header(lang)
+        
+    def page_footer(self, lang):
+        """Return the page footer content for given language."""
+        return self._variant(lang, 'page_footer')
+
+    def left_page_footer(self, lang):
+        """Return the page footer content for left pages for given language."""
+        return self._variant(lang, 'left_page_footer') or self.page_footer(lang)
+
+    def right_page_footer(self, lang):
+        """Return the page footer content for right pages for given language."""
+        return self._variant(lang, 'right_page_footer') or self.page_footer(lang)
+
+    def page_background(self, lang):
+        """Return the page background content for given language."""
+        return self._variant(lang, 'page_background')
+
+    def presentation(self, lang):
+        """Return presentation of this node."""
+        return self._variant(lang, 'presentation')
+
+
+class Variant(object):
+    """Definition of language specific values of certain 'ContentNode' attributes."""
+    def __init__(self, lang, content=None, page_header=None, first_page_header=None,
+                 page_footer=None, left_page_footer=None, right_page_footer=None,
+                 page_background=None, presentation=None):
+        """Arguments:
+        
+          lang -- an ISO 639-1 Alpha-2 language code
+          content -- The actual document content as a 'Content' instance or a
+            sequence of 'Content' instances.
+          page_header -- 'Content' instance to be inserted at the top of each
+            output page.  If 'None', no page header is inserted.
+          first_page_header -- 'Content' instance to be inserted at the top of
+            the first output page.  If 'None', page_header (if any) is used on
+            all pages.
+          page_footer -- 'Content' instance to be inserted at the bottom of
+            each output page.  If 'None', no page footer is inserted.
+          left_page_footer -- 'Content' instance to be inserted at the bottom
+            of each left side output page.  If 'None', page_footer (if any) is
+            used on all pages.
+          right_page_footer -- 'Content' instance to be inserted at the bottom
+            of each right side output page.  If 'None', page_footer (if any) is
+            used on all pages.
+          page_background -- 'Content' instance to be put on the background of
+            each output page.  If 'None', nothing is put on the background.
+          presentation -- 'Presentation' instance to be used for output page
+            presentation customization.  If 'None', no specific presentation is
+            used.
+
+        """
+        def _content(x):
+            if isinstance(x, (tuple, list)):
+                x = lcg.Container(x)
+            assert x is None or isinstance(x, lcg.Content), x
+            return x
+        assert isinstance(lang, basestring) and len(lang) == 2, lang
+        self._lang = lang
+        self._content = _content(content)
+        self._page_header = _content(page_header)
+        self._first_page_header = _content(first_page_header)
+        self._page_footer = _content(page_footer)
+        self._left_page_footer = _content(left_page_footer)
+        self._right_page_footer = _content(right_page_footer)
+        self._page_background = _content(page_background)
+        self._presentation = presentation
+        
+    def lang(self):
+        return self._lang
+        
+    def content(self):
+        return self._content
+
+    def page_header(self):
+        return self._page_header
+
+    def first_page_header(self):
+        self._first_page_header
+
+    def page_footer(self):
+        return self._page_footer
+
+    def left_page_footer(self):
+        return self._left_page_footer
+
+    def right_page_footer(self):
+        return self._right_page_footer
+
+    def page_background(self):
+        return self._page_background
+
+    def presentation(self):
+        return self._presentation
 
 
 class Metadata(object):

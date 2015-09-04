@@ -167,7 +167,7 @@ class EpubExporter(Exporter):
         self._html_exporter = EpubHtml5Exporter(translations=self._translation_path)
 
     def dump(self, node, directory, filename=None, variant=None, **kwargs):
-        variants = variant and (variant,) or node.variants() or (None,)
+        variants = (variant,) if variant else node.variants() or (None,)
         for lang in variants:
             context = self.context(node, lang, **kwargs)
             ext = lang and '.' + lang or ''
@@ -367,8 +367,8 @@ class EpubExporter(Exporter):
                 a.appendChild(doc.createTextNode(title))
                 if subitems:
                     export(subitems, li)
-        items = list(lcg.NodeIndex(node=node).items(context))
-        items.insert(0, (node, ())) # Add the top level node as the first navigation item.
+        # Add the top level node as the first navigation item.
+        items = [(node, ())] + lcg.NodeIndex(node=node).items(lang)
         export(items, nav)
         return doc.toprettyxml(indent='', newl='', encoding='UTF-8')
 

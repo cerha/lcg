@@ -37,7 +37,7 @@ import sys
 
 import lcg
 from lcg import attribute_value, concat, Localizable, Localizer, Resource, \
-    ContentNode, Content, Container, ContentVariants, \
+    ContentNode, Content, Container, \
     Paragraph, PreformattedText, Section, TableOfContents, \
     DefinitionList, FieldSet, \
     Table, TableCell, TableHeading, TableRow, \
@@ -392,7 +392,6 @@ class Exporter(object):
                 Link: self._export_link,
                 Section: self._export_section,
                 Heading: self._export_heading,
-                ContentVariants: self._export_content_variants,
                 TableOfContents: self._export_table_of_contents,
                 ItemizedList: self._export_itemized_list,
                 DefinitionList: self._export_definition_list,
@@ -417,7 +416,7 @@ class Exporter(object):
         try:
             heading = node.heading().export(context)
             newline = self._newline(context, 2)
-            content = node.content().export(context)
+            content = node.content(context.lang()).export(context)
             if recursive:
                 # FIXME: The context should be cloned here with the correct node in
                 # it, but it doesn't seem to matter in Braille output, which is
@@ -768,7 +767,7 @@ class Exporter(object):
         if id is None:
             item = parent
         else:
-            item = parent.find_section(id, context)
+            item = parent.find_section(context.lang(), id)
             if not item:
                 item = parent.root().find_node(id)
         if item:
@@ -916,16 +915,6 @@ class Exporter(object):
         """Export given 'Heading' element."""
         return self._export_container(context, element)
         
-    def _export_content_variants(self, context, element):
-        """Export the proper language variant of 'ContentVariants' element.
-
-        Returns the exported content for language determined by
-        'context.lang()'.  There should be no need to override this method in
-        derived classes.
-
-        """
-        return element.variant(context.lang()).export(context)
- 
     def _export_itemized_list(self, context, element, lang=None):
         """Export given 'ItemizedList' element."""
         numbering = element.order()
@@ -1029,7 +1018,7 @@ class Exporter(object):
                 else:
                     item_list.append(node.export(context))
                 item_list.append(self.text(context, self._HFILL if page_width else ' '))
-                item_list.append(self.text(context, node.page_number(context), lang=current_lang))
+                item_list.append(self.text(context, node.page_number(), lang=current_lang))
                 item_list.append(self._newline(context))
                 if subitems:
                     export(subitems)
@@ -1039,7 +1028,7 @@ class Exporter(object):
                 items.append((node.heading(), (),))
             else:
                 items.append((node, subitems,))
-        for node, subitems in element.items(context):
+        for node, subitems in element.items():
             add_item(node, subitems)
         export(items)
         result = self.concat(self.concat(*item_list),
