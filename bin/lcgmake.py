@@ -172,8 +172,7 @@ def main(argv, opt, args):
         cls = lcg.EpubExporter
     else:
         if output_format == IMS:
-            from lcg import ims
-            cls = ims.IMSExporter
+            cls = lcg.IMSExporter
         else:
             cls = lcg.HtmlStaticExporter
         kwargs = dict(styles=opt['styles'].split(':'), inlinestyles=opt['inline-styles'])
