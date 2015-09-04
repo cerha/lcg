@@ -27,7 +27,7 @@ construction of the whole tree is finished, each element knows its ancestor
 (the container) and all the successors (sub-content) in the tree.
 
 The content hierarchy may be built independently, however you need to assign a
-content to a 'ContentNode' instance to be able to export it.
+content to a 'lcg.ContentNode' instance to be able to export it.
 
 Please note the difference between the hierarchy of content within one node and
 the hierarchy of the nodes themselves.
@@ -36,12 +36,9 @@ the hierarchy of the nodes themselves.
 
 import copy
 import re
+import lcg
 
-from lcg import Audio, ContentNode, HorizontalAlignment, \
-    Image, ParseError, Resource, TranslatableTextFactory, Unit, Video, \
-    config, is_sequence_of
-
-_ = TranslatableTextFactory('lcg')
+_ = lcg.TranslatableTextFactory('lcg')
 
     
 class Content(object):
@@ -94,7 +91,7 @@ class Content(object):
         self._container = container
 
     def set_parent(self, node):
-        """Set the parent 'ContentNode' to 'node'.
+        """Set the parent 'lcg.ContentNode' to 'node'.
 
         This method is deprecated.  The parent node (the node to which the
         content belongs) should always be obtained from the export context, not
@@ -103,8 +100,8 @@ class Content(object):
         methods should be avoided in newly written code.
         
         """
-        assert isinstance(node, ContentNode), \
-            "Not a 'ContentNode' instance: %s" % node
+        assert isinstance(node, lcg.ContentNode), \
+            "Not a 'lcg.ContentNode' instance: %s" % node
         # assert self._parent is None or self._parent is node, \
         #       "Reparenting not allowed: %s -> %s" % (self._parent, node)
         self._parent = node
@@ -270,7 +267,7 @@ class Container(Content):
             attribute).
           id -- depracated, use 'name' instead.
           halign -- horizontal alignment of the container content; one of the
-            'HorizontalAlignment' constants or 'None' (default alignment).
+            'lcg.HorizontalAlignment' constants or 'None' (default alignment).
           valign -- vertical alignment of the container content; one of the
             'VerticalAlignment' constants or 'None' (default alignment).
           orientation -- orientation of the container content flow (vertical
@@ -285,7 +282,7 @@ class Container(Content):
 
         """
         super(Container, self).__init__(**kwargs)
-        assert isinstance(name, basestring) or is_sequence_of(name, basestring), name
+        assert isinstance(name, basestring) or lcg.is_sequence_of(name, basestring), name
         assert halign is None or isinstance(halign, str), halign
         assert valign is None or isinstance(valign, str), valign
         assert orientation is None or isinstance(orientation, str), orientation
@@ -319,7 +316,7 @@ class Container(Content):
                         "Not a '%s' instance: %s" % (self._ALLOWED_CONTENT, c)
                     c.set_container(self)
         elif isinstance(content, (list, tuple)):
-            assert is_sequence_of(content, self._ALLOWED_CONTENT), \
+            assert lcg.is_sequence_of(content, self._ALLOWED_CONTENT), \
                 "Not a '%s' instances sequence: %s" % (self._ALLOWED_CONTENT, content)
             self._content = tuple(content)
             for c in content:
@@ -515,8 +512,8 @@ class Link(Container):
     def __init__(self, target, label=None, descr=None, type=None, lang=None):
         """Arguments:
 
-          target -- target of the link, instance of 'Section', 'ContentNode',
-            'Resource', 'Link.ExternalTarget' or 'basestring'.  If a string is
+          target -- target of the link, instance of 'Section', 'lcg.ContentNode',
+            'lcg.Resource', 'Link.ExternalTarget' or 'basestring'.  If a string is
             used, it is a temporary reference to be resolved in export time.
             It allows creation of links which refer to objects, which can not
             be resolved at the time of Link instance creation (their instances
@@ -531,7 +528,7 @@ class Link(Container):
           lang -- lowercase ISO 639-1 Alpha-2 language code
         
         """
-        assert isinstance(target, (Section, ContentNode, Resource, self.ExternalTarget,
+        assert isinstance(target, (Section, lcg.ContentNode, lcg.Resource, self.ExternalTarget,
                                    basestring)), target
         assert label is None or isinstance(label, (basestring, Content)), label
         assert descr is None or isinstance(descr, basestring), descr
@@ -553,7 +550,7 @@ class Link(Container):
 
         If a string reference was passed to the constructor argument 'target',
         it is automatically resolved, so the returned instance is always one of
-        'Section', 'ContentNode', 'Resource' or 'Link.ExternalTarget'.
+        'Section', 'lcg.ContentNode', 'lcg.Resource' or 'Link.ExternalTarget'.
         
         """
         target = self._target
@@ -719,7 +716,7 @@ class InlineImage(_SizedInlineObject):
     def __init__(self, image, align=None, standalone=None, **kwargs):
         """Arguments:
 
-          image -- the displayed image as an 'Image' resource instance.
+          image -- the displayed image as an 'lcg.Image' resource instance.
           align -- requested alignment of the image to the surrounding text;
             one of the constants 'InlineImage.LEFT', 'InlineImage.RIGHT',
             'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
@@ -729,7 +726,7 @@ class InlineImage(_SizedInlineObject):
         All other keyword arguments are passed to the parent class constructor.
 
         """
-        assert isinstance(image, (Image, basestring)), image
+        assert isinstance(image, (lcg.Image, basestring)), image
         assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
         self._image = image
         self._align = align
@@ -740,10 +737,10 @@ class InlineImage(_SizedInlineObject):
         """Return the value of 'image' passed to the constructor.
 
         If the 'image' was passed as a string reference, it is automatically
-        converted into an 'Image' instance.
+        converted into an 'lcg.Image' instance.
 
         """
-        return self._resource_instance(context, self._image, Image)
+        return self._resource_instance(context, self._image, lcg.Image)
         
     def align(self):
         """Return the value of 'align' as passed to the constructor."""
@@ -765,14 +762,14 @@ class InlineAudio(_InlineObject):
     def __init__(self, audio, image=None, shared=True, **kwargs):
         """Arguments:
 
-          image -- visual presentation image as an 'Image' resource instance or None.
+          image -- visual presentation image as an 'lcg.Image' resource instance or None.
           shared -- boolean flag indicating whether using a shared audio player is desired.
         
         All other arguments are passed to the parent class constructor.
         
         """
-        assert isinstance(audio, (Audio, basestring)), audio
-        assert image is None or isinstance(image, (Image, basestring)), image
+        assert isinstance(audio, (lcg.Audio, basestring)), audio
+        assert image is None or isinstance(image, (lcg.Image, basestring)), image
         assert isinstance(shared, bool)
         self._audio = audio
         self._image = image
@@ -783,19 +780,19 @@ class InlineAudio(_InlineObject):
         """Return the value of 'audio' as passed to the constructor.
 
         If the 'audio' was passed as a string reference, it is automatically
-        converted into an 'Audio' instance.
+        converted into an 'lcg.Audio' instance.
 
         """
-        return self._resource_instance(context, self._audio, Audio)
+        return self._resource_instance(context, self._audio, lcg.Audio)
     
     def image(self, context):
         """Return the value of 'image' as passed to the constructor.
 
         If the 'image' was passed as a string reference, it is automatically
-        converted into an 'Image' instance.
+        converted into an 'lcg.Image' instance.
 
         """
-        return self._resource_instance(context, self._image, Image)
+        return self._resource_instance(context, self._image, lcg.Image)
     
     def shared(self):
         """Return the value of 'shared' as passed to the constructor."""
@@ -812,14 +809,14 @@ class InlineVideo(_SizedInlineObject):
     def __init__(self, video, image=None, **kwargs):
         """Arguments:
 
-          video -- 'Video' resource instance.
-          image -- video thumbnail image as an 'Image' resource instance or None.
+          video -- 'lcg.Video' resource instance.
+          image -- video thumbnail image as an 'lcg.Image' resource instance or None.
         
         All other keyword arguments are passed to the parent class constructor.
         
         """
-        assert isinstance(video, (Video, basestring)), video
-        assert image is None or isinstance(image, (Image, basestring)), image
+        assert isinstance(video, (lcg.Video, basestring)), video
+        assert image is None or isinstance(image, (lcg.Image, basestring)), image
         self._video = video
         self._image = image
         super(InlineVideo, self).__init__(**kwargs)
@@ -828,19 +825,19 @@ class InlineVideo(_SizedInlineObject):
         """Return the value of 'video' as passed to the constructor.
 
         If the 'video' was passed as a string reference, it is automatically
-        converted into an 'Video' instance.
+        converted into an 'lcg.Video' instance.
 
         """
-        return self._resource_instance(context, self._video, Video)
+        return self._resource_instance(context, self._video, lcg.Video)
     
     def image(self, context):
         """Return the value of 'image' as passed to the constructor.
 
         If the 'image' was passed as a string reference, it is automatically
-        converted into an 'Image' instance.
+        converted into an 'lcg.Image' instance.
 
         """
-        return self._resource_instance(context, self._image, Image)
+        return self._resource_instance(context, self._image, lcg.Image)
 
 
 class InlineExternalVideo(Content):
@@ -996,13 +993,13 @@ class HSpace(Content):
     """
     def __init__(self, size, lang=None):
         """
-        @type: L{Unit}
+        @type: L{lcg.Unit}
         @param: Size of the space.
         @type: string
         @param: Content language as an ISO 639-1 Alpha-2 language code (lowercase).
         """
         super(HSpace, self).__init__(lang=lang)
-        assert isinstance(size, Unit), size
+        assert isinstance(size, lcg.Unit), size
         self._size = size
 
     def size(self, context):
@@ -1034,8 +1031,7 @@ class HtmlContent(TextContent):
     
     """
     def export(self, context):
-        from lcg.export import HtmlExporter
-        assert isinstance(context.exporter(), HtmlExporter), \
+        assert isinstance(context.exporter(), lcg.HtmlExporter), \
             "Only HTML export is supported for this element."
         return self._text
 
@@ -1134,9 +1130,9 @@ class FieldSet(Container):
 
 class TableCell(Container):
     """Table cell is a container of cell content and may appear within 'TableRow'."""
-    LEFT = HorizontalAlignment.LEFT
-    RIGHT = HorizontalAlignment.RIGHT
-    CENTER = HorizontalAlignment.CENTER
+    LEFT = lcg.HorizontalAlignment.LEFT
+    RIGHT = lcg.HorizontalAlignment.RIGHT
+    CENTER = lcg.HorizontalAlignment.CENTER
 
     def __init__(self, content, align=None, **kwargs):
         """Arguments:
@@ -1208,7 +1204,7 @@ class Table(Container):
             even when the table could fit on a new separate page or by using
             different column widths on each page when the column widths are
             variable.
-          column_widths -- sequence of 'Unit's defining widths of columns, it
+          column_widths -- sequence of 'lcg.Unit's defining widths of columns, it
             must have the same number of elements and in the same order as
             table columns.  If any of the elements is 'None', the width of the
             corresponding column is to be determined automatically.
@@ -1303,9 +1299,9 @@ class Section(Container):
             refer to a section explicitly from outside of the document, it is
             better to set the identifier explicitly to maintain consistency.
             The identifier must be, however, unique within the whole content
-            hierarchy (of one 'ContentNode').  See also 'ContentNode.find_section(),
-            which allows you to find a section of given id in content
-            hierarchy.
+            hierarchy (of one 'lcg.ContentNode').  See also
+            'lcg.ContentNode.find_section(), which allows you to find a section
+            of given id in content hierarchy.
           anchor -- deprecated - use 'id' instead.
           in_toc -- a boolean flag indicating whether this section is supposed
             to be included in the Table of Contents
@@ -1406,7 +1402,7 @@ class Section(Container):
         'None' is always returned.
 
         """
-        if node is self.parent() and self._backref is None and config.allow_backref:
+        if node is self.parent() and self._backref is None and lcg.config.allow_backref:
             self._backref = "backref-" + self.id()
             return self._backref
         else:
@@ -1446,7 +1442,7 @@ class TableOfContents(Content):
           title -- the title of the index as a string or unicode
           depth -- hierarchy depth limit as an integer or 'None' for unlimited depth
           detailed -- boolean indicating whether the whole 'Content' hierarchy
-            ('True') or only 'ContentNode' hierarchy ('False') of the leaf
+            ('True') or only 'lcg.ContentNode' hierarchy ('False') of the leaf
             nodes of the node tree will be included in the index.  This argument
             has no effect when 'item' is a 'Container' instance.
             
@@ -1482,7 +1478,7 @@ class TableOfContents(Content):
 
         The returned value is a recursive structure.  It is a list of pairs
         (tuples) ITEM, SUBITEMS, where ITEM is always either 'Section' or
-        'ContentNode' instance and SUBITEMS is a nested list of the same
+        'lcg.ContentNode' instance and SUBITEMS is a nested list of the same
         type if given item has subitems displayed in the table of contents.
         Otherwise SUBITEMS is an empty list.
 
@@ -1496,7 +1492,7 @@ class TableOfContents(Content):
                 if depth <= 0:
                     return []
                 depth -= 1
-            if isinstance(item, ContentNode):
+            if isinstance(item, lcg.ContentNode):
                 items = [node for node in item.children() if not node.hidden()]
             else:
                 items = []
@@ -1504,7 +1500,7 @@ class TableOfContents(Content):
                 if isinstance(item, (tuple, list)):
                     items = item
                 else:
-                    if isinstance(item, ContentNode):
+                    if isinstance(item, lcg.ContentNode):
                         sections = item.content(lang).sections()
                     else:
                         sections = item.sections()
@@ -1521,7 +1517,7 @@ class NodeIndex(TableOfContents):
     default displays only nodes, not their inner conent (detailed=False).
     
     """
-    _TOC_ITEM_TYPE = ContentNode
+    _TOC_ITEM_TYPE = lcg.ContentNode
 
     def __init__(self, title=None, node=None, depth=None, detailed=False):
         super(NodeIndex, self).__init__(node, title=title, depth=depth, detailed=detailed)
@@ -1748,7 +1744,7 @@ class MathML(Content):
         try:
             tree = etree.parse(cStringIO.StringIO(content), parser=parser)
         except ElementTree.ParseError as e:
-            raise ParseError("Error when parsing MathML element", e, content)
+            raise lcg.ParseError("Error when parsing MathML element", e, content)
         regexp = re.compile('{.*}')
         for e in tree.getiterator():
             match = regexp.match(e.tag)
@@ -1881,7 +1877,7 @@ def link(target, label=None, type=None, descr=None):
 
       target -- link target.  It can be a direct URI as a string or unicode
         instance or any referable content element, such as 'Section',
-        'ContentNode', 'Resource' or 'Link.ExternalTarget'.
+        'lcg.ContentNode', 'lcg.Resource' or 'Link.ExternalTarget'.
       label -- link label is mandatory when the target is a direct URI (string
         or unicode) and optional for LCG content element targets.  In this case
         it just overrides the default title of the refered object.
@@ -1894,7 +1890,8 @@ def link(target, label=None, type=None, descr=None):
         assert label is not None
         target = Link.ExternalTarget(target, None, descr=descr)
     else:
-        assert isinstance(target, (ContentNode, Section, Link.ExternalTarget, Resource)), target
+        assert isinstance(target, (lcg.ContentNode, Section, Link.ExternalTarget, lcg.Resource)), \
+            target
         assert descr is None
     return Link(target, label=label, type=type)
     

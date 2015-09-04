@@ -17,7 +17,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import lcg
-from lcg.export import Exporter, Html5Exporter
 
 import xml.dom.minidom as xml
 import zipfile
@@ -40,9 +39,9 @@ class Constants(object):
     DC_NS = 'http://purl.org/dc/elements/1.1/'
     
 
-class EpubHtml5Exporter(Html5Exporter):
+class EpubHtml5Exporter(lcg.Html5Exporter):
     
-    class Generator(Html5Exporter.Generator):
+    class Generator(lcg.Html5Exporter.Generator):
 
         def script(self, *args, **kwargs):
             # We need to be able to find out, whether a script was used
@@ -140,7 +139,7 @@ class EpubHtml5Exporter(Html5Exporter):
         return uri
 
 
-class EpubExporter(Exporter):
+class EpubExporter(lcg.Exporter):
 
     class Config(object):
         """Specifies implementation-defined EPUB parameters"""
@@ -152,7 +151,7 @@ class EpubExporter(Exporter):
         # images at all.  The OSX version doesn't seem to care.  However it stil seems an
         # acceptable general limit to keep the total EPUB size reasonable.
 
-    class Context(Exporter.Context):
+    class Context(lcg.Exporter.Context):
 
         def _init_kwargs(self, allow_interactivity=True, **kwargs):
             self._allow_interactivity = allow_interactivity

@@ -18,12 +18,10 @@
 
 """Exporter class which generates an IMS compliant package."""
 
-from lcg import *
-from lcg.export import *
-
-from xml.dom import minidom
-from xml.dom.domreg import getDOMImplementation
-import os, codecs
+import lcg
+import xml.dom.domreg
+import os
+import codecs
 
 class _Manifest:
     """IMS manifest is a collection of information about all files in a package.
@@ -36,7 +34,7 @@ class _Manifest:
         """Initialize the manifest for given root node export context."""
         self._context = context
         uri = "http://www.imsglobal.org/xsd/imscp_v1p1"
-        minidom = getDOMImplementation('minidom')
+        minidom = xml.dom.domreg.getDOMImplementation('minidom')
         self._document = document = minidom.createDocument(uri, 'manifest', '')        
         self._manifest = manifest = document.firstChild
         # Namespace
@@ -108,7 +106,7 @@ class _Manifest:
         fh.close()
 
         
-class IMSExporter(StyledHtmlExporter, HtmlFileExporter):
+class IMSExporter(lcg.StyledHtmlExporter, lcg.HtmlFileExporter):
     """Export the content as an IMS package."""
    
     def dump(self, node, directory, **kwargs):

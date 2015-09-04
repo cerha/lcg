@@ -25,11 +25,9 @@ import urllib
 from xml.sax import saxutils
 
 import lcg
-from lcg import ContentNode, HorizontalAlignment, Resource, Script, Section, \
-    Stylesheet, Translations, concat, is_sequence_of, language_name
-from lcg.export import Exporter, FileExporter
+from lcg import concat
 
-import mathml
+from . import mathml
 
 _ = lcg.TranslatableTextFactory('lcg')
 
@@ -538,7 +536,7 @@ class HtmlGenerator(object):
         elif isinstance(value, dict):
             # Only string keys are supported in JavaScript (int works too, but is actually
             # converted to string, which might be unexpected, so we don't support it).
-            assert is_sequence_of(value.keys(), str)
+            assert lcg.is_sequence_of(value.keys(), str)
             return concat('{', concat([concat(self.js_value(k), ': ', self.js_value(v))
                                        for k, v in value.items()],
                                       separator=", "),
@@ -554,10 +552,10 @@ class HtmlGenerator(object):
 class XhtmlGenerator(HtmlGenerator):
     pass
 
-class HtmlExporter(Exporter):
+class HtmlExporter(lcg.Exporter):
     Generator = HtmlGenerator
 
-    class Context(Exporter.Context):
+    class Context(lcg.Exporter.Context):
         class IdGenerator(object):
             """HTML identifier class for the 'id_generator()' method."""
             def __init__(self, context):
@@ -680,7 +678,7 @@ class HtmlExporter(Exporter):
 
     def _scripts(self, context):
         """Return the list of 'Script' instances for given context/node."""
-        return context.node().resources(Script)
+        return context.node().resources(lcg.Script)
 
     def _script(self, context, script):
         g = context.generator()
@@ -702,7 +700,7 @@ class HtmlExporter(Exporter):
                [g.link(rel='alternate', lang=lang, href=self._uri_node(context, node, lang=lang))
                 for lang in node.variants() if lang != context.lang()] + \
                [g.link(rel='gettext', type='application/x-po', href=context.uri(t))
-                for t in context.node().resources(Translations)] + \
+                for t in context.node().resources(lcg.Translations)] + \
                [self._script(context, script) for script in self._scripts(context)]
 
     def _parts(self, context, parts):
@@ -733,7 +731,7 @@ class HtmlExporter(Exporter):
         links = []
         for lang in variants:
             localizer = self.localizer(lang)
-            label = localizer.localize(language_name(lang) or lang)
+            label = localizer.localize(lcg.language_name(lang) or lang)
             cls = 'lang-' + lang
             if lang == context.lang():
                 cls += ' current'
@@ -850,26 +848,26 @@ class HtmlExporter(Exporter):
         label = self.concat(self._exported_container_content(context, element))
         descr = element.descr()
         if not label:
-            if isinstance(target, (ContentNode, Section)):
+            if isinstance(target, (lcg.ContentNode, lcg.Section)):
                 label = target.heading().export(context)
-            elif isinstance(target, Resource):
+            elif isinstance(target, lcg.Resource):
                 label = target.title() or target.filename()
             elif isinstance(target, element.ExternalTarget):
                 label = target.title() or target.uri()
         if descr is None:
-            if isinstance(target, (ContentNode, element.ExternalTarget, Resource)):
+            if isinstance(target, (lcg.ContentNode, element.ExternalTarget, lcg.Resource)):
                 descr = target.descr()
-            elif isinstance(target, Section) and target.parent() is not element.parent():
+            elif isinstance(target, lcg.Section) and target.parent() is not element.parent():
                 descr = target.title() + ' (' + target.parent().title() + ')'
         return self._generator.a(label, href=context.uri(target), title=descr, type=element.type())
 
     def _container_attr(self, element, cls=None, lang=None, **kwargs):
         style = {}
         if element.halign():
-            style['text-align'] = {HorizontalAlignment.RIGHT: 'right',
-                                   HorizontalAlignment.LEFT: 'left',
-                                   HorizontalAlignment.CENTER: 'center',
-                                   HorizontalAlignment.JUSTIFY: 'justify',
+            style['text-align'] = {lcg.HorizontalAlignment.RIGHT: 'right',
+                                   lcg.HorizontalAlignment.LEFT: 'left',
+                                   lcg.HorizontalAlignment.CENTER: 'center',
+                                   lcg.HorizontalAlignment.JUSTIFY: 'justify',
                                    }[element.halign()]
         presentation = element.presentation()
         if presentation and presentation.indent_left:
@@ -977,12 +975,12 @@ class HtmlExporter(Exporter):
         g = self._generator
         parent = element.parent()
         def toc_link(item):
-            if isinstance(item, ContentNode):
+            if isinstance(item, lcg.ContentNode):
                 descr = item.descr()
                 name = None
                 uri_kwargs = {}
             else:
-                assert isinstance(item, Section)
+                assert isinstance(item, lcg.Section)
                 descr = None
                 name = item.create_backref(parent)
                 uri_kwargs = dict(local=(parent is item.parent()))
@@ -1356,7 +1354,7 @@ class Html5Exporter(HtmlExporter):
                              xmlns='http://www.w3.org/1999/xhtml'))
 
 
-class HtmlFileExporter(FileExporter, HtmlExporter):
+class HtmlFileExporter(lcg.FileExporter, HtmlExporter):
     """Export the content as a set of html files."""
 
     _OUTPUT_FILE_EXT = 'html'
@@ -1383,7 +1381,7 @@ class StyledHtmlExporter(object):
 
     def _stylesheets(self, context):
         """Return the list of 'Stylesheet' instances for given context/node."""
-        return context.node().resources(Stylesheet)
+        return context.node().resources(lcg.Stylesheet)
 
     def _head(self, context):
         g = self._generator
@@ -1400,7 +1398,7 @@ class StyledHtmlExporter(object):
         return super(StyledHtmlExporter, self)._head(context) + tags
 
     def _export_resource(self, resource, dir):
-        if self._inlinestyles and isinstance(resource, Stylesheet):
+        if self._inlinestyles and isinstance(resource, lcg.Stylesheet):
             pass
         else:
             super(StyledHtmlExporter, self)._export_resource(resource, dir)

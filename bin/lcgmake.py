@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2004-2012, 2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,22 +158,18 @@ def main(argv, opt, args):
     kwargs = {}
     export_kwargs = {}
     if output_format == PDF:
-        from lcg import pdf
-        cls = pdf.PDFExporter
+        cls = lcg.PDFExporter
         export_kwargs['recursive'] = True
     elif output_format == HHP:
-        from lcg import hhp
-        cls = hhp.HhpExporter
+        cls = lcg.HhpExporter
     elif output_format == TEXT:
         cls = lcg.TextExporter
         export_kwargs['recursive'] = True
     elif output_format == BRAILLE:
-        from lcg import braille
-        cls = braille.BrailleExporter
+        cls = lcg.BrailleExporter
         export_kwargs['recursive'] = True
     elif output_format == EPUB:
-        from lcg import EpubExporter
-        cls = EpubExporter
+        cls = lcg.EpubExporter
     else:
         if output_format == IMS:
             from lcg import ims

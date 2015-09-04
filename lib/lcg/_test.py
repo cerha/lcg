@@ -2006,8 +2006,7 @@ class PDFExport(unittest.TestCase):
         name = 'structured-text'
         reader = lcg.reader(path, name, ext='txt', recourse=False)
         node = reader.build()
-        from lcg import pdf
-        exporter = pdf.PDFExporter()
+        exporter = lcg.PDFExporter()
         context = exporter.context(node, 'cs')
         exporter.export(context)
 

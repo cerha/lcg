@@ -135,7 +135,7 @@ class ContentNode(object):
         for variant in tuple(variants) + (self._default_variant,):
             if variant.content():
                 variant.content().set_parent(self)
-        self._empty_content = Content()
+        self._empty_content = lcg.Content()
         # if __debug__:
         #    seen = {}
         #    for n in self.linear():

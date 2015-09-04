@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2009, 2011, 2012, 2013, 2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,17 +18,17 @@
 
 """Representation and management of external resources.
 
-The LCG content elements may depend on several external resources.  These resources usually refer
-to external files, but in general, thay don't depend on these files, they just provide their
-abstract representation.  The resources are managed by the 'ResourceProvider' (see below).
-    
+The LCG content elements may depend on several external resources.  These
+resources usually refer to external files, but in general, thay don't depend on
+these files, they just provide their abstract representation.  The resources
+are managed by the 'ResourceProvider' (see below).
+
 """
 import os
 import glob
+import lcg
 
-from lcg import *
-
-_ = TranslatableTextFactory('lcg')
+_ = lcg.TranslatableTextFactory('lcg')
 
 class Resource(object):
     """Generic resource representation.
@@ -46,24 +46,28 @@ class Resource(object):
           filename -- unique string identifying the resource (typisally its
             file name).
           title -- optional user visible resource title as a string or None.
-          descr -- optional user visible resource description as a string or None.
-          src_file -- absolute pathname of the source file.  If None, the resource will not be
-            exported.  The source file is normally located by the resource provider and this
-            argument is supplied automatically, so you usually do not need to care about it.  In
-            any case, the exporter is responsible for writing the resources which have the source
-            file defined to the output (if necessary for given output format).  The filename (last
-            part of the path) must not necessarily be the same as 'filename'.  This may indicate
-            that a conversion is necessary on export (such as WAV to MP3; see the particular
-            'Exporter' class for the supported conversions).
-          uri -- resource's URI as a string.  If None, the URI will be supplied by the exporter
-            automatically (the exporter is normally responsible for exporting the file to a
-            location with a corresponding URI).  Supplying the URI directly to the resource
-            constructor may be, however, needed when the resource is handled by the application
+          descr -- optional user visible resource description as a string or
+            None.
+          src_file -- absolute pathname of the source file.  If None, the
+            resource will not be exported.  The source file is normally located
+            by the resource provider and this argument is supplied
+            automatically, so you usually do not need to care about it.  In any
+            case, the exporter is responsible for writing the resources which
+            have the source file defined to the output (if necessary for given
+            output format).  The filename (last part of the path) must not
+            necessarily be the same as 'filename'.  This may indicate that a
+            conversion is necessary on export (such as WAV to MP3; see the
+            particular 'Exporter' class for the supported conversions).
+          uri -- resource's URI as a string.  If None, the URI will be supplied
+            by the exporter automatically (the exporter is normally responsible
+            for exporting the file to a location with a corresponding URI).
+            Supplying the URI directly to the resource constructor may be,
+            however, needed when the resource is handled by the application
             specifically.
           info -- additional application specific information about the
             attachment.  No particular limitation on the content is defined and
             LCG ignores this value alltogether.
-            
+
         """
         super(Resource, self).__init__()
         assert isinstance(filename, (str, unicode)), filename
@@ -269,8 +273,8 @@ class ResourceProvider(object):
         assert isinstance(dirs, (list, tuple)), dirs
         assert isinstance(resources, (list, tuple)), resources
         self._dirs = tuple(dirs)
-        if config.default_resource_dir is not None:
-            self._dirs += (config.default_resource_dir,)
+        if lcg.config.default_resource_dir is not None:
+            self._dirs += (lcg.config.default_resource_dir,)
         self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
         
@@ -309,7 +313,7 @@ class ResourceProvider(object):
                    search_path=tuple(dirs)))
         return None
 
-    def resource(self, filename, node=None, searchdir=None, warn=log):
+    def resource(self, filename, node=None, searchdir=None, warn=lcg.log):
         """Get the resource instance by its filename.
 
         Arguments:
@@ -337,7 +341,7 @@ class ResourceProvider(object):
             resource = self._resource(filename, searchdir, warn)
             nodes = []
             self._cache[filename] = (resource, nodes)
-        if isinstance(node, ContentNode):
+        if isinstance(node, lcg.ContentNode):
             node_id = node.id()
         else:
             node_id = node

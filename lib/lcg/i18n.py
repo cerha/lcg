@@ -1015,8 +1015,11 @@ class Localizer(object):
         try:
             locale_data = cls._locale_data_cache[lang]
         except KeyError:
-            locale_data = globals().get('LocaleData_' + (lang or ''), lcg.LocaleData)()
-            cls._locale_data_cache[lang] = locale_data
+            try:
+                locale_data_class = getattr(lcg, 'LocaleData_' + (lang or ''))
+            except AttributeError:
+                locale_data_class = lcg.LocaleData
+            cls._locale_data_cache[lang] = locale_data = locale_data_class()
         return locale_data
 
     def __init__(self, lang=None, translation_path=(), timezone=None):

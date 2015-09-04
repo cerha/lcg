@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2012, 2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,20 +15,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-from export import *
-from html import *
-from epub import EpubExporter
-try:
-    import pdf
-except ImportError:
-    pass
-try:
-    import braille
-    from braille import BrailleError, BrailleExporter, braille_presentation, xml2braille
-except ImportError:
-    pass
-import ims
-import hhp
-import exercises_html
 

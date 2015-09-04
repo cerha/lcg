@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2006, 2007, 2008, 2010, 2012 Brailcom, o.p.s.
+# Copyright (C) 2006-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,9 +23,7 @@ browser (see http://www/wxwidgets.org for more information about wx Widgets).
 
 """
 
-from lcg import *
-from lcg.export import *
-
+import lcg
 import os
 
 class _MetaFile(object):
@@ -100,9 +98,9 @@ class _Header(_MetaFile):
                 "Charset=%s" % self._charset)
     
     
-class HhpExporter(HtmlFileExporter):
+class HhpExporter(lcg.HtmlFileExporter):
     
-    class Generator(HtmlGenerator):
+    class Generator(lcg.HtmlGenerator):
         def hr(self, **kwargs):
             return '<hr>' # We don't want XHTML tag syntax (<hr/>).
 
@@ -117,7 +115,7 @@ class HhpExporter(HtmlFileExporter):
             return super(HhpExporter.Generator, self).div(content, cls=cls, **kwargs)
 
     def dump(self, node, directory, **kwargs):
-        config.allow_backref
+        lcg.config.allow_backref
         super(HhpExporter, self).dump(node, directory, **kwargs)
         if node == node.root():
             context = self.context(node, None)

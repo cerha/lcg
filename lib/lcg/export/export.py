@@ -36,18 +36,6 @@ import string
 import sys
 
 import lcg
-from lcg import attribute_value, concat, Localizable, Localizer, Resource, \
-    ContentNode, Content, Container, \
-    Paragraph, PreformattedText, Section, TableOfContents, \
-    DefinitionList, FieldSet, \
-    Table, TableCell, TableHeading, TableRow, \
-    TextContent, Heading, Title, Abbreviation, Anchor, Link, \
-    Strong, Emphasized, Underlined, Code, Citation, Quotation, Superscript, Subscript, \
-    InlineAudio, InlineExternalVideo, InlineImage, InlineVideo, ItemizedList, \
-    NewLine, NewPage, PageHeading, PageNumber, HorizontalSeparator, HSpace, VSpace, \
-    Substitution, SetVariable, MathML, Figure
-from lcg.exercises import Exercise, FillInExercise, HiddenAnswers, VocabExercise, GapFilling, \
-    WritingTest
 
 _ = lcg.TranslatableTextFactory('lcg')
 
@@ -366,49 +354,49 @@ class Exporter(object):
         return target.uri()
     
     def _define_export_methods(self):
-        return {Content: self._export_content,
-                HorizontalSeparator: self._export_horizontal_separator,
-                NewPage: self._export_new_page,
-                NewLine: self._export_new_line,
-                PageNumber: self._export_page_number,
-                PageHeading: self._export_page_heading,
-                Title: self._export_title,
-                HSpace: self._export_hspace,
-                VSpace: self._export_vspace,
-                Strong: self._export_strong,
-                Emphasized: self._export_emphasized,
-                Underlined: self._export_underlined,
-                Code: self._export_code,
-                Citation: self._export_citation,
-                Quotation: self._export_quotation,
-                Superscript: self._export_superscript,
-                Subscript: self._export_subscript,
-                TextContent: self._export_text_content,
-                PreformattedText: self._export_preformatted_text,
-                Abbreviation: self._export_abbreviation,
-                Anchor: self._export_anchor,
-                Container: self._export_container,
-                Paragraph: self._export_paragraph,
-                Link: self._export_link,
-                Section: self._export_section,
-                Heading: self._export_heading,
-                TableOfContents: self._export_table_of_contents,
-                ItemizedList: self._export_itemized_list,
-                DefinitionList: self._export_definition_list,
-                FieldSet: self._export_field_set,
-                Table: self._export_table,
-                TableRow: self._export_table_row,
-                TableCell: self._export_table_cell,
-                TableHeading: self._export_table_heading,
-                InlineImage: self._export_inline_image,
-                InlineAudio: self._export_inline_audio,
-                InlineVideo: self._export_inline_video,
-                InlineExternalVideo: self._export_inline_external_video,
-                SetVariable: self._export_set_variable,
-                Substitution: self._export_substitution,
-                MathML: self._export_mathml,
-                Figure: self._export_figure,
-                Exercise: self._export_exercise,
+        return {lcg.Content: self._export_content,
+                lcg.HorizontalSeparator: self._export_horizontal_separator,
+                lcg.NewPage: self._export_new_page,
+                lcg.NewLine: self._export_new_line,
+                lcg.PageNumber: self._export_page_number,
+                lcg.PageHeading: self._export_page_heading,
+                lcg.Title: self._export_title,
+                lcg.HSpace: self._export_hspace,
+                lcg.VSpace: self._export_vspace,
+                lcg.Strong: self._export_strong,
+                lcg.Emphasized: self._export_emphasized,
+                lcg.Underlined: self._export_underlined,
+                lcg.Code: self._export_code,
+                lcg.Citation: self._export_citation,
+                lcg.Quotation: self._export_quotation,
+                lcg.Superscript: self._export_superscript,
+                lcg.Subscript: self._export_subscript,
+                lcg.TextContent: self._export_text_content,
+                lcg.PreformattedText: self._export_preformatted_text,
+                lcg.Abbreviation: self._export_abbreviation,
+                lcg.Anchor: self._export_anchor,
+                lcg.Container: self._export_container,
+                lcg.Paragraph: self._export_paragraph,
+                lcg.Link: self._export_link,
+                lcg.Section: self._export_section,
+                lcg.Heading: self._export_heading,
+                lcg.TableOfContents: self._export_table_of_contents,
+                lcg.ItemizedList: self._export_itemized_list,
+                lcg.DefinitionList: self._export_definition_list,
+                lcg.FieldSet: self._export_field_set,
+                lcg.Table: self._export_table,
+                lcg.TableRow: self._export_table_row,
+                lcg.TableCell: self._export_table_cell,
+                lcg.TableHeading: self._export_table_heading,
+                lcg.InlineImage: self._export_inline_image,
+                lcg.InlineAudio: self._export_inline_audio,
+                lcg.InlineVideo: self._export_inline_video,
+                lcg.InlineExternalVideo: self._export_inline_external_video,
+                lcg.SetVariable: self._export_set_variable,
+                lcg.Substitution: self._export_substitution,
+                lcg.MathML: self._export_mathml,
+                lcg.Figure: self._export_figure,
+                lcg.Exercise: self._export_exercise,
                 }
     
     def _export(self, node, context, recursive=False):
@@ -442,16 +430,16 @@ class Exporter(object):
           context -- exporting object created in the 'context' method and
             propagated from the 'export' method
           target -- URI target that can be one of: 'ContentNode', 'Section',
-            'Link.ExternalTarget' or 'Resource' instance
+            'Link.ExternalTarget' or 'lcg.Resource' instance
 
         """
-        if isinstance(target, ContentNode):
+        if isinstance(target, lcg.ContentNode):
             method = self._uri_node
-        elif isinstance(target, Section):
+        elif isinstance(target, lcg.Section):
             method = self._uri_section
-        elif isinstance(target, Resource):
+        elif isinstance(target, lcg.Resource):
             method = self._uri_resource
-        elif isinstance(target, Link.ExternalTarget):
+        elif isinstance(target, lcg.Link.ExternalTarget):
             method = self._uri_external
         else:
             raise Exception("Invalid URI target:", target)
@@ -459,7 +447,7 @@ class Exporter(object):
 
     def localizer(self, lang, timezone=None):
         """Return a 'lcg.Localizer' instance for given language and time zone."""
-        return Localizer(lang, timezone=timezone, translation_path=self._translation_path)
+        return lcg.Localizer(lang, timezone=timezone, translation_path=self._translation_path)
     
     translator = localizer
     """Deprecated backwards compatibility alias - please use 'localizer' instead."""
@@ -545,7 +533,7 @@ class Exporter(object):
         'exported' objects.
 
         """
-        return concat(*items)
+        return lcg.concat(*items)
 
     def text(self, context, text, lang=None, reformat=False):
         """Return exported 'text'.
@@ -777,7 +765,7 @@ class Exporter(object):
         return self.text(context, title, lang=element.lang(), reformat=True)
 
     def _export_preformatted_text(self, context, element):
-        """Export verbatim text of given 'PreformattedText' element.
+        """Export verbatim text of given 'lcg.PreformattedText' element.
 
         In this class the method returns just the escaped element text.
         
@@ -824,10 +812,10 @@ class Exporter(object):
                 dictionary[key] = value
         if value is None:
             result = self.escape(element.markup())
-        elif isinstance(value, Content):
+        elif isinstance(value, lcg.Content):
             result = value.export(context)
         else:
-            if not isinstance(value, Localizable):
+            if not isinstance(value, lcg.Localizable):
                 value = unicode(value)
             result = self.escape(value)
         return result
@@ -839,19 +827,19 @@ class Exporter(object):
 
         """
         context.node().set_global(element.name(), element.value(), top=True)
-        return self._export_content(context, Content())
+        return self._export_content(context, lcg.Content())
 
     # Container elements
     
     def _export_container(self, context, element):
-        """Export given 'Container' element.
+        """Export given 'lcg.Container' element.
 
         In this class the method exports the contained content elements and concatenates them.
         
         """
         exported = []
         for content in element.content():
-            if isinstance(content, (ItemizedList, DefinitionList,)) and exported:
+            if isinstance(content, (lcg.ItemizedList, lcg.DefinitionList,)) and exported:
                 exported[-1] = self._ensure_newlines(context, exported[-1])
             exported.append(content.export(context))
         return self.concat(*exported)
@@ -877,9 +865,9 @@ class Exporter(object):
             label = self._transform_link_content(context, element)
         target = element.target(context)
         if not label:
-            if isinstance(target, (ContentNode, Section)):
+            if isinstance(target, (lcg.ContentNode, lcg.Section)):
                 label = self._transform_link_heading(context, target.heading())
-            elif isinstance(target, Resource):
+            elif isinstance(target, lcg.Resource):
                 label = target.title() or target.filename()
         if isinstance(target, element.ExternalTarget):
             uri = target.uri()
@@ -924,15 +912,15 @@ class Exporter(object):
         def number():
             n = item_number[0]
             item_number[0] += 1
-            if numbering == ItemizedList.NUMERIC:
+            if numbering == lcg.ItemizedList.NUMERIC:
                 result = u'%d. ' % (n,)
                 exported = self.text(context, result, lang=lang)
-            elif numbering in (ItemizedList.LOWER_ALPHA, ItemizedList.UPPER_ALPHA,):
+            elif numbering in (lcg.ItemizedList.LOWER_ALPHA, lcg.ItemizedList.UPPER_ALPHA,):
                 result = letters[(n - 1) % n_letters]
                 while n > n_letters:
                     n = n / n_letters
                     result = letters[(n - 1) % n_letters] + result
-                if numbering == ItemizedList.UPPER_ALPHA:
+                if numbering == lcg.ItemizedList.UPPER_ALPHA:
                     result = result.upper()
                 result += u'. '
                 exported = self.text(context, result, lang=lang)
@@ -942,9 +930,9 @@ class Exporter(object):
         list_level = context.list_level + 1
         if list_level == 1:
             def level(element):
-                if isinstance(element, Container) and element.content():
+                if isinstance(element, lcg.Container) and element.content():
                     result = max([level(c) for c in element.content()])
-                    if isinstance(element, ItemizedList):
+                    if isinstance(element, lcg.ItemizedList):
                         result += 1
                 else:
                     result = 0
@@ -953,8 +941,8 @@ class Exporter(object):
         else:
             max_list_level = context.max_list_level
         content = []
-        with attribute_value(context, 'list_level', list_level):
-            with attribute_value(context, 'max_list_level', max_list_level):
+        with lcg.attribute_value(context, 'list_level', list_level):
+            with lcg.attribute_value(context, 'max_list_level', max_list_level):
                 element_content = element.content()
                 no_page_break = len(element_content) > 1
                 indentation = max_list_level * 2
@@ -993,7 +981,7 @@ class Exporter(object):
         return self._export_definition_list(context, element)
             
     def _export_paragraph(self, context, element):
-        """Export given 'Paragraph' element."""
+        """Export given 'lcg.Paragraph' element."""
         items = [self._export_container(context, element),
                  self._newline(context)]
         if context.list_level == 0:
@@ -1001,7 +989,7 @@ class Exporter(object):
         return self.concat(*items)
 
     def _export_table_of_contents(self, context, element):
-        """Generate a Table of Contents for given 'TableOfContents' element."""
+        """Generate a Table of Contents for given 'lcg.TableOfContents' element."""
         lang = element.lang()
         presentation_set = context.presentation()
         presentation = presentation_set and presentation_set.presentation(None, lang)
@@ -1010,9 +998,9 @@ class Exporter(object):
         node_list = context.toc_elements = []
         def export(items):
             for node, subitems in items:
-                node_list.append(node.heading() if isinstance(node, ContentNode) else node)
+                node_list.append(node.heading() if isinstance(node, lcg.ContentNode) else node)
                 current_lang = (node.lang() or lang)
-                if isinstance(node, Section):
+                if isinstance(node, lcg.Section):
                     item_list.append(self.text(context, node.title(), lang=current_lang,
                                                reformat=True))
                 else:
@@ -1024,7 +1012,7 @@ class Exporter(object):
                     export(subitems)
         items = []
         def add_item(node, subitems):
-            if isinstance(node, ContentNode):
+            if isinstance(node, lcg.ContentNode):
                 items.append((node.heading(), (),))
             else:
                 items.append((node, subitems,))
@@ -1048,14 +1036,14 @@ class Exporter(object):
         heading_present = False
         if content:
             row_content = content[0].content()
-            if row_content and isinstance(row_content[0], TableHeading):
+            if row_content and isinstance(row_content[0], lcg.TableHeading):
                 heading_present = True
-        separator = HorizontalSeparator()
+        separator = lcg.HorizontalSeparator()
         vertical_separator = self._vertical_cell_separator(context, 1)
         first_vertical_separator = self._vertical_cell_separator(context, 0)
         last_vertical_separator = self._vertical_cell_separator(context, -1)
         try:
-            n_cells = max([len(row.content()) for row in content if isinstance(row, TableRow)])
+            n_cells = max([len(row.content()) for row in content if isinstance(row, lcg.TableRow)])
         except ValueError:
             raise Exception("No row found in the table", content)
         widths = [0] * n_cells
@@ -1138,7 +1126,7 @@ class Exporter(object):
         return len(cell)
 
     def _set_table_column_widths(self, context, element, extra_width, widths):
-        exported_rows = [r.content() for r in element.content() if isinstance(r, TableRow)]
+        exported_rows = [r.content() for r in element.content() if isinstance(r, lcg.TableRow)]
         for row in exported_rows:
             if isinstance(row, (tuple, list,)):
                 for i in range(len(row)):
@@ -1242,9 +1230,9 @@ class Exporter(object):
                 result = fill_in_area
             return result
         def export_task_parts(task, show_answers):
-            if isinstance(element, WritingTest):
+            if isinstance(element, lcg.WritingTest):
                 return (None if show_answers else self.text(context, fill_in_area),)
-            elif isinstance(element, FillInExercise):
+            elif isinstance(element, lcg.FillInExercise):
                 if task.has_fields_in_text():
                     text = format_task_text(context, task,
                                             lambda *args: make_field(show_answers, *args))
@@ -1254,7 +1242,7 @@ class Exporter(object):
                 if not show_answers and task.prompt():
                     prompt = context.localize(task.prompt().export(context))
                     prompt = self._ensure_newlines(context, prompt)
-                    if isinstance(element, VocabExercise):
+                    if isinstance(element, lcg.VocabExercise):
                         separator = self.text(context, ' ')
                     else:
                         separator = self._newline(context)
@@ -1262,13 +1250,13 @@ class Exporter(object):
                 else:
                     result = (text,)
                 return result
-            elif isinstance(element, HiddenAnswers):
+            elif isinstance(element, lcg.HiddenAnswers):
                 if show_answers:
                     result = (task.answer().export(context),)
                 else:
                     result = (task.prompt().export(context),)
                 return result
-            elif isinstance(element, GapFilling):
+            elif isinstance(element, lcg.GapFilling):
                 gap_matcher = re.compile(r"(___+)")
                 def text_preprocessor(text):
                     if show_answers:
@@ -1281,7 +1269,7 @@ class Exporter(object):
                     else:
                         replacement = fill_in_area
                     return gap_matcher.sub(replacement, text)
-                with attribute_value(context, 'text_preprocessor', text_preprocessor):
+                with lcg.attribute_value(context, 'text_preprocessor', text_preprocessor):
                     task_prompt = task.prompt()
                     prompt = context.localize(task_prompt.export(context))
                 prompt = self._ensure_newlines(context, prompt)
@@ -1430,7 +1418,7 @@ class FileExporter(object):
 
         Arguments:
 
-           node -- the 'ContentNode' instance to dump.
+           node -- the 'lcg.ContentNode' instance to dump.
            directory -- name of the destination directory as a string.
            filename -- the name of the output file as a string.  If None, the
              name will be determined automatically based on the node id and
