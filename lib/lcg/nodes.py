@@ -260,15 +260,6 @@ class ContentNode(object):
         else:
             return None
 
-    def index(self, node):
-        """Return the child node's index number within this node's children.
-
-        The numbering begins at zero and corresponds to the natural order of
-        child nodes.
-        
-        """
-        return self._children.index(node)
-
     def globals(self):
         """Return the node variables as a dictionary keyed by variable names."""
         return self._globals
