@@ -817,6 +817,14 @@ class Concatenation(Localizable):
             if text:
                 flat.append(text)
 
+    def __setstate__(self, state):
+        # Prevent traceback on unpickling an instance which was pickled
+        # with older LCG versions (this actually happens when loading
+        # recent forms on Pytis application startup)
+        self.__dict__ = state
+        if '_html_escape' not in state:
+            self._html_escape = False
+
     def _clone_args(self):
         return (self._items,)
 
