@@ -431,7 +431,6 @@ class ContentNode(unittest.TestCase):
         self.assertEqual(n.content('en').text(), 'EN')
         self.assertEqual(n.content('cs').text(), 'CS')
         self.assertEqual(n.content('fr').text(), 'C')
-        self.assertEqual(n.content(None).text(), 'C')
         self.assertEqual(n.page_header('en').text(), 'H.EN')
         self.assertIsNone(n.page_footer('en'))
         self.assertEqual(n.right_page_footer('en').text(), 'RF')
@@ -442,6 +441,11 @@ class ContentNode(unittest.TestCase):
         self.assertEqual(n.page_background('en').text(), 'B')
         self.assertEqual(n.page_background('cs').text(), 'B')
         self.assertEqual(n.page_background('fr').text(), 'B')
+        # Lang must be passed to .content() when variants are defined,
+        # but may be omitted when no variants are passed to ContentNode.
+        self.assertRaises(AssertionError, n.content) 
+        n2 = lcg.ContentNode('n', content=lcg.TextContent("C"))
+        self.assertEqual(n2.content().text(), 'C')
 
 tests.add(ContentNode)
 

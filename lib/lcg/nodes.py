@@ -95,11 +95,14 @@ class ContentNode(object):
             be passed directly as node keyword arguments.  The names and
             meaning of the arguments match the names of 'lcg.Variant'
             constructor arguments.  These defaults are used when no matching
-            variant is found in 'variants' for given export language or where
-            that variant does not define given attribute (such as
-            'page_footer').  The most typical usage is for language independent
+            variant is found in 'variants' for given export language, when that
+            variant does not define given attribute (such as 'page_footer') or
+            when 'lang' is not passed to the methods obtaining given content or
+            parameter.  The most typical usage is for language independent
             content, which consists of localizable texts (see
-            'lcg.Localizable').
+            'lcg.Localizable') or for content of undefined language --
+            'ContentNode' doesn't force you to define the language of the
+            content.
 
         """
         assert isinstance(id, basestring), repr(id)
@@ -354,6 +357,9 @@ class ContentNode(object):
         return self._variants
 
     def _variant(self, lang, attr):
+        assert lang is not None or not self._variants_dict, \
+            ("Passing 'lang' to lcg.ContentNode.%s() is mandatory "
+             "when language variants are a defined %s.") % (attr, self._variants)
         for variant in (self._variants_dict.get(lang), self._default_variant,):
             if variant:
                 method = getattr(variant, attr)
@@ -362,36 +368,76 @@ class ContentNode(object):
                     return result
         return None
         
-    def content(self, lang):
-        """Return the main document content for given language."""
+    def content(self, lang=None):
+        """Return the main document content for given language.
+        
+        If 'lang' is not None, the appropriate language specific content passed
+        to the constructor argument 'variants' is returned if found.  If given
+        language is not found in variants or if given variant doesn't define
+        'content', the content passed to the constructor argument 'content' is
+        returned.  This is particularly practical for language neutral content
+        (e.g. consisting of translatable texts).  When 'lang' is None (or
+        omitted), the content passed to the constructor argument 'content' is
+        returned as well, which may be useful for content of undefined
+        language.
+
+        """
         return self._variant(lang, 'content') or self._empty_content
     
-    def page_header(self, lang):
-        """Return the page header content for given language."""
+    def page_header(self, lang=None):
+        """Return the page header content for given language.
+
+        The same rules as described for the method 'content()' apply here analogously.
+
+        """
         return self._variant(lang, 'page_header')
 
-    def first_page_header(self, lang):
-        """Return the first page header content for given language."""
+    def first_page_header(self, lang=None):
+        """Return the first page header content for given language.
+
+        The same rules as described for the method 'content()' apply here analogously.
+
+        """
         return self._variant(lang, 'first_page_header') or self.page_header(lang)
         
-    def page_footer(self, lang):
-        """Return the page footer content for given language."""
+    def page_footer(self, lang=None):
+        """Return the page footer content for given language.
+
+        The same rules as described for the method 'content()' apply here analogously.
+
+        """
         return self._variant(lang, 'page_footer')
 
-    def left_page_footer(self, lang):
-        """Return the page footer content for left pages for given language."""
+    def left_page_footer(self, lang=None):
+        """Return the page footer content for left pages for given language.
+
+        The same rules as described for the method 'content()' apply here analogously.
+
+        """
         return self._variant(lang, 'left_page_footer') or self.page_footer(lang)
 
-    def right_page_footer(self, lang):
-        """Return the page footer content for right pages for given language."""
+    def right_page_footer(self, lang=None):
+        """Return the page footer content for right pages for given language.
+
+        The same rules as described for the method 'content()' apply here analogously.
+
+        """
         return self._variant(lang, 'right_page_footer') or self.page_footer(lang)
 
-    def page_background(self, lang):
-        """Return the page background content for given language."""
+    def page_background(self, lang=None):
+        """Return the page background content for given language.
+
+        The same rules as described for the method 'content()' apply here analogously.
+
+        """
         return self._variant(lang, 'page_background')
 
-    def presentation(self, lang):
-        """Return presentation of this node."""
+    def presentation(self, lang=None):
+        """Return presentation of this node.
+
+        The same rules as described for the method 'content()' apply here analogously.
+
+        """
         return self._variant(lang, 'presentation')
 
 

@@ -90,11 +90,8 @@ class Reader(object):
     def _variants(self):
         return ()
 
-    def _variant(self, lang):
-        return lcg.Variant(lang, content=self._content(lang))
-
     def _content(self, lang):
-        return ()
+        return dict()
 
     def _resource_dirs(self):
         return ()
@@ -114,13 +111,23 @@ class Reader(object):
     def build(self):
         """Build hierarchy of 'ContentNode' instances and return the root node."""
         try:
-            variants = [self._variant(lang) for lang in self._variants()]
-            return lcg.ContentNode(id=self._id, title=self._title(),
+            variants = self._variants()
+            if variants:
+                # There is one or more known source language (files have the lang extension).
+                kwargs = dict(variants=[lcg.Variant(lang, **self._content(lang))
+                                        for lang in variants])
+            else:
+                # There is one unknown source language.
+                kwargs = self._content(None)
+            return lcg.ContentNode(id=self._id,
+                                   title=self._title(), 
                                    brief_title=self._brief_title(),
-                                   descr=self._descr(), variants=variants,
+                                   descr=self._descr(),
                                    children=[child.build() for child in self._children()],
                                    resource_provider=self._resource_provider_,
-                                   globals=self._globals(), hidden=self._hidden)
+                                   globals=self._globals(),
+                                   hidden=self._hidden,
+                                   **kwargs)
                                    
         except Exception as e:
             if hasattr(self, '_source_filename'):
@@ -243,7 +250,7 @@ class StructuredTextReader(FileReader):
         return title, lcg.Container(sections), parameters
 
     def _title(self):
-        # This method is called after _variant(), is called for each
+        # This method is called after _content(), is called for each
         # language, so the dictionary of titles is already built.
         if len(self._titles.keys()) == 1:
             title = self._titles.values()[0]
@@ -251,10 +258,10 @@ class StructuredTextReader(FileReader):
             title = lcg.SelfTranslatableText(self._id, translations=self._titles)
         return title
 
-    def _variant(self, lang):
+    def _content(self, lang):
         title, content, parameters = self._document(self._source_text(lang))
         self._titles[lang] = title
-        return lcg.Variant(lang, content=content, **parameters)
+        return dict(content=content, **parameters)
 
     
 class DocFileReader(StructuredTextReader):
@@ -272,14 +279,22 @@ class DocFileReader(StructuredTextReader):
           
         """
         self._ext = ext
+        self._cached_variants = None
         super(DocFileReader, self).__init__(id, **kwargs)
 
     def _variants(self):
-        if self._parent is not None:
-            return self._parent._variants()
+        # Cache the result to avoid repetitive file system access...
+        if self._cached_variants is not None:
+            variants = self._cached_variants
         else:
-            return tuple([os.path.splitext(os.path.splitext(f)[0])[1][1:]
-                          for f in glob.glob(self._input_file(self._id, lang='*', ext=self._ext))])
+            if self._parent is not None:
+                variants = self._parent._variants()
+            else:
+                matcher = self._input_file(self._id, lang='*', ext=self._ext)
+                variants = tuple([os.path.splitext(os.path.splitext(f)[0])[1][1:]
+                                  for f in glob.glob(matcher)])
+            self._cached_variants = variants
+        return variants
     
     def _source_text(self, lang):
         return self._read_file(self._id, lang=lang, ext=self._ext)
