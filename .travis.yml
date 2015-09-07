@@ -31,5 +31,3 @@ notifications:
   email:
     recipients:
       - lcg-cvs@lists.freebsoft.org
-    on_success: always
-    on_failure: always
