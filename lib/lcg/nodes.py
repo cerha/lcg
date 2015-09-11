@@ -472,12 +472,16 @@ class Variant(object):
 
         """
         def _content(x):
+            if isinstance(x, dict) and tuple(x.keys()) == (None,):
+                # Handle old hacks gracefully.
+                x = x[None]
             if isinstance(x, (tuple, list)):
                 x = lcg.Container(x)
             assert x is None or isinstance(x, lcg.Content), x
             return x
         assert isinstance(lang, basestring) and len(lang) == 2, lang
         if isinstance(presentation, dict) and tuple(presentation.keys()) == (None,):
+            # Handle old hacks gracefully.
             presentation = presentation[None]
         assert presentation is None or isinstance(presentation, lcg.Presentation), presentation
         self._lang = lang
