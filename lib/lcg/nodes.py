@@ -477,6 +477,9 @@ class Variant(object):
             assert x is None or isinstance(x, lcg.Content), x
             return x
         assert isinstance(lang, basestring) and len(lang) == 2, lang
+        if isinstance(presentation, dict) and tuple(presentation.keys()) == (None,):
+            presentation = presentation[None]
+        assert presentation is None or isinstance(presentation, lcg.Presentation), presentation
         self._lang = lang
         self._content = _content(content)
         self._page_header = _content(page_header)
