@@ -504,7 +504,7 @@ class Variant(object):
         return self._page_header
 
     def first_page_header(self):
-        self._first_page_header
+        return self._first_page_header
 
     def page_footer(self):
         return self._page_footer

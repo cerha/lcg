@@ -419,6 +419,7 @@ class ContentNode(unittest.TestCase):
 
     def test_variants(self):
         n = lcg.ContentNode('n', content=lcg.TextContent("C"),
+                            first_page_header=lcg.TextContent("FH"),
                             right_page_footer=lcg.TextContent("RF"),
                             page_background=lcg.TextContent("B"),
                             variants=(
@@ -431,6 +432,8 @@ class ContentNode(unittest.TestCase):
         self.assertEqual(n.content('en').text(), 'EN')
         self.assertEqual(n.content('cs').text(), 'CS')
         self.assertEqual(n.content('fr').text(), 'C')
+        self.assertEqual(n.first_page_header('en').text(), 'FH')
+        self.assertEqual(n.first_page_header('cz').text(), 'FH')
         self.assertEqual(n.page_header('en').text(), 'H.EN')
         self.assertIsNone(n.page_footer('en'))
         self.assertEqual(n.right_page_footer('en').text(), 'RF')
