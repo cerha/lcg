@@ -92,11 +92,9 @@
 
 .popup-menu-ctrl-widget a {
     display: inline-block;
-    background-image: url(popup-arrow.png);
-    background-position: right bottom;
-    background-repeat: no-repeat;
-    width: 10px;
-    height: 14px;
+    background: url(popup-arrow.png) 3px bottom no-repeat;
+    width: 22px;
+    height: 1em;
 }
 .popup-menu-widget, .dropdown-selection-widget {
     position: absolute;

@@ -291,7 +291,8 @@ class PopupMenuCtrl(Widget, lcg.Content):
     def __init__(self, items, tooltip=None, active_area_selector=None, **kwargs):
         """Arguments:
 
-           items -- sequence of 'lcg.PopupMenuItem' instances representing menu items.
+           items -- sequence of 'lcg.PopupMenuItem' instances representing menu
+             items.
            tooltip -- tooltip of the popup menu control as a string.
            active_area_selector -- CSS selector string (such as 'tr',
              'div.title', '.menu li' etc.) to identify a surrounding DOM
@@ -299,7 +300,7 @@ class PopupMenuCtrl(Widget, lcg.Content):
              corresponding element will also invoke the context menu on right
              mouse button click.
            **kwargs -- other arguments defined by the parent class
-           
+
         """
         self._items = items
         self._tooltip = tooltip
