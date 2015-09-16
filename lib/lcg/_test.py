@@ -450,6 +450,13 @@ class ContentNode(unittest.TestCase):
         n2 = lcg.ContentNode('n', content=lcg.TextContent("C"))
         self.assertEqual(n2.content().text(), 'C')
 
+    def test_resources(self):
+        img = lcg.Image('a.png')
+        n = lcg.ContentNode('n', content=lcg.TextContent("C", resources=(img,)))
+        self.assertIs(n.resource('a.png'), img)
+        self.assertIsNone(n.resource('b.png'))
+        self.assertEqual(n.resources(), (img,))
+
 tests.add(ContentNode)
 
 

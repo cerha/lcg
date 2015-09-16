@@ -323,7 +323,7 @@ class ContentNode(object):
         
     def resource(self, filename, **kwargs):
         """Get the resource instance by its type and relative filename."""
-        for lang in self.variants():
+        for lang in self.variants() or (None,):
             for resource in self.content(lang).resources():
                 if resource.filename() == filename:
                     # Hmm, why don't have images here src_file set?
