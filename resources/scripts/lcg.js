@@ -662,9 +662,9 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 		var total_height = menu.getHeight();
 		var css_height = menu.getLayout().get('height');
 		menu.setStyle({height: 0, display: 'block', overflowY: 'hidden'});
-		new Effect.Morph(menu, {style: {height: css_height + 'px',
-						top: y - total_height + 'px'},
-					duration: 0.2});
+		Effect.Morph(menu, {style: {height: css_height + 'px',
+					    top: y - total_height + 'px'},
+				    duration: 0.2});
 		setTimeout(function () { menu.setStyle({overflowY: 'auto'}); }, 200);
 	    } else {
 		Effect.SlideDown(menu, {duration: 0.2});
@@ -686,7 +686,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 	lcg.popup_menu = null;
 	var element = this.popup_element;
 	if (element) {
-	    element.setAttribute('aria-expanded', 'false')
+	    element.setAttribute('aria-expanded', 'false');
 	    this.set_focus(element);
 	}
     }
@@ -715,7 +715,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
         //   callback_args -- Array of additional arguments to pass to the callback function
         //   cls -- CSS class name to be used for the item (string, optional)
         // You will typically supply either uri or callback, but both can be used as well.
-	var i, item, a, enabled;
+	var i, item, a, li;
 	var ul = new Element('ul', {'role': 'presentation'});
 	for (i = 0; i < items.length; i++) {
 	    item = items[i];
@@ -725,7 +725,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    }
 	    a._lcg_popup_menu_item_spec = item;
 	    a.update(item.label);
-	    var li = new Element('li');
+	    li = new Element('li');
 	    if (item.enabled === undefined || item.enabled) {
 		li.addClassName('active');
 	    }
@@ -822,7 +822,7 @@ lcg.DropDownSelection = Class.create(lcg.PopupMenuBase, {
     initialize: function ($super, element_id, button_id, activation_callback,
 			  get_selected_item_index) {
 	if (get_selected_item_index === undefined) {
-	    get_selected_item_index = function () { return 0 };
+	    get_selected_item_index = function () { return 0; };
 	}
 	$super(element_id);
 	this.activation_callback = activation_callback;
@@ -842,7 +842,7 @@ lcg.DropDownSelection = Class.create(lcg.PopupMenuBase, {
     on_button_key_down: function(event) {
 	var key = this.event_key(event);
 	if (key === 'Enter' || key === 'Space' || key === 'Alt-Down') {
-	    this.dropdown()
+	    this.dropdown();
 	    event.stop();
 	}
     },
