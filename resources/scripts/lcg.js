@@ -713,7 +713,8 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
         //     invoked as the first argument.  Additional arguments may be
         //     optionally specified by 'callback_args'.
         //   callback_args -- Array of additional arguments to pass to the callback function
-	// You will typically supply either uri or callback, but both can be used.
+        //   cls -- CSS class name to be used for the item (string, optional)
+        // You will typically supply either uri or callback, but both can be used as well.
 	var i, item, a, enabled;
 	var ul = new Element('ul', {'role': 'presentation'});
 	for (i = 0; i < items.length; i++) {
@@ -724,8 +725,14 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    }
 	    a._lcg_popup_menu_item_spec = item;
 	    a.update(item.label);
-	    enabled = (item.enabled === undefined || item.enabled);
-	    ul.insert(new Element('li', (enabled ? {'class': 'active'} : {})).update(a));
+	    var li = new Element('li');
+	    if (item.enabled === undefined || item.enabled) {
+		li.addClassName('active');
+	    }
+	    if (item.cls) {
+		li.addClassName(item.cls);
+	    }
+	    ul.insert(li.update(a));
 	}
 	var menu = new Element('div', {'role': 'menu',
 				       'class': 'popup-menu-widget',

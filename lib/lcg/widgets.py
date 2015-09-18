@@ -238,7 +238,7 @@ class PopupMenuItem(Widget, lcg.Content):
     """Popup menu item specification."""
 
     def __init__(self, label, tooltip=None, uri=None, enabled=True, callback=None,
-                 callback_args=()):
+                 callback_args=(), cls=None):
         """Arguments:
           label -- item title (string)
           tooltip -- item description/tooltip (string).
@@ -251,6 +251,8 @@ class PopupMenuItem(Widget, lcg.Content):
             optionally specified by 'callback_args'.
           callback_args -- Additional JavaScript callback function arguments
             (tuple of values capable of JSON conversion).
+          cls -- CSS class name to be used for the item (e.g to assign
+             icons through stylesheets).  No class assigned when None.
 
         """
         self._label = label
@@ -259,6 +261,7 @@ class PopupMenuItem(Widget, lcg.Content):
         self._enabled = enabled
         self._callback = callback
         self._callback_args = callback_args
+        self._cls = cls
     def label(self):
         return self._label
     def tooltip(self):
@@ -271,6 +274,8 @@ class PopupMenuItem(Widget, lcg.Content):
         return self._callback
     def callback_args(self):
         return self._callback_args
+    def cls(self):
+        return self._cls
 
     
 class PopupMenuCtrl(Widget, lcg.Content):
@@ -319,7 +324,8 @@ class PopupMenuCtrl(Widget, lcg.Content):
                       enabled=item.enabled(),
                       uri=item.uri(),
                       callback=item.callback(),
-                      callback_args=item.callback_args())
+                      callback_args=item.callback_args(),
+                      cls=item.cls())
                  for item in self._items]
         return (items, context.translate(self._tooltip), self._active_area_selector)
 
