@@ -1039,6 +1039,12 @@ class HtmlExport(unittest.TestCase):
         content = lcg.MathML(u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>')
         self.assertIsInstance(export(content), basestring)
 
+    def test_html_content(self):
+        # Make sure the HTML content is not escaped when wrappped in another HTML element.
+        c = lcg.Container(lcg.HtmlContent('<b>B</b>'), id='x')
+        context = lcg.HtmlExporter().context(lcg.ContentNode('y'), None)
+        self.assertEqual(c.export(context), '<div class="x"><b>B</b></div>')
+
     def test_js_value(self):
         import json
         g = lcg.HtmlGenerator()

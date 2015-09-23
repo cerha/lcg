@@ -1033,7 +1033,8 @@ class HtmlContent(TextContent):
     def export(self, context):
         assert isinstance(context.exporter(), lcg.HtmlExporter), \
             "Only HTML export is supported for this element."
-        return self._text
+        g = context.generator()
+        return g.noescape(self._text)
 
     
 class Heading(Container):
