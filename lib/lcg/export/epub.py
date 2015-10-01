@@ -50,7 +50,11 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
             self.context.scripted = True
             return super(EpubHtml5Exporter.Generator, self).script(*args, **kwargs)
 
-    _INVALID_MATHML_ATTRIBUTES = re.compile(r' ((fontfamily|mathcolor)=""|contenteditable="false")')
+    _SUPPRESSED_MATHML = re.compile(
+        # Annotations are otherwise displayed in iBooks.
+        r'(<annotation encoding="ASCII">.*?</annotation>|'
+        r' ((fontfamily|mathcolor)=""|contenteditable="false"))'
+    )
     _INVALID_RESOURCE_URI_CHARACTERS = re.compile(r'[^a-z0-9;,_+*/=\-\.\(\)]')
  
     def __init__(self, *args, **kwargs):
@@ -106,7 +110,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
     def _export_mathml(self, context, element):
         context.mathml = True
         result = super(EpubHtml5Exporter, self)._export_mathml(context, element)
-        return self._generator.noescape(self._INVALID_MATHML_ATTRIBUTES.sub('', result))
+        return self._generator.noescape(self._SUPPRESSED_MATHML.sub('', result))
 
     def _uri_node(self, context, node, lang=None):
         return node.id() + '.xhtml'
