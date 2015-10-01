@@ -71,8 +71,8 @@ from .exercises import Task, TextTask, ContentTask, Choice, \
     GapFilling, HiddenAnswers, FillInExercise, VocabExercise, \
     WrittenAnswers, NumberedCloze, Cloze, ModelCloze
 
-from .export.export import Exporter, FileExporter, TextExporter, \
-    UnsupportedElementType, SubstitutionIterator
+from .export.export import INFO, WARNING, ERROR, \
+    Exporter, FileExporter, TextExporter, UnsupportedElementType, SubstitutionIterator
 
 from .export.html import HtmlEscapedUnicode, HtmlGenerator, \
     XhtmlGenerator, HtmlExporter, Html5Exporter, HtmlFileExporter, \
