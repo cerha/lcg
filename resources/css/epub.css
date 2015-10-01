@@ -18,6 +18,14 @@ table.lcg-table {
 table.lcg-table td, table.lcg-table th {
     padding: .4em;
 }
+img.left-aligned {
+    float: left;
+    margin-right: 1em;
+}
+img.right-aligned {
+    float: right;
+    margin-left: 1em;
+}
 .exercise {
     margin-top: 0.8em;
 }
