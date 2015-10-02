@@ -1016,7 +1016,7 @@ class Exporter(object):
                 items.append((node.heading(), (),))
             else:
                 items.append((node, subitems,))
-        for node, subitems in element.items():
+        for node, subitems in element.items(context.lang()):
             add_item(node, subitems)
         export(items)
         result = self.concat(self.concat(*item_list),
