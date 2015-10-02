@@ -1230,9 +1230,9 @@ class Exporter(object):
                 result = fill_in_area
             return result
         def export_task_parts(task, show_answers):
-            if isinstance(element, lcg.WritingTest):
-                return (None if show_answers else self.text(context, fill_in_area),)
-            elif isinstance(element, lcg.FillInExercise):
+            #if isinstance(element, lcg.WritingTest):
+            #    return (None if show_answers else self.text(context, fill_in_area),)
+            if isinstance(element, lcg.FillInExercise):
                 if task.has_fields_in_text():
                     text = format_task_text(context, task,
                                             lambda *args: make_field(show_answers, *args))
