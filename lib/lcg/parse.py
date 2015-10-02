@@ -1310,7 +1310,7 @@ class HTMLProcessor(object):
         def _blockquote(self, element, followers):
             kwargs = {}
             footer = element.find('footer')
-            if footer:
+            if footer is not None:
                 # Convert the <footer> content inside <blockquote> into Quotation 'kwargs'.
                 element.remove(footer)
                 text = self._plain_text(footer).strip()
@@ -1318,7 +1318,7 @@ class HTMLProcessor(object):
                     text = text[2:]
                 kwargs['source'] = text
                 link = footer.find('a')
-                if link:
+                if link is not None:
                     kwargs['uri'] = link.attrib.get('href')
             content = self._transform_sub(element)
             return lcg.Quotation(content, **kwargs)
