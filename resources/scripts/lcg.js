@@ -629,19 +629,6 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 	this.dismiss();
     },
 
-    on_document_click: function (event) {
-	if (this.ignore_next_click) {
-	    // The first click is the one which pops the menu up.
-	    this.ignore_next_click = false;
-	    return;
-	}
-	var outside = event.findElement('div') !== this.element;
-	this.dismiss();
-	if (outside) {
-	    event.stop();
-	}
-    },
-    
     popup: function (element, x, y, direction, selected_item_index) {
 	if (lcg.popup_menu) {
 	    lcg.popup_menu.dismiss();
@@ -677,11 +664,45 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 	    menu.show();
 	    this.set_focus(selected_item);
 	}
-	this.on_click_handler = this.on_document_click.bind(this);
+	this.on_touchstart_handler = function (e) { this.touch_moved = false; }.bind(this);
+	this.on_touchmove_handler = function (e) { this.touch_moved = true; }.bind(this);
+	this.on_touchend_handler = this.on_touchend.bind(this);
+	this.on_click_handler = this.on_click.bind(this);
+	$(document).observe('touchstart', this.on_touchstart_handler);
+	$(document).observe('touchmove', this.on_touchmove_handler);
+	$(document).observe('touchend', this.on_touchend_handler);
 	$(document).observe('click', this.on_click_handler);
     },
 
+    on_click: function (event) {
+	if (this.ignore_next_click) {
+	    // The first click is the one which pops the menu up.
+	    this.ignore_next_click = false;
+	    return;
+	}
+	var outside = event.findElement('div') !== this.element;
+	this.dismiss();
+	if (outside) {
+	    event.stop();
+	}
+    },
+
+    on_touchend: function (event) {
+	if (!this.touch_moved) {
+	    var outside = event.findElement('div') !== this.element;
+	    if (outside) {
+		this.dismiss();
+	    } else {
+		this.cmd_activate(event.element());
+	    }
+	    event.stop();
+	}
+    },
+
     dismiss: function() {
+	$(document).stopObserving('touchstart', this.on_touchstart_handler);
+	$(document).stopObserving('touchmove', this.on_touchmove_handler);
+	$(document).stopObserving('touchend', this.on_touchend_handler);
 	$(document).stopObserving('click', this.on_click_handler);
 	lcg.popup_menu = null;
 	var element = this.popup_element;
