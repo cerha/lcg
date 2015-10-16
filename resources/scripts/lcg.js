@@ -307,16 +307,17 @@ lcg.Notebook = Class.create(lcg.Menu, {
     },
 
     last_saved_selected_item: function() {
-	// Get the selected item saved most recently in a browser cookie.
-	//
-	// We remember the last tab only for one notebook (the one which was
-	// last switched) to avoid polution of cookies with too many values).
-	//
-	// The HTML class should identify a particular Notebook widget and
-	// should not change across requests, while its id is unique on a page,
-	// but may not identify a particulat widget and may change across
-	// requests.  So we use the class as a part of cookie value.
-	//
+	/* Get the selected item saved most recently in a browser cookie.
+	 *
+	 * We remember the last tab only for one notebook (the one which was
+	 * last switched) to avoid polution of cookies with too many values).
+	 *
+	 * The HTML class should identify a particular Notebook widget and
+	 * should not change across requests, while its id is unique on a page,
+	 * but may not identify a particulat widget and may change across
+	 * requests.  So we use the class as a part of cookie value.
+	 *
+	 */
 	var cls = this.element.getAttribute('class');
 	if (cls) {
 	    var cookie = lcg.cookies.get(this.COOKIE);
@@ -377,24 +378,24 @@ lcg.Notebook._activation_callbacks = {};
 
 lcg.Notebook.on_activation = function (page, callback, repeat) {
     /* Register a callback to be called on notebook tab activation.
-       
-    Arguments: 
-      page -- notebook page DOM element -- the div enclosing the
-        notebook page contents
-      callback -- javascript function to be called when the page is activated.
-        The callbacked is always called once for the initally active tab in the
-        notebook and then on each tab switch for the newly activated tab.
-      repeat -- if true, the callback will be repeated on each activation, if
-        false (by default), the callback will be called just once, when given
-        tab is activated for the first time.
-
-    Note: This is a class method, not an instance method, because the Notebook
-    instance often doesn't exist yet, when the caller needs to register a
-    callback.  The instance is created when the whole notebook contents (all
-    tabs and pages) is available, while the registration is typically done by
-    the objects which appear inside the notebook pages.
-
-    */
+     *
+     * Arguments:
+     *   page -- notebook page DOM element -- the div enclosing the
+     *     notebook page contents
+     *   callback -- javascript function to be called when the page is activated.
+     *     The callbacked is always called once for the initally active tab in the
+     *     notebook and then on each tab switch for the newly activated tab.
+     *   repeat -- if true, the callback will be repeated on each activation, if
+     *     false (by default), the callback will be called just once, when given
+     *     tab is activated for the first time.
+     *
+     * Note: This is a class method, not an instance method, because the Notebook
+     * instance often doesn't exist yet, when the caller needs to register a
+     * callback.  The instance is created when the whole notebook contents (all
+     * tabs and pages) is available, while the registration is typically done by
+     * the objects which appear inside the notebook pages.
+     *
+     */
     if (repeat === undefined) {
 	repeat = false;
     }
@@ -718,24 +719,26 @@ lcg.popup_menu = null;
 
 
 lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
-    // Popup menu widget.
+    /* Popup menu widget. */
     
     initialize: function ($super, items) {
-	// items -- array of menu items.  Each item is an object with the
-	// following attributes:
-	//   label -- item title (string)
-	//   tooltip -- item description/tooltip (string, optional)
-	//   uri -- URI where the item points to (string, optional)
-	//   enabled -- if present and false, the item will be disabled (inactive)
-        //   callback -- The JavaScript function to be called on item invocation.
-        //     May be passed also as a string (function of given name will be 
-	//     looked up in the current JavaScript name space).  The callback
-        //     function will be called with the element on which the menu was
-        //     invoked as the first argument.  Additional arguments may be
-        //     optionally specified by 'callback_args'.
-        //   callback_args -- Array of additional arguments to pass to the callback function
-        //   cls -- CSS class name to be used for the item (string, optional)
-        // You will typically supply either uri or callback, but both can be used as well.
+	/* items -- array of menu items as objects with the following attributes:
+	 *   label -- item title (string)
+	 *   tooltip -- item description/tooltip (string, optional)
+	 *   uri -- URI where the item points to (string, optional)
+	 *   enabled -- if present and false, the item will be disabled (inactive)
+	 *   callback -- The JavaScript function to be called on item invocation.
+	 *     May be passed also as a string (function of given name will be 
+	 *     looked up in the current JavaScript name space).	 The callback
+	 *     function will be called with the element on which the menu was
+	 *     invoked as the first argument.  Additional arguments may be
+	 *     optionally specified by 'callback_args'.
+	 *   callback_args -- Array of additional arguments to pass to the callback function
+	 *   cls -- CSS class name to be used for the item (string, optional)
+	 *
+	 * You will typically supply either uri or callback, but both can be used as well.
+	 *
+	 */
 	var i, item, a, li;
 	var ul = new Element('ul', {'role': 'presentation'});
 	for (i = 0; i < items.length; i++) {
@@ -800,11 +803,13 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
     },
 
     popup: function ($super, event, selected_item_index) {
-	// event -- JavaScript event triggering the popup -- either a mouse
-	//   action catched by 'contextmenu' handler or mouse/keyboard action
-	//   catched by 'click' handler.
-	// selected_item_index (optional) -- index of the menu item to be
-	//   initially selected
+	/* Arguments:
+	 *   event -- JavaScript event triggering the popup -- either a mouse
+	 *     action catched by 'contextmenu' handler or mouse/keyboard action
+	 *     catched by 'click' handler.
+	 *   selected_item_index (optional) -- index of the menu item to be
+	 *     initially selected
+	 */
 	event.stop();
 	var x, y, direction;
 	var element = event.element();
