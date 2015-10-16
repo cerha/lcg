@@ -843,14 +843,15 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 
 });
 
-lcg.DropDownSelection = Class.create(lcg.PopupMenuBase, {
+
+lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
 
     initialize: function ($super, element_id, button_id, activation_callback,
 			  get_selected_item_index) {
+	$super(element_id);
 	if (get_selected_item_index === undefined) {
 	    get_selected_item_index = function () { return 0; };
 	}
-	$super(element_id);
 	this.activation_callback = activation_callback;
 	this.get_selected_item_index = get_selected_item_index;
 	this.element.setAttribute('role', 'listbox');
