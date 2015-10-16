@@ -104,7 +104,12 @@ lcg.KeyHandler = Class.create({
 
 lcg.Widget = Class.create(lcg.KeyHandler, {
     /* Generic base class for all LCG JavaScript widgets.
-     * 
+     *
+     * Constructor arguments:
+     *
+     *   element_id -- HTML id of the widget root element as a string.
+     *     May also be the element itself as Prototype.js Element instance.
+     *
      */ 
     initialize: function ($super, element_id) {
 	$super();
@@ -116,9 +121,16 @@ lcg.Widget = Class.create(lcg.KeyHandler, {
 lcg.Menu = Class.create(lcg.Widget, {
     /* Generic base class for several other menu-like widgets.
      * 
-     * The code here traverses the menu structure, initializes connections
-     * between the hierarchical items, assigns ARIA roles to HTML tags and
-     * binds keyboard event handling to support keyboard menu traversal.
+     * Constructor arguments:
+     *
+     *   element_id -- HTML id of the widget root element (described in the parent class).
+     *
+     * The menu structure is traversed on instance creation and connections
+     * between the hierarchical items are initialized, ARIA roles are assigned
+     * to HTML elements and event handling is established.
+     *
+     * Accessibility is supported through automatically managed ARIA roles
+     * and states and handling keyboard menu traversal.
      * 
      */
     _MANAGE_TABINDEX: true,
@@ -611,8 +623,8 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
 lcg.PopupMenuBase = Class.create(lcg.Menu, {
 
-    initialize: function ($super, element) {
-	$super(element);
+    initialize: function ($super, element_id) {
+	$super(element_id);
 	this.ignore_next_click = false;
     },
 
@@ -719,26 +731,29 @@ lcg.popup_menu = null;
 
 
 lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
-    /* Popup menu widget. */
-    
+    /* Popup menu widget.
+     *
+     * Constructor arguments:
+     *
+     *   items -- array of menu items as objects with the following attributes:
+     *     label -- item title (string)
+     *     tooltip -- item description/tooltip (string, optional)
+     *     uri -- URI where the item points to (string, optional)
+     *     enabled -- if present and false, the item will be disabled (inactive)
+     *     callback -- The JavaScript function to be called on item invocation.
+     *       May be passed also as a string (function of given name will be 
+     *       looked up in the current JavaScript name space).	 The callback
+     *       function will be called with the element on which the menu was
+     *       invoked as the first argument.  Additional arguments may be
+     *       optionally specified by 'callback_args'.
+     *     callback_args -- Array of additional arguments to pass to the callback function
+     *     cls -- CSS class name to be used for the item (string, optional)
+     *
+     * You will typically supply either uri or callback, but both can be used as well.
+     *
+     */
+
     initialize: function ($super, items) {
-	/* items -- array of menu items as objects with the following attributes:
-	 *   label -- item title (string)
-	 *   tooltip -- item description/tooltip (string, optional)
-	 *   uri -- URI where the item points to (string, optional)
-	 *   enabled -- if present and false, the item will be disabled (inactive)
-	 *   callback -- The JavaScript function to be called on item invocation.
-	 *     May be passed also as a string (function of given name will be 
-	 *     looked up in the current JavaScript name space).	 The callback
-	 *     function will be called with the element on which the menu was
-	 *     invoked as the first argument.  Additional arguments may be
-	 *     optionally specified by 'callback_args'.
-	 *   callback_args -- Array of additional arguments to pass to the callback function
-	 *   cls -- CSS class name to be used for the item (string, optional)
-	 *
-	 * You will typically supply either uri or callback, but both can be used as well.
-	 *
-	 */
 	var i, item, a, li;
 	var ul = new Element('ul', {'role': 'presentation'});
 	for (i = 0; i < items.length; i++) {
@@ -845,6 +860,19 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 
 
 lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
+    /* Dropdown selection menu widget
+     *
+     * Constructor arguments:
+     *
+     *   element_id -- HTML id of the widget root element (described in
+     *     the parent class)
+     *   button_id -- HTML id of the element inoking the selection
+     *   activation_callback -- callback called on item item activation
+     *     with one argument (the activated item)
+     *   get_selected_item_index -- function returning the initially selected
+     *     item.  Called with no arguments every time before the dropdown
+     *     is expanded.
+     */
 
     initialize: function ($super, element_id, button_id, activation_callback,
 			  get_selected_item_index) {
