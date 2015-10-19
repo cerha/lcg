@@ -94,6 +94,7 @@
 
 .popup-menu-ctrl-widget {
     display: inline-block;
+    position: relative;
 }
 .popup-menu-ctrl-widget .popup-arrow {
     display: inline-block;

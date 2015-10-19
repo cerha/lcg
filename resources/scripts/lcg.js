@@ -685,15 +685,18 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 	$(document).observe('touchmove', this.on_touchmove_handler);
 	$(document).observe('touchend', this.on_touchend_handler);
 	$(document).observe('click', this.on_click_handler);
+	if (element) {
+	    element.setAttribute('aria-expanded', 'true');
+	}
     },
 
     on_click: function (event) {
-	if (this.ignore_next_click) {
+	var outside = event.findElement('div') !== this.element;
+	if (this.ignore_next_click && !outside) {
 	    // The first click is the one which pops the menu up.
 	    this.ignore_next_click = false;
 	    return;
 	}
-	var outside = event.findElement('div') !== this.element;
 	this.dismiss();
 	if (outside) {
 	    event.stop();
@@ -717,6 +720,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 	$(document).stopObserving('touchmove', this.on_touchmove_handler);
 	$(document).stopObserving('touchend', this.on_touchend_handler);
 	$(document).stopObserving('click', this.on_click_handler);
+	this.element.hide();
 	lcg.popup_menu = null;
 	var element = this.popup_element;
 	if (element) {
@@ -753,7 +757,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      *
      */
 
-    initialize: function ($super, items) {
+    initialize: function ($super, element_id, items) {
 	var i, item, a, li;
 	var ul = new Element('ul', {'role': 'presentation'});
 	for (i = 0; i < items.length; i++) {
@@ -773,11 +777,11 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    }
 	    ul.insert(li.update(a));
 	}
-	var menu = new Element('div', {'role': 'menu',
+	var menu = new Element('div', {'id': element_id,
+				       'role': 'menu',
 				       'class': 'popup-menu-widget',
 				       'style': 'display: none'});
 	menu.update(ul);
-	$(document.body).insert(menu);
 	$super(menu);
     },
 
@@ -826,34 +830,27 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	 *     initially selected
 	 */
 	event.stop();
-	var x, y, direction;
-	var element = event.element();
-	if (event.isLeftClick() || event.isRightClick()) {
-	    x = event.pointerX();
-	    y = event.pointerY();
-	} else {
-	    var offset = element.cumulativeOffset();
-	    x = offset.left;
-	    y = offset.top + 10;
-	}
 	var menu = this.element;
+	var offset = menu.parentNode.cumulativeOffset();
+	var x = 0;
+	var y = 0;
+	if (event.isLeftClick() || event.isRightClick()) {
+	    x = event.pointerX() - offset.left;
+	    y = event.pointerY() - offset.top;
+        }
 	var viewport = document.viewport.getDimensions();
 	var scroll_offset = document.viewport.getScrollOffsets();
-	if (x + menu.getWidth() > viewport.width + scroll_offset.left) {
+	if (offset.left + x + menu.getWidth() > viewport.width + scroll_offset.left) {
 	    x -= menu.getWidth();
 	}
-	if (y + menu.getHeight() > viewport.height + scroll_offset.top && y > menu.getHeight()) {
+	var direction;
+	if (offset.top + y + menu.getHeight() > viewport.height + scroll_offset.top && y > menu.getHeight()) {
 	    direction = 'up';
 	} else {
 	    direction = 'down';
 	}
 	this.ignore_next_click = !event.isLeftClick();
-	$super(element, x, y, direction, selected_item_index);
-    },
-
-    dismiss: function($super) {
-	$super();
-	this.element.remove();
+	$super(event.element(), x, y, direction, selected_item_index);
     }
 
 });
@@ -871,16 +868,15 @@ lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
     initialize: function ($super, element_id, items, selector) {
 	$super(element_id);
 	var element = this.element;
-	element.observe('click', this.popup_menu.bind(this));
+	var menu = new lcg.PopupMenu(element.getAttribute('id') + '-popup-menu', items);
+	element.insert(menu.element);
+	element.observe('click', menu.popup.bind(menu));
 	element.setAttribute('aria-haspopup', 'true');
+	element.setAttribute('aria-expanded', 'false');
+	element.setAttribute('aria-controls', menu.element.getAttribute('id'));
 	if (selector) {
-	    element.up(selector).observe('contextmenu', this.popup_menu.bind(this));
+	    element.up(selector).observe('contextmenu', menu.popup.bind(menu));
 	}
-    },
-
-    popup_menu: function (event) {
-	var menu = new lcg.PopupMenu(this.items);
-	menu.popup(event);
     }
 
 });
@@ -994,13 +990,6 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
 	var padding = menu.getWidth() - menu.getLayout().get('width');
 	menu.setStyle({width: this.button.getWidth() - padding + 'px'});
 	this.popup(this.button, 0, y, direction, this.get_selected_item_index());
-	this.button.setAttribute('aria-expanded', 'true');
-    },
-
-    dismiss: function($super) {
-	$super();
-	this.element.hide();
-	this.button.setAttribute('aria-expanded', 'false');
     }
 
 });
