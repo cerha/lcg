@@ -278,27 +278,34 @@ class PopupMenuItem(Widget, lcg.Content):
         return self._cls
 
     
-class PopupMenuCtrl(Widget, lcg.Content):
+class PopupMenuCtrl(Widget, lcg.Container):
     """Popup menu invocation control.
 
-    The control is rendered as a small down pointing arrow.  Clicking the arrow
-    will create and display a popup menu.  The widget may also make a
-    surrounding HTML element active on right mouse button click to create the
-    same menu.  Thus, for example, a whole table row may display a context menu
-    when clicked.  The presence of the arrow is still important for visual
-    indication and for accessibility.  The arrow works as an html link which is
-    keyboard navigable and invokes the menu when activated (moving keyboard
-    focus to the menu).  This makes the menu completely accessible from
-    keyboard.
+    The control is rendered as a label with a small down pointing arrow on the
+    right.  The label is any inner content of the container (this widget is
+    lcg.Container).  If the content is empty, only the arrow icon is displayed.
+    Clicking the label or the arrow will display a popup menu.  The widget may
+    also make a surrounding HTML element active on right mouse button click to
+    display the same menu.  Thus, for example, a whole table row may display a
+    context menu when clicked.  The presence of the arrow is still important
+    for visual indication and for accessibility.  The arrow works as an html
+    link which is keyboard navigable and invokes the menu when activated
+    (moving keyboard focus to the menu).  This makes the menu completely
+    accessible from keyboard.
 
     """
 
-    def __init__(self, items, tooltip=None, active_area_selector=None, **kwargs):
+    def __init__(self, items, content=(), tooltip=None, active_area_selector=None,
+                 **kwargs):
         """Arguments:
 
            items -- sequence of 'lcg.PopupMenuItem' instances representing menu
              items.
-           tooltip -- tooltip of the popup menu control as a string.
+           content -- content displayed inside the control (typically a label)
+             which invokes the menu when clicked.  If empty, the control will
+             only display as a clickable icon.
+           title -- menu title displayed as a tooltip of the popup control and
+             also used as accessible title of the arrow icon element.
            active_area_selector -- CSS selector string (such as 'tr',
              'div.title', '.menu li' etc.) to identify a surrounding DOM
              element to be observed for 'contextmenu' event.  If passed, the
@@ -310,13 +317,7 @@ class PopupMenuCtrl(Widget, lcg.Content):
         self._items = items
         self._tooltip = tooltip
         self._active_area_selector = active_area_selector
-        super(PopupMenuCtrl, self).__init__(**kwargs)
-        
-    def _export_widget(self, context):
-        return ''
-    
-    def _wrap_exported_widget(self, context, content, **kwargs):
-        return context.generator().span(content, **kwargs)
+        super(PopupMenuCtrl, self).__init__(content, **kwargs)
     
     def _javascript_widget_arguments(self, context):
         items = [dict(label=context.translate(item.label()),
@@ -327,7 +328,12 @@ class PopupMenuCtrl(Widget, lcg.Content):
                       callback_args=item.callback_args(),
                       cls=item.cls())
                  for item in self._items]
-        return (items, context.translate(self._tooltip), self._active_area_selector)
+        return (items, self._active_area_selector)
+
+    def _export_widget(self, context):
+        g = context.generator()
+        arrow = g.a('', title=self._tooltip, href='#', cls='popup-arrow')
+        return g.concat(lcg.Container.export(self, context), arrow)
 
 
 class CollapsiblePane(Widget, lcg.Section):

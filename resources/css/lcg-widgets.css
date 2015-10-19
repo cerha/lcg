@@ -92,7 +92,10 @@
 
 /* Popup menu & Dropdown selection widget */
 
-.popup-menu-ctrl-widget a {
+.popup-menu-ctrl-widget {
+    display: inline-block;
+}
+.popup-menu-ctrl-widget .popup-arrow {
     display: inline-block;
     background: url(popup-arrow.png) 3px bottom no-repeat;
     width: 22px;

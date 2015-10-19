@@ -859,6 +859,33 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 });
 
 
+lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
+    /* Control for invocation of a popup menu.
+     *
+     * This is the Javascript counterpart of the Python class
+     * `lcg.PopupMenuCtrl'.  See its documentation for description of
+     * constructor arguments.
+     *
+     */
+
+    initialize: function ($super, element_id, items, selector) {
+	$super(element_id);
+	var element = this.element;
+	element.observe('click', this.popup_menu.bind(this));
+	element.setAttribute('aria-haspopup', 'true');
+	if (selector) {
+	    element.up(selector).observe('contextmenu', this.popup_menu.bind(this));
+	}
+    },
+
+    popup_menu: function (event) {
+	var menu = new lcg.PopupMenu(this.items);
+	menu.popup(event);
+    }
+
+});
+
+
 lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
     /* Dropdown selection menu widget
      *
@@ -978,34 +1005,6 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
 
 });
 
-lcg.PopupMenuCtrl = Class.create({
-    /* Control for invocation of a popup menu.
-     *
-     * This is the Javascript counterpart of the Python class
-     * `lcg.PopupMenuCtrl'.  See its documentation for description of
-     * constructor arguments.
-     *
-     */
-    
-    initialize: function (element_id, items, tooltip, selector) {
-	this.items = items;
-	var link = new Element('a', {'aria-haspopup': 'true'});
-        $(element_id).insert(link);
-        link.observe('click', this.popup_menu.bind(this));
-        if (tooltip) {
-     	    link.setAttribute('title', tooltip);
-	}
-        if (selector) {
-      	    link.up(selector).observe('contextmenu', this.popup_menu.bind(this));
-	}
-    },
-
-    popup_menu: function (event) { 
-	var menu = new lcg.PopupMenu(this.items);
-	menu.popup(event);
-    }
-
-});
 
 lcg.Tooltip = Class.create({
     // Tooltip widget with asynchronlusly loaded content.
