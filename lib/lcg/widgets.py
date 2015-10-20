@@ -234,7 +234,7 @@ class Notebook(Widget, lcg.Container):
         return g.concat(switcher, lcg.Container.export(self, context))
 
     
-class PopupMenuItem(Widget, lcg.Content):
+class PopupMenuItem(object):
     """Popup menu item specification."""
 
     def __init__(self, label, tooltip=None, uri=None, enabled=True, callback=None,
