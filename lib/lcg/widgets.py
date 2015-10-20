@@ -255,27 +255,13 @@ class PopupMenuItem(object):
              icons through stylesheets).  No class assigned when None.
 
         """
-        self._label = label
-        self._tooltip = tooltip
-        self._uri = uri
-        self._enabled = enabled
-        self._callback = callback
-        self._callback_args = callback_args
-        self._cls = cls
-    def label(self):
-        return self._label
-    def tooltip(self):
-        return self._tooltip
-    def uri(self):
-        return self._uri
-    def enabled(self):
-        return self._enabled
-    def callback(self):
-        return self._callback
-    def callback_args(self):
-        return self._callback_args
-    def cls(self):
-        return self._cls
+        self.label = label
+        self.tooltip = tooltip
+        self.uri = uri
+        self.enabled = enabled
+        self.callback = callback
+        self.callback_args = callback_args
+        self.cls = cls
 
     
 class PopupMenuCtrl(Widget, lcg.Container):
@@ -320,13 +306,13 @@ class PopupMenuCtrl(Widget, lcg.Container):
         super(PopupMenuCtrl, self).__init__(content, **kwargs)
     
     def _javascript_widget_arguments(self, context):
-        items = [dict(label=context.translate(item.label()),
-                      tooltip=context.translate(item.tooltip()),
-                      enabled=item.enabled(),
-                      uri=item.uri(),
-                      callback=item.callback(),
-                      callback_args=item.callback_args(),
-                      cls=item.cls())
+        items = [dict(label=context.translate(item.label),
+                      tooltip=context.translate(item.tooltip),
+                      enabled=item.enabled,
+                      uri=item.uri,
+                      callback=item.callback,
+                      callback_args=item.callback_args,
+                      cls=item.cls)
                  for item in self._items]
         return (items, self._active_area_selector)
 
