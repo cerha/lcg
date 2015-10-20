@@ -264,6 +264,46 @@ class PopupMenuItem(object):
         self.cls = cls
 
     
+class PopupMenu(Widget, lcg.Content):
+    """Popup menu widget.
+
+    The popup menu is created as initially hidden.  It must be later popped up
+    through JavaScript.  See also 'PopupMenuCtrl' for a control which may be
+    used to invoke the menu from the UI.
+
+    """
+
+    def __init__(self, items, **kwargs):
+        """Arguments:
+
+           items -- sequence of 'lcg.PopupMenuItem' instances representing menu
+             items.
+           **kwargs -- other arguments defined by the parent class
+
+        """
+        self._items = items
+        super(PopupMenu, self).__init__(**kwargs)
+    
+    def _javascript_widget_arguments(self, context):
+        items = [dict(label=context.translate(item.label),
+                      tooltip=context.translate(item.tooltip),
+                      enabled=item.enabled,
+                      uri=item.uri,
+                      callback=item.callback,
+                      callback_args=item.callback_args,
+                      cls=item.cls)
+                 for item in self._items]
+        return (items,)
+
+    def _wrap_exported_widget(self, context, content, **kwargs):
+        return super(PopupMenu, self)._wrap_exported_widget(context, content, role='menu',
+                                                            style='display: none;', **kwargs)
+
+    def _export_widget(self, context):
+        # Menu is actually rendered in javascript.
+        return ''
+
+
 class PopupMenuCtrl(Widget, lcg.Container):
     """Popup menu invocation control.
 
@@ -306,20 +346,16 @@ class PopupMenuCtrl(Widget, lcg.Container):
         super(PopupMenuCtrl, self).__init__(content, **kwargs)
     
     def _javascript_widget_arguments(self, context):
-        items = [dict(label=context.translate(item.label),
-                      tooltip=context.translate(item.tooltip),
-                      enabled=item.enabled,
-                      uri=item.uri,
-                      callback=item.callback,
-                      callback_args=item.callback_args,
-                      cls=item.cls)
-                 for item in self._items]
-        return (items, self._active_area_selector)
+        return (self._active_area_selector,)
 
     def _export_widget(self, context):
         g = context.generator()
-        arrow = g.a('', title=self._tooltip, href='#', cls='popup-arrow')
-        return g.concat(lcg.Container.export(self, context), arrow)
+        return g.concat(
+            g.div((lcg.Container.export(self, context),
+                   g.a('', title=self._tooltip, href='#', cls='popup-arrow')),
+                  cls='invoke-menu'),
+            PopupMenu(self._items).export(context),
+        )
 
 
 class CollapsiblePane(Widget, lcg.Section):

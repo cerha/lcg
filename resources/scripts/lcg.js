@@ -748,21 +748,29 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      *
      * Constructor arguments:
      *
+     *   element_id -- HTML id of the widget root element (described in
+     *     the parent class)
      *   items -- array of menu items as objects with the following attributes:
      *     label -- item title (string)
      *     tooltip -- item description/tooltip (string, optional)
      *     uri -- URI where the item points to (string, optional)
-     *     enabled -- if present and false, the item will be disabled (inactive)
+     *     enabled -- if present and false, the item will be disabled
+     *       (inactive)
      *     callback -- The JavaScript function to be called on item invocation.
      *       May be passed also as a string (function of given name will be 
      *       looked up in the current JavaScript name space).	 The callback
      *       function will be called with the element on which the menu was
      *       invoked as the first argument.  Additional arguments may be
      *       optionally specified by 'callback_args'.
-     *     callback_args -- Array of additional arguments to pass to the callback function
+     *     callback_args -- Array of additional arguments to pass to the
+     *       callback function
      *     cls -- CSS class name to be used for the item (string, optional)
      *
-     * You will typically supply either uri or callback, but both can be used as well.
+     * You will typically supply either uri or callback, but both can be used
+     * as well.
+     *
+     * This is the Javascript counterpart of the Python class
+     * `lcg.PopupMenu'.
      *
      */
 
@@ -786,12 +794,8 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    }
 	    ul.insert(li.update(a));
 	}
-	var menu = new Element('div', {'id': element_id,
-				       'role': 'menu',
-				       'class': 'popup-menu-widget',
-				       'style': 'display: none'});
-	menu.update(ul);
-	$super(menu);
+	$(element_id).update(ul);
+	$super(element_id);
     },
 
     init_item: function ($super, item, prev, parent) {
@@ -868,23 +872,33 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
     /* Control for invocation of a popup menu.
      *
+     * Constructor arguments:
+     *
+     *   element_id -- HTML id of the widget root element (described in
+     *     the parent class)
+     *   selector -- optional CSS selector string to find the HTML element
+     *     on which the 'contextmenu' event (right click) should be handled
+     *     by popping the menu up.  The selector is searched up in the DOM
+     *     treee so the element must be the parent of the PopupMenuCtrl
+     *     widget.  If undefined, no context menu event is handled.
+     *
      * This is the Javascript counterpart of the Python class
-     * `lcg.PopupMenuCtrl'.  See its documentation for description of
-     * constructor arguments.
+     * `lcg.PopupMenuCtrl'.
      *
      */
 
-    initialize: function ($super, element_id, items, selector) {
+    initialize: function ($super, element_id, selector) {
 	$super(element_id);
-	var element = this.element;
-	var menu = new lcg.PopupMenu(element.getAttribute('id') + '-popup-menu', items);
-	element.insert(menu.element);
-	element.observe('click', menu.popup.bind(menu));
-	element.setAttribute('aria-haspopup', 'true');
-	element.setAttribute('aria-expanded', 'false');
-	element.setAttribute('aria-controls', menu.element.getAttribute('id'));
+	var menu = lcg.widget_instance(this.element.down('.popup-menu-widget'));
+	var ctrl = this.element.down('.invoke-menu');
+	ctrl.observe('click', menu.popup.bind(menu));
+	ctrl.down('.popup-arrow').observe('click', menu.popup.bind(menu));
+	ctrl.setAttribute('role', 'button');
+	ctrl.setAttribute('aria-haspopup', 'true');
+	ctrl.setAttribute('aria-expanded', 'false');
+	ctrl.setAttribute('aria-controls', menu.element.getAttribute('id'));
 	if (selector) {
-	    element.up(selector).observe('contextmenu', menu.popup.bind(menu));
+	    this.element.up(selector).observe('contextmenu', menu.popup.bind(menu));
 	}
     }
 

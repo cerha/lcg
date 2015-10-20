@@ -96,6 +96,9 @@
     display: inline-block;
     position: relative;
 }
+.popup-menu-ctrl-widget .invoke-menu {
+    display: inline-block;
+}
 .popup-menu-ctrl-widget .popup-arrow {
     display: inline-block;
     background: url(popup-arrow.png) 3px bottom no-repeat;
