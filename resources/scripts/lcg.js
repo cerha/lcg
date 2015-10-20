@@ -137,8 +137,14 @@ lcg.Menu = Class.create(lcg.Widget, {
     
     initialize: function ($super, element_id) {
 	$super(element_id);
-	// Go through the menu and assign aria roles and key bindings.
 	var ul = this.element.down('ul');
+	if (ul) {
+	    this.init_menu(ul);
+	}
+    },
+
+    init_menu: function (ul) {
+	// Go through the menu and assign aria roles and key bindings.
 	this.items = this.init_items(ul, null);
 	// Set the active item.
 	var selected = this.initially_selected_item();
@@ -775,10 +781,20 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      */
 
     initialize: function ($super, element_id, items) {
+	$super(element_id);
+	this.items = items;
+    },
+
+    create_menu: function () {
+	/* The menu is created and initialized only when needed. This is important
+	 * for example in Pytis forms, where there is a context menu for each form
+	 * row and initializing them all on page load might waste a significant
+	 * amount of browser resources.
+	 */
 	var i, item, a, li;
 	var ul = new Element('ul', {'role': 'presentation'});
-	for (i = 0; i < items.length; i++) {
-	    item = items[i];
+	for (i = 0; i < this.items.length; i++) {
+	    item = this.items[i];
 	    a = new Element('a', {'href': '#', 'onclick': 'return false;'});
 	    if (item.tooltip) {
 		a.setAttribute('title', item.tooltip);
@@ -794,8 +810,8 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    }
 	    ul.insert(li.update(a));
 	}
-	$(element_id).update(ul);
-	$super(element_id);
+	this.element.update(ul);
+	this.init_menu(ul);
     },
 
     init_item: function ($super, item, prev, parent) {
@@ -844,6 +860,9 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	 */
 	event.stop();
 	var menu = this.element;
+	if (menu.empty()) {
+	    this.create_menu();
+	}
 	var offset = menu.parentNode.cumulativeOffset();
 	var x = 0;
 	var y = 0;
