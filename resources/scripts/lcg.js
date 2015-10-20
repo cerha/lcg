@@ -662,14 +662,23 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 		var total_height = menu.getHeight();
 		var css_height = menu.getLayout().get('height');
 		menu.setStyle({height: 0, display: 'block', overflowY: 'hidden'});
-		Effect.Morph(menu, {style: {height: css_height + 'px',
-					    top: y - total_height + 'px'},
-				    duration: 0.2});
-		setTimeout(function () { menu.setStyle({overflowY: 'auto'}); }, 200);
+		Effect.Morph(menu, {
+		    style: {height: css_height + 'px',
+			    top: y - total_height + 'px'},
+		    duration: 0.2,
+		    afterFinish: function () {
+			menu.setStyle({overflowY: 'auto'});
+			this.set_focus(selected_item);
+		    }.bind(this),
+		});
 	    } else {
-		Effect.SlideDown(menu, {duration: 0.2});
+		Effect.SlideDown(menu, {
+		    duration: 0.2,
+		    afterFinish: function () {
+			this.set_focus(selected_item);
+		    }.bind(this),
+		});
 	    }
-	    setTimeout(function () { this.set_focus(selected_item); }.bind(this), 210);
 	} else {
 	    if (direction === 'up') {
 		menu.setStyle({top: y - menu.getHeight() + 'px'});
