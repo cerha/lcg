@@ -850,6 +850,11 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	}
     },
 
+    on_key_down: function ($super, event) {
+	this.element.addClassName('keyboard-navigated');
+	$super(event);
+    },
+
     popup: function ($super, event, selected_item_index) {
 	/* Arguments:
 	 *   event -- JavaScript event triggering the popup -- either a mouse
@@ -869,7 +874,10 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	if (event.isLeftClick() || event.isRightClick()) {
 	    x = event.pointerX() - offset.left;
 	    y = event.pointerY() - offset.top;
-        }
+	    menu.removeClassName('keyboard-navigated');
+        } else {
+	    menu.addClassName('keyboard-navigated');
+	}
 	var viewport = document.viewport.getDimensions();
 	var scroll_offset = document.viewport.getScrollOffsets();
 	if (offset.left + x + menu.getWidth() > viewport.width + scroll_offset.left) {

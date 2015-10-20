@@ -104,6 +104,7 @@
     background: url(popup-arrow.png) 3px bottom no-repeat;
     width: 22px;
     height: 1em;
+    outline: none;
 }
 .popup-menu-widget, .dropdown-selection-widget {
     position: absolute;
@@ -145,6 +146,7 @@
     padding: 3px 10px;
     text-decoration: none;
     min-height: 14px;
+    outline: none;
 }
 .popup-menu-widget li.active a,
 .dropdown-selection-widget li.active a {
@@ -152,6 +154,9 @@
 }
 .popup-menu-widget li.active:hover {
     background-color: #fff;
+}
+.popup-menu-widget.keyboard-navigated li.active a:focus {
+    outline: #000 dotted 1px;
 }
 .dropdown-selection-widget li.active a:focus {
     background-color: #3af;
