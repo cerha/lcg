@@ -892,7 +892,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    x -= menu.getWidth();
 	}
 	var direction;
-	if (offset.top + y + menu.getHeight() > viewport.height + scroll_offset.top && y > menu.getHeight()) {
+	if (offset.top + y + menu.getHeight() > viewport.height + scroll_offset.top) {
 	    direction = 'up';
 	} else {
 	    direction = 'down';
