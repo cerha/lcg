@@ -106,6 +106,7 @@
     background: url(popup-arrow.png) 3px center no-repeat;
     height: 1em;
     padding-left: 21px;
+    text-indent: -999px;
     width: 0px;
     overflow: hidden;
     outline: none;
