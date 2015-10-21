@@ -649,8 +649,12 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
     },
 
     popup: function (element, x, y, direction, selected_item_index) {
-	if (lcg.popup_menu) {
-	    lcg.popup_menu.dismiss();
+	var active_menu = lcg.popup_menu;
+	if (active_menu) {
+	    active_menu.dismiss();
+	    if (active_menu === this) {
+		return;
+	    }
 	}
 	lcg.popup_menu = this;
 	this.popup_element = element;
