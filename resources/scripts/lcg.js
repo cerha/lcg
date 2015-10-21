@@ -669,7 +669,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 		var total_height = menu.getHeight();
 		var css_height = menu.getLayout().get('height');
 		menu.setStyle({height: 0, display: 'block', overflowY: 'hidden'});
-		Effect.Morph(menu, {
+		new Effect.Morph(menu, {
 		    style: {height: css_height + 'px',
 			    top: y - total_height + 'px'},
 		    duration: 0.2,
@@ -679,7 +679,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 		    }.bind(this),
 		});
 	    } else {
-		Effect.SlideDown(menu, {
+		new Effect.SlideDown(menu, {
 		    duration: 0.2,
 		    afterFinish: function () {
 			this.set_focus(selected_item);
@@ -1160,7 +1160,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 	this.element.addClassName('expanded');
 	this.heading.setAttribute('aria-expanded', 'true');
 	if (Effect !== undefined) {
-	    Effect.SlideDown(this.content, {duration: 0.2});
+	    new Effect.SlideDown(this.content, {duration: 0.2});
 	} else {
 	    this.content.show();
 	}
@@ -1171,7 +1171,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 	this.element.addClassName('collapsed');
 	this.heading.setAttribute('aria-expanded', 'false');
 	if (Effect !== undefined) {
-	    Effect.SlideUp(this.content, {duration: 0.2});
+	    new Effect.SlideUp(this.content, {duration: 0.2});
 	} else {
 	    this.content.hide();
 	}
