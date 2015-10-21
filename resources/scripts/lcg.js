@@ -872,6 +872,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	if (menu.empty()) {
 	    this.create_menu();
 	}
+	var element = event.findElement('.invoke-menu');
 	var offset = menu.parentNode.cumulativeOffset();
 	var x = 0;
 	var y = 0;
@@ -879,8 +880,8 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    // Math.min limits the pointer position to the boundary of the
 	    // element invoking the menu, because VoiceOver emits click events
 	    // with a wrong position and the menu would be placed radiculously.
-	    x = Math.min(event.pointerX() - offset.left, event.element().getWidth());
-	    y = Math.min(event.pointerY() - offset.top, event.element().getHeight());
+	    x = Math.min(event.pointerX() - offset.left, element.getWidth());
+	    y = Math.min(event.pointerY() - offset.top, element.getHeight());
 	    menu.removeClassName('keyboard-navigated');
         } else {
 	    menu.addClassName('keyboard-navigated');
@@ -897,7 +898,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    direction = 'down';
 	}
 	this.ignore_next_click = !event.isLeftClick();
-	$super(event.element(), x, y, direction, selected_item_index);
+	$super(element, x, y, direction, selected_item_index);
     }
 
 });
