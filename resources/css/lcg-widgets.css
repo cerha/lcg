@@ -100,9 +100,11 @@
     display: inline-block;
 }
 .popup-menu-ctrl-widget .popup-arrow {
+    position: relative;
+    top: 2px;
     display: inline-block;
-    background: url(popup-arrow.png) 3px bottom no-repeat;
     width: 22px;
+    background: url(popup-arrow.png) 3px center no-repeat;
     height: 1em;
     outline: none;
 }
@@ -143,7 +145,7 @@
 .dropdown-selection-widget li a {
     display: block;
     color: #777;
-    padding: 3px 10px;
+    padding: 5px 10px;
     text-decoration: none;
     min-height: 14px;
     outline: none;
