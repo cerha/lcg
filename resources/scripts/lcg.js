@@ -662,6 +662,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 	    selected_item = menu.down('a');
 	}
 	this.select_item(selected_item);
+	menu.setAttribute('style', 'display: none;'); // Force consistent initial state;
 	menu.setStyle({left: x + 'px', top: y + 'px'});
 	if (Effect !== undefined) {
 	    if (direction === 'up') {
