@@ -325,17 +325,17 @@ class PopupMenuCtrl(Widget, lcg.Container):
 
     """
 
-    def __init__(self, items, content=(), tooltip=None, active_area_selector=None,
+    def __init__(self, title, items, content=(), active_area_selector=None,
                  **kwargs):
         """Arguments:
 
+           title -- menu title displayed as a tooltip of the popup control and
+             also used as accessible title of the arrow icon element.
            items -- sequence of 'lcg.PopupMenuItem' instances representing menu
              items.
            content -- content displayed inside the control (typically a label)
              which invokes the menu when clicked.  If empty, the control will
              only display as a clickable icon.
-           title -- menu title displayed as a tooltip of the popup control and
-             also used as accessible title of the arrow icon element.
            active_area_selector -- CSS selector string (such as 'tr',
              'div.title', '.menu li' etc.) to identify a surrounding DOM
              element to be observed for 'contextmenu' event.  If passed, the
@@ -345,7 +345,7 @@ class PopupMenuCtrl(Widget, lcg.Container):
 
         """
         self._items = items
-        self._tooltip = tooltip
+        self._title = title
         self._active_area_selector = active_area_selector
         super(PopupMenuCtrl, self).__init__(content, **kwargs)
     
@@ -354,10 +354,10 @@ class PopupMenuCtrl(Widget, lcg.Container):
 
     def _export_widget(self, context):
         g = context.generator()
+        content = lcg.Container.export(self, context)
         return g.concat(
-            g.div((lcg.Container.export(self, context),
-                   g.a('', title=self._tooltip, href='#', cls='popup-arrow')),
-                  cls='invoke-menu'),
+            g.div((content, g.a(self._title, title=self._title, href='#', cls='popup-arrow')),
+                  cls='invoke-menu' + (' labeled' if content else '')),
             PopupMenu(self._items).export(context),
         )
 
