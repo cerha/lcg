@@ -271,6 +271,10 @@ class PopupMenu(Widget, lcg.Content):
     through JavaScript.  See also 'PopupMenuCtrl' for a control which may be
     used to invoke the menu from the UI.
 
+    Menu items are created in JavaScript only when the menu is actually used
+    (when first popped up).  This reduces the browser resource usage as well as
+    page initialization overhead, so many menus can be present on one page.
+
     """
 
     def __init__(self, items, **kwargs):

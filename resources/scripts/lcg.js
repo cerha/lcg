@@ -778,6 +778,13 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      * This is the Javascript counterpart of the Python class
      * `lcg.PopupMenu'.
      *
+     * The widget is initially created as hidden and must be invoked (popped up)
+     * by calling the method 'popup()'.  Morover, the element is initially empty.
+     * The menu is created and initialized only when needed (when first invoked).
+     * This reduces the browser resource usage (DOM elements and their event
+     * handlers) as well as page initialization overhead, so many menus can be
+     * present on one page.
+     *
      */
 
     initialize: function ($super, element_id, items) {
@@ -786,11 +793,6 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
     },
 
     create_menu: function () {
-	/* The menu is created and initialized only when needed. This is important
-	 * for example in Pytis forms, where there is a context menu for each form
-	 * row and initializing them all on page load might waste a significant
-	 * amount of browser resources.
-	 */
 	var i, item, a, li;
 	var ul = new Element('ul', {'role': 'presentation'});
 	for (i = 0; i < this.items.length; i++) {
