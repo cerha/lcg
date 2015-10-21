@@ -14,6 +14,7 @@
 }
 .foldable-tree-widget li { 
     line-height: 1.2em;
+    padding: 0.1em 0;
     width: 100%;
 }
 .foldable-tree-widget li a, .foldable-tree-widget li a span {
@@ -38,7 +39,7 @@
 }
 .foldable-tree-widget li.foldable {
     background-image: url(folder-open.png);
-    background-position: left 0.35em;
+    background-position: left 0.45em;
     background-repeat: no-repeat;
 }
 .foldable-tree-widget li.foldable.folded {
