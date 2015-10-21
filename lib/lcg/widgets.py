@@ -300,7 +300,7 @@ class PopupMenu(Widget, lcg.Content):
         return (items,)
 
     def _wrap_exported_widget(self, context, content, **kwargs):
-        return super(PopupMenu, self)._wrap_exported_widget(context, content, role='menu',
+        return super(PopupMenu, self)._wrap_exported_widget(context, content,
                                                             style='display: none;', **kwargs)
 
     def _export_widget(self, context):

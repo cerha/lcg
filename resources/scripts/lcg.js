@@ -813,6 +813,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    ul.insert(li.update(a));
 	}
 	this.element.update(ul);
+	this.element.setAttribute('role', 'menu');
 	this.init_menu(ul);
     },
 
