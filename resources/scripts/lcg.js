@@ -872,20 +872,25 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	$super(event);
     },
 
-    popup: function ($super, event, selected_item_index) {
+    popup: function ($super, event, element, selected_item_index) {
 	/* Arguments:
 	 *   event -- JavaScript event triggering the popup -- either a mouse
 	 *     action catched by 'contextmenu' handler or mouse/keyboard action
 	 *     catched by 'click' handler.
+	 *   element -- HTML element that invoked the menu from the UI.  The
+	 *     menu will appear above this element.  If undefined, the element
+	 *     is obtained from the given event.
 	 *   selected_item_index (optional) -- index of the menu item to be
 	 *     initially selected
 	 */
 	event.stop();
+	if (element === undefined) {
+	    element = event.element();
+	}
 	var menu = this.element;
 	if (menu.empty()) {
 	    this.create();
 	}
-	var element = event.findElement('.invoke-menu');
 	var offset = menu.parentNode.cumulativeOffset();
 	var x = 0;
 	var y = 0;
@@ -939,15 +944,18 @@ lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
 	$super(element_id);
 	var menu = lcg.widget_instance(this.element.down('.popup-menu-widget'));
 	var ctrl = this.element.down('.invoke-menu');
-	ctrl.observe('click', menu.popup.bind(menu));
-	ctrl.down('.popup-arrow').observe('click', menu.popup.bind(menu));
+	ctrl.observe('click', function (e) { menu.popup(e, ctrl); });
+	ctrl.down('.popup-arrow').observe('click', function (e) { menu.popup(e, ctrl); });
 	ctrl.setAttribute('role', 'button');
 	ctrl.setAttribute('aria-haspopup', 'true');
 	ctrl.setAttribute('aria-expanded', 'false');
 	ctrl.setAttribute('aria-controls', menu.element.getAttribute('id'));
 	if (selector) {
-	    this.element.up(selector).observe('contextmenu', menu.popup.bind(menu));
+	    this.element.up(selector).observe('contextmenu', 
+					      function (e) { menu.popup(e, ctrl); });
 	}
+	this.menu = menu;
+	this.ctrl = ctrl;
     }
 
 });
