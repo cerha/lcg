@@ -788,8 +788,8 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      * The menu is created and initialized only when needed (when first invoked).
      * This reduces the browser resource usage (DOM elements and their event
      * handlers) as well as page initialization overhead, so many menus can be
-     * present on one page.
-     *
+     * present on one page.  If needed the method 'create()' may be called to
+     * create and initialize the menu HTML elements explicitly.
      */
 
     initialize: function ($super, element_id, items) {
@@ -797,7 +797,19 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	this.items = items;
     },
 
-    create_menu: function () {
+    create: function () {
+	/* Create and initialize menu HTML elements.
+	 *
+	 * You normally don't need to call this method explicitly.  It is called
+	 * automatically when needed internally.  You may need to call it
+	 * explicitly for example to be able to manipupate menu items from
+	 * JavaScript before menu invocation.  See class documentation for
+	 * more details about delayed menu creation.  The method does nothing
+	 * if the the menu was already created before.
+	 */
+	if (!this.element.empty()) {
+	    return;
+	}
 	var ul = new Element('ul', {'role': 'presentation'});
 	this.items.each(function (item) {
 	    var a = new Element('a', {'href': '#', 'onclick': 'return false;'}).update(item.label);
@@ -871,7 +883,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	event.stop();
 	var menu = this.element;
 	if (menu.empty()) {
-	    this.create_menu();
+	    this.create();
 	}
 	var element = event.findElement('.invoke-menu');
 	var offset = menu.parentNode.cumulativeOffset();
