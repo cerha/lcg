@@ -798,25 +798,22 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
     },
 
     create_menu: function () {
-	var i, item, a, li;
 	var ul = new Element('ul', {'role': 'presentation'});
-	for (i = 0; i < this.items.length; i++) {
-	    item = this.items[i];
-	    a = new Element('a', {'href': '#', 'onclick': 'return false;'});
+	this.items.each(function (item) {
+	    var a = new Element('a', {'href': '#', 'onclick': 'return false;'}).update(item.label);
 	    if (item.tooltip) {
 		a.setAttribute('title', item.tooltip);
 	    }
 	    a._lcg_popup_menu_item_spec = item;
-	    a.update(item.label);
-	    li = new Element('li');
+	    var li = new Element('li').update(a);
 	    if (item.enabled === undefined || item.enabled) {
 		li.addClassName('active');
 	    }
 	    if (item.cls) {
 		li.addClassName(item.cls);
 	    }
-	    ul.insert(li.update(a));
-	}
+	    ul.insert(li);
+	});
 	this.element.update(ul);
 	this.element.setAttribute('role', 'menu');
 	this.init_menu(ul);
