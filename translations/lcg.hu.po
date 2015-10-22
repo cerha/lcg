@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 12:33+0200\n"
+"POT-Creation-Date: 2015-10-21 16:08+0200\n"
 "PO-Revision-Date: 2010-02-03 01:56+0100\n"
 "Last-Translator: Hostomský Károly <khostomsky@gmail.com>\n"
 "Language-Team: Hungarian <lcg@lists.freebsoft.org>\n"
@@ -16,55 +16,55 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/export/braille.py:849
+#: ../lib/lcg/export/braille.py:854
 #, python-format
 msgid "Character %r can't be represented on given output device: \"%s\""
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1242
+#: ../lib/lcg/export/braille.py:1247
 msgid "The table is transposed."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1250
+#: ../lib/lcg/export/braille.py:1255
 msgid "The table is expanded by rows."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1253
+#: ../lib/lcg/export/braille.py:1258
 msgid "The table is expanded by columns."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1260
+#: ../lib/lcg/export/braille.py:1265
 msgid "The table is vertically split."
 msgstr ""
 
-#: ../lib/lcg/export/braille.py:1472
+#: ../lib/lcg/export/braille.py:1477
 msgid "The table is read across facing pages."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1409
+#: ../lib/lcg/export/export.py:1386
 #, python-format
 msgid "%s: file created."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1418
+#: ../lib/lcg/export/export.py:1395
 #, python-format
 msgid "%s: file copied."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1433
+#: ../lib/lcg/export/export.py:1410
 #, python-format
 msgid "%s: converting to %s: %s"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:678
+#: ../lib/lcg/export/html.py:665
 msgid "Choose your language:"
 msgstr "Válassz nyelvet:"
 
-#: ../lib/lcg/export/html.py:1176
+#: ../lib/lcg/export/html.py:1163
 msgid "Flash movie object"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1234
+#: ../lib/lcg/export/html.py:1221
 msgid ""
 "Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
 "swfobject.js to your resource path."
@@ -72,7 +72,7 @@ msgstr ""
 
 #. Translators: Title of the link to Adobe website used in
 #. the Flash warning.
-#: ../lib/lcg/export/html.py:1260
+#: ../lib/lcg/export/html.py:1247
 msgid "Adobe Flash plugin"
 msgstr "Adobe Flash plugin"
 
@@ -80,40 +80,40 @@ msgstr "Adobe Flash plugin"
 #. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
 #. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
 #. version number.
-#: ../lib/lcg/export/html.py:1256
+#: ../lib/lcg/export/html.py:1243
 #, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr "Töltse le a %(version)s vagy későbbi verziójú %(plugin)s-t."
 
-#: ../lib/lcg/export/html.py:1262
+#: ../lib/lcg/export/html.py:1249
 msgid "Use a JavaScript enabled browser."
 msgstr "JavaScripttel ellátott böngészőt használjon."
 
-#: ../lib/lcg/export/html.py:1263 ../lib/lcg/export/html.py:1265
+#: ../lib/lcg/export/html.py:1250 ../lib/lcg/export/html.py:1252
 msgid "Warning:"
 msgstr "Figyelem:"
 
-#: ../lib/lcg/export/html.py:1296
+#: ../lib/lcg/export/html.py:1283
 msgid "Media Player unavailable."
 msgstr "Media Player nem elérhető."
 
 #. Translators: Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:1497
+#: ../lib/lcg/export/html.py:1484
 msgid "None"
 msgstr "Üres"
 
-#: ../lib/lcg/export/html.py:1498
+#: ../lib/lcg/export/html.py:1485
 msgid "You are here:"
 msgstr "Ön itt található:"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1502
+#: ../lib/lcg/export/html.py:1489
 msgid "Next"
 msgstr "Következő"
 
 #. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1504
+#: ../lib/lcg/export/html.py:1491
 msgid "Previous"
 msgstr "Előző"
 
@@ -131,7 +131,7 @@ msgstr ""
 msgid "Page content too large, reducing it by %s"
 msgstr ""
 
-#: ../lib/lcg/resources.py:307
+#: ../lib/lcg/resources.py:311
 #, python-format
 msgid "Resource file not found: %(filename)s %(search_path)s"
 msgstr ""
