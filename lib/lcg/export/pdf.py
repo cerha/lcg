@@ -284,7 +284,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     BOX_LEFT = 'LEFT'
     BOX_RIGHT = 'RIGHT'
     def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0,
-                 box_width=None, box_color=None):
+                 box_width=None, box_color=None, box_radius=0):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         if __debug__:
@@ -304,9 +304,11 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             box_margin = 0
             box_width = 0
             box_color = None
+            box_radius = 0
         self._box_box_margin = box_margin
         self._box_box_width = box_width
         self._box_box_color = box_color
+        self._box_box_radius = box_radius
         self._box_last_split_height = None
         self._box_last_wrap = None
         # Another hack for pytis markup:
@@ -516,7 +518,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 self.canv.setLineWidth(self._box_box_width)
             if self._box_box_color is not None:
                 self.canv.setStrokeColorRGB(*self._box_box_color)
-            self.canv.rect(0, 0, width, height)
+            if self._box_box_radius != 0:
+                self.canv.roundRect(0, 0, width, height, self._box_box_radius)
+            else:
+                self.canv.rect(0, 0, width, height)
             self.canv.restoreState()
     def __unicode__(self):
         result = ('RLContainer(vertical=%s, align=%s, boxed=%s):\n' %
@@ -1826,10 +1831,17 @@ class Container(Element):
                         box_color_rgb = None
                     else:
                         box_color_rgb = box_color.rgb()
+                    box_radius = presentation and presentation.box_radius
+                    if box_radius is None:
+                        box_radius_points = 0
+                    else:
+                        box_radius_points = self._unit2points(box_radius, style)
                     result = [RLContainer(content=result, vertical=self.vertical, align=align,
-                                          boxed=boxed, box_margin=box_margin_points,
+                                          boxed=boxed,
+                                          box_margin=box_margin_points,
                                           box_width=box_width_points,
                                           box_color=box_color_rgb,
+                                          box_radius=box_radius_points,
                                           )]
         # Enforce upper alignment
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):
