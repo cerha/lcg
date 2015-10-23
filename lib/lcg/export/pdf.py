@@ -284,7 +284,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     BOX_LEFT = 'LEFT'
     BOX_RIGHT = 'RIGHT'
     def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0,
-                 box_width=None):
+                 box_width=None, box_color=None):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         if __debug__:
@@ -303,8 +303,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         if not boxed:
             box_margin = 0
             box_width = 0
+            box_color = None
         self._box_box_margin = box_margin
         self._box_box_width = box_width
+        self._box_box_color = box_color
         self._box_last_split_height = None
         self._box_last_wrap = None
         # Another hack for pytis markup:
@@ -512,6 +514,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             self.canv.saveState()
             if self._box_box_width is not None:
                 self.canv.setLineWidth(self._box_box_width)
+            if self._box_box_color is not None:
+                self.canv.setStrokeColorRGB(*self._box_box_color)
             self.canv.rect(0, 0, width, height)
             self.canv.restoreState()
     def __unicode__(self):
@@ -1817,9 +1821,15 @@ class Container(Element):
                         box_width_points = None
                     else:
                         box_width_points = self._unit2points(box_width, style)
+                    box_color = presentation and presentation.box_color
+                    if box_color is None:
+                        box_color_rgb = None
+                    else:
+                        box_color_rgb = box_color.rgb()
                     result = [RLContainer(content=result, vertical=self.vertical, align=align,
                                           boxed=boxed, box_margin=box_margin_points,
                                           box_width=box_width_points,
+                                          box_color=box_color_rgb,
                                           )]
         # Enforce upper alignment
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):

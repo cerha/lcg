@@ -133,3 +133,32 @@ class FontFamily(object):
     """Standard sans serif proportional font(e.g. Helvetica)."""
     FIXED_WIDTH = 'FIXED_WIDTH'
     """Standard nonproportional font (e.g. Courier)."""
+
+class Color(object):
+    """RGB color specification.
+    
+    The constructor accepts differnt color specification options:
+      -- Color(255, 128 0) -- three ints specify decimal RGB values in 0-255 range
+      -- Color(1.0, 0.5, 0) -- three floats specify RGB values in 0.0-1.0 range
+      -- Color('#ff8000') -- string in HTML hex notation
+      -- Color('#f80') -- string in short HTML hex notation
+
+    """
+    def __init__(self, *args):
+        n = len(args)
+        arg = args and args[0]
+        if n == 3 and all(isinstance(a, int) and a >= 0 and a <= 255 for a in args):
+            rgb = args
+        elif n == 3 and all(isinstance(a, (int, float)) and a >= 0 and a <= 1 for a in args):
+            rgb = [int(a*255) for a in args]
+        elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 7:
+            rgb = [int(x, 16) for x in (arg[1:2], arg[3:5], arg[5:7])]
+        elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 4:
+            rgb = [int(x, 16) for x in arg[1:]]
+        else:
+            raise ValueError("Invalid color specification: %r" % (args,))
+        self._rgb = tuple(rgb)
+
+    def rgb(self):
+        """Return RGB color as a tuple of three integers in range 0-255."""
+        return self._rgb

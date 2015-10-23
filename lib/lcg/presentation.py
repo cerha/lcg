@@ -74,6 +74,8 @@ class Presentation(object):
     """
     box_width = None
     """Box line width, 'Unit'."""
+    box_color = None
+    """Box line color, 'Unit'."""
     separator_height = None
     """Height of lines separating objects, 'Unit'.
     It currently works only for row separators in tables.

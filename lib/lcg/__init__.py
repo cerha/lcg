@@ -43,7 +43,7 @@ from .resources import Resource, Image, Stylesheet, Script, Translations, \
     Media, Audio, Video, Flash, ResourceProvider
 
 from .units import Unit, UAny, UFont, UMm, UPoint, USpace, FontFamily, \
-    HorizontalAlignment, VerticalAlignment, Orientation
+    HorizontalAlignment, VerticalAlignment, Orientation, Color
 
 from .content import Content, Container, Strong, Emphasized, \
     Underlined, Code, Citation, Quotation, Superscript, Subscript, \
