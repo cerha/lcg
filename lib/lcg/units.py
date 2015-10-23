@@ -138,10 +138,10 @@ class Color(object):
     """RGB color specification.
     
     The constructor accepts differnt color specification options:
-      -- Color(255, 128 0) -- three ints specify decimal RGB values in 0-255 range
-      -- Color(1.0, 0.5, 0) -- three floats specify RGB values in 0.0-1.0 range
-      -- Color('#ff8000') -- string in HTML hex notation
-      -- Color('#f80') -- string in short HTML hex notation
+      - Color(255, 128 0) -- three ints specify decimal RGB values in 0-255 range
+      - Color(1.0, 0.5, 0) -- three floats specify RGB values in 0.0-1.0 range
+      - Color('#ff8000') -- string in HTML hex notation
+      - Color('#f80') -- string in short HTML hex notation
 
     """
     def __init__(self, *args):
