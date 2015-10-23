@@ -44,12 +44,17 @@ class Presentation(object):
     desirable to define presentation explicitly.  You need to define
     presentation this way when you prepare a printed document with fixed
     structure, on the other hand when preparing a general HTML page you should
-    use variable external stylesheets instead.
+    use variable external stylesheets instead.  That's why most properties are
+    ignored by the HTML export backend.
 
     This class serves just as a storage of presentation properties, it does not
     provide any special methods.  All of the attribute values can be set to
     'None' meaning there is no presentation requirement for that attribute and
     it can be taken from another active presentation.
+
+    Presentation properties may be passed to Presentation constructor as
+    keyword arguments or manipulated on an existing instance by setting the
+    relevant attributes.
 
     """
     font_size = None
@@ -196,7 +201,10 @@ class Presentation(object):
     """Custom left page footer, 'lcg.Content' instance or 'None'."""
     right_page_footer = None
     """Custom right page footer, 'lcg.Content' instance or 'None'."""
-    
+
+    def __init__(self, **kwargs):
+        self.__dict__.update(**kwargs)
+
 
 class ContentMatcher(object):
     """Matcher for presentations.
