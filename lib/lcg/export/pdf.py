@@ -1830,7 +1830,7 @@ class Container(Element):
                     if box_color is None:
                         box_color_rgb = None
                     else:
-                        box_color_rgb = box_color.rgb()
+                        box_color_rgb = [float(x)/255 for x in box_color.rgb()]
                     box_radius = presentation and presentation.box_radius
                     if box_radius is None:
                         box_radius_points = 0
