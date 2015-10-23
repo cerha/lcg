@@ -72,6 +72,8 @@ class Presentation(object):
     """Space between the box and the content, 'Unit'.
     It may be ignored in some boxed elements.
     """
+    box_width = None
+    """Box line width, 'Unit'."""
     separator_height = None
     """Height of lines separating objects, 'Unit'.
     It currently works only for row separators in tables.

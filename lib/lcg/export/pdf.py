@@ -283,7 +283,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     BOX_BOTTOM = 'BOTTOM'
     BOX_LEFT = 'LEFT'
     BOX_RIGHT = 'RIGHT'
-    def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0):
+    def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0,
+                 box_width=None):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         if __debug__:
@@ -301,7 +302,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._box_boxed = boxed
         if not boxed:
             box_margin = 0
+            box_width = 0
         self._box_box_margin = box_margin
+        self._box_box_width = box_width
         self._box_last_split_height = None
         self._box_last_wrap = None
         # Another hack for pytis markup:
@@ -506,7 +509,11 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             i += 1
         if self._box_boxed:
             width, height = self._width_height
+            self.canv.saveState()
+            if self._box_box_width is not None:
+                self.canv.setLineWidth(self._box_box_width)
             self.canv.rect(0, 0, width, height)
+            self.canv.restoreState()
     def __unicode__(self):
         result = ('RLContainer(vertical=%s, align=%s, boxed=%s):\n' %
                   (self._box_vertical, self._box_align, self._box_boxed,))
@@ -1805,8 +1812,15 @@ class Container(Element):
                         box_margin_points = 0
                     else:
                         box_margin_points = self._unit2points(box_margin, style)
+                    box_width = presentation and presentation.box_width
+                    if box_width is None:
+                        box_width_points = None
+                    else:
+                        box_width_points = self._unit2points(box_width, style)
                     result = [RLContainer(content=result, vertical=self.vertical, align=align,
-                                          boxed=boxed, box_margin=box_margin_points)]
+                                          boxed=boxed, box_margin=box_margin_points,
+                                          box_width=box_width_points,
+                                          )]
         # Enforce upper alignment
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):
             result[0].hAlign = halign
