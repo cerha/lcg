@@ -664,7 +664,8 @@ class HtmlExporter(lcg.Exporter):
                    )
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
-
+    _MATHML_XMLNS = re.compile(r'<math [^>]* xmlns=".*')
+        
     def __init__(self, *args, **kwargs):
         self._generator = self.Generator()
         super(HtmlExporter, self).__init__(*args, **kwargs)
@@ -1176,7 +1177,14 @@ class HtmlExporter(lcg.Exporter):
         for e in top_node.iter():
             if e.tag not in mathml_elements:
                 raise lcg.ParseError("Unexpected MathML element", e)
-        return self._generator.noescape(element.content())
+        content = element.content()
+        if not self._MATHML_XMLNS.match(result):
+            # HACK: xmlns sometimes disappears, so we make sure to put it
+            # back here, but it would be better to ensure it doesn't
+            # disappear through editation.
+            assert content.startswith('<math ')
+            content = '<math xmlns="http://www.w3.org/1998/Math/MathML"' + content[5:]
+        return self._generator.noescape(content)
 
     def export_swf_object(self, context, filename, element_id, width, height, flashvars={},
                           min_flash_version=None, alternative_content=None, warning=None):
