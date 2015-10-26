@@ -1339,6 +1339,10 @@ class Element(object):
         else:
             raise Exception('Not implemented', size)
         return points
+
+    def _color2rgb(self, color):
+        return [float(x)/255 for x in color.rgb()]
+
     def _wrapped_image(self, content):
         if isinstance(content, Container) and len(content.content) == 1:
             element = content.content[0]
@@ -1669,8 +1673,15 @@ class HorizontalRule(Element):
 
     """
     _CATEGORY = 'break'
+    thickness = None
+    color = None
     def _export(self, context):
-        return reportlab.platypus.flowables.HRFlowable(width='100%')
+        kwargs = {}
+        if self.thickness:
+            kwargs['thickness'] = self._unit2points(self.thickness, context.pdf_context.style())
+        if self.color:
+            kwargs['color'] = self._color2rgb(self.color)
+        return reportlab.platypus.flowables.HRFlowable(width='100%', **kwargs)
 
 class TableOfContents(Element):
     """Table of contents.
@@ -1830,7 +1841,7 @@ class Container(Element):
                     if box_color is None:
                         box_color_rgb = None
                     else:
-                        box_color_rgb = [float(x)/255 for x in box_color.rgb()]
+                        box_color_rgb = self._color2rgb(box_color)
                     box_radius = presentation and presentation.box_radius
                     if box_radius is None:
                         box_radius_points = 0
@@ -2638,7 +2649,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(SimpleMarkup, content='br')
 
     def _export_horizontal_separator(self, context, element):
-        return make_element(HorizontalRule)
+        return make_element(HorizontalRule, thickness=element.thickness(), color=element.color())
 
     def _export_page_number(self, context, element):
         return make_element(PageNumber, total=element.total(), separator=element.separator())

@@ -921,14 +921,31 @@ class Title(Content):
 
     
 class HorizontalSeparator(Content):
-    """Horizontal separator of document section.
+    """Horizontal separator.
 
-    Typically it may be a page separator in paged documents or a horizontal
-    separator in documents without pages.
+    Typically rendered as a horizontal line separating visually the content
+    above and below it.
 
     """
-    pass
-
+    def __init__(self, thickness=None, color=None, **kwargs):
+        """Arguments:
+        thickness -- Thickness of the line as 'lcg.Unit' or None for the (media
+          dependent) default thickness.  Currently only supported by the PDF backend.
+        color -- line color as 'lcg.Color' or None for the (media dependent)
+          default color.  Currently only supported by the PDF backend.
+        """
+        assert thickness is None or isinstance(thickness, lcg.Unit), thickness
+        assert color is None or isinstance(color, lcg.Color), color 
+        self._thickness = thickness
+        self._color = color
+        super(HorizontalSeparator, self).__init__(**kwargs)
+        
+    def thickness(self):
+        return self._thickness
+        
+    def color(self):
+        return self._color
+        
 
 class NewPage(Content):
     """New page starts here."""
