@@ -1177,12 +1177,12 @@ class HtmlExporter(lcg.Exporter):
         for e in top_node.iter():
             if e.tag not in mathml_elements:
                 raise lcg.ParseError("Unexpected MathML element", e)
-        content = element.content()
+        content = element.content().strip()
         if not self._MATHML_XMLNS.match(content):
             # HACK: xmlns sometimes disappears, so we make sure to put it
             # back here, but it would be better to ensure it doesn't
             # disappear through editation.
-            assert content.startswith('<math ')
+            assert content.startswith('<math '), repr(content)
             content = '<math xmlns="http://www.w3.org/1998/Math/MathML"' + content[5:]
         return self._generator.noescape(content)
 
