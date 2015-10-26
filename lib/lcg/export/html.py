@@ -1178,7 +1178,7 @@ class HtmlExporter(lcg.Exporter):
             if e.tag not in mathml_elements:
                 raise lcg.ParseError("Unexpected MathML element", e)
         content = element.content()
-        if not self._MATHML_XMLNS.match(result):
+        if not self._MATHML_XMLNS.match(content):
             # HACK: xmlns sometimes disappears, so we make sure to put it
             # back here, but it would be better to ensure it doesn't
             # disappear through editation.
