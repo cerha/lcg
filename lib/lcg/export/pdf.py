@@ -74,7 +74,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             next_template = 'First%d' % (self._context_number,)
         self._handle_nextPageTemplate(next_template)
         reportlab.platypus.BaseDocTemplate.handle_pageEnd(self)
-        
+
     def afterFlowable(self, flowable):
         reportlab.platypus.BaseDocTemplate.afterFlowable(self, flowable)
         if isinstance(flowable, reportlab.platypus.Paragraph):
@@ -123,7 +123,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                     flowable = flowable[0]
                 else:
                     flowable = RLContainer(flowable, vertical=True)
-            max_height = self.height / 3 # so that header, footer and content have all chance to fit
+            max_height = self.height / 3  # so that header, footer and content have all chance to fit
             width, height = flowable.wrap(self.width, max_height)
             return flowable, width, height
         def frame_height(header, footer):
@@ -188,10 +188,10 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         later_frame = Frame(self.leftMargin, bottom_margin, self.width, height,
                             id=('later%d' % (n,)))
         self.addPageTemplates([PageTemplate(id=('First%d' % (n,)), frames=first_frame,
-                                          onPage=on_page, pagesize=self.pagesize),
-                             PageTemplate(id=('Later%d' % (n,)), frames=later_frame,
-                                          onPage=on_page, pagesize=self.pagesize)])
-        
+                                            onPage=on_page, pagesize=self.pagesize),
+                               PageTemplate(id=('Later%d' % (n,)), frames=later_frame,
+                                            onPage=on_page, pagesize=self.pagesize)])
+
     def build(self, flowables, *args, **kwargs):
         self._make_page_templates()
         # It's necessary to reset the global ReportLab sequencer to prevent
@@ -533,7 +533,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             result += ('  ----\n' +
                        string.join([' ' + l if l else '' for l in u.split('\n')], '\n'))
         return result
-        
+
 class RLText(reportlab.platypus.flowables.Flowable):
     # Paragraphs have variable dimensions and they don't work well when
     # wrapping simple texts for horizontal concatenation.  Tables can handle
@@ -551,7 +551,7 @@ class RLText(reportlab.platypus.flowables.Flowable):
         for i in range(len(self._text)):
             while True:
                 width = reportlab.pdfbase.pdfmetrics.stringWidth(self._text[i], style.fontName,
-                                                                style.fontSize)
+                                                                 style.fontSize)
                 if max_width is None or width <= max_width:
                     break
                 text_length = len(self._text[i])
@@ -568,14 +568,14 @@ class RLText(reportlab.platypus.flowables.Flowable):
         for line in self._text:
             tx = self.canv.beginText(x, y)
             tx.setFont(self._style.fontName,
-                      self._style.fontSize,
-                      self._style.leading)
+                       self._style.fontSize,
+                       self._style.leading)
             tx.textLine(line)
             self.canv.drawText(tx)
             y -= self._style.leading
     def __unicode__(self):
         return 'RLText(%s)' % (self._text.join('\n'),)
-    
+
 class RLSpacer(reportlab.platypus.flowables.Spacer):
     def __init__(self, *args, **kwargs):
         reportlab.platypus.flowables.Spacer.__init__(self, *args, **kwargs)
@@ -685,11 +685,11 @@ class Context(object):
         self._relative_font_size = 1
         self._export_notes = []
         self._tempdir = None
-        
+
     def __del__(self):
         if self._tempdir is not None:
             shutil.rmtree(self._tempdir, ignore_errors=True)
-            
+
     def _init_styles(self):
         self._styles = reportlab.lib.styles.getSampleStyleSheet()
         # Normal
@@ -718,7 +718,7 @@ class Context(object):
     def _init_fonts(self):
         self._fonts = {}
         default_font = self.font(None, FontFamily.SERIF, False, False)
-        try: # these objects are no longer present in newer ReportLab versions
+        try:  # these objects are no longer present in newer ReportLab versions
             reportlab.platypus.tableofcontents.levelZeroParaStyle.fontName = default_font
             reportlab.platypus.tableofcontents.levelOneParaStyle.fontName = default_font
             reportlab.platypus.tableofcontents.levelTwoParaStyle.fontName = default_font
@@ -732,7 +732,7 @@ class Context(object):
         """Initialize 'Context' class.
 
         This method must be run before every new use of 'Context' class.
-        
+
         """
         # Global variables
         # Note: We can't initialize them simply on the class level, because
@@ -821,7 +821,7 @@ class Context(object):
                 reportlab.lib.fonts.addMapping(font_name, bold, italic, font_face_name)
             Context._registered_fonts[key] = font_file
         return font_face_name
-        
+
     def font(self, name, family, bold, italic):
         """Return full font name for given arguments.
 
@@ -832,7 +832,7 @@ class Context(object):
           family -- one of 'FontFamily' constants
           bold -- boolean
           italic -- boolean
-          
+
         """
         assert family is not None
         key = (name, family, bold, italic,)
@@ -853,7 +853,7 @@ class Context(object):
         """Return tuple (NAME, FAMILY, BOLD, ITALIC,) corresponding to given 'font_name'.
 
         Arguments:
-        
+
           font-name -- font name as a string
 
         Raise 'KeyError' if the given name is not found.
@@ -886,7 +886,7 @@ class Context(object):
 
         This is used mostly for determining proper left indentation.
         Starting level is 0.
-        
+
         """
         return self._nesting_level
 
@@ -900,7 +900,7 @@ class Context(object):
 
         This is used for determining proper bullet style.
         Starting level is 0.
-        
+
         """
         return self._list_nesting_level
 
@@ -984,7 +984,7 @@ class Context(object):
         Arguments:
 
           style -- style to use as a template; if 'None' then use normal style
-        
+
         """
         style = copy.copy(style or self.normal_style())
         presentation = self.current_presentation()
@@ -1033,7 +1033,7 @@ class Context(object):
 
         This enables access to internal counter that can be used to lease
         unique numbers for any purpose.
-        
+
         """
         self._counter += 1
         return self._counter
@@ -1047,7 +1047,7 @@ class Context(object):
         Parameters:
 
           name -- name of the anchor, basestring
-          
+
         """
         if name not in self._anchors:
             self._anchors[name] = False
@@ -1062,7 +1062,7 @@ class Context(object):
         Parameters:
 
           name -- name of the anchor, basestring
-          
+
         """
         self._anchors[name] = True
         if self._parent_context:
@@ -1094,7 +1094,7 @@ class Context(object):
 
           presentation -- 'Presentation' to be applied; if 'None', current
             presentation is used instead
-        
+
         """
         current_presentation = self.current_presentation()
         if current_presentation is None:
@@ -1119,7 +1119,7 @@ class Context(object):
 
           presentation -- 'Presentation' to be applied; if 'None', current
             presentation is used instead
-        
+
         """
         self._presentations.append(presentation)
 
@@ -1225,7 +1225,7 @@ class Context(object):
         """
         assert isinstance(note, str)
         self._export_notes.append(note)
-        
+
     def pop_export_note(self):
         """Remove the last export note from the notes stack."""
         self._export_notes.pop()
@@ -1235,7 +1235,7 @@ class Context(object):
         if self._tempdir is None:
             self._tempdir = tempfile.mkdtemp()
         return self._tempdir
-    
+
 def _ok_export_result(result):
     if not isinstance(result, (tuple, list,)) or not result:
         return True
@@ -1266,7 +1266,7 @@ def _unescape(text):
     for old, new in _replacements:
         text = text.replace(new, old)
     return text
-    
+
 class Element(object):
     """Base class of all content classes.
 
@@ -1280,19 +1280,19 @@ class Element(object):
     These classes don't define argument initialization constructors not to
     waste space in this source file.  Use the 'make_element' function to create
     instances of these classes.
-    
+
     """
     _CATEGORY = None
-    
+
     content = None
     presentation = None
-    
+
     def init(self):
         """Initialize class.
 
         This method is called after instance attributes are set in
         'make_element' function.
-        
+
         """
         pass
     def export(self, context, **kwargs):
@@ -1302,7 +1302,7 @@ class Element(object):
 
           context -- LCG 'Context' instance
           kwargs -- class specific arguments
-          
+
         """
         pdf_context = context.pdf_context
         pdf_context.add_presentation(self.presentation)
@@ -1341,7 +1341,7 @@ class Element(object):
         return points
 
     def _color2rgb(self, color):
-        return [float(x)/255 for x in color.rgb()]
+        return [float(x) / 255 for x in color.rgb()]
 
     def _wrapped_image(self, content):
         if isinstance(content, Container) and len(content.content) == 1:
@@ -1409,7 +1409,7 @@ class Empty(Text):
 
     Useful when 'Text' is required or expected, but there is no actual
     content to provide.  'content' value is ignored.
-    
+
     """
     _CATEGORY = None
     def init(self):
@@ -1442,7 +1442,7 @@ class TextContainer(Text):
     'content' is a list of 'Text' instances.
 
     This class serves for grouping several 'Text' elements together.
-    
+
     """
     def init(self):
         content = self.content = copy.copy(self.content)
@@ -1522,12 +1522,12 @@ class MarkedText(TextContainer):
         self.content.prepend_text(text)
     def plain_text(self):
         return False
-    
+
 class PreformattedText(Element):
     """Text to be output verbatim.
 
     'content' is a unicode object to be printed.
-    
+
     """
     _CATEGORY = 'paragraph'
     def init(self):
@@ -1602,12 +1602,12 @@ class Paragraph(Element):
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
         self.content.insert(0, make_element(Text, content=text))
-        
+
 class Label(Paragraph):
     """Label, e.g. in a definition list.
 
     'content' is the same as in 'Paragraph'.
-    
+
     """
     _CATEGORY = 'label'
     def _style(self, context):
@@ -1623,7 +1623,7 @@ class Heading(Label):
 
     'content' is the same as in 'Paragraph'.  Additionally heading 'level'
     property must be specified, as an int starting from 1 (the topmost level).
-    
+
     """
     _CATEGORY = 'heading'
     level = None
@@ -1653,7 +1653,7 @@ class NewDocument(PageBreak):
 
     This mark serves for transfering contexts to ReportLab formatting.  The
     content is LCG 'Content' instance to be transferred to the given place.
-    
+
     """
     def init(self):
         super(NewDocument, self).init()
@@ -1688,7 +1688,7 @@ class TableOfContents(Element):
 
     This table of contents is complete and usually shouldn't be present in the
     document more than once.
-    
+
     """
     _CATEGORY = 'paragraph'
     def _export(self, context):
@@ -1743,7 +1743,7 @@ class Space(Element):
         width = self._unit2points(self.width, style)
         height = self._unit2points(self.height, style)
         return RLSpacer(width, height)
-        
+
 class Container(Element):
     """Sequence of (almost) any objects.
 
@@ -1886,7 +1886,7 @@ class Container(Element):
             returning a list of 'Element' instances.  Through the filtering
             function the container content may be changed or filtered out (by
             returning empty lists).
-          
+
         """
         expanded = []
         for c in self.content:
@@ -1995,7 +1995,7 @@ class Link(Text):
         else:
             result = u'<i>%s</i>' % (exported_content,)
         return result
-        
+
 class LinkTarget(Text):
     """Target of an internal link.
 
@@ -2019,7 +2019,7 @@ class InlineImage(Text):
     """Image inside a paragraph.
 
     'image' is an Image instance.
-    
+
     """
     align = None
     resize = None
@@ -2083,13 +2083,13 @@ class InlineImage(Text):
         else:
             result = image.title() or image.filename()
         return result
-    
+
 class Image(Element):
     """Image taken from an Image resource instance.
 
     'image' is an Image instance.  An additional argument 'text' may provide text description of
     the image in the form of base string.
-    
+
     """
     _CATEGORY = 'block'
     uri = None
@@ -2136,7 +2136,7 @@ class TableRow(Element):
     'content' is a sequence of 'TableCell's.
     'line_above' and 'line_below' indicate whether to put a horizontal line
     above or below the row, respectively.
-    
+
     """
     line_above = None
     line_below = None
@@ -2161,7 +2161,7 @@ class Table(Element):
     halign = None
     valign = None
     bars = ()
-    
+
     def init(self):
         super(Table, self).init()
         assert isinstance(self.content, (list, tuple,)), ('type error', self.content,)
@@ -2374,7 +2374,7 @@ def make_marked_text(text, **kwargs):
 
       text -- text content of the MarkedText instance; basestring
       kwargs -- kwargs to pass to MarkedText constructor
-      
+
     """
     assert isinstance(text, basestring), text
     text_element = make_element(Text, content=text)
@@ -2382,9 +2382,9 @@ def make_marked_text(text, **kwargs):
 
 
 class PDFExporter(FileExporter, Exporter):
-    
+
     _OUTPUT_FILE_EXT = 'pdf'
-    
+
     def _uri_section(self, context, section, local=False):
         # Force all section links to be local, since there is just one output document.
         return super(PDFExporter, self)._uri_section(context, section, local=True)
@@ -2436,12 +2436,12 @@ class PDFExporter(FileExporter, Exporter):
 
     def _reformat_text(self, context, text):
         return text
-    
+
     def _ensure_newlines(self, context, exported, number=1):
         if isinstance(exported, Text):
             exported = make_element(Paragraph, content=[exported])
         return exported
-    
+
     def text(self, context, text, lang=None, reformat=False):
         assert isinstance(text, basestring), text
         if text:
@@ -2455,7 +2455,7 @@ class PDFExporter(FileExporter, Exporter):
         else:
             result = make_element(Empty)
         return result
-    
+
     def escape(self, text):
         return make_element(Text, content=text)
 
@@ -2463,16 +2463,19 @@ class PDFExporter(FileExporter, Exporter):
         return None
 
     # Classic exports
-        
+
     def export(self, context, old_contexts=None, global_presentation=None, recursive=False):
         Context.reset()
         first_pass = (old_contexts is None)
         if old_contexts is None:
             old_contexts = {}
         old = old_contexts.get(None)
-        total_pages = 0
         if old is not None:
             total_pages = old.page
+            page_size = old.page_size()
+        else:
+            total_pages = 0
+            page_size = reportlab.lib.pagesizes.A4
         node = context.node()
         lang = context.lang()
         page_header = node.page_header(lang)
@@ -2489,21 +2492,10 @@ class PDFExporter(FileExporter, Exporter):
             for p in ('font_name', 'font_family',):
                 setattr(node_presentation, p,
                         (getattr(node_presentation, p) or getattr(global_presentation, p)))
-        context.pdf_context = old_contexts[None] = pdf_context = \
-            Context(total_pages=total_pages,
-                    first_page_header=(node.first_page_header(lang) or page_header),
-                    page_header=page_header,
-                    page_footer=node.page_footer(lang),
-                    page_background=node.page_background(lang),
-                    presentation=node_presentation,
-                    presentation_set=presentation_set,
-                    lang=lang)
-        presentation = pdf_context.current_presentation()
-        page_size = reportlab.lib.pagesizes.A4
-        if presentation and presentation.landscape:
-            page_size = reportlab.lib.pagesizes.landscape(page_size)
-        else:
-            page_size = reportlab.lib.pagesizes.portrait(page_size)
+            if global_presentation.landscape:
+                page_size = reportlab.lib.pagesizes.landscape(page_size)
+            else:
+                page_size = reportlab.lib.pagesizes.portrait(page_size)
         def presentation_size(attr, default=(10 * reportlab.lib.units.mm)):
             try:
                 size = getattr(global_presentation, attr)
@@ -2518,6 +2510,17 @@ class PDFExporter(FileExporter, Exporter):
             return points
         page_size = (presentation_size('page_width', default=page_size[0]),
                      presentation_size('page_height', default=page_size[1]),)
+        context.pdf_context = old_contexts[None] = pdf_context = \
+            Context(total_pages=total_pages,
+                    first_page_header=(node.first_page_header(lang) or page_header),
+                    page_header=page_header,
+                    page_footer=node.page_footer(lang),
+                    page_background=node.page_background(lang),
+                    page_size=page_size,
+                    presentation=node_presentation,
+                    presentation_set=presentation_set,
+                    lang=lang)
+        presentation = pdf_context.current_presentation()
         exported_structure = []
         first_subcontext = None
         subnodes = node.linear()
@@ -2615,7 +2618,7 @@ class PDFExporter(FileExporter, Exporter):
         if first_pass and pdf_context.total_pages_requested():
             return self.export(context, old_contexts=old_contexts)
         return output.getvalue()
-    
+
     def export_element(self, context, element):
         pdf_context = context.pdf_context
         presentation = pdf_context.set_styled_presentation(element)
@@ -2629,19 +2632,19 @@ class PDFExporter(FileExporter, Exporter):
             result.presentation = presentation
         pdf_context.unset_styled_presentation()
         return result
-    
+
     def _export_content(self, context, element):
         return make_element(Empty)
 
     def _export_preformatted_text(self, context, element):
         return make_element(PreformattedText, content=element.text())
-        
+
     def _export_anchor(self, context, element):
         anchor = element.anchor()
         if anchor:
             anchor = context.pdf_context.anchor_prefix + anchor
         return make_element(LinkTarget, content=element.text(), name=anchor)
-    
+
     def _export_new_page(self, context, element):
         return make_element(PageBreak)
 
@@ -2661,7 +2664,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Space, height=element.size(context), width=UMm(0))
 
     # Container elements
-    
+
     def _export_container(self, context, element):
         # This is going to be a really wild guesswork.  There can be two very
         # distinct kinds of containers: 1. alignment containers; 2. paragraphs
@@ -2712,29 +2715,29 @@ class PDFExporter(FileExporter, Exporter):
     def _markup_container(self, context, element, tag, **attributes):
         exported_content = self._content_export(context, element, collapse=False)
         return make_element(MarkedText, content=exported_content, tag=tag, attributes=attributes)
-    
+
     def _export_emphasized(self, context, element):
         return self._markup_container(context, element, 'i')
 
     def _export_strong(self, context, element):
         return self._markup_container(context, element, 'strong')
-    
+
     def _export_code(self, context, element):
         face = context.pdf_context.font(None, FontFamily.FIXED_WIDTH, False, False)
         return self._markup_container(context, element, 'font', face=face)
-     
+
     def _export_underlined(self, context, element):
         return self._markup_container(context, element, 'u')
-    
+
     def _export_superscript(self, context, element):
         return self._markup_container(context, element, 'super')
-    
+
     def _export_subscript(self, context, element):
         return self._markup_container(context, element, 'sub')
-    
+
     def _export_citation(self, context, element):
         return self._export_emphasized(context, element)
-    
+
     def _export_quotation(self, context, element):
         exported = self._export_paragraph(context, element)
         source = element.source()
@@ -2750,7 +2753,7 @@ class PDFExporter(FileExporter, Exporter):
             text = self.concat(*extra)
             exported = make_element(Paragraph, content=[text], halign=HorizontalAlignment.RIGHT)
         return exported
-    
+
     def _export_link(self, context, element):
         target = element.target(context)
         node_id = element.node_id()
@@ -2859,7 +2862,7 @@ class PDFExporter(FileExporter, Exporter):
         result_items = [make_item(dt.export(context), dd.export(context))
                         for dt, dd in element.content()]
         return make_element(Container, content=result_items)
-    
+
     def _export_field_set(self, context, element):
         def has_markup(element):
             if isinstance(element, (MarkedText, Link,)):
@@ -2883,7 +2886,7 @@ class PDFExporter(FileExporter, Exporter):
             return make_element(TableRow, content=content)
         rows = [make_item(*c) for c in element.content()]
         return make_element(Table, content=rows, compact=False)
-            
+
     def _export_paragraph(self, context, element):
         # LCG interpretation of "paragraph" is very wide, we have to expect
         # anything containing anything.  The only "paragraph" meaning we use
@@ -2956,7 +2959,7 @@ class PDFExporter(FileExporter, Exporter):
                             content=[self._content_export(context, element)],
                             align=element.align(),
                             heading=heading)
-        
+
     def _export_table_cell(self, context, element):
         return self._simple_export_table_cell(context, element, heading=False)
 
@@ -2975,7 +2978,7 @@ class PDFExporter(FileExporter, Exporter):
             class_ = InlineImage
             kwargs['text'] = element.title()
         return make_element(class_, image=image, align=element.align(), filename=filename, **kwargs)
-    
+
     def _export_figure(self, context, element):
         pdf_context = context.pdf_context
         in_figure = pdf_context.in_figure
@@ -2983,7 +2986,7 @@ class PDFExporter(FileExporter, Exporter):
         result = super(PDFExporter, self)._export_figure(context, element)
         pdf_context.in_figure = in_figure
         return result
-    
+
     # Special constructs
 
     _simple_annotation_regexp = re.compile('^[- 0-9.,a-zA-Z+=()]+$')
