@@ -1182,7 +1182,7 @@ class HtmlExporter(lcg.Exporter):
             # HACK: xmlns sometimes disappears, so we make sure to put it
             # back here, but it would be better to ensure it doesn't
             # disappear through editation.
-            assert content.startswith('<math '), repr(content)
+            assert content.startswith('<math') and content[5] in (' ', '>'), repr(content)
             content = '<math xmlns="http://www.w3.org/1998/Math/MathML"' + content[5:]
         return self._generator.noescape(content)
 
