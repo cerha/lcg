@@ -240,7 +240,8 @@ lcg.Menu = Class.create(lcg.Widget, {
 
     on_menu_click: function (event) {
 	var element = event.element();
-	this.cmd_activate(element.nodeName === 'A' ? element : element.down('a'));
+	this.cmd_activate(element.nodeName === 'A' ? element :
+			  element.down('a') || element.up('a'));
 	event.stop();
     },
     
