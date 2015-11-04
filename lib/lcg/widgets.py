@@ -358,7 +358,7 @@ class PopupMenuCtrl(Widget, lcg.Container):
         return g.concat(
             g.div((content, g.a(self._title, title=self._title, href='#', cls='popup-arrow')),
                   cls='invoke-menu' + (' labeled' if content else '')),
-            PopupMenu(self._items).export(context),
+            PopupMenu(self._items, label=self._title).export(context),
         )
 
 
