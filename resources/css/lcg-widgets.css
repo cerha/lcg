@@ -133,7 +133,6 @@
     list-style: none;
 }
 .popup-menu-widget ul li, .dropdown-selection-widget ul li {
-    font-size: 12px;
     white-space: nowrap;
     min-width: 100px;
     margin: 0;
