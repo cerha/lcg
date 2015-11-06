@@ -177,7 +177,7 @@ lcg.Menu = Class.create(lcg.Widget, {
     init_item: function (item, prev, parent) {
 	item.setAttribute('aria-selected', 'false');
 	item.observe('keydown', this.on_key_down.bind(this));
-	item.observe('click', this.on_menu_click.bind(this));
+	item.observe('click', function (event) { this.on_item_click(event, item); }.bind(this));
 	item._lcg_menu_prev = prev;
 	item._lcg_menu_next = null;
 	item._lcg_menu_parent = parent;
@@ -238,10 +238,8 @@ lcg.Menu = Class.create(lcg.Widget, {
 	return false;
     },
 
-    on_menu_click: function (event) {
-	var element = event.element();
-	this.cmd_activate(element.nodeName === 'A' ? element :
-			  element.down('a') || element.up('a'));
+    on_item_click: function (event, item) {
+	this.cmd_activate(item);
 	event.stop();
     },
     
@@ -604,7 +602,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	}
     },
     
-    on_menu_click: function (event) {
+    on_item_click: function (event, item) {
 	var element = event.element();
 	if (element.nodeName === 'A' || element.nodeName === 'LI') {
 	    // The inner SPAN has a left margin making space for folding controls.
@@ -612,8 +610,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    // SPAN, folding controls were clicked.  The strange hack with the inner
 	    // SPAN is needed to make folding work across browsers (particulartly
 	    // MSIE).
-	    var span = element.down('span');
-	    var item = span.parentNode;
+	    var span = item.down('span');
 	    if (event.pointerX() < span.cumulativeOffset().left) {
 		if (item.up('li').hasClassName('folded')) { 
 		    this.expand_item(item);
@@ -813,7 +810,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	}
 	var ul = new Element('ul', {'role': 'presentation'});
 	this.items.each(function (item) {
-	    var a = new Element('a', {'href': '#', 'onclick': 'return false;'}).update(item.label);
+	    var a = new Element('a', {'href': item.uri || '#'}).update(item.label);
 	    if (item.tooltip) {
 		a.setAttribute('title', item.tooltip);
 	    }
@@ -837,40 +834,62 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	item.setAttribute('role', 'menuitem');
     },
 
-    cmd_activate: function (item) {
-	var li = item.up('li');
-	var spec, namespaces, func, context, i, args;
-	if (li.hasClassName('active')) {
+    on_key_down: function ($super, event) {
+	this.element.addClassName('keyboard-navigated');
+	$super(event);
+    },
+
+    on_item_click: function (event, item) {
+	if (item.up('li').hasClassName('active')) {
 	    this.dismiss();
-	    spec = item._lcg_popup_menu_item_spec;
-	    var callback = spec.callback;
-	    if (callback) {
-		if (typeof callback === 'string') {
-		    namespaces = callback.split(".");
-		    func = namespaces.pop();
-		    context = window;
-		    for (i = 0; i < namespaces.length; i++) {
-			context = context[namespaces[i]];
-		    }
-		    callback = context[func];
-		}
-		args = [this.popup_element];
-		if (spec.callback_args) {
-		    for (i = 0; i < spec.callback_args.length; i++) {
-			args[i + 1] = spec.callback_args[i];
-		    }
-		}
-		return callback.apply(this, args);
+	    this.run_callback(item);
+	    var uri = item._lcg_popup_menu_item_spec.uri;
+	    // If the item has a uri, the link has an href and we want to
+	    // let the event bubble up and get to standard browser processing
+	    // as a link click.  This way the browser may apply its configuration
+	    // and for example open a link in a new tab when Ctrl is pressed
+	    // on Linux/Windows or Cmd on Mac.
+	    if (!uri) {
+		event.stop();
 	    }
-	    if (spec.uri) {
-		self.location = spec.uri;
+	} else {
+	    event.stop();
+	}
+    },
+
+    cmd_activate: function (item) {
+	if (item.up('li').hasClassName('active')) {
+	    this.dismiss();
+	    this.run_callback(item);
+	    var uri = item._lcg_popup_menu_item_spec.uri;
+	    if (uri) {
+		self.location = uri;
 	    }
 	}
     },
 
-    on_key_down: function ($super, event) {
-	this.element.addClassName('keyboard-navigated');
-	$super(event);
+    run_callback: function(item) {
+	var spec = item._lcg_popup_menu_item_spec;
+	var callback = spec.callback;
+	if (callback) {
+	    var i;
+	    if (typeof callback === 'string') {
+		var namespaces = callback.split(".");
+		var func = namespaces.pop();
+		var context = window;
+		for (i = 0; i < namespaces.length; i++) {
+		    context = context[namespaces[i]];
+		}
+		callback = context[func];
+	    }
+	    var args = [this.popup_element];
+	    if (spec.callback_args) {
+		for (i = 0; i < spec.callback_args.length; i++) {
+		    args[i + 1] = spec.callback_args[i];
+		}
+	    }
+	    return callback.apply(this, args);
+	}
     },
 
     popup: function ($super, event, element, selected_item_index) {
