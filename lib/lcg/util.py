@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Author: Tomas Cerha <cerha@brailcom.org>
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2013, 2014 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ def is_sequence_of(seq, cls):
 
 
 _CAMEL_CASE_WORD = re.compile(r'[A-Z][a-z\d]+')
-        
+
 def camel_case_to_lower(string, separator='-'):
     """Return a lowercase string using 'separator' to concatenate words."""
     words = _CAMEL_CASE_WORD.findall(string)
@@ -46,7 +46,7 @@ def camel_case_to_lower(string, separator='-'):
 
 def text_to_id(string, separator='-'):
     """Convert any text to an identifier.
-    
+
     The returned identifier consists only of safe characters, such as lower
     case letters of English alphabet, numbers and separators, but it attempts
     to keep as much of the input text as possible.  Upper case characters are
@@ -111,7 +111,7 @@ def log(message, *args):
 
       message -- The text of a message.  Any object will be converted to a
         unicode string.
-        
+
       *args -- message arguments.  When formatting the message with these
         arguments doesn't succeed, the arguemnts are simply appended to the end
         of the message.
@@ -148,7 +148,7 @@ def caller():
     code = frame[5] and ':\n    %s' % frame[5] or ''
     return 'File "%s", line %d, in %s' % frame[1:4] + code
 
-    
+
 _LANGUAGE_NAMES = {
     # Translators: The following 139 strings represent names of languages.
     # Feel free to consider which language names are worth a translation and
@@ -302,7 +302,7 @@ def language_name(code):
 
     The returned string is 'lcg.TranslatableText' instance or None if given
     code is not known.
-    
+
     """
     return _LANGUAGE_NAMES.get(code)
 
@@ -569,7 +569,7 @@ def country_name(code):
 
     The returned string is 'lcg.TranslatableText' instance or None if given
     code is not known.
-    
+
     """
     return _COUNTRY_NAMES.get(code)
 
@@ -591,9 +591,9 @@ def week_day_name(number, abbrev=False):
         to ISO-8601).
       abbrev -- iff true, the abbreviated variant is returned (up to 3 characters in most
         languages).  Full name is returned otherwise (by default).
-      
+
     The returned string is 'lcg.TranslatableText' instance.
-    
+
     """
     if abbrev:
         names = _SHORT_DAY_NAMES
@@ -620,9 +620,9 @@ def month_name(number, abbrev=False):
       number -- numeric index from 0 to 11, where 0 corresponds to June and 11 to December.
       abbrev -- iff true, the abbreviated variant is returned (up to 3 characters in most
         languages).  Full name is returned otherwise (by default).
-      
+
     The returned string is 'lcg.TranslatableText' instance.
-    
+
     """
     if abbrev:
         names = _SHORT_MONTH_NAMES

@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
 
-    
+
 class Content(object):
     """Generic base class for all types of content.
 
@@ -52,7 +52,7 @@ class Content(object):
 
     """
     _ALLOWED_CONTAINER = None
-    
+
     def __init__(self, lang=None, resources=()):
         """Initialize the instance.
 
@@ -72,7 +72,7 @@ class Content(object):
         self._page_number = ''
         self._resources = tuple(resources)
         super(Content, self).__init__()
-        
+
     def set_container(self, container):
         """Set the parent 'Container' to 'container'.
 
@@ -98,7 +98,7 @@ class Content(object):
         from the node itself.  This method is now called automatically when an
         element is exported to keep the 'parent()' method working, but both
         methods should be avoided in newly written code.
-        
+
         """
         assert isinstance(node, lcg.ContentNode), \
             "Not a 'lcg.ContentNode' instance: %s" % node
@@ -112,9 +112,9 @@ class Content(object):
         This is to be used in table of contents.
 
         Arguments:
-        
+
           number -- the page number; basestring
-          
+
         """
         assert isinstance(number, basestring), number
         self._page_number = number
@@ -128,7 +128,7 @@ class Content(object):
         """Return the content language as lowercase ISO 639-1 Alpha-2 language code.
 
         Arguments:
-        
+
           inherited -- iff True, the language will be determined from the
             parent element in the hierarchy if this element doesn't define
             'lang' explicitly.  When False, the value of 'lang' passed to the
@@ -143,7 +143,7 @@ class Content(object):
     def resources(self):
         """Return the value of 'resources' passed to the constructor as a tuple."""
         return self._resources
-        
+
     def container(self):
         """Return the direct container of this element."""
         return self._container
@@ -186,7 +186,7 @@ class Content(object):
                 return neighbor
             neighbor = content[-1]
         return neighbor
-        
+
     def previous_element(self, stop_classes=()):
         """ """
         return self._neighbor_element(-1, stop_classes)
@@ -200,24 +200,24 @@ class Content(object):
 
         This method allows introspection of content hierarchy (for example for
         creation of a table of contents).
-        
+
         An empty list is returned in the base class.  Derived classes which
         contain sections should override this method to return the contained
         sections.
 
         """
         return []
-        
+
     def page_number(self):
         """Return page number of the content element.
 
         This is to be used in table of contents.
 
         Arguments:
-        
+
           context -- formatting context as a 'Exporter.Context' instance
             created and returned by 'Exporter.context' method
-            
+
         """
         return self._page_number
 
@@ -250,14 +250,14 @@ class Container(Content):
     _ALLOWED_CONTENT = Content
     _SUBSEQUENCES = False
     _SUBSEQUENCE_LENGTH = None
-    
+
     def __init__(self, content, name=(), id=None, halign=None, valign=None,
                  orientation=None,
                  presentation=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
-        
+
           content -- the actual content wrapped into this container as a
             sequence of 'Content' instances in the order in which they should
             appear in the output.
@@ -331,7 +331,7 @@ class Container(Content):
         """Return the sequence of contained content elements.
         """
         return self._content
-            
+
     def sections(self):
         result = []
         for c in self._content:
@@ -340,23 +340,23 @@ class Container(Content):
             elif isinstance(c, Container):
                 result.extend(c.sections())
         return result
-    
+
     def names(self):
         """Return the tuple of strings passed as 'name' to the constructor."""
         return self._names
-    
+
     def halign(self):
         """Return the value of 'halign' as passed to the constructor."""
         return self._halign
-    
+
     def valign(self):
         """Return the value of 'valign' as passed to the constructor."""
         return self._valign
-    
+
     def orientation(self):
         """Return the value of 'orientation' as passed to the constructor."""
         return self._orientation
-    
+
     def presentation(self):
         """Return the value of 'presentation' as passed to the constructor."""
         return self._presentation
@@ -375,7 +375,7 @@ class Container(Content):
             self._contained_resources = tuple(resources)
         return self._resources + self._contained_resources
 
-    
+
 # ======================== Inline content elements ========================
 
 
@@ -387,7 +387,7 @@ class Strong(Container):
 class Emphasized(Container):
     """Text emphasized by slanted font face."""
     pass
-    
+
 
 class Underlined(Container):
     """Underlined text."""
@@ -413,7 +413,7 @@ class Quotation(Container):
           source -- reference to the source of the quotation, such as the
             original author, publication, web page etc. (basestring)
           uri -- link to the source (basestring)
-            
+
         """
         assert source is None or isinstance(source, basestring), source
         assert uri is None or isinstance(uri, basestring), uri
@@ -428,7 +428,7 @@ class Quotation(Container):
     def uri(self):
         """Return the quotation source URI as passed to the constructor."""
         return self._uri
-        
+
 class Superscript(Container):
     """Text vertically aligned above the normal line level."""
     pass
@@ -481,10 +481,10 @@ class TextContent(Content):
         cloned._text = text
         return cloned
 
-    
+
 class Link(Container):
     """Link to internal or external location."""
-    
+
     class ExternalTarget(object):
         """Representation of an external target specified by its URI."""
         def __init__(self, uri, title, descr=None, lang=None):
@@ -494,7 +494,7 @@ class Link(Container):
               title -- title of the target as a string or unicode
               descr -- ???
               lang -- lowercase ISO 639-1 Alpha-2 language code
-              
+
             """
             self._uri = uri
             self._title = title
@@ -526,7 +526,7 @@ class Link(Container):
             taken from the 'target' instance depending on its type
           type -- ???
           lang -- lowercase ISO 639-1 Alpha-2 language code
-        
+
         """
         assert isinstance(target, (Section, lcg.ContentNode, lcg.Resource, self.ExternalTarget,
                                    basestring)), target
@@ -551,7 +551,7 @@ class Link(Container):
         If a string reference was passed to the constructor argument 'target',
         it is automatically resolved, so the returned instance is always one of
         'Section', 'lcg.ContentNode', 'lcg.Resource' or 'Link.ExternalTarget'.
-        
+
         """
         target = self._target
         if isinstance(target, basestring):
@@ -594,7 +594,7 @@ class Link(Container):
 
 class Abbreviation(TextContent):
     """Abbreviation with description."""
-    
+
     def __init__(self, text, descr, **kwargs):
         """Arguments:
 
@@ -613,7 +613,7 @@ class Abbreviation(TextContent):
 
 class Anchor(TextContent):
     """Target of a link (an anchor)."""
-    
+
     def __init__(self, anchor, text='', **kwargs):
         """Arguments:
 
@@ -632,10 +632,10 @@ class Anchor(TextContent):
 
 class _InlineObject(Content):
     """Super class for embedded objects, such as images, audio and video."""
-    
+
     def __init__(self, title=None, descr=None, name=None, lang=None):
         """Arguments:
-        
+
           title -- object title as a string or unicode.  If not None, overrides
             'resource.title()' for this particular use.
           descr -- object description a string or unicode.  If not None, overrides
@@ -670,35 +670,35 @@ class _InlineObject(Content):
     def title(self):
         """Return the value of 'title' as passed to the constructor."""
         return self._title
-    
+
     def descr(self):
         """Return the value of 'descr' as passed to the constructor."""
         return self._descr
-    
+
     def name(self):
         """Return the value of 'name' as passed to the constructor."""
         return self._name
 
-    
+
 class _SizedInlineObject(_InlineObject):
-    
+
     def __init__(self, size=None, **kwargs):
         """Arguments:
 
           size -- size in pixels as a tuple of two integers (WIDTH, HEIGHT)
 
         All other arguments are passed to the parent class constructor.
-          
+
         """
         assert size is None or isinstance(size, tuple), size
         self._size = size
         super(_SizedInlineObject, self).__init__(**kwargs)
-    
+
     def size(self):
         """Return the value of 'size' as passed to the constructor."""
         return self._size
-    
-    
+
+
 class InlineImage(_SizedInlineObject):
     """Image embedded inside the document.
 
@@ -706,13 +706,13 @@ class InlineImage(_SizedInlineObject):
     the place of invocation.
 
     """
-    
+
     LEFT = 'left'
     RIGHT = 'right'
     TOP = 'top'
     BOTTOM = 'bottom'
     MIDDLE = 'middle'
-    
+
     def __init__(self, image, align=None, standalone=None, **kwargs):
         """Arguments:
 
@@ -722,7 +722,7 @@ class InlineImage(_SizedInlineObject):
             'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
             'None'
           standalone -- iff true then never put the image inside a paragraph
-            
+
         All other keyword arguments are passed to the parent class constructor.
 
         """
@@ -741,7 +741,7 @@ class InlineImage(_SizedInlineObject):
 
         """
         return self._resource_instance(context, self._image, lcg.Image)
-        
+
     def align(self):
         """Return the value of 'align' as passed to the constructor."""
         return self._align
@@ -749,24 +749,24 @@ class InlineImage(_SizedInlineObject):
     def standalone(self):
         """Return the value of 'standalone' as passed to the constructor."""
         return self._standalone
-    
+
 
 class InlineAudio(_InlineObject):
     """Audio file embedded inside the document.
 
     For example in HTML, this might be exported as a play button using a
     Flash audio player.
-    
+
     """
-       
+
     def __init__(self, audio, image=None, shared=True, **kwargs):
         """Arguments:
 
           image -- visual presentation image as an 'lcg.Image' resource instance or None.
           shared -- boolean flag indicating whether using a shared audio player is desired.
-        
+
         All other arguments are passed to the parent class constructor.
-        
+
         """
         assert isinstance(audio, (lcg.Audio, basestring)), audio
         assert image is None or isinstance(image, (lcg.Image, basestring)), image
@@ -784,7 +784,7 @@ class InlineAudio(_InlineObject):
 
         """
         return self._resource_instance(context, self._audio, lcg.Audio)
-    
+
     def image(self, context):
         """Return the value of 'image' as passed to the constructor.
 
@@ -793,7 +793,7 @@ class InlineAudio(_InlineObject):
 
         """
         return self._resource_instance(context, self._image, lcg.Image)
-    
+
     def shared(self):
         """Return the value of 'shared' as passed to the constructor."""
         return self._shared
@@ -803,17 +803,17 @@ class InlineVideo(_SizedInlineObject):
     """Video file embedded inside the document.
 
     For example in HTML, this might be exported as an embedded video player.
-    
+
     """
-    
+
     def __init__(self, video, image=None, **kwargs):
         """Arguments:
 
           video -- 'lcg.Video' resource instance.
           image -- video thumbnail image as an 'lcg.Image' resource instance or None.
-        
+
         All other keyword arguments are passed to the parent class constructor.
-        
+
         """
         assert isinstance(video, (lcg.Video, basestring)), video
         assert image is None or isinstance(image, (lcg.Image, basestring)), image
@@ -829,7 +829,7 @@ class InlineVideo(_SizedInlineObject):
 
         """
         return self._resource_instance(context, self._video, lcg.Video)
-    
+
     def image(self, context):
         """Return the value of 'image' as passed to the constructor.
 
@@ -845,7 +845,7 @@ class InlineExternalVideo(Content):
 
     For example in HTML, this might be exported as an embedded YouTube video
     player.
-    
+
     """
     def __init__(self, service, video_id, title=None, descr=None, size=None, lang=None):
         """Arguments:
@@ -856,7 +856,7 @@ class InlineExternalVideo(Content):
           size -- explicit video size in pixels as a tuple of two integers
             (WIDTH, HEIGHT) or None for the default size.
           lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
-          
+
         """
         assert service in ('youtube', 'vimeo'), service
         assert isinstance(video_id, (str, unicode)), video_id
@@ -875,19 +875,19 @@ class InlineExternalVideo(Content):
     def video_id(self):
         """Return the string identifier of the video within the service."""
         return self._video_id
-    
+
     def title(self):
         """Return the value of 'title' as passed to the constructor."""
         return self._title
-    
+
     def descr(self):
         """Return the value of 'descr' as passed to the constructor."""
         return self._descr
-    
+
     def size(self):
         """Return the video size in pixels as a pair of integers or None."""
         return self._size
-    
+
 
 class Title(Content):
     """Inline element, which is substituted by the title of the requested item in export time.
@@ -919,7 +919,7 @@ class Title(Content):
         """Return the value of 'id' as passed to the constructor."""
         return self._id
 
-    
+
 class HorizontalSeparator(Content):
     """Horizontal separator.
 
@@ -935,17 +935,17 @@ class HorizontalSeparator(Content):
           default color.  Currently only supported by the PDF backend.
         """
         assert thickness is None or isinstance(thickness, lcg.Unit), thickness
-        assert color is None or isinstance(color, lcg.Color), color 
+        assert color is None or isinstance(color, lcg.Color), color
         self._thickness = thickness
         self._color = color
         super(HorizontalSeparator, self).__init__(**kwargs)
-        
+
     def thickness(self):
         return self._thickness
-        
+
     def color(self):
         return self._color
-        
+
 
 class NewPage(Content):
     """New page starts here."""
@@ -981,7 +981,7 @@ class PageNumber(Content):
         super(PageNumber, self).__init__(lang=lang)
         self._total = total
         self._separator = separator
-        
+
     def total(self):
         """Return the value of 'total' as passed to the constructor."""
         return self._total
@@ -1022,7 +1022,7 @@ class HSpace(Content):
     def size(self, context):
         """Return the value of 'size' as passed to the constructor."""
         return self._size
-        
+
 
 class VSpace(HSpace):
     """Vertical space of given size.
@@ -1045,7 +1045,7 @@ class HtmlContent(TextContent):
     At the same time, this class demonstrates a content element, which exports
     itself actively and doesn't rely on the exporter as the other generic
     elements defined in this module.
-    
+
     """
     def export(self, context):
         assert isinstance(context.exporter(), lcg.HtmlExporter), \
@@ -1053,7 +1053,7 @@ class HtmlContent(TextContent):
         g = context.generator()
         return g.noescape(self._text)
 
-    
+
 class Heading(Container):
     """Heading, e.g. heading of a section.
 
@@ -1065,12 +1065,12 @@ class Heading(Container):
     def __init__(self, content, level, **kwargs):
         """
         Arguments:
-        
+
           cotnent -- the actual content of this element as lcg.Content element
             or their sequence
           level -- level of the heading, positive integer, starting from 1
           kwargs -- keyword arguments for parent class constructor
-          
+
         """
         assert isinstance(level, int) and level > 0, level
         super(Heading, self).__init__(content, **kwargs)
@@ -1080,7 +1080,7 @@ class Heading(Container):
         "Return level of the heading, positive integer, starting from 1."
         return self._level
 
-    
+
 class PreformattedText(TextContent):
     """Preformatted text."""
     pass
@@ -1091,7 +1091,7 @@ class PreformattedText(TextContent):
 
 SectionContainer = Container
 """Deprecated: Use 'Container' instead."""
-    
+
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
     pass
@@ -1103,14 +1103,14 @@ class ItemizedList(Container):
     NUMERIC = 'numeric'
     LOWER_ALPHA = 'lower-alpha'
     UPPER_ALPHA = 'upper-alpha'
-    
+
     def __init__(self, content, order=None, **kwargs):
         """Arguments:
-        
+
           content -- sequence of list items as 'Content' instances.
           order -- one of class constants determining the list item ordering style or
             None for an unordered list (bullet list).
-          
+
         """
         assert order in (None, self.LOWER_ALPHA, self.UPPER_ALPHA, self.NUMERIC)
         self._order = order
@@ -1126,12 +1126,12 @@ class DefinitionList(Container):
 
     The constructor accepts a sequence of definitions, where each definition is a pair '(TERM,
     DESCRIPTION)', where both items are 'Content' instances.
-    
+
     """
     _SUBSEQUENCES = True
     _SUBSEQUENCE_LENGTH = 2
 
-    
+
 class FieldSet(Container):
     """A list of label and value pairs.
 
@@ -1144,7 +1144,7 @@ class FieldSet(Container):
     """
     _SUBSEQUENCES = True
     _SUBSEQUENCE_LENGTH = 2
-    
+
 
 class TableCell(Container):
     """Table cell is a container of cell content and may appear within 'TableRow'."""
@@ -1186,7 +1186,7 @@ class TableRow(Container):
           iterated -- iff true, this row expands into any number of rows
             according to the iterator variable used within one or more of its
             cells
-    
+
         """
         self._line_above = line_above
         self._line_below = line_below
@@ -1205,7 +1205,7 @@ class TableRow(Container):
     def iterated(self):
         return self._iterated
 
-    
+
 class Table(Container):
     """Table is a container of 'TableRow' instances."""
     _ALLOWED_CONTENT = (TableRow, HorizontalSeparator,)
@@ -1251,15 +1251,15 @@ class Table(Container):
         self._bars = bars
         self._transformations = transformations
         super(Table, self).__init__(content, **kwargs)
-        
+
     def title(self):
         """Return the value of 'title' as passed to the constructor."""
         return self._title
-    
+
     def long(self):
         """Return the value of 'long' as passed to the constructor."""
         return self._long
-    
+
     def column_widths(self):
         """Return the value of 'column_widths' as passed to the constructor."""
         return self._column_widths
@@ -1275,8 +1275,8 @@ class Table(Container):
     def transformations(self):
         """Return the value of 'transformations' as passed to the constructor."""
         return self._transformations
-        
-    
+
+
 class Section(Container):
     """Section wraps the subordinary contents into an inline section.
 
@@ -1297,7 +1297,7 @@ class Section(Container):
 
     """
     _ID_PREFIX = 'sec'
-    
+
     def __init__(self, title, content, heading=None, id=None, anchor=None,
                  descr=None, in_toc=True, **kwargs):
         """Arguments:
@@ -1349,7 +1349,7 @@ class Section(Container):
 
         """
         return [c for c in self.container_path() if isinstance(c, Section)]
-    
+
     def title(self):
         """Return the section title as a basestring."""
         return self._title
@@ -1371,7 +1371,7 @@ class Section(Container):
     def in_toc(self):
         """Return true if the section is supposed to appear in TOC."""
         return self._in_toc
-    
+
     def id(self):
         """Return unique section identifier as a string.
 
@@ -1411,7 +1411,7 @@ class Section(Container):
 
         Back reference is a reference leading from the section heading to the
         corresponding link in the table of contents.
-        
+
         Just one back reference target on one page is allowed.  Links on other
         pages are not back referenced.  Thus if 'node' is not section's parent
         or if a back references was already created, the method retorns 'None'.
@@ -1425,7 +1425,7 @@ class Section(Container):
             return self._backref
         else:
             return None
-    
+
     def backref(self):
         """Return the back reference if it was previously created successfully."""
         return self._backref
@@ -1463,9 +1463,9 @@ class TableOfContents(Content):
             ('True') or only 'lcg.ContentNode' hierarchy ('False') of the leaf
             nodes of the node tree will be included in the index.  This argument
             has no effect when 'item' is a 'Container' instance.
-            
+
           All other arguments have the same meaning as in the parent class constructor.
-        
+
         """
         assert item is None or isinstance(item, self._TOC_ITEM_TYPE)
         assert title is None or isinstance(title, (str, unicode))
@@ -1476,7 +1476,7 @@ class TableOfContents(Content):
         self._depth = depth
         self._detailed = detailed
         super(TableOfContents, self).__init__(**kwargs)
-        
+
     def _root_item(self):
         """Return the position in the hierarchy where to start the table of contents."""
         item = self._item
@@ -1525,15 +1525,15 @@ class TableOfContents(Content):
                     items = [s for s in sections if s.in_toc()]
             return [(subitem, subitems(subitem, depth)) for subitem in items]
         return subitems(self._root_item(), depth=self._depth)
-    
-    
+
+
 class NodeIndex(TableOfContents):
     """A table of contents which lists the node subtree of the current node.
 
     This class is just a specific type of 'TableOfContents', which by default
     starts at the parent node of the content where it is used and which by
     default displays only nodes, not their inner conent (detailed=False).
-    
+
     """
     _TOC_ITEM_TYPE = lcg.ContentNode
 
@@ -1542,11 +1542,11 @@ class NodeIndex(TableOfContents):
 
     def _root_item(self):
         return self._item or self.parent()
-        
+
 
 class RootIndex(NodeIndex):
     """'NodeIndex' starting from the top level node of the whole tree."""
-    
+
     def _root_item(self):
         return self.parent().root()
 
@@ -1557,7 +1557,7 @@ class NoneContent(Content):
     Intended for places where 'Content' is required but there is nothing to put
     in.  It is, however, actually useless, since 'Content' may be used for the
     same purpose.
-    
+
     """
     pass
 
@@ -1567,7 +1567,7 @@ class SetVariable(Content):
     This content doesn't produce any output, it just sets a node global
     variable value.  It is used by structured text parser to set global
     variables at proper places.
-    
+
     """
     def __init__(self, name, value, **kwargs):
         """
@@ -1594,7 +1594,7 @@ class SetVariable(Content):
 
 class Substitution(Content):
     """Variable to be substituted by the actual value on export."""
-    
+
     def __init__(self, name, markup=None, **kwargs):
         """
         Arguments:
@@ -1615,7 +1615,7 @@ class Substitution(Content):
     def name(self):
         """Return name of the variable."""
         return self._name
-    
+
     def markup(self):
         """Return source text representation of the variable."""
         return self._markup
@@ -1654,7 +1654,7 @@ class MathML(Content):
     which returns a parsed DOM structure to work with.
 
     It is expected that the MathML content is a presentation form of MathML 3.
-    
+
     """
     class EntityHandler(object):
         """Entity dictionary to be used in 'tree_content()' method.
@@ -1679,7 +1679,7 @@ class MathML(Content):
         Arguments:
 
           content -- the MathML content represented as a MathML XML unicode
-        
+
         """
         super(MathML, self).__init__()
         assert isinstance(content, unicode), content
@@ -1743,12 +1743,12 @@ class MathML(Content):
         for n in top.childNodes:
             export(tree, n)
         return tree
-        
+
     def _dom_tree_content(self):
         # This can't handle entity references (e.g. &PlusMinus;).
         from xml.dom.minidom import parseString
         return self._dom_content(parseString(self._str_content()))
-        
+
     def _tree_content(self, entity_dictionary):
         from xml.etree import ElementTree
         import cStringIO
@@ -1805,7 +1805,7 @@ class MathML(Content):
             if closing:
                 ElementTree.SubElement(node, 'mo', dict(fence='true')).text = closing
         return math
-        
+
     def tree_content(self, entity_dictionary=None, transform=False, top_only=False):
         """Return a parsed 'xml.etree.Element' instance of the math content.
 
@@ -1835,7 +1835,7 @@ class MathML(Content):
         if transform:
             tree = self._transform_content(tree)
         return tree
-    
+
 
 # Convenience functions for simple content construction.
 
@@ -1850,7 +1850,7 @@ def coerce(content, formatted=False):
         inline markup or simply turned into 'TextContent' instance depending on
         the 'formatted' argument.  A 'Content' instance is returned as is.  Any
         other argument raises AssertionError.
-        
+
       formatted -- a boolean flag indicating how strings should treated.  If
         False (the default) strings are parsed for inline markup using
         'lcg.Parser.parse_inline_markup()'.  If True strings are simply turned
@@ -1912,7 +1912,7 @@ def link(target, label=None, type=None, descr=None):
             target
         assert descr is None
     return Link(target, label=label, type=type)
-    
+
 def dl(items, formatted=False):
     """Create a 'DefinitionList' from a sequence of (TERM, DESCRIPTION) pairs.
 
@@ -1936,7 +1936,7 @@ def fieldset(pairs, formatted=False):
     """Create a 'FieldSet' out of given sequence of (LABEL, VALUE) pairs.
 
     Both label and value are coerced, but only value is treated as formatted.
-    
+
     """
     fields = [(coerce(label), coerce(value, formatted=formatted)) for label, value in pairs]
     return FieldSet(fields)
@@ -1967,10 +1967,10 @@ def code(*items, **kwargs):
 def cite(*items, **kwargs):
     """Create an 'Citation' instance by coercing all arguments."""
     return _container(Citation, items, **kwargs)
-    
+
 def container(*items, **kwargs):
     return _container(Container, items, **kwargs)
-    
+
 def br():
     return NewLine()
 

@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,16 +74,16 @@ class Reader(object):
             resource_provider = root._resource_provider_
         self._root = root
         self._resource_provider_ = resource_provider
-        
+
     def _title(self):
         return None
-    
+
     def _brief_title(self):
         return None
-    
+
     def _descr(self):
         return None
-    
+
     def _children(self):
         return ()
 
@@ -95,7 +95,7 @@ class Reader(object):
 
     def _resource_dirs(self):
         return ()
-    
+
     def _resource_provider(self):
         return lcg.ResourceProvider(dirs=self._resource_dirs())
 
@@ -120,7 +120,7 @@ class Reader(object):
                 # There is one unknown source language.
                 kwargs = self._content(None)
             return lcg.ContentNode(id=self._id,
-                                   title=self._title(), 
+                                   title=self._title(),
                                    brief_title=self._brief_title(),
                                    descr=self._descr(),
                                    children=[child.build() for child in self._children()],
@@ -128,7 +128,7 @@ class Reader(object):
                                    globals=self._globals(),
                                    hidden=self._hidden,
                                    **kwargs)
-                                   
+
         except Exception as e:
             if hasattr(self, '_source_filename'):
                 # TODO: This is a quick hack.  The attribute `_source_filename' is prefilled in
@@ -145,7 +145,7 @@ class FileReader(Reader):
 
     _ENCODING_HEADER_MATCHER = re.compile(r'^#\s*-\*-.*coding:\s*([^\s;]+).*-\*-\s*$')
     _EMACS_CODING_EXTENSION_MATCHER = re.compile(r'(^mule-|-(dos|unix|mac)$)')
-    
+
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
         assert isinstance(dir, str), dir
         assert encoding is None or isinstance(encoding, str) and codecs.lookup(encoding), encoding
@@ -164,7 +164,7 @@ class FileReader(Reader):
         if dir is None:
             dir = self._dir
         return os.path.join(dir, filename)
-        
+
     def _read_file(self, name, ext='txt', comment=None, dir=None, lang=None, fallback_lang=None):
         """Return the text read from the source file."""
         filename = self._input_file(name, ext=ext, lang=lang, dir=dir)
@@ -204,7 +204,7 @@ class FileReader(Reader):
             return unicode(content, encoding=encoding)
         except UnicodeDecodeError as e:
             raise Exception("File %s: %s" % (filename, e))
-        
+
     def encoding(self):
         """Return the name of encoding expected in source files.
 
@@ -212,11 +212,11 @@ class FileReader(Reader):
 
         """
         return self._encoding
-        
+
     def dir(self):
         """Return the name of the source directory."""
         return self._dir
-        
+
 
 class StructuredTextReader(FileReader):
     """Reader class for nodes read from an LCG Structured Text document.
@@ -233,7 +233,7 @@ class StructuredTextReader(FileReader):
 
     def _source_text(self, lang):
         return None
-        
+
     def _parse_text(self, text):
         parser = self._parser
         parameters = {}
@@ -263,7 +263,7 @@ class StructuredTextReader(FileReader):
         self._titles[lang] = title
         return dict(content=content, **parameters)
 
-    
+
 class DocFileReader(StructuredTextReader):
     """Node of a Structured Text read from a source file."""
 
@@ -271,12 +271,12 @@ class DocFileReader(StructuredTextReader):
         """Initialize the instance.
 
         Arguments:
-        
+
           ext -- the extension of the input file ('txt' by default).  The complete filename is the
             node's id, an optional language extension and this extension.
 
           The other arguments are inherited from the parent class.
-          
+
         """
         self._ext = ext
         self._cached_variants = None
@@ -295,11 +295,11 @@ class DocFileReader(StructuredTextReader):
                                   for f in glob.glob(matcher)])
             self._cached_variants = variants
         return variants
-    
+
     def _source_text(self, lang):
         return self._read_file(self._id, lang=lang, ext=self._ext)
-        
-    
+
+
 class DocDirReader(DocFileReader):
     """Node of a Structured Text read from a source file.
 
@@ -341,7 +341,7 @@ class DocDirReader(DocFileReader):
                                        hidden=hidden, parent=self))
         return children
 
-    
+
 def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, recourse=True, cls=None,
            **kwargs):
     """Create an instance of sensible reader class for given source directory and document name.

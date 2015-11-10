@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2006-2015 Brailcom, o.p.s.
+# Copyright (C) 2006-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import os
 
 class _MetaFile(object):
     _EXT = None
-    
+
     def __init__(self, context, charset='utf-8'):
         self._context = context
         self._charset = charset
@@ -38,16 +38,16 @@ class _MetaFile(object):
 
     def filename(self):
         return self._context.node().id() + self._EXT
-    
+
     def write(self, directory):
         file = open(os.path.join(directory, self.filename()), 'w')
         file.write("\n".join(self._lines()).encode(self._charset))
         file.close()
 
-        
+
 class _Contents(_MetaFile):
     _EXT = '.hhc'
-    
+
     def _item(self, node, indent=''):
         uri = self._context.exporter().uri(self._context, node)
         lines = ('<li>',
@@ -56,7 +56,7 @@ class _Contents(_MetaFile):
                  '    <param name="Local" value="%s">' % uri,
                  '  </object>')
         return tuple([indent+'  '+line for line in lines])
-    
+
     def _lines(self, node=None, indent=''):
         node = node or self._context.node()
         lines = ()
@@ -69,7 +69,7 @@ class _Contents(_MetaFile):
             lines += (indent + "</ul>",)
         return lines
 
-    
+
 class _Index(_Contents):
     _EXT = '.hhk'
 
@@ -88,7 +88,7 @@ class _Header(_MetaFile):
         super(_Header, self).__init__(context, **kwargs)
         self._contents = contents
         self._index = index
-            
+
     def _lines(self):
         return ("Contents file=%s" % self._contents.filename(),
                 "Index file=%s" % self._index.filename(),
@@ -96,10 +96,10 @@ class _Header(_MetaFile):
                 "Default topic=%s" % self._context.exporter().uri(self._context,
                                                                   self._context.node()),
                 "Charset=%s" % self._charset)
-    
-    
+
+
 class HhpExporter(lcg.HtmlFileExporter):
-    
+
     class Generator(lcg.HtmlGenerator):
         def hr(self, **kwargs):
             return '<hr>' # We don't want XHTML tag syntax (<hr/>).
@@ -108,7 +108,7 @@ class HhpExporter(lcg.HtmlFileExporter):
             if cls == 'lcg-table':
                 kwargs = dict(kwargs, cellspacing=3, cellpadding=0)
             return super(HhpExporter.Generator, self).table(content, cls=cls, **kwargs)
-        
+
         def div(self, content, cls=None, **kwargs):
             if cls == 'table-of-contents':
                 content = '<br>' + content
@@ -124,4 +124,3 @@ class HhpExporter(lcg.HtmlFileExporter):
             header = _Header(context, contents, index)
             for metafile in (header, contents, index):
                 metafile.write(directory)
-

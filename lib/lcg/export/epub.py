@@ -37,10 +37,10 @@ class Constants(object):
     METADIR = 'META-INF'
     OPF_NS = 'http://www.idpf.org/2007/opf'
     DC_NS = 'http://purl.org/dc/elements/1.1/'
-    
+
 
 class EpubHtml5Exporter(lcg.Html5Exporter):
-    
+
     class Generator(lcg.Html5Exporter.Generator):
 
         def script(self, *args, **kwargs):
@@ -56,7 +56,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         r' ((fontfamily|mathcolor)=""|contenteditable="false"))'
     )
     _INVALID_RESOURCE_URI_CHARACTERS = re.compile(r'[^a-z0-9;,_+*/=\-\.\(\)]')
- 
+
     def __init__(self, *args, **kwargs):
         super(EpubHtml5Exporter, self).__init__(*args, **kwargs)
         self._resource_uri_dict = {}
@@ -70,7 +70,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
 
     def _export_table_of_contents(self, context, element):
         return ''
-        
+
     def _export_inline_image(self, context, element):
         g = self._generator
         image = element.image(context)
@@ -120,7 +120,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
 
     def _allow_flash_audio_player(self, context, audio):
         return False
-        
+
     def _media_player(self, context):
         return None
 
@@ -163,7 +163,7 @@ class EpubExporter(lcg.Exporter):
 
         def allow_interactivity(self):
             return self._allow_interactivity
-            
+
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
         super(EpubExporter, self).__init__(*args, **kwargs)
@@ -221,7 +221,7 @@ class EpubExporter(lcg.Exporter):
                         image.save(stream, image.format)
                         data = stream.getvalue()
                 epub.writestr(self._resource_path(resource), data)
-                              
+
             epub.writestr(self._publication_resource_path(self.Config.PACKAGE_DOC_FILENAME),
                           self._package_document(node, lang, resources, node_properties))
         finally:
@@ -240,10 +240,10 @@ class EpubExporter(lcg.Exporter):
         Retrieving the file data for other resources is usually application
         specific.  Thus this method may be implemented to support such
         application specific resource retrieval.
-        
+
         """
         return resource.get()
-    
+
     def _container_path(self, *components):
         #TODO replace forbidden characters as per spec
         def ensure_pathenc(component):

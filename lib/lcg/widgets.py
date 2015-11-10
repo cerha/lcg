@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class Widget(object):
 
     def __init__(self, *args, **kwargs):
         """Arguments:
-        
+
            label -- text to be used for aria-label attribute or the widget's
              root HTML element
            **kwargs -- other arguments passed to parent classes
@@ -95,7 +95,7 @@ class Widget(object):
         """
         g = context.generator()
         return g.div(content, **kwargs)
-        
+
     def _javascript_widget_arguments(self, context):
         """Return a sequence of additional JavaScript class constructor arguments.
 
@@ -130,16 +130,16 @@ class FoldableTree(Widget, lcg.Content):
     supporting JavaScript code.  Note, that folding must be enabled at each
     level of the tree by the 'foldable' flag of the node.  See
     'ContentNode.foldable()'.
-    
+
     """
 
     def __init__(self, node=None, tooltip=None, **kwargs):
         """Arguments:
-        
+
            tooltip -- tooltip of a button to expand/collapse the whole foldable
              tree at once.  If None, the button will not be created at all.
            **kwargs -- other arguments defined by the parent class
-           
+
         """
         self._node = node
         self._tooltip = tooltip
@@ -147,7 +147,7 @@ class FoldableTree(Widget, lcg.Content):
 
     def _javascript_widget_arguments(self, context):
         return (self._tooltip and context.translate(self._tooltip),)
-    
+
     def _export_widget(self, context):
         g = context.generator()
         current = context.node()
@@ -190,7 +190,7 @@ class FoldableTree(Widget, lcg.Content):
                 return g.escape('')
         return menu(self._node or current.root())
 
-    
+
 class Notebook(Widget, lcg.Container):
     """HTML Notebook widget.
 
@@ -206,18 +206,18 @@ class Notebook(Widget, lcg.Container):
 
     """
     _ALLOWED_CONTENT = (lcg.Section,)
-    
+
     def __init__(self, content, active=None, **kwargs):
         """Arguments:
 
            content -- sequence of 'lcg.Section' instances representing the tabs
            active -- id of the active tab or None
            **kwargs -- other arguments defined by the parent class
-           
+
         """
         self._active = active
         super(Notebook, self).__init__(content, **kwargs)
-    
+
     def names(self):
         # Avoid creation of the inner div (the name is present in outer div's cls).
         return ()
@@ -226,7 +226,7 @@ class Notebook(Widget, lcg.Container):
         if self._names:
             kwargs['cls'] += ' ' + ' '.join(self._names)
         return super(Notebook, self)._wrap_exported_widget(context, content, **kwargs)
-    
+
     def _export_widget(self, context):
         g = context.generator()
         switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#' + s.id(), title=s.descr(),
@@ -236,7 +236,7 @@ class Notebook(Widget, lcg.Container):
                         cls='notebook-switcher')
         return g.concat(switcher, lcg.Container.export(self, context))
 
-    
+
 class PopupMenuItem(object):
     """Popup menu item specification."""
 
@@ -266,7 +266,7 @@ class PopupMenuItem(object):
         self.callback_args = callback_args
         self.cls = cls
 
-    
+
 class PopupMenu(Widget, lcg.Content):
     """Popup menu widget.
 
@@ -290,7 +290,7 @@ class PopupMenu(Widget, lcg.Content):
         """
         self._items = items
         super(PopupMenu, self).__init__(**kwargs)
-    
+
     def _javascript_widget_arguments(self, context):
         items = [dict(label=context.translate(item.label),
                       tooltip=context.translate(item.tooltip),
@@ -352,7 +352,7 @@ class PopupMenuCtrl(Widget, lcg.Container):
         self._title = title
         self._active_area_selector = active_area_selector
         super(PopupMenuCtrl, self).__init__(content, **kwargs)
-    
+
     def _javascript_widget_arguments(self, context):
         return (self._active_area_selector,)
 
@@ -374,19 +374,19 @@ class CollapsiblePane(Widget, lcg.Section):
     content expansion state.
 
     """
-    
+
     def __init__(self, title, content, collapsed=True, in_toc=False, **kwargs):
         """Arguments:
-         
+
            title -- pane title as a basestring
            content -- 'lcg.Content' instance representing collapsible pane content
            collapsed -- pass False to make the pane initially expanded
            **kwargs -- other arguments defined by the parent class
-           
+
         """
         self._collapsed = collapsed
         super(CollapsiblePane, self).__init__(title, content, in_toc=in_toc, **kwargs)
-    
+
     def _javascript_widget_arguments(self, context):
         return (self._collapsed,)
 

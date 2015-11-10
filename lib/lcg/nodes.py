@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ class ContentNode(object):
             arguments for a complete list).  These variant specific values will
             take precedence over the same attributes passed directly as
             'ContentNode' arguments (see below).
-          content, page_header, first_page_header, 
+          content, page_header, first_page_header,
           page_footer, left_page_footer,
           right_page_footer, page_background,
           presentation -- default variants of node content and parameters may
@@ -148,7 +148,7 @@ class ContentNode(object):
         #               "Duplicate node id: %s, %s" % (n, seen[nid])
         #        seen[nid] = n
         self._used_content_resources = []
-        
+
     def __repr__(self):
         return "<%s[%x] id='%s'>" % (self.__class__.__name__, lcg.positive_id(self), self.id())
 
@@ -162,24 +162,24 @@ class ContentNode(object):
     def parent(self):
         """Return the parent node of this node."""
         return self._parent
-    
+
     def id(self):
         """Return a unique id of this node as a string."""
         return self._id
-        
+
     def title(self, brief=False):
         """Return the title of this node as a string.
 
         If a true value is passed to the optional argument 'brief', a shorter
         version of the title will be returned, when available.
-        
+
         """
         return brief and self._brief_title or self._title
-    
+
     def heading(self):
         """Return node heading as a 'Content' instance (see constructor)."""
         return self._heading
-    
+
     def descr(self):
         """Return a short description of this node as a string or None."""
         return self._descr
@@ -187,15 +187,15 @@ class ContentNode(object):
     def hidden(self):
         """Return True if this is a hidden node (should not appear in TOC)."""
         return self._hidden
-        
+
     def active(self):
         """Return the value of the 'active' flag as passed in the constructor.."""
         return self._active
-        
+
     def foldable(self):
         """Return the value of the 'foldable' flag as passed in the constructor.."""
         return self._foldable
-    
+
     def children(self):
         """Return all subordinate nodes as a tuple."""
         return self._children
@@ -221,7 +221,7 @@ class ContentNode(object):
                     return found
             return None
         return find(id, self)
-    
+
     def root(self):
         """Return the top-most node of the hierarchy."""
         if self._parent is None:
@@ -234,13 +234,13 @@ class ContentNode(object):
 
         When the optional argument `relative_to' is specified, the returned
         path is relative to this node, when it exists in the path.
-        
+
         """
         if self._parent is None or self._parent is relative_to:
             return (self,)
         else:
             return self._parent.path(relative_to=relative_to) + (self,)
-        
+
     def linear(self):
         """Return the linearized subtree of this node as a list."""
         return [self] + functools.reduce(lambda l, n: l + n.linear(), self.children(), [])
@@ -253,7 +253,7 @@ class ContentNode(object):
             return linear[i + 1]
         else:
             return None
-    
+
     def prev(self):
         """Return the node preceding this node in the linearized structure."""
         linear = self.root().linear()
@@ -312,7 +312,7 @@ class ContentNode(object):
 
         The optional argument 'cls' allows restriction of the returned resources by their type
         (class).
-        
+
         """
         resources = tuple(self._used_content_resources)
         if cls is not None:
@@ -320,7 +320,7 @@ class ContentNode(object):
         if self._resource_provider:
             resources += tuple(self._resource_provider.resources(cls=cls, node=self))
         return resources
-        
+
     def resource(self, filename, **kwargs):
         """Get the resource instance by its type and relative filename."""
         for lang in self.variants() or (None,):
@@ -352,7 +352,7 @@ class ContentNode(object):
         """Return the tuple of available language variants of this node.
 
         The returned tuple consists of just the language codes as basestrings.
-        
+
         """
         return self._variants
 
@@ -367,10 +367,10 @@ class ContentNode(object):
                 if result is not None:
                     return result
         return None
-        
+
     def content(self, lang=None):
         """Return the main document content for given language.
-        
+
         If 'lang' is not None, the appropriate language specific content passed
         to the constructor argument 'variants' is returned if found.  If given
         language is not found in variants or if given variant doesn't define
@@ -383,7 +383,7 @@ class ContentNode(object):
 
         """
         return self._variant(lang, 'content') or self._empty_content
-    
+
     def page_header(self, lang=None):
         """Return the page header content for given language.
 
@@ -399,7 +399,7 @@ class ContentNode(object):
 
         """
         return self._variant(lang, 'first_page_header') or self.page_header(lang)
-        
+
     def page_footer(self, lang=None):
         """Return the page footer content for given language.
 
@@ -447,7 +447,7 @@ class Variant(object):
                  page_footer=None, left_page_footer=None, right_page_footer=None,
                  page_background=None, presentation=None):
         """Arguments:
-        
+
           lang -- an ISO 639-1 Alpha-2 language code
           content -- The actual document content as a 'Content' instance or a
             sequence of 'Content' instances.
@@ -493,10 +493,10 @@ class Variant(object):
         self._right_page_footer = _content(right_page_footer)
         self._page_background = _content(page_background)
         self._presentation = presentation
-        
+
     def lang(self):
         return self._lang
-        
+
     def content(self):
         return self._content
 

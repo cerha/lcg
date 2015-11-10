@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ class SubstitutionIterator(object):
     In order to implement iterating behavior for particular substitution
     situation you should subclass this class and redefine the methods
     '_value()', '_next()' and '_reset()'.
-    
+
     """
     class NotStartedError(Exception):
         """Exception raised when 'value()' without previous 'next()' is called.
@@ -81,7 +81,7 @@ class SubstitutionIterator(object):
 
     def __init__(self):
         self.reset()
-        
+
     def value(self):
         """Return the current value of the iterator.
 
@@ -99,7 +99,7 @@ class SubstitutionIterator(object):
 
     def _value(self):
         return None
-    
+
     def next(self):
         """Advance the iterator to the next value.
 
@@ -112,13 +112,13 @@ class SubstitutionIterator(object):
 
     def _next(self):
         return False
-    
+
     def reset(self):
         """Reset the iterator to its initial state.
 
         After this operation the iterator can be used to generate all the
         substitution values again.
-        
+
         """
         self._started = False
         self._reset()
@@ -140,7 +140,7 @@ class Exporter(object):
 
     The exporting process itself is run by subsequent calls to the 'export()'
     method, passing it a context created by the 'context()' method.
-    
+
     """
 
     _RE_SPACE_MATCHER = re.compile('  +')
@@ -148,7 +148,7 @@ class Exporter(object):
     _TOC_MARKER_CHAR = u'\ue000'
     _HFILL = u'\ue001\ue001\ue001'
     _END_MARKER_CHAR = u'\n'
-    
+
     class Context(object):
         """Storage class containing complete data necessary for export.
 
@@ -164,7 +164,7 @@ class Exporter(object):
         be passed through the context in the on-line web environment).  The
         method '_init_kwargs()' may be overriden to process these specific
         arguments without the need to override the default constructor.
-        
+
         To use an extended context class, just define it as the 'Context'
         attribute of the derived 'Exporter' class (it is a nested class).
 
@@ -173,7 +173,7 @@ class Exporter(object):
             """Initialize the export context.
 
             Arguments:
-            
+
               exporter -- 'Exporter' instance to which this context belongs.
               node -- 'ContentNode' instance to be exported.
               lang -- Target language as an ISO 639-1 Alpha-2 lowercase
@@ -217,15 +217,15 @@ class Exporter(object):
             self._presentation = presentation
             self._localizer = self._exporter.localizer(lang, timezone=timezone)
             self._text_preprocessor = text_preprocessor
-            
+
         def _default_logging_function(self, message, kind=INFO):
             assert kind in (ERROR, WARNING, INFO)
             assert isinstance(message, basestring)
             self._messages.append((kind, message))
-            
+
         def exporter(self):
             return self._exporter
-        
+
         def lang(self):
             if self._secondary_language_active:
                 lang = self._sec_lang or self._lang
@@ -245,10 +245,10 @@ class Exporter(object):
                 yield None
             finally:
                 self._lang = old_lang
-    
+
         def node(self):
             return self._node
-            
+
         def locale_data(self):
             return self._localizer.locale_data()
 
@@ -264,18 +264,18 @@ class Exporter(object):
             if 'warn' not in kwargs:
                 kwargs['warn'] = lambda m: self.log(m, kind=WARNING)
             return self._node.resource(filename, **kwargs)
-        
+
         def uri(self, target, **kwargs):
             return self._exporter.uri(self, target, **kwargs)
 
         def toc_element(self, marker):
             return self._toc_markers[marker]
-            
+
         def add_toc_marker(self, element):
             marker = unicode(len(self._toc_markers))
             self._toc_markers[marker] = element
             return marker
-        
+
         def page_heading(self):
             return self._page_heading
 
@@ -284,7 +284,7 @@ class Exporter(object):
 
         def log(self, message, kind=INFO):
             """Record error or important information about the export progress.
-            
+
             This method should be used by export backends to report problems,
             errors or important information about the progress of the export.
             This information will be displayed to the user who invoked the
@@ -299,7 +299,7 @@ class Exporter(object):
 
               'lcg.WARNING' -- for minor or potential problems which don't make the
                 output unusable, but may require some attention.
- 
+
               'lcg.INFO' -- to display information about normal export progress.
 
             The problems are typically also visibly marked within the output,
@@ -315,7 +315,7 @@ class Exporter(object):
 
         def messages(self):
             """Return all messages logged during the export through the 'log()' method.
-        
+
             Return a tuple of pairs (KIND, MESSAGE) corresponding to the
             relevant 'log()' method arguments.  Returns None when the argument
             'log' is passed to the constructor (logging is performed through an
@@ -323,7 +323,7 @@ class Exporter(object):
 
             """
             return self._messages
-            
+
     def __init__(self, translations=()):
         self._translation_path = translations
         self._export_method = self._define_export_methods()
@@ -349,10 +349,10 @@ class Exporter(object):
             if prefix:
                 result = prefix + '/' + result
         return result
-    
+
     def _uri_external(self, context, target):
         return target.uri()
-    
+
     def _define_export_methods(self):
         return {lcg.Content: self._export_content,
                 lcg.HorizontalSeparator: self._export_horizontal_separator,
@@ -398,7 +398,7 @@ class Exporter(object):
                 lcg.Figure: self._export_figure,
                 lcg.Exercise: self._export_exercise,
                 }
-    
+
     def _export(self, node, context, recursive=False):
         context.position_info.append(node.heading().text())
         try:
@@ -421,7 +421,7 @@ class Exporter(object):
 
     def _adjusted_export(self, context, exported):
         return exported
-        
+
     def uri(self, context, target, **kwargs):
         """Return the URI of the target as string.
 
@@ -448,7 +448,7 @@ class Exporter(object):
     def localizer(self, lang, timezone=None):
         """Return a 'lcg.Localizer' instance for given language and time zone."""
         return lcg.Localizer(lang, timezone=timezone, translation_path=self._translation_path)
-    
+
     translator = localizer
     """Deprecated backwards compatibility alias - please use 'localizer' instead."""
 
@@ -476,7 +476,7 @@ class Exporter(object):
           context -- export context object created by the 'context()' method and
             propagated from the 'export()' method.  Instance of 'self.Context'.
           element -- 'Content' instance to be exported.
-          
+
         The supported element types are defined by the method '_define_export_methods()'.  If the
         'element' class is not found there directly, all its base classes are searched.
 
@@ -505,7 +505,7 @@ class Exporter(object):
             toc_marker = context.add_toc_marker(element)
             exported = self.concat(self._marker(self._TOC_MARKER_CHAR, toc_marker), exported)
         return exported
-        
+
     def export(self, context, recursive=False):
         """Export the node represented by 'context' and return the corresponding output string.
 
@@ -522,7 +522,7 @@ class Exporter(object):
         """Escape 'text' for the output format and return the resulting string.
 
         In this class the method returns value of 'text'.
-        
+
         """
         return text
 
@@ -624,31 +624,31 @@ class Exporter(object):
 
         In this class the method just returns the escaped element text.  It
         should not be necessary to override this method in derived classes.
-        
+
         """
         return self.text(context, element.text(), lang=element.lang(), reformat=True)
-        
+
     def _export_abbreviation(self, context, element):
         """Export the given 'Abbreviation' element.
 
         In this class the method just returns the escaped anchor text.
-        
+
         """
         return self._export_text_content(context, element)
-    
+
     def _export_anchor(self, context, element):
         """Export the given 'Anchor' element.
 
         In this class the method just returns the escaped anchor text.
-        
+
         """
         return self._export_text_content(context, element)
-    
+
     def _export_new_page(self, context, element):
         """Export the given 'NewPage' element.
 
         In this class the method just returns the page break character.
-        
+
         """
         return '\f'
 
@@ -656,7 +656,7 @@ class Exporter(object):
         """Export the given 'NewLine' element.
 
         In this class the method just returns the page break character.
-        
+
         """
         return self._newline(context)
 
@@ -696,23 +696,23 @@ class Exporter(object):
     def _export_strong(self, context, element):
         """Export the given 'Strong' element."""
         return self._export_container(context, element)
-                
+
     def _export_emphasized(self, context, element):
         """Export the given 'Emphasized' element."""
         return self._export_container(context, element)
-                
+
     def _export_underlined(self, context, element):
         """Export the given 'Underlined' element."""
         return self._export_container(context, element)
-                
+
     def _export_code(self, context, element):
         """Export the given 'Code' element."""
         return self._export_container(context, element)
-                
+
     def _export_citation(self, context, element):
         """Export the given 'Citation' element."""
         return self._export_container(context, element)
-                
+
     def _export_quotation(self, context, element):
         """Export the given 'Quotation' element."""
         exported = self._export_container(context, element)
@@ -738,11 +738,11 @@ class Exporter(object):
     def _export_superscript(self, context, element):
         """Export the given 'Superscript' element."""
         return self._export_container(context, element)
-                
+
     def _export_subscript(self, context, element):
         """Export the given 'Subscript' element."""
         return self._export_container(context, element)
-                
+
     def _export_title(self, context, element):
         """Export the given 'Title' element.
 
@@ -768,7 +768,7 @@ class Exporter(object):
         """Export verbatim text of given 'lcg.PreformattedText' element.
 
         In this class the method returns just the escaped element text.
-        
+
         """
         text = element.text()
         lang = element.lang()
@@ -819,7 +819,7 @@ class Exporter(object):
                 value = unicode(value)
             result = self.escape(value)
         return result
-    
+
     def _export_set_variable(self, context, element):
         """Set node variable defined by 'element'.
 
@@ -830,12 +830,12 @@ class Exporter(object):
         return self._export_content(context, lcg.Content())
 
     # Container elements
-    
+
     def _export_container(self, context, element):
         """Export given 'lcg.Container' element.
 
         In this class the method exports the contained content elements and concatenates them.
-        
+
         """
         exported = []
         for content in element.content():
@@ -852,13 +852,13 @@ class Exporter(object):
 
     def _link_content_is_url(self, context, label):
         return label.startswith('http:')
-        
+
     def _export_link(self, context, element):
         """Export given 'Link' element.
 
         In this class the method returns link description (if available) and
         the link target URL.
-        
+
         """
         label = element.descr()
         if not label:
@@ -887,7 +887,7 @@ class Exporter(object):
 
         In this class the method returns section title and contents separated by empty
         lines.
-        
+
         """
         toc_marker = context.add_toc_marker(element)
         context.position_info.append(element.title())
@@ -902,7 +902,7 @@ class Exporter(object):
     def _export_heading(self, context, element):
         """Export given 'Heading' element."""
         return self._export_container(context, element)
-        
+
     def _export_itemized_list(self, context, element, lang=None):
         """Export given 'ItemizedList' element."""
         numbering = element.order()
@@ -979,7 +979,7 @@ class Exporter(object):
     def _export_field_set(self, context, element):
         """Export given 'FieldSet' element."""
         return self._export_definition_list(context, element)
-            
+
     def _export_paragraph(self, context, element):
         """Export given 'lcg.Paragraph' element."""
         items = [self._export_container(context, element),
@@ -1101,7 +1101,7 @@ class Exporter(object):
     def _export_table_row(self, context, element):
         """Export given 'TableRow' element."""
         return [c.export(context) for c in element.content()]
-        
+
     def _export_table_cell(self, context, element):
         """Export given 'TableCell' element."""
         return self._export_container(context, element)
@@ -1150,9 +1150,9 @@ class Exporter(object):
 
     def _export_inline_image(self, context, element):
         """Export embedded image for given 'InlineImage' element.
-        
+
         In this class the method returns just the escaped image title.
-        
+
         """
         return self._inline_export(context, element, element.image(context), lang=element.lang())
 
@@ -1176,7 +1176,7 @@ class Exporter(object):
         """Export embedded video player for given 'InlineExternalVideo' element.
 
         In this class the method returns just the escaped video title.
-        
+
         """
         label = (element.title() or
                  "Embedded Video %s id=%s" % (element.service(), element.video_id()))
@@ -1332,11 +1332,11 @@ class Exporter(object):
         """Export 'MathML' element.
 
         In this class the method returns the raw MathML content.
-        
+
         """
         return element.content()
-    
-        
+
+
 class FileExporter(object):
     """Mix-in class exporting content into files.
 
@@ -1371,7 +1371,7 @@ class FileExporter(object):
         if lang is not None and ((len(node.variants()) > 1) or (self._force_lang_ext)):
             name += '.' + lang
         return name + '.' + self._OUTPUT_FILE_EXT
-    
+
     def _export_resource(self, resource, dir):
         infile = resource.src_file()
         if resource.SUBDIR:
@@ -1411,7 +1411,7 @@ class FileExporter(object):
                 command = cmd.replace('%infile', infile).replace('%outfile', outfile)
                 if os.system(command):
                     raise IOError("Subprocess returned a non-zero exit status.")
-    
+
     def dump(self, node, directory, filename=None, variant=None, recursive=False,
              **kwargs):
         """Write node's content into the output file.
@@ -1458,7 +1458,7 @@ class UnsupportedElementType(Exception):
 
 class TextExporter(FileExporter, Exporter):
     _OUTPUT_FILE_EXT = 'text'
-    
+
     def _adjusted_export(self, context, exported):
         return string.join([line for line in exported.split('\n')
                             if self._text_mark(line) is None],

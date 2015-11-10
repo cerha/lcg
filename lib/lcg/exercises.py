@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class Task(object):
 
     Tasks are not the 'Content' instances.  They are not able to render
     themselves.  They just hold the data.
-    
+
     """
 
     def __init__(self, prompt, comment=None, media=None):
@@ -70,7 +70,7 @@ class Task(object):
 
     def prompt(self):
         return self._prompt
-    
+
     def comment(self):
         return self._comment
 
@@ -106,7 +106,7 @@ class TextTask(Task):
 
     def answers(self):
         """Return all answers from all fields found within the task text.
-        
+
         Returns the whole task text if it doesn't contain explicitly marked
         text fields (the wole text is the answer in this case).
 
@@ -126,7 +126,7 @@ class TextTask(Task):
         """Substitute text boxes within task text.
 
         Arguments:
-  
+
           text - the text to be substituted containing textbox markup (answers
             in square brackets).  This is usually the task text as returned by
             'text()', but various export formats may require various
@@ -195,17 +195,17 @@ class Choice(object):
     def correct(self):
         return self._correct
 
-        
+
 class ChoiceTask(Task):
     """Abstract base class for all choice-based tasks."""
-    
+
     def __init__(self, prompt, choices, **kwargs):
         """Initialize the instance.
 
         Arguments:
-        
+
           choices -- sequence of 'Choice' instances related to this Task.
-          
+
         """
         assert all(isinstance(choice, Choice) for choice in choices) and len(choices) > 1, choices
         self._choices = list(choices)
@@ -225,19 +225,19 @@ class ChoiceTask(Task):
 
     def choice_index(self, choice):
         return self._choices.index(choice)
-        
-        
+
+
 class TrueFalseTask(ChoiceTask):
 
     def __init__(self, statement, correct=True, **kwargs):
         """Initialize the instance.
 
         Arguments:
-        
+
           statement -- exercise within the containing section.
           correct -- boolean flag indicating whether the statement is correct
             or not (true when it is correct).
-          
+
         """
         assert isinstance(correct, bool)
         # Translators: Labels for exercise buttons. Keep in capitals.
@@ -274,7 +274,7 @@ class ExerciseParser(object):
 
     def _parse_text(self, text):
         return self._parser.parse_inline_markup(text.strip())
-    
+
     def _single_text_box_task(self, prompt, text, **kwargs):
         task = TextTask(prompt, text.strip(), **kwargs)
         if len(task.answers()) != 1:
@@ -386,7 +386,7 @@ class ExerciseParser(object):
 
     def parse(self, exercise_type, src, **kwargs):
         """Convert textual exercise specification into an Exercise instance.
-        
+
         Returns 'lcg.Exercise' instance on success or 'lcg.Container' instance
         with error information if the exercise specification is invalid.
 
@@ -521,13 +521,13 @@ class Exercise(lcg.Content):
     def _check_task(self, task):
         assert isinstance(task, self._TASK_TYPE), \
             "Not a %s instance: %r" % (self._TASK_TYPE.__name__, task)
-        
+
     def instructions(self):
         return self._instructions
 
     def answers(self):
         """Return all correct answers for all tasks within the exercise.
-        
+
         Returns a sequence of answers in the form expected by the Javascript
         exercise evaluation handler.  Typically this is a list of choice
         indexex for choice based exercises or a list of text answers for
@@ -738,7 +738,7 @@ class _SingleTextBoxFillInExercise(FillInExercise):
     def _check_task(self, task):
         super(_SingleTextBoxFillInExercise, self)._check_task(task)
         assert len(task.answers()) == 1
-            
+
 
 class VocabExercise(_SingleTextBoxFillInExercise):
     """A small text-field for each vocabulary item on a separate row."""
@@ -811,7 +811,7 @@ class NumberedCloze(_SingleTextBoxFillInExercise):
 
 The city is split by the River [Thames] into North and South.
 """)
-    
+
 
 class Cloze(FillInExercise):
     """Paragraphs of text including text-fields for the marked words."""

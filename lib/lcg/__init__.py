@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ from .content import Content, Container, Strong, Emphasized, \
     Table, Section, TableOfContents, NodeIndex, RootIndex, NoneContent, \
     SetVariable, Substitution, Figure, MathML, \
     coerce, join, link, dl, ul, ol, fieldset, p, strong, em, u, \
-    code, cite, container, br, hr, pre, abbr 
+    code, cite, container, br, hr, pre, abbr
 
 from .widgets import Widget, FoldableTree, Notebook, PopupMenuCtrl, \
     PopupMenuItem, CollapsiblePane
@@ -109,4 +109,3 @@ from .read import Reader, FileReader, StructuredTextReader, DocFileReader, \
 
 from .transform import data2content, data2html, html2data, \
     HTML2XML, XML2HTML, XML2Content
-

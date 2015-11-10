@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008-2015 Brailcom, o.p.s.
+# Copyright (C) 2008-2015 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #

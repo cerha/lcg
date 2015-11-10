@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ lcg.config.default_resource_dir = os.path.join(lcg_dir, 'resources')
 translation_path = [os.path.join(lcg_dir, 'translations')]
 
 class TranslatableText(unittest.TestCase):
-          
+
     def test_interpolation(self):
         a = lcg.TranslatableText("Hi %s, say hello to %s.", "Joe", "Bob")
         b = lcg.TranslatableText("Hi %(person1)s, say hello to %(person2)s.",
@@ -55,7 +55,7 @@ class TranslatableText(unittest.TestCase):
         self.assertEqual(a1, "Hi Joe, say hello to Bob.")
         self.assertEqual(b1, "Hi Joe, say hello to Bob.")
         self.assertEqual(c1, "Hi -person1-, say hello to -person2-.")
-        
+
     def test_addition(self):
         a = lcg.TranslatableText("Version %s", "1.0")
         b = "xxx"
@@ -75,7 +75,7 @@ class TranslatableText(unittest.TestCase):
         except TypeError as e:
             pass
         self.assertIsInstance(e, TypeError)
-            
+
     def test_concat(self):
         a = lcg.concat(lcg.TranslatableText("Version %s", "1.0") + 'xx',
                        'yy', separator="\n")
@@ -89,7 +89,7 @@ class TranslatableText(unittest.TestCase):
         c = lcg.concat('a', (u'b', 'c', 'd'), 'e', 'f', separator='-')
         self.assertIsInstance(c, unicode)
         self.assertEqual(c, 'a-b-c-d-e-f')
-        
+
     def test_replace(self):
         t = lcg.TranslatableText("Version %s", "xox")
         a = t + '-yoy'
@@ -156,7 +156,7 @@ class TranslatableText(unittest.TestCase):
                 assert isinstance(result, lcg.HtmlEscapedUnicode)
             else:
                 assert not isinstance(result, lcg.HtmlEscapedUnicode)
-            
+
         g = lcg.HtmlExporter.Generator()
         a = lcg.TranslatableText("Hi %s, say hello to %s.", g.strong("Joe"), g.strong("Bob"))
         test(a,
@@ -189,7 +189,7 @@ tests.add(TranslatableText)
 
 
 class TranslatablePluralForms(unittest.TestCase):
-          
+
     def test_translation(self):
         loc = lcg.Localizer('cs', translation_path=translation_path)
         for n, translated in ((1, u"Mám 1 problém."),
@@ -198,7 +198,7 @@ class TranslatablePluralForms(unittest.TestCase):
             a = _.ngettext("I have %d problem.", "I have %d problems.", n)
             b = a.localize(loc)
             self.assertEqual(b, translated)
-        
+
     def test_interpolation(self):
         t = lcg.Localizer('cs', translation_path=translation_path)
         for n, translated in ((1, u"1 záznam nalezen v tabulce xy."),
@@ -208,7 +208,7 @@ class TranslatablePluralForms(unittest.TestCase):
                            "%(n)d records found in table %(name)s.", n=n, name='xy')
             b = a.localize(t)
             self.assertEqual(b, translated)
-        
+
     def test_replace(self):
         loc = lcg.Localizer('cs', translation_path=translation_path)
         for n, ta, tb in ((1, u"Mám 1 problém.", u"1 záznam nalezen v tabulce xy."),
@@ -225,12 +225,12 @@ class TranslatablePluralForms(unittest.TestCase):
             b2 = b1.localize(loc)
             tb1 = tb.replace('5', '123')
             self.assertEqual(b2, tb1)
-            
+
 tests.add(TranslatablePluralForms)
 
 
 class SelfTranslatableText(unittest.TestCase):
-          
+
     def test_interpolation(self):
         text = "%(person1)s is smarter than %(person2)s."
         translations = {'cs': u"%(person1)s je chytřejší než %(person2)s."}
@@ -245,7 +245,7 @@ class SelfTranslatableText(unittest.TestCase):
         c2 = a3.localize(lcg.Localizer('cs', translation_path=translation_path))
         self.assertEqual(b2, "-person1- is smarter than -person2-.")
         self.assertEqual(c2, u"-person1- je chytřejší než -person2-.")
-        
+
 tests.add(SelfTranslatableText)
 
 class LocalizableDateTime(unittest.TestCase):
@@ -264,7 +264,7 @@ class LocalizableDateTime(unittest.TestCase):
                 return "GMT %+d" % div * sign
         def dst(self, dt):
             return datetime.timedelta(0)
-    
+
     def test_localize(self):
         d1 = lcg.LocalizableDateTime("2006-12-21")
         d2 = lcg.LocalizableDateTime("2006-12-21 02:43", show_time=False)
@@ -298,7 +298,7 @@ class LocalizableDateTime(unittest.TestCase):
         self.assertEqual(y4, u"Čt 21.12.2006 18:43:32")
         self.assertEqual(y5, "30.1.2006")
         self.assertEqual(y6, u"21.12.2006 17:43:32")
-        
+
     def test_concat(self):
         d = lcg.LocalizableDateTime("2006-01-30")
         c = "Date is: " + d
@@ -367,7 +367,7 @@ class Monetary(unittest.TestCase):
         self.assertEqual(a1, '8975.50')
         self.assertEqual(a2, u'8\xa0975,50')
         self.assertEqual(a3, '8,975.50')
-    
+
     def test_precision(self):
         a = lcg.Monetary(8975.5, precision=0)
         b = lcg.Monetary(8975.5, precision=3)
@@ -383,7 +383,7 @@ class Monetary(unittest.TestCase):
         b1 = lcg.Localizer().localize(b)
         self.assertEqual(a1, '8975.50')
         self.assertEqual(b1, '8975,50')
-        
+
 tests.add(Monetary)
 
 
@@ -399,7 +399,7 @@ tests.add(GettextTranslator)
 
 
 class ContentNode(unittest.TestCase):
-    
+
     def test_node_structure(self):
         d = lcg.ContentNode('d')
         c = lcg.ContentNode('c', children=(d,))
@@ -446,7 +446,7 @@ class ContentNode(unittest.TestCase):
         self.assertEqual(n.page_background('fr').text(), 'B')
         # Lang must be passed to .content() when variants are defined,
         # but may be omitted when no variants are passed to ContentNode.
-        self.assertRaises(AssertionError, n.content) 
+        self.assertRaises(AssertionError, n.content)
         n2 = lcg.ContentNode('n', content=lcg.TextContent("C"))
         self.assertEqual(n2.content().text(), 'C')
 
@@ -461,7 +461,7 @@ tests.add(ContentNode)
 
 
 class Resources(unittest.TestCase):
-    
+
     def test_provider(self):
         warnings = []
         def warn(msg):
@@ -479,7 +479,7 @@ class Resources(unittest.TestCase):
         r = p.resource('default.css')
         self.assertIsInstance(r, lcg.Stylesheet)
         self.assertEqual(len(warnings), 2, warnings)
-        
+
     def test_dependencies(self):
         p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),
                                             lcg.Audio('sound2.ogg')))
@@ -501,7 +501,7 @@ class Parser(unittest.TestCase):
 
     def setUp(self):
         self._parser = lcg.Parser()
-        
+
     def test_simple_text(self):
         text = "Hallo, how are you?\n\n  * one\n  * two\n  * three\n"
         c = self._parser.parse(text)
@@ -618,7 +618,7 @@ blah blah
      Next line 1.
 
      Next paragraph 1.
-     
+
   b. Ordered item 2.
 
      Next paragraph 2.
@@ -649,7 +649,7 @@ blah blah
         c = self._parser.parse('hello\n\nworld')
         self.assertEqual(c[0].content()[0].content()[0].text()[-1], 'o',
                         "Extra newline after paragraph?")
-                
+
 tests.add(Parser)
 
 class MacroParser(unittest.TestCase):
@@ -679,7 +679,7 @@ class MacroParser(unittest.TestCase):
         r = lcg.MacroParser(globals=dict(a=5, b=0, c=2)).parse(text)
         self.assertEqual(r, "A\nZeroDivisionError: integer division or modulo by zero\nB\n\n",
                         repr(r))
-        
+
     def test_condition_newlines(self):
         text = "A\n@if x\nX\n@endif\n\nB\n\n"
         r = lcg.MacroParser(globals=dict(x=True)).parse(text)
@@ -744,7 +744,7 @@ class HtmlImport(unittest.TestCase):
  <p>
          Odstavec sekce.</p>
  <pre>
- předformátovaný 
+ předformátovaný
  řádkovaný text</pre>
  <div>
          obecný blok</div>
@@ -828,12 +828,12 @@ A screen reader is:
         context = lcg.HtmlExporter().context(n, None)
         content.export(context)
         lcg.html2data(html, lcg.HTML2XML)
-        
+
 tests.add(HtmlImport)
 
 
 class HtmlExport(unittest.TestCase):
-    
+
     def test_generator(self):
         g = lcg.HtmlGenerator()
         localizer = lcg.Localizer('cs', translation_path=translation_path)
@@ -845,7 +845,7 @@ class HtmlExport(unittest.TestCase):
         ):
             result = localizer.localize(generated)
             self.assertEqual(result, html, "\n  - expected: %r\n  - got:      %r" % (html, result))
-            
+
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
                             globals=dict(x='value of x'))
@@ -877,7 +877,7 @@ class HtmlExport(unittest.TestCase):
             self.assertEqual(result, html,
                             "\n  - content:  %r\n  - expected: %r\n  - got:      %r" %
                             (content, html, result,))
-            
+
     def test_formatting(self):
         def check(result, expected_result):
             if isinstance(expected_result, basestring):
@@ -2015,7 +2015,7 @@ class BrailleExport(unittest.TestCase):
   <mn>1242</mn>
 </mstack>
 </math>''', u'⠀⠀⠀⠆⠒\n⠀⠈⠡⠢⠲\n⠒⠒⠒⠒⠒⠒\n⠀⠀⠀⠔⠆\n⠀⠂⠂⠢\n⠒⠒⠒⠒⠒⠒\n⠀⠂⠆⠲⠆', page_height=True)
-        
+
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
         # bindings to it work and that there is no big problem.
@@ -2073,7 +2073,7 @@ tests.add(PDFExport)
 
 
 class Presentations(unittest.TestCase):
-    
+
     def test_style_file(self):
         style_file = lcg.StyleFile()
         f = open(os.path.join(lcg_dir, 'styles', 'standard'))
@@ -2094,7 +2094,7 @@ class Presentations(unittest.TestCase):
 
 tests.add(Presentations)
 
-        
+
 def get_tests():
     return tests
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2011, 2012, 2013, 2014, 2015 Brailcom, o.p.s.
+# Copyright (C) 2011-2015 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -222,7 +222,7 @@ class ContentMatcher(object):
 
           content -- 'Content' instance
           lang -- lowercase ISO 639-1 Alpha-2 language code; string
-        
+
         """
         return True
 
@@ -236,33 +236,33 @@ class TopLevelMatcher(ContentMatcher):
     def matches(self, content, lang):
         """Return true iff 'content' is 'None'."""
         return content is None
-        
+
 
 class LanguageMatcher(ContentMatcher):
     """Langugage based matching, ignoring content.
 
     The matcher takes a language specifications and matches it with equal or
     unspecified languages.
-    
+
     """
     def __init__(self, lang):
         """
         Arguments:
 
           lang -- lowercase ISO 639-1 Alpha-2 language code; string or 'None'
-          
+
         """
         super(LanguageMatcher, self).__init__()
         assert lang is None or isinstance(lang, basestring), lang
         self._lang = None
-        
+
     def matches(self, content, lang):
         """Return true iff 'lang' matches the matcher's language.
 
         If any of the languages is 'None', return true.
 
         'content' is ignored.
-        
+
         """
         assert lang is None or isinstance(lang, basestring), lang
         return self._lang is None or lang is None or lang == self._lang
@@ -280,7 +280,7 @@ class LCGClassMatcher(ContentMatcher):
         """
         assert issubclass(content_class, lcg.Content), content_class
         self._content_class = content_class
-        
+
     def matches(self, content, lang):
         return isinstance(content, self._content_class)
 
@@ -322,13 +322,13 @@ class LCGContainerMatcher(LCGClassMatcher):
         return (super(LCGContainerMatcher, self).matches(content, lang) and
                 self._name in content.names())
 
-    
+
 class PresentationSet(object):
     """Group of 'Presentation' objects, together with their matchers.
 
     The class can create a common 'Presentation' object from filtered
     presentations, see 'presentation()' method.
-    
+
     """
     def __init__(self, presentations):
         """
@@ -453,7 +453,7 @@ class StyleFile(object):
     property identifiers in '_PROPERTY_MAPPING' attribute.  The user can define
     his own styles with his own names (all lower case identifiers are
     recommended) and inherit them in the supported styles or his other styles.
-    
+
     """
     _MATCHERS = (('Common', TopLevelMatcher(),),
                  ('Heading_1', LCGHeadingMatcher(1),),
@@ -469,7 +469,7 @@ class StyleFile(object):
                          ('bold', 'bold', _parse_boolean,),
                          ('italic', 'italic', _parse_boolean,),
                          )
-                         
+
     class _Style(object):
         name = None
         inherits = ()
@@ -477,7 +477,7 @@ class StyleFile(object):
 
     class ParseError(Exception):
         pass
-        
+
     def __init__(self):
         self._styles = []
         self._names_styles = {}

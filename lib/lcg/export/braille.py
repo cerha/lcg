@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012, 2013, 2014, 2015 Brailcom, o.p.s.
+# Copyright (C) 2012-2015 Brailcom, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ def braille_presentation(presentation_file='presentation-braille.py'):
     Arguments:
 
       presentation_file -- base name of the presentation file to be used; string
-      
+
     """
     presentation = Presentation()
     filename = os.path.join(os.path.dirname(__file__), 'styles', presentation_file)
@@ -101,7 +101,7 @@ def braille_presentation(presentation_file='presentation-braille.py'):
     return presentation
 
 class _Braille(object):
-    
+
     def __init__(self, text, hyphenation=None):
         assert isinstance(text, basestring), text
         assert hyphenation is None or isinstance(hyphenation, basestring), hyphenation
@@ -163,7 +163,7 @@ class BrailleError(Exception):
         Arguments:
 
           message -- message explaining the error; unicode
-          
+
         """
         assert isinstance(message, basestring), message
         super(BrailleError, self).__init__(message, *args)
@@ -304,9 +304,9 @@ from nemeth import mathml_nemeth
 
 class BrailleExporter(FileExporter, Exporter):
     "Transforming structured content objects to Braille output."
-    
+
     _OUTPUT_FILE_EXT = 'brl'
-    
+
     _PAGE_START_CHAR = '\ue010' # recommended page break + priority
     _PAGE_END_CHAR = '\ue011' # end of a single-page object
     _PAGE_START_REPEAT_CHAR = '\ue012' # end of repeating lines from the first page start (headers)
@@ -381,7 +381,7 @@ class BrailleExporter(FileExporter, Exporter):
 
         def page_number(self):
             return self._page_number
-        
+
         def advance_page_number(self):
             page_number = self._page_number
             self._page_number += 1
@@ -866,7 +866,7 @@ class BrailleExporter(FileExporter, Exporter):
         if device_finish is not None:
             output += device_finish
         return output
-            
+
     # Basic utilitites
 
     def concat(self, *items):
@@ -874,7 +874,7 @@ class BrailleExporter(FileExporter, Exporter):
                         string.join([i.hyphenation() for i in items], ''))
 
     _per_cent_regexp = re.compile('([ ⠀]+)⠼[⠏⠗]')
-    
+
     def text(self, context, text, lang=None, reformat=False):
         """Return 'text' converted to Unicode Braille characters.
 
@@ -1027,7 +1027,7 @@ class BrailleExporter(FileExporter, Exporter):
             assert page_start >= 0 and page_start < 10, page_start
             braille += self._marker(self._PAGE_START_CHAR, page_start)
         return braille
-    
+
     def _ensure_newlines(self, context, exported, number=1):
         real_number = 0
         text = exported.text()
@@ -1099,7 +1099,7 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _separator(self, context):
         return ' - '
-        
+
     def _marker(self, marker, argument=''):
         mark = super(BrailleExporter, self)._marker(marker, argument)
         return _Braille(mark)
@@ -1109,13 +1109,13 @@ class BrailleExporter(FileExporter, Exporter):
     def _export_text_content(self, context, element):
         text = context.alternate_text(element)
         return self.text(context, text, lang=element.lang(), reformat=True)
-    
+
     def _export_new_page(self, context, element):
         return _Braille('\f', self.HYPH_NO)
 
     def _export_horizontal_separator(self, context, element, width=64):
         return _Braille('\n', self.HYPH_NO)
-    
+
     def _export_title(self, context, element):
         title = super(BrailleExporter, self)._export_title(context, element)
         return self.text(context, title, lang=element.lang())
@@ -1153,7 +1153,7 @@ class BrailleExporter(FileExporter, Exporter):
                                self._export_container(context, element))
         finally:
             context.position_info.pop()
-            
+
     # Inline constructs (text styles).
 
     def _inline_braille_export(self, context, element, form=None, lang=None, hyphenate=None):
@@ -1171,10 +1171,10 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _export_code(self, context, element):
         return self._inline_braille_export(context, element)
-     
+
     def _export_underlined(self, context, element):
         return self._inline_braille_export(context, element, louis.underline)
-    
+
     def _export_superscript(self, context, element):
         lang = context.lang()
         braille = self._inline_braille_export(context, element)
@@ -1182,7 +1182,7 @@ class BrailleExporter(FileExporter, Exporter):
             braille.prepend('⠌', self.HYPH_NO)
             braille.append('⠱', self.HYPH_NO)
         return braille
-    
+
     def _export_subscript(self, context, element):
         lang = context.lang()
         braille = self._inline_braille_export(context, element)
@@ -1190,7 +1190,7 @@ class BrailleExporter(FileExporter, Exporter):
             braille.prepend('⠡', self.HYPH_NO)
             braille.append('⠱', self.HYPH_NO)
         return braille
-    
+
     def _export_citation(self, context, element):
         lang = element.lang(inherited=False) or context.sec_lang()
         hyphenate = (lang == context.lang())
@@ -1204,11 +1204,11 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _transform_link_heading(self, context, heading):
         return heading.export(context)[0]
-    
+
     def _link_content_is_url(self, context, label):
         http_prefix = self.text(context, 'http:')[0]
         return label.startswith(http_prefix)
-        
+
     def _export_link(self, context, element):
         label = self._export_container(context, element)
         if not label:
@@ -1275,7 +1275,7 @@ class BrailleExporter(FileExporter, Exporter):
                 context.log(unicode(exception), kind=lcg.ERROR)
                 return _Braille('')
         return result
-    
+
     def _export_table_cell(self, context, element):
         exported = super(BrailleExporter, self)._export_table_cell(context, element)
         text, hyphenation = exported.text(), exported.hyphenation()
@@ -1493,7 +1493,7 @@ class BrailleExporter(FileExporter, Exporter):
             exported.append(content[i].export(context))
             context.set_compactness(orig_compactness)
         return exported
-        
+
     def _export_table_heading(self, context, element):
         compactness = context.compactness()
         prefix = compactness.get('prefix')
@@ -1509,9 +1509,9 @@ class BrailleExporter(FileExporter, Exporter):
         if prefix or suffix:
             context.set_compactness(compactness)
         return exported
-        
+
     # Mathematics
-    
+
     def _export_mathml(self, context, element):
         math_rules = context.node_presentation().braille_math_rules
         if math_rules == 'nemeth':
@@ -1529,10 +1529,10 @@ class BrailleExporter(FileExporter, Exporter):
         braille = xml2braille(xml)
         hyphenation_list = [self.HYPH_WS if c == '⠀' else self.HYPH_NO for c in braille]
         return _Braille(braille, string.join(hyphenation_list, ''))
-        
+
     def _export_mathml_nemeth(self, context, element):
         return mathml_nemeth(self, context, element)
-        
+
     def _export_mathml_czech(self, context, element):
         class EntityHandler(element.EntityHandler):
             def __init__(self, *args, **kwargs):

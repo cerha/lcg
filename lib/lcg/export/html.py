@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -665,7 +665,7 @@ class HtmlExporter(lcg.Exporter):
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
     _MATHML_XMLNS = re.compile(r'<math [^>]* xmlns=".*')
-        
+
     def __init__(self, *args, **kwargs):
         self._generator = self.Generator()
         super(HtmlExporter, self).__init__(*args, **kwargs)

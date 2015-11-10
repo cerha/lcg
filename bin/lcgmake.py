@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -299,7 +299,7 @@ Environment variables:
              includes only source directories).  Also the directory
              '$LCGDIR/translations' will be added to the beginning of the
              translation path (specified by --translations).
-             
+
 
 """
     die(help % (os.path.split(argv[0])[-1], dumpoptions(width=80, indent=2)))
@@ -313,7 +313,7 @@ def lcg_exception_details(title, details=[], reason=None):
       reason -- reason for the error (error message)
 
     Multi-line texts in 'details' are delimited by markings for easier reading.
-      
+
     """
     def format(line):
         # Format one record in information output.
@@ -367,6 +367,6 @@ def run(argv):
             import pdb
             pdb.post_mortem(sys.exc_info()[2])
         sys.exit(1)
-    
+
 if __name__ == "__main__":
     run(sys.argv)

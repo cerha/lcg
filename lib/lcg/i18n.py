@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,12 +54,12 @@ class TranslatableTextFactory(object):
     def domain(self):
         """Return the domain name as set in the constructor."""
         return self._domain
-        
+
     def __call__(self, *args, **kwargs):
         kwargs['_domain'] = self._domain
         kwargs['_origin'] = self._origin
         return TranslatableText(*args, **kwargs)
-    
+
     def ngettext(self, *args, **kwargs):
         kwargs['_domain'] = self._domain
         kwargs['_origin'] = self._origin
@@ -68,7 +68,7 @@ class TranslatableTextFactory(object):
 
 class TranslatedTextFactory(TranslatableTextFactory):
     """Like 'TranslatableTextFactory', but usable also in desktop application environment.
-    
+
     We need to maintain the functionality of the base class (produce
     translatable strings), but we need to translate the strings in advance as
     well.  This will make the translation work both in web and desktop
@@ -83,14 +83,14 @@ class TranslatedTextFactory(TranslatableTextFactory):
     """
     def __init__(self, domain, origin='en', lang=None, translation_path=()):
         """Arguments:
-        
+
           domain, origin -- as in base class.
-        
+
           lang -- target language code as a string.
 
           translation_path -- a sequence of directory names to search for
             translations.  As in 'GettextTranslator'.
-        
+
         """
         # Create localizer to make use of its translator instance cache.
         localizer = lcg.Localizer(lang=lang, translation_path=translation_path, timezone=None)
@@ -103,14 +103,14 @@ class TranslatedTextFactory(TranslatableTextFactory):
     def __call__(self, text, *args, **kwargs):
         kwargs['_orig_text'] = text
         return super(TranslatedTextFactory, self).__call__(self._gettext(text), *args, **kwargs)
-    
+
     def ngettext(self, singular, plural, *args, **kwargs):
         kwargs['_singular_orig_text'] = singular
         kwargs['_plural_orig_text'] = plural
         return super(TranslatedTextFactory, self).ngettext(self._gettext(singular),
                                                            self._gettext(plural),
                                                            *args, **kwargs)
-    
+
 
 class Localizable(unicode):
     """Common superclass of all localizable classes.
@@ -127,7 +127,7 @@ class Localizable(unicode):
     permitted:
 
       * concatenation using the 'concat' function defined below.
-      
+
       * concatenation using the '+' operator with other string, unicode,
         'TranslatableText' or 'Concatenation' instances.
 
@@ -151,7 +151,7 @@ class Localizable(unicode):
     def __init__(self, _transforms=()):
         assert isinstance(_transforms, tuple), _transforms
         self._transforms = _transforms
-    
+
     def __add__(self, other):
         if not isinstance(other, basestring):
             return NotImplemented
@@ -164,18 +164,18 @@ class Localizable(unicode):
 
     def _clone_args(self):
         return (self._text,)
-    
+
     def _clone_kwargs(self):
         return dict(_transforms=self._transforms)
-    
+
     def _clone(self, **kwargs):
         args = self._clone_args()
         kwargs = dict(self._clone_kwargs(), **kwargs)
         return self.__class__(*args, **kwargs)
-    
+
     def _localize(self, localizer):
         raise Exception("This method must be overriden!")
-        
+
     def transform(self, function):
         """Return a copy performing given transformation after localization.
 
@@ -183,10 +183,10 @@ class Localizable(unicode):
         final string after the delayed localization.  The function will receive
         one argument -- the localized (unicode) string representing given
         instance.
-        
+
         """
         return self._clone(_transforms=self._transforms + (function,))
-    
+
     def replace(self, old, new):
         """Return a new 'Localizable' replacing the string 'old' by 'new'.
 
@@ -242,7 +242,7 @@ class Localizable(unicode):
         for transform in self._transforms:
             result = transform(result)
         return result
-    
+
 class TranslatableText(Localizable):
     """Translatable string with a delayed translation.
 
@@ -267,10 +267,10 @@ class TranslatableText(Localizable):
     get the translated version right away and we can substitute the variables in
     place.  However with 'TranslatableText', we must pass the variables to its
     constructor and let the instance interpolate them later.
-    
+
     """
     _RESERVED_ARGS = ('escape_html',)
-    
+
     class _Interpolator(object):
         def __init__(self, func, localizer):
             self._func = func
@@ -297,8 +297,8 @@ class TranslatableText(Localizable):
 
         def contains_escaped_html(self):
             return self._contains_escaped_html
-            
-    
+
+
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
             substitution_dict = dict([(k, v) for k, v in kwargs.items()
@@ -334,7 +334,7 @@ class TranslatableText(Localizable):
 
         If 'args' or 'kwargs' are passed, the 'text' is considered a format
         string and it will be automatically interpolated after translation.
-        
+
         Only 'args' or only 'kwargs' may be passed (not both at once).  This
         depends whether you are using named variables in the format string or
         just positional substitution.  It is recommended to use named format

@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,15 +34,15 @@ class Resource(object):
     """Generic resource representation.
 
     Specific classes for certain resource types may be derived from this class.
-    
+
     """
-    
+
     SUBDIR = None
     """Name of the subdirectory where files are searched on input and stored on output."""
-    
+
     def __init__(self, filename, title=None, descr=None, src_file=None, uri=None, info=None):
         """Arguments:
-        
+
           filename -- unique string identifying the resource (typisally its
             file name).
           title -- optional user visible resource title as a string or None.
@@ -81,23 +81,23 @@ class Resource(object):
         self._src_file = src_file
         self._uri = uri
         self._info = info
-                 
+
     def filename(self):
         """Return the unique resource identifier as a string."""
         return self._filename
-        
+
     def title(self):
         """Return the resource title passed to the constructor or None."""
         return self._title
-            
+
     def descr(self):
         """Return the resource description passed to the constructor or None."""
         return self._descr
-        
+
     def src_file(self):
         """Return the absolute pathname of the source file as passed to the constructor."""
         return self._src_file
-    
+
     def uri(self):
         """Return the resource URI passed to the constructor or None."""
         return self._uri
@@ -120,14 +120,14 @@ class Resource(object):
 class Image(Resource):
     """An image of undefined type."""
     SUBDIR = 'images'
-    
+
     def __init__(self, filename, size=None, thumbnail=None, **kwargs):
         """Arguments:
 
         size -- explicit image size as a tuple of two integers (width, height)
           in pixels.  If not None, the HTML output will use these values when
           the 'Image' instance is used within an 'InlineImage' element.
-          
+
         thumbnail -- image thumbnail an an Image instance.  If not None, the
           image will not be rendered in full size when used within an
           'InlineImage' element, but given thumbnail will be used instead.  The
@@ -161,7 +161,7 @@ class Stylesheet(Resource):
 
     def media(self):
         return self._media
-    
+
 class Script(Resource):
     """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'
@@ -185,7 +185,7 @@ class Video(Media):
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
     SUBDIR = 'flash'
-    
+
 
 ###################################################################################################
 ###                                   Resource Provider                                        ####
@@ -200,7 +200,7 @@ class ResourceProvider(object):
     dependencies of each node on its resources.
 
     The resource files are searched in the source directories in this order:
-    
+
       1) the directory passed as the 'searchdir' argument to the 'resource()'
          method call,
 
@@ -210,7 +210,7 @@ class ResourceProvider(object):
 
       3) all directories passed as the 'dirs' argument to the provider
          constructor
-      
+
       4) default resource directory set by 'config.default_resource_dir' (if
          not None).
 
@@ -235,7 +235,7 @@ class ResourceProvider(object):
     """A dictionary of alternative source filename extensions.  When the input file is not found,
     given alternative filename extensions are also tried.  The exporter is then responsible for the
     conversion."""
-    
+
     _TYPEMAP = {'jpeg': Image,
                 'jpg':  Image,
                 'gif':  Image,
@@ -246,7 +246,7 @@ class ResourceProvider(object):
                 'js':   Script,
                 'swf':  Flash,
                 'po':   Translations,}
-    
+
     class OrderedDict(object):
         # Totally simplistic - just what we need to get the resources in the order of allocation.
         # This is needed for the correct precedence of stylesheets.
@@ -260,7 +260,7 @@ class ResourceProvider(object):
             return self._dict[key]
         def values(self):
             return self._values
-    
+
     def __init__(self, resources=(), dirs=(), **kwargs):
         """Arguments:
 
@@ -277,7 +277,7 @@ class ResourceProvider(object):
             self._dirs += (lcg.config.default_resource_dir,)
         self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
-        
+
     def _resource(self, filename, searchdir, warn):
         dirs = list(self._dirs)
         try:
@@ -317,15 +317,15 @@ class ResourceProvider(object):
         """Get the resource instance by its filename.
 
         Arguments:
-        
+
           filename -- filename of the resource passed to the constructor.
-            
+
           node -- The node, for which the resource is allocated.  This can be either the
             'ContentNode' instance or a node identifier as a string (passing a string may be useful
             in content construction time, when the node instance is not created yet).  When None,
             the resource is considered to be global.  Global resources belong to all nodes and thus
             are returned for any 'node' argument when querying the 'resources()' method.
-          
+
         The resource instances may be cached by 'filename'.  These cached instances may be shared
         for multiple nodes, but the provider is responsible for keeping track of their dependency
         on particular nodes (to be able to serve the 'resources()' queries correctly).
@@ -348,19 +348,19 @@ class ResourceProvider(object):
         if node_id not in nodes:
             nodes.append(node_id)
         return resource
-    
+
     def resources(self, cls=None, node=None):
         """Return the list of all resources matching the query.
 
         Query arguments:
 
           cls -- Only return the resources of given class.
-          
+
           node -- only return the resources which were allocated for given node ('ContentNode'
             instance) or which are global (were allocated without passing the 'node' argument to
             the 'resource()' method.  If None, all resources are returned without respect to the
             nodes to which they belong.
-        
+
         """
         if cls is None:
             cls = Resource

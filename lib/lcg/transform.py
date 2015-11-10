@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012, 2013 Brailcom, o.p.s.
+# Copyright (C) 2012-2015 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -59,7 +59,7 @@ class Processor(object):
             for regexp, replacement in self._TEXT_REPLACEMENTS:
                 html = regexp.sub(replacement, html)
             return html
-            
+
         def lcg_parse(self, data):
             """Parse 'data' and return 'xml.etree.ElementTree.Element' instance.
 
@@ -69,13 +69,13 @@ class Processor(object):
 
             In this class the method does nothing, you must redefine it in
             some subclass.
-            
+
             """
             pass
 
     class Transformer(object):
         """'xml.etree.ElementTree.Element' tree transformer.
-        
+
         Transformation is performed by calling 'transform()' method.
 
         The transformation process is primarily customized by redefining
@@ -103,7 +103,7 @@ class Processor(object):
         them and the returned instances are inserted into the transformed
         element.  Several typical handling functions (methods) are predefined
         in 'Transformer' subclasses.
-    
+
         """
 
         def __init__(self):
@@ -179,7 +179,7 @@ class Processor(object):
             '_matchers()' method.
 
             Arguments:
-            
+
               element -- 'xml.etree.ElementTree.Element' instance
 
             The result may be arbitrary, it depends on particular 'Transformer'
@@ -213,7 +213,7 @@ class XMLProcessor(Processor):
     """Processor working on LCG XML input.
 
     TODO: LCG XML should be defined here.
-    
+
     """
 
     class Parser(Processor.Parser):
@@ -304,13 +304,13 @@ class XMLProcessor(Processor):
 
             The return value is a sequence of transformed children, each of the
             values is as returned from 'transform()' method.
-            
+
             """
             if children is None:
                 children = element.getchildren()
             return [self.transform(c) for c in children]
 
-        
+
 class XML2Content(XMLProcessor):
     """Processor transforming LCG XML to LCG 'Content'."""
 
@@ -365,7 +365,7 @@ class XML2Content(XMLProcessor):
                 ('row', (self._container, dict(class_=lcg.TableRow))),
                 ('cell', self._table_cell),
             )
-        
+
         def _transform_sub(self, element, children=None):
             if children is None:
                 children = element.getchildren()
@@ -406,7 +406,7 @@ class XML2Content(XMLProcessor):
         def _definitions(self, element, followers):
             paired_items = [self._transform_sub(e) for e in element.getchildren()]
             return lcg.DefinitionList(paired_items)
-            
+
         def _anchor(self, element, followers):
             name = element.attrib['name']
             text = element.text
@@ -416,7 +416,7 @@ class XML2Content(XMLProcessor):
             label = self._transform_sub(element)[0]
             target = element.attrib['target']
             return lcg.Link(target=target, label=label)
-        
+
         def _media(self, element, followers, class_=None, **kwargs):
             return class_(element.attrib['target'], name=element.attrib['name'], **kwargs)
 
@@ -486,7 +486,7 @@ class XML2HTML(XMLProcessor):
                 ('row', (self._container, dict(class_=lcg.TableRow))),
                 ('cell', self._table_cell),
             )
-        
+
         def __init__(self):
             XMLProcessor.Transformer.__init__(self)
             self._section_level = 1
@@ -548,7 +548,7 @@ class XML2HTML(XMLProcessor):
                 definition.tag = 'dd'
                 html_items += [term, definition]
             return self._make_content('dl', {}, html_items)
-            
+
         def _anchor(self, element, followers):
             name = element.attrib['name']
             text = element.text
@@ -557,13 +557,13 @@ class XML2HTML(XMLProcessor):
         def _link(self, element, followers):
             return self._make_content('a', dict(href=element.attrib['target']),
                                       self._transform_sub(element))
-        
+
         def _media(self, element, followers):
             media_class = {'audio': 'lcg-audio',
                            'video': 'lcg-video'}.get(element.tag)
             return self._make_content('a', {'class': media_class, 'href': element.attrib['target']},
                                       self._transform_sub(element))
-        
+
         def _image(self, element, followers):
             alignment = {lcg.InlineImage.LEFT: 'left',
                          lcg.InlineImage.RIGHT: 'right'}.get(element.attrib.get('align'))
@@ -669,7 +669,7 @@ class HTML2XML(Processor):
             num = name.lstrip('&#').rstrip(';')
             expanded = unichr(int(num))
             self.handle_data(expanded)
-            
+
         def handle_entityref(self, name):
             if self._hp_raw:
                 self._handle_data('&' + name + ';')
@@ -700,13 +700,13 @@ class HTML2XML(Processor):
             for c in children:
                 if c.tag != '_text':
                     self._hp_strip(c)
-            
+
         def lcg_parse(self, html):
             html = self._text_process(html)
             self.feed(html)
             self._hp_strip(self._hp_tree)
             return self._hp_tree
-        
+
     class Transformer(Processor.Transformer):
 
         def __init__(self):
@@ -751,7 +751,7 @@ class HTML2XML(Processor):
                 ('img', self._image),
                 ('_text', self._text),
             )
-            
+
         def _first_text(self, element):
             """Return first text found in 'element'.
 
@@ -786,7 +786,7 @@ class HTML2XML(Processor):
             Arguments:
 
               element -- 'xml.etree.ElementTree.Element' instance
-              
+
             """
             text = element.text or ''
             for c in element.getchildren():
@@ -906,7 +906,7 @@ class HTML2XML(Processor):
         def _table_row(self, element, followers):
             head = '1' if self._in_table_heading else '0'
             return self._container(element, followers, tag='row', head=head)
-            
+
         def _table_cell(self, element, followers):
             style = element.attrib.get('style', '')
             align = None
@@ -919,7 +919,7 @@ class HTML2XML(Processor):
             heading = '1' if element.tag == 'th' else '0'
             return self._make_content('cell', dict(align=align, heading=heading),
                                       self._transform_sub(element))
-        
+
     def transform(self, data):
         transformed = super(HTML2XML, self).transform(data)
         return unicode(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
@@ -936,7 +936,7 @@ def data2content(data):
       data -- unicode containing input LCG XML
 
     Return corresponding 'Content' instance.
-    
+
     See 'XML2Content' for more information and information about LCG XML.
 
     """
@@ -952,7 +952,7 @@ def data2html(data, processor):
       processor -- class to use for the conversion; subclass of 'XML2HTML'
 
     Return corresponding HTML unicode.
-    
+
     See 'XML2HTML' for more information.
 
     """
@@ -968,7 +968,7 @@ def html2data(html, processor):
       processor -- class to use for the conversion; subclass of 'HTML2XML'
 
     Return corresponding LCG XML unicode.
-    
+
     See 'HTML2XML' for more information.
 
     """

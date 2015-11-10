@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2010, 2011, 2012 Brailcom, o.p.s.
+# Copyright (C) 2010-2015 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -56,7 +56,7 @@ class Unit(object):
         @return: True iff the size is non-zero.
         """
         return self._size != 0
-    
+
     def __add__(self, size):
         """
         @type size: float or integer
@@ -93,10 +93,10 @@ class UMm(Unit):
 
 class UPoint(Unit):
     """Point (1/72 in) units."""
-    
+
 class UFont(Unit):
     """Units corresponding to a current font size."""
-    
+
 class USpace(Unit):
     """Units corresponding to a current preferred gap between two words."""
 
@@ -136,7 +136,7 @@ class FontFamily(object):
 
 class Color(object):
     """RGB color specification.
-    
+
     The constructor accepts differnt color specification options:
       - Color(255, 128 0) -- three ints specify decimal RGB values in 0-255 range
       - Color(1.0, 0.5, 0) -- three floats specify RGB values in 0.0-1.0 range

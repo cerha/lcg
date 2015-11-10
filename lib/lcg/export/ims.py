@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,13 +29,13 @@ class _Manifest:
     It defines the structure and dependencies of the content.
 
     """
-    
+
     def __init__(self, context):
         """Initialize the manifest for given root node export context."""
         self._context = context
         uri = "http://www.imsglobal.org/xsd/imscp_v1p1"
         minidom = xml.dom.domreg.getDOMImplementation('minidom')
-        self._document = document = minidom.createDocument(uri, 'manifest', '')        
+        self._document = document = minidom.createDocument(uri, 'manifest', '')
         self._manifest = manifest = document.firstChild
         # Namespace
         self._set_xml_attr(manifest, 'xmlns', 'http://www.imsglobal.org/xsd/imscp_v1p1')
@@ -76,12 +76,12 @@ class _Manifest:
 
         for node in node.children():
             self._create_item(item, resources, node)
-            
+
     # XML helper methods.
-    
+
     def _set_xml_attr(self, node, key, value):
         attr = self._document.createAttribute(key)
-        node.setAttributeNode(attr)            
+        node.setAttributeNode(attr)
         node.setAttribute(key, value)
         return attr
 
@@ -96,18 +96,18 @@ class _Manifest:
         return node
 
     # Public methods
-    
+
     def xml(self):
         """Return the IMS Manifest into a file."""
         return '<?xml version="1.0" encoding="UTF-8"?>\n' + self._manifest.toxml()
 
-        
+
 class IMSExporter(lcg.StyledHtmlExporter, lcg.HtmlFileExporter):
     """Export the content as an IMS package."""
 
     def manifest(self, node):
         return _Manifest(self.context(node, None))
-        
+
     def dump(self, node, directory, **kwargs):
         super(IMSExporter, self).dump(node, directory, **kwargs)
         if node == node.root():
@@ -117,4 +117,3 @@ class IMSExporter(lcg.StyledHtmlExporter, lcg.HtmlFileExporter):
 
     def _body_parts(self, context):
         return (context.node().content(context.lang()).export(context),)
-        

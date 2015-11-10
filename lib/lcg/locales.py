@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2012, 2013 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,10 +32,10 @@ class LocaleData(object):
     those attributes, which differ from the defaults.  When this derived class has a name in the
     form 'LocaleData_<name>', where '<name>' is the name of the locale, this definition will be
     used by LCG 'Translator' automatically when formatting localizable values.
-    
+
     The instances of this class should always be treated read-only and thus can be considered
     immutable.
-    
+
     """
     date_format = '%Y-%m-%d'
     time_format = '%H:%M'
@@ -48,7 +48,7 @@ class LocaleData(object):
     thousands_sep = None
     grouping = (3,3,3,3)
     mon_decimal_point = None
-    mon_thousands_sep = None 
+    mon_thousands_sep = None
     mon_grouping = None
     default_timezone = None
 
@@ -77,10 +77,10 @@ class LocaleData_en(LocaleData):
     exact_time_format = "%I:%M:%S %p"
     first_week_day = 6
     thousands_sep = ','
-            
+
 class LocaleData_es(LocaleData):
     date_format = "%d/%m/%Y"
-    
+
 class LocaleData_no(LocaleData):
     date_format = "%d.%m.%Y"
     time_format = "%H.%M"

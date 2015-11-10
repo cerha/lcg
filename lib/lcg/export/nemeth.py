@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013, 2014 Brailcom, o.p.s.
+# Copyright (C) 2013-2015 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -225,7 +225,7 @@ class _Variables(list):
         finally:
             if value is not None:
                 self.pop()
-                
+
     @contextmanager
     def xlet(self, *definitions):
         n = 0
@@ -238,7 +238,7 @@ class _Variables(list):
         finally:
             for i in range(n):
                 self.pop()
-        
+
     def get(self, name, default=None):
         for i in range(len(self) - 1, -1, -1):
             if self[i][0] == name:
@@ -587,7 +587,7 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
         if suffix:
             braille += suffix
     return _Braille(braille)
-    
+
 def _child_export(node, exporter, context, variables, separators=None, **kwargs):
     braille = _Braille('', '')
     children = _child_nodes(node)
@@ -821,7 +821,7 @@ def _mroot(base, index, exporter, context, variables, **kwargs):
         else:
             exported_base = _export(base, exporter, context, variables, **kwargs)
     return prefix + exported_base + suffix
-    
+
 def _export_msqrt(node, exporter, context, variables, **kwargs):
     return _mroot(node, None, exporter, context, variables, **kwargs)
 
@@ -867,7 +867,7 @@ def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
         if not indicate:
             exported_index = _Braille(_IMPLICIT_SUBSCRIPT) + exported_index
         return exported_base + new_subsup + exported_index + terminator
-    
+
 def _export_msup(node, exporter, context, variables, **kwargs):
     base, index = _child_nodes(node)
     if index.tag == 'mo' and index.text.strip() in _primes:
@@ -928,7 +928,7 @@ def _modifier(variables):
     if subsup:
         modifier = _Braille(_INNER_SUBSUP) + subsup + modifier
     return modifier
-    
+
 def _export_munder(node, exporter, context, variables, **kwargs):
     base, under = _child_nodes(node)
     result = (_export(base, exporter, context, variables, **kwargs) + _Braille('⠩') +
@@ -936,7 +936,7 @@ def _export_munder(node, exporter, context, variables, **kwargs):
     if not variables.get('no-under-boundaries'):
         result = _modifier(variables) + result + _Braille('⠻')
     return result
-    
+
 def _export_mover(node, exporter, context, variables, **kwargs):
     base, over = _child_nodes(node)
     exported_base = _export(base, exporter, context, variables, **kwargs)
@@ -992,7 +992,7 @@ def _export_mtr(node, exporter, context, variables, **kwargs):
     elif row.text()[:2] == '⠤' + _CONDITIONAL_NUM_PREFIX:
         row = _Braille('⠤⠼' + row.text()[2:])
     return row
-    
+
 def _export_mtd(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
 

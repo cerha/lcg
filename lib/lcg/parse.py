@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 Brailcom, o.p.s.
+# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class ProcessingError(Exception):
 
         Arguments:
           reason -- text string describing the reason for the error
-          
+
         """
         self._reason = reason
         self._info = info
@@ -53,7 +53,7 @@ class ProcessingError(Exception):
 
         There are no strict rules on 'caption' and 'information' except that
         both must be strings.  See the 'info()' method.
-        
+
         """
         assert isinstance(caption, basestring)
         self._info.append((caption, information))
@@ -74,15 +74,15 @@ class ProcessingError(Exception):
            ('Unit', '01-telephoning'),
            ('Section', 'Consolidation'),
            ('Offending text', '* Bla bla')]
-           
+
         """
         return self._info
 
     def reason(self):
         """Return reason for the error
-        
+
         Example: A choice must start with a + or minus sign and a space!
-        
+
         """
         return self._reason
 
