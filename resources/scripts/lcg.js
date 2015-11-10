@@ -935,7 +935,9 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	 *   selected_item_index (optional) -- index of the menu item to be
 	 *     initially selected
 	 */
-	event.stop();
+	if (event) {
+	    event.stop();
+	}
 	if (element === undefined) {
 	    element = event.element();
 	}
@@ -944,9 +946,8 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    this.create();
 	}
 	var offset = menu.parentNode.cumulativeOffset();
-	var x = 0;
-	var y = 0;
-	if (event.isLeftClick() || event.isRightClick()) {
+	var x, y;
+	if (event && (event.isLeftClick() || event.isRightClick())) {
 	    // Math.min limits the pointer position to the boundary of the
 	    // element invoking the menu, because VoiceOver emits click events
 	    // with a wrong position and the menu would be placed radiculously.
@@ -954,6 +955,8 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    y = Math.min(event.pointerY() - offset.top, element.getHeight());
 	    menu.removeClassName('keyboard-navigated');
         } else {
+	    x = 0;
+	    y = element.getHeight();
 	    menu.addClassName('keyboard-navigated');
 	}
 	var viewport = document.viewport.getDimensions();
@@ -967,7 +970,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	} else {
 	    direction = 'down';
 	}
-	this.ignore_next_click = !event.isLeftClick();
+	this.ignore_next_click = event && !event.isLeftClick();
 	$super(element, x, y, direction, selected_item_index);
     }
 
@@ -997,6 +1000,7 @@ lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
 	var menu = lcg.widget_instance(this.element.down('.popup-menu-widget'));
 	var ctrl = this.element.down('.invoke-menu');
 	ctrl.observe('click', function (e) { menu.popup(e, ctrl); });
+	ctrl.observe('keydown', this.on_key_down.bind(this));
 	ctrl.down('.popup-arrow').observe('click', function (e) { menu.popup(e, ctrl); });
 	ctrl.setAttribute('role', 'button');
 	ctrl.setAttribute('aria-haspopup', 'true');
@@ -1008,6 +1012,17 @@ lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
 	}
 	this.menu = menu;
 	this.ctrl = ctrl;
+    },
+
+    keymap: function () {
+	return {
+	    'Enter': this.cmd_activate,
+	    'Space': this.cmd_activate
+	};
+    },
+
+    cmd_activate: function (element) {
+	this.menu.popup(undefined, element);
     }
 
 });
