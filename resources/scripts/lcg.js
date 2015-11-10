@@ -207,8 +207,10 @@ lcg.Menu = Class.create(lcg.Widget, {
     },
 
     selected_item: function () {
-	var element_id = this.element.getAttribute('aria-activedescendant');
-	return (element_id ? $(element_id) : null);
+	// The attribute aria-activedescendant may not always be on the root element.
+	var element = this.element.down('*[aria-activedescendant]') || this.element;
+	var id = element.getAttribute('aria-activedescendant');
+	return (id ? $(id) : null);
     },
 
     select_item: function (item) {
@@ -219,7 +221,9 @@ lcg.Menu = Class.create(lcg.Widget, {
 	    }
 	    previously_selected_item.setAttribute('aria-selected', 'false');
 	}
-	this.element.setAttribute('aria-activedescendant', item.getAttribute('id'));
+	// The attribute aria-activedescendant may not always be on the root element.
+	var element = this.element.down('*[aria-activedescendant]') || this.element;
+	element.setAttribute('aria-activedescendant', item.getAttribute('id'));
 	item.setAttribute('aria-selected', 'true');
 	if (this._MANAGE_TABINDEX) {
 	    item.setAttribute('tabindex', '0');
@@ -817,7 +821,14 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	if (!this.element.empty()) {
 	    return;
 	}
-	var ul = new Element('ul', {'role': 'presentation'});
+	var ul = new Element('ul', {'role': 'menu'});
+	['aria-label', 'aria-activedescendant'].each(function (attr) {
+	    // The ul must be to root element of the menu, because otherwise
+	    // the close button would be considered as another menu item by
+	    // screen readers and item count would be announced incorrectly.
+	    ul.setAttribute(attr, this.element.getAttribute(attr));
+	    this.element.removeAttribute(attr);
+	}.bind(this));
 	this.items.each(function (item) {
 	    var a = new Element('a', {'href': item.uri || '#'}).update(item.label);
 	    if (item.tooltip) {
@@ -847,7 +858,6 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 		    }.bind(this))
 	    );
 	}
-	this.element.setAttribute('role', 'menu');
 	this.init_menu(ul);
     },
 
