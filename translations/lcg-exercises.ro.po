@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 12:33+0200\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-11-10 14:19+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
 "Language-Team: \n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. Translators: Labels for exercise buttons. Keep in capitals.
+#. Labels for exercise buttons. Keep in capitals.
 #: ../lib/lcg/exercises.py:244
 msgid "TRUE"
 msgstr "ADEVĂRAT"
@@ -54,7 +54,7 @@ msgstr ""
 msgid "Task specification must consist of 2 lines (%d given)."
 msgstr ""
 
-#. Translators: Error message. Don't translate [T] and [F].
+#. Error message. Don't translate [T] and [F].
 #. They mean True and False but don't change with localization.
 #: ../lib/lcg/exercises.py:383
 msgid "A true/false statement must end with '[T]' or '[F]'."
@@ -98,7 +98,7 @@ msgstr ""
 "arată cât de multe răspunsuri au fost corecte la prima încercare (a se vedea "
 "[# indicatorii])."
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:566
 msgid "Multiple Choice Questions"
 msgstr "Întrebări cu variante multiple de răspunsuri"
@@ -142,7 +142,7 @@ msgid ""
 "- a computer manufacturer\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:597
 msgid "Selections"
 msgstr "Ce este corect"
@@ -186,7 +186,7 @@ msgid ""
 "- Australia is the largest continent.\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:627
 msgid "True/False Statements"
 msgstr "Adevărat/Fals"
@@ -222,7 +222,7 @@ msgid ""
 "The largest tropical rainforest in the world is in Brasil. [T]\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:650
 msgid "Gap Filling"
 msgstr "Completare prin selectare"
@@ -387,7 +387,7 @@ msgstr ""
 "a fi incorect. Dacă traduceţi o propoziţie întreagă, trebuie să utilizaţi, "
 "de asemenea, semnele de punctuaţie corecte."
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:771
 #, fuzzy
 msgid "Written Answers"
@@ -451,7 +451,7 @@ msgid ""
 "The city is split by the River [Thames] into North and South.\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:819
 msgid "Cloze"
 msgstr "Completarea"
@@ -483,7 +483,7 @@ msgid ""
 "investment advice, foreign exchange facilities, and so on.\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:842
 #, fuzzy
 msgid "Cloze with Model Answers"
@@ -521,7 +521,7 @@ msgstr ""
 msgid "Total points:"
 msgstr "Total de puncte:"
 
-#. Translators: Type of exercise
+#. Type of exercise
 #: ../lib/lcg/exercises.py:948
 msgid "Writing"
 msgstr "Scriere"
@@ -577,7 +577,7 @@ msgstr ""
 "cursorul este mutat pe primul răspuns incorect. În câmpul de text cursorul, "
 "în plus, se mută la primul caracter incorect al răspunsului dumneavoastră."
 
-#. Translators: Fill (a form with correct answers).
+#. Fill (a form with correct answers).
 #: ../lib/lcg/export/exercises_html.py:46
 msgid "Fill"
 msgstr "Completează"
@@ -762,7 +762,7 @@ msgstr "Puncte adăugate de meditator:"
 msgid "correct answer"
 msgstr "răspuns corect"
 
-#. Translators: Incorrect (answer)
+#. Incorrect (answer)
 #: ../lib/lcg/export/exercises_html.py:609
 msgid "incorrect"
 msgstr "incorect"

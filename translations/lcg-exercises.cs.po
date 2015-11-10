@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 12:33+0200\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-11-10 14:19+0100\n"
 "PO-Revision-Date: 2015-06-16 12:35+0200\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. Translators: Labels for exercise buttons. Keep in capitals.
+#. Labels for exercise buttons. Keep in capitals.
 #: ../lib/lcg/exercises.py:244
 msgid "TRUE"
 msgstr "PRAVDA"
@@ -44,7 +44,8 @@ msgstr "Více než jedna odpověď je označena jako správná."
 
 #: ../lib/lcg/exercises.py:308
 msgid "All or none choices must be marked as unknown."
-msgstr "Jako neznámá odpověď musí být oznaženy buďto všechny možnosti nebo žádná."
+msgstr ""
+"Jako neznámá odpověď musí být oznaženy buďto všechny možnosti nebo žádná."
 
 #: ../lib/lcg/exercises.py:310
 msgid "None of the choices is marked as correct."
@@ -59,7 +60,7 @@ msgstr "Značka vynechaného textu (tři a více podtržítek) nebyla nalezena."
 msgid "Task specification must consist of 2 lines (%d given)."
 msgstr "Definice úkolu se musí mít právě dva řádky (nalezeno %d)."
 
-#. Translators: Error message. Don't translate [T] and [F].
+#. Error message. Don't translate [T] and [F].
 #. They mean True and False but don't change with localization.
 #: ../lib/lcg/exercises.py:383
 msgid "A true/false statement must end with '[T]' or '[F]'."
@@ -100,7 +101,7 @@ msgstr ""
 "dokud správnou odpověď nenaleznete.  Výsledky vespod cvičení ukazují kolik "
 "odpovědí bylo zodpovězeno správně na první pokus."
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:566
 msgid "Multiple Choice Questions"
 msgstr "Zaškrtávací test"
@@ -162,7 +163,7 @@ msgstr ""
 "+ Operační systém\n"
 "- Název počítače\n"
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:597
 msgid "Selections"
 msgstr "Co je správně"
@@ -218,7 +219,7 @@ msgstr ""
 "+ Austrálie je nejmenší kontinent.\n"
 "- Austrálie je největší kontinent.\n"
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:627
 msgid "True/False Statements"
 msgstr "Pravda/nepravda"
@@ -261,7 +262,7 @@ msgstr ""
 "\n"
 "Největší tropický deštný les na světě je v Brazílii. [T]\n"
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:650
 msgid "Gap Filling"
 msgstr "Doplňování s výběrem"
@@ -451,7 +452,7 @@ msgstr ""
 "považována za chybnou. Pokud překládáte celou větu, dbejte také správné "
 "interpunkce."
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:771
 msgid "Written Answers"
 msgstr "Vyplňování odpovědí"
@@ -530,7 +531,7 @@ msgstr ""
 "\n"
 "Řeka [Temže] město rozděluje na severní a jižní část.\n"
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:819
 msgid "Cloze"
 msgstr "Doplňovačka"
@@ -570,7 +571,7 @@ msgstr ""
 "poskytují rady, půjčují peníze a poskytují konzultace investic. Banky\n"
 "mohou také [směňovat] peníze do cizích měn.\n"
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:842
 msgid "Cloze with Model Answers"
 msgstr "Doplňovačka se vzorovými odpověďmi"
@@ -612,7 +613,7 @@ msgstr ""
 msgid "Total points:"
 msgstr "Body celkem:"
 
-#. Translators: Type of exercise
+#. Type of exercise
 #: ../lib/lcg/exercises.py:948
 msgid "Writing"
 msgstr "Psaní"
@@ -668,7 +669,7 @@ msgstr ""
 "přesunut na první nesprávnou odpověď. V textovém poli je navíc kurzor "
 "posunut na první chybný znak Vaší odpovědi."
 
-#. Translators: Fill (a form with correct answers).
+#. Fill (a form with correct answers).
 #: ../lib/lcg/export/exercises_html.py:46
 msgid "Fill"
 msgstr "Doplnit"
@@ -840,7 +841,7 @@ msgstr "Body přidané vyučujícím:"
 msgid "correct answer"
 msgstr "správná odpověď"
 
-#. Translators: Incorrect (answer)
+#. Incorrect (answer)
 #: ../lib/lcg/export/exercises_html.py:609
 msgid "incorrect"
 msgstr "chyba"

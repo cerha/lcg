@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-21 16:08+0200\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-11-10 14:19+0100\n"
 "PO-Revision-Date: 2008-09-30 08:59+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
@@ -17,16 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 
-#: ../lib/lcg/_test.py:114 ../lib/lcg/_test.py:115 ../lib/lcg/_test.py:355
-msgid "Bob"
-msgstr "Bobik"
-
 #: ../lib/lcg/_test.py:114
 #, python-format
 msgid "His name is \"%s\""
 msgstr "Jmenuje se \"%s\""
 
-#: ../lib/lcg/_test.py:115 ../lib/lcg/_test.py:355
+#: ../lib/lcg/_test.py:115
+msgid "Bob"
+msgstr "Bobik"
+
+#: ../lib/lcg/_test.py:115
 msgid "Joe"
 msgstr "Pepa"
 

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 12:33+0200\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-11-10 14:19+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
 "Language-Team: \n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. Translators: Labels for exercise buttons. Keep in capitals.
+#. Labels for exercise buttons. Keep in capitals.
 #: ../lib/lcg/exercises.py:244
 msgid "TRUE"
 msgstr "VRAI"
@@ -54,7 +54,7 @@ msgstr ""
 msgid "Task specification must consist of 2 lines (%d given)."
 msgstr ""
 
-#. Translators: Error message. Don't translate [T] and [F].
+#. Error message. Don't translate [T] and [F].
 #. They mean True and False but don't change with localization.
 #: ../lib/lcg/exercises.py:383
 msgid "A true/false statement must end with '[T]' or '[F]'."
@@ -97,7 +97,7 @@ msgstr ""
 "bonne réponse. Les résultats ci-dessous vous montreront combien de réponses "
 "ont été correctes au premier essai (voir le [# indicators] ci-dessous)."
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:566
 msgid "Multiple Choice Questions"
 msgstr "Questions à choix multiple"
@@ -141,7 +141,7 @@ msgid ""
 "- a computer manufacturer\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:597
 msgid "Selections"
 msgstr "Sélections"
@@ -185,7 +185,7 @@ msgid ""
 "- Australia is the largest continent.\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:627
 msgid "True/False Statements"
 msgstr "Exercices VRAI/FAUX"
@@ -220,7 +220,7 @@ msgid ""
 "The largest tropical rainforest in the world is in Brasil. [T]\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:650
 msgid "Gap Filling"
 msgstr "Exercice à trous"
@@ -381,7 +381,7 @@ msgstr ""
 "correctes est toujours considérée comme incorrecte. Lorsque l'expression est "
 "une phrase complète, vous devez également utiliser la ponctuation correcte."
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:771
 #, fuzzy
 msgid "Written Answers"
@@ -444,7 +444,7 @@ msgid ""
 "The city is split by the River [Thames] into North and South.\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:819
 msgid "Cloze"
 msgstr "Exercice à trous"
@@ -475,7 +475,7 @@ msgid ""
 "investment advice, foreign exchange facilities, and so on.\n"
 msgstr ""
 
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:842
 #, fuzzy
 msgid "Cloze with Model Answers"
@@ -512,7 +512,7 @@ msgstr ""
 msgid "Total points:"
 msgstr "Total des points :"
 
-#. Translators: Type of exercise
+#. Type of exercise
 #: ../lib/lcg/exercises.py:948
 msgid "Writing"
 msgstr "Expression écrite"
@@ -568,7 +568,7 @@ msgstr ""
 "vers la première mauvaise réponse. Dans une zone de texte, le curseur est "
 "également déplacé au premier élément incorrect de votre réponse."
 
-#. Translators: Fill (a form with correct answers).
+#. Fill (a form with correct answers).
 #: ../lib/lcg/export/exercises_html.py:46
 msgid "Fill"
 msgstr "Complétez"
@@ -747,7 +747,7 @@ msgstr "Points supplémentaires ajoutés par le tuteur :"
 msgid "correct answer"
 msgstr "réponse correcte"
 
-#. Translators: Incorrect (answer)
+#. Incorrect (answer)
 #: ../lib/lcg/export/exercises_html.py:609
 msgid "incorrect"
 msgstr "incorrect"

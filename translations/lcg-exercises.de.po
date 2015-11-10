@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-16 12:33+0200\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-11-10 14:19+0100\n"
 "PO-Revision-Date: 2011-12-06 20:41+0100\n"
 "Last-Translator: Petr Topiarz <reditel@mluvim.cz>\n"
 "Language-Team: German <de@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # The answer for the True/False exercise.
-#. Translators: Labels for exercise buttons. Keep in capitals.
+#. Labels for exercise buttons. Keep in capitals.
 #: ../lib/lcg/exercises.py:244
 msgid "TRUE"
 msgstr "RICHTIG"
@@ -61,7 +61,7 @@ msgstr ""
 msgid "Task specification must consist of 2 lines (%d given)."
 msgstr ""
 
-#. Translators: Error message. Don't translate [T] and [F].
+#. Error message. Don't translate [T] and [F].
 #. They mean True and False but don't change with localization.
 #: ../lib/lcg/exercises.py:383
 msgid "A true/false statement must end with '[T]' or '[F]'."
@@ -107,7 +107,7 @@ msgstr ""
 "(siehe auch [#indicators])."
 
 # Title for MultipleChoiceQuestions
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:566
 msgid "Multiple Choice Questions"
 msgstr "Auswahlfragebogen"
@@ -152,7 +152,7 @@ msgid ""
 msgstr ""
 
 # Section title
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:597
 msgid "Selections"
 msgstr "Auswahlmöglichkeiten"
@@ -197,7 +197,7 @@ msgid ""
 msgstr ""
 
 # Tile for TrueFalseStatements
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:627
 msgid "True/False Statements"
 msgstr "Richtig/Falsch Aussagen"
@@ -233,7 +233,7 @@ msgid ""
 msgstr ""
 
 # Title for GapFilling
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:650
 msgid "Gap Filling"
 msgstr "Lückentext mit Einfüllübung"
@@ -400,7 +400,7 @@ msgstr ""
 "Zeichensetzung."
 
 # The link after the recording controls.
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:771
 #, fuzzy
 msgid "Written Answers"
@@ -465,7 +465,7 @@ msgid ""
 msgstr ""
 
 # Title for Cloze
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:819
 msgid "Cloze"
 msgstr "Lückentext"
@@ -498,7 +498,7 @@ msgid ""
 msgstr ""
 
 # Section title
-#. Translators: Type of exercise (use language terminology)
+#. Type of exercise (use language terminology)
 #: ../lib/lcg/exercises.py:842
 #, fuzzy
 msgid "Cloze with Model Answers"
@@ -537,7 +537,7 @@ msgid "Total points:"
 msgstr "Gesamtpunktzahl:"
 
 # Exercise type name.
-#. Translators: Type of exercise
+#. Type of exercise
 #: ../lib/lcg/exercises.py:948
 msgid "Writing"
 msgstr "Schreibübung"
@@ -599,7 +599,7 @@ msgstr ""
 "wechselt der Curser zum ersten falschen Zeichen innerhalb des Textes."
 
 # Button label.
-#. Translators: Fill (a form with correct answers).
+#. Fill (a form with correct answers).
 #: ../lib/lcg/export/exercises_html.py:46
 msgid "Fill"
 msgstr "Einfügen"
@@ -796,7 +796,7 @@ msgid "correct answer"
 msgstr "richtige Antwort"
 
 # The label for the display field with exercise results.
-#. Translators: Incorrect (answer)
+#. Incorrect (answer)
 #: ../lib/lcg/export/exercises_html.py:609
 msgid "incorrect"
 msgstr "falsch"

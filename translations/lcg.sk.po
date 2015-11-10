@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-21 16:08+0200\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-11-10 12:17+0100\n"
 "PO-Revision-Date: 2009-11-25 12:21+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Slovak <lcg@lists.freebsoft.org>\n"
@@ -17,127 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/export/braille.py:854
-#, python-format
-msgid "Character %r can't be represented on given output device: \"%s\""
-msgstr ""
-
-#: ../lib/lcg/export/braille.py:1247
-msgid "The table is transposed."
-msgstr ""
-
-#: ../lib/lcg/export/braille.py:1255
-msgid "The table is expanded by rows."
-msgstr ""
-
-#: ../lib/lcg/export/braille.py:1258
-msgid "The table is expanded by columns."
-msgstr ""
-
-#: ../lib/lcg/export/braille.py:1265
-msgid "The table is vertically split."
-msgstr ""
-
-#: ../lib/lcg/export/braille.py:1477
-msgid "The table is read across facing pages."
-msgstr ""
-
-#: ../lib/lcg/export/export.py:1386
-#, python-format
-msgid "%s: file created."
-msgstr ""
-
-#: ../lib/lcg/export/export.py:1395
-#, python-format
-msgid "%s: file copied."
-msgstr ""
-
-#: ../lib/lcg/export/export.py:1410
-#, python-format
-msgid "%s: converting to %s: %s"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:665
-msgid "Choose your language:"
-msgstr "Zvoľte si jazyk:"
-
-#: ../lib/lcg/export/html.py:1163
-msgid "Flash movie object"
-msgstr ""
-
-#: ../lib/lcg/export/html.py:1221
-msgid ""
-"Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
-"swfobject.js to your resource path."
-msgstr ""
-
-#. Translators: Title of the link to Adobe website used in
-#. the Flash warning.
-#: ../lib/lcg/export/html.py:1247
-msgid "Adobe Flash plugin"
-msgstr "Adobe Flash plugin"
-
-#. Translators: Warning message displayed if Flash plugin is not installed or doesn't
-#. have the required version.  '%(plugin)s' is automatically replaced by a hypertext
-#. link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
-#. version number.
-#: ../lib/lcg/export/html.py:1243
-#, python-format
-msgid "Get %(plugin)s %(version)s or later."
-msgstr "Prosím nainštalujte alebo upgradujte %(plugin)s %(version)s."
-
-#: ../lib/lcg/export/html.py:1249
-msgid "Use a JavaScript enabled browser."
-msgstr "Použijte prehliadač s podporou JavaScriptu."
-
-#: ../lib/lcg/export/html.py:1250 ../lib/lcg/export/html.py:1252
-msgid "Warning:"
-msgstr "Upozornenie:"
-
-#: ../lib/lcg/export/html.py:1283
-msgid "Media Player unavailable."
-msgstr ""
-
-#. Translators: Label used instead of a link when the target does not exist.  For
-#. example sequential navigation may contain: "Previous: Introduction, Next: None".
-#: ../lib/lcg/export/html.py:1484
-msgid "None"
-msgstr "Nie je"
-
-#: ../lib/lcg/export/html.py:1485
-msgid "You are here:"
-msgstr "Nachádzate sa tu:"
-
-#. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1489
-msgid "Next"
-msgstr "Nasledujúce"
-
-#. Translators: Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1491
-msgid "Previous"
-msgstr "Predchádzajúce"
-
-#: ../lib/lcg/export/pdf.py:1993 ../lib/lcg/export/pdf.py:2061
-#, python-format
-msgid "Missing image: %s"
-msgstr ""
-
-#: ../lib/lcg/export/pdf.py:2561
-msgid "Page content extremely large, giving up"
-msgstr ""
-
-#: ../lib/lcg/export/pdf.py:2562
-#, python-format
-msgid "Page content too large, reducing it by %s"
-msgstr ""
-
-#: ../lib/lcg/resources.py:311
+#: ../lib/lcg/resources.py:313
 #, python-format
 msgid "Resource file not found: %(filename)s %(search_path)s"
 msgstr ""
 
-#. Translators: The following 139 strings represent names of languages.
+#. The following 139 strings represent names of languages.
 #. Feel free to consider which language names are worth a translation and
 #. which are fine to be left untranslated.  Many of these languages are so
 #. exotic, that a proper translation may even not exist in your language.
@@ -620,8 +505,9 @@ msgid "Tigrinya"
 msgstr ""
 
 #: ../lib/lcg/util.py:277
+#, fuzzy
 msgid "Turkmen"
-msgstr ""
+msgstr "turečtina"
 
 #: ../lib/lcg/util.py:278
 msgid "Tagalog"
@@ -703,7 +589,7 @@ msgstr "čínština"
 msgid "Zulu"
 msgstr ""
 
-#. Translators: The following 249 strings represent names of countries.
+#. The following 249 strings represent names of countries.
 #. Feel free to consider which country names are worth a translation and
 #. which are fine to be left untranslated.  Many of these countries are so
 #. exotic, that a proper translation may even not exist in your language.
@@ -735,8 +621,9 @@ msgid "Albania"
 msgstr "albánčina"
 
 #: ../lib/lcg/util.py:322
+#, fuzzy
 msgid "Armenia"
-msgstr ""
+msgstr "rumunčina"
 
 #: ../lib/lcg/util.py:323
 msgid "Angola"
@@ -755,8 +642,9 @@ msgid "American Samoa"
 msgstr ""
 
 #: ../lib/lcg/util.py:327
+#, fuzzy
 msgid "Austria"
-msgstr ""
+msgstr "taliančina"
 
 #: ../lib/lcg/util.py:328
 #, fuzzy
@@ -988,8 +876,9 @@ msgid "Ethiopia"
 msgstr ""
 
 #: ../lib/lcg/util.py:385
+#, fuzzy
 msgid "Finland"
-msgstr ""
+msgstr "thajčina"
 
 #: ../lib/lcg/util.py:387
 msgid "Falkland Islands"
@@ -1000,8 +889,9 @@ msgid "Micronesia"
 msgstr ""
 
 #: ../lib/lcg/util.py:389
+#, fuzzy
 msgid "Faroe Islands"
-msgstr ""
+msgstr "islandčina"
 
 #: ../lib/lcg/util.py:390
 msgid "France"
@@ -1042,8 +932,9 @@ msgid "Gibraltar"
 msgstr ""
 
 #: ../lib/lcg/util.py:399
+#, fuzzy
 msgid "Greenland"
-msgstr ""
+msgstr "islandčina"
 
 #: ../lib/lcg/util.py:400
 msgid "Gambia"
@@ -1410,8 +1301,9 @@ msgid "Peru"
 msgstr ""
 
 #: ../lib/lcg/util.py:490
+#, fuzzy
 msgid "French Polynesia"
-msgstr ""
+msgstr "francúzština"
 
 #: ../lib/lcg/util.py:491
 msgid "Papua New Guinea"
@@ -1422,12 +1314,14 @@ msgid "Philippines"
 msgstr ""
 
 #: ../lib/lcg/util.py:493
+#, fuzzy
 msgid "Pakistan"
-msgstr ""
+msgstr "turečtina"
 
 #: ../lib/lcg/util.py:494
+#, fuzzy
 msgid "Poland"
-msgstr ""
+msgstr "islandčina"
 
 #: ../lib/lcg/util.py:495
 msgid "Saint Pierre and Miquelon"
@@ -1568,8 +1462,9 @@ msgid "Syrian Arab Republic"
 msgstr ""
 
 #: ../lib/lcg/util.py:528
+#, fuzzy
 msgid "Swaziland"
-msgstr ""
+msgstr "thajčina"
 
 #: ../lib/lcg/util.py:529
 msgid "Turks and Caicos Islands"
@@ -1593,8 +1488,9 @@ msgid "Thailand"
 msgstr "thajčina"
 
 #: ../lib/lcg/util.py:534
+#, fuzzy
 msgid "Tajikistan"
-msgstr ""
+msgstr "turečtina"
 
 #: ../lib/lcg/util.py:535
 msgid "Tokelau"
@@ -1715,7 +1611,8 @@ msgstr ""
 msgid "Zimbabwe"
 msgstr ""
 
-#. Translators: The following 7 strings represent full week day names.  Please, take care to use
+#. The following 7 strings represent full week day names.  Please, take care to
+#. use
 #. upper/lower case letters according to the rules of the target language.
 #: ../lib/lcg/util.py:578
 msgid "Monday"
@@ -1745,16 +1642,18 @@ msgstr ""
 msgid "Sunday"
 msgstr ""
 
-#. Translators: The following 7 strings represent the abbreviated week day names.  The
-#. abbreviations should normally take up to three characters.  Feel free to use whatever form
+#. The following 7 strings represent the abbreviated week day names.  The
+#. abbreviations should normally take up to three characters.  Feel free to use
+#. whatever form
 #. usual in the target language.
 #: ../lib/lcg/util.py:584
 msgid "Mon"
 msgstr ""
 
 #: ../lib/lcg/util.py:584
+#, fuzzy
 msgid "Tue"
-msgstr ""
+msgstr "turečtina"
 
 #: ../lib/lcg/util.py:584
 msgid "Wed"
@@ -1776,7 +1675,8 @@ msgstr ""
 msgid "Sun"
 msgstr ""
 
-#. Translators: The following 12 strings represent full month names.  Please, take care to use
+#. The following 12 strings represent full month names.  Please, take care to
+#. use
 #. upper/lower case letters according to the rules of the target language.
 #: ../lib/lcg/util.py:606
 msgid "January"
@@ -1826,12 +1726,14 @@ msgstr ""
 msgid "December"
 msgstr ""
 
-#. Translators: The following 12 strings represent the abbreviated month names.  The
-#. abbreviations should normally take up to three characters.  Feel free to use whatever form
+#. The following 12 strings represent the abbreviated month names.  The
+#. abbreviations should normally take up to three characters.  Feel free to use
+#. whatever form
 #. usual in the target language.
 #: ../lib/lcg/util.py:613
+#, fuzzy
 msgid "Jan"
-msgstr ""
+msgstr "japončina"
 
 #: ../lib/lcg/util.py:613
 msgid "Feb"
@@ -1872,6 +1774,124 @@ msgstr ""
 #: ../lib/lcg/util.py:614
 msgid "Dec"
 msgstr ""
+
+#: ../lib/lcg/widgets.py:304
+#, python-format
+msgid "Close menu %s"
+msgstr ""
+
+#: ../lib/lcg/widgets.py:305
+msgid "Close menu"
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:854
+#, python-format
+msgid "Character %r can't be represented on given output device: \"%s\""
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1247
+msgid "The table is transposed."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1255
+msgid "The table is expanded by rows."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1258
+msgid "The table is expanded by columns."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1265
+msgid "The table is vertically split."
+msgstr ""
+
+#: ../lib/lcg/export/braille.py:1477
+msgid "The table is read across facing pages."
+msgstr ""
+
+#: ../lib/lcg/export/export.py:1386
+#, python-format
+msgid "%s: file created."
+msgstr ""
+
+#: ../lib/lcg/export/export.py:1395
+#, python-format
+msgid "%s: file copied."
+msgstr ""
+
+#: ../lib/lcg/export/export.py:1410
+#, python-format
+msgid "%s: converting to %s: %s"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:665
+msgid "Choose your language:"
+msgstr "Zvoľte si jazyk:"
+
+#: ../lib/lcg/export/html.py:1164
+msgid "Flash movie object"
+msgstr ""
+
+#: ../lib/lcg/export/html.py:1229
+msgid ""
+"Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
+"swfobject.js to your resource path."
+msgstr ""
+
+#: ../lib/lcg/export/html.py:1255
+#, python-format
+msgid "Get %(plugin)s %(version)s or later."
+msgstr "Prosím nainštalujte alebo upgradujte %(plugin)s %(version)s."
+
+#: ../lib/lcg/export/html.py:1257
+msgid "Use a JavaScript enabled browser."
+msgstr "Použijte prehliadač s podporou JavaScriptu."
+
+#: ../lib/lcg/export/html.py:1258 ../lib/lcg/export/html.py:1260
+msgid "Warning:"
+msgstr "Upozornenie:"
+
+#: ../lib/lcg/export/html.py:1291
+msgid "Media Player unavailable."
+msgstr ""
+
+#. Label used instead of a link when the target does not exist.  For
+#. example sequential navigation may contain: "Previous: Introduction, Next:
+#. None".
+#: ../lib/lcg/export/html.py:1492
+msgid "None"
+msgstr "Nie je"
+
+#: ../lib/lcg/export/html.py:1493
+msgid "You are here:"
+msgstr "Nachádzate sa tu:"
+
+#. Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:1497
+msgid "Next"
+msgstr "Nasledujúce"
+
+#. Label of a link to the next page in sequential navigation.
+#: ../lib/lcg/export/html.py:1499
+msgid "Previous"
+msgstr "Predchádzajúce"
+
+#: ../lib/lcg/export/pdf.py:2040 ../lib/lcg/export/pdf.py:2108
+#, python-format
+msgid "Missing image: %s"
+msgstr ""
+
+#: ../lib/lcg/export/pdf.py:2611
+msgid "Page content extremely large, giving up"
+msgstr ""
+
+#: ../lib/lcg/export/pdf.py:2613
+#, python-format
+msgid "Page content too large, reducing it by %s"
+msgstr ""
+
+#~ msgid "Adobe Flash plugin"
+#~ msgstr "Adobe Flash plugin"
 
 #~ msgid "Index:"
 #~ msgstr "Obsah:"
