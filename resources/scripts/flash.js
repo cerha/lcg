@@ -1,6 +1,6 @@
-/* Copyright (C) 2009, 2012 Brailcom, o.p.s.
+/* Copyright (C) 2009-2015 BRAILCOM, o.p.s.
  * Author: Tomas Cerha
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +18,7 @@
 
 /* Helper function for embedding flash objects through SWFobject library. */
 
-function embed_swf_object(uri, id, width, height, flashvars, min_flash_version, 
+function embed_swf_object(uri, id, width, height, flashvars, min_flash_version,
 			  alternative_content, allow_fullscreen) {
    /* Arguments:
 
@@ -30,12 +30,12 @@ function embed_swf_object(uri, id, width, height, flashvars, min_flash_version,
       min_flash_version -- minimal required Flash version as a string, such as '9' or '9.0.25'
       alternative_content -- content to display (put inside the target HTML element) when Flash
         is not available or its version doesn't match min_flash_version.
-      allow_fullscreen -- allow switching 
+      allow_fullscreen -- allow switching
 
    */
    // TODO: Detect and handle when running locally (JavaScript communication
    // doesn't work in this case because of Flash security restrictions).
-   if (min_flash_version == null) 
+   if (min_flash_version == null)
       min_flash_version = '9';
    if (swfobject.hasFlashPlayerVersion(min_flash_version)) {
       flashvars.id = id;

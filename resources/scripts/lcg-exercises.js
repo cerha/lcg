@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2004-2014 Brailcom, o.p.s.
+ * Copyright (C) 2004-2015 BRAILCOM, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 lcg.Exercise = Class.create(lcg.KeyHandler, {
     /* Generic exercise handler class.
-     */ 
+     */
 
     initialize: function ($super, exercise_id, answers, responses, messages) {
 	$super();
@@ -273,7 +273,7 @@ lcg.SelectBasedExercise = Class.create(lcg.Exercise, {
 	var field = this._fields[i];
 	for (var j=0; j < field.options.length; j++) {
 	    var option = field.options[j];
-	    if (option.value == value) 
+	    if (option.value == value)
 		option.selected = true;
 	}
     }
@@ -295,8 +295,8 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
 
     _cmd_hint: function(field) {
      	var found = this._find_answer(field);
-     	var answer = found.answer; 
-     	var i = found.index; 
+     	var answer = found.answer;
+     	var i = found.index;
      	var val = field.value
      	if (answer.length > i) {
      	    field.value = answer.slice(0, i+1) + val.slice(i, val.length);
@@ -309,7 +309,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
     },
 
     _recognize_field: function(field) {
-	return ((field.type == 'text' || field.type == 'textarea') && 
+	return ((field.type == 'text' || field.type == 'textarea') &&
      		this._last_answer_index < this._answers.length);
     },
 
@@ -339,7 +339,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
 	for (var i=0; i < answers.length; i++) {
             var a = answers[i];
             var j = 0;
-            while (value.slice(0, j+1) == a.slice(0, j+1) && j < a.length) j++; 
+            while (value.slice(0, j+1) == a.slice(0, j+1) && j < a.length) j++;
             if (j > char_index) {
      		char_index = j;
      		answer_index = i;
@@ -372,7 +372,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
 	var answers = this._answers[i].split('|');
 	for (var j=0; j < answers.length; j++) {
             // Replace repeated spaces, newlines and tabs with a single space
-            if (value.replace(/^\s*|\s(?=\s)|\s*$/g, "") == answers[j]) 
+            if (value.replace(/^\s*|\s(?=\s)|\s*$/g, "") == answers[j])
      		return true;
 	}
 	return false;

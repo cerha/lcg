@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2012, 2013, 2014, 2015 Brailcom, o.p.s.
+ * Copyright (C) 2012-2015 BRAILCOM, o.p.s.
  * Author: Tomas Cerha
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ lcg.KeyHandler = Class.create({
     initialize: function () {
 	this._keymap = this.keymap();
     },
-      
+
     keymap: function () {
 	return {};
     },
@@ -99,7 +99,7 @@ lcg.KeyHandler = Class.create({
 	    setTimeout(function () { try { element.focus(); } catch (ignore) {} }, 0);
 	}
     }
-    
+
 });
 
 lcg.Widget = Class.create(lcg.KeyHandler, {
@@ -110,7 +110,7 @@ lcg.Widget = Class.create(lcg.KeyHandler, {
      *   element_id -- HTML id of the widget root element as a string.
      *     May also be the element itself as Prototype.js Element instance.
      *
-     */ 
+     */
     initialize: function ($super, element_id) {
 	$super();
 	this.element = $(element_id);
@@ -120,7 +120,7 @@ lcg.Widget = Class.create(lcg.KeyHandler, {
 
 lcg.Menu = Class.create(lcg.Widget, {
     /* Generic base class for several other menu-like widgets.
-     * 
+     *
      * Constructor arguments:
      *
      *   element_id -- HTML id of the widget root element (described in the parent class).
@@ -131,10 +131,10 @@ lcg.Menu = Class.create(lcg.Widget, {
      *
      * Accessibility is supported through automatically managed ARIA roles
      * and states and handling keyboard menu traversal.
-     * 
+     *
      */
     _MANAGE_TABINDEX: true,
-    
+
     initialize: function ($super, element_id) {
 	$super(element_id);
 	var ul = this.element.down('ul');
@@ -190,7 +190,7 @@ lcg.Menu = Class.create(lcg.Widget, {
 	    prev._lcg_menu_next = item;
 	}
     },
-    
+
     initially_selected_item: function () {
 	var item;
 	if (this.items.length !== 0) {
@@ -205,7 +205,7 @@ lcg.Menu = Class.create(lcg.Widget, {
 	}
 	return item;
     },
-    
+
     selected_item: function () {
 	var element_id = this.element.getAttribute('aria-activedescendant');
 	return (element_id ? $(element_id) : null);
@@ -233,7 +233,7 @@ lcg.Menu = Class.create(lcg.Widget, {
 	    this.set_focus(item);
 	}
     },
-    
+
     expand_item: function (item, recourse) {
 	return false;
     },
@@ -242,7 +242,7 @@ lcg.Menu = Class.create(lcg.Widget, {
 	this.cmd_activate(item);
 	event.stop();
     },
-    
+
     cmd_prev: function (item) {
 	this.set_focus(item._lcg_menu_prev);
     },
@@ -250,7 +250,7 @@ lcg.Menu = Class.create(lcg.Widget, {
     cmd_next: function (item) {
 	this.set_focus(item._lcg_menu_next);
     },
-    
+
     cmd_activate: function (item) {
 	return;
     }
@@ -430,7 +430,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
      *
      * This is the Javascript counterpart of the Python class
      * `lcg.FoldableTree'.
-     */ 
+     */
 
     initialize: function ($super, element_id, toggle_button_tooltip) {
 	$super(element_id);
@@ -465,12 +465,12 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    'Space': this.cmd_activate
 	};
     },
-    
+
     init_items: function ($super, ul, parent) {
 	ul.setAttribute('role', 'group');
 	return $super(ul, parent);
     },
-    
+
     init_item: function ($super, item, prev, parent) {
 	$super(item, prev, parent);
 	item.setAttribute('role', 'treeitem');
@@ -496,7 +496,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    item._lcg_submenu = this.init_items(submenu, item);
 	}
     },
-    
+
     toggle_item_expansion: function (item) {
 	if (item) {
 	    if (this.expanded) {
@@ -510,7 +510,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    this.toggle_item_expansion(item._lcg_menu_next);
 	}
     },
-    
+
     expand_item: function (item, recourse) {
 	var expanded = false;
 	var li = item.up('li');
@@ -525,7 +525,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	}
 	return expanded;
     },
-    
+
     collapse_item: function (item) {
 	var li = item.up('li');
 	if (li.hasClassName('foldable') && !li.hasClassName('folded')) {
@@ -536,7 +536,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	}
 	return false;
     },
-    
+
     next_item: function (item) {
 	// Recursively find the next item in sequence by traversing the hierarchy.
 	var next;
@@ -547,7 +547,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	}
 	return next;
     },
-    
+
     cmd_up: function (item) {
 	var target = null;
 	if (item._lcg_menu_prev) {
@@ -590,7 +590,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     cmd_quit: function (item) {
 	this.set_focus($('main-heading'));
     },
-    
+
     on_toggle_expansion: function (event) {
 	this.toggle_item_expansion(this.items[0]);
 	this.expanded = !this.expanded;
@@ -601,7 +601,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    b.removeClassName('expanded');
 	}
     },
-    
+
     on_item_click: function (event, item) {
 	var element = event.element();
 	if (element.nodeName === 'A' || element.nodeName === 'LI') {
@@ -612,7 +612,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    // MSIE).
 	    var span = item.down('span');
 	    if (event.pointerX() < span.cumulativeOffset().left) {
-		if (item.up('li').hasClassName('folded')) { 
+		if (item.up('li').hasClassName('folded')) {
 		    this.expand_item(item);
 		} else {
 		    this.collapse_item(item);
@@ -621,7 +621,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    }
 	}
     }
-    
+
 });
 
 
@@ -766,7 +766,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      *     enabled -- if present and false, the item will be disabled
      *       (inactive)
      *     callback -- The JavaScript function to be called on item invocation.
-     *       May be passed also as a string (function of given name will be 
+     *       May be passed also as a string (function of given name will be
      *       looked up in the current JavaScript name space).	 The callback
      *       function will be called with the element on which the menu was
      *       invoked as the first argument.  Additional arguments may be
@@ -782,7 +782,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      *	   discoverable way to close the menu (activating the PopupMenuCtrl
      *	   again actually does it, but the user would have to go back through
      *	   the menu items).
-     *	     
+     *
      * You will typically supply either uri or callback, but both can be used
      * as well.
      *
@@ -993,7 +993,7 @@ lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
 	ctrl.setAttribute('aria-expanded', 'false');
 	ctrl.setAttribute('aria-controls', menu.element.getAttribute('id'));
 	if (selector) {
-	    this.element.up(selector).observe('contextmenu', 
+	    this.element.up(selector).observe('contextmenu',
 					      function (e) { menu.popup(e, ctrl); });
 	}
 	this.menu = menu;
@@ -1037,7 +1037,7 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
       	button.on('click', this.on_button_click.bind(this));
       	button.on('keydown', this.on_button_key_down.bind(this));
     },
-	
+
     on_button_key_down: function(event) {
 	var key = this.event_key(event);
 	if (key === 'Enter' || key === 'Space' || key === 'Alt-Down') {
@@ -1134,8 +1134,8 @@ lcg.Tooltip = Class.create({
 		    if (content_type === 'text/html') {
 			element.update(transport.responseText);
 		    } else if (content_type.substring(0, 6) === 'image/') {
-			// The AJAX request was redundant in this case (the image will 
-			// be loaded again by the browser for the new img tag) but 
+			// The AJAX request was redundant in this case (the image will
+			// be loaded again by the browser for the new img tag) but
 			// there's no better way to tell automatically what the URL
 			// points to and thanks to browser caching it should not
 			// normally be a serious problem.
@@ -1251,7 +1251,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 
 
 lcg.Cookies = Class.create({
-    // This class is taken from 
+    // This class is taken from
     // http://codeinthehole.com/writing/javascript-cookie-objects-using-prototype-and-json/
     initialize: function (path, domain) {
         this.path = path || '/';
@@ -1260,7 +1260,7 @@ lcg.Cookies = Class.create({
 
     // Sets a cookie
     set: function (key, value, days) {
-        if (typeof key !== 'string') { 
+        if (typeof key !== 'string') {
 	    throw "Invalid key";
 	}
         if (typeof value !== 'string' && typeof value !== 'number') {

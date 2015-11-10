@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2009, 2013 Brailcom, o.p.s.
+/* Copyright (C) 2004-2015 BRAILCOM, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  * elements, such as buttons, links, selection boxes etc.  The main advantage of this approach is
  * the accessibility of such controls (Flash applications themselves are not accessible at the time
  * being).
- * 
+ *
  * The implementation is currently specific for JW FLV Media Player
  * (http://www.longtailvideo.com/players/jw-flv-player).  If the player is not available
  * (i.e. Flash not installed), the media files should be sent to browser to play them using the
@@ -93,7 +93,7 @@ function init_player_controls(player_id, uri, button_id, selection_id, durations
          the current position may be passed back from the player to the web
          application.  The field's value is automatically updated during
          playback, so the form can be submitted to save the last position etc.
-       
+
     */
     var button = document.getElementById(button_id);
     var select = document.getElementById(selection_id);
@@ -165,7 +165,7 @@ function _media_player(player_id) {
 	// Check that this really is the player instance, not its empty container.
 	if (typeof player.getPlaylist != 'undefined')
 	    return player;
-    } 
+    }
     return null;
 }
 
@@ -236,7 +236,7 @@ function _media_player_seek(player_id, forward) {
 	    if (skip > 30) skip = 30;
 	    if (forward)
 		position += skip;
-	    else 
+	    else
 		position -= skip;
 	    if (position < 0)
 		position = 0;
@@ -271,7 +271,7 @@ function _str(obj) {
 
 // Callbacks invoked by the media player.
 
-function _on_player_time_changed(event) { 
+function _on_player_time_changed(event) {
     var state = _player_state[event.id];
     var ctrl = state.controls;
     var position = event.position;
@@ -290,13 +290,13 @@ function _on_player_time_changed(event) {
 
 function _on_player_volume_changed(event) {
     var state = _player_state[event.id];
-    state.volume = event.percentage; 
+    state.volume = event.percentage;
 }
 
 function _on_player_state_changed(event) {
     // Player states: IDLE, BUFFERING, PLAYING, PAUSED, COMPLETED
     var state = _player_state[event.id];
-    //state.playing = (event.newstate == 'BUFFERING' || event.newstate == 'PLAYING'); 
+    //state.playing = (event.newstate == 'BUFFERING' || event.newstate == 'PLAYING');
     var ctrl = state.controls;
     // Warning: The player behaves strangely with short recordings.  The state normally changes form
     // 'PLAYING' to 'COMPLETED', but sometimes also 'PLAYING' -> 'PAUSED', 'PAUSED' -> 'COMPLETED'.
@@ -310,7 +310,7 @@ function _on_player_state_changed(event) {
     }
 }
 
-function _on_player_loading_progress_changed(event) { 
+function _on_player_loading_progress_changed(event) {
     if (event.loaded == event.total) {
 	var state = _player_state[event.id];
 	state.loaded_uri = _media_player_current_uri(_media_player(event.id));
@@ -345,7 +345,7 @@ function _on_media_ctrl_keydown(event) {
 	       38: '+', // up arrow
 	       40: '-'} // down arrow
     var key = map[code];
-    if (key != null) 
+    if (key != null)
 	return _handle_media_ctrl_keys(key, this._media_player_ctrl);
     else
 	return true;
@@ -366,7 +366,7 @@ function _handle_media_ctrl_keys(key, ctrl) {
 	return false;
     }
     var player_id = ctrl.player_id;
-    if (key == '>') { 
+    if (key == '>') {
 	_media_player_seek(player_id, true);
 	return false;
     }
