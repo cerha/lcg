@@ -11,8 +11,8 @@
 /doc/src/structured-text.en.pdf
 /doc/examples/lcgmake-basic-reader/dest/*
 /translations/*/LC_MESSAGES/*.mo
-/translations/*.d
 /translations/*.pot
+/resources/translations/*.po
 /TAGS
 /.ropeproject
 /lib/lcg/export/styles/presentation-braille-local.py
