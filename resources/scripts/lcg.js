@@ -774,7 +774,15 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      *     callback_args -- Array of additional arguments to pass to the
      *       callback function
      *     cls -- CSS class name to be used for the item (string, optional)
-     *
+     *   close_button_label -- if defined, the menu will have a close button
+     *     with given label.  The close button is displayed at the top right
+     *     corner, but comes as the last item in sequential navigation.  It
+     *     is actually most needed for screen reader users on touch screen
+     *	   devices, such as iOS VoiceOver, where there is no other easilly
+     *	   discoverable way to close the menu (activating the PopupMenuCtrl
+     *	   again actually does it, but the user would have to go back through
+     *	   the menu items).
+     *	     
      * You will typically supply either uri or callback, but both can be used
      * as well.
      *
@@ -790,9 +798,10 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      * create and initialize the menu HTML elements explicitly.
      */
 
-    initialize: function ($super, element_id, items) {
+    initialize: function ($super, element_id, items, close_button_label) {
 	$super(element_id);
 	this.items = items;
+	this.close_button_label = close_button_label;
     },
 
     create: function () {
@@ -825,6 +834,19 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    ul.insert(li);
 	});
 	this.element.update(ul);
+	if (this.close_button_label) {
+	    this.element.insert(
+		new Element('a', {'href': '#',
+				  'title': this.close_button_label,
+				  'class': 'close-menu',
+				  'role': 'button'})
+		    .update(this.close_button_label)
+		    .observe('click', function (event) {
+			this.dismiss();
+			event.stop();
+		    }.bind(this))
+	    );
+	}
 	this.element.setAttribute('role', 'menu');
 	this.init_menu(ul);
     },

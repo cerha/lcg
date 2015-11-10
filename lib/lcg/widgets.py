@@ -37,6 +37,9 @@ don't work.
 
 import lcg
 
+_ = lcg.TranslatableTextFactory('lcg')
+
+
 class Widget(object):
     """Mix-in class for content elements implementing HTML Widgets.
 
@@ -297,7 +300,8 @@ class PopupMenu(Widget, lcg.Content):
                       callback_args=item.callback_args,
                       cls=item.cls)
                  for item in self._items]
-        return (items,)
+        return (items, context.translate(_("Close menu %s", self._label) if self._label else
+                                         _("Close menu")))
 
     def _wrap_exported_widget(self, context, content, **kwargs):
         return super(PopupMenu, self)._wrap_exported_widget(context, content,

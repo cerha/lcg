@@ -100,7 +100,7 @@
     background: url(popup-arrow.png) 3px center no-repeat;
     height: 1em;
     padding-left: 21px;
-    text-indent: -999px;
+    text-indent: -9999px;
     width: 0px;
     overflow: hidden;
     outline: none;
@@ -160,6 +160,22 @@
 .dropdown-selection-widget li.active a:focus {
     background-color: #3af;
 }
+.popup-menu-widget a.close-menu {
+    display: inline-block;
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 13px;
+    height: 13px;
+    overflow: hidden;
+    text-indent: -9999px;
+    border: solid 1px #aaa;
+    border-radius: 7px;
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    background: url(cross-small.png) 1px 1px no-repeat #ddd;
+}
+
 
 .tooltip-widget {
     position: absolute;
