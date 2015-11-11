@@ -673,7 +673,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 			    top: y - total_height + 'px'},
 		    duration: 0.2,
 		    afterFinish: function () {
-			menu.setStyle({overflowY: 'auto'});
+			menu.setStyle({overflowY: 'visible'});
 			this.set_focus(selected_item);
 		    }.bind(this)
 		});
