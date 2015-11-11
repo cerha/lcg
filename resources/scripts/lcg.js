@@ -607,22 +607,13 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     },
 
     on_item_click: function (event, item) {
-	var element = event.element();
-	if (element.nodeName === 'A' || element.nodeName === 'LI') {
-	    // The inner SPAN has a left margin making space for folding controls.
-	    // Then, if the user clicks inside the A or LI element, but not inside
-	    // SPAN, folding controls were clicked.  The strange hack with the inner
-	    // SPAN is needed to make folding work across browsers (particulartly
-	    // MSIE).
-	    var span = item.down('span');
-	    if (event.pointerX() < span.cumulativeOffset().left) {
-		if (item.up('li').hasClassName('folded')) {
-		    this.expand_item(item);
-		} else {
-		    this.collapse_item(item);
-		}
-		event.stop();
+	if (event.findElement('.icon')) {
+	    if (item.up('li').hasClassName('folded')) {
+		this.expand_item(item);
+	    } else {
+		this.collapse_item(item);
 	    }
+	    event.stop();
 	}
     }
 

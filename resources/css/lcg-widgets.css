@@ -9,38 +9,41 @@
     margin: 0;
 }
 .foldable-tree-widget ul ul {
-    padding: 0 0 0 14px;
+    padding: 0 0 0 13px;
 }
 .foldable-tree-widget li { 
     line-height: 1.2em;
     width: 100%;
-    background: url(folder-bullet.png) left 0.25em no-repeat;
-}
-.foldable-tree-widget li.foldable {
-    background-image: url(folder-open.png);
-}
-.foldable-tree-widget li.foldable.folded {
-    background-image: url(folder-closed.png);
+    padding: 0;
 }
 .foldable-tree-widget li.folded ul {
     display: none;
 }
-.foldable-tree-widget li a,
-.foldable-tree-widget li a span {
+.foldable-tree-widget li a {
     display: block;
     clear: both;
-}
-.foldable-tree-widget li a {
-    cursor: default;
-    padding-left: 14px;
     text-decoration: none;
 }
-.foldable-tree-widget li a span {
-    cursor: pointer;
-    padding: 2px;
-    margin-left: 1px; /* Fix MSIE bullet display */
+.foldable-tree-widget li .icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    float: left;
+    margin: 3px 0;
+    background: url(lcg-icons.png) 0 -40px no-repeat;
 }
-.foldable-tree-widget li a.current span {
+.foldable-tree-widget li.foldable > a > .icon {
+    background-position: 0 -28px;
+}
+.foldable-tree-widget li.foldable.folded > a > .icon {
+    background-position: 0 -16px;
+}
+.foldable-tree-widget li .label {
+    display: block;
+    padding: 2px;
+    margin-left: 15px;
+}
+.foldable-tree-widget a.current .label {
     background-color: #ddd;
 }
 
@@ -50,10 +53,10 @@
     border: none;
     width: 12px;
     height: 12px;
-    background: url(folder-closed.png) left center no-repeat;
+    background: url(lcg-icons.png) 0 -16px no-repeat;
 }
 .foldable-tree-widget button.toggle-menu-expansion.expanded {
-    background-image: url(folder-open.png);
+    background-position: 0 -28px;
 }
 
 /* Notebook widget */
@@ -175,7 +178,6 @@
     -webkit-border-radius: 7px;
     background: url(cross-small.png) 1px 1px no-repeat #ddd;
 }
-
 
 .tooltip-widget {
     position: absolute;

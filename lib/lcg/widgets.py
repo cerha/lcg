@@ -154,36 +154,21 @@ class FoldableTree(Widget, lcg.Content):
         while current.parent() is not None and current.hidden():
             current = current.parent()
         path = current.path()
-        def is_foldable(node):
-            if node.foldable():
-                for item in node.children():
-                    if not item.hidden():
-                        return True
-            return False
-        def li_cls(node):
-            if is_foldable(node):
-                cls = 'foldable'
-                if node not in path:
-                    cls += ' folded'
-                return cls
-            return None
-        def item(node):
-            cls = []
-            if node is current:
-                cls.append('current')
-            if not node.active():
-                cls.append('inactive')
-            # The inner span is necessary because MSIE doesn't fire on click events outside the A
-            # tag, so we basically need to indent the link title inside and draw folding controls
-            # in this space.  This is only needed for foldable trees, but we render also fixed
-            # trees in the same manner for consistency.  The CSS class 'bullet' represents either
-            # fixed tree items or leaves in foldable trees (where no further folding is possible).
-            content = g.span(node.title(), cls=not is_foldable(node) and 'bullet' or None)
-            return g.a(content, href=context.uri(node), title=node.descr(),
-                       cls=' '.join(cls) or None)
         def menu(node):
-            items = [g.li(item(n) + menu(n), cls=li_cls(n))
-                     for n in node.children() if not n.hidden()]
+            # The 'icon' span must be inside the A tag because MSIE doesn't fire on click
+            # events outside.  The span indents the link title and creates a space for
+            # the clickable folding controls (if the item is foldable).
+            items = [
+                g.li((g.a(g.span('', cls='icon') + g.span(child.title(), cls='label'),
+                          href=context.uri(child), title=child.descr(),
+                          cls=(('current ' if child is current else '') +
+                               ('inactive ' if not child.active() else '')).strip() or None) +
+                      menu(child)),
+                     cls=(('foldable' + (' folded' if child not in path else ''))
+                          if child.foldable() and any(not n.hidden() for n in child.children())
+                          else None))
+                for child in node.children() if not child.hidden()
+            ]
             if items:
                 return g.ul(*items)
             else:
