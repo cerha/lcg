@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*jslint browser: true */
-/*jslint bitwise: true */
-/*jslint unparam: true */
-/*jslint todo: true */
+
+/*jshint browser: true */
+/*jshint es3: true */
+/*jshint -W016 */ // allow bitwise operations
+/*jshint -W097 */ // allow direct "use strict"
 /*global Class */
 /*global Event */
 /*global Element */
@@ -30,6 +31,7 @@
 /*global self */
 /*global escape */
 /*global unescape */
+/*global console */
 
 "use strict";
 
@@ -673,14 +675,14 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 		    afterFinish: function () {
 			menu.setStyle({overflowY: 'auto'});
 			this.set_focus(selected_item);
-		    }.bind(this),
+		    }.bind(this)
 		});
 	    } else {
 		new Effect.SlideDown(menu, {
 		    duration: 0.2,
 		    afterFinish: function () {
 			this.set_focus(selected_item);
-		    }.bind(this),
+		    }.bind(this)
 		});
 	    }
 	} else {

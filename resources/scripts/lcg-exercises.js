@@ -17,6 +17,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA */
 
+/*jshint browser: true */
+/*jshint es3: true */
+/*jshint -W097 */ // allow direct "use strict"
+/*global Class */
+/*global Effect */
+/*global $ */
+/*global lcg */
+/*global play_media */
+
+"use strict";
+
 // JavaScript support for interactive LCG Tests and Exercises
 
 lcg.Exercise = Class.create(lcg.KeyHandler, {
@@ -31,7 +42,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 	this._messages = messages;
 	this._results = new Array(answers.length);
 	this._first_attempt = new Array(answers.length);
-	this._fields = new Array();
+	this._fields = [];
 	this._last_answer_index = 0;
 	for (var i=0; i < this._form.elements.length; i++) {
 	    var field = this._form.elements[i];
@@ -78,9 +89,9 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
     _eval_answers: function() {
 	for (var i=0; i < this._answers.length; i++) {
             var value = this._get_value(i);
-            if (value != '' && value != null) {
+            if (value !== '' && value !== null) {
      		this._results[i] = (this._eval_answer(value, i) ? 1:-1);
-     		if (this._first_attempt[i] == null)
+     		if (this._first_attempt[i] === null)
      		    this._first_attempt[i] = this._results[i];
             } else {
      		this._results[i] = null;
@@ -101,7 +112,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 	this._eval_answers();
 	var i = field.answer_index;
 	var result = this._results[i];
-	if (result != null) {
+	if (result !== null) {
             play_media(this.response(result == 1 ? 'correct':'incorrect'));
             if (result == 1) {
      		// if (i < this._fields.length)
@@ -125,7 +136,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 	}
 	var response;
 	if (this._fields.length > 1) {
-            var percentage = this._percentage()
+            var percentage = this._percentage();
             if      (percentage < 50)  response='poor';
             else if (percentage < 70)  response='sufficient';
             else if (percentage < 85)  response='good';
@@ -150,7 +161,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
     },
 
     _percentage: function() {
-	return Math.round(100 * this._correct() / this._answers.length)
+	return Math.round(100 * this._correct() / this._answers.length);
     },
 
     _display_results: function() {
@@ -197,7 +208,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
     _slide_down: function (element, duration) {
 	if (typeof(Effect) != 'undefined') {
 	    if (typeof(duration) == 'undefined')
-		duration = 0.2
+		duration = 0.2;
 	    new Effect.SlideDown(element, {duration: duration});
 	} else {
 	    element.show();
@@ -217,7 +228,7 @@ lcg.ChoiceBasedExercise = Class.create(lcg.Exercise, {
 
     _init_field: function(field) {
 	if (field.name != this._last_group) {
-	    if (this._last_group != null) this._last_answer_index++;
+	    if (this._last_group !== null) this._last_answer_index++;
 	    this._last_group = field.name;
 	}
 	field.answer_index = this._last_answer_index;
@@ -261,7 +272,7 @@ lcg.ChoiceBasedExercise = Class.create(lcg.Exercise, {
 lcg.SelectBasedExercise = Class.create(lcg.Exercise, {
 
     _recognize_field: function(field) {
-	return field.options != null;
+	return field.options !== null;
     },
 
     _init_field: function(field) {
@@ -297,7 +308,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
      	var found = this._find_answer(field);
      	var answer = found.answer;
      	var i = found.index;
-     	var val = field.value
+     	var val = field.value;
      	if (answer.length > i) {
      	    field.value = answer.slice(0, i+1) + val.slice(i, val.length);
      	    this._highlight(field, i+1, i+1);
@@ -363,8 +374,8 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
 
     _error_handler: function(field) {
         var found = this._find_answer(field);
-        var index = found.index
-        field.focus()
+        var index = found.index;
+        field.focus();
         this._highlight(field, index, index);
     },
 
@@ -488,10 +499,9 @@ lcg.Dictation = Class.create(lcg.FillInExercise, {
 	play_media(this._recordings[this._current_recording]);
     },
 
-
     _display_results: function() {
-	msg = this._msg(this._correct() ? 'Correct':'Error(s) found');
-	this._form.result.value = msg
+	var msg = this._msg(this._correct() ? 'Correct':'Error(s) found');
+	this._form.result.value = msg;
     }
 
 });
