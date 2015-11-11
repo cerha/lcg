@@ -345,10 +345,15 @@ class PopupMenuCtrl(Widget, lcg.Container):
         g = context.generator()
         content = lcg.Container.export(self, context)
         return g.concat(
-            g.div((content, g.a(self._title, title=self._title, href='#', cls='popup-arrow')),
-                  cls='invoke-menu' + (' labeled' if content else ''), tabindex='0'),
+            g.span((content, g.a(self._title, title=self._title, href='#', cls='popup-arrow')),
+                   cls='invoke-menu' + (' labeled' if content else ''), tabindex='0'),
             PopupMenu(self._items, label=self._title).export(context),
         )
+
+    def _wrap_exported_widget(self, context, content, **kwargs):
+        g = context.generator()
+        # Using spans is important to make display: inline-block work in MSIE 8.
+        return g.span(content, **kwargs)
 
 
 class CollapsiblePane(Widget, lcg.Section):
