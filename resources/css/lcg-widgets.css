@@ -94,13 +94,12 @@
     position: relative;
 }
 .popup-menu-ctrl-widget .invoke-menu {
-    display: inline-block;
 }
 .popup-menu-ctrl-widget .popup-arrow {
     position: relative;
-    top: 2px;
+    bottom: 0;
     display: inline-block;
-    background: url(popup-arrow.png) 3px center no-repeat;
+    background: url(popup-arrow.png) 3px 1px no-repeat;
     height: 1em;
     padding-left: 21px;
     text-indent: -9999px;
