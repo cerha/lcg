@@ -96,16 +96,11 @@ class ExerciseExporter(object):
         """
         return True
 
-    def _media_control(self, context, media, inline=False):
+    def _media_control(self, context, media):
         g = context.generator()
-        if inline:
-            img = context.resource('media-play.gif')
-            label = g.img(context.uri(img))
-        else:
-            label = _("Play")
         button_id = context.unique_id()
         context.connect_shared_player(context.uri(media), button_id)
-        return g.button(label, id=button_id, cls='media-control')
+        return g.button(_("Play"), id=button_id, cls='media-control')
 
     def _export_tasks(self, context, exercise, exercise_id):
         exported_tasks = [context.localize(self._export_task(context, exercise, exercise_id, task))
@@ -425,7 +420,7 @@ class _FillInExerciseExporter(ExerciseExporter):
                         # Set the width through CSS. Otherwise the fields are too wide in FF.
                         style='box-model: content-box; width: %dem;' % size,
                         cls=self._field_cls(context, field_id, text)),
-                [self._media_control(context, m, inline=True) for m in task.media()],
+                [self._media_control(context, m) for m in task.media()],
                 self._field_result(context, field_id, text)
             )
         return (context.localize(field), field_id)
