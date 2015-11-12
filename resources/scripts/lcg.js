@@ -609,7 +609,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     },
 
     on_item_click: function (event, item) {
-	if (event.findElement('.icon')) {
+	if (!event.findElement('.label')) {
 	    if (item.up('li').hasClassName('folded')) {
 		this.expand_item(item);
 	    } else {
