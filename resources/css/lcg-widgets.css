@@ -96,14 +96,14 @@
 .popup-menu-ctrl-widget .invoke-menu {
 }
 .popup-menu-ctrl-widget .popup-arrow {
+    display: inline-block;
+    width: 16px;
+    height: 12px;
+    background: url(lcg-icons.png) 0px 1px no-repeat;
     position: relative;
     bottom: 0;
-    display: inline-block;
-    background: url(popup-arrow.png) 3px 1px no-repeat;
-    height: 1em;
-    padding-left: 21px;
+    margin: 0 2px;
     text-indent: -9999px;
-    width: 0px;
     overflow: hidden;
     outline: none;
 }
