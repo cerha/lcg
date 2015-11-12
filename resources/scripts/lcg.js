@@ -1226,6 +1226,10 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 	    this.toggle();
 	    event.stop();
 	}.bind(this));
+	var backref = heading.down('a.backref');
+	if (backref) {
+	    backref.setAttribute('href', '');
+	}
 	if (!content.getAttribute('id')) {
 	    content.setAttribute('id', this.element.getAttribute('id') + '-collapsible-content');
 	}
