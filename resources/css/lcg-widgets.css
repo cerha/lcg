@@ -175,7 +175,7 @@
     border-radius: 7px;
     -moz-border-radius: 7px;
     -webkit-border-radius: 7px;
-    background: url(cross-small.png) 1px 1px no-repeat #ddd;
+    background: url(lcg-icons.png) -23px -39px no-repeat #ddd;
 }
 
 .tooltip-widget {
@@ -197,7 +197,6 @@
     display: button;
     font-size: 1.1em;
     padding: 0;
-    padding-left: 12px;
     margin-top: 0.7em;
     margin-bottom: 0.4em;
     background-position: left center;
@@ -205,10 +204,13 @@
     border: none;
     cursor: default;
 }
-
-.collapsible-pane-widget.expanded .collapsible-pane-heading {
-    background-image: url(pane-expanded.png);
+.collapsible-pane-widget .collapsible-pane-heading .icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 2px;
+    background: url(lcg-icons.png) -13px -16px no-repeat; 
 }
-.collapsible-pane-widget.collapsed .collapsible-pane-heading {
-    background-image: url(pane-collapsed.png);
+.collapsible-pane-widget.expanded .collapsible-pane-heading .icon {
+    background-position: -12px -28px;
 }

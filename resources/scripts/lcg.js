@@ -1221,6 +1221,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 	    this.element.addClassName('expanded');
 	}
 	heading.addClassName('collapsible-pane-heading');
+	heading.insert({top: new Element('span', {'class': 'icon'})});
 	heading.on('click', function(event) {
 	    this.toggle();
 	    event.stop();
