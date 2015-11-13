@@ -99,9 +99,9 @@
     display: inline-block;
     width: 16px;
     height: 12px;
-    background: url(lcg-icons.png) 0px 1px no-repeat;
+    background: url(lcg-icons.png) 0px 0px no-repeat;
     position: relative;
-    bottom: 0;
+    bottom: -1px;
     margin: 0 2px;
     text-indent: -9999px;
     overflow: hidden;
