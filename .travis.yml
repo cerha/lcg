@@ -20,7 +20,7 @@ install:
   # install liblouisutdml
   - "if [ $UTDML_VERSION == 'debian-wheezy' ]; then wget http://http.debian.net/debian/pool/main/libl/liblouisutdml/liblouisutdml_2.2.0.orig.tar.gz && tar xzf liblouisutdml_2.2.0.orig.tar.gz && cd liblouisutdml-2.2.0; fi"
   - "if [ $UTDML_VERSION == 'debian-jessie' ]; then wget https://liblouisutdml.googlecode.com/files/liblouisutdml-2.5.0.tar.gz && tar xzf liblouisutdml-2.5.0.tar.gz && cd liblouisutdml-2.5.0; fi"
-  - "if [ $UTDML_VERSION == 'head' ]; then hg clone https://code.google.com/p/liblouisutdml/ && cd liblouisutdml && ./autogen.sh; fi"
+  - "if [ $UTDML_VERSION == 'head' ]; then git clone https://github.com/liblouis/liblouisutdml && cd liblouisutdml && ./autogen.sh; fi"
   - "./configure --prefix=/usr CFLAGS='-I/usr/lib/jvm/java-7-oracle/include -I/usr/lib/jvm/java-7-oracle/include/linux' && make && sudo make install && cd .."
 script:
   - "PYTHONPATH=`pwd`/lib:$PYTHONPATH LCGDIR=`pwd` make"
