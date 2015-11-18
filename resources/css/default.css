@@ -15,7 +15,7 @@ h7,h8,h9 { font-size: 1.1em; }
 a:link, a:visited { color: #04b; }
 a:hover, .speaking-text:hover { color: #f60; }
 a.backref, a:link.backref { 
-    color: #000 !important; /* important needed for MSIE */
+    color: #000;
     text-decoration: none;
 }
 
@@ -24,7 +24,7 @@ a.backref, a:link.backref {
 /* Exporter generated parts */
 
 #language-selection { 
-    border: 0px solid #c8ccd0;
+    border: 0 solid #c8ccd0;
     font-size: 0.9em;
     padding: 0.2em;
     border-top-width: 1px;
@@ -94,14 +94,14 @@ table.lcg-fieldset th {
     vertical-align: top;
 }
 
-pre.lcg-preformatted-text {
+.lcg-preformatted-text {
     background: #efffb8;
     border: 1px solid #aaa;
     padding: 4pt;
     white-space: pre;
 }
 
-div.table-of-contents { 
+.table-of-contents { 
     border: solid #c8ccd0;
     border-width: 1px 0;
     background: #f0f0f0;
@@ -109,8 +109,7 @@ div.table-of-contents {
     padding: 3pt;
     clear: both;
 }
-/* div.table-of-contents a { text-decoration: none; } */
-div.table-of-contents ul { 
+.table-of-contents ul { 
     margin-top: 3pt;
     margin-bottom: 0;
 }
