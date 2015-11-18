@@ -1,6 +1,6 @@
 /* Generic content styles */
 
-html, body { 
+html, body {
     background: #fff;
     font-family: sans-serif;
 }
@@ -14,7 +14,7 @@ h7,h8,h9 { font-size: 1.1em; }
 
 a:link, a:visited { color: #04b; }
 a:hover, .speaking-text:hover { color: #f60; }
-a.backref, a:link.backref { 
+a.backref, a:link.backref {
     color: #000;
     text-decoration: none;
 }
@@ -23,47 +23,47 @@ a.backref, a:link.backref {
 
 /* Exporter generated parts */
 
-#language-selection { 
+#language-selection {
     border: 0 solid #c8ccd0;
     font-size: 0.9em;
     padding: 0.2em;
     border-top-width: 1px;
     text-align: right;
 }
-#language-selection img { 
+#language-selection img {
     margin: 0 0.2em;
     border: 0;
 }
-#content { 
+#content {
     margin-bottom: 1.6em;
 }
-#copyright { 
+#copyright {
     font-size: 0.8em;
     float: right;
 }
-#version { 
+#version {
     font-size: 0.8em;
 }
-#shared-audio-player { 
+#shared-audio-player {
     position: fixed;
     bottom: 0;
     right: 0;
 }
-div#shared-audio-player { 
+div#shared-audio-player {
     background: #fee;
     border: solid 1px #f00;
     padding: .1em;
 }
 
-#navigation, #top-navigation, #bottom-navigation { 
+#navigation, #top-navigation, #bottom-navigation {
     border: solid #b8bcc0;
     border-width: 1px 0;
     background: #e8ecf0;
 }
-#navigation span.separator, #top-navigation span.separator, #bottom-navigation span.separator { 
+#navigation span.separator, #top-navigation span.separator, #bottom-navigation span.separator {
     display: none;
 }
-#navigation span.next, #top-navigation span.next, #bottom-navigation span.next { 
+#navigation span.next, #top-navigation span.next, #bottom-navigation span.next {
     float: right;
 }
 #navigation hr, #top-navigation hr, #bottom-navigation hr { display: none; }
@@ -101,7 +101,7 @@ table.lcg-fieldset th {
     white-space: pre;
 }
 
-.table-of-contents { 
+.table-of-contents {
     border: solid #c8ccd0;
     border-width: 1px 0;
     background: #f0f0f0;
@@ -109,23 +109,23 @@ table.lcg-fieldset th {
     padding: 3pt;
     clear: both;
 }
-.table-of-contents ul { 
+.table-of-contents ul {
     margin-top: 3pt;
     margin-bottom: 0;
 }
 
 /* Formatter */
 
-.citation, .quotation { 
+.citation, .quotation {
     font-style: italic;
 }
-.underline { 
+.underline {
     text-decoration: underline;
 }
 dl dt {
     font-weight: bold;
 }
-dl dt .citation { 
+dl dt .citation {
     font-style: normal;
 }
 
