@@ -92,7 +92,7 @@ from .export.exercises_html import ExerciseExporter, \
 try:
     from .export.braille import BrailleError, BrailleExporter, \
         braille_presentation, xml2braille
-except ImportError:
+except (ImportError, OSError):
     pass
 
 try:
