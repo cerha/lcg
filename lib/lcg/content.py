@@ -1083,7 +1083,20 @@ class Heading(Container):
 
 class PreformattedText(TextContent):
     """Preformatted text."""
-    pass
+    def __init__(self, text, mime_type=None, **kwargs):
+        """Arguments:
+
+          text -- the text itself as a basestring.
+          mime_type -- MIME type of the text as a basestring.  Used for
+            syntax highlighting in HTML export.
+
+        """
+        super(PreformattedText, self).__init__(text, **kwargs)
+        self._mime_type = mime_type
+
+    def mime_type(self):
+        """Return MIME type of the text if it was passed to the constructor or None."""
+        return self._mime_type
 
 
 # ======================== Block level elements ========================

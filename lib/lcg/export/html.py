@@ -279,8 +279,8 @@ class HtmlGenerator(object):
     def code(self, text, **kwargs):
         return self._tag('code', text, **kwargs)
 
-    def pre(self, text, cls="lcg-preformatted-text", **kwargs):
-        return self._tag('pre', text, cls=cls, **kwargs)
+    def pre(self, text, **kwargs):
+        return self._tag('pre', text, **kwargs)
 
     def sup(self, text, **kwargs):
         return self._tag('sup', text, **kwargs)
@@ -939,7 +939,23 @@ class HtmlExporter(lcg.Exporter):
             context.position_info.pop()
 
     def _export_preformatted_text(self, context, element):
-        return self._generator.pre(self.escape(element.text()))
+        g = self._generator
+        text = element.text()
+        mime_type = element.mime_type()
+        if mime_type:
+            try:
+                import pygments
+                import pygments.lexers
+                import pygments.formatters
+            except ImportError:
+                pass
+            else:
+                lexer = pygments.lexers.get_lexer_for_mimetype(mime_type)
+                if lexer:
+                    html = pygments.highlight(text, lexer, pygments.formatters.HtmlFormatter())
+                    context.resource('pygments.css')
+                    return g.div(g.noescape(html), cls="lcg-preformatted-text")
+        return g.div(g.pre(self.escape(text)), cls="lcg-preformatted-text")
 
     def _export_itemized_list(self, context, element):
         g = self._generator

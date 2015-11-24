@@ -96,10 +96,13 @@ table.lcg-fieldset th {
 .lcg-preformatted-text {
     background: #efffb8;
     border: 1px solid #aaa;
-    padding: 4pt;
-    white-space: pre;
+    margin: 1em 0;
+    padding: 4px;
 }
-
+.lcg-preformatted-text pre {
+    white-space: pre;
+    margin: 0;
+}
 .table-of-contents {
     border: solid #c8ccd0;
     border-width: 1px 0;
