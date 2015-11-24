@@ -1448,15 +1448,15 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
 
     def _head(self, context):
         g = self._generator
-        base = super(HtmlStaticExporter, self)._head(context)
         node = context.node()
-        additional = [g.link(rel=kind, href=self.uri(context, n), title=n.title())
-                      for kind, n in (('top', node.root()),
-                                      ('prev', node.prev()),
-                                      ('next', node.next()),
-                                      ('parent', node.parent()))
-                      if n is not None and n is not node]
-        return base + additional
+        return super(HtmlStaticExporter, self)._head(context) + [
+            g.link(rel=kind, href=self.uri(context, n), title=n.title())
+            for kind, n in (('top', node.root()),
+                            ('prev', node.prev()),
+                            ('next', node.next()),
+                            ('parent', node.parent()))
+            if n is not None and n is not node
+        ] + [g.meta(http_equiv='Content-Type', content='text/html; charset=utf-8')]
 
     def _language_selection(self, context):
         if context.node() is not context.node().root():
