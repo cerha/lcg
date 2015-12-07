@@ -226,7 +226,7 @@ class PopupMenuItem(object):
     """Popup menu item specification."""
 
     def __init__(self, label, tooltip=None, uri=None, enabled=True, callback=None,
-                 callback_args=(), cls=None):
+                 callback_args=(), icon=None, cls=None):
         """Arguments:
           label -- item title (string)
           tooltip -- item description/tooltip (string).
@@ -239,8 +239,11 @@ class PopupMenuItem(object):
             optionally specified by 'callback_args'.
           callback_args -- Additional JavaScript callback function arguments
             (tuple of values capable of JSON conversion).
-          cls -- CSS class name to be used for the item (e.g to assign
-             icons through stylesheets).  No class assigned when None.
+          icon -- icon CSS class name.  If not None, a span with this class
+            name will be added before the item label.  The CSS definition of
+            the icon must be present in stylesheets.
+          cls -- CSS class name to be used for the item.  No class assigned
+             when None.
 
         """
         self.label = label
@@ -249,6 +252,7 @@ class PopupMenuItem(object):
         self.enabled = enabled
         self.callback = callback
         self.callback_args = callback_args
+        self.icon = icon
         self.cls = cls
 
 
@@ -283,6 +287,7 @@ class PopupMenu(Widget, lcg.Content):
                       uri=item.uri,
                       callback=item.callback,
                       callback_args=item.callback_args,
+                      icon=item.icon,
                       cls=item.cls)
                  for item in self._items]
         return (items, context.translate(_("Close menu %s", self._label) if self._label else

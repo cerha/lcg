@@ -770,6 +770,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
      *       optionally specified by 'callback_args'.
      *     callback_args -- Array of additional arguments to pass to the
      *       callback function
+     *     icon -- CSS class name of item's icon (string, optional)
      *     cls -- CSS class name to be used for the item (string, optional)
      *   close_button_label -- if defined, the menu will have a close button
      *     with given label.  The close button is displayed at the top right
@@ -831,6 +832,9 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    var li = new Element('li').update(a);
 	    if (item.enabled === undefined || item.enabled) {
 		li.addClassName('active');
+	    }
+	    if (item.icon) {
+		a.insert({top: new Element('span', {'class': 'icon ' + item.icon})});
 	    }
 	    if (item.cls) {
 		li.addClassName(item.cls);
