@@ -140,6 +140,10 @@
     min-width: 100px;
     margin: 0;
 }
+.popup-menu-widget li .icon {
+    margin-right: 6px;
+}
+
 .popup-menu-widget li a,
 .dropdown-selection-widget li a {
     display: block;
