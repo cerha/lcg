@@ -142,6 +142,10 @@
 }
 .popup-menu-widget li .icon {
     float: left;
+    opacity: 0.6;
+}
+.popup-menu-widget li.active .icon {
+    opacity: 1;
 }
 .popup-menu-widget li .label.indented {
     margin-left: 22px;
