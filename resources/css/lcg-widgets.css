@@ -141,7 +141,11 @@
     margin: 0;
 }
 .popup-menu-widget li .icon {
-    margin-right: 6px;
+    float: left;
+}
+.popup-menu-widget li .label.indented {
+    margin-left: 22px;
+    display: block;
 }
 
 .popup-menu-widget li a,

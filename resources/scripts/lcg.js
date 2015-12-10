@@ -823,8 +823,13 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
 	    ul.setAttribute(attr, this.element.getAttribute(attr));
 	    this.element.removeAttribute(attr);
 	}.bind(this));
+	var label_class = 'label';
+	if (this.items.some(function (item) { return item.icon; })) {
+	    label_class += ' indented';
+	}
 	this.items.each(function (item) {
-	    var a = new Element('a', {'href': item.uri || '#'}).update(item.label);
+	    var a = new Element('a', {'href': item.uri || '#'})
+		.update(new Element('span', {'class': label_class}).update(item.label));
 	    if (item.tooltip) {
 		a.setAttribute('title', item.tooltip);
 	    }
