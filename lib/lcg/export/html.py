@@ -195,7 +195,32 @@ class HtmlGenerator(object):
         return self._tag('input', None, _attr, _paired=False, type=type, **kwargs)
 
     def uri(self, base, *args, **kwargs):
+        """Return a URI constructed from given base URI and arguments.
+
+        Arguments:
+
+          base -- base URI.  A relative path such as '/xx/yy'.
+          *args -- pairs (NAME, VALUE) representing arguments appended to
+            'base_uri' in the order in which they appear.  The first positional
+            argument may also be a string representing an anchor name.  If
+            that's the case, the anchor is appended to 'base_uri' after a '#'
+            sign and the first argument is not considered to be a (NAME, VALUE)
+            pair.
+          **kwargs -- keyword arguments representing additional arguments to
+            append to the URI.  Use 'kwargs' if you don't care about the order
+            of arguments in the returned URI, otherwise use 'args'.
+
+        If any of 'args' or 'kwargs' VALUE is None, the argument is omitted.
+
+        The URI and the arguments may be unicode strings.  All strings are
+        encoded as 'utf-8' and properly quoted and in the returned URI.
+
+        """
         uri = urllib.quote(base.encode('utf-8'))
+        if args and isinstance(args[0], basestring):
+            uri += '#' + urllib.quote(unicode(args[0]).encode('utf-8'))
+            args = args[1:]
+
         query = ';'.join([k + '=' + urllib.quote(unicode(v).encode('utf-8'))
                           for k, v in args + tuple(kwargs.items()) if v is not None])
         if query:
