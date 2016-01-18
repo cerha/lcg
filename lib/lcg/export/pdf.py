@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2008-2016 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -2896,7 +2896,7 @@ class PDFExporter(FileExporter, Exporter):
         if isinstance(content, Text):
             paragraph = make_element(Paragraph, content=[content],
                                      presentation=element.presentation(),
-                                     halign=halign)
+                                     halign=halign, noindent=element.noindent())
         else:
             paragraph = make_element(Container, content=[content], halign=halign)
         return paragraph

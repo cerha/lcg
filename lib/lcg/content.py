@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -252,8 +252,7 @@ class Container(Content):
     _SUBSEQUENCE_LENGTH = None
 
     def __init__(self, content, name=(), id=None, halign=None, valign=None,
-                 orientation=None,
-                 presentation=None, **kwargs):
+                 orientation=None, presentation=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -1107,7 +1106,23 @@ SectionContainer = Container
 
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
-    pass
+
+    def __init__(self, content, noindent=False, **kwargs):
+        """Arguments:
+
+          content -- sequence of list items as 'Content' instances.
+          noindent -- True if first line indentation should be suppressed.
+            Note, that only PDF export currently supports first paragraph line
+            indentation.
+
+        """
+        assert isinstance(noindent, bool)
+        self._noindent = noindent
+        super(Paragraph, self).__init__(content, **kwargs)
+
+    def noindent(self):
+        """Return 'noindent' as it was given in the constructor."""
+        return self._noindent
 
 
 class ItemizedList(Container):
