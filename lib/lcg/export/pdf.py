@@ -123,7 +123,8 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                     flowable = flowable[0]
                 else:
                     flowable = RLContainer(flowable, vertical=True)
-            max_height = self.height / 3  # so that header, footer and content have all chance to fit
+            # Set max height so that header, footer and content have all chance to fit.
+            max_height = self.height / 3
             width, height = flowable.wrap(self.width, max_height)
             return flowable, width, height
         def frame_height(header, footer):
@@ -1373,7 +1374,7 @@ class Text(Element):
             # some coding issues with pytis data retrieved from the database we
             # must make sure that the result is unicode.  On the other hand we
             # shouldn't touch the original object unless needed, otherwise the
-            # mysterious Context.translate method may stop produce texts from
+            # mysterious Context.localize method may stop produce texts from
             # symbolic labels.
             if not isinstance(self.content, unicode):
                 self.content = unicode(self.content)
