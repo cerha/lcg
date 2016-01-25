@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2012-2015 BRAILCOM, o.p.s.
+ * Copyright (C) 2012-2016 BRAILCOM, o.p.s.
  * Author: Tomas Cerha
  *
  * This program is free software; you can redistribute it and/or modify
@@ -480,9 +480,17 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     init_item: function ($super, item, prev, parent) {
 	$super(item, prev, parent);
 	item.setAttribute('role', 'treeitem');
-	var span = item.down('span');
-	if (span) {
-	    span.setAttribute('role', 'presentation');
+	var icon = item.down('.icon');
+	if (icon) {
+	    icon.setAttribute('role', 'presentation');
+	}
+	var label = item.down('.label');
+	if (label) {
+	    // Needed for VoiceOver to read the labels after adding the icon span
+	    // inside the a tag (because of MSIE as described in widgets.py...).
+	    var label_id = item.getAttribute('id') + '-label';
+	    label.setAttribute('id', label_id);
+	    item.setAttribute('aria-labeledby', label_id);
 	}
 	var li = item.up('li');
 	// Append hierarchical submenu if found.
