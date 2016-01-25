@@ -788,7 +788,8 @@ class Context(object):
                 italic_name = '-' + italic_name
         for directory in ('/usr/share/fonts/truetype/ttf-dejavu',
                           '/usr/share/fonts/truetype/freefont',
-                          '/Library/Fonts'):
+                          '/Library/Fonts',
+                          os.getenv('HOME') + '/Library/Fonts'):
             font_file = ('%s/%s%s%s%s.ttf' % (directory, name, family_name,
                                               bold_name, italic_name,))
             if os.access(font_file, os.R_OK):
