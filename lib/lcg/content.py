@@ -454,8 +454,8 @@ class TextContent(Content):
         super(TextContent, self).__init__(**kwargs)
         self._text = text
 
-    def __str__(self):
-        text = str(self._text).strip()
+    def __unicode__(self):
+        text = unicode(self._text).strip()
         sample = text and text.splitlines()[0] or ''
         if len(sample) > 20:
             sample = sample[:20]
