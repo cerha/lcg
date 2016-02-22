@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -350,7 +350,8 @@ class PopupMenuCtrl(Widget, lcg.Container):
         g = context.generator()
         content = lcg.Container.export(self, context)
         return g.concat(
-            g.span((content, g.a(self._title, title=self._title, href='#', cls='popup-arrow')),
+            g.span((content, g.a(self._title, title=self._title, href='#', tabindex="-1",
+                                 cls='popup-arrow')),
                    cls='invoke-menu' + (' labeled' if content else ''), tabindex='0'),
             PopupMenu(self._items, label=self._title).export(context),
         )
