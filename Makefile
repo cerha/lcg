@@ -10,6 +10,9 @@ compile:
 translations:
 	make -C translations
 
+extract:
+	make -C translations extract
+
 doc:
 	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" bin/lcgmake.py doc/src doc/html
 
