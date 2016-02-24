@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-10 12:17+0100\n"
+"POT-Creation-Date: 2016-02-24 10:49+0100\n"
 "PO-Revision-Date: 2009-09-14 14:36+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Spanish <lcg@lists.freebsoft.org>\n"
@@ -1773,12 +1773,12 @@ msgstr "nov"
 msgid "Dec"
 msgstr "dic"
 
-#: ../lib/lcg/widgets.py:304
+#: ../lib/lcg/widgets.py:293
 #, python-format
 msgid "Close menu %s"
 msgstr ""
 
-#: ../lib/lcg/widgets.py:305
+#: ../lib/lcg/widgets.py:294
 msgid "Close menu"
 msgstr ""
 
@@ -1822,39 +1822,39 @@ msgstr ""
 msgid "%s: converting to %s: %s"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:665
+#: ../lib/lcg/export/html.py:690
 msgid "Choose your language:"
 msgstr "Escoger el idioma:"
 
-#: ../lib/lcg/export/html.py:1164
+#: ../lib/lcg/export/html.py:1205
 msgid "Flash movie object"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1229
+#: ../lib/lcg/export/html.py:1270
 msgid ""
 "Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
 "swfobject.js to your resource path."
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1255
+#: ../lib/lcg/export/html.py:1296
 #, fuzzy, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr ""
 "Flash %(version)s no detectado. Obtener %(plugin)s %(version)s o más nuevo "
 "para las funciones más avanzadas."
 
-#: ../lib/lcg/export/html.py:1257
+#: ../lib/lcg/export/html.py:1298
 #, fuzzy
 msgid "Use a JavaScript enabled browser."
 msgstr ""
 "Java script no detectado. Usar un navegador con JavaScript para las "
 "funciones más avanzadas."
 
-#: ../lib/lcg/export/html.py:1258 ../lib/lcg/export/html.py:1260
+#: ../lib/lcg/export/html.py:1299 ../lib/lcg/export/html.py:1301
 msgid "Warning:"
 msgstr "Aviso:"
 
-#: ../lib/lcg/export/html.py:1291
+#: ../lib/lcg/export/html.py:1332
 msgid "Media Player unavailable."
 msgstr ""
 
@@ -1862,36 +1862,36 @@ msgstr ""
 #. Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next:
 #. None".
-#: ../lib/lcg/export/html.py:1492
+#: ../lib/lcg/export/html.py:1533
 msgid "None"
 msgstr "Nada"
 
-#: ../lib/lcg/export/html.py:1493
+#: ../lib/lcg/export/html.py:1534
 msgid "You are here:"
 msgstr "Usted está aquí:"
 
 # Link to the next page.
 #. Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1497
+#: ../lib/lcg/export/html.py:1538
 msgid "Next"
 msgstr "Siguiente"
 
 # Link to the previous page.
 #. Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1499
+#: ../lib/lcg/export/html.py:1540
 msgid "Previous"
 msgstr "Anterior"
 
-#: ../lib/lcg/export/pdf.py:2040 ../lib/lcg/export/pdf.py:2108
+#: ../lib/lcg/export/pdf.py:2042 ../lib/lcg/export/pdf.py:2110
 #, python-format
 msgid "Missing image: %s"
 msgstr ""
 
-#: ../lib/lcg/export/pdf.py:2611
+#: ../lib/lcg/export/pdf.py:2613
 msgid "Page content extremely large, giving up"
 msgstr ""
 
-#: ../lib/lcg/export/pdf.py:2613
+#: ../lib/lcg/export/pdf.py:2615
 #, python-format
 msgid "Page content too large, reducing it by %s"
 msgstr ""
