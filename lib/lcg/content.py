@@ -1880,10 +1880,10 @@ def coerce(content, formatted=False):
         other argument raises AssertionError.
 
       formatted -- a boolean flag indicating how strings should treated.  If
-        False (the default) strings are parsed for inline markup using
-        'lcg.Parser.parse_inline_markup()'.  If True strings are simply turned
-        into 'TextContent' instances.  Applies recursively if a sequence is
-        passed as the 'content' argument.
+        False (the default) strings are simply turned into 'TextContent'
+        instances.  If True, strings are parsed for inline markup using
+        'lcg.Parser.parse_inline_markup()'.  Applies recursively if a sequence
+        is passed as the 'content' argument.
 
     """
     assert isinstance(formatted, bool)
