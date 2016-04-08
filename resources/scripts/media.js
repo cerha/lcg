@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+/* Copyright (C) 2004-2016 BRAILCOM, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -107,27 +107,28 @@ function init_player_controls(player_id, uri, button_id, selection_id, durations
 	initial_position: null,
 	track_durations: durations
     };
-    if (button != null) {
+    if (button !== null) {
 	button._media_player_ctrl = ctrl;
 	button.onclick = _on_media_ctrl_click;
 	// Not all browsers fire keypress events for arrow keys, so we handle onkeydown as well.
 	button.onkeypress = _on_media_ctrl_keypress;
 	button.onkeydown = _on_media_ctrl_keydown;
     }
-    if (select != null) {
+    if (select !== null) {
 	select._media_player_ctrl = ctrl;
 	select.onchange = _on_media_ctrl_select;
     }
-    if (field != null) {
+    if (field !== null) {
 	// If the position field contains an initial value (position in seconds), the first playback
 	// will start from given position.
-	var position = field.value
-	if (typeof position != 'undefined' && position != 0)
+	var position = field.value;
+	if (typeof position != 'undefined' && position !== 0)
 	    ctrl.initial_position = position;
 	field.value = 0;
     }
-    if (player_id != _shared_player_id)
-	_player_state[player_id].controls = ctrl
+    if (player_id !== _shared_player_id) {
+	_player_state[player_id].controls = ctrl;
+    }
 }
 
 function play_media(uri) {
@@ -144,9 +145,9 @@ function playerReady(obj) {
 	player.addModelListener('STATE', '_on_player_state_changed');
 	player.addModelListener('TIME', '_on_player_time_changed');
 	player.addModelListener('LOADED', '_on_player_loading_progress_changed');
-	state.volume = player.getConfig()['volume'];
+	state.volume = player.getConfig().volume;
 	var ctrl = state.controls;
-	if (ctrl != null && ctrl.initial_position != null) {
+	if (ctrl !== null && ctrl.initial_position !== null) {
 	    // If position was saved before, we want to start download on page load, because for
 	    // seeking we need to download the whole file first.  The player actually starts download
 	    // after playback is invoked, so the trick below starts and stops playback.  The delay was
@@ -160,7 +161,7 @@ function playerReady(obj) {
 // Media player control functions.
 
 function _media_player(player_id) {
-    if (player_id != null) {
+    if (player_id !== null) {
 	var player = document.getElementById(player_id);
 	// Check that this really is the player instance, not its empty container.
 	if (typeof player.getPlaylist != 'undefined')
@@ -171,21 +172,21 @@ function _media_player(player_id) {
 
 function _media_player_current_uri(player) {
     var playlist = player.getPlaylist();
-    if (playlist != null && playlist.length != null)
+    if (playlist !== null && playlist.length !== null)
 	return playlist[0].file;
     else
-	return null
+	return null;
 }
 
 function _media_player_play(player_id, uri, duration, position) {
     var player = _media_player(player_id);
-    if (player != null) {
-	if (uri != _media_player_current_uri(player))
+    if (player !== null) {
+	if (uri !== _media_player_current_uri(player))
 	    player.sendEvent('LOAD', {file: uri, duration: duration});
 	player.sendEvent('PLAY');
-	if (position != null) {
+	if (position !== null) {
 	    var state = _player_state[player_id];
-	    if (uri == state.loaded_uri) {
+	    if (uri === state.loaded_uri) {
 		// When the file was already loaded, we can seek immediately.
 		player.sendEvent('SEEK', position);
 	    } else {
@@ -211,9 +212,9 @@ function _media_player_ctrl_play(ctrl, preserve_initial_position) {
     var duration = null;
     var position = null;
     var select = ctrl.track_selection;
-    if (select != null) {
+    if (select !== null) {
 	uri += '/'+ select.value;
-	if (ctrl.track_durations != null)
+	if (ctrl.track_durations !== null)
 	    duration = ctrl.track_durations[select.selectedIndex];
     }
     if (typeof preserve_initial_position == 'undefined') {
@@ -226,11 +227,11 @@ function _media_player_ctrl_play(ctrl, preserve_initial_position) {
 
 function _media_player_seek(player_id, forward) {
     var player = _media_player(player_id);
-    if (player != null) {
+    if (player !== null) {
 	var state = _player_state[player_id];
 	var position = state.position;
 	var duration = state.duration;
-	if (duration != null) {
+	if (duration !== null) {
 	    var skip = duration / 20; // Seconds
 	    if (skip < 3) skip = 3;
 	    if (skip > 30) skip = 30;
@@ -249,7 +250,7 @@ function _media_player_seek(player_id, forward) {
 function _media_player_volume(player_id, diff) {
     // Increase/decrease the player volume by +/- diff percent.
     var player = _media_player(player_id);
-    if (player != null) {
+    if (player !== null) {
 	var state = _player_state[player_id];
 	var volume = state.volume + diff;
 	//alert(_str(state) +': '+ volume);
@@ -264,7 +265,7 @@ function _media_player_volume(player_id, diff) {
 function _str(obj) {
     // For debugging only.
     var str = '';
-    for (attr in obj)
+    for (var attr in obj)
 	str += (str ? ', ' : '') + attr +': '+ obj[attr];
     return '{'+ str +'}';
 }
@@ -278,11 +279,11 @@ function _on_player_time_changed(event) {
     state.position = position;
     state.duration = event.duration;
     // Update the position stored in player controls.
-    if (ctrl != null) {
+    if (ctrl !== null) {
 	var field = ctrl.position_field;
-	if (field != null) {
+	if (field !== null) {
 	    var value = Math.floor(position);
-	    if (value != field.value)
+	    if (value !== field.value)
 		field.value = value;
 	}
     }
@@ -296,13 +297,13 @@ function _on_player_volume_changed(event) {
 function _on_player_state_changed(event) {
     // Player states: IDLE, BUFFERING, PLAYING, PAUSED, COMPLETED
     var state = _player_state[event.id];
-    //state.playing = (event.newstate == 'BUFFERING' || event.newstate == 'PLAYING');
+    //state.playing = (event.newstate === 'BUFFERING' || event.newstate === 'PLAYING');
     var ctrl = state.controls;
     // Warning: The player behaves strangely with short recordings.  The state normally changes form
     // 'PLAYING' to 'COMPLETED', but sometimes also 'PLAYING' -> 'PAUSED', 'PAUSED' -> 'COMPLETED'.
-    if (ctrl != null && event.newstate == "COMPLETED" && event.oldstate != "COMPLETED") {
+    if (ctrl !== null && event.newstate === "COMPLETED" && event.oldstate !== "COMPLETED") {
 	var select = ctrl.track_selection;
-	if (select != null && select.selectedIndex < select.options.length-1) {
+	if (select !== null && select.selectedIndex < select.options.length-1) {
 	    // Automatically advance to the next track if track selection control is present.
 	    select.selectedIndex++;
 	    _media_player_ctrl_play(ctrl);
@@ -311,11 +312,11 @@ function _on_player_state_changed(event) {
 }
 
 function _on_player_loading_progress_changed(event) {
-    if (event.loaded == event.total) {
+    if (event.loaded === event.total) {
 	var state = _player_state[event.id];
 	state.loaded_uri = _media_player_current_uri(_media_player(event.id));
 	var on_load = state.on_load;
-	if (on_load != null) {
+	if (on_load !== null) {
 	    state.on_load = null;
 	    setTimeout(on_load, 100);
 	}
@@ -332,7 +333,7 @@ function _on_media_ctrl_click(event) {
 function _on_media_ctrl_select(event) {
     var ctrl = this._media_player_ctrl;
     var field = ctrl.position_field;
-    if (field != null)
+    if (field !== null)
 	field.value = 0;
     return true;
 }
@@ -343,9 +344,9 @@ function _on_media_ctrl_keydown(event) {
     var map = {37: '<', // left arrow
 	       39: '>', // right arrow
 	       38: '+', // up arrow
-	       40: '-'} // down arrow
+	       40: '-'}; // down arrow
     var key = map[code];
-    if (key != null)
+    if (key !== null)
 	return _handle_media_ctrl_keys(key, this._media_player_ctrl);
     else
 	return true;
@@ -359,26 +360,26 @@ function _on_media_ctrl_keypress(event) {
 }
 
 function _handle_media_ctrl_keys(key, ctrl) {
-    if (key == ' ' && ctrl.button.nodeName == 'A') {
+    if (key === ' ' && ctrl.button.nodeName === 'A') {
 	// Pressing space invokes the click event on buttons, but not on links,
 	// so we must handle space on links explicitly here.
 	_media_player_ctrl_play(ctrl);
 	return false;
     }
     var player_id = ctrl.player_id;
-    if (key == '>') {
+    if (key === '>') {
 	_media_player_seek(player_id, true);
 	return false;
     }
-    if (key == '<') {
+    if (key === '<') {
 	_media_player_seek(player_id, false);
 	return false;
     }
-    if (key == '+') {
+    if (key === '+') {
 	_media_player_volume(player_id, +5);
 	return false;
     }
-    if (key == '-') {
+    if (key === '-') {
 	_media_player_volume(player_id, -5);
 	return false;
     }
