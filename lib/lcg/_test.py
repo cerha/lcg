@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -633,14 +633,14 @@ blah blah
         # First item contents
         item_content = items[0].content()
         self.assertEqual(len(item_content), 2, item_content)
-        self.assertIsInstance(item_content[0], lcg.Paragraph)
+        self.assertIsInstance(item_content[0], lcg.Container)
         self.assertIsInstance(item_content[1], lcg.ItemizedList)
         self.assertEqual(item_content[1].order(), lcg.ItemizedList.NUMERIC)
         self.assertEqual(len(item_content[1].content()), 2)
         # Second item contents
         item_content = items[1].content()
         self.assertEqual(len(item_content), 2, item_content)
-        self.assertIsInstance(item_content[0], lcg.Paragraph)
+        self.assertIsInstance(item_content[0], lcg.Container)
         self.assertIsInstance(item_content[1], lcg.ItemizedList)
         self.assertEqual(item_content[1].order(), lcg.ItemizedList.LOWER_ALPHA)
         self.assertEqual(len(item_content[1].content()), 2, item_content[1].content())

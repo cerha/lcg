@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -401,14 +401,16 @@ class Parser(object):
                         break
                 if current_indentation < inner_indentation: # no inner content anymore
                     break
+            # Hack to prevent single paragraphs in list item contents.
+            item0 = item_content[0]
+            if (((len(item_content) == 1
+                  or len(item_content) > 1 and isinstance(item_content[1], lcg.ItemizedList))
+                 and isinstance(item0, lcg.Paragraph)
+                 and item0.halign() is None
+                 and len(item0.content()) == 1)):
+                item_content[0] = item0.content()[0]
             if len(item_content) == 1:
-                element = item_content[0]
-                # Hack to prevent ugly list formatting
-                if ((isinstance(element, lcg.Paragraph) and
-                     element.halign() is None and
-                     len(element.content()) == 1)):
-                    element = element.content()[0]
-                items.append(element)
+                items.append(item_content[0])
             else:
                 items.append(lcg.Container(item_content))
             if position >= size or current_indentation != list_indentation: # no next item
