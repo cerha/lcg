@@ -154,7 +154,9 @@
 }
 
 .popup-menu-widget li a,
-.dropdown-selection-widget li a {
+.popup-menu-widget li a:hover,
+.dropdown-selection-widget li a,
+.dropdown-selection-widget li a:hover {
     display: block;
     color: #777;
     padding: 5px 10px;
