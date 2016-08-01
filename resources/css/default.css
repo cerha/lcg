@@ -69,10 +69,18 @@ div#shared-audio-player {
 
 /* Generic content elements */
 
+table.lcg-fieldset { margin: 0.5em 0; }
+table.lcg-fieldset td.label {
+    white-space: nowrap;
+    text-align: left;
+    padding-right: 0.5em;
+    vertical-align: top;
+}
+
 table.lcg-table {
     border-collapse: collapse;
+    margin: 0.5em 0;
 }
-table.lcg-table, table.lcg-fieldset { margin: 0.5em 0; }
 table.lcg-table td, table.lcg-table th {
     padding: 2pt;
     vertical-align: top;
@@ -81,16 +89,10 @@ table.lcg-table td, table.lcg-table th {
 }
 table.lcg-table td { background: #f4f4f4; }
 table.lcg-table th { background: #eee; }
-table.lcg-table caption, table.lcg-fieldset caption {
+table.lcg-table caption {
     font-weight: bold;
     font-size: 1.1em;
     text-align: left;
-}
-table.lcg-fieldset th {
-    white-space: nowrap;
-    text-align: left;
-    padding-right: 0.5em;
-    vertical-align: top;
 }
 
 .lcg-preformatted-text {

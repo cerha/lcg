@@ -1008,7 +1008,7 @@ class HtmlExporter(lcg.Exporter):
 
     def _export_field_set(self, context, element):
         g = self._generator
-        return g.table([g.tr((g.th(name.export(context)),
+        return g.table([g.tr((g.td(name.export(context), cls='label'),
                               g.td(value.export(context))))
                         for name, value in element.content()],
                        cls='lcg-fieldset', role="presentation")
