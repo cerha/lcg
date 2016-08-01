@@ -490,7 +490,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 	    // inside the a tag (because of MSIE as described in widgets.py...).
 	    var label_id = item.getAttribute('id') + '-label';
 	    label.setAttribute('id', label_id);
-	    item.setAttribute('aria-labeledby', label_id);
+	    item.setAttribute('aria-labelledby', label_id);
 	}
 	var li = item.up('li');
 	// Append hierarchical submenu if found.
