@@ -75,6 +75,7 @@ table.lcg-fieldset td.label {
     text-align: left;
     padding-right: 0.5em;
     vertical-align: top;
+    font-weight: bold;
 }
 
 table.lcg-table {
