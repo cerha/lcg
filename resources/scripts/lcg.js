@@ -217,18 +217,24 @@ lcg.Menu = Class.create(lcg.Widget, {
 
     select_item: function (item) {
 	var previously_selected_item = this.selected_item();
-	if (previously_selected_item) {
-	    if (this._MANAGE_TABINDEX) {
-		previously_selected_item.setAttribute('tabindex', '-1');
-	    }
-	    previously_selected_item.setAttribute('aria-selected', 'false');
-	}
 	// The attribute aria-activedescendant may not always be on the root element.
 	var element = this.element.down('*[aria-activedescendant]') || this.element;
 	element.setAttribute('aria-activedescendant', item.getAttribute('id'));
-	item.setAttribute('aria-selected', 'true');
+	if (item.hasAttribute('aria-selected')) {
+	    // Note: Derived classes (Wiking's MainMenu) may unset
+	    // 'aria-selected' because they are using ARIA roles which
+	    // don't support the aria-selected attribute.  So we
+	    // manipulate this attribute only when already set.
+	    item.setAttribute('aria-selected', 'true');
+	    if (previously_selected_item) {
+		previously_selected_item.setAttribute('aria-selected', 'false');
+	    }
+	}
 	if (this._MANAGE_TABINDEX) {
 	    item.setAttribute('tabindex', '0');
+	    if (previously_selected_item) {
+		previously_selected_item.setAttribute('tabindex', '-1');
+	    }
 	}
     },
 
