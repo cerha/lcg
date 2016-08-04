@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -252,13 +252,16 @@ class Exporter(object):
         def locale_data(self):
             return self._localizer.locale_data()
 
-        def presentation(self):
-            return self._presentation
+        def timezone(self):
+            return self._localizer.timezone()
 
         def localize(self, text):
             return self._localizer.localize(text)
 
         translate = localize # For backwards compatibility...
+
+        def presentation(self):
+            return self._presentation
 
         def resource(self, filename, **kwargs):
             if 'warn' not in kwargs:
