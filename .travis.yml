@@ -10,6 +10,7 @@ matrix:
   allow_failures:
     - env: LOUIS_VERSION=debian-wheezy UTDML_VERSION=debian-wheezy
     - env: LOUIS_VERSION=debian-jessie UTDML_VERSION=debian-wheezy
+    - env: LOUIS_VERSION=head UTDML_VERSION=head
 install:
   - "sudo apt-get update -qq"
   - "sudo apt-get -y install gettext fontconfig ttf-freefont libxml2-dev texinfo"
