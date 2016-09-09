@@ -17,21 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*jshint browser: true */
-/*jshint es3: true */
-/*jshint -W016 */ // allow bitwise operations
-/*jshint -W097 */ // allow direct "use strict"
-/*global Class */
-/*global Event */
-/*global Element */
-/*global Ajax */
-/*global Effect */
-/*global $ */
-/*global $break */
-/*global self */
-/*global escape */
-/*global unescape */
-/*global console */
+/* eslint no-unused-vars: 0 */
+/* global $, Class, Event, Element, Ajax, Effect, $break, self, escape, unescape, console */
 
 "use strict";
 
