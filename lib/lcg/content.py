@@ -556,22 +556,16 @@ class Link(Container):
         if isinstance(target, basestring):
             reference = target
             target = context.resource(reference, warn=False)
-            if target is None:
+            if target is None and '@' not in reference:
                 if '#' in reference:
                     node_id, section_id = reference.split('#', 1)
+                    node = context.node()
+                    if node_id:
+                        node = node.root().find_node(node_id)
+                    if node:
+                        target = node.find_section(context.lang(), section_id)
                 else:
-                    node_id, section_id = reference, None
-                parent = context.node()
-                if not node_id:
-                    node = parent
-                elif '@' not in node_id and '/' not in node_id:
-                    node = parent.root().find_node(node_id)
-                else:
-                    node = None
-                if node and section_id:
-                    target = node.find_section(context.lang(), section_id)
-                else:
-                    target = node
+                    target = context.node().root().find_node(reference)
             if target is None:
                 target = self.ExternalTarget(reference, reference)
         return target
