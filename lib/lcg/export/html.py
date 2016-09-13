@@ -805,6 +805,10 @@ class HtmlExporter(lcg.Exporter):
     def _export_new_page(self, context, element):
         return self._generator.hr(cls='new-page')
 
+    def _export_vspace(self, context, element):
+        """Export the given 'VSpace' element."""
+        return self._generator.div('', style='height: %dmm' % element.size(context).size())
+
     def _export_strong(self, context, element):
         return self._export_container(context, element, wrap=self._generator.strong)
 
