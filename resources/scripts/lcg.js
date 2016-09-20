@@ -1284,6 +1284,189 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
 });
 
 
+lcg.AudioPlayer = Class.create(lcg.Widget, {
+
+    initialize: function ($super, element_id, swf_uri) {
+        $super(element_id);
+        this._volume = 0.8;
+        this._player = jQuery('#' + element_id + ' .jp-player');
+        this._player.jPlayer({
+            volumechange: this._on_player_volume_change.bind(this),
+            play: this._on_player_play.bind(this),
+            pause: this._on_player_pause.bind(this),
+            timeupdate: this._on_player_time_update.bind(this),
+            swfPath: swf_uri,
+            supplied: "mp3",
+            wmode: "window",
+            useStateClassSkin: true,
+            autoBlur: false,
+            smoothPlayBar: true,
+            keyEnabled: true,
+            remainingDuration: true,
+            captureDuration: false,
+            toggleDuration: true,
+            volume: this._volume
+        });
+        this.element.down('.jp-volume-bar-value').innerHTML = Math.round(100 * this._volume) + '%';
+        var play_button = this.element.down('button.play-pause');
+        this._play_label = play_button.getAttribute('title');
+        this._pause_label = play_button.getAttribute('data-pause-label');
+        this._remaining_label = this.element.down('.jp-duration').getAttribute('title');
+        this._duration_label = this.element.down('.jp-duration').getAttribute('data-duration-label');
+        this._bind('play-pause', this._play_pause);
+        this._bind('fast-forward', this._skip, true);
+        this._bind('rewind', this._skip, false);
+        this._bind('volume-up', this._change_volume, true);
+        this._bind('volume-down', this._change_volume, false);
+        this.element.down('.jp-duration').on('click', this._on_toggle_duration.bind(this));
+        play_button.on('keydown', this._on_key_down.bind(this));
+    },
+
+    _bind: function(name, handler, arg) {
+        this.element.down('button.' + name).on('click', function(event) {
+            handler.bind(this)(arg);
+            event.element().focus();
+            event.stop();
+        }.bind(this));
+    },
+
+    _define_keymap: function () {
+        return {
+            'Space': function (button) { this._play_pause(); },
+            'Left': function (button) { this._skip(false); },
+            'Right': function (button) { this._skip(true); },
+            'Up': function (button) { this._change_volume(true); },
+            'Down': function (button) { this._change_volume(false); },
+            'Ctrl-Shift-Left': function (button) { this._skip(false); },
+            'Ctrl-Shift-Right': function (button) { this._skip(true); },
+            'Ctrl-Shift-Up': function (button) { this._change_volume(true); },
+            'Ctrl-Shift-Down': function (button) { this._change_volume(false); },
+        };
+    },
+
+    _play_pause: function() {
+        var status = this._player.data('jPlayer').status;
+        var action = (status.paused ? 'play' : 'pause');
+        this._player.jPlayer(action);
+    },
+
+    _seek: function(time, play) {
+        var command = (play ? 'play' : 'pause');
+        this._player.jPlayer(command, time);
+    },
+
+    _skip: function(forward) {
+        var player = this._player;
+        var status = player.data('jPlayer').status;
+        var position = status.currentTime;
+        var duration = status.duration;
+        var playing = !status.paused;
+        if (position !== null && duration !== null) {
+            var skip = Math.max(Math.min(duration / 20, 30), 3); // Seconds
+            position += skip * (forward ? 1 : -1);
+            if (position > duration) {
+                return;
+            }
+            if (position < 0) {
+                position = 0;
+            }
+            this._seek(position, playing);
+        }
+    },
+
+    _change_volume: function(up) {
+        var player = this._player;
+        if (up && this._volume < 1) {
+            this._volume = Math.min(this._volume + 0.05, 1);
+            player.jPlayer('volume', this._volume);
+        }
+        if (!up && this._volume > 0) {
+            this._volume = Math.max(this._volume - 0.05, 0);
+            player.jPlayer('volume', this._volume);
+        }
+    },
+
+    _on_player_volume_change: function(event) {
+        this._volume = event.jPlayer.options.volume;
+        this.element.down('.jp-volume-bar-value').innerHTML = Math.round(100 * this._volume) + '%';
+    },
+
+    _set_play_button_label: function(label) {
+        var button = this.element.down('button.play-pause');
+        button.setAttribute('title', label);
+        button.down('span').innerHTML = label;
+    },
+
+    _on_player_play: function(event) {
+        this._set_play_button_label(this._pause_label);
+    },
+
+    _on_player_pause: function(event) {
+        this._set_play_button_label(this._play_label);
+    },
+
+    _on_toggle_duration: function(event) {
+        var label;
+        if (this._player.data('jPlayer').options.remainingDuration) {
+            label = this._remaining_label;
+        } else {
+            label = this._duration_label;
+        }
+        this.element.down('.jp-duration').setAttribute('title', label);
+        this.element.down('.duration-label').innerHTML = label;
+    },
+
+    _on_player_time_update: function(event) {
+        var status = event.jPlayer.status;
+    },
+
+    _absolute_uri: function (uri) {
+        var origin = window.location.origin;
+        if (!origin) {
+            // Fix for some older browsers (such as MSIE <= 8)...
+            origin = window.location.protocol + "//" + window.location.hostname;
+            if (window.location.port && window.location.port !== 80) {
+                origin += ':' + window.location.port;
+            }
+        }
+        if (uri.indexOf(origin) !== 0) {
+            uri = origin + uri;
+        }
+        return uri;
+    },
+
+    _load_if_needed: function(uri) {
+        var status = this._player.data('jPlayer').status;
+        if (status.media.mp3 !== this._absolute_uri(uri)) {
+            this.load(uri);
+        }
+    },
+
+    load: function(uri) {
+        this._player.jPlayer('setMedia', {
+            mp3: uri
+        });
+    },
+
+    play: function() {
+        this._player.jPlayer('play')
+    },
+
+    bind_audio_control: function(element_id, uri) {
+        var element = $(element_id);
+        element.on('click', function(event) {
+            this._load_if_needed(uri);
+            this._play_pause();
+            event.stop();
+        }.bind(this));
+        element.on('keydown', function(event) {
+            this._load_if_needed(uri);
+            this._on_key_down(event);
+        }.bind(this));
+    },
+
+});
+
 lcg.Cookies = Class.create({
     // This class is taken from
     // http://codeinthehole.com/writing/javascript-cookie-objects-using-prototype-and-json/

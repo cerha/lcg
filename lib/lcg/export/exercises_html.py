@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ class ExerciseExporter(object):
     def _media_control(self, context, media):
         g = context.generator()
         button_id = context.unique_id()
-        context.connect_shared_player(context.uri(media), button_id)
+        context.bind_audio_control(button_id, context.uri(media))
         return g.button(_("Play"), id=button_id, cls='media-control')
 
     def _export_tasks(self, context, exercise, exercise_id):
@@ -193,7 +193,6 @@ class ExerciseExporter(object):
             context.resource('lcg-exercises.js')
             context.resource('effects.js')
             context.resource('media.js')
-            context.connect_shared_player()
             methods = (self._export_instructions,
                        self._export_tasks,
                        self._export_results)

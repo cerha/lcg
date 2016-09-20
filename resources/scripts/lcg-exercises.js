@@ -18,7 +18,7 @@
  * USA */
 
 /* eslint no-unused-vars: 0 */
-/* global $, Class, Effect, lcg, play_media */
+/* global $, Class, Effect, lcg */
 
 "use strict";
 
@@ -111,7 +111,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
         var i = field.answer_index;
         var result = this._results[i];
         if (result !== undefined) {
-            play_media(this.response(result === 1 ? 'correct':'incorrect'));
+            this._play_audio(this.response(result === 1 ? 'correct':'incorrect'));
             if (result === 1) {
                 // if (i < this._fields.length)
                 //    This doesn't work in MultipleChoiceQuestions (answer index is not
@@ -144,7 +144,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
         } else {
             response = this._correct() ? 'correct':'incorrect';
         }
-        play_media(this.response(response));
+        this._play_audio(this.response(response));
     },
 
     _count: function (array, value) {
@@ -214,6 +214,20 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
             new Effect.SlideDown(element, {duration: duration});
         } else {
             element.show();
+        }
+    },
+
+    _play_audio: function(uri) {
+        if (!lcg.audio && typeof Audio !== 'undefined') {
+            lcg.audio = new Audio();
+        }
+        var audio = lcg.audio;
+        if (audio) {
+            if (audio.src !== uri) {
+                audio.src = uri;
+                audio.load();
+            }
+            audio.play();
         }
     }
 
@@ -503,7 +517,7 @@ lcg.Dictation = Class.create(lcg.FillInExercise, {
     },
 
     _cmd_play_current: function(field) {
-        play_media(this._recordings[this._current_recording]);
+        this._play_audio(this._recordings[this._current_recording]);
     },
 
     _display_results: function() {

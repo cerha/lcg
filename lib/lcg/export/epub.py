@@ -118,11 +118,8 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
     def _uri_resource(self, context, resource):
         return self.resource_uri(resource)
 
-    def _allow_flash_audio_player(self, context, audio):
+    def _allow_lcg_audio_player(self, context, audio):
         return False
-
-    def _media_player(self, context):
-        return None
 
     def resource_uri(self, resource):
         uri = resource.filename()

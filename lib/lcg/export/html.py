@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -592,7 +592,7 @@ class HtmlExporter(lcg.Exporter):
 
         def __init__(self, *args, **kwargs):
             self._generator = kwargs.pop('generator')
-            self._shared_player_controls = []
+            self._audio_controls = []
             # We generate a random string prefix for all unique identifiers.
             # This makes the identifiers unique even if we compose a page from
             # pieces exported in different contexts, which is typical when
@@ -658,34 +658,31 @@ class HtmlExporter(lcg.Exporter):
             """
             return self.IdGenerator(self)
 
-        def connect_shared_player(self, *args):
-            """Allocate the shared media player for current page content.
+        def bind_audio_control(self, element_id, uri):
+            """Bind audio player to play given audio file on given element.
 
-            When called without arguments, the call only indicates, that the
-            shared player will be used by the content (for example the
-            JavaScript function play_media() will be called).
+            Connects the audio player to play a particular audio file for a
+            particular control element (typically button or link).
 
-            Otherwise the call connects the player to a particular media file
-            with particulat control element (button or link) and the arguments
-            correspond to the arguments of the JavaScript function
-            'init_player_controls()' defined in 'media.js' starting with 'uri'.
-            At least two arguments ('uri' and 'button_id') should be passed.
-            The remaining arguments are optional.
-
-            If this method is called at least once during document export, a shared media player is
-            exported at the bottom of the page and passed player controls are connected to the
-            player.
+            If this method is called at least once during document export, a
+            shared audio player instance is created at the bottom of the page
+            and connected to all controls for which this method was called.
 
             """
-            self._shared_player_controls.append(args)
+            self._audio_controls.append((element_id, uri))
 
-        def shared_player_controls(self):
-            return self._shared_player_controls
+        def audio_controls(self):
+            """Return a list of all audio player controls on current page.
+
+            Returns a list of (element_id, uri) pairs for which
+            'bind_audio_control()' was called.
+
+            """
+            return self._audio_controls
 
     _BODY_PARTS = ('heading',
                    'language_selection',
                    'content',
-                   'media_player',
                    )
     _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
@@ -788,7 +785,11 @@ class HtmlExporter(lcg.Exporter):
         return kwargs
 
     def _body_content(self, context):
-        return self._parts(context, self._BODY_PARTS)
+        content = self._parts(context, self._BODY_PARTS)
+        if context.audio_controls():
+            # Automatically add the shared audio player if needed.
+            content += concat(self._export_audio_player(context))
+        return content
 
     def context(self, *args, **kwargs):
         kwargs['generator'] = self._generator
@@ -1108,10 +1109,15 @@ class HtmlExporter(lcg.Exporter):
                 context.resource(f)
         return img
 
-    def _allow_flash_audio_player(self, context, audio):
-        # OGG Vorbis is not supported by Flash, so we use the HTML 5 audio tag
-        # at least for OGG now.
-        return not audio.filename().lower().endswith('.ogg')
+    def _allow_lcg_audio_player(self, context, audio):
+        # The shared player implemented by the JavaScript class lcg.AudioPlayer
+        # (based on jPlayer) only supports MP3 audio.  The HTML 5 <audio> tag
+        # will be used for all other types, such as OGG Vorbis.  It should be,
+        # however, possible to use the shared player for all media types.  Also
+        # note, thet this method is used in EPUB exporter to disable the player
+        # altogether in favour of the <audio> tag.  This might be reconsidered
+        # after testing the new player implementation with EPUB.
+        return audio.filename().lower().endswith('.mp3')
 
     def _export_inline_audio(self, context, element):
         """Export emedded audio player for given audio file.
@@ -1136,9 +1142,9 @@ class HtmlExporter(lcg.Exporter):
                 descr = descr or title
             else:
                 label = title or audio.title() or audio.filename()
-            if self._allow_flash_audio_player(context, audio):
+            if self._allow_lcg_audio_player(context, audio):
                 link_id = context.unique_id()
-                context.connect_shared_player(uri, link_id)
+                context.bind_audio_control(link_id, uri)
                 return g.a(label, href=uri, id=link_id, title=descr, cls='media-control-link')
             else:
                 # TODO: The HTML 5 player is currently not shared.
@@ -1313,55 +1319,67 @@ class HtmlExporter(lcg.Exporter):
                 g.script(g.js_call('embed_swf_object', context.uri(flash_object), element_id,
                                    width, height, flashvars, min_flash_version, no_flash_content)))
 
-    def export_media_player(self, context, player_id, width, height, shared=False):
-        """Export Flash media player
-
-        The player can be controlled from other parts of the webpage through
-        Javascript functions defined in 'media.js'.
-
-        Caution: The media player works only if the webpage is served through a
-        webserver. If it is displayed locally, Flash and Javascript
-        communication is not possible due to security restrictions. The player
-        displays but there is no way to controll it.
-
-        Arguments:
-          context, player_id, width, height -- see 'export_swf_object()' arguments
-          shared -- whether to use a shared media player (e.g. in bottom right corner
-            of a webpage to serve many different media playback requests)
-
-        """
+    def _export_audio_player(self, context):
         g = self._generator
-        result = self.export_swf_object(context, 'mediaplayer.swf', player_id, width, height,
-                                        min_flash_version='9.0.115',
-                                        warning=_("Media Player unavailable."))
-        if result:
-            context.resource('media.js')
-            result += g.script(g.js_call('init_media_player', player_id, shared))
-        return result
-
-    def _media_player(self, context):
-        """Export shared media player if in use, otherwise do nothing.
-
-        See export_media_player() for more details.
-
-        """
-        controls = context.shared_player_controls()
-        if controls:
-            # Shared player controls exist, so create the player and connect the controls to it.
-            g = self._generator
-            player_id = 'shared-audio-player'
-            # export_media_player() returns None if one of the dependencies is not found...
-            content = self.export_media_player(context, player_id, 300, 20, shared=True)
-            if content:
-                for args in controls:
-                    if args:
-                        # args may be an empty list when connect_shared_player
-                        # was called without arguments.
-                        content += "\n" + g.script(g.js_call('init_player_controls',
-                                                             player_id, *args))
-            return content
-        else:
-            return None
+        ids = context.id_generator()
+        button = lambda label, **kwargs: g.button(g.span(label), title=label, **kwargs)
+        context.resource('lcg.js')
+        context.resource('lcg-widgets.css')
+        context.resource('jquery.min.js')
+        context.resource('jplayer.min.js')
+        player = (
+            g.div(cls='jp-controls', content=(
+                button(_("Play"), cls='play-pause', data_pause_label=_("Pause")),
+                button(_("Rewind"), cls='rewind'),
+                button(_("Fast Forward"), cls='fast-forward'),
+            )),
+            g.div(cls='jp-progress', content=(
+                g.div(cls='jp-seek-bar', content=g.div('', cls='jp-play-bar')),
+            )),
+            # aria-live should be off by default, but Orca doesn't think so...
+            g.div(cls='status', content=(
+                g.div(_("Current position"), id=ids.cp_label, cls='hidden-label'),
+                g.div(g.noescape('&nbsp;'), title=_("Current position"), cls='jp-current-time',
+                      id=ids.cp_value, aria_labelledby=' '.join((ids.cp_label, ids.cp_value)),
+                      aria_live='off'),
+                g.div(_("Remaining time"), id=ids.rt_label, cls='hidden-label duration-label'),
+                g.div(g.noescape('&nbsp;'), title=_("Remaining time"), cls='jp-duration',
+                      data_duration_label=_("Total time"),
+                      id=ids.rt_value, aria_labelledby=' '.join((ids.rt_label, ids.rt_value)),
+                      aria_live='off'),
+            )),
+            g.div(cls='jp-volume-controls', content=(
+                g.div(cls='jp-volume-bar', content=(
+                    g.div(_("Volume"), id=ids.vol_label, cls='hidden-label'),
+                    g.div('', cls='jp-volume-bar-value', id=ids.vol_value, aria_live='polite',
+                          aria_labelledby=' '.join((ids.vol_label, ids.vol_value))),
+                )),
+                button(_("Volume Down"), cls='volume-down'),
+                button(_("Volume Up"), cls='volume-up'),
+            )),
+        )
+        content = [
+            g.div(id=ids.player, cls='audio-player-widget', content=(
+                g.div('', cls='jp-player'),
+                g.div(id='jp_container_1', role='application', aria_label=_("Player"), cls='jp-audio', content=(
+                    g.div(cls='jp-no-solution', content=(
+                        g.strong(_("Update Required:")), ' ',
+                        _("To play audio you will need to either update your "
+                          "browser to a recent version or update %s.",
+                          g.a(_("Flash plugin"),
+                              href="http://get.adobe.com/flashplayer/", target='_blank')),
+                    )),
+                    g.div(cls='jp-gui jp-interface', content=player),
+                )),
+            )),
+        ]
+        swf = context.resource('jplayer.swf')
+        script = [g.js_call('var player = new lcg.AudioPlayer', ids.player,
+                            swf and context.uri(swf))]
+        for element_id, uri in context.audio_controls():
+            script.append(g.js_call('player.bind_audio_control', element_id, uri))
+        content.append(g.script(''.join(line + ';\n' for line in script)))
+        return content
 
     def escape(self, text):
         return self._generator.escape(text)
@@ -1472,7 +1490,6 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                    'language_selection',
                    'content',
                    'bottom_navigation',
-                   'media_player',
                    )
 
     def _head(self, context):
