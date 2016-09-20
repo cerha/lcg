@@ -300,7 +300,7 @@ lcg.SelectBasedExercise = Class.create(lcg.Exercise, {
 
 lcg.FillInExercise = Class.create(lcg.Exercise, {
 
-    keymap: function () {
+    _define_keymap: function () {
         return {'Enter': this._cmd_eval_answer,
                 'Alt-Space': this._cmd_hint,
                 'Ctrl-Space': this._cmd_hint};
@@ -332,7 +332,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
 
     _init_field: function(field) {
         field.answer_index = this._last_answer_index++;
-        field.observe('keydown', this.on_key_down.bind(this));
+        field.observe('keydown', this._on_key_down.bind(this));
         field.observe('dblclick', this._on_eval_answer.bind(this));
         field.observe('touchstart', this._on_touch_start.bind(this));
     },
@@ -480,7 +480,7 @@ lcg.Dictation = Class.create(lcg.FillInExercise, {
         this._current_recording = -1;
     },
 
-    keymap: function () {
+    _define_keymap: function () {
         return {'Enter': this._cmd_eval_answer,
                 'Ctrl-Space': this._cmd_hint,
                 '>': this._cmd_play_next,
