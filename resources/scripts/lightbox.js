@@ -43,11 +43,17 @@
 // -----------------------------------------------------------------------------------
 
 //
-//  Configurationl
+//  Configuration
 //
+var LightboxOrigin = (function() {
+    var scripts = document.getElementsByTagName('script');
+    var url = scripts[scripts.length - 1].src;
+    return url.substr(0, url.length - 'lightbox.js'.length);
+})();
+
 LightboxOptions = Object.extend({
-    fileLoadingImage:        '/_resources/lightbox/loading.gif',     
-    fileBottomNavCloseImage: '/_resources/lightbox/close.png',
+    fileLoadingImage:        LightboxOrigin + 'lightbox/loading.gif',
+    fileBottomNavCloseImage: LightboxOrigin + 'lightbox/close.png',
 
     overlayOpacity: 0.8,   // controls transparency of shadow overlay
 
@@ -56,10 +62,10 @@ LightboxOptions = Object.extend({
 
     borderSize: 10,         //if you adjust the padding in the CSS, you will need to update this variable
 
-	// When grouping images this is used to write: Image # of #.
-	// Change it for non-english localization
-	labelImage: "",
-	labelOf: "/"
+    // When grouping images this is used to write: Image # of #.
+    // Change it for non-english localization
+    labelImage: "",
+    labelOf: "/"
 }, window.LightboxOptions || {});
 
 // -----------------------------------------------------------------------------------
