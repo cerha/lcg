@@ -1442,6 +1442,41 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         }
     },
 
+    _media_type: function(uri) {
+        var ext = uri.split('.').pop().toLowerCase();
+        if (ext === 'mp3') {
+            return {type: 'mp3', media: 'audio/mpeg;'};
+        } else if (ext === 'ogg' || ext === 'oga') {
+            return {type: 'oga', media: 'audio/ogg; codecs="vorbis"'};
+        } else if (ext === 'wav' || ext === 'wave') {
+            return {type: 'wav', media: 'audio/wav; codecs="1"'};
+        } else if (ext === 'aac' || ext === 'm4a') {
+            return {type: 'aac', media: 'audio/mp4; codecs="mp4a.40.2"'};
+        } else {
+            return undefined;
+        }
+    },
+
+    _can_play_audio: function(uri) {
+        var type = this._media_type(uri);
+        if (!type) {
+            return false;
+        }
+        var audio = this.element.down('audio');
+        if (audio) {
+            // If the browser supports the <audio> tag, jPlayer will use it and
+            // we can get the media support information from its API.
+            return !!(audio.canPlayType && audio.canPlayType(type.media).replace(/no/, ''));
+        } else if (!this.element.down('.jp-no-solution').visible()) {
+            // The div 'jp-no-solution' made visible by jPlayer if Flash is unavailable
+            // so the above condition means that the Flash fallback will be used and
+            // thus we return true only for formats known to be supported by Flash.
+            return (type.type == 'mp3' || type.type == 'aac');
+        } else {
+            return false;
+        }
+    },
+    
     load: function(uri) {
         this._player.jPlayer('setMedia', {
             mp3: uri
@@ -1453,17 +1488,23 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
     },
 
     bind_audio_control: function(element_id, uri) {
-        var element = $(element_id);
-        element.on('click', function(event) {
-            this._load_if_needed(uri);
-            this._play_pause();
-            event.stop();
-        }.bind(this));
-        element.on('keydown', function(event) {
-            this._load_if_needed(uri);
-            this._on_key_down(event);
-        }.bind(this));
-    },
+        if (this._can_play_audio(uri)) {
+            // Only bind the player to the control if it is capable of playing
+            // given media type.  Otherwise leave the original HTML element
+            // untouched.  Suppose that it already provides some fallback
+            // functionality (such as download).
+            var element = $(element_id);
+            element.on('click', function(event) {
+                this._load_if_needed(uri);
+                this._play_pause();
+                event.stop();
+            }.bind(this));
+            element.on('keydown', function(event) {
+                this._load_if_needed(uri);
+                this._on_key_down(event);
+            }.bind(this));
+        }
+    }
 
 });
 
