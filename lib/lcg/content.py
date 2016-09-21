@@ -747,8 +747,8 @@ class InlineImage(_SizedInlineObject):
 class InlineAudio(_InlineObject):
     """Audio file embedded inside the document.
 
-    For example in HTML, this might be exported as a play button using a
-    Flash audio player.
+    When possible, this element should be represented by an interactive control
+    which invokes playback of the embedded audio.
 
     """
 
@@ -789,7 +789,8 @@ class InlineAudio(_InlineObject):
 class InlineVideo(_SizedInlineObject):
     """Video file embedded inside the document.
 
-    For example in HTML, this might be exported as an embedded video player.
+    When possible, this element should be represented as an embedded video
+    player preloaded with given video and playing it on invocation.
 
     """
 
@@ -830,8 +831,8 @@ class InlineVideo(_SizedInlineObject):
 class InlineExternalVideo(Content):
     """Embedded video from external services such as YouTube or Vimeo
 
-    For example in HTML, this might be exported as an embedded YouTube video
-    player.
+    When possible, this element should be represented as an embedded video
+    player preloaded with given video and playing it on invocation.
 
     """
     def __init__(self, service, video_id, title=None, descr=None, size=None, lang=None):
