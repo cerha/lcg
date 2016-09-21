@@ -1295,7 +1295,7 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
             play: this._on_player_play.bind(this),
             pause: this._on_player_pause.bind(this),
             timeupdate: this._on_player_time_update.bind(this),
-            swfPath: swf_uri,
+            swfPath: swf_uri || undefined,
             supplied: "mp3",
             wmode: "window",
             useStateClassSkin: true,
