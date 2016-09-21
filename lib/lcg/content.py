@@ -752,21 +752,19 @@ class InlineAudio(_InlineObject):
 
     """
 
-    def __init__(self, audio, image=None, shared=True, **kwargs):
+    def __init__(self, audio, image=None, **kwargs):
         """Arguments:
 
+          audio -- the target audio file as 'lcg.Audio' resource instance.
           image -- visual presentation image as an 'lcg.Image' resource instance or None.
-          shared -- boolean flag indicating whether using a shared audio player is desired.
 
         All other arguments are passed to the parent class constructor.
 
         """
         assert isinstance(audio, (lcg.Audio, basestring)), audio
         assert image is None or isinstance(image, (lcg.Image, basestring)), image
-        assert isinstance(shared, bool)
         self._audio = audio
         self._image = image
-        self._shared = shared
         super(InlineAudio, self).__init__(**kwargs)
 
     def audio(self, context):
@@ -786,10 +784,6 @@ class InlineAudio(_InlineObject):
 
         """
         return self._resource_instance(context, self._image, lcg.Image)
-
-    def shared(self):
-        """Return the value of 'shared' as passed to the constructor."""
-        return self._shared
 
 
 class InlineVideo(_SizedInlineObject):

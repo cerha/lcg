@@ -118,8 +118,29 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
     def _uri_resource(self, context, resource):
         return self.resource_uri(resource)
 
-    def _allow_lcg_audio_player(self, context, audio):
-        return False
+    def _export_inline_audio(self, context, element):
+        """Export emedded audio player for given audio file.
+
+        Use the HTML 5 <audio> tag instead of the LCG's shared player.  This is
+        here because the original player implementation did not work in EPUB
+        because of its Flash dependency.  This might be reconsidered after
+        testing the new player implementation with EPUB.
+
+        """
+        g = self._generator
+        audio = element.audio(context)
+        image = element.image(context)
+        title = element.title() or audio.title()
+        descr = element.descr() or audio.descr()
+        uri = context.uri(audio)
+        if image:
+            label = g.img(context.uri(image), alt=title)
+            descr = descr or title
+        else:
+            label = title or audio.filename()
+        return g.audio(src=uri, title=descr or title or audio.filename(),
+                       # 'content' is displayed when the audio tag is not supported by browser
+                       content=g.a(label, href=uri, title=descr))
 
     def resource_uri(self, resource):
         uri = resource.filename()

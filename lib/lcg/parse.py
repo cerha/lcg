@@ -778,7 +778,7 @@ class Parser(object):
                                      size=size)
         elif ext in self._AUDIO_EXTENSIONS:
             result = lcg.InlineAudio(href, title=label, descr=descr, name=basename,
-                                     image=label_image, shared=True)
+                                     image=label_image)
         elif ext in self._VIDEO_EXTENSIONS:
             result = lcg.InlineVideo(href, title=label, descr=descr, name=basename,
                                      image=label_image, size=size)

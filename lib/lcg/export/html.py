@@ -1109,58 +1109,38 @@ class HtmlExporter(lcg.Exporter):
                 context.resource(f)
         return img
 
-    def _allow_lcg_audio_player(self, context, audio):
-        # The shared player implemented by the JavaScript class lcg.AudioPlayer
-        # (based on jPlayer) only supports MP3 audio.  The HTML 5 <audio> tag
-        # will be used for all other types, such as OGG Vorbis.  It should be,
-        # however, possible to use the shared player for all media types.  Also
-        # note, thet this method is used in EPUB exporter to disable the player
-        # altogether in favour of the <audio> tag.  This might be reconsidered
-        # after testing the new player implementation with EPUB.
-        return audio.filename().lower().endswith('.mp3')
-
     def _export_inline_audio(self, context, element):
         """Export emedded audio player for given audio file.
 
-        Inline audio can be rendered as a simple link which controls a shared
-        Flash audio player (usually located at the bottom right corner of a
-        webpage) or using a standalone Flash audio player located directly
-        inside page content in place of the link.  In both cases, if Flash or
-        Javascript is not available, a simple link without a player is rendered
-        allowing just downloading the audio file.
+        Inline audio is rendered as a simple link which controls the LCG's
+        shared audio player (usually located at the bottom right corner of a
+        webpage).  If JavaScript is not available, the link will just download
+        the audio file.
 
         """
-        if element.shared():
-            g = self._generator
-            audio = element.audio(context)
-            image = element.image(context)
-            title = element.title()
-            descr = element.descr()
-            uri = context.uri(audio)
-            if image:
-                label = g.img(context.uri(image), alt=title)
-                descr = descr or title
-            else:
-                label = title or audio.title() or audio.filename()
-            if self._allow_lcg_audio_player(context, audio):
-                link_id = context.unique_id()
-                context.bind_audio_control(link_id, uri)
-                return g.a(label, href=uri, id=link_id, title=descr, cls='media-control-link')
-            else:
-                # TODO: The HTML 5 player is currently not shared.
-                return g.audio(src=uri, title=descr or title or audio.title() or audio.filename(),
-                               # 'content' is displayed only in browsers not
-                               # supporting the audio tag.
-                               content=g.a(label, href=uri, title=descr))
+        g = self._generator
+        audio = element.audio(context)
+        image = element.image(context)
+        title = element.title() or audio.title()
+        descr = element.descr() or audio.descr()
+        uri = context.uri(audio)
+        if image:
+            label = g.img(context.uri(image), alt=title)
+            descr = descr or title
         else:
-            raise NotImplementedError
+            label = title or audio.filename()
+        link_id = context.unique_id()
+        context.bind_audio_control(link_id, uri)
+        return g.a(label, href=uri, id=link_id, title=descr, cls='media-control-link')
 
     def _export_inline_video(self, context, element):
         """Export emedded video player for given video file.
 
-        The 'Video' resource instance is rendered as a standalone Flash video
-        player preloaded with given video.  If Flash or Javascript is not
-        available, only a link to the video file is rendered.
+        The video is normally represented by an HTML 5 <video> tag.  The FLV
+        video format (supported for backwards compatibility), uses a Flash
+        based player named JW Player.  When such video is used, the file
+        'mediaplayer.swf' (containing the JW Player) must be located somewhere
+        in the resource path.
 
         """
         g = self._generator
@@ -1185,11 +1165,9 @@ class HtmlExporter(lcg.Exporter):
                                             alternative_content=link)
             return g.div(player or link, cls='video-player')
         else:
-            # Use HTML 5 video tag.
+            # 'content' is displayed only in browsers not supporting the audio tag.
             return g.video(src=uri, title=descr or title, poster=image_uri,
-                           width=width, height=height,
-                           # 'content' is displayed only in browsers not supporting the audio tag.
-                           content=g.a(title, href=uri, title=descr))
+                           width=width, height=height, content=link)
 
     def _export_inline_external_video(self, context, element):
         """Export emedded video player for external services such as YouTube or Vimeo.
