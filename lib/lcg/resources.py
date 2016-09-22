@@ -199,7 +199,7 @@ class Audio(Media):
 
 class Video(Media):
     """Video media file."""
-    EXTENSIONS = ('flv', 'ogv', 'mp4')
+    EXTENSIONS = ('flv', 'ogv', 'mp4', 'webm', '3gp')
 
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
