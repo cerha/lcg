@@ -1391,29 +1391,8 @@ class FileExporter(object):
               os.path.exists(infile) and os.path.getmtime(outfile) < os.path.getmtime(infile)):
             if not os.path.isdir(os.path.dirname(outfile)):
                 os.makedirs(os.path.dirname(outfile))
-            input_format = os.path.splitext(infile)[1].lower()[1:]
-            output_format = os.path.splitext(outfile)[1].lower()[1:]
-            if input_format == output_format:
-                shutil.copyfile(infile, outfile)
-                lcg.log(_("%s: file copied.", outfile))
-            else:
-                if input_format != 'wav':
-                    raise Exception("Unsupported conversion: %s -> %s" %
-                                    (input_format, output_format))
-                var = 'LCG_%s_COMMAND' % output_format.upper()
-                def cmd_err(msg):
-                    info = "Specify a command encoding %s file '%%infile' to %s file '%%outfile'."
-                    raise Exception(msg % var + "\n" + info % (input_format, output_format))
-                try:
-                    cmd = os.environ[var]
-                except KeyError:
-                    cmd_err("Environment variable %s not set.")
-                if cmd.find("%infile") == -1 or cmd.find("%outfile") == -1:
-                    cmd_err("Environment variable %s must refer to '%%infile' and '%%outfile'.")
-                lcg.log(_("%s: converting to %s: %s", outfile, output_format, cmd))
-                command = cmd.replace('%infile', infile).replace('%outfile', outfile)
-                if os.system(command):
-                    raise IOError("Subprocess returned a non-zero exit status.")
+            shutil.copyfile(infile, outfile)
+            lcg.log(_("%s: file copied.", outfile))
 
     def dump(self, node, directory, filename=None, variant=None, recursive=False,
              **kwargs):

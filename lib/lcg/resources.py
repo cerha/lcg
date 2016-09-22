@@ -243,25 +243,20 @@ class ResourceProvider(object):
     in step 3).  This allows more flexibility in organization of the resource
     files.  Sometimes it is more practical to have different kinds of files
     arranged separately, sometimes it is more practical to group them in some
-    other way but LCG shold still be able to locate them.
+    other way but LCG should still be able to locate them.
 
     Unsuccessful resource allocations are usually logged together with the
     exact list of directories where the file was searched so this might help
     you to discover problems in your setup.
 
     """
-    _CONVERSIONS = {'mp3': ('wav',),
-                    'ogg': ('wav',)}
-    """A dictionary of alternative source filename extensions.  When the input file is not found,
-    given alternative filename extensions are also tried.  The exporter is then responsible for the
-    conversion."""
 
     class OrderedDict(object):
         # Totally simplistic - just what we need to get the resources in the order of allocation.
         # This is needed for the correct precedence of stylesheets.
         def __init__(self, pairs):
             self._dict = dict(pairs)
-            self._values = [v for k,v in pairs]
+            self._values = [v for k, v in pairs]
         def __setitem__(self, key, value):
             self._values.append(value)
             self._dict[key] = value
@@ -295,23 +290,20 @@ class ResourceProvider(object):
         if searchdir is not None:
             dirs.insert(0, searchdir)
         basename, ext = os.path.splitext(filename)
-        altnames = [basename +'.'+ e
-                    for e in self._CONVERSIONS.get(ext.lower()[1:], ()) if e != ext]
-        for d in dirs:
-            for src_file in [filename] + altnames:
-                # Here we assume that the filesystem uses UTF-8 filenames.  If
-                # it is not always the case, we may need to make it
-                # configurable.
-                src_path = unicode(os.path.join(d, src_file)).encode('utf-8')
-                if os.path.isfile(src_path):
-                    return cls(filename, src_file=src_path)
-                elif src_path.find('*') != -1:
-                    pathlist = [path for path in glob.glob(src_path) if os.path.isfile(path)]
-                    if pathlist:
-                        pathlist.sort()
-                        i = len(d)+1
-                        return [cls(os.path.splitext(path[i:])[0]+ext, src_file=path)
-                                for path in pathlist]
+        for directory in dirs:
+            # Here we assume that the filesystem uses UTF-8 filenames.  If
+            # it is not always the case, we may need to make it
+            # configurable.
+            src_path = unicode(os.path.join(directory, filename)).encode('utf-8')
+            if os.path.isfile(src_path):
+                return cls(filename, src_file=src_path)
+            elif src_path.find('*') != -1:
+                pathlist = [path for path in glob.glob(src_path) if os.path.isfile(path)]
+                if pathlist:
+                    pathlist.sort()
+                    i = len(directory) + 1
+                    return [cls(os.path.splitext(path[i:])[0] + ext, src_file=path)
+                            for path in pathlist]
         if warn:
             warn(_("Resource file not found: %(filename)s %(search_path)s",
                    filename=filename,
