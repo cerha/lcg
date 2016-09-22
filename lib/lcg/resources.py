@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,6 +39,21 @@ class Resource(object):
 
     SUBDIR = None
     """Name of the subdirectory where files are searched on input and stored on output."""
+    EXTENSIONS = ()
+    """All valid filename extensions for particular resource type."""
+    _type_map = None
+
+    @classmethod
+    def subclass(cls, filename):
+        """Return the Resource subclass matching given filename (by extension)."""
+        def all_subclasses(c):
+            subclasses = c.__subclasses__()
+            return subclasses + [x for s in c.__subclasses__() for x in all_subclasses(s)]
+        if cls._type_map is None:
+            subclasses = cls.__subclasses__()
+            cls._type_map = dict((ext, c) for c in all_subclasses(cls) for ext in c.EXTENSIONS)
+        ext = os.path.splitext(filename)[1].lower().lstrip('.')
+        return cls._type_map.get(ext, Resource)
 
     def __init__(self, filename, title=None, descr=None, src_file=None, uri=None, info=None):
         """Arguments:
@@ -120,6 +135,7 @@ class Resource(object):
 class Image(Resource):
     """An image of undefined type."""
     SUBDIR = 'images'
+    EXTENSIONS = ('jpeg', 'jpg', 'gif', 'png')
 
     def __init__(self, filename, size=None, thumbnail=None, **kwargs):
         """Arguments:
@@ -148,6 +164,7 @@ class Image(Resource):
 class Stylesheet(Resource):
     """A cascading style sheet."""
     SUBDIR = 'css'
+    EXTENSIONS = ('css',)
 
     def __init__(self, filename, media='all', **kwargs):
         """Arguments:
@@ -165,26 +182,29 @@ class Stylesheet(Resource):
 class Script(Resource):
     """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'
+    EXTENSIONS = ('js',)
 
 class Translations(Resource):
     """Gettext translations .po file"""
     SUBDIR = 'translations'
+    EXTENSIONS = ('po',)
 
 class Media(Resource):
     """Media file, such as audio or video."""
     SUBDIR = 'media'
 
 class Audio(Media):
-    """Audio media file of undefined type."""
-    pass
+    """Audio media file."""
+    EXTENSIONS = ('mp3', 'wave', 'ogg', 'oga', 'wav', 'aac', 'm4a')
 
 class Video(Media):
-    """Video media file of undefined type."""
-    pass
+    """Video media file."""
+    EXTENSIONS = ('flv', 'ogv', 'mp4')
 
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
     SUBDIR = 'flash'
+    EXTENSIONS = ('swf',)
 
 
 ###################################################################################################
@@ -236,17 +256,6 @@ class ResourceProvider(object):
     given alternative filename extensions are also tried.  The exporter is then responsible for the
     conversion."""
 
-    _TYPEMAP = {'jpeg': Image,
-                'jpg':  Image,
-                'gif':  Image,
-                'png':  Image,
-                'mp3':  Audio,
-                'ogg':  Audio,
-                'css':  Stylesheet,
-                'js':   Script,
-                'swf':  Flash,
-                'po':   Translations,}
-
     class OrderedDict(object):
         # Totally simplistic - just what we need to get the resources in the order of allocation.
         # This is needed for the correct precedence of stylesheets.
@@ -280,11 +289,7 @@ class ResourceProvider(object):
 
     def _resource(self, filename, searchdir, warn):
         dirs = list(self._dirs)
-        try:
-            ext = filename.rsplit('.', 1)[1]
-            cls = self._TYPEMAP[ext.lower()]
-        except (KeyError, IndexError):
-            cls = Resource
+        cls = Resource.subclass(filename)
         if cls.SUBDIR:
             dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs] + dirs
         if searchdir is not None:
