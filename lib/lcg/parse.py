@@ -1418,7 +1418,7 @@ class HTMLProcessor(object):
             else:
                 target = uri or element.attrib['href']
             basename = target.split('/')[-1].rsplit('.', 1)[0]
-            return class_(target, name=basename, **kwargs)
+            return class_(target, name=basename, title=self._plain_text(element), **kwargs)
 
         def _image(self, element, followers):
             align = {'left': lcg.InlineImage.LEFT,
