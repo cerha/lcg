@@ -285,9 +285,14 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     BOX_LEFT = 'LEFT'
     BOX_RIGHT = 'RIGHT'
     def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0,
-                 box_width=None, box_color=None, box_radius=0):
+                 box_width=None, box_color=None, box_radius=0, box_mask=None):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
+        assert box_mask is None or (isinstance(box_mask, (tuple, list))
+                                    and len(box_mask) == 4
+                                    and all(isinstance(x, bool) for x in box_mask)), box_mask
+        if box_mask and box_radius:
+            raise Exception("Unsupported combination of 'box_mask' and 'box_radius'.")
         if __debug__:
             if vertical:
                 assert align in (self.BOX_CENTER, self.BOX_LEFT, self.BOX_RIGHT, None,), align
@@ -306,10 +311,12 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             box_width = 0
             box_color = None
             box_radius = 0
+            box_mask = None
         self._box_box_margin = box_margin
         self._box_box_width = box_width
         self._box_box_color = box_color
         self._box_box_radius = box_radius
+        self._box_box_mask = box_mask
         self._box_last_split_height = None
         self._box_last_wrap = None
         # Another hack for pytis markup:
@@ -519,7 +526,17 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 self.canv.setLineWidth(self._box_box_width)
             if self._box_box_color is not None:
                 self.canv.setStrokeColorRGB(*self._box_box_color)
-            if self._box_box_radius != 0:
+            if self._box_box_mask:
+                top, right, bottom, left = self._box_box_mask
+                if top:
+                    self.canv.line(0, height, width, height)
+                if right:
+                    self.canv.line(width, height, width, 0)
+                if bottom:
+                    self.canv.line(width, 0, 0, 0)
+                if left:
+                    self.canv.line(0, 0, 0, height)
+            elif self._box_box_radius != 0:
                 self.canv.roundRect(0, 0, width, height, self._box_box_radius)
             else:
                 self.canv.rect(0, 0, width, height)
@@ -1849,12 +1866,14 @@ class Container(Element):
                         box_radius_points = 0
                     else:
                         box_radius_points = self._unit2points(box_radius, style)
+                    box_mask = presentation and presentation.box_mask
                     result = [RLContainer(content=result, vertical=self.vertical, align=align,
                                           boxed=boxed,
                                           box_margin=box_margin_points,
                                           box_width=box_width_points,
                                           box_color=box_color_rgb,
                                           box_radius=box_radius_points,
+                                          box_mask=box_mask,
                                           )]
         # Enforce upper alignment
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):

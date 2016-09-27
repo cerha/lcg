@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2011-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2011-2016 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -83,6 +83,8 @@ class Presentation(object):
     """Box line color, 'Unit'."""
     box_radius = None
     """Radius of box corners, if the corners should be rounded, 'Unit'."""
+    box_mask = None
+    """Mask of visible box sides as a sequence of 4 bools (top, right, bottom, left)."""
     separator_height = None
     """Height of lines separating objects, 'Unit'.
     It currently works only for row separators in tables.
