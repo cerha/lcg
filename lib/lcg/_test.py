@@ -486,13 +486,11 @@ class Resources(unittest.TestCase):
         a = lcg.ContentNode('a', content=lcg.Content(), resource_provider=p)
         b = lcg.ContentNode('b', content=lcg.Content(), resource_provider=p)
         a.resource('default.css')
-        b.resource('media.js')
-        ar = [r.filename() for r in a.resources()]
-        self.assertEqual(len(ar), 3, ar)
-        self.assertTrue('default.css' in ar and 'sound1.ogg' in ar and 'sound2.ogg' in ar, ar)
-        br = [r.filename() for r in b.resources()]
-        self.assertEqual(len(br), 3, br)
-        self.assertTrue('media.js' in br and 'sound1.ogg' in br and 'sound2.ogg' in br, br)
+        b.resource('non-existing-file.js')
+        self.assertEqual(tuple(sorted([r.filename() for r in a.resources()])),
+                         ('default.css', 'sound1.ogg', 'sound2.ogg'))
+        self.assertEqual(tuple(sorted([r.filename() for r in b.resources()])),
+                         ('sound1.ogg', 'sound2.ogg'))
 
 tests.add(Resources)
 
