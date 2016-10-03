@@ -939,57 +939,57 @@ class HtmlExport(unittest.TestCase):
               u'clip_id=&amp;server=vimeo.com"/><param name="wmode" value="opaque"/></object>')),
             # Inline images
             ('[aa.jpg]',
-             '<img src="images/aa.jpg" alt="" class="lcg-image image-aa"/>'),
+             '<img src="images/aa.jpg" class="lcg-image image-aa" alt=""/>'),
             ('*[aa.jpg]*',
-             '<strong><img src="images/aa.jpg" alt="" class="lcg-image image-aa"/></strong>'),
+             '<strong><img src="images/aa.jpg" class="lcg-image image-aa" alt=""/></strong>'),
             ('[aa.jpg label]',
-             '<img src="images/aa.jpg" alt="label" class="lcg-image image-aa"/>'),
+             '<img src="images/aa.jpg" class="lcg-image image-aa" alt="label"/>'),
             ('[aa.jpg:20x30 label]',
-             ('<img src="images/aa.jpg" height="30" width="20" alt="label" '
-              'class="lcg-image image-aa"/>')),
+             ('<img src="images/aa.jpg" style="width: 20px; height: 30px;" '
+              'class="lcg-image image-aa" alt="label"/>')),
             ('[>aa.jpg]',
-             ('<img src="images/aa.jpg" align="right" alt="" '
-              'class="lcg-image right-aligned image-aa"/>')),
+             ('<img src="images/aa.jpg" class="lcg-image right-aligned image-aa" '
+              'align="right" alt=""/>')),
             ('[<aa.jpg]',
-             ('<img src="images/aa.jpg" align="left" alt="" '
-              'class="lcg-image left-aligned image-aa"/>')),
+             ('<img src="images/aa.jpg" class="lcg-image left-aligned image-aa" '
+              'align="left" alt=""/>')),
             ('[aa.jpg label | descr]',
-             '<img src="images/aa.jpg" alt="label: descr" class="lcg-image image-aa"/>'),
+             '<img src="images/aa.jpg" class="lcg-image image-aa" alt="label: descr"/>'),
             ('[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
-             ('<img src="http://www.freebsoft.org/img/logo.gif" alt="Free(b)soft logo" '
-              'class="lcg-image image-logo"/>')),
+             ('<img src="http://www.freebsoft.org/img/logo.gif" '
+              'class="lcg-image image-logo" alt="Free(b)soft logo"/>')),
             ('[cc.png]',
-             '<img src="images/cc.png" alt="Image C: Nice picture" class="lcg-image image-cc"/>'),
+             '<img src="images/cc.png" class="lcg-image image-cc" alt="Image C: Nice picture"/>'),
             # Image links (links with an image instead of a label)
             ('[aa.jpg bb.jpg label | descr]',
              ('<a href="images/aa.jpg" title="descr">'
-              '<img src="images/bb.jpg" alt="label" class="lcg-image image-bb"/></a>')),
+              '<img src="images/bb.jpg" class="lcg-image image-bb" alt="label"/></a>')),
             ('[aa.jpg bb.jpg | descr]',
              ('<a href="images/aa.jpg" title="descr">'
-              '<img src="images/bb.jpg" alt="" class="lcg-image image-bb"/></a>')),
+              '<img src="images/bb.jpg" class="lcg-image image-bb" alt=""/></a>')),
             ('[>aa.jpg bb.jpg label | descr]',
              ('<a href="images/aa.jpg" title="descr">'
-              '<img src="images/bb.jpg" align="right" alt="label" '
-              'class="lcg-image right-aligned image-bb"/></a>')),
+              '<img src="images/bb.jpg" '
+              'class="lcg-image right-aligned image-bb" align="right" alt="label"/></a>')),
             ('[test bb.jpg bb]',
              ('<a href="test" title="Some description">'
-              '<img src="images/bb.jpg" alt="bb" class="lcg-image image-bb"/></a>')),
+              '<img src="images/bb.jpg" class="lcg-image image-bb" alt="bb"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif]',
              ('<a href="http://www.freebsoft.org">'
-              '<img src="/img/logo.gif" alt="" class="lcg-image image-logo"/></a>')),
+              '<img src="/img/logo.gif" class="lcg-image image-logo" alt=""/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website]',
              ('<a href="http://www.freebsoft.org">'
-              '<img src="/img/logo.gif" alt="Free(b)soft website" '
-              'class="lcg-image image-logo"/></a>')),
+              '<img src="/img/logo.gif" class="lcg-image image-logo" alt="Free(b)soft website"/>'
+              '</a>')),
             (('[http://www.freebsoft.org /img/logo.gif Free(b)soft website | '
               'Go to Free(b)soft website]'),
              ('<a href="http://www.freebsoft.org" title="Go to Free(b)soft website">'
-              '<img src="/img/logo.gif" alt="Free(b)soft website" '
-              'class="lcg-image image-logo"/></a>')),
+              '<img src="/img/logo.gif" '
+              'class="lcg-image image-logo" alt="Free(b)soft website"/></a>')),
             # Absolute image links
             ('http://www.freebsoft.org/img/logo.gif',
-             ('<img src="http://www.freebsoft.org/img/logo.gif" alt="" '
-              'class="lcg-image image-logo"/>')),
+             ('<img src="http://www.freebsoft.org/img/logo.gif" '
+              'class="lcg-image image-logo" alt=""/>')),
             # Audio player links
             ('[xx.mp3]',
              re.compile(r'<a href="media/xx.mp3" id="[a-z0-9-]+" '
