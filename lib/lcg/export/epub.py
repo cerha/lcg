@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012-2015 by BRAILCOM,o.p.s.
+# Copyright (C) 2012-2016 by BRAILCOM,o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,24 +74,13 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
     def _export_inline_image(self, context, element):
         g = self._generator
         image = element.image(context)
-        title = element.title()
-        descr = element.descr()
-        size = element.size()
         uri = context.uri(image)
-        if size is None:
-            thumbnail = image.thumbnail()
-            if thumbnail:
-                size = thumbnail.size()
-            else:
-                size = image.size()
+        title = element.title()
         if title is None:
             title = image.title()
+        descr = element.descr()
         if descr is None:
             descr = image.descr()
-        if size is not None:
-            width, height = size
-        else:
-            width, height = None, None
         if descr:
             if title:
                 alt = self.concat(title, ': ', descr)
@@ -99,13 +88,19 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
                 alt = descr
         else:
             alt = title
+        width, height = element.width(), element.height()
+        if width is None and height is None:
+            thumbnail = image.thumbnail()
+            if thumbnail and thumbnail.size():
+                width, height = map(lcg.UPx, thumbnail.size())
+            elif not thumbnail and image.size():
+                width, height = map(lcg.UPx, image.size())
         cls = ['lcg-image']
         if element.align():
             cls.append(element.align() + '-aligned')
         if element.name():
             cls.append('image-' + element.name())
-        return g.img(uri, alt=alt, cls=' '.join(cls),
-                     width=width, height=height)
+        return g.img(uri, alt=alt, cls=' '.join(cls), style=self._image_style(width, height))
 
     def _export_mathml(self, context, element):
         context.mathml = True

@@ -756,7 +756,11 @@ class Parser(object):
                     label_image_basename = image_basename
                     label = None
         if size:
-            size = tuple(map(int, size.split('x')))
+            pxsize = tuple(map(int, size.split('x')))
+            width, height = map(lcg.UPx, pxsize)
+        else:
+            pxsize = None
+            width, height = None, None
         if align:
             align = {'>': lcg.InlineImage.RIGHT, '<': lcg.InlineImage.LEFT}.get(align)
         basename, ext = split_filename(href)
@@ -772,7 +776,7 @@ class Parser(object):
             else:
                 video_service = None
         if video_service:
-            result = lcg.InlineExternalVideo(video_service, video_id, size=size)
+            result = lcg.InlineExternalVideo(video_service, video_id, size=pxsize)
         elif ext in self._IMAGE_EXTENSIONS and not label_image:
             result = lcg.InlineImage(href, title=label, descr=descr, name=basename, align=align,
                                      size=size)
@@ -781,7 +785,7 @@ class Parser(object):
                                      image=label_image)
         elif ext in self._VIDEO_EXTENSIONS:
             result = lcg.InlineVideo(href, title=label, descr=descr, name=basename,
-                                     image=label_image, size=size)
+                                     image=label_image, size=pxsize)
         else:
             if label_image:
                 label = lcg.InlineImage(label_image, title=label, name=label_image_basename,

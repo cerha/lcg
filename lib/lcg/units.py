@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2010-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2010-2016 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -105,6 +105,8 @@ class UAny(Unit):
     The value is currently ignored.
     """
 
+class UPx(Unit):
+    """Pixel units (only supported by HTML output)."""
 
 class HorizontalAlignment(object):
     """Enumeration of horizontal alignment kinds."""

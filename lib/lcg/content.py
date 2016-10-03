@@ -673,30 +673,13 @@ class _InlineObject(Content):
         return self._name
 
 
-class _SizedInlineObject(_InlineObject):
-
-    def __init__(self, size=None, **kwargs):
-        """Arguments:
-
-          size -- size in pixels as a tuple of two integers (WIDTH, HEIGHT)
-
-        All other arguments are passed to the parent class constructor.
-
-        """
-        assert size is None or isinstance(size, tuple), size
-        self._size = size
-        super(_SizedInlineObject, self).__init__(**kwargs)
-
-    def size(self):
-        """Return the value of 'size' as passed to the constructor."""
-        return self._size
-
-
-class InlineImage(_SizedInlineObject):
+class InlineImage(_InlineObject):
     """Image embedded inside the document.
 
-    It is unspecified whether the image is floating or to be put directly into
-    the place of invocation.
+    The image may be either a part of a textual paragraph or standalone
+    (outside paragraph).  When inside paragraph, it may float left or right
+    from the surrounding text or be put directly into its position within the
+    text.
 
     """
 
@@ -706,23 +689,35 @@ class InlineImage(_SizedInlineObject):
     BOTTOM = 'bottom'
     MIDDLE = 'middle'
 
-    def __init__(self, image, align=None, standalone=None, **kwargs):
+    def __init__(self, image, align=None, width=None, height=None, standalone=False, **kwargs):
         """Arguments:
 
           image -- the displayed image as an 'lcg.Image' resource instance.
-          align -- requested alignment of the image to the surrounding text;
-            one of the constants 'InlineImage.LEFT', 'InlineImage.RIGHT',
-            'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE' or
-            'None'
-          standalone -- iff true then never put the image inside a paragraph
+          align -- requested alignment of the image within the surrounding
+            text; one of the class constants: 'InlineImage.LEFT' and
+            'InlineImage.RIGHT' make the image float aside the text,
+            'InlineImage.TOP', 'InlineImage.BOTTOM' , 'InlineImage.MIDDLE'
+            align the image horizontally within the text line. 'None' let's the
+            output backend decide the best image position.
+          width -- output image width as lcg.Unit subclass instance.  If only
+            one of width/height is specified (not None), the other dimension is
+            computed to maintain the original image proportions.  Note that
+            various output backends may only support certain units.
+          height -- output image height as lcg.Unit subclass instance.  See 'width'.
+          standalone -- iff true then never put the image inside a paragraph.
 
         All other keyword arguments are passed to the parent class constructor.
 
         """
         assert isinstance(image, (lcg.Image, basestring)), image
         assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
+        assert width is None or isinstance(width, lcg.Unit), width
+        assert height is None or isinstance(height, lcg.Unit), height
+        assert isinstance(standalone, bool), standalone
         self._image = image
         self._align = align
+        self._width = width
+        self._height = height
         self._standalone = standalone
         super(InlineImage, self).__init__(**kwargs)
 
@@ -738,6 +733,14 @@ class InlineImage(_SizedInlineObject):
     def align(self):
         """Return the value of 'align' as passed to the constructor."""
         return self._align
+
+    def width(self):
+        """Return the value of 'width' as passed to the constructor."""
+        return self._width
+
+    def height(self):
+        """Return the value of 'height' as passed to the constructor."""
+        return self._height
 
     def standalone(self):
         """Return the value of 'standalone' as passed to the constructor."""
@@ -786,7 +789,7 @@ class InlineAudio(_InlineObject):
         return self._resource_instance(context, self._image, lcg.Image)
 
 
-class InlineVideo(_SizedInlineObject):
+class InlineVideo(_InlineObject):
     """Video file embedded inside the document.
 
     When possible, this element should be represented as an embedded video
@@ -794,19 +797,22 @@ class InlineVideo(_SizedInlineObject):
 
     """
 
-    def __init__(self, video, image=None, **kwargs):
+    def __init__(self, video, image=None, size=None, **kwargs):
         """Arguments:
 
           video -- 'lcg.Video' resource instance.
           image -- video thumbnail image as an 'lcg.Image' resource instance or None.
+          size -- size in pixels as a tuple of two integers (WIDTH, HEIGHT)
 
         All other keyword arguments are passed to the parent class constructor.
 
         """
         assert isinstance(video, (lcg.Video, basestring)), video
         assert image is None or isinstance(image, (lcg.Image, basestring)), image
+        assert size is None or isinstance(size, tuple), size
         self._video = video
         self._image = image
+        self._size = size
         super(InlineVideo, self).__init__(**kwargs)
 
     def video(self, context):
@@ -826,6 +832,11 @@ class InlineVideo(_SizedInlineObject):
 
         """
         return self._resource_instance(context, self._image, lcg.Image)
+
+    def size(self):
+        """Return the value of 'size' as passed to the constructor."""
+        return self._size
+
 
 
 class InlineExternalVideo(Content):

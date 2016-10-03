@@ -791,6 +791,29 @@ class HtmlExporter(lcg.Exporter):
             content += concat(self._export_audio_player(context))
         return content
 
+    def _css_dimension(self, dimension):
+        if dimension is None:
+            return None
+        try:
+            unit = {
+                lcg.UPx: 'px',
+                lcg.UFont: 'em',
+                lcg.UMm: 'mm',
+            }[dimension.__class__]
+        except KeyError:
+            raise Exception("Unsupported unit in HTML output: %r" % dimension)
+        value = dimension.size()
+        if isinstance(value, float):
+            strvalue = '%.2f' % (value,)
+        else:
+            strvalue = str(value)
+        return strvalue + unit
+
+    def _image_style(self, width, height):
+        return ' '.join('%s: %s;' % (attr, self._css_dimension(x))
+                        for attr, x in (('width', width), ('height', height))
+                        if x is not None) or None
+
     def context(self, *args, **kwargs):
         kwargs['generator'] = self._generator
         return super(HtmlExporter, self).context(*args, **kwargs)
@@ -1067,25 +1090,18 @@ class HtmlExporter(lcg.Exporter):
         g = self._generator
         image = element.image(context)
         thumbnail = image.thumbnail()
+        uri = context.uri(image)
         link = None
         if thumbnail:
             if True not in [isinstance(c, lcg.Link) for c in element.container_path()]:
                 link = context.uri(image)
             image = thumbnail
         title = element.title()
-        descr = element.descr()
-        size = element.size()
-        uri = context.uri(image)
-        if size is None:
-            size = image.size()
         if title is None:
             title = image.title()
+        descr = element.descr()
         if descr is None:
             descr = image.descr()
-        if size is not None:
-            width, height = size
-        else:
-            width, height = None, None
         if descr:
             if title:
                 title = self.concat(title, ': ', descr)
@@ -1095,13 +1111,16 @@ class HtmlExporter(lcg.Exporter):
             alt = title
         else:
             alt = ''
+        width, height = element.width(), element.height()
+        if width is None and height is None and image.size():
+            width, height = map(lcg.UPx, image.size())
         cls = ['lcg-image']
         if element.align():
             cls.append(element.align() + '-aligned')
         if element.name():
             cls.append('image-' + element.name())
         img = g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
-                    width=width, height=height)
+                    style=self._image_style(width, height))
         if link:
             img = g.a(img, href=link, title=title, rel='lightbox[gallery]')
             # Load lightbox.js and its dependencies.

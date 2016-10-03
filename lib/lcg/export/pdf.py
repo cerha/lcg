@@ -2036,23 +2036,47 @@ class LinkTarget(Text):
         result = u'<a name="%s"/>%s' % (self.name, exported_text,)
         return result
 
-class InlineImage(Text):
+class ImageBase(Element):
+    filename = None
+    width = None
+    height = None
+    align = None
+    def init(self):
+        super(ImageBase, self).init()
+        assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
+        assert self.filename is None or isinstance(self.filename, basestring), \
+            ('type error', self.filename,)
+        assert self.width is None or isinstance(self.width, lcg.Unit), self.width
+        assert self.height is None or isinstance(self.height, lcg.Unit), self.height
+        assert self.align is None or isinstance(self.align, str), self.align
+    def _size(self, context, filename):
+        style = context.pdf_context.style()
+        if self.width is not None and self.height is not None:
+            width, height = (self._unit2points(x, style) for x in (self.width, self.height))
+        else:
+            img = reportlab.lib.utils.ImageReader(filename)
+            img_width, img_height = img.getSize()
+            if self.width is not None:
+                width = self._unit2points(self.width, style)
+                height = width * img_height / img_width
+            elif self.height is not None:
+                height = self._unit2points(self.height, style)
+                width = height * img_width / img_height
+            else:
+                width, height = img_width, img_height
+        return width, height
+
+class InlineImage(ImageBase, Text):
     """Image inside a paragraph.
 
     'image' is an Image instance.
 
     """
-    align = None
     resize = None
-    filename = None
     def init(self):
         self.content = ''
         super(InlineImage, self).init()
-        assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
-        assert self.align is None or isinstance(self.align, (str, int, float,)), self.align
         assert self.resize is None or isinstance(self.resize, float), self.resize
-        assert self.filename is None or isinstance(self.filename, basestring), \
-            ('type error', self.filename,)
     def plain_text(self):
         return False
     def _export(self, context):
@@ -2065,47 +2089,46 @@ class InlineImage(Text):
             filename = self.filename
         if filename:
             align = self.align
+            pdf_context = context.pdf_context
             if align in (None, lcg.InlineImage.LEFT, lcg.InlineImage.RIGHT,):
                 alignment = ' valign="text-top"'
             elif isinstance(align, (int, float,)):
                 alignment = ' valign="%s"' % (align,)
             else:
-                mapping = {lcg.InlineImage.TOP: 'valign="top"',
-                           lcg.InlineImage.BOTTOM: 'valign="bottom"',
-                           lcg.InlineImage.MIDDLE: 'valign="center"',
-                           }
+                mapping = {
+                    lcg.InlineImage.TOP: 'valign="top"',
+                    lcg.InlineImage.BOTTOM: 'valign="bottom"',
+                    lcg.InlineImage.MIDDLE: 'valign="center"',
+                }
                 alignment = ' ' + mapping[align]
-            resize = self.resize
-            if resize is None:
-                resize = 1
-            if resize is None:
-                size = ''
-            else:
-                img = reportlab.lib.utils.ImageReader(filename)
-                img_width, img_height = img.getSize()
-                width, height = img_width * resize, img_height * resize
-                page_width, page_height = context.pdf_context.page_size()
-                max_width, max_height = page_width / 2.0, page_height / 2.0
-                if width > max_width:
-                    height *= (max_width / width)
-                    width = max_width
-                if height > max_height:
-                    width *= (max_height / height)
-                    height = max_height
-                size = ' width="%s" height="%s"' % (width, height,)
-            if ((isinstance(context.pdf_context.in_paragraph, list) and
+            width, height = self._size(context, filename)
+            if self.width is None and self.height is None:
+                resize = self.resize
+                if resize is not None:
+                    width, height = width * resize, height * resize
+                else:
+                    page_width, page_height = context.pdf_context.page_size()
+                    max_width, max_height = page_width * 0.5, page_height * 0.5
+                    if width > max_width:
+                        height *= (max_width / width)
+                        width = max_width
+                    if height > max_height:
+                        width *= (max_height / height)
+                        height = max_height
+            if ((isinstance(pdf_context.in_paragraph, list) and
                  align in (lcg.InlineImage.LEFT, lcg.InlineImage.RIGHT,))):
                 rl_image = RLImage(filename, width=width, height=height)
                 rl_image.rl_side = align
-                context.pdf_context.in_paragraph.append(rl_image)
+                pdf_context.in_paragraph.append(rl_image)
                 result = ''
             else:
-                result = u'<img src="%s"%s%s/>' % (filename, alignment, size,)
+                result = (u'<img src="%s"%s width="%s" height="%s"/>' %
+                          (filename, alignment, width, height))
         else:
             result = image.title() or image.filename()
         return result
 
-class Image(Element):
+class Image(ImageBase):
     """Image taken from an Image resource instance.
 
     'image' is an Image instance.  An additional argument 'text' may provide text description of
@@ -2114,15 +2137,9 @@ class Image(Element):
     """
     _CATEGORY = 'block'
     uri = None
-    filename = None
-    align = None
     def init(self):
         super(Image, self).init()
-        assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
-        assert self.align is None or isinstance(self.align, str), self.align
         assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
-        assert self.filename is None or isinstance(self.filename, basestring), \
-            ('type error', self.filename,)
     def _export(self, context):
         image = self.image
         if image is None:
@@ -2133,7 +2150,8 @@ class Image(Element):
         if not filename:
             filename = self.filename
         if filename:
-            result = RLImage(filename, uri=self.uri)
+            width, height = self._size(context, filename)
+            result = RLImage(filename, uri=self.uri, width=width, height=height)
         else:
             content = make_element(Text, content=(image.title() or image.filename()))
             result = make_element(Paragraph, content=[content]).export(context)
@@ -2992,13 +3010,15 @@ class PDFExporter(FileExporter, Exporter):
     def _export_inline_image(self, context, element):
         image = element.image(context)
         filename = self._get_resource_path(context, image)
-        kwargs = {}
         if element.standalone() or context.pdf_context.in_figure:
             class_ = Image
+            kwargs = {}
         else:
             class_ = InlineImage
-            kwargs['text'] = element.title()
-        return make_element(class_, image=image, align=element.align(), filename=filename, **kwargs)
+            kwargs = dict(text=element.title())
+        return make_element(class_, image=image, filename=filename,
+                            width=element.width(), height=element.height(),
+                            align=element.align(), **kwargs)
 
     def _export_figure(self, context, element):
         pdf_context = context.pdf_context

@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ from .nodes import ContentNode, Variant, Metadata
 from .resources import Resource, Image, Stylesheet, Script, Translations, \
     Media, Audio, Video, Flash, ResourceProvider
 
-from .units import Unit, UAny, UFont, UMm, UPoint, USpace, FontFamily, \
+from .units import Unit, UAny, UFont, UMm, UPoint, USpace, UPx, FontFamily, \
     HorizontalAlignment, VerticalAlignment, Orientation, Color
 
 from .content import Content, Container, Strong, Emphasized, \
