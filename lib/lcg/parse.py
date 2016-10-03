@@ -181,9 +181,6 @@ class Parser(object):
     _VIMEO_VIDEO_MATCHER = re.compile(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
     _YOUTUBE_VIDEO_MATCHER = re.compile(
         r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)")
-    _IMAGE_EXTENSIONS = ('jpg', 'jpeg', 'gif', 'png')
-    _AUDIO_EXTENSIONS = ('mp3', 'ogg')
-    _VIDEO_EXTENSIONS = ('flv', 'ogv', 'mp4')
     _BLANK_MATCHER = re.compile(r'\s+', re.MULTILINE)
 
     class _StackEntry(object):
@@ -730,31 +727,24 @@ class Parser(object):
             return lcg.TextContent(markup)
 
     def _link_markup_handler(self, link, href=None, size=None, label=None, descr=None, align=None):
-        def split_filename(filename):
+        def _basename(filename):
             if filename:
                 if '/' in filename:
                     filename = filename.split('/')[-1]
                 if '.' in filename:
-                    filename, ext = filename.rsplit('.', 1)
-                    return filename, ext.lower()
-            return None, None
-        label_image, label_image_basename = None, None
+                    filename = filename.rsplit('.', 1)[0]
+            return filename or None
         if label:
-            label = label.strip()
+            label = label.strip() or None
+        label_image = None
+        if label:
             label_parts = self._BLANK_MATCHER.split(label, 1)
-            if len(label_parts) == 2:
-                image, label_ = label_parts
-                image_basename, image_ext = split_filename(image)
-                if image_ext in self._IMAGE_EXTENSIONS:
-                    label_image = image
-                    label_image_basename = image_basename
-                    label = label_.strip()
-            else:
-                image_basename, image_ext = split_filename(label)
-                if image_ext in self._IMAGE_EXTENSIONS:
-                    label_image = label
-                    label_image_basename = image_basename
-                    label = None
+            if len(label_parts) == 1 and lcg.Resource.subclass(label) is lcg.Image:
+                label_image = label
+                label = None
+            elif len(label_parts) == 2 and lcg.Resource.subclass(label_parts[0]) is lcg.Image:
+                label_image = label_parts[0]
+                label = label_parts[1].strip()
         if size:
             pxsize = tuple(map(int, size.split('x')))
             width, height = map(lcg.UPx, pxsize)
@@ -763,7 +753,7 @@ class Parser(object):
             width, height = None, None
         if align:
             align = {'>': lcg.InlineImage.RIGHT, '<': lcg.InlineImage.LEFT}.get(align)
-        basename, ext = split_filename(href)
+        resource_cls = None
         match = self._YOUTUBE_VIDEO_MATCHER.match(href)
         if match:
             video_service = 'youtube'
@@ -775,20 +765,21 @@ class Parser(object):
                 video_id = match.group("video_id")
             else:
                 video_service = None
+                resource_cls = lcg.Resource.subclass(href)
         if video_service:
             result = lcg.InlineExternalVideo(video_service, video_id, size=pxsize)
-        elif ext in self._IMAGE_EXTENSIONS and not label_image:
-            result = lcg.InlineImage(href, title=label, descr=descr, name=basename, align=align,
-                                     size=size)
-        elif ext in self._AUDIO_EXTENSIONS:
-            result = lcg.InlineAudio(href, title=label, descr=descr, name=basename,
+        elif resource_cls is lcg.Image and not label_image:
+            result = lcg.InlineImage(href, title=label, descr=descr, name=_basename(href),
+                                     align=align, width=width, height=height)
+        elif resource_cls is lcg.Audio:
+            result = lcg.InlineAudio(href, title=label, descr=descr, name=_basename(href),
                                      image=label_image)
-        elif ext in self._VIDEO_EXTENSIONS:
-            result = lcg.InlineVideo(href, title=label, descr=descr, name=basename,
+        elif resource_cls is lcg.Video:
+            result = lcg.InlineVideo(href, title=label, descr=descr, name=_basename(href),
                                      image=label_image, size=pxsize)
         else:
             if label_image:
-                label = lcg.InlineImage(label_image, title=label, name=label_image_basename,
+                label = lcg.InlineImage(label_image, title=label, name=_basename(label_image),
                                         align=align)
             if ((href.startswith('http://') or href.startswith('https://') or
                  href.startswith('ftp://'))):
