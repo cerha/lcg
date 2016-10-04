@@ -662,11 +662,11 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
 
     _on_touchend: function (event) {
         if (!this._touch_moved) {
-            var outside = event.findElement('div') !== this.element;
-            if (outside) {
+            // Detect touch outside the menu div:
+            if (event.findElement('div') !== this.element) {
                 this.dismiss();
             } else {
-                this._cmd_activate(event.element());
+                this._cmd_activate(event.findElement('a'));
             }
             event.stop();
         }
