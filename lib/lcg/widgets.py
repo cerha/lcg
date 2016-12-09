@@ -122,6 +122,61 @@ class Widget(object):
                                            *self._javascript_widget_arguments(context))))
 
 
+class Button(Widget, lcg.Content):
+    """HTML button submitting given values to given URI."""
+
+    def __init__(self, label, uri, values=(), callback=None, tooltip=None, enabled=True,
+                 icon=None, **kwargs):
+        """Arguments:
+
+           label -- button label as a basestring
+           uri -- target URI where the form is submitted
+           values -- list of name/value pairs or a dict containing values
+             to be submitted as request parameters to given URI when the
+             button is clicked
+           callback -- name of the JavaScript function to be called on
+             button invocation (will be looked up in the current JavaScript
+             name space).  The callback function will be called with the
+             instance of 'lcg.Button' JavaScript class as the first argument.
+           tooltip -- button description/tooltip as a basestring
+           enabled -- the buton is enabled iff True; False makes it gray
+           icon -- icon CSS class name.  If not None, a span with this class
+             name will be added before the item label.  The CSS definition of
+             the icon must be present in stylesheets.
+           **kwargs -- other arguments defined by the parent class
+
+        """
+        self._uri = uri
+        self._callback = callback
+        self._tooltip = tooltip
+        self._enabled = enabled
+        self._icon = icon
+        self._values = values.items() if isinstance(values, dict) else values
+        super(Button, self).__init__(label=label, **kwargs)
+
+    def _export_widget(self, context):
+        g = context.generator()
+        return g.form(
+            [g.hidden(name, value is True and 'true' or value) for name, value in self._values] +
+            [g.button(g.span('', cls='icon' + ((' ' + self._icon) if self._icon else '')) +
+                      g.span(self._label or 'x', cls='label'),
+                      title=self._tooltip,
+                      disabled=not self._enabled,
+                      type='submit',
+                      cls='disabled' if not self._enabled else None)],
+            action=self._uri,
+            method='POST',
+        )
+
+    def _javascript_widget_arguments(self, context):
+        return (self._callback,)
+
+    def _wrap_exported_widget(self, context, content, **kwargs):
+        g = context.generator()
+        # Using spans is important to make display: inline-block work in MSIE 8.
+        return g.span(content, **kwargs)
+
+
 class FoldableTree(Widget, lcg.Content):
     """HTML interactive foldable tree menu widget.
 

@@ -108,6 +108,41 @@ lcg.Widget = Class.create(lcg.KeyHandler, {
     }
 });
 
+lcg.Button = Class.create(lcg.Widget, {
+    /* LCG JavaScript Button widget handler.
+     *
+     * Constructor arguments:
+     *
+     *   element_id -- HTML id of the widget root element as a string.
+     *     May also be the element itself as Prototype.js Element instance.
+     *   callback -- The JavaScript function to be called on item invocation.
+     *     May be passed also as a string (function of given name will be
+     *     looked up in the current JavaScript name space).  The callback
+     *     function will be called with the Button widget instance
+     *     as the first argument.
+     */
+    initialize: function ($super, element_id, callback) {
+        var i;
+        $super(element_id);
+        if (typeof callback === 'string') {
+            var namespaces = callback.split(".");
+            var func = namespaces.pop();
+            var context = window;
+            for (i = 0; i < namespaces.length; i++) {
+                context = context[namespaces[i]];
+            }
+            callback = context[func];
+        }
+        if (callback) {
+            this.element.down('button').on('click', function (event) {
+                callback(this);
+                event.stop();
+            }.bind(this));
+        }
+    }
+
+});
+
 lcg.Menu = Class.create(lcg.Widget, {
     /* Generic base class for several other menu-like widgets.
      *

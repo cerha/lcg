@@ -57,7 +57,7 @@ from .content import Content, Container, Strong, Emphasized, \
     coerce, join, link, dl, ul, ol, fieldset, p, strong, em, u, \
     code, cite, container, br, hr, pre, abbr
 
-from .widgets import Widget, FoldableTree, Notebook, PopupMenuCtrl, \
+from .widgets import Widget, Button, FoldableTree, Notebook, PopupMenuCtrl, \
     PopupMenuItem, CollapsiblePane
 
 from .presentation import Presentation, ContentMatcher, \
