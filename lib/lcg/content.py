@@ -37,6 +37,7 @@ the hierarchy of the nodes themselves.
 import copy
 import re
 import lcg
+import collections
 
 _ = lcg.TranslatableTextFactory('lcg')
 
@@ -1033,24 +1034,57 @@ class VSpace(HSpace):
     """
 
 
-class HtmlContent(TextContent):
-    """LCG content class for wrapping already exported HTML text.
+class HtmlContent(Content):
+    """Special element for dirtect HTML embedding in LCG content hierarchy.
 
-    This class allows embedding HTML content directly into the LCG content
-    hierarchy.  Its export in HTML is a noop, but it is only implemented for the
-    HTML output.  Attempt to export this type of content to any other target
-    format will lead to an error.
+    This class only supports HTML export and an attempt to export an element of
+    this class to any other target format will lead to an error.
 
-    At the same time, this class demonstrates a content element, which exports
-    itself actively and doesn't rely on the exporter as the other generic
-    elements defined in this module.
+    The HTML content may be passed directly as a Python string or as a Python
+    function which will be called to generate the content dynamically in export
+    time.  The function will be called with at least two arguments (context,
+    element), where 'element' is the 'HtmlContent' instance itself and
+    'context' is a 'wiking.Exporter.Context' instance.  Any positional
+    arguments passed to the constructor are also passed to the export function.
+
+    Use with caution.  Defining specific content classes for more generic
+    content elements is encouraged over using this class.  This class should
+    only be used for simple cases where defining a class makes too much
+    unnecessary noise...
+
+    This class demonstrates a content element, which exports itself actively
+    and doesn't rely on the exporter as the other generic elements defined in
+    this module.
 
     """
+
+    def __init__(self, content, *args, **kwargs):
+        """Initialize the instance.
+
+        Arguments:
+
+          content -- the actual HTML content of this element as a basestring
+            or an export function (see class docstring for details).
+          *args -- additional positional arguments passed to the export
+            function (given in 'content').  No arguments are allowed when
+            'content' is a basestring.
+          kwargs -- keyword arguments for parent class constructor.
+
+        """
+        assert isinstance(content, (basestring, collections.Callable)), content
+        self._content = content
+        self._export_args = args
+        super(HtmlContent, self).__init__(**kwargs)
+
     def export(self, context):
         assert isinstance(context.exporter(), lcg.HtmlExporter), \
             "Only HTML export is supported for this element."
-        g = context.generator()
-        return g.noescape(self._text)
+        if isinstance(self._content, basestring):
+            g = context.generator()
+            return g.noescape(self._text)
+        else:
+            return self._content(context, self, *self._export_args)
+
 
 
 class Heading(Container):
