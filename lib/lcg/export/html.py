@@ -549,19 +549,19 @@ class HtmlGenerator(object):
             return 'null'
         elif isinstance(value, self._JavaScriptCode):
             return value
-        elif isinstance(value, (str, unicode)):
+        elif isinstance(value, basestring):
             # Use double quotes (not single) to make output JSON compatible!
             return '"' + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, value) + '"'
         elif isinstance(value, bool):
             return (value and 'true' or 'false')
-        elif isinstance(value, int):
+        elif isinstance(value, (int, long)):
             return str(value)
         elif isinstance(value, (tuple, list)):
             return concat('[', concat([self.js_value(v) for v in value], separator=", "), ']')
         elif isinstance(value, dict):
             # Only string keys are supported in JavaScript (int works too, but is actually
             # converted to string, which might be unexpected, so we don't support it).
-            assert lcg.is_sequence_of(value.keys(), str)
+            assert lcg.is_sequence_of(value.keys(), basestring)
             return concat('{', concat([concat(self.js_value(k), ': ', self.js_value(v))
                                        for k, v in value.items()],
                                       separator=", "),
