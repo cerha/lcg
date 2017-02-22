@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1081,7 +1081,7 @@ class HtmlContent(Content):
             "Only HTML export is supported for this element."
         if isinstance(self._content, basestring):
             g = context.generator()
-            return g.noescape(self._text)
+            return g.noescape(self._content)
         else:
             return self._content(context, self, *self._export_args)
 
