@@ -105,6 +105,7 @@
     bottom: -1px;
     margin: 0 2px;
     text-indent: -9999px;
+    text-align: left;
     overflow: hidden;
     outline: none;
 }
