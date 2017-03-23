@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -684,7 +684,6 @@ class HtmlExporter(lcg.Exporter):
                    'language_selection',
                    'content',
                    )
-    _LANGUAGE_SELECTION_LABEL = _("Choose your language:")
     _LANGUAGE_SELECTION_COMBINED = False
     _MATHML_XMLNS = re.compile(r'<math [^>]* xmlns=".*')
 
@@ -770,7 +769,7 @@ class HtmlExporter(lcg.Exporter):
             links.append(g.a(label, href=self._uri_node(context, node, lang=lang),
                              lang=lang, cls=cls) + sign)
         space = g.escape(' ')
-        return concat(g.a(self._LANGUAGE_SELECTION_LABEL,
+        return concat(g.a(_("Choose your language:"),
                           id='language-selection-anchor', name='language-selection-anchor'), ' ',
                       concat(links, separator=(space + g.span('|', cls='sep') + space)))
 
