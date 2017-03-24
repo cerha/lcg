@@ -847,8 +847,8 @@ class HtmlExporter(lcg.Exporter):
     def _content(self, context):
         return context.node().content(context.lang()).export(context)
 
-    def _body_attr(self, context, **kwargs):
-        return kwargs
+    def _body_attr(self, context):
+        return {}
 
     def _body_content(self, context):
         content = self._parts(context, self._PAGE_STRUCTURE)
