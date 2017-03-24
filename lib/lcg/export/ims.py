@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2015, 2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -105,6 +105,10 @@ class _Manifest:
 class IMSExporter(lcg.StyledHtmlExporter, lcg.HtmlFileExporter):
     """Export the content as an IMS package."""
 
+    _PAGE_STRUCTURE = (
+        lcg.HtmlExporter.Part('content'),
+    )
+
     def manifest(self, node):
         return _Manifest(self.context(node, None))
 
@@ -114,6 +118,3 @@ class IMSExporter(lcg.StyledHtmlExporter, lcg.HtmlFileExporter):
             manifest = self.manifest(node).xml()
             with file(os.path.join(directory, 'imsmanifest.xml'), 'w') as f:
                 f.write(manifest.encode('utf-8'))
-
-    def _body_parts(self, context):
-        return (context.node().content(context.lang()).export(context),)
