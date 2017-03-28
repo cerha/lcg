@@ -3,7 +3,7 @@
 
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -183,7 +183,6 @@ class TranslatableText(unittest.TestCase):
         fields = dict(a=g.a(lcg.TranslatableText("a"), href='a'), b='b')
         interpolated = template.interpolate(lambda f: fields[f])
         test(interpolated, '<a href="a">a</a> [b]')
-
 
 tests.add(TranslatableText)
 
@@ -833,16 +832,63 @@ tests.add(HtmlImport)
 class HtmlExport(unittest.TestCase):
 
     def test_generator(self):
-        g = lcg.HtmlGenerator()
+        g = lcg.HtmlGenerator(sorted_attributes=True)
         localizer = lcg.Localizer('cs', translation_path=translation_path)
-        for generated, html in (
-                (g.a('X', href='x'),
-                 '<a href="x">X</a>'),
-                (g.button('X', disabled=True),
-                 '<button disabled="disabled" type="button">X</button>'),
+        def test(result, expected):
+            self.assertEqual(result, expected,
+                             "\n  - expected: %r\n  - got:      %r" % (expected, result))
+        for tag in ('html', 'head', 'title', 'style', 'body', 'div', 'section',
+                    'map', 'p', 'blockquote', 'footer', 'figure', 'figcaption', 'ol',
+                    'ul', 'li', 'dl', 'dt', 'dd',  'time', 'table', 'tr', 'th', 'td',
+                    'thead', 'tfoot', 'tbody', 'object', 'optgroup', 'noscript'):
+            test(getattr(g, tag)('x'), '<%s>x</%s>' % (tag, tag))
+            test(getattr(g, tag)(content='x'), '<%s>x</%s>' % (tag, tag))
+            test(getattr(g, tag)(content=('x', 'y')), '<%s>xy</%s>' % (tag, tag))
+            test(getattr(g, tag)(content=()), '<%s></%s>' % (tag, tag))
+        for tag in ('link', 'meta', 'br', 'hr', 'param'):
+            test(getattr(g, tag)(), '<%s/>' % tag)
+        # These tags require positional arguemnts, test with minimal arguments first.
+        for result, expected in (
+                (g.a('x'), u'<a>x</a>'),
+                (g.script('x'), u'<script type="text/javascript">x</script>'),
+                (g.submit('x'), u'<input type="submit" value="x"/>'),
+                (g.form('x'), u'<form action="#">x</form>'),
+                (g.h('x', 3), u'<h3>x</h3>'),
+                (g.img('x'), u'<img alt="" src="x"/>'),
+                (g.iframe('x'), u'<iframe src="x"><a href="x">x</a></iframe>'),
+                (g.fieldset('a', 'x'), u'<fieldset><legend>a</legend>x</fieldset>'),
+                (g.input(type='text'), u'<input type="text"/>'),
+                (g.checkbox('a'), u'<input name="a" type="checkbox"/>'),
+                (g.hidden('a', 'x'), u'<input name="a" type="hidden" value="x"/>'),
+                (g.radio('a'), u'<input name="a" type="radio"/>'),
+                (g.upload('a'), u'<input class="upload" name="a" size="50" type="file"/>'),
+                (g.select('a', ()), u'<select name="a"></select>'),
+                (g.audio('x'), u'<audio controls="controls" src="x"/>'),
+                (g.video('x'), u'<video controls="controls" src="x"/>'),
+                (g.source('x'), u'<source src="x"/>'),
         ):
-            result = localizer.localize(generated)
-            self.assertEqual(result, html, "\n  - expected: %r\n  - got:      %r" % (html, result))
+            test(result, expected)
+        # Now test with *some* typical optional arguments.
+        for result, expected in (
+                (g.a('x', href='a'), '<a href="a">x</a>'),
+                (g.a('x', name='a'), '<a name="a">x</a>'),
+                (g.button('X', disabled=True), '<button disabled="disabled" type="button">X</button>'),
+                (g.select('a', (('X', 'x'), ('Y', 'y'))),
+                 (u'<select name="a"><option value="x">X</option>'
+                  u'<option value="y">Y</option></select>')),
+                (g.select('a', (('X', 'x', False, 'c'), ('Y', 'y', True, 'cc'))),
+                 (u'<select name="a"><option class="c" disabled="disabled" value="x">X</option>'
+                  u'<option class="cc" value="y">Y</option></select>')),
+                (g.select('a', (('aa', (('X', 'x'), ('Y', 'y'))), ('bb', (('Z', 'z'),)))),
+                 (u'<select name="a"><optgroup label="aa"><option value="x">X</option>'
+                  u'<option value="y">Y</option></optgroup>'
+                  u'<optgroup label="bb"><option value="z">Z</option>'
+                  u'</optgroup></select>')),
+        ):
+            test(result, expected)
+
+
+
 
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
@@ -896,6 +942,7 @@ class HtmlExport(unittest.TestCase):
         n = lcg.ContentNode('test', title='Test Node', descr="Some description",
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
+        context.generator()._sorted_attributes = True
         for text, html in (
             ('a *b /c/ _d_* =e=',
              'a <strong>b <em>c</em> <u>d</u></strong> <code>e</code>'),
@@ -925,85 +972,85 @@ class HtmlExport(unittest.TestCase):
              '<a href="http://www.freebsoft.org" title="descr">label</a>'),
             # Video service links
             ('http://www.youtube.com/watch?v=xyz123',
-             (u'<object type="application/x-shockwave-flash" title="Flash movie object" '
-              u'data="http://www.youtube.com/v/xyz123?rel=0" width="500" height="300">'
+             (u'<object data="http://www.youtube.com/v/xyz123?rel=0" height="300"'
+              u' title="Flash movie object" type="application/x-shockwave-flash" width="500">'
               u'<param name="movie" value="http://www.youtube.com/v/xyz123?rel=0"/>'
               u'<param name="wmode" value="opaque"/></object>')),
             ('http://www.vimeo.com/xyz123',
-             (u'<object type="application/x-shockwave-flash" title="Flash movie object" '
-              u'data="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com" '
-              u'width="500" height="300">'
+             (u'<object data="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com"'
+              u' height="300" title="Flash movie object" type="application/x-shockwave-flash"'
+              u' width="500">'
               u'<param name="movie" value="http://vimeo.com/moogaloop.swf?'
               u'clip_id=&amp;server=vimeo.com"/><param name="wmode" value="opaque"/></object>')),
             # Inline images
             ('[aa.jpg]',
-             '<img src="images/aa.jpg" class="lcg-image image-aa" alt=""/>'),
+             u'<img alt="" class="lcg-image image-aa" src="images/aa.jpg"/>'),
             ('*[aa.jpg]*',
-             '<strong><img src="images/aa.jpg" class="lcg-image image-aa" alt=""/></strong>'),
+             '<strong><img alt="" class="lcg-image image-aa" src="images/aa.jpg"/></strong>'),
             ('[aa.jpg label]',
-             '<img src="images/aa.jpg" class="lcg-image image-aa" alt="label"/>'),
+             u'<img alt="label" class="lcg-image image-aa" src="images/aa.jpg"/>'),
             ('[aa.jpg:20x30 label]',
-             ('<img src="images/aa.jpg" style="width: 20px; height: 30px;" '
-              'class="lcg-image image-aa" alt="label"/>')),
+             (u'<img alt="label" class="lcg-image image-aa"'
+              u' src="images/aa.jpg" style="width: 20px; height: 30px;"/>')),
             ('[>aa.jpg]',
-             ('<img src="images/aa.jpg" class="lcg-image right-aligned image-aa" '
-              'align="right" alt=""/>')),
+             (u'<img align="right" alt="" class="lcg-image right-aligned image-aa"'
+              u' src="images/aa.jpg"/>')),
             ('[<aa.jpg]',
-             ('<img src="images/aa.jpg" class="lcg-image left-aligned image-aa" '
-              'align="left" alt=""/>')),
+             (u'<img align="left" alt="" class="lcg-image left-aligned image-aa" '
+              u'src="images/aa.jpg"/>')),
             ('[aa.jpg label | descr]',
-             '<img src="images/aa.jpg" class="lcg-image image-aa" alt="label: descr"/>'),
-            ('[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
-             ('<img src="http://www.freebsoft.org/img/logo.gif" '
-              'class="lcg-image image-logo" alt="Free(b)soft logo"/>')),
+             u'<img alt="label: descr" class="lcg-image image-aa" src="images/aa.jpg"/>'),
+            (u'[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
+             (u'<img alt="Free(b)soft logo" class="lcg-image image-logo"'
+              u' src="http://www.freebsoft.org/img/logo.gif"/>')),
             ('[cc.png]',
-             '<img src="images/cc.png" class="lcg-image image-cc" alt="Image C: Nice picture"/>'),
+             u'<img alt="Image C: Nice picture" class="lcg-image image-cc" src="images/cc.png"/>'),
             # Image links (links with an image instead of a label)
             ('[aa.jpg bb.jpg label | descr]',
-             ('<a href="images/aa.jpg" title="descr">'
-              '<img src="images/bb.jpg" class="lcg-image image-bb" alt="label"/></a>')),
+             (u'<a href="images/aa.jpg" title="descr">'
+              u'<img alt="label" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
             ('[aa.jpg bb.jpg | descr]',
              ('<a href="images/aa.jpg" title="descr">'
-              '<img src="images/bb.jpg" class="lcg-image image-bb" alt=""/></a>')),
+              u'<img alt="" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
             ('[>aa.jpg bb.jpg label | descr]',
-             ('<a href="images/aa.jpg" title="descr">'
-              '<img src="images/bb.jpg" '
-              'class="lcg-image right-aligned image-bb" align="right" alt="label"/></a>')),
+             (u'<a href="images/aa.jpg" title="descr">'
+              u'<img align="right" alt="label"'
+              u' class="lcg-image right-aligned image-bb" src="images/bb.jpg"/></a>')),
             ('[test bb.jpg bb]',
-             ('<a href="test" title="Some description">'
-              '<img src="images/bb.jpg" class="lcg-image image-bb" alt="bb"/></a>')),
+             (u'<a href="test" title="Some description">'
+              u'<img alt="bb" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif]',
-             ('<a href="http://www.freebsoft.org">'
-              '<img src="/img/logo.gif" class="lcg-image image-logo" alt=""/></a>')),
+             (u'<a href="http://www.freebsoft.org">'
+              u'<img alt="" class="lcg-image image-logo" src="/img/logo.gif"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website]',
-             ('<a href="http://www.freebsoft.org">'
-              '<img src="/img/logo.gif" class="lcg-image image-logo" alt="Free(b)soft website"/>'
-              '</a>')),
+             (u'<a href="http://www.freebsoft.org">'
+              u'<img alt="Free(b)soft website" class="lcg-image image-logo" src="/img/logo.gif"/>'
+              u'</a>')),
             (('[http://www.freebsoft.org /img/logo.gif Free(b)soft website | '
               'Go to Free(b)soft website]'),
-             ('<a href="http://www.freebsoft.org" title="Go to Free(b)soft website">'
-              '<img src="/img/logo.gif" '
-              'class="lcg-image image-logo" alt="Free(b)soft website"/></a>')),
+             (u'<a href="http://www.freebsoft.org" title="Go to Free(b)soft website">'
+              u'<img alt="Free(b)soft website" class="lcg-image image-logo" '
+              'src="/img/logo.gif"/></a>')),
             # Absolute image links
             ('http://www.freebsoft.org/img/logo.gif',
-             ('<img src="http://www.freebsoft.org/img/logo.gif" '
-              'class="lcg-image image-logo" alt=""/>')),
+             (u'<img alt="" class="lcg-image image-logo"'
+              u' src="http://www.freebsoft.org/img/logo.gif"/>')),
             # Audio player links
             ('[xx.mp3]',
-             re.compile(r'<a href="media/xx.mp3" id="[a-z0-9-]+" '
-                        r'class="media-control-link">xx.mp3</a>')),
+             re.compile(r'<a class="media-control-link" href="media/xx.mp3"'
+                        r' id="[a-z0-9-]+">xx.mp3</a>')),
             ('[/somewhere/some.mp3]',
-             re.compile(r'<a href="/somewhere/some.mp3" id="[a-z0-9-]+" '
-                        r'class="media-control-link">/somewhere/some.mp3</a>')),
+             re.compile(r'<a class="media-control-link" href="/somewhere/some.mp3" id="[a-z0-9-]+"'
+                        r'>/somewhere/some.mp3</a>')),
             # Internal Reference Links
             ('[text.txt]',
-             '<a href="/resources/texts/text.txt">text.txt</a>'),
+             u'<a href="/resources/texts/text.txt">text.txt</a>'),
             ('[test]',
-             '<a href="test" title="Some description">Test Node</a>'),
+             u'<a href="test" title="Some description">Test Node</a>'),
             ('[test#sec1]',
-             '<a href="test#sec1">Section One</a>'),
+             u'<a href="test#sec1">Section One</a>'),
             ('[#sec1]',
-             '<a href="test#sec1">Section One</a>'),
+             u'<a href="test#sec1">Section One</a>'),
             # HTML special
             (r'<bla>',
              r'&lt;bla&gt;'),

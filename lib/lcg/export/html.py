@@ -142,6 +142,15 @@ class HtmlGenerator(object):
                            '\n': '\\n'}
     _JAVASCRIPT_ESCAPE_REGEX = re.compile('[<>&"\'\\\n]')
 
+    def __init__(self, sorted_attributes=False):
+        """Arguments:
+
+          sorted_attributes -- set to True when deterministic attribute order in HTML tags
+            is needed (mostly useful for unit testing).
+
+        """
+        self._sorted_attributes = sorted_attributes
+
     def _js_escape_char(self, match):
         return self._JAVASCRIPT_ESCAPES[match.group(0)]
 
@@ -151,7 +160,10 @@ class HtmlGenerator(object):
         if __debug__:
             valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title',
                              'accesskey')
-        for name, value in kwargs.items():
+        attr = kwargs.items()
+        if self._sorted_attributes:
+            attr = sorted(attr)
+        for name, value in attr:
             name = name.replace('_', '-')
             if value is not None and value is not False:
                 assert name in valid or name.startswith('aria-') or name.startswith('data-'), \
