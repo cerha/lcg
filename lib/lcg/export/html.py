@@ -154,23 +154,23 @@ class HtmlGenerator(object):
     def _js_escape_char(self, match):
         return self._JAVASCRIPT_ESCAPES[match.group(0)]
 
-    def _tag(self, tag, _content=None, _attr=(), _paired=True, **kwargs):
-        result_list = [self.noescape('<' + tag)]
+    def _tag(self, tag, content=None, attr=None, paired=True, allow=()):
+        common_attributes = ('accesskey', 'class', 'id', 'lang',
+                             'role', 'style', 'tabindex', 'title')
         dirty = False
-        if __debug__:
-            valid = _attr + ('id', 'lang', 'tabindex', 'cls', 'style', 'role', 'title',
-                             'accesskey')
-        attr = kwargs.items()
+        result = [self.noescape('<' + tag)]
+        attributes = (attr or {}).items()
         if self._sorted_attributes:
-            attr = sorted(attr)
-        for name, value in attr:
+            attributes = sorted(attributes)
+        for name, value in attributes:
             name = name.replace('_', '-')
             if value is not None and value is not False:
-                assert name in valid or name.startswith('aria-') or name.startswith('data-'), \
-                    "Invalid attribute '%s' of HTML tag '%s'." % (name, tag)
                 if name == 'cls':
                     name = 'class'
-                result_list.append(' ' + name + '=')
+                assert (name in common_attributes or name in allow or
+                        name.startswith('aria-') or name.startswith('data-')), \
+                    "Invalid attribute '%s' for HTML tag '%s'." % (name, tag)
+                result.append(' ' + name + '=')
                 if value is True:
                     # Use boolean value syntax, which is compatible with both HTML4 and XHTML.
                     str_value = '"' + name + '"'
@@ -181,30 +181,21 @@ class HtmlGenerator(object):
                     dirty = True
                 else:
                     str_value = self.noescape(saxutils.quoteattr(value))
-                result_list.append(str_value)
-        if _content is not None and not isinstance(_content, HtmlEscapedUnicode):
-            if _content.__class__ in (unicode, str,):
-                _content = self.escape(_content)
+                result.append(str_value)
+        if content is not None and not isinstance(content, HtmlEscapedUnicode):
+            if content.__class__ in (unicode, str,):
+                content = self.escape(content)
             else:
                 dirty = True
-        if _paired:
-            result_list.extend((self.noescape('>'),
-                                _content,
-                                self.noescape('</' + tag + '>')))
+        if paired:
+            result.extend((self.noescape('>'), content or '', self.noescape('</' + tag + '>')))
         else:
-            assert _content is None, "Non-empty non-paired content"
-            result_list.append(self.noescape('/>'))
+            assert content is None, "Non-empty non-paired content"
+            result.append(self.noescape('/>'))
         if dirty:
-            result = self.concat(*result_list)
+            return self.concat(*result)
         else:
-            result = self.noescape(string.join(result_list, ''))
-        return result
-
-    def _input(self, type, _attr=(), **kwargs):
-        _attr += ('type', 'name', 'value', 'size', 'maxlength', 'autocomplete',
-                  'autofocus', 'onclick', 'onmousedown', 'onmouseup', 'onkeydown',
-                  'onkeypress', 'onchange', 'readonly', 'disabled')
-        return self._tag('input', None, _attr, _paired=False, type=type, **kwargs)
+            return self.noescape(string.join(result, ''))
 
     def uri(self, base, *args, **kwargs):
         """Return a URI constructed from given base URI and arguments.
@@ -264,66 +255,64 @@ class HtmlGenerator(object):
     def concat(self, *items):
         return concat(*self._concat_escape(items))
 
-    # HTML tags
-
     def html(self, content, **kwargs):
-        return self._tag('html', content, ('xmlns',), **kwargs)
+        return self._tag('html', content, kwargs, allow=('xmlns',))
 
-    def head(self, content):
-        return self._tag('head', content)
+    def head(self, content, **kwargs):
+        return self._tag('head', content, kwargs)
 
     def title(self, content, **kwargs):
-        return self._tag('title', content, **kwargs)
+        return self._tag('title', content, kwargs)
 
     def link(self, **kwargs):
-        return self._tag('link', None, ('rel', 'type', 'href', 'media'),
-                         _paired=False, **kwargs)
+        return self._tag('link', None, kwargs, paired=False,
+                         allow=('rel', 'type', 'href', 'media'))
 
     def style(self, content, **kwargs):
-        return self._tag('style', content, ('type', 'media'), _paired=True, **kwargs)
+        return self._tag('style', content, kwargs, allow=('type', 'media'))
 
     def meta(self, **kwargs):
-        return self._tag('meta', None, ('name', 'content', 'property', 'http-equiv'),
-                         _paired=False, **kwargs)
+        return self._tag('meta', None, kwargs, paired=False,
+                         allow=('name', 'content', 'property', 'http-equiv'))
 
     def body(self, content, **kwargs):
-        return self._tag('body', content, ('onkeydown', 'onload'), **kwargs)
+        return self._tag('body', content, kwargs, allow=('onkeydown', 'onload'))
 
     def div(self, content, **kwargs):
-        return self._tag('div', content, (), **kwargs)
+        return self._tag('div', content, kwargs)
 
     def section(self, content, **kwargs):
-        return self._tag('section', content, (), **kwargs)
+        return self._tag('section', content, kwargs)
 
-    def span(self, text, **kwargs):
-        return self._tag('span', text, (), **kwargs)
+    def span(self, content, **kwargs):
+        return self._tag('span', content, kwargs)
 
-    def h(self, title, level, **kwargs):
-        return self._tag('h%d' % level, title, **kwargs)
+    def h(self, content, level, **kwargs):
+        return self._tag('h%d' % level, content, kwargs)
 
     def map(self, content, **kwargs):
-        return self._tag('map', content, ('name',), **kwargs)
+        return self._tag('map', content, kwargs, allow=('name',))
 
-    def strong(self, text, **kwargs):
-        return self._tag('strong', text, **kwargs)
+    def strong(self, content, **kwargs):
+        return self._tag('strong', content, kwargs)
 
-    def em(self, text, **kwargs):
-        return self._tag('em', text, **kwargs)
+    def em(self, content, **kwargs):
+        return self._tag('em', content, kwargs)
 
-    def u(self, text, **kwargs):
-        return self._tag('u', text, **kwargs)
+    def u(self, content, **kwargs):
+        return self._tag('u', content, kwargs)
 
-    def code(self, text, **kwargs):
-        return self._tag('code', text, **kwargs)
+    def code(self, content, **kwargs):
+        return self._tag('code', content, kwargs)
 
-    def pre(self, text, **kwargs):
-        return self._tag('pre', text, **kwargs)
+    def pre(self, content, **kwargs):
+        return self._tag('pre', content, kwargs)
 
-    def sup(self, text, **kwargs):
-        return self._tag('sup', text, **kwargs)
+    def sup(self, content, **kwargs):
+        return self._tag('sup', content, kwargs)
 
-    def sub(self, text, **kwargs):
-        return self._tag('sub', text, **kwargs)
+    def sub(self, content, **kwargs):
+        return self._tag('sub', content, kwargs)
 
     def p(self, *args, **kwargs):
         content = args + tuple(kwargs.pop('content', ()))
@@ -334,151 +323,151 @@ class HtmlGenerator(object):
             if ((content and content[0].strip().startswith('<div') and
                  content[-1].strip().endswith('</div>'))):
                 return self.concat(content)
-        return self._tag('p', content, **kwargs)
+        return self._tag('p', content, kwargs)
 
     def blockquote(self, content, **kwargs):
-        return self._tag('blockquote', content, **kwargs)
+        return self._tag('blockquote', content, kwargs)
 
     def footer(self, content, **kwargs):
-        return self._tag('footer', content, **kwargs)
+        return self._tag('footer', content, kwargs)
 
     def figure(self, content, **kwargs):
-        return self._tag('figure', content, **kwargs)
+        return self._tag('figure', content, kwargs)
 
     def figcaption(self, content, **kwargs):
-        return self._tag('figcaption', content, **kwargs)
+        return self._tag('figcaption', content, kwargs)
 
     def br(self, **kwargs):
-        return self._tag('br', _paired=False, **kwargs)
+        return self._tag('br', None, kwargs, paired=False)
 
     def hr(self, **kwargs):
-        return self._tag('hr', _paired=False, **kwargs)
+        return self._tag('hr', None, kwargs, paired=False)
 
-    def a(self, label, **kwargs):
-        attr = ('href', 'type', 'name', 'target', 'rel', 'onclick', 'onmouseover', 'onmouseout')
-        return self._tag('a', label, attr, **kwargs)
+    def a(self, content, **kwargs):
+        return self._tag('a', content, kwargs,
+                         allow=('href', 'type', 'name', 'target', 'rel',
+                                'onclick', 'onmouseover', 'onmouseout'))
 
     def ol(self, *args, **kwargs):
         content = args + tuple(kwargs.pop('content', ()))
-        return self._tag('ol', content, **kwargs)
+        return self._tag('ol', content, kwargs)
 
     def ul(self, *args, **kwargs):
         content = args + tuple(kwargs.pop('content', ()))
-        return self._tag('ul', content, **kwargs)
+        return self._tag('ul', content, kwargs)
 
     def li(self, content, **kwargs):
-        return self._tag('li', content, **kwargs)
+        return self._tag('li', content, kwargs)
 
     def dl(self, *args, **kwargs):
         content = args + tuple(kwargs.pop('content', ()))
-        return self._tag('dl', content, **kwargs)
+        return self._tag('dl', content, kwargs)
 
     def dt(self, content, **kwargs):
-        return self._tag('dt', content)
+        return self._tag('dt', content, kwargs)
 
     def dd(self, content, **kwargs):
-        return self._tag('dd', content)
+        return self._tag('dd', content, kwargs)
 
     def img(self, src, alt='', **kwargs):
-        attr = ('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border')
-        return self._tag('img', None, attr, _paired=False, src=src, alt=alt, **kwargs)
+        return self._tag('img', None, dict(kwargs, src=src, alt=alt), paired=False,
+                         allow=('src', 'alt', 'longdesc', 'width', 'height', 'align', 'border'))
 
-    def abbr(self, term, **kwargs):
-        return self._tag('abbr', term, (), **kwargs)
+    def abbr(self, content, **kwargs):
+        return self._tag('abbr', content, kwargs)
 
     def time(self, content, **kwargs):
-        return self._tag('time', content, ('datetime',), **kwargs)
+        return self._tag('time', content, kwargs, allow=('datetime',))
 
     def table(self, content, **kwargs):
-        attr = ('summary', 'border', 'cellspacing', 'cellpadding', 'width')
-        return self._tag('table', content, attr, **kwargs)
+        return self._tag('table', content, kwargs,
+                         allow=('summary', 'border', 'cellspacing', 'cellpadding', 'width'))
 
     def tr(self, content, **kwargs):
-        return self._tag('tr', content, **kwargs)
+        return self._tag('tr', content, kwargs)
 
     def th(self, content, **kwargs):
-        return self._tag('th', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
+        return self._tag('th', content, kwargs,
+                         allow=('colspan', 'width', 'align', 'valign', 'scope'))
 
     def td(self, content, **kwargs):
-        return self._tag('td', content, ('colspan', 'width', 'align', 'valign', 'scope'), **kwargs)
+        return self._tag('td', content, kwargs,
+                         allow=('colspan', 'width', 'align', 'valign', 'scope'))
 
-    def thead(self, content):
-        return self._tag('thead', content)
+    def thead(self, content, **kwargs):
+        return self._tag('thead', content, kwargs)
 
-    def tfoot(self, content):
-        return self._tag('tfoot', content)
+    def tfoot(self, content, **kwargs):
+        return self._tag('tfoot', content, kwargs)
 
-    def tbody(self, content):
-        return self._tag('tbody', content)
+    def tbody(self, content, **kwargs):
+        return self._tag('tbody', content, kwargs)
 
     def iframe(self, src, **kwargs):
-        attr = ('src', 'width', 'height', 'frameborder')
-        return self._tag('iframe', self.a(src, href=src), attr, src=src, **kwargs)
+        return self._tag('iframe', self.a(src, href=src), dict(kwargs, src=src),
+                         allow=('src', 'width', 'height', 'frameborder'))
 
     def object(self, content, **kwargs):
-        attr = ('align', 'archive', 'border', 'classid', 'codebase', 'codetype',
-                'data', 'declare', 'height', 'hspace', 'name', 'standby', 'type',
-                'usemap', 'vspace', 'width', 'dir')
-        return self._tag('object', content, attr, **kwargs)
+        return self._tag('object', content, kwargs, allow=(
+            'align', 'archive', 'border', 'classid', 'codebase', 'codetype',
+            'data', 'declare', 'height', 'hspace', 'name', 'standby', 'type',
+            'usemap', 'vspace', 'width', 'dir',
+        ))
 
     def param(self, **kwargs):
-        return self._tag('param', None, ('name', 'value', 'valuetype', 'type'),
-                         _paired=False, **kwargs)
-
-    # Form controls (special methods for various HTML INPUT fields are defined, so the `input'
-    # method itself is not needed).
+        return self._tag('param', None, kwargs, paired=False,
+                         allow=('name', 'value', 'valuetype', 'type'))
 
     def form(self, content, action="#", **kwargs):
-        attr = ('name', 'action', 'method', 'enctype', 'onsubmit', 'novalidate')
-        return self._tag('form', content, attr, action=action, **kwargs)
+        return self._tag('form', content, dict(kwargs, action=action),
+                         allow=('name', 'action', 'method', 'enctype', 'onsubmit', 'novalidate'))
 
     def fieldset(self, legend, content, **kwargs):
-        content = ((self._tag('legend', legend or '', cls=(not legend and 'empty' or None)),) +
+        content = ((self._tag('legend', legend, dict(cls=(not legend and 'empty' or None))),) +
                    tuple(content))
-        return self._tag('fieldset', content, **kwargs)
+        return self._tag('fieldset', content, kwargs)
 
-    def label(self, text, for_=None, **kwargs):
+    def label(self, content, for_=None, **kwargs):
         # The argument for_ may be also used as positional.  It
         # should to be kept as the second argument in future.
         kwargs['for'] = for_
-        return self._tag('label', text, ('for',), **kwargs)
-
-    def field(self, value='', name='', size=20, password=False, cls=None, **kwargs):
-        # Deprecated!  Use 'input()' instead.
-        type = password and 'password' or 'text'
-        cls = type + (cls and ' ' + cls or '')
-        return self._input(type, name=name, value=value, size=size, cls=cls, **kwargs)
+        return self._tag('label', content, kwargs, allow=('for',))
 
     def input(self, type='text', **kwargs):
         assert type in ('button', 'checkbox', 'color', 'date', 'datetime', 'datetime-local',
                         'email', 'file', 'hidden', 'image', 'month', 'number', 'password',
                         'radio', 'range', 'reset', 'search', 'submit', 'tel', 'text', 'time',
                         'url', 'week'), type
-        return self._input(type, **kwargs)
+        return self._tag('input', None, dict(kwargs, type=type), paired=False,
+                         allow=('type', 'name', 'value', 'size', 'maxlength', 'autocomplete',
+                                'autofocus', 'onclick', 'onmousedown', 'onmouseup', 'onkeydown',
+                                'onkeypress', 'onchange', 'readonly', 'disabled', 'checked'))
 
-    def upload(self, name, size=50, cls=None, **kwargs):
-        cls = 'upload' + (cls and ' ' + cls or '')
-        return self._input('file', name=name, size=size, cls=cls, **kwargs)
+    def field(self, value='', name='', size=20, password=False, cls=None, **kwargs):
+        # Deprecated!  Use 'input()' instead.
+        type = password and 'password' or 'text'
+        cls = type + (cls and ' ' + cls or '')
+        return self.input(type=type, name=name, value=value, size=size, cls=cls, **kwargs)
+
+    def upload(self, name, **kwargs):
+        return self.input(type='file', name=name, **kwargs)
 
     def radio(self, name, **kwargs):
-        return self._input('radio', ('checked',), name=name, **kwargs)
+        return self.input(type='radio', name=name, **kwargs)
+
+    def checkbox(self, name, **kwargs):
+        return self.input(type='checkbox', name=name, **kwargs)
 
     def hidden(self, name, value, id=None):
-        return self._input('hidden', name=name, value=value, id=id)
+        return self.input(type='hidden', name=name, value=value, id=id)
 
-    def button(self, content, type='button', **kwargs):
-        attr = ('name', 'value', 'type', 'onclick', 'cls', 'disabled')
-        return self._tag('button', content, attr, type=type, **kwargs)
+    def button(self, content, type=None, **kwargs):
+        assert type in (None, 'button', 'reset', 'submit', 'menu'), type
+        return self._tag('button', content, dict(kwargs, type=type),
+                         allow=('name', 'value', 'type', 'onclick', 'disabled'))
 
-    def reset(self, label, onclick=None, cls=None, title=None):
-        return self._input('reset', title=title, onclick=onclick, value=label, cls=cls)
-
-    def submit(self, label, value=None, **kwargs):
-        if value is None:
-            return self._input('submit', value=label, **kwargs)
-        else:
-            attr = ('value', 'onclick', 'name', 'cls', 'disabled')
-            return self._tag('button', label, attr, value=value, **kwargs)
+    def submit(self, content, **kwargs):
+        return self.button(content, type='submit', **kwargs)
 
     def select(self, name, options, selected=None, **kwargs):
         if __debug__:
@@ -492,68 +481,42 @@ class HtmlGenerator(object):
                         found.append(value)
                 return self.option(label, value=value, selected=(value == selected),
                                    disabled=not enabled, cls=cls)
-        opts = [opt(*x) for x in options]
+        content = [opt(*x) for x in options]
         assert selected is None or found, "Value %r not found in options: %r" % (selected, options)
         # TODO: check also for duplicate `selected' values?
-        attr = ('name', 'onchange', 'disabled', 'readonly')
-        return self._tag('select', opts, attr, name=name, **kwargs)
+        return self._tag('select', content, dict(kwargs, name=name),
+                         allow=('name', 'onchange', 'disabled', 'readonly'))
 
     def optgroup(self, content, **kwargs):
-        return self._tag('optgroup', content, ('label',), **kwargs)
+        return self._tag('optgroup', content, kwargs, allow=('label',))
 
-    def option(self, label, **kwargs):
-        return self._tag('option', label, ('value', 'selected', 'disabled'), **kwargs)
+    def option(self, content, **kwargs):
+        return self._tag('option', content, kwargs, allow=('value', 'selected', 'disabled'))
 
-    def checkbox(self, name, **kwargs):
-        return self._input('checkbox', ('checked',), name=name, **kwargs)
-
-    def textarea(self, name, value='', **kwargs):
-        attr = ('name', 'rows', 'cols', 'disabled', 'readonly')
-        return self._tag('textarea', value, attr, name=name, **kwargs)
-
-    # HTML 5 Media tags
+    def textarea(self, content=None, **kwargs):
+        return self._tag('textarea', content, kwargs,
+                         allow=('name', 'rows', 'cols', 'disabled', 'readonly'))
 
     def audio(self, src, content=None, controls=True, **kwargs):
-        return self._tag('audio', content,
-                         ('autoplay', 'controls', 'loop', 'preload', 'src'),
-                         _paired=content is not None, src=src, controls=controls, **kwargs)
+        return self._tag('audio', content, dict(kwargs, src=src, controls=controls),
+                         paired=content is not None,
+                         allow=('autoplay', 'controls', 'loop', 'preload', 'src'))
 
     def video(self, src, content=None, controls=True, **kwargs):
-        return self._tag('video', content,
-                         ('autoplay', 'controls', 'height', 'loop', 'muted', 'poster',
-                          'preload', 'src', 'width'),
-                         _paired=content is not None, src=src, controls=controls, **kwargs)
+        return self._tag('video', content, dict(kwargs, src=src, controls=controls),
+                         paired=content is not None,
+                         allow=('autoplay', 'controls', 'height', 'loop', 'muted',
+                                'poster', 'preload', 'src', 'width'))
 
     def source(self, src, **kwargs):
-        return self._tag('source', None, ('src', 'type'), _paired=False, src=src, **kwargs)
+        return self._tag('source', None, dict(kwargs, src=src), paired=False,
+                         allow=('src', 'type'))
 
-    # JavaScript code generation.
-
-    def script(self, code=None, src=None, type="text/javascript", noscript=None, **kwargs):
-        if code is not None:
-            assert src is None, src
-            assert isinstance(code, basestring)
-            content = code.strip()
-        else:
-            assert isinstance(src, basestring)
-            content = ''
-        result = self._tag('script', content, ('src', 'type'), src=src, type=type, **kwargs)
-        if noscript:
-            # Deprecated.
-            result += self.noscript(noscript)
-        return result
+    def script(self, content=None, type="text/javascript", **kwargs):
+        return self._tag('script', content, dict(kwargs, type=type), allow=('src', 'type'))
 
     def noscript(self, content):
         return self._tag('noscript', content)
-
-    def script_write(self, content, noscript=None, condition=None):
-        if content:
-            c = content.replace('"', '\\"').replace("'", "\\'")
-            c = c.replace('</', '<\\/').replace('\n', '\\n')
-            content = 'document.write("' + c + '");'
-            if condition:
-                content = 'if (' + condition + ') ' + content
-        return self.script(content, noscript)
 
     def js_value(self, value):
         """Return Javascript representation of given python value as a unicode."""
@@ -584,6 +547,16 @@ class HtmlGenerator(object):
     def js_call(self, fname, *args):
         fargs = [self.js_value(arg) for arg in args]
         return self._JavaScriptCode('%s(%s)' % (fname, concat(fargs, separator=", ")))
+
+    def script_write(self, content, noscript=None, condition=None):
+        # Deprecated! Don't use!
+        if content:
+            c = content.replace('"', '\\"').replace("'", "\\'")
+            c = c.replace('</', '<\\/').replace('\n', '\\n')
+            content = 'document.write("' + c + '");'
+            if condition:
+                content = 'if (' + condition + ') ' + content
+        return self.script(content, noscript)
 
 
 class XhtmlGenerator(HtmlGenerator):
@@ -1397,7 +1370,8 @@ class HtmlExporter(lcg.Exporter):
     def _export_audio_player(self, context):
         g = self._generator
         ids = context.id_generator()
-        button = lambda label, **kwargs: g.button(g.span(label), title=label, **kwargs)
+        def button(label, **kwargs):
+            return g.button(g.span(label), title=label, **kwargs)
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
         context.resource('jquery.min.js')
@@ -1436,16 +1410,19 @@ class HtmlExporter(lcg.Exporter):
         content = [
             g.div(id=ids.player, cls='audio-player-widget', content=(
                 g.div('', cls='jp-player'),
-                g.div(id='jp_container_1', role='application', aria_label=_("Player"), cls='jp-audio', content=(
-                    g.div(cls='jp-no-solution', content=(
-                        g.strong(_("Update Required:")), ' ',
-                        _("To play audio you will need to either update your "
-                          "browser to a recent version or update %s.",
-                          g.a(_("Flash plugin"),
-                              href="http://get.adobe.com/flashplayer/", target='_blank')),
-                    )),
-                    g.div(cls='jp-gui jp-interface', content=player),
-                )),
+                g.div(id='jp_container_1', role='application',
+                      aria_label=_("Player"), cls='jp-audio',
+                      content=(
+                          g.div(cls='jp-no-solution', content=(
+                              g.strong(_("Update Required:")), ' ',
+                              _("To play audio you will need to either update your "
+                                "browser to a recent version or update %s.",
+                                g.a(_("Flash plugin"),
+                                    href="http://get.adobe.com/flashplayer/", target='_blank')),
+                          )),
+                          g.div(cls='jp-gui jp-interface', content=player),
+                      ),
+                ),
             )),
         ]
         swf = context.resource('jplayer.swf')

@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -644,7 +644,7 @@ class WritingTestExporter(FillInTestExporter):
     def _export_task_parts(self, context, exercise, exercise_id, task):
         g = context.generator()
         name = self._task_id(exercise, exercise_id, task)
-        return (g.textarea(name=name, value=self._field_value(context, name),
+        return (g.textarea(self._field_value(context, name), name=name,
                            rows=10, cols=60, readonly=self._readonly(context),
                            cls=self._field_cls(context, name, task.answer())),
                 self._field_result(context, name, task.answer()))
