@@ -315,7 +315,7 @@ class HtmlGenerator(object):
 
     def p(self, *args, **kwargs):
         content = args + tuple(kwargs.pop('content', ()))
-        if content[0].find('object') != -1:
+        if content and content[0].find('object') != -1:
             # This is a nasty hack to suppress <p>...</p> around a video player.  In any case,
             # wrapping a block-level element in another block level element is invalid HTML, so
             # this should never be wrong to omit the paragraph.
