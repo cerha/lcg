@@ -87,10 +87,13 @@ class HtmlGenerator(object):
 
     Generator produces strings in HTML syntax.  The API methods usually map 1:1
     to HTML tags and their arguments to the attributes.  There are exceptions,
-    such as the 'input' tag, where the generator has methods for different
-    input types, rather than one 'input()' method with type arguments.  Another
-    exception is the HTML attribute "class" which corresponds to the argument
-    "cls" to avoid conflict with the python keyword.
+    such as the 'class' HTML attribute which is named 'cls' here to avoid
+    conflict with the Python keyword.  The attribute 'for' of the 'label' tag
+    is named 'for_' for the same reason.
+
+    There are also a few additional methods, such as 'h()' (allows passing the
+    header level as a numeric value) or 'radio()', 'upload()', 'checkbox()' and
+    'hidden()' (simplify creation of specific input fields).
 
     Example usage:
 
@@ -333,6 +336,8 @@ class HtmlGenerator(object):
         return self._tag('sub', content, kwargs)
 
     def p(self, *args, **kwargs):
+        # Passing content as several positional arguments is deprecated.
+        # Use a single 'content' argument.
         content = args + tuple(kwargs.pop('content', ()))
         if content and content[0].find('object') != -1:
             # This is a nasty hack to suppress <p>...</p> around a video player.  In any case,
@@ -367,10 +372,14 @@ class HtmlGenerator(object):
                                 'onclick', 'onmouseover', 'onmouseout'))
 
     def ol(self, *args, **kwargs):
+        # Passing content as several positional arguments is deprecated.
+        # Use a single 'content' argument.
         content = args + tuple(kwargs.pop('content', ()))
         return self._tag('ol', content, kwargs)
 
     def ul(self, *args, **kwargs):
+        # Passing content as several positional arguments is deprecated.
+        # Use a single 'content' argument.
         content = args + tuple(kwargs.pop('content', ()))
         return self._tag('ul', content, kwargs)
 
@@ -378,6 +387,8 @@ class HtmlGenerator(object):
         return self._tag('li', content, kwargs)
 
     def dl(self, *args, **kwargs):
+        # Passing content as several positional arguments is deprecated.
+        # Use a single 'content' argument.
         content = args + tuple(kwargs.pop('content', ()))
         return self._tag('dl', content, kwargs)
 
