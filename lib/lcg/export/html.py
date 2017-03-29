@@ -290,6 +290,24 @@ class HtmlGenerator(object):
     def h(self, content, level, **kwargs):
         return self._tag('h%d' % level, content, kwargs)
 
+    def h1(self, content, **kwargs):
+        return self.h(content, level=1, **kwargs)
+
+    def h2(self, content, **kwargs):
+        return self.h(content, level=2, **kwargs)
+
+    def h3(self, content, **kwargs):
+        return self.h(content, level=3, **kwargs)
+
+    def h4(self, content, **kwargs):
+        return self.h(content, level=4, **kwargs)
+
+    def h5(self, content, **kwargs):
+        return self.h(content, level=5, **kwargs)
+
+    def h6(self, content, **kwargs):
+        return self.h(content, level=6, **kwargs)
+
     def map(self, content, **kwargs):
         return self._tag('map', content, kwargs, allow=('name',))
 
@@ -793,7 +811,7 @@ class HtmlExporter(lcg.Exporter):
         return result
 
     def _heading(self, context):
-        return self._generator.h(context.node().title(), level=1)
+        return self._generator.h1(context.node().title())
 
     def _language_selection(self, context):
         g = context._generator

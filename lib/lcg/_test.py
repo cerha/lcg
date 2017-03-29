@@ -855,7 +855,7 @@ class HtmlExport(unittest.TestCase):
                 (g.script('x'), u'<script type="text/javascript">x</script>'),
                 (g.submit('x'), u'<button type="submit">x</button>'),
                 (g.form('x'), u'<form action="#">x</form>'),
-                (g.h('x', 3), u'<h3>x</h3>'),
+                (g.h('x', level=8), u'<h8>x</h8>'),
                 (g.img('x'), u'<img alt="" src="x"/>'),
                 (g.iframe('x'), u'<iframe src="x"><a href="x">x</a></iframe>'),
                 (g.fieldset('a', 'x'), u'<fieldset><legend>a</legend>x</fieldset>'),
