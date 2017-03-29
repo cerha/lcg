@@ -837,35 +837,34 @@ class HtmlExport(unittest.TestCase):
         def test(result, expected):
             self.assertEqual(result, expected,
                              "\n  - expected: %r\n  - got:      %r" % (expected, result))
-        for tag in ('html', 'head', 'title', 'style', 'body', 'div', 'section', 'span',
-                    'map', 'strong', 'em', 'u', 'code', 'pre', 'sup', 'sub', 'p',
-                    'blockquote', 'footer', 'figure', 'figcaption', 'a', 'ol',
-                    'ul', 'li', 'dl', 'dt', 'dd', 'abbr', 'time', 'table', 'tr',
-                    'th', 'td', 'thead', 'tfoot', 'tbody', 'object', 'label',
-                    'button', 'optgroup', 'option', 'textarea', 'noscript'):
+        # Tags with trivial export.
+        for tag in ('html', 'head', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'title',
+                    'style', 'body', 'div', 'section', 'span', 'map', 'strong',
+                    'em', 'u', 'code', 'pre', 'sup', 'sub', 'p', 'blockquote',
+                    'footer', 'figure', 'figcaption', 'a', 'ol', 'ul', 'li', 'dl',
+                    'dt', 'dd', 'abbr', 'time', 'table', 'tr', 'th', 'td', 'thead',
+                    'tfoot', 'tbody', 'object', 'label', 'button', 'optgroup',
+                    'option', 'textarea', 'noscript', 'select', 'fieldset', 'legend'):
             test(getattr(g, tag)('x'), '<%s>x</%s>' % (tag, tag))
             test(getattr(g, tag)(content='x'), '<%s>x</%s>' % (tag, tag))
             test(getattr(g, tag)(content=('x', 'y')), '<%s>xy</%s>' % (tag, tag))
             test(getattr(g, tag)(content=()), '<%s></%s>' % (tag, tag))
         for tag in ('link', 'meta', 'br', 'hr', 'param'):
             test(getattr(g, tag)(), '<%s/>' % tag)
-        # These tags require positional arguemnts, test with minimal arguments first.
+        # These tags require positional arguemnts or have non-trivial export.
         for result, expected in (
-                (g.a('x'), u'<a>x</a>'),
                 (g.script('x'), u'<script type="text/javascript">x</script>'),
                 (g.submit('x'), u'<button type="submit">x</button>'),
                 (g.form('x'), u'<form action="#">x</form>'),
                 (g.h('x', level=8), u'<h8>x</h8>'),
                 (g.img('x'), u'<img alt="" src="x"/>'),
                 (g.iframe('x'), u'<iframe src="x"><a href="x">x</a></iframe>'),
-                (g.fieldset('a', 'x'), u'<fieldset><legend>a</legend>x</fieldset>'),
                 (g.input(type='text'), u'<input type="text"/>'),
                 (g.field(name='a'), u'<input class="text" name="a" size="20" type="text" value=""/>'),
                 (g.checkbox('a'), u'<input name="a" type="checkbox"/>'),
                 (g.hidden('a', 'x'), u'<input name="a" type="hidden" value="x"/>'),
                 (g.radio('a'), u'<input name="a" type="radio"/>'),
                 (g.upload('a'), u'<input name="a" type="file"/>'),
-                (g.select('a', ()), u'<select name="a"></select>'),
                 (g.audio('x'), u'<audio controls="controls" src="x"/>'),
                 (g.video('x'), u'<video controls="controls" src="x"/>'),
                 (g.source('x'), u'<source src="x"/>'),
@@ -876,10 +875,11 @@ class HtmlExport(unittest.TestCase):
                 (g.a('x', href='a'), '<a href="a">x</a>'),
                 (g.a('x', name='a'), '<a name="a">x</a>'),
                 (g.button('X', disabled=True), '<button disabled="disabled">X</button>'),
-                (g.select('a', (('X', 'x'), ('Y', 'y'))),
+                # Testing backwards compatibility of deprecated select() arguemnts.
+                (g.select('a', options=(('X', 'x'), ('Y', 'y'))),
                  (u'<select name="a"><option value="x">X</option>'
                   u'<option value="y">Y</option></select>')),
-                (g.select('a', (('X', 'x', False, 'c'), ('Y', 'y', True, 'cc'))),
+                (g.select('a', options=(('X', 'x', False, 'c'), ('Y', 'y', True, 'cc'))),
                  (u'<select name="a"><option class="c" disabled="disabled" value="x">X</option>'
                   u'<option class="cc" value="y">Y</option></select>')),
                 (g.select('a', (('aa', (('X', 'x'), ('Y', 'y'))), ('bb', (('Z', 'z'),)))),

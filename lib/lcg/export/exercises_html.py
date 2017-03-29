@@ -295,8 +295,9 @@ class _SelectBasedExerciseExporter(_ChoiceBasedExerciseExporter):
     def _format_choices(self, context, exercise, exercise_id, task):
         g = context.generator()
         task_name = self._task_id(exercise, exercise_id, task)
-        return g.select(task_name, id=task_name, readonly=self._readonly(context),
-                        options=[(ch.answer(), task.choice_index(ch)) for ch in task.choices()])
+        return g.select(name=task_name, id=task_name, readonly=self._readonly(context),
+                        content=[g.option(ch.answer(), value=task.choice_index(ch))
+                                 for ch in task.choices()])
 
 
 class GapFillingExporter(_ChoiceBasedExerciseExporter):

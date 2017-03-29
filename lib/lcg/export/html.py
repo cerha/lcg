@@ -440,9 +440,10 @@ class HtmlGenerator(object):
         return self._tag('form', content, dict(kwargs, action=action),
                          allow=('name', 'action', 'method', 'enctype', 'onsubmit', 'novalidate'))
 
-    def fieldset(self, legend, content, **kwargs):
-        content = ((self._tag('legend', legend, dict(cls=(not legend and 'empty' or None))),) +
-                   tuple(content))
+    def legend(self, content, **kwargs):
+        return self._tag('legend', content, kwargs)
+
+    def fieldset(self, content, **kwargs):
         return self._tag('fieldset', content, kwargs)
 
     def label(self, content, for_=None, **kwargs):
@@ -487,22 +488,27 @@ class HtmlGenerator(object):
     def submit(self, content, **kwargs):
         return self.button(content, type='submit', **kwargs)
 
-    def select(self, name, options, selected=None, **kwargs):
-        if __debug__:
-            found = []
-        def opt(label, value, enabled=True, cls=None):
-            if isinstance(value, (list, tuple)):
-                return self.optgroup([opt(*x) for x in value], label=label)
-            else:
-                if __debug__:
-                    if selected == value:
-                        found.append(value)
-                return self.option(label, value=value, selected=(value == selected),
-                                   disabled=not enabled, cls=cls)
-        content = [opt(*x) for x in options]
-        assert selected is None or found, "Value %r not found in options: %r" % (selected, options)
-        # TODO: check also for duplicate `selected' values?
-        return self._tag('select', content, dict(kwargs, name=name),
+    def select(self, content, options=None, selected=None, **kwargs):
+        # The arguments 'options' and 'selected' are deprecated, use 'content' instead.
+        if options is not None:
+            if __debug__:
+                found = []
+            def opt(label, value, enabled=True, cls=None):
+                if isinstance(value, (list, tuple)):
+                    return self.optgroup([opt(*x) for x in value], label=label)
+                else:
+                    if __debug__:
+                        if selected == value:
+                            found.append(value)
+                    return self.option(label, value=value, selected=(value == selected),
+                                       disabled=not enabled, cls=cls)
+            assert selected is None or found, \
+                "Value %r not found in options: %r" % (selected, options)
+            kwargs['name'] = content # name used to be the first positional argument.
+            content = [opt(*x) for x in options]
+        else:
+            assert selected is None, "Can't use 'selected' without 'options'."
+        return self._tag('select', content, kwargs,
                          allow=('name', 'onchange', 'disabled', 'readonly'))
 
     def optgroup(self, content, **kwargs):
