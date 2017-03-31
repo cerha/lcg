@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2015 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2015, 2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -533,74 +533,111 @@ class LocalizableDateTime(Localizable):
             return self._ZERO_DIFF
     _UTC_TZ = _UTCTimezone()
 
-    def __init__(self, string, show_weekday=False, show_time=True, leading_zeros=True, utc=False,
-                 **kwargs):
+    def __new__(cls, dt, **kwargs):
+        if isinstance(dt, datetime.datetime):
+            string = dt.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(dt, datetime.date):
+            string = dt.isoformat()
+        else:
+            string = dt
+        return Localizable.__new__(cls, string, **kwargs)
+
+    def __init__(self, dt, show_seconds=True, show_weekday=False, show_time=True, utc=False,
+                 leading_zeros=True, **kwargs):
         """Initialize the instance.
 
         Arguments:
 
-          string -- the input date/datetime string in format 'yyyy-mm-dd' for
-            date values and 'yyyy-mm-dd HH:MM' or 'yyyy-mm-dd HH:MM:SS' for
-            datetime values.  The time precision used on input is respected on
-            output.
+          dt -- the input date/datetime as a python datetime.datetime,
+            datetime.date or string.  If string is passed, it must be in format
+            'yyyy-mm-dd' for date values or one of 'yyyy-mm-dd HH:MM' or
+            'yyyy-mm-dd HH:MM:SS' for datetime values.
+          show_time -- if true and if the passed datetime contains the time
+            information, the time is also shown on output.  If false, only date
+            is shown even if the input contains time.  The difference between
+            passing a date and passing a datetime with show_time=False is that
+            time zone conversion may apply before the date is displayed.
+          show_seconds -- if true and the passed datetime's precision is
+            sufficient (datetime instance or 'yyyy-mm-dd HH:MM:SS' string is
+            passed), the time is displayed including seconds on output.
+            Otherwise seconds are stripped.
           show_weekday -- if true, abbreviated localized week day name is added
             to the date/datetime value on output.
-          show_time -- if true and the 'string' contains the time part (it is a
-            datetime value) the time is also shown on output.  If false, the
-            time part is never shown.
+
+          utc -- this argument is only used if 'dt' is passed as a string or as
+            a timezone naive datetime instance.  If true, the time is supposed
+            to be in UTC and will be converted to local time zone on
+            localization.  If false, the time is not subject to time zone
+            conversion.  If timezone aware datetime instance is passed, its
+            timezone is always respected and converted to local timezone on
+            output (if known).
+
           leading_zeros -- if true the numeric values are always padded by
             leading zeros on output to maintain the same character width for
             any value.
-          utc -- if true, the time is supposed to be in UTC and will be
-            converted to the local time zone on translation.  If false, the
-            time is supposed to be in local time zone and no conversion
-            applies.
 
         """
         super(LocalizableDateTime, self).__init__(**kwargs)
-        m = self._RE.match(string)
-        if not m:
-            raise Exception("Invalid date/time format", self)
-        numbers = [int(n) for n in m.groups() if n is not None]
-        if utc:
-            tz = self._UTC_TZ
+        if isinstance(dt, basestring):
+            m = self._RE.match(dt)
+            if not m:
+                raise ValueError("Invalid date/time format", dt)
+            numbers = [int(n) for n in m.groups() if n is not None]
+            if len(numbers) > 3:
+                if utc:
+                    tz = self._UTC_TZ
+                else:
+                    tz = None
+                dt = datetime.datetime(*numbers, tzinfo=tz)
+                is_datetime = True
+                if len(numbers) < 6:
+                    show_seconds = False
+            else:
+                dt = datetime.date(*numbers)
+                is_datetime = False
         else:
-            tz = None
-        self._datetime = datetime.datetime(*numbers, tzinfo=tz)
+            is_datetime = isinstance(dt, datetime.datetime)
+            assert is_datetime or isinstance(dt, datetime.date)
+            if is_datetime and not dt.tzinfo and utc:
+                dt = dt.replace(tzinfo=self._UTC_TZ)
+        self._datetime = dt
         self._show_weekday = show_weekday
         self._leading_zeros = leading_zeros
-        self._has_time = len(numbers) > 3
+        self._is_datetime = is_datetime
         self._show_time = show_time
-        self._show_seconds = len(numbers) > 5
+        self._show_seconds = show_seconds
         self._utc = utc
+
+    def _clone_args(self):
+        return (self._datetime,)
 
     def _clone_kwargs(self):
         return dict(super(LocalizableDateTime, self)._clone_kwargs(),
-                    show_weekday=self._show_weekday,
                     show_time=self._show_time,
+                    show_seconds=self._show_seconds,
+                    show_weekday=self._show_weekday,
                     leading_zeros=self._leading_zeros,
                     utc=self._utc)
 
     def _localize(self, localizer):
-        data = localizer.locale_data()
         dt = self._datetime
-        displayed_timezone = ''
-        if self._has_time and self._utc:
-            timezone = localizer.timezone() or data.default_timezone
-            if timezone is not None:
-                dt = dt.astimezone(timezone)
-            else:
-                displayed_timezone = ' UTC'
+        data = localizer.locale_data()
         result = dt.strftime(data.date_format)
         if not self._leading_zeros:
             result = self._LEADING_ZEROS.sub('', result)
-        if self._has_time and self._show_time:
-            time_format = (self._show_seconds and data.exact_time_format or data.time_format)
-            result += ' ' + dt.strftime(time_format)
         if self._show_weekday:
             weekday = localizer.localize(lcg.week_day_name(dt.weekday(), abbrev=True))
             result = weekday + ' ' + result
-        return result + displayed_timezone
+        if self._is_datetime:
+            timezone = localizer.timezone() or data.default_timezone
+            if self._show_time:
+                if dt.tzinfo and timezone:
+                    dt = dt.astimezone(timezone)
+                time_format = (self._show_seconds and data.exact_time_format or data.time_format)
+                result += ' ' + dt.strftime(time_format)
+            if not timezone and dt.tzinfo:
+                result += ' ' + dt.tzinfo.tzname(dt)
+        return result
 
 
 class LocalizableTime(Localizable):
