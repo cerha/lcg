@@ -265,38 +265,70 @@ class LocalizableDateTime(unittest.TestCase):
             return datetime.timedelta(0)
 
     def test_localize(self):
-        d1 = lcg.LocalizableDateTime("2006-12-21")
-        d2 = lcg.LocalizableDateTime("2006-12-21 02:43", show_time=False)
-        d3 = lcg.LocalizableDateTime("2006-12-21 02:43")
-        d4 = lcg.LocalizableDateTime("2006-12-21 18:43:32", show_weekday=True)
-        d5 = lcg.LocalizableDateTime("2006-01-30", leading_zeros=False)
-        d6 = lcg.LocalizableDateTime("2006-12-21 18:43:32", utc=True)
-        loc1 = lcg.Localizer('en', translation_path=translation_path)
-        x1 = d1.localize(loc1)
-        x2 = d2.localize(loc1)
-        x3 = d3.localize(loc1)
-        x4 = d4.localize(loc1)
-        x5 = d5.localize(loc1)
-        x6 = d6.localize(loc1)
-        self.assertEqual(x1, "21/12/2006")
-        self.assertEqual(x2, "21/12/2006")
-        self.assertEqual(x3, "21/12/2006 02:43 AM")
-        self.assertEqual(x4, "Thu 21/12/2006 06:43:32 PM")
-        self.assertEqual(x5, "30/1/2006")
-        self.assertEqual(x6, "21/12/2006 06:43:32 PM UTC")
-        loc2 = lcg.Localizer('cs', translation_path=translation_path, timezone=self.tzinfo(-60))
-        y1 = d1.localize(loc2)
-        y2 = d2.localize(loc2)
-        y3 = d3.localize(loc2)
-        y4 = d4.localize(loc2)
-        y5 = d5.localize(loc2)
-        y6 = d6.localize(loc2)
-        self.assertEqual(y1, "21.12.2006")
-        self.assertEqual(y2, "21.12.2006")
-        self.assertEqual(y3, "21.12.2006 02:43")
-        self.assertEqual(y4, u"Čt 21.12.2006 18:43:32")
-        self.assertEqual(y5, "30.1.2006")
-        self.assertEqual(y6, u"21.12.2006 17:43:32")
+        en = lcg.Localizer('en', translation_path=translation_path)
+        cs = lcg.Localizer('cs', translation_path=translation_path, timezone=self.tzinfo(-60))
+        utc = lcg.LocalizableDateTime._UTC_TZ
+        for dt, kwargs, localizer, expected_result in (
+                ("2006-12-21", {}, en,
+                 "21/12/2006"),
+                (datetime.date(2006, 12, 21), {}, en,
+                 "21/12/2006"),
+                ("2006-12-21 02:43", dict(show_time=False), en,
+                 "21/12/2006"),
+                ("2006-12-21 02:43", dict(show_time=False, utc=True), en,
+                 "21/12/2006 UTC"),
+                (datetime.datetime(2006, 12, 21, 2, 43), dict(show_time=False), en,
+                 "21/12/2006"),
+                (datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), dict(show_time=False), en,
+                 "21/12/2006 UTC"),
+                ("2006-12-21 02:43", {}, en,
+                 "21/12/2006 02:43 AM"),
+                (datetime.datetime(2006, 12, 21, 2, 43), dict(show_seconds=False), en,
+                 "21/12/2006 02:43 AM"),
+                ("2006-12-21 18:43:32", dict(show_weekday=True), en,
+                 "Thu 21/12/2006 06:43:32 PM"),
+                (datetime.datetime(2006, 12, 21, 18, 43, 32), dict(show_weekday=True), en,
+                 "Thu 21/12/2006 06:43:32 PM"),
+                ("2006-01-30", dict(leading_zeros=False), en,
+                 "30/1/2006"),
+                (datetime.date(2006, 01, 30), dict(leading_zeros=False), en,
+                 "30/1/2006"),
+                ("2006-12-21 18:43:32", dict(utc=True), en,
+                 "21/12/2006 06:43:32 PM UTC"),
+                (datetime.datetime(2006, 12, 21, 18, 43, 32), {}, en,
+                 "21/12/2006 06:43:32 PM"),
+                ("2006-12-21", {}, cs,
+                 "21.12.2006"),
+                (datetime.date(2006, 12, 21), {}, cs,
+                 "21.12.2006"),
+                ("2006-12-21 02:43", dict(show_time=False), cs,
+                 "21.12.2006"),
+                (datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), dict(show_time=False), cs,
+                 "21.12.2006"),
+                ("2006-12-21 02:43", {}, cs,
+                 "21.12.2006 02:43"),
+                ("2006-12-21 02:43", dict(utc=True), cs,
+                 "21.12.2006 01:43"),
+                (datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), dict(show_seconds=False), cs,
+                 "21.12.2006 01:43"),
+                ("2006-12-21 18:43:32", dict(show_weekday=True), cs,
+                 u"Čt 21.12.2006 18:43:32"),
+                (datetime.datetime(2006, 12, 21, 18, 43, 32), {}, cs,
+                 u"21.12.2006 18:43:32"),
+                (datetime.datetime(2006, 12, 21, 18, 43, 32, tzinfo=utc), {}, cs,
+                 u"21.12.2006 17:43:32"),
+                ("2006-01-30", dict(leading_zeros=False), cs,
+                 "30.1.2006"),
+                (datetime.date(2006, 01, 30), dict(leading_zeros=False), cs,
+                 "30.1.2006"),
+                ("2006-12-21 18:43:32", dict(utc=True), cs,
+                 u"21.12.2006 17:43:32"),
+                (datetime.datetime(2006, 12, 21, 18, 43, 32), dict(utc=True), cs,
+                 u"21.12.2006 17:43:32"),
+        ):
+            result = lcg.LocalizableDateTime(dt, **kwargs).localize(localizer)
+            self.assertEqual(result, expected_result,
+                             "%r %s: %s != %s" % (dt, kwargs, result, expected_result))
 
     def test_concat(self):
         d = lcg.LocalizableDateTime("2006-01-30")
