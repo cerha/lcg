@@ -2854,17 +2854,16 @@ class PDFExporter(FileExporter, Exporter):
     # Container elements
 
     def _export_container(self, context, element):
+        exported_content = self._content_export(context, element, collapse=False)
+        assert isinstance(exported_content, (list, tuple,)), exported_content
+        texts = [isinstance(c, (Text, basestring,)) for c in exported_content]
         # This is going to be a really wild guesswork.  There can be two very
         # distinct kinds of containers: 1. alignment containers; 2. paragraphs
         # (Containers inside Paragraphs).  And of course there are many common
         # (often useless) containers with no special purpose in typical LCG
         # content.
-        plain_container = (element.presentation() is None and element.orientation() is None and
-                           element.halign() is None and element.valign() is None)
-        exported_content = self._content_export(context, element, collapse=False)
-        assert isinstance(exported_content, (list, tuple,)), exported_content
-        texts = [isinstance(c, (Text, basestring,)) for c in exported_content]
-        if plain_container:
+        if ((element.presentation() is None and element.orientation() is None and
+             element.halign() is None and element.valign() is None)):
             # Just a container without any special purpose.  Maybe we can avoid
             # it.
             if all(texts):
