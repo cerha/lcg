@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2008-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2008-2017 BRAILCOM, o.p.s.
 #
 # COPYRIGHT NOTICE
 #
@@ -327,10 +327,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 self.hAlign = self._box_align
     def wrap(self, availWidth, availHeight):
         self._box_last_wrap = availWidth, availHeight
-        box_margin_size_2 = self._box_box_margin * 2
+        total_box_margin_size = self._box_box_margin * 2
         if self._box_boxed:
-            availWidth -= box_margin_size_2
-            availHeight -= box_margin_size_2
+            availWidth -= total_box_margin_size
+            availHeight -= total_box_margin_size
         self._box_content = [copy.copy(c) for c in self._box_original_content]
         vertical = self._box_vertical
         if vertical:
@@ -456,8 +456,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             self._width_height = (self._box_max_depth, self._box_total_length,)
         else:
             self._width_height = (self._box_total_length, self._box_max_depth,)
-        self._width_height = (self._width_height[0] + box_margin_size_2,
-                              self._width_height[1] + box_margin_size_2,)
+        self._width_height = (self._width_height[0] + total_box_margin_size,
+                              self._width_height[1] + total_box_margin_size,)
         return self._width_height
     def split(self, availWidth, availHeight):
         if not self._box_vertical or not self._box_content:
