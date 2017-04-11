@@ -254,7 +254,7 @@ class Container(Content):
     _SUBSEQUENCE_LENGTH = None
 
     def __init__(self, content, name=(), id=None, halign=None, valign=None,
-                 orientation=None, presentation=None, **kwargs):
+                 orientation=None, width=None, height=None, presentation=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -275,11 +275,17 @@ class Container(Content):
           orientation -- orientation of the container content flow (vertical
             vs.horizontalal); one of the 'Orientation' constants or 'None'
             (default orientation).
+          width -- output width as 'lcg.Unit' subclass instance.  Note that
+            various output backends may only support certain units or
+            completely ignore this property.
+          height -- output width as 'lcg.Unit' subclass instance.  Note that
+            various output backends may only support certain units or
+            completely ignore this property.
           presentation -- 'Presentation' instance defining various presentation
             properties; if 'None' then no explicit presentation for this container
             is defined.
 
-        Note that 'halign', 'valign', 'orientation' and 'presentation'
+        Note that 'halign', 'valign', 'orientation', 'width', 'height' and 'presentation'
         parameters may be ignored by some exporters.
 
         """
@@ -290,6 +296,8 @@ class Container(Content):
         assert orientation is None or isinstance(orientation, str), orientation
         assert id is None or isinstance(id, basestring), id
         assert isinstance(name, (basestring, tuple, list))
+        assert width is None or isinstance(width, lcg.Unit), width
+        assert height is None or isinstance(height, lcg.Unit), height
         self._id = id
         if isinstance(name, basestring):
             names = (name,)
@@ -302,6 +310,8 @@ class Container(Content):
         self._halign = halign
         self._valign = valign
         self._orientation = orientation
+        self._width = width
+        self._height = height
         self._presentation = presentation
         self._contained_resources = None
         if self._SUBSEQUENCES:
@@ -360,6 +370,14 @@ class Container(Content):
     def orientation(self):
         """Return the value of 'orientation' as passed to the constructor."""
         return self._orientation
+
+    def width(self):
+        """Return the value of 'width' as passed to the constructor."""
+        return self._width
+
+    def height(self):
+        """Return the value of 'height' as passed to the constructor."""
+        return self._height
 
     def presentation(self):
         """Return the value of 'presentation' as passed to the constructor."""

@@ -297,7 +297,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
     BOX_RIGHT = 'RIGHT'
 
     def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0,
-                 box_width=None, box_color=None, box_radius=0, box_mask=None):
+                 box_width=None, box_color=None, box_radius=0, box_mask=None,
+                 width=None, height=None):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         assert box_mask is None or (isinstance(box_mask, (tuple, list)) and
@@ -331,6 +332,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._box_box_mask = box_mask
         self._box_last_split_height = None
         self._box_last_wrap = None
+        self._width = width
+        self._height = height
+        self._fixedWidth = width or 0
+        self._fixedHeight = height or 0
         # Another hack for pytis markup:
         if len(content) == 1:
             if getattr(content[0], 'hAlign', None):
@@ -468,11 +473,14 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             else:
                 break
         if vertical:
-            self._width_height = (self._box_max_depth, self._box_total_length,)
+            width_height = [self._box_max_depth, self._box_total_length]
         else:
-            self._width_height = (self._box_total_length, self._box_max_depth,)
-        self._width_height = (self._width_height[0] + total_box_margin_size,
-                              self._width_height[1] + total_box_margin_size,)
+            width_height = [self._box_total_length, self._box_max_depth]
+        for i, size in ((0, self._width), (1, self._height)):
+            if size is not None:
+                width_height[i] = size
+            width_height[i] += total_box_margin_size
+        self._width_height = tuple(width_height)
         return self._width_height
 
     def split(self, availWidth, availHeight):
@@ -1874,6 +1882,8 @@ class Container(Element):
     vertical = True
     halign = None
     valign = None
+    width = None
+    height = None
 
     def init(self):
         if __debug__:
@@ -1967,8 +1977,16 @@ class Container(Element):
                     else:
                         box_radius_points = self._unit2points(box_radius, style)
                     box_mask = presentation and presentation.box_mask
+                    if self.width is not None:
+                        width = self._unit2points(self.width, style)
+                    else:
+                        width = None
+                    if self.height is not None:
+                        height = self._unit2points(self.height, style)
+                    else:
+                        height = None
                     result = [RLContainer(content=result, vertical=self.vertical, align=align,
-                                          boxed=boxed,
+                                          boxed=boxed, width=width, height=height,
                                           box_margin=box_margin_points,
                                           box_width=box_width_points,
                                           box_color=box_color_rgb,
@@ -2880,6 +2898,7 @@ class PDFExporter(FileExporter, Exporter):
         return make_element(Container, content=exported_content,
                             vertical=(element.orientation() != 'HORIZONTAL'),
                             halign=element.halign(), valign=element.valign(),
+                            width=element.width(), height=element.height(),
                             presentation=element.presentation())
 
     def _markup_container(self, context, element, tag, **attributes):
