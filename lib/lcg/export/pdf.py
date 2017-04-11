@@ -296,9 +296,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                  box_width=None, box_color=None, box_radius=0, box_mask=None):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
-        assert box_mask is None or (isinstance(box_mask, (tuple, list))
-                                    and len(box_mask) == 4
-                                    and all(isinstance(x, bool) for x in box_mask)), box_mask
+        assert box_mask is None or (isinstance(box_mask, (tuple, list)) and
+                                    len(box_mask) == 4 and
+                                    all(isinstance(x, bool) for x in box_mask)), box_mask
         if box_mask and box_radius:
             raise Exception("Unsupported combination of 'box_mask' and 'box_radius'.")
         if __debug__:
