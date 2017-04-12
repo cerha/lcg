@@ -1410,7 +1410,9 @@ class Element(object):
         raise Exception('Not implemented')
 
     def _unit2points(self, size, style):
-        if isinstance(size, UMm):
+        if size is None:
+            points = None
+        elif isinstance(size, UMm):
             points = size.size() * reportlab.lib.units.mm
         elif isinstance(size, UPoint):
             points = size.size()
@@ -1425,7 +1427,11 @@ class Element(object):
         return points
 
     def _color2rgb(self, color):
-        return [float(x) / 255 for x in color.rgb()]
+        if color is None:
+            rgb = None
+        else:
+            rgb = [float(x) / 255 for x in color.rgb()]
+        return rgb
 
     def _wrapped_image(self, content):
         if isinstance(content, Container) and len(content.content) == 1:
@@ -1970,45 +1976,29 @@ class Container(Element):
                         align = self.halign
                     else:
                         align = self.valign
-                    box_margin = presentation and presentation.box_margin
-                    if box_margin is None:
-                        box_margin_points = 0
+                    if presentation and boxed:
+                        box_color = self._color2rgb(presentation.box_color)
+                        box_width = self._unit2points(presentation.box_width, style)
+                        box_radius = self._unit2points(presentation.box_radius, style) or 0
+                        box_margin = self._unit2points(presentation.box_margin, style) or 0
                     else:
-                        box_margin_points = self._unit2points(box_margin, style)
-                    box_width = presentation and presentation.box_width
-                    if box_width is None:
-                        box_width_points = None
-                    else:
-                        box_width_points = self._unit2points(box_width, style)
-                    box_color = presentation and presentation.box_color
-                    if box_color is None:
-                        box_color_rgb = None
-                    else:
-                        box_color_rgb = self._color2rgb(box_color)
-                    box_radius = presentation and presentation.box_radius
-                    if box_radius is None:
-                        box_radius_points = 0
-                    else:
-                        box_radius_points = self._unit2points(box_radius, style)
-                    box_mask = presentation and presentation.box_mask
-                    if self.width is not None:
-                        width = self._unit2points(self.width, style)
-                    else:
-                        width = None
-                    if self.height is not None:
-                        height = self._unit2points(self.height, style)
-                    else:
-                        height = None
+                        box_color = None
+                        box_width = None
+                        box_radius = 0
+                        box_margin = 0
                     result = [RLContainer(
                         content=result, vertical=self.vertical, align=align,
-                        width=width, height=height,
+                        width=(self.width if isinstance(self.width, UPercent)
+                               else self._unit2points(self.width, style)),
+                        height=(self.height if isinstance(self.height, UPercent)
+                                else self._unit2points(self.height, style)),
                         padding=padding and [self._unit2points(x, style) for x in padding],
                         boxed=boxed,
-                        box_color=box_color_rgb,
-                        box_width=box_width_points,
-                        box_radius=box_radius_points,
-                        box_margin=box_margin_points,
-                        box_mask=box_mask,
+                        box_color=box_color,
+                        box_width=box_width,
+                        box_radius=box_radius,
+                        box_margin=box_margin,
+                        box_mask=boxed and presentation and presentation.box_mask,
                     )]
         # Enforce upper alignment
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):
