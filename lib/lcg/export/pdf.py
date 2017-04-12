@@ -18,6 +18,7 @@
 
 import copy
 import cStringIO
+import decimal
 import inspect
 import os
 import re
@@ -44,7 +45,7 @@ import reportlab.platypus.flowables
 import reportlab.platypus.tableofcontents
 
 import lcg
-from lcg import FontFamily, UMm, UPoint, UFont, USpace, UAny, HorizontalAlignment
+from lcg import FontFamily, UMm, UPoint, UPercent, UFont, USpace, UAny, HorizontalAlignment
 from export import Exporter, FileExporter
 
 _ = lcg.TranslatableTextFactory('lcg')
@@ -304,6 +305,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         assert box_mask is None or (isinstance(box_mask, (tuple, list)) and
                                     len(box_mask) == 4 and
                                     all(isinstance(x, bool) for x in box_mask)), box_mask
+        assert width is None or isinstance(width, (float, int, long, decimal.Decimal, UPercent)), \
+            width
+        assert height is None or isinstance(width, (float, int, long, decimal.Decimal, UPercent)), \
+            height
         assert padding is None or isinstance(padding, (tuple, list,)) and len(padding) == 4, \
             padding
         if box_mask and box_radius:
@@ -336,8 +341,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._box_last_wrap = None
         self._width = width
         self._height = height
-        self._fixedWidth = width or 0
-        self._fixedHeight = height or 0
+        self._fixedWidth = 1 if width else 0
+        self._fixedHeight = 1 if width else 0
         self._padding = padding
         # Another hack for pytis markup:
         if len(content) == 1:
@@ -482,7 +487,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             width_height = [self._box_max_depth, self._box_total_length]
         else:
             width_height = [self._box_total_length, self._box_max_depth]
-        for i, size in ((0, self._width), (1, self._height)):
+        for i, size in enumerate((self._width, self._height)):
+            if isinstance(size, UPercent):
+                size = size.size() * self._box_last_wrap[i] / 100
             if size is not None:
                 # The explicitly specified size of the box already includes margin and padding.
                 width_height[i] = size

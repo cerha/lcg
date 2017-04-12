@@ -38,7 +38,7 @@ from .nodes import ContentNode, Variant, Metadata
 from .resources import Resource, Image, Stylesheet, Script, Translations, \
     Media, Audio, Video, Flash, ResourceProvider
 
-from .units import Unit, UAny, UFont, UMm, UPoint, USpace, UPx, FontFamily, \
+from .units import Unit, UAny, UFont, UMm, UPercent, UPoint, UPx, USpace, FontFamily, \
     HorizontalAlignment, VerticalAlignment, Orientation, Color
 
 from .content import Content, Container, Strong, Emphasized, \
