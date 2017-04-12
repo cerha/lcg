@@ -254,7 +254,8 @@ class Container(Content):
     _SUBSEQUENCE_LENGTH = None
 
     def __init__(self, content, name=(), id=None, halign=None, valign=None,
-                 orientation=None, width=None, height=None, presentation=None, **kwargs):
+                 orientation=None, width=None, height=None, padding=None,
+                 presentation=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -275,12 +276,26 @@ class Container(Content):
           orientation -- orientation of the container content flow (vertical
             vs.horizontalal); one of the 'Orientation' constants or 'None'
             (default orientation).
-          width -- output width as 'lcg.Unit' subclass instance.  Note that
-            various output backends may only support certain units or
-            completely ignore this property.
-          height -- output width as 'lcg.Unit' subclass instance.  Note that
-            various output backends may only support certain units or
-            completely ignore this property.
+          width -- explicit output width as 'lcg.Unit' subclass instance.
+            Applies to the outer dimension of the whole box including any
+            padding and/or box_margin.  Currently only supported in PDF export.
+          height -- explicit output width as 'lcg.Unit' subclass instance.
+            Applies to the outer dimension of the whole box including any
+            padding and/or box_margin.  Currently only supported in PDF export.
+          padding -- space around the container content.  If not None, it can
+            be either a 'Unit' instance determining equal padding for all sides
+            or a sequence of four 'Unit' instances determining padding for each
+            side separately in the order (top, right, bottom, left) or a
+            sequence of two 'Unit' instances, where the first value determines
+            top and bottom padding and the second value determines left and
+            right padding.  Note, that 'presentation' may also define
+            'box_margin' for a boxed group, but there are major differences
+            between box_margin and padding.  Box margin only applies to boxed
+            groups and is ignored for non boxed groups.  Padding applies to
+            both.  Also, box_margin is (through presentation inheritance)
+            inherited to any inner boxed groups which don't explicitly override
+            it.  Padding only applies to the container for which it is defined.
+            Currently only supported in PDF export.
           presentation -- 'Presentation' instance defining various presentation
             properties; if 'None' then no explicit presentation for this container
             is defined.
@@ -298,6 +313,9 @@ class Container(Content):
         assert isinstance(name, (basestring, tuple, list))
         assert width is None or isinstance(width, lcg.Unit), width
         assert height is None or isinstance(height, lcg.Unit), height
+        assert (padding is None or isinstance(padding, lcg.Unit)
+                or lcg.is_sequence_of(padding, lcg.Unit) and len(padding) in (2, 4)), padding
+        assert not name or id is None, id
         self._id = id
         if isinstance(name, basestring):
             names = (name,)
@@ -312,6 +330,7 @@ class Container(Content):
         self._orientation = orientation
         self._width = width
         self._height = height
+        self._padding = padding
         self._presentation = presentation
         self._contained_resources = None
         if self._SUBSEQUENCES:
@@ -378,6 +397,10 @@ class Container(Content):
     def height(self):
         """Return the value of 'height' as passed to the constructor."""
         return self._height
+
+    def padding(self):
+        """Return the value of 'padding' as passed to the constructor."""
+        return self._padding
 
     def presentation(self):
         """Return the value of 'presentation' as passed to the constructor."""

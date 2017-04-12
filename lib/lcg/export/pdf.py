@@ -298,12 +298,14 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
 
     def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0,
                  box_width=None, box_color=None, box_radius=0, box_mask=None,
-                 width=None, height=None):
+                 width=None, height=None, padding=None):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         assert box_mask is None or (isinstance(box_mask, (tuple, list)) and
                                     len(box_mask) == 4 and
                                     all(isinstance(x, bool) for x in box_mask)), box_mask
+        assert padding is None or isinstance(padding, (tuple, list,)) and len(padding) == 4, \
+            padding
         if box_mask and box_radius:
             raise Exception("Unsupported combination of 'box_mask' and 'box_radius'.")
         if __debug__:
@@ -336,6 +338,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._height = height
         self._fixedWidth = width or 0
         self._fixedHeight = height or 0
+        self._padding = padding
         # Another hack for pytis markup:
         if len(content) == 1:
             if getattr(content[0], 'hAlign', None):
@@ -345,10 +348,13 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
 
     def wrap(self, availWidth, availHeight):
         self._box_last_wrap = availWidth, availHeight
-        total_box_margin_size = self._box_box_margin * 2
-        if self._box_boxed:
-            availWidth -= total_box_margin_size
-            availHeight -= total_box_margin_size
+        total_box_margin_size = [2 * self._box_box_margin, 2 * self._box_box_margin]
+        padding = self._padding
+        if padding:
+            total_box_margin_size[0] += padding[1] + padding[3]
+            total_box_margin_size[1] += padding[0] + padding[2]
+        availWidth -= total_box_margin_size[0]
+        availHeight -= total_box_margin_size[1]
         self._box_content = [copy.copy(c) for c in self._box_original_content]
         vertical = self._box_vertical
         if vertical:
@@ -478,8 +484,11 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             width_height = [self._box_total_length, self._box_max_depth]
         for i, size in ((0, self._width), (1, self._height)):
             if size is not None:
+                # The explicitly specified size of the box already includes margin and padding.
                 width_height[i] = size
-            width_height[i] += total_box_margin_size
+            else:
+                # The computed size is the content size, so padding and margin must be added.
+                width_height[i] += total_box_margin_size[i]
         self._width_height = tuple(width_height)
         return self._width_height
 
@@ -518,10 +527,13 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         vertical = self._box_vertical
         box_margin = self._box_box_margin
         x = box_margin
+        y = box_margin
         if vertical:
-            y = self._box_total_length + box_margin
-        else:
-            y = box_margin
+            y += self._box_total_length
+        padding = self._padding
+        if padding:
+            x += padding[3]
+            y += padding[2]
         i = 0
         for c in self._box_content:
             align = self._box_align
@@ -1884,6 +1896,7 @@ class Container(Element):
     valign = None
     width = None
     height = None
+    padding = None
 
     def init(self):
         if __debug__:
@@ -1909,7 +1922,8 @@ class Container(Element):
         # If there is only a single element, unwrap it from the container.
         presentation = pdf_context.current_presentation()
         boxed = presentation and presentation.boxed
-        if len(self.content) == 1 and not boxed:
+        padding = self.padding
+        if len(self.content) == 1 and not boxed and not padding:
             content_element = self.content[0]
             if self.halign is not None and getattr(content_element, 'halign', None) is None:
                 content_element.halign = self.halign
@@ -1939,8 +1953,8 @@ class Container(Element):
                     result.append(exported)
             assert _ok_export_result(result), ('wrong export', result,)
             # If wrapping by a container is needed, create a ReportLab container.
-            if len(result) > 1 or boxed:
-                if boxed:
+            if len(result) > 1 or boxed or padding:
+                if boxed or padding:
                     wrap = True
                 elif parent_container is None:
                     wrap = (not self.vertical)
@@ -1985,14 +1999,17 @@ class Container(Element):
                         height = self._unit2points(self.height, style)
                     else:
                         height = None
-                    result = [RLContainer(content=result, vertical=self.vertical, align=align,
-                                          boxed=boxed, width=width, height=height,
-                                          box_margin=box_margin_points,
-                                          box_width=box_width_points,
-                                          box_color=box_color_rgb,
-                                          box_radius=box_radius_points,
-                                          box_mask=box_mask,
-                                          )]
+                    result = [RLContainer(
+                        content=result, vertical=self.vertical, align=align,
+                        width=width, height=height,
+                        padding=padding and [self._unit2points(x, style) for x in padding],
+                        boxed=boxed,
+                        box_color=box_color_rgb,
+                        box_width=box_width_points,
+                        box_radius=box_radius_points,
+                        box_margin=box_margin_points,
+                        box_mask=box_mask,
+                    )]
         # Enforce upper alignment
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):
             result[0].hAlign = halign
@@ -2894,10 +2911,17 @@ class PDFExporter(FileExporter, Exporter):
                     c = make_element(TextContainer, content=[c])
                 return c
             exported_content = [wrap(c) for c in exported_content]
+        padding = element.padding()
+        if padding is not None:
+            if not isinstance(padding, (tuple, list)):
+                padding = (padding, padding, padding, padding)
+            elif len(padding) == 2:
+                padding = (padding[0], padding[1], padding[0], padding[1])
         return make_element(Container, content=exported_content,
                             vertical=(element.orientation() != 'HORIZONTAL'),
                             halign=element.halign(), valign=element.valign(),
                             width=element.width(), height=element.height(),
+                            padding=padding,
                             presentation=element.presentation())
 
     def _markup_container(self, context, element, tag, **attributes):
