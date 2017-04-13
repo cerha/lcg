@@ -1969,8 +1969,8 @@ class Container(Element):
         # If there is only a single element, unwrap it from the container.
         presentation = pdf_context.current_presentation()
         boxed = presentation and presentation.boxed
-        padding = self.padding
-        if len(self.content) == 1 and not boxed and not padding:
+        padding, width, height = self.padding, self.width, self.height
+        if len(self.content) == 1 and not boxed and not padding and not width and not height:
             content_element = self.content[0]
             if self.halign is not None and getattr(content_element, 'halign', None) is None:
                 content_element.halign = self.halign
@@ -2000,8 +2000,8 @@ class Container(Element):
                     result.append(exported)
             assert _ok_export_result(result), ('wrong export', result,)
             # If wrapping by a container is needed, create a ReportLab container.
-            if len(result) > 1 or boxed or padding:
-                if boxed or padding:
+            if len(result) > 1 or boxed or padding or width or height:
+                if boxed or padding or width or height:
                     wrap = True
                 elif parent_container is None:
                     wrap = (not self.vertical)
@@ -2029,10 +2029,10 @@ class Container(Element):
                         box_margin = 0
                     result = [RLContainer(
                         content=result, vertical=self.vertical, align=align,
-                        width=(self.width if isinstance(self.width, UPercent)
-                               else self._unit2points(self.width, style)),
-                        height=(self.height if isinstance(self.height, UPercent)
-                                else self._unit2points(self.height, style)),
+                        width=(width if isinstance(width, UPercent)
+                               else self._unit2points(width, style)),
+                        height=(height if isinstance(height, UPercent)
+                                else self._unit2points(height, style)),
                         padding=padding and [self._unit2points(x, style) for x in padding],
                         boxed=boxed,
                         box_color=box_color,
