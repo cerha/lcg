@@ -344,6 +344,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._fixedWidth = 1 if width else 0
         self._fixedHeight = 1 if width else 0
         self._padding = padding
+        self._total_fixed_length = None
         # Another hack for pytis markup:
         if len(content) == 1:
             if getattr(content[0], 'hAlign', None):
@@ -351,7 +352,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             else:
                 self.hAlign = self._box_align
 
-    def wrap(self, availWidth, availHeight):
+    def wrap(self, availWidth, availHeight, siblings_fixed_length=None):
         self._box_last_wrap = availWidth, availHeight
         total_box_margin_size = [2 * self._box_box_margin, 2 * self._box_box_margin]
         padding = self._padding
@@ -377,9 +378,39 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._box_lengths = []
         self._box_depths = []
 
+        def fixed_length(content, length_index_):
+            # TODO: This is quite a hack.  See below (where called) for the purpose.
+            # Currently we recognize only the below enumerated flowables as fixed.
+            # In future we will probably need to add more.  Maybe there is some
+            # general rule for recognition of fixed content or we may need to add
+            # a new public method implemented by flowables themselves.  For now,
+            # we just want to be safe and enumerate the known classes.
+            if isinstance(content, (RLContainer, RLImage)):
+                sizes = (content._width, content._height)
+            elif isinstance(content, RLSpacer):
+                sizes = (content.width, content.height)
+                sizes = (content.width, content.height)
+            else:
+                sizes = (None, None)
+            length = sizes[length_index_]
+            return length if length and not isinstance(length, UPercent) else 0
+
         def wrap(content, i, width, height, store=True):
             content.canv = getattr(self, 'canv', None)
-            sizes = content.wrap(width, height)
+            if ((isinstance(content, RLContainer) and
+                 isinstance((content._width, content._height)[length_index], UPercent))):
+                # Pass the sum of fixed siblings lengths to a container with a relative
+                # size.  This allows us to compute the relative sizes from the space
+                # remaining after all fixed sized siblings are counted.
+                if self._total_fixed_length is None:
+                    self._total_fixed_length = reduce(
+                        lambda size, c: size + fixed_length(c, length_index),
+                        self._box_content, 0
+                    )
+                kwargs = dict(siblings_fixed_length=(length_index, self._total_fixed_length))
+            else:
+                kwargs = dict()
+            sizes = content.wrap(width, height, **kwargs)
             del content.canv
             if not store:
                 return
@@ -489,7 +520,10 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             width_height = [self._box_total_length, self._box_max_depth]
         for i, size in enumerate((self._width, self._height)):
             if isinstance(size, UPercent):
-                size = size.size() * self._box_last_wrap[i] / 100
+                avail_space = self._box_last_wrap[i]
+                if siblings_fixed_length and siblings_fixed_length[0] == i:
+                    avail_space -= siblings_fixed_length[1]
+                size = size.size() * avail_space / 100
             if size is not None:
                 # The explicitly specified size of the box already includes margin and padding.
                 width_height[i] = size
