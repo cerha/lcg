@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+ * Copyright (C) 2004-2017 BRAILCOM, o.p.s.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
             ['.evaluate-button', this._on_evaluate_button],
             ['.fill-button', this._on_fill_button],
             ['.reset-button', this._on_reset_button]
-        ].each(function(x) {
+        ].each(function (x) {
             var button = this._form.down(x[0]);
             if (button) {
                 button.observe('click', x[1].bind(this));
@@ -155,15 +155,15 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
         return count;
     },
 
-    _correct: function() {
+    _correct: function () {
         return this._count(this._results, 1);
     },
 
-    _percentage: function() {
+    _percentage: function () {
         return Math.round(100 * this._correct() / this._answers.length);
     },
 
-    _display_results: function() {
+    _display_results: function () {
         var count = this._answers.length;
         var correct = this._correct();
         var incorrect = this._count(this._results, -1);
@@ -178,11 +178,11 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
         this._form.result.value = result;
     },
 
-    _fill_answer: function(i) {
+    _fill_answer: function (i) {
         this._set_answer(i, this._answers[i]);
     },
 
-    _on_fill_button: function(event) {
+    _on_fill_button: function (event) {
         var i;
         for (i=0; i < this._answers.length; i++) {
             this._fill_answer(i);
@@ -190,7 +190,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
         this._eval_answers();
     },
 
-    _on_reset_button: function(event) {
+    _on_reset_button: function (event) {
         this._results = [];
         this._first_attempt = [];
         this._display_results();
@@ -217,7 +217,7 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
         }
     },
 
-    _play_audio: function(uri) {
+    _play_audio: function (uri) {
         if (!lcg.audio && typeof Audio !== 'undefined') {
             lcg.audio = new Audio();
         }
@@ -238,11 +238,11 @@ lcg.Exercise = Class.create(lcg.KeyHandler, {
 
 lcg.ChoiceBasedExercise = Class.create(lcg.Exercise, {
 
-    _recognize_field: function(field) {
+    _recognize_field: function (field) {
         return field.type === 'radio';
     },
 
-    _init_field: function(field) {
+    _init_field: function (field) {
         if (field.name !== this._last_group) {
             if (this._last_group !== undefined) {
                 this._last_answer_index++;
@@ -253,7 +253,7 @@ lcg.ChoiceBasedExercise = Class.create(lcg.Exercise, {
         field.observe('click', this._on_eval_answer.bind(this));
     },
 
-    _set_answer: function(i, value) {
+    _set_answer: function (i, value) {
         var n;
         for (n=0; n < this._fields.length; n++) {
             var field = this._fields[n];
@@ -263,7 +263,7 @@ lcg.ChoiceBasedExercise = Class.create(lcg.Exercise, {
         }
     },
 
-    _get_value: function(i) {
+    _get_value: function (i) {
         var field;
         for (var n=0; n < this._fields.length; n++) {
             field = this._fields[n];
@@ -274,7 +274,7 @@ lcg.ChoiceBasedExercise = Class.create(lcg.Exercise, {
         return undefined;
     },
 
-    _error_handler: function(field) {
+    _error_handler: function (field) {
         var n, i = field.answer_index;
         for (n=0; n < this._fields.length; n++) {
             var f = this._fields[n];
@@ -291,16 +291,16 @@ lcg.ChoiceBasedExercise = Class.create(lcg.Exercise, {
 
 lcg.SelectBasedExercise = Class.create(lcg.Exercise, {
 
-    _recognize_field: function(field) {
+    _recognize_field: function (field) {
         return field.options !== undefined;
     },
 
-    _init_field: function(field) {
+    _init_field: function (field) {
         field.answer_index = this._last_answer_index++;
         field.observe('change', this._on_eval_answer.bind(this));
     },
 
-    _set_answer: function(i, value) {
+    _set_answer: function (i, value) {
         var j, field = this._fields[i];
         for (j=0; j < field.options.length; j++) {
             var option = field.options[j];
@@ -320,11 +320,11 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
                 'Ctrl-Space': this._cmd_hint};
     },
 
-    _cmd_eval_answer: function(field) {
+    _cmd_eval_answer: function (field) {
         this._eval_field_answer(field);
     },
 
-    _cmd_hint: function(field) {
+    _cmd_hint: function (field) {
         var found = this._find_answer(field);
         var answer = found.answer;
         var i = found.index;
@@ -339,19 +339,19 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
         return false;
     },
 
-    _recognize_field: function(field) {
+    _recognize_field: function (field) {
         return ((field.type === 'text' || field.type === 'textarea') &&
                 this._last_answer_index < this._answers.length);
     },
 
-    _init_field: function(field) {
+    _init_field: function (field) {
         field.answer_index = this._last_answer_index++;
         field.observe('keydown', this._on_key_down.bind(this));
         field.observe('dblclick', this._on_eval_answer.bind(this));
         field.observe('touchstart', this._on_touch_start.bind(this));
     },
 
-    _on_touch_start: function(event) {
+    _on_touch_start: function (event) {
         // This is necessary in iBooks on iPhone/iPad as iBooks probably makes all
         // text fields ineditable by default so the keyboard doesnt show up when
         // the field is touched to type.
@@ -362,7 +362,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
         event.stop();
     },
 
-    _find_answer: function(field) {
+    _find_answer: function (field) {
         var answers = this._answers[field.answer_index].split('|');
         var value = field.value;
         var answer_index = 0;
@@ -380,7 +380,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
         return {"answer": answers[answer_index], "index": char_index};
     },
 
-    _highlight: function(field, start, end) {
+    _highlight: function (field, start, end) {
         if (field.setSelectionRange) {
             field.focus();
             field.setSelectionRange(start, end);
@@ -393,14 +393,14 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
         }
     },
 
-    _error_handler: function(field) {
+    _error_handler: function (field) {
         var found = this._find_answer(field);
         var index = found.index;
         field.focus();
         this._highlight(field, index, index);
     },
 
-    _eval_answer: function(value, i) {
+    _eval_answer: function (value, i) {
         var j, answers = this._answers[i].split('|');
         for (j=0; j < answers.length; j++) {
             // Replace repeated spaces, newlines and tabs with a single space
@@ -410,7 +410,7 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
         return false;
     },
 
-    _fill_answer: function(i) {
+    _fill_answer: function (i) {
         var answers = this._answers[i].split('|');
         this._set_answer(i, answers[0]);
     }
@@ -427,21 +427,21 @@ lcg.HiddenAnswers = Class.create(lcg.Exercise, {
         }.bind(this));
     },
 
-    _recognize_field: function(field) {
+    _recognize_field: function (field) {
         return false;
     },
 
-    _show_answer: function(answer) {
+    _show_answer: function (answer) {
         this._slide_down(answer);
         answer.up('.task').down('.toggle-button').update(this._msg("Hide Answer"));
     },
 
-    _hide_answer: function(answer) {
+    _hide_answer: function (answer) {
         this._slide_up(answer);
         answer.up('.task').down('.toggle-button').update(this._msg("Show Answer"));
     },
 
-    _on_toggle_button: function(event) {
+    _on_toggle_button: function (event) {
         var answer = event.element().up('.task').down('.answer');
         if (answer.visible())
             this._hide_answer(answer);
@@ -449,13 +449,13 @@ lcg.HiddenAnswers = Class.create(lcg.Exercise, {
             this._show_answer(answer);
     },
 
-    _on_evaluate_button: function(event) {
+    _on_evaluate_button: function (event) {
         this._form.select('.answer').each(function (a) {
             this._show_answer(a);
         }.bind(this));
     },
 
-    _on_reset_button: function(event) {
+    _on_reset_button: function (event) {
         this._form.select('.answer').each(function (a) {
             this._hide_answer(a);
         }.bind(this));
@@ -471,15 +471,15 @@ lcg.ModelCloze = Class.create(lcg.Exercise, {
         this._form.down('.model-answers').hide();
     },
 
-    _recognize_field: function(field) {
+    _recognize_field: function (field) {
         return false;
     },
 
-    _on_evaluate_button: function(event) {
+    _on_evaluate_button: function (event) {
         this._form.down('.model-answers').show();
     },
 
-    _on_reset_button: function(event) {
+    _on_reset_button: function (event) {
         this._form.down('.model-answers').hide();
     }
 
@@ -502,25 +502,25 @@ lcg.Dictation = Class.create(lcg.FillInExercise, {
                 'Ctrl-Enter': this._cmd_play_current};
     },
 
-    _cmd_play_next: function(field) {
+    _cmd_play_next: function (field) {
         if (this._current_recording < this._recordings.length-1) {
             this._current_recording++;
             this._cmd_play_current(field);
         }
     },
 
-    _cmd_play_previous: function(field) {
+    _cmd_play_previous: function (field) {
         if (this._current_recording > 0) {
             this._current_recording--;
             this._cmd_play_current(field);
         }
     },
 
-    _cmd_play_current: function(field) {
+    _cmd_play_current: function (field) {
         this._play_audio(this._recordings[this._current_recording]);
     },
 
-    _display_results: function() {
+    _display_results: function () {
         var msg = this._msg(this._correct() ? 'Correct':'Error(s) found');
         this._form.result.value = msg;
     }

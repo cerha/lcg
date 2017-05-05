@@ -186,7 +186,7 @@ lcg.Menu = Class.create(lcg.Widget, {
         } else {
             base_id = parent.getAttribute('id');
         }
-        ul.childElements().each(function(li) {
+        ul.childElements().each(function (li) {
             if (li.nodeName === 'LI') {
                 li.setAttribute('role', 'presentation');
                 var item = li.down('a');
@@ -346,7 +346,7 @@ lcg.Notebook = Class.create(lcg.Menu, {
         item.setAttribute('aria-controls', page.getAttribute('id'));
     },
 
-    _current_location_selected_item: function() {
+    _current_location_selected_item: function () {
         // Get the selected item if the anchor is part of the current location.
         var match = self.location.href.match('#');
         if (match) {
@@ -358,7 +358,7 @@ lcg.Notebook = Class.create(lcg.Menu, {
         }
     },
 
-    _last_saved_selected_item: function() {
+    _last_saved_selected_item: function () {
         /* Get the selected item saved most recently in a browser cookie.
          *
          * We remember the last tab only for one notebook (the one which was
@@ -769,7 +769,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
         }
     },
 
-    dismiss: function() {
+    dismiss: function () {
         $(document).stopObserving('touchstart', this._on_touchstart_handler);
         $(document).stopObserving('touchmove', this._on_touchmove_handler);
         $(document).stopObserving('touchend', this._on_touchend_handler);
@@ -941,7 +941,7 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
         }
     },
 
-    _run_callback: function(item) {
+    _run_callback: function (item) {
         var spec = item._lcg_popup_menu_item_spec;
         var callback = spec.callback;
         if (callback) {
@@ -1103,7 +1103,7 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
         button.on('keydown', this._on_button_key_down.bind(this));
     },
 
-    _on_button_key_down: function(event) {
+    _on_button_key_down: function (event) {
         var key = this._event_key(event);
         if (key === 'Enter' || key === 'Space' || key === 'Alt-Down') {
             this.dropdown();
@@ -1111,7 +1111,7 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
         }
     },
 
-    _on_button_click: function(event) {
+    _on_button_click: function (event) {
         event.stop();
         if (this._button.getAttribute('aria-expanded') === 'true') {
             this.dismiss();
@@ -1159,7 +1159,7 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
         this._set_focus(item);
     },
 
-    dropdown: function() {
+    dropdown: function () {
         var y, direction;
         var menu = this.element;
         var viewport = document.viewport.getDimensions();
@@ -1192,7 +1192,7 @@ lcg.Tooltip = Class.create({
         this._show_when_ready = null;
         new Ajax.Request(uri, {
             method: 'GET',
-            onSuccess: function(transport) {
+            onSuccess: function (transport) {
                 try {
                     var element = new Element('div', {'class': 'tooltip-widget'});
                     var content_type = transport.getHeader('Content-Type');
@@ -1225,7 +1225,7 @@ lcg.Tooltip = Class.create({
         });
     },
 
-    show: function(x, y) {
+    show: function (x, y) {
         if (this._tooltip) {
             var left = x + 3; // Show a little on right to avoid onmouseout and infinite loop.
             var top = y  - this._tooltip.getHeight();
@@ -1236,7 +1236,7 @@ lcg.Tooltip = Class.create({
         }
     },
 
-    hide: function() {
+    hide: function () {
         if (this._tooltip) {
             this._tooltip.hide();
         }
@@ -1269,7 +1269,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
         }
         heading.addClassName('collapsible-pane-heading');
         heading.insert({top: new Element('span', {'class': 'icon'})});
-        heading.on('click', function(event) {
+        heading.on('click', function (event) {
             this.toggle();
             event.stop();
         }.bind(this));
@@ -1284,11 +1284,11 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
         heading.setAttribute('aria-controls', content.getAttribute('id'));
     },
 
-    expanded: function() {
+    expanded: function () {
         return this.element.hasClassName('expanded');
     },
 
-    expand: function() {
+    expand: function () {
         this.element.removeClassName('collapsed');
         this.element.addClassName('expanded');
         this._heading.setAttribute('aria-expanded', 'true');
@@ -1299,7 +1299,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
         }
     },
 
-    collapse: function() {
+    collapse: function () {
         this.element.removeClassName('expanded');
         this.element.addClassName('collapsed');
         this._heading.setAttribute('aria-expanded', 'false');
@@ -1310,7 +1310,7 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
         }
     },
 
-    toggle: function() {
+    toggle: function () {
         if (this.element.hasClassName('collapsed')) {
             this.expand();
         } else {
@@ -1358,8 +1358,8 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         play_button.on('keydown', this._on_key_down.bind(this));
     },
 
-    _bind: function(name, handler, arg) {
-        this.element.down('button.' + name).on('click', function(event) {
+    _bind: function (name, handler, arg) {
+        this.element.down('button.' + name).on('click', function (event) {
             handler.bind(this)(arg);
             event.element().focus();
             event.stop();
@@ -1380,18 +1380,18 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         };
     },
 
-    _play_pause: function() {
+    _play_pause: function () {
         var status = this._player.data('jPlayer').status;
         var action = (status.paused ? 'play' : 'pause');
         this._player.jPlayer(action);
     },
 
-    _seek: function(time, play) {
+    _seek: function (time, play) {
         var command = (play ? 'play' : 'pause');
         this._player.jPlayer(command, time);
     },
 
-    _skip: function(forward) {
+    _skip: function (forward) {
         var player = this._player;
         var status = player.data('jPlayer').status;
         var position = status.currentTime;
@@ -1410,7 +1410,7 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         }
     },
 
-    _change_volume: function(up) {
+    _change_volume: function (up) {
         var player = this._player;
         if (up && this._volume < 1) {
             this._volume = Math.min(this._volume + 0.05, 1);
@@ -1422,26 +1422,26 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         }
     },
 
-    _on_player_volume_change: function(event) {
+    _on_player_volume_change: function (event) {
         this._volume = event.jPlayer.options.volume;
         this.element.down('.jp-volume-bar-value').innerHTML = Math.round(100 * this._volume) + '%';
     },
 
-    _set_play_button_label: function(label) {
+    _set_play_button_label: function (label) {
         var button = this.element.down('button.play-pause');
         button.setAttribute('title', label);
         button.down('span').innerHTML = label;
     },
 
-    _on_player_play: function(event) {
+    _on_player_play: function (event) {
         this._set_play_button_label(this._pause_label);
     },
 
-    _on_player_pause: function(event) {
+    _on_player_pause: function (event) {
         this._set_play_button_label(this._play_label);
     },
 
-    _on_toggle_duration: function(event) {
+    _on_toggle_duration: function (event) {
         var label;
         if (this._player.data('jPlayer').options.remainingDuration) {
             label = this._remaining_label;
@@ -1452,7 +1452,7 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         this.element.down('.duration-label').innerHTML = label;
     },
 
-    _on_player_time_update: function(event) {
+    _on_player_time_update: function (event) {
         var status = event.jPlayer.status;
     },
 
@@ -1471,14 +1471,14 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         return uri;
     },
 
-    _load_if_needed: function(uri) {
+    _load_if_needed: function (uri) {
         var status = this._player.data('jPlayer').status;
         if (status.media.mp3 !== this._absolute_uri(uri)) {
             this.load(uri);
         }
     },
 
-    _media_type: function(uri) {
+    _media_type: function (uri) {
         var ext = uri.split('.').pop().toLowerCase();
         if (ext === 'mp3') {
             return {type: 'mp3', media: 'audio/mpeg;'};
@@ -1493,7 +1493,7 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         }
     },
 
-    _can_play_audio: function(uri) {
+    _can_play_audio: function (uri) {
         var type = this._media_type(uri);
         if (!type) {
             return false;
@@ -1513,29 +1513,29 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
         }
     },
     
-    load: function(uri) {
+    load: function (uri) {
         this._player.jPlayer('setMedia', {
             mp3: uri
         });
     },
 
-    play: function() {
+    play: function () {
         this._player.jPlayer('play');
     },
 
-    bind_audio_control: function(element_id, uri) {
+    bind_audio_control: function (element_id, uri) {
         if (this._can_play_audio(uri)) {
             // Only bind the player to the control if it is capable of playing
             // given media type.  Otherwise leave the original HTML element
             // untouched.  Suppose that it already provides some fallback
             // functionality (such as download).
             var element = $(element_id);
-            element.on('click', function(event) {
+            element.on('click', function (event) {
                 this._load_if_needed(uri);
                 this._play_pause();
                 event.stop();
             }.bind(this));
-            element.on('keydown', function(event) {
+            element.on('keydown', function (event) {
                 this._load_if_needed(uri);
                 this._on_key_down(event);
             }.bind(this));
@@ -1577,7 +1577,7 @@ lcg.Cookies = Class.create({
     // Returns a cookie value or false
     get: function (key) {
         var value = false;
-        document.cookie.split(';').invoke('strip').each(function(s) {
+        document.cookie.split(';').invoke('strip').each(function (s) {
             if (s.startsWith(key+"=")) {
                 value = unescape(s.substring(key.length+1, s.length));
                 throw $break;
@@ -1602,7 +1602,7 @@ lcg.Cookies = Class.create({
 
 lcg.cookies = new lcg.Cookies();
 
-lcg.widget_instance = function(element) {
+lcg.widget_instance = function (element) {
     /* Return a JavaScript widget instance for given DOM element or null.
      *
      * If given DOM element has an associated JavaScript widget instance,
