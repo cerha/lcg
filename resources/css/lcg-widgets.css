@@ -118,9 +118,9 @@
 }
 .popup-menu-widget {
     background-color: #ddd;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
     box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.6);
     -moz-box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.6);
     -webkit-box-shadow: rgba(0, 0, 0, 0.6) 1px 1px 12px;
@@ -186,7 +186,7 @@
     width: 13px;
     height: 13px;
     overflow: hidden;
-    text-indent: -9999px;
+    text-indent: 20px;
     border: solid 1px #aaa;
     border-radius: 7px;
     -moz-border-radius: 7px;
