@@ -320,11 +320,11 @@ lcg.FillInExercise = Class.create(lcg.Exercise, {
                 'Ctrl-Space': this._cmd_hint};
     },
 
-    _cmd_eval_answer: function (field) {
+    _cmd_eval_answer: function (event, field) {
         this._eval_field_answer(field);
     },
 
-    _cmd_hint: function (field) {
+    _cmd_hint: function (event, field) {
         var found = this._find_answer(field);
         var answer = found.answer;
         var i = found.index;
@@ -502,21 +502,21 @@ lcg.Dictation = Class.create(lcg.FillInExercise, {
                 'Ctrl-Enter': this._cmd_play_current};
     },
 
-    _cmd_play_next: function (field) {
+    _cmd_play_next: function (event, field) {
         if (this._current_recording < this._recordings.length-1) {
             this._current_recording++;
-            this._cmd_play_current(field);
+            this._cmd_play_current(event, field);
         }
     },
 
-    _cmd_play_previous: function (field) {
+    _cmd_play_previous: function (event, field) {
         if (this._current_recording > 0) {
             this._current_recording--;
-            this._cmd_play_current(field);
+            this._cmd_play_current(event, field);
         }
     },
 
-    _cmd_play_current: function (field) {
+    _cmd_play_current: function (event, field) {
         this._play_audio(this._recordings[this._current_recording]);
     },
 

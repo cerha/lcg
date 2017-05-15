@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2012-2016 BRAILCOM, o.p.s.
+ * Copyright (C) 2012-2017 BRAILCOM, o.p.s.
  * Author: Tomas Cerha
  *
  * This program is free software; you can redistribute it and/or modify
@@ -78,9 +78,10 @@ lcg.KeyHandler = Class.create({
         var key_name = this._event_key(event);
         var command = this._keymap[key_name];
         if (command) {
-            var element = event.element();
-            command.bind(this)(element);
-            event.stop();
+            command.bind(this)(event, event.element());
+            if (!event.stopped) {
+                event.stop();
+            }
         }
     },
 
@@ -266,19 +267,19 @@ lcg.Menu = Class.create(lcg.Widget, {
     },
 
     _on_item_click: function (event, item) {
-        this._cmd_activate(item);
+        this._cmd_activate(event, item);
         event.stop();
     },
 
-    _cmd_prev: function (item) {
+    _cmd_prev: function (event, item) {
         this._set_focus(item._lcg_menu_prev);
     },
 
-    _cmd_next: function (item) {
+    _cmd_next: function (event, item) {
         this._set_focus(item._lcg_menu_next);
     },
 
-    _cmd_activate: function (item) {
+    _cmd_activate: function (event, item) {
         return;
     },
 
@@ -419,7 +420,7 @@ lcg.Notebook = Class.create(lcg.Menu, {
         }
     },
 
-    _cmd_activate: function (item) {
+    _cmd_activate: function (event, item) {
         this._select_item(item);
         this._set_focus(item._lcg_notebook_page);
     }
@@ -593,7 +594,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
         return next;
     },
 
-    _cmd_up: function (item) {
+    _cmd_up: function (event, item) {
         var target = null;
         if (item._lcg_menu_prev) {
             target = item._lcg_menu_prev;
@@ -606,7 +607,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
         this._set_focus(target);
     },
 
-    _cmd_down: function (item) {
+    _cmd_down: function (event, item) {
         var target = null;
         if (item._lcg_submenu && !item.up('li').hasClassName('folded')) {
             target = item._lcg_submenu[0];
@@ -616,23 +617,23 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
         this._set_focus(target);
     },
 
-    _cmd_expand: function (item) {
+    _cmd_expand: function (event, item) {
         if (!this._expand_item(item) && item._lcg_submenu) {
             this._set_focus(item._lcg_submenu[0]);
         }
     },
 
-    _cmd_collapse: function (item) {
+    _cmd_collapse: function (event, item) {
         if (!this._collapse_item(item)) {
             this._set_focus(item._lcg_menu_parent);
         }
     },
 
-    _cmd_activate: function (item) {
+    _cmd_activate: function (event, item) {
         self.location = item.getAttribute('href');
     },
 
-    _cmd_quit: function (item) {
+    _cmd_quit: function (event, item) {
         this._set_focus($('main-heading'));
     },
 
@@ -678,7 +679,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
         };
     },
 
-    _cmd_quit: function (item) {
+    _cmd_quit: function (event, item) {
         this.dismiss();
     },
 
@@ -701,7 +702,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
             if (event.findElement('div') !== this.element) {
                 this.dismiss();
             } else {
-                this._cmd_activate(event.findElement('a'));
+                this._cmd_activate(event, event.findElement('a'));
             }
             event.stop();
         }
@@ -915,14 +916,13 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
     _on_item_click: function (event, item) {
         if (item.up('li').hasClassName('active')) {
             this.dismiss();
-            this._run_callback(item);
-            var uri = item._lcg_popup_menu_item_spec.uri;
+            this._run_callback(event, item);
             // If the item has a uri, the link has an href and we want to
             // let the event bubble up and get to standard browser processing
             // as a link click.  This way the browser may apply its configuration
             // and for example open a link in a new tab when Ctrl is pressed
             // on Linux/Windows or Cmd on Mac.
-            if (!uri) {
+            if (!event.stopped && !item._lcg_popup_menu_item_spec.uri) {
                 event.stop();
             }
         } else {
@@ -930,36 +930,36 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
         }
     },
 
-    _cmd_activate: function (item) {
+    _cmd_activate: function (event, item) {
         if (item.up('li').hasClassName('active')) {
             this.dismiss();
-            this._run_callback(item);
-            var uri = item._lcg_popup_menu_item_spec.uri;
-            if (uri) {
-                self.location = uri;
+            this._run_callback(event, item);
+            if (!event.stopped) {
+                var uri = item._lcg_popup_menu_item_spec.uri;
+                if (uri) {
+                    self.location = uri;
+                }
             }
         }
     },
 
-    _run_callback: function (item) {
+    _run_callback: function (event, item) {
         var spec = item._lcg_popup_menu_item_spec;
         var callback = spec.callback;
         if (callback) {
-            var i;
             if (typeof callback === 'string') {
                 var namespaces = callback.split(".");
                 var func = namespaces.pop();
                 var context = window;
+                var i;
                 for (i = 0; i < namespaces.length; i++) {
                     context = context[namespaces[i]];
                 }
                 callback = context[func];
             }
-            var args = [this._popup_element];
+            var args = [event, this._popup_element];
             if (spec.callback_args) {
-                for (i = 0; i < spec.callback_args.length; i++) {
-                    args[i + 1] = spec.callback_args[i];
-                }
+                args = args.concat(spec.callback_args);
             }
             return callback.apply(this, args);
         }
@@ -1061,7 +1061,7 @@ lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
         };
     },
 
-    _cmd_activate: function (element) {
+    _cmd_activate: function (event, element) {
         this._menu.popup(undefined, element);
     }
 
@@ -1120,7 +1120,7 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
         }
     },
 
-    _cmd_activate: function (item) {
+    _cmd_activate: function (event, item) {
         this.dismiss();
         this._activation_callback(item);
     },
@@ -1368,15 +1368,15 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
 
     _define_keymap: function () {
         return {
-            'Space': function (button) { this._play_pause(); },
-            'Left': function (button) { this._skip(false); },
-            'Right': function (button) { this._skip(true); },
-            'Up': function (button) { this._change_volume(true); },
-            'Down': function (button) { this._change_volume(false); },
-            'Ctrl-Shift-Left': function (button) { this._skip(false); },
-            'Ctrl-Shift-Right': function (button) { this._skip(true); },
-            'Ctrl-Shift-Up': function (button) { this._change_volume(true); },
-            'Ctrl-Shift-Down': function (button) { this._change_volume(false); }
+            'Space': function (event, button) { this._play_pause(); },
+            'Left': function (event, button) { this._skip(false); },
+            'Right': function (event, button) { this._skip(true); },
+            'Up': function (event, button) { this._change_volume(true); },
+            'Down': function (event, button) { this._change_volume(false); },
+            'Ctrl-Shift-Left': function (event, button) { this._skip(false); },
+            'Ctrl-Shift-Right': function (event, button) { this._skip(true); },
+            'Ctrl-Shift-Up': function (event, button) { this._change_volume(true); },
+            'Ctrl-Shift-Down': function (event, button) { this._change_volume(false); }
         };
     },
 
