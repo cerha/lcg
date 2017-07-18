@@ -65,6 +65,9 @@ class TranslatableTextFactory(object):
         kwargs['_origin'] = self._origin
         return TranslatablePluralForms(*args, **kwargs)
 
+    def pgettext(self, context, text, *args, **kwargs):
+        return self.__call__(context + '\x04' + text, *args, **kwargs).split('\x04', 1)[1]
+
 
 class TranslatedTextFactory(TranslatableTextFactory):
     """Like 'TranslatableTextFactory', but usable also in desktop application environment.
