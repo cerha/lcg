@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -217,7 +217,7 @@ class FoldableTree(Widget, lcg.Content):
                 g.li((g.a(g.span('', cls='icon') + g.span(child.title(), cls='label'),
                           href=context.uri(child), title=child.descr(),
                           cls=(('current ' if child is current else '') +
-                               ('inactive ' if not child.active() else '')).strip() or None) +
+                               ('inactive ' if not child.active() else '')).strip() or None),
                       menu(child)),
                      cls=(('foldable' + (' folded' if child not in path else ''))
                           if child.foldable() and any(not n.hidden() for n in child.children())
@@ -225,7 +225,7 @@ class FoldableTree(Widget, lcg.Content):
                 for child in node.children() if not child.hidden()
             ]
             if items:
-                return g.ul(*items)
+                return g.ul(items, cls='level-%d' % len(node.path()))
             else:
                 return g.escape('')
         return menu(self._node or current.root())
@@ -269,10 +269,10 @@ class Notebook(Widget, lcg.Container):
 
     def _export_widget(self, context):
         g = context.generator()
-        switcher = g.ul(g.concat([g.li(g.a(s.title(), href='#' + s.id(), title=s.descr(),
-                                           cls=(s.id()==self._active and 'current' or None)),
-                                       cls="notebook-tab")
-                                  for s in self.sections()]),
+        switcher = g.ul([g.li(g.a(s.title(), href='#' + s.id(), title=s.descr(),
+                                  cls=(s.id()==self._active and 'current' or None)),
+                              cls="notebook-tab")
+                         for s in self.sections()],
                         cls='notebook-switcher')
         return g.concat(switcher, lcg.Container.export(self, context))
 

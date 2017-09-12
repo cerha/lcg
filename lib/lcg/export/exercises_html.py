@@ -112,7 +112,7 @@ class ExerciseExporter(object):
         else:
             if len(exported_tasks) > 1:
                 g = context.generator()
-                return g.ol(*[g.li(t) for t in exported_tasks], cls="tasks")
+                return g.ol([g.li(t) for t in exported_tasks], cls="tasks")
             elif exported_tasks:
                 return exported_tasks[0]
             else:
@@ -241,8 +241,8 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
 
     def _format_choices(self, context, exercise, exercise_id, task):
         g = context.generator()
-        return g.ol(*[g.li(self._choice_control(context, exercise, exercise_id, task, ch))
-                      for ch in task.choices()],
+        return g.ol([g.li(self._choice_control(context, exercise, exercise_id, task, ch))
+                     for ch in task.choices()],
                     cls='choices')
 
     def _task_style_cls(self, exercise):

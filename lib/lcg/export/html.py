@@ -103,8 +103,8 @@ class HtmlGenerator(object):
         g = context.generator()
         return g.div((g.p(g.strong("Some text"), ' ',
                           g.a("Link label", href="/link/uri", title="Link tooltip")),
-                      g.ul(g.li("First list item"),
-                           g.li("Second list item")),
+                      g.ul((g.li("First list item"),
+                            g.li("Second list item"))),
                       ),
                      cls="div-class-name")
 
@@ -338,7 +338,7 @@ class HtmlGenerator(object):
     def p(self, *args, **kwargs):
         # Passing content as several positional arguments is deprecated.
         # Use a single 'content' argument.
-        content = args + tuple(kwargs.pop('content', ()))
+        content = args[0] if len(args) == 1 else args or tuple(kwargs.pop('content', ()))
         if content and content[0].find('object') != -1:
             # This is a nasty hack to suppress <p>...</p> around a video player.  In any case,
             # wrapping a block-level element in another block level element is invalid HTML, so
@@ -374,13 +374,13 @@ class HtmlGenerator(object):
     def ol(self, *args, **kwargs):
         # Passing content as several positional arguments is deprecated.
         # Use a single 'content' argument.
-        content = args + tuple(kwargs.pop('content', ()))
+        content = args[0] if len(args) == 1 else args or tuple(kwargs.pop('content', ()))
         return self._tag('ol', content, kwargs)
 
     def ul(self, *args, **kwargs):
         # Passing content as several positional arguments is deprecated.
         # Use a single 'content' argument.
-        content = args + tuple(kwargs.pop('content', ()))
+        content = args[0] if len(args) == 1 else args or tuple(kwargs.pop('content', ()))
         return self._tag('ul', content, kwargs)
 
     def li(self, content, **kwargs):
@@ -389,7 +389,7 @@ class HtmlGenerator(object):
     def dl(self, *args, **kwargs):
         # Passing content as several positional arguments is deprecated.
         # Use a single 'content' argument.
-        content = args + tuple(kwargs.pop('content', ()))
+        content = args[0] if len(args) == 1 else args or tuple(kwargs.pop('content', ()))
         return self._tag('dl', content, kwargs)
 
     def dt(self, content, **kwargs):
@@ -1110,15 +1110,15 @@ class HtmlExporter(lcg.Exporter):
                 style = 'list-style-type: upper-alpha'
             else:
                 style = None
-        return method(*[g.li(item.export(context), cls="i%d" % (i + 1,))
-                        for i, item in enumerate(element.content())],
+        return method([g.li(item.export(context), cls="i%d" % (i + 1,))
+                       for i, item in enumerate(element.content())],
                       style=style)
 
     def _export_definition_list(self, context, element):
         g = self._generator
         content = [g.dt(dt.export(context)) + g.dd(dd.export(context))
                    for dt, dd in element.content()]
-        return g.dl(*content)
+        return g.dl(content)
 
     def _export_field_set(self, context, element):
         g = self._generator
@@ -1146,8 +1146,8 @@ class HtmlExporter(lcg.Exporter):
             if len(items) == 0:
                 return g.escape('')
             else:
-                return g.ul(*[g.li((toc_link(item), make_toc(subitems)), cls="i%d" % (i + 1,))
-                              for i, (item, subitems) in enumerate(items)])
+                return g.ul([g.li((toc_link(item), make_toc(subitems)), cls="i%d" % (i + 1,))
+                             for i, (item, subitems) in enumerate(items)])
         result = make_toc(element.items(context.lang()))
         title = element.title()
         if title is not None:
