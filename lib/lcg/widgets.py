@@ -219,9 +219,10 @@ class FoldableTree(Widget, lcg.Content):
                           cls=(('current ' if child is current else '') +
                                ('inactive ' if not child.active() else '')).strip() or None),
                       menu(child)),
-                     cls=(('foldable' + (' folded' if child not in path else ''))
-                          if child.foldable() and any(not n.hidden() for n in child.children())
-                          else None))
+                     cls=((('foldable ' + ('expanded ' if child in path else 'collapsed '))
+                           if child.foldable() and any(not n.hidden() for n in child.children())
+                           else '') +
+                          ('in-path' if child in path else '')).strip() or None)
                 for child in node.children() if not child.hidden()
             ]
             if items:

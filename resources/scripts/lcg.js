@@ -532,10 +532,9 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
                 if (!submenu.getAttribute('id')) {
                     submenu.setAttribute('id', item.getAttribute('id') + '-submenu');
                 }
-                var hidden = (li.hasClassName('folded') ? 'true' : 'false');
-                submenu.setAttribute('aria-hidden', hidden);
-                var expanded = (li.hasClassName('folded') ? 'false' : 'true' );
-                item.setAttribute('aria-expanded', expanded);
+                var expanded = li.hasClassName('expanded');
+                submenu.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+                item.setAttribute('aria-expanded', expanded ? 'true' : 'false');
                 item.setAttribute('aria-controls', submenu.getAttribute('id'));
                 this._foldable = true;
             }
@@ -560,9 +559,11 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
     _expand_item: function (item, recourse) {
         var expanded = false;
         var li = item.up('li');
-        if (li.hasClassName('folded')) {
-            li.removeClassName('folded');
-            li.down('ul').setAttribute('aria-hidden', 'false');
+        if (li.hasClassName('collapsed')) {
+            var submenu = li.down('ul');
+            li.removeClassName('collapsed');
+            li.addClassName('expanded');
+            submenu.setAttribute('aria-hidden', 'false');
             item.setAttribute('aria-expanded', 'true');
             expanded = true;
         }
@@ -574,9 +575,11 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
     _collapse_item: function (item) {
         var li = item.up('li');
-        if (li.hasClassName('foldable') && !li.hasClassName('folded')) {
-            li.addClassName('folded');
-            li.down('ul').setAttribute('aria-hidden', 'true');
+        if (li.hasClassName('foldable') && li.hasClassName('expanded')) {
+            var submenu = li.down('ul');
+            li.removeClassName('expanded');
+            li.addClassName('collapsed');
+            submenu.setAttribute('aria-hidden', 'true');
             item.setAttribute('aria-expanded', 'false');
             return true;
         }
@@ -598,7 +601,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
         var target = null;
         if (item._lcg_menu_prev) {
             target = item._lcg_menu_prev;
-            if (target._lcg_submenu && !target.up('li').hasClassName('folded')) {
+            if (target._lcg_submenu && target.up('li').hasClassName('expanded')) {
                 target = target._lcg_submenu[target._lcg_submenu.length-1];
             }
         } else {
@@ -609,7 +612,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
     _cmd_down: function (event, item) {
         var target = null;
-        if (item._lcg_submenu && !item.up('li').hasClassName('folded')) {
+        if (item._lcg_submenu && item.up('li').hasClassName('expanded')) {
             target = item._lcg_submenu[0];
         } else {
             target = this._next_item(item);
@@ -650,7 +653,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
     _on_item_click: function (event, item) {
         if (!event.findElement('.label')) {
-            if (item.up('li').hasClassName('folded')) {
+            if (item.up('li').hasClassName('collapsed')) {
                 this._expand_item(item);
             } else {
                 this._collapse_item(item);

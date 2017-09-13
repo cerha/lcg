@@ -16,7 +16,7 @@
     width: 100%;
     padding: 0;
 }
-.foldable-tree-widget li.folded ul {
+.foldable-tree-widget li.collapsed ul {
     display: none;
 }
 .foldable-tree-widget li a {
@@ -35,7 +35,7 @@
 .foldable-tree-widget li.foldable > a > .icon {
     background-position: 0 -28px;
 }
-.foldable-tree-widget li.foldable.folded > a > .icon {
+.foldable-tree-widget li.foldable.collapsed > a > .icon {
     background-position: 0 -16px;
 }
 .foldable-tree-widget li .label {
