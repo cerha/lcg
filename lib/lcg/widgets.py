@@ -96,6 +96,18 @@ class Widget(object):
         g = context.generator()
         return g.div(content, **kwargs)
 
+    def _javascript_widget_class(self, context):
+        """Return the name of the JavaScript class controlling the widget.
+
+        An instance of this class will be created for every widget.  The
+        constructor will receive the HTML id of the widget root DOM element.
+        The name is by default the same as the name of the Python class and is
+        inside the 'lcg' JavaScript namespace.  Derived classes may override
+        this method to use a specific (typically derived) JavaScript class.
+
+        """
+        return 'lcg.' + self.__class__.__name__
+
     def _javascript_widget_arguments(self, context):
         """Return a sequence of additional JavaScript class constructor arguments.
 
@@ -105,21 +117,37 @@ class Widget(object):
         """
         return ()
 
+    def _css_class_name(self, context):
+        """Return the name of the CSS class assigned to the widget root DOM element.
+
+        The name is by default created by converting the camel-case Python
+        class name to hyphen separated words and adding '-widget' to the end
+        (for example 'foldable-tree-widget' for the 'FoldableTree' Python
+        class).  Derived classes may override this method to use a specific CSS
+        class name.
+
+        """
+
+        return lcg.camel_case_to_lower(self.__class__.__name__) + '-widget'
+
     def export(self, context):
         context.resource('prototype.js')
         context.resource('gettext.js')
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
         g = context.generator()
-        name = self.__class__.__name__
         element_id = context.unique_id()
-        return g.concat(self._wrap_exported_widget(context,
-                                                   self._export_widget(context),
-                                                   id=element_id,
-                                                   aria_label=self._label,
-                                                   cls=lcg.camel_case_to_lower(name) + '-widget'),
-                        g.script(g.js_call('new lcg.%s' % name, element_id,
-                                           *self._javascript_widget_arguments(context))))
+        return g.concat(
+            self._wrap_exported_widget(
+                context,
+                self._export_widget(context),
+                id=element_id,
+                aria_label=self._label,
+                cls=self._css_class_name(context),
+            ),
+            g.script(g.js_call('new ' + self._javascript_widget_class(context), element_id,
+                               *self._javascript_widget_arguments(context))),
+        )
 
 
 class Button(Widget, lcg.Content):
