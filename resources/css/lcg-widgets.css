@@ -66,7 +66,6 @@
     margin: 1.6em 0 1em 0;
     padding: 3px 0 2px 0;
     border-bottom: solid #777 1px;
-    height: 19px;
 }
 .notebook-widget li.notebook-tab {
     display: inline;
@@ -76,6 +75,8 @@
     font-weight: bold;
 }
 .notebook-widget li.notebook-tab a {
+    position: relative;
+    top: 1px;
     border-radius: 4px 4px 0 0;
     border: solid #777 1px;
     padding: 3px 12px 2px 12px;
@@ -211,7 +212,7 @@
 }
 
 .collapsible-pane-widget .collapsible-pane-heading {
-    display: button;
+    display: inline-block;
     font-size: 1.1em;
     padding: 0;
     margin-top: 0.7em;
