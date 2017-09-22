@@ -1,6 +1,6 @@
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ class Resource(object):
 class Image(Resource):
     """An image of undefined type."""
     SUBDIR = 'images'
-    EXTENSIONS = ('jpeg', 'jpg', 'gif', 'png')
+    EXTENSIONS = ('jpeg', 'jpg', 'gif', 'png', 'svg')
 
     def __init__(self, filename, size=None, thumbnail=None, **kwargs):
         """Arguments:
