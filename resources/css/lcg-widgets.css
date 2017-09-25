@@ -230,7 +230,7 @@
     margin-right: 2px;
     background: url(lcg-icons.png) -13px -16px no-repeat; 
 }
-.collapsible-pane-widget.expanded .collapsible-pane-heading .icon {
+.collapsible-pane-widget.expanded > div > div > div > .collapsible-pane-heading .icon {
     background-position: -12px -28px;
 }
 
