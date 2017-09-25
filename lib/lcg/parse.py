@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ class Parser(object):
     _CELL_ALIGNMENT_MAPPING = {'c': lcg.TableCell.CENTER, 'l': lcg.TableCell.LEFT,
                                'r': lcg.TableCell.RIGHT}
     _COMMENT_MATCHER = re.compile('^#[^\r\n]*\r?(\n|$)', re.MULTILINE)
-    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<collapsible>> +)?(?P<title>.*) (?P=level)'
+    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<collapsible>>\+? +)?(?P<title>.*) (?P=level)'
                                    r'(?:[\t ]+(?:\*|(?P<not_in_toc>\!)?'
                                    r'(?P<section_id>[\w\d_-]+)))?'
                                    r'(?P<section_classes>(?:[\t ]+\.[\w\d_-]+)*) *\r?$'),
@@ -308,7 +308,13 @@ class Parser(object):
         size = len(text)
         position += match.end()
         kwargs = self._prune_kwargs(kwargs, ('section_level',))
-        element = lcg.CollapsiblePane if match.group('collapsible') else lcg.Section
+        element_kwargs = {}
+        if match.group('collapsible'):
+            element = lcg.CollapsiblePane
+            if match.group('collapsible').strip().endswith('+'):
+                element_kwargs['collapsed'] = False
+        else:
+            element = lcg.Section
         while True:
             position = self._find_next_block(text, position)
             if position >= size:
@@ -322,7 +328,7 @@ class Parser(object):
         return element(title=title, heading=self.parse_inline_markup(title),
                        content=lcg.Container(section_content),
                        id=section_id, name=tuple(section_classes) or ('default-section',),
-                       in_toc=in_toc), position
+                       in_toc=in_toc, **element_kwargs), position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])
