@@ -78,7 +78,8 @@
     top: 1px;
     border-radius: 4px 4px 0 0;
     border: solid #777 1px;
-    padding: 3px 12px 2px 12px;
+    border-bottom: none;
+    padding: .2em .7em 1px .7em;
     background-color: #ddd;
     color: #000;
     font-size: 1.1em;
@@ -87,8 +88,8 @@
     text-decoration: none;
 }
 .notebook-widget li.notebook-tab a.current {
+    padding-bottom: 2px;
     background-color: #fff;
-    border-bottom-color: #fff;
 }
 
 /* Popup menu & Dropdown selection widget */
