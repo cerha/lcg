@@ -25,17 +25,12 @@ import re
 import string
 import sys
 import unittest
+import zipfile
+import cStringIO
 
 import lcg
 
 _ = lcg.TranslatableTextFactory('test')
-
-class TestSuite(unittest.TestSuite):
-    def add(self, cls, prefix='test_'):
-        tests = [cls(attr) for attr in dir(cls) if attr.startswith(prefix)]
-        self.addTests(tests)
-
-tests = TestSuite()
 
 lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
 lcg.config.default_resource_dir = os.path.join(lcg_dir, 'resources')
@@ -184,8 +179,6 @@ class TranslatableText(unittest.TestCase):
         interpolated = template.interpolate(lambda f: fields[f])
         test(interpolated, '<a href="a">a</a> [b]')
 
-tests.add(TranslatableText)
-
 
 class TranslatablePluralForms(unittest.TestCase):
 
@@ -225,8 +218,6 @@ class TranslatablePluralForms(unittest.TestCase):
             tb1 = tb.replace('5', '123')
             self.assertEqual(b2, tb1)
 
-tests.add(TranslatablePluralForms)
-
 
 class SelfTranslatableText(unittest.TestCase):
 
@@ -245,7 +236,6 @@ class SelfTranslatableText(unittest.TestCase):
         self.assertEqual(b2, "-person1- is smarter than -person2-.")
         self.assertEqual(c2, u"-person1- je chytřejší než -person2-.")
 
-tests.add(SelfTranslatableText)
 
 class LocalizableDateTime(unittest.TestCase):
     class tzinfo(datetime.tzinfo):
@@ -361,7 +351,6 @@ class LocalizableDateTime(unittest.TestCase):
         self.assertEqual(d1, "30/01/2006")
         self.assertEqual(d2, "30:01:2006")
 
-tests.add(LocalizableDateTime)
 
 class LocalizableTime(unittest.TestCase):
 
@@ -377,8 +366,6 @@ class LocalizableTime(unittest.TestCase):
         self.assertEqual(t1no, "02.43")
         self.assertEqual(t2no, "18.43.32")
 
-tests.add(LocalizableTime)
-
 
 class TranslatableTextFactory(unittest.TestCase):
 
@@ -386,7 +373,6 @@ class TranslatableTextFactory(unittest.TestCase):
         a = _("%(name1)s is smarter than %(name2)s.", name1=_("Joe"), name2=_("Bob"))
         self.assertEqual(a.domain(), 'test')
 
-tests.add(TranslatableTextFactory)
 
 class Monetary(unittest.TestCase):
 
@@ -415,8 +401,6 @@ class Monetary(unittest.TestCase):
         self.assertEqual(a1, '8975.50')
         self.assertEqual(b1, '8975,50')
 
-tests.add(Monetary)
-
 
 class GettextTranslator(unittest.TestCase):
 
@@ -425,8 +409,6 @@ class GettextTranslator(unittest.TestCase):
         a = "%(name1)s is smarter than %(name2)s."
         b = t.gettext(a, domain='test')
         self.assertEqual(b, u"%(name1)s je chytřejší než %(name2)s.")
-
-tests.add(GettextTranslator)
 
 
 class ContentNode(unittest.TestCase):
@@ -449,17 +431,19 @@ class ContentNode(unittest.TestCase):
         self.assertEqual(c.linear(), [c, d])
 
     def test_variants(self):
-        n = lcg.ContentNode('n', content=lcg.TextContent("C"),
-                            first_page_header=lcg.TextContent("FH"),
-                            right_page_footer=lcg.TextContent("RF"),
-                            page_background=lcg.TextContent("B"),
-                            variants=(
-                                lcg.Variant('en', content=lcg.TextContent('EN'),
-                                            page_header=lcg.TextContent('H.EN')),
-                                lcg.Variant('cs', content=lcg.TextContent('CS'),
-                                            page_footer=lcg.TextContent('F.CS'),
-                                            right_page_footer=lcg.TextContent('RF.CS')),
-                            ))
+        n = lcg.ContentNode(
+            'n', content=lcg.TextContent("C"),
+            first_page_header=lcg.TextContent("FH"),
+            right_page_footer=lcg.TextContent("RF"),
+            page_background=lcg.TextContent("B"),
+            variants=(
+                lcg.Variant('en', content=lcg.TextContent('EN'),
+                            page_header=lcg.TextContent('H.EN')),
+                lcg.Variant('cs', content=lcg.TextContent('CS'),
+                            page_footer=lcg.TextContent('F.CS'),
+                            right_page_footer=lcg.TextContent('RF.CS')),
+            ),
+        )
         self.assertEqual(n.content('en').text(), 'EN')
         self.assertEqual(n.content('cs').text(), 'CS')
         self.assertEqual(n.content('fr').text(), 'C')
@@ -487,8 +471,6 @@ class ContentNode(unittest.TestCase):
         self.assertIs(n.resource('a.png'), img)
         self.assertIsNone(n.resource('b.png'))
         self.assertEqual(n.resources(), (img,))
-
-tests.add(ContentNode)
 
 
 class Resources(unittest.TestCase):
@@ -522,8 +504,6 @@ class Resources(unittest.TestCase):
                          ('default.css', 'sound1.ogg', 'sound2.ogg'))
         self.assertEqual(tuple(sorted([r.filename() for r in b.resources()])),
                          ('sound1.ogg', 'sound2.ogg'))
-
-tests.add(Resources)
 
 
 class Parser(unittest.TestCase):
@@ -679,7 +659,6 @@ blah blah
         self.assertEqual(c[0].content()[0].content()[0].text()[-1], 'o',
                         "Extra newline after paragraph?")
 
-tests.add(Parser)
 
 class MacroParser(unittest.TestCase):
 
@@ -738,8 +717,6 @@ class MacroParser(unittest.TestCase):
         text = "Foo\n@include bar\nBaz\n"
         r = lcg.MacroParser(globals=dict(bar='Bar')).parse(text)
         self.assertEqual(r, "Foo\nBar\nBaz\n", repr(r))
-
-tests.add(MacroParser)
 
 
 class HtmlImport(unittest.TestCase):
@@ -858,14 +835,11 @@ A screen reader is:
         content.export(context)
         lcg.html2data(html, lcg.HTML2XML)
 
-tests.add(HtmlImport)
-
 
 class HtmlExport(unittest.TestCase):
 
     def test_generator(self):
         g = lcg.HtmlGenerator(sorted_attributes=True)
-        localizer = lcg.Localizer('cs', translation_path=translation_path)
         def test(result, expected):
             self.assertEqual(result, expected,
                              "\n  - expected: %r\n  - got:      %r" % (expected, result))
@@ -892,7 +866,8 @@ class HtmlExport(unittest.TestCase):
                 (g.img('x'), u'<img alt="" src="x"/>'),
                 (g.iframe('x'), u'<iframe src="x"><a href="x">x</a></iframe>'),
                 (g.input(type='text'), u'<input type="text"/>'),
-                (g.field(name='a'), u'<input class="text" name="a" size="20" type="text" value=""/>'),
+                (g.field(name='a'), (u'<input class="text" name="a" size="20" '
+                                     u'type="text" value=""/>')),
                 (g.checkbox('a'), u'<input name="a" type="checkbox"/>'),
                 (g.hidden('a', 'x'), u'<input name="a" type="hidden" value="x"/>'),
                 (g.radio('a'), u'<input name="a" type="radio"/>'),
@@ -921,9 +896,6 @@ class HtmlExport(unittest.TestCase):
                   u'</optgroup></select>')),
         ):
             test(result, expected)
-
-
-
 
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
@@ -1129,24 +1101,20 @@ class HtmlExport(unittest.TestCase):
         import json
         g = lcg.HtmlGenerator()
         for value in ('a', 1, True,
-                      [1,2,3], [3,2,1],
+                      [1, 2, 3], [3, 2, 1],
                       {'a': 'A', 'b': 'B'}, {'1': 1, '2': 2},
                       "foo'ba{r}", '"foo"[bar]', '<a>'):
             x = g.js_value(value)
             y = json.loads(x)
             self.assertEqual(value, y,
-                            "\n  - value:  %r\n  - result: %s\n  - check:  %r" %
-                            (value, x, y))
-
-tests.add(HtmlExport)
+                             "\n  - value:  %r\n  - result: %s\n  - check:  %r" %
+                             (value, x, y))
 
 
 class EpubExport(unittest.TestCase):
 
     def test_export(self):
-        import zipfile
-        import cStringIO
-        #m = lcg.Metadata()
+        # m = lcg.Metadata()
         p = lcg.ResourceProvider()
         d = lcg.ContentNode('d', resource_provider=p)
         c = lcg.ContentNode('c', children=(d,), resource_provider=p)
@@ -1159,15 +1127,11 @@ class EpubExport(unittest.TestCase):
         pkg_opf = archive.read('rsrc/pkg.opf')
         self.assertEqual(pkg_opf[:19], '<?xml version="1.0"')
 
-tests.add(EpubExport)
-
 
 class ImsExport(unittest.TestCase):
 
     def test_export(self):
-        import zipfile
-        import cStringIO
-        #m = lcg.Metadata()
+        # m = lcg.Metadata()
         p = lcg.ResourceProvider()
         d = lcg.ContentNode('d', resource_provider=p)
         c = lcg.ContentNode('c', children=(d,), resource_provider=p)
@@ -1176,8 +1140,6 @@ class ImsExport(unittest.TestCase):
         e = lcg.IMSExporter()
         manifest = e.manifest(a).xml()
         self.assertEqual(manifest[:19], '<?xml version="1.0"')
-
-tests.add(ImsExport)
 
 
 class BrailleExport(unittest.TestCase):
@@ -2134,8 +2096,6 @@ class BrailleExport(unittest.TestCase):
 # <mfrac><mfrac><mn>3</mn><mn>8</mn></mfrac><mn>5</mn></mfrac>
 # </math>''', u'⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼')
 
-tests.add(BrailleExport)
-
 
 class PDFExport(unittest.TestCase):
 
@@ -2148,8 +2108,6 @@ class PDFExport(unittest.TestCase):
         exporter = lcg.PDFExporter()
         context = exporter.context(node, 'cs')
         exporter.export(context)
-
-tests.add(PDFExport)
 
 
 class Presentations(unittest.TestCase):
@@ -2172,11 +2130,6 @@ class Presentations(unittest.TestCase):
                     value_1, value_2 = getattr(p_1, attr), getattr(p_2, attr)
                     self.assertEqual(value_1, value_2, (attr, value_1, value_2,))
 
-tests.add(Presentations)
-
-
-def get_tests():
-    return tests
 
 if __name__ == '__main__':
-    unittest.main(defaultTest='get_tests')
+    unittest.main()
