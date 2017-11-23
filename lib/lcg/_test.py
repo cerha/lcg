@@ -511,22 +511,45 @@ class Parser(unittest.TestCase):
     def setUp(self):
         self._parser = lcg.Parser()
 
+    def _test_parser(self, text, content):
+        """Parse given text and verify that the result matches given content."""
+        def html(content):
+            if not isinstance(content, lcg.Content):
+                content = lcg.Container(content)
+            node = lcg.ContentNode('test', title='Test', content=content)
+            exporter = lcg.HtmlExporter()
+            context = exporter.context(node, None)
+            result = content.export(context)
+            try:
+                import bs4
+            except ImportError:
+                return result
+            else:
+                return bs4.BeautifulSoup(result, 'lxml').prettify()
+        # Compare the HTML exports as comparison of lcg.Content elements
+        # is currently not implemented well.  Also in case of error, the diff
+        # of the HTML gives a good idea about what is wrong.
+        parsed = self._parser.parse(text)
+        assert html(parsed) == html(content)
+
     def test_simple_text(self):
-        text = "Hallo, how are you?\n\n  * one\n  * two\n  * three\n"
-        c = self._parser.parse(text)
-        self.assertTrue((len(c) == 2 and isinstance(c[0], lcg.Paragraph) and
-                        isinstance(c[1], lcg.ItemizedList)), c)
-        self.assertEqual(len(c[1].content()), 3)
-        self.assertIsNone(c[1].order())
+        text = "Hello, how are you?\n\n  * one\n  * two\n  * three\n"
+        self._test_parser(text, (
+            lcg.p("Hello, how are you?"),
+            lcg.ul(("one", "two", "three")),
+        ))
 
     def test_sections(self):
         text = "= Main =\n== Sub1 ==\n== Sub2 ==\n=== SubSub1 ===\n== Sub3 =="
-        c = self._parser.parse(text)
-        self.assertTrue(len(c) == 1 and isinstance(c[0], lcg.Section), c)
-        s = c[0].sections()
-        self.assertTrue(len(s) == 3 and isinstance(s[0], lcg.Section) and
-                       len(s[0].sections()) == 0 and len(s[1].sections()) == 1 and
-                       len(s[2].sections()) == 0, s)
+        self._test_parser(text, (
+            lcg.sec('Main', (
+                lcg.sec('Sub1', ()),
+                lcg.sec('Sub2', (
+                    lcg.sec('SubSub1', ()),
+                )),
+                lcg.sec('Sub3', ()),
+            ))
+        ))
 
     def test_parameters(self):
         text = '''
@@ -556,9 +579,11 @@ blah blah
 
 blah blah
 '''
-        c = self._parser.parse(text)
-        self.assertEqual(len(c), 3, c)
-        self.assertIsInstance(c[1], lcg.HorizontalSeparator)
+        self._test_parser(text, (
+            lcg.p('blah blah'),
+            lcg.hr(),
+            lcg.p('blah blah'),
+        ))
 
     def test_alignment(self):
         for alignment, constant in (('center', lcg.HorizontalAlignment.CENTER,),
@@ -657,7 +682,7 @@ blah blah
     def test_paragraph_newline(self):
         c = self._parser.parse('hello\n\nworld')
         self.assertEqual(c[0].content()[0].content()[0].text()[-1], 'o',
-                        "Extra newline after paragraph?")
+                         "Extra newline after paragraph?")
 
 
 class MacroParser(unittest.TestCase):
