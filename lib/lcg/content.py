@@ -1981,6 +1981,13 @@ def p(*items, **kwargs):
     """Create a 'Paragraph' by coercing all arguments."""
     return _container(Paragraph, items, **kwargs)
 
+def sec(title, content, heading=None, name='default-section', **kwargs):
+    """Create a 'Section' by coercing all content."""
+    formatted = kwargs.pop('formatted', False)
+    return Section(title=title, heading=coerce(heading, formatted=formatted) if heading else None,
+                   content=[coerce(item, formatted=formatted) for item in content],
+                   name=name, **kwargs)
+
 def strong(*items, **kwargs):
     """Create a 'Strong' instance by coercing all arguments."""
     return _container(Strong, items, **kwargs)
