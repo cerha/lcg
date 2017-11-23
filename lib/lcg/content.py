@@ -265,7 +265,8 @@ class Container(Content):
             identifiers may be then used as output presentation selectors (for
             example in HTML they will compose the value of the 'class'
             attribute).
-          id -- depracated, use 'name' instead.
+          id -- unique identifier as a string.  The identifier must be unique
+            within the whole content hierarchy of one 'lcg.ContentNode'.
           halign -- horizontal alignment of the container content; one of the
             'lcg.HorizontalAlignment' constants or 'None' (default alignment).
           valign -- vertical alignment of the container content; one of the
@@ -286,13 +287,11 @@ class Container(Content):
         assert halign is None or isinstance(halign, str), halign
         assert valign is None or isinstance(valign, str), valign
         assert orientation is None or isinstance(orientation, str), orientation
-        assert not name or id is None, id
+        assert id is None or isinstance(id, basestring), id
+        assert isinstance(name, (basestring, tuple, list))
+        self._id = id
         if isinstance(name, basestring):
             names = (name,)
-        elif id:
-            # For backwards compatibility ('name' was formely named 'id').
-            assert isinstance(id, basestring), id
-            names = (id,)
         else:
             names = tuple(name)
         self._names = names
@@ -331,6 +330,10 @@ class Container(Content):
         """Return the sequence of contained content elements.
         """
         return self._content
+
+    def id(self):
+        """Return the unique identifier of this container as a string."""
+        return self._id
 
     def sections(self):
         result = []
@@ -1372,19 +1375,11 @@ class Section(Container):
             None), the content is created automatically as TextContent(title),
             but you may pass any lcg.Content instance when some more fancy
             content is desired.
-          id -- unique section identifier as a string.  If 'None' (default) the
-            identifier will be generated automatically based on section order
-            and hierarchy, so it will not change across several LCG invocations
-            as long as the hierarchy remains unchanged.  However if you want to
-            refer to a section explicitly from outside of the document, it is
-            better to set the identifier explicitly to maintain consistency.
-            The identifier must be, however, unique within the whole content
-            hierarchy (of one 'lcg.ContentNode').  See also
-            'lcg.ContentNode.find_section(), which allows you to find a section
-            of given id in content hierarchy.
           anchor -- deprecated - use 'id' instead.
           in_toc -- a boolean flag indicating whether this section is supposed
             to be included in the Table of Contents
+
+          Other keyword arguments are defined by parent classes.
 
         """
         if anchor:
@@ -1392,14 +1387,12 @@ class Section(Container):
             id = anchor
         assert isinstance(title, basestring), title
         assert heading is None or isinstance(heading, Content), heading
-        assert isinstance(id, basestring) or id is None, id
         assert isinstance(in_toc, bool), in_toc
         self._title = title
         self._in_toc = in_toc
-        self._id = id
         self._descr = descr
         self._heading = heading or TextContent(title)
-        super(Section, self).__init__(content, **kwargs)
+        super(Section, self).__init__(content, id=id, **kwargs)
 
     def section_path(self):
         """Return the sequence of parent sections in the container hierarchy.
@@ -1974,19 +1967,19 @@ def fieldset(pairs, formatted=False):
     fields = [(coerce(label), coerce(value, formatted=formatted)) for label, value in pairs]
     return FieldSet(fields)
 
-def _container(container, items, formatted=False, **kwargs):
-    return container([coerce(item, formatted=formatted) for item in items], **kwargs)
-
-def p(*items, **kwargs):
-    """Create a 'Paragraph' by coercing all arguments."""
-    return _container(Paragraph, items, **kwargs)
-
 def sec(title, content, heading=None, name='default-section', **kwargs):
     """Create a 'Section' by coercing all content."""
     formatted = kwargs.pop('formatted', False)
     return Section(title=title, heading=coerce(heading, formatted=formatted) if heading else None,
                    content=[coerce(item, formatted=formatted) for item in content],
                    name=name, **kwargs)
+
+def _container(container, items, formatted=False, **kwargs):
+    return container([coerce(item, formatted=formatted) for item in items], **kwargs)
+
+def p(*items, **kwargs):
+    """Create a 'Paragraph' by coercing all arguments."""
+    return _container(Paragraph, items, **kwargs)
 
 def strong(*items, **kwargs):
     """Create a 'Strong' instance by coercing all arguments."""

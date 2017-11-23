@@ -946,8 +946,30 @@ class HtmlExport(unittest.TestCase):
              'value of x'),
             ((lcg.Subscript(lcg.TextContent('sub')), lcg.Superscript(lcg.TextContent('sup'))),
              '<sub>sub</sub><sup>sup</sup>'),
-            (lcg.p('Kotva: ', lcg.Anchor('x', text='zde'), halign=lcg.HorizontalAlignment.RIGHT),
-             '<p style="text-align: right;">Kotva: <span id="x">zde</span></p>'),
+            (lcg.p('Anchor: ', lcg.Anchor('x', text='here'), halign=lcg.HorizontalAlignment.RIGHT),
+             '<p style="text-align: right;">Anchor: <span id="x">here</span></p>'),
+            (lcg.container('blah'),
+             'blah'),
+            (lcg.container('blah', id='foo'),
+             '<div id="foo">blah</div>'),
+            (lcg.container('blah', name='bar'),
+             '<div class="bar">blah</div>'),
+            (lcg.container('blah', name=('foo', 'bar')),
+             '<div class="foo bar">blah</div>'),
+            (lcg.container('blah', id='foo', name='bar'),
+             '<div id="foo" class="bar">blah</div>'),
+            (lcg.sec('Section', 'blah'),
+             ('<div id="sec1" class="section section-level-2 default-section">'
+              '<div class="section-container section-level-2">'
+              '<div class="section-heading section-level-2"><h2>Section</h2></div>'
+              '<div class="section-content section-level-2">'
+              '<div class="section-content-wrapper">blah</div></div></div></div>')),
+            (lcg.sec('Section', 'blah', id='foo', heading='The Section'),
+             ('<div id="foo" class="section section-level-2 default-section">'
+              '<div class="section-container section-level-2">'
+              '<div class="section-heading section-level-2"><h2>The Section</h2></div>'
+              '<div class="section-content section-level-2">'
+              '<div class="section-content-wrapper">blah</div></div></div></div>')),
         ):
             result = lcg.coerce(content).export(context)
             self.assertEqual(result, html,
@@ -1118,7 +1140,7 @@ class HtmlExport(unittest.TestCase):
 
     def test_html_content(self):
         # Make sure the HTML content is not escaped when wrappped in another HTML element.
-        c = lcg.Container(lcg.HtmlContent('<b>B</b>'), id='x')
+        c = lcg.Container(lcg.HtmlContent('<b>B</b>'), name='x')
         context = lcg.HtmlExporter().context(lcg.ContentNode('y'), None)
         self.assertEqual(c.export(context), '<div class="x"><b>B</b></div>')
 

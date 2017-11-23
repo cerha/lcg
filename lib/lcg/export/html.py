@@ -1044,7 +1044,8 @@ class HtmlExporter(lcg.Exporter):
         presentation = element.presentation()
         if presentation and presentation.indent_left:
             style['margin-left'] = '%dem' % element.presentation().indent_left.size()
-        attr = dict(cls=' '.join([x for x in element.names() + ((cls,) if cls else ())]) or None,
+        attr = dict(id=element.id(),
+                    cls=' '.join([x for x in element.names() + ((cls,) if cls else ())]) or None,
                     lang=lang or element.lang(inherited=False),
                     style=style and ' '.join(['%s: %s;' % x for x in style.items()]) or None,
                     **kwargs)
@@ -1098,6 +1099,7 @@ class HtmlExporter(lcg.Exporter):
             attr = self._container_attr(element)
             # Replace the 'cls' attribute, because it will be used in the parent HTML tag.
             attr['cls'] = 'section-container section-level-%d' % level
+            attr['id'] = None
             return g.div(
                 (g.div(g.h(exported_heading, level, lang=lang),
                        cls='section-heading section-level-%d' % level),
