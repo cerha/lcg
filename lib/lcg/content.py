@@ -1516,7 +1516,7 @@ class TableOfContents(Content):
         if not item:
             # Create a local table of contens automatically (taking this elements container as a
             # start point).
-            assert isinstance(self._container, Container)
+            assert isinstance(self._container, Container), self._container
             item = self._container
         return item
 
