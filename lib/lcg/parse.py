@@ -115,6 +115,12 @@ class Parser(object):
                                    r'(?P<section_id>[\w\d_-]+)))?'
                                    r'(?P<section_classes>(?:[\t ]+\.[\w\d_-]+)*) *\r?$'),
                                   re.MULTILINE)
+    _CONTAINER_MATCHER = re.compile((r'^\>(?P<level>\>+)'
+                                     r'([ \t]+(?P<id>[\w\d_-]+))?'
+                                     r'(?P<classes>(?:[\t ]+\.[\w\d_-]+)*)[\t ]*\r?$'),
+                                    re.MULTILINE)
+    _CONTAINER_END_MATCHER = [re.compile(r'^\<%s *\r?$' % (r'\<' * i), re.MULTILINE)
+                              for i in range(10)]
     _LINE_MATCHER = re.compile(r'^([\t ]*)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL | re.MULTILINE)
     _DOCTEST_MATCHER = re.compile(r'(^>>> .+\r?\n)(^(>>>|\.\.\.)[ \t].+\r?\n)*(^[ \t]*\S.*\r?\n)*',
@@ -192,6 +198,7 @@ class Parser(object):
         self._processors = (self._alignment_processor,
                             self._field_processor,
                             self._section_processor,
+                            self._container_processor,
                             self._literal_processor,
                             self._doctest_processor,
                             self._hrule_processor,
@@ -329,6 +336,22 @@ class Parser(object):
                        content=lcg.Container(section_content),
                        id=section_id, name=tuple(section_classes) or ('default-section',),
                        in_toc=in_toc, **element_kwargs), position
+
+    def _container_processor(self, text, position, section_level=0, **kwargs):
+        start = self._CONTAINER_MATCHER.match(text[position:])
+        if not start:
+            return None
+        position += start.end()
+        level = len(start.group('level'))
+        end = self._CONTAINER_END_MATCHER[level].search(text[position:])
+        if not end:
+            return None
+        content = self.parse(text[position:position + end.start()])
+        position += end.end()
+        classes = tuple([x.lstrip('.') for x in start.group('classes').strip().split()])
+        container = lcg.Container(content=content, id=start.group('id'),
+                                  name=classes or 'lcg-generic-container')
+        return container, position
 
     def _literal_processor(self, text, position, **kwargs):
         match = self._LITERAL_MATCHER.match(text[position:])

@@ -684,6 +684,112 @@ blah blah
         self.assertEqual(c[0].content()[0].content()[0].text()[-1], 'o',
                          "Extra newline after paragraph?")
 
+    def test_generic_container(self):
+        text = '''
+blah blah
+
+>>
+
+inner content
+
+<<
+
+blah
+'''
+        self._test_parser(text, (
+            lcg.p("blah blah"),
+            lcg.Container(lcg.p("inner content"), name='lcg-generic-container'),
+            lcg.p("blah"),
+        ))
+
+    def test_generic_container_with_class(self):
+        text = '''
+>> .foo
+
+blah
+
+<<
+'''
+        self._test_parser(text, (
+            lcg.Container(lcg.p("blah"), name='foo'),
+        ))
+
+    def test_generic_container_with_class(self):
+        text = '''
+>> bar
+
+blah
+
+<<
+'''
+        self._test_parser(text, (
+            lcg.Container(lcg.p("blah"), id='bar', name='lcg-generic-container'),
+        ))
+
+    def test_nested_generic_container(self):
+        text = '''
+blah
+
+>>
+
+inner content
+
+>>>
+1st nested
+<<<
+
+>>>
+2nd nested
+<<<
+<<
+'''
+        self._test_parser(text, (
+            lcg.p("blah"),
+            lcg.Container((lcg.p("inner content"),
+                           lcg.Container(lcg.p("1st nested"), name='lcg-generic-container'),
+                           lcg.Container(lcg.p("2nd nested"), name='lcg-generic-container'),
+            ), name='lcg-generic-container'),
+        ))
+
+    def test_generic_container_with_nested_section(self):
+        text = '''
+>>
+
+blah blah
+
+= Top Section =
+
+>>>
+
+== Section One ==
+
+one
+
+== Section Two ==
+
+two
+
+<<<
+
+blah blah
+
+<<
+'''
+        self._test_parser(text, (
+            lcg.Container((
+                lcg.p("blah blah"),
+                lcg.Section(title='Top Section', name='default-section', content=(
+                    lcg.Container((
+                        lcg.Section(title='Section One', name='default-section',
+                                    content=lcg.p('one')),
+                        lcg.Section(title='Section Two', name='default-section',
+                                    content=lcg.p('two')),
+                    ), name='lcg-generic-container'),
+                    lcg.p("blah blah"),
+                )),
+            ), name='lcg-generic-container'),
+        ))
+
 
 class MacroParser(unittest.TestCase):
 
