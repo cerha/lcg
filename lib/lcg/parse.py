@@ -115,7 +115,7 @@ class Parser(object):
                                    r'(?P<section_id>[\w\d_-]+)))?'
                                    r'(?P<section_classes>(?:[\t ]+\.[\w\d_-]+)*) *\r?$'),
                                   re.MULTILINE)
-    _CONTAINER_MATCHER = re.compile((r'^\>(?P<level>\>+)'
+    _CONTAINER_MATCHER = re.compile((r'^(?P<collapsible>\[(?P<title>[^\]]+)\]\+? +)?\>(?P<level>\>+)'
                                      r'([ \t]+(?P<id>[\w\d_-]+))?'
                                      r'(?P<classes>(?:[\t ]+\.[\w\d_-]+)*)[\t ]*\r?$'),
                                     re.MULTILINE)
@@ -317,7 +317,7 @@ class Parser(object):
         kwargs = self._prune_kwargs(kwargs, ('section_level',))
         element_kwargs = {}
         if match.group('collapsible'):
-            element = lcg.CollapsiblePane
+            element = lcg.CollapsibleSection
             if match.group('collapsible').strip().endswith('+'):
                 element_kwargs['collapsed'] = False
         else:
@@ -348,9 +348,19 @@ class Parser(object):
             return None
         content = self.parse(text[position:position + end.start()])
         position += end.end()
+        id_ = start.group('id')
         classes = tuple([x.lstrip('.') for x in start.group('classes').strip().split()])
-        container = lcg.Container(content=content, id=start.group('id'),
-                                  name=classes or 'lcg-generic-container')
+        container_kwargs = {}
+        if start.group('collapsible'):
+            container = lcg.CollapsiblePane
+            if start.group('collapsible').strip().endswith('+'):
+                container_kwargs['collapsed'] = False
+            container_kwargs['title'] = start.group('title')
+        else:
+            container = lcg.Container
+            if not classes:
+                classes = 'lcg-generic-container'
+        container = container(content=content, id=id_, name=classes, **container_kwargs)
         return container, position
 
     def _literal_processor(self, text, position, **kwargs):

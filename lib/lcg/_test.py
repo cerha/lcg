@@ -790,6 +790,30 @@ blah blah
             ), name='lcg-generic-container'),
         ))
 
+    def test_collapsible_pane(self):
+        text = '''
+[Read more...] >> xx
+
+blah
+
+<<
+'''
+        self._test_parser(text, (
+            lcg.CollapsiblePane("Read more...", lcg.p("blah"), id='xx'),
+        ))
+
+    def test_collapsible_pane_expanded(self):
+        text = '''
+[Read more...]+ >> xx
+
+blah
+
+<<
+'''
+        self._test_parser(text, (
+            lcg.CollapsiblePane("Read more...", lcg.p("blah"), collapsed=False, id='xx'),
+        ))
+
 
 class MacroParser(unittest.TestCase):
 
