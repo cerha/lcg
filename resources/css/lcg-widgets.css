@@ -219,19 +219,25 @@
     padding: 0;
     margin-top: 0.7em;
     margin-bottom: 0.4em;
-    background-position: left center;
-    background-repeat: no-repeat;
     border: none;
     cursor: default;
 }
-.collapsible-pane-widget .collapsible-pane-heading .icon {
+.collapsible-section-widget .collapsible-section-heading .icon,
+.collapsible-pane-widget .pane-title .icon {
+    vertical-align: middle;
     display: inline-block;
     width: 12px;
     height: 12px;
-    margin-right: 2px;
     background: url(lcg-icons.png) -13px -16px no-repeat; 
 }
-.collapsible-pane-widget.expanded > div > div > div > .collapsible-pane-heading .icon {
+.collapsible-section-widget .collapsible-section-heading .icon {
+    margin-right: 4px;
+}
+.collapsible-pane-widget .pane-title .icon {
+    margin-left: 4px;
+}
+.collapsible-section-widget.expanded > div > div > div > .collapsible-section-heading .icon,
+.collapsible-pane-widget.expanded > .pane-title .icon {
     background-position: -12px -28px;
 }
 

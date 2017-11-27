@@ -445,16 +445,27 @@ class PopupMenuCtrl(Widget, lcg.Container):
         return g.span(content, **kwargs)
 
 
-class CollapsiblePane(Widget, lcg.Section):
+class CollapsibleWidget(Widget):
+    """Common base class for CollapsiblePane and CollapsibleSection."""
+
+    def __init__(self, collapsed=True, **kwargs):
+        self._collapsed = collapsed
+        super(CollapsibleWidget, self).__init__(**kwargs)
+
+    def _javascript_widget_arguments(self, context):
+        return (self._collapsed,)
+
+
+class CollapsiblePane(CollapsibleWidget, lcg.Container):
     """HTML Collapsible pane widget.
 
-    The pane content can be collapsed or expanded.  When collapsed, only a one
-    line pane title is displayed.  The title may be clicked to toggle the
-    content expansion state.
+    The pane content can be collapsed or expanded.  When collapsed, the pane
+    title is displayed.  The title may be clicked to toggle the content
+    expansion state.
 
     """
 
-    def __init__(self, title, content, collapsed=True, in_toc=False, **kwargs):
+    def __init__(self, title, content, **kwargs):
         """Arguments:
 
            title -- pane title as a basestring
@@ -463,11 +474,24 @@ class CollapsiblePane(Widget, lcg.Section):
            **kwargs -- other arguments defined by the parent class
 
         """
-        self._collapsed = collapsed
-        super(CollapsiblePane, self).__init__(title, content, in_toc=in_toc, **kwargs)
+        self._title = title
+        super(CollapsiblePane, self).__init__(content=content, **kwargs)
 
-    def _javascript_widget_arguments(self, context):
-        return (self._collapsed,)
+    def _export_widget(self, context):
+        g = context.generator()
+        return (
+            g.div(g.a(self._title, href='javascript:void(0)'), cls='pane-title') +
+            g.div(context.exporter().export_element(context, self), cls='pane-content')
+        )
+
+
+class CollapsibleSection(CollapsibleWidget, lcg.Section):
+    """HTML Collapsible section widget.
+
+    Exported like ordinary LCG section, but the section heading
+    expands/collapses the section content when clicked.
+
+    """
 
     def _export_widget(self, context):
         return context.exporter().export_element(context, self)

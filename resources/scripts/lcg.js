@@ -1249,42 +1249,40 @@ lcg.Tooltip = Class.create({
 });
 
 
-lcg.CollapsiblePane = Class.create(lcg.Widget, {
-    /* Collapsible Pane.
+lcg.CollapsibleWidget = Class.create(lcg.Widget, {
+    /* Abstract base class for CollapsibleSection and CollapsiblePane.
      *
-     * This is the Javascript counterpart of the Python class `lcg.CollapsiblePane'.
-     * The panel content can be collapsed or expanded.  When collapsed, only a one
-     * line panel title is displayed.  The title may be clicked to toggle the content
-     * expansion state.
+     * The content can be collapsed or expanded.  When collapsed, only
+     * the title is displayed.  The title may be clicked to toggle the
+     * content expansion state.
      *
      */
+
     initialize: function ($super, element_id, collapsed) {
         $super(element_id);
-        var content = this.element.down('div.section-content');
-        var heading = this.element.down('h1,h2,h3,h4,h5,h6,h7,h8');
-        this._heading = heading;
-        this._content = content;
+        var heading = this._heading = this._collapsible_heading();
+        var content = this._content = this._collapsible_content();
         if (collapsed) {
             this.element.addClassName('collapsed');
             content.hide();
         } else {
             this.element.addClassName('expanded');
         }
-        heading.addClassName('collapsible-pane-heading');
-        heading.insert({top: new Element('span', {'class': 'icon'})});
         heading.on('click', function (event) {
             this.toggle();
             event.stop();
         }.bind(this));
-        var backref = heading.down('a.backref');
-        if (backref) {
-            backref.setAttribute('href', '');
-        }
         if (!content.getAttribute('id')) {
             content.setAttribute('id', this.element.getAttribute('id') + '-collapsible-content');
         }
         heading.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
         heading.setAttribute('aria-controls', content.getAttribute('id'));
+    },
+
+    _collapsible_heading: function() {
+    },
+
+    _collapsible_content: function() {
     },
 
     expanded: function () {
@@ -1320,6 +1318,49 @@ lcg.CollapsiblePane = Class.create(lcg.Widget, {
             this.collapse();
         }
     }
+
+});
+
+lcg.CollapsibleSection = Class.create(lcg.CollapsibleWidget, {
+    /* Collapsible section widget.
+     *
+     * This is the Javascript counterpart of the Python class `lcg.CollapsibleSection'.
+     */
+
+    _collapsible_heading: function() {
+        var heading = this.element.down('h1,h2,h3,h4,h5,h6,h7,h8');
+        heading.addClassName('collapsible-section-heading');
+        heading.insert({top: new Element('span', {'class': 'icon'})});
+        var backref = heading.down('a.backref');
+        if (backref) {
+            backref.setAttribute('href', '');
+        }
+        return heading
+    },
+
+    _collapsible_content: function() {
+        return this.element.down('div.section-content');
+    }
+
+});
+
+
+lcg.CollapsiblePane = Class.create(lcg.CollapsibleWidget, {
+    /* Collapsible pane widget.
+     *
+     * This is the Javascript counterpart of the Python class `lcg.CollapsiblePane'.
+     */
+
+    _collapsible_heading: function() {
+        var title = this.element.down('.pane-title');
+        title.insert({bottom: new Element('span', {'class': 'icon'})});
+        return title;
+    },
+
+    _collapsible_content: function() {
+        return this.element.down('.pane-content');
+    }
+
 });
 
 
