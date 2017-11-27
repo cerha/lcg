@@ -434,7 +434,8 @@ class HtmlGenerator(object):
 
     def iframe(self, src, **kwargs):
         return self._tag('iframe', self.a(src, href=src), dict(kwargs, src=src),
-                         allow=('src', 'width', 'height', 'frameborder'))
+                         allow=('src', 'type', 'width', 'height', 'frameborder',
+                                'webkitallowfullscreen', 'mozallowfullscreen', 'allowfullscreen'))
 
     def object(self, content, **kwargs):
         return self._tag('object', content, kwargs, allow=(
@@ -1321,19 +1322,24 @@ class HtmlExporter(lcg.Exporter):
         service = element.service()
         if service == 'youtube':
             # rel=0 means do not load related videos
-            video_uri = "http://www.youtube.com/v/%s?rel=0" % element.video_id()
+            uri = "https://www.youtube.com/embed/%s" % element.video_id()
         elif service == 'vimeo':
-            video_uri = ("http://vimeo.com/moogaloop.swf?clip_id=%s&server=vimeo.com" %
-                         (element.video_id(),))
+            uri = ("https://player.vimeo.com/video/%s" %
+                   (element.video_id(),))
         else:
             Exception("Unsupported video service %s" % service)
-        width, height = element.size() or (500, 300,)
-        return g.object(
-            (g.param(name="movie", value=video_uri),
-             g.param(name="wmode", value="opaque")),
-            type="application/x-shockwave-flash",
-            title=element.title() or _("Flash movie object"),
-            data=video_uri, width=width, height=height)
+        width, height = element.size() or (480, 360)
+        return g.iframe(
+            src=uri,
+            type="text/html",
+            width=width,
+            height=height,
+            title=element.title(),
+            frameborder=0,
+            webkitallowfullscreen=True,
+            mozallowfullscreen=True,
+            allowfullscreen=True,
+        )
 
     def _export_exercise(self, context, element):
         import exercises_html
