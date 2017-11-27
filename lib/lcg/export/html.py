@@ -1339,6 +1339,7 @@ class HtmlExporter(lcg.Exporter):
             webkitallowfullscreen=True,
             mozallowfullscreen=True,
             allowfullscreen=True,
+            cls='embedded-video-player',
         )
 
     def _export_exercise(self, context, element):
