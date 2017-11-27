@@ -1262,6 +1262,7 @@ lcg.CollapsibleWidget = Class.create(lcg.Widget, {
         $super(element_id);
         var heading = this._heading = this._collapsible_heading();
         var content = this._content = this._collapsible_content();
+        heading.insert({bottom: new Element('span', {'class': 'icon'})});
         if (collapsed) {
             this.element.addClassName('collapsed');
             content.hide();
@@ -1330,7 +1331,6 @@ lcg.CollapsibleSection = Class.create(lcg.CollapsibleWidget, {
     _collapsible_heading: function() {
         var heading = this.element.down('h1,h2,h3,h4,h5,h6,h7,h8');
         heading.addClassName('collapsible-section-heading');
-        heading.insert({top: new Element('span', {'class': 'icon'})});
         var backref = heading.down('a.backref');
         if (backref) {
             backref.setAttribute('href', '');
@@ -1352,9 +1352,7 @@ lcg.CollapsiblePane = Class.create(lcg.CollapsibleWidget, {
      */
 
     _collapsible_heading: function() {
-        var title = this.element.down('.pane-title');
-        title.insert({bottom: new Element('span', {'class': 'icon'})});
-        return title;
+        return this.element.down('.pane-title');
     },
 
     _collapsible_content: function() {
