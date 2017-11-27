@@ -184,9 +184,9 @@ class Parser(object):
 
     _INLINE_MARKUP_PARAMETERS = ('align', 'href', 'label', 'descr', 'subst', 'size', 'char')
 
-    _VIMEO_VIDEO_MATCHER = re.compile(r"http://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
+    _VIMEO_VIDEO_MATCHER = re.compile(r"https?://(www.)?vimeo.com/(?P<video_id>[0-9]*)")
     _YOUTUBE_VIDEO_MATCHER = re.compile(
-        r"http://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)")
+        r"https?://(www.)?youtube.com/watch\?v=(?P<video_id>[a-zA-z0-9_-]*)")
     _BLANK_MATCHER = re.compile(r'\s+', re.MULTILINE)
 
     class _StackEntry(object):
