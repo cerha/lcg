@@ -75,6 +75,7 @@ class Widget(object):
 
         """
         self._label = kwargs.pop('label', None)
+        self._widget_id = kwargs.pop('id', None)
         super(Widget, self).__init__(*args, **kwargs)
 
     def _export_widget(self, context):
@@ -136,7 +137,7 @@ class Widget(object):
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
         g = context.generator()
-        element_id = context.unique_id()
+        element_id = self._widget_id or context.unique_id()
         return g.concat(
             self._wrap_exported_widget(
                 context,
