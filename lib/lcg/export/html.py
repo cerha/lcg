@@ -1329,17 +1329,18 @@ class HtmlExporter(lcg.Exporter):
         else:
             Exception("Unsupported video service %s" % service)
         width, height = element.size() or (480, 360)
-        return g.iframe(
-            src=uri,
-            type="text/html",
-            width=width,
-            height=height,
-            title=element.title(),
-            frameborder=0,
-            webkitallowfullscreen=True,
-            mozallowfullscreen=True,
-            allowfullscreen=True,
-            cls='embedded-video-player',
+        return g.div(
+            g.iframe(
+                src=uri,
+                type="text/html",
+                width=width,
+                height=height,
+                title=element.title(),
+                frameborder=0,
+                webkitallowfullscreen=True,
+                mozallowfullscreen=True,
+                allowfullscreen=True,
+            ), cls='embedded-video-player',
         )
 
     def _export_exercise(self, context, element):
