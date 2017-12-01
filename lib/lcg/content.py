@@ -856,6 +856,7 @@ class InlineExternalVideo(Content):
           service -- string identifier of the video service.  The two currently
             supported services are 'youtube' and 'vimeo'.
           video_id -- string identifier of the video within the given service.
+          title -- video title as a string or None.
           size -- explicit video size in pixels as a tuple of two integers
             (WIDTH, HEIGHT) or None for the default size.
           lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
