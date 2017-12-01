@@ -806,7 +806,7 @@ class Parser(object):
                 video_service = None
                 resource_cls = lcg.Resource.subclass(href)
         if video_service:
-            result = lcg.InlineExternalVideo(video_service, video_id, size=pxsize)
+            result = lcg.InlineExternalVideo(video_service, video_id, size=pxsize, title=label)
         elif resource_cls is lcg.Image and not label_image:
             result = lcg.InlineImage(href, title=label, descr=descr, name=_basename(href),
                                      align=align, width=width, height=height)
