@@ -1328,20 +1328,22 @@ class HtmlExporter(lcg.Exporter):
                    (element.video_id(),))
         else:
             Exception("Unsupported video service %s" % service)
-        width, height = element.size() or (480, 360)
-        return g.div(
-            g.iframe(
-                src=uri,
-                type="text/html",
-                width=width,
-                height=height,
-                title=element.title(),
-                frameborder=0,
-                webkitallowfullscreen=True,
-                mozallowfullscreen=True,
-                allowfullscreen=True,
-            ), cls='embedded-video-player',
-        )
+        width, height = element.size() or (640, 480)
+        return g.div(cls='external-video', style='max-width: %dpx;' % width, content=(
+            g.div(cls='wrapper', style='padding-bottom: %.1f%%' % (100 * height / width), content=(
+                g.iframe(
+                    src=uri,
+                    type="text/html",
+                    width=width,
+                    height=height,
+                    title=element.title(),
+                    frameborder=0,
+                    webkitallowfullscreen=True,
+                    mozallowfullscreen=True,
+                    allowfullscreen=True,
+                )
+            ))
+        ))
 
     def _export_exercise(self, context, element):
         import exercises_html
