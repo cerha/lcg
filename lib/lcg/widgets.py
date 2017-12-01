@@ -481,7 +481,7 @@ class CollapsiblePane(CollapsibleWidget, lcg.Container):
     def _export_widget(self, context):
         g = context.generator()
         return (
-            g.div(g.a(self._title, href='javascript:void(0)'), cls='pane-title') +
+            g.div(g.a(self._title, href='javascript:void(0)', role='button'), cls='pane-title') +
             g.div(context.exporter().export_element(context, self), cls='pane-content')
         )
 

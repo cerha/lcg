@@ -1352,7 +1352,7 @@ lcg.CollapsiblePane = Class.create(lcg.CollapsibleWidget, {
      */
 
     _collapsible_heading: function() {
-        return this.element.down('.pane-title');
+        return this.element.down('.pane-title').down('a');
     },
 
     _collapsible_content: function() {
