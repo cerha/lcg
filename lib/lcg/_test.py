@@ -518,6 +518,7 @@ class Parser(unittest.TestCase):
                 content = lcg.Container(content)
             node = lcg.ContentNode('test', title='Test', content=content)
             exporter = lcg.HtmlExporter()
+            exporter._generator._sorted_attributes = True
             context = exporter.context(node, None)
             result = content.export(context)
             try:
@@ -814,6 +815,17 @@ blah
             lcg.CollapsiblePane("Read more...", lcg.p("blah"), collapsed=False, id='xx'),
         ))
 
+    def test_external_video_links(self):
+        for text, content in (
+                ('http://www.youtube.com/watch?v=xyz123',
+                 lcg.p(lcg.InlineExternalVideo('youtube', 'xyz123'))),
+                ('http://www.vimeo.com/xyz123',
+                 lcg.p(lcg.InlineExternalVideo('vimeo', 'xyz123'))),
+        ):
+            self._test_parser(text, content)
+
+
+
 
 class MacroParser(unittest.TestCase):
 
@@ -1056,11 +1068,12 @@ class HtmlExport(unittest.TestCase):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
                             globals=dict(x='value of x'))
         context = lcg.HtmlExporter().context(n, None, sec_lang='es')
+        context._generator._sorted_attributes = True
         for content, html in (
             (('a', ' ', lcg.strong('b ', lcg.em('c'), ' ', lcg.u('d')), ' ', lcg.code('e')),
              'a <strong>b <em>c</em> <u>d</u></strong> <code>e</code>'),
             (lcg.cite('x'),
-             '<span lang="es" class="lcg-citation">x</span>'),
+             '<span class="lcg-citation" lang="es">x</span>'),
             (lcg.br(),
              '<br/>'),
             (lcg.hr(),
@@ -1087,19 +1100,39 @@ class HtmlExport(unittest.TestCase):
             (lcg.container('blah', name=('foo', 'bar')),
              '<div class="foo bar">blah</div>'),
             (lcg.container('blah', id='foo', name='bar'),
-             '<div id="foo" class="bar">blah</div>'),
+             '<div class="bar" id="foo">blah</div>'),
             (lcg.sec('Section', 'blah'),
-             ('<div id="sec1" class="section section-level-2 default-section">'
+             ('<div class="section section-level-2 default-section" id="sec1">'
               '<div class="section-container section-level-2">'
               '<div class="section-heading section-level-2"><h2>Section</h2></div>'
               '<div class="section-content section-level-2">'
               '<div class="section-content-wrapper">blah</div></div></div></div>')),
             (lcg.sec('Section', 'blah', id='foo', heading='The Section'),
-             ('<div id="foo" class="section section-level-2 default-section">'
+             ('<div class="section section-level-2 default-section" id="foo">'
               '<div class="section-container section-level-2">'
               '<div class="section-heading section-level-2"><h2>The Section</h2></div>'
               '<div class="section-content section-level-2">'
               '<div class="section-content-wrapper">blah</div></div></div></div>')),
+            (lcg.InlineExternalVideo('vimeo', 'xyz'),
+             ('<div class="external-video" style="max-width: 640px;">'
+              '<div class="wrapper" style="padding-bottom: 75.0%">'
+              '<iframe allowfullscreen="allowfullscreen" frameborder="0"'
+              ' height="480" mozallowfullscreen="mozallowfullscreen"'
+              ' src="https://player.vimeo.com/video/xyz" title="Video"'
+              ' type="text/html" webkitallowfullscreen="webkitallowfullscreen" width="640">'
+              '<a href="https://player.vimeo.com/video/xyz">'
+              'https://player.vimeo.com/video/xyz</a>'
+              '</iframe></div></div>')),
+            (lcg.InlineExternalVideo('youtube', 'xyz', size=(330, 220), title='My Video'),
+             ('<div class="external-video" style="max-width: 330px;">'
+              '<div class="wrapper" style="padding-bottom: 66.0%">'
+              '<iframe allowfullscreen="allowfullscreen" frameborder="0"'
+              ' height="220" mozallowfullscreen="mozallowfullscreen"'
+              ' src="https://www.youtube.com/embed/xyz" title="My Video"'
+              ' type="text/html" webkitallowfullscreen="webkitallowfullscreen" width="330">'
+              '<a href="https://www.youtube.com/embed/xyz">'
+              'https://www.youtube.com/embed/xyz</a>'
+              '</iframe></div></div>')),
         ):
             result = lcg.coerce(content).export(context)
             self.assertEqual(result, html,
@@ -1154,18 +1187,6 @@ class HtmlExport(unittest.TestCase):
              '<a href="http://www.freebsoft.org">Free(b)soft website</a>'),
             ('[http://www.freebsoft.org label | descr]',
              '<a href="http://www.freebsoft.org" title="descr">label</a>'),
-            # Video service links
-            ('http://www.youtube.com/watch?v=xyz123',
-             (u'<object data="http://www.youtube.com/v/xyz123?rel=0" height="300"'
-              u' title="Flash movie object" type="application/x-shockwave-flash" width="500">'
-              u'<param name="movie" value="http://www.youtube.com/v/xyz123?rel=0"/>'
-              u'<param name="wmode" value="opaque"/></object>')),
-            ('http://www.vimeo.com/xyz123',
-             (u'<object data="http://vimeo.com/moogaloop.swf?clip_id=&amp;server=vimeo.com"'
-              u' height="300" title="Flash movie object" type="application/x-shockwave-flash"'
-              u' width="500">'
-              u'<param name="movie" value="http://vimeo.com/moogaloop.swf?'
-              u'clip_id=&amp;server=vimeo.com"/><param name="wmode" value="opaque"/></object>')),
             # Inline images
             ('[aa.jpg]',
              u'<img alt="" class="lcg-image image-aa" src="images/aa.jpg"/>'),
