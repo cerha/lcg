@@ -1336,7 +1336,7 @@ class HtmlExporter(lcg.Exporter):
                     type="text/html",
                     width=width,
                     height=height,
-                    title=element.title(),
+                    title=element.title() or _("Video"),
                     frameborder=0,
                     webkitallowfullscreen=True,
                     mozallowfullscreen=True,
