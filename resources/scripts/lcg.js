@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*-
  *
- * Copyright (C) 2012-2017 BRAILCOM, o.p.s.
+ * Copyright (C) 2012-2018 BRAILCOM, o.p.s.
  * Author: Tomas Cerha
  *
  * This program is free software; you can redistribute it and/or modify
@@ -736,7 +736,7 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
                 var total_height = menu.getHeight();
                 var css_height = menu.getLayout().get('height');
                 menu.setStyle({height: 0, display: 'block', overflowY: 'hidden'});
-                menu.morph({
+                new Effect.Morph(menu, {
                     style: {height: css_height + 'px',
                             top: y - total_height + 'px'},
                     duration: 0.2,
