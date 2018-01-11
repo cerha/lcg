@@ -2,7 +2,7 @@
 #
 # Author: Tomas Cerha <cerha@brailcom.org>
 #
-# Copyright (C) 2004-2017 BRAILCOM, o.p.s.
+# Copyright (C) 2004-2018 BRAILCOM, o.p.s.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -907,7 +907,7 @@ class HtmlExporter(lcg.Exporter):
         content = self._parts(context, self._PAGE_STRUCTURE)
         if context.audio_controls():
             # Automatically add the shared audio player if needed.
-            content += concat(self._export_audio_player(context))
+            content = concat(content, self._export_audio_player(context))
         return content
 
     def _css_dimension(self, dimension):
