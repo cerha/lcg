@@ -119,6 +119,7 @@
     padding: 0;
     border: 1px solid #aaa;
     z-index: 240;
+    line-height: 1.6em;
 }
 .popup-menu-widget {
     background-color: #ddd;
@@ -149,6 +150,7 @@
 .popup-menu-widget li .icon {
     float: left;
     opacity: 0.6;
+    margin: .3em 0;
 }
 .popup-menu-widget li.active .icon {
     opacity: 1;
