@@ -46,7 +46,7 @@ msgstr "Více než jedna odpověď je označena jako správná."
 #: ../lib/lcg/exercises.py:313
 msgid "All or none choices must be marked as unknown."
 msgstr ""
-"Jako neznámá odpověď musí být oznaženy buďto všechny možnosti nebo žádná."
+"Jako neznámá odpověď musí být označeny buďto všechny možnosti nebo žádná."
 
 #: ../lib/lcg/exercises.py:315
 msgid "None of the choices is marked as correct."
@@ -120,7 +120,7 @@ msgid ""
 "One exercise typically consists of a definition of several questions, where "
 "each question has two or more possible answers."
 msgstr ""
-"Jedno cvičení se obvykla skládá z několika otázek, kde ke každé otázce "
+"Jedno cvičení se obvykle skládá z několika otázek, kde ke každé otázce "
 "existují\n"
 "dvě nebo více možných odpovědí."
 
@@ -816,7 +816,7 @@ msgstr ""
 
 #: ../lib/lcg/export/exercises_html.py:484
 msgid "Show Answers"
-msgstr "Zobrazit odpověďi"
+msgstr "Zobrazit odpovědi"
 
 #: ../lib/lcg/export/exercises_html.py:485
 msgid "Show model answers."
