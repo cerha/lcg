@@ -40,11 +40,11 @@ class ExerciseExporter(object):
                       "first pair of numbers shows the results of all current answers.  If "
                       "you didn't answer all of them correctly on first attempt, there is "
                       "also a second pair of numbers showing how many answers you did "
-                      u"succesfuly on the first try.  Use the ‘Reset’ button to start "
+                      u"successfully on the first try.  Use the ‘Reset’ button to start "
                       "again.")))
     _BUTTONS = ((_("Evaluate"), 'button', 'evaluate-button',
                  _("Evaluate the entire exercise.  If an error is found, the cursor is moved to "
-                   "the first incorrect answer.  Within a text-box, the cursor is also moved to "
+                   "the first incorrect answer.  Within a text box, the cursor is also moved to "
                    "the first incorrect character of your answer.")),
                 # Translators: Fill (a form with correct answers).
                 (_('Fill'), 'button', 'fill-button',
@@ -355,10 +355,10 @@ class _FillInExerciseExporter(ExerciseExporter):
 
     @classmethod
     def _help_keys(cls):
-        return (lcg.p(_("In all the exercises where you fill in the text into a text-box "
+        return (lcg.p(_("In all the exercises where you fill in the text into a text box "
                         "you can use the two shortcut keys described below.")),
                 lcg.dl(((_("Enter"),
-                         _("Use this key within the text-field to evaluate the current answer. "
+                         _("Use this key within the text field to evaluate the current answer. "
                            "You hear a sound response and in case of an error, the cursor is "
                            "moved to the position of the first incorrect character within the "
                            "text.  This way you can locate the error, fix it and evaluate again. "

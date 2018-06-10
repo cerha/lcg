@@ -292,7 +292,7 @@ class ExerciseParser(object):
     def _single_text_box_task(self, prompt, text, **kwargs):
         task = TextTask(prompt, text.strip(), **kwargs)
         if len(task.answers()) != 1:
-            self._error(_("Just one textbox per task allowed, but %d found.", len(task.answers())))
+            self._error(_("Just one text box per task allowed, but %d found.", len(task.answers())))
         return task
 
     def _split(self, text):
@@ -584,7 +584,7 @@ class MultipleChoiceQuestions(_ChoiceBasedExercise):
     ) + _ChoiceBasedExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
         _("One exercise typically consists of a definition of several "
-          "questions, where each question has two or more possbile answers."),
+          "questions, where each question has two or more possible answers."),
         _("The question and its possible answers (choices) are written each "
           "at a separate line. The correct answer begins with a plus sign "
           "followed by a space. Incorrect answers begin with a minus sign "
@@ -653,7 +653,7 @@ class TrueFalseStatements(_ChoiceBasedExercise):
     _SOURCE_EXAMPLE = _("""
 The Microsoft Windows operating system never crashes. [F]
 
-The largest tropical rainforest in the world is in Brasil. [T]
+The largest tropical rainforest in the world is in Brazil. [T]
 """)
 
 
@@ -764,15 +764,15 @@ class VocabExercise(_SingleTextBoxFillInExercise):
           "exercise both ways to get the best results."),
         _("To do the exercise orally is simple.  Go through the vocabulary list "
           "and think of the correct translation for each word or expression. "
-          u"There is a ‘Play’ button after the text-box for each item which "
-          "allows you to hear the correct answer.  Repeat the answer to practise "
+          u"There is a ‘Play’ button after the text box for each item which "
+          "allows you to hear the correct answer.  Repeat the answer to practice "
           "the correct pronunciation.  Some items have more than one correct "
           "answer, so there may be multiple buttons to play each of them.  Since "
           "there is no way of checking your oral answers, the results are not "
           "available.  If you want to see your score, you must do the written "
           "exercise."),
         _("To do the exercise in written form, simply type the translation of "
-          "each item into the text-box.  Be careful to use capital letters where "
+          "each item into the text box.  Be careful to use capital letters where "
           "this is appropriate, since an answer without correct capitalization is "
           "always considered incorrect.  When the prompt is a complete sentence, "
           "you must also use correct punctuation."),
@@ -794,7 +794,7 @@ class WrittenAnswers(_SingleTextBoxFillInExercise):
         _("Either whole or a part of the answer is written inside square "
           "brackets.  The text inside the brackets is supposed to be filled "
           "into the text box by the user. The text before and after will "
-          "appear on the screen providing a hint or a templete of the "
+          "appear on the screen providing a hint or a template of the "
           "expected answer for the user."),
         _("Another pair or question and answer may follow after a blank line."),
     ) + FillInExercise._SOURCE_FORMATTING
@@ -876,7 +876,7 @@ class ModelCloze(FillInExercise):
 ################################################################################
 
 class _Test(object):
-    """Tests are similar to exercises, but instead of practise, they are used for testing.
+    """Tests are similar to exercises, but instead of practice, they are used for testing.
 
     It would be more logical to derive exercises from tests, since tests are simpler (they are not
     interactive).  Due to historical reasons, however, they are implemented by overriding
