@@ -301,13 +301,12 @@
 .collapsible-pane-widget .pane-title a {
     text-decoration: none;
 }
-.collapsible-section-widget.expanded > section > div > div > .collapsible-section-heading .icon,
 .collapsible-section-widget.expanded > div > div > div > .collapsible-section-heading .icon,
 .collapsible-pane-widget.expanded > .pane-title .icon {
     background-position: -12px -28px;
 }
 .collapsible-section-widget.expanded > section > div > div > .collapsible-section-heading .icon {
-    /* For some reason, this is necessary in HTML 5 <section>. */
+    /* For unknown reasons, HTML 5 <section> needs this icon offsets. */
     background-position: -48px -37px;
 }
 
