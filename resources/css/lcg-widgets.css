@@ -281,6 +281,11 @@
     margin-bottom: 0.4em;
     border: none;
 }
+.collapsible-pane-widget .collapsible-pane-heading,
+.collapsible-section-widget .collapsible-section-heading,
+.collapsible-pane-widget .pane-title {
+    cursor: pointer;
+}
 .collapsible-section-widget .collapsible-section-heading .icon,
 .collapsible-pane-widget .pane-title .icon {
     vertical-align: middle;
