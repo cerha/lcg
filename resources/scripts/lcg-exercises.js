@@ -316,9 +316,11 @@ lcg.SelectBasedExercise = Class.create(lcg.Exercise, {
 lcg.FillInExercise = Class.create(lcg.Exercise, {
 
     _define_keymap: function () {
-        return {'Enter': this._cmd_eval_answer,
-                'Alt-Space': this._cmd_hint,
-                'Ctrl-Space': this._cmd_hint};
+        return {
+            'Enter': this._cmd_eval_answer,
+            'Alt-Space': this._cmd_hint,
+            'Ctrl-Space': this._cmd_hint
+        };
     },
 
     _cmd_eval_answer: function (event, field) {
@@ -496,11 +498,13 @@ lcg.Dictation = Class.create(lcg.FillInExercise, {
     },
 
     _define_keymap: function () {
-        return {'Enter': this._cmd_eval_answer,
-                'Ctrl-Space': this._cmd_hint,
-                '>': this._cmd_play_next,
-                '<': this._cmd_play_previous,
-                'Ctrl-Enter': this._cmd_play_current};
+        return {
+            'Enter': this._cmd_eval_answer,
+            'Ctrl-Space': this._cmd_hint,
+            '>': this._cmd_play_next,
+            '<': this._cmd_play_previous,
+            'Ctrl-Enter': this._cmd_play_current
+        };
     },
 
     _cmd_play_next: function (event, field) {

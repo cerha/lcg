@@ -27,7 +27,7 @@ deps-dev:
 	pip2 install flake8
 	npm install
 
-lint: lint-flake8
+lint: lint-flake8 lint-eslint
 
 lint-flake8:
 	flake8 lib bin

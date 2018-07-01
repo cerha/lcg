@@ -21,40 +21,43 @@
 /* Helper function for embedding flash objects through SWFobject library. */
 
 function embed_swf_object(uri, id, width, height, flashvars, min_flash_version,
-			  alternative_content, allow_fullscreen) {
-   /* Arguments:
+    alternative_content, allow_fullscreen)
+{
+    /* Arguments:
 
-      uri -- URI of the Flash object to embed
-      id -- target HTML element id
-      width -- width in pixels
-      height -- height in pixels
-      flashvars -- associative array of variables to pass as to the flash object as flashvars
-      min_flash_version -- minimal required Flash version as a string, such as '9' or '9.0.25'
-      alternative_content -- content to display (put inside the target HTML element) when Flash
-        is not available or its version doesn't match min_flash_version.
-      allow_fullscreen -- allow switching
+       uri -- URI of the Flash object to embed
+       id -- target HTML element id
+       width -- width in pixels
+       height -- height in pixels
+       flashvars -- associative array of variables to pass as to the flash object as flashvars
+       min_flash_version -- minimal required Flash version as a string, such as '9' or '9.0.25'
+       alternative_content -- content to display (put inside the target HTML element) when Flash
+         is not available or its version doesn't match min_flash_version.
+       allow_fullscreen -- allow switching
 
-   */
-   // TODO: Detect and handle when running locally (JavaScript communication
-   // doesn't work in this case because of Flash security restrictions).
-   if (min_flash_version == null)
-      min_flash_version = '9';
-   if (swfobject.hasFlashPlayerVersion(min_flash_version)) {
-      flashvars.id = id;
-      var params = {allowfullscreen: (allow_fullscreen?'true':'false'),
-		    allowscriptaccess: 'always'};
-      var attrs = {id: id, name: id};
-      swfobject.embedSWF(uri, id, width, height, min_flash_version, false, flashvars, params, attrs);
-   } else if (alternative_content != null) {
-      // Replace the original content of the div by an error message or some
-      // other content.  This allows, for example, to replace a message like
-      // "Javascript disabled" by a message "Flash not installed".  If the
-      // browser supports both Flash and JS, the content is replaced by the
-      // object, otherwise the appropriate message is displayed (if JS doesn't
-      // work, original message stays, if it does, but flash does not, the
-      // later message replaces it).
-      var node = document.getElementById(id);
-      if (node != null)
-	 node.innerHTML = alternative_content;
-   }
+    */
+    // TODO: Detect and handle when running locally (JavaScript communication
+    // doesn't work in this case because of Flash security restrictions).
+    if (min_flash_version == null)
+        min_flash_version = '9';
+    if (swfobject.hasFlashPlayerVersion(min_flash_version)) {
+        flashvars.id = id;
+        var params = {
+            allowfullscreen: (allow_fullscreen?'true':'false'),
+            allowscriptaccess: 'always'
+        };
+        var attrs = {id: id, name: id};
+        swfobject.embedSWF(uri, id, width, height, min_flash_version, false, flashvars, params, attrs);
+    } else if (alternative_content != null) {
+        // Replace the original content of the div by an error message or some
+        // other content.  This allows, for example, to replace a message like
+        // "Javascript disabled" by a message "Flash not installed".  If the
+        // browser supports both Flash and JS, the content is replaced by the
+        // object, otherwise the appropriate message is displayed (if JS doesn't
+        // work, original message stays, if it does, but flash does not, the
+        // later message replaces it).
+        var node = document.getElementById(id);
+        if (node != null)
+            node.innerHTML = alternative_content;
+    }
 }

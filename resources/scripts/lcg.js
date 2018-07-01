@@ -474,9 +474,10 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
         $super(element_id);
         this.element.setAttribute('role', 'tree');
         if (this._foldable && toggle_button_tooltip) {
-            var b = new Element('button',
-                                {'class': 'toggle-menu-expansion',
-                                 'title': toggle_button_tooltip});
+            var b = new Element('button', {
+                'class': 'toggle-menu-expansion',
+                'title': toggle_button_tooltip
+            });
             this.element.down('ul').insert({after: b});
             b.observe('click', this._on_toggle_full_expansion.bind(this));
         }
@@ -757,8 +758,10 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
                 var css_height = menu.getLayout().get('height');
                 menu.setStyle({height: 0, display: 'block', overflowY: 'hidden'});
                 new Effect.Morph(menu, {
-                    style: {height: css_height + 'px',
-                            top: y - total_height + 'px'},
+                    style: {
+                        height: css_height + 'px',
+                        top: y - total_height + 'px'
+                    },
                     duration: 0.2,
                     afterFinish: function () {
                         menu.setStyle({overflowY: 'auto'});
@@ -912,10 +915,12 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
         this.element.update(ul);
         if (this._close_button_label) {
             this.element.insert(
-                new Element('a', {'href': '#',
-                                  'title': this._close_button_label,
-                                  'class': 'close-menu',
-                                  'role': 'button'})
+                new Element('a', {
+                    'href': '#',
+                    'title': this._close_button_label,
+                    'class': 'close-menu',
+                    'role': 'button'
+                })
                     .update(this._close_button_label)
                     .observe('click', function (event) {
                         this.dismiss();
@@ -1071,8 +1076,10 @@ lcg.PopupMenuCtrl = Class.create(lcg.Widget, {
         ctrl.setAttribute('aria-expanded', 'false');
         ctrl.setAttribute('aria-controls', menu.element.getAttribute('id'));
         if (selector) {
-            this.element.up(selector).observe('contextmenu',
-                                              function (e) { menu.popup(e, ctrl); });
+            this.element.up(selector).observe(
+                'contextmenu',
+                function (e) { menu.popup(e, ctrl); }
+            );
         }
         this._menu = menu;
     },
@@ -1107,7 +1114,8 @@ lcg.DropdownSelection = Class.create(lcg.PopupMenuBase, {
      */
 
     initialize: function ($super, element_id, button_id, activation_callback,
-                          get_selected_item_index) {
+        get_selected_item_index)
+    {
         $super(element_id);
         if (get_selected_item_index === undefined) {
             get_selected_item_index = function () { return 0; };
@@ -1227,8 +1235,11 @@ lcg.Tooltip = Class.create({
                         // there's no better way to tell automatically what the URL
                         // points to and thanks to browser caching it should not
                         // normally be a serious problem.
-                        element.insert(new Element('img', {'src': uri, 'border': 0,
-                                                           'style': 'vertical-align: middle;'}));
+                        element.insert(new Element('img', {
+                            'src': uri,
+                            'border': 0,
+                            'style': 'vertical-align: middle;'
+                        }));
                     } else {
                         return;
                     }
@@ -1242,7 +1253,7 @@ lcg.Tooltip = Class.create({
                     // Errors in asynchronous handlers are otherwise silently ignored.
                     // Calling console.log will raise error in some browsers but there
                     // is a problem anyway and it helps debugging...
-                    console.log(e);
+                    console.log(e); // eslint-disable-line no-console
                 }
             }.bind(this)
         });
