@@ -10,6 +10,7 @@
 /doc/src/structured-text.en.html
 /doc/src/structured-text.en.pdf
 /doc/examples/lcgmake-basic-reader/dest/*
+/node_modules
 /translations/*/LC_MESSAGES/*.mo
 /translations/*.pot
 /resources/translations/*.po

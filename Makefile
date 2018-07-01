@@ -22,3 +22,15 @@ test:
 coverage:
 	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" coverage run --source=lib/lcg lib/lcg/_test.py
 	coverage report
+
+deps-dev:
+	pip2 install flake8
+	npm install
+
+lint: lint-flake8
+
+lint-flake8:
+	flake8 lib bin
+
+lint-eslint:
+	npm run eslint resources/scripts/{flash,lcg-exercises,lcg}.js

@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "eslint": "eslint"
+  },
+  "devDependencies": {
+    "eslint": ""
+  }
+}
