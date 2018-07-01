@@ -34,3 +34,6 @@ lint-flake8:
 
 lint-eslint:
 	npm run eslint resources/scripts/{flash,lcg-exercises,lcg}.js
+
+lint-csslint:
+	npm run csslint resources/css

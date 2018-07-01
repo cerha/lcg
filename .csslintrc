@@ -1,0 +1,12 @@
+{
+  "ignore": [
+  ],
+  "warnings": [
+  ],
+  "errors": [
+  ],
+  "exclude-list": [
+    "resources/css/lightbox.css",
+    "resources/css/pygments.css"
+  ]
+}
