@@ -111,6 +111,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
         page_header = pdf_context.page_header()
         page_footer = pdf_context.page_footer()
         page_background = pdf_context.page_background()
+
         def make_flowable(content):
             context = self._lcg_context
             pdf_context = context.pdf_context
@@ -129,6 +130,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             max_height = self.height / 3
             width, height = flowable.wrap(self.width, max_height)
             return flowable, width, height
+
         def frame_height(header, footer):
             bottom_margin = self.bottomMargin
             height = self.height
@@ -145,11 +147,13 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                     height = height - footer_height
                     bottom_margin = bottom_margin + footer_height
             return bottom_margin, height
+
         def on_page(canvas, doc):
             pdf_context = self._lcg_context.pdf_context
             pdf_context.page += 1
             page = pdf_context.page
             canvas.saveState()
+
             def add_flowable(content, position):
                 flowable, width, height = make_flowable(content)
                 x = (self.pagesize[0] - width) / 2
@@ -356,6 +360,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         variable_content = []
         self._box_lengths = []
         self._box_depths = []
+
         def wrap(content, i, width, height, store=True):
             content.canv = getattr(self, 'canv', None)
             sizes = content.wrap(width, height)
@@ -374,6 +379,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 self._box_lengths[i] = length
                 self._box_depths[i] = depth
             return sizes
+
         def unwrap(i):
             self._box_total_length -= self._box_lengths[i]
             self._box_lengths[i] = None
@@ -483,6 +489,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 break
             height += next_height
             i += 1
+
         def container(content):
             return RLContainer(content, vertical=self._box_vertical,
                                align=self._box_align, boxed=self._box_boxed)
@@ -512,9 +519,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             align = self._box_align
             if vertical and getattr(c, 'hAlign', None):
                 align = c.hAlign
-            l = lengths[i]
+            length = lengths[i]
             if vertical:
-                y -= l
+                y -= length
             x_shift = y_shift = 0
             if align == self.BOX_CENTER:
                 shift = (self._box_max_depth - self._box_depths[i]) / 2
@@ -528,7 +535,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 x_shift = self._box_max_depth - self._box_depths[i]
             c.drawOn(canv, x + x_shift, y + y_shift)
             if not vertical:
-                x += l
+                x += length
             i += 1
         if self._box_boxed:
             width, height = self._width_height
@@ -676,7 +683,7 @@ class RLImage(reportlab.platypus.flowables.Image):
                     self._width = w * reportlab.lib.units.inch / xdpi
                 if self._height is None and ydpi:
                     self._height = h * reportlab.lib.units.inch / ydpi
-            except:
+            except Exception:
                 pass
         reportlab.platypus.flowables.Image._setup_inner(self)
 
@@ -828,7 +835,8 @@ class Context(object):
                 bold_name = '-' + bold_name
             elif italic:
                 italic_name = '-' + italic_name
-        for directory in ('/usr/share/fonts/truetype/ttf-dejavu',
+        for directory in ('/usr/share/fonts/truetype/dejavu',
+                          '/usr/share/fonts/truetype/ttf-dejavu',
                           '/usr/share/fonts/truetype/freefont',
                           '/Library/Fonts',
                           os.getenv('HOME') + '/Library/Fonts'):
@@ -1298,6 +1306,7 @@ def _ok_export_result(result):
                 return False
     return True
 
+
 _replacements = (('&', '&amp;',),
                  ('<', '&lt;',),
                  ('>', '&gt;',),
@@ -1737,6 +1746,7 @@ class NewDocument(PageBreak):
 
     def _export(self, context):
         context = self.content
+
         def set_context(flowable, aW, aH, context=context):
             flowable.canv._doctemplate._new_lcg_context = context
         exported = [reportlab.platypus.flowables.CallerMacro(wrapCallable=set_context),
@@ -1851,6 +1861,7 @@ class Container(Element):
         style = pdf_context.style()
         halign = self.halign
         # Let's first transform simple text elements into real exportable elements.
+
         def transform_content(c):
             if isinstance(c, basestring):
                 c = make_element(Text, content=unicode(c), style=style, halign=halign)
@@ -1901,7 +1912,7 @@ class Container(Element):
                     wrap = (not self.vertical)
                 elif (parent_container.vertical != self.vertical or
                       (parent_container.vertical and
-                       self.halign is not None and
+                          self.halign is not None and
                        parent_container.halign != self.halign)):
                     wrap = True
                 else:
@@ -2035,6 +2046,7 @@ class List(Element):
         next_pdf_context.bullet_indent = style.bulletIndent
         next_context = copy.copy(context)
         next_context.pdf_context = next_pdf_context
+
         def make_item(item):
             # Prevent paragpraph indenting of text after bullet:
             next_pdf_context.last_element_category = 'list-item-start'
@@ -2356,6 +2368,7 @@ class Table(Element):
                         elif self.halign is not None and len(row.content) == 1:
                             table_style_data.append(('ALIGN', (j, i), (j, i), self.halign,))
                     # ReportLab can't take anything as a cell content, let's prepare for it
+
                     def simplify(exported_column):
                         if isinstance(exported_column, str):
                             result = unicode(exported_column)
@@ -2617,6 +2630,7 @@ class PDFExporter(FileExporter, Exporter):
                 page_size = reportlab.lib.pagesizes.landscape(page_size)
             else:
                 page_size = reportlab.lib.pagesizes.portrait(page_size)
+
         def presentation_size(attr, default=(10 * reportlab.lib.units.mm)):
             try:
                 size = getattr(global_presentation, attr)
@@ -2626,7 +2640,7 @@ class PDFExporter(FileExporter, Exporter):
                     points = size.size()
                 else:
                     points = default
-            except:
+            except Exception:
                 points = default
             return points
         page_size = (presentation_size('page_width', default=page_size[0]),
@@ -2920,6 +2934,7 @@ class PDFExporter(FileExporter, Exporter):
     def _export_section(self, context, element):
         pdf_context = context.pdf_context
         content = context.exporter().export_element(context, element.heading())
+
         def update_text(content, function):
             if isinstance(content, TextContainer):
                 c = content.content
@@ -2938,6 +2953,7 @@ class PDFExporter(FileExporter, Exporter):
         anchor = element.id()
         if anchor:
             anchor = context.pdf_context.anchor_prefix + anchor
+
             def make_link_target(content):
                 return make_element(LinkTarget, name=anchor, content=content.content,
                                     style=content.style, halign=content.halign)
@@ -2945,6 +2961,7 @@ class PDFExporter(FileExporter, Exporter):
         backref = element.backref()
         if backref:
             backref = context.pdf_context.anchor_prefix + backref
+
             def make_backref(content):
                 make_element(lcg.Link, uri=("#" + backref), content=content.content,
                              style=content.style, halign=content.halign)
@@ -2997,11 +3014,13 @@ class PDFExporter(FileExporter, Exporter):
                 if has_markup(c):
                     return True
             return False
+
         def make_cell(element):
             exported = element.export(context)
             if has_markup(exported):
                 exported = make_element(Paragraph, content=[exported])
             return make_element(TableCell, content=[exported])
+
         def make_item(label, value):
             content = [make_cell(label), make_cell(value)]
             return make_element(TableRow, content=content)
@@ -3121,16 +3140,16 @@ class PDFExporter(FileExporter, Exporter):
             annotation = annotation.strip()
             if self._simple_annotation_regexp.match(annotation):
                 i = 0
-                l = len(annotation)
+                length = len(annotation)
                 content = []
-                while i < l:
+                while i < length:
                     j = i
-                    while j < l and annotation[j] in string.ascii_letters:
+                    while j < length and annotation[j] in string.ascii_letters:
                         j += 1
                     if j > i:
                         content.append(make_marked_text(annotation[i:j], tag='i'))
                         i = j
-                    while j < l and annotation[j] not in string.ascii_letters:
+                    while j < length and annotation[j] not in string.ascii_letters:
                         j += 1
                     if j > i:
                         content.append(make_element(Text, content=annotation[i:j]))
