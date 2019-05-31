@@ -623,6 +623,7 @@ class HtmlExporter(lcg.Exporter):
                                                             '-',
                                                             11)))
             self._unique_id_index = 0
+            self._backref = {}
             super(HtmlExporter.Context, self).__init__(*args, **kwargs)
 
         def _init_kwargs(self, allow_interactivity=True, **kwargs):
@@ -700,6 +701,35 @@ class HtmlExporter(lcg.Exporter):
             """
             return self._audio_controls
 
+        def create_backref(self, item):
+            """Create a back reference anchor for given section and return it as a string.
+
+            Arguments:
+              item -- the lcg.Section instance for which the back reference should be
+                created.
+
+            Back reference is a reference leading from section heading to
+            its corresponding item in the table of contents.  TOC asks the back
+            reference creation using this method.  The section then asks
+            whether the back reference exists using the 'backref()' method.
+
+            Just one back reference may exist so only the first call returns
+            the anchor.  Following calls in the same context (on the same page)
+            return None.
+
+            """
+            if item not in self._backref:
+                backref = self._backref[item] = "backref-" + self.id()
+            else:
+                backref = None
+            return backref
+
+        def backref(self, item):
+            """Return the back reference if it was previously created or None."""
+            return self._backref.get(item)
+
+
+
     class Part(object):
         """Representation of the HTML page <body> element content structure.
 
@@ -766,6 +796,8 @@ class HtmlExporter(lcg.Exporter):
 
     _LANGUAGE_SELECTION_COMBINED = False
     _MATHML_XMLNS = re.compile(r'<math [^>]* xmlns=".*')
+    _ALLOW_BACKREF = True
+    """Allow using back references from section titles to related TOC items (if TOC exists)."""
 
     def __init__(self, *args, **kwargs):
         self._generator = self.Generator()
@@ -1059,7 +1091,7 @@ class HtmlExporter(lcg.Exporter):
                 lang = heading.content()[0].lang()
                 heading = lcg.Container(heading.content()[0].content())
             exported_heading = heading.export(context)
-            backref = element.backref()
+            backref = context.backref(element)
             if backref:
                 exported_heading = self._generator.a(exported_heading, href="#" + backref,
                                                      cls='backref')
@@ -1138,7 +1170,10 @@ class HtmlExporter(lcg.Exporter):
             else:
                 assert isinstance(item, lcg.Section)
                 descr = None
-                name = item.create_backref(parent)
+                if item.parent() == parent and self._ALLOW_BACKREF:
+                    name = context.create_backref(item)
+                else:
+                    name = None
                 uri_kwargs = dict(local=(parent is item.parent()))
             uri = context.uri(item, **uri_kwargs)
             return g.a(item.heading().export(context), href=uri, name=name, title=descr)

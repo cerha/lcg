@@ -16,12 +16,8 @@
 
 """LCG configuration variables."""
 
-default_resource_dir = None
+ = None
 """The LCG comes with a set of default resources (style sheets, scripts and
 media files).  They are used if no custom files of the same name are present in
 the source directory.  This variable specifies the name of the directory, where
 LCG default resources are installed."""
-
-allow_backref = True
-"""Boolean flag indicating, whether using backreferences in section titles is
-allowed."""

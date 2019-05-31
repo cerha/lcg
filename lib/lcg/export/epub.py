@@ -41,6 +41,8 @@ class Constants(object):
 
 class EpubHtml5Exporter(lcg.Html5Exporter):
 
+    _ALLOW_BACKREF = False
+
     class Generator(lcg.Html5Exporter.Generator):
 
         def script(self, *args, **kwargs):
@@ -192,7 +194,6 @@ class EpubExporter(lcg.Exporter):
 
     def export(self, context):
         """Return the exported E-pub archive as a binary string."""
-        lcg.config.allow_backref = False
         fileobject = StringIO.StringIO()
         epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
         node = context.node()

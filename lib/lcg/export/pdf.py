@@ -2958,14 +2958,6 @@ class PDFExporter(FileExporter, Exporter):
                 return make_element(LinkTarget, name=anchor, content=content.content,
                                     style=content.style, halign=content.halign)
             update_text(content, make_link_target)
-        backref = element.backref()
-        if backref:
-            backref = context.pdf_context.anchor_prefix + backref
-
-            def make_backref(content):
-                make_element(lcg.Link, uri=("#" + backref), content=content.content,
-                             style=content.style, halign=content.halign)
-            update_text(content, make_backref)
         level = pdf_context.heading_level
         heading = make_element(Heading, content=content.content, level=level)
         pdf_context.heading_level += 1

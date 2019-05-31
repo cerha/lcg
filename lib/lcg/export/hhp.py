@@ -100,6 +100,8 @@ class _Header(_MetaFile):
 
 class HhpExporter(lcg.HtmlFileExporter):
 
+    _ALLOW_BACKREF = False
+
     class Generator(lcg.HtmlGenerator):
         def hr(self, **kwargs):
             return '<hr>' # We don't want XHTML tag syntax (<hr/>).
@@ -115,7 +117,6 @@ class HhpExporter(lcg.HtmlFileExporter):
             return super(HhpExporter.Generator, self).div(content, cls=cls, **kwargs)
 
     def dump(self, node, directory, **kwargs):
-        lcg.config.allow_backref
         super(HhpExporter, self).dump(node, directory, **kwargs)
         if node == node.root():
             context = self.context(node, None)

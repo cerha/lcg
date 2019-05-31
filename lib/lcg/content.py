@@ -1398,7 +1398,6 @@ class Section(Container):
         self._in_toc = in_toc
         self._id = id
         self._descr = descr
-        self._backref = None
         self._heading = heading or TextContent(title)
         super(Section, self).__init__(content, **kwargs)
 
@@ -1463,34 +1462,6 @@ class Section(Container):
 
     # Temporary backwards compatibility.
     anchor = id
-
-    def create_backref(self, node):
-        """Create a back reference anchor for the section and return it as a string.
-
-        Arguments:
-          node -- the parent node of the table of contents for which the back
-            reference should be created.
-
-        Back reference is a reference leading from the section heading to the
-        corresponding link in the table of contents.
-
-        Just one back reference target on one page is allowed.  Links on other
-        pages are not back referenced.  Thus if 'node' is not section's parent
-        or if a back references was already created, the method retorns 'None'.
-
-        Back references may also be disabled in configuration.  In this case
-        'None' is always returned.
-
-        """
-        if node is self.parent() and self._backref is None and lcg.config.allow_backref:
-            self._backref = "backref-" + self.id()
-            return self._backref
-        else:
-            return None
-
-    def backref(self):
-        """Return the back reference if it was previously created successfully."""
-        return self._backref
 
 
 class TableOfContents(Content):
