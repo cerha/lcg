@@ -17,16 +17,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from future import standard_library
+from builtins import map
+from builtins import object
+
 import lcg
 
 import xml.dom.minidom as xml
 import zipfile
-import cStringIO as StringIO
+import io as StringIO
 import datetime
 import mimetypes
 import re
 import unicodedata
 import os
+
+standard_library.install_aliases()
 
 
 class Constants(object):
@@ -96,9 +102,9 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         if width is None and height is None:
             thumbnail = image.thumbnail()
             if thumbnail and thumbnail.size():
-                width, height = map(lcg.UPx, thumbnail.size())
+                width, height = [lcg.UPx(x) for x in thumbnail.size()]
             elif not thumbnail and image.size():
-                width, height = map(lcg.UPx, image.size())
+                width, height = [lcg.UPx(x) for x in image.size()]
         cls = ['lcg-image']
         if element.align():
             cls.append(element.align() + '-aligned')
@@ -148,7 +154,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         # Normalize and disambiguate the URI (several source URIs may have
         # the same normalized form or the normalized form may match an existing
         # resource URI).
-        if isinstance(uri, unicode):
+        if isinstance(uri, str):
             uri = unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore')
         uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', uri.lower())
         n = 0
@@ -224,8 +230,8 @@ class EpubExporter(lcg.Exporter):
                 data = self._get_resource_data(context, resource)
                 if isinstance(resource, lcg.Image):
                     import PIL.Image
-                    import cStringIO
-                    image = PIL.Image.open(cStringIO.StringIO(data))
+                    import io
+                    image = PIL.Image.open(io.BytesIO(data))
                     width, height = image.size
                     max_resolution = self.Config.MAX_IMAGE_RESOLUTION
                     if width * height > max_resolution:
@@ -233,7 +239,7 @@ class EpubExporter(lcg.Exporter):
                         scale = math.sqrt(float(max_resolution - 1) / (width * height))
                         size = (int(width * scale), int(height * scale))
                         image.thumbnail(size, PIL.Image.ANTIALIAS)
-                        stream = cStringIO.StringIO()
+                        stream = io.BytesIO()
                         image.save(stream, image.format)
                         data = stream.getvalue()
                 epub.writestr(self._resource_path(resource), data)
@@ -263,10 +269,10 @@ class EpubExporter(lcg.Exporter):
     def _container_path(self, *components):
         # TODO replace forbidden characters as per spec
         def ensure_pathenc(component):
-            if isinstance(component, unicode):
+            if isinstance(component, str):
                 return component.encode(Constants.PATHENC)
             return component
-        components = map(ensure_pathenc, components)
+        components = list(map(ensure_pathenc, components))
         path = Constants.PATHSEP.join(components)
         return path
 

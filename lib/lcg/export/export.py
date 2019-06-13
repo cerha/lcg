@@ -27,6 +27,13 @@ The module contains the following important classes:
 See documentation of the individual classes for more details.
 
 """
+from __future__ import division
+
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from past.utils import old_div
+from builtins import object
 
 import collections
 from contextlib import contextmanager
@@ -282,7 +289,7 @@ class Exporter(object):
             return self._toc_markers[marker]
 
         def add_toc_marker(self, element):
-            marker = unicode(len(self._toc_markers))
+            marker = str(len(self._toc_markers))
             self._toc_markers[marker] = element
             return marker
 
@@ -318,7 +325,7 @@ class Exporter(object):
             messages thus serve as a summary of problems.
 
             """
-            position = string.join(self.position_info, ' / ')
+            position = ' / '.join(self.position_info)
             if position:
                 message = position + ': ' + message
             self._log(message, kind=kind)
@@ -600,7 +607,7 @@ class Exporter(object):
             lines = (lines[:first_indented] +
                      [u' ' * init_indentation + lines[first_indented]] +
                      [space + l if l else '' for l in lines[first_indented + 1:]])
-        return string.join(lines, '\n')
+        return '\n'.join(lines)
 
     def _list_item_prefix(self, context, lang=None):
         return u'• '
@@ -828,7 +835,7 @@ class Exporter(object):
             result = value.export(context)
         else:
             if not isinstance(value, lcg.Localizable):
-                value = unicode(value)
+                value = str(value)
             result = self.escape(value)
         return result
 
@@ -851,7 +858,7 @@ class Exporter(object):
         """
         exported = []
         for content in element.content():
-            if isinstance(content, (lcg.ItemizedList, lcg.DefinitionList,)) and exported:
+            if isinstance(content, (lcg.ItemizedList, lcg.DefinitionList)) and exported:
                 exported[-1] = self._ensure_newlines(context, exported[-1])
             exported.append(content.export(context))
         return self.concat(*exported)
@@ -931,7 +938,7 @@ class Exporter(object):
             elif numbering in (lcg.ItemizedList.LOWER_ALPHA, lcg.ItemizedList.UPPER_ALPHA,):
                 result = letters[(n - 1) % n_letters]
                 while n > n_letters:
-                    n = n / n_letters
+                    n = old_div(n, n_letters)
                     result = letters[(n - 1) % n_letters] + result
                 if numbering == lcg.ItemizedList.UPPER_ALPHA:
                     result = result.upper()
@@ -1143,7 +1150,7 @@ class Exporter(object):
     def _set_table_column_widths(self, context, element, extra_width, widths):
         exported_rows = [r.content() for r in element.content() if isinstance(r, lcg.TableRow)]
         for row in exported_rows:
-            if isinstance(row, (tuple, list,)):
+            if isinstance(row, (tuple, list)):
                 for i in range(len(row)):
                     cell_width = self._table_cell_width(context, element, row[i].export(context))
                     widths[i] = max(widths[i], cell_width)
@@ -1380,7 +1387,7 @@ class FileExporter(object):
         directory = os.path.split(filename)[0]
         if directory and not os.path.isdir(directory):
             os.makedirs(directory)
-        if isinstance(content, unicode):
+        if isinstance(content, str):
             content = content.encode('utf-8')
         file = open(filename, 'wb')
         try:
@@ -1465,6 +1472,5 @@ class TextExporter(FileExporter, Exporter):
     _OUTPUT_FILE_EXT = 'text'
 
     def _adjusted_export(self, context, exported):
-        return string.join([line for line in exported.split('\n')
-                            if self._text_mark(line) is None],
-                           '\n')
+        return '\n'.join([line for line in exported.split('\n')
+                          if self._text_mark(line) is None])

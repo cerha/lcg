@@ -18,19 +18,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from __future__ import division
+from __future__ import print_function
+from future import standard_library
+from builtins import str
+from builtins import zip
+from builtins import range
+from past.builtins import basestring
+
 import datetime
+import io
 import os
 import re
 import string
 import sys
 import unittest
 import zipfile
-import cStringIO
 import pytest
 
 import lcg
 
 _ = lcg.TranslatableTextFactory('test')
+standard_library.install_aliases()
 
 lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
 os.environ['LCGDIR'] = lcg_dir
@@ -73,8 +82,7 @@ class TranslatableText(unittest.TestCase):
         assert isinstance(e, TypeError)
 
     def test_concat(self):
-        a = lcg.concat(lcg.TranslatableText("Version %s", "1.0") + 'xx',
-                       'yy', separator="\n")
+        a = lcg.concat(lcg.TranslatableText("Version %s", "1.0") + 'xx', 'yy', separator="\n")
         assert isinstance(a, lcg.Concatenation)
         items = a.items()
         assert len(items) == 2
@@ -254,7 +262,7 @@ class LocalizableDateTime(unittest.TestCase):
 
         def tzname(self, dt):
             offset = self._offset
-            sign = offset / abs(offset)
+            sign = offset // abs(offset)
             div, mod = divmod(abs(offset), 60)
             if mod:
                 return "GMT %+d:%d" % (div * sign, mod)
@@ -1314,7 +1322,7 @@ class HtmlExport(unittest.TestCase):
 class EpubExport(unittest.TestCase):
 
     def test_export(self):
-        # m = lcg.Metadata()
+        #m = lcg.Metadata()
         p = lcg.ResourceProvider()
         d = lcg.ContentNode('d', resource_provider=p)
         c = lcg.ContentNode('c', children=(d,), resource_provider=p)
@@ -1323,7 +1331,7 @@ class EpubExport(unittest.TestCase):
         e = lcg.EpubExporter()
         context = e.context(a, 'en')
         epub = e.export(context)
-        archive = zipfile.ZipFile(cStringIO.StringIO(epub))
+        archive = zipfile.ZipFile(io.BytesIO(epub))
         pkg_opf = archive.read('rsrc/pkg.opf')
         assert pkg_opf[:19] == '<?xml version="1.0"'
 
@@ -1364,7 +1372,7 @@ class BrailleExport(unittest.TestCase):
         if isinstance(braille, basestring):
             n_lines = page_lines - len(braille.split('\n')) - 2
             expected = [header + braille + '\n' * n_lines + footer]
-        elif isinstance(braille, (tuple, list,)):
+        elif isinstance(braille, (tuple, list)):
             expected = [header + braille[0] +
                         '\n' * (page_lines - len(braille[0].split('\n')) - 2) + footer[0]]
             expected.extend([b + '\n' * (page_lines - len(b.split('\n'))) + f
@@ -1644,12 +1652,12 @@ class BrailleExport(unittest.TestCase):
             elif post == ',':
                 result = result[:-2] + u'⠠'
             if result != expected_result:
-                print '---'
-                print mathml
-                print '---'
-                print " expected: |%s|" % (expected_result,)
-                print "      got: |%s|" % (result,)
-                print '---'
+                print('---')
+                print(mathml)
+                print('---')
+                print(" expected: |%s|" % (expected_result,))
+                print("      got: |%s|" % (result,))
+                print('---')
             assert result == expected_result
         # §8
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">

@@ -30,7 +30,12 @@ Additionally various enumerations are defined here, for instance:
 @L{HorizontalAlignment}, L{VerticalAlignment}, L{Orientation}, L{FontFamily}.
 
 """
+from past.builtins import cmp
+from past.builtins import basestring
+from builtins import object
+
 import decimal
+
 
 class Unit(object):
     """Dimension unit representation.
@@ -49,10 +54,10 @@ class Unit(object):
         @type size: integer, float or decimal.Decimal
         @param size: Dimension value.
         """
-        assert isinstance(size, (float, int, long, decimal.Decimal)), size
+        assert isinstance(size, (float, int, decimal.Decimal)), size
         self._size = size
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         @return: True iff the size is non-zero.
         """
@@ -64,7 +69,7 @@ class Unit(object):
         @param size: Value to increase the instance size by.
         @return: New instance of the same class, with size increased by C{size}.
         """
-        assert isinstance(size, (float, int, long, decimal.Decimal,)), size
+        assert isinstance(size, (float, int, decimal.Decimal)), size
         return self.__class__(self._size + size)
 
     def __mul__(self, size):
@@ -73,7 +78,7 @@ class Unit(object):
         @param size: Value to multiple the instance size by.
         @return: New instance of the same class, with size multiplied by C{size}.
         """
-        assert isinstance(size, (float, int, long, decimal.Decimal,)), size
+        assert isinstance(size, (float, int, decimal.Decimal)), size
         return self.__class__(self._size * size)
 
     def __cmp__(self, other):

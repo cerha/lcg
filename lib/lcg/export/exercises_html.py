@@ -17,6 +17,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from builtins import str
+from builtins import object
 import re
 import lcg
 from lcg import concat
@@ -140,7 +142,7 @@ class ExerciseExporter(object):
         return g.js_call('new %s' % self._JAVASCRIPT_CLASS,
                          exercise_id, exercise.answers(), responses,
                          dict([(msg, context.localize(translation))
-                               for msg, translation in self._MESSAGES.items()]))
+                               for msg, translation in list(self._MESSAGES.items())]))
 
     def _task_style_cls(self, exercise):
         return 'task %s-task' % lcg.camel_case_to_lower(exercise.__class__.__name__)

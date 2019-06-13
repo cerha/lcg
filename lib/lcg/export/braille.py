@@ -17,10 +17,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""Export to Braille notation."""
 from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 
-"""Export to Braille notation.
-"""
+from builtins import chr
+from builtins import zip
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 
 from contextlib import contextmanager
 import copy
@@ -37,7 +44,9 @@ from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, Pag
     Container, TranslatableTextFactory, Table, TableRow, TableCell, TableHeading, TextContent, \
     ItemizedList
 import lcg
-import mathml
+from . import mathml
+from .export import Exporter, FileExporter
+from .nemeth import mathml_nemeth
 
 _ = TranslatableTextFactory('lcg')
 
@@ -81,7 +90,6 @@ _mathml_operators = {
 }
 
 _unknown_char_regexp = re.compile('⠄⡳⠭([⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+)')  # only English version
-from .export import Exporter, FileExporter
 
 
 def braille_presentation(presentation_file='presentation-braille.py'):
@@ -124,7 +132,7 @@ class _Braille(object):
     def __len__(self):
         return len(self._text)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return not not self._text
 
     def __add__(self, braille):
@@ -286,7 +294,8 @@ def xml2braille(xml):
     else:
         mode = 1 << 30
         try:
-            # latest liblouisutdml logs output with log level INFO - unexpected output fails tests; so raise the default log level
+            # latest liblouisutdml logs output with log level INFO - unexpected output fails tests;
+            # so raise the default log level
             _louisutdml.lbu_setLogLevel(40000)  # liblouis.h: LOG_ERROR = 40000
         except AttributeError:
             pass
@@ -304,13 +313,10 @@ def xml2braille(xml):
     # unknown reason.
 
     def make_dot_char(i):
-        c = unichr(i)
+        c = chr(i)
         return _en6backmapping.get(c, c)
     output = ''.join([make_dot_char(i) for i in outbuf[:outlen.value]])
     return output.strip(string.whitespace + '⠀')
-
-
-from nemeth import mathml_nemeth
 
 
 class BrailleExporter(FileExporter, Exporter):
@@ -460,7 +466,7 @@ class BrailleExporter(FileExporter, Exporter):
         self._whitespace = string.whitespace + ' \u2800'
 
     def _braille_characters(self):
-        return string.join([unichr(i) for i in range(10240, 10496)], '')
+        return ''.join([chr(i) for i in range(10240, 10496)])
 
     def braille_unknown_char(self, code, report):
         return '⠿⠿⠿%s⠿⠿⠿' % (code,)
@@ -476,11 +482,11 @@ class BrailleExporter(FileExporter, Exporter):
             printer_properties = {}
         page_width = presentation.page_width
         if page_width:
-            assert isinstance(page_width, (UFont, USpace,)), page_width
+            assert isinstance(page_width, (UFont, USpace)), page_width
             page_width = page_width.size()
         page_height = presentation.page_height
         if page_height:
-            assert isinstance(page_height, (UFont, USpace,)), page_height
+            assert isinstance(page_height, (UFont, USpace)), page_height
             page_height = page_height.size()
         left_status_line = presentation.left_page_footer or node.left_page_footer(lang)
         right_status_line = presentation.right_page_footer or node.right_page_footer(lang)
@@ -539,7 +545,7 @@ class BrailleExporter(FileExporter, Exporter):
                             l = l[:pos] + '⠀' * fill_len + l[pos + hfill_len:]
                         if center and len(l) < page_width:
                             l = l.strip(' ⠀' + self._CENTER_CHAR)
-                            l = '⠀' * ((page_width - len(l)) / 2) + l
+                            l = '⠀' * ((page_width - len(l)) // 2) + l
                         if no_page_break and not l.startswith(self._NO_PAGE_BREAK_CHAR):
                             l = self._NO_PAGE_BREAK_CHAR + l
                         lines.append(l)
@@ -581,7 +587,7 @@ class BrailleExporter(FileExporter, Exporter):
                             hyphenation = hyphenation[:start] + hyphenation[end:]
                             next_prefix_len += end - start
                         prefix = ' ' * next_prefix_len
-                        prefix_limit = page_width / 2
+                        prefix_limit = page_width // 2
                         if next_prefix_len > prefix_limit:
                             prefix = prefix[:prefix_limit]
                         hyphenation_prefix = self.HYPH_NO * len(prefix)
@@ -774,7 +780,7 @@ class BrailleExporter(FileExporter, Exporter):
                         else:
                             marker, arg = mark
                             if marker == self._TOC_MARKER_CHAR:
-                                page_number = unicode(context.page_number())
+                                page_number = str(context.page_number())
                                 element = context.toc_element(arg)
                                 element.set_page_number(page_number)
                                 if isinstance(element, Section):
@@ -820,7 +826,7 @@ class BrailleExporter(FileExporter, Exporter):
                                 if pos > 0:
                                     title = exported_status_line[pos:].strip(u'⠀ ')
                                     text_len = len(title) + pos
-                                    fill = (page_width - text_len) / 2
+                                    fill = (page_width - text_len) // 2
                                     exported_status_line = (exported_status_line[:pos] +
                                                             u'⠀' * fill + title)
                             elif c and isinstance(c[-1], PageNumber):
@@ -828,7 +834,7 @@ class BrailleExporter(FileExporter, Exporter):
                                 if pos >= 0 and pos != len(exported_status_line) - 1:
                                     title = exported_status_line[:pos].strip(u'⠀ ')
                                     text_len = len(title) + (len(exported_status_line) - pos)
-                                    fill_2 = (page_width - text_len) / 2
+                                    fill_2 = (page_width - text_len) // 2
                                     fill_1 = page_width - text_len - fill_2
                                     exported_status_line = (u'⠀' * fill_1 + title + u'⠀' * fill_2 +
                                                             exported_status_line[pos + 1:])
@@ -859,7 +865,7 @@ class BrailleExporter(FileExporter, Exporter):
         run_export()
         pages = run_export()
         # Device character set transformation
-        final_text = string.join([string.join(p, '\n') for p in pages], '\f')
+        final_text = '\f'.join(['\n'.join(p) for p in pages])
         if final_text and final_text[-1] != '\f':
             final_text += '\f'
         output = ''
@@ -886,8 +892,8 @@ class BrailleExporter(FileExporter, Exporter):
     # Basic utilitites
 
     def concat(self, *items):
-        return _Braille(string.join([i.text() for i in items], ''),
-                        string.join([i.hyphenation() for i in items], ''))
+        return _Braille(''.join([i.text() for i in items]),
+                        ''.join([i.hyphenation() for i in items]))
 
     _per_cent_regexp = re.compile('([ ⠀]+)⠼[⠏⠗]')
 
@@ -1068,7 +1074,7 @@ class BrailleExporter(FileExporter, Exporter):
             new_hyphenation += self.HYPH_NO
         lines = text.split('\n')
         # Skip initial lines
-        intro = string.join(lines[:first_indented], '\n')
+        intro = '\n'.join(lines[:first_indented])
         n = len(intro)
         new_text += intro
         new_hyphenation += hyphenation[:n]
@@ -1257,12 +1263,12 @@ class BrailleExporter(FileExporter, Exporter):
         transformations = element.transformations()
         try:
             result = export(element, None)
-        except TableTooWideError, e:
+        except TableTooWideError as e:
             if 'transpose' in transformations:
                 try:
                     result = export(self._transposed_table(context, element),
                                     _("The table is transposed."))
-                except TableTooWideError, e:
+                except TableTooWideError as e:
                     exception = e
             else:
                 exception = e
@@ -1286,10 +1292,10 @@ class BrailleExporter(FileExporter, Exporter):
                                          self._export_table(context, table_2, recursive=True))
                     break
                 else:
-                    context.log(unicode(exception), kind=lcg.ERROR)
+                    context.log(str(exception), kind=lcg.ERROR)
                     return _Braille('')
             else:
-                context.log(unicode(exception), kind=lcg.ERROR)
+                context.log(str(exception), kind=lcg.ERROR)
                 return _Braille('')
         return result
 
@@ -1492,7 +1498,7 @@ class BrailleExporter(FileExporter, Exporter):
                         if e_len > max_len:
                             max_row = e
                             max_len = e_len
-                    info = string.join([c.text() for c in max_row], '⠀')
+                    info = '⠀'.join([c.text() for c in max_row])
                     raise TableTooWideError(info)
         finally:
             context_compactness.clear()
@@ -1552,7 +1558,7 @@ class BrailleExporter(FileExporter, Exporter):
         xml = element.content()
         braille = xml2braille(xml)
         hyphenation_list = [self.HYPH_WS if c == '⠀' else self.HYPH_NO for c in braille]
-        return _Braille(braille, string.join(hyphenation_list, ''))
+        return _Braille(braille, ''.join(hyphenation_list))
 
     def _export_mathml_nemeth(self, context, element):
         return mathml_nemeth(self, context, element)
@@ -1861,7 +1867,7 @@ class BrailleExporter(FileExporter, Exporter):
         # def export_mscarries(node, **kwargs):
         # def export_mscarry(node, **kwargs):
         # def export_mlongdiv(node, **kwargs):
-        for k, v in locals().items():
+        for k, v in list(locals().items()):
             if k.startswith('export_'):
                 exporters[k[len('export_'):]] = v
         e = child_export(top)

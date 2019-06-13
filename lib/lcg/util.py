@@ -19,8 +19,9 @@
 
 """Various utilities"""
 
+from builtins import str
+
 from contextlib import contextmanager
-import operator
 import re
 import sys
 import unicodedata
@@ -28,9 +29,10 @@ import unicodedata
 from lcg import TranslatableTextFactory
 _ = TranslatableTextFactory('lcg')
 
+
 def is_sequence_of(seq, cls):
     """Return true if 'seq' is a sequence of instances of 'cls'."""
-    if not operator.isSequenceType(seq):
+    if not isinstance(seq, (tuple, list)):
         return False
     for item in seq:
         if not isinstance(item, cls):
@@ -40,10 +42,12 @@ def is_sequence_of(seq, cls):
 
 _CAMEL_CASE_WORD = re.compile(r'[A-Z][a-z\d]+')
 
+
 def camel_case_to_lower(string, separator='-'):
     """Return a lowercase string using 'separator' to concatenate words."""
     words = _CAMEL_CASE_WORD.findall(string)
     return separator.join([w.lower() for w in words])
+
 
 def text_to_id(string, separator='-'):
     """Convert any text to an identifier.
@@ -62,20 +66,21 @@ def text_to_id(string, separator='-'):
     string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
     return re.sub(r'[^a-z0-9 ]', '', string.lower()).replace(' ', separator)
 
+
 def unindent_docstring(docstring):
     """Trim indentation and blank lines from docstring text and return it."""
     if not docstring:
         return docstring
     lines = docstring.expandtabs().splitlines()
     # Determine minimum indentation (first line doesn't count):
-    indent = sys.maxint
+    indent = sys.maxsize
     for line in lines[1:]:
         stripped = line.lstrip()
         if stripped:
             indent = min(indent, len(line) - len(stripped))
     # Remove indentation (first line is special):
     trimmed = [lines[0].strip()]
-    if indent < sys.maxint:
+    if indent < sys.maxsize:
         for line in lines[1:]:
             trimmed.append(line[indent:].rstrip())
     # Strip off trailing and leading blank lines:
@@ -96,22 +101,22 @@ def positive_id(obj):
         # relation to sys.maxint).  Try 32 bits first (and on a 32-bit
         # box, adding 2**32 gives a positive number with the same hex
         # representation as the original result).
-        result += 1L << 32
+        result += 1 << 32
         if result < 0:
             # Undo that, and try 64 bits.
-            result -= 1L << 32
-            result += 1L << 64
+            result -= 1 << 32
+            result += 1 << 64
             assert result >= 0  # else addresses are fatter than 64 bits
     return result
 
 
 def log(message, *args):
-    """Log a processing information.
+    """Log processing information.
 
     Arguments:
 
       message -- The text of a message.  Any object will be converted to a
-        unicode string.
+        string.
 
       *args -- message arguments.  When formatting the message with these
         arguments doesn't succeed, the arguemnts are simply appended to the end
@@ -120,8 +125,8 @@ def log(message, *args):
     The logging is currently only written to STDERR.
 
     """
-    if not isinstance(message, (str, unicode)):
-        message = unicode(message)
+    if not isinstance(message, str):
+        message = str(message)
     try:
         message %= args
     except TypeError:
@@ -129,11 +134,12 @@ def log(message, *args):
             message += ":"
         if not message.endswith(" "):
             message += " "
-        message += ', '.join([unicode(a) for a in args])
+        message += ', '.join([str(a) for a in args])
     if not message.endswith("\n"):
         message += "\n"
-    sys.stderr.write("  " + message.encode('iso-8859-2', 'replace'))
+    sys.stderr.write("  " + message)
     sys.stderr.flush()
+
 
 def caller():
     """Return the frame stack caller information formatted as a string.
@@ -298,6 +304,7 @@ _LANGUAGE_NAMES = {
     'zu': _(u"Zulu"),
 }
 
+
 def language_name(code):
     """Return the language name corresponding to given ISO 639-1 code.
 
@@ -306,6 +313,7 @@ def language_name(code):
 
     """
     return _LANGUAGE_NAMES.get(code)
+
 
 _COUNTRY_NAMES = {
     # Translators: The following 249 strings represent names of countries.
@@ -565,6 +573,7 @@ _COUNTRY_NAMES = {
     'ZW': _(u"Zimbabwe"),
 }
 
+
 def country_name(code):
     """Return the country name corresponding to given ISO 3166-1 code.
 
@@ -573,6 +582,7 @@ def country_name(code):
 
     """
     return _COUNTRY_NAMES.get(code)
+
 
 # Translators: The following 7 strings represent full week day names.  Please, take care to use
 # upper/lower case letters according to the rules of the target language.
@@ -614,6 +624,7 @@ _FULL_MONTH_NAMES = (_("January"), _("February"), _("March"), _("April"), _("May
 # usual in the target language.
 _SHORT_MONTH_NAMES = (_("Jan"), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"),
                       _("Aug"), _("Sep"), _("Oct"), _("Nov"), _("Dec"))
+
 
 def month_name(number, abbrev=False):
     """Return the calendar month name corresponding to given numeric index.

@@ -36,6 +36,7 @@ don't work.
 
 """
 
+from builtins import object
 import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
@@ -182,7 +183,7 @@ class Button(Widget, lcg.Content):
         self._tooltip = tooltip
         self._enabled = enabled
         self._icon = icon
-        self._values = values.items() if isinstance(values, dict) else values
+        self._values = list(values.items()) if isinstance(values, dict) else values
         super(Button, self).__init__(label=label, **kwargs)
 
     def _export_widget(self, context):

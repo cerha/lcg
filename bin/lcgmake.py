@@ -20,6 +20,7 @@
 
 """Simple and `quite' generic LCG generator."""
 
+from builtins import str
 import functools
 import getopt
 import imp
@@ -149,7 +150,7 @@ def main(argv, opt, args):
     try:
         node = reader.build()
     except IOError as e:
-        message = unicode(e)
+        message = str(e)
         match = re.match('[[]Errno[^]]*[]] *', message)
         if match:
             message = message[match.end():]
@@ -231,7 +232,7 @@ def read_style(filename):
         die("Can't open file: %s" % (filename,))
     try:
         style_file.read(f)
-    except Exception, e:
+    except Exception as e:
         die("Can't process style file: %s" % (e,))
     finally:
         f.close()
