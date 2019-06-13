@@ -17,7 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+from __future__ import absolute_import
 
+from builtins import zip
+from builtins import range
 from contextlib import contextmanager
 import copy
 import re
@@ -25,8 +28,8 @@ import string
 
 import lcg
 
-from braille import _Braille, _braille_whitespace
-import mathml
+from .braille import _Braille, _braille_whitespace
+from . import mathml
 
 
 _CONDITIONAL_NUM_PREFIX = '\ue020'
@@ -662,7 +665,7 @@ def _op_export(operator, exporter, context, variables, node=None):
         # on unknown characters, we try to identify and handle such a
         # situation here.
         if op_braille is None or '⠈⠀⠭' in op_braille or '⡳' in op_braille:
-            op_braille = string.join([c for c in op_braille if c != '⡳'], '')
+            op_braille = ''.join([c for c in op_braille if c != '⡳'])
             op_braille = exporter.braille_unknown_char(op_braille, operator)
             hyphenation = exporter.HYPH_NO * len(op_braille)
         elif operator in _math_comparison_operators:
@@ -712,10 +715,10 @@ def _export_mn(node, exporter, context, variables, **kwargs):
             prefix += _CONDITIONAL_NUM_PREFIX
         if context.lang() == 'cs':
             text = text.replace(',', '.')
-        translated = prefix + string.join([_nemeth_numbers[c] for c in text], '')
+        translated = prefix + ''.join([_nemeth_numbers[c] for c in text])
     variables.set('enclosed-list', 'no')
-    hyphenation = string.join([exporter.HYPH_NEMETH_WS if c == '⠀' else exporter.HYPH_NEMETH_NUMBER
-                               for c in translated], '')
+    hyphenation = ''.join([exporter.HYPH_NEMETH_WS if c == '⠀' else exporter.HYPH_NEMETH_NUMBER
+                           for c in translated])
     return _Braille(translated, hyphenation)
 
 

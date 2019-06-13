@@ -19,6 +19,7 @@
 
 """Exporter class which generates an IMS compliant package."""
 
+from builtins import object
 import lcg
 import xml.dom.domreg
 import os

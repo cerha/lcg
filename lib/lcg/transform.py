@@ -17,14 +17,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from future import standard_library
+from builtins import chr
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import object
+
 import collections
-import HTMLParser
-import htmlentitydefs
+import html.parser
+import html.entities
 import re
 import xml.dom.minidom
 import xml.etree.ElementTree
 
 import lcg
+
+standard_library.install_aliases()
 
 
 class Processor(object):
@@ -118,7 +127,7 @@ class Processor(object):
             for test, handler in matchers:
                 if isinstance(test, basestring):
                     test = (test,)
-                if isinstance(test, (tuple, list,)):
+                if isinstance(test, (tuple, list)):
                     tag_regexp = re.compile(test[0] + '$')
                     attr_tests = [(a, re.compile(r),) for a, r in test[1:]]
 
@@ -137,7 +146,7 @@ class Processor(object):
                     test_function = test
                 else:
                     raise Exception("Invalid matcher test specification", test)
-                if not isinstance(handler, (tuple, list,)):
+                if not isinstance(handler, (tuple, list)):
                     handler = (handler, {})
                 compiled_matchers.append((test_function, handler))
             self._compiled_matchers = compiled_matchers
@@ -204,7 +213,7 @@ class Processor(object):
         The result is dependent on particular 'Processor' class.
 
         """
-        assert isinstance(data, unicode), data
+        assert isinstance(data, str), data
         tree = self.Parser().lcg_parse(data)
         return self.Transformer().transform(tree)
 
@@ -510,7 +519,7 @@ class XML2HTML(XMLProcessor):
                         last.text = (last.text or '') + c
                     else:
                         last.tail = (last.tail or '') + c
-                elif isinstance(c, (tuple, list,)):
+                elif isinstance(c, (tuple, list)):
                     children = list(c) + children
                 else:
                     element.insert(i, c)
@@ -606,7 +615,7 @@ class XML2HTML(XMLProcessor):
 
     def transform(self, data):
         transformed = super(XML2HTML, self).transform(data)
-        return unicode(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
+        return str(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
 
 
 class HTML2XML(Processor):
@@ -617,10 +626,10 @@ class HTML2XML(Processor):
 
     """
 
-    class Parser(HTMLParser.HTMLParser, Processor.Parser):
+    class Parser(html.parser.HTMLParser, Processor.Parser):
 
         def reset(self):
-            HTMLParser.HTMLParser.reset(self)
+            html.parser.HTMLParser.reset(self)
             self._hp_tree = xml.etree.ElementTree.Element('html')
             self._hp_elements = [self._hp_tree]
             self._hp_open_tags = []
@@ -670,23 +679,23 @@ class HTML2XML(Processor):
 
         def handle_charref(self, name):
             num = name.lstrip('&#').rstrip(';')
-            expanded = unichr(int(num))
+            expanded = chr(int(num))
             self.handle_data(expanded)
 
         def handle_entityref(self, name):
             if self._hp_raw:
                 self._handle_data('&' + name + ';')
             else:
-                expanded = htmlentitydefs.entitydefs[name]
+                expanded = html.entities.entitydefs[name]
                 if expanded[0] == '&' and expanded[-1] == ';':
                     self.handle_charref(expanded)
                 else:
-                    self.handle_data(unicode(expanded, 'iso-8859-1'))
+                    self.handle_data(str(expanded, 'iso-8859-1'))
 
         def close(self):
             while self._open_tags:
                 self.handle_endtag(self._open_tags[-1])
-            HTMLParser.HTMLParser.close()
+            html.parser.HTMLParser.close()
 
         def _hp_strip(self, tree):
             if tree.tag == 'pre':
@@ -917,7 +926,7 @@ class HTML2XML(Processor):
 
     def transform(self, data):
         transformed = super(HTML2XML, self).transform(data)
-        return unicode(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
+        return str(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
 
 
 # Utility functions

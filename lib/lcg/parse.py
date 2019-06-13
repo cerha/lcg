@@ -17,15 +17,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+from builtins import chr
+from builtins import map
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import object
+
 import collections
 import copy
-import HTMLParser
-import htmlentitydefs
+import html.parser
+import html.entities
 import re
 import string
 import xml.etree.ElementTree
 
 import lcg
+
+standard_library.install_aliases()
 
 
 class ProcessingError(Exception):
@@ -156,7 +168,7 @@ class Parser(object):
     _INLINE_MARKUP = (
         ('newline', '//'),
         ('emphasized', ('/', '/')),
-        ('strong', ('\*', '\*')),
+        ('strong', (r'\*', r'\*')),
         ('code', ('=', '=')),
         ('underlined', ('_', '_')),
         ('citation', ('>>', '<<')),
@@ -176,7 +188,7 @@ class Parser(object):
         ('uri', (r'(?:https?|ftp)://\S+?(?=[\),.:;]*(\s|$))')),  # ?!? SOS!
         ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
         ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" +
-                          "|\{[^\}]+\})")),
+                          r"|\{[^\}]+\})")),
         ('comment', r'^#.*'),
         ('dash', r'(^|(?<=\s))--($|(?=\s))'),
         ('nbsp', '~'),
@@ -891,7 +903,7 @@ class Parser(object):
                     markup = value
         number_of_backslashes = markup.count('\\')
         markup = markup[number_of_backslashes:]
-        initial_backslashes = number_of_backslashes / 2 * '\\'
+        initial_backslashes = (number_of_backslashes // 2) * '\\'
         if number_of_backslashes % 2:
             # If the number of backslashes is odd, the markup is escaped (printed as is).
             return [lcg.TextContent(initial_backslashes + markup)]
@@ -1055,9 +1067,9 @@ class MacroParser(object):
             try:
                 result = self._evaluate(self._condition)
             except Exception as e:
-                return e.__class__.__name__ + ': ' + unicode(e)
+                return e.__class__.__name__ + ': ' + str(e)
             else:
-                return ''.join([unicode(x) for x in self._content[bool(result)]])
+                return ''.join([str(x) for x in self._content[bool(result)]])
 
     def __init__(self, globals=None, evaluate=None, include=None):
         """Arguments:
@@ -1089,7 +1101,7 @@ class MacroParser(object):
 
     def _default_include(self, name):
         try:
-            return unicode(self._globals[name])
+            return str(self._globals[name])
         except KeyError:
             return ''
 
@@ -1109,7 +1121,7 @@ class MacroParser(object):
                 current = current.parent
             else:
                 current.append(t)
-        return unicode(result)
+        return str(result)
 
 
 class HTMLProcessor(object):
@@ -1161,10 +1173,10 @@ class HTMLProcessor(object):
 
     """
 
-    class _HTMLParser(HTMLParser.HTMLParser):
+    class _HTMLParser(html.parser.HTMLParser):
 
         def reset(self):
-            HTMLParser.HTMLParser.reset(self)
+            html.parser.HTMLParser.reset(self)
             self._hp_tree = xml.etree.ElementTree.Element('html')
             self._hp_elements = [self._hp_tree]
             self._hp_open_tags = []
@@ -1214,23 +1226,23 @@ class HTMLProcessor(object):
 
         def handle_charref(self, name):
             num = name.lstrip('&#').rstrip(';')
-            expanded = unichr(int(num))
+            expanded = chr(int(num))
             self.handle_data(expanded)
 
         def handle_entityref(self, name):
             if self._hp_raw:
                 self.handle_data('&' + name + ';')
             else:
-                expanded = htmlentitydefs.entitydefs[name]
+                expanded = html.entities.entitydefs[name]
                 if expanded[0] == '&' and expanded[-1] == ';':
                     self.handle_charref(expanded)
                 else:
-                    self.handle_data(unicode(expanded, 'iso-8859-1'))
+                    self.handle_data(str(expanded, 'iso-8859-1'))
 
         def close(self):
             while self._open_tags:
                 self.handle_endtag(self._open_tags[-1])
-            HTMLParser.HTMLParser.close()
+            html.parser.HTMLParser.close()
 
         def tree(self):
             return self._hp_tree
@@ -1333,7 +1345,7 @@ class HTMLProcessor(object):
                     margin = margin.strip('px')
                     if margin.isdigit():
                         kwargs['presentation'] = presentation = lcg.Presentation()
-                        presentation.indent_left = lcg.UFont(int(margin) / 12)
+                        presentation.indent_left = lcg.UFont(int(margin) // 12)
             content = self._transform_sub(element)
             if class_ == lcg.Paragraph and self._find_element(content, (lcg.Section,
                                                                         lcg.Paragraph,
@@ -1371,7 +1383,7 @@ class HTMLProcessor(object):
             return lcg.Quotation(content, **kwargs)
 
         def _exercise(self, element, followers):
-            import exercises
+            from . import exercises
             parser = exercises.ExerciseParser()
             exercise_type = getattr(exercises, element.attrib.get('data-type'))
             src = self._first_text(element)
@@ -1501,7 +1513,7 @@ class HTMLProcessor(object):
             for test, handler in matchers:
                 if isinstance(test, basestring):
                     test = (test,)
-                if isinstance(test, (tuple, list,)):
+                if isinstance(test, (tuple, list)):
                     tag_regexp = re.compile(test[0] + '$')
                     attr_tests = [(a, re.compile(r),) for a, r in test[1:]]
 
@@ -1520,7 +1532,7 @@ class HTMLProcessor(object):
                     test_function = test
                 else:
                     raise Exception("Invalid matcher test specification", test)
-                if not isinstance(handler, (tuple, list,)):
+                if not isinstance(handler, (tuple, list)):
                     handler = (handler, {})
                 compiled_matchers.append((test_function, handler))
             self._compiled_matchers = compiled_matchers

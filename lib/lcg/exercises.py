@@ -37,6 +37,11 @@ present in the code may still not be fully supported.
 
 """
 
+from builtins import str
+from builtins import map
+from past.builtins import basestring
+from builtins import object
+
 import lcg
 import re
 
@@ -57,7 +62,7 @@ class Task(object):
 
     def __init__(self, prompt, comment=None, media=None):
         assert isinstance(prompt, lcg.Content) or prompt is None, prompt
-        assert isinstance(comment, unicode) or comment is None, comment
+        assert isinstance(comment, str) or comment is None, comment
         if media is None:
             media = ()
         elif isinstance(media, lcg.Media):
@@ -186,7 +191,7 @@ class Choice(object):
     """
 
     def __init__(self, answer, correct=False):
-        assert isinstance(answer, (str, unicode)), answer
+        assert isinstance(answer, str), answer
         assert correct is None or isinstance(correct, bool), correct
         self._answer = answer
         self._correct = correct
@@ -302,7 +307,7 @@ class ExerciseParser(object):
             return Choice(text[2:].strip(), correct=correct)
         if not lines:
             self._error(_("No choices defined."))
-        choices = map(choice, lines)
+        choices = list(map(choice, lines))
         correct_choices = [ch for ch in choices if ch.correct()]
         unknown_choices = [ch.correct() is None for ch in choices]
         if len(correct_choices) == 1 and not any(unknown_choices) or all(unknown_choices):
@@ -903,7 +908,7 @@ class _Test(object):
             name = '%s-a%d' % (self.id(), i + 1)
             answer = self._param(req, name)
             # Correct answer is a numer or string.
-            if answer == unicode(correct_answer):
+            if answer == str(correct_answer):
                 points += self.points()
             # elif not answer:
             #    empty += self.points()

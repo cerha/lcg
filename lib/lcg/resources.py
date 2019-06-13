@@ -25,6 +25,8 @@ these files, they just provide their abstract representation.  The resources
 are managed by the 'ResourceProvider' (see below).
 
 """
+from builtins import str
+from builtins import object
 import os
 import glob
 import lcg
@@ -92,11 +94,11 @@ class Resource(object):
 
         """
         super(Resource, self).__init__()
-        assert isinstance(filename, (str, unicode)), filename
-        assert title is None or isinstance(title, (str, unicode)), title
-        assert descr is None or isinstance(descr, (str, unicode)), descr
-        assert uri is None or isinstance(uri, (str, unicode)), uri
-        assert src_file is None or isinstance(src_file, (str, unicode)), src_file
+        assert isinstance(filename, str), filename
+        assert title is None or isinstance(title, str), title
+        assert descr is None or isinstance(descr, str), descr
+        assert uri is None or isinstance(uri, str), uri
+        assert src_file is None or isinstance(src_file, str), src_file
         assert content is None or isinstance(content, bytes) or hasattr(content, 'read'), content
         self._filename = filename
         self._title = title
@@ -325,7 +327,7 @@ class ResourceProvider(object):
             # Here we assume that the filesystem uses UTF-8 filenames.  If
             # it is not always the case, we may need to make it
             # configurable.
-            src_path = unicode(os.path.join(directory, filename)).encode('utf-8')
+            src_path = str(os.path.join(directory, filename)).encode('utf-8')
             if os.path.isfile(src_path):
                 return cls(filename, src_file=src_path)
             elif src_path.find('*') != -1:
@@ -393,7 +395,7 @@ class ResourceProvider(object):
         if cls is None:
             cls = Resource
         result = []
-        for resource, nodes in self._cache.values():
+        for resource, nodes in list(self._cache.values()):
             if node is None or node.id() in nodes or None in nodes:
                 if isinstance(resource, (list, tuple)):
                     result.extend([r for r in resource if isinstance(r, cls)])

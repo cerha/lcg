@@ -24,7 +24,11 @@ important to retain the original strings while constructing LCG content.  This
 allows us to decide for the output language at the export time.
 
 """
+from __future__ import print_function
 
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import lcg
 
 import collections
@@ -34,6 +38,7 @@ import os
 import re
 import string
 import sys
+from functools import reduce
 
 
 class TranslatableTextFactory(object):
@@ -120,7 +125,7 @@ class TranslatedTextFactory(TranslatableTextFactory):
                                                            *args, **kwargs)
 
 
-class Localizable(unicode):
+class Localizable(str):
     """Common superclass of all localizable classes.
 
     This class is derived from Python 'unicode' type.  Thus it behaves as an
@@ -147,12 +152,12 @@ class Localizable(unicode):
         for f in _transforms:
             transformed = f(transformed)
         try:
-            instance = unicode.__new__(cls, transformed)
+            instance = str.__new__(cls, transformed)
         except UnicodeDecodeError:
             # Necessary to display some tracebacks
             def escape(text):
                 return re.sub(r'[^\x01-\x7F]', '?', text)
-            instance = unicode.__new__(cls, escape(transformed))
+            instance = str.__new__(cls, escape(transformed))
         instance._text = text
         return instance
 
@@ -310,7 +315,7 @@ class TranslatableText(Localizable):
 
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
-            substitution_dict = dict([(k, v) for k, v in kwargs.items()
+            substitution_dict = dict([(k, v) for k, v in list(kwargs.items())
                                       if not k.startswith('_') and k not in cls._RESERVED_ARGS])
             assert not args or not substitution_dict, \
                 ("Cannot pass both positional and keyword substitution variables: " +
@@ -433,8 +438,8 @@ class TranslatableText(Localizable):
                 args = tuple([localizer.localize(arg) for arg in self._args])
                 values = args if escape is None else None
             else:
-                args = dict([(k, localizer.localize(v)) for k, v in self._kwargs.items()])
-                values = args.values() if escape is None else None
+                args = dict([(k, localizer.localize(v)) for k, v in list(self._kwargs.items())])
+                values = list(args.values()) if escape is None else None
             if escape is None and any(isinstance(v, lcg.HtmlEscapedUnicode) for v in values):
                 translated = lcg.HtmlEscapedUnicode(translated, escape=True)
             translated %= args
@@ -499,7 +504,7 @@ class TranslatablePluralForms(TranslatableText):
             assert 'n' in kwargs, \
                    "A number determining the plural form must be passed as keyword argument 'n'."
             n = kwargs['n']
-        assert isinstance(n, (int, long,))
+        assert isinstance(n, int)
         text = n == 1 and singular or plural
         return TranslatableText.__new__(cls, text, *args, **kwargs)
 
@@ -509,8 +514,8 @@ class TranslatablePluralForms(TranslatableText):
         else:
             n = kwargs['n']
         text = n == 1 and singular or plural
-        self._singular = unicode(singular)
-        self._plural = unicode(plural)
+        self._singular = str(singular)
+        self._plural = str(plural)
         self._n = n
         super(TranslatablePluralForms, self).__init__(text, *args, **kwargs)
 
@@ -692,7 +697,7 @@ class Decimal(Localizable):
     """Localizable decimal number."""
 
     def __new__(cls, value, precision=None, **kwargs):
-        if isinstance(value, (int, long,)):
+        if isinstance(value, int):
             format = '%d'
         elif precision is None:
             format = '%f'
@@ -705,7 +710,7 @@ class Decimal(Localizable):
         self._precision = precision
         if precision is not None:
             self._format = '%%.%df' % precision
-        elif isinstance(value, (int, long,)):
+        elif isinstance(value, int):
             self._format = '%d'
         else:
             self._format = '%f'
@@ -830,7 +835,7 @@ class Concatenation(Localizable):
         super(Concatenation, self).__init__(**kwargs)
 
         def html_escaped(items):
-            if isinstance(items, (list, tuple,)):
+            if isinstance(items, (list, tuple)):
                 for i in items:
                     if html_escaped(i):
                         return True
@@ -846,17 +851,12 @@ class Concatenation(Localizable):
 
         def flatten(sequence, separator=separator):
             for x in sequence:
-                if x.__class__ in (unicode, str,):
-                    if h_escape:
-                        x = lcg.HtmlEscapedUnicode(x, escape=True)
-                    last.append(x)
-                    last.append(separator)
-                elif isinstance(x, Concatenation) and not x._transforms:
+                if isinstance(x, Concatenation) and not x._transforms:
                     s = lcg.HtmlEscapedUnicode('', escape=False) if h_escape else ''
-                    flatten(x.items(), separator=s)
+                    flatten(list(x.items()), separator=s)
                     last.append(separator)
                 elif isinstance(x, Localizable):
-                    text = string.join(last, '')
+                    text = ''.join(last)
                     if text:
                         if h_escape:
                             text = lcg.HtmlEscapedUnicode(text, escape=False)
@@ -864,17 +864,14 @@ class Concatenation(Localizable):
                     del last[:]
                     flat.append(x)
                     last.append(separator)
-                elif isinstance(x, (unicode, str,)):
-                    # This is a quick fix for special unicode/str subclasses, such as
-                    # HtmlExporter._JavaScriptCode.  Reordering the conditions would
-                    # make sense, but it might harm the optimization effort.
+                elif isinstance(x, (tuple, list)):
+                    flatten(x)
+                else:
+                    assert isinstance(x, basestring)
                     if h_escape:
                         x = lcg.HtmlEscapedUnicode(x, escape=True)
                     last.append(x)
                     last.append(separator)
-                else:
-                    assert isinstance(x, (tuple, list,)), (x.__class__, repr(x))
-                    flatten(x)
         flatten(items)
         if len(last) > 1:
             text = reduce(operator.add, last[1:-1], last[0])
@@ -1043,17 +1040,20 @@ class GettextTranslator(Translator):
             gettext = self._cache[(domain, origin)]
         except KeyError:
             gettext = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
+            if sys.version_info[0] == 2:
+                gettext.gettext = gettext.ugettext
+                gettext.ngettext = gettext.ungettext
         return gettext
 
     def gettext(self, text, domain=None, origin=None):
         domain = domain or self._default_domain
         gettext = self._cached_gettext_instance(domain, origin)
-        return gettext.ugettext(text)
+        return gettext.gettext(text)
 
     def ngettext(self, singular, plural, n, domain=None, origin=None):
         domain = domain or self._default_domain
         gettext = self._cached_gettext_instance(domain, origin)
-        result = gettext.ungettext(singular, plural, n)
+        result = gettext.ngettext(singular, plural, n)
         return result
 
 
@@ -1156,7 +1156,7 @@ def concat(*args, **kwargs):
     # Optimization: It may slow down processing in some cases but I guess it
     # usually helps a bit.
     if not kwargs:
-        if len(args) == 1 and isinstance(args[0], (list, tuple,)):
+        if len(args) == 1 and isinstance(args[0], (list, tuple)):
             args = args[0]
         for a in args:
             if not isinstance(a, basestring) or isinstance(a, Localizable):
@@ -1168,7 +1168,7 @@ def concat(*args, **kwargs):
                 return reduce(operator.add, args[1:], args[0])
     # Standard processing
     result = Concatenation(args, **kwargs)
-    items = result.items()
+    items = list(result.items())
     if len(items) == 1 and not isinstance(items[0], Localizable):
         return items[0]
     return result
@@ -1260,4 +1260,4 @@ if __name__ == '__main__':
         "Usage: python -m lcg/i18n directory [domain]"
     directory = sys.argv[1]
     domain = len(sys.argv) == 3 and sys.argv[2] or None
-    print " ".join(source_files_by_domain(directory, domain=domain))
+    print(" ".join(source_files_by_domain(directory, domain=domain)))

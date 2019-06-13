@@ -17,10 +17,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from __future__ import absolute_import
+from future import standard_library
+
+from builtins import map
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import random
 import re
 import string
-import urllib
+import urllib.request
+import urllib.parse
+import urllib.error
 from xml.sax import saxutils
 
 import lcg
@@ -29,8 +38,9 @@ from lcg import concat
 from . import mathml
 
 _ = lcg.TranslatableTextFactory('lcg')
+standard_library.install_aliases()
 
-class HtmlEscapedUnicode(unicode):
+class HtmlEscapedUnicode(str):
     """Escaping wrapper for unicodes.
 
     In order to prevent display errors, XSS, CSRF, etc., it is necessary to
@@ -65,7 +75,7 @@ class HtmlEscapedUnicode(unicode):
         if isinstance(other, lcg.Localizable):
             result = concat(self, other)
         else:
-            result = self.__class__(unicode(self) + unicode(other), escape=False)
+            result = self.__class__(str(self) + str(other), escape=False)
         return result
 
     def __mod__(self, other):
@@ -73,10 +83,10 @@ class HtmlEscapedUnicode(unicode):
             return HtmlEscapedUnicode(x, escape=True) if isinstance(x, basestring) else x
         if isinstance(other, basestring):
             arguments = escape(other)
-        elif isinstance(other, (tuple, list,)):
+        elif isinstance(other, (tuple, list)):
             arguments = tuple(map(escape, other))
         elif isinstance(other, dict):
-            arguments = dict([(k, escape(v)) for k, v in other.items()])
+            arguments = dict([(k, escape(v)) for k, v in list(other.items())])
         else:
             # Special dictionary-like object, such as _Interpolator
             arguments = self._EscapingInterpolator(other, escape)
@@ -133,10 +143,9 @@ class HtmlGenerator(object):
 
     """
 
-    class _JavaScriptCode(unicode):
-
+    class _JavaScriptCode(str):
         def __new__(cls, text):
-            return unicode.__new__(cls, text)
+            return str.__new__(cls, text)
 
     # Characters to be replaced in Javascript string literals for their
     # safe usage within HTML <script> tags.
@@ -166,7 +175,7 @@ class HtmlGenerator(object):
                              'role', 'style', 'tabindex', 'title')
         dirty = False
         result = [self.noescape('<' + tag)]
-        attributes = (attr or {}).items()
+        attributes = list((attr or {}).items())
         if self._sorted_attributes:
             attributes = sorted(attributes)
         for name, value in attributes:
@@ -181,7 +190,7 @@ class HtmlGenerator(object):
                 if value is True:
                     # Use boolean value syntax, which is compatible with both HTML4 and XHTML.
                     str_value = '"' + name + '"'
-                elif isinstance(value, (int, long)):
+                elif isinstance(value, int):
                     str_value = '"%d"' % value
                 elif isinstance(value, lcg.Localizable):
                     str_value = value.transform(saxutils.quoteattr)
@@ -190,7 +199,7 @@ class HtmlGenerator(object):
                     str_value = self.noescape(saxutils.quoteattr(value))
                 result.append(str_value)
         if content is not None and not isinstance(content, HtmlEscapedUnicode):
-            if content.__class__ in (unicode, str,):
+            if content.__class__ in (str, str,):
                 content = self.escape(content)
             else:
                 dirty = True
@@ -202,7 +211,7 @@ class HtmlGenerator(object):
         if dirty:
             return self.concat(*result)
         else:
-            return self.noescape(string.join(result, ''))
+            return self.noescape(''.join(result))
 
     def uri(self, base, *args, **kwargs):
         """Return a URI constructed from given base URI and arguments.
@@ -226,12 +235,12 @@ class HtmlGenerator(object):
         encoded as 'utf-8' and properly quoted and in the returned URI.
 
         """
-        uri = urllib.quote(base.encode('utf-8'))
+        uri = urllib.parse.quote(base.encode('utf-8'))
         if args and isinstance(args[0], basestring):
-            uri += '#' + urllib.quote(unicode(args[0]).encode('utf-8'))
+            uri += '#' + urllib.parse.quote(str(args[0]).encode('utf-8'))
             args = args[1:]
 
-        query = ';'.join([k + '=' + urllib.quote(unicode(v).encode('utf-8'))
+        query = ';'.join([k + '=' + urllib.parse.quote(str(v).encode('utf-8'))
                           for k, v in args + tuple(kwargs.items()) if v is not None])
         if query:
             uri += '?' + query
@@ -571,16 +580,16 @@ class HtmlGenerator(object):
             return '"' + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, value) + '"'
         elif isinstance(value, bool):
             return (value and 'true' or 'false')
-        elif isinstance(value, (int, long)):
+        elif isinstance(value, int):
             return str(value)
         elif isinstance(value, (tuple, list)):
             return concat('[', concat([self.js_value(v) for v in value], separator=", "), ']')
         elif isinstance(value, dict):
             # Only string keys are supported in JavaScript (int works too, but is actually
             # converted to string, which might be unexpected, so we don't support it).
-            assert lcg.is_sequence_of(value.keys(), basestring)
+            assert lcg.is_sequence_of(list(value.keys()), basestring)
             return concat('{', concat([concat(self.js_value(k), ': ', self.js_value(v))
-                                       for k, v in value.items()],
+                                       for k, v in list(value.items())],
                                       separator=", "),
                           '}')
         else:
@@ -1061,9 +1070,9 @@ class HtmlExporter(lcg.Exporter):
         attr = dict(id=element.id(),
                     cls=' '.join([x for x in element.names() + ((cls,) if cls else ())]) or None,
                     lang=lang or element.lang(inherited=False),
-                    style=style and ' '.join(['%s: %s;' % x for x in style.items()]) or None,
+                    style=style and ' '.join(['%s: %s;' % x for x in list(style.items())]) or None,
                     **kwargs)
-        return dict([(key, value) for key, value in attr.items() if value is not None])
+        return dict([(key, value) for key, value in list(attr.items()) if value is not None])
 
     def _exported_container_content(self, context, element):
         return [subcontent.export(context) for subcontent in element.content()]
@@ -1263,7 +1272,7 @@ class HtmlExporter(lcg.Exporter):
             alt = ''
         width, height = element.width(), element.height()
         if width is None and height is None and image.size():
-            width, height = map(lcg.UPx, image.size())
+            width, height = list(map(lcg.UPx, image.size()))
         cls = ['lcg-image']
         if element.align():
             cls.append(element.align() + '-aligned')
@@ -1372,7 +1381,7 @@ class HtmlExporter(lcg.Exporter):
         ))
 
     def _export_exercise(self, context, element):
-        import exercises_html
+        from . import exercises_html
         exporter_cls = getattr(exercises_html, element.__class__.__name__ + 'Exporter')
         exporter = exporter_cls()
         return exporter.export(context, element)

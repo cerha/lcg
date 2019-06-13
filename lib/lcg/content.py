@@ -35,12 +35,19 @@ the hierarchy of the nodes themselves.
 
 """
 
+from future import standard_library
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import object
+
 import copy
 import re
 import lcg
 import collections
 
 _ = lcg.TranslatableTextFactory('lcg')
+standard_library.install_aliases()
 
 
 class Content(object):
@@ -306,9 +313,9 @@ class Container(Content):
         """
         super(Container, self).__init__(**kwargs)
         assert isinstance(name, basestring) or lcg.is_sequence_of(name, basestring), name
-        assert halign is None or isinstance(halign, str), halign
-        assert valign is None or isinstance(valign, str), valign
-        assert orientation is None or isinstance(orientation, str), orientation
+        assert halign is None or isinstance(halign, basestring), halign
+        assert valign is None or isinstance(valign, basestring), valign
+        assert orientation is None or isinstance(orientation, basestring), orientation
         assert id is None or isinstance(id, basestring), id
         assert width is None or isinstance(width, lcg.Unit), width
         assert height is None or isinstance(height, lcg.Unit), height
@@ -497,12 +504,12 @@ class TextContent(Content):
           kwargs -- keyword arguments for parent class constructor.
 
         """
-        assert isinstance(text, (str, unicode)), text
+        assert isinstance(text, basestring), text
         super(TextContent, self).__init__(**kwargs)
         self._text = text
 
     def __unicode__(self):
-        text = unicode(self._text).strip()
+        text = str(self._text).strip()
         sample = text and text.splitlines()[0] or ''
         if len(sample) > 20:
             sample = sample[:20]
@@ -585,7 +592,7 @@ class Link(Container):
         assert descr is None or isinstance(descr, basestring), descr
         assert type is None or isinstance(type, basestring), type
         assert lang is None or isinstance(lang, basestring), lang
-        if isinstance(label, (str, unicode)):
+        if isinstance(label, basestring):
             content = TextContent(label)
         elif label is not None:
             content = label
@@ -691,16 +698,16 @@ class _InlineObject(Content):
           lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
 
         """
-        assert title is None or isinstance(title, (str, unicode)), title
-        assert descr is None or isinstance(descr, (str, unicode)), descr
-        assert name is None or isinstance(name, (str, unicode)), name
+        assert title is None or isinstance(title, basestring), title
+        assert descr is None or isinstance(descr, basestring), descr
+        assert name is None or isinstance(name, basestring), name
         self._title = title
         self._descr = descr
         self._name = name
         super(_InlineObject, self).__init__(lang=lang)
 
     def _resource_instance(self, context, resource, cls):
-        if isinstance(resource, (str, unicode)):
+        if isinstance(resource, basestring):
             filename = resource
             if ((filename.startswith('http:') or filename.startswith('https:') or
                  filename.startswith('ftp:'))):
@@ -912,7 +919,7 @@ class InlineExternalVideo(Content):
 
         """
         assert service in ('youtube', 'vimeo'), service
-        assert isinstance(video_id, (str, unicode)), video_id
+        assert isinstance(video_id, basestring), video_id
         assert size is None or isinstance(size, tuple), size
         self._service = service
         self._video_id = video_id
@@ -1362,10 +1369,10 @@ class Table(Container):
             narrower tables).
 
         """
-        assert title is None or isinstance(title, (str, unicode))
+        assert title is None or isinstance(title, basestring)
         assert isinstance(long, bool), long
-        assert column_widths is None or isinstance(column_widths, (tuple, list,)), column_widths
-        assert isinstance(bars, (tuple, list,)), bars
+        assert column_widths is None or isinstance(column_widths, (tuple, list)), column_widths
+        assert isinstance(bars, (tuple, list)), bars
         self._title = title
         self._long = long
         self._column_widths = column_widths
@@ -1550,7 +1557,7 @@ class TableOfContents(Content):
 
         """
         assert item is None or isinstance(item, self._TOC_ITEM_TYPE)
-        assert title is None or isinstance(title, (str, unicode))
+        assert title is None or isinstance(title, basestring)
         assert depth is None or isinstance(depth, int)
         assert isinstance(detailed, bool)
         self._item = item
@@ -1661,7 +1668,7 @@ class SetVariable(Content):
           value -- value of the variable, 'Content' instance
 
         """
-        assert isinstance(name, basestring), str
+        assert isinstance(name, basestring), name
         assert isinstance(value, Content), value
         self._name = name
         self._value = value
@@ -1768,7 +1775,7 @@ class MathML(Content):
 
         """
         super(MathML, self).__init__()
-        assert isinstance(content, unicode), content
+        assert isinstance(content, basestring), content
         self._content = content
 
     def content(self):
@@ -1838,7 +1845,7 @@ class MathML(Content):
 
     def _tree_content(self, entity_dictionary):
         from xml.etree import ElementTree
-        import cStringIO
+        import io
         parser = ElementTree.XMLParser()
         parser.parser.UseForeignDTD(True)
         if entity_dictionary is None:
@@ -1847,7 +1854,7 @@ class MathML(Content):
         etree = ElementTree.ElementTree()
         content = self._str_content()
         try:
-            tree = etree.parse(cStringIO.StringIO(content), parser=parser)
+            tree = etree.parse(io.StringIO(content), parser=parser)
         except ElementTree.ParseError as e:
             raise lcg.ParseError("Error when parsing MathML element", e, content)
         regexp = re.compile('{.*}')
@@ -1955,7 +1962,7 @@ def coerce(content, formatted=False):
                     item = coerce(item, formatted=formatted)
                 items.append(item)
         return container(items)
-    elif isinstance(content, (str, unicode)):
+    elif isinstance(content, str):
         if formatted:
             from lcg import Parser
             return Parser().parse_inline_markup(content)
@@ -1993,7 +2000,7 @@ def link(target, label=None, type=None, descr=None):
         the link target is a direct URI.
 
     """
-    if isinstance(target, (str, unicode)):
+    if isinstance(target, basestring):
         assert label is not None
         target = Link.ExternalTarget(target, None, descr=descr)
     else:
@@ -2034,12 +2041,14 @@ def fieldset(pairs, formatted=False):
     fields = [(coerce(label), coerce(value, formatted=formatted)) for label, value in pairs]
     return FieldSet(fields)
 
+
 def sec(title, content, heading=None, name='default-section', **kwargs):
     """Create a 'Section' by coercing all content."""
     formatted = kwargs.pop('formatted', False)
     return Section(title=title, heading=coerce(heading, formatted=formatted) if heading else None,
                    content=[coerce(item, formatted=formatted) for item in content],
                    name=name, **kwargs)
+
 
 def _container(container, items, formatted=False, **kwargs):
     return container([coerce(item, formatted=formatted) for item in items], **kwargs)

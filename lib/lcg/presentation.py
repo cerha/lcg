@@ -30,6 +30,9 @@ currently processed 'Content' instance and current language.
 
 """
 
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import copy
 import lcg
 import re
@@ -350,7 +353,7 @@ class PresentationSet(object):
             presentation.
 
         """
-        assert isinstance(presentations, (list, tuple,)), presentations
+        assert isinstance(presentations, (list, tuple)), presentations
         if __debug__:
             for p, m in presentations:
                 assert isinstance(p, Presentation), (p, presentations,)
@@ -375,7 +378,7 @@ class PresentationSet(object):
             present here override parameters of former presentations
 
         """
-        assert isinstance(presentations, (list, tuple,)), presentations
+        assert isinstance(presentations, (list, tuple)), presentations
         presentations = [p for p in presentations if p is not None]
         if __debug__:
             assert all([isinstance(p, Presentation) for p in presentations]), presentations
@@ -577,7 +580,7 @@ class StyleFile(object):
         """
         for style in self._styles:
             file.write(style.name)
-            file.write(' (%s) :\n' % (string.join(style.inherits, ', '),))
+            file.write(' (%s) :\n' % (', '.join(style.inherits),))
             presentation = style.presentation
             for identifier, property, parser in self._PROPERTY_MAPPING:
                 value = getattr(presentation, property)
@@ -588,8 +591,8 @@ class StyleFile(object):
                         str_value = 'yes'
                     else:
                         str_value = 'no'
-                elif isinstance(value, (basestring, float,)):
-                    str_value = unicode(value)
+                elif isinstance(value, (basestring, float)):
+                    str_value = str(value)
                 else:
                     raise Exception("Unsupported value type", value)
                 file.write('%s = %s\n' % (identifier, str_value,))

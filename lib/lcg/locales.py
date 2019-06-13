@@ -23,6 +23,8 @@ This module defines the base class for locale data and a derived class for each 
 
 """
 
+from builtins import object
+
 
 class LocaleData(object):
     """Locale data base class.

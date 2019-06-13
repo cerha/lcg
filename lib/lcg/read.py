@@ -19,6 +19,8 @@
 
 """Tools for building the LCG 'ContentNode' hierarchy."""
 
+from builtins import str
+from builtins import object
 import codecs
 import glob
 import os
@@ -204,7 +206,7 @@ class FileReader(Reader):
                 lines = [l for l in lines if not comment_matcher.match(l)]
         content = ''.join(lines)
         try:
-            return unicode(content, encoding=encoding)
+            return str(content, encoding=encoding)
         except UnicodeDecodeError as e:
             raise Exception("File %s: %s" % (filename, e))
 
