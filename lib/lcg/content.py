@@ -37,7 +37,6 @@ the hierarchy of the nodes themselves.
 
 from __future__ import unicode_literals
 from future import standard_library
-from builtins import str
 from builtins import range
 
 import sys
@@ -47,8 +46,8 @@ import lcg
 import collections
 
 _ = lcg.TranslatableTextFactory('lcg')
-standard_library.install_aliases()
 
+standard_library.install_aliases()
 unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
@@ -508,12 +507,12 @@ class TextContent(Content):
           kwargs -- keyword arguments for parent class constructor.
 
         """
-        assert isinstance(text, basestring), text
+        assert isinstance(text, unistr), text
         super(TextContent, self).__init__(**kwargs)
         self._text = text
 
     def __unicode__(self):
-        text = unistr(self._text).strip()
+        text = self._text.strip()
         sample = text and text.splitlines()[0] or ''
         if len(sample) > 20:
             sample = sample[:20]

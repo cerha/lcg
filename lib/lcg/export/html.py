@@ -40,7 +40,6 @@ from lcg import concat
 from . import mathml
 
 _ = lcg.TranslatableTextFactory('lcg')
-
 standard_library.install_aliases()
 unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:

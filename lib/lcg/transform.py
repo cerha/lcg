@@ -621,7 +621,7 @@ class XML2HTML(XMLProcessor):
         tree = xml.etree.ElementTree.ElementTree(transformed)
         f = io.BytesIO()
         tree.write(f, 'utf-8', method=None)
-        return unistr(f.getvalue(), 'utf-8')
+        return f.getvalue().decode('utf-8')
 
 
 class HTML2XML(Processor):
@@ -696,7 +696,7 @@ class HTML2XML(Processor):
                 if expanded[0] == b'&' and expanded[-1] == b';':
                     self.handle_charref(expanded)
                 else:
-                    self.handle_data(unistr(expanded, 'iso-8859-1'))
+                    self.handle_data(expanded.decode('iso-8859-1'))
 
         def close(self):
             while self._open_tags:
@@ -935,7 +935,7 @@ class HTML2XML(Processor):
         tree = xml.etree.ElementTree.ElementTree(transformed)
         f = io.BytesIO()
         tree.write(f, 'utf-8', method=None)
-        return unistr(f.getvalue(), 'utf-8')
+        return f.getvalue().decode('utf-8')
 
 
 # Utility functions

@@ -595,8 +595,12 @@ class StyleFile(object):
                         str_value = 'yes'
                     else:
                         str_value = 'no'
-                elif isinstance(value, (basestring, float)):
-                    str_value = unistr(value)
+                elif isinstance(value, unistr):
+                    str_value = value
+                elif isinstance(value, float):
+                    str_value = str(value)
+                elif isinstance(value, bytes):
+                    str_value = value.decode()
                 else:
                     raise Exception("Unsupported value type", value)
                 file.write('%s = %s\n' % (identifier, str_value,))

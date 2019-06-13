@@ -157,7 +157,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         # the same normalized form or the normalized form may match an existing
         # resource URI).
         if isinstance(uri, unistr):
-            uri = unistr(unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore'))
+            uri = unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore').decode('ascii')
         uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', uri.lower())
         n = 0
         template = '%s-%%d%s' % os.path.splitext(uri)
@@ -274,7 +274,7 @@ class EpubExporter(lcg.Exporter):
                 if isinstance(component, unistr):
                     return component.encode(Constants.PATHENC)
                 return component
-            components = list(map(ensure_pathenc, components))
+            components = map(ensure_pathenc, components)
         return Constants.PATHSEP.join(components)
 
     def _meta_path(self, *components):
