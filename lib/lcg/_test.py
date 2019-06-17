@@ -33,7 +33,7 @@ import lcg
 _ = lcg.TranslatableTextFactory('test')
 
 lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
-lcg.config.default_resource_dir = os.path.join(lcg_dir, 'resources')
+os.environ['LCGDIR'] = lcg_dir
 translation_path = [os.path.join(lcg_dir, 'translations')]
 
 class TranslatableText(unittest.TestCase):

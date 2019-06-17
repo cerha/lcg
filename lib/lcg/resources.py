@@ -277,8 +277,9 @@ class ResourceProvider(object):
         assert isinstance(dirs, (list, tuple)), dirs
         assert isinstance(resources, (list, tuple)), resources
         self._dirs = tuple(dirs)
-        if lcg.config.default_resource_dir is not None:
-            self._dirs += (lcg.config.default_resource_dir,)
+        lcgdir = os.environ.get('LCGDIR')
+        if lcgdir:
+            self._dirs += (os.path.normpath(os.path.join(lcgdir, 'resources')),)
         self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
 

@@ -135,7 +135,6 @@ def main(argv, opt, args):
     lcg_dir = os.environ.get('LCGDIR')
     if lcg_dir:
         translations.append(os.path.abspath(os.path.join(lcg_dir, 'translations')))
-        lcg.config.default_resource_dir = os.path.normpath(os.path.join(lcg_dir, 'resources'))
     if opt['translations']:
         translations.extend([os.path.abspath(d) for d in opt['translations'].split(':')])
     #######################################################################################
