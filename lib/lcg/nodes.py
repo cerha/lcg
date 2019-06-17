@@ -30,6 +30,7 @@ import copy
 
 from lcg import is_sequence_of
 
+
 class ContentNode(object):
     """Representation of one node within an LCG publication.
 
@@ -115,7 +116,7 @@ class ContentNode(object):
         assert metadata is None or isinstance(metadata, Metadata)
         assert heading is None or isinstance(heading, lcg.Content), heading
         self._id = id
-        self._parent = None #parent
+        self._parent = None  # parent
         self._title = title if title is not None else brief_title or id
         self._heading = heading or lcg.TextContent(self._title)
         self._brief_title = brief_title or title
@@ -443,6 +444,7 @@ class ContentNode(object):
 
 class Variant(object):
     """Definition of language specific values of certain 'ContentNode' attributes."""
+
     def __init__(self, lang, content=None, page_header=None, first_page_header=None,
                  page_footer=None, left_page_footer=None, right_page_footer=None,
                  page_background=None, presentation=None):

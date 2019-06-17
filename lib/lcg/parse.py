@@ -28,6 +28,7 @@ import xml.etree.ElementTree
 
 import lcg
 
+
 class ProcessingError(Exception):
     """Exception for errors generated during processing of defective source data.
 
@@ -90,6 +91,7 @@ class ProcessingError(Exception):
 def _bool(string):
     return string.strip().lower() not in ('0', 'false', 'no',)
 
+
 class Parser(object):
     """Structured text (wiki) document parser.
 
@@ -110,12 +112,14 @@ class Parser(object):
     _CELL_ALIGNMENT_MAPPING = {'c': lcg.TableCell.CENTER, 'l': lcg.TableCell.LEFT,
                                'r': lcg.TableCell.RIGHT}
     _COMMENT_MATCHER = re.compile('^#[^\r\n]*\r?(\n|$)', re.MULTILINE)
-    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<collapsible>>\+? +)?(?P<title>.*) (?P=level)'
+    _SECTION_MATCHER = re.compile((r'^(?P<level>=+) (?P<collapsible>>\+? +)?'
+                                   r'(?P<title>.*) (?P=level)'
                                    r'(?:[\t ]+(?:\*|(?P<not_in_toc>\!)?'
                                    r'(?P<section_id>[\w\d_-]+)))?'
                                    r'(?P<section_classes>(?:[\t ]+\.[\w\d_-]+)*) *\r?$'),
                                   re.MULTILINE)
-    _CONTAINER_MATCHER = re.compile((r'^(?P<collapsible>\[(?P<title>[^\]]+)\]\+? +)?\>(?P<level>\>+)'
+    _CONTAINER_MATCHER = re.compile((r'^(?P<collapsible>\[(?P<title>[^\]]+)\]\+? +)?'
+                                     r'\>(?P<level>\>+)'
                                      r'([ \t]+(?P<id>[\w\d_-]+))?'
                                      r'(?P<classes>(?:[\t ]+\.[\w\d_-]+)*)[\t ]*\r?$'),
                                     re.MULTILINE)
@@ -159,18 +163,18 @@ class Parser(object):
         ('citation', ('>>', '<<')),
         # Link to an internal or external (http) target via [ ].
         ('link', (r'\['
-                  r'(?P<align>[<>])?' # Left/right Image aligment e.g. [<imagefile], [>imagefile]
-                  r'(?P<href>[^\[\]\|\s]*?)' # The link target e.g. [src]
-                  r'(?::(?P<size>\d+x\d+))?' # Optional explicit image (or video) size
-                                             # e.g. [image.jpg:30x40])
-                  r'(?:(?:\s*\|\s*|\s+)' # Separator (pipe is enabled for backwards compatibility,
-                                         # but space is the official separator)
-                  r'(?P<label>[^\[\]\|]*))?' # Label text
-                  r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?' # Description after |
-                                                          # [src Label | Description]
+                  r'(?P<align>[<>])?'  # Left/right Image aligment e.g. [<imagefile], [>imagefile]
+                  r'(?P<href>[^\[\]\|\s]*?)'  # The link target e.g. [src]
+                  r'(?::(?P<size>\d+x\d+))?'  # Optional explicit image (or video) size
+                                              # e.g. [image.jpg:30x40])
+                  r'(?:(?:\s*\|\s*|\s+)'  # Separator (pipe is enabled for backwards compatibility,
+                                          # but space is the official separator)
+                  r'(?P<label>[^\[\]\|]*))?'  # Label text
+                  r'(?:(?:\s*\|\s*)(?P<descr>[^\[\]]*))?'  # Description after |
+                                                           # [src Label | Description]
                   r'\]')),
         # Link directly in the text starting with http(s)/ftp://
-        ('uri', (r'(?:https?|ftp)://\S+?(?=[\),.:;]*(\s|$))')), # ?!? SOS!
+        ('uri', (r'(?:https?|ftp)://\S+?(?=[\),.:;]*(\s|$))')),  # ?!? SOS!
         ('email', r'\w[\w\-\.]*@\w[\w\-\.]*\w'),
         ('substitution', (r"(?!\\)\$(?P<subst>[a-zA-Z][a-zA-Z_]*(\.[a-zA-Z][a-zA-Z_]*)?" +
                           "|\{[^\}]+\})")),
@@ -179,7 +183,7 @@ class Parser(object):
         ('nbsp', '~'),
         ('page_number', '@PAGE@'),
         ('total_pages', '@PAGES@'),
-        ('escape', '\\\\(?P<char>[-*@])'),
+        ('escape', r'\\\\(?P<char>[-*@])'),
     )
 
     _INLINE_MARKUP_PARAMETERS = ('align', 'href', 'label', 'descr', 'subst', 'size', 'char')
@@ -190,6 +194,7 @@ class Parser(object):
     _BLANK_MATCHER = re.compile(r'\s+', re.MULTILINE)
 
     class _StackEntry(object):
+
         def __init__(self, name):
             self.name = name
             self.content = []
@@ -226,7 +231,7 @@ class Parser(object):
         for k in prune:
             try:
                 del kwargs[k]
-            except:
+            except KeyError:
                 pass
         return kwargs
 
@@ -397,6 +402,7 @@ class Parser(object):
         match = self._LIST_MATCHER.match(text[position:])
         if not match:
             return None
+
         def list_kind(text, position):
             char = text[position]
             if char in ('*', '-',):
@@ -435,7 +441,7 @@ class Parser(object):
                         current_indentation += 1
                     else:
                         break
-                if current_indentation < inner_indentation: # no inner content anymore
+                if current_indentation < inner_indentation:  # no inner content anymore
                     break
             # Hack to prevent single paragraphs in list item contents.
             item0 = item_content[0]
@@ -449,7 +455,7 @@ class Parser(object):
                 items.append(item_content[0])
             else:
                 items.append(lcg.Container(item_content))
-            if position >= size or current_indentation != list_indentation: # no next item
+            if position >= size or current_indentation != list_indentation:  # no next item
                 break
             match = self._LIST_MATCHER.match(text[position:])
             if not match:               # this is not a (next) list item
@@ -465,6 +471,7 @@ class Parser(object):
         bars = None
         global_widths = None
         global_alignments = {}
+
         def align(column_number, cell):
             alignment = global_alignments.get(column_number)
             if alignment is not None:
@@ -484,7 +491,7 @@ class Parser(object):
             eol = text[start_position:].find('\n')
             if eol >= 0:
                 position += eol + 1
-                if text[position - 2] != '\r' and text[position:position + 1] == '\r': # Mac
+                if text[position - 2] != '\r' and text[position:position + 1] == '\r':  # Mac
                     position += 1
             else:
                 position = len(text)
@@ -541,7 +548,7 @@ class Parser(object):
             # Is it a heading?
             if (not table_rows and
                 all([not cell or cell.startswith("*") and cell.endswith("*")
-                     for cell in stripped_cells])):
+                     for cell in stripped_cells])):  # noqa: F812
                 row_cells = [lcg.TableHeading(self.parse_inline_markup(cell and cell[1:-1]))
                              for cell in stripped_cells]
             else:
@@ -566,7 +573,7 @@ class Parser(object):
         if global_widths is None or all([w is None for w in global_widths.values()]):
             column_widths = None
         else:
-            column_widths = [global_widths[i] for i in range(len(global_widths))]
+            column_widths = [global_widths[i] for i in range(len(global_widths))]  # noqa: F812
         content = lcg.Table(table_rows, bars=bars, column_widths=column_widths, halign=halign)
         return content, position
 
@@ -719,7 +726,7 @@ class Parser(object):
             if match.end(1) - match.start(1) + extra_indentation < indentation:
                 # reduced indentation?
                 break
-            if compressed and self._LIST_MATCHER.match(text[position:]): # inner list
+            if compressed and self._LIST_MATCHER.match(text[position:]):  # inner list
                 break
             position += match.end()
             extra_indentation = 0
@@ -932,6 +939,7 @@ class Parser(object):
         stack = []
         result = []
         pos = 0
+
         def append(*content):
             if stack:
                 stack[-1].content.extend(content)
@@ -1029,6 +1037,7 @@ class MacroParser(object):
     _INCLUDE_REGEX = re.compile(r'(?m)^@include (.*)\r?$')
 
     class _ConditionalText(object):
+
         def __init__(self, evaluate, condition, parent=None):
             self._evaluate = evaluate
             self._condition = condition
@@ -1503,6 +1512,7 @@ class HTMLProcessor(object):
                 if isinstance(test, (tuple, list,)):
                     tag_regexp = re.compile(test[0] + '$')
                     attr_tests = [(a, re.compile(r),) for a, r in test[1:]]
+
                     def test_function(element, tag_regexp=tag_regexp, attr_tests=attr_tests):
                         if not tag_regexp.match(element.tag):
                             return False

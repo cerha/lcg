@@ -27,6 +27,7 @@ import re
 import unicodedata
 import os
 
+
 class Constants(object):
     """Things mandated by EPUB 3 spec"""
     CONTAINER_NS = 'urn:oasis:names:tc:opendocument:xmlns:container'
@@ -259,7 +260,7 @@ class EpubExporter(lcg.Exporter):
         return resource.get()
 
     def _container_path(self, *components):
-        #TODO replace forbidden characters as per spec
+        # TODO replace forbidden characters as per spec
         def ensure_pathenc(component):
             if isinstance(component, unicode):
                 return component.encode(Constants.PATHENC)
@@ -306,6 +307,7 @@ class EpubExporter(lcg.Exporter):
         metadata = node.metadata() or lcg.Metadata()
         metadata_element = package.appendChild(doc.createElement('metadata'))
         metadata_element.setAttribute('xmlns:dc', Constants.DC_NS)
+
         def add_meta(name, value, **kwargs):
             if value:
                 element = metadata_element.appendChild(doc.createElement(name))
@@ -334,6 +336,7 @@ class EpubExporter(lcg.Exporter):
         # manifest and spine
         manifest = package.appendChild(doc.createElement('manifest'))
         spine = package.appendChild(doc.createElement('spine'))
+
         def add_item(item_id, href, mediatype, properties=()):
             item = manifest.appendChild(doc.createElement('item'))
             item.setAttribute('id', item_id)
@@ -343,8 +346,8 @@ class EpubExporter(lcg.Exporter):
                 item.setAttribute('properties', ' '.join(properties))
         add_item('nav', self.Config.NAV_DOC_FILENAME, 'application/xhtml+xml', properties=('nav',))
         for n in node.linear():
-            item_id = 'node-' + n.id() # Prefix to avoid ids beginning with a number (invalid HTML)
-            href = '/'.join(self._node_path(n).split('/')[1:]) #TODO hack to make path relative
+            item_id = 'node-' + n.id()  # Prefix to avoid ids beginning with a number (invalid HTML)
+            href = '/'.join(self._node_path(n).split('/')[1:])  # TODO hack to make path relative
             add_item(item_id, href, mediatype='application/xhtml+xml',
                      properties=node_properties.get(n, ()))
             spine.appendChild(doc.createElement('itemref')).setAttribute('idref', item_id)
@@ -372,12 +375,13 @@ class EpubExporter(lcg.Exporter):
         body = html.appendChild(doc.createElement('body'))
         nav = body.appendChild(doc.createElement('nav'))
         nav.setAttribute('epub:type', 'toc')
+
         def export(items, root):
             ol = root.appendChild(doc.createElement('ol'))
             for item, subitems in items:
                 title = item.title()
                 # descr = item.descr() TODO: unused
-                uri = context.uri(item) #TODO fix relativeness, add #fragments for Sections
+                uri = context.uri(item)  # TODO fix relativeness, add #fragments for Sections
                 li = ol.appendChild(doc.createElement('li'))
                 a = li.appendChild(doc.createElement('a'))
                 a.setAttribute('href', uri)

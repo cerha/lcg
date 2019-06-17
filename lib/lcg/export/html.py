@@ -41,9 +41,11 @@ class HtmlEscapedUnicode(unicode):
 
     """
     class _EscapingInterpolator(object):
+
         def __init__(self, interpolator, escape):
             self._interpolator = interpolator
             self._escape = escape
+
         def __getitem__(self, key):
             return self._escape(self._interpolator[key])
 
@@ -81,6 +83,7 @@ class HtmlEscapedUnicode(unicode):
             arguments = self._EscapingInterpolator(other, escape)
         result = super(HtmlEscapedUnicode, self).__mod__(arguments)
         return HtmlEscapedUnicode(result, escape=False)
+
 
 class HtmlGenerator(object):
     """Generate HTML tags through a simple Pythonic API.
@@ -130,7 +133,9 @@ class HtmlGenerator(object):
     attribute, please help your self and add it.
 
     """
+
     class _JavaScriptCode(unicode):
+
         def __new__(cls, text):
             return unicode.__new__(cls, text)
 
@@ -505,6 +510,7 @@ class HtmlGenerator(object):
         if options is not None:
             if __debug__:
                 found = []
+
             def opt(label, value, enabled=True, cls=None):
                 if isinstance(value, (list, tuple)):
                     return self.optgroup([opt(*x) for x in value], label=label)
@@ -514,9 +520,10 @@ class HtmlGenerator(object):
                             found.append(value)
                     return self.option(label, value=value, selected=(value == selected),
                                        disabled=not enabled, cls=cls)
+
             assert selected is None or found, \
                 "Value %r not found in options: %r" % (selected, options)
-            kwargs['name'] = content # name used to be the first positional argument.
+            kwargs['name'] = content  # name used to be the first positional argument.
             content = [opt(*x) for x in options]
         else:
             assert selected is None, "Can't use 'selected' without 'options'."
@@ -598,14 +605,18 @@ class HtmlGenerator(object):
 class XhtmlGenerator(HtmlGenerator):
     pass
 
+
 class HtmlExporter(lcg.Exporter):
     Generator = HtmlGenerator
 
     class Context(lcg.Exporter.Context):
+
         class IdGenerator(object):
             """HTML identifier class for the 'id_generator()' method."""
+
             def __init__(self, context):
                 self._context = context
+
             def __getattr__(self, name):
                 id = self._context.unique_id()
                 self.__dict__[name] = id
@@ -729,8 +740,6 @@ class HtmlExporter(lcg.Exporter):
             """Return the back reference if it was previously created or None."""
             return self._backref.get(item)
 
-
-
     class Part(object):
         """Representation of the HTML page <body> element content structure.
 
@@ -782,6 +791,7 @@ class HtmlExporter(lcg.Exporter):
             statically defined attributes passed to 'Part' constructor.
 
         """
+
         def __init__(self, id, content=None, **attr):
             self.id = id
             self.name = '_' + id.replace('-', '_')
@@ -971,6 +981,7 @@ class HtmlExporter(lcg.Exporter):
 
     def _export_quotation(self, context, element):
         g = self._generator
+
         def wrap(content, cls='lcg-quotation', **kwargs):
             uri = element.uri()
             if uri:
@@ -980,6 +991,7 @@ class HtmlExporter(lcg.Exporter):
             if source or uri:
                 content += g.footer(g.escape(u'— ') + source)
             return g.blockquote(content, cls=cls, **kwargs)
+
         return self._export_container(context, element, wrap=wrap)
 
     def _export_footer(self, context, element):
@@ -987,6 +999,7 @@ class HtmlExporter(lcg.Exporter):
 
     def _export_figure(self, context, element):
         g = self._generator
+
         def wrap(content, **kwargs):
             caption = element.caption()
             if caption:
@@ -999,6 +1012,7 @@ class HtmlExporter(lcg.Exporter):
             else:
                 cls = None
             return g.figure(content, cls=cls, **kwargs)
+
         return self._export_container(context, element, wrap=wrap)
 
     def _export_superscript(self, context, element):
@@ -1165,6 +1179,7 @@ class HtmlExporter(lcg.Exporter):
     def _export_table_of_contents(self, context, element):
         g = self._generator
         parent = element.parent()
+
         def toc_link(item):
             if isinstance(item, lcg.ContentNode):
                 descr = item.descr()
@@ -1180,12 +1195,14 @@ class HtmlExporter(lcg.Exporter):
                 uri_kwargs = dict(local=(parent is item.parent()))
             uri = context.uri(item, **uri_kwargs)
             return g.a(item.heading().export(context), href=uri, name=name, title=descr)
+
         def make_toc(items):
             if len(items) == 0:
                 return g.escape('')
             else:
                 return g.ul([g.li((toc_link(item), make_toc(subitems)), cls="i%d" % (i + 1,))
                              for i, (item, subitems) in enumerate(items)])
+
         result = make_toc(element.items(context.lang()))
         title = element.title()
         if title is not None:
@@ -1409,8 +1426,10 @@ class HtmlExporter(lcg.Exporter):
             context.log(msg, kind=lcg.WARNING)
             context.log(_("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
                           "and put swfobject.js to your resource path."))
+
         def escape(value):
             return str(value).replace('?', '%3F').replace('=', '%3D').replace('&', '%26')
+
         flash_object = context.resource(filename)
         if flash_object is None:
             return None
@@ -1452,8 +1471,10 @@ class HtmlExporter(lcg.Exporter):
     def _export_audio_player(self, context):
         g = self._generator
         ids = context.id_generator()
+
         def button(label, **kwargs):
             return g.button(g.span(label), title=label, **kwargs)
+
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
         context.resource('jquery.min.js')
@@ -1503,8 +1524,7 @@ class HtmlExporter(lcg.Exporter):
                                     href="http://get.adobe.com/flashplayer/", target='_blank')),
                           )),
                           g.div(cls='jp-gui jp-interface', content=player),
-                      ),
-                ),
+                      )),
             )),
         ]
         swf = context.resource('jplayer.swf')
@@ -1668,6 +1688,7 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
             return None
         g = self._generator
         parent = node.parent()
+
         def link(target, label=None, key=None):
             if target:
                 hidden = ''
@@ -1687,6 +1708,7 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
                 # Translators: Label used instead of a link when the target does not exist.  For
                 # example sequential navigation may contain: "Previous: Introduction, Next: None".
                 return _("None")
+
         breadcrumbs = g.div(_("You are here:") + ' ' +
                             concat([link(n) for n in node.path()], separator=' / '))
         nav = [
@@ -1699,6 +1721,7 @@ class HtmlStaticExporter(StyledHtmlExporter, HtmlFileExporter):
 
 _URL_MATCHER = re.compile(r'(https?://.+?)(?=[\),.:;?!\]]?\.*(\s|&nbsp;|&lt;|&gt;|<br/?>|$))')
 
+
 def format_text(text):
     """Format given string into HTML preserving linebreaks and indentation in multiline text.
 
@@ -1708,6 +1731,7 @@ def format_text(text):
     """
     nbsp = '&nbsp;'
     len_nbsp = len(nbsp)
+
     def convert_line(line):
         line_length = len(line)
         i = 0

@@ -30,6 +30,7 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
 
+
 class Resource(object):
     """Generic resource representation.
 
@@ -161,6 +162,7 @@ class Image(Resource):
     def thumbnail(self):
         return self._thumbnail
 
+
 class Stylesheet(Resource):
     """A cascading style sheet."""
     SUBDIR = 'css'
@@ -179,27 +181,33 @@ class Stylesheet(Resource):
     def media(self):
         return self._media
 
+
 class Script(Resource):
     """A java/ecma/... script object used within the content."""
     SUBDIR = 'scripts'
     EXTENSIONS = ('js',)
+
 
 class Translations(Resource):
     """Gettext translations .po file"""
     SUBDIR = 'translations'
     EXTENSIONS = ('po',)
 
+
 class Media(Resource):
     """Media file, such as audio or video."""
     SUBDIR = 'media'
+
 
 class Audio(Media):
     """Audio media file."""
     EXTENSIONS = ('mp3', 'wave', 'ogg', 'oga', 'wav', 'aac', 'm4a')
 
+
 class Video(Media):
     """Video media file."""
     EXTENSIONS = ('flv', 'ogv', 'mp4', 'webm', '3gp')
+
 
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
@@ -254,14 +262,18 @@ class ResourceProvider(object):
     class OrderedDict(object):
         # Totally simplistic - just what we need to get the resources in the order of allocation.
         # This is needed for the correct precedence of stylesheets.
+
         def __init__(self, pairs):
             self._dict = dict(pairs)
             self._values = [v for k, v in pairs]
+
         def __setitem__(self, key, value):
             self._values.append(value)
             self._dict[key] = value
+
         def __getitem__(self, key):
             return self._dict[key]
+
         def values(self):
             return self._values
 

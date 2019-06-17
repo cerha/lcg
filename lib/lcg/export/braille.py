@@ -79,8 +79,9 @@ _mathml_operators = {
     '∉': (_inf, ' ⠈⠘⠑ ', '00000',),
 }
 
-_unknown_char_regexp = re.compile('⠄⡳⠭([⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+)') # only English version
-from export import Exporter, FileExporter
+_unknown_char_regexp = re.compile('⠄⡳⠭([⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔]+)')  # only English version
+from .export import Exporter, FileExporter
+
 
 def braille_presentation(presentation_file='presentation-braille.py'):
     """Return default braille presentation.
@@ -99,6 +100,7 @@ def braille_presentation(presentation_file='presentation-braille.py'):
         if o[0] in string.lowercase and hasattr(presentation, o):
             setattr(presentation, o, confmodule.__dict__[o])
     return presentation
+
 
 class _Braille(object):
 
@@ -158,6 +160,7 @@ class BrailleError(Exception):
     The exception provides a human readable explanation message.
 
     """
+
     def __init__(self, message, *args):
         """
         Arguments:
@@ -173,8 +176,10 @@ class BrailleError(Exception):
         """
         return self.args[0]
 
+
 class TableTooWideError(BrailleError):
     "Exception raised on tables that can't be fit to the page width."
+
     def __init__(self, info):
         super(TableTooWideError, self).__init__("Table too wide (%s)" % (info,))
 
@@ -253,11 +258,14 @@ _en6backmapping = {
     u'=': u'⠿',
 }
 _entity_regexp = re.compile('&([A-Za-z]+);')
+
+
 def xml2braille(xml):
     if _louisutdml is None:
         return None
     # Preprocess entities
     entity_table = mathml.entities
+
     def replace_entity(match):
         entity = match.group(1)
         replacement = entity_table.get(entity)
@@ -278,12 +286,12 @@ def xml2braille(xml):
         mode = 1 << 30
         try:
             # latest liblouisutdml logs output with log level INFO - unexpected output fails tests; so raise the default log level
-            _louisutdml.lbu_setLogLevel(40000) # liblouis.h: LOG_ERROR = 40000
+            _louisutdml.lbu_setLogLevel(40000)  # liblouis.h: LOG_ERROR = 40000
         except AttributeError:
             pass
     # Make the foreign call and process the results
     result = _louisutdml.lbu_translateString(str("preferences.cfg"), inbuf, len(inbuf) + 1,
-                                            outbuf, ctypes.byref(outlen), None, None, mode)
+                                             outbuf, ctypes.byref(outlen), None, None, mode)
     if not result:
         raise BrailleError("XML processing failed", xml)
     _louisutdml_initialized = True
@@ -293,6 +301,7 @@ def xml2braille(xml):
     # translate the output here.  Additionally we remove spaces from the
     # beginning of the output which are put there by liblouisutdml for an
     # unknown reason.
+
     def make_dot_char(i):
         c = unichr(i)
         return _en6backmapping.get(c, c)
@@ -302,18 +311,19 @@ def xml2braille(xml):
 
 from nemeth import mathml_nemeth
 
+
 class BrailleExporter(FileExporter, Exporter):
     "Transforming structured content objects to Braille output."
 
     _OUTPUT_FILE_EXT = 'brl'
 
-    _PAGE_START_CHAR = '\ue010' # recommended page break + priority
-    _PAGE_END_CHAR = '\ue011' # end of a single-page object
-    _PAGE_START_REPEAT_CHAR = '\ue012' # end of repeating lines from the first page start (headers)
-    _DOUBLE_PAGE_CHAR = '\ue013' # left and right pages composing a single page (e.g. wide table)
-    _SOFT_NEWLINE_CHAR = '\ue014' # removable newline (e.g. removable at the end of a page)
-    _NEW_PAGE_CHAR = '\ue015' # new page if not at the beginning of new page
-    _NO_PAGE_BREAK_CHAR = '\ue016' # no page break after this line
+    _PAGE_START_CHAR = '\ue010'  # recommended page break + priority
+    _PAGE_END_CHAR = '\ue011'  # end of a single-page object
+    _PAGE_START_REPEAT_CHAR = '\ue012'  # end of repeating lines from the first page start (headers)
+    _DOUBLE_PAGE_CHAR = '\ue013'  # left and right pages composing a single page (e.g. wide table)
+    _SOFT_NEWLINE_CHAR = '\ue014'  # removable newline (e.g. removable at the end of a page)
+    _NEW_PAGE_CHAR = '\ue015'  # new page if not at the beginning of new page
+    _NO_PAGE_BREAK_CHAR = '\ue016'  # no page break after this line
     _INDENTATION_CHAR = '\uf010'
     _NEXT_INDENTATION_CHAR = '\uf011'
     _RESTART_INDENTATION_CHAR = '\uf012'
@@ -486,6 +496,7 @@ class BrailleExporter(FileExporter, Exporter):
         hyphenation_tables = presentation.braille_hyphenation_tables
         context.set_tables(braille_tables, hyphenation_tables)
         # Export
+
         def run_export(page_height=page_height):
             context.set_page_heading(_Braille(''))
             braille = super(BrailleExporter, self).export(context, recursive=recursive)
@@ -506,6 +517,7 @@ class BrailleExporter(FileExporter, Exporter):
             hfill = self._HFILL
             hfill_len = len(hfill)
             page_strings = text.split('\f')
+
             def split(page):
                 lines = page.split('\n')
                 if lines[-1] == u'':
@@ -516,6 +528,7 @@ class BrailleExporter(FileExporter, Exporter):
             if page_width:
                 for i in range(len(pages)):
                     lines = []
+
                     def add_line(l, center=False, no_page_break=False):
                         while True:
                             pos = l.find(hfill)
@@ -666,8 +679,10 @@ class BrailleExporter(FileExporter, Exporter):
                 new_pages = []
                 repeated_lines = []
                 repeated_lines_activated = [False]
+
                 def add_page(page):
                     lines = []
+
                     def add_line(l, line_list, check=False):
                         if __debug__ and check:
                             if self._RE_MARKER_MATCHER.search(l) is not None:
@@ -920,7 +935,7 @@ class BrailleExporter(FileExporter, Exporter):
         # But hopefully this simplification here doesn't cause real use
         # problems.
         braille = louis.translateString(tables, text, typeform=copy.copy(typeform),
-                                       mode=(louis.dotsIO + louis.ucBrl))
+                                        mode=(louis.dotsIO + louis.ucBrl))
         whitespace = self._whitespace
         if typeform is None:
             if italic:
@@ -1225,6 +1240,7 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _export_table(self, context, element, recursive=False):
         exception = None
+
         def export(element, explanation):
             if isinstance(element, Table):
                 try:
@@ -1300,8 +1316,10 @@ class BrailleExporter(FileExporter, Exporter):
         content = [c.content() for c in element.content() if isinstance(c, TableRow)]
         top_label = content[0][0]
         items = []
+
         def cell(label, value):
             return Container((label, TextContent(': '), value,))
+
         def add_list(label, headings, cells):
             cells = list(cells) + [TextContent('')] * (len(headings) - len(cells))
             subitems = [cell(*lv) for lv in zip(headings, cells)]
@@ -1312,6 +1330,7 @@ class BrailleExporter(FileExporter, Exporter):
                 add_list(row[0], headings, row[1:])
         elif direction == 'column':
             headings = [c[0] for c in content[1:]]
+
             def get_cell(row, i):
                 try:
                     return row[i]
@@ -1378,18 +1397,21 @@ class BrailleExporter(FileExporter, Exporter):
         export = self._export_table_cell
         table_cell_width = self._table_cell_width
         table_intro = None
+
         def prefix(cell, common):
             i = 0
             for i in range(min(len(cell), len(common))):
                 if cell[i] != common[i]:
                     break
             return common[:i]
+
         def suffix(cell, common):
             i = 0
             for i in range(min(len(cell), len(common))):
                 if cell[-i - 1] != common[-i - 1]:
                     break
             return common[len(common) - i:]
+
         def export_cells(column, compactness):
             context_compactness.clear()
             context_compactness.update(compactness)
@@ -1400,6 +1422,7 @@ class BrailleExporter(FileExporter, Exporter):
                 else:
                     exported.append(_Braille(''))
             return exported
+
         def adjust_widths(max_w, total_width=total_width):
             if total_width <= max_w:
                 return True
@@ -1535,20 +1558,24 @@ class BrailleExporter(FileExporter, Exporter):
 
     def _export_mathml_czech(self, context, element):
         class EntityHandler(element.EntityHandler):
+
             def __init__(self, *args, **kwargs):
                 super(EntityHandler, self).__init__(*args, **kwargs)
                 self._data = mathml.entities
+
             def __getitem__(self, key):
                 return self._data.get(key, '?')
         entity_handler = EntityHandler()
         top = element.tree_content(entity_handler, transform=True)
         exporters = {}
         flags = []
+
         def current_style():
             for i in range(len(flags) - 1, -1, -1):
                 if flags[i].startswith('style:'):
                     return flags[i]
             return ''
+
         def set_style(node):
             variant = node.get('mathvariant')
             if variant:
@@ -1570,21 +1597,26 @@ class BrailleExporter(FileExporter, Exporter):
             else:
                 f = ''
             flags.append(f)
+
         def unset_style():
             flags.pop()
+
         def node_value(node):
             value = node.text
             if value is None:
                 # this may happen with unresolved entities
                 value = '?'
             return value
+
         def child_nodes(node, exported=False):
             children = node.getchildren()
             if exported:
                 children = [export(c) for c in children]
             return children
+
         def attribute(node, name, default=None):
             return node.attrib.get(name, default)
+
         def op_translation(operator, node=None):
             translation = _mathml_operators.get(operator)
             op_form = None if translation is None else translation[0]
@@ -1615,6 +1647,7 @@ class BrailleExporter(FileExporter, Exporter):
                     op_braille += '⠀'
                     hyphenation += self.HYPH_CZECH_MATH_WS
             return op_form, _Braille(op_braille, hyphenation)
+
         def text_export(text, node=None):
             if node is not None:
                 set_style(node)
@@ -1629,6 +1662,7 @@ class BrailleExporter(FileExporter, Exporter):
             if node is not None:
                 unset_style()
             return _Braille(braille, self.HYPH_NO * len(braille))
+
         def export(node, **kwargs):
             tag = node.tag
             e = exporters.get(tag)
@@ -1652,6 +1686,7 @@ class BrailleExporter(FileExporter, Exporter):
                 if variant:
                     flags.pop()
             return result
+
         def child_export(node, separators=None):
             braille = _Braille('', '')
             children = child_nodes(node)
@@ -1674,9 +1709,11 @@ class BrailleExporter(FileExporter, Exporter):
                     braille.append(separator, hyph_separator)
                 braille = braille + export(n, op_form=op_form)
             return braille
+
         def export_mi(node, **kwargs):
             text = node_value(node).strip()
             return text_export(text, node=node)
+
         def export_mn(node, **kwargs):
             text = node_value(node).replace(' ', '')
             braille = text_export(text)
@@ -1685,9 +1722,10 @@ class BrailleExporter(FileExporter, Exporter):
             # this will be fixed in final MathML result processing.
             braille.append(u'⠐', self.HYPH_NO)
             return braille
+
         def export_mo(node, op_form=None, **kwargs):
-            form = attribute(node, 'form', op_form) # prefix, infix, postfix
-            separator = attribute(node, 'separator') # true, false
+            form = attribute(node, 'form', op_form)  # prefix, infix, postfix
+            separator = attribute(node, 'separator')  # true, false
             # We should probably ignore these as Braille script has its own
             # rules of math line breaking:
             # linebreak = attribute(node, 'linebreak') # auto, newline, nobreak, goodbreak, badbreak
@@ -1704,6 +1742,7 @@ class BrailleExporter(FileExporter, Exporter):
                 if op_braille.text()[0] not in (' ', '⠀',):
                     op_braille.prepend(' ', self.HYPH_NO)
             return op_braille
+
         def export_mtext(node, **kwargs):
             text = node_value(node).strip()
             # It's necessary to replace commas in order to distinguish
@@ -1718,13 +1757,17 @@ class BrailleExporter(FileExporter, Exporter):
                     text = text[:pos] + ' ' + text[pos:]
                 pos += 1
             return text_export(text, node=node)
+
         def export_mspace(node, **kwargs):
             return text_export(' ')
+
         def export_ms(node, **kwargs):
             text = '"%s"' % (node_value(node).strip(),)
             return text_export(text, node=node)
+
         def export_mrow(node, **kwargs):
             return child_export(node)
+
         def export_mfrac(node, **kwargs):
             child_1, child_2 = child_nodes(node, exported=True)
             mfrac_flag = 'mfrac'
@@ -1733,15 +1776,18 @@ class BrailleExporter(FileExporter, Exporter):
             else:
                 line = _Braille('⠻', self.HYPH_CZECH_MATH_WS)
             return _Braille('⠆') + child_1 + line + child_2 + _Braille('⠰')
+
         def export_msqrt(node, **kwargs):
             return _Braille('⠩', self.HYPH_CZECH_MATH_WS) + child_export(node) + _Braille('⠱')
+
         def export_mroot(node, **kwargs):
             base, root = child_nodes(node, exported=True)
             return (_Braille('⠠⠌') + root + _Braille('⠩', self.HYPH_CZECH_MATH_WS) + base +
                     _Braille('⠱'))
+
         def export_mstyle(node, **kwargs):
             break_style = attribute(node, 'infixlinebreakstyle')
-            if break_style: # before, after, duplicate
+            if break_style:  # before, after, duplicate
                 flags.append('infixlinebreakstyle:' + break_style)
             set_style(node)
             result = child_export(node)
@@ -1749,28 +1795,37 @@ class BrailleExporter(FileExporter, Exporter):
             if break_style:
                 flags.pop()
             return result
+
         def export_merror(node, **kwargs):
             return child_export(node)
+
         def export_mpadded(node, **kwargs):
             return child_export(node)
+
         def export_mphantom(node, **kwargs):
             braille = child_export(node)
             n = len(braille)
             return _Braille('⠀' * n)
+
         def export_menclose(node, **kwargs):
             return child_export(node)
+
         def export_msub(node, **kwargs):
             base, sub = child_nodes(node, exported=True)
             return base + _Braille('⠡') + sub + _Braille('⠱')
+
         def export_msup(node, **kwargs):
             base, sup = child_nodes(node, exported=True)
             return base + _Braille('⠌') + sup + _Braille('⠱')
+
         def export_msubsup(node, **kwargs):
             base, sub, sup = child_nodes(node, exported=True)
             return base + _Braille('⠌') + sub + _Braille('⠱⠡') + sup + _Braille('⠱')
+
         def export_munder(node, **kwargs):
             base, under = child_nodes(node, exported=True)
             return base + _Braille('⠠⠡') + under + _Braille('⠱')
+
         def export_mover(node, **kwargs):
             base_child, over_child = child_nodes(node)
             base = export(base_child)
@@ -1782,9 +1837,11 @@ class BrailleExporter(FileExporter, Exporter):
                 over = export(over_child)
                 braille = base + over
             return braille
+
         def export_munder_mover(node, **kwargs):
             base, under, over = child_nodes(node, exported=True)
             return base + _Braille('⠠⠡') + under + _Braille('⠱⠠⠌') + over + _Braille('⠱')
+
         def export_maction(node, **kwargs):
             selection = attribute(node, 'selection')
             if not selection:

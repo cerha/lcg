@@ -36,6 +36,7 @@ lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
 os.environ['LCGDIR'] = lcg_dir
 translation_path = [os.path.join(lcg_dir, 'translations')]
 
+
 class TranslatableText(unittest.TestCase):
 
     def test_interpolation(self):
@@ -110,7 +111,7 @@ class TranslatableText(unittest.TestCase):
         b = _("Bob") + ' + ' + _("Joe")
         c = a.transform(saxutils.quoteattr)
         d = b.transform(saxutils.quoteattr)
-        e = "attr=" + d # Test transformed Concatenation nesting!
+        e = "attr=" + d  # Test transformed Concatenation nesting!
         f = lcg.concat('<tag ' + e + '>')
         self.assertIsInstance(c, lcg.TranslatableText)
         self.assertIsInstance(d, lcg.Concatenation)
@@ -238,11 +239,15 @@ class SelfTranslatableText(unittest.TestCase):
 
 
 class LocalizableDateTime(unittest.TestCase):
+
     class tzinfo(datetime.tzinfo):
+
         def __init__(self, offset):
             self._offset = offset
+
         def utcoffset(self, dt):
             return datetime.timedelta(minutes=self._offset)
+
         def tzname(self, dt):
             offset = self._offset
             sign = offset / abs(offset)
@@ -251,6 +256,7 @@ class LocalizableDateTime(unittest.TestCase):
                 return "GMT %+d:%d" % (div * sign, mod)
             else:
                 return "GMT %+d" % div * sign
+
         def dst(self, dt):
             return datetime.timedelta(0)
 
@@ -477,6 +483,7 @@ class Resources(unittest.TestCase):
 
     def test_provider(self):
         warnings = []
+
         def warn(msg):
             warnings.append(msg)
         p = lcg.ResourceProvider(resources=(lcg.Audio('xxx.ogg'),))
@@ -567,10 +574,10 @@ class Parser(unittest.TestCase):
         self.assertNotIn('first_page_header', parameters)
         header = parameters['page_header']
         self.assertTrue(header.content()[0].content()[0].content()[0].text() == 'hello',
-                       header.content()[0].content()[0].content()[0].text())
+                        header.content()[0].content()[0].content()[0].text())
         footer = parameters['page_footer']
         self.assertEqual(footer.content()[0].halign(), lcg.HorizontalAlignment.CENTER,
-                        footer.content()[0].halign())
+                         footer.content()[0].halign())
 
     def test_hrule(self):
         text = '''
@@ -715,7 +722,7 @@ blah
             lcg.Container(lcg.p("blah"), name='foo'),
         ))
 
-    def test_generic_container_with_class(self):
+    def test_generic_container_with_id_and_class(self):
         text = '''
 >> bar
 
@@ -746,9 +753,10 @@ inner content
 '''
         self._test_parser(text, (
             lcg.p("blah"),
-            lcg.Container((lcg.p("inner content"),
-                           lcg.Container(lcg.p("1st nested"), name='lcg-generic-container'),
-                           lcg.Container(lcg.p("2nd nested"), name='lcg-generic-container'),
+            lcg.Container((
+                lcg.p("inner content"),
+                lcg.Container(lcg.p("1st nested"), name='lcg-generic-container'),
+                lcg.Container(lcg.p("2nd nested"), name='lcg-generic-container'),
             ), name='lcg-generic-container'),
         ))
 
@@ -829,8 +837,6 @@ blah
             self._test_parser(text, content)
 
 
-
-
 class MacroParser(unittest.TestCase):
 
     def test_simple_condition(self):
@@ -857,7 +863,7 @@ class MacroParser(unittest.TestCase):
         text = "A\n@if a/b == c\nX@else\nY\n@endif\n\nB\n\n"
         r = lcg.MacroParser(globals=dict(a=5, b=0, c=2)).parse(text)
         self.assertEqual(r, "A\nZeroDivisionError: integer division or modulo by zero\nB\n\n",
-                        repr(r))
+                         repr(r))
 
     def test_condition_newlines(self):
         text = "A\n@if x\nX\n@endif\n\nB\n\n"
@@ -893,8 +899,15 @@ class MacroParser(unittest.TestCase):
 class HtmlImport(unittest.TestCase):
 
     def test_html(self):
-        html = u''' <p>
-         some text <span class="lcg-mathml" contenteditable="false" style="display: inline-block;"><math contenteditable="false" style="display:inline-block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mstyle><annotation encoding="ASCII">x^2 + y^2</annotation></semantics></math></span></p>
+        # This HTML preserves the formatting produced by ckeditor, only long lines are wrapped
+        # in order to make Flycheck happy...
+        html = u''' <p>some text
+   <span class="lcg-mathml" contenteditable="false" style="display: inline-block;">
+     <math contenteditable="false" style="display:inline-block"
+         xmlns="http://www.w3.org/1998/Math/MathML">
+       <semantics><mstyle displaystyle="true"><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup>
+         <mi>y</mi><mn>2</mn></msup></mstyle><annotation encoding="ASCII">x^2 + y^2</annotation>
+       </semantics></math></span></p>
  <ol start="1" style="list-style-type: lower-alpha;">
          <li>
                  jedna</li>
@@ -915,7 +928,8 @@ class HtmlImport(unittest.TestCase):
  </ol>
  <hr />
  <p>
-         Písmo <strong>tučné</strong>, <em>zvýrazněné</em>, <u>podtržené</u>, <strike>škrtnuté</strike>, index<sub>dolní</sub> , index<sup>horní</sup>.</p>
+         Písmo <strong>tučné</strong>, <em>zvýrazněné</em>, <u>podtržené</u>,
+         <strike>škrtnuté</strike>, index<sub>dolní</sub> , index<sup>horní</sup>.</p>
  <h1>
          Sekce nová</h1>
  <p>
@@ -928,9 +942,11 @@ class HtmlImport(unittest.TestCase):
  <p>
          a zase jeden odstavec</p>
  <p>
-         <a href="http://www.brailcom.org">Vložíme link na http://www.brailcom.org</a>, a uděláme <a name="kotva">kotvu</a>.</p>
+         <a href="http://www.brailcom.org">Vložíme link na http://www.brailcom.org</a>,
+         a uděláme <a name="kotva">kotvu</a>.</p>
  <p>
-         Teď se odkážeme na tu <a href="#kotva">kotvu</a>. Budeme taky <a href="mailto:info@brailcom.org?subject=LCG%20testing">mailovat</a>.</p>
+         Teď se odkážeme na tu <a href="#kotva">kotvu</a>.
+         Budeme taky <a href="mailto:info@brailcom.org?subject=LCG%20testing">mailovat</a>.</p>
  <h1>
          Další sekce</h1>
  <p style="text-align: center;">
@@ -972,11 +988,15 @@ class HtmlImport(unittest.TestCase):
 
  Inline Resource Image: <img data-lcg-resource="popup-arrow.png" src="/whatever/popup-arrow.png" />
  Inline External Image: <img src="http://www.freebsoft.org/img/logo.gif" />
- Image link: <a href="http://www.freebsoft.org"><img src="http://www.freebsoft.org/img/logo.gif" /></a>
- Audio: <a class="lcg-audio" data-lcg-resource="my-song.mp3" href="/whatever/my-song.mp3">My Song</a>
- Video: <a class="lcg-video" data-lcg-resource="my-video.flv" href="/whatever/my-video.flv">My Video</a>
+ Image link: <a href="http://www.freebsoft.org">
+   <img src="http://www.freebsoft.org/img/logo.gif" /></a>
+ Audio: <a class="lcg-audio" data-lcg-resource="my-song.mp3" href="/whatever/my-song.mp3">
+   My Song</a>
+ Video: <a class="lcg-video" data-lcg-resource="my-video.flv" href="/whatever/my-video.flv">
+   My Video</a>
 
-<div class="lcg-exercise" contenteditable="false" data-type="MultipleChoiceQuestions" style="display: inline-block;">
+<div class="lcg-exercise" contenteditable="false" data-type="MultipleChoiceQuestions"
+     style="display: inline-block;">
 <pre class="lcg-exercise-instructions">
 Choose the correct answer
 </pre>
@@ -1011,6 +1031,7 @@ class HtmlExport(unittest.TestCase):
 
     def test_generator(self):
         g = lcg.HtmlGenerator(sorted_attributes=True)
+
         def test(result, expected):
             self.assertEqual(result, expected,
                              "\n  - expected: %r\n  - got:      %r" % (expected, result))
@@ -1140,8 +1161,8 @@ class HtmlExport(unittest.TestCase):
         ):
             result = lcg.coerce(content).export(context)
             self.assertEqual(result, html,
-                            "\n  - content:  %r\n  - expected: %r\n  - got:      %r" %
-                            (content, html, result,))
+                             "\n  - content:  %r\n  - expected: %r\n  - got:      %r" %
+                             (content, html, result,))
 
     def test_formatting(self):
         def check(result, expected_result):
@@ -1151,8 +1172,8 @@ class HtmlExport(unittest.TestCase):
                 ok = expected_result.match(result)
                 expected_result = expected_result.pattern
             self.assertTrue(ok, ("\n  - source text: %r"
-                                "\n  - expected:    %r"
-                                "\n  - got:         %r" % (text, expected_result, result)))
+                                 "\n  - expected:    %r"
+                                 "\n  - got:         %r" % (text, expected_result, result)))
         resources = (lcg.Resource('text.txt', uri='/resources/texts/text.txt'),
                      lcg.Audio('xx.mp3'),
                      lcg.Image('aa.jpg'),
@@ -1167,7 +1188,7 @@ class HtmlExport(unittest.TestCase):
         for text, html in (
             ('a *b /c/ _d_* =e=',
              'a <strong>b <em>c</em> <u>d</u></strong> <code>e</code>'),
-            ('a */b', # Unfinished markup (we probably don't want that, but now it works so).
+            ('a */b',  # Unfinished markup (we probably don't want that, but now it works so).
              'a <strong><em>b</em></strong>'),
             (' x ',
              ' x '),
@@ -1272,6 +1293,7 @@ class HtmlExport(unittest.TestCase):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
                             globals=dict(x='value of x'))
         context = lcg.HtmlExporter().context(n, None)
+
         def export(content):
             return content.export(context)
         content = lcg.MathML(u"""
@@ -1321,7 +1343,7 @@ class EpubExport(unittest.TestCase):
         d = lcg.ContentNode('d', resource_provider=p)
         c = lcg.ContentNode('c', children=(d,), resource_provider=p)
         b = lcg.ContentNode('b', resource_provider=p)
-        a = lcg.ContentNode('a', children=(b, c), resource_provider=p) #, metadata=m)
+        a = lcg.ContentNode('a', children=(b, c), resource_provider=p)  # , metadata=m)
         e = lcg.EpubExporter()
         context = e.context(a, 'en')
         epub = e.export(context)
@@ -1338,7 +1360,7 @@ class ImsExport(unittest.TestCase):
         d = lcg.ContentNode('d', resource_provider=p)
         c = lcg.ContentNode('c', children=(d,), resource_provider=p)
         b = lcg.ContentNode('b', resource_provider=p)
-        a = lcg.ContentNode('a', children=(b, c), resource_provider=p) #, metadata=m)
+        a = lcg.ContentNode('a', children=(b, c), resource_provider=p)  # , metadata=m)
         e = lcg.IMSExporter()
         manifest = e.manifest(a).xml()
         self.assertEqual(manifest[:19], '<?xml version="1.0"')
@@ -1380,8 +1402,8 @@ class BrailleExport(unittest.TestCase):
             sys.stdout.write('*** Got:\n')
             sys.stdout.write(string.join(result, '\f').encode('utf-8') + '\n')
         self.assertEqual(result, expected,
-                        ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
-                         (text, expected, result,)))
+                         ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+                          (text, expected, result,)))
 
     def test_formatting(self):
         presentation = self._load_presentation()
@@ -1474,13 +1496,15 @@ class BrailleExport(unittest.TestCase):
                     u'⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
                     u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',),
                    presentation, 'cs', full_parse=True)
+
     def test_mathml(self):
         import louis
         python_version = sys.version_info
         louis_version = louis.version().split()[0].split('.')
         can_parse_entities = (python_version[0] >= 3 or
-                             python_version[0] == 2 and python_version[1] >= 7)
+                              python_version[0] == 2 and python_version[1] >= 7)
         entity_regexp = re.compile('&[a-zA-Z]+;')
+
         def test(mathml, expected_result, min_louis=None):
             if not can_parse_entities and entity_regexp.search(mathml):
                 return
@@ -1505,9 +1529,9 @@ class BrailleExport(unittest.TestCase):
             exported = exporter.export(context)
             result = exported.replace('\r\n', '\n').split('\n\n')[1]
             self.assertEqual(result, expected_result,
-                            (("\n  - source text: %r\n  - expected:    %r\n  - "
-                              "got:         %r") %
-                             (mathml, expected_result, result,)))
+                             (("\n  - source text: %r\n  - expected:    %r\n  - "
+                               "got:         %r") %
+                              (mathml, expected_result, result,)))
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,14</mn></mrow>
 </math>''', u'⠼⠉⠂⠁⠙')
@@ -1616,8 +1640,9 @@ class BrailleExport(unittest.TestCase):
     def test_mathml_nemeth(self):
         python_version = sys.version_info
         can_parse_entities = (python_version[0] >= 3 or
-                             python_version[0] == 2 and python_version[1] >= 7)
+                              python_version[0] == 2 and python_version[1] >= 7)
         entity_regexp = re.compile('&[a-zA-Z]+;')
+
         def test(mathml, expected_result, lang='cs', page_width=None, page_height=None,
                  pre=None, post=None):
             if not can_parse_entities and entity_regexp.search(mathml):
@@ -1660,16 +1685,16 @@ class BrailleExport(unittest.TestCase):
         # §8
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,76</mn></mrow>
-</math>''', u'⠼⠒⠨⠶⠖', lang='cs') # decimal point
+</math>''', u'⠼⠒⠨⠶⠖', lang='cs')  # decimal point
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.76</mn></mrow>
-</math>''', u'⠼⠒⠨⠶⠖', lang='cs') # decimal point
+</math>''', u'⠼⠒⠨⠶⠖', lang='cs')  # decimal point
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1,378</mn></mrow>
-</math>''', u'⠼⠂⠠⠒⠶⠦', lang='en') # comma
+</math>''', u'⠼⠂⠠⠒⠶⠦', lang='en')  # comma
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.76</mn></mrow>
-</math>''', u'⠼⠒⠨⠶⠖', lang='en') # decimal point
+</math>''', u'⠼⠒⠨⠶⠖', lang='en')  # decimal point
         # §9
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>27</mn></mrow>
@@ -1768,7 +1793,7 @@ class BrailleExport(unittest.TestCase):
 </math>''', u'⠼⠆⠈⠡⠲')
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mn>10,000</mn>
-</math>''', u'⠼⠂⠴⠠⠴⠴⠴', lang='en') # comma
+</math>''', u'⠼⠂⠴⠠⠴⠴⠴', lang='en')  # comma
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="|" close="|" separators=","><mrow><mo>-</mo><mn>3</mn></mrow></mfenced>
 </math>''', u'⠳⠤⠒⠳')
@@ -2275,9 +2300,9 @@ class BrailleExport(unittest.TestCase):
             exported = exporter.export(context)
             result = exported.replace('\r\n', '\n').split('\n\n')[1]
             self.assertEqual(result, expected_result,
-                            (("\n  - source text: %r\n  - expected:    %r\n  - "
-                              "got:         %r") %
-                             (mathml, expected_result, result,)))
+                             (("\n  - source text: %r\n  - expected:    %r\n  - "
+                               "got:         %r") %
+                              (mathml, expected_result, result,)))
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.76</mn></mrow>
 </math>''', u'⠼⠒⠨⠶⠖')

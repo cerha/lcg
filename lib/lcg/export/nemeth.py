@@ -36,8 +36,8 @@ _SINGLE_LETTER_START = '\ue022'
 _SINGLE_LETTER_END = '\ue023'
 _SINGLE_LETTER_KILLER_PREFIX = '\ue024'
 _SINGLE_LETTER_KILLER_SUFFIX = '\ue025'
-_LEFT_WHITESPACE_42 = '\ue026' # Nemeth §42 and similar
-_RIGHT_WHITESPACE_42 = '\ue027' # Nemeth §42 and similar
+_LEFT_WHITESPACE_42 = '\ue026'  # Nemeth §42 and similar
+_RIGHT_WHITESPACE_42 = '\ue027'  # Nemeth §42 and similar
 _END_SUBSUP = '\ue028'
 _INNER_SUBSUP = '\ue029'
 _IMPLICIT_SUBSCRIPT = '\ue030'  # to prevent numeric multipurpose indicator in subscripts
@@ -65,6 +65,8 @@ _braille_punctuation = ('⠂',)
 _braille_left_grouping = ()
 _braille_right_grouping = ()
 _braille_comparison = ()
+
+
 def _comparison(symbol, braille):
     global _braille_comparison, _nemeth_operators
     braille = braille.strip('%s%s' % (_SINGLE_LETTER_KILLER_PREFIX, _SINGLE_LETTER_KILLER_SUFFIX,))
@@ -73,11 +75,15 @@ def _comparison(symbol, braille):
         _braille_comparison += (braille,)
     braille = _SINGLE_LETTER_KILLER_PREFIX + braille + _SINGLE_LETTER_KILLER_SUFFIX
     _nemeth_operators[symbol] = braille
+
+
 def _punctuation(symbol, braille):
     global _braille_punctuation, _nemeth_operators
     if braille not in _braille_punctuation:
         _braille_punctuation += (braille,)
     _nemeth_operators[symbol] = braille
+
+
 def _shape(symbol, braille, lspace=True, rspace=True):
     global _signs_of_shape, _signs_of_shape_lspace, _signs_of_shape_rspace, _nemeth_operators
     if symbol not in _signs_of_shape:
@@ -88,18 +94,24 @@ def _shape(symbol, braille, lspace=True, rspace=True):
         _signs_of_shape_rspace += symbol
     translated = _SINGLE_LETTER_KILLER_PREFIX + braille + _SINGLE_LETTER_KILLER_SUFFIX
     _nemeth_operators[symbol] = translated
+
+
 def _lgrouping(symbol, braille):
     global _braille_left_grouping, _nemeth_operators
     if braille not in _braille_left_grouping:
         _braille_left_grouping += (braille,)
     if symbol is not None:
         _nemeth_operators[symbol] = braille
+
+
 def _rgrouping(symbol, braille):
     global _braille_right_grouping, _nemeth_operators
     if braille not in _braille_right_grouping:
         _braille_right_grouping += (braille,)
     if symbol is not None:
         _nemeth_operators[symbol] = braille
+
+
 def _prime(symbol, braille):
     global _primes, _nemeth_operators
     if symbol not in _primes:
@@ -112,7 +124,7 @@ _nemeth_operators = {
     '∥': '⠳⠳',
     '¯': '⠱',
     '!': '⠯',
-    '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX, # function application
+    '\u2061': '⠀' + _SINGLE_LETTER_KILLER_PREFIX,  # function application
 }
 _comparison('≐', '⠐⠨⠅⠣⠡⠻')
 _prime("'", '⠄')
@@ -211,7 +223,7 @@ _braille_right_indicators = ('⠼', '⠠⠼', '⠠⠠⠼', '⠸⠼', '⠻', '⠸
                              '⠘', '⠰', '⠣',)
 _braille_symbols_42 = ()        # TODO: not yet defined
 
-
+
 # General utilities
 
 class _Variables(list):
@@ -252,6 +264,7 @@ class _Variables(list):
                 return True
         return False
 
+
 @contextmanager
 def _style(node, variables):
     variant = None if node is None else node.get('mathvariant')
@@ -271,11 +284,14 @@ def _style(node, variables):
     with variables.let('style', style):
         yield None
 
+
 def _child_nodes(node):
     return node.getchildren()
 
+
 def _attribute(node, name, default=None):
     return node.get(name, default)
+
 
 def _node_value(node):
     value = node.text
@@ -284,7 +300,7 @@ def _node_value(node):
         value = '?'
     return value
 
-
+
 # Common export functions
 
 _num_prefix_regexp = re.compile('(^|[\n⠀%s%s%s])([%s%s%s]*⠤?)(%s)' %
@@ -301,11 +317,15 @@ _braille_repeated_subsup_regexp = re.compile('[⠰⠘]+(%s[⠰⠘]+)' % (_INNER_
 _braille_separate_subscript_regexp = \
     re.compile('([⠰%s][%s]+|[⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])$' % (_IMPLICIT_SUBSCRIPT,
                                                                _nemeth_digits,))
+
+
 def mathml_nemeth(exporter, context, element):
     class EntityHandler(element.EntityHandler):
+
         def __init__(self, *args, **kwargs):
             super(EntityHandler, self).__init__(*args, **kwargs)
             self._data = mathml.entities
+
         def __getitem__(self, key):
             return self._data.get(key, '?')
     entity_handler = EntityHandler()
@@ -475,7 +495,7 @@ def mathml_nemeth(exporter, context, element):
             t = text[:i]
             if not post and _braille_empty_regexp.match(t):
                 space = False
-            elif not _braille_number_regexp.search(t): # numbers may look like punctuation
+            elif not _braille_number_regexp.search(t):  # numbers may look like punctuation
                 for b in (_braille_punctuation + _braille_right_indicators +
                           _braille_left_grouping + _braille_right_grouping + _braille_symbols_42 +
                           ('⠀',)):
@@ -534,11 +554,14 @@ def mathml_nemeth(exporter, context, element):
     return _Braille(text, hyphenation)
 
 _exporters = {}
+
+
 def _exporter(tag):
     e = _exporters.get(tag)
     if e is None:
         e = _exporters[tag] = globals().get('_export_' + tag)
     return e
+
 
 def _export(node, exporter, context, variables, **kwargs):
     braille = getattr(node, 'braille', None)
@@ -552,6 +575,7 @@ def _export(node, exporter, context, variables, **kwargs):
         with _style(node, variables):
             result = e(node, exporter, context, variables, **kwargs)
     return result
+
 
 def _text_export(text, exporter, context, variables, node=None, plain=False):
     with _style(node, variables):
@@ -570,7 +594,7 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
               variables.get('enclosed-list') != 'yes' and
               variables.get('direct-delimiters') != 'yes' and
               variables.get('no-letter-prefix') != 'yes' and
-              (len(text) == 1 or text in ('cd',))): # short-form combinations
+              (len(text) == 1 or text in ('cd',))):  # short-form combinations
             prefix = _SINGLE_LETTER_START + prefix
             suffix += _SINGLE_LETTER_END
         else:
@@ -587,6 +611,7 @@ def _text_export(text, exporter, context, variables, node=None, plain=False):
         if suffix:
             braille += suffix
     return _Braille(braille)
+
 
 def _child_export(node, exporter, context, variables, separators=None, **kwargs):
     braille = _Braille('', '')
@@ -628,6 +653,7 @@ def _child_export(node, exporter, context, variables, separators=None, **kwargs)
         left_node = n
     return braille
 
+
 def _op_export(operator, exporter, context, variables, node=None):
     op_braille = _nemeth_operators.get(operator)
     hyphenation = None
@@ -652,7 +678,7 @@ def _op_export(operator, exporter, context, variables, node=None):
         hyphenation = hyphenation[:-1] + exporter.HYPH_NEMETH_WS
     return _Braille(op_braille, hyphenation)
 
-
+
 # Element exports
 
 def _export_mi(node, exporter, context, variables, **kwargs):
@@ -664,6 +690,7 @@ def _export_mi(node, exporter, context, variables, **kwargs):
         exported.prepend(_LEFT_WHITESPACE_42)
         exported.append(_RIGHT_WHITESPACE_42)
     return exported
+
 
 def _export_mn(node, exporter, context, variables, **kwargs):
     text = _node_value(node).strip()
@@ -692,9 +719,11 @@ def _export_mn(node, exporter, context, variables, **kwargs):
                                for c in translated], '')
     return _Braille(translated, hyphenation)
 
+
 def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
     op = _node_value(node).strip()
     op_braille = _op_export(op, exporter, context, variables)
+
     def space(left):
         s = _attribute(node, ('lspace' if left else 'rspace'), None)
         if s is None:
@@ -715,9 +744,11 @@ def _export_mo(node, exporter, context, variables, op_form=None, **kwargs):
         op_braille.append(_NUM_PREFIX_REQUIRED)
     return op_braille
 
+
 def _export_mtext(node, exporter, context, variables, **kwargs):
     text = _node_value(node).strip()
     return _text_export(text, exporter, context, variables, node=node, plain=True)
+
 
 def _export_mspace(node, exporter, context, variables, **kwargs):
     # Just basic support
@@ -731,9 +762,11 @@ def _export_mspace(node, exporter, context, variables, **kwargs):
             raise
     return _Braille('⠀' * n, '4' * n)
 
+
 def _export_ms(node, exporter, context, variables, **kwargs):
     text = '"%s"' % (_node_value(node).strip(),)
     return _text_export(text, exporter, context, variables, node=node, plain=True)
+
 
 def _export_mrow(node, exporter, context, variables, **kwargs):
     children = _child_nodes(node)
@@ -749,25 +782,31 @@ def _export_mrow(node, exporter, context, variables, **kwargs):
             return _export(children[1], exporter, context, variables, **kwargs)
     return _child_export(node, exporter, context, variables)
 
+
 def _export_mstyle(node, exporter, context, variables, **kwargs):
-    break_style = _attribute(node, 'infixlinebreakstyle') # before, after, duplicate
+    break_style = _attribute(node, 'infixlinebreakstyle')  # before, after, duplicate
     with variables.let('infixlinebreakstyle', break_style):
         with _style(node, variables):
             return _child_export(node, exporter, context, variables)
 
+
 def _export_merror(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
 
+
 def _export_mpadded(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
+
 
 def _export_mphantom(node, exporter, context, variables, **kwargs):
     braille = _child_export(node, exporter, context, variables)
     n = len(braille)
     return _Braille('⠀' * n)
 
+
 def _export_menclose(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
+
 
 def _export_maction(node, exporter, context, variables, **kwargs):
     selection = _attribute(node, 'selection')
@@ -775,8 +814,10 @@ def _export_maction(node, exporter, context, variables, **kwargs):
         selection = 1
     return _export(_child_nodes(node)[selection - 1], exporter, context, variables)
 
+
 def _export_mfenced(node, exporter, context, variables, **kwargs):
     raise Exception('debug')
+
 
 def _export_mfrac(node, exporter, context, variables, **kwargs):
     numerator, denominator = _child_nodes(node)
@@ -807,6 +848,7 @@ def _export_mfrac(node, exporter, context, variables, **kwargs):
         line = _Braille('⠠' * level + '⠌')
     return opening + exported_numerator + line + exported_denominator + closing
 
+
 def _mroot(base, index, exporter, context, variables, **kwargs):
     level = variables.get('root-level', 0)
     repeater = _Braille('⠨' * level)
@@ -822,12 +864,15 @@ def _mroot(base, index, exporter, context, variables, **kwargs):
             exported_base = _export(base, exporter, context, variables, **kwargs)
     return prefix + exported_base + suffix
 
+
 def _export_msqrt(node, exporter, context, variables, **kwargs):
     return _mroot(node, None, exporter, context, variables, **kwargs)
+
 
 def _export_mroot(node, exporter, context, variables, **kwargs):
     base, index = _child_nodes(node)
     return _mroot(base, index, exporter, context, variables, **kwargs)
+
 
 def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
     base, index = _child_nodes(node)
@@ -858,7 +903,7 @@ def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
         terminator = subsup
     else:
         terminator = _Braille(_END_SUBSUP)
-    with variables.let('no-letter-prefix', 'yes'): # probably not *completely* correct
+    with variables.let('no-letter-prefix', 'yes'):  # probably not *completely* correct
         exported_base = _export(base, exporter, context, variables, **kwargs)
         if exported_base.text().endswith(_END_SUBSUP):
             exported_base = _Braille(exported_base.text()[:-1], exported_base.hyphenation()[:-1])
@@ -867,6 +912,7 @@ def __export_subsup(indicator, node, exporter, context, variables, **kwargs):
         if not indicate:
             exported_index = _Braille(_IMPLICIT_SUBSCRIPT) + exported_index
         return exported_base + new_subsup + exported_index + terminator
+
 
 def _export_msup(node, exporter, context, variables, **kwargs):
     base, index = _child_nodes(node)
@@ -885,8 +931,10 @@ def _export_msup(node, exporter, context, variables, **kwargs):
                 return base.braille
     return __export_subsup('⠘', node, exporter, context, variables, **kwargs)
 
+
 def _export_msub(node, exporter, context, variables, **kwargs):
     return __export_subsup('⠰', node, exporter, context, variables, **kwargs)
+
 
 def _export_msubsup(node, exporter, context, variables, **kwargs):
     base, sub, sup = _child_nodes(node)
@@ -922,6 +970,7 @@ def _export_msubsup(node, exporter, context, variables, **kwargs):
         c.append(sub)
         return _export_msup(node, exporter, context, variables, **kwargs)
 
+
 def _modifier(variables):
     modifier = _Braille('⠐')
     subsup = variables.get('subsup')
@@ -929,13 +978,15 @@ def _modifier(variables):
         modifier = _Braille(_INNER_SUBSUP) + subsup + modifier
     return modifier
 
+
 def _export_munder(node, exporter, context, variables, **kwargs):
     base, under = _child_nodes(node)
     result = (_export(base, exporter, context, variables, **kwargs) + _Braille('⠩') +
-            _export(under, exporter, context, variables, **kwargs))
+              _export(under, exporter, context, variables, **kwargs))
     if not variables.get('no-under-boundaries'):
         result = _modifier(variables) + result + _Braille('⠻')
     return result
+
 
 def _export_mover(node, exporter, context, variables, **kwargs):
     base, over = _child_nodes(node)
@@ -945,6 +996,7 @@ def _export_mover(node, exporter, context, variables, **kwargs):
         return exported_base + _Braille('⠱')
     return (_modifier(variables) + exported_base + _Braille('⠣') +
             _export(over, exporter, context, variables, **kwargs) + _Braille('⠻'))
+
 
 def _export_munderover(node, exporter, context, variables, **kwargs):
     base, under, over = _child_nodes(node)
@@ -958,6 +1010,7 @@ def _export_munderover(node, exporter, context, variables, **kwargs):
     c.append(under)
     with variables.let('no-under-boundaries', True):
         return _export_mover(node, exporter, context, variables, **kwargs)
+
 
 def _export_mtable(node, exporter, context, variables, **kwargs):
     matrix = _Braille(_MATRIX_START)
@@ -976,6 +1029,7 @@ def _export_mtable(node, exporter, context, variables, **kwargs):
     matrix.append(_MATRIX_END)
     return matrix
 
+
 def _export_mtr(node, exporter, context, variables, **kwargs):
     n_columns = variables.get('matrix-n-columns')
     cells = _child_nodes(node)
@@ -993,8 +1047,10 @@ def _export_mtr(node, exporter, context, variables, **kwargs):
         row = _Braille('⠤⠼' + row.text()[2:])
     return row
 
+
 def _export_mtd(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
+
 
 def _export_mstack(node, exporter, context, variables, **kwargs):
     rows = []
@@ -1132,11 +1188,14 @@ def _export_mstack(node, exporter, context, variables, **kwargs):
     result = _Braille(result)
     return result
 
+
 def _export_msgroup(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
 
+
 def _export_msrow(node, exporter, context, variables, **kwargs):
     return _child_export(node, exporter, context, variables)
+
 
 def _export_msline(node, exporter, context, variables, **kwargs):
     variables.set('msline-present', True)

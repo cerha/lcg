@@ -24,6 +24,7 @@ from lcg import concat
 
 _ = lcg.TranslatableTextFactory('lcg-exercises')
 
+
 class ExerciseExporter(object):
     _JAVASCRIPT_CLASS = 'lcg.Exercise'
     _MESSAGES = {"on first attempt": _("on first attempt")}
@@ -263,7 +264,8 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
     def _export_task_answer(self, context, exercise, exercise_id, task):
         i = exercise.tasks().index(task)
         answer = self._export_task_answer_name(context, exercise, exercise_id, task)
-        return lcg.format('%s. %s', i+1, answer)
+        return lcg.format('%s. %s', i + 1, answer)
+
 
 class MultipleChoiceQuestionsExporter(_ChoiceBasedExerciseExporter):
     pass
@@ -339,7 +341,7 @@ class HiddenAnswersExporter(ExerciseExporter):
 
     def _export_task_answer(self, context, exercise, exercise_id, task):
         i = exercise.tasks().index(task)
-        return lcg.format('%s. %s', i+1, task.answer().export(context))
+        return lcg.format('%s. %s', i + 1, task.answer().export(context))
 
 
 class _FillInExerciseExporter(ExerciseExporter):
@@ -377,6 +379,7 @@ class _FillInExerciseExporter(ExerciseExporter):
 
     def _export_task_text(self, context, exercise, exercise_id, task):
         g = context.generator()
+
         def make_field(answer, label, word_start, word_end):
             field, field_id = self._make_field(context, exercise, exercise_id, task, answer)
             if word_start or word_end:
@@ -453,7 +456,7 @@ class _FillInExerciseExporter(ExerciseExporter):
         answer = ', '.join(task.answers())
         if len(exercise.tasks()) > 1:
             i = exercise.tasks().index(task)
-            answer = lcg.format('%s. %s', i+1, answer)
+            answer = lcg.format('%s. %s', i + 1, answer)
         return answer
 
 
@@ -491,12 +494,14 @@ class ModelClozeExporter(ClozeExporter):
         result = super(ModelClozeExporter, self)._export_tasks(context, exercise, exercise_id)
         if context.allow_interactivity():
             g = context.generator()
+
             def make_field(answer, label, word_start, word_end):
                 field = g.span(answer, cls='model-answer')
                 if word_start or word_end:
                     return g.span(g.noescape(word_start + field + word_end), cls='nowrap')
                 else:
                     return field
+
             def export_task(task):
                 text = task.text().replace('[', '\[')
                 if text:
@@ -521,6 +526,7 @@ class _TestExporter(object):
     exercises and leaving out everything, what is not necesarry...
 
     """
+
     def _export_script(self, context, exercise, exercise_id):
         return None
 
@@ -550,6 +556,7 @@ class _TestExporter(object):
         # (to let the tutor fix it).
         added = self.added_points(context.req())
         max = self.max_points()
+
         def field(label, name, value, size=6, readonly=True, **kwargs):
             field_id = exercise_id + '-' + name
             return (g.label(label, field_id) + ' ' +

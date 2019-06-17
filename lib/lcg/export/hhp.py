@@ -26,6 +26,7 @@ browser (see http://www/wxwidgets.org for more information about wx Widgets).
 import lcg
 import os
 
+
 class _MetaFile(object):
     _EXT = None
 
@@ -55,7 +56,7 @@ class _Contents(_MetaFile):
                  '    <param name="Name" value="%s">' % node.title(),
                  '    <param name="Local" value="%s">' % uri,
                  '  </object>')
-        return tuple([indent+'  '+line for line in lines])
+        return tuple([indent + '  ' + line for line in lines])
 
     def _lines(self, node=None, indent=''):
         node = node or self._context.node()
@@ -65,7 +66,7 @@ class _Contents(_MetaFile):
             lines += (indent + "<ul>",)
             for n in children:
                 lines += self._item(n, indent=indent)
-                lines += self._lines(node=n, indent=indent+'    ')
+                lines += self._lines(node=n, indent=indent + '    ')
             lines += (indent + "</ul>",)
         return lines
 
@@ -103,8 +104,9 @@ class HhpExporter(lcg.HtmlFileExporter):
     _ALLOW_BACKREF = False
 
     class Generator(lcg.HtmlGenerator):
+
         def hr(self, **kwargs):
-            return '<hr>' # We don't want XHTML tag syntax (<hr/>).
+            return '<hr>'  # We don't want XHTML tag syntax (<hr/>).
 
         def table(self, content, cls=None, **kwargs):
             if cls == 'lcg-table':

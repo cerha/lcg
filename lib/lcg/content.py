@@ -406,6 +406,7 @@ class Citation(Container):
     """Citation of a text in another language."""
     pass
 
+
 class Quotation(Container):
     """Quotation of content from other source."""
 
@@ -432,9 +433,11 @@ class Quotation(Container):
         """Return the quotation source URI as passed to the constructor."""
         return self._uri
 
+
 class Superscript(Container):
     """Text vertically aligned above the normal line level."""
     pass
+
 
 class Subscript(Container):
     """Text vertically aligned below the normal line level."""
@@ -490,6 +493,7 @@ class Link(Container):
 
     class ExternalTarget(object):
         """Representation of an external target specified by its URI."""
+
         def __init__(self, uri, title, descr=None, lang=None):
             """Arguments:
 
@@ -503,12 +507,16 @@ class Link(Container):
             self._title = title
             self._descr = descr
             self._lang = lang
+
         def uri(self):
             return self._uri
+
         def title(self):
             return self._title
+
         def descr(self):
             return self._descr
+
         def lang(self):
             return self._lang
 
@@ -588,6 +596,7 @@ class Link(Container):
         if isinstance(target, basestring) and '#' in target:
             return target.split('#', 1)[0]
         return None
+
 
 class Abbreviation(TextContent):
     """Abbreviation with description."""
@@ -842,7 +851,6 @@ class InlineVideo(_InlineObject):
         return self._size
 
 
-
 class InlineExternalVideo(Content):
     """Embedded video from external services such as YouTube or Vimeo
 
@@ -850,6 +858,7 @@ class InlineExternalVideo(Content):
     player preloaded with given video and playing it on invocation.
 
     """
+
     def __init__(self, service, video_id, title=None, descr=None, size=None, lang=None):
         """Arguments:
 
@@ -906,6 +915,7 @@ class Title(Content):
     used for substitution.
 
     """
+
     def __init__(self, id=None):
         """Arguments:
 
@@ -931,6 +941,7 @@ class HorizontalSeparator(Content):
     above and below it.
 
     """
+
     def __init__(self, thickness=None, color=None, **kwargs):
         """Arguments:
         thickness -- Thickness of the line as 'lcg.Unit' or None for the (media
@@ -969,6 +980,7 @@ class PageNumber(Content):
     This content may be used only inside page headers and footers.
 
     """
+
     def __init__(self, total=False, separator=None, lang=None):
         """
         Arguments:
@@ -1012,6 +1024,7 @@ class HSpace(Content):
     can be used.
 
     """
+
     def __init__(self, size, lang=None):
         """
         @type: L{lcg.Unit}
@@ -1090,7 +1103,6 @@ class HtmlContent(Content):
             return self._content(context, self, *self._export_args)
 
 
-
 class Heading(Container):
     """Heading, e.g. heading of a section.
 
@@ -1099,6 +1111,7 @@ class Heading(Container):
     for the purpose of applying specific styles to its content.
 
     """
+
     def __init__(self, content, level, **kwargs):
         """
         Arguments:
@@ -1120,6 +1133,7 @@ class Heading(Container):
 
 class PreformattedText(TextContent):
     """Preformatted text."""
+
     def __init__(self, text, mime_type=None, **kwargs):
         """Arguments:
 
@@ -1141,6 +1155,7 @@ class PreformattedText(TextContent):
 
 SectionContainer = Container
 """Deprecated: Use 'Container' instead."""
+
 
 class Paragraph(Container):
     """A paragraph of text, where the text can be any 'Content'."""
@@ -1588,6 +1603,7 @@ class NoneContent(Content):
     """
     pass
 
+
 class SetVariable(Content):
     """Pseudo-content serving for setting node global variables.
 
@@ -1596,6 +1612,7 @@ class SetVariable(Content):
     variables at proper places.
 
     """
+
     def __init__(self, name, value, **kwargs):
         """
         Arguments:
@@ -1672,6 +1689,7 @@ class Figure(Container):
     def align(self):
         return self._align
 
+
 class MathML(Content):
     """Representation of MathML content for inclusion in LCG documents.
 
@@ -1692,6 +1710,7 @@ class MathML(Content):
         Unicode characters.
 
         """
+
         def __getitem__(self, key):
             return key
 
@@ -1748,6 +1767,7 @@ class MathML(Content):
         assert len(top_elements) == 1
         top = top_elements[0]
         tree = ElementTree.Element(top.tagName)
+
         def export(parent_tree, node):
             node_type = node.nodeType
             if node_type == node.ELEMENT_NODE:
@@ -1863,7 +1883,7 @@ class MathML(Content):
             tree = self._transform_content(tree)
         return tree
 
-
+
 # Convenience functions for simple content construction.
 
 def coerce(content, formatted=False):
@@ -1905,6 +1925,7 @@ def coerce(content, formatted=False):
         assert isinstance(content, Content), ('Invalid content', content,)
         return content
 
+
 def join(items, separator=' '):
     """Coerce all items and put the coerced separator in between them."""
     sep = coerce(separator)
@@ -1914,6 +1935,7 @@ def join(items, separator=' '):
             result.append(sep)
         result.append(coerce(item))
     return coerce(result)
+
 
 def link(target, label=None, type=None, descr=None):
     """Return a 'Link' instance.
@@ -1940,6 +1962,7 @@ def link(target, label=None, type=None, descr=None):
         assert descr is None
     return Link(target, label=label, type=type)
 
+
 def dl(items, formatted=False):
     """Create a 'DefinitionList' from a sequence of (TERM, DESCRIPTION) pairs.
 
@@ -1950,14 +1973,17 @@ def dl(items, formatted=False):
     return DefinitionList([(coerce(term), coerce(descr, formatted=formatted))
                            for term, descr in items])
 
+
 def ul(items, formatted=False):
     """Create an 'ItemizedList' by coercing given sequence of items."""
     return ItemizedList([coerce(item, formatted=formatted) for item in items])
+
 
 def ol(items, formatted=False, alpha=False):
     """Create an 'ItemizedList' by coercing given sequence of items."""
     return ItemizedList([coerce(item, formatted=formatted) for item in items],
                         order=(alpha and ItemizedList.LOWER_ALPHA or ItemizedList.NUMERIC))
+
 
 def fieldset(pairs, formatted=False):
     """Create a 'FieldSet' out of given sequence of (LABEL, VALUE) pairs.
@@ -1978,42 +2004,53 @@ def sec(title, content, heading=None, name='default-section', **kwargs):
 def _container(container, items, formatted=False, **kwargs):
     return container([coerce(item, formatted=formatted) for item in items], **kwargs)
 
+
 def p(*items, **kwargs):
     """Create a 'Paragraph' by coercing all arguments."""
     return _container(Paragraph, items, **kwargs)
+
 
 def strong(*items, **kwargs):
     """Create a 'Strong' instance by coercing all arguments."""
     return _container(Strong, items, **kwargs)
 
+
 def em(*items, **kwargs):
     """Create an 'Emphasized' instance by coercing all arguments."""
     return _container(Emphasized, items, **kwargs)
+
 
 def u(*items, **kwargs):
     """Create an 'Underlined' instance by coercing all arguments."""
     return _container(Underlined, items, **kwargs)
 
+
 def code(*items, **kwargs):
     """Create an 'Code' instance by coercing all arguments."""
     return _container(Code, items, **kwargs)
+
 
 def cite(*items, **kwargs):
     """Create an 'Citation' instance by coercing all arguments."""
     return _container(Citation, items, **kwargs)
 
+
 def container(*items, **kwargs):
     return _container(Container, items, **kwargs)
+
 
 def br():
     return NewLine()
 
+
 def hr():
     return HorizontalSeparator()
+
 
 def pre(text, **kwargs):
     """Create an 'PreformattedText' instance by coercing all arguments."""
     return PreformattedText(text, **kwargs)
+
 
 def abbr(text, descr, **kwargs):
     """Create an 'Abbreviation' instance."""

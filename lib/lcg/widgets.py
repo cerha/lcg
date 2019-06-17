@@ -238,6 +238,7 @@ class FoldableTree(Widget, lcg.Content):
         while current.parent() is not None and current.hidden():
             current = current.parent()
         path = current.path()
+
         def menu(node):
             # The 'icon' span must be inside the A tag because MSIE doesn't fire on click
             # events outside.  The span indents the link title and creates a space for
@@ -300,7 +301,7 @@ class Notebook(Widget, lcg.Container):
     def _export_widget(self, context):
         g = context.generator()
         switcher = g.ul([g.li(g.a(s.title(), href='#' + s.id(), title=s.descr(),
-                                  cls=(s.id()==self._active and 'current' or None)),
+                                  cls=(s.id() == self._active and 'current' or None)),
                               cls="notebook-tab")
                          for s in self.sections()],
                         cls='notebook-switcher')

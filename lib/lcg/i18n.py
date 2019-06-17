@@ -34,6 +34,7 @@ import re
 import string
 import sys
 
+
 class TranslatableTextFactory(object):
     """A helper for defining the '_' identifier bound to a certain domain.
 
@@ -45,6 +46,7 @@ class TranslatableTextFactory(object):
     unicode, not string, otherwise the argument may remain untranslated!
 
     """
+
     def __init__(self, domain, origin='en'):
         assert isinstance(domain, basestring), domain
         assert isinstance(origin, basestring), origin
@@ -84,6 +86,7 @@ class TranslatedTextFactory(TranslatableTextFactory):
     satisfies both worlds.  This class does that.
 
     """
+
     def __init__(self, domain, origin='en', lang=None, translation_path=()):
         """Arguments:
 
@@ -246,6 +249,7 @@ class Localizable(unicode):
             result = transform(result)
         return result
 
+
 class TranslatableText(Localizable):
     """Translatable string with a delayed translation.
 
@@ -275,6 +279,7 @@ class TranslatableText(Localizable):
     _RESERVED_ARGS = ('escape_html',)
 
     class _Interpolator(object):
+
         def __init__(self, func, localizer):
             self._func = func
             self._localizer = localizer
@@ -300,7 +305,6 @@ class TranslatableText(Localizable):
 
         def contains_escaped_html(self):
             return self._contains_escaped_html
-
 
     def __new__(cls, text, *args, **kwargs):
         if not args or __debug__:
@@ -528,10 +532,13 @@ class LocalizableDateTime(Localizable):
 
     class _UTCTimezone(datetime.tzinfo):
         _ZERO_DIFF = datetime.timedelta(0)
+
         def utcoffset(self, dt):
             return self._ZERO_DIFF
+
         def tzname(self, dt):
             return "UTC"
+
         def dst(self, dt):
             return self._ZERO_DIFF
     _UTC_TZ = _UTCTimezone()
@@ -762,6 +769,7 @@ class Concatenation(Localizable):
     def __new__(cls, items, separator='', **kwargs):
         def escape(text):
             return re.sub(r'[^\x01-\x7F]', '?', text)
+
         def x(item):
             if isinstance(item, (list, tuple)):
                 try:
@@ -806,6 +814,7 @@ class Concatenation(Localizable):
 
         """
         super(Concatenation, self).__init__(**kwargs)
+
         def html_escaped(items):
             if isinstance(items, (list, tuple,)):
                 for i in items:
@@ -820,6 +829,7 @@ class Concatenation(Localizable):
             separator = lcg.HtmlEscapedUnicode(separator, escape=True)
         self._items = flat = []
         last = []
+
         def flatten(sequence, separator=separator):
             for x in sequence:
                 if x.__class__ in (unicode, str,):
@@ -923,6 +933,7 @@ class Translator(object):
     'NullTranslator' for concrete implementations.
 
     """
+
     def __init__(self, lang=None):
         self._lang = lang
 
@@ -1147,6 +1158,7 @@ def concat(*args, **kwargs):
     if len(items) == 1 and not isinstance(items[0], Localizable):
         return items[0]
     return result
+
 
 def format(template, *args, **kwargs):
     """Return a translatable string with interpolated format values.

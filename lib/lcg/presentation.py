@@ -36,6 +36,7 @@ import lcg
 import re
 import string
 
+
 class Presentation(object):
     """Set of presentation properties.
 
@@ -215,6 +216,7 @@ class ContentMatcher(object):
     matching algorithms.  Matching is performed using 'matches()' method.
 
     """
+
     def matches(self, content, lang):
         """Return true iff the matcher matches the given content and language.
 
@@ -235,6 +237,7 @@ class TopLevelMatcher(ContentMatcher):
     As a convention the matcher returns true on null content.
 
     """
+
     def matches(self, content, lang):
         """Return true iff 'content' is 'None'."""
         return content is None
@@ -247,6 +250,7 @@ class LanguageMatcher(ContentMatcher):
     unspecified languages.
 
     """
+
     def __init__(self, lang):
         """
         Arguments:
@@ -332,6 +336,7 @@ class PresentationSet(object):
     presentations, see 'presentation()' method.
 
     """
+
     def __init__(self, presentations):
         """
         Arguments:
@@ -418,8 +423,12 @@ class PresentationSet(object):
 
 def _parse_ufont(s):
     return float(s)
+
+
 def _parse_string(s):
     return s
+
+
 def _parse_boolean(s):
     s = s.lower()
     if s == 'yes':
@@ -428,6 +437,8 @@ def _parse_boolean(s):
         return False
     else:
         raise Exception("Invalid boolean value")
+
+
 def _parse_font_family(s):
     if s == 'SERIF':
         result = lcg.FontFamily.SERIF
@@ -438,6 +449,8 @@ def _parse_font_family(s):
     else:
         raise Exception("Invalid font family")
     return result
+
+
 class StyleFile(object):
     """Style file support.
 
@@ -521,7 +534,7 @@ class StyleFile(object):
                 for s in inherits:
                     if s not in names_styles:
                         raise self.ParseError("Unknown style `%s' in style file on line %s" %
-                                         (s, line_number,))
+                                              (s, line_number,))
                 style = names_styles[name] = self._Style()
                 styles.append(style)
                 style.name = name

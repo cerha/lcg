@@ -46,6 +46,7 @@ class Reader(object):
     Just override the corresponding method, such as '_title()' for the 'title' argument, etc.
 
     """
+
     def __init__(self, id, parent=None, hidden=False, resource_provider=None):
         """Initialize the instance.
 
@@ -137,6 +138,7 @@ class Reader(object):
                 # exception was actually raised during processing this file.
                 e = lcg.add_processing_info(e, 'File', self._source_filename)
             raise
+
 
 class FileReader(Reader):
 

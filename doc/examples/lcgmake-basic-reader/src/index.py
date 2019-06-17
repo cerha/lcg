@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import lcg
 
+
 class Reader(lcg.DocFileReader):
     """Simple LCG Reader example.
 
@@ -20,12 +21,11 @@ class Reader(lcg.DocFileReader):
     class).  Thus this example is useful only as a template for other custom
     readers.  If you really wanted to just process one (structued) text file,
     you could simply invoke 'lcgmake file.txt'.
-            
+
     """
+
     def __init__(self, id, *args, **kwargs):
         # Force the name of the input file to the other file in the same directory.
         super(Reader, self).__init__('src', *args, **kwargs)
 
     # Here you would override the DocFileReader methods
-
-

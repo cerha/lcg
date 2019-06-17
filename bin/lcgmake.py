@@ -88,6 +88,7 @@ EPUB = 'epub'
 
 _debug = False
 
+
 def main(argv, opt, args):
     global _debug
     _debug = opt['debug']
@@ -201,6 +202,7 @@ def main(argv, opt, args):
     exporter.dump(node, dst, filename=filename, variant=lang, sec_lang=opt['sec-lang'],
                   presentation=presentation, **export_kwargs)
 
+
 def read_presentation(filename):
     presentation = lcg.Presentation()
     try:
@@ -218,6 +220,7 @@ def read_presentation(filename):
             setattr(presentation, o, confmodule.__dict__[o])
     return lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
 
+
 def read_style(filename):
     style_file = lcg.StyleFile()
     try:
@@ -232,17 +235,18 @@ def read_style(filename):
         f.close()
     return lcg.PresentationSet(style_file.presentations())
 
+
 def getoptions(argv):
     optspec = functools.reduce(operator.add, [optspec for section, optspec in OPTIONS], ())
     opts, args = getopt.getopt(argv[1:], '', [x[0] for x in optspec])
     optdict = dict(opts)
     options = {}
     for option, default, doc in optspec:
-            if option.endswith('='):
-                option = option[:-1]
-                options[option] = optdict.get('--' + option, default)
-            else:
-                options[option] = ('--' + option) in optdict
+        if option.endswith('='):
+            option = option[:-1]
+            options[option] = optdict.get('--' + option, default)
+        else:
+            options[option] = ('--' + option) in optdict
     return options, args
 
 
@@ -265,9 +269,11 @@ def dumpoptions(width=80, indent=3):
                                  for o, d in options]))
     return "\n\n".join(result)
 
+
 def die(msg):
     sys.stderr.write(msg + "\n")
     sys.exit(2)
+
 
 def usage(argv):
     help = """Usage: %s [options] source [destination]
@@ -303,6 +309,7 @@ Environment variables:
 """
     die(help % (os.path.split(argv[0])[-1], dumpoptions(width=80, indent=2)))
 
+
 def lcg_exception_details(title, details=[], reason=None):
     """Print LCG specific details about the printed exception.
 
@@ -323,6 +330,7 @@ def lcg_exception_details(title, details=[], reason=None):
             return "%s: %s" % line
     return """\n\n%s:\n%s\n\nError: %s\n""" % \
            (title, "\n".join([format(line) for line in reversed(details)]), reason)
+
 
 def run(argv):
     try:

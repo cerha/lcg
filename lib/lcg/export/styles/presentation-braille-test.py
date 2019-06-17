@@ -39,4 +39,4 @@ right_page_footer = lcg.Container((lcg.PageHeading(),
                                    lcg.HSpace(lcg.UFont(3)),
                                    lcg.PageNumber(),))
 
-braille_math_rules = 'czech' # 'nemeth', 'czech'
+braille_math_rules = 'czech'  # 'nemeth', 'czech'

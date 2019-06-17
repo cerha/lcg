@@ -70,8 +70,10 @@ class SubstitutionIterator(object):
     class NotStartedError(Exception):
         """Exception raised when 'value()' without previous 'next()' is called.
         """
+
         def __init__(self, iterator):
             self._iterator = iterator
+
         def iterator(self):
             return self._iterator
 
@@ -169,6 +171,7 @@ class Exporter(object):
         attribute of the derived 'Exporter' class (it is a nested class).
 
         """
+
         def __init__(self, exporter, node, lang, **kwargs):
             """Initialize the export context.
 
@@ -258,7 +261,7 @@ class Exporter(object):
         def localize(self, text):
             return self._localizer.localize(text)
 
-        translate = localize # For backwards compatibility...
+        translate = localize  # For backwards compatibility...
 
         def presentation(self):
             return self._presentation
@@ -564,7 +567,7 @@ class Exporter(object):
     def _reformat_text(self, context, text):
         text = context.localize(text)
         text = text.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
-        text = self._RE_MARKER_MATCHER.sub('', text) # prevent crashes on marker chars in input
+        text = self._RE_MARKER_MATCHER.sub('', text)  # prevent crashes on marker chars in input
         text = self._RE_SPACE_MATCHER.sub(' ', text)
         return text
 
@@ -912,6 +915,7 @@ class Exporter(object):
         letters = u'abcdefghijklmnopqrstuvwxyz'
         n_letters = len(letters)
         item_number = [1]
+
         def number():
             n = item_number[0]
             item_number[0] += 1
@@ -999,6 +1003,7 @@ class Exporter(object):
         page_width = presentation and presentation.page_width
         item_list = []
         node_list = context.toc_elements = []
+
         def export(items):
             for node, subitems in items:
                 node_list.append(node.heading() if isinstance(node, lcg.ContentNode) else node)
@@ -1014,6 +1019,7 @@ class Exporter(object):
                 if subitems:
                     export(subitems)
         items = []
+
         def add_item(node, subitems):
             if isinstance(node, lcg.ContentNode):
                 items.append((node.heading(), (),))
@@ -1197,11 +1203,13 @@ class Exporter(object):
         # Tasks
         fill_in_char = u'_'
         fill_in_area = fill_in_char * 4
+
         def choice_text(task, choice, show_answers):
             if not show_answers or choice.correct():
                 return self.text(context, choice.answer(), reformat=True)
             else:
                 return None
+
         def format_choices(task, show_answers):
             choices = []
             for c in task.choices():
@@ -1215,6 +1223,7 @@ class Exporter(object):
             if choices:
                 choices_nl.append(choices[-1])
             return self.concat(*choices_nl)
+
         def format_task_text(context, task, field_maker):
             text = task.text()
             if text:
@@ -1226,14 +1235,16 @@ class Exporter(object):
             else:
                 text = self.text(context, '')
             return text
+
         def make_field(show_answers, context, task, text):
             if show_answers:
                 result = fill_in_char + self._reformat_text(context, text) + fill_in_char
             else:
                 result = fill_in_area
             return result
+
         def export_task_parts(task, show_answers):
-            #if isinstance(element, lcg.WritingTest):
+            # if isinstance(element, lcg.WritingTest):
             #    return (None if show_answers else self.text(context, fill_in_area),)
             if isinstance(element, lcg.FillInExercise):
                 if task.has_fields_in_text():
@@ -1261,6 +1272,7 @@ class Exporter(object):
                 return result
             elif isinstance(element, lcg.GapFilling):
                 gap_matcher = re.compile(r"(___+)")
+
                 def text_preprocessor(text):
                     if show_answers:
                         for c in task.choices():
@@ -1291,6 +1303,7 @@ class Exporter(object):
                         result.append(prompt)
                 result.append(format_choices(task, show_answers))
                 return result
+
         def export_task(task):
             def add_part(with_answers, add_page_start):
                 parts = [p for p in export_task_parts(task, with_answers) if p is not None]
@@ -1433,6 +1446,7 @@ class FileExporter(object):
 
 
 class UnsupportedElementType(Exception):
+
     def __init__(self, element_type):
         msg = "Element type not supported by the exporter: %s" % element_type
         super(UnsupportedElementType, self).__init__(msg)

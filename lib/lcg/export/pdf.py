@@ -214,6 +214,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
 
 
 class RLTableOfContents(reportlab.platypus.tableofcontents.TableOfContents):
+
     def __init__(self, *args, **kwargs):
         if 'context' in kwargs:
             context = kwargs['context']
@@ -696,6 +697,7 @@ class RLImage(reportlab.platypus.flowables.Image):
                          self.drawWidth,
                          self.drawHeight,)
             self.canv.linkURL(uri, link_rect, relative=1)
+
 
 class Context(object):
     """Place holder for PDF backend export state.
@@ -1288,6 +1290,7 @@ class Context(object):
             self._tempdir = tempfile.mkdtemp()
         return self._tempdir
 
+
 def _ok_export_result(result):
     if not isinstance(result, (tuple, list,)) or not result:
         return True
@@ -1311,14 +1314,19 @@ _replacements = (('&', '&amp;',),
                  ('<', '&lt;',),
                  ('>', '&gt;',),
                  )
+
+
 def _escape(text):
     for old, new in _replacements:
         text = text.replace(old, new)
     return text
+
+
 def _unescape(text):
     for old, new in _replacements:
         text = text.replace(new, old)
     return text
+
 
 class Element(object):
     """Base class of all content classes.
@@ -1411,6 +1419,7 @@ class Element(object):
                 return None
         return None
 
+
 class Text(Element):
     """Basic text.
 
@@ -1465,6 +1474,7 @@ class Text(Element):
             return self.content.plain_text()
         return True
 
+
 class Empty(Text):
     """An empty content.
 
@@ -1473,8 +1483,10 @@ class Empty(Text):
 
     """
     _CATEGORY = None
+
     def init(self):
         self.content = ''
+
 
 class SimpleMarkup(Text):
     """In-paragraph markup without content.
@@ -1499,6 +1511,7 @@ class SimpleMarkup(Text):
 
     def plain_text(self):
         return False
+
 
 class TextContainer(Text):
     """Container of any number of 'Text' elements.
@@ -1557,6 +1570,7 @@ class TextContainer(Text):
                 break
         return result
 
+
 class MarkedText(TextContainer):
     """Text wrapped by an in-paragraph markup.
 
@@ -1597,6 +1611,7 @@ class MarkedText(TextContainer):
     def plain_text(self):
         return False
 
+
 class PreformattedText(Element):
     """Text to be output verbatim.
 
@@ -1615,6 +1630,7 @@ class PreformattedText(Element):
         space = reportlab.platypus.Spacer(0, self._unit2points(UFont(0.5), style))
         result = [space, reportlab.platypus.Preformatted(self.content, style), space]
         return result
+
 
 class Paragraph(Element):
     """Paragraph of text.
@@ -1682,6 +1698,7 @@ class Paragraph(Element):
         assert isinstance(text, Text), ('type error', text,)
         self.content.insert(0, make_element(Text, content=text))
 
+
 class Label(Paragraph):
     """Label, e.g. in a definition list.
 
@@ -1698,6 +1715,7 @@ class Label(Paragraph):
         maybe_break = reportlab.platypus.CondPageBreak(self._unit2points(UFont(5), style))
         label = super(Label, self)._export(context, style=style)
         return [maybe_break, label]
+
 
 class Heading(Label):
     """Heading of a section, etc.
@@ -1721,6 +1739,7 @@ class Heading(Label):
     def _style(self, context):
         return context.pdf_context.heading_style(self.level)
 
+
 class PageBreak(Element):
     """Unconditional page break.
 
@@ -1731,6 +1750,7 @@ class PageBreak(Element):
 
     def _export(self, context):
         return reportlab.platypus.PageBreak()
+
 
 class NewDocument(PageBreak):
     """Element with no real content marking end of a new document in series.
@@ -1753,6 +1773,7 @@ class NewDocument(PageBreak):
                     reportlab.platypus.PageBreak()]
         return exported
 
+
 class HorizontalRule(Element):
     """Horizontal rule, similar to HTML <hr>.
 
@@ -1771,6 +1792,7 @@ class HorizontalRule(Element):
             kwargs['color'] = self._color2rgb(self.color)
         return reportlab.platypus.flowables.HRFlowable(width='100%', **kwargs)
 
+
 class TableOfContents(Element):
     """Table of contents.
 
@@ -1782,6 +1804,7 @@ class TableOfContents(Element):
 
     def _export(self, context):
         return RLTableOfContents(context=context)
+
 
 class PageNumber(Text):
     """Page number.
@@ -1817,6 +1840,7 @@ class PageNumber(Text):
         Text.init(self)
         return Text._export(self, context)
 
+
 class Space(Element):
     """Hard space.
 
@@ -1835,6 +1859,7 @@ class Space(Element):
         width = self._unit2points(self.width, style)
         height = self._unit2points(self.height, style)
         return RLSpacer(width, height)
+
 
 class Container(Element):
     """Sequence of (almost) any objects.
@@ -1997,6 +2022,7 @@ class Container(Element):
                 expanded += filter_(c)
         return expanded
 
+
 class List(Element):
     """List of items.
 
@@ -2074,6 +2100,7 @@ class List(Element):
         assert _ok_export_result(result), ('wrong export', result,)
         return result
 
+
 class Link(Text):
     """Link to some location, either internal or external.
 
@@ -2100,6 +2127,7 @@ class Link(Text):
             result = u'<i>%s</i>' % (exported_content,)
         return result
 
+
 class LinkTarget(Text):
     """Target of an internal link.
 
@@ -2120,6 +2148,7 @@ class LinkTarget(Text):
         context.pdf_context.clear_anchor_reference(self.name)
         result = u'<a name="%s"/>%s' % (self.name, exported_text,)
         return result
+
 
 class ImageBase(Element):
     filename = None
@@ -2152,6 +2181,7 @@ class ImageBase(Element):
             else:
                 width, height = img_width, img_height
         return width, height
+
 
 class InlineImage(ImageBase, Text):
     """Image inside a paragraph.
@@ -2218,6 +2248,7 @@ class InlineImage(ImageBase, Text):
             result = image.title() or image.filename()
         return result
 
+
 class Image(ImageBase):
     """Image taken from an Image resource instance.
 
@@ -2249,6 +2280,7 @@ class Image(ImageBase):
             result = make_element(Paragraph, content=[content]).export(context)
         return result
 
+
 class TableCell(Container):
     """Table cell.
 
@@ -2260,6 +2292,7 @@ class TableCell(Container):
     align = None
     valign = None
     heading = False
+
 
 class TableRow(Element):
     """Table row.
@@ -2278,6 +2311,7 @@ class TableRow(Element):
         if __debug__:
             for c in self.content:
                 assert isinstance(c, TableCell), ('type error', c,)
+
 
 class Table(Element):
     """Table of rows and columns.
@@ -2483,6 +2517,7 @@ class Table(Element):
             pdf_context.last_element_category = self._CATEGORY
         return table
 
+
 def make_element(cls, **kwargs):
     """Create instance of 'cls' class and initialize its attributes.
 
@@ -2500,6 +2535,7 @@ def make_element(cls, **kwargs):
         setattr(element, k, v)
     element.init()
     return element
+
 
 def make_marked_text(text, **kwargs):
     """Returned MarkedText instance containing just 'text'.
@@ -3124,6 +3160,7 @@ class PDFExporter(FileExporter, Exporter):
     # Special constructs
 
     _simple_annotation_regexp = re.compile('^[- 0-9.,a-zA-Z+=()]+$')
+
     def _export_mathml(self, context, element):
         # For simple cases, use just annotation (it's faster and may look better)
         xml_tree = element.tree_content()

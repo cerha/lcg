@@ -44,6 +44,7 @@ class Unit(object):
     directly.  Use one of its subclasses instead.
 
     """
+
     def __init__(self, size):
         """
         @type size: integer, float or decimal.Decimal
@@ -89,25 +90,32 @@ class Unit(object):
         """
         return self._size
 
+
 class UMm(Unit):
     """Millimeter units."""
+
 
 class UPoint(Unit):
     """Point (1/72 in) units."""
 
+
 class UFont(Unit):
     """Units corresponding to a current font size."""
 
+
 class USpace(Unit):
     """Units corresponding to a current preferred gap between two words."""
+
 
 class UAny(Unit):
     """Special unit representing a flexible space.
     The value is currently ignored.
     """
 
+
 class UPx(Unit):
     """Pixel units (only supported by HTML output)."""
+
 
 class HorizontalAlignment(object):
     """Enumeration of horizontal alignment kinds."""
@@ -116,16 +124,19 @@ class HorizontalAlignment(object):
     RIGHT = 'RIGHT'
     JUSTIFY = 'JUSTIFY'
 
+
 class VerticalAlignment(object):
     """Enumeration of vertical alignment kinds."""
     CENTER = 'CENTER'
     TOP = 'TOP'
     BOTTOM = 'BOTTOM'
 
+
 class Orientation(object):
     """Enumeration of container orientations."""
     HORIZONTAL = 'HORIZONTAL'
     VERTICAL = 'VERTICAL'
+
 
 class FontFamily(object):
     PROPORTIONAL = 'SERIF'
@@ -137,6 +148,7 @@ class FontFamily(object):
     FIXED_WIDTH = 'FIXED_WIDTH'
     """Standard nonproportional font (e.g. Courier)."""
 
+
 class Color(object):
     """RGB color specification.
 
@@ -147,13 +159,14 @@ class Color(object):
       - Color('#f80') -- string in short HTML hex notation
 
     """
+
     def __init__(self, *args):
         n = len(args)
         arg = args and args[0]
         if n == 3 and all(isinstance(a, int) and a >= 0 and a <= 255 for a in args):
             rgb = args
         elif n == 3 and all(isinstance(a, (int, float)) and a >= 0 and a <= 1 for a in args):
-            rgb = [int(a*255) for a in args]
+            rgb = [int(a * 255) for a in args]
         elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 7:
             rgb = [int(x, 16) for x in (arg[1:3], arg[3:5], arg[5:7])]
         elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 4:

@@ -100,7 +100,7 @@ def positive_id(obj):
             # Undo that, and try 64 bits.
             result -= 1L << 32
             result += 1L << 64
-            assert result >= 0 # else addresses are fatter than 64 bits
+            assert result >= 0  # else addresses are fatter than 64 bits
     return result
 
 
@@ -583,6 +583,7 @@ _FULL_DAY_NAMES = (_("Monday"), _("Tuesday"), _("Wednesday"), _("Thursday"), _("
 # usual in the target language.
 _SHORT_DAY_NAMES = (_("Mon"), _("Tue"), _("Wed"), _("Thu"), _("Fri"), _("Sat"), _("Sun"))
 
+
 def week_day_name(number, abbrev=False):
     """Return the week day name corresponding to given numeric index.
 
@@ -630,6 +631,7 @@ def month_name(number, abbrev=False):
         names = _FULL_MONTH_NAMES
     return names[number]
 
+
 @contextmanager
 def attribute_value(obj, name, value):
     """Set 'obj' attribute 'name' to 'value' and run the code.
@@ -649,6 +651,7 @@ def attribute_value(obj, name, value):
         yield
     finally:
         setattr(obj, name, orig_value)
+
 
 class ParseError(Exception):
     "Exception raised on various parsing errors."

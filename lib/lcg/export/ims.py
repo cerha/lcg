@@ -23,7 +23,8 @@ import xml.dom.domreg
 import os
 import codecs
 
-class _Manifest:
+
+class _Manifest(object):
     """IMS manifest is a collection of information about all files in a package.
 
     It defines the structure and dependencies of the content.
@@ -48,7 +49,7 @@ class _Manifest:
         self._set_xml_attr(organisations, 'default', 'TOC1')
         o = self._append_xml_element(organisations, 'organization')
         self._set_xml_attr(o, 'identifier', 'TOC1')
-        self._set_xml_attr(o, 'structure',  'hierachical')
+        self._set_xml_attr(o, 'structure', 'hierachical')
         # Title
         self._append_xml_text(o, 'title', context.node().title())
         # Resources

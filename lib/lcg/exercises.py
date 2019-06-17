@@ -47,6 +47,7 @@ _ = lcg.TranslatableTextFactory('lcg-exercises')
 ################################     Tasks     #################################
 ################################################################################
 
+
 class Task(object):
     """Abstract base class of all task types.
 
@@ -90,9 +91,9 @@ class TextTask(Task):
 
     """
     _FIELD_MATCHER = re.compile(r"([\w\d.,;?!/%$@=*+-]*)"
-                               r"\[([^\]]*?)(?:\<([\w\d]+)\>)?\]"
-                               r"([\w\d.,;?!/%$@=*+-]*)",
-                               flags=re.UNICODE)
+                                r"\[([^\]]*?)(?:\<([\w\d]+)\>)?\]"
+                                r"([\w\d.,;?!/%$@=*+-]*)",
+                                flags=re.UNICODE)
     _NEWLINE_MATCHER = re.compile(r"\r?\n")
 
     def __init__(self, prompt, text, **kwargs):
@@ -168,6 +169,7 @@ class ContentTask(Task):
     parse the answer text during export.
 
     """
+
     def __init__(self, prompt, answer, **kwargs):
         super(ContentTask, self).__init__(prompt, **kwargs)
         assert isinstance(answer, lcg.Content)
@@ -183,6 +185,7 @@ class Choice(object):
     This is the answer text with an information whether it is correct or not.
 
     """
+
     def __init__(self, answer, correct=False):
         assert isinstance(answer, (str, unicode)), answer
         assert correct is None or isinstance(correct, bool), correct
@@ -255,11 +258,14 @@ class ExerciseParser(object):
     """
     class ExerciseParserError(Exception):
         """Exception raised when exercise parsing fails due to invalid input data."""
+
         def __init__(self, message, task_number=None):
             self._message = message
             self._task_number = task_number
+
         def message(self):
             return self._message
+
         def task_number(self):
             return self._task_number
 
@@ -317,7 +323,7 @@ class ExerciseParser(object):
         # Cloze comments unsupported for now.
         #comments = ()
         #cstart = text.find("\n.. ") + 1
-        #if cstart != 0:
+        # if cstart != 0:
         #    src_comments = [c[3:] for c in self._split(text[cstart:])]
         #    text = text[0:cstart].rstrip()
         #    if src_comments:
@@ -725,6 +731,7 @@ class FillInExercise(Exercise):
           "text box will allow the user to fill in any text.  The number of "
           "underscores determines the size of the box."),
     )
+
     def answers(self):
         answers = []
         for task in self._tasks:
@@ -894,12 +901,12 @@ class _Test(object):
         """Evaluate the answers of given request and return the number of points."""
         points = 0
         for i, correct_answer in enumerate(self.answers()):
-            name = '%s-a%d' % (self.id(), i+1)
+            name = '%s-a%d' % (self.id(), i + 1)
             answer = self._param(req, name)
             # Correct answer is a numer or string.
             if answer == unicode(correct_answer):
                 points += self.points()
-            #elif not answer:
+            # elif not answer:
             #    empty += self.points()
         return points
 
@@ -927,20 +934,26 @@ class _Test(object):
 class ChoiceBasedTest(_Test, _ChoiceBasedExercise):
     pass
 
+
 class FillInTest(_Test, FillInExercise):
     pass
+
 
 class MultipleChoiceQuestionsTest(ChoiceBasedTest, MultipleChoiceQuestions):
     pass
 
+
 class SelectionsTest(ChoiceBasedTest, Selections):
     pass
+
 
 class TrueFalseStatementsTest(ChoiceBasedTest, TrueFalseStatements):
     pass
 
+
 class GapFillingTest(ChoiceBasedTest, GapFilling):
     pass
+
 
 class WritingTest(FillInTest):
     _POINTS = 10
@@ -961,6 +974,7 @@ class WritingTest(FillInTest):
 
 class ClozeTest(FillInTest, Cloze):
     pass
+
 
 class NumberedClozeTest(FillInTest, NumberedCloze):
     pass

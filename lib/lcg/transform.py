@@ -122,6 +122,7 @@ class Processor(object):
                 if isinstance(test, (tuple, list,)):
                     tag_regexp = re.compile(test[0] + '$')
                     attr_tests = [(a, re.compile(r),) for a, r in test[1:]]
+
                     def test_function(element, tag_regexp=tag_regexp, attr_tests=attr_tests):
                         if not tag_regexp.match(element.tag):
                             return False
@@ -228,6 +229,7 @@ class XMLProcessor(Processor):
             from xml.etree import ElementTree
             top = element
             tree = ElementTree.Element('_lcg')
+
             def subexport(tree, node):
                 if hasattr(node, 'tagName'):
                     spacing = self._TAG_PRESERVE_WHITESPACE.get(node.tagName)
@@ -241,6 +243,7 @@ class XMLProcessor(Processor):
                     tree_children = tree.getchildren()
                     if tree_children:
                         last_node = tree_children[-1]
+
             def export(parent_tree, node, preceding_node, final_node, spacing):
                 node_type = node.nodeType
                 if node_type == node.ELEMENT_NODE:
@@ -370,6 +373,7 @@ class XML2Content(XMLProcessor):
             if children is None:
                 children = element.getchildren()
             transformed = []
+
             def add_text(text):
                 if text:
                     transformed.append(lcg.TextContent(text))
@@ -925,7 +929,7 @@ class HTML2XML(Processor):
         return unicode(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
 
 
-### Utility functions
+# Utility functions
 
 
 def data2content(data):
@@ -943,6 +947,7 @@ def data2content(data):
     processor = XML2Content()
     return processor.transform(data)
 
+
 def data2html(data, processor):
     """Convenience function to convert LCG XML to LCG Content.
 
@@ -958,6 +963,7 @@ def data2html(data, processor):
     """
     processor = processor()
     return processor.transform(data)
+
 
 def html2data(html, processor):
     """Convenience function to convert editor HTML to LCG XML.

@@ -29,7 +29,7 @@ braille_tables = {'en': ['en-us-g1.ctb'],
                   'nemeth': ['nemeth.ctb']}
 braille_hyphenation_tables = {'en': 'hyph_en_US.dic',
                               'cs': 'hyph_cs_CZ.dic'}
-braille_math_rules = 'nemeth' # 'nemeth', 'czech'
+braille_math_rules = 'nemeth'  # 'nemeth', 'czech'
 
 page_width = lcg.UFont(35)
 page_height = lcg.UFont(29)
@@ -576,18 +576,24 @@ debug_device_output_cs = {
 }
 
 # Index Everest-D V2, Index 4x4 PRO V2
+
+
 def device_init_index_v2(width, height, inner, outer, top, bottom):
-    return (('0,0,0,0,x,x,x,x,x,' # 0-8
-             '%(width)d,%(outer)d,%(inner)d,%(top)d,%(bottom)d,4,1,0,0,' # 9-17
+    return (('0,0,0,0,x,x,x,x,x,'  # 0-8
+             '%(width)d,%(outer)d,%(inner)d,%(top)d,%(bottom)d,4,1,0,0,'  # 9-17
              'x,0,0,x,x,x,x,x,x,0,1,x,x,x,x,x,x,x,x,x,x,x,') %
             dict(width=(width - 23), inner=inner, outer=outer, top=top, bottom=bottom))
 # Index Everest-D V3
+
+
 def device_init_index_v3(width, height, inner, outer, top, bottom):
     return (('DBT0,TD0,LS50,DP2,PN0,PW%(width)d,PL%(height)d,'
              'IM%(inner)d,OM%(outer)d,TM%(top)d,BM%(bottom)d;') %
             dict(width=(width * 6), height=(height * 10),
                  inner=inner, outer=outer, top=top, bottom=bottom))
 # Index Everest-D V4, Index 4x4 PRO V3
+
+
 def device_init_index_v4(width, height, inner, outer, top, bottom):
     return (('DBT0,TD0,LS50,DP2,PN0,CH%(width)d,LP%(height)d,'
              'BI%(inner)d,TM%(top)d;') %

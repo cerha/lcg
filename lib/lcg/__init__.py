@@ -91,7 +91,7 @@ except (ImportError, OSError):
     pass
 
 try:
-    from .export import pdf # For backwards compatibility
+    from .export import pdf  # For backwards compatibility
     from .export.pdf import PDFExporter
 except ImportError:
     pass
@@ -104,5 +104,6 @@ from .read import Reader, FileReader, StructuredTextReader, DocFileReader, \
 
 from .transform import data2content, data2html, html2data, \
     HTML2XML, XML2HTML, XML2Content
+
 
 __version__ = '0.6.1'

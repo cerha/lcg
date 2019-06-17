@@ -24,6 +24,7 @@ This module defines the base class for locale data and a derived class for each 
 
 """
 
+
 class LocaleData(object):
     """Locale data base class.
 
@@ -46,7 +47,7 @@ class LocaleData(object):
     positive_sign = ''
     decimal_point = '.'
     thousands_sep = None
-    grouping = (3,3,3,3)
+    grouping = (3, 3, 3, 3)
     mon_decimal_point = None
     mon_thousands_sep = None
     mon_grouping = None
@@ -66,10 +67,12 @@ class LocaleData_cs(LocaleData):
     decimal_point = ','
     thousands_sep = u'\xa0'
 
+
 class LocaleData_de(LocaleData):
     date_format = "%d.%m.%Y"
     first_week_day = 6
     thousands_sep = ','
+
 
 class LocaleData_en(LocaleData):
     date_format = "%d/%m/%Y"
@@ -78,16 +81,20 @@ class LocaleData_en(LocaleData):
     first_week_day = 6
     thousands_sep = ','
 
+
 class LocaleData_es(LocaleData):
     date_format = "%d/%m/%Y"
+
 
 class LocaleData_no(LocaleData):
     date_format = "%d.%m.%Y"
     time_format = "%H.%M"
     exact_time_format = "%H.%M.%S"
 
+
 class LocaleData_pl(LocaleData):
     date_format = "%Y-%m-%d"
+
 
 class LocaleData_sk(LocaleData):
     date_format = "%d.%m.%Y"
