@@ -30,6 +30,7 @@ from builtins import object
 
 import os
 import glob
+import sys
 import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
@@ -329,10 +330,9 @@ class ResourceProvider(object):
             dirs.insert(0, searchdir)
         basename, ext = os.path.splitext(filename)
         for directory in dirs:
-            # Here we assume that the filesystem uses UTF-8 filenames.  If
-            # it is not always the case, we may need to make it
-            # configurable.
-            src_path = str(os.path.join(directory, filename)).encode('utf-8')
+            src_path = os.path.join(directory, filename)
+            if sys.version_info[0] == 2:
+                src_path = src_path.encode('utf-8')
             if os.path.isfile(src_path):
                 return cls(filename, src_file=src_path)
             elif src_path.find('*') != -1:
