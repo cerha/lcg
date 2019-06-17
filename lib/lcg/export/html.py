@@ -720,7 +720,7 @@ class HtmlExporter(lcg.Exporter):
 
             """
             if item not in self._backref:
-                backref = self._backref[item] = "backref-" + self.id()
+                backref = self._backref[item] = "backref-" + item.id()
             else:
                 backref = None
             return backref
