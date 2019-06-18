@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
 from future import standard_library
-from builtins import str
 from builtins import range
 from builtins import object
 from past.utils import old_div
@@ -58,11 +57,11 @@ from lcg import FontFamily, UMm, UPoint, UPercent, UFont, USpace, UAny, Horizont
 from .export import Exporter, FileExporter
 
 standard_library.install_aliases()
-
-_ = lcg.TranslatableTextFactory('lcg')
-
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
+
+_ = lcg.TranslatableTextFactory('lcg')
 
 
 MATHML_FORMATTER = 'jeuclid-cli'
@@ -135,7 +134,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             if isinstance(flowable, Element):
                 flowable = flowable.export(context)
             if isinstance(flowable, basestring):
-                flowable = reportlab.platypus.Paragraph(str(flowable), style)
+                flowable = reportlab.platypus.Paragraph(unistr(flowable), style)
             while isinstance(flowable, (tuple, list)):
                 if len(flowable) == 1:
                     flowable = flowable[0]
@@ -646,7 +645,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         result = ('RLContainer(vertical=%s, align=%s, boxed=%s):\n' %
                   (self._box_vertical, self._box_align, self._box_boxed,))
         for c in self._box_content:
-            u = str(c)
+            u = unistr(c)
             if u and u[-1] != '\n':
                 u += '\n'
             result += ('  ----\n' + '\n'.join([' ' + l if l else '' for l in u.split('\n')]))
@@ -1357,7 +1356,7 @@ class Context(object):
           note -- the note, string
 
         """
-        assert isinstance(note, str)
+        assert isinstance(note, unistr)
         self._export_notes.append(note)
 
     def pop_export_note(self):
@@ -1528,8 +1527,8 @@ class Text(Element):
             # shouldn't touch the original object unless needed, otherwise the
             # mysterious Context.localize method may stop produce texts from
             # symbolic labels.
-            if not isinstance(self.content, str):
-                self.content = str(self.content)
+            if not isinstance(self.content, unistr):
+                self.content = unistr(self.content)
 
     def _export(self, context):
         content = self.content
@@ -1538,7 +1537,7 @@ class Text(Element):
         else:
             result = content.export(context)
         assert _ok_export_result(result), ('wrong export', result,)
-        result = str(result)
+        result = unistr(result)
         if self.style is not None:
             result = _unescape(result)
             result = RLText(result, self.style, halign=self.halign)
@@ -1586,7 +1585,7 @@ class SimpleMarkup(Text):
     attributes = {}
 
     def init(self):
-        assert isinstance(self.content, str), ('type error', self.content,)
+        assert isinstance(self.content, unistr), ('type error', self.content,)
 
     def _export(self, context):
         mark = self.content
@@ -1670,7 +1669,7 @@ class MarkedText(TextContainer):
 
     def init(self):
         super(MarkedText, self).init()
-        assert isinstance(self.tag, str), ('type error', self.tag,)
+        assert isinstance(self.tag, unistr), ('type error', self.tag,)
         assert isinstance(self.attributes, dict)
 
     def export(self, context):
@@ -1915,13 +1914,13 @@ class PageNumber(Text):
         if self.total:
             total = pdf_context.total_pages()
             if total:
-                text = str(total)
+                text = unistr(total)
             else:
                 text = '?'
             if self.separator is not None:
-                text = str(pdf_context.page) + self.separator + text
+                text = unistr(pdf_context.page) + self.separator + text
         else:
-            text = str(pdf_context.page)
+            text = unistr(pdf_context.page)
         self.content = text
         Text.init(self)
         return Text._export(self, context)
@@ -1981,7 +1980,7 @@ class Container(Element):
 
         def transform_content(c):
             if isinstance(c, basestring):
-                c = make_element(Text, content=str(c), style=style, halign=halign)
+                c = make_element(Text, content=unistr(c), style=style, halign=halign)
             elif isinstance(c, Text):
                 if c.style is None:
                     c.style = style
@@ -2251,7 +2250,7 @@ class ImageBase(Element):
             ('type error', self.filename,)
         assert self.width is None or isinstance(self.width, lcg.Unit), self.width
         assert self.height is None or isinstance(self.height, lcg.Unit), self.height
-        assert self.align is None or isinstance(self.align, str), self.align
+        assert self.align is None or isinstance(self.align, unistr), self.align
 
     def _size(self, context, filename):
         style = context.pdf_context.style()
@@ -2492,18 +2491,18 @@ class Table(Element):
                     # ReportLab can't take anything as a cell content, let's prepare for it
 
                     def simplify(exported_column):
-                        if isinstance(exported_column, str):
-                            result = str(exported_column)
+                        if isinstance(exported_column, unistr):
+                            result = unistr(exported_column)
                         elif isinstance(exported_column, (tuple, list)):
                             exported_column = [simplify(x) for x in exported_column]
                             if len(exported_column) == 1:
                                 result = exported_column[0]
-                            elif all([isinstance(x, str) for x in exported_column]):
+                            elif all(isinstance(x, unistr) for x in exported_column):
                                 result = ' '.join(exported_column)
                             else:
                                 result = []
                                 for x in exported_column:
-                                    if isinstance(x, str):
+                                    if isinstance(x, unistr):
                                         para = make_element(Paragraph, content=[Text(content=x)])
                                         x = para.export(context)
                                     result.append(x)
@@ -2854,7 +2853,7 @@ class PDFExporter(FileExporter, Exporter):
             try:
                 doc.multi_build(document, context=first_subcontext)
             except reportlab.platypus.doctemplate.LayoutError as e:
-                if str(e).find('too large') >= 0:
+                if unistr(e).find('too large') >= 0:
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
                         tb = sys.exc_info()[2]
@@ -2866,7 +2865,7 @@ class PDFExporter(FileExporter, Exporter):
                         else:
                             obj = None
                         if obj is not None:
-                            e = (e, str(obj),)
+                            e = (e, unistr(obj),)
                         context.log(_("Page content extremely large, giving up"), kind=lcg.ERROR)
                     context.log(_("Page content too large, reducing it by %s",
                                   (pdf_context.relative_font_size())))
@@ -3298,7 +3297,7 @@ class PDFExporter(FileExporter, Exporter):
         style = context.pdf_context.normal_style()
         font_size = style.fontSize
         scale = 2.0
-        args = [tempfile_mml, tempfile_png, '-fontSize', str(font_size * scale)]
+        args = [tempfile_mml, tempfile_png, '-fontSize', unistr(font_size * scale)]
         font_name = style.fontName
         if font_name is not None and font_name.startswith('DejaVu'):
             args.extend(['-fontsMonospaced', 'DejaVuSansMono',

@@ -23,7 +23,6 @@ from __future__ import absolute_import
 from future import standard_library
 from builtins import chr
 from builtins import map
-from builtins import str
 from builtins import range
 from builtins import object
 
@@ -39,6 +38,7 @@ import xml.etree.ElementTree
 import lcg
 
 standard_library.install_aliases()
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -645,7 +645,7 @@ class Parser(object):
             else:                       # unfinished variable
                 return None, position
             variable_content = lcg.Container(self.parse(value))
-        content = lcg.SetVariable(str(identifier), variable_content)
+        content = lcg.SetVariable(unistr(identifier), variable_content)
         return content, position
 
     def _style_processor(self, text, position, **kwargs):
@@ -1070,9 +1070,9 @@ class MacroParser(object):
             try:
                 result = self._evaluate(self._condition)
             except Exception as e:
-                return e.__class__.__name__ + ': ' + str(e)
+                return e.__class__.__name__ + ': ' + unistr(e)
             else:
-                return ''.join([str(x) for x in self._content[bool(result)]])
+                return ''.join([unistr(x) for x in self._content[bool(result)]])
 
     def __init__(self, globals=None, evaluate=None, include=None):
         """Arguments:
@@ -1104,7 +1104,7 @@ class MacroParser(object):
 
     def _default_include(self, name):
         try:
-            return str(self._globals[name])
+            return unistr(self._globals[name])
         except KeyError:
             return ''
 
@@ -1124,7 +1124,7 @@ class MacroParser(object):
                 current = current.parent
             else:
                 current.append(t)
-        return str(result)
+        return unistr(result)
 
 
 class HTMLProcessor(object):
@@ -1240,7 +1240,7 @@ class HTMLProcessor(object):
                 if expanded[0] == '&' and expanded[-1] == ';':
                     self.handle_charref(expanded)
                 else:
-                    self.handle_data(str(expanded, 'iso-8859-1'))
+                    self.handle_data(unistr(expanded, 'iso-8859-1'))
 
         def close(self):
             while self._open_tags:

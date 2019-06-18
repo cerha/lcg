@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 from future import standard_library
 from builtins import map
-from builtins import str
 from builtins import object
 
 import random
@@ -39,11 +38,14 @@ from lcg import concat
 from . import mathml
 
 _ = lcg.TranslatableTextFactory('lcg')
+
 standard_library.install_aliases()
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
-class HtmlEscapedUnicode(str):
+
+class HtmlEscapedUnicode(unistr):
     """Escaping wrapper for unicodes.
 
     In order to prevent display errors, XSS, CSRF, etc., it is necessary to
@@ -78,7 +80,7 @@ class HtmlEscapedUnicode(str):
         if isinstance(other, lcg.Localizable):
             result = concat(self, other)
         else:
-            result = self.__class__(str(self) + str(other), escape=False)
+            result = self.__class__(unistr(self) + unistr(other), escape=False)
         return result
 
     def __mod__(self, other):
@@ -145,10 +147,9 @@ class HtmlGenerator(object):
     attribute, please help your self and add it.
 
     """
-
-    class _JavaScriptCode(str):
+    class _JavaScriptCode(unistr):
         def __new__(cls, text):
-            return str.__new__(cls, text)
+            return unistr.__new__(cls, text)
 
     # Characters to be replaced in Javascript string literals for their
     # safe usage within HTML <script> tags.
@@ -202,7 +203,7 @@ class HtmlGenerator(object):
                     str_value = self.noescape(saxutils.quoteattr(value))
                 result.append(str_value)
         if content is not None and not isinstance(content, HtmlEscapedUnicode):
-            if content.__class__ in (str, str,):
+            if content.__class__ in (str, unistr):
                 content = self.escape(content)
             else:
                 dirty = True
@@ -240,10 +241,10 @@ class HtmlGenerator(object):
         """
         uri = urllib.parse.quote(base.encode('utf-8'))
         if args and isinstance(args[0], basestring):
-            uri += '#' + urllib.parse.quote(str(args[0]).encode('utf-8'))
+            uri += '#' + urllib.parse.quote(unistr(args[0]).encode('utf-8'))
             args = args[1:]
 
-        query = ';'.join([k + '=' + urllib.parse.quote(str(v).encode('utf-8'))
+        query = ';'.join([k + '=' + urllib.parse.quote(unistr(v).encode('utf-8'))
                           for k, v in args + tuple(kwargs.items()) if v is not None])
         if query:
             uri += '?' + query
@@ -584,7 +585,7 @@ class HtmlGenerator(object):
         elif isinstance(value, bool):
             return (value and 'true' or 'false')
         elif isinstance(value, int):
-            return str(value)
+            return unistr(value)
         elif isinstance(value, (tuple, list)):
             return concat('[', concat([self.js_value(v) for v in value], separator=", "), ']')
         elif isinstance(value, dict):
@@ -946,7 +947,7 @@ class HtmlExporter(lcg.Exporter):
         if isinstance(value, float):
             strvalue = '%.2f' % (value,)
         else:
-            strvalue = str(value)
+            strvalue = unistr(value)
         return strvalue + unit
 
     def _image_style(self, width, height):
@@ -1449,7 +1450,7 @@ class HtmlExporter(lcg.Exporter):
                           "and put swfobject.js to your resource path."))
 
         def escape(value):
-            return str(value).replace('?', '%3F').replace('=', '%3D').replace('&', '%26')
+            return unistr(value).replace('?', '%3F').replace('=', '%3D').replace('&', '%26')
 
         flash_object = context.resource(filename)
         if flash_object is None:
@@ -1636,7 +1637,7 @@ class StyledHtmlExporter(object):
         styles = self._stylesheets(context)
         if self._inlinestyles:
             tags = [g.style(content, type='text/css', media=media)
-                    for media, content in [(s.media(), unicode(s.get(), 'utf-8')) for s in styles]
+                    for media, content in [(s.media(), unistr(s.get(), 'utf-8')) for s in styles]
                     if content is not None]
         else:
             tags = [g.link(rel='stylesheet', type='text/css', href=context.uri(s), media=s.media())

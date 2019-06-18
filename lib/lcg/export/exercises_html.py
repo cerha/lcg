@@ -18,7 +18,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 from __future__ import unicode_literals
-from builtins import str
 from builtins import object
 
 import re
@@ -26,6 +25,8 @@ import lcg
 from lcg import concat
 
 _ = lcg.TranslatableTextFactory('lcg-exercises')
+
+unistr = type(u'')  # Python 2/3 transition hack.
 
 
 class ExerciseExporter(object):
@@ -598,7 +599,7 @@ class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
 
     def _checked(self, context, exercise, exercise_id, task, i):
         task_name = self._task_id(exercise, exercise_id, task)
-        return self._param(context.req(), task_name, False) == str(i)
+        return self._param(context.req(), task_name, False) == unistr(i)
 
     def _choice_text(self, context, exercise, exercise_id, task, choice):
         text = super(ChoiceBasedTestExporter, self)._choice_text(context, exercise, exercise_id,
@@ -609,7 +610,7 @@ class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
                 result = _("correct answer")
             else:
                 name = self._task_id(exercise, exercise_id, task)
-                if self._param(context.req(), name) == str(task.choices().index(choice)):
+                if self._param(context.req(), name) == unistr(task.choices().index(choice)):
                     # Translators: Incorrect (answer)
                     result = _("incorrect")
             if result:
@@ -622,7 +623,7 @@ class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
                                                                       exercise_id, task, choice)
         if self._show_results(context):
             name = self._task_id(exercise, exercise_id, task)
-            if self._param(context.req(), name) == str(task.choices().index(choice)):
+            if self._param(context.req(), name) == unistr(task.choices().index(choice)):
                 cls = choice.correct() and 'correct-answer' or 'incorrect-answer'
             else:
                 cls = 'non-selected-answer'

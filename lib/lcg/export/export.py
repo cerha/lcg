@@ -29,7 +29,6 @@ See documentation of the individual classes for more details.
 """
 from __future__ import unicode_literals
 from __future__ import division
-from builtins import str
 from builtins import range
 from past.utils import old_div
 from builtins import object
@@ -46,6 +45,7 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -289,7 +289,7 @@ class Exporter(object):
             return self._toc_markers[marker]
 
         def add_toc_marker(self, element):
-            marker = str(len(self._toc_markers))
+            marker = unistr(len(self._toc_markers))
             self._toc_markers[marker] = element
             return marker
 
@@ -808,13 +808,13 @@ class Exporter(object):
         if not name:
             return self.escape(element.markup())
         names = name.split('.')
-        value = context.node().global_(str(names[0]))
+        value = context.node().global_(unistr(names[0]))
         for xname in names[1:]:
             if value is None:
                 break
             if isinstance(value, SubstitutionIterator):
                 value = value.value()
-            key = str(xname)
+            key = unistr(xname)
             dictionary = value
             try:
                 value = value.get(key)
@@ -833,7 +833,7 @@ class Exporter(object):
             result = value.export(context)
         else:
             if not isinstance(value, lcg.Localizable):
-                value = str(value)
+                value = unistr(value)
             result = self.escape(value)
         return result
 
@@ -1382,7 +1382,7 @@ class FileExporter(object):
         directory = os.path.split(filename)[0]
         if directory and not os.path.isdir(directory):
             os.makedirs(directory)
-        if isinstance(content, str):
+        if isinstance(content, unistr):
             content = content.encode('utf-8')
         file = open(filename, 'wb')
         try:

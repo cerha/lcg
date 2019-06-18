@@ -50,6 +50,7 @@ import collections
 _ = lcg.TranslatableTextFactory('lcg')
 standard_library.install_aliases()
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -513,7 +514,7 @@ class TextContent(Content):
         self._text = text
 
     def __unicode__(self):
-        text = str(self._text).strip()
+        text = unistr(self._text).strip()
         sample = text and text.splitlines()[0] or ''
         if len(sample) > 20:
             sample = sample[:20]
@@ -1514,9 +1515,9 @@ class Section(Container):
         if self._id is None:
             path = self.section_path()
             if len(path) >= 2:
-                self._id = path[-2].id() + '.' + str(section_number(self))
+                self._id = path[-2].id() + '.' + unistr(section_number(self))
             else:
-                numbers = [str(section_number(x)) for x in path]
+                numbers = [unistr(section_number(x)) for x in path]
                 self._id = self._ID_PREFIX + '.'.join(numbers)
         return self._id
 
@@ -1966,7 +1967,7 @@ def coerce(content, formatted=False):
                     item = coerce(item, formatted=formatted)
                 items.append(item)
         return container(items)
-    elif isinstance(content, str):
+    elif isinstance(content, unistr):
         if formatted:
             from lcg import Parser
             return Parser().parse_inline_markup(content)

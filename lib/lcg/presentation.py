@@ -31,7 +31,6 @@ currently processed 'Content' instance and current language.
 """
 
 from __future__ import unicode_literals
-from builtins import str
 from builtins import object
 
 import sys
@@ -40,6 +39,7 @@ import lcg
 import re
 import string
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -597,7 +597,7 @@ class StyleFile(object):
                     else:
                         str_value = 'no'
                 elif isinstance(value, (basestring, float)):
-                    str_value = str(value)
+                    str_value = unistr(value)
                 else:
                     raise Exception("Unsupported value type", value)
                 file.write('%s = %s\n' % (identifier, str_value,))

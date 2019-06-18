@@ -20,7 +20,6 @@
 from __future__ import unicode_literals
 from future import standard_library
 from builtins import chr
-from builtins import str
 from builtins import range
 from builtins import object
 
@@ -35,6 +34,7 @@ import xml.etree.ElementTree
 import lcg
 
 standard_library.install_aliases()
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -216,7 +216,7 @@ class Processor(object):
         The result is dependent on particular 'Processor' class.
 
         """
-        assert isinstance(data, str), data
+        assert isinstance(data, unistr), data
         tree = self.Parser().lcg_parse(data)
         return self.Transformer().transform(tree)
 
@@ -618,7 +618,7 @@ class XML2HTML(XMLProcessor):
 
     def transform(self, data):
         transformed = super(XML2HTML, self).transform(data)
-        return str(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
+        return unistr(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
 
 
 class HTML2XML(Processor):
@@ -693,7 +693,7 @@ class HTML2XML(Processor):
                 if expanded[0] == '&' and expanded[-1] == ';':
                     self.handle_charref(expanded)
                 else:
-                    self.handle_data(str(expanded, 'iso-8859-1'))
+                    self.handle_data(unistr(expanded, 'iso-8859-1'))
 
         def close(self):
             while self._open_tags:
@@ -929,7 +929,7 @@ class HTML2XML(Processor):
 
     def transform(self, data):
         transformed = super(HTML2XML, self).transform(data)
-        return str(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
+        return unistr(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
 
 
 # Utility functions

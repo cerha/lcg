@@ -20,7 +20,6 @@
 """Tools for building the LCG 'ContentNode' hierarchy."""
 
 from __future__ import unicode_literals
-from builtins import str
 from builtins import object
 import codecs
 import glob
@@ -31,6 +30,7 @@ import unicodedata
 
 import lcg
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -158,7 +158,7 @@ class FileReader(Reader):
 
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
         assert isinstance(dir, basestring), dir
-        assert encoding is None or isinstance(encoding, str) and codecs.lookup(encoding), encoding
+        assert encoding is None or isinstance(encoding, unistr) and codecs.lookup(encoding), encoding
         self._dir = os.path.normpath(dir)
         super(FileReader, self).__init__(id, **kwargs)
         if not encoding and self._parent and isinstance(self._parent, FileReader):
@@ -211,7 +211,7 @@ class FileReader(Reader):
                 lines = [l for l in lines if not comment_matcher.match(l)]
         content = ''.join(lines)
         try:
-            return str(content, encoding=encoding)
+            return unistr(content, encoding=encoding)
         except UnicodeDecodeError as e:
             raise Exception("File %s: %s" % (filename, e))
 

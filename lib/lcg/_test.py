@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from __future__ import division
 from __future__ import print_function
 from future import standard_library
-from builtins import str
 from builtins import zip
 from builtins import range
 
@@ -40,6 +39,7 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('test')
 standard_library.install_aliases()
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -91,10 +91,10 @@ class TranslatableText(unittest.TestCase):
         assert len(items) == 2
         assert items[1] == ('xx\nyy')
         b = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
-        assert isinstance(b, str)
+        assert isinstance(b, unistr)
         assert b == 'a-b-c-d-e-f'
         c = lcg.concat('a', (u'b', 'c', 'd'), 'e', 'f', separator='-')
-        assert isinstance(c, unicode)
+        assert isinstance(c, unistr)
         assert c == 'a-b-c-d-e-f'
 
     def test_replace(self):
@@ -111,10 +111,10 @@ class TranslatableText(unittest.TestCase):
         bx = b.localize(lcg.Localizer())
         cx = c.localize(lcg.Localizer())
         dx = d.localize(lcg.Localizer())
-        assert str(a) == ax == 'Version xox-yoy', (a, ax)
-        assert str(b) == bx == 'Versi-n x-x', (b, bx)
-        assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
-        assert str(d) == dx == 'versi-n x-x-y-y', (d, dx)
+        assert unistr(a) == ax == 'Version xox-yoy', (a, ax)
+        assert unistr(b) == bx == 'Versi-n x-x', (b, bx)
+        assert unistr(c) == cx == 'Versi-n x-x-y-y', (c, cx)
+        assert unistr(d) == dx == 'versi-n x-x-y-y', (d, dx)
 
     def test_translate(self):
         cs = lcg.Localizer('cs', translation_path=translation_path)
@@ -352,15 +352,15 @@ class LocalizableDateTime(unittest.TestCase):
         en = lcg.Localizer('en', translation_path=translation_path)
         cs = lcg.Localizer('cs', translation_path=translation_path)
         b = a.replace('-', '+')
-        assert str(b) == "2006+01+30"
+        assert unistr(b) == "2006+01+30"
         assert b.localize(en) == "30/01/2006"
         assert b.localize(cs) == "30.01.2006"
         c = a.replace('/', '|')
-        assert str(c) == "2006-01-30"
+        assert unistr(c) == "2006-01-30"
         assert c.localize(en) == "30|01|2006"
         assert c.localize(cs) == "30.01.2006"
         d = a.replace('.', ':')
-        assert str(d) == "2006-01-30"
+        assert unistr(d) == "2006-01-30"
         assert d.localize(en) == "30/01/2006"
         assert d.localize(cs) == "30:01:2006"
 
