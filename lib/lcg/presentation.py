@@ -30,9 +30,11 @@ currently processed 'Content' instance and current language.
 
 """
 
+from __future__ import unicode_literals
 from builtins import str
 from past.builtins import basestring
 from builtins import object
+
 import copy
 import lcg
 import re

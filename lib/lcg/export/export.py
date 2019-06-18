@@ -27,8 +27,8 @@ The module contains the following important classes:
 See documentation of the individual classes for more details.
 
 """
+from __future__ import unicode_literals
 from __future__ import division
-
 from builtins import str
 from builtins import range
 from past.builtins import basestring

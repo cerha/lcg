@@ -23,6 +23,7 @@ This module defines the base class for locale data and a derived class for each 
 
 """
 
+from __future__ import unicode_literals
 from builtins import object
 
 

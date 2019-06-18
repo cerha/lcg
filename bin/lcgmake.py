@@ -20,7 +20,9 @@
 
 """Simple and `quite' generic LCG generator."""
 
+from __future__ import unicode_literals
 from builtins import str
+
 import functools
 import getopt
 import imp

@@ -30,6 +30,7 @@ Additionally various enumerations are defined here, for instance:
 @L{HorizontalAlignment}, L{VerticalAlignment}, L{Orientation}, L{FontFamily}.
 
 """
+from __future__ import unicode_literals
 from past.builtins import cmp
 from past.builtins import basestring
 from builtins import object

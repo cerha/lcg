@@ -24,7 +24,9 @@ browser (see http://www/wxwidgets.org for more information about wx Widgets).
 
 """
 
+from __future__ import unicode_literals
 from builtins import object
+
 import lcg
 import os
 

@@ -25,8 +25,10 @@ document in the hierarchy is represented by a single 'ContentNode' instance (def
 
 """
 
+from __future__ import unicode_literals
 from past.builtins import basestring
 from builtins import object
+
 import lcg
 import functools
 import copy

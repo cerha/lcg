@@ -25,8 +25,10 @@ these files, they just provide their abstract representation.  The resources
 are managed by the 'ResourceProvider' (see below).
 
 """
+from __future__ import unicode_literals
 from builtins import str
 from builtins import object
+
 import os
 import glob
 import lcg
