@@ -22,7 +22,6 @@ from __future__ import absolute_import
 from future import standard_library
 from builtins import str
 from builtins import range
-from past.builtins import basestring
 from builtins import object
 from past.utils import old_div
 
@@ -62,6 +61,10 @@ from .export import Exporter, FileExporter
 standard_library.install_aliases()
 
 _ = lcg.TranslatableTextFactory('lcg')
+
+if sys.version_info[0] > 2:
+    basestring = str
+
 
 MATHML_FORMATTER = 'jeuclid-cli'
 

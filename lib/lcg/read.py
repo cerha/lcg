@@ -26,9 +26,13 @@ import codecs
 import glob
 import os
 import re
+import sys
 import unicodedata
 
 import lcg
+
+if sys.version_info[0] > 2:
+    basestring = str
 
 
 class Reader(object):
@@ -153,7 +157,7 @@ class FileReader(Reader):
     _EMACS_CODING_EXTENSION_MATCHER = re.compile(r'(^mule-|-(dos|unix|mac)$)')
 
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
-        assert isinstance(dir, str), dir
+        assert isinstance(dir, basestring), dir
         assert encoding is None or isinstance(encoding, str) and codecs.lookup(encoding), encoding
         self._dir = os.path.normpath(dir)
         super(FileReader, self).__init__(id, **kwargs)

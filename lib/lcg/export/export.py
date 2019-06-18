@@ -31,7 +31,6 @@ from __future__ import unicode_literals
 from __future__ import division
 from builtins import str
 from builtins import range
-from past.builtins import basestring
 from past.utils import old_div
 from builtins import object
 
@@ -46,6 +45,10 @@ import sys
 import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
+
+if sys.version_info[0] > 2:
+    basestring = str
+
 
 INFO = 'INFO'
 """Constant denoting informational messages for 'kind' argument of 'Exporter.Context.log()'."""

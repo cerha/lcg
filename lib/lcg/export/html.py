@@ -22,13 +22,13 @@ from __future__ import absolute_import
 from future import standard_library
 from builtins import map
 from builtins import str
-from past.builtins import basestring
 from builtins import object
 
 import base64
 import io
 import random
 import re
+import sys
 import string
 import urllib.request
 import urllib.parse
@@ -42,6 +42,8 @@ from . import mathml
 
 _ = lcg.TranslatableTextFactory('lcg')
 standard_library.install_aliases()
+if sys.version_info[0] > 2:
+    basestring = str
 
 
 class HtmlEscapedUnicode(str):

@@ -22,19 +22,21 @@ from future import standard_library
 from builtins import chr
 from builtins import str
 from builtins import range
-from past.builtins import basestring
 from builtins import object
 
 import collections
 import html.parser
 import html.entities
 import re
+import sys
 import xml.dom.minidom
 import xml.etree.ElementTree
 
 import lcg
 
 standard_library.install_aliases()
+if sys.version_info[0] > 2:
+    basestring = str
 
 
 class Processor(object):

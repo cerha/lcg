@@ -39,9 +39,9 @@ from __future__ import unicode_literals
 from future import standard_library
 from builtins import str
 from builtins import range
-from past.builtins import basestring
 from builtins import object
 
+import sys
 import copy
 import re
 import lcg
@@ -49,6 +49,9 @@ import collections
 
 _ = lcg.TranslatableTextFactory('lcg')
 standard_library.install_aliases()
+
+if sys.version_info[0] > 2:
+    basestring = str
 
 
 class Content(object):
