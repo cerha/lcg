@@ -20,7 +20,6 @@
 """Various utilities"""
 
 from __future__ import unicode_literals
-from builtins import str
 
 from contextlib import contextmanager
 import re
@@ -30,6 +29,7 @@ import unicodedata
 from lcg import TranslatableTextFactory
 _ = TranslatableTextFactory('lcg')
 
+unistr = type(u'')  # Python 2/3 transition hack.
 
 def is_sequence_of(seq, cls):
     """Return true if 'seq' is a sequence of instances of 'cls'."""
@@ -126,8 +126,8 @@ def log(message, *args):
     The logging is currently only written to STDERR.
 
     """
-    if not isinstance(message, str):
-        message = str(message)
+    if not isinstance(message, unistr):
+        message = unistr(message)
     try:
         message %= args
     except TypeError:
@@ -135,7 +135,7 @@ def log(message, *args):
             message += ":"
         if not message.endswith(" "):
             message += " "
-        message += ', '.join([str(a) for a in args])
+        message += ', '.join([unistr(a) for a in args])
     if not message.endswith("\n"):
         message += "\n"
     sys.stderr.write("  " + message)

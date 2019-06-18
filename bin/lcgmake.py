@@ -21,7 +21,6 @@
 """Simple and `quite' generic LCG generator."""
 
 from __future__ import unicode_literals
-from builtins import str
 
 import functools
 import getopt
@@ -32,6 +31,9 @@ import os
 import re
 import string
 import sys
+
+unistr = type(u'')  # Python 2/3 transition hack.
+
 
 OPTIONS = (
     ("Input options", (
@@ -148,11 +150,12 @@ def main(argv, opt, args):
     kwargs = {}
     if opt['plain']:
         kwargs['cls'] = lcg.DocFileReader
+
     reader = lcg.reader(src, name, ext=ext, recourse=recourse, encoding=opt['encoding'], **kwargs)
     try:
         node = reader.build()
     except IOError as e:
-        message = str(e)
+        message = unistr(e)
         match = re.match('[[]Errno[^]]*[]] *', message)
         if match:
             message = message[match.end():]
@@ -363,7 +366,7 @@ def run(argv):
             import cgitb
             sys.stderr.write(cgitb.text(einfo))
         except Exception as e:
-            sys.stderr.write("Unable to generate detailed traceback: " + str(e) + "\n")
+            sys.stderr.write("Unable to generate detailed traceback: " + unistr(e) + "\n")
             import traceback
             traceback.print_exception(*einfo)
         # The _lcg_processing_details exception attribute should not be generally used to pass data
@@ -374,7 +377,7 @@ def run(argv):
         # right away and cause errors in program code at a different place.
         if hasattr(ex, '_lcg_processing_details'):
             sys.stderr.write(lcg_exception_details("LCG exception details",
-                                                   ex._lcg_processing_details, str(ex)))
+                                                   ex._lcg_processing_details, unistr(ex)))
         if _debug:
             import pdb
             pdb.post_mortem(sys.exc_info()[2])

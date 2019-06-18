@@ -35,6 +35,7 @@ import copy
 
 from lcg import is_sequence_of
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -304,7 +305,7 @@ class ContentNode(object):
           top -- iff true, set the value in the top node
 
         """
-        assert isinstance(name, str), name
+        assert isinstance(name, unistr), name
         assert isinstance(value, lcg.Content), value
         node = self
         if top:

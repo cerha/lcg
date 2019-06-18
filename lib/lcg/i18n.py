@@ -26,7 +26,6 @@ allows us to decide for the output language at the export time.
 """
 from __future__ import unicode_literals
 from __future__ import print_function
-from builtins import str
 from builtins import object
 import lcg
 
@@ -39,6 +38,7 @@ import string
 import sys
 from functools import reduce
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -127,7 +127,7 @@ class TranslatedTextFactory(TranslatableTextFactory):
                                                            *args, **kwargs)
 
 
-class Localizable(str):
+class Localizable(unistr):
     """Common superclass of all localizable classes.
 
     This class is derived from Python 'unicode' type.  Thus it behaves as an
@@ -154,12 +154,12 @@ class Localizable(str):
         for f in _transforms:
             transformed = f(transformed)
         try:
-            instance = str.__new__(cls, transformed)
+            instance = unistr.__new__(cls, transformed)
         except UnicodeDecodeError:
             # Necessary to display some tracebacks
             def escape(text):
                 return re.sub(r'[^\x01-\x7F]', '?', text)
-            instance = str.__new__(cls, escape(transformed))
+            instance = unistr.__new__(cls, escape(transformed))
         instance._text = text
         return instance
 
@@ -302,7 +302,7 @@ class TranslatableText(Localizable):
             try:
                 localized_value = self._cache[key]
             except KeyError:
-                value = self._func(str(key))
+                value = self._func(unistr(key))
                 localized_value = self._localizer.localize(value)
                 if isinstance(value, lcg.HtmlEscapedUnicode):
                     self._contains_escaped_html = True
@@ -516,8 +516,8 @@ class TranslatablePluralForms(TranslatableText):
         else:
             n = kwargs['n']
         text = n == 1 and singular or plural
-        self._singular = str(singular)
-        self._plural = str(plural)
+        self._singular = unistr(singular)
+        self._plural = unistr(plural)
         self._n = n
         super(TranslatablePluralForms, self).__init__(text, *args, **kwargs)
 

@@ -34,6 +34,7 @@ import unicodedata
 import os
 
 standard_library.install_aliases()
+unistr = type(u'')  # Python 2/3 transition hack.
 
 
 class Constants(object):
@@ -155,7 +156,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         # Normalize and disambiguate the URI (several source URIs may have
         # the same normalized form or the normalized form may match an existing
         # resource URI).
-        if isinstance(uri, str):
+        if isinstance(uri, unistr):
             uri = unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore')
         uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', uri.lower())
         n = 0
@@ -270,7 +271,7 @@ class EpubExporter(lcg.Exporter):
     def _container_path(self, *components):
         # TODO replace forbidden characters as per spec
         def ensure_pathenc(component):
-            if isinstance(component, str):
+            if isinstance(component, unistr):
                 return component.encode(Constants.PATHENC)
             return component
         components = list(map(ensure_pathenc, components))

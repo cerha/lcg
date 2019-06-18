@@ -38,7 +38,6 @@ present in the code may still not be fully supported.
 """
 
 from __future__ import unicode_literals
-from builtins import str
 from builtins import map
 from builtins import object
 
@@ -48,6 +47,7 @@ import re
 
 _ = lcg.TranslatableTextFactory('lcg-exercises')
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -67,7 +67,7 @@ class Task(object):
 
     def __init__(self, prompt, comment=None, media=None):
         assert isinstance(prompt, lcg.Content) or prompt is None, prompt
-        assert isinstance(comment, str) or comment is None, comment
+        assert isinstance(comment, unistr) or comment is None, comment
         if media is None:
             media = ()
         elif isinstance(media, lcg.Media):
@@ -196,7 +196,7 @@ class Choice(object):
     """
 
     def __init__(self, answer, correct=False):
-        assert isinstance(answer, str), answer
+        assert isinstance(answer, unistr), answer
         assert correct is None or isinstance(correct, bool), correct
         self._answer = answer
         self._correct = correct
@@ -913,7 +913,7 @@ class _Test(object):
             name = '%s-a%d' % (self.id(), i + 1)
             answer = self._param(req, name)
             # Correct answer is a numer or string.
-            if answer == str(correct_answer):
+            if answer == unistr(correct_answer):
                 points += self.points()
             # elif not answer:
             #    empty += self.points()

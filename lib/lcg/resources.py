@@ -26,7 +26,6 @@ are managed by the 'ResourceProvider' (see below).
 
 """
 from __future__ import unicode_literals
-from builtins import str
 from builtins import object
 
 import os
@@ -35,6 +34,7 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -99,10 +99,10 @@ class Resource(object):
 
         """
         super(Resource, self).__init__()
-        assert isinstance(filename, str), filename
-        assert title is None or isinstance(title, str), title
-        assert descr is None or isinstance(descr, str), descr
-        assert uri is None or isinstance(uri, str), uri
+        assert isinstance(filename, unistr), filename
+        assert title is None or isinstance(title, unistr), title
+        assert descr is None or isinstance(descr, unistr), descr
+        assert uri is None or isinstance(uri, unistr), uri
         assert src_file is None or isinstance(src_file, basestring), src_file
         assert content is None or isinstance(content, bytes) or hasattr(content, 'read'), content
         self._filename = filename

@@ -24,7 +24,6 @@ from __future__ import absolute_import
 
 from builtins import chr
 from builtins import zip
-from builtins import str
 from builtins import range
 from builtins import object
 
@@ -49,6 +48,7 @@ from .nemeth import mathml_nemeth
 
 _ = TranslatableTextFactory('lcg')
 
+unistr = type(u'')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -303,7 +303,7 @@ def xml2braille(xml):
         except AttributeError:
             pass
     # Make the foreign call and process the results
-    result = _louisutdml.lbu_translateString(str("preferences.cfg"), inbuf, len(inbuf) + 1,
+    result = _louisutdml.lbu_translateString(unistr("preferences.cfg"), inbuf, len(inbuf) + 1,
                                              outbuf, ctypes.byref(outlen), None, None, mode)
     if not result:
         raise BrailleError("XML processing failed", xml)
@@ -783,7 +783,7 @@ class BrailleExporter(FileExporter, Exporter):
                         else:
                             marker, arg = mark
                             if marker == self._TOC_MARKER_CHAR:
-                                page_number = str(context.page_number())
+                                page_number = unistr(context.page_number())
                                 element = context.toc_element(arg)
                                 element.set_page_number(page_number)
                                 if isinstance(element, Section):
@@ -1146,13 +1146,13 @@ class BrailleExporter(FileExporter, Exporter):
         return self.text(context, title, lang=element.lang())
 
     def _export_page_number(self, context, element):
-        return self.text(context, str(context.page_number()), lang=element.lang())
+        return self.text(context, unistr(context.page_number()), lang=element.lang())
 
     def _export_page_heading(self, context, element):
         return context.page_heading()
 
     def _page_formatter(self, context, **kwargs):
-        return self.text(context, str(context.page_number()))
+        return self.text(context, unistr(context.page_number()))
 
     def _export_section(self, context, element):
         level = len(element.section_path())
@@ -1295,10 +1295,10 @@ class BrailleExporter(FileExporter, Exporter):
                                          self._export_table(context, table_2, recursive=True))
                     break
                 else:
-                    context.log(str(exception), kind=lcg.ERROR)
+                    context.log(unistr(exception), kind=lcg.ERROR)
                     return _Braille('')
             else:
-                context.log(str(exception), kind=lcg.ERROR)
+                context.log(unistr(exception), kind=lcg.ERROR)
                 return _Braille('')
         return result
 
