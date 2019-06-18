@@ -162,7 +162,7 @@ class Button(Widget, lcg.Content):
                  icon=None, **kwargs):
         """Arguments:
 
-           label -- button label as a basestring
+           label -- button label as a string
            uri -- target URI where the form is submitted
            values -- list of name/value pairs or a dict containing values
              to be submitted as request parameters to given URI when the
@@ -171,7 +171,7 @@ class Button(Widget, lcg.Content):
              button invocation (will be looked up in the current JavaScript
              name space).  The callback function will be called with the
              instance of 'lcg.Button' JavaScript class as the first argument.
-           tooltip -- button description/tooltip as a basestring
+           tooltip -- button description/tooltip as a string
            enabled -- the buton is enabled iff True; False makes it gray
            icon -- icon CSS class name.  If not None, a span with this class
              name will be added before the item label.  The CSS definition of
@@ -487,7 +487,7 @@ class CollapsiblePane(CollapsibleWidget, lcg.Container):
     def __init__(self, title, content, **kwargs):
         """Arguments:
 
-           title -- pane title as a basestring
+           title -- pane title as a string
            content -- 'lcg.Content' instance representing collapsible pane content
            collapsed -- pass False to make the pane initially expanded
            **kwargs -- other arguments defined by the parent class

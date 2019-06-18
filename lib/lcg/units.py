@@ -32,11 +32,13 @@ Additionally various enumerations are defined here, for instance:
 """
 from __future__ import unicode_literals
 from past.builtins import cmp
-from past.builtins import basestring
 from builtins import object
 
+import sys
 import decimal
 
+if sys.version_info[0] > 2:
+    basestring = str
 
 class Unit(object):
     """Dimension unit representation.

@@ -26,15 +26,17 @@ document in the hierarchy is represented by a single 'ContentNode' instance (def
 """
 
 from __future__ import unicode_literals
-from past.builtins import basestring
 from builtins import object
 
+import sys
 import lcg
 import functools
 import copy
 
 from lcg import is_sequence_of
 
+if sys.version_info[0] > 2:
+    basestring = str
 
 class ContentNode(object):
     """Representation of one node within an LCG publication.

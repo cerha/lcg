@@ -35,6 +35,9 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
 
+if sys.version_info[0] > 2:
+    basestring = str
+
 
 class Resource(object):
     """Generic resource representation.
@@ -100,7 +103,7 @@ class Resource(object):
         assert title is None or isinstance(title, str), title
         assert descr is None or isinstance(descr, str), descr
         assert uri is None or isinstance(uri, str), uri
-        assert src_file is None or isinstance(src_file, str), src_file
+        assert src_file is None or isinstance(src_file, basestring), src_file
         assert content is None or isinstance(content, bytes) or hasattr(content, 'read'), content
         self._filename = filename
         self._title = title

@@ -25,7 +25,6 @@ from future import standard_library
 from builtins import str
 from builtins import zip
 from builtins import range
-from past.builtins import basestring
 
 import datetime
 import io
@@ -41,6 +40,9 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('test')
 standard_library.install_aliases()
+if sys.version_info[0] > 2:
+    basestring = str
+
 
 lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
 os.environ['LCGDIR'] = lcg_dir

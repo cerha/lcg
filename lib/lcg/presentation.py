@@ -32,13 +32,16 @@ currently processed 'Content' instance and current language.
 
 from __future__ import unicode_literals
 from builtins import str
-from past.builtins import basestring
 from builtins import object
 
+import sys
 import copy
 import lcg
 import re
 import string
+
+if sys.version_info[0] > 2:
+    basestring = str
 
 
 class Presentation(object):

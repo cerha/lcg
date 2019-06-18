@@ -27,7 +27,6 @@ allows us to decide for the output language at the export time.
 from __future__ import unicode_literals
 from __future__ import print_function
 from builtins import str
-from past.builtins import basestring
 from builtins import object
 import lcg
 
@@ -39,6 +38,9 @@ import re
 import string
 import sys
 from functools import reduce
+
+if sys.version_info[0] > 2:
+    basestring = str
 
 
 class TranslatableTextFactory(object):

@@ -26,7 +26,6 @@ from builtins import chr
 from builtins import zip
 from builtins import str
 from builtins import range
-from past.builtins import basestring
 from builtins import object
 
 from contextlib import contextmanager
@@ -49,6 +48,10 @@ from .export import Exporter, FileExporter
 from .nemeth import mathml_nemeth
 
 _ = TranslatableTextFactory('lcg')
+
+if sys.version_info[0] > 2:
+    basestring = str
+
 
 _braille_whitespace = ' ⠀'
 
