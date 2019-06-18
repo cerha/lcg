@@ -265,7 +265,7 @@ class StructuredTextReader(FileReader):
         # This method is called after _content(), is called for each
         # language, so the dictionary of titles is already built.
         if len(self._titles.keys()) == 1:
-            title = self._titles.values()[0]
+            title = list(self._titles.values())[0]
         else:
             title = lcg.SelfTranslatableText(self._id, translations=self._titles)
         return title
