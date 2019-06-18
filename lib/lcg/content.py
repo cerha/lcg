@@ -35,6 +35,7 @@ the hierarchy of the nodes themselves.
 
 """
 
+from __future__ import unicode_literals
 from future import standard_library
 from builtins import str
 from builtins import range

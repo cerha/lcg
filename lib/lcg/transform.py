@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from __future__ import unicode_literals
 from future import standard_library
 from builtins import chr
 from builtins import str

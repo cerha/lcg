@@ -24,8 +24,8 @@ important to retain the original strings while constructing LCG content.  This
 allows us to decide for the output language at the export time.
 
 """
+from __future__ import unicode_literals
 from __future__ import print_function
-
 from builtins import str
 from past.builtins import basestring
 from builtins import object

@@ -19,6 +19,7 @@
 
 """Various utilities"""
 
+from __future__ import unicode_literals
 from builtins import str
 
 from contextlib import contextmanager

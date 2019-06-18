@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
 from future import standard_library
@@ -24,6 +25,7 @@ from builtins import range
 from past.builtins import basestring
 from builtins import object
 from past.utils import old_div
+
 import copy
 import decimal
 import io

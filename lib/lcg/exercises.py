@@ -37,6 +37,7 @@ present in the code may still not be fully supported.
 
 """
 
+from __future__ import unicode_literals
 from builtins import str
 from builtins import map
 from past.builtins import basestring
