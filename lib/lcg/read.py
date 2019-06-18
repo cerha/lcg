@@ -153,8 +153,8 @@ class FileReader(Reader):
     # Byte Order Mark (see http://en.wikipedia.org/wiki/Byte-order_mark).
     _BOM = unicodedata.lookup('ZERO WIDTH NO-BREAK SPACE').encode('utf-8')
 
-    _ENCODING_HEADER_MATCHER = re.compile(r'^#\s*-\*-.*coding:\s*([^\s;]+).*-\*-\s*$')
-    _EMACS_CODING_EXTENSION_MATCHER = re.compile(r'(^mule-|-(dos|unix|mac)$)')
+    _ENCODING_HEADER_MATCHER = re.compile(b'^#\s*-\*-.*coding:\s*([^\s;]+).*-\*-\s*$')
+    _EMACS_CODING_EXTENSION_MATCHER = re.compile(b'(^mule-|-(dos|unix|mac)$)')
 
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
         assert isinstance(dir, basestring), dir
@@ -184,7 +184,7 @@ class FileReader(Reader):
                 lcg.log("File '%s' not found. Using '%s' instead.", filename, filename2)
                 filename = filename2
         self._source_filename = filename
-        fh = open(filename)
+        fh = open(filename, 'rb')
         try:
             lines = fh.readlines()
         finally:
@@ -197,8 +197,10 @@ class FileReader(Reader):
             match = self._ENCODING_HEADER_MATCHER.match(lines[0])
             if match:
                 enc = self._EMACS_CODING_EXTENSION_MATCHER.sub('', match.group(1))
+                if sys.version_info[0] > 2:
+                    enc = str(enc, 'ascii')
                 try:
-                    codecs.lookup(enc)
+                    codecs.lookup(str(enc))
                 except LookupError:
                     lcg.log("File %s: Unknown encoding '%s' in file header, using default '%s'.",
                             filename, enc, encoding)
@@ -209,7 +211,7 @@ class FileReader(Reader):
                 # This is a hack (it breaks line numbering).
                 comment_matcher = re.compile(comment)
                 lines = [l for l in lines if not comment_matcher.match(l)]
-        content = ''.join(lines)
+        content = b''.join(lines)
         try:
             return unistr(content, encoding=encoding)
         except UnicodeDecodeError as e:
