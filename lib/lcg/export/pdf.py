@@ -2931,7 +2931,7 @@ class PDFExporter(FileExporter, Exporter):
             for a in invalid_anchors:
                 sys.stderr.write("  #%s\n" % (a,))
             return ''
-        output = io.StringIO()
+        output = io.BytesIO()
         doc = DocTemplate(output, pagesize=page_size,
                           leftMargin=left_margin,
                           rightMargin=right_margin,

@@ -1859,7 +1859,7 @@ class MathML(Content):
         etree = ElementTree.ElementTree()
         content = self._str_content()
         try:
-            tree = etree.parse(io.StringIO(content), parser=parser)
+            tree = etree.parse(io.BytesIO(content), parser=parser)
         except ElementTree.ParseError as e:
             raise lcg.ParseError("Error when parsing MathML element", e, content)
         regexp = re.compile('{.*}')
