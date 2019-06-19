@@ -26,7 +26,7 @@ import lcg
 
 import xml.dom.minidom as xml
 import zipfile
-import io as StringIO
+import io
 import datetime
 import mimetypes
 import re
@@ -204,7 +204,7 @@ class EpubExporter(lcg.Exporter):
 
     def export(self, context):
         """Return the exported E-pub archive as a binary string."""
-        fileobject = StringIO.StringIO()
+        fileobject = io.BytesIO()
         epub = zipfile.ZipFile(fileobject, 'w', zipfile.ZIP_DEFLATED)
         node = context.node()
         lang = context.lang()
