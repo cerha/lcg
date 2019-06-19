@@ -234,8 +234,8 @@ class Parser(object):
         regexp = r"(?P<%s>\\*%s)"
         pair_regexp = '|'.join((regexp % ("%s_end", r"(?<=\S)%s(?!\w)"),
                                 regexp % ("%s_start", r"(?<!\w)%s(?=\S)")))
-        regexps = [isinstance(markup, str) and regexp % (name, markup)
-                   or pair_regexp % (name, markup[1], name, markup[0])
+        regexps = [pair_regexp % (name, markup[1], name, markup[0])
+                   if isinstance(markup, tuple) else regexp % (name, markup)
                    for name, markup in self._INLINE_MARKUP]
         self._inline_markup = re.compile('(?:' + '|'.join(regexps) + ')',
                                          re.MULTILINE | re.UNICODE | re.IGNORECASE)
