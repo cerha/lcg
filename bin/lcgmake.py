@@ -207,7 +207,7 @@ def read_presentation(filename):
     presentation = lcg.Presentation()
     try:
         f = open(filename)
-    except:
+    except IOError:
         die("Can't open file: %s" % (filename,))
     try:
         confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
@@ -225,7 +225,7 @@ def read_style(filename):
     style_file = lcg.StyleFile()
     try:
         f = open(filename)
-    except:
+    except IOError:
         die("Can't open file: %s" % (filename,))
     try:
         style_file.read(f)

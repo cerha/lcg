@@ -242,7 +242,7 @@ class EpubExporter(lcg.Exporter):
         finally:
             try:
                 epub.close()
-            except:
+            except Exception:
                 # Closing may fail after a prior exception.
                 # This prevents the later exception to take over.
                 pass

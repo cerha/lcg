@@ -807,7 +807,7 @@ class Exporter(object):
             dictionary = value
             try:
                 value = value.get(key)
-            except:
+            except Exception:
                 dictionary = None
                 break
             if isinstance(value, collections.Callable):

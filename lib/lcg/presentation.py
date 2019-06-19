@@ -553,7 +553,7 @@ class StyleFile(object):
                     if name == identifier:
                         try:
                             value = parser(text_value)
-                        except:
+                        except Exception:
                             raise self.ParseError("Invalid property value on line %s: %s" %
                                                   (line_number, raw_line,))
                         break
