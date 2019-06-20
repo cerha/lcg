@@ -48,43 +48,43 @@ class TranslatableText(unittest.TestCase):
         a1 = a.localize(lcg.Localizer())
         b1 = b.localize(lcg.Localizer())
         c1 = c.localize(lcg.Localizer())
-        self.assertEqual(a1, "Hi Joe, say hello to Bob.")
-        self.assertEqual(b1, "Hi Joe, say hello to Bob.")
-        self.assertEqual(c1, "Hi -person1-, say hello to -person2-.")
+        assert a1, "Hi Joe, say hello to Bob."
+        assert b1, "Hi Joe, say hello to Bob."
+        assert c1, "Hi -person1-, say hello to -person2-."
 
     def test_addition(self):
         a = lcg.TranslatableText("Version %s", "1.0")
         b = "xxx"
         c = a + b
-        self.assertIsInstance(c, lcg.Concatenation)
-        self.assertEqual(c, "Version 1.0xxx")
+        assert isinstance(c, lcg.Concatenation)
+        assert c == "Version 1.0xxx"
         d = c + b
-        self.assertIsInstance(d, lcg.Concatenation)
+        assert isinstance(d, lcg.Concatenation)
         e = b + a
-        self.assertIsInstance(e, lcg.Concatenation)
-        self.assertEqual(e, "xxxVersion 1.0")
+        assert isinstance(e, lcg.Concatenation)
+        assert e == "xxxVersion 1.0"
         f = b + c
-        self.assertIsInstance(f, lcg.Concatenation)
-        self.assertEqual(f, "xxxVersion 1.0xxx")
+        assert isinstance(f, lcg.Concatenation)
+        assert f == "xxxVersion 1.0xxx"
         try:
             e = a + 1
         except TypeError as e:
             pass
-        self.assertIsInstance(e, TypeError)
+        assert isinstance(e, TypeError)
 
     def test_concat(self):
         a = lcg.concat(lcg.TranslatableText("Version %s", "1.0") + 'xx',
                        'yy', separator="\n")
-        self.assertIsInstance(a, lcg.Concatenation)
+        assert isinstance(a, lcg.Concatenation)
         items = a.items()
-        self.assertEqual(len(items), 2, items)
-        self.assertEqual(items[1], ('xx\nyy'))
+        assert len(items) == 2
+        assert items[1] == ('xx\nyy')
         b = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
-        self.assertIsInstance(b, str)
-        self.assertEqual(b, 'a-b-c-d-e-f')
+        assert isinstance(b, str)
+        assert b == 'a-b-c-d-e-f'
         c = lcg.concat('a', (u'b', 'c', 'd'), 'e', 'f', separator='-')
-        self.assertIsInstance(c, unicode)
-        self.assertEqual(c, 'a-b-c-d-e-f')
+        assert isinstance(c, unicode)
+        assert c == 'a-b-c-d-e-f'
 
     def test_replace(self):
         t = lcg.TranslatableText("Version %s", "xox")
@@ -92,18 +92,18 @@ class TranslatableText(unittest.TestCase):
         b = t.replace('o', '-')
         c = a.replace('o', '-')
         d = c.replace('V', 'v')
-        self.assertIsInstance(a, lcg.Concatenation)
-        self.assertIsInstance(b, lcg.TranslatableText)
-        self.assertIsInstance(c, lcg.Concatenation)
-        self.assertIsInstance(d, lcg.Concatenation)
+        assert isinstance(a, lcg.Concatenation)
+        assert isinstance(b, lcg.TranslatableText)
+        assert isinstance(c, lcg.Concatenation)
+        assert isinstance(d, lcg.Concatenation)
         ax = a.localize(lcg.Localizer())
         bx = b.localize(lcg.Localizer())
         cx = c.localize(lcg.Localizer())
         dx = d.localize(lcg.Localizer())
-        self.assertTrue(str(a) == ax == 'Version xox-yoy', (a, ax))
-        self.assertTrue(str(b) == bx == 'Versi-n x-x', (b, bx))
-        self.assertTrue(str(c) == cx == 'Versi-n x-x-y-y', (c, cx))
-        self.assertTrue(str(d) == dx == 'versi-n x-x-y-y', (d, dx))
+        assert str(a) == ax == 'Version xox-yoy', (a, ax)
+        assert str(b) == bx == 'Versi-n x-x', (b, bx)
+        assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
+        assert str(d) == dx == 'versi-n x-x-y-y', (d, dx)
 
     def test_transform(self):
         from xml.sax import saxutils
@@ -113,8 +113,8 @@ class TranslatableText(unittest.TestCase):
         d = b.transform(saxutils.quoteattr)
         e = "attr=" + d  # Test transformed Concatenation nesting!
         f = lcg.concat('<tag ' + e + '>')
-        self.assertIsInstance(c, lcg.TranslatableText)
-        self.assertIsInstance(d, lcg.Concatenation)
+        assert isinstance(c, lcg.TranslatableText)
+        assert isinstance(d, lcg.Concatenation)
         loc = lcg.Localizer('cs', translation_path=translation_path)
         ax = a.localize(loc)
         bx = b.localize(loc)
@@ -122,32 +122,32 @@ class TranslatableText(unittest.TestCase):
         dx = d.localize(loc)
         ex = e.localize(loc)
         fx = f.localize(loc)
-        self.assertEqual(str(a), 'His name is "Bob"')
-        self.assertEqual(str(b), 'Bob + Joe')
-        self.assertEqual(ax, 'Jmenuje se "Bobik"')
-        self.assertEqual(bx, 'Bobik + Pepa')
-        self.assertEqual(str(c), '\'His name is "Bob"\'')
-        self.assertEqual(str(d), '"Bob + Joe"')
-        self.assertEqual(str(e), 'attr="Bob + Joe"')
-        self.assertEqual(str(f), '<tag attr="Bob + Joe">')
-        self.assertEqual(cx, '\'Jmenuje se "Bobik"\'')
-        self.assertEqual(dx, '"Bobik + Pepa"')
-        self.assertEqual(ex, 'attr="Bobik + Pepa"')
-        self.assertEqual(fx, '<tag attr="Bobik + Pepa">')
+        assert str(a) == 'His name is "Bob"'
+        assert str(b) == 'Bob + Joe'
+        assert ax == 'Jmenuje se "Bobik"'
+        assert bx == 'Bobik + Pepa'
+        assert str(c) == '\'His name is "Bob"\''
+        assert str(d) == '"Bob + Joe"'
+        assert str(e) == 'attr="Bob + Joe"'
+        assert str(f) == '<tag attr="Bob + Joe">'
+        assert cx == '\'Jmenuje se "Bobik"\''
+        assert dx == '"Bobik + Pepa"'
+        assert ex == 'attr="Bobik + Pepa"'
+        assert fx == '<tag attr="Bobik + Pepa">'
 
     def test_string_context(self):
         a = lcg.TranslatableText("Version %s", "1.0")
-        self.assertEqual(a, "Version 1.0")
+        assert a == "Version 1.0"
         b = lcg.TranslatableText("Info: %s", a)
-        self.assertEqual(b, "Info: Version 1.0")
+        assert b == "Info: Version 1.0"
         c = lcg.concat("Info:", lcg.concat(a, '2006-08-14', separator=', '),
                        ('Mon', '10:32'), separator=' ')
-        self.assertEqual(c, "Info: Version 1.0, 2006-08-14 Mon 10:32")
+        assert c == "Info: Version 1.0, 2006-08-14 Mon 10:32"
 
     def test_html_escaping(self):
         def test(src, expected_result, escaped=True):
             result = src.localize(lcg.Localizer())
-            self.assertEqual(result, expected_result)
+            assert result == expected_result
             if escaped:
                 assert isinstance(result, lcg.HtmlEscapedUnicode)
             else:
@@ -190,7 +190,7 @@ class TranslatablePluralForms(unittest.TestCase):
                               (5, u"Mám 5 problémů.")):
             a = _.ngettext("I have %d problem.", "I have %d problems.", n)
             b = a.localize(loc)
-            self.assertEqual(b, translated)
+            assert b == translated
 
     def test_interpolation(self):
         t = lcg.Localizer('cs', translation_path=translation_path)
@@ -200,7 +200,7 @@ class TranslatablePluralForms(unittest.TestCase):
             a = _.ngettext("%(n)d record found in table %(name)s.",
                            "%(n)d records found in table %(name)s.", n=n, name='xy')
             b = a.localize(t)
-            self.assertEqual(b, translated)
+            assert b == translated
 
     def test_replace(self):
         loc = lcg.Localizer('cs', translation_path=translation_path)
@@ -211,13 +211,13 @@ class TranslatablePluralForms(unittest.TestCase):
             a1 = a.replace('5', '123')
             a2 = a1.localize(loc)
             ta1 = ta.replace('5', '123')
-            self.assertEqual(a2, ta1)
+            assert a2 == ta1
             b = _.ngettext("%(n)d record found in table %(name)s.",
                            "%(n)d records found in table %(name)s.", n=n, name='xy')
             b1 = b.replace('5', '123')
             b2 = b1.localize(loc)
             tb1 = tb.replace('5', '123')
-            self.assertEqual(b2, tb1)
+            assert b2 == tb1
 
 
 class SelfTranslatableText(unittest.TestCase):
@@ -228,14 +228,14 @@ class SelfTranslatableText(unittest.TestCase):
         a = lcg.SelfTranslatableText(text, person1="Joe", person2="Ann", translations=translations)
         a2 = lcg.SelfTranslatableText(text, translations=translations)
         a3 = a2.interpolate(lambda key: '-' + key + '-')
-        b = a.localize(lcg.Localizer())
-        c = a.localize(lcg.Localizer('cs', translation_path=translation_path))
-        self.assertEqual(b, "Joe is smarter than Ann.")
-        self.assertEqual(c, u"Joe je chytřejší než Ann.")
-        b2 = a3.localize(lcg.Localizer())
-        c2 = a3.localize(lcg.Localizer('cs', translation_path=translation_path))
-        self.assertEqual(b2, "-person1- is smarter than -person2-.")
-        self.assertEqual(c2, u"-person1- je chytřejší než -person2-.")
+        assert a.localize(lcg.Localizer()) == \
+            "Joe is smarter than Ann."
+        assert a.localize(lcg.Localizer('cs', translation_path=translation_path)) == \
+            u"Joe je chytřejší než Ann."
+        assert a3.localize(lcg.Localizer()) == \
+            "-person1- is smarter than -person2-."
+        assert a3.localize(lcg.Localizer('cs', translation_path=translation_path)) == \
+            u"-person1- je chytřejší než -person2-."
 
 
 class LocalizableDateTime(unittest.TestCase):
@@ -264,98 +264,89 @@ class LocalizableDateTime(unittest.TestCase):
         en = lcg.Localizer('en', translation_path=translation_path)
         cs = lcg.Localizer('cs', translation_path=translation_path, timezone=self.tzinfo(-60))
         utc = lcg.LocalizableDateTime._UTC_TZ
-        for dt, kwargs, localizer, expected_result in (
-                ("2006-12-21", {}, en,
-                 "21/12/2006"),
-                (datetime.date(2006, 12, 21), {}, en,
-                 "21/12/2006"),
-                ("2006-12-21 02:43", dict(show_time=False), en,
-                 "21/12/2006"),
-                ("2006-12-21 02:43", dict(show_time=False, utc=True), en,
-                 "21/12/2006 UTC"),
-                (datetime.datetime(2006, 12, 21, 2, 43), dict(show_time=False), en,
-                 "21/12/2006"),
-                (datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), dict(show_time=False), en,
-                 "21/12/2006 UTC"),
-                ("2006-12-21 02:43", {}, en,
-                 "21/12/2006 02:43 AM"),
-                (datetime.datetime(2006, 12, 21, 2, 43), dict(show_seconds=False), en,
-                 "21/12/2006 02:43 AM"),
-                ("2006-12-21 18:43:32", dict(show_weekday=True), en,
-                 "Thu 21/12/2006 06:43:32 PM"),
-                (datetime.datetime(2006, 12, 21, 18, 43, 32), dict(show_weekday=True), en,
-                 "Thu 21/12/2006 06:43:32 PM"),
-                ("2006-01-30", dict(leading_zeros=False), en,
-                 "30/1/2006"),
-                (datetime.date(2006, 01, 30), dict(leading_zeros=False), en,
-                 "30/1/2006"),
-                ("2006-12-21 18:43:32", dict(utc=True), en,
-                 "21/12/2006 06:43:32 PM UTC"),
-                (datetime.datetime(2006, 12, 21, 18, 43, 32), {}, en,
-                 "21/12/2006 06:43:32 PM"),
-                ("2006-12-21", {}, cs,
-                 "21.12.2006"),
-                (datetime.date(2006, 12, 21), {}, cs,
-                 "21.12.2006"),
-                ("2006-12-21 02:43", dict(show_time=False), cs,
-                 "21.12.2006"),
-                (datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), dict(show_time=False), cs,
-                 "21.12.2006"),
-                ("2006-12-21 02:43", {}, cs,
-                 "21.12.2006 02:43"),
-                ("2006-12-21 02:43", dict(utc=True), cs,
-                 "21.12.2006 01:43"),
-                (datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), dict(show_seconds=False), cs,
-                 "21.12.2006 01:43"),
-                ("2006-12-21 18:43:32", dict(show_weekday=True), cs,
-                 u"Čt 21.12.2006 18:43:32"),
-                (datetime.datetime(2006, 12, 21, 18, 43, 32), {}, cs,
-                 u"21.12.2006 18:43:32"),
-                (datetime.datetime(2006, 12, 21, 18, 43, 32, tzinfo=utc), {}, cs,
-                 u"21.12.2006 17:43:32"),
-                ("2006-01-30", dict(leading_zeros=False), cs,
-                 "30.1.2006"),
-                (datetime.date(2006, 01, 30), dict(leading_zeros=False), cs,
-                 "30.1.2006"),
-                ("2006-12-21 18:43:32", dict(utc=True), cs,
-                 u"21.12.2006 17:43:32"),
-                (datetime.datetime(2006, 12, 21, 18, 43, 32), dict(utc=True), cs,
-                 u"21.12.2006 17:43:32"),
-        ):
-            result = lcg.LocalizableDateTime(dt, **kwargs).localize(localizer)
-            self.assertEqual(result, expected_result,
-                             "%r %s: %s != %s" % (dt, kwargs, result, expected_result))
+        def localize(dt, localizer, **kwargs):
+            return lcg.LocalizableDateTime(dt, **kwargs).localize(localizer)
+
+        assert localize("2006-12-21", en) == \
+            "21/12/2006"
+        assert localize(datetime.date(2006, 12, 21), en) == \
+            "21/12/2006"
+        assert localize("2006-12-21 02:43", en, show_time=False) == \
+            "21/12/2006"
+        assert localize("2006-12-21 02:43", en, show_time=False, utc=True) == \
+            "21/12/2006 UTC"
+        assert localize(datetime.datetime(2006, 12, 21, 2, 43), en, show_time=False) == \
+            "21/12/2006"
+        assert localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), en, show_time=False) == \
+            "21/12/2006 UTC"
+        assert localize("2006-12-21 02:43", en) == \
+            "21/12/2006 02:43 AM"
+        assert localize(datetime.datetime(2006, 12, 21, 2, 43), en, show_seconds=False) == \
+            "21/12/2006 02:43 AM"
+        assert localize("2006-12-21 18:43:32", en, show_weekday=True) == \
+            "Thu 21/12/2006 06:43:32 PM"
+        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), en, show_weekday=True) == \
+            "Thu 21/12/2006 06:43:32 PM"
+        assert localize("2006-01-30", en, leading_zeros=False) == \
+            "30/1/2006"
+        assert localize(datetime.date(2006, 01, 30), en, leading_zeros=False) == \
+            "30/1/2006"
+        assert localize("2006-12-21 18:43:32", en, utc=True) == \
+            "21/12/2006 06:43:32 PM UTC"
+        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), en) == \
+            "21/12/2006 06:43:32 PM"
+        assert localize("2006-12-21", cs) == \
+            "21.12.2006"
+        assert localize(datetime.date(2006, 12, 21), cs) == \
+            "21.12.2006"
+        assert localize("2006-12-21 02:43", cs, show_time=False) == \
+            "21.12.2006"
+        assert localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_time=False) == \
+            "21.12.2006"
+        assert localize("2006-12-21 02:43", cs) == \
+            "21.12.2006 02:43"
+        assert localize("2006-12-21 02:43", cs, utc=True) == \
+            "21.12.2006 01:43"
+        assert localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_seconds=False) == \
+            "21.12.2006 01:43"
+        assert localize("2006-12-21 18:43:32", cs, show_weekday=True) == \
+            u"Čt 21.12.2006 18:43:32"
+        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs) == \
+            u"21.12.2006 18:43:32"
+        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32, tzinfo=utc), cs) == \
+            u"21.12.2006 17:43:32"
+        assert localize("2006-01-30", cs, leading_zeros=False) == \
+            "30.1.2006"
+        assert localize(datetime.date(2006, 01, 30), cs, leading_zeros=False) == \
+            "30.1.2006"
+        assert localize("2006-12-21 18:43:32", cs, utc=True) == \
+            u"21.12.2006 17:43:32"
+        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs, utc=True) == \
+            u"21.12.2006 17:43:32"
 
     def test_concat(self):
-        d = lcg.LocalizableDateTime("2006-01-30")
-        c = "Date is: " + d
-        t = c.localize(lcg.Localizer('en', translation_path=translation_path))
-        self.assertEqual(t, "Date is: 30/01/2006")
-        t = c.localize(lcg.Localizer('cs', translation_path=translation_path))
-        self.assertEqual(t, "Date is: 30.01.2006")
+        c = "Date is: " + lcg.LocalizableDateTime("2006-01-30")
+        assert c.localize(lcg.Localizer('en', translation_path=translation_path)) == \
+            "Date is: 30/01/2006"
+        assert c.localize(lcg.Localizer('cs', translation_path=translation_path)) == \
+            "Date is: 30.01.2006"
 
     def test_replace(self):
         a = lcg.LocalizableDateTime("2006-01-30")
+        en = lcg.Localizer('en', translation_path=translation_path)
+        cs = lcg.Localizer('cs', translation_path=translation_path)
         b = a.replace('-', '+')
+        assert str(b) == "2006+01+30"
+        assert b.localize(en) == "30/01/2006"
+        assert b.localize(cs) == "30.01.2006"
         c = a.replace('/', '|')
+        assert str(c) == "2006-01-30"
+        assert c.localize(en) == "30|01|2006"
+        assert c.localize(cs) == "30.01.2006"
         d = a.replace('.', ':')
-        loc1 = lcg.Localizer('en', translation_path=translation_path)
-        loc2 = lcg.Localizer('cs', translation_path=translation_path)
-        b1 = b.localize(loc1)
-        b2 = b.localize(loc2)
-        self.assertEqual(str(b), "2006+01+30")
-        self.assertEqual(b1, "30/01/2006")
-        self.assertEqual(b2, "30.01.2006")
-        c1 = c.localize(loc1)
-        c2 = c.localize(loc2)
-        self.assertEqual(str(c), "2006-01-30")
-        self.assertEqual(c1, "30|01|2006")
-        self.assertEqual(c2, "30.01.2006")
-        d1 = d.localize(loc1)
-        d2 = d.localize(loc2)
-        self.assertEqual(str(d), "2006-01-30")
-        self.assertEqual(d1, "30/01/2006")
-        self.assertEqual(d2, "30:01:2006")
+        assert str(d) == "2006-01-30"
+        assert d.localize(en) == "30/01/2006"
+        assert d.localize(cs) == "30:01:2006"
 
 
 class LocalizableTime(unittest.TestCase):
@@ -363,21 +354,19 @@ class LocalizableTime(unittest.TestCase):
     def test_format(self):
         t1 = lcg.LocalizableTime("02:43")
         t2 = lcg.LocalizableTime("18:43:32")
-        t1cs = t1.localize(lcg.Localizer('cs', translation_path=translation_path))
-        t2cs = t2.localize(lcg.Localizer('cs', translation_path=translation_path))
-        t1no = t1.localize(lcg.Localizer('no', translation_path=translation_path))
-        t2no = t2.localize(lcg.Localizer('no', translation_path=translation_path))
-        self.assertEqual(t1cs, "02:43")
-        self.assertEqual(t2cs, "18:43:32")
-        self.assertEqual(t1no, "02.43")
-        self.assertEqual(t2no, "18.43.32")
+        cs = lcg.Localizer('cs', translation_path=translation_path)
+        no = lcg.Localizer('no', translation_path=translation_path)
+        assert t1.localize(cs) == "02:43"
+        assert t2.localize(cs) == "18:43:32"
+        assert t1.localize(no) == "02.43"
+        assert t2.localize(no) == "18.43.32"
 
 
 class TranslatableTextFactory(unittest.TestCase):
 
     def test_domain(self):
         a = _("%(name1)s is smarter than %(name2)s.", name1=_("Joe"), name2=_("Bob"))
-        self.assertEqual(a.domain(), 'test')
+        assert a.domain() == 'test'
 
 
 class Monetary(unittest.TestCase):
@@ -387,34 +376,28 @@ class Monetary(unittest.TestCase):
         a1 = lcg.Localizer().localize(a)
         a2 = lcg.Localizer('cs').localize(a)
         a3 = lcg.Localizer('en').localize(a)
-        self.assertEqual(a1, '8975.50')
-        self.assertEqual(a2, u'8\xa0975,50')
-        self.assertEqual(a3, '8,975.50')
+        assert a1 == '8975.50'
+        assert a2 == u'8\xa0975,50'
+        assert a3 == '8,975.50'
 
     def test_precision(self):
-        a = lcg.Monetary(8975.5, precision=0)
-        b = lcg.Monetary(8975.5, precision=3)
-        a1 = lcg.Localizer().localize(a)
-        b1 = lcg.Localizer().localize(b)
-        self.assertEqual(a1, '8976')
-        self.assertEqual(b1, '8975.500')
+        loc = lcg.Localizer()
+        assert loc.localize(lcg.Monetary(8975.5, precision=0)) == '8976'
+        assert loc.localize(lcg.Monetary(8975.5, precision=3)) == '8975.500'
 
     def test_transform(self):
-        a = lcg.Monetary(8975.5, precision=2)
-        b = a.transform(lambda x: x.replace('.', ','))
-        a1 = lcg.Localizer().localize(a)
-        b1 = lcg.Localizer().localize(b)
-        self.assertEqual(a1, '8975.50')
-        self.assertEqual(b1, '8975,50')
+        loc = lcg.Localizer()
+        amount = lcg.Monetary(8975.5, precision=2)
+        assert loc.localize(amount) == '8975.50'
+        assert loc.localize(amount.transform(lambda x: x.replace('.', ','))) == '8975,50'
 
 
 class GettextTranslator(unittest.TestCase):
 
     def test_translate(self):
         t = lcg.Localizer('cs', translation_path=translation_path).translator()
-        a = "%(name1)s is smarter than %(name2)s."
-        b = t.gettext(a, domain='test')
-        self.assertEqual(b, u"%(name1)s je chytřejší než %(name2)s.")
+        assert t.gettext("%(name1)s is smarter than %(name2)s.", domain='test') == \
+            u"%(name1)s je chytřejší než %(name2)s."
 
 
 class ContentNode(unittest.TestCase):
@@ -424,17 +407,17 @@ class ContentNode(unittest.TestCase):
         c = lcg.ContentNode('c', children=(d,))
         b = lcg.ContentNode('b')
         a = lcg.ContentNode('a', children=(b, c))
-        self.assertEqual(a.id(), 'a')
-        self.assertIs(a.root(), b.root())
-        self.assertIs(c.root(), a)
-        self.assertIs(d.root(), a)
-        self.assertIs(b.next(), c)
-        self.assertIs(b.prev(), a)
-        self.assertEqual(d.path(), (a, c, d))
-        self.assertEqual(b.path(), (a, b))
-        self.assertEqual(a.linear(), [a, b, c, d])
-        self.assertEqual(b.linear(), [b])
-        self.assertEqual(c.linear(), [c, d])
+        assert a.id() == 'a'
+        assert a.root() is b.root()
+        assert c.root() is a
+        assert d.root() is a
+        assert b.next() is c
+        assert b.prev() is a
+        assert d.path() == (a, c, d)
+        assert b.path() == (a, b)
+        assert a.linear() == [a, b, c, d]
+        assert b.linear() == [b]
+        assert c.linear() == [c, d]
 
     def test_variants(self):
         n = lcg.ContentNode(
@@ -450,33 +433,34 @@ class ContentNode(unittest.TestCase):
                             right_page_footer=lcg.TextContent('RF.CS')),
             ),
         )
-        self.assertEqual(n.content('en').text(), 'EN')
-        self.assertEqual(n.content('cs').text(), 'CS')
-        self.assertEqual(n.content('fr').text(), 'C')
-        self.assertEqual(n.first_page_header('en').text(), 'FH')
-        self.assertEqual(n.first_page_header('cz').text(), 'FH')
-        self.assertEqual(n.page_header('en').text(), 'H.EN')
-        self.assertIsNone(n.page_footer('en'))
-        self.assertEqual(n.right_page_footer('en').text(), 'RF')
-        self.assertIsNone(n.page_header('cs'))
-        self.assertEqual(n.page_footer('cs').text(), 'F.CS')
-        self.assertEqual(n.right_page_footer('cs').text(), 'RF.CS')
-        self.assertIsNone(n.page_header('fr'))
-        self.assertEqual(n.page_background('en').text(), 'B')
-        self.assertEqual(n.page_background('cs').text(), 'B')
-        self.assertEqual(n.page_background('fr').text(), 'B')
+        assert n.content('en').text() == 'EN'
+        assert n.content('cs').text() == 'CS'
+        assert n.content('fr').text() == 'C'
+        assert n.first_page_header('en').text() == 'FH'
+        assert n.first_page_header('cz').text() == 'FH'
+        assert n.page_header('en').text() == 'H.EN'
+        assert n.page_footer('en') is None
+        assert n.right_page_footer('en').text() == 'RF'
+        assert n.page_header('cs') is None
+        assert n.page_footer('cs').text() == 'F.CS'
+        assert n.right_page_footer('cs').text() == 'RF.CS'
+        assert n.page_header('fr') is None
+        assert n.page_background('en').text() == 'B'
+        assert n.page_background('cs').text() == 'B'
+        assert n.page_background('fr').text() == 'B'
         # Lang must be passed to .content() when variants are defined,
         # but may be omitted when no variants are passed to ContentNode.
-        self.assertRaises(AssertionError, n.content)
+        with pytest.raises(AssertionError):
+            n.content()
         n2 = lcg.ContentNode('n', content=lcg.TextContent("C"))
-        self.assertEqual(n2.content().text(), 'C')
+        assert n2.content().text() == 'C'
 
     def test_resources(self):
         img = lcg.Image('a.png')
         n = lcg.ContentNode('n', content=lcg.TextContent("C", resources=(img,)))
-        self.assertIs(n.resource('a.png'), img)
-        self.assertIsNone(n.resource('b.png'))
-        self.assertEqual(n.resources(), (img,))
+        assert n.resource('a.png') is img
+        assert n.resource('b.png') is None
+        assert n.resources() == (img,)
 
 
 class Resources(unittest.TestCase):
@@ -488,17 +472,17 @@ class Resources(unittest.TestCase):
             warnings.append(msg)
         p = lcg.ResourceProvider(resources=(lcg.Audio('xxx.ogg'),))
         r = p.resource('xxx.xx', warn=warn)
-        self.assertIsNone(r)
-        self.assertEqual(len(warnings), 1, warnings)
+        assert r is None
+        assert len(warnings) == 1
         r = p.resource('xxx.mp3', warn=warn)
-        self.assertIsNone(r)
-        self.assertEqual(len(warnings), 2, warnings)
+        assert r is None
+        assert len(warnings) == 2
         r = p.resource('xxx.ogg')
-        self.assertIsInstance(r, lcg.Audio)
-        self.assertEqual(len(warnings), 2, warnings)
+        assert isinstance(r, lcg.Audio)
+        assert len(warnings) == 2
         r = p.resource('default.css')
-        self.assertIsInstance(r, lcg.Stylesheet)
-        self.assertEqual(len(warnings), 2, warnings)
+        assert isinstance(r, lcg.Stylesheet)
+        assert len(warnings) == 2
 
     def test_dependencies(self):
         p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),
@@ -507,10 +491,10 @@ class Resources(unittest.TestCase):
         b = lcg.ContentNode('b', content=lcg.Content(), resource_provider=p)
         a.resource('default.css')
         b.resource('non-existing-file.js')
-        self.assertEqual(tuple(sorted([r.filename() for r in a.resources()])),
-                         ('default.css', 'sound1.ogg', 'sound2.ogg'))
-        self.assertEqual(tuple(sorted([r.filename() for r in b.resources()])),
-                         ('sound1.ogg', 'sound2.ogg'))
+        assert tuple(sorted([r.filename() for r in a.resources()])) == \
+            ('default.css', 'sound1.ogg', 'sound2.ogg')
+        assert tuple(sorted([r.filename() for r in b.resources()])) == \
+                         ('sound1.ogg', 'sound2.ogg')
 
 
 class Parser(unittest.TestCase):
@@ -569,15 +553,13 @@ class Parser(unittest.TestCase):
 '''
         parameters = {}
         self._parser.parse(text, parameters)
-        self.assertIn('page_header', parameters)
-        self.assertIn('page_footer', parameters)
-        self.assertNotIn('first_page_header', parameters)
+        assert 'page_header' in parameters
+        assert 'page_footer' in parameters
+        assert 'first_page_header' not in parameters
         header = parameters['page_header']
-        self.assertTrue(header.content()[0].content()[0].content()[0].text() == 'hello',
-                        header.content()[0].content()[0].content()[0].text())
+        assert header.content()[0].content()[0].content()[0].text() == 'hello'
         footer = parameters['page_footer']
-        self.assertEqual(footer.content()[0].halign(), lcg.HorizontalAlignment.CENTER,
-                         footer.content()[0].halign())
+        assert footer.content()[0].halign() == lcg.HorizontalAlignment.CENTER
 
     def test_hrule(self):
         text = '''
@@ -606,10 +588,10 @@ blah blah
 blah blah
 ''' % (alignment,)
             c = self._parser.parse(text)
-            self.assertEqual(len(c), 3, c)
-            self.assertIsNone(c[0].halign())
-            self.assertEqual(c[1].halign(), constant)
-            self.assertIsNone(c[2].halign())
+            assert len(c) == 3
+            assert c[0].halign() is None
+            assert c[1].halign() == constant
+            assert c[2].halign() is None
 
     def test_table(self):
         text = '''
@@ -628,24 +610,24 @@ blah blah
 | text1    | text2  |
 '''
         c = self._parser.parse(text)
-        self.assertEqual(len(c), 3, c)
-        self.assertTrue(all([isinstance(x, lcg.Table) for x in c]), c)
+        assert len(c) == 3
+        assert all([isinstance(x, lcg.Table) for x in c])
         for i in range(3):
             rows = c[i].content()
-            self.assertEqual(len(rows), 2, rows)
-            self.assertTrue(all([isinstance(r, lcg.TableRow) for r in rows]), rows)
+            assert len(rows) == 2
+            assert all([isinstance(r, lcg.TableRow) for r in rows])
             for cell in rows[0].content():
-                self.assertIsInstance(cell, lcg.TableHeading, rows[0])
+                assert isinstance(cell, lcg.TableHeading)
             for cell in rows[1].content():
-                self.assertIsInstance(cell, lcg.TableCell, rows[1])
+                assert isinstance(cell, lcg.TableCell)
         row = c[2].content()[1]
         cells = row.content()
-        self.assertEqual(cells[0].align(), lcg.TableCell.RIGHT)
-        self.assertEqual(cells[1].align(), lcg.TableCell.CENTER)
+        assert cells[0].align() == lcg.TableCell.RIGHT
+        assert cells[1].align() == lcg.TableCell.CENTER
         bars = c[2].bars()
-        self.assertIn(1, bars)
-        self.assertIn(2, bars)
-        self.assertNotIn(0, bars)
+        assert 1 in bars
+        assert 2 in bars
+        assert 0 not in bars
 
     def test_lists(self):
         text = '''
@@ -667,30 +649,30 @@ blah blah
 * Unordered item 3.
 '''
         c = self._parser.parse(text)
-        self.assertEqual(len(c), 1, c)
-        self.assertIsInstance(c[0], lcg.ItemizedList)
-        self.assertIsNone(c[0].order())
+        assert len(c) == 1
+        assert isinstance(c[0], lcg.ItemizedList)
+        assert c[0].order() is None
         items = c[0].content()
-        self.assertEqual(len(items), 3, items)
+        assert len(items) == 3
         # First item contents
         item_content = items[0].content()
-        self.assertEqual(len(item_content), 2, item_content)
-        self.assertIsInstance(item_content[0], lcg.Container)
-        self.assertIsInstance(item_content[1], lcg.ItemizedList)
-        self.assertEqual(item_content[1].order(), lcg.ItemizedList.NUMERIC)
-        self.assertEqual(len(item_content[1].content()), 2)
+        assert len(item_content) == 2
+        assert isinstance(item_content[0], lcg.Container)
+        assert isinstance(item_content[1], lcg.ItemizedList)
+        assert item_content[1].order() == lcg.ItemizedList.NUMERIC
+        assert len(item_content[1].content()) == 2
         # Second item contents
         item_content = items[1].content()
-        self.assertEqual(len(item_content), 2, item_content)
-        self.assertIsInstance(item_content[0], lcg.Container)
-        self.assertIsInstance(item_content[1], lcg.ItemizedList)
-        self.assertEqual(item_content[1].order(), lcg.ItemizedList.LOWER_ALPHA)
-        self.assertEqual(len(item_content[1].content()), 2, item_content[1].content())
+        assert len(item_content) == 2
+        assert isinstance(item_content[0], lcg.Container)
+        assert isinstance(item_content[1], lcg.ItemizedList)
+        assert item_content[1].order() == lcg.ItemizedList.LOWER_ALPHA
+        assert len(item_content[1].content()) == 2
 
     def test_paragraph_newline(self):
         c = self._parser.parse('hello\n\nworld')
-        self.assertEqual(c[0].content()[0].content()[0].text()[-1], 'o',
-                         "Extra newline after paragraph?")
+        assert c[0].content()[0].content()[0].text()[-1] == 'o', \
+            "Extra newline after paragraph?"
 
     def test_generic_container(self):
         text = '''
@@ -842,14 +824,14 @@ class MacroParser(unittest.TestCase):
     def test_simple_condition(self):
         text = "@if x\nX\n@else\nY@endif\n"
         r = lcg.MacroParser(globals=dict(x=True)).parse(text)
-        self.assertEqual(r, "X\n", repr(r))
+        assert r == "X\n"
 
     def test_condition(self):
         def check(condition, expected_result, **globals):
             text = ("@if " + condition + "\nTrue\n@else\nFalse\n@endif")
             parser = lcg.MacroParser(globals=globals)
             result = parser.parse(text).strip() == 'True'
-            self.assertEqual(result, expected_result, (condition, globals, result))
+            assert result == expected_result
         # Some more complicated condition.
         c1 = "a in ('A', 'B', 'C') and b > 3 and b+5 <= c and c is not None"
         check(c1, True, a='A', b=5, c=55)
@@ -862,13 +844,12 @@ class MacroParser(unittest.TestCase):
     def test_exception(self):
         text = "A\n@if a/b == c\nX@else\nY\n@endif\n\nB\n\n"
         r = lcg.MacroParser(globals=dict(a=5, b=0, c=2)).parse(text)
-        self.assertEqual(r, "A\nZeroDivisionError: integer division or modulo by zero\nB\n\n",
-                         repr(r))
+        assert r == "A\nZeroDivisionError: integer division or modulo by zero\nB\n\n"
 
     def test_condition_newlines(self):
         text = "A\n@if x\nX\n@endif\n\nB\n\n"
         r = lcg.MacroParser(globals=dict(x=True)).parse(text)
-        self.assertEqual(r, "A\nX\n\nB\n\n", repr(r))
+        assert r == "A\nX\n\nB\n\n"
 
     def test_nested_condition(self):
         def join(*lines):
@@ -886,14 +867,14 @@ class MacroParser(unittest.TestCase):
         r1 = lcg.MacroParser(globals=dict(b=True, c=True)).parse(text)
         r2 = lcg.MacroParser(globals=dict(b=False, c=True)).parse(text)
         r3 = lcg.MacroParser(globals=dict(b=False, c=False)).parse(text)
-        self.assertEqual(r1, join("A", "B", "E"))
-        self.assertEqual(r2, join("A", "C", "D", "E"))
-        self.assertEqual(r3, join("A", "D", "E"))
+        assert r1 == join("A", "B", "E")
+        assert r2 == join("A", "C", "D", "E")
+        assert r3 == join("A", "D", "E")
 
     def test_inclusion(self):
         text = "Foo\n@include bar\nBaz\n"
         r = lcg.MacroParser(globals=dict(bar='Bar')).parse(text)
-        self.assertEqual(r, "Foo\nBar\nBaz\n", repr(r))
+        assert r == "Foo\nBar\nBaz\n"
 
 
 class HtmlImport(unittest.TestCase):
@@ -1031,10 +1012,6 @@ class HtmlExport(unittest.TestCase):
 
     def test_generator(self):
         g = lcg.HtmlGenerator(sorted_attributes=True)
-
-        def test(result, expected):
-            self.assertEqual(result, expected,
-                             "\n  - expected: %r\n  - got:      %r" % (expected, result))
         # Tags with trivial export.
         for tag in ('html', 'head', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'title',
                     'style', 'body', 'div', 'section', 'span', 'map', 'strong',
@@ -1043,51 +1020,46 @@ class HtmlExport(unittest.TestCase):
                     'dt', 'dd', 'abbr', 'time', 'table', 'tr', 'th', 'td', 'thead',
                     'tfoot', 'tbody', 'object', 'label', 'button', 'optgroup',
                     'option', 'textarea', 'noscript', 'select', 'fieldset', 'legend'):
-            test(getattr(g, tag)('x'), '<%s>x</%s>' % (tag, tag))
-            test(getattr(g, tag)(content='x'), '<%s>x</%s>' % (tag, tag))
-            test(getattr(g, tag)(content=('x', 'y')), '<%s>xy</%s>' % (tag, tag))
-            test(getattr(g, tag)(content=()), '<%s></%s>' % (tag, tag))
+            method = getattr(g, tag)
+            assert method('x') == '<%s>x</%s>' % (tag, tag)
+            assert method(content='x') == '<%s>x</%s>' % (tag, tag)
+            assert method(content=('x', 'y')) == '<%s>xy</%s>' % (tag, tag)
+            assert method(content=()) == '<%s></%s>' % (tag, tag)
         for tag in ('link', 'meta', 'br', 'hr', 'param'):
-            test(getattr(g, tag)(), '<%s/>' % tag)
+            assert getattr(g, tag)() == '<%s/>' % tag
         # These tags require positional arguemnts or have non-trivial export.
-        for result, expected in (
-                (g.script('x'), u'<script type="text/javascript">x</script>'),
-                (g.submit('x'), u'<button type="submit">x</button>'),
-                (g.form('x'), u'<form action="#">x</form>'),
-                (g.h('x', level=8), u'<h8>x</h8>'),
-                (g.img('x'), u'<img alt="" src="x"/>'),
-                (g.iframe('x'), u'<iframe src="x"><a href="x">x</a></iframe>'),
-                (g.input(type='text'), u'<input type="text"/>'),
-                (g.field(name='a'), (u'<input class="text" name="a" size="20" '
-                                     u'type="text" value=""/>')),
-                (g.checkbox('a'), u'<input name="a" type="checkbox"/>'),
-                (g.hidden('a', 'x'), u'<input name="a" type="hidden" value="x"/>'),
-                (g.radio('a'), u'<input name="a" type="radio"/>'),
-                (g.upload('a'), u'<input name="a" type="file"/>'),
-                (g.audio('x'), u'<audio controls="controls" src="x"/>'),
-                (g.video('x'), u'<video controls="controls" src="x"/>'),
-                (g.source('x'), u'<source src="x"/>'),
-        ):
-            test(result, expected)
+        assert g.script('x') == u'<script type="text/javascript">x</script>'
+        assert g.submit('x') == u'<button type="submit">x</button>'
+        assert g.form('x') == u'<form action="#">x</form>'
+        assert g.h('x', level=8) == u'<h8>x</h8>'
+        assert g.img('x') == u'<img alt="" src="x"/>'
+        assert g.iframe('x') == u'<iframe src="x"><a href="x">x</a></iframe>'
+        assert g.input(type='text') == u'<input type="text"/>'
+        assert g.field(name='a') == (u'<input class="text" name="a" size="20" '
+                                     u'type="text" value=""/>')
+        assert g.checkbox('a') == u'<input name="a" type="checkbox"/>'
+        assert g.hidden('a', 'x') == u'<input name="a" type="hidden" value="x"/>'
+        assert g.radio('a') == u'<input name="a" type="radio"/>'
+        assert g.upload('a') == u'<input name="a" type="file"/>'
+        assert g.audio('x') == u'<audio controls="controls" src="x"/>'
+        assert g.video('x') == u'<video controls="controls" src="x"/>'
+        assert g.source('x') == u'<source src="x"/>'
         # Now test with *some* typical optional arguments.
-        for result, expected in (
-                (g.a('x', href='a'), '<a href="a">x</a>'),
-                (g.a('x', name='a'), '<a name="a">x</a>'),
-                (g.button('X', disabled=True), '<button disabled="disabled">X</button>'),
-                # Testing backwards compatibility of deprecated select() arguemnts.
-                (g.select('a', options=(('X', 'x'), ('Y', 'y'))),
-                 (u'<select name="a"><option value="x">X</option>'
-                  u'<option value="y">Y</option></select>')),
-                (g.select('a', options=(('X', 'x', False, 'c'), ('Y', 'y', True, 'cc'))),
-                 (u'<select name="a"><option class="c" disabled="disabled" value="x">X</option>'
-                  u'<option class="cc" value="y">Y</option></select>')),
-                (g.select('a', (('aa', (('X', 'x'), ('Y', 'y'))), ('bb', (('Z', 'z'),)))),
-                 (u'<select name="a"><optgroup label="aa"><option value="x">X</option>'
-                  u'<option value="y">Y</option></optgroup>'
-                  u'<optgroup label="bb"><option value="z">Z</option>'
-                  u'</optgroup></select>')),
-        ):
-            test(result, expected)
+        assert g.a('x', href='a') == '<a href="a">x</a>'
+        assert g.a('x', name='a') == '<a name="a">x</a>'
+        assert g.button('X', disabled=True) == '<button disabled="disabled">X</button>'
+        # Testing backwards compatibility of deprecated select() arguemnts.
+        assert g.select('a', options=(('X', 'x'), ('Y', 'y'))) == (
+            u'<select name="a"><option value="x">X</option>'
+            u'<option value="y">Y</option></select>')
+        assert g.select('a', options=(('X', 'x', False, 'c'), ('Y', 'y', True, 'cc'))) == (
+            u'<select name="a"><option class="c" disabled="disabled" value="x">X</option>'
+            u'<option class="cc" value="y">Y</option></select>')
+        assert g.select('a', (('aa', (('X', 'x'), ('Y', 'y'))), ('bb', (('Z', 'z'),)))) == (
+            u'<select name="a"><optgroup label="aa"><option value="x">X</option>'
+            u'<option value="y">Y</option></optgroup>'
+            u'<optgroup label="bb"><option value="z">Z</option>'
+            u'</optgroup></select>')
 
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
@@ -1159,21 +1131,9 @@ class HtmlExport(unittest.TestCase):
               'https://www.youtube.com/embed/xyz</a>'
               '</iframe></div></div>')),
         ):
-            result = lcg.coerce(content).export(context)
-            self.assertEqual(result, html,
-                             "\n  - content:  %r\n  - expected: %r\n  - got:      %r" %
-                             (content, html, result,))
+            assert lcg.coerce(content).export(context) == html
 
     def test_formatting(self):
-        def check(result, expected_result):
-            if isinstance(expected_result, basestring):
-                ok = result == expected_result
-            else:
-                ok = expected_result.match(result)
-                expected_result = expected_result.pattern
-            self.assertTrue(ok, ("\n  - source text: %r"
-                                 "\n  - expected:    %r"
-                                 "\n  - got:         %r" % (text, expected_result, result)))
         resources = (lcg.Resource('text.txt', uri='/resources/texts/text.txt'),
                      lcg.Audio('xx.mp3'),
                      lcg.Image('aa.jpg'),
@@ -1185,7 +1145,7 @@ class HtmlExport(unittest.TestCase):
                             content=lcg.Container((sec,)), resource_provider=p)
         context = lcg.HtmlExporter().context(n, None)
         context.generator()._sorted_attributes = True
-        for text, html in (
+        for text, expected in (
             ('a *b /c/ _d_* =e=',
              'a <strong>b <em>c</em> <u>d</u></strong> <code>e</code>'),
             ('a */b',  # Unfinished markup (we probably don't want that, but now it works so).
@@ -1297,8 +1257,11 @@ class HtmlExport(unittest.TestCase):
              r'&lt;bla&gt;'),
         ):
             content = lcg.Parser().parse_inline_markup(text)
-            parsed_result = content.export(context)
-            check(parsed_result, html)
+            result = content.export(context)
+            if isinstance(expected, basestring):
+                assert result == expected
+            else:
+                assert expected.match(result)
 
     def test_mathml(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
@@ -1316,21 +1279,22 @@ class HtmlExport(unittest.TestCase):
     <mn>2</mn>
   </msup>
 </math>""")
-        self.assertIsInstance(export(content), basestring)
+        assert isinstance(export(content), basestring)
         for xml in (u'</math><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',
                     u'<math xmlns="http://www.w3.org/1998/Math/MathML"><script>1</script></math>',
                     u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>' +
                     u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',):
             content = lcg.MathML(xml)
-            self.assertRaises(lcg.ParseError, export, content)
+            with pytest.raises(lcg.ParseError):
+                export(content)
         content = lcg.MathML(u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>')
-        self.assertIsInstance(export(content), basestring)
+        assert isinstance(export(content), basestring)
 
     def test_html_content(self):
         # Make sure the HTML content is not escaped when wrappped in another HTML element.
         c = lcg.Container(lcg.HtmlContent('<b>B</b>'), name='x')
         context = lcg.HtmlExporter().context(lcg.ContentNode('y'), None)
-        self.assertEqual(c.export(context), '<div class="x"><b>B</b></div>')
+        assert c.export(context) == '<div class="x"><b>B</b></div>'
 
     def test_js_value(self):
         import json
@@ -1339,11 +1303,7 @@ class HtmlExport(unittest.TestCase):
                       [1, 2, 3], [3, 2, 1],
                       {'a': 'A', 'b': 'B'}, {'1': 1, '2': 2},
                       "foo'ba{r}", '"foo"[bar]', '<a>'):
-            x = g.js_value(value)
-            y = json.loads(x)
-            self.assertEqual(value, y,
-                             "\n  - value:  %r\n  - result: %s\n  - check:  %r" %
-                             (value, x, y))
+            assert value == json.loads(g.js_value(value))
 
 
 class EpubExport(unittest.TestCase):
@@ -1360,7 +1320,7 @@ class EpubExport(unittest.TestCase):
         epub = e.export(context)
         archive = zipfile.ZipFile(cStringIO.StringIO(epub))
         pkg_opf = archive.read('rsrc/pkg.opf')
-        self.assertEqual(pkg_opf[:19], '<?xml version="1.0"')
+        assert pkg_opf[:19] == '<?xml version="1.0"'
 
 
 class ImsExport(unittest.TestCase):
@@ -1374,7 +1334,7 @@ class ImsExport(unittest.TestCase):
         a = lcg.ContentNode('a', children=(b, c), resource_provider=p)  # , metadata=m)
         e = lcg.IMSExporter()
         manifest = e.manifest(a).xml()
-        self.assertEqual(manifest[:19], '<?xml version="1.0"')
+        assert manifest[:19] == '<?xml version="1.0"'
 
 
 @pytest.mark.skipif(not hasattr(lcg, 'BrailleExporter'), reason="Braille support not present")
@@ -1405,17 +1365,10 @@ class BrailleExport(unittest.TestCase):
             expected.extend([b + '\n' * (page_lines - len(b.split('\n'))) + f
                              for b, f in zip(braille, footer)[1:]])
         else:
-            self.assertRaises(braille, exporter.export, context)
+            with pytest.raises(braille):
+                exporter.export(context)
             return
-        result = exporter.export(context).replace('\r\n', '\n').split('\f')[:-1]
-        if result != expected:
-            sys.stdout.write('*** Expected:\n')
-            sys.stdout.write(string.join(expected, '\f').encode('utf-8') + '\n')
-            sys.stdout.write('*** Got:\n')
-            sys.stdout.write(string.join(result, '\f').encode('utf-8') + '\n')
-        self.assertEqual(result, expected,
-                         ("\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
-                          (text, expected, result,)))
+        assert exporter.export(context).replace('\r\n', '\n').split('\f')[:-1] == expected
 
     def test_formatting(self):
         presentation = self._load_presentation()
@@ -1540,10 +1493,9 @@ class BrailleExport(unittest.TestCase):
             context = exporter.context(n, lang='cs', presentation=presentation_set)
             exported = exporter.export(context)
             result = exported.replace('\r\n', '\n').split('\n\n')[1]
-            self.assertEqual(result, expected_result,
-                             (("\n  - source text: %r\n  - expected:    %r\n  - "
-                               "got:         %r") %
-                              (mathml, expected_result, result,)))
+            assert result == expected_result, (
+                "\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+                (mathml, expected_result, result))
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,14</mn></mrow>
 </math>''', u'⠼⠉⠂⠁⠙')
@@ -1645,9 +1597,9 @@ class BrailleExport(unittest.TestCase):
         context = exporter.context(n, lang='cs', presentation=presentation_set)
         exported = exporter.export(context)
         result = exported.replace('\r\n', '\n').split('\n\n')[1]
-        self.assertEqual(result, u'''⠠⠞⠗⠕⠉⠓⠁⠀⠍⠁⠞⠑⠍⠁⠞⠊⠅⠽
+        assert result == u'''⠠⠞⠗⠕⠉⠓⠁⠀⠍⠁⠞⠑⠍⠁⠞⠊⠅⠽
 ⠦⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃⠴
-⠝⠑⠥⠱⠅⠕⠙⠌⠄''', repr(result))
+⠝⠑⠥⠱⠅⠕⠙⠌⠄'''
 
     def test_mathml_nemeth(self):
         python_version = sys.version_info
@@ -1693,7 +1645,7 @@ class BrailleExport(unittest.TestCase):
                 print " expected: |%s|" % (expected_result,)
                 print "      got: |%s|" % (result,)
                 print '---'
-            self.assertEqual(result, expected_result)
+            assert result == expected_result
         # §8
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,76</mn></mrow>
@@ -2311,10 +2263,9 @@ class BrailleExport(unittest.TestCase):
             context = exporter.context(n, lang='cs', presentation=presentation_set)
             exported = exporter.export(context)
             result = exported.replace('\r\n', '\n').split('\n\n')[1]
-            self.assertEqual(result, expected_result,
-                             (("\n  - source text: %r\n  - expected:    %r\n  - "
-                               "got:         %r") %
-                              (mathml, expected_result, result,)))
+            assert result == expected_result, (
+                "\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
+                (mathml, expected_result, result))
         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.76</mn></mrow>
 </math>''', u'⠼⠒⠨⠶⠖')
@@ -2367,7 +2318,7 @@ class Presentations(unittest.TestCase):
             for attr in dir(p_1):
                 if attr[0] in string.ascii_lowercase:
                     value_1, value_2 = getattr(p_1, attr), getattr(p_2, attr)
-                    self.assertEqual(value_1, value_2, (attr, value_1, value_2,))
+                    assert value_1 == value_2
 
 
 if __name__ == '__main__':
