@@ -1212,6 +1212,17 @@ class HtmlExport(unittest.TestCase):
              '<a href="http://www.freebsoft.org">Free(b)soft website</a>'),
             ('[http://www.freebsoft.org label | descr]',
              '<a href="http://www.freebsoft.org" title="descr">label</a>'),
+            # XSS attacks
+            ('[javascript:alert("XSS"); click me]',
+             '[javascript:alert("XSS"); click me]'),
+            ('[JavascrIpt:alert("XSS"); click me]',
+             '[JavascrIpt:alert("XSS"); click me]'),
+            ('[vbscript:msgbox("XSS"); click me]',
+             '[vbscript:msgbox("XSS"); click me]'),
+            ('["javascript:alert("XSS");" click me]',
+             '<a href=\'"javascript:alert("XSS");"\'>click me</a>'),
+            ('[http://xss.me <script>alert("XSS");</script>]',
+             '<a href="http://xss.me">&lt;script&gt;alert("XSS");&lt;/script&gt;</a>'),
             # Inline images
             ('[aa.jpg]',
              u'<img alt="" class="lcg-image image-aa" src="images/aa.jpg"/>'),

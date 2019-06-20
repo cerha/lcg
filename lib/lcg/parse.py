@@ -163,7 +163,7 @@ class Parser(object):
         # Link to an internal or external (http) target via [ ].
         ('link', (r'\['
                   r'(?P<align>[<>])?'  # Left/right Image aligment e.g. [<imagefile], [>imagefile]
-                  r'(?P<href>[^\[\]\|\s]*?)'  # The link target e.g. [src]
+                  r'(?P<href>(?!(java|vb)script:)[^\[\]\|\s]*?)'  # The link target e.g. [src]
                   r'(?::(?P<size>\d+x\d+))?'  # Optional explicit image (or video) size
                                               # e.g. [image.jpg:30x40])
                   r'(?:(?:\s*\|\s*|\s+)'  # Separator (pipe is enabled for backwards compatibility,
