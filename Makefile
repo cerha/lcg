@@ -17,7 +17,7 @@ doc:
 	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" bin/lcgmake.py doc/src doc/html
 
 test:
-	lib/lcg/_test.py
+	python -m pytest lib/lcg/_test.py
 
 tags:
 	rm -f TAGS
