@@ -285,7 +285,7 @@ def _style(node, variables):
 
 
 def _child_nodes(node):
-    return node.getchildren()
+    return list(node)
 
 
 def _attribute(node, name, default=None):
@@ -436,11 +436,11 @@ def mathml_nemeth(exporter, context, element):
                 indicate = True
             if not indicate:
                 last_element = top_node
-                children = last_children = last_element.getchildren()
+                children = last_children = list(last_element)
                 while last_element.tag not in ('mi', 'mo', 'mn',) and children:
                     last_children = children
                     last_element = children[-1]
-                    children = last_element.getchildren()
+                    children = list(last_element)
                 if last_element.tag == 'mo' and (last_element.text or '') in ',-–—':
                     if len(last_children) > 1:
                         last_element = last_children[-2]
@@ -964,7 +964,7 @@ def _export_msubsup(node, exporter, context, variables, **kwargs):
         node.tag = 'msup'
         ElementTree.SubElement(node, 'msub')
         node.append(sup)
-        c = node.getchildren()[0]
+        c = list(node)[0]
         c.append(base)
         c.append(sub)
         return _export_msup(node, exporter, context, variables, **kwargs)
@@ -1004,7 +1004,7 @@ def _export_munderover(node, exporter, context, variables, **kwargs):
     node.tag = 'mover'
     ElementTree.SubElement(node, 'munder')
     node.append(over)
-    c = node.getchildren()[0]
+    c = list(node)[0]
     c.append(base)
     c.append(under)
     with variables.let('no-under-boundaries', True):

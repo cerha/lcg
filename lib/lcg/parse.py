@@ -1283,27 +1283,19 @@ class HTMLProcessor(object):
             text = element.text
             if text:
                 return text
-            for c in element.getchildren():
-                text = self._first_text(c)
+            for child in element:
+                text = self._first_text(child)
                 if text:
                     return text
             return ''
 
         def _plain_text(self, element):
             text = element.text or ''
-            for c in element.getchildren():
-                text += self._plain_text(c)
+            for child in element:
+                text += self._plain_text(child)
             return text
 
         def _transform_sub(self, obj, nowhitespace=True):
-            if type(xml.etree.ElementTree.Element) == type(object):
-                # Python >= 2.7
-                element_class = xml.etree.ElementTree.Element
-            else:
-                # Python 2.6
-                element_class = xml.etree.ElementTree._ElementInterface
-            if isinstance(obj, element_class):
-                obj = obj.getchildren()
             obj = list(obj)
             content = []
             while obj:
@@ -1387,11 +1379,11 @@ class HTMLProcessor(object):
         def _figure(self, element, followers):
             kwargs = {}
             body = []
-            for c in element.getchildren():
-                if c.tag == 'figcaption':
-                    kwargs['caption'] = lcg.Container(self._transform_sub(c))
+            for child in element:
+                if child.tag == 'figcaption':
+                    kwargs['caption'] = lcg.Container(self._transform_sub(child))
                 else:
-                    body.append(c)
+                    body.append(child)
             content = self._transform_sub(body)
             kwargs['align'] = element.attrib.get('data-lcg-align')
             return lcg.Figure(content, **kwargs)
@@ -1477,16 +1469,16 @@ class HTMLProcessor(object):
             else:
                 # Don't pass the argument to use the default transformations.
                 kwargs = {}
-            for c in element.getchildren():
-                tag = c.tag
+            for child in element:
+                tag = child.tag
                 if tag == 'caption':
-                    title = self._first_text(c).strip()
+                    title = self._first_text(child).strip()
                 elif tag == 'thead':
                     self._in_table_heading = True
-                    content += self._transform_sub(c.getchildren())
+                    content += self._transform_sub(child)
                     self._in_table_heading = False
                 elif tag == 'tbody':
-                    content += self._transform_sub(c.getchildren())
+                    content += self._transform_sub(child)
             return lcg.Table(content, title=title, **kwargs)
 
         def _table_cell(self, element, followers):

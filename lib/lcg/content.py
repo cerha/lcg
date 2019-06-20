@@ -1812,7 +1812,7 @@ class MathML(Content):
         except ElementTree.ParseError as e:
             raise lcg.ParseError("Error when parsing MathML element", e, content)
         regexp = re.compile('{.*}')
-        for e in tree.getiterator():
+        for e in tree.iter():
             match = regexp.match(e.tag)
             if match:
                 e.tag = e.tag[match.end():]
@@ -1822,11 +1822,11 @@ class MathML(Content):
         from xml.etree import ElementTree
         math = copy.copy(math)
         for node in math.getiterator():
-            children = node.getchildren()
+            children = list(node)
             for i in range(len(children)):
                 c = children[i]
                 if c.tag == 'semantics':
-                    c_children = c.getchildren()
+                    c_children = list(c)
                     if c_children:
                         node.insert(i, c_children[0])
                         node.remove(c)
@@ -1838,7 +1838,7 @@ class MathML(Content):
             opening = node.attrib.get('open', '(')
             closing = node.attrib.get('close', ')')
             separators = node.attrib.get('separators', ',').split()
-            children = node.getchildren()
+            children = list(node)
             node.clear()
             node.tag = 'mrow'
             if opening:

@@ -239,7 +239,7 @@ class XMLProcessor(Processor):
                 final_node = child_nodes and child_nodes[-1]
                 for n in child_nodes:
                     export(tree, n, last_node, final_node, spacing)
-                    tree_children = tree.getchildren()
+                    tree_children = list(tree)
                     if tree_children:
                         last_node = tree_children[-1]
 
@@ -279,7 +279,7 @@ class XMLProcessor(Processor):
                     raise Exception('Unhandled node type', node, node.nodeType)
             assert len(top.childNodes) == 1, top.childNodes
             subexport(tree, top)
-            return tree.getchildren()[0]
+            return list(tree)[0]
 
         def lcg_parse(self, xml_):
             import xml.dom.minidom
@@ -309,7 +309,7 @@ class XMLProcessor(Processor):
 
             """
             if children is None:
-                children = element.getchildren()
+                children = list(element)
             return [self.transform(c) for c in children]
 
 
@@ -370,7 +370,7 @@ class XML2Content(XMLProcessor):
 
         def _transform_sub(self, element, children=None):
             if children is None:
-                children = element.getchildren()
+                children = list(element)
             transformed = []
 
             def add_text(text):
@@ -393,7 +393,7 @@ class XML2Content(XMLProcessor):
 
         def _section(self, element, followers):
             text_title = element.attrib.get('title', '')
-            children = element.getchildren()
+            children = list(element)
             if children and children[0].tag == 'heading':
                 heading_content = self._transform_sub(children[0])
                 if len(heading_content) == 1:
@@ -407,7 +407,7 @@ class XML2Content(XMLProcessor):
             return lcg.Section(text_title, content, heading=heading)
 
         def _definitions(self, element, followers):
-            paired_items = [self._transform_sub(e) for e in element.getchildren()]
+            paired_items = [self._transform_sub(e) for e in element]
             return lcg.DefinitionList(paired_items)
 
         def _anchor(self, element, followers):
@@ -530,7 +530,7 @@ class XML2HTML(XMLProcessor):
             return element.text
 
         def _section(self, element, followers):
-            children = element.getchildren()
+            children = list(element)
             if children and children[0].tag == 'heading':
                 heading = self._transform_sub(children[0])
                 children = children[1:]
@@ -546,7 +546,7 @@ class XML2HTML(XMLProcessor):
             items = self._transform_sub(element)
             html_items = []
             for i in items:
-                term, definition = i.getchildren()
+                term, definition = list(i)
                 term.tag = 'dt'
                 definition.tag = 'dd'
                 html_items += [term, definition]
@@ -691,7 +691,7 @@ class HTML2XML(Processor):
         def _hp_strip(self, tree):
             if tree.tag == 'pre':
                 return
-            children = tree.getchildren()
+            children = list(tree)
             if len(children) > 0:
                 first = children[0]
                 if first.tag == '_text':
@@ -771,7 +771,7 @@ class HTML2XML(Processor):
             text = element.text
             if text:
                 return text
-            for c in element.getchildren():
+            for c in element:
                 text = self._first_text(c)
                 if text:
                     return text
@@ -792,19 +792,11 @@ class HTML2XML(Processor):
 
             """
             text = element.text or ''
-            for c in element.getchildren():
+            for c in element:
                 text += self._plain_text(c)
             return text
 
         def _transform_sub(self, obj, nowhitespace=True):
-            if type(xml.etree.ElementTree.Element) == type(object):
-                # Python >= 2.7
-                element_class = xml.etree.ElementTree.Element
-            else:
-                # Python 2.6
-                element_class = xml.etree.ElementTree._ElementInterface
-            if isinstance(obj, element_class):
-                obj = obj.getchildren()
             obj = list(obj)
             content = []
             while obj:
@@ -894,7 +886,7 @@ class HTML2XML(Processor):
         def _table(self, element, followers):
             content = []
             title = None
-            for c in element.getchildren():
+            for c in element:
                 tag = c.tag
                 if tag == 'caption':
                     title = self._first_text(c).strip()

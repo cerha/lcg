@@ -1610,7 +1610,7 @@ class BrailleExporter(FileExporter, Exporter):
             return value
 
         def child_nodes(node, exported=False):
-            children = node.getchildren()
+            children = list(node)
             if exported:
                 children = [export(c) for c in children]
             return children
