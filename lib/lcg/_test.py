@@ -26,6 +26,7 @@ import sys
 import unittest
 import zipfile
 import cStringIO
+import pytest
 
 import lcg
 
@@ -1365,6 +1366,7 @@ class ImsExport(unittest.TestCase):
         self.assertEqual(manifest[:19], '<?xml version="1.0"')
 
 
+@pytest.mark.skipif(not hasattr(lcg, 'BrailleExporter'), reason="Braille support not present")
 class BrailleExport(unittest.TestCase):
 
     def _load_presentation(self):
