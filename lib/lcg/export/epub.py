@@ -20,7 +20,6 @@
 from __future__ import unicode_literals
 from future import standard_library
 from builtins import map
-from builtins import object
 
 import lcg
 

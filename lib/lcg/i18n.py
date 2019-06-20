@@ -26,7 +26,6 @@ allows us to decide for the output language at the export time.
 """
 from __future__ import unicode_literals
 from __future__ import print_function
-from builtins import object
 import lcg
 
 import collections

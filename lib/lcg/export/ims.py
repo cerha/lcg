@@ -20,7 +20,6 @@
 """Exporter class which generates an IMS compliant package."""
 
 from __future__ import unicode_literals
-from builtins import object
 
 import lcg
 import xml.dom.domreg

@@ -25,7 +25,6 @@ from __future__ import absolute_import
 from builtins import chr
 from builtins import zip
 from builtins import range
-from builtins import object
 
 from contextlib import contextmanager
 import copy

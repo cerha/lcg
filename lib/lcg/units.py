@@ -32,7 +32,6 @@ Additionally various enumerations are defined here, for instance:
 """
 from __future__ import unicode_literals
 from past.builtins import cmp
-from builtins import object
 
 import sys
 import decimal

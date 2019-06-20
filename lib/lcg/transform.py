@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 from future import standard_library
 from builtins import chr
 from builtins import range
-from builtins import object
 
 import collections
 import html.parser
