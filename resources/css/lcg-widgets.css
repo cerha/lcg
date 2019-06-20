@@ -222,7 +222,6 @@
     margin-top: 0.7em;
     margin-bottom: 0.4em;
     border: none;
-    cursor: default;
 }
 .collapsible-section-widget .collapsible-section-heading .icon,
 .collapsible-pane-widget .pane-title .icon {
@@ -231,6 +230,11 @@
     width: 12px;
     height: 12px;
     background: url(lcg-icons.png) -13px -16px no-repeat; 
+}
+.collapsible-pane-widget .collapsible-pane-heading,
+.collapsible-section-widget .collapsible-section-heading,
+.collapsible-pane-widget .pane-title {
+    cursor: pointer;
 }
 .collapsible-section-widget .collapsible-section-heading .icon,
 .collapsible-pane-widget .pane-title .icon {
@@ -242,6 +246,10 @@
 .collapsible-section-widget.expanded > div > div > div > .collapsible-section-heading .icon,
 .collapsible-pane-widget.expanded > .pane-title .icon {
     background-position: -12px -28px;
+}
+.collapsible-section-widget.expanded > section > div > div > .collapsible-section-heading .icon {
+    /* For some reason, this is necessary in HTML 5 <section>. */
+    background-position: -48px -37px;
 }
 
 /* Audio player displayed at the bottom of the page. */
