@@ -827,12 +827,12 @@ blah
         for text, content in (
                 ('http://www.youtube.com/watch?v=xyz123',
                  lcg.p(lcg.InlineExternalVideo('youtube', 'xyz123'))),
-                ('http://www.vimeo.com/xyz123',
-                 lcg.p(lcg.InlineExternalVideo('vimeo', 'xyz123'))),
-                ('[http://www.vimeo.com/xyz123:330x220]',
-                 lcg.p(lcg.InlineExternalVideo('vimeo', 'xyz123', size=(330, 220)))),
-                ('[http://www.vimeo.com/xyz123 My Special Video]',
-                 lcg.p(lcg.InlineExternalVideo('vimeo', 'xyz123', title='My Special Video'))),
+                ('http://www.vimeo.com/123456',
+                 lcg.p(lcg.InlineExternalVideo('vimeo', '123456'))),
+                ('[http://www.vimeo.com/123456:330x220]',
+                 lcg.p(lcg.InlineExternalVideo('vimeo', '123456', size=(330, 220)))),
+                ('[http://www.vimeo.com/123456 My Special Video]',
+                 lcg.p(lcg.InlineExternalVideo('vimeo', '123456', title='My Special Video'))),
         ):
             self._test_parser(text, content)
 
