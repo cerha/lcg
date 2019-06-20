@@ -24,7 +24,6 @@ from future import standard_library
 from builtins import chr
 from builtins import map
 from builtins import range
-from builtins import object
 
 import collections
 import copy

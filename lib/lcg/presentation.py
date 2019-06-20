@@ -31,7 +31,6 @@ currently processed 'Content' instance and current language.
 """
 
 from __future__ import unicode_literals
-from builtins import object
 
 import sys
 import copy
