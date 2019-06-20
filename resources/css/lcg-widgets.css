@@ -2,6 +2,9 @@
 
 /* FoldableTree widget */
 
+.foldable-tree-widget {
+    line-height: 1.3em;
+}
 .foldable-tree-widget ul {
     display: block;
     list-style-type: none;
@@ -12,39 +15,94 @@
     padding: 0 0 0 13px;
 }
 .foldable-tree-widget li { 
-    line-height: 1.2em;
     width: 100%;
     padding: 0;
+    position: relative;
 }
-.foldable-tree-widget li.collapsed ul {
+.foldable-tree-widget .collapsed ul {
     display: none;
 }
-.foldable-tree-widget li a {
+.foldable-tree-widget .item {
     display: block;
     clear: both;
     text-decoration: none;
+    margin: 1px;
 }
-.foldable-tree-widget li .icon {
+.foldable-tree-widget .item .icon {
     display: inline-block;
     width: 12px;
     height: 12px;
     float: left;
-    margin: 3px 0;
+    position: relative;
+    top: .5em;
     background: url(lcg-icons.png) 0 -40px no-repeat;
 }
-.foldable-tree-widget li.foldable > a > .icon {
+.foldable-tree-widget .foldable > .item .icon {
     background-position: 0 -28px;
 }
-.foldable-tree-widget li.foldable.collapsed > a > .icon {
+.foldable-tree-widget .foldable.collapsed > .item .icon {
     background-position: 0 -16px;
 }
-.foldable-tree-widget li .label {
+.foldable-tree-widget .item .label {
     display: block;
-    padding: 2px;
+    padding: .2em .1em;
     margin-left: 15px;
 }
-.foldable-tree-widget a.current .label {
+.foldable-tree-widget .current .label {
     background-color: #ddd;
+    border-radius: 3px;
+}
+
+.foldable-tree-widget .expander {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    box-sizing: border-box;
+    width: 1px;
+    height: 1px;
+    vertical-align: middle;
+    outline: none;
+    border: 1px dotted #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    overflow: hidden;
+}
+.foldable-tree-widget .expander .icon {
+    display: block;
+    background: url(lcg-icons.png) -68px 0 no-repeat;
+    width: 16px;
+    height: 16px;
+    margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.foldable-tree-widget .expanded > .expander .icon {
+    background-position: -68px -16px;
+}
+.foldable-tree-widget .expander .label {
+    /* Hide the label from the screen and leave it present for VoiceOver, but work around 
+       VO scrolling the expander when VO cursor moves over it. (as with text-indent) */
+    display: block;
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+@media only screen and (max-width: 600px) {
+    .foldable-tree-widget .expander {
+        opacity: 1;
+        width: 1.7em;
+        height: 1.7em;
+    }
+    .foldable-tree-widget .item .label {
+        padding-right: 1.8em;
+    }
 }
 
 .foldable-tree-widget button.toggle-menu-expansion {
@@ -184,7 +242,7 @@
 .dropdown-selection-widget li.active a:focus {
     background-color: #3af;
 }
-.popup-menu-widget a.close-menu {
+.popup-menu-widget .close-menu {
     display: inline-block;
     position: absolute;
     top: -7px;

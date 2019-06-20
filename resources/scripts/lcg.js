@@ -262,7 +262,7 @@ lcg.Menu = Class.create(lcg.Widget, {
         }
     },
 
-    _expand_item: function (item, recourse) {
+    _expand_item: function (item) {
         return false;
     },
 
@@ -286,7 +286,7 @@ lcg.Menu = Class.create(lcg.Widget, {
     focus: function () {
         var item = this._selected_item();
         if (item) {
-            this._expand_item(item, true);
+            this._expand_item(item);
             this._set_focus(item);
         }
     }
@@ -478,7 +478,7 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
                                 {'class': 'toggle-menu-expansion',
                                  'title': toggle_button_tooltip});
             this.element.down('ul').insert({after: b});
-            b.observe('click', this._on_toggle_expansion.bind(this));
+            b.observe('click', this._on_toggle_full_expansion.bind(this));
         }
     },
 
@@ -532,58 +532,77 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
                 if (!submenu.getAttribute('id')) {
                     submenu.setAttribute('id', item.getAttribute('id') + '-submenu');
                 }
-                var expanded = li.hasClassName('expanded');
-                submenu.setAttribute('aria-hidden', expanded ? 'false' : 'true');
-                item.setAttribute('aria-expanded', expanded ? 'true' : 'false');
                 item.setAttribute('aria-controls', submenu.getAttribute('id'));
+                var expander = li.down('.expander');
+                expander.setAttribute('aria-controls', submenu.getAttribute('id'));
+                expander.on('click', this._on_expander_click.bind(this));
+                this._update_item(item, li.hasClassName('expanded'));
                 this._foldable = true;
             }
             item._lcg_submenu = this._init_items(submenu, item);
         }
     },
 
-    _toggle_item_expansion: function (item) {
-        if (item) {
-            if (this._expanded) {
-                this._collapse_item(item);
-            } else {
-                this._expand_item(item);
-            }
-            if (item._lcg_submenu) {
-                this._toggle_item_expansion(item._lcg_submenu[0]);
-            }
-            this._toggle_item_expansion(item._lcg_menu_next);
-        }
-    },
-
-    _expand_item: function (item, recourse) {
-        var expanded = false;
+    _update_item: function (item, expanded) {
         var li = item.up('li');
-        if (li.hasClassName('collapsed')) {
-            var submenu = li.down('ul');
+        var submenu = li.down('ul');
+        var expander = li.down('.expander');
+        var label = expander.getAttribute(expanded ? 'data-collapse-label' : 'data-expand-label');
+        if (expanded) {
             li.removeClassName('collapsed');
             li.addClassName('expanded');
-            submenu.setAttribute('aria-hidden', 'false');
-            item.setAttribute('aria-expanded', 'true');
+        } else {
+            li.removeClassName('expanded');
+            li.addClassName('collapsed');
+        }
+        submenu.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+        item.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+
+        expander.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        expander.setAttribute('title', label);
+        expander.down('.label').innerHTML = label;
+    },
+
+    _expand_item: function (item) {
+        var expanded = false;
+        if (item.up('li').hasClassName('collapsed')) {
+            this._update_item(item, true);
             expanded = true;
         }
-        if (recourse && item._lcg_menu_parent) {
-            this._expand_item(item._lcg_menu_parent, true);
+        if (item._lcg_menu_parent) {
+            this._expand_item(item._lcg_menu_parent);
         }
         return expanded;
     },
 
     _collapse_item: function (item) {
-        var li = item.up('li');
-        if (li.hasClassName('foldable') && li.hasClassName('expanded')) {
-            var submenu = li.down('ul');
-            li.removeClassName('expanded');
-            li.addClassName('collapsed');
-            submenu.setAttribute('aria-hidden', 'true');
-            item.setAttribute('aria-expanded', 'false');
+        if (item.up('li').hasClassName('expanded')) {
+            this._update_item(item, false);
             return true;
         }
         return false;
+    },
+
+    _toggle_expansion: function (item) {
+        if (item.up('li').hasClassName('collapsed')) {
+            this._expand_item(item);
+        } else {
+            this._collapse_item(item);
+        }
+    },
+
+    _expand_recursively: function (item, expand) {
+        if (expand) {
+            this._expand_item(item);
+        } else {
+            this._collapse_item(item);
+        }
+        if (item._lcg_submenu) {
+            this._expand_recursively(item._lcg_submenu[0], expand);
+        }
+        if (item._lcg_menu_next) {
+            this._expand_recursively(item._lcg_menu_next, expand);
+        }
     },
 
     _next_item: function (item) {
@@ -640,9 +659,9 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
         this._set_focus($('main-heading'));
     },
 
-    _on_toggle_expansion: function (event) {
-        this._toggle_item_expansion(this.items[0]);
+    _on_toggle_full_expansion: function (event) {
         this._expanded = !this._expanded;
+        this._expand_recursively(this.items[0], this._expanded);
         var b = this.element.down('button.toggle-menu-expansion');
         if (this._expanded) {
             b.addClassName('expanded');
@@ -653,13 +672,14 @@ lcg.FoldableTree = Class.create(lcg.Menu, {
 
     _on_item_click: function (event, item) {
         if (!event.findElement('.label')) {
-            if (item.up('li').hasClassName('collapsed')) {
-                this._expand_item(item);
-            } else {
-                this._collapse_item(item);
-            }
+            this._toggle_expansion(item);
             event.stop();
         }
+    },
+
+    _on_expander_click: function (event, expander) {
+        this._toggle_expansion(expander.up('li').firstChild);
+        event.stop();
     }
 
 });

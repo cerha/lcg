@@ -240,22 +240,35 @@ class FoldableTree(Widget, lcg.Content):
             current = current.parent()
         path = current.path()
 
+        def item(child):
+            submenu = menu(child)
+            in_path = child in path
+            labels = [x + ' ' + child.title() for x in (_("Expand"), _("Collapse"))]
+            label = labels[1 if in_path else 0]
+            return g.li(
+                content=(
+                    g.a(content=(g.span('', cls='icon'),
+                                 g.span(child.title(), cls='label')),
+                        href=context.uri(child), title=child.descr(),
+                        cls=('item ' + ('current ' if child is current else '') +
+                             ('inactive ' if not child.active() else '')).strip()),
+                    g.a((g.span('', cls='icon'),
+                         g.span(label, cls='label')),
+                        data_expand_label=labels[0],
+                        data_collapse_label=labels[1],
+                        role='button', title=label, tabindex=-1,
+                        cls='expander') if submenu else '',
+                    submenu),
+                cls=((('foldable ' + ('expanded ' if in_path else 'collapsed '))
+                      if child.foldable() and submenu else '') +
+                     ('in-path' if in_path else '')).strip() or None,
+            )
+
         def menu(node):
             # The 'icon' span must be inside the A tag because MSIE doesn't fire on click
             # events outside.  The span indents the link title and creates a space for
             # the clickable folding controls (if the item is foldable).
-            items = [
-                g.li((g.a(g.span('', cls='icon') + g.span(child.title(), cls='label'),
-                          href=context.uri(child), title=child.descr(),
-                          cls=(('current ' if child is current else '') +
-                               ('inactive ' if not child.active() else '')).strip() or None),
-                      menu(child)),
-                     cls=((('foldable ' + ('expanded ' if child in path else 'collapsed '))
-                           if child.foldable() and any(not n.hidden() for n in child.children())
-                           else '') +
-                          ('in-path' if child in path else '')).strip() or None)
-                for child in node.children() if not child.hidden()
-            ]
+            items = [item(child) for child in node.children() if not child.hidden()]
             if items:
                 return g.ul(items, cls='level-%d' % len(node.path()))
             else:
