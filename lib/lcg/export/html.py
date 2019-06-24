@@ -152,14 +152,14 @@ class HtmlGenerator(object):
 
     # Characters to be replaced in Javascript string literals for their
     # safe usage within HTML <script> tags.
-    _JAVASCRIPT_ESCAPES = {'<': '\u003c',
-                           '>': '\u003e',
-                           '&': '\u0026',
-                           '"': '\u0022',
-                           '\'': '\u0027',
-                           '\\': '\u005c',
+    _JAVASCRIPT_ESCAPES = {'<': '\\u003c',
+                           '>': '\\u003e',
+                           '&': '\\u0026',
+                           '"': '\\u0022',
+                           '\'': '\\u0027',
+                           '\\': '\\u005c',
                            '\n': '\\n'}
-    _JAVASCRIPT_ESCAPE_REGEX = re.compile('[<>&"\'\\\n]')
+    _JAVASCRIPT_ESCAPE_REGEX = re.compile(r'[<>&"\'\n\\]')
 
     def __init__(self, sorted_attributes=False):
         """Arguments:
