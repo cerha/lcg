@@ -858,7 +858,7 @@ class MacroParser(unittest.TestCase):
         check(c2, False, a='X', b=5, c=2)
 
     def test_exception(self):
-        text = "A\n@if a/b == c\nX@else\nY\n@endif\n\nB\n\n"
+        text = "A\n@if a//b == c\nX@else\nY\n@endif\n\nB\n\n"
         r = lcg.MacroParser(globals=dict(a=5, b=0, c=2)).parse(text)
         assert r == "A\nZeroDivisionError: integer division or modulo by zero\nB\n\n"
 
