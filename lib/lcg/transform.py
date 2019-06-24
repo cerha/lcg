@@ -25,6 +25,7 @@ from builtins import range
 import collections
 import html.parser
 import html.entities
+import io
 import re
 import sys
 import xml.dom.minidom
@@ -617,7 +618,10 @@ class XML2HTML(XMLProcessor):
 
     def transform(self, data):
         transformed = super(XML2HTML, self).transform(data)
-        return unistr(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
+        tree = xml.etree.ElementTree.ElementTree(transformed)
+        f = io.BytesIO()
+        tree.write(f, 'utf-8', method=None)
+        return unistr(f.getvalue(), 'utf-8')
 
 
 class HTML2XML(Processor):
@@ -928,7 +932,10 @@ class HTML2XML(Processor):
 
     def transform(self, data):
         transformed = super(HTML2XML, self).transform(data)
-        return unistr(xml.etree.ElementTree.tostring(transformed, 'UTF-8'), 'UTF-8')
+        tree = xml.etree.ElementTree.ElementTree(transformed)
+        f = io.BytesIO()
+        tree.write(f, 'utf-8', method=None)
+        return unistr(f.getvalue(), 'utf-8')
 
 
 # Utility functions
