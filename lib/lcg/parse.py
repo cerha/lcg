@@ -1236,7 +1236,7 @@ class HTMLProcessor(object):
                 self.handle_data('&' + name + ';')
             else:
                 expanded = html.entities.entitydefs[name]
-                if expanded[0] == '&' and expanded[-1] == ';':
+                if expanded[0] == b'&' and expanded[-1] == b';':
                     self.handle_charref(expanded)
                 else:
                     self.handle_data(unistr(expanded, 'iso-8859-1'))

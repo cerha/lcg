@@ -39,7 +39,7 @@ unistr = type(u'')  # Python 2/3 transition hack.
 class Constants(object):
     """Things mandated by EPUB 3 spec"""
     CONTAINER_NS = 'urn:oasis:names:tc:opendocument:xmlns:container'
-    EPUB_MIMETYPE = 'application/epub+zip'
+    EPUB_MIMETYPE = b'application/epub+zip'
     PATHSEP = '/'
     PATHENC = 'UTF-8'
     PACKAGE_DOC_MIMETYPE = 'application/oebps-package+xml'
