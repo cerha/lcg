@@ -231,7 +231,6 @@ class EpubExporter(lcg.Exporter):
                 data = self._get_resource_data(context, resource)
                 if isinstance(resource, lcg.Image):
                     import PIL.Image
-                    import io
                     image = PIL.Image.open(io.BytesIO(data))
                     width, height = image.size
                     max_resolution = self.Config.MAX_IMAGE_RESOLUTION
