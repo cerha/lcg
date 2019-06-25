@@ -289,7 +289,7 @@ class LocalizableDateTime(unittest.TestCase):
             "Thu 21/12/2006 06:43:32 PM"
         assert localize("2006-01-30", en, leading_zeros=False) == \
             "30/1/2006"
-        assert localize(datetime.date(2006, 01, 30), en, leading_zeros=False) == \
+        assert localize(datetime.date(2006, 1, 30), en, leading_zeros=False) == \
             "30/1/2006"
         assert localize("2006-12-21 18:43:32", en, utc=True) == \
             "21/12/2006 06:43:32 PM UTC"
@@ -317,7 +317,7 @@ class LocalizableDateTime(unittest.TestCase):
             u"21.12.2006 17:43:32"
         assert localize("2006-01-30", cs, leading_zeros=False) == \
             "30.1.2006"
-        assert localize(datetime.date(2006, 01, 30), cs, leading_zeros=False) == \
+        assert localize(datetime.date(2006, 1, 30), cs, leading_zeros=False) == \
             "30.1.2006"
         assert localize("2006-12-21 18:43:32", cs, utc=True) == \
             u"21.12.2006 17:43:32"
