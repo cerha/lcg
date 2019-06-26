@@ -63,6 +63,8 @@ class Presentation(object):
     "Name of the font to use, e.g. 'Free' or 'DejaVu', string."
     font_family = None
     "Font family to be used for typesetting text, one of 'FontFamily' constants."
+    font_color = None
+    """Font color, 'Color'."""
     heading_font_family = None
     "Font family to be used for typesetting headings, one of 'FontFamily' constants."
     noindent = None
@@ -80,7 +82,7 @@ class Presentation(object):
     box_width = None
     """Box line width, 'Unit'."""
     box_color = None
-    """Box line color, 'Unit'."""
+    """Box line color, 'Color'."""
     box_radius = None
     """Radius of box corners, if the corners should be rounded, 'Unit'."""
     box_mask = None

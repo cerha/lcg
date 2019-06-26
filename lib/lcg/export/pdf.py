@@ -1954,6 +1954,9 @@ class Container(Element):
         pdf_context = context.pdf_context
         style = pdf_context.style()
         halign = self.halign
+        presentation = pdf_context.current_presentation()
+        if presentation.font_color:
+            style.textColor = self._color2rgb(presentation.font_color)
         # Let's first transform simple text elements into real exportable elements.
 
         def transform_content(c):
@@ -1967,7 +1970,6 @@ class Container(Element):
         for c in self.content:
             transform_content(c)
         # If there is only a single element, unwrap it from the container.
-        presentation = pdf_context.current_presentation()
         boxed = presentation and presentation.boxed
         padding, width, height = self.padding, self.width, self.height
         if len(self.content) == 1 and not boxed and not padding and not width and not height:
