@@ -65,6 +65,8 @@ class Presentation(object):
     "Font family to be used for typesetting text, one of 'FontFamily' constants."
     font_color = None
     """Font color, 'Color'."""
+    background_color = None
+    """Background color, 'Color'."""
     heading_font_family = None
     "Font family to be used for typesetting headings, one of 'FontFamily' constants."
     noindent = None

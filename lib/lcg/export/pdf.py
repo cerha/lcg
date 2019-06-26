@@ -299,7 +299,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
 
     def __init__(self, content, vertical=False, align=None, boxed=False, box_margin=0,
                  box_width=None, box_color=None, box_radius=0, box_mask=None,
-                 width=None, height=None, padding=None):
+                 width=None, height=None, padding=None, background_color=None):
         assert isinstance(content, (tuple, list,)), content
         assert isinstance(vertical, bool), vertical
         assert box_mask is None or (isinstance(box_mask, (tuple, list)) and
@@ -344,6 +344,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         self._fixedWidth = 1 if width else 0
         self._fixedHeight = 1 if width else 0
         self._padding = padding
+        self._background_color = background_color
         self._total_fixed_length = None
         # Another hack for pytis markup:
         if len(content) == 1:
@@ -575,6 +576,33 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         if padding:
             x += padding[3]
             y += padding[2]
+        if self._box_boxed:
+            width, height = self._width_height
+            radius = self._box_box_radius
+            stroke = not self._box_box_mask
+            fill = self._background_color is not None
+            self.canv.saveState()
+            if self._box_box_width is not None:
+                self.canv.setLineWidth(self._box_box_width)
+            if self._box_box_color is not None:
+                self.canv.setStrokeColorRGB(*self._box_box_color)
+            if fill:
+                self.canv.setFillColorRGB(*self._background_color)
+            if radius != 0:
+                self.canv.roundRect(0, 0, width, height, radius, fill=fill, stroke=stroke)
+            else:
+                self.canv.rect(0, 0, width, height, fill=fill, stroke=stroke)
+            if self._box_box_mask:
+                top, right, bottom, left = self._box_box_mask
+                if top:
+                    self.canv.line(0, height, width, height)
+                if right:
+                    self.canv.line(width, height, width, 0)
+                if bottom:
+                    self.canv.line(width, 0, 0, 0)
+                if left:
+                    self.canv.line(0, 0, 0, height)
+            self.canv.restoreState()
         i = 0
         for c in self._box_content:
             align = self._box_align
@@ -598,28 +626,6 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             if not vertical:
                 x += length
             i += 1
-        if self._box_boxed:
-            width, height = self._width_height
-            self.canv.saveState()
-            if self._box_box_width is not None:
-                self.canv.setLineWidth(self._box_box_width)
-            if self._box_box_color is not None:
-                self.canv.setStrokeColorRGB(*self._box_box_color)
-            if self._box_box_mask:
-                top, right, bottom, left = self._box_box_mask
-                if top:
-                    self.canv.line(0, height, width, height)
-                if right:
-                    self.canv.line(width, height, width, 0)
-                if bottom:
-                    self.canv.line(width, 0, 0, 0)
-                if left:
-                    self.canv.line(0, 0, 0, height)
-            elif self._box_box_radius != 0:
-                self.canv.roundRect(0, 0, width, height, self._box_box_radius)
-            else:
-                self.canv.rect(0, 0, width, height)
-            self.canv.restoreState()
 
     def __unicode__(self):
         result = ('RLContainer(vertical=%s, align=%s, boxed=%s):\n' %
@@ -2042,6 +2048,7 @@ class Container(Element):
                         box_radius=box_radius,
                         box_margin=box_margin,
                         box_mask=boxed and presentation and presentation.box_mask,
+                        background_color=self._color2rgb(presentation.background_color),
                     )]
         # Enforce upper alignment
         if halign and len(result) == 1 and hasattr(result[0], 'hAlign'):
