@@ -772,6 +772,7 @@ class Context(object):
                  presentation_set=None, page_size=None, lang=None):
         self._lang = lang
         self._presentations = []
+        self._tempdir = None
         self._init_fonts()
         self._init_styles()
         self._anchors = {}
@@ -796,7 +797,6 @@ class Context(object):
                 self._page_footer = parent_context.page_footer()
         self._relative_font_size = 1
         self._export_notes = []
-        self._tempdir = None
 
     def __del__(self):
         if self._tempdir is not None:
