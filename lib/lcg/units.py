@@ -171,7 +171,7 @@ class Color(object):
         elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 7:
             rgb = [int(x, 16) for x in (arg[1:3], arg[3:5], arg[5:7])]
         elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 4:
-            rgb = [int(x, 16) for x in arg[1:]]
+            rgb = [int(x + x, 16) for x in arg[1:]]
         else:
             raise ValueError("Invalid color specification: %r" % (args,))
         self._rgb = tuple(rgb)
