@@ -31,6 +31,7 @@ import mimetypes
 import re
 import unicodedata
 import os
+import sys
 
 standard_library.install_aliases()
 unistr = type(u'')  # Python 2/3 transition hack.
@@ -156,7 +157,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         # the same normalized form or the normalized form may match an existing
         # resource URI).
         if isinstance(uri, unistr):
-            uri = unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore')
+            uri = unistr(unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore'))
         uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', uri.lower())
         n = 0
         template = '%s-%%d%s' % os.path.splitext(uri)
@@ -267,14 +268,14 @@ class EpubExporter(lcg.Exporter):
         return resource.get()
 
     def _container_path(self, *components):
-        # TODO replace forbidden characters as per spec
-        def ensure_pathenc(component):
-            if isinstance(component, unistr):
-                return component.encode(Constants.PATHENC)
-            return component
-        components = list(map(ensure_pathenc, components))
-        path = Constants.PATHSEP.join(components)
-        return path
+        # TODO: replace forbidden characters as per spec
+        if sys.version_info[0] == 2:
+            def ensure_pathenc(component):
+                if isinstance(component, unistr):
+                    return component.encode(Constants.PATHENC)
+                return component
+            components = list(map(ensure_pathenc, components))
+        return Constants.PATHSEP.join(components)
 
     def _meta_path(self, *components):
         return self._container_path(Constants.METADIR, *components)
