@@ -34,6 +34,7 @@ import sys
 import unittest
 import zipfile
 import pytest
+import tempfile
 
 import lcg
 
@@ -2323,7 +2324,7 @@ class Presentations(unittest.TestCase):
         f = open(os.path.join(lcg_dir, 'styles', 'standard'))
         style_file.read(f)
         f.close()
-        f = os.tmpfile()
+        f = tempfile.NamedTemporaryFile(mode='w+t')
         style_file.write(f)
         f.seek(0)
         style_file_2 = lcg.StyleFile()
