@@ -1091,11 +1091,11 @@ class MacroParser(object):
         self._include = include or self._default_include
 
     def _default_evaluate(self, expr):
-        safe_builtins = ('False', 'None', 'True', 'abs', 'all', 'any', 'bool', 'chr', 'cmp',
-                         'complex', 'dict', 'divmod', 'float', 'hash', 'hex', 'id',
-                         'isinstance', 'int', 'len', 'list', 'long', 'max', 'min', 'oct', 'ord',
-                         'pow', 'range', 'repr', 'reversed', 'round', 'set', 'slice', 'sorted',
-                         'str', 'sum', 'tuple', 'unichr', 'unicode', 'zip')
+        safe_builtins = ('False', 'None', 'True', 'abs', 'all', 'any', 'bool', 'bytes',
+                         'chr', 'complex', 'dict', 'divmod', 'float', 'hash', 'hex',
+                         'id', 'isinstance', 'int', 'len', 'list', 'max', 'min', 'oct',
+                         'ord', 'pow', 'range', 'repr', 'reversed', 'round', 'set',
+                         'slice', 'sorted', 'str', 'sum', 'tuple', 'zip')
         globals = dict(self._globals, __builtins__=None)
         for builtin in safe_builtins:
             globals[builtin] = __builtins__[builtin]
