@@ -820,7 +820,7 @@ class HtmlExporter(lcg.Exporter):
     """The HTML page <body> element content structure as a sequence of 'Part' instances."""
 
     _LANGUAGE_SELECTION_COMBINED = False
-    _MATHML_XMLNS = re.compile(r'<math [^>]* xmlns=".*')
+    _MATHML_XMLNS = re.compile(r'<math[^>]* xmlns=".*')
     _ALLOW_BACKREF = True
     """Allow using back references from section titles to related TOC items (if TOC exists)."""
 
