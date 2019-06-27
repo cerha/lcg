@@ -19,6 +19,7 @@
 
 from __future__ import unicode_literals
 from __future__ import absolute_import
+from __future__ import division
 from future import standard_library
 from builtins import map
 

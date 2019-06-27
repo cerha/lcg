@@ -1139,7 +1139,7 @@ class HtmlExport(unittest.TestCase):
               '</iframe></div></div>')),
             (lcg.InlineExternalVideo('youtube', 'xyz', size=(330, 220), title='My Video'),
              ('<div class="external-video" style="max-width: 330px;">'
-              '<div class="wrapper" style="padding-bottom: 66.0%">'
+              '<div class="wrapper" style="padding-bottom: 66.7%">'
               '<iframe allowfullscreen="allowfullscreen" frameborder="0"'
               ' height="220" mozallowfullscreen="mozallowfullscreen"'
               ' src="https://www.youtube.com/embed/xyz" title="My Video"'
