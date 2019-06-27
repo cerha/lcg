@@ -79,11 +79,8 @@ class TranslatableText(unittest.TestCase):
         f = b + c
         assert isinstance(f, lcg.Concatenation)
         assert f == "xxxVersion 1.0xxx"
-        try:
+        with pytest.raises(TypeError):
             e = a + 1
-        except TypeError as e:
-            pass
-        assert isinstance(e, TypeError)
 
     def test_concat(self):
         a = lcg.concat(lcg.TranslatableText("Version %s", "1.0") + 'xx', 'yy', separator="\n")
