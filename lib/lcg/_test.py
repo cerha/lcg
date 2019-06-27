@@ -1290,16 +1290,17 @@ class HtmlExport(unittest.TestCase):
 
         def export(content):
             return content.export(context)
-        content = lcg.MathML(u"""
+        mathml = u"""
 <math xmlns="http://www.w3.org/1998/Math/MathML">
   <mi>&#x03C0;<!-- π --></mi>
-  <mo>&#x2062;<!-- &InvisibleTimes; --></mo>
+  <mo>&#x2062;&eplus;<!-- &InvisibleTimes; --></mo>
   <msup>
     <mi>r</mi>
     <mn>2</mn>
   </msup>
-</math>""")
-        assert isinstance(export(content), basestring)
+</math>"""
+        content = lcg.MathML(mathml)
+        assert export(content).replace('\n', '') == mathml.replace('\n', '')
         for xml in (u'</math><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',
                     u'<math xmlns="http://www.w3.org/1998/Math/MathML"><script>1</script></math>',
                     u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>' +
@@ -1307,8 +1308,9 @@ class HtmlExport(unittest.TestCase):
             content = lcg.MathML(xml)
             with pytest.raises(lcg.ParseError):
                 export(content)
-        content = lcg.MathML(u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>')
-        assert isinstance(export(content), basestring)
+        mathml = u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>'
+        content = lcg.MathML(mathml)
+        assert export(content).replace('\n', '') == mathml.replace('\n', '')
 
     def test_html_content(self):
         # Make sure the HTML content is not escaped when wrappped in another HTML element.

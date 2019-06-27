@@ -1851,10 +1851,17 @@ class MathML(Content):
         from xml.etree import ElementTree
         import io
         parser = ElementTree.XMLParser()
-        parser.parser.UseForeignDTD(True)
-        if entity_dictionary is None:
-            entity_dictionary = self.EntityHandler()
-        parser.entity = entity_dictionary
+        if sys.version_info[0] == 2:
+            # TODO: This doesn't work in Python 3.  The only way of getting it to work
+            # seems to be defining all entities in a DOCTYPE  as suggested in:
+            # https://stackoverflow.com/questions/35591478/ +
+            # how-to-parse-html-with-entities-such-as-nbsp-using-builtin-library-elementtree
+            # But is this really needed?  Valid MathML entities are already defined.
+            # Do we need to allow invalid entities for some reasons?
+            parser.parser.UseForeignDTD(True)
+            if entity_dictionary is None:
+                entity_dictionary = self.EntityHandler()
+            parser.entity = entity_dictionary
         etree = ElementTree.ElementTree()
         content = self._str_content()
         try:
