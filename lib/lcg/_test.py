@@ -835,60 +835,66 @@ blah
 
 class MacroParser(unittest.TestCase):
 
+    def _unindent(self, text):
+        return '\n'.join(line.lstrip() for line in text.splitlines())
+
+    def _parse(self, text, **kwargs):
+        return lcg.MacroParser(globals=kwargs).parse(text)
+
     def test_simple_condition(self):
-        text = "@if x\nX\n@else\nY@endif\n"
-        r = lcg.MacroParser(globals=dict(x=True)).parse(text)
-        assert r == "X\n"
+        assert self._parse("@if x\nX\n@else\nY@endif\n", x=True) == "X\n"
 
     def test_condition(self):
-        def check(condition, expected_result, **globals):
+        def test(condition, **kwargs):
             text = ("@if " + condition + "\nTrue\n@else\nFalse\n@endif")
-            parser = lcg.MacroParser(globals=globals)
-            result = parser.parse(text).strip() == 'True'
-            assert result == expected_result
+            return self._parse(text, **kwargs).strip()
         # Some more complicated condition.
-        c1 = "a in ('A', 'B', 'C') and b > 3 and b+5 <= c and c is not None"
-        check(c1, True, a='A', b=5, c=55)
-        check(c1, False, a='X', b=5, c=None)
+        c1 = "a in ('A', 'B', 'C') and b > 3 and b + 5 <= c and c is not None"
+        assert test(c1, a='A', b=5, c=55) == 'True'
+        assert test(c1, a='X', b=5, c=None) == 'False'
         # Try using builtins.
-        c2 = "ord(a) == b and chr(b) == a and sum((b,c,3)) >= 70 and any([True, False, a == b])"
-        check(c2, True, a='A', b=65, c=2)
-        check(c2, False, a='X', b=5, c=2)
+        c2 = "ord(a) == b and chr(b) == a and sum((b, c, 3)) >= 70 and any([True, False, a == b])"
+        assert test(c2, a='A', b=65, c=2) == 'True'
+        assert test(c2, a='X', b=5, c=2) == 'False'
 
     def test_exception(self):
-        text = "A\n@if a//b == c\nX@else\nY\n@endif\n\nB\n\n"
-        r = lcg.MacroParser(globals=dict(a=5, b=0, c=2)).parse(text)
-        assert r == "A\nZeroDivisionError: integer division or modulo by zero\nB\n\n"
+        text = self._unindent("""
+        A
+        @if a//b == c
+        X
+        @else
+        Y
+        @endif
+
+        B
+
+        """)
+        assert self._parse(text, a=5, b=0, c=2) == \
+            "\nA\nZeroDivisionError: integer division or modulo by zero\nB\n\n"
 
     def test_condition_newlines(self):
         text = "A\n@if x\nX\n@endif\n\nB\n\n"
-        r = lcg.MacroParser(globals=dict(x=True)).parse(text)
-        assert r == "A\nX\n\nB\n\n"
+        assert self._parse(text, x=True) == "A\nX\n\nB\n\n"
 
     def test_nested_condition(self):
-        def join(*lines):
-            return "".join([line + "\n" for line in lines])
-        text = join("A",
-                    "@if b",
-                    "B",
-                    "@else",
-                    "@if c",
-                    "C",
-                    "@endif",
-                    "D",
-                    "@endif",
-                    "E")
-        r1 = lcg.MacroParser(globals=dict(b=True, c=True)).parse(text)
-        r2 = lcg.MacroParser(globals=dict(b=False, c=True)).parse(text)
-        r3 = lcg.MacroParser(globals=dict(b=False, c=False)).parse(text)
-        assert r1 == join("A", "B", "E")
-        assert r2 == join("A", "C", "D", "E")
-        assert r3 == join("A", "D", "E")
+        text = self._unindent("""
+        A
+        @if b
+        B
+        @else
+        @if c
+        C
+        @endif
+        D
+        @endif
+        E
+        """)
+        assert self._parse(text, b=True, c=True).strip() == 'A\nB\nE'
+        assert self._parse(text, b=False, c=True).strip() == 'A\nC\nD\nE'
+        assert self._parse(text, b=False, c=False).strip() == 'A\nD\nE'
 
     def test_inclusion(self):
-        text = "Foo\n@include bar\nBaz\n"
-        r = lcg.MacroParser(globals=dict(bar='Bar')).parse(text)
-        assert r == "Foo\nBar\nBaz\n"
+        self._parse("Foo\n@include bar\nBaz\n", bar='Bar') == "Foo\nBar\nBaz\n"
 
 
 class HtmlImport(unittest.TestCase):
