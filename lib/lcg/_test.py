@@ -1337,7 +1337,7 @@ class EpubExport(unittest.TestCase):
         epub = e.export(context)
         archive = zipfile.ZipFile(io.BytesIO(epub))
         pkg_opf = archive.read('rsrc/pkg.opf')
-        assert pkg_opf[:19] == '<?xml version="1.0"'
+        assert pkg_opf.startswith(b'<?xml version="1.0"')
 
 
 class ImsExport(unittest.TestCase):
