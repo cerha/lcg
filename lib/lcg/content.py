@@ -310,12 +310,10 @@ class Container(Content):
         assert valign is None or isinstance(valign, str), valign
         assert orientation is None or isinstance(orientation, str), orientation
         assert id is None or isinstance(id, basestring), id
-        assert isinstance(name, (basestring, tuple, list))
         assert width is None or isinstance(width, lcg.Unit), width
         assert height is None or isinstance(height, lcg.Unit), height
         assert (padding is None or isinstance(padding, lcg.Unit)
                 or lcg.is_sequence_of(padding, lcg.Unit) and len(padding) in (2, 4)), padding
-        assert not name or id is None, id
         self._id = id
         if isinstance(name, basestring):
             names = (name,)
