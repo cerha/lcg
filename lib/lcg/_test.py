@@ -105,35 +105,39 @@ class TranslatableText(unittest.TestCase):
         assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
         assert str(d) == dx == 'versi-n x-x-y-y', (d, dx)
 
+    def test_translate(self):
+        cs = lcg.Localizer('cs', translation_path=translation_path)
+        a = _('His name is "%s"', _("Bob"))
+        assert a.localize(cs) == 'Jmenuje se "Bobik"'
+        assert str(a) == 'His name is "Bob"'
+        b = _("Bob") + ' + ' + _("Joe")
+        assert str(b) == 'Bob + Joe'
+        assert b.localize(cs) == 'Bobik + Pepa'
+
     def test_transform(self):
         from xml.sax import saxutils
-        a = _('His name is "%s"', _("Bob"))
+        cs = lcg.Localizer('cs', translation_path=translation_path)
+        a = _('His name is "%s"', _("Bob")).transform(saxutils.quoteattr)
+        assert isinstance(a, lcg.TranslatableText)
+        assert str(a) == '\'His name is "Bob"\''
+        assert a.localize(cs) == '\'Jmenuje se "Bobik"\''
         b = _("Bob") + ' + ' + _("Joe")
-        c = a.transform(saxutils.quoteattr)
-        d = b.transform(saxutils.quoteattr)
-        e = "attr=" + d  # Test transformed Concatenation nesting!
-        f = lcg.concat('<tag ' + e + '>')
-        assert isinstance(c, lcg.TranslatableText)
-        assert isinstance(d, lcg.Concatenation)
-        loc = lcg.Localizer('cs', translation_path=translation_path)
-        ax = a.localize(loc)
-        bx = b.localize(loc)
-        cx = c.localize(loc)
-        dx = d.localize(loc)
-        ex = e.localize(loc)
-        fx = f.localize(loc)
-        assert str(a) == 'His name is "Bob"'
-        assert str(b) == 'Bob + Joe'
-        assert ax == 'Jmenuje se "Bobik"'
-        assert bx == 'Bobik + Pepa'
-        assert str(c) == '\'His name is "Bob"\''
-        assert str(d) == '"Bob + Joe"'
-        assert str(e) == 'attr="Bob + Joe"'
-        assert str(f) == '<tag attr="Bob + Joe">'
-        assert cx == '\'Jmenuje se "Bobik"\''
-        assert dx == '"Bobik + Pepa"'
-        assert ex == 'attr="Bobik + Pepa"'
-        assert fx == '<tag attr="Bobik + Pepa">'
+        c = b.transform(saxutils.quoteattr)
+        assert isinstance(c, lcg.Concatenation)
+        assert str(c) == '"Bob + Joe"'
+        assert c.localize(cs) == '"Bobik + Pepa"'
+        attr = "attr=" + c  # Test transformed Concatenation nesting!
+        assert str(attr) == 'attr="Bob + Joe"'
+        assert attr.localize(cs) == 'attr="Bobik + Pepa"'
+        tag = lcg.concat('<tag ' + attr + '>')
+        assert str(tag) == '<tag attr="Bob + Joe">'
+        assert tag.localize(cs) == '<tag attr="Bobik + Pepa">'
+
+    def test_pgettext(self):
+        cs = lcg.Localizer('cs', translation_path=translation_path)
+        assert _.pgettext('dont translete this msg', 'untranslated').localize(cs) == 'untranslated'
+        assert _.pgettext('verb', 'force').localize(cs) == 'donutit'
+        assert _.pgettext('noun', 'force').localize(cs) == u'síla'
 
     def test_string_context(self):
         a = lcg.TranslatableText("Version %s", "1.0")
@@ -264,6 +268,7 @@ class LocalizableDateTime(unittest.TestCase):
         en = lcg.Localizer('en', translation_path=translation_path)
         cs = lcg.Localizer('cs', translation_path=translation_path, timezone=self.tzinfo(-60))
         utc = lcg.LocalizableDateTime._UTC_TZ
+
         def localize(dt, localizer, **kwargs):
             return lcg.LocalizableDateTime(dt, **kwargs).localize(localizer)
 

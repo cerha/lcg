@@ -69,7 +69,8 @@ class TranslatableTextFactory(object):
         return TranslatablePluralForms(*args, **kwargs)
 
     def pgettext(self, context, text, *args, **kwargs):
-        return self.__call__(context + '\x04' + text, *args, **kwargs).split('\x04', 1)[1]
+        kwargs['_context'] = context
+        return self.__call__(text, *args, **kwargs)
 
 
 class TranslatedTextFactory(TranslatableTextFactory):
@@ -361,10 +362,11 @@ class TranslatableText(Localizable):
         self._args = args
         self._init_kwargs(**kwargs)
 
-    def _init_kwargs(self, _orig_text=None, _domain=None, _origin='en', _interpolate=None,
-                     _transforms=(), escape_html=None, **kwargs):
+    def _init_kwargs(self, _context=None, _orig_text=None, _domain=None, _origin='en',
+                     _interpolate=None, _transforms=(), escape_html=None, **kwargs):
         assert isinstance(_domain, basestring) or _domain is None, _domain
         assert isinstance(_origin, basestring), _origin
+        assert _context is None or isinstance(_context, basestring), _context
         assert _interpolate is None or isinstance(_interpolate, collections.Callable), _interpolate
         assert escape_html is None or isinstance(escape_html, bool), escape_html
         self._orig_text = _orig_text or self._text
@@ -373,6 +375,7 @@ class TranslatableText(Localizable):
         self._interpolate = _interpolate
         self._kwargs = kwargs
         self._escape_html = escape_html
+        self._context = _context
         super(TranslatableText, self).__init__(_transforms=_transforms)
 
     def _clone_args(self):
@@ -401,7 +404,17 @@ class TranslatableText(Localizable):
 
     def _translate(self, localizer):
         translator = localizer.translator()
-        return translator.gettext(self._orig_text, domain=self._domain, origin=self._origin)
+        text = self._orig_text
+        if self._context is not None:
+            text = self._context + '\x04' + text
+        translation = translator.gettext(text, domain=self._domain, origin=self._origin)
+        if self._context is not None and translation == text:
+            # When the translation is found, the context is stripped automatically,
+            # but when the translation doesn't exist, text is returned unchanged,
+            # so we need to return the original mesg without the context to avoid
+            # having contexts clutter the ui.
+            translation = self._orig_text
+        return translation
 
     def _localize(self, localizer):
         translated = self._translate(localizer)
