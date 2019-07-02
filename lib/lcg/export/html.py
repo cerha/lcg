@@ -810,7 +810,7 @@ class HtmlExporter(lcg.Exporter):
     """Allow using back references from section titles to related TOC items (if TOC exists)."""
 
     def __init__(self, *args, **kwargs):
-        self._generator = self.Generator()
+        self._generator = self.Generator(sorted_attributes=kwargs.pop('sorted_attributes', False))
         super(HtmlExporter, self).__init__(*args, **kwargs)
 
     def _title(self, context):
