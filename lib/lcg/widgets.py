@@ -134,6 +134,7 @@ class Widget(object):
 
     def export(self, context):
         context.resource('prototype.js')
+        context.resource('effects.js')
         context.resource('gettext.js')
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
