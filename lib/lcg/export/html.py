@@ -1624,7 +1624,7 @@ class StyledHtmlExporter(object):
         styles = self._stylesheets(context)
         if self._inlinestyles:
             tags = [g.style(content, type='text/css', media=media)
-                    for media, content in [(s.media(), s.get()) for s in styles]
+                    for media, content in [(s.media(), unicode(s.get(), 'utf-8')) for s in styles]
                     if content is not None]
         else:
             tags = [g.link(rel='stylesheet', type='text/css', href=context.uri(s), media=s.media())
