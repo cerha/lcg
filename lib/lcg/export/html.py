@@ -1047,8 +1047,8 @@ class HtmlExporter(lcg.Exporter):
                 descr = target.title() + ' (' + target.parent().title() + ')'
         return self._generator.a(label, href=context.uri(target), title=descr, type=element.type())
 
-    def _container_attr(self, element, cls=None, lang=None, **kwargs):
-        style = {}
+    def _container_attr(self, element, cls=None, lang=None, style=None, **kwargs):
+        style = style or {}
         if element.halign():
             style['text-align'] = {lcg.HorizontalAlignment.RIGHT: 'right',
                                    lcg.HorizontalAlignment.LEFT: 'left',
@@ -1219,8 +1219,18 @@ class HtmlExporter(lcg.Exporter):
         return self._export_container(context, element, wrap=self._generator.tr)
 
     def _export_table_cell(self, context, element):
+        style = None
+        row = element.container()
+        widths = row.container().column_widths()
+        if widths:
+            index = row.content().index(element)
+            if index < len(widths):
+                width = widths[index]
+                if width:
+                    style = {'width': str(width.size()) + 'em',
+                             'max-width': str(width.size()) + 'em'}
         return self._export_container(context, element, wrap=self._generator.td,
-                                      align=element.align())
+                                      align=element.align(), style=style)
 
     def _export_table_heading(self, context, element):
         return self._export_container(context, element, wrap=self._generator.th,
