@@ -572,11 +572,8 @@ class Parser(object):
         if global_widths is None or all([w is None for w in global_widths.values()]):
             column_widths = None
         else:
-            print global_widths
             column_widths = [global_widths.get(i)
                              for i in range(max(global_widths) + 1)]  # noqa: F812
-            print global_widths
-            print column_widths
         content = lcg.Table(table_rows, bars=bars, column_widths=column_widths, halign=halign)
         return content, position
 
