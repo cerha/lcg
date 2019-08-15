@@ -57,7 +57,8 @@ class Resource(object):
         ext = os.path.splitext(filename)[1].lower().lstrip('.')
         return cls._type_map.get(ext, Resource)
 
-    def __init__(self, filename, title=None, descr=None, src_file=None, uri=None, info=None):
+    def __init__(self, filename, title=None, descr=None, uri=None,
+                 src_file=None, content=None, info=None):
         """Arguments:
 
           filename -- unique string identifying the resource (typisally its
@@ -65,38 +66,45 @@ class Resource(object):
           title -- optional user visible resource title as a string or None.
           descr -- optional user visible resource description as a string or
             None.
-          src_file -- absolute pathname of the source file.  If None, the
-            resource will not be exported.  The source file is normally located
-            by the resource provider and this argument is supplied
-            automatically, so you usually do not need to care about it.  In any
-            case, the exporter is responsible for writing the resources which
-            have the source file defined to the output (if necessary for given
-            output format).  The filename (last part of the path) must not
-            necessarily be the same as 'filename'.  This may indicate that a
-            conversion is necessary on export (such as WAV to MP3; see the
-            particular 'Exporter' class for the supported conversions).
           uri -- resource's URI as a string.  If None, the URI will be supplied
             by the exporter automatically (the exporter is normally responsible
             for exporting the file to a location with a corresponding URI).
             Supplying the URI directly to the resource constructor may be,
             however, needed when the resource is handled by the application
             specifically.
-          info -- additional application specific information about the
-            attachment.  No particular limitation on the content is defined and
-            LCG ignores this value alltogether.
+          src_file -- absolute pathname of the source file.  If not None, the
+            resource data will be read from the file when needed (typicaly on
+            export).  If None, the 'content' argument may provide the data from
+            other source.  This argument is normally supplied by the
+            'ResourceProvider', so you would typically not need to pass it
+            manually.  The filename (last part of the path) must not
+            necessarily be the same as 'filename'.  In some cases, however, a
+            different filename suffix may indicate that a conversion is
+            necessary on export (such as WAV to MP3).  The particular
+            'Exporter' class is responsible for handling such conversions when
+            necessary.
+          content -- resource data as a bytes instance or a file-like object.
+            Typically used when passing 'Resource' instances from application
+            code.  These resources are not located by the 'ResourceProvider'
+            and may not be bound to files on the file system.
+          info -- additional application specific
+            information about the attachment.  No particular limitation on the
+            content is defined and LCG ignores this value alltogether.
 
         """
         super(Resource, self).__init__()
         assert isinstance(filename, (str, unicode)), filename
         assert title is None or isinstance(title, (str, unicode)), title
         assert descr is None or isinstance(descr, (str, unicode)), descr
-        assert src_file is None or isinstance(src_file, (str, unicode)), src_file
         assert uri is None or isinstance(uri, (str, unicode)), uri
+        assert src_file is None or isinstance(src_file, (str, unicode)), src_file
+        assert content is None or isinstance(content, bytes) or hasattr(content, 'read'), content
         self._filename = filename
         self._title = title
         self._descr = descr
-        self._src_file = src_file
         self._uri = uri
+        self._src_file = src_file
+        self._content = content
         self._info = info
 
     def filename(self):
@@ -124,14 +132,24 @@ class Resource(object):
         return self._info
 
     def get(self):
-        """Return the resource file contents as a byte string or None if it does not exist."""
-        if self._src_file is None:
-            return None
+        """Return the resource file data as a byte string or None.
+
+        None is returned if this instance is not bound to any particular data
+        (when neither 'src_file' nor 'content' was passed to its constructor).
+
+        This method may only be called once, otherwise the behavior is undefined.
+
+        """
+        if self._src_file is not None:
+            f = open(self._src_file, 'rb')
+        elif isinstance(self._content, bytes):
+            return self._content
+        elif self._content:
+            f = self._content
         else:
-            fh = open(self._src_file)
-            data = fh.read()
-            fh.close()
-            return data
+            return None
+        with f:
+            return f.read()
 
 
 class Image(Resource):
