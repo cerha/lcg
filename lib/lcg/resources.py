@@ -52,7 +52,6 @@ class Resource(object):
             subclasses = c.__subclasses__()
             return subclasses + [x for s in c.__subclasses__() for x in all_subclasses(s)]
         if cls._type_map is None:
-            subclasses = cls.__subclasses__()
             cls._type_map = dict((ext, c) for c in all_subclasses(cls) for ext in c.EXTENSIONS)
         ext = os.path.splitext(filename)[1].lower().lstrip('.')
         return cls._type_map.get(ext, Resource)
@@ -235,7 +234,7 @@ class Flash(Resource):
 
 
 ###################################################################################################
-###                                   Resource Provider                                        ####
+#                                     Resource Provider                                           #
 ###################################################################################################
 
 class ResourceProvider(object):

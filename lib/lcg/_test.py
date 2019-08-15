@@ -272,62 +272,62 @@ class LocalizableDateTime(unittest.TestCase):
         def localize(dt, localizer, **kwargs):
             return lcg.LocalizableDateTime(dt, **kwargs).localize(localizer)
 
-        assert localize("2006-12-21", en) == \
-            "21/12/2006"
-        assert localize(datetime.date(2006, 12, 21), en) == \
-            "21/12/2006"
-        assert localize("2006-12-21 02:43", en, show_time=False) == \
-            "21/12/2006"
-        assert localize("2006-12-21 02:43", en, show_time=False, utc=True) == \
-            "21/12/2006 UTC"
-        assert localize(datetime.datetime(2006, 12, 21, 2, 43), en, show_time=False) == \
-            "21/12/2006"
-        assert localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), en, show_time=False) == \
-            "21/12/2006 UTC"
-        assert localize("2006-12-21 02:43", en) == \
-            "21/12/2006 02:43 AM"
-        assert localize(datetime.datetime(2006, 12, 21, 2, 43), en, show_seconds=False) == \
-            "21/12/2006 02:43 AM"
-        assert localize("2006-12-21 18:43:32", en, show_weekday=True) == \
-            "Thu 21/12/2006 06:43:32 PM"
-        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), en, show_weekday=True) == \
-            "Thu 21/12/2006 06:43:32 PM"
-        assert localize("2006-01-30", en, leading_zeros=False) == \
-            "30/1/2006"
-        assert localize(datetime.date(2006, 1, 30), en, leading_zeros=False) == \
-            "30/1/2006"
-        assert localize("2006-12-21 18:43:32", en, utc=True) == \
-            "21/12/2006 06:43:32 PM UTC"
-        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), en) == \
-            "21/12/2006 06:43:32 PM"
-        assert localize("2006-12-21", cs) == \
-            "21.12.2006"
-        assert localize(datetime.date(2006, 12, 21), cs) == \
-            "21.12.2006"
-        assert localize("2006-12-21 02:43", cs, show_time=False) == \
-            "21.12.2006"
-        assert localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_time=False) == \
-            "21.12.2006"
-        assert localize("2006-12-21 02:43", cs) == \
-            "21.12.2006 02:43"
-        assert localize("2006-12-21 02:43", cs, utc=True) == \
-            "21.12.2006 01:43"
-        assert localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_seconds=False) == \
-            "21.12.2006 01:43"
-        assert localize("2006-12-21 18:43:32", cs, show_weekday=True) == \
-            u"Čt 21.12.2006 18:43:32"
-        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs) == \
-            u"21.12.2006 18:43:32"
-        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32, tzinfo=utc), cs) == \
-            u"21.12.2006 17:43:32"
-        assert localize("2006-01-30", cs, leading_zeros=False) == \
-            "30.1.2006"
-        assert localize(datetime.date(2006, 1, 30), cs, leading_zeros=False) == \
-            "30.1.2006"
-        assert localize("2006-12-21 18:43:32", cs, utc=True) == \
-            u"21.12.2006 17:43:32"
-        assert localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs, utc=True) == \
-            u"21.12.2006 17:43:32"
+        assert (localize("2006-12-21", en)
+                == "21/12/2006")
+        assert (localize(datetime.date(2006, 12, 21), en)
+                == "21/12/2006")
+        assert (localize("2006-12-21 02:43", en, show_time=False)
+                == "21/12/2006")
+        assert (localize("2006-12-21 02:43", en, show_time=False, utc=True)
+                == "21/12/2006 UTC")
+        assert (localize(datetime.datetime(2006, 12, 21, 2, 43), en, show_time=False)
+                == "21/12/2006")
+        assert (localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), en, show_time=False)
+                == "21/12/2006 UTC")
+        assert (localize("2006-12-21 02:43", en)
+                == "21/12/2006 02:43 AM")
+        assert (localize(datetime.datetime(2006, 12, 21, 2, 43), en, show_seconds=False)
+                == "21/12/2006 02:43 AM")
+        assert (localize("2006-12-21 18:43:32", en, show_weekday=True)
+                == "Thu 21/12/2006 06:43:32 PM")
+        assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), en, show_weekday=True)
+                == "Thu 21/12/2006 06:43:32 PM")
+        assert (localize("2006-01-30", en, leading_zeros=False)
+                == "30/1/2006")
+        assert (localize(datetime.date(2006, 1, 30), en, leading_zeros=False)
+                == "30/1/2006")
+        assert (localize("2006-12-21 18:43:32", en, utc=True)
+                == "21/12/2006 06:43:32 PM UTC")
+        assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), en)
+                == "21/12/2006 06:43:32 PM")
+        assert (localize("2006-12-21", cs)
+                == "21.12.2006")
+        assert (localize(datetime.date(2006, 12, 21), cs)
+                == "21.12.2006")
+        assert (localize("2006-12-21 02:43", cs, show_time=False)
+                == "21.12.2006")
+        assert (localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_time=False)
+                == "21.12.2006")
+        assert (localize("2006-12-21 02:43", cs)
+                == "21.12.2006 02:43")
+        assert (localize("2006-12-21 02:43", cs, utc=True)
+                == "21.12.2006 01:43")
+        assert (localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_seconds=False)
+                == "21.12.2006 01:43")
+        assert (localize("2006-12-21 18:43:32", cs, show_weekday=True)
+                == u"Čt 21.12.2006 18:43:32")
+        assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs)
+                == u"21.12.2006 18:43:32")
+        assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32, tzinfo=utc), cs)
+                == u"21.12.2006 17:43:32")
+        assert (localize("2006-01-30", cs, leading_zeros=False)
+                == "30.1.2006")
+        assert (localize(datetime.date(2006, 1, 30), cs, leading_zeros=False)
+                == "30.1.2006")
+        assert (localize("2006-12-21 18:43:32", cs, utc=True)
+                == u"21.12.2006 17:43:32")
+        assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs, utc=True)
+                == u"21.12.2006 17:43:32")
 
     def test_concat(self):
         c = "Date is: " + lcg.LocalizableDateTime("2006-01-30")
@@ -499,7 +499,7 @@ class Resources(unittest.TestCase):
         assert tuple(sorted([r.filename() for r in a.resources()])) == \
             ('default.css', 'sound1.ogg', 'sound2.ogg')
         assert tuple(sorted([r.filename() for r in b.resources()])) == \
-                         ('sound1.ogg', 'sound2.ogg')
+            ('sound1.ogg', 'sound2.ogg')
 
 
 class Parser(unittest.TestCase):
