@@ -1374,7 +1374,7 @@ class FileExporter(object):
             os.makedirs(directory)
         if isinstance(content, unicode):
             content = content.encode('utf-8')
-        file = open(filename, 'w')
+        file = open(filename, 'wb')
         try:
             file.write(content)
         finally:
