@@ -64,7 +64,7 @@ def text_to_id(string, separator='-'):
     # Handle certain special cases.
     string = string.replace(u'´', '').replace('_', ' ')
     # Remove accents
-    string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore')
+    string = str(unicodedata.normalize('NFKD', string).encode('ascii', 'ignore'))
     return re.sub(r'[^a-z0-9 ]', '', string.lower()).replace(' ', separator)
 
 
