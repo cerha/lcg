@@ -47,10 +47,10 @@
     display: block;
     padding: .2em .1em;
     margin-left: 15px;
+    border-radius: 3px;
 }
 .foldable-tree-widget .current .label {
     background-color: #ddd;
-    border-radius: 3px;
 }
 
 .foldable-tree-widget .expander {
