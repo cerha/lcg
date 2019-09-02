@@ -259,7 +259,7 @@ class FoldableTree(Widget, lcg.Content):
                         data_expand_label=labels[0],
                         data_collapse_label=labels[1],
                         role='button', title=label, tabindex=-1,
-                        cls='expander') if submenu else '',
+                        cls='expander') if child.foldable() and submenu else '',
                     submenu),
                 cls=((('foldable ' + ('expanded ' if in_path else 'collapsed '))
                       if child.foldable() and submenu else '') +
