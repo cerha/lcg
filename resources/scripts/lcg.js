@@ -349,7 +349,7 @@ lcg.Notebook = Class.create(lcg.Menu, {
 
     _current_location_selected_item: function () {
         // Get the selected item if the anchor is part of the current location.
-        var match = self.location.href.match('#');
+        var match = self.location.href.match('#.+');
         if (match) {
             var parts = self.location.href.split('#', 2);
             var page = this.element.down('#'+parts[1]);
@@ -1574,7 +1574,7 @@ lcg.AudioPlayer = Class.create(lcg.Widget, {
             return false;
         }
     },
-    
+
     load: function (uri) {
         this._player.jPlayer('setMedia', {
             mp3: uri
