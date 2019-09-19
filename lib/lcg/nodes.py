@@ -19,9 +19,10 @@
 
 """Document structure abstraction.
 
-The complete LCG publication typically consists of multiple documents which form a hierarchy.  See
-the module 'content' for classes representing the content hierarchy within one document.  Each
-document in the hierarchy is represented by a single 'ContentNode' instance (defined below).
+The complete LCG publication typically consists of multiple documents which
+form a hierarchy.  See the module 'content' for classes representing the
+content hierarchy within one document.  Each document in the hierarchy is
+represented by a single 'ContentNode' instance (defined below).
 
 """
 
@@ -318,8 +319,8 @@ class ContentNode(object):
     def resources(self, cls=None):
         """Return the list of all resources this node depends on.
 
-        The optional argument 'cls' allows restriction of the returned resources by their type
-        (class).
+        The optional argument 'cls' allows restriction of the returned
+        resources by their type (class).
 
         """
         resources = tuple(self._used_content_resources)
@@ -395,7 +396,8 @@ class ContentNode(object):
     def page_header(self, lang=None):
         """Return the page header content for given language.
 
-        The same rules as described for the method 'content()' apply here analogously.
+        The same rules as described for the method 'content()' apply here
+        analogously.
 
         """
         return self._variant(lang, 'page_header')
@@ -403,7 +405,8 @@ class ContentNode(object):
     def first_page_header(self, lang=None):
         """Return the first page header content for given language.
 
-        The same rules as described for the method 'content()' apply here analogously.
+        The same rules as described for the method 'content()' apply here
+        analogously.
 
         """
         return self._variant(lang, 'first_page_header') or self.page_header(lang)
@@ -411,7 +414,8 @@ class ContentNode(object):
     def page_footer(self, lang=None):
         """Return the page footer content for given language.
 
-        The same rules as described for the method 'content()' apply here analogously.
+        The same rules as described for the method 'content()' apply here
+        analogously.
 
         """
         return self._variant(lang, 'page_footer')
@@ -419,7 +423,8 @@ class ContentNode(object):
     def left_page_footer(self, lang=None):
         """Return the page footer content for left pages for given language.
 
-        The same rules as described for the method 'content()' apply here analogously.
+        The same rules as described for the method 'content()' apply here
+        analogously.
 
         """
         return self._variant(lang, 'left_page_footer') or self.page_footer(lang)
@@ -427,7 +432,8 @@ class ContentNode(object):
     def right_page_footer(self, lang=None):
         """Return the page footer content for right pages for given language.
 
-        The same rules as described for the method 'content()' apply here analogously.
+        The same rules as described for the method 'content()' apply here
+        analogously.
 
         """
         return self._variant(lang, 'right_page_footer') or self.page_footer(lang)
@@ -435,7 +441,8 @@ class ContentNode(object):
     def page_background(self, lang=None):
         """Return the page background content for given language.
 
-        The same rules as described for the method 'content()' apply here analogously.
+        The same rules as described for the method 'content()' apply here
+        analogously.
 
         """
         return self._variant(lang, 'page_background')
@@ -443,7 +450,8 @@ class ContentNode(object):
     def presentation(self, lang=None):
         """Return presentation of this node.
 
-        The same rules as described for the method 'content()' apply here analogously.
+        The same rules as described for the method 'content()' apply here
+        analogously.
 
         """
         return self._variant(lang, 'presentation')
