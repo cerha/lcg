@@ -919,9 +919,9 @@ class Context(object):
                           '/usr/share/fonts/truetype/ttf-dejavu',
                           '/usr/share/fonts/truetype/freefont',
                           '/Library/Fonts',
-                          os.getenv('HOME') + '/Library/Fonts'):
-            font_file = ('%s/%s%s%s%s.ttf' % (directory, name, family_name,
-                                              bold_name, italic_name,))
+                          '~/Library/Fonts'):
+            font_file = os.path.join(os.path.expanduser(directory),
+                                     '%s%s%s%s.ttf' % (name, family_name, bold_name, italic_name,))
             if os.access(font_file, os.R_OK):
                 break
         else:
