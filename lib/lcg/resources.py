@@ -314,7 +314,7 @@ class ResourceProvider(object):
         assert isinstance(dirs, (list, tuple)), dirs
         assert isinstance(resources, (list, tuple)), resources
         self._dirs = tuple(dirs)
-        lcgdir = os.environ.get('LCGDIR')
+        lcgdir = os.environ.get('LCGDIR', os.path.join(__file__, '..', '..', '..'))
         if lcgdir:
             self._dirs += (os.path.normpath(os.path.join(lcgdir, 'resources')),)
         self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
