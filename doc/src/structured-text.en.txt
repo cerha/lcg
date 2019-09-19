@@ -2,6 +2,9 @@
 # Copyright (c) 2005-2012 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
+# Note: The examples (surronded by ---- lines) are displayed in a fixed
+# width font with wrapping disabled.  Please, wrap all examples to 65
+# characters to prevent this document taking too much horizontal space.
 
 @parameter footer
 @center
@@ -130,13 +133,14 @@ description following immediately after the term.
 
 ------
 Learning Content Generator (LCG)
-  LCG is a software tool able to process structured textual and multimedia data
-  and produce an output presentation which is suitable for use in an on-line or
-  off-line learning environment.
+  LCG is a software tool able to process structured textual and
+  multimedia data and produce an output presentation which is
+  suitable for use in an on-line or off-line learning
+  environment.
 
 Wiking
-  Wiking is an accessible content management system written on top of the Pytis
-  toolkit and LCG.
+  Wiking is an accessible content management system written on
+  top of the Pytis toolkit and LCG.
 ------
 
 This will be presented as:
@@ -193,8 +197,10 @@ square brackets.
  * link to another document: [intro]
  * link to another section of the same document: [#bullet-lists]
  * with an explicit name: [#bullet-lists Bullets]
- * with a description (tooltip): [#bullet-lists Bullets | Using Bullet Lists]
- * external link: [http://www.freebsoft.org Free(b)soft laboratory]
+ * with a description (tooltip):
+   [#bullet-lists Bullets | Using Bullet Lists]
+ * external link:
+   [http://www.freebsoft.org Free(b)soft laboratory]
  * automatic link: http://www.gnu.org
  * email address: yourname@yourdomain.com
 -----
@@ -218,21 +224,29 @@ Links with an image in place of a link target display the image inline.  Links
 with an image instead of link label display an image which acts as a link.
 
 -----
- * simple image: [http://www.google.com/accounts/google_white.gif]
- * with ALT text: [http://www.google.com/accounts/google_white.gif Google logo]
- * image link: [http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png]
- * image link with label: [http://www.opensource.org
-   http://www.opensource.org/trademarks/open_source_button.png 
+ * simple image:
+   [http://www.google.com/accounts/google_white.gif]
+ * with ALT text:
+   [http://www.google.com/accounts/google_white.gif Google logo]
+ * simple image link: [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png]
+ * image link with label and description:
+   [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png
    OSI | Open Source Initiative]
 -----
 
 Resulting images:
 
- * simple image: [http://www.google.com/accounts/google_white.gif]
- * with ALT text: [http://www.google.com/accounts/google_white.gif Google logo]
- * simple image link: [http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png]
- * image link with label and description: [http://www.opensource.org
-   http://www.opensource.org/trademarks/open_source_button.png 
+ * simple image:
+   [http://www.google.com/accounts/google_white.gif]
+ * with ALT text:
+   [http://www.google.com/accounts/google_white.gif Google logo]
+ * simple image link: [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png]
+ * image link with label and description:
+   [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png
    OSI | Open Source Initiative]
 
 See [#images] and [#image-links] for more details.
@@ -315,14 +329,16 @@ of the equation signs determines the level.
 ------
  = Main Heading =
 
- Everything after the section heading belongs to this section, until another
- section heading is found.  Any number of paragraphs or other constructs can be
- used within the text of a section.
+ Everything after the section heading belongs to this section,
+ until another section heading is found.  Any number of
+ paragraphs or other constructs can be used within the text of a
+ section.
 
  == First Section ==
 
- Since the heading has more equation signs than the previous one, this section
- logically belongs to the previous section in the hierarchy.
+ Since the heading has more equation signs than the previous one,
+ this section logically belongs to the previous section in the
+ hierarchy.
 
  === Subsection of the First Section ===
 
@@ -427,61 +443,69 @@ period (or round brackets) instead of an asterisk.
 
 ------
  * General rules:
-   1. Longer item texts can be split over multiple lines, provided
-      that they are indented properly.
-   2. Tabs and spaces can be used for indentation, but tab is always considered
-      8 characters wide, so you may have problems when your editor sets the tab
-      width differently (then converting tabs to spaces is recommended).
+   1. Longer item texts can be split over multiple lines,
+      provided that they are indented properly.
+   2. Tabs and spaces can be used for indentation, but tab is
+      always considered 8 characters wide, so you may have
+      problems when your editor sets the tab width differently
+      (then converting tabs to spaces is recommended).
    3. A list item may contain one or more paragraphs of text.
-
-   4. Empty lines between the list items are optional and have no effect on the
-      output.  That's just a matter of your preference.
+   4. Empty lines between the list items are optional and have no
+      effect on the output.  That's just a matter of your
+      preference.
 
  * Rules for ordered lists:
-   0. The numbers in the source document are ignored, since the output numbers
-      are automatically generated.  Thus you are free to mark all items with
-      zero, for example, or you can use real order numbers if you prefer.
+   0. The numbers in the source document are ignored, since the
+      output numbers are automatically generated.  Thus you are
+      free to mark all items with zero, for example, or you can
+      use real order numbers if you prefer.
    0. You can also use letters for alphabetically ordered lists.
+
  * Intermixing different kinds of lists:
    a) There are basically three different kinds of lists:
       (1) unordered
       (2) numerically ordered
       (3) alpha-ordered
-   b) Whenever you switch from one kind to another (at the same indentation
-      level), the previous list is finished and ordering starts from the
-      beginning.
-   c. It does not matter, whether you use a dot or brackets in the source
-      text.  The output style of each list kind is given by the style sheet.
+   b) Whenever you switch from one kind to another (at the same
+      indentation level), the previous list is finished and
+      ordering starts from the beginning.
+   c. It does not matter, whether you use a dot or brackets in
+      the source text.  The output style of each list kind is
+      given by the style sheet.
 ------
 
 This will be presented as:
 
  * General rules:
-   1. Longer item texts can be split over multiple lines, provided
-      that they are indented properly.
-   2. Tabs and spaces can be used for indentation, but tab is always considered
-      8 characters wide, so you may have problems when your editor sets the tab
-      width differently (then converting tabs to spaces is recommended).
+   1. Longer item texts can be split over multiple lines,
+      provided that they are indented properly.
+   2. Tabs and spaces can be used for indentation, but tab is
+      always considered 8 characters wide, so you may have
+      problems when your editor sets the tab width differently
+      (then converting tabs to spaces is recommended).
    3. A list item may contain one or more paragraphs of text.
-
-   4. Empty lines between the list items are optional and have no effect on the
-      output.  That's just a matter of your preference.
+   4. Empty lines between the list items are optional and have no
+      effect on the output.  That's just a matter of your
+      preference.
 
  * Rules for ordered lists:
-   0. The numbers in the source document are ignored, since the output numbers
-      are automatically generated.  Thus you are free to mark all items with
-      zero, for example, or you can use real order numbers if you prefer.
+   0. The numbers in the source document are ignored, since the
+      output numbers are automatically generated.  Thus you are
+      free to mark all items with zero, for example, or you can
+      use real order numbers if you prefer.
    0. You can also use letters for alphabetically ordered lists.
+
  * Intermixing different kinds of lists:
    a) There are basically three different kinds of lists:
       (1) unordered
       (2) numerically ordered
       (3) alpha-ordered
-   b) Whenever you switch from one kind to another (at the same indentation
-      level), the previous list is finished and ordering starts from the
-      beginning.
-   c. It does not matter, whether you use a dot or brackets in the source
-      text.  The output style of each list kind is given by the style sheet.
+   b) Whenever you switch from one kind to another (at the same
+      indentation level), the previous list is finished and
+      ordering starts from the beginning.
+   c. It does not matter, whether you use a dot or brackets in
+      the source text.  The output style of each list kind is
+      given by the style sheet.
 
 
 ==== Definition Lists ==== definition-lists
@@ -494,24 +518,25 @@ by blank lines from each other.
 
 ------
 Term syntax
-   Definition term is a one line text immediately followed by a description.
+   Definition term is a one line text immediately followed by a
+   description.
 
-Description syntax 
-   Definition description follows immediately after the term and is indented by
-   one or more spaces.  Multiple lines are allowed as long as they are all
-   indented.
+Description syntax
+   Definition description follows immediately after the term and
+   is indented by one or more spaces.  Multiple lines are allowed
+   as long as they are all indented.
 ------
 
 This will be presented as:
 
 Term syntax
-   Definition term is a one line text immediately followed by a description.
+   Definition term is a one line text immediately followed by a
+   description.
 
-Description syntax 
-   Definition description follows immediately after the term and is indented by
-   one or more spaces.  Multiple lines are allowed as long as they are all
-   indented.
-
+Description syntax
+   Definition description follows immediately after the term and
+   is indented by one or more spaces.  Multiple lines are allowed
+   as long as they are all indented.
 
 
 ==== Field-Sets ==== field-sets
@@ -663,8 +688,8 @@ You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
 The source code for the paragraph above looks like:
 
 -----
-You can use /emphasized text/, *strong text*, _underlined text_, =fixed font=,
-/*or their _combinations_*/.
+You can use /emphasized text/, *strong text*, _underlined text_,
+=fixed font=, /*or their _combinations_*/.
 -----
 
 
@@ -723,7 +748,8 @@ Image
    - same document: [#anchors]
    - other document: [usage#run]
    - explicit label: [#links Using links in documents]
-   - description: [#links Links | Complete description of using links in LCG structured text]
+   - description: [#links Links | Complete description of using
+     links in LCG structured text]
  * External links:
    - [http://www.gnu.org GNU | Homepage of the GNU project]
 ------
@@ -735,7 +761,8 @@ Image
    - same document: [#anchors]
    - other document: [usage#run]
    - explicit label: [#links Using links in documents]
-   - description: [#links Links | Complete description of using links in LCG structured text]
+   - description: [#links Links | Complete description of using
+     links in LCG structured text]
  * External links:
    - [http://www.gnu.org GNU | Homepage of the GNU project]
 
@@ -748,12 +775,12 @@ give the link a more descriptive name.  Also e-mail addresses become links
 automatically.
 
 ------
-See GNU project homepage at http://www.gnu.org (contact bill@microsoft.com for
-more information).
+See GNU project homepage at http://www.gnu.org (contact
+bill@microsoft.com for more information).
 ------
 
-See GNU project homepage at http://www.gnu.org (contact bill@microsoft.com for
-more information).
+See GNU project homepage at http://www.gnu.org (contact
+bill@microsoft.com for more information).
 
 
 ==== Images ==== images
@@ -775,21 +802,23 @@ ALT text (see the example below).
 
 *Example:*
 ------
-[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | A handsome 
-GNU Head with typical beard and smart-looking curled horns]
+[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | A
+handsome GNU Head with typical beard and smart-looking curled
+horns]
 ------
 
-[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | A handsome 
-GNU Head with typical beard and smart-looking curled horns]
+[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | A
+handsome GNU Head with typical beard and smart-looking curled
+horns]
 
-[<http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg]
+[<http://www.opensource.org/trademarks/open_source_button.png]
 Images can be also aligned to the left or right side of the text which follows
 them.  Simply use a left or right angle bracket (less than or greater than
 sign) preceding the image name inside square brackets.  The OSI logo floating on
 the left side of this paragraph was written like this:
 
 ------
-[<http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg]
+[<http://www.opensource.org/trademarks/open_source_button.png]
 Images can be also aligned ...
 ------
 
@@ -802,10 +831,10 @@ The image size may be specified explicitly using a colon and width x height in
 pixels at the end of the image filename:
 
 ------
-[http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg:27x24]
+[http://www.gnu.org/graphics/heckert_gnu.small.png:24x24]
 ------
 
-[http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg:27x24]
+[http://www.gnu.org/graphics/heckert_gnu.small.png:24x24]
 
 ==== Image Links ==== image-links
 
@@ -816,8 +845,10 @@ URL) in place of the link label.  Textual link label (used for image accessible
 ALT text) and description (used for link tooltip) may follow in the usual form.
 
 ------
-[http://www.google.com http://www.google.com/accounts/google_white.gif]
-[http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png
+[http://www.google.com
+ http://www.google.com/accounts/google_white.gif]
+[http://www.opensource.org
+ http://www.opensource.org/trademarks/open_source_button.png
 OSI logo | Open Source Initiative]
 ------
 
@@ -976,19 +1007,21 @@ document by prefixing them with a backslash.
 *Example:*
 
 ------
-Slashes are used for /emphasizing/, however sometimes you want them \/like
-here\/.  Double backslash must be used to force the \\/backslash/ itself in
-front of a markup (anywhere else in the text, backslashes can be used freely).
-Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+Slashes are used for /emphasizing/, however sometimes you want
+them \/like here\/.  Double backslash must be used to force the
+\\/backslash/ itself in front of a markup (anywhere else in the
+text, backslashes can be used freely).  Other backslash
+combination examples: \*one* \\*two* \\\*three* \\\\*four*
 \\\\\*five*.
 ------
 
 This will be presented as:
 
-Slashes are used for /emphasizing/, however sometimes you want them \/like
-here\/.  Double backslash must be used to force the \\/backslash/ itself in
-front of a markup (anywhere else in the text, backslashes can be used freely).
-Other backslash combination examples: \*one* \\*two* \\\*three* \\\\*four*
+Slashes are used for /emphasizing/, however sometimes you want
+them \/like here\/.  Double backslash must be used to force the
+\\/backslash/ itself in front of a markup (anywhere else in the
+text, backslashes can be used freely).  Other backslash
+combination examples: \*one* \\*two* \\\*three* \\\\*four*
 \\\\\*five*.
 
 

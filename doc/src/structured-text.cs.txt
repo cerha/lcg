@@ -2,6 +2,9 @@
 # Copyright (c) 2005-2012 Brailcom, o.p.s.
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
+# Note: The examples (surronded by ---- lines) are displayed in a fixed
+# width font with wrapping disabled.  Please, wrap all examples to 65
+# characters to prevent this document taking too much horizontal space.
 
 @parameter footer
 @center
@@ -133,24 +136,29 @@ určitých termínů či názvů a k~nim se vztahujících podrobnějších vysv
 
 *Příklad:*
 ------
-Krkonošský národní park 
-  Krkonošský národní park se rozprostírá v~severovýchodní části Čech
-  při hranici s~Polskem.  Jeho rozloha je 54~969~ha a byl založen roku 1963.
+Krkonošský národní park
+  Krkonošský národní park se rozprostírá v~severovýchodní části
+  Čech při hranici s~Polskem.  Jeho rozloha je 54~969~ha a byl
+  založen roku 1963.
 
 Národní park Šumava
-  Národní park a chráněná krajinná oblast Šumava leží při jihozápadní hranici
-  České republiky se Spolkovou republikou Německo a Rakouskem.  NP byl založen
-  roku 1991 a jeho rozloha činí 69~030~ha.
+  Národní park a chráněná krajinná oblast Šumava leží při
+  jihozápadní hranici České republiky se Spolkovou republikou
+  Německo a Rakouskem.  NP byl založen roku 1991 a jeho rozloha
+  činí 69~030~ha.
+  
 ------
 
-Krkonošský národní park 
-  Krkonošský národní park se rozprostírá v~severovýchodní části Čech
-  při hranici s~Polskem.  Jeho rozloha je 54~969~ha a byl založen roku 1963.
+Krkonošský národní park
+  Krkonošský národní park se rozprostírá v~severovýchodní části
+  Čech při hranici s~Polskem.  Jeho rozloha je 54~969~ha a byl
+  založen roku 1963.
 
 Národní park Šumava
-  Národní park a chráněná krajinná oblast Šumava leží při jihozápadní hranici
-  České republiky se Spolkovou republikou Německo a Rakouskem.  NP byl založen
-  roku 1991 a jeho rozloha činí 69~030~ha.
+  Národní park a chráněná krajinná oblast Šumava leží při
+  jihozápadní hranici České republiky se Spolkovou republikou
+  Německo a Rakouskem.  NP byl založen roku 1991 a jeho rozloha
+  činí 69~030~ha.
 
 
 === Sledy položek ===
@@ -193,8 +201,10 @@ potřeba.
  * odkaz na jiný dokument: [intro]
  * odkaz na jinou kapitolu stejného dokumentu: [#bullet-lists]
  * s explicitním názvem: [#bullet-lists kapitola o odrážkách]
- * s popisem (bublina): [#bullet-lists odrážky | používání odrážkových seznamů]
- * externí odkaz: [http://www.freebsoft.org Free(b)soft laboratoř]
+ * s popisem (bublina):
+   [#bullet-lists odrážky | používání odrážkových seznamů]
+ * externí odkaz:
+   [http://www.freebsoft.org Free(b)soft laboratoř]
  * automatický odkaz: http://www.gnu.org
  * e-mailová adresa: vasejmeno@vasedomena.cz
 -----
@@ -204,8 +214,10 @@ Výsledné odkazy:
  * odkaz na jiný dokument: [intro]
  * odkaz na jinou kapitolu stejného dokumentu: [#bullet-lists]
  * s explicitním názvem: [#bullet-lists kapitola o odrážkách]
- * s popisem (bublina): [#bullet-lists odrážky | používání odrážkových seznamů]
- * externí odkaz: [http://www.freebsoft.org Free(b)soft laboratoř]
+ * s popisem (bublina):
+   [#bullet-lists odrážky | používání odrážkových seznamů]
+ * externí odkaz:
+   [http://www.freebsoft.org Free(b)soft laboratoř]
  * automatický odkaz: http://www.gnu.org
  * e-mailová adresa: vasejmeno@vasedomena.cz
 
@@ -219,12 +231,17 @@ dokumentu.  Odkazy, které mají obrázek na místě názvu odkazu se zobrazí j
 tento obrázek, ale nadále fungují jako odkaz.
 
 -----
- * jednoduchý obrázek: [http://www.google.com/accounts/google_white.gif]
- * s alternativním textem: [http://www.google.com/accounts/google_white.gif Google logo]
- * jednoduchý odkaz s obrázkem: [http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png]
- * odkaz s obrázkem, textem a popisem: [http://www.opensource.org
-   http://www.opensource.org/trademarks/open_source_button.png 
-   OSI | Open Source Iniciativa]
+ * jednoduchý obrázek:
+   [http://www.google.com/accounts/google_white.gif]
+ * s alternativním textem:
+   [http://www.google.com/accounts/google_white.gif Google logo]
+ * jednoduchý odkaz s obrázkem:
+   [http://www.opensource.org
+    http://www.opensource.org/trademarks/open_source_button.png]
+ * odkaz s obrázkem, textem a popisem:
+   [http://www.opensource.org
+    http://www.opensource.org/trademarks/open_source_button.png 
+    OSI | Open Source Iniciativa]
 -----
 
 Výsledné obrázky:
@@ -313,14 +330,14 @@ Počet rovnítek určuje úroveň kapitoly v rámci hierarchie.
 ------
  = Hlavní nadpis =
 
- Veškerý obsah následující za nadpisem patří do dané kapitoly, dokud není
- nalezen nadpis další kapitoly.  Zde může být použit libovolný počet odstavců
- nebo jakýchkoliv jiných konstrukcí.
+ Veškerý obsah následující za nadpisem patří do dané kapitoly,
+ dokud není nalezen nadpis další kapitoly.  Zde může být použit
+ libovolný počet odstavců nebo jakýchkoliv jiných konstrukcí.
 
  == První kapitola ==
 
- Protože tento nadpis má více rovnítek, jde o nadpis, který v rámci hierarchie
- logicky spadá do předchozí kapitoly.
+ Protože tento nadpis má více rovnítek, jde o nadpis, který v
+ rámci hierarchie logicky spadá do předchozí kapitoly.
 
  === Podkapitola první kapitoly ===
 
@@ -427,69 +444,78 @@ jsou označeny pořadovým číslem, nebo písmenem.
 
 ------
  * Obecná pravidla:
-   1. Delší text položky může být rozdělen na více řádků, pokud je zachováno
-      patřičné odsazení.
-   2. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
-      odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
-      tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
-      převod tabelátorů na mezery.
-   3. Položka seznamu může obsahovat jeden nebo více odstavců textu.
-      
-   4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný vliv na
-      výsledný dokument.  Jde čistě o vaši volbu.
+   1. Delší text položky může být rozdělen na více řádků, pokud
+      je zachováno patřičné odsazení.
+   2. Pro odsazení je možné použít tabelátory a mezery.  Jeden
+      tabelátor odpovídá osmi mezerám.  Pokud váš editor umožňuje
+      nastavit šířku tabelátoru, dbejte na to, aby byla nastavena
+      na 8, nebo si nastavte převod tabelátorů na mezery.
+   3. Položka seznamu může obsahovat jeden nebo více odstavců
+      textu.
+   4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný
+      vliv na výsledný dokument.  Jde čistě o vaši volbu.
 
  * Pravidla pro uspořádané seznamy:
-   0. Čísla ve zdrojovém textu dokumentu jsou ignorována.  Výstupní číslování
-      je prováděno automaticky.  Proto můžete například označit všechny položky
-      nulou.  I v tom případě budou výstupní položky číslovány od jedničky
-      vzestupně.  Tím vám odpadá starost o udržování správných hodnot čísel při
-      úpravách dokumentu.  Pokud však chcete, nic vám nebrání používat skutečná
-      pořadová čísla.
-   0. Namísto čísel můžete použít také písmena pro abecedně řazené seznamy.
+   0. Čísla ve zdrojovém textu dokumentu jsou ignorována.
+      Výstupní číslování je prováděno automaticky.  Proto můžete
+      například označit všechny položky nulou.  I v tom případě
+      budou výstupní položky číslovány od jedničky vzestupně.
+      Tím vám odpadá starost o udržování správných hodnot čísel
+      při úpravách dokumentu.  Pokud však chcete, nic vám nebrání
+      používat skutečná pořadová čísla.
+   0. Namísto čísel můžete použít také písmena pro abecedně
+      řazené seznamy.
  * Míchání různých typů seznamů:
    a) Existují v zásadě tři druhy seznamů:
       (1) neuspořádané (odrážkové)
       (2) číselně uspořádané
       (3) abecedně uspořádané
-   b) Kdykoliv přejdete z jednoho typu na jiný (v rámci stejné úrovně
-      odsazení), je předchozí seznam ukončen a pořadí je počítáno od počátku.
-   c. Nezáleží na tom, jestli pro uvození čísla či písmena používáte ve
-      zdrojovém textu tečku nebo kulaté závorky.  Způsob zobrazení seznamů ve
-      výstupním dokumentu je dán stylem.
+   b) Kdykoliv přejdete z jednoho typu na jiný (v rámci stejné
+      úrovně odsazení), je předchozí seznam ukončen a pořadí je
+      počítáno od počátku.
+   c. Nezáleží na tom, jestli pro uvození čísla či písmena
+      používáte ve zdrojovém textu tečku nebo kulaté závorky.
+      Způsob zobrazení seznamů ve výstupním dokumentu je dán
+      stylem.
+      
 ------
 
 Toto bude zobrazeno jako:
 
  * Obecná pravidla:
-   1. Delší text položky může být rozdělen na více řádků, pokud je zachováno
-      patřičné odsazení.
-   2. Pro odsazení je možné použít tabelátory a mezery.  Jeden tabelátor
-      odpovídá osmi mezerám.  Pokud váš editor umožňuje nastavit šířku
-      tabelátoru, dbejte na to, aby byla nastavena na 8, nebo si nastavte
-      převod tabelátorů na mezery.
-   3. Položka seznamu může obsahovat jeden nebo více odstavců textu.
-      
-   4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný vliv na
-      výsledný dokument.  Jde čistě o vaši volbu.
+   1. Delší text položky může být rozdělen na více řádků, pokud
+      je zachováno patřičné odsazení.
+   2. Pro odsazení je možné použít tabelátory a mezery.  Jeden
+      tabelátor odpovídá osmi mezerám.  Pokud váš editor umožňuje
+      nastavit šířku tabelátoru, dbejte na to, aby byla nastavena
+      na 8, nebo si nastavte převod tabelátorů na mezery.
+   3. Položka seznamu může obsahovat jeden nebo více odstavců
+      textu.
+   4. Prázdné řádky mezi položkami jsou možné, ale nemají žádný
+      vliv na výsledný dokument.  Jde čistě o vaši volbu.
 
  * Pravidla pro uspořádané seznamy:
-   0. Čísla ve zdrojovém textu dokumentu jsou ignorována.  Výstupní číslování
-      je prováděno automaticky.  Proto můžete například označit všechny položky
-      nulou.  I v tom případě budou výstupní položky číslovány od jedničky
-      vzestupně.  Tím vám odpadá starost o udržování správných hodnot čísel při
-      úpravách dokumentu.  Pokud však chcete, nic vám nebrání používat skutečná
-      pořadová čísla.
-   0. Namísto čísel můžete použít také písmena pro abecedně řazené seznamy.
+   0. Čísla ve zdrojovém textu dokumentu jsou ignorována.
+      Výstupní číslování je prováděno automaticky.  Proto můžete
+      například označit všechny položky nulou.  I v tom případě
+      budou výstupní položky číslovány od jedničky vzestupně.
+      Tím vám odpadá starost o udržování správných hodnot čísel
+      při úpravách dokumentu.  Pokud však chcete, nic vám nebrání
+      používat skutečná pořadová čísla.
+   0. Namísto čísel můžete použít také písmena pro abecedně
+      řazené seznamy.
  * Míchání různých typů seznamů:
    a) Existují v zásadě tři druhy seznamů:
       (1) neuspořádané (odrážkové)
       (2) číselně uspořádané
       (3) abecedně uspořádané
-   b) Kdykoliv přejdete z jednoho typu na jiný (v rámci stejné úrovně
-      odsazení), je předchozí seznam ukončen a pořadí je počítáno od počátku.
-   c. Nezáleží na tom, jestli pro uvození čísla či písmena používáte ve
-      zdrojovém textu tečku nebo kulaté závorky.  Způsob zobrazení seznamů ve
-      výstupním dokumentu je dán příslušným stylem.
+   b) Kdykoliv přejdete z jednoho typu na jiný (v rámci stejné
+      úrovně odsazení), je předchozí seznam ukončen a pořadí je
+      počítáno od počátku.
+   c. Nezáleží na tom, jestli pro uvození čísla či písmena
+      používáte ve zdrojovém textu tečku nebo kulaté závorky.
+      Způsob zobrazení seznamů ve výstupním dokumentu je dán
+      stylem.
 
 
 ==== Seznamy definic ==== definition-lists
@@ -506,25 +532,27 @@ víceřádkové, pokud jsou všechny řádky náležitě odsazeny.
 
 ------
 LCG (Learning Content Generator)
-  LCG je softwarový nástroj schopný zpracovat strukturovaná textová a
-  multimediální data a vyprodukovat jejich výstupní prezentaci vhodnou k
-  použití v on-line nebo off-line výukovém prostředí.
+  LCG je softwarový nástroj schopný zpracovat strukturovaná
+  textová a multimediální data a vyprodukovat jejich výstupní
+  prezentaci vhodnou k použití v on-line nebo off-line výukovém
+  prostředí.
 
 Wiking
-  Wiking je systém správy obsahu s vysokým stupňem zpřístupnění, který je
-  postaven nad databázovým toolkitem Pytis a LCG.
+  Wiking je systém správy obsahu s vysokým stupňem zpřístupnění,
+  který je postaven nad databázovým toolkitem Pytis a LCG.  
 ------
 
 Toto bude zobrazeno jako:
 
 LCG (Learning Content Generator)
-  LCG je softwarový nástroj schopný zpracovat strukturovaná textová a
-  multimediální data a vyprodukovat jejich výstupní prezentaci vhodnou k
-  použití v on-line nebo off-line výukovém prostředí.
+  LCG je softwarový nástroj schopný zpracovat strukturovaná
+  textová a multimediální data a vyprodukovat jejich výstupní
+  prezentaci vhodnou k použití v on-line nebo off-line výukovém
+  prostředí.
 
 Wiking
-  Wiking je systém správy obsahu s vysokým stupněm zpřístupnění, který je
-  postaven nad databázovým toolkitem Pytis a LCG.
+  Wiking je systém správy obsahu s vysokým stupněm zpřístupnění,
+  který je postaven nad databázovým toolkitem Pytis a LCG.
 
 
 ==== Sledy položek ==== field-sets
@@ -681,8 +709,9 @@ Můžete používat /zvýrazněný text/, *silně zvýrazněný text*, _podtrže
 Zdrojový text pro výše uvedený odstavec by vypadal následovně:
 
 -----
-Můžete používat /zvýrazněný text/, *silně zvýrazněný text*, _podtržený text_,
-=písmo s pevnou šířkou znaku=, /*nebo jejich _kombinace_*/.
+Můžete používat /zvýrazněný text/, *silně zvýrazněný text*,
+_podtržený text_, =písmo s pevnou šířkou znaku=, /*nebo jejich
+_kombinace_*/.
 -----
 
 
@@ -738,8 +767,10 @@ Obrázek
  * Místní kapitola:
    - stejný dokument: [#anchors]
    - jiný dokument: [usage#run]
-   - explicitní název: [#links Použití odkazů v dokumentech]
-   - popis: [#links Odkazy | Kompletní popis použití odkazů ve strukturovaném textu LCG]
+   - explicitní název:
+     [#links Použití odkazů v dokumentech]
+   - popis: [#links Odkazy | Kompletní popis použití odkazů
+     ve strukturovaném textu LCG]
  * Externí odkaz:
    - [http://www.gnu.org GNU | Domovská stránka GNU projektu]
 ------
@@ -751,7 +782,8 @@ Obrázek
    - stejný dokument: [#anchors]
    - jiný dokument: [usage#run]
    - explicitní název: [#links Použití odkazů v dokumentech]
-   - popis: [#links Odkazy | Kompletní popis použití odkazů ve strukturovaném textu LCG]
+   - popis: [#links Odkazy | Kompletní popis použití odkazů
+     ve strukturovaném textu LCG]
  * Externí odkaz:
    - [http://www.gnu.org GNU | Domovská stránka GNU projektu]
 
@@ -764,14 +796,15 @@ definovat explicitní název nebo popis odkazu.   Také e-mailové adresy jsou
 automaticky zobrazeny formou odkazu.
 
 ------
-Navštivte domovskou stránku projektu GNU na adrese http://www.gnu.org, případně 
-kontaktujte bill@microsoft.com pro více informací.
+Navštivte domovskou stránku projektu GNU na adrese
+http://www.gnu.org, případně kontaktujte bill@microsoft.com pro
+více informací.
 ------
 
 
 ==== Obrázky ==== images
 
-Obrázky jsou speciálním případem odkazů [#links].  Libovolný odkaz, jehož cílem
+Obrázky jsou speciálním případem [#links odkazů].  Libovolný odkaz, jehož cílem
 je obrázek bude automaticky zobrazen jako obrázek v těle dokumentu.  Obrázky
 jsou rozeznávány podle přípony.  Momentálně jsou podporovány obrázky typu JPEG,
 PNG a GIF.
@@ -789,8 +822,9 @@ obsažen (viz. příklad níže).
 
 *Příklad*:
 ------
-[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | Pohledná hlava
-pakoně s typickou bradkou a zatočenými rohy umocňujícími chytré vzezření]
+[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo |
+Pohledná hlava pakoně s typickou bradkou a zatočenými rohy
+umocňujícími chytré vzezření]
 ------
 
 [http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | Pohledná hlava
@@ -803,7 +837,7 @@ dokumentu následuje.  Jednoduše použijte znaménko „je menší“, resp. �
 Logo OSI po levé straně tohoto odstavce bylo zapsáno následovně:
 
 ------
-[<http://www.opensource.org/trademarks/opensource/web/opensource-55x48.jpg]
+[<http://www.opensource.org/trademarks/open_source_button.png]
 Obrázky mohou být také zarovnány ...
 ------
 
@@ -823,8 +857,10 @@ Textový název (použitý jako alternativní text) a popis (pro bublinovou
 nápovědu) mohou následovat v obvyklé formě.
 
 ------
-[http://www.google.com http://www.google.com/accounts/google_white.gif]
-[http://www.opensource.org http://www.opensource.org/trademarks/open_source_button.png
+[http://www.google.com
+ http://www.google.com/accounts/google_white.gif]
+[http://www.opensource.org
+ http://www.opensource.org/trademarks/open_source_button.png
 OSI logo | Open Source Iniciativa]
 ------
 
@@ -989,22 +1025,24 @@ potlačit pomocí zpětného lomítka.
 
 ------
 
-Lomítka jsou běžně používána pro /zvýraznění/, nicméně někdy chcete právě
-lomítka, jako \/např. zde\/.  Dvojité zpětné lomítko může být použito před
-řídícím znakem pokud skutečně chceme zobrazit právě \\/zpětné lomítko/
-(kdekoliv jinde v textu mohou být zpětná lomítka používána bez omezení).  Další
-příklady použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čtyři*
+Lomítka jsou běžně používána pro /zvýraznění/, nicméně někdy
+chcete právě lomítka, jako \/např. zde\/.  Dvojité zpětné lomítko
+může být použito před řídícím znakem pokud skutečně chceme
+zobrazit právě \\/zpětné lomítko/ (kdekoliv jinde v textu mohou
+být zpětná lomítka používána bez omezení).  Další příklady
+použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čtyři*
 \\\\\*pět*.
 
 ------
 
 Toto bude zobrazeno jako:
 
-Lomítka jsou běžně používána pro /zvýraznění/, nicméně někdy chcete právě
-lomítka, jako \/např. zde\/.  Dvojité zpětné lomítko může být použito před
-řídícím znakem pokud skutečně chceme zobrazit právě \\/zpětné lomítko/
-(kdekoliv jinde v textu mohou být zpětná lomítka používána bez omezení).  Další
-příklady použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čtyři*
+Lomítka jsou běžně používána pro /zvýraznění/, nicméně někdy
+chcete právě lomítka, jako \/např. zde\/.  Dvojité zpětné lomítko
+může být použito před řídícím znakem pokud skutečně chceme
+zobrazit právě \\/zpětné lomítko/ (kdekoliv jinde v textu mohou
+být zpětná lomítka používána bez omezení).  Další příklady
+použití zpětného lomítka: \*jedno* \\*dvě* \\\*tři* \\\\*čtyři*
 \\\\\*pět*.
 
 
