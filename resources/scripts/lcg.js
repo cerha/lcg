@@ -1355,7 +1355,7 @@ lcg.CollapsibleSection = Class.create(lcg.CollapsibleWidget, {
         if (backref) {
             backref.setAttribute('href', '');
         }
-        return heading
+        return heading;
     },
 
     _collapsible_content: function() {
