@@ -140,7 +140,7 @@ def main(argv, opt, args):
             die("You must specify the destination directory!")
     # Initialize translation and resource directories.
     translations = []
-    lcg_dir = os.environ.get('LCGDIR')
+    lcg_dir = os.environ.get('LCGDIR', os.path.join(__file__, '..'))
     if lcg_dir:
         translations.append(os.path.abspath(os.path.join(lcg_dir, 'translations')))
     if opt['translations']:
