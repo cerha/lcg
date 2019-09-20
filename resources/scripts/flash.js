@@ -1,5 +1,7 @@
-/* Copyright (C) 2009-2015 BRAILCOM, o.p.s.
- * Author: Tomas Cerha
+/* -*- coding: utf-8 -*-
+ *
+ * Copyright (C) 2009-2015 OUI Technology Ltd.
+ * Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

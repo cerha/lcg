@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2011-2016 BRAILCOM, o.p.s.
+# Copyright (C) 2011-2016 OUI Technology Ltd.
 # Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify

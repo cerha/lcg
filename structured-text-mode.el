@@ -1,6 +1,7 @@
 ;;; structured-text-mode.el -- Mode for editing LCG structured text files
 
-;; Copyright (C) 2006 Brailcom, o.p.s.
+;; Copyright (C) 2006 OUI Technology Ltd.
+;; Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
 
 ;; This file is not part of GNU Emacs.
 
@@ -44,11 +45,11 @@
 	  '(1 'font-lock-keyword-face)
 	  '(2 'font-lock-variable-name-face))
     ; TODO: the following regexps don't work on multiline text
-    (list "\\(?:\\W\\|^\\)\\*\\(\\S-\\(.*?\\S-\\)?\\)\\*\\W" 
+    (list "\\(?:\\W\\|^\\)\\*\\(\\S-\\(.*?\\S-\\)?\\)\\*\\W"
 	  1 'font-lock-function-name-face t) ; bold
-    (list "\\(?:\\W\\|^\\)/\\(\\S-\\(.*?\\S-\\)?\\)/\\W" 
+    (list "\\(?:\\W\\|^\\)/\\(\\S-\\(.*?\\S-\\)?\\)/\\W"
 	  1 'font-lock-comment-face t) ; italic
-    (list "\\(?:\\W\\|^\\)=\\(\\S-\\(.*?\\S-\\)?\\)=\\W" 
+    (list "\\(?:\\W\\|^\\)=\\(\\S-\\(.*?\\S-\\)?\\)=\\W"
 	  1 'font-lock-string-face) ; fixed font
     ))
   "Expressions to highlight in structured text.")

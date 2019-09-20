@@ -1,14 +1,14 @@
 # LCG translations
-# Copyright (C) 2005-2015 Brailcom, o.p.s.
+# Copyright (C) 2005-2015 OUI Technology Ltd.
+# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
 # This file is distributed under the same license as the LCG package.
-# Tomas Cerha <cerha@brailcom.org>, 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-10-17 10:31+0200\n"
-"PO-Revision-Date: 2019-10-17 10:32+0200\n"
+"PO-Revision-Date: 2019-11-19 20:50+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
 "Language: cs\n"
