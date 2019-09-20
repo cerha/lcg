@@ -1,5 +1,5 @@
 # eurochance translations
-# Copyright (C) 2005--2010 Brailcom, o.p.s.
+# Copyright (C) 2005--2010 OUI Technology Ltd.
 # This file is distributed under the GNU GPL v2 license or any later version"
 #
 msgid ""

@@ -1,5 +1,5 @@
 # Eurochance LCG Extension
-# Copyright (C) 2007-2009, Brailcom, o.p.s.
+# Copyright (C) 2007-2009, OUI Technology Ltd.
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2007.
 #

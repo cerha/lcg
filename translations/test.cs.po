@@ -1,5 +1,6 @@
 # Learning Content Generator test translations
-# Copyright (C) 2006-2008 Brailcom, o.p.s.
+# Copyright (C) 2006-2008 OUI Technology Ltd.
+# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2006.
 #
@@ -8,7 +9,7 @@ msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-06-28 17:34+0200\n"
-"PO-Revision-Date: 2019-06-28 19:16+0200\n"
+"PO-Revision-Date: 2019-09-20 14:04+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
 "Language: cs\n"
