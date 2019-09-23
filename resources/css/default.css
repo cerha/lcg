@@ -45,9 +45,10 @@ a.backref, a:link.backref {
 }
 
 #navigation, #top-navigation, #bottom-navigation {
-    border: solid #b8bcc0;
+    border: solid #c8ccd0;
     border-width: 1px 0;
     background: #e8ecf0;
+    padding: .3em 0;
 }
 #navigation span.separator, #top-navigation span.separator, #bottom-navigation span.separator {
     display: none;
@@ -87,8 +88,8 @@ table.lcg-table caption {
 }
 
 .lcg-preformatted-text {
-    background: #efffb8;
-    border: 1px solid #aaa;
+    background: #fff4C0;
+    border: 1px solid #dcc;
     margin: 1em 0;
     padding: 4px;
 }
