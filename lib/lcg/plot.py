@@ -79,9 +79,8 @@ class LinePlot(lcg.Content):
         for col, label in zip(df.columns, self._plot_labels or [None for x in df.columns]):
             ax.plot(df.index, getattr(df, col), label=label)
         if isinstance(df.index[0], datetime.date):
-            # Dates tend to take more space, so let's rotate them to avoid overlapping.
-            pyplot.subplots_adjust(bottom=0.2)
-            pyplot.setp(ax.get_xticklabels(), rotation=19, horizontalalignment='right')
+            # Automatically rotate date labels if necessary to avoid overlapping.
+            fig.autofmt_xdate()
         if self._title:
             pyplot.title(self._title)
         if self._xlabel:
