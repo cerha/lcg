@@ -79,6 +79,10 @@ class LinePlot(lcg.Content):
         for col, label in zip(df.columns, self._plot_labels or [None for x in df.columns]):
             ax.plot(df.index, getattr(df, col), label=label)
         if isinstance(df.index[0], datetime.date):
+            # Set locale specific date format.
+            import matplotlib.dates
+            formatter = matplotlib.dates.DateFormatter(context.locale_data().date_format)
+            ax.xaxis.set_major_formatter(formatter)
             # Automatically rotate date labels if necessary to avoid overlapping.
             fig.autofmt_xdate()
         if self._title:
