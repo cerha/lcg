@@ -83,6 +83,7 @@ class LinePlot(lcg.Content):
             self._major_grid, self._minor_grid = grid
         else:
             self._major_grid, self._minor_grid = grid, False
+        super(LinePlot, self).__init__()
 
     def export(self, context):
         g = context.generator()
