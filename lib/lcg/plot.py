@@ -38,7 +38,7 @@ class LinePlot(lcg.Content):
     """
 
     def __init__(self, data, size=(10, 6), title=None, xlabel=None, ylabel=None,
-                 plot_labels=None, annotate=False):
+                 plot_labels=None, annotate=False, grid=False):
         """Arguments:
 
           data: 'pandas.DataFrame' instance or a sequence of sequences
@@ -58,6 +58,14 @@ class LinePlot(lcg.Content):
             values in 'data'.
           annotate: If True, each plot point (x, y pair present in data) will
             be labeled by the y value directly within the plot.
+          grid: Controls grid lines.  May be True, to turn on the major grid or
+            False to turn it off (default).  May also be a tuple of two values
+            where the first value controls the major grid and the second value
+            controls the minor grid.  Major grid connects to labeled axis
+            values, minor grid provides finer subdivision.  Each value may also
+            be a dictionary defining matplotlib's Line2D properties, such as:
+            dict(color='#a0a0a0', linestyle=':', alpha=0.3).  Use with caution
+            to aviod dependency on specific matplotlib versions.
 
         """
         if not isinstance(data, pandas.DataFrame):
@@ -71,6 +79,10 @@ class LinePlot(lcg.Content):
         self._ylabel = ylabel
         self._plot_labels = plot_labels
         self._annotate = annotate
+        if isinstance(grid, tuple):
+            self._major_grid, self._minor_grid = grid
+        else:
+            self._major_grid, self._minor_grid = grid, False
 
     def export(self, context):
         g = context.generator()
@@ -98,6 +110,13 @@ class LinePlot(lcg.Content):
                 for i, value in enumerate(getattr(df, col)):
                     x = df.index[i]
                     ax.annotate(value, xy=(x, value), textcoords='data')
+        if self._major_grid:
+            kwargs = self._major_grid if isinstance(self._major_grid, dict) else dict(color='#dddddd')
+            pyplot.grid(b=True, which='major', **kwargs)
+        if self._minor_grid:
+            kwargs = self._minor_grid if isinstance(self._minor_grid, dict) else dict(color='#eeeeee')
+            pyplot.minorticks_on()
+            pyplot.grid(b=True, which='minor', **kwargs)
         f = io.StringIO()
         fig.savefig(f, format='svg')
         return g.noescape(f.getvalue())
