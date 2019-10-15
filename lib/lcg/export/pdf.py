@@ -21,6 +21,7 @@ import cStringIO
 import decimal
 import inspect
 import os
+import io
 import re
 import shutil
 import string
@@ -775,7 +776,8 @@ class Context(object):
 
     def __init__(self, parent_context=None, total_pages=0, first_page_header=None,
                  page_header=None, page_footer=None, page_background=None, presentation=None,
-                 presentation_set=None, page_size=None, lang=None):
+                 presentation_set=None, page_size=None, left_margin=None, right_margin=None,
+                 top_margin=None, bottom_margin=None, lang=None):
         self._lang = lang
         self._presentations = []
         self._tempdir = None
@@ -792,6 +794,10 @@ class Context(object):
         self._page_footer = page_footer
         self._page_background = page_background
         self._page_size = page_size
+        self._left_margin = left_margin
+        self._right_margin = right_margin
+        self._top_margin = top_margin
+        self._bottom_margin = bottom_margin
         self._presentation_set = presentation_set
         self._styled_presentations = []
         if parent_context is not None:
@@ -1312,6 +1318,22 @@ class Context(object):
     def page_size(self):
         "Return page width and height in points."
         return self._page_size
+
+    def left_margin(self):
+        "Return left page margin width in points."
+        return self._left_margin
+
+    def right_margin(self):
+        "Return right page margin width in points."
+        return self._right_margin
+
+    def top_margin(self):
+        "Return top page margin width in points."
+        return self._top_margin
+
+    def bottom_margin(self):
+        "Return bottom page margin width in points."
+        return self._bottom_margin
 
     def relative_font_size(self):
         """Return global font size coefficient."""
@@ -2355,6 +2377,34 @@ class Image(ImageBase):
         return result
 
 
+class SVGDrawing(Element):
+
+    def _export(self, context):
+        from svglib.svglib import svg2rlg
+        svg = self.svg
+        if 'Created with matplotlib' in svg[:200]:
+            factor = 1 / context.exporter().MATPLOTLIB_RESCALE_FACTOR
+        else:
+            factor = 1
+        drawing = svg2rlg(io.BytesIO(svg.encode('utf-8')))
+        page_width = context.pdf_context.page_size()[0]
+        if drawing.width * factor > page_width:
+            factor *= page_width / (drawing.width * factor)
+        drawing.scale(factor, factor)
+        drawing.width *= factor
+        drawing.height *= factor
+        # If the SVG is wider than page width, we scale it down to fit
+        # the page width, but it may still exceed to page margins.  The
+        # initial position aligns with the left margin so we need to
+        # shift it to the left in order to overlap equally on both
+        # sides.
+        width = page_width - context.pdf_context.left_margin() - context.pdf_context.right_margin()
+        overlap = drawing.width - width
+        if overlap > 0:
+            drawing.shift(-1 * overlap / 2.0, 0)
+        return drawing
+
+
 class TableCell(Container):
     """Table cell.
 
@@ -2629,6 +2679,24 @@ class PDFExporter(FileExporter, Exporter):
 
     _OUTPUT_FILE_EXT = 'pdf'
 
+    MATPLOTLIB_RESCALE_FACTOR = 1.5
+    """This trick helps to improve matplotlib plots in PDF output.
+
+    Matplotlib automatically determines the level of detail present in the plot
+    based on plot dimensions.  While this usually works fine in HTML output,
+    the result is not perfect in PDF output.  The printed plots seem to have
+    less detail than they deserve for given output size.  The fonts are too
+    big, the lines too thick, axes have too few labeled values etc.
+
+    This constant defines the scaling factor which tricks matplotlib to include
+    more details.  We enlarge the requested plot size passed to matplotlib by
+    given factor, matplotlib creates a plot of bigger dimmensions and then we
+    scale down the result by the same factor before embedding it into the final
+    PDF.  Thus the final plot size matches the requested size but the plot
+    includes more details.  It is a hack but it solves the problem.
+
+    """
+
     def _uri_section(self, context, section, local=False):
         # Force all section links to be local, since there is just one output document.
         return super(PDFExporter, self)._uri_section(context, section, local=True)
@@ -2755,6 +2823,10 @@ class PDFExporter(FileExporter, Exporter):
             return points
         page_size = (presentation_size('page_width', default=page_size[0]),
                      presentation_size('page_height', default=page_size[1]),)
+        left_margin = presentation_size('left_margin')
+        right_margin = presentation_size('right_margin')
+        top_margin = presentation_size('top_margin')
+        bottom_margin = presentation_size('bottom_margin')
         context.pdf_context = old_contexts[None] = pdf_context = \
             Context(total_pages=total_pages,
                     first_page_header=(node.first_page_header(lang) or page_header),
@@ -2762,6 +2834,10 @@ class PDFExporter(FileExporter, Exporter):
                     page_footer=node.page_footer(lang),
                     page_background=node.page_background(lang),
                     page_size=page_size,
+                    left_margin=left_margin,
+                    right_margin=right_margin,
+                    top_margin=top_margin,
+                    bottom_margin=bottom_margin,
                     presentation=node_presentation,
                     presentation_set=presentation_set,
                     lang=lang)
@@ -2794,6 +2870,10 @@ class PDFExporter(FileExporter, Exporter):
                         presentation=presentation,
                         presentation_set=context.presentation(),
                         page_size=page_size,
+                        left_margin=left_margin,
+                        right_margin=right_margin,
+                        top_margin=top_margin,
+                        bottom_margin=bottom_margin,
                         lang=lang)
             subcontext.pdf_context.add_presentation(n.presentation(lang))
             subcontext.pdf_context.heading_level = context_heading_level
@@ -2832,10 +2912,10 @@ class PDFExporter(FileExporter, Exporter):
             return ''
         output = cStringIO.StringIO()
         doc = DocTemplate(output, pagesize=page_size,
-                          leftMargin=presentation_size('left_margin'),
-                          rightMargin=presentation_size('right_margin'),
-                          topMargin=presentation_size('top_margin'),
-                          bottomMargin=presentation_size('bottom_margin'))
+                          leftMargin=left_margin,
+                          rightMargin=right_margin,
+                          topMargin=top_margin,
+                          bottomMargin=bottom_margin)
         while True:
             try:
                 doc.multi_build(document, context=first_subcontext)
@@ -3305,3 +3385,6 @@ class PDFExporter(FileExporter, Exporter):
             text = annotation or element.content()
             result = make_element(TextContainer, content=[make_element(Text, content=text)])
         return result
+
+    def _export_inline_svg(self, context, element):
+        return make_element(SVGDrawing, svg=element.svg(context))

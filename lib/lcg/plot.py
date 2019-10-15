@@ -23,7 +23,7 @@ from matplotlib import pyplot
 import pandas
 
 
-class LinePlot(lcg.Content):
+class LinePlot(lcg.InlineSVG):
     """Embedded line plot as 'lcg.Content' element.
 
     Line plot can be created based on input data passed as a sequence of x, y
@@ -83,12 +83,13 @@ class LinePlot(lcg.Content):
             self._major_grid, self._minor_grid = grid
         else:
             self._major_grid, self._minor_grid = grid, False
-        super(LinePlot, self).__init__()
+        super(LinePlot, self).__init__(self._svg)
 
-    def export(self, context):
-        g = context.generator()
+    def _svg(self, context):
         df = self._dataframe
-        fig, ax = pyplot.subplots(1, 1, figsize=self._size, sharex=True, sharey=True)
+        factor = context.exporter().MATPLOTLIB_RESCALE_FACTOR
+        size = [x * factor for x in self._size]
+        fig, ax = pyplot.subplots(1, 1, figsize=size, sharex=True, sharey=True)
         for col, label in zip(df.columns, self._plot_labels or [None for x in df.columns]):
             ax.plot(df.index, getattr(df, col), label=label)
         if isinstance(df.index[0], datetime.date):
@@ -120,4 +121,4 @@ class LinePlot(lcg.Content):
             pyplot.grid(b=True, which='minor', **kwargs)
         f = io.StringIO()
         fig.savefig(f, format='svg')
-        return g.noescape(f.getvalue())
+        return f.getvalue()

@@ -1393,6 +1393,9 @@ class HtmlExporter(lcg.Exporter):
             content = '<math xmlns="http://www.w3.org/1998/Math/MathML"' + content[5:]
         return self._generator.noescape(content)
 
+    def _export_inline_svg(self, context, element):
+        return self._generator.noescape(element.svg(context))
+
     def export_swf_object(self, context, filename, element_id, width, height, flashvars={},
                           min_flash_version=None, alternative_content=None, warning=None):
         """Export an arbitrary SWF object.

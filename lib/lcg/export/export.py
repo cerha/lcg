@@ -152,6 +152,9 @@ class Exporter(object):
     _HFILL = u'\ue001\ue001\ue001'
     _END_MARKER_CHAR = u'\n'
 
+    MATPLOTLIB_RESCALE_FACTOR = 1
+    """Hack to improve matplotlib output in PDF.  See 'PDFExporter.MATPLOTLIB_RESCALE_FACTOR'."""
+
     class Context(object):
         """Storage class containing complete data necessary for export.
 
@@ -404,6 +407,8 @@ class Exporter(object):
                 lcg.MathML: self._export_mathml,
                 lcg.Figure: self._export_figure,
                 lcg.Exercise: self._export_exercise,
+                lcg.Exercise: self._export_exercise,
+                lcg.InlineSVG: self._export_inline_svg,
                 }
 
     def _export(self, node, context, recursive=False):
@@ -1352,6 +1357,9 @@ class Exporter(object):
 
         """
         return element.content()
+
+    def _export_inline_svg(self, context, element):
+        return element.svg(context)
 
 
 class FileExporter(object):

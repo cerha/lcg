@@ -49,7 +49,7 @@ from .content import Content, Container, Strong, Emphasized, \
     HtmlContent, Heading, PreformattedText, Paragraph, ItemizedList, \
     DefinitionList, FieldSet, TableCell, TableHeading, TableRow, \
     Table, Section, TableOfContents, NodeIndex, RootIndex, NoneContent, \
-    SetVariable, Substitution, Figure, MathML, \
+    SetVariable, Substitution, Figure, MathML, InlineSVG, \
     coerce, join, link, dl, ul, ol, fieldset, p, sec, strong, em, u, \
     code, cite, container, br, hr, pre, abbr
 

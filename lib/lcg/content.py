@@ -1924,6 +1924,38 @@ class MathML(Content):
         return tree
 
 
+class InlineSVG(Content):
+    """Generic SVG content for inclusion in LCG documents.
+
+    SVG may be included in HTML and PDF backends.  Requires svglib when PDF
+    output is used.
+
+    """
+    def __init__(self, content, *args, **kwargs):
+        """Initialize the instance.
+
+        Arguments:
+
+          content -- the actual SVG content of this element as a string, bytes
+            or a function of one argument (exporter context).
+          *args -- additional positional arguments passed to the export
+            function (given in 'content').  No arguments are allowed when
+            'content' is a string.
+          **kwargs -- keyword arguments for parent class constructor.
+
+        """
+        assert isinstance(content, (str, bytes, collections.Callable)), content
+        self._content = content
+        self._export_args = args
+        super(InlineSVG, self).__init__(**kwargs)
+
+    def svg(self, context):
+        """Return the SVG content as a string."""
+        content = self._content
+        if isinstance(content, collections.Callable):
+            content = content(context)
+        return content
+
 # Convenience functions for simple content construction.
 
 def coerce(content, formatted=False):
