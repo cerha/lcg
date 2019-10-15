@@ -17,6 +17,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import base64
+import io
 import random
 import re
 import string
@@ -810,7 +812,17 @@ class HtmlExporter(lcg.Exporter):
     """Allow using back references from section titles to related TOC items (if TOC exists)."""
 
     def __init__(self, *args, **kwargs):
+        """Arguments:
+
+          sorted_attributes: set to True when deterministic attribute order in
+            HTML tags is needed (mostly useful for unit testing).
+          allow_svg: if True (the default), SVG content will be included in
+            HTML directly.  If False, SVG content will be converted to PNG and
+            embedded in HTML as an image (requires cairosvg to be installed).
+
+        """
         self._generator = self.Generator(sorted_attributes=kwargs.pop('sorted_attributes', False))
+        self._allow_svg = kwargs.pop('allow_svg', True)
         super(HtmlExporter, self).__init__(*args, **kwargs)
 
     def _title(self, context):
@@ -1394,7 +1406,15 @@ class HtmlExporter(lcg.Exporter):
         return self._generator.noescape(content)
 
     def _export_inline_svg(self, context, element):
-        return self._generator.noescape(element.svg(context))
+        svg = element.svg(context)
+        if self._allow_svg:
+            return self._generator.noescape(svg)
+        else:
+            import cairosvg
+            png = io.BytesIO()
+            cairosvg.svg2png(bytestring=svg.encode('utf-8'), write_to=png)
+            return self._generator.img(src='data:image/png;base64, ' +
+                                       base64.b64encode(png.getvalue()))
 
     def export_swf_object(self, context, filename, element_id, width, height, flashvars={},
                           min_flash_version=None, alternative_content=None, warning=None):
