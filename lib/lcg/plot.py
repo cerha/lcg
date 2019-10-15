@@ -37,7 +37,7 @@ class LinePlot(lcg.InlineSVG):
 
     """
 
-    def __init__(self, data, size=(10, 6), title=None, xlabel=None, ylabel=None,
+    def __init__(self, data, size=(250, 120), title=None, xlabel=None, ylabel=None,
                  plot_labels=None, annotate=False, grid=False):
         """Arguments:
 
@@ -48,7 +48,8 @@ class LinePlot(lcg.InlineSVG):
             be also more y values in each item.  In this case several
             lines will appear in the plot sharing the x coordinates and
             differing y coordinates.
-          size: total plot size as a pair of numerical values in inches.
+          size: total plot size as a pair of 'lcg.Unit' subclass instances or
+            numeric values which will be converted to 'lcg.UMm'.
           title: Title to be displayed above the plot as a string.
           xlabel: x axis label as a human readable string.
           ylabel: y axis label as a human readable string.
@@ -73,7 +74,7 @@ class LinePlot(lcg.InlineSVG):
                                     index=[x[0] for x in data],
                                     columns=['column%d' % n for n in range(len(data[0]) - 1)])
         self._dataframe = data
-        self._size = size
+        self._size = [x if isinstance(x, lcg.Unit) else lcg.UMm(x) for x in size]
         self._title = title
         self._xlabel = xlabel
         self._ylabel = ylabel
@@ -88,7 +89,7 @@ class LinePlot(lcg.InlineSVG):
     def _svg(self, context):
         df = self._dataframe
         factor = context.exporter().MATPLOTLIB_RESCALE_FACTOR
-        size = [x * factor for x in self._size]
+        size = [x.size() * factor / 25.4 for x in self._size]
         fig, ax = pyplot.subplots(1, 1, figsize=size, sharex=True, sharey=True)
         for col, label in zip(df.columns, self._plot_labels or [None for x in df.columns]):
             ax.plot(df.index, getattr(df, col), label=label)
