@@ -2302,6 +2302,10 @@ class InlineImage(ImageBase, Text):
             return ''
         filename = image.src_file()
         if not filename:
+            content = image.get()
+            if content:
+                filename = io.BytesIO(content)
+        if not filename:
             filename = self.filename
         if filename:
             align = self.align
@@ -2366,6 +2370,10 @@ class Image(ImageBase):
             dummy_comment = [make_element(Text, content='[image]')]
             return make_element(Paragraph, content=dummy_comment).export(context)
         filename = image.src_file()
+        if not filename:
+            content = image.get()
+            if content:
+                filename = io.BytesIO(content)
         if not filename:
             filename = self.filename
         if filename:
