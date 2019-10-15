@@ -114,10 +114,12 @@ class LinePlot(lcg.InlineSVG):
                     x = df.index[i]
                     ax.annotate(value, xy=(x, value), textcoords='data')
         if self._major_grid:
-            kwargs = self._major_grid if isinstance(self._major_grid, dict) else dict(color='#dddddd')
+            kwargs = (self._major_grid if isinstance(self._major_grid, dict)
+                      else dict(color='#dddddd'))
             pyplot.grid(b=True, which='major', **kwargs)
         if self._minor_grid:
-            kwargs = self._minor_grid if isinstance(self._minor_grid, dict) else dict(color='#eeeeee')
+            kwargs = (self._minor_grid if isinstance(self._minor_grid, dict)
+                      else dict(color='#eeeeee'))
             pyplot.minorticks_on()
             pyplot.grid(b=True, which='minor', **kwargs)
         f = io.StringIO()
