@@ -196,11 +196,11 @@ class DecimalFormatter(LocalizingFormatter):
 
     _UNITS = tuple(reversed((
         # Translators: Abbreviation for a million (10 ** 6).
-        (10 ** 6, ("mil.")),
+        (10 ** 6, _("mil.")),
         # Translators: Abbreviation for a billion (10 ** 9).
-        (10 ** 9, ("bil.")),
+        (10 ** 9, _("bil.")),
         # Translators: Abbreviation for a trillion (10 ** 12).
-        (10 ** 12, ("tril.")),
+        (10 ** 12, _("tril.")),
     )))
     _LOCALIZABLE = lcg.Decimal
 
@@ -268,6 +268,7 @@ def _test_formatter(formatter, pairs):
     for number, formatted in pairs:
         assert formatter(context, number, 0).replace(u'\xa0', ' ') == formatted
 
+
 def test_decimal_formatter():
     _test_formatter(lcg.plot.DecimalFormatter(), (
         (1.0, '1'),
@@ -277,12 +278,14 @@ def test_decimal_formatter():
         (4234500000000, '4,234,500,000,000'),
     ))
 
+
 def test_decimal_formatter_with_precision():
     _test_formatter(lcg.plot.DecimalFormatter(precision=3), (
         (1.0, '1.000'),
         (3.4, '3.400'),
         (1200, '1,200.000'),
     ))
+
 
 def test_abbreviating_monetary_formatter():
     _test_formatter(lcg.plot.MonetaryFormatter(abbreviate=True), (
