@@ -654,9 +654,11 @@ class LocalizableDateTime(Localizable):
             result = weekday + ' ' + result
         if self._is_datetime:
             timezone = localizer.timezone() or data.default_timezone
+            # TODO: Add tests for corner cases, such as all (dt.tzinfo, timezone,
+            # self._show_time) combinations (in their existence or nonexistence).
+            if dt.tzinfo and timezone:
+                dt = dt.astimezone(timezone)
             if self._show_time:
-                if dt.tzinfo and timezone:
-                    dt = dt.astimezone(timezone)
                 time_format = (self._show_seconds and data.exact_time_format or data.time_format)
                 result += ' ' + dt.strftime(time_format)
             if not timezone and dt.tzinfo:
