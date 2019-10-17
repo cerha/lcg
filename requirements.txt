@@ -2,6 +2,12 @@
 matplotlib
 pandas
 
+# To enable syntax highlighting of PreformattedText in HTML output.
+pygments
+
+# When scaling images for PDF and EPUB output.
+pillow
+
 # When using PDF output.
 reportlab
 
@@ -10,3 +16,7 @@ svglib
 
 # When exporting plots to HTML with conversion to PNG (allow_svg=False)
 cairosvg==0.5
+
+# When using Braille output.
+# Commented out because it is not as simple as pip install...
+# louis
