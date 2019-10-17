@@ -205,6 +205,17 @@ class DecimalFormatter(LocalizingFormatter):
     _LOCALIZABLE = lcg.Decimal
 
     def __init__(self, abbreviate=False, precision=None):
+        """Arguments:
+
+          abbreviate: iff True, the trailing zeros in large numbers will be
+            abbreviated to "mil.", "bil." or "tril." if possible.  See class
+            docstring for details.
+          precision: if not None, all numbers will have given number of digits
+            after the decimal point.  If None, the decimal point is only
+            present when there are any non-zero digits.  Note that it must be
+            None in order to allow 'abbreviate' to work.
+
+        """
         self._abbreviate = abbreviate
         self._precision = precision
 
