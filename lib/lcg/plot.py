@@ -22,6 +22,7 @@ import lcg
 from matplotlib import pyplot
 import matplotlib.ticker
 import matplotlib.dates
+import os
 import pandas
 
 _ = lcg.TranslatableTextFactory('lcg')
@@ -262,9 +263,11 @@ class MonetaryFormatter(DecimalFormatter):
 # TODO: This belongs to test.py in the python3 branch, but we temporarily
 # keep it here until python3 is merged to master to prevent merge conflicts.
 
-def _test_formatter(formatter, pairs):
-    exporter = lcg.HtmlExporter()
-    context = exporter.context(None, 'en')
+def _test_formatter(formatter, pairs, lang='en'):
+    lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
+    translation_path = [os.path.join(lcg_dir, 'translations')]
+    exporter = lcg.HtmlExporter(translations=translation_path)
+    context = exporter.context(None, lang)
     for number, formatted in pairs:
         assert formatter(context, number, 0).replace(u'\xa0', ' ') == formatted
 
@@ -304,3 +307,10 @@ def test_abbreviating_monetary_formatter():
         (4123400000000, '4,123.400 bil.'),
         (5 * 10 ** 12, '5 tril.'),
     ))
+
+def test_translated_abbreviations():
+    _test_formatter(lcg.plot.MonetaryFormatter(abbreviate=True), (
+        (1340000, '1,34 mil.'),
+        (2500000000, '2,5 mld.'),
+        (3100000000000, '3,1 bil.'),
+    ), lang='cs')
