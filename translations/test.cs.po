@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-06-28 17:34+0200\n"
+"POT-Creation-Date: 2019-10-17 10:29+0200\n"
 "PO-Revision-Date: 2019-06-28 19:16+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
@@ -17,35 +17,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 
-#: ../lib/lcg/_test.py:110
+#: ../lib/lcg/_test.py:110 ../lib/lcg/_test.py:120
 #, python-format
 msgid "His name is \"%s\""
 msgstr "Jmenuje se \"%s\""
 
-#: ../lib/lcg/_test.py:111
+#: ../lib/lcg/_test.py:110 ../lib/lcg/_test.py:113 ../lib/lcg/_test.py:120
+#: ../lib/lcg/_test.py:124 ../lib/lcg/_test.py:373
 msgid "Bob"
 msgstr "Bobik"
 
-#: ../lib/lcg/_test.py:111
+#: ../lib/lcg/_test.py:113 ../lib/lcg/_test.py:124 ../lib/lcg/_test.py:373
 msgid "Joe"
 msgstr "Pepa"
 
-#: ../lib/lcg/_test.py:140
+#: ../lib/lcg/_test.py:138
+msgctxt "dont translete this msg"
+msgid "untranslated"
+msgstr ""
+
+#: ../lib/lcg/_test.py:139
 msgctxt "verb"
 msgid "force"
 msgstr "donutit"
 
-#: ../lib/lcg/_test.py:141
+#: ../lib/lcg/_test.py:140
 msgctxt "noun"
 msgid "force"
 msgstr "síla"
 
-#: ../lib/lcg/_test.py:178
+#: ../lib/lcg/_test.py:177
 #, python-format
 msgid "post #%s"
 msgstr "příspěvek #%s"
 
-#: ../lib/lcg/_test.py:196 ../lib/lcg/_test.py:215
+#: ../lib/lcg/_test.py:195 ../lib/lcg/_test.py:214
 #, python-format
 msgid "I have %d problem."
 msgid_plural "I have %d problems."
@@ -53,7 +59,7 @@ msgstr[0] "Mám %d problém."
 msgstr[1] "Mám %d problémy."
 msgstr[2] "Mám %d problémů."
 
-#: ../lib/lcg/_test.py:205 ../lib/lcg/_test.py:220
+#: ../lib/lcg/_test.py:204 ../lib/lcg/_test.py:219
 #, python-format
 msgid "%(n)d record found in table %(name)s."
 msgid_plural "%(n)d records found in table %(name)s."

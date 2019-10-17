@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-06-28 17:34+0200\n"
+"POT-Creation-Date: 2019-10-17 10:31+0200\n"
 "PO-Revision-Date: 2010-03-07 20:40+0100\n"
 "Last-Translator: Petr Topiarz <topiarz@post.cz>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
@@ -16,7 +16,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../lib/lcg/resources.py:324
+#. Abbreviation for a million (10 ** 6).
+#: ../lib/lcg/plot.py:200
+msgid "mil."
+msgstr ""
+
+#. Abbreviation for a billion (10 ** 9).
+#: ../lib/lcg/plot.py:202
+msgid "bil."
+msgstr ""
+
+#. Abbreviation for a trillion (10 ** 12).
+#: ../lib/lcg/plot.py:204
+msgid "tril."
+msgstr ""
+
+#: ../lib/lcg/resources.py:341
 #, python-format
 msgid "Resource file not found: %(filename)s %(search_path)s"
 msgstr ""
@@ -1773,20 +1788,20 @@ msgstr "Kas"
 msgid "Dec"
 msgstr "Ara"
 
-#: ../lib/lcg/widgets.py:246
+#: ../lib/lcg/widgets.py:247
 msgid "Expand"
 msgstr ""
 
-#: ../lib/lcg/widgets.py:246
+#: ../lib/lcg/widgets.py:247
 msgid "Collapse"
 msgstr ""
 
-#: ../lib/lcg/widgets.py:393
+#: ../lib/lcg/widgets.py:394
 #, python-format
 msgid "Close menu %s"
 msgstr ""
 
-#: ../lib/lcg/widgets.py:394
+#: ../lib/lcg/widgets.py:395
 msgid "Close menu"
 msgstr ""
 
@@ -1815,92 +1830,92 @@ msgstr ""
 msgid "The table is read across facing pages."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1403
+#: ../lib/lcg/export/export.py:1411
 #, python-format
 msgid "%s: file created."
 msgstr ""
 
-#: ../lib/lcg/export/export.py:1409
+#: ../lib/lcg/export/export.py:1417
 #, python-format
 msgid "%s: file copied."
 msgstr ""
 
-#: ../lib/lcg/export/html.py:901
+#: ../lib/lcg/export/html.py:913
 msgid "Choose your language:"
 msgstr "Dil seçiniz:"
 
-#: ../lib/lcg/export/html.py:1355
+#: ../lib/lcg/export/html.py:1377
 msgid "Video"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1426
+#: ../lib/lcg/export/html.py:1459
 msgid ""
 "Get SWFObject v2.1 from http://code.google.com/p/swfobject/ and put "
 "swfobject.js to your resource path."
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1454
+#: ../lib/lcg/export/html.py:1487
 #, python-format
 msgid "Get %(plugin)s %(version)s or later."
 msgstr "Eklenti alın %(plugin)s %(version)s veya sonra."
 
-#: ../lib/lcg/export/html.py:1456
+#: ../lib/lcg/export/html.py:1489
 msgid "Use a JavaScript enabled browser."
 msgstr "JavaScript etkin tarayıcısı kullanınız."
 
-#: ../lib/lcg/export/html.py:1457 ../lib/lcg/export/html.py:1459
+#: ../lib/lcg/export/html.py:1490 ../lib/lcg/export/html.py:1492
 msgid "Warning:"
 msgstr "Uyarı:"
 
-#: ../lib/lcg/export/html.py:1483
+#: ../lib/lcg/export/html.py:1516
 msgid "Play"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1483
+#: ../lib/lcg/export/html.py:1516
 msgid "Pause"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1484
+#: ../lib/lcg/export/html.py:1517
 msgid "Rewind"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1485
+#: ../lib/lcg/export/html.py:1518
 msgid "Fast Forward"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1492 ../lib/lcg/export/html.py:1493
+#: ../lib/lcg/export/html.py:1525 ../lib/lcg/export/html.py:1526
 msgid "Current position"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1496 ../lib/lcg/export/html.py:1497
+#: ../lib/lcg/export/html.py:1529 ../lib/lcg/export/html.py:1530
 msgid "Remaining time"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1498
+#: ../lib/lcg/export/html.py:1531
 msgid "Total time"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1504
+#: ../lib/lcg/export/html.py:1537
 msgid "Volume"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1508
+#: ../lib/lcg/export/html.py:1541
 msgid "Volume Down"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1509
+#: ../lib/lcg/export/html.py:1542
 msgid "Volume Up"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1516
+#: ../lib/lcg/export/html.py:1549
 msgid "Player"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1519
+#: ../lib/lcg/export/html.py:1552
 msgid "Update Required:"
 msgstr ""
 
-#: ../lib/lcg/export/html.py:1522
+#: ../lib/lcg/export/html.py:1555
 #, python-format
 msgid ""
 "To play audio you will need to either update your browser to a recent "
@@ -1910,34 +1925,34 @@ msgstr ""
 #. Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next:
 #. None".
-#: ../lib/lcg/export/html.py:1709
+#: ../lib/lcg/export/html.py:1742
 msgid "None"
 msgstr "Hiçbiri"
 
-#: ../lib/lcg/export/html.py:1711
+#: ../lib/lcg/export/html.py:1744
 msgid "You are here:"
 msgstr "Buradasınız:"
 
 #. Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1715
+#: ../lib/lcg/export/html.py:1748
 msgid "Next"
 msgstr "Sonraki"
 
 #. Label of a link to the next page in sequential navigation.
-#: ../lib/lcg/export/html.py:1717
+#: ../lib/lcg/export/html.py:1750
 msgid "Previous"
 msgstr "Önceki"
 
-#: ../lib/lcg/export/pdf.py:2279 ../lib/lcg/export/pdf.py:2343
+#: ../lib/lcg/export/pdf.py:2301 ../lib/lcg/export/pdf.py:2369
 #, python-format
 msgid "Missing image: %s"
 msgstr ""
 
-#: ../lib/lcg/export/pdf.py:2856
+#: ../lib/lcg/export/pdf.py:2944
 msgid "Page content extremely large, giving up"
 msgstr ""
 
-#: ../lib/lcg/export/pdf.py:2858
+#: ../lib/lcg/export/pdf.py:2946
 #, python-format
 msgid "Page content too large, reducing it by %s"
 msgstr ""
