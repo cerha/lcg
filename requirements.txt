@@ -1,0 +1,12 @@
+# When using lcg.plot 
+matplotlib
+pandas
+
+# When using PDF output.
+reportlab
+
+# When exporting plots to PDF.
+svglib
+
+# When exporting plots to HTML with conversion to PNG (allow_svg=False)
+cairosvg==0.5
