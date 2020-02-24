@@ -1243,7 +1243,7 @@ class Exporter(object):
             if text:
                 def make_field(answer, label, word_start, word_end):
                     return word_start + field_maker(context, task, answer) + word_end
-                text = task.substitute_fields(text.replace('[', '\['), make_field)
+                text = task.substitute_fields(text.replace('[', r'\['), make_field)
                 content = lcg.Parser().parse_inline_markup(text)
                 text = context.localize(content.export(context))
             else:

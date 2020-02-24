@@ -389,7 +389,7 @@ class _FillInExerciseExporter(ExerciseExporter):
                 return g.span(g.noescape(word_start + field + word_end), cls='nowrap')
             else:
                 return field
-        text = task.text().replace('[', '\[')
+        text = task.text().replace('[', r'\[')
         if text:
             content = lcg.Parser().parse_inline_markup(text)
             html = context.localize(content.export(context))
@@ -506,7 +506,7 @@ class ModelClozeExporter(ClozeExporter):
                     return field
 
             def export_task(task):
-                text = task.text().replace('[', '\[')
+                text = task.text().replace('[', r'\[')
                 if text:
                     content = lcg.Parser().parse_inline_markup(text)
                     html = context.localize(content.export(context))
