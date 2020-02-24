@@ -1,6 +1,6 @@
 # LCG test translations
 # Copyright (C) 2006-2008 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 # This file is distributed under the same license as the LCG package.
 #
 msgid ""
@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-10-17 10:29+0200\n"
-"PO-Revision-Date: 2019-12-04 15:53+0100\n"
+"PO-Revision-Date: 2020-02-24 22:29+0100\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
 "Language: cs\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 
 #: ../lib/lcg/_test.py:110 ../lib/lcg/_test.py:120
-#, python-format, fuzzy
+#, python-format
 msgid "His name is \"%s\""
 msgstr "Jmenuje se \"%s\""
 
