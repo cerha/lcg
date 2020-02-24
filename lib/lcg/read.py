@@ -157,7 +157,8 @@ class FileReader(Reader):
 
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
         assert isinstance(dir, basestring), dir
-        assert encoding is None or isinstance(encoding, unistr) and codecs.lookup(encoding), encoding
+        assert encoding is None or isinstance(encoding, unistr) and codecs.lookup(encoding), \
+            encoding
         self._dir = os.path.normpath(dir)
         super(FileReader, self).__init__(id, **kwargs)
         if not encoding and self._parent and isinstance(self._parent, FileReader):

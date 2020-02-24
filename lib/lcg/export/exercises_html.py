@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -235,8 +235,8 @@ class _ChoiceBasedExerciseExporter(ExerciseExporter):
             checked = self._checked(context, exercise, exercise_id, task, i)
             # Disable only the unchecked fields in the read-only mode.  This makes the selection
             # unchangable in practice and has also the advantage that the checked fields can be
-            # navigated, which is even better than using the `readonly' attribute (which doesn't work
-            # in browsers anyway).
+            # navigated, which is even better than using the `readonly' attribute (which doesn't
+            # work in browsers anyway).
             disabled = self._readonly(context) and not checked
             ctrl = g.radio(task_name, id=choice_id, value=i,
                            cls='answer-control', checked=checked, disabled=disabled)

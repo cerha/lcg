@@ -824,7 +824,7 @@ class Exporter(object):
             except Exception:
                 dictionary = None
                 break
-            gif callable(value):
+            if callable(value):
                 value = value()
                 # It is necessary to store the computed value in order to
                 # prevent repeated object initializations in it.  Otherwise it
