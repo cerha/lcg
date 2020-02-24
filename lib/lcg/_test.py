@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1069,17 +1069,11 @@ class HtmlExport(unittest.TestCase):
         assert g.a('x', name='a') == '<a name="a">x</a>'
         assert g.button('X', disabled=True) == '<button disabled="disabled">X</button>'
         # Testing backwards compatibility of deprecated select() arguemnts.
-        assert g.select('a', options=(('X', 'x'), ('Y', 'y'))) == (
-            u'<select name="a"><option value="x">X</option>'
-            u'<option value="y">Y</option></select>')
-        assert g.select('a', options=(('X', 'x', False, 'c'), ('Y', 'y', True, 'cc'))) == (
-            u'<select name="a"><option class="c" disabled="disabled" value="x">X</option>'
-            u'<option class="cc" value="y">Y</option></select>')
-        assert g.select('a', (('aa', (('X', 'x'), ('Y', 'y'))), ('bb', (('Z', 'z'),)))) == (
-            u'<select name="a"><optgroup label="aa"><option value="x">X</option>'
-            u'<option value="y">Y</option></optgroup>'
-            u'<optgroup label="bb"><option value="z">Z</option>'
-            u'</optgroup></select>')
+        assert g.select([], name='a') == u'<select name="a"></select>'
+        assert g.option('X', value='x') == u'<option value="x">X</option>'
+        assert g.option('X', value='x', disabled=True, cls='c') == (
+            u'<option class="c" disabled="disabled" value="x">X</option>')
+        assert g.optgroup([], label='aa') == '<optgroup label="aa"></optgroup>'
 
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
