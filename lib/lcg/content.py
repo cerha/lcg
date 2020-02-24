@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ import sys
 import copy
 import re
 import lcg
-import collections
+
 
 _ = lcg.TranslatableTextFactory('lcg')
 
@@ -1138,7 +1138,7 @@ class HtmlContent(Content):
           kwargs -- keyword arguments for parent class constructor.
 
         """
-        assert isinstance(content, (basestring, collections.Callable)), content
+        assert isinstance(content, basestring) or callable(content), content
         self._content = content
         self._export_args = args
         super(HtmlContent, self).__init__(**kwargs)
@@ -1961,7 +1961,7 @@ class InlineSVG(Content):
           **kwargs -- keyword arguments for parent class constructor.
 
         """
-        assert isinstance(content, (str, bytes, collections.Callable)), content
+        assert isinstance(content, (str, bytes)) or callable(content), content
         self._content = content
         self._export_args = args
         super(InlineSVG, self).__init__(**kwargs)
@@ -1969,7 +1969,7 @@ class InlineSVG(Content):
     def svg(self, context):
         """Return the SVG content as a string."""
         content = self._content
-        if isinstance(content, collections.Callable):
+        if callable(content):
             content = content(context)
         return content
 

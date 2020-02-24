@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015, 2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ from __future__ import unicode_literals
 from __future__ import print_function
 import lcg
 
-import collections
 import datetime
 import operator
 import os
@@ -373,7 +372,7 @@ class TranslatableText(Localizable):
         assert isinstance(_domain, basestring) or _domain is None, _domain
         assert isinstance(_origin, basestring), _origin
         assert _context is None or isinstance(_context, basestring), _context
-        assert _interpolate is None or isinstance(_interpolate, collections.Callable), _interpolate
+        assert _interpolate is None or callable(_interpolate), _interpolate
         assert escape_html is None or isinstance(escape_html, bool), escape_html
         self._orig_text = _orig_text or self._text
         self._domain = _domain

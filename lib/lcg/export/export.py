@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2016 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ from __future__ import division
 from builtins import range
 from past.utils import old_div
 
-import collections
 from contextlib import contextmanager
 import os
 import re
@@ -224,7 +223,7 @@ class Exporter(object):
             self._lang = lang
             self._sec_lang = sec_lang
             if log is not None:
-                assert isinstance(log, collections.Callable)
+                assert callable(log)
                 self._messages = None
                 self._log = log
             else:
@@ -825,7 +824,7 @@ class Exporter(object):
             except Exception:
                 dictionary = None
                 break
-            if isinstance(value, collections.Callable):
+            gif callable(value):
                 value = value()
                 # It is necessary to store the computed value in order to
                 # prevent repeated object initializations in it.  Otherwise it

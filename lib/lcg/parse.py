@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ from builtins import chr
 from builtins import map
 from builtins import range
 
-import collections
 import copy
 import html.parser
 import html.entities
@@ -1530,7 +1529,7 @@ class HTMLProcessor(object):
                             if not regexp.match(value + '$'):
                                 return False
                         return True
-                elif isinstance(test, collections.Callable):
+                elif callable(test):
                     test_function = test
                 else:
                     raise Exception("Invalid matcher test specification", test)
