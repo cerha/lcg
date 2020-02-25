@@ -1,5 +1,8 @@
 .PHONY: translations doc test
 
+export LCGDIR=.
+export PYTHONPATH="./lib:$$PYTHONPATH"
+
 all: compile translations
 
 compile:
@@ -14,13 +17,13 @@ extract:
 	make -C translations extract
 
 doc:
-	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" bin/lcgmake.py doc/src doc/html
+	bin/lcgmake.py doc/src doc/html
 
 test:
 	python -m pytest lib/lcg/test.py
 
 coverage:
-	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" coverage run --source=lib/lcg -m pytest lib/lcg/test.py
+	coverage run --source=lib/lcg -m pytest lib/lcg/test.py
 	coverage report
 
 deps-dev:
