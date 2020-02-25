@@ -20,7 +20,7 @@ test:
 	python -m pytest lib/lcg/test.py
 
 coverage:
-	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" coverage run --source=lib/lcg lib/lcg/test.py
+	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" coverage run --source=lib/lcg -m pytest lib/lcg/test.py
 	coverage report
 
 deps-dev:
