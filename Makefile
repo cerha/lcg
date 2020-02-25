@@ -17,10 +17,10 @@ doc:
 	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" bin/lcgmake.py doc/src doc/html
 
 test:
-	python -m pytest lib/lcg/_test.py
+	python -m pytest lib/lcg/test.py
 
 coverage:
-	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" coverage run --source=lib/lcg lib/lcg/_test.py
+	LCGDIR=. PYTHONPATH="./lib:${PYTHONPATH}" coverage run --source=lib/lcg lib/lcg/test.py
 	coverage report
 
 deps-dev:
