@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2008-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1377,7 +1377,7 @@ class Context(object):
           note -- the note, string
 
         """
-        assert isinstance(note, unistr)
+        assert isinstance(note, basestring)
         self._export_notes.append(note)
 
     def pop_export_note(self):
@@ -1548,7 +1548,7 @@ class Text(Element):
             # shouldn't touch the original object unless needed, otherwise the
             # mysterious Context.localize method may stop produce texts from
             # symbolic labels.
-            if not isinstance(self.content, unistr):
+            if not isinstance(self.content, basestring):
                 self.content = unistr(self.content)
 
     def _export(self, context):
@@ -1606,7 +1606,7 @@ class SimpleMarkup(Text):
     attributes = {}
 
     def init(self):
-        assert isinstance(self.content, unistr), ('type error', self.content,)
+        assert isinstance(self.content, basestring), ('type error', self.content,)
 
     def _export(self, context):
         mark = self.content
@@ -1690,7 +1690,7 @@ class MarkedText(TextContainer):
 
     def init(self):
         super(MarkedText, self).init()
-        assert isinstance(self.tag, unistr), ('type error', self.tag,)
+        assert isinstance(self.tag, basestring), ('type error', self.tag,)
         assert isinstance(self.attributes, dict)
 
     def export(self, context):
@@ -2271,7 +2271,7 @@ class ImageBase(Element):
             ('type error', self.filename,)
         assert self.width is None or isinstance(self.width, lcg.Unit), self.width
         assert self.height is None or isinstance(self.height, lcg.Unit), self.height
-        assert self.align is None or isinstance(self.align, unistr), self.align
+        assert self.align is None or isinstance(self.align, basestring), self.align
 
     def _size(self, context, filename):
         style = context.pdf_context.style()
@@ -2548,18 +2548,18 @@ class Table(Element):
                     # ReportLab can't take anything as a cell content, let's prepare for it
 
                     def simplify(exported_column):
-                        if isinstance(exported_column, unistr):
+                        if isinstance(exported_column, basestring):
                             result = unistr(exported_column)
                         elif isinstance(exported_column, (tuple, list)):
                             exported_column = [simplify(x) for x in exported_column]
                             if len(exported_column) == 1:
                                 result = exported_column[0]
-                            elif all(isinstance(x, unistr) for x in exported_column):
+                            elif all(isinstance(x, basestring) for x in exported_column):
                                 result = ' '.join(exported_column)
                             else:
                                 result = []
                                 for x in exported_column:
-                                    if isinstance(x, unistr):
+                                    if isinstance(x, basestring):
                                         para = make_element(Paragraph, content=[Text(content=x)])
                                         x = para.export(context)
                                     result.append(x)

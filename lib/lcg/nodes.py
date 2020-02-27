@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -305,7 +305,7 @@ class ContentNode(object):
           top -- iff true, set the value in the top node
 
         """
-        assert isinstance(name, unistr), name
+        assert isinstance(name, basestring), name
         assert isinstance(value, lcg.Content), value
         node = self
         if top:

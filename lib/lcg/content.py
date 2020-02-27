@@ -507,7 +507,7 @@ class TextContent(Content):
           kwargs -- keyword arguments for parent class constructor.
 
         """
-        assert isinstance(text, unistr), text
+        assert isinstance(text, basestring), text
         super(TextContent, self).__init__(**kwargs)
         self._text = text
 
@@ -2004,7 +2004,7 @@ def coerce(content, formatted=False):
                     item = coerce(item, formatted=formatted)
                 items.append(item)
         return container(items)
-    elif isinstance(content, unistr):
+    elif isinstance(content, basestring):
         if formatted:
             from lcg import Parser
             return Parser().parse_inline_markup(content)

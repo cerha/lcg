@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2011-2016 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -595,7 +595,7 @@ class StyleFile(object):
                         str_value = 'yes'
                     else:
                         str_value = 'no'
-                elif isinstance(value, unistr):
+                elif isinstance(value, basestring):
                     str_value = value
                 elif isinstance(value, float):
                     str_value = str(value)

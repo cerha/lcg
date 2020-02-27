@@ -215,7 +215,7 @@ class Processor(object):
         The result is dependent on particular 'Processor' class.
 
         """
-        assert isinstance(data, unistr), data
+        assert isinstance(data, basestring), data
         tree = self.Parser().lcg_parse(data)
         return self.Transformer().transform(tree)
 

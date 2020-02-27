@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,10 +99,10 @@ class Resource(object):
 
         """
         super(Resource, self).__init__()
-        assert isinstance(filename, unistr), filename
-        assert title is None or isinstance(title, unistr), title
-        assert descr is None or isinstance(descr, unistr), descr
-        assert uri is None or isinstance(uri, unistr), uri
+        assert isinstance(filename, basestring), filename
+        assert title is None or isinstance(title, basestring), title
+        assert descr is None or isinstance(descr, basestring), descr
+        assert uri is None or isinstance(uri, basestring), uri
         assert src_file is None or isinstance(src_file, basestring), src_file
         assert content is None or isinstance(content, bytes) or hasattr(content, 'read'), content
         self._filename = filename
