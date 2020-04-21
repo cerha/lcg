@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2010-2016 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,6 +64,9 @@ class Unit(object):
         @return: True iff the size is non-zero.
         """
         return self._size != 0
+
+    # Just for Python 2 compatibility.
+    __nonzero__ = __bool__
 
     def __add__(self, size):
         """

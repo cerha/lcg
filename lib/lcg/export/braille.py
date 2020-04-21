@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2012-2015 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -136,6 +136,9 @@ class _Braille(object):
 
     def __bool__(self):
         return not not self._text
+
+    # Just for Python 2 compatibility.
+    __nonzero__ = __bool__
 
     def __add__(self, braille):
         return _Braille(self.text() + braille.text(), self.hyphenation() + braille.hyphenation())
