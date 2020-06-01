@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -97,8 +97,10 @@ except (ImportError, OSError):
 try:
     from .export import pdf  # For backwards compatibility
     from .export.pdf import PDFExporter
-except ImportError:
-    pass
+except ImportError as e:
+    class PDFExporter:
+        def __init__(self, *args, **kwargs):
+            raise e
 
 from .parse import ProcessingError, Parser, MacroParser, HTMLProcessor, \
     html2lcg, add_processing_info
