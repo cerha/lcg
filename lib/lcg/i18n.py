@@ -625,7 +625,7 @@ class LocalizableDateTime(Localizable):
                 is_datetime = False
         else:
             is_datetime = isinstance(dt, datetime.datetime)
-            assert is_datetime or isinstance(dt, datetime.date)
+            assert is_datetime or isinstance(dt, datetime.date), dt
             if is_datetime and not dt.tzinfo and utc:
                 dt = dt.replace(tzinfo=self._UTC_TZ)
         self._datetime = dt
