@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2018 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -301,6 +301,9 @@ class HtmlGenerator(object):
 
     def div(self, content, **kwargs):
         return self._tag('div', content, kwargs)
+
+    def template(self, content, **kwargs):
+        return self._tag('template', content, kwargs)
 
     def section(self, content, **kwargs):
         return self._tag('section', content, kwargs)

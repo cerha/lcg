@@ -272,7 +272,10 @@ class FoldableTree(Widget, lcg.Content):
             # the clickable folding controls (if the item is foldable).
             items = [item(child) for child in node.children() if not child.hidden()]
             if items:
-                return g.ul(items, cls='level-%d' % len(node.path()))
+                # Add empty <template> tag to work around JavaScript SlideDown effect
+                # bug which slides the first element strangely (<template> is one of
+                # the few other permitted elements inside <ul>).
+                return g.ul([g.template('')] + items, cls='level-%d' % len(node.path()))
             else:
                 return g.escape('')
         return menu(self._node or current.root())
