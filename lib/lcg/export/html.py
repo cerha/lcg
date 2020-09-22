@@ -242,13 +242,17 @@ class HtmlGenerator(object):
         """
         uri = urllib.parse.quote(base.encode('utf-8'))
         if args and isinstance(args[0], basestring):
-            uri += '#' + urllib.parse.quote(unistr(args[0]).encode('utf-8'))
+            anchor = urllib.parse.quote(unistr(args[0]).encode('utf-8'))
             args = args[1:]
+        else:
+            anchor = None
 
         query = ';'.join([k + '=' + urllib.parse.quote(unistr(v).encode('utf-8'))
                           for k, v in args + tuple(kwargs.items()) if v is not None])
         if query:
             uri += '?' + query
+        if anchor:
+            uri += '#' + anchor
         return uri
 
     def escape(self, text):
