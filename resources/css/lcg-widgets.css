@@ -14,7 +14,7 @@
 .foldable-tree-widget ul ul {
     padding: 0 0 0 13px;
 }
-.foldable-tree-widget li { 
+.foldable-tree-widget li {
     width: 100%;
     padding: 0;
     position: relative;
@@ -84,7 +84,7 @@
     background-position: -68px -16px;
 }
 .foldable-tree-widget .expander .label {
-    /* Hide the label from the screen and leave it present for VoiceOver, but work around 
+    /* Hide the label from the screen and leave it present for VoiceOver, but work around
        VO scrolling the expander when VO cursor moves over it. (as with text-indent) */
     display: block;
     width: 1px;
@@ -124,30 +124,38 @@
     margin: 1.6em 0 1em 0;
     padding: 0;
     border-bottom: solid #777 1px;
+    display: block;
 }
 .notebook-widget li.notebook-tab {
-    display: inline;
+    display: inline-block;
     margin: 0 0 0 4px;
     padding: 0;
+    line-height: 2em;
+    height: 2em;
+    box-sizing: border-box;
 }
 .notebook-widget li.notebook-tab a {
-    display: inline-block;
     position: relative;
-    top: 1px;
+    top: -1px;
+    display: inline-block;
     border-radius: 4px 4px 0 0;
     border: solid #777 1px;
     border-bottom: none;
-    padding: .2em .7em 1px .7em;
+    padding: 0 .7em;
     background-color: #ddd;
     color: #000;
     font-size: 1.1em;
     font-weight: bold;
     white-space: nowrap;
     text-decoration: none;
+    outline: none;
+}
+.notebook-widget li.notebook-tab a:focus {
+    outline: rgba(0, 0, 0, .3) dotted 1px;
 }
 .notebook-widget li.notebook-tab a.current {
-    padding-bottom: 2px;
     background-color: #fff;
+    padding-bottom: 1px;
 }
 
 /* Popup menu & Dropdown selection widget */
@@ -292,7 +300,7 @@
     display: inline-block;
     width: 12px;
     height: 12px;
-    background: url(lcg-icons.png) -13px -16px no-repeat; 
+    background: url(lcg-icons.png) -13px -16px no-repeat;
 }
 .collapsible-pane-widget .collapsible-pane-heading,
 .collapsible-section-widget .collapsible-section-heading,
@@ -475,5 +483,3 @@
 .audio-player-widget .volume-up span {
     background-position: -52px -32px;
 }
-
-
