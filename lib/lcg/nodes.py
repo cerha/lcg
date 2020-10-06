@@ -78,7 +78,7 @@ class ContentNode(object):
           active -- a boolean flag indicating, that this node is active.  Usage
             of this flag may be application specific and there is currently no
             difference in behavior of LCG in respect to this flag, except for
-            marking the links by css class 'inactive' on export.
+            marking the items by css class 'inactive' on export.
           foldable -- iff true, the node's submenu will be presented as a
             foldable in foldable tree presentations which support it.
           resource_provider -- a 'ResourceProvider' instance or None.
