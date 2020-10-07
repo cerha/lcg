@@ -1,8 +1,0 @@
-Learning Content Generator
-
-LCG documentation is included in the package.  To generate the HTML version run
-"make doc" within the package root directory.
-
-See the file INSTALL for installation instructions.
-
-See the project homepage http://www.freebsoft.org/lcg for more information.
