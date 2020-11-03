@@ -1,57 +1,32 @@
 LCG Installation Instructions
+=============================
 
-Dependencies:
+LCG is a pure Python library running on Python 2.7 or Python 3.5 or later.  It
+can be used directly from the checked out tree.  You need to:
 
-  * Python 2.6 or later 2.x.
+  * Add the `lib` subdirectory to PYTHONPATH.
+  * Run `make` after each checkout to update generated files.
+  * Create a Python virtual environment and install required packages as
+    described below.
 
-  * To use the PDF output, you also need:
-    - Python module `reportlab',
-    - Fontconfig (the package name in Debian is `fontconfig'),
-    - the default font `Freefont' if you don't specify another font explicitly.
-      (the package is ttf-freefont in Debian and fonts-freefont-ttf in Ubuntu)
+All needed Python packages are defined in the file requirements.txt.
+Some of the dependencies are optional and you may wish to edit the file
+according to the features you are going to use (such as PDF or Braille output).
+To install them run the following command in your virtual environment:
 
-  * To use the Braille output, you also need:
-    - Python module `louise' (for liblouise 2.5.4)
+```
+$ pip install -r requirements.txt
+```
 
-The currently supported model of using LCG is running it directly out of the
-checked out tree, being able to check out a newer version at any time and using
-this new version right away.  The provided Makefile will update the generated
-files after checking out new versions of source files, so you need to run
-'make' after each checkout.  LCG is a pure Python library so the setup is quite
-simple.  Two typical use cases are described below.
+When using PDF output, you additionally need Fontconfig (the package
+`fontconfig` in Debian) and the default font Freefont (the package
+`ttf-freefont` in Debian and `fonts-freefont-ttf` in Ubuntu)
 
-WIKING WEB APPLICATIONS
+To use lcgmake.py you may also need to add the `bin` subdirectory to your PATH
+and set the environment variable LCGDIR to the directory where you checked out
+LCG.
 
-LCG is often used in web applications in combination with Pytis and Wiking
-which use the same approach and their versions typically need to be
-synchronized.  You will need to setup the web application to find LCG's `lib'
-subdirectory in its Python path and set the following Wiking configuration
-options:
-  - `resource_path' to include the LCG's `resources' subdirectory
-  - `translation_path' to include the `translations' subdirectory
-  - `doc_dirs' to map `lcg' to `doc/src' subdirectory
-
-STANDALONE USAGE
-
-To use LCG as a standalone program, you need too setup your environment to find
-LCG.  Let's suppose that you have unpacked LCG to `/home/bob/lcg':
-
-  1. Create or update the generated files from the source files (this step can
-     be omitted if you downloaded an LCG release package).
-
-     $ make all
-
-  2. Tell Python where to find the libraries:
-
-     $ export PYTHONPATH=/home/bob/lcg/lib:$PYTHONPATH
-
-  3. Tell LCG where to find its data:
-
-     $ export LCGDIR=/home/bob/lcg
-
-  4. If you need to use LCG executables, such as `lcgmake.py', use their full
-     path, link them manually somewhere to your PATH or setup your PATH to
-     include the LCG's `bin' subdirectory:
-     	     
-     $ export PATH=/home/bob/lcg/bin:$PATH
-
+```
+$ export PATH=~/git/lcg/bin:$PATH
+$ export LCGDIR=~/git/lcg
+```
