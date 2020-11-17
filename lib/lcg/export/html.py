@@ -497,7 +497,8 @@ class HtmlGenerator(object):
         return self._tag('input', None, dict(kwargs, type=type), paired=False,
                          allow=('type', 'name', 'value', 'size', 'maxlength', 'autocomplete',
                                 'autofocus', 'onclick', 'onmousedown', 'onmouseup', 'onkeydown',
-                                'onkeypress', 'onchange', 'readonly', 'disabled', 'checked'))
+                                'onkeypress', 'onchange', 'readonly', 'disabled', 'checked',
+                                'multiple'))
 
     def field(self, value='', name='', size=20, password=False, cls=None, **kwargs):
         # Deprecated!  Use 'input()' instead.
