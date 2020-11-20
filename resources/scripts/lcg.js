@@ -744,7 +744,8 @@ lcg.PopupMenuBase = Class.create(lcg.Menu, {
         this._popup_element = element;
         var menu = this.element;
         var selected_item;
-        if (selected_item_index !== undefined && selected_item_index !== null) {
+        if (selected_item_index !== undefined && selected_item_index !== null
+            && selected_item_index !== -1) {
             selected_item = menu.down('ul').childElements()[selected_item_index].down('a');
         } else {
             selected_item = menu.down('a');
