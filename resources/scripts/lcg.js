@@ -1024,8 +1024,17 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
         if (menu.empty()) {
             this.create();
         }
-        var offset = menu.parentNode.cumulativeOffset();
+        var offset = element.cumulativeOffset();
+        var scroll_offset = document.viewport.getScrollOffsets();
+        var viewport = document.viewport.getDimensions();
         var x, y;
+        var direction;
+        if (offset.top + element.getHeight() + menu.getHeight() > scroll_offset.top + viewport.height
+            && offset.top > menu.getHeight()) {
+            direction = 'up';
+        } else {
+            direction = 'down';
+        }
         if (event && (event.isLeftClick() || event.isRightClick())) {
             // Math.min limits the pointer position to the boundary of the
             // element invoking the menu, because VoiceOver emits click events
@@ -1035,19 +1044,14 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
             menu.removeClassName('keyboard-navigated');
         } else {
             x = 0;
-            y = element.getHeight();
+            y = direction === 'up' ? 0 : element.getHeight();
             menu.addClassName('keyboard-navigated');
         }
-        var viewport = document.viewport.getDimensions();
-        var scroll_offset = document.viewport.getScrollOffsets();
+        var correction = offset.relativeTo(element.getOffsetParent().cumulativeOffset());
+        x += correction.left;
+        y += correction.top;
         if (offset.left + x + menu.getWidth() > viewport.width + scroll_offset.left) {
             x -= menu.getWidth();
-        }
-        var direction;
-        if (offset.top + y + menu.getHeight() > viewport.height + scroll_offset.top) {
-            direction = 'up';
-        } else {
-            direction = 'down';
         }
         this._ignore_next_click = event && !event.isLeftClick();
         $super(element, x, y, direction, selected_item_index);
