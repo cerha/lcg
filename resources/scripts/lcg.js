@@ -868,6 +868,16 @@ lcg.PopupMenu = Class.create(lcg.PopupMenuBase, {
         this._close_button_label = close_button_label;
     },
 
+    update: function (items) {
+        this.items = items;
+        if (!this.element.empty()) {
+            this.element.descendants().each(function (element) {
+                Event.stopObserving(element);
+            });
+            this.element.update();
+        }
+    },
+
     create: function () {
         /* Create and initialize menu HTML elements.
          *
