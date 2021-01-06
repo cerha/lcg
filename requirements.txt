@@ -15,7 +15,7 @@ reportlab
 svglib
 
 # When exporting plots to HTML with conversion to PNG (allow_svg=False)
-cairosvg==0.5
+cairosvg==2.5.1
 
 # When using Braille output.
 # Commented out because it is not as simple as pip install...
