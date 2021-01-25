@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2008-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -2585,7 +2585,7 @@ class Table(Element):
             if presentation.separator_height:
                 size = self._unit2points(presentation.separator_height, style)
                 table_style_data.append(('LINEBELOW', (0, 0), (-1, -1), size, black,))
-            if header_row_p and presentation.header_separator_height is not None:
+            if header_row_p and presentation.header_separator_height:
                 size = self._unit2points(presentation.header_separator_height, style)
                 table_style_data.append(('LINEBELOW', (0, 0), (-1, 0), size, black,))
             elif presentation.separator_height:
