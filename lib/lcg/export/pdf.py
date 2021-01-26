@@ -21,6 +21,7 @@ from __future__ import division
 from __future__ import absolute_import
 from future import standard_library
 from builtins import range
+from past.builtins import long
 from past.utils import old_div
 
 import copy
