@@ -3280,7 +3280,7 @@ class PDFExporter(FileExporter, Exporter):
             else:
                 content += exported.content
         return make_element(Table, content=content,
-                            long=element.long(), compact=False,
+                            long=element.long(), compact=element.compact(),
                             column_widths=element.column_widths(),
                             bars=element.bars(),
                             halign=element.halign(),

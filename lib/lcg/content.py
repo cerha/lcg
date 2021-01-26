@@ -1342,7 +1342,7 @@ class Table(Container):
     _ALLOWED_CONTENT = (TableRow, HorizontalSeparator,)
 
     def __init__(self, content, title=None, long=False, column_widths=None, bars=(),
-                 transformations=('facing', 'transpose',), **kwargs):
+                 compact=False, transformations=('facing', 'transpose',), **kwargs):
         """Arguments:
 
           content -- sequence of 'TableRow' and 'HorizontalSeparator' instances
@@ -1363,6 +1363,9 @@ class Table(Container):
             before the first column is numbered 0, the next position is 1 and
             the position after the last column is numbered N where N is the
             number of columns in the table.
+          compact -- If True, suppress default padding in all table cells
+            (including headings).  Use containers to add custom padding.  Only
+            implemented in PDF output.
           transformations -- permitted table transformations; currently used
             only in Braille backend.  It's a sequence containing any of the
             following strings: 'facing' (table may be spread across facing
@@ -1376,10 +1379,12 @@ class Table(Container):
         assert isinstance(long, bool), long
         assert column_widths is None or isinstance(column_widths, (tuple, list)), column_widths
         assert isinstance(bars, (tuple, list)), bars
+        assert isinstance(compact, bool), compact
         self._title = title
         self._long = long
         self._column_widths = column_widths
         self._bars = bars
+        self._compact = compact
         self._transformations = transformations
         super(Table, self).__init__(content, **kwargs)
 
@@ -1402,6 +1407,10 @@ class Table(Container):
 
         """
         return self._bars
+
+    def compact(self):
+        """Return the value of 'compact' passed to the constructor."""
+        return self._compact
 
     def transformations(self):
         """Return the value of 'transformations' as passed to the constructor."""
