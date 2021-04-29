@@ -26,6 +26,7 @@ from past.utils import old_div
 
 import copy
 import decimal
+import functools
 import io
 import inspect
 import os
@@ -418,7 +419,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 # size.  This allows us to compute the relative sizes from the space
                 # remaining after all fixed sized siblings are counted.
                 if self._total_fixed_length is None:
-                    self._total_fixed_length = reduce(
+                    self._total_fixed_length = functools.reduce(
                         lambda size, c: size + fixed_length(c, length_index),
                         self._box_content, 0
                     )
