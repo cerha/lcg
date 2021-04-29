@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019, 2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import os
 import glob
 import sys
 import lcg
+import functools
 
 _ = lcg.TranslatableTextFactory('lcg')
 
@@ -321,12 +322,14 @@ class ResourceProvider(object):
         super(ResourceProvider, self).__init__(**kwargs)
 
     def _resource(self, filename, searchdir, warn):
-        dirs = list(self._dirs)
+        dirs = self._dirs
         cls = Resource.subclass(filename)
         if cls.SUBDIR:
-            dirs = [os.path.join(dir, cls.SUBDIR) for dir in self._dirs] + dirs
+            dirs = tuple(functools.reduce(
+                lambda a, b: a + b, ((os.path.join(dir, cls.SUBDIR), dir) for dir in dirs), ()
+            ))
         if searchdir is not None:
-            dirs.insert(0, searchdir)
+            dirs = (searchdir,) + dirs
         basename, ext = os.path.splitext(filename)
         for directory in dirs:
             src_path = os.path.join(directory, filename)
