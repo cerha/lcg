@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,34 @@ import pandas
 _ = lcg.TranslatableTextFactory('lcg')
 
 
+class Line(object):
+    """Representation of a plot line parameters for 'grid' and 'lines' arguments of 'LinePlot'.
+
+    Constructor arguments:
+
+      x: Line position for a vertical line in 'lines' argument of a 'LinePlot'.
+        A value compatible with other x axis values of the plot (e.g. a
+        datetime instance when x values are datetimes).  Irrelevant for 'grid'
+        lines.
+      y: Line position for a horizontal line in 'lines' argument of a
+        'LinePlot'.  Analogical to 'x'.
+      color: Line color given by 'lcg.Color' instance, hexadecimal RGB or RGBA
+        representation or a X11/CSS4 color name (such as '#fa046e' or 'red').
+      with: Line width in points (int or float).
+      style: Line style.  One of 'solid', 'dashed', 'dashdot' or 'dotted'.
+      alpha: Alpha as a float in range 0.0 (transparent) - 1.0 (solid).
+
+    """
+    def __init__(self, x=None, y=None, color=None, width=None, style=None,
+                 alpha=None):
+        self.x = x
+        self.y = y
+        if isinstance(color, lcg.Color):
+            color = tuple(float(x) / 255 for x in color.rgb())
+        attr = dict(color=color, linewidth=width, linestyle=style)
+        self.attr = {k: v for k, v in attr.items() if v is not None}
+
+
 class LinePlot(lcg.InlineSVG):
     """Embedded line plot as 'lcg.Content' element.
 
@@ -44,7 +72,7 @@ class LinePlot(lcg.InlineSVG):
 
     def __init__(self, data, size=(250, 120), title=None, xlabel=None, ylabel=None,
                  xformatter=None, yformatter=None, plot_labels=None, annotate=False,
-                 grid=False):
+                 grid=False, lines=()):
         """Arguments:
 
           data: 'pandas.DataFrame' instance or a sequence of sequences
@@ -75,14 +103,17 @@ class LinePlot(lcg.InlineSVG):
             values in 'data'.
           annotate: If True, each plot point (x, y pair present in data) will
             be labeled by the y value directly within the plot.
-          grid: Controls grid lines.  May be True, to turn on the major grid or
-            False to turn it off (default).  May also be a tuple of two values
-            where the first value controls the major grid and the second value
-            controls the minor grid.  Major grid connects to labeled axis
-            values, minor grid provides finer subdivision.  Each value may also
-            be a dictionary defining matplotlib's Line2D properties, such as:
-            dict(color='#a0a0a0', linestyle=':', alpha=0.3).  Use with caution
-            to aviod dependency on specific matplotlib versions.
+          grid: Controls grid lines.  May be a single value to control the
+            major grid (minor is off), a tuple of two values (major, minor) or
+            four values (major-x, major-y, minor-x, minor-y).  Major grid
+            connects to labeled axis values, minor grid provides finer
+            subdivision.  Each value may be a boolean to turn the grid on or
+            off or a 'lcg.plot.Line' instance defining properties in more
+            detail.
+          lines: Additional vertical or horizontal lines added to the graph as
+            a sequence of 'Line' instances.  Lines must define 'x' (for
+            vertical lines) or 'y' (for horizontal lines) position as a value
+            compatible with other values of that axis.
 
         """
         if not isinstance(data, pandas.DataFrame):
@@ -98,10 +129,19 @@ class LinePlot(lcg.InlineSVG):
         self._yformatter = yformatter
         self._plot_labels = plot_labels
         self._annotate = annotate
-        if isinstance(grid, tuple):
-            self._major_grid, self._minor_grid = grid
+        if grid is False:
+            grid = None
+        elif grid is True:
+            grid = (True, True, False, False)
         else:
-            self._major_grid, self._minor_grid = grid, False
+            assert isinstance(grid, (tuple, list))
+            if len(grid) == 2:
+                major, minor = grid
+                grid = (major, major, minor, minor)
+            else:
+                assert len(grid) == 4
+        self._grid = grid
+        self._lines = lines
         super(LinePlot, self).__init__(self._svg)
 
     def _svg(self, context):
@@ -134,15 +174,26 @@ class LinePlot(lcg.InlineSVG):
                 for i, value in enumerate(getattr(df, col)):
                     x = df.index[i]
                     ax.annotate(value, xy=(x, value), textcoords='data')
-        if self._major_grid:
-            kwargs = (self._major_grid if isinstance(self._major_grid, dict)
-                      else dict(color='#dddddd'))
-            pyplot.grid(b=True, which='major', **kwargs)
-        if self._minor_grid:
-            kwargs = (self._minor_grid if isinstance(self._minor_grid, dict)
-                      else dict(color='#eeeeee'))
-            pyplot.minorticks_on()
-            pyplot.grid(b=True, which='minor', **kwargs)
+        if self._grid:
+            for line, which, axis in zip(self._grid, ('major', 'major', 'minor', 'minor'),
+                                         ('x', 'y', 'x', 'y')):
+                if line is True:
+                    kwargs = dict(color='#dddddd' if which == 'major' else '#eeeeee')
+                elif line is False:
+                    kwargs = dict(b=False)
+                elif isinstance(line, dict):
+                    # Undocumented backwards compatibility (probably not used anywhere).
+                    kwargs = line
+                else:
+                    kwargs = line.attr
+                if line and which == 'minor':
+                    pyplot.minorticks_on()
+                pyplot.grid(which=which, axis=axis, **kwargs)
+        for line in self._lines:
+            if line.x:
+                pyplot.axvline(x=line.x, **line.attr)
+            else:
+                pyplot.axhline(y=line.y, **line.attr)
         f = io.StringIO()
         fig.savefig(f, format='svg')
         return f.getvalue()
