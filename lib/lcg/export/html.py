@@ -831,10 +831,6 @@ class HtmlExporter(lcg.Exporter):
         """Return the list of pairs (NAME, CONTENT) for meta tags of given context/node."""
         return (('generator', 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
 
-    def _scripts(self, context):
-        """Return the list of 'Script' instances for given context/node."""
-        return context.node().resources(lcg.Script)
-
     def _head(self, context):
         g = context.generator()
         node = context.node()
@@ -853,7 +849,7 @@ class HtmlExporter(lcg.Exporter):
             [g.script(src=context.uri(script) if script.src_file() else None,
                       type=script.type() or "text/javascript",
                       content=script.content())
-             for script in self._scripts(context)]
+             for script in context.node().resources(lcg.Script)]
         )
 
     def _part(self, context, part):

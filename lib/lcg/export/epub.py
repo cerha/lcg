@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2012-2016 by OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2022 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,7 +78,10 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         stylesheet = context.resource('epub.css')
         return ([g.title(self._title(context)),
                  g.link(rel="stylesheet", type="text/css", href=context.uri(stylesheet))] +
-                [g.script(src=context.uri(s)) for s in self._scripts(context)])
+                [g.script(src=context.uri(script) if script.src_file() else None,
+                          type=script.type() or "text/javascript",
+                          content=script.content())
+                 for script in context.node().resources(lcg.Script)])
 
     def _export_table_of_contents(self, context, element):
         return ''
