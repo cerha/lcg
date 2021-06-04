@@ -835,15 +835,6 @@ class HtmlExporter(lcg.Exporter):
         """Return the list of 'Script' instances for given context/node."""
         return context.node().resources(lcg.Script)
 
-    def _script(self, context, script):
-        g = context.generator()
-        result = g.script(src=context.uri(script) if script.src_file() else None,
-                          type=script.type() or "text/javascript",
-                          content=script.content().decode('utf-8') if script.content() else None)
-        if script.filename() in ('jquery.js', 'jquery.min.js'):
-            result += g.script('jQuery.noConflict()')
-        return result
-
     def _head(self, context):
         g = context.generator()
         node = context.node()
@@ -859,7 +850,10 @@ class HtmlExporter(lcg.Exporter):
              for lang in node.variants() if lang != context.lang()] +
             [g.link(rel='gettext', type='application/x-po', href=context.uri(t))
              for t in context.node().resources(lcg.Translations)] +
-            [self._script(context, script) for script in self._scripts(context)]
+            [g.script(src=context.uri(script) if script.src_file() else None,
+                      type=script.type() or "text/javascript",
+                      content=script.content())
+             for script in self._scripts(context)]
         )
 
     def _part(self, context, part):
@@ -1430,9 +1424,9 @@ class HtmlExporter(lcg.Exporter):
         def button(label, **kwargs):
             return g.button(g.span(label), title=label, **kwargs)
 
+        context.resource('jquery.min.js')
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
-        context.resource('jquery.min.js')
         context.resource('jplayer.min.js')
         player = (
             g.div(cls='jp-controls', content=(
