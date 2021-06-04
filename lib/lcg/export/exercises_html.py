@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -192,11 +192,9 @@ class ExerciseExporter(object):
             methods = (self._export_tasks,
                        self._export_answers)
         else:
-            context.resource('prototype.js')
+            context.resource('jquery.min.js')
             context.resource('lcg.js')
             context.resource('lcg-exercises.js')
-            context.resource('effects.js')
-            context.resource('media.js')
             methods = (self._export_instructions,
                        self._export_tasks,
                        self._export_results)

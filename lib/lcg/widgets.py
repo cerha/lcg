@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -134,8 +134,7 @@ class Widget(object):
         return lcg.camel_case_to_lower(self.__class__.__name__) + '-widget'
 
     def export(self, context):
-        context.resource('prototype.js')
-        context.resource('effects.js')
+        context.resource('jquery.min.js')
         context.resource('gettext.js')
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
