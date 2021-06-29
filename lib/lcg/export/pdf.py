@@ -696,7 +696,7 @@ class RLText(reportlab.platypus.flowables.Flowable):
             y -= self._style.leading
 
     def __unicode__(self):
-        return 'RLText(%s)' % (self._text.join('\n'),)
+        return 'RLText(%s)' % ('\n'.join(self._text),)
 
 
 class RLSpacer(reportlab.platypus.flowables.Spacer):
