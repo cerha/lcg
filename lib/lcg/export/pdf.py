@@ -2161,19 +2161,20 @@ class List(Element):
         else:
             after_bullet = 1
         style.leftIndent = style.bulletIndent + after_bullet * font_size
-        if self.order:
+        if self.order == 'numeric':
             seqid = pdf_context.get_seqid()
-            seq_string = make_element(SimpleMarkup, content='seq',
-                                      attributes=dict(id='list%d' % (seqid,)))
-            dot_string = make_element(Text, content=u'.')
-            bullet_element = make_element(TextContainer, content=[seq_string, dot_string])
-        else:
+            bullet_element = make_element(TextContainer, content=[
+                make_element(SimpleMarkup, content='seq', attributes=dict(id='list%d' % (seqid,))),
+                make_element(Text, content=u'.'),
+            ])
+        elif self.order is None:
             if list_nesting_level == 0:
                 bullet_string = u'•'
             else:
                 bullet_string = u'-'
             bullet_element = make_element(Text, content=bullet_string)
-        bullet = make_element(MarkedText, content=[bullet_element], tag='bullet')
+        else:
+            bullet_element = None
         next_pdf_context = copy.copy(pdf_context)
         next_pdf_context.inc_nesting_level()
         next_pdf_context.inc_list_nesting_level()
@@ -2182,10 +2183,16 @@ class List(Element):
         next_context = copy.copy(context)
         next_context.pdf_context = next_pdf_context
 
-        def make_item(item):
+        def make_item(i, item):
             # Prevent paragpraph indenting of text after bullet:
             next_pdf_context.last_element_category = 'list-item-start'
-            item.prepend_text(bullet)
+            if self.order in ('lower-alpha', 'upper-alpha'):
+                letters = (string.ascii_lowercase if self.order == 'lower-alpha' else
+                           string.ascii_uppercase)
+                bullet = make_element(Text, content=letters[i] + u')')
+            else:
+                bullet = bullet_element
+            item.prepend_text(make_element(MarkedText, content=[bullet], tag='bullet'))
             if isinstance(item, Text):
                 assert next_pdf_context.in_paragraph is None
                 next_pdf_context.in_paragraph = True
@@ -2203,8 +2210,8 @@ class List(Element):
             return result
         space = reportlab.platypus.Spacer(0, self._unit2points(UFont(0.5), style))
         result = [space]
-        for item in self.content:
-            result += make_item(item)
+        for i, item in enumerate(self.content):
+            result += make_item(i, item)
         result.append(space)
         assert _ok_export_result(result), ('wrong export', result,)
         return result
