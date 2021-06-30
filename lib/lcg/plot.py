@@ -16,6 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from __future__ import division
+
 import datetime
 import io
 import lcg
@@ -46,8 +48,7 @@ class Line(object):
       alpha: Alpha as a float in range 0.0 (transparent) - 1.0 (solid).
 
     """
-    def __init__(self, x=None, y=None, color=None, width=None, style=None,
-                 alpha=None):
+    def __init__(self, x=None, y=None, color=None, width=None, style=None, alpha=None):
         self.x = x
         self.y = y
         if isinstance(color, lcg.Color):
@@ -56,7 +57,7 @@ class Line(object):
         self.attr = {k: v for k, v in attr.items() if v is not None}
 
 
-class LinePlot(lcg.InlineSVG):
+class BasePlot(lcg.InlineSVG):
     """Embedded line plot as 'lcg.Content' element.
 
     Line plot can be created based on input data passed as a sequence of x, y
@@ -120,7 +121,9 @@ class LinePlot(lcg.InlineSVG):
             data = pandas.DataFrame([x[1:] for x in data],
                                     index=[x[0] for x in data],
                                     columns=['column%d' % n for n in range(len(data[0]) - 1)])
-        self._dataframe = data
+        if not xformatter and isinstance(data.index[0], datetime.date):
+            xformatter = DateFormatter()
+        self._data = data
         self._size = [x if isinstance(x, lcg.Unit) else lcg.UMm(x) for x in size]
         self._title = title
         self._xlabel = xlabel
@@ -142,37 +145,28 @@ class LinePlot(lcg.InlineSVG):
                 assert len(grid) == 4
         self._grid = grid
         self._lines = lines
-        super(LinePlot, self).__init__(self._svg)
+        super(BasePlot, self).__init__(self._svg)
+
+    def _plot(self, ax):
+        raise NotImplementedError()
 
     def _svg(self, context):
-        df = self._dataframe
         factor = context.exporter().MATPLOTLIB_RESCALE_FACTOR
         size = [x.size() * factor / 25.4 for x in self._size]
         fig, ax = pyplot.subplots(1, 1, figsize=size, sharex=True, sharey=True)
-        for col, label in zip(df.columns, self._plot_labels or [None for x in df.columns]):
-            ax.plot(df.index, getattr(df, col), label=label)
-        xformatter, yformatter = self._xformatter, self._yformatter
-        if not xformatter and isinstance(df.index[0], datetime.date):
-            xformatter = DateFormatter()
-            # Automatically rotate date labels if necessary to avoid overlapping.
-            fig.autofmt_xdate()
-        for formatter, axis in ((xformatter, ax.xaxis), (yformatter, ax.yaxis)):
-            if formatter:
-                axis.set_major_formatter(matplotlib.ticker.FuncFormatter(
-                    lambda value, position, formatter=formatter: formatter(context, value, position)
-                ))
         if self._title:
-            pyplot.title(self._title)
+            ax.set_title(self._title)
         if self._xlabel:
-            pyplot.xlabel(self._xlabel)
+            ax.set_xlabel(self._xlabel)
         if self._ylabel:
-            pyplot.ylabel(self._ylabel)
-        if self._plot_labels:
-            ax.legend()
+            ax.set_ylabel(self._ylabel)
         if self._annotate:
-            for col in df.columns:
-                for i, value in enumerate(getattr(df, col)):
-                    x = df.index[i]
+            data = self._data
+            for col in data.columns:
+                for i, value in enumerate(getattr(data, col)):
+                    x = data.index[i]
+                    # TODO: This doesn't work for bar plots due to index mapping to a range.
+                    # Either disable annotations for bar plots or fix...
                     ax.annotate(value, xy=(x, value), textcoords='data')
         if self._grid:
             for line, which, axis in zip(self._grid, ('major', 'major', 'minor', 'minor'),
@@ -187,16 +181,78 @@ class LinePlot(lcg.InlineSVG):
                 else:
                     kwargs = line.attr
                 if line and which == 'minor':
-                    pyplot.minorticks_on()
-                pyplot.grid(which=which, axis=axis, **kwargs)
+                    ax.minorticks_on()
+                ax.grid(which=which, axis=axis, zorder=0, **kwargs)
         for line in self._lines:
             if line.x:
-                pyplot.axvline(x=line.x, **line.attr)
+                ax.axvline(x=line.x, **line.attr)
             else:
-                pyplot.axhline(y=line.y, **line.attr)
+                ax.axhline(y=line.y, **line.attr)
+        xformatter, yformatter = self._xformatter, self._yformatter
+        if isinstance(xformatter, DateFormatter):
+            # Automatically rotate date labels if necessary to avoid overlapping.
+            fig.autofmt_xdate()
+        for formatter, axis in ((xformatter, ax.xaxis), (yformatter, ax.yaxis)):
+            if formatter:
+                axis.set_major_formatter(matplotlib.ticker.FuncFormatter(
+                    lambda value, position, f=formatter: f(context, value, position)
+                ))
+        self._plot(ax)
+        if self._plot_labels:
+            ax.legend()
         f = io.StringIO()
         fig.savefig(f, format='svg')
         return f.getvalue()
+
+
+class BarPlot(BasePlot):
+    """Embedded line plot as 'lcg.Content' element.
+
+    Bar plot can be created based on input data passed as a sequence of x, y
+    pairs or a 'pandas.DataFrame' instance.  The x, y points present in input
+    data are connected by a line.  The axes automatically accommodate to
+    the range present in input data.  Several plot lines can be present in a
+    single plot.  Plot data can be also passed as .
+
+    The plot is exported as SVG figure into the final document.  Only HTML
+    export is currently supported.
+
+    """
+
+    def _plot(self, ax):
+        data = self._data
+        n = len(data.columns)
+        width = 0.8 / n
+        xticks = range(len(data))
+        for i, col, label in zip(range(len(data)), data.columns, self._plot_labels or [None for x in df.columns]):
+            ax.bar([x + (i + 1 - (n + 1) / 2) * width for x in xticks], getattr(data, col),
+                   width=width, zorder=3, label=label)
+        ax.set_xticks(xticks)
+        labels = [data.index[x] for x in xticks]
+        if isinstance(labels[0], datetime.date):
+            formatter = ax.xaxis.get_major_formatter()
+            labels = [formatter(label) for label in matplotlib.dates.date2num(labels)]
+        ax.set_xticklabels(labels)
+
+
+class LinePlot(BasePlot):
+    """Embedded line plot as 'lcg.Content' element.
+
+    Line plot can be created based on input data passed as a sequence of x, y
+    points or a 'pandas.DataFrame' instance.  The x, y points present in input
+    data are connected by a line.  The axes automatically accommodate to
+    the range present in input data.  Several plot lines can be present in a
+    single plot.  Plot data can be also passed as .
+
+    The plot is exported as SVG figure into the final document.  Only HTML
+    export is currently supported.
+
+    """
+
+    def _plot(self, ax):
+        data = self._data
+        for col, label in zip(data.columns, self._plot_labels or [None for x in df.columns]):
+            ax.plot(data.index, getattr(data, col), label=label)
 
 
 class LocalizingFormatter(object):
