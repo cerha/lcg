@@ -72,8 +72,8 @@ class BasePlot(lcg.InlineSVG):
     """
 
     def __init__(self, data, size=(250, 120), title=None, xlabel=None, ylabel=None,
-                 xformatter=None, yformatter=None, plot_labels=None, annotate=False,
-                 grid=False, lines=()):
+                 xformatter=None, yformatter=None, legend=None, annotate=False,
+                 grid=False, lines=(), plot_labels=None):
         """Arguments:
 
           data: 'pandas.DataFrame' instance or a sequence of sequences
@@ -98,10 +98,10 @@ class BasePlot(lcg.InlineSVG):
             'DateFormatter' is used automatically for the x axis if it contains
             datetime values.
           yformatter: as xformatter but for the y axis values.
-          plot_labels: optional sequence of plot line labels as human readable
-            strings.  Mostly useful for distinction when there are several plot
-            lines.  The number of labels must correspond to the number of y
-            values in 'data'.
+          legend: optional sequence of plot labels as human readable
+            strings.  Useful for distinction when there are several plots (data
+            contain multiple y values).  The number of labels must correspond to
+            the number of y values in 'data'.
           annotate: If True, each plot point (x, y pair present in data) will
             be labeled by the y value directly within the plot.
           grid: Controls grid lines.  May be a single value to control the
@@ -130,7 +130,8 @@ class BasePlot(lcg.InlineSVG):
         self._ylabel = ylabel
         self._xformatter = xformatter
         self._yformatter = yformatter
-        self._plot_labels = plot_labels
+        # The former (deprecated) argument name is 'plot_labels'.
+        self._legend = legend or plot_labels or [None for x in data.columns]
         self._annotate = annotate
         if grid is False:
             grid = None
@@ -198,7 +199,7 @@ class BasePlot(lcg.InlineSVG):
                     lambda value, position, f=formatter: f(context, value, position)
                 ))
         self._plot(ax)
-        if self._plot_labels:
+        if any(self._legend):
             ax.legend()
         f = io.StringIO()
         fig.savefig(f, format='svg')
@@ -224,7 +225,7 @@ class BarPlot(BasePlot):
         n = len(data.columns)
         width = 0.8 / n
         xticks = range(len(data))
-        for i, col, label in zip(range(len(data)), data.columns, self._plot_labels or [None for x in df.columns]):
+        for i, col, label in zip(range(len(data)), data.columns, self._legend):
             ax.bar([x + (i + 1 - (n + 1) / 2) * width for x in xticks], getattr(data, col),
                    width=width, zorder=3, label=label)
         ax.set_xticks(xticks)
@@ -251,7 +252,7 @@ class LinePlot(BasePlot):
 
     def _plot(self, ax):
         data = self._data
-        for col, label in zip(data.columns, self._plot_labels or [None for x in df.columns]):
+        for col, label in zip(data.columns, self._legend):
             ax.plot(data.index, getattr(data, col), label=label)
 
 
