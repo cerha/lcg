@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2018 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -837,7 +837,9 @@ class HtmlExporter(lcg.Exporter):
 
     def _script(self, context, script):
         g = context.generator()
-        result = g.script(src=context.uri(script))
+        result = g.script(src=context.uri(script) if script.src_file() else None,
+                          type=script.type() or "text/javascript",
+                          content=script.content())
         if script.filename() in ('jquery.js', 'jquery.min.js'):
             result += g.script('jQuery.noConflict()')
         return result
@@ -845,18 +847,20 @@ class HtmlExporter(lcg.Exporter):
     def _head(self, context):
         g = context.generator()
         node = context.node()
-        return [g.title(self._title(context))] + \
-               [g.meta(http_equiv=header, content=value)
-                for header, value in (('Content-Language', context.lang()),
-                                      ('Content-Script-Type', 'text/javascript'),
-                                      ('Content-Style-Type', 'text/css'),
-                                      ('X-UA-Compatible', 'edge'))] + \
-               [g.meta(name=name, content=value) for name, value in self._meta(context)] + \
-               [g.link(rel='alternate', lang=lang, href=self._uri_node(context, node, lang=lang))
-                for lang in node.variants() if lang != context.lang()] + \
-               [g.link(rel='gettext', type='application/x-po', href=context.uri(t))
-                for t in context.node().resources(lcg.Translations)] + \
-               [self._script(context, script) for script in self._scripts(context)]
+        return (
+            [g.title(self._title(context))] +
+            [g.meta(http_equiv=header, content=value)
+             for header, value in (('Content-Language', context.lang()),
+                                   ('Content-Script-Type', 'text/javascript'),
+                                   ('Content-Style-Type', 'text/css'),
+                                   ('X-UA-Compatible', 'edge'))] +
+            [g.meta(name=name, content=value) for name, value in self._meta(context)] +
+            [g.link(rel='alternate', lang=lang, href=self._uri_node(context, node, lang=lang))
+             for lang in node.variants() if lang != context.lang()] +
+            [g.link(rel='gettext', type='application/x-po', href=context.uri(t))
+             for t in context.node().resources(lcg.Translations)] +
+            [self._script(context, script) for script in self._scripts(context)]
+        )
 
     def _part(self, context, part):
         if part.content is not None:
@@ -1251,6 +1255,7 @@ class HtmlExporter(lcg.Exporter):
         g = self._generator
         image = element.image(context)
         thumbnail = image.thumbnail()
+        size = image.size()
         uri = context.uri(image)
         link = None
         if thumbnail:
@@ -1283,10 +1288,18 @@ class HtmlExporter(lcg.Exporter):
         img = g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
                     style=self._image_style(width, height))
         if link:
-            img = g.a(img, href=link, title=title, rel='lightbox[gallery]')
-            # Load lightbox.js and its dependencies.
-            for f in ('prototype.js', 'effects.js', 'builder.js', 'lightbox.js', 'lightbox.css'):
-                context.resource(f)
+            context.resource('photoswipe.js', type='module', content=(
+                "import PhotoSwipeLightbox from '{}'; new PhotoSwipeLightbox({}).init();".format(
+                    context.uri(lcg.Script('photoswipe-lightbox.esm.min.js')),
+                    g.js_value(dict(
+                        gallerySelector='#main',
+                        childSelector='a.photoswipe-image',
+                        pswpModule=context.uri(lcg.Script('photoswipe.esm.min.js')),
+                        pswpCSS=context.uri(lcg.Stylesheet('photoswipe.css')),
+                    )))
+            ))
+            img = g.a(img, href=link, title=title, cls='photoswipe-image',
+                      data_pswp_width='%spx' % size[0], data_pswp_height='%spx' % size[1])
         return img
 
     def _export_inline_audio(self, context, element):

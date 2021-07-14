@@ -138,6 +138,10 @@ class Resource(object):
         """Return the resource info as passed to the constructor or None."""
         return self._info
 
+    def content(self):
+        """Return the resource content as passed to the constructor or None."""
+        return self._content
+
     def get(self):
         """Return the resource file data as a byte string or None.
 
@@ -209,9 +213,25 @@ class Stylesheet(Resource):
 
 
 class Script(Resource):
-    """A java/ecma/... script object used within the content."""
+    """A JavaScript object used within the content."""
     SUBDIR = 'scripts'
     EXTENSIONS = ('js',)
+
+    def __init__(self, filename, type=None, **kwargs):
+        """Arguments:
+
+        type -- script type analogous to HTML <script> tag type attribute.  Can
+          contain a valid JavaScript MIME type or 'module' to indicate the
+          script is actually a JavaScript module.  If None, defaults to
+          'text/javascript'.
+
+        """
+        self._type = type
+        super(Script, self).__init__(filename, **kwargs)
+
+    def type(self):
+        """Return the script type as passed to the constructor."""
+        return self._type
 
 
 class Translations(Resource):
@@ -321,9 +341,11 @@ class ResourceProvider(object):
         self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
 
-    def _resource(self, filename, searchdir, warn):
+    def _resource(self, filename, searchdir, warn, **kwargs):
         dirs = self._dirs
         cls = Resource.subclass(filename)
+        if kwargs.get('content') is not None:
+            return cls(filename, **kwargs)
         if cls.SUBDIR:
             dirs = tuple(functools.reduce(
                 lambda a, b: a + b, ((os.path.join(dir, cls.SUBDIR), dir) for dir in dirs), ()
@@ -336,13 +358,13 @@ class ResourceProvider(object):
             if sys.version_info[0] == 2:
                 src_path = src_path.encode('utf-8')
             if os.path.isfile(src_path):
-                return cls(filename, src_file=src_path)
+                return cls(filename, src_file=src_path, **kwargs)
             elif src_path.find('*') != -1:
                 pathlist = [path for path in glob.glob(src_path) if os.path.isfile(path)]
                 if pathlist:
                     pathlist.sort()
                     i = len(directory) + 1
-                    return [cls(os.path.splitext(path[i:])[0] + ext, src_file=path)
+                    return [cls(os.path.splitext(path[i:])[0] + ext, src_file=path, **kwargs)
                             for path in pathlist]
         if warn:
             warn(_("Resource file not found: %(filename)s %(search_path)s",
@@ -350,7 +372,7 @@ class ResourceProvider(object):
                    search_path=tuple(dirs)))
         return None
 
-    def resource(self, filename, node=None, searchdir=None, warn=lcg.log):
+    def resource(self, filename, node=None, searchdir=None, warn=lcg.log, **kwargs):
         """Get the resource instance by its filename.
 
         Arguments:
@@ -372,12 +394,13 @@ class ResourceProvider(object):
         you to discover problems in your setup.
 
         """
+        key = (filename, tuple(kwargs.items()))
         try:
-            resource, nodes = self._cache[filename]
+            resource, nodes = self._cache[key]
         except KeyError:
-            resource = self._resource(filename, searchdir, warn)
+            resource = self._resource(filename, searchdir, warn, **kwargs)
             nodes = []
-            self._cache[filename] = (resource, nodes)
+            self._cache[key] = (resource, nodes)
         if isinstance(node, lcg.ContentNode):
             node_id = node.id()
         else:
