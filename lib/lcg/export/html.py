@@ -1075,6 +1075,7 @@ class HtmlExporter(lcg.Exporter):
             style['margin-left'] = '%dem' % element.presentation().indent_left.size()
         attr = dict(id=element.id(),
                     cls=' '.join([x for x in element.names() + ((cls,) if cls else ())]) or None,
+                    role=element.role(), aria_label=element.label(),
                     lang=lang or element.lang(inherited=False),
                     style=style and ' '.join(['%s: %s;' % x for x in list(style.items())]) or None,
                     **kwargs)

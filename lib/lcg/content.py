@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -263,9 +263,9 @@ class Container(Content):
     _SUBSEQUENCES = False
     _SUBSEQUENCE_LENGTH = None
 
-    def __init__(self, content, name=(), id=None, halign=None, valign=None,
-                 orientation=None, width=None, height=None, padding=None,
-                 presentation=None, **kwargs):
+    def __init__(self, content, name=(), id=None, role=None, label=None,
+                 halign=None, valign=None, orientation=None, width=None, height=None,
+                 padding=None, presentation=None, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -279,6 +279,8 @@ class Container(Content):
             attribute).
           id -- unique identifier as a string.  The identifier must be unique
             within the whole content hierarchy of one 'lcg.ContentNode'.
+          role -- ARIA role name for HTML output as a string or None.
+          label -- container label to be used for aria-label in HTML output.
           halign -- horizontal alignment of the container content; one of the
             'lcg.HorizontalAlignment' constants or 'None' (default alignment).
           valign -- vertical alignment of the container content; one of the
@@ -330,6 +332,8 @@ class Container(Content):
         else:
             names = tuple(name)
         self._names = names
+        self._role = role
+        self._label = label
         from lcg import Presentation
         assert presentation is None or isinstance(presentation, Presentation), presentation
         super(Container, self).__init__(**kwargs)
@@ -385,6 +389,14 @@ class Container(Content):
     def names(self):
         """Return the tuple of strings passed as 'name' to the constructor."""
         return self._names
+
+    def role(self):
+        """Return the 'role' passed to the constructor."""
+        return self._role
+
+    def label(self):
+        """Return the 'label' passed to the constructor."""
+        return self._label
 
     def halign(self):
         """Return the value of 'halign' as passed to the constructor."""

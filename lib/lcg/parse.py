@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -132,9 +132,9 @@ class Parser(object):
                                   re.MULTILINE)
     _CONTAINER_MATCHER = re.compile((r'^(?P<collapsible>\[(?P<title>[^\]]+)\]\+? +)?'
                                      r'\>(?P<level>\>+)'
-                                     r'([ \t]+(?P<id>[\w\d_-]+))?'
-                                     r'(?P<classes>(?:[\t ]+\.[\w\d_-]+)*)[\t ]*\r?$'),
-                                    re.MULTILINE)
+                                     r'(?P<id>[ \t]+([ \t]*[#\.=]?[\w\d_-]+)*)?'
+                                     r'([ \t]+"(?P<label>[^"]*)")?'
+                                     r'[\t ]*\r?$'), re.MULTILINE)
     _CONTAINER_END_MATCHER = [re.compile(r'^\<%s *\r?$' % (r'\<' * i), re.MULTILINE)
                               for i in range(10)]
     _LINE_MATCHER = re.compile(r'^([\t ]*)([^\n\r]*)\r?(\n|$)', re.MULTILINE)
@@ -365,8 +365,16 @@ class Parser(object):
             return None
         content = self.parse(text[position:position + end.start()])
         position += end.end()
-        id_ = start.group('id')
-        classes = tuple([x.lstrip('.') for x in start.group('classes').strip().split()])
+        id_, role, classes = None, None, []
+        for x in start.group('id').strip().split():
+            if x.startswith('.'):
+                classes.append(x.lstrip('.'))
+            elif x.startswith('='):
+                role = x.lstrip('=')
+            elif x.startswith('#'):
+                id_ = x.lstrip('#')
+            else:
+                id_ = x
         container_kwargs = {}
         if start.group('collapsible'):
             container = lcg.CollapsiblePane
@@ -377,7 +385,8 @@ class Parser(object):
             container = lcg.Container
             if not classes:
                 classes = 'lcg-generic-container'
-        container = container(content=content, id=id_, name=classes, **container_kwargs)
+            container_kwargs['label'] = start.group('label')
+        container = container(content=content, id=id_, name=classes, role=role, **container_kwargs)
         return container, position
 
     def _literal_processor(self, text, position, **kwargs):
