@@ -1288,18 +1288,25 @@ class HtmlExporter(lcg.Exporter):
         img = g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
                     style=self._image_style(width, height))
         if link:
-            context.resource('photoswipe.js', type='module', content=(
-                "import PhotoSwipeLightbox from '{}'; new PhotoSwipeLightbox({}).init();".format(
-                    context.uri(lcg.Script('photoswipe-lightbox.esm.min.js')),
-                    g.js_value(dict(
-                        gallerySelector='#main',
-                        childSelector='a.photoswipe-image',
-                        pswpModule=context.uri(lcg.Script('photoswipe.esm.min.js')),
-                        pswpCSS=context.uri(lcg.Stylesheet('photoswipe.css')),
-                    )))
-            ))
-            img = g.a(img, href=link, title=title, cls='photoswipe-image',
-                      data_pswp_width='%spx' % size[0], data_pswp_height='%spx' % size[1])
+            if size:
+                context.resource('photoswipe.js', type='module', content=(
+                    "import PhotoSwipeLightbox from '{}';new PhotoSwipeLightbox({}).init();".format(
+                        context.uri(lcg.Script('photoswipe-lightbox.esm.min.js')),
+                        g.js_value(dict(
+                            gallerySelector='#main',
+                            childSelector='a.photoswipe-image',
+                            pswpModule=context.uri(lcg.Script('photoswipe.esm.min.js')),
+                            pswpCSS=context.uri(lcg.Stylesheet('photoswipe.css')),
+                        )))
+                ))
+                kwargs = dict(
+                    cls='photoswipe-image',
+                    data_pswp_width='%spx' % size[0],
+                    data_pswp_height='%spx' % size[1],
+                )
+            else:
+                kwargs = {}
+            img = g.a(img, href=link, title=title, **kwargs)
         return img
 
     def _export_inline_audio(self, context, element):
