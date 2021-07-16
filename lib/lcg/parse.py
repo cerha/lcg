@@ -366,15 +366,16 @@ class Parser(object):
         content = self.parse(text[position:position + end.start()])
         position += end.end()
         id_, role, classes = None, None, []
-        for x in start.group('id').strip().split():
-            if x.startswith('.'):
-                classes.append(x.lstrip('.'))
-            elif x.startswith('='):
-                role = x.lstrip('=')
-            elif x.startswith('#'):
-                id_ = x.lstrip('#')
-            else:
-                id_ = x
+        if start.group('id'):
+            for x in start.group('id').strip().split():
+                if x.startswith('.'):
+                    classes.append(x.lstrip('.'))
+                elif x.startswith('='):
+                    role = x.lstrip('=')
+                elif x.startswith('#'):
+                    id_ = x.lstrip('#')
+                else:
+                    id_ = x
         container_kwargs = {}
         if start.group('collapsible'):
             container = lcg.CollapsiblePane
