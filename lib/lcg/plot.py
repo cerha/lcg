@@ -64,8 +64,8 @@ class BasePlot(lcg.InlineSVG):
     points or a 'pandas.DataFrame' instance.  The axes automatically
     accommodate to the range present in input data.
 
-    The plot is exported as SVG figure into the final document.  Only HTML
-    export is currently supported.
+    The plot is exported as SVG figure into the final document.  HTML and PDF
+    export is supported.
 
     """
 
