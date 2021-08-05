@@ -58,13 +58,11 @@ class Line(object):
 
 
 class BasePlot(lcg.InlineSVG):
-    """Embedded line plot as 'lcg.Content' element.
+    """Base class for embedded plot as 'lcg.Content' element.
 
-    Line plot can be created based on input data passed as a sequence of x, y
-    points or a 'pandas.DataFrame' instance.  The x, y points present in input
-    data are connected by a line.  The axes automatically accommodate to
-    the range present in input data.  Several plot lines can be present in a
-    single plot.  Plot data can be also passed as .
+    Plots can be created based on input data passed as a sequence of x, y
+    points or a 'pandas.DataFrame' instance.  The axes automatically
+    accommodate to the range present in input data.
 
     The plot is exported as SVG figure into the final document.  Only HTML
     export is currently supported.
@@ -207,16 +205,12 @@ class BasePlot(lcg.InlineSVG):
 
 
 class BarPlot(BasePlot):
-    """Embedded line plot as 'lcg.Content' element.
+    """Bar plot to be used within LCG content.
 
-    Bar plot can be created based on input data passed as a sequence of x, y
-    pairs or a 'pandas.DataFrame' instance.  The x, y points present in input
-    data are connected by a line.  The axes automatically accommodate to
-    the range present in input data.  Several plot lines can be present in a
-    single plot.  Plot data can be also passed as .
-
-    The plot is exported as SVG figure into the final document.  Only HTML
-    export is currently supported.
+    Input data passed to the constructor should represent atomic values (a
+    sequence of (x, y) values is the simplest use case -- see the constructor
+    arguments documentation).  More y values (represented by separate bars for
+    each x value) are also supported.
 
     """
 
@@ -237,13 +231,9 @@ class BarPlot(BasePlot):
 
 
 class LinePlot(BasePlot):
-    """Embedded line plot as 'lcg.Content' element.
+    """Line plot to be used within LCG content.
 
-    Line plot can be created based on input data passed as a sequence of x, y
-    points or a 'pandas.DataFrame' instance.  The x, y points present in input
-    data are connected by a line.  The axes automatically accommodate to
-    the range present in input data.  Several plot lines can be present in a
-    single plot.  Plot data can be also passed as .
+    Several plot lines can be present in a single plot.
 
     The plot is exported as SVG figure into the final document.  Only HTML
     export is currently supported.
