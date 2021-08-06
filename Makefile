@@ -1,7 +1,7 @@
 .PHONY: translations doc test
 
 export LCGDIR=.
-export PYTHONPATH="./lib:$$PYTHONPATH"
+export PYTHONPATH=lib
 
 all: compile translations
 
