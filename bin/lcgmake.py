@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 
 import functools
 import getopt
-import imp
+import importlib
 import lcg
 import operator
 import os
@@ -213,19 +213,16 @@ def main(argv, opt, args):
 
 def read_presentation(filename):
     presentation = lcg.Presentation()
+    import importlib.util
     try:
-        f = open(filename)
-    except IOError:
-        die("Can't open file: %s" % (filename,))
-    try:
-        confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
+        spec = importlib.util.spec_from_file_location('_lcg_presentation', filename)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
     except Exception as e:
         die("Can't process presentation file: %s" % (e,))
-    finally:
-        f.close()
-    for o in dir(confmodule):
-        if o[0] in string.lowercase and hasattr(presentation, o):
-            setattr(presentation, o, confmodule.__dict__[o])
+    for o in dir(mod):
+        if o[0] in string.ascii_lowercase and hasattr(presentation, o):
+            setattr(presentation, o, mod.__dict__[o])
     return lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
 
 
