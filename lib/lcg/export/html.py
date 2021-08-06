@@ -1337,38 +1337,26 @@ class HtmlExporter(lcg.Exporter):
     def _export_inline_video(self, context, element):
         """Export emedded video player for given video file.
 
-        The video is normally represented by an HTML 5 <video> tag.  The FLV
-        video format (supported for backwards compatibility), uses a Flash
-        based player named JW Player.  When such video is used, the file
-        'mediaplayer.swf' (containing the JW Player) must be located somewhere
-        in the resource path.
+        The video is represented by an HTML 5 <video> tag.
 
         """
         g = self._generator
-        if element.size() is None:
-            width, height = (None, None)
-        else:
-            width, height = element.size()
         video = element.video(context)
         uri = context.uri(video)
         title = element.title() or video.title() or video.filename()
         descr = element.descr() or video.descr()
-        link = g.a(title, href=uri, title=descr)
         image = element.image(context)
-        image_uri = image and context.uri(image)
-        if video.filename().lower().endswith('.flv'):
-            player = self.export_swf_object(context, 'mediaplayer.swf', context.unique_id(),
-                                            width or 200, height or 200,
-                                            min_flash_version='9.0.115',
-                                            flashvars=dict(file=uri, title=title,
-                                                           description=descr,
-                                                           image=image_uri),
-                                            alternative_content=link)
-            return g.div(player or link, cls='video-player')
+        if element.size() is None:
+            width, height = (None, None)
         else:
+            width, height = element.size()
+        return g.video(
+            src=uri, title=descr or title,
+            poster=image and context.uri(image),
+            width=width, height=height,
             # 'content' is displayed only in browsers not supporting the audio tag.
-            return g.video(src=uri, title=descr or title, poster=image_uri,
-                           width=width, height=height, content=link)
+            content=g.a(title, href=uri, title=descr)
+        )
 
     def _export_inline_external_video(self, context, element):
         """Export emedded video player for external services such as YouTube or Vimeo.
@@ -1435,90 +1423,6 @@ class HtmlExporter(lcg.Exporter):
             cairosvg.svg2png(bytestring=svg.encode('utf-8'), write_to=png)
             return self._generator.img(src='data:image/png;base64, ' +
                                        base64.b64encode(png.getvalue()))
-
-    def export_swf_object(self, context, filename, element_id, width, height, flashvars={},
-                          min_flash_version=None, alternative_content=None, warning=None):
-        """Export an arbitrary SWF object.
-
-        This method tries to export a Flash object into HTML.  The object is
-        not included directly, but using a mechanism with a Javascript library
-        that ensures that if Javascript or Flash is not available on client
-        side, alternative content (error message or a gracefull degradation)
-        may be displayed.
-
-        Arguments:
-          filename -- name of the .swf file of the Flash object to embed (must
-            be available through resources)
-          element_id -- HTML id to use for the flash object HTML element
-            (necessary for communication via Javascript)
-          width, height -- size of the HTML element in pixels
-          flashvars -- dictionary of variables to pass to the flash object (through
-            SWFObject's 'flashvars' parameter).
-          min_flash_version -- minimal required Flash version as a string, such
-            as '9' or '9.0.25'
-          alternative_content -- HTML content (as a string or unicode) displayed
-            inside the HTML element when Flash or JavaScript don't work on the
-            client side (Flash not installed or its version doesn't match
-            'min_flash_version', JS is disabled or not supoported, ...).  You
-            may also pass a tuple of two strings in which case the first is
-            used when Flash doesn't work and the second when the problem is in
-            JavaScript.  If you wish to display simple warning messages, you
-            may think of using the argument 'warning' instead of this one.
-          warning -- Warning message displayed as alternative content.  This
-            message will become a part of automatically created alternative
-            content, so it cannot be used in combination with the
-            'alternative_content' argument.  Individual warnings are generated
-            to cover both situations (no JS and no Flash).  They will look like:
-            ``Warning: <warning> Get Adobe Flash plugin 9.0.10 or later.'' and
-            ``Warning: <warning> Use a JavaScript enabled browser.'', where
-            ``<warning>'' is replaced by the value of this argument.
-
-        """
-        def warn_swfobject(msg):
-            context.log(msg, kind=lcg.WARNING)
-            context.log(_("Get SWFObject v2.1 from http://code.google.com/p/swfobject/ "
-                          "and put swfobject.js to your resource path."))
-
-        def escape(value):
-            return unistr(value).replace('?', '%3F').replace('=', '%3D').replace('&', '%26')
-
-        flash_object = context.resource(filename)
-        if flash_object is None:
-            return None
-        swfobject_js = context.resource('swfobject.js', warn=warn_swfobject)
-        if swfobject_js is None:
-            return None
-        flash_js = context.resource('flash.js')
-        if flash_js is None:
-            return None
-        g = self._generator
-        if isinstance(alternative_content, tuple):
-            no_flash_content, no_js_content = alternative_content
-            no_flash_content = context.localize(no_flash_content)
-        elif warning and alternative_content is None:
-            # Translators: Warning message displayed if Flash plugin is not installed or doesn't
-            # have the required version.  '%(plugin)s' is automatically replaced by a hypertext
-            # link to Adobe Flash plugin download page.  '%(version)s' is replaced by the required
-            # version number.
-            msg1 = _("Get %(plugin)s %(version)s or later.",
-                     version=min_flash_version or '9',
-                     # Translators: Title of the link to Adobe website used in
-                     # the Flash warning.
-                     plugin=g.a(_("Adobe Flash plugin"),
-                                href='http://www.adobe.com/products/flash/about/'))
-            msg2 = _("Use a JavaScript enabled browser.")
-            no_flash_content = context.localize(g.strong(_("Warning:")) + ' ' +
-                                                warning + ' ' + msg1)
-            no_js_content = g.strong(_("Warning:")) + ' ' + warning + ' ' + msg2
-        else:
-            no_flash_content = None
-            no_js_content = alternative_content
-        # Here we first create a DIV containing error text about js not
-        # working, then a javascript code that replaces this error message with
-        # the flash object when page is loaded into browser and js is working.
-        return (g.div(no_js_content or '', id=element_id) +
-                g.script(g.js_call('embed_swf_object', context.uri(flash_object), element_id,
-                                   width, height, flashvars, min_flash_version, no_flash_content)))
 
     def _export_audio_player(self, context):
         g = self._generator

@@ -1,6 +1,6 @@
 # -*- coding: utf-8; mode: structured-text -*-
 # Copyright (C) 2005-2012 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2021 Tomáš Cerha <t.cerha@gmail.com>
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 # Note: The examples (surronded by ---- lines) are displayed in a fixed
@@ -258,17 +258,14 @@ Více podrobností viz [#images].
 
 === Audio a Video ===
 
-Podobně jako obrázky, budou rozpoznány také vložené audio soubory ve formátu
-MP3, video soubory ve formátu FLV a odkazy na videa ze služeb YouTube a Vimeo.
+Odkazy na zvukové nahrávky ve formátu MP3 budou v mít HTML výstupu podobu
+běžného odkazu, ale tento odkaz bude fungovat jako ovládací prvek přehrávače,
+který se zobrazí v pravém dolním rohu okna prohlížeče.  Podporováno je i plně
+zpřístupněné ovládání z klávesnice.  Více viz [#audio].
 
-Odkazy na zvukové nahrávky budou v mít HTML výstupu podobu běžného odkazu, ale
-tento odkaz bude fungovat jako ovládací prvek přehrávače, který se zobrazí v
-pravém dolním rohu okna prohlížeče.  Podporováno je i plně zpřístupněné
-ovládání z klávesnice.  Více viz [#audio].
-
-Odkazy na video ve formátu FLV budou zobrazeny vloženým multimediálním
-přehrávačem. Stejně tak je vložený přehrávač automaticky zobrazen
-i u odkazů na služby YouTube a Vimeo. Více viz [#video].
+Podobně jako obrázky, budou rozpoznány také vložené video soubory ve formátu
+OGV, MP4, WEBM a 3GP a odkazy na videa ze služeb YouTube a Vimeo.  Tyto odkazy
+budou zobrazeny ve formě přehrávače příslušného videa.  Více viz [#video].
 
 
 == Obecná doporučení ==
@@ -903,36 +900,15 @@ Pokud nefunguje, podívejte se do technických požadavků.
 lokální soubory budou fungovat jak je popsáno.
 
 
-===== Technické požadavky ===== player-requirements
-
-/Požadavky na straně klienta:/ Pro zobrazení vloženého přehrávače médií musí
-mít uživatel nainstalován webový prohlížeč s podporou JavaScriptu a Adobe
-Flash. Pokud tyto nejsou k dispozici, zobrazí se pouze link pro stažení
-souboru.
-
-/Požadavky na straně serveru:/ LCG musí být pro správnou funkci vloženého
-přehrávače správně zkonfigurováno. To znamená, že mezi zdroji (resource path)
-musí být dostupný flashový JW Media Player a javascriptová knihovna SWF Object.
-Pokud tyto nejsou k dispozici, poskytne LCG varování a více informací na
-svém chybovém výstupu.
-
 ==== Video ==== video
 
-Video lze do LCG stránek vkládat buď lokálně jako soubor ve formátu
-FLV nebo jako odkaz na služby YouTube nebo Vimeo. V obou případech se
-při použití HTML výstupu uživateli ve výsledné stránce zobrazí vložený
-přehrávač, ve kterém je možné video přímo spustit.
+Video lze do LCG stránek vkládat buď lokálně jako soubor ve formátu OGV, MP4,
+WEBM a 3GP nebo jako odkaz na služby YouTube nebo Vimeo (viz níže). V obou
+případech se však při použití HTML výstupu uživateli ve výsledné stránce
+zobrazí vložený přehrávač, ve kterém je možné video přímo spustit.
 
-===== Lokální video soubory FLV =====
-
-Odkazy na videa ve formátu FLV budou automaticky reprezentovány vloženým
-multimediálním přehrávačem. Většinu formátů videa lze do FLV zkonvertovat,
-potřebné informace, jak to provést, můžete nalézt na stránce
-[http://en.kioskea.net/faq/447-how-to-convert-a-video-clip-in-flv-format-and-vice-versa
-nástroje na konverzi FLV].
-
-Velikost videopřehrávače můžete ovlivnit podobným způsobem jako velikost
-obrázků (za jménem dvojtečka a šířka x výška)
+Velikost videopřehrávače můžete v případě lokálních souvorů ovlivnit podobným
+způsobem jako velikost obrázků (za jménem dvojtečka a šířka x výška)
 
 Pokud je místo názvu linku uveden obrázek, bude tento obrázek použit
 jako náhled (dokud uživatel nespustí přehrávání, bude přehrávač zobrazovat
@@ -941,18 +917,6 @@ tento obrázek).
 /Poznámka:/ Přehrávač momentálně není používán pro externí odkazy.
 Tak, jak je popsáno, budou fungovat pouze lokální soubory. Jak vkládat
 videa z veřejných služeb typu YouTube a Vimeo je popsáno níže.
-
-/Poznámka:/ I v tomto případě platí stejné [#player-requirements technické
-požadavky] jako pro vkládání audia.
-
-Protože při distribuci této dokumentace není možné zaručit dodržení
-technických požadavků (viz níže), následující příklad neobsahuje živou
-ukázku přehrávače. Při jejich dodržení by však měl fungovat:
-
------
-[video.flv:400x300 preview.jpg]
------
-
 
 ===== Vkládání videa z YouTube a Vimeo =====
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -993,8 +993,6 @@ class HtmlImport(unittest.TestCase):
    <img src="http://www.freebsoft.org/img/logo.gif" /></a>
  Audio: <a class="lcg-audio" data-lcg-resource="my-song.mp3" href="/whatever/my-song.mp3">
    My Song</a>
- Video: <a class="lcg-video" data-lcg-resource="my-video.flv" href="/whatever/my-video.flv">
-   My Video</a>
 
 <div class="lcg-exercise" contenteditable="false" data-type="MultipleChoiceQuestions"
      style="display: inline-block;">

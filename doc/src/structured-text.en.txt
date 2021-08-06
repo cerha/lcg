@@ -1,6 +1,6 @@
 # -*- coding: utf-8; mode: structured-text -*-
 # Copyright (C) 2005-2012 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2021 Tomáš Cerha <t.cerha@gmail.com>
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 # Note: The examples (surronded by ---- lines) are displayed in a fixed
@@ -255,17 +255,14 @@ See [#images] and [#image-links] for more details.
 
 === Audio and Video ===
 
-Similarly as images, also audio files in MP3 format, videos in FLV format and
-links to YouTube and Vimeo services are automatically recognized.
+Links to audio recordings in MP3 format will appear as ordinary links in HTML,
+but these links will act as a remote control of the audio player displayed at
+the bottom right corner of the browser window.  Full keyboard accessibility is
+also implemented.  See [#audio] for more information.
 
-Links to audio recordings will appear as ordinary links in HTML, but these
-links will act as a remote control of the audio player displayed at the bottom
-right corner of the browser window.  Full keyboard accessibility is also
-implemented.  See [#audio] for more information.
-
-Links to videos in FLV format are represented by an embedded multimedia player.
-Also links to Youtube and Vimeo videos are detected and an embedded player is
-displayed automatically.  See [#video] for more information.
+Similarly as images, also video files in OGV, MP4, WEBM a 3GP formats and links
+to YouTube and Vimeo services are automatically recognized and displayed as an
+embedded player.  See [#video] for more information.
 
 
 == General Recommendations ==
@@ -890,53 +887,23 @@ If it doesn't, check the requirements below.
 will work.
 
 
-===== Technical Requirements ===== player-requirements
-
-/User side requirements:/ A JavaScript enabled browser with Adobe Flash support is
-required on the user side to use the embedded media player.  If not, the link
-will simply download the file.
-
-/Server side requirements:/ LCG must be configured properly to be able to embed
-the media player.  This means JW Media Player and SWF Object must be available
-in the resource path.  LCG will complain to the error output with more details.
-
-
 ==== Video ==== video
 
-Video can be embedded into the webpage either locally as a file
-in the FLV format or as a link to the YouTube or Vimeo services.
-In either case, the user is presented with an embedded player,
-in which it is possible to directly play the video.
+Video can be embedded into the webpage either locally as a file in the OGV,
+MP4, WEBM a 3GP formats or as a link to the YouTube or Vimeo services.  In
+either case, the user is presented with an embedded player, in which it is
+possible to directly play the video.
 
-===== Local FLV Video Files =====
-
-Links to video files in FLV format will be automatically represented by an
-embedded multimedia player.  Most video formats can be converted to
-FLV — find out more about
-[http://en.kioskea.net/faq/447-how-to-convert-a-video-clip-in-flv-format-and-vice-versa
-FLV conversion tools].
-
-It is possible to control the size of the player in the same way as the size of
-images (colon and width x height after the filename).
+For local files it is possible to control the size of the player in the same
+way as the size of images (colon and width x height after the filename).
 
 If an image is used in place of link label, this image will be used as the
 video preview (the player will display the image until the user starts
 playback).
 
-/Note:/ Embedding currently doesn't work for external links.  Only local videos
-may be embedded this way, but see below how to embed videos from public video
+/Note:/ Embedding doesn't work for external links.  Only local videos may be
+embedded this way, but see below how to embed videos from public video
 services, such as YouTube.
-
-/Note:/ The same [#player-requirements technical requirements] as for audio
-embedding apply here.
-
-Since the technical requirements can not be easily enforced for distribution of
-this documentation, the examples don't include a player demo.  The following
-example should work, however, when the requirements are fulfilled:
-
------
-[video.flv:400x300 preview.jpg]
------
 
 
 ===== Embedded Video from YouTube or Vimeo =====
