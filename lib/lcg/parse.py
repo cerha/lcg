@@ -141,6 +141,9 @@ class Parser(object):
     _LITERAL_MATCHER = re.compile(r'^-----+[ \t]*\r?\n(.*?)^-----+ *\r?$', re.DOTALL | re.MULTILINE)
     _DOCTEST_MATCHER = re.compile(r'(^>>> .+\r?\n)(^(>>>|\.\.\.)[ \t].+\r?\n)*(^[ \t]*\S.*\r?\n)*',
                                   re.MULTILINE)
+    _EXERCISE_MATCHER = re.compile(r'^<exercise type=["\']([a-zA-Z]+)["\']>\s*\r?\n'
+                                   r'(.*?)^</exercise>\s*\r?$',
+                                   re.DOTALL | re.MULTILINE)
     _VARIABLE_MATCHER = re.compile(r'@define +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _PARAMETER_MATCHER = re.compile(r'@parameter +([a-z_]+)( +.*)?\r?$', re.MULTILINE)
     _VSPACE_MATCHER = re.compile(r'@vspace +([0-9]+(\.[0-9]+)?)mm\r?$', re.MULTILINE)
@@ -218,6 +221,7 @@ class Parser(object):
                             self._container_processor,
                             self._literal_processor,
                             self._doctest_processor,
+                            self._exercise_processor,
                             self._hrule_processor,
                             self._toc_processor,
                             self._table_processor,
@@ -402,6 +406,18 @@ class Parser(object):
         if not match:
             return None
         content = lcg.PreformattedText(match.group(0), mime_type='text/x-python-doctest')
+        return content, position + match.end()
+
+    def _exercise_processor(self, text, position, **kwargs):
+        match = self._EXERCISE_MATCHER.match(text[position:])
+        if not match:
+            return None
+        from . import exercises
+        parser = exercises.ExerciseParser()
+        exercise_type = getattr(exercises, match.group(1), None)
+        if not exercise_type:
+            return None
+        content = parser.parse(exercise_type, match.group(2))
         return content, position + match.end()
 
     def _toc_processor(self, text, position, **kwargs):
