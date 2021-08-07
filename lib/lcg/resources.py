@@ -337,7 +337,9 @@ class ResourceProvider(object):
         self._dirs = tuple(dirs)
         lcgdir = os.environ.get('LCGDIR', os.path.join(__file__, '..', '..', '..'))
         if lcgdir:
-            self._dirs += (os.path.normpath(os.path.join(lcgdir, 'resources')),)
+            lcgdir = os.path.normpath(lcgdir)
+            self._dirs += (os.path.join(lcgdir, 'javascript'),
+                           os.path.join(lcgdir, 'resources'),)
         self._cache = self.OrderedDict([(r.filename(), (r, [None])) for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
 
