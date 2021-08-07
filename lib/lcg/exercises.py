@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -218,7 +218,7 @@ class ChoiceTask(Task):
           choices -- sequence of 'Choice' instances related to this Task.
 
         """
-        assert all(isinstance(choice, Choice) for choice in choices) and len(choices) > 1, choices
+        assert all(isinstance(choice, Choice) for choice in choices), choices
         self._choices = list(choices)
         if all(ch.correct() is None for ch in choices):
             self._correct_choice = None
