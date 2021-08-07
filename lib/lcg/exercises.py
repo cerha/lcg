@@ -200,6 +200,9 @@ class Choice(object):
         self._answer = answer
         self._correct = correct
 
+    def __repr__(self):
+        return '<choice correct={} answer="{}">'.format(self._correct, self._answer)
+
     def answer(self):
         return self._answer
 
