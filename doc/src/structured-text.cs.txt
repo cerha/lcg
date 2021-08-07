@@ -957,6 +957,14 @@ požadavcích na straně serveru.  Požadavky pro přehrávání na straně klie
 však stejné jako pro jiné způsoby vkládání multimédií. (prohlížeč s podporou
 JavaScriptu a Adobe Flash).
 
+
+==== Interaktivní cvičení ====
+
+
+Možnosti vkládání interaktivních cvičení jsou momentálně popsány pouze v
+anglické verzi tohoto manuálu.
+
+
 ==== Vertikální mezery ====
 
 Vertikální mezery mohou být vloženy pomocí značky =\@vspace= určující velikost
