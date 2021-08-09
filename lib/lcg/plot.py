@@ -159,14 +159,6 @@ class BasePlot(lcg.InlineSVG):
             ax.set_xlabel(self._xlabel)
         if self._ylabel:
             ax.set_ylabel(self._ylabel)
-        if self._annotate:
-            data = self._data
-            for col in data.columns:
-                for i, value in enumerate(getattr(data, col)):
-                    x = data.index[i]
-                    # TODO: This doesn't work for bar plots due to index mapping to a range.
-                    # Either disable annotations for bar plots or fix...
-                    ax.annotate(value, xy=(x, value), textcoords='data')
         if self._grid:
             for line, which, axis in zip(self._grid, ('major', 'major', 'minor', 'minor'),
                                          ('x', 'y', 'x', 'y')):
@@ -220,8 +212,12 @@ class BarPlot(BasePlot):
         width = 0.8 / n
         xticks = range(len(data))
         for i, col, label in zip(range(len(data)), data.columns, self._legend):
-            ax.bar([x + (i + 1 - (n + 1) / 2) * width for x in xticks], getattr(data, col),
-                   width=width, zorder=3, label=label)
+            xpos = [x + (i + 1 - (n + 1) / 2) * width for x in xticks]
+            coldata = getattr(data, col)
+            ax.bar(xpos, coldata, width=width, zorder=3, label=label)
+            if self._annotate:
+                for x, y in zip(xpos, coldata):
+                    ax.annotate(y, xy=(x, y), verticalalignment='bottom', horizontalalignment='center')
         ax.set_xticks(xticks)
         labels = [data.index[x] for x in xticks]
         if isinstance(labels[0], datetime.date):
@@ -244,6 +240,10 @@ class LinePlot(BasePlot):
         data = self._data
         for col, label in zip(data.columns, self._legend):
             ax.plot(data.index, getattr(data, col), label=label)
+        if self._annotate:
+            for col in data.columns:
+                for i, value in enumerate(getattr(data, col)):
+                    ax.annotate(value, xy=(data.index[i], value), verticalalignment='bottom')
 
 
 class LocalizingFormatter(object):
