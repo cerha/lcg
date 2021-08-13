@@ -910,39 +910,35 @@ services, such as YouTube.
 
 A link to a video on YouTube or Vimeo will be in HTML rendered as an embedded
 video player.  Thus you don't need to use any special code to embed these
-videos.  Just the URI is enough.
+videos.  Just the URI is enough.  With square brackets you may set title,
+description, cover image or dimensions similarly as with ordinary links or
+images.
 
 -----
-http://www.youtube.com/watch?v=aKULi72yUko
+https://www.youtube.com/watch?v=BMUiFMZr7vk
 -----
 
-http://www.youtube.com/watch?v=aKULi72yUko
-
-If the link is specified in square brackets, it is also possible to specify the
-explicit video size in the same way as for images (colon and width x height
-after the filename).
-
------
-Youtube video with specified size 400x250:
-
-[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
+https://www.youtube.com/watch?v=BMUiFMZr7vk
 
 Vimeo links work in the same way:
 
-[http://www.vimeo.com/8719387]
+-----
+http://www.vimeo.com/8719387
 -----
 
-Youtube video with specified size 400x250:
+http://www.vimeo.com/8719387
 
-[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
+Explicit video size may be set in the same way as for images (width x
+height in pixels after a colon).
 
-Vimeo links work in the same way:
+-----
+[https://www.youtube.com/watch?v=Wl98eZpkp-c:400x300]
+-----
 
-[http://www.vimeo.com/8719387]
+[https://www.youtube.com/watch?v=Wl98eZpkp-c:400x300]
 
 /Note:/ This way of embedding has the advantage of no server side technical
-requirements.  Client side requirements are the same as for other types of
-multimedia embedding (JavaScript enabled browser with Adobe Flash support).
+requirements.
 
 
 ==== Interactive exercises ====
@@ -977,14 +973,6 @@ GNU/Linux is:
 
 ===== Selections =====
 
-<exercise type="Selections">
-+ India is located in Asia.
-- China is located in Africa.
-
-+ Australia is the smallest continent.
-- Australia is the largest continent.
-</exercise>
-
 -----
 <exercise type="Selections">
 + India is located in Asia.
@@ -994,16 +982,18 @@ GNU/Linux is:
 - Australia is the largest continent.
 </exercise>
 -----
+
+<exercise type="Selections">
++ India is located in Asia.
+- China is located in Africa.
+
++ Australia is the smallest continent.
+- Australia is the largest continent.
+</exercise>
 
 
 ===== TrueFalseStatements =====
 
-<exercise type="TrueFalseStatements">
-The Microsoft Windows operating system never crashes. [F]
-
-The largest tropical rainforest in the world is in Brazil. [T]
-</exercise>
-
 -----
 <exercise type="TrueFalseStatements">
 The Microsoft Windows operating system never crashes. [F]
@@ -1011,22 +1001,16 @@ The Microsoft Windows operating system never crashes. [F]
 The largest tropical rainforest in the world is in Brazil. [T]
 </exercise>
 -----
+
+<exercise type="TrueFalseStatements">
+The Microsoft Windows operating system never crashes. [F]
+
+The largest tropical rainforest in the world is in Brazil. [T]
+</exercise>
 
 
 ===== GapFilling =====
 
-<exercise type="GapFilling">
-If you want to send money to somebody, you can ____ a transfer.
-- do
-+ make
-- have
-
-To change money between two currencies you need to know the ____ rate.
-- success
-- interest
-+ exchange
-</exercise>
-
 -----
 <exercise type="GapFilling">
 If you want to send money to somebody, you can ____ a transfer.
@@ -1040,18 +1024,22 @@ To change money between two currencies you need to know the ____ rate.
 + exchange
 </exercise>
 -----
+
+<exercise type="GapFilling">
+If you want to send money to somebody, you can ____ a transfer.
+- do
++ make
+- have
+
+To change money between two currencies you need to know the ____ rate.
+- success
+- interest
++ exchange
+</exercise>
 
 
 ===== HiddenAnswers =====
 
-<exercise type="HiddenAnswers">
-What is the name of the highest mountain in the world?
-Mount Everest.
-
-What is its height?
-8,848m
-</exercise>
-
 -----
 <exercise type="HiddenAnswers">
 What is the name of the highest mountain in the world?
@@ -1061,18 +1049,18 @@ What is its height?
 8,848m
 </exercise>
 -----
+
+<exercise type="HiddenAnswers">
+What is the name of the highest mountain in the world?
+Mount Everest.
+
+What is its height?
+8,848m
+</exercise>
 
 
 ===== WrittenAnswers =====
 
-<exercise type="WrittenAnswers">
-What is the name of the largest continent?
-[Asia]
-
-Use the correct form of the verb "to be":
-Children [are] our future.
-</exercise>
-
 -----
 <exercise type="WrittenAnswers">
 What is the name of the largest continent?
@@ -1082,35 +1070,37 @@ Use the correct form of the verb "to be":
 Children [are] our future.
 </exercise>
 -----
+
+<exercise type="WrittenAnswers">
+What is the name of the largest continent?
+[Asia]
+
+Use the correct form of the verb "to be":
+Children [are] our future.
+</exercise>
 
 
 ===== Cloze =====
 
+-----
 <exercise type="Cloze">
 Commercial banks and savings banks receive and hold deposits
 [in] current accounts, savings accounts and deposit accounts,
 make payments [for] their customers, lend money, [and] offer
 investment advice, foreign exchange facilities, and so on.
 </exercise>
+-----
 
------
 <exercise type="Cloze">
 Commercial banks and savings banks receive and hold deposits
 [in] current accounts, savings accounts and deposit accounts,
 make payments [for] their customers, lend money, [and] offer
 investment advice, foreign exchange facilities, and so on.
 </exercise>
------
 
 
 ===== Numbered Cloze =====
 
-<exercise type="NumberedCloze">
-[London] is the capital of the United Kingdom.
-
-The city is split by the River [Thames] into North and South.
-</exercise>
-
 -----
 <exercise type="NumberedCloze">
 [London] is the capital of the United Kingdom.
@@ -1118,6 +1108,12 @@ The city is split by the River [Thames] into North and South.
 The city is split by the River [Thames] into North and South.
 </exercise>
 -----
+
+<exercise type="NumberedCloze">
+[London] is the capital of the United Kingdom.
+
+The city is split by the River [Thames] into North and South.
+</exercise>
 
 
 

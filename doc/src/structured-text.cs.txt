@@ -925,38 +925,30 @@ zobrazí jako vložený přehrávač. Není zapotřebí žádný speciální kó
 postačuje uvést příslušné URI:
 
 -----
-http://www.youtube.com/watch?v=aKULi72yUko
+https://www.youtube.com/watch?v=BMUiFMZr7vk
 -----
 
-http://www.youtube.com/watch?v=aKULi72yUko
+https://www.youtube.com/watch?v=BMUiFMZr7vk
 
-Pokud je link uveden v hranatých závorkách, může být určena explicitní velikost
-videa, podobně jako u obrázků (dvojtečka a šířka x výška v pixelech za názvem
-souboru).
+Podobně fungují i odkazy na Vimeo:
 
 -----
-Video YouTube o velikosti 400x250:
-
-[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
-
-Odkazy na Vimeo fungují obdobně:
-
-[http://www.vimeo.com/8719387]
+http://www.vimeo.com/8719387
 -----
 
-Video YouTube o velikosti 400x250:
+http://www.vimeo.com/8719387
 
-[http://www.youtube.com/watch?v=FdRklzmfzRM&aaa=1:400x250]
+Velikost videa je možné explicitně nastavit podobně jako u obrázků (přidáním
+šířka x výška v pixelech za dvojtečkou).
 
-Odkazy na Vimeo fungují obdobně:
+-----
+[https://www.youtube.com/watch?v=Wl98eZpkp-c:400x300]
+-----
 
-[http://www.vimeo.com/8719387]
+[https://www.youtube.com/watch?v=Wl98eZpkp-c:400x300]
 
 /Poznámka:/ Tento způsob vkládání videa má výhodu v nulových technických
-požadavcích na straně serveru.  Požadavky pro přehrávání na straně klienta jsou
-však stejné jako pro jiné způsoby vkládání multimédií. (prohlížeč s podporou
-JavaScriptu a Adobe Flash).
-
+požadavcích na straně serveru.
 
 ==== Interaktivní cvičení ====
 
