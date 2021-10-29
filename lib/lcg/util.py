@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ def text_to_id(string, separator='-'):
     # Handle certain special cases.
     string = string.replace(u'´', '').replace('_', ' ')
     # Remove accents
-    string = str(unicodedata.normalize('NFKD', string).encode('ascii', 'ignore'))
+    string = unicodedata.normalize('NFKD', string).encode('ascii', 'ignore').decode('ascii')
     return re.sub(r'[^a-z0-9 ]', '', string.lower()).replace(' ', separator)
 
 
