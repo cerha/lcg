@@ -220,7 +220,7 @@
 .popup-menu-widget li.active .icon {
     opacity: 1;
 }
-.popup-menu-widget li .label.indented {
+.popup-menu-widget.with-icons li .label {
     margin-left: 22px;
     display: block;
 }
