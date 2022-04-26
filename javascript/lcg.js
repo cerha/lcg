@@ -1700,6 +1700,8 @@ lcg.widget_instance = function (element) {
      */
     if (element instanceof jQuery) {
         element = element[0]
+    } else if (typeof element === 'string') {
+        element = document.getElementById(element)
     }
     if (element && element._lcg_widget_instance) {
         return element._lcg_widget_instance
