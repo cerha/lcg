@@ -148,7 +148,6 @@ lcg.Widget = class extends lcg.KeyHandler {
         }
         return result
     }
-
 }
 
 lcg.Button = class extends lcg.Widget {
@@ -530,9 +529,8 @@ lcg.FoldableTree = class extends lcg.Menu {
         $(this.element).attr('role', 'tree')
         if (this._foldable && toggle_button_tooltip) {
             $(this.element).find('ul').first().append(
-                `<button class="toggle-menu-expansion" title="${toggle_button_tooltip}">`
-            ).find('button.toggle-menu-expansion')
-                .on('click', this._on_toggle_full_expansion.bind(this))
+                $(`<button class="toggle-menu-expansion" title="${toggle_button_tooltip}">`)
+                    .on('click', this._on_toggle_full_expansion.bind(this)))
         }
     }
 
@@ -944,8 +942,8 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
         if (this.element.children().length !== 0) {
             return
         }
-        this.element.html('<ul role="menu">')
-        var ul = this.element.children()
+        var ul = $('<ul role="menu">')
+        this.element.html(ul)
 
         for (let attr of ['aria-label', 'aria-activedescendant']) {
             // The ul must be to root element of the menu, because otherwise
@@ -957,10 +955,8 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
         let label_class = 'label'
         let indented = this.items.some(item => item.icon);
         for (let spec of this.items) {
-            ul.append(`<li><a><span class="label">${spec.label}</span></a></li>`)
-            let li = ul.children(':last-child')
-            let item = li.children()
-            item.attr('href', spec.uri || '#')
+            let item = $(`<a href="${spec.uri || '#'}"><span class="label">${spec.label}</span></a>`)
+            let li = $('<li>').append(item)
             if (spec.tooltip) {
                 item.attr('title', spec.tooltip)
             }
@@ -977,15 +973,13 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
             if (spec.cls) {
                 li.addClass(spec.cls)
             }
+            ul.append(li)
         }
         let close = this._close_button_label;
         if (close) {
             this.element.append(
-                `<a href="#" title="${close}" class="close-menu" role="button">${close}</a>`
-            ).on('click', event => {
-                this.dismiss()
-                return false
-            })
+                $(`<a href="#" title="${close}" class="close-menu" role="button">${close}</a>`)
+                    .on('click', e => { this.dismiss(); return false }))
         }
         this._init_menu(ul)
     }
@@ -1276,7 +1270,7 @@ lcg.Tooltip = class extends lcg.Widget {
             if (this._abort) {
                 return
             }
-            let div = this.element = $(`<div class="tooltip-widget"></div>`)
+            let div = this.element = $(`<div class="tooltip-widget">`)
             let content_type = xhr.getResponseHeader('Content-Type')
             if (content_type === 'text/html') {
                 div.html(response)
