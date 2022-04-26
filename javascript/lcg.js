@@ -944,6 +944,9 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
         }
         var ul = $('<ul role="menu">')
         this.element.html(ul)
+        if (this.items.some(item => item.icon)) {
+            this.element.addClass('with-icons')
+        }
 
         for (let attr of ['aria-label', 'aria-activedescendant']) {
             // The ul must be to root element of the menu, because otherwise
@@ -953,7 +956,6 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
             this.element.removeAttr(attr)
         }
         let label_class = 'label'
-        let indented = this.items.some(item => item.icon);
         for (let spec of this.items) {
             let item = $(`<a href="${spec.uri || '#'}"><span class="label">${spec.label}</span></a>`)
             let li = $('<li>').append(item)
@@ -963,9 +965,6 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
             item[0]._lcg_popup_menu_item_spec = spec
             if (spec.enabled === undefined || spec.enabled) {
                 li.addClass('active')
-            }
-            if (indented) {
-                item.children('span').addClass('indented')
             }
             if (spec.icon) {
                 item.prepend(`<span class="icon ${spec.icon}"></span>`)
