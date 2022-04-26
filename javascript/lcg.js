@@ -138,6 +138,23 @@ lcg.Widget = class extends lcg.KeyHandler {
                 return undefined
             }
         }
+        if (settings.form) {
+            // Make AJAX call similar to submission of given form.
+            let data = settings.form.serializeArray()
+            for (let param in settings.data) {
+                if (settings.data.hasOwnProperty(param)) {
+                    let item = data.find(item => item.name === param)
+                    if (item !== undefined) {
+                        item.value = settings.data[param]
+                    } else {
+                        data.push({name: param, value: settings.data[param]})
+                    }
+                }
+            }
+            settings.url ||= settings.form.attr('action')
+            settings.method ||= settings.form.attr('method')
+            settings.data = data
+        }
         document.body.style.cursor = "wait"
         let result = $.ajax(settings).always(() => document.body.style.cursor = "default")
         if (callback) {
