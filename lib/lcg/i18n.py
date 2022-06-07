@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015, 2017 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -503,7 +503,7 @@ class TranslatablePluralForms(TranslatableText):
             assert 'n' in kwargs, \
                    "A number determining the plural form must be passed as keyword argument 'n'."
             n = kwargs['n']
-        assert isinstance(n, int)
+        assert isinstance(n, int), n
         text = n == 1 and singular or plural
         return TranslatableText.__new__(cls, text, *args, **kwargs)
 
