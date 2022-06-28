@@ -830,7 +830,7 @@ lcg.PopupMenuBase = class extends lcg.Menu {
             && selected_item_index !== -1) {
             selected_item = $(menu.find('ul').children()[selected_item_index]).find('a')
         } else {
-            selected_item = menu.find('a')
+            selected_item = menu.find('li.active a').first()
         }
         this._select_item(selected_item)
         menu.attr('style', 'display: none') // Force consistent initial state
