@@ -1087,7 +1087,7 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
         } else {
             direction = 'down'
         }
-        if (event && (event.which === 1 || event.which === 2 || event.which === 3)) {
+        if (event && event.detail === 1) {
             // Math.min limits the pointer position to the boundary of the
             // element invoking the menu, because VoiceOver emits click events
             // with a wrong position and the menu would be placed radiculously.
