@@ -1657,15 +1657,18 @@ lcg.Cookies = class {
     }
 
     set(name, value, days) {
-        let cookie = name +'='+ escape(String(value)) + '; path=' + escape(this.path)
+        let cookie = (name +'='+ escape(String(value)) + '; ' +
+                      'SameSite=Lax; ' +
+                      'Path=' + escape(this.path))
         if (days) {
             let date = new Date()
             date.setTime(date.getTime() + (days*24*60*60*1000))
-            cookie += '; expires=' + date.toGMTString()
+            cookie += '; Expires=' + date.toGMTString()
         }
         if (this.domain) {
-            cookie += '; domain=' + escape(this.domain)
+            cookie += '; Domain=' + escape(this.domain)
         }
+
         document.cookie = cookie
     }
 
