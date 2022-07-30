@@ -99,8 +99,9 @@ try:
     from .export.pdf import PDFExporter
 except ImportError as e:
     class PDFExporter:
+        e = e
         def __init__(self, *args, **kwargs):
-            raise e
+            raise self.e
 
 from .parse import ProcessingError, Parser, MacroParser, HTMLProcessor, \
     html2lcg, add_processing_info
