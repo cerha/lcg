@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -383,6 +383,17 @@ class TranslatableTextFactory(unittest.TestCase):
         assert a.domain() == 'test'
 
 
+class TranslatedTextFactory(unittest.TestCase):
+
+    def test_translated(self):
+        cs = lcg.Localizer('cs', translation_path=translation_path)
+        assert _.pgettext('verb', 'force').localize(cs) == 'donutit'
+        __ = lcg.TranslatedTextFactory('test', lang='cs', translation_path=translation_path)
+        assert __("Bob") == 'Bobik'
+        assert __.pgettext('verb', 'force') == 'donutit'
+        assert __.pgettext('noun', 'force') == u'síla'
+
+
 class Monetary(unittest.TestCase):
 
     def test_format(self):
@@ -480,10 +491,10 @@ class ContentNode(unittest.TestCase):
 class Resources(unittest.TestCase):
 
     def test_provider(self):
-        warnings = []
-
         def warn(msg):
             warnings.append(msg)
+
+        warnings = []
         p = lcg.ResourceProvider(resources=(lcg.Audio('xxx.ogg'),))
         r = p.resource('xxx.xx', warn=warn)
         assert r is None
@@ -1197,41 +1208,41 @@ class HtmlExport(unittest.TestCase):
              '<a href="http://xss.me">&lt;script&gt;alert("XSS");&lt;/script&gt;</a>'),
             # Inline images
             ('[aa.jpg]',
-             u'<img alt="" class="lcg-image image-aa" src="images/aa.jpg"/>'),
+             u'<img alt="" class="lcg-image image-aa" src="aa.jpg"/>'),
             ('*[aa.jpg]*',
-             '<strong><img alt="" class="lcg-image image-aa" src="images/aa.jpg"/></strong>'),
+             '<strong><img alt="" class="lcg-image image-aa" src="aa.jpg"/></strong>'),
             ('[aa.jpg label]',
-             u'<img alt="label" class="lcg-image image-aa" src="images/aa.jpg"/>'),
+             u'<img alt="label" class="lcg-image image-aa" src="aa.jpg"/>'),
             ('[aa.jpg:20x30 label]',
              (u'<img alt="label" class="lcg-image image-aa"'
-              u' src="images/aa.jpg" style="width: 20px; height: 30px;"/>')),
+              u' src="aa.jpg" style="width: 20px; height: 30px;"/>')),
             ('[>aa.jpg]',
              (u'<img align="right" alt="" class="lcg-image right-aligned image-aa"'
-              u' src="images/aa.jpg"/>')),
+              u' src="aa.jpg"/>')),
             ('[<aa.jpg]',
              (u'<img align="left" alt="" class="lcg-image left-aligned image-aa" '
-              u'src="images/aa.jpg"/>')),
+              u'src="aa.jpg"/>')),
             ('[aa.jpg label | descr]',
-             u'<img alt="label: descr" class="lcg-image image-aa" src="images/aa.jpg"/>'),
+             u'<img alt="label: descr" class="lcg-image image-aa" src="aa.jpg"/>'),
             (u'[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
              (u'<img alt="Free(b)soft logo" class="lcg-image image-logo"'
               u' src="http://www.freebsoft.org/img/logo.gif"/>')),
-            ('[cc.png]',
-             u'<img alt="Image C: Nice picture" class="lcg-image image-cc" src="images/cc.png"/>'),
+            #('[cc.png]',
+            # u'<img alt="Image C: Nice picture" class="lcg-image image-cc" src="cc.png"/>'),
             # Image links (links with an image instead of a label)
             ('[aa.jpg bb.jpg label | descr]',
-             (u'<a href="images/aa.jpg" title="descr">'
-              u'<img alt="label" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
+             (u'<a href="aa.jpg" title="descr">'
+              u'<img alt="label" class="lcg-image image-bb" src="bb.jpg"/></a>')),
             ('[aa.jpg bb.jpg | descr]',
-             ('<a href="images/aa.jpg" title="descr">'
-              u'<img alt="" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
+             ('<a href="aa.jpg" title="descr">'
+              u'<img alt="" class="lcg-image image-bb" src="bb.jpg"/></a>')),
             ('[>aa.jpg bb.jpg label | descr]',
-             (u'<a href="images/aa.jpg" title="descr">'
+             (u'<a href="aa.jpg" title="descr">'
               u'<img align="right" alt="label"'
-              u' class="lcg-image right-aligned image-bb" src="images/bb.jpg"/></a>')),
+              u' class="lcg-image right-aligned image-bb" src="bb.jpg"/></a>')),
             ('[test bb.jpg bb]',
              (u'<a href="test" title="Some description">'
-              u'<img alt="bb" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
+              u'<img alt="bb" class="lcg-image image-bb" src="bb.jpg"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif]',
              (u'<a href="http://www.freebsoft.org">'
               u'<img alt="" class="lcg-image image-logo" src="/img/logo.gif"/></a>')),
@@ -1250,14 +1261,14 @@ class HtmlExport(unittest.TestCase):
               u' src="http://www.freebsoft.org/img/logo.gif"/>')),
             # Audio player links
             ('[xx.mp3]',
-             re.compile(r'<a class="media-control-link" href="media/xx.mp3"'
+             re.compile(r'<a class="media-control-link" href="xx.mp3"'
                         r' id="[a-z0-9-]+">xx.mp3</a>')),
             ('[/somewhere/some.mp3]',
              re.compile(r'<a class="media-control-link" href="/somewhere/some.mp3" id="[a-z0-9-]+"'
                         r'>/somewhere/some.mp3</a>')),
             # Internal Reference Links
-            ('[text.txt]',
-             u'<a href="/resources/texts/text.txt">text.txt</a>'),
+            #('[text.txt]',
+            # u'<a href="/resources/texts/text.txt">text.txt</a>'),
             ('[test]',
              u'<a href="test" title="Some description">Test Node</a>'),
             ('[test#sec1]',
