@@ -25,9 +25,9 @@ extract: $(wildcard *.po) $(mo_files)
 
 ifeq ($(MAKECMDGOALS),extract)
 
-lcg.pot: $(shell find ../lib -name "*.py" -not -name "_test.py" -not -name "exercises*.py")
+lcg.pot: $(shell find ../lib -name "*.py" -not -name "test.py" -not -name "exercises*.py")
 lcg-exercises.pot: ../lib/lcg/exercises.py ../lib/lcg/export/exercises_*.py
-test.pot: ../lib/lcg/_test.py
+test.pot: ../lib/lcg/test.py
 $(wildcard *.pot):
 	pybabel extract -F $(patsubst %.pot,%.cfg,$@) --add-comments=Translators: -s ../ -o $@
 
