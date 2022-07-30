@@ -119,9 +119,17 @@ class TranslatedTextFactory(TranslatableTextFactory):
     def ngettext(self, singular, plural, *args, **kwargs):
         kwargs['_singular_orig_text'] = singular
         kwargs['_plural_orig_text'] = plural
-        return super(TranslatedTextFactory, self).ngettext(self._gettext(singular),
-                                                           self._gettext(plural),
-                                                           *args, **kwargs)
+        singular = self._gettext(singular)
+        plural = self._gettext(plural)
+        return super(TranslatedTextFactory, self).ngettext(singular, plural, *args, **kwargs)
+
+    def pgettext(self, context, text, *args, **kwargs):
+        kwargs['_orig_text'] = text
+        text = self._gettext(context + '\x04' + text)
+        if text == context + '\x04' + text:
+            # See TranslatableText._translate for comment on this hack (missing translation).
+            text = kwargs['_orig_text']
+        return super(TranslatedTextFactory, self).pgettext(context, text, *args, **kwargs)
 
 
 class Localizable(unistr):
