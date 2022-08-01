@@ -429,7 +429,7 @@ class ResourceProvider(object):
         if cls is None:
             cls = Resource
         result = []
-        for resource, nodes in list(self._cache.values()):
+        for resource, nodes in self._cache.values():
             if node is None or node.id() in nodes or None in nodes:
                 if isinstance(resource, (list, tuple)):
                     result.extend([r for r in resource if isinstance(r, cls)])
