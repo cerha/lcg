@@ -511,15 +511,18 @@ class Resources(unittest.TestCase):
 
     def test_dependencies(self):
         p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),
-                                            lcg.Audio('sound2.ogg')))
+                                            lcg.Audio('sound2.mp3', descr="Nice song")))
         a = lcg.ContentNode('a', content=lcg.Content(), resource_provider=p)
         b = lcg.ContentNode('b', content=lcg.Content(), resource_provider=p)
-        a.resource('default.css')
-        b.resource('non-existing-file.js')
-        assert tuple(sorted([r.filename() for r in a.resources()])) == \
-            ('default.css', 'sound1.ogg', 'sound2.ogg')
-        assert tuple(sorted([r.filename() for r in b.resources()])) == \
-            ('sound1.ogg', 'sound2.ogg')
+        assert a.resource('sound1.ogg') is not None
+        assert a.resource('sound2.mp3').descr() == 'Nice song'
+        assert len(p.resources()) == 2
+        assert a.resource('default.css') is not None
+        assert b.resource('non-existing-file.js') is None
+        assert len(p.resources()) == 3
+        assert tuple(r.filename() for r in a.resources()) == ('sound1.ogg', 'sound2.mp3',
+                                                              'default.css')
+        assert tuple(r.filename() for r in b.resources()) == ('sound1.ogg', 'sound2.mp3')
 
 
 class Parser(unittest.TestCase):
