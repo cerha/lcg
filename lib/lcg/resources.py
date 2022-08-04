@@ -92,8 +92,11 @@ class Resource(object):
             necessary.
           content -- resource data as a bytes instance or a file-like object.
             Typically used when passing 'Resource' instances from application
-            code.  These resources are not located by the 'ResourceProvider'
-            and may not be bound to files on the file system.
+            code.  Textual content (such as scripts, stylesheets, etc.) should
+            be encoded in UTF-8.  Resources with 'content' are not located by
+            the 'ResourceProvider' and may not be bound to files on the file
+            system.
+
           info -- additional application specific
             information about the attachment.  No particular limitation on the
             content is defined and LCG ignores this value alltogether.

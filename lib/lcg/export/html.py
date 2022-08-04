@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2018 OUI Technology Ltd.
-# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -839,7 +839,7 @@ class HtmlExporter(lcg.Exporter):
         g = context.generator()
         result = g.script(src=context.uri(script) if script.src_file() else None,
                           type=script.type() or "text/javascript",
-                          content=script.content())
+                          content=script.content().decode('utf-8') if script.content() else None)
         if script.filename() in ('jquery.js', 'jquery.min.js'):
             result += g.script('jQuery.noConflict()')
         return result
@@ -1299,7 +1299,7 @@ class HtmlExporter(lcg.Exporter):
                             pswpModule=context.uri(lcg.Script('photoswipe.esm.min.js')),
                             pswpCSS=context.uri(lcg.Stylesheet('photoswipe.css')),
                         )))
-                ))
+                ).encode('utf-8'))
                 kwargs = dict(
                     cls='photoswipe-image',
                     data_pswp_width='%spx' % size[0],
