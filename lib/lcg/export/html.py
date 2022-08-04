@@ -1257,7 +1257,6 @@ class HtmlExporter(lcg.Exporter):
         image = element.image(context)
         thumbnail = image.thumbnail()
         size = image.size()
-        uri = context.uri(image)
         link = None
         if thumbnail:
             if True not in [isinstance(c, lcg.Link) for c in element.container_path()]:
@@ -1286,7 +1285,7 @@ class HtmlExporter(lcg.Exporter):
             cls.append(element.align() + '-aligned')
         if element.name():
             cls.append('image-' + element.name())
-        img = g.img(uri, alt=alt, align=element.align(), cls=' '.join(cls),
+        img = g.img(src=context.uri(image), alt=alt, align=element.align(), cls=' '.join(cls),
                     style=self._image_style(width, height))
         if link:
             if size:
