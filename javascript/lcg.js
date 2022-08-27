@@ -75,8 +75,10 @@ lcg.KeyHandler = class {
     _on_key_down(event) {
         let command = this._keymap[this._event_key(event)]
         if (command) {
+            // Returning false doesn't work here for some reason...
+            event.preventDefault()
+            event.stopPropagation()
             command.bind(this)(event, $(event.target))
-            return false
         }
     }
 
