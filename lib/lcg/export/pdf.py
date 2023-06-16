@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2008-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2021, 2023 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -2925,7 +2925,7 @@ class PDFExporter(FileExporter, Exporter):
                 exported = self.concat(*exported)
             exported_structure.append(exported)
         if not exported_structure:
-            return ''
+            return b''
         exported_content = self.concat(*exported_structure)
         document = exported_content.export(first_subcontext)
         if len(document) == 1 and isinstance(document[0], basestring):
@@ -2937,7 +2937,7 @@ class PDFExporter(FileExporter, Exporter):
             sys.stderr.write("Error: Invalid internal links:\n")
             for a in invalid_anchors:
                 sys.stderr.write("  #%s\n" % (a,))
-            return ''
+            return b''
         output = io.BytesIO()
         doc = DocTemplate(output, pagesize=page_size,
                           leftMargin=left_margin,
