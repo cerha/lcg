@@ -52,6 +52,7 @@ import reportlab.pdfgen
 import reportlab.platypus
 import reportlab.platypus.flowables
 import reportlab.platypus.tableofcontents
+import reportlab.rl_config
 
 import lcg
 from lcg import FontFamily, UMm, UPoint, UPercent, UFont, USpace, UAny, HorizontalAlignment
@@ -791,6 +792,7 @@ class Context(object):
                  page_header=None, page_footer=None, page_background=None, presentation=None,
                  presentation_set=None, page_size=None, left_margin=None, right_margin=None,
                  top_margin=None, bottom_margin=None, lang=None):
+        reportlab.rl_config.invariant = 1
         self._lang = lang
         self._presentations = []
         self._tempdir = None
