@@ -513,8 +513,8 @@ class TranslatablePluralForms(TranslatableText):
         if args:
             n = args[0]
         else:
-            assert 'n' in kwargs, \
-                   "A number determining the plural form must be passed as keyword argument 'n'."
+            assert 'n' in kwargs, ("A number determining the plural form must be passed as "
+                                   "the first positional argument or as keyword argument 'n'.")
             n = kwargs['n']
         assert isinstance(n, int), n
         text = n == 1 and singular or plural
