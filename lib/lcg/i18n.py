@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015, 2017 OUI Technology Ltd.
-# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2023 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -117,11 +117,16 @@ class TranslatedTextFactory(TranslatableTextFactory):
         return super(TranslatedTextFactory, self).__call__(self._gettext(text), *args, **kwargs)
 
     def ngettext(self, singular, plural, *args, **kwargs):
+        if args:
+            n = args[0]
+        else:
+            # Accept missing 'n' here to let the assertion in TranslatablePluralForms.__new__ act.
+            n = kwargs.get('n', 0)
+        translated = self._translator.ngettext(singular, plural, n,
+                                               domain=self._domain, origin=self._origin)
         kwargs['_singular_orig_text'] = singular
         kwargs['_plural_orig_text'] = plural
-        singular = self._gettext(singular)
-        plural = self._gettext(plural)
-        return super(TranslatedTextFactory, self).ngettext(singular, plural, *args, **kwargs)
+        return super(TranslatedTextFactory, self).ngettext(translated, translated, *args, **kwargs)
 
     def pgettext(self, context, text, *args, **kwargs):
         kwargs['_orig_text'] = text
