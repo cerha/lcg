@@ -40,7 +40,7 @@ import lcg
 
 _ = lcg.TranslatableTextFactory('test')
 standard_library.install_aliases()
-unistr = type(u'')  # Python 2/3 transition hack.
+unistr = type('')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
@@ -91,7 +91,7 @@ class TranslatableText(unittest.TestCase):
         b = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
         assert isinstance(b, unistr)
         assert b == 'a-b-c-d-e-f'
-        c = lcg.concat('a', (u'b', 'c', 'd'), 'e', 'f', separator='-')
+        c = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
         assert isinstance(c, unistr)
         assert c == 'a-b-c-d-e-f'
 
@@ -146,7 +146,7 @@ class TranslatableText(unittest.TestCase):
         cs = lcg.Localizer('cs', translation_path=translation_path)
         assert _.pgettext('dont translete this msg', 'untranslated').localize(cs) == 'untranslated'
         assert _.pgettext('verb', 'force').localize(cs) == 'donutit'
-        assert _.pgettext('noun', 'force').localize(cs) == u'síla'
+        assert _.pgettext('noun', 'force').localize(cs) == 'síla'
 
     def test_string_context(self):
         a = lcg.TranslatableText("Version %s", "1.0")
@@ -198,18 +198,18 @@ class TranslatablePluralForms(unittest.TestCase):
 
     def test_translation(self):
         loc = lcg.Localizer('cs', translation_path=translation_path)
-        for n, translated in ((1, u"Mám 1 problém."),
-                              (2, u"Mám 2 problémy."),
-                              (5, u"Mám 5 problémů.")):
+        for n, translated in ((1, "Mám 1 problém."),
+                              (2, "Mám 2 problémy."),
+                              (5, "Mám 5 problémů.")):
             a = _.ngettext("I have %d problem.", "I have %d problems.", n)
             b = a.localize(loc)
             assert b == translated
 
     def test_interpolation(self):
         t = lcg.Localizer('cs', translation_path=translation_path)
-        for n, translated in ((1, u"1 záznam nalezen v tabulce xy."),
-                              (2, u"2 záznamy nalezeny v tabulce xy."),
-                              (5, u"5 záznamů nalezeno v tabulce xy.")):
+        for n, translated in ((1, "1 záznam nalezen v tabulce xy."),
+                              (2, "2 záznamy nalezeny v tabulce xy."),
+                              (5, "5 záznamů nalezeno v tabulce xy.")):
             a = _.ngettext("%(n)d record found in table %(name)s.",
                            "%(n)d records found in table %(name)s.", n=n, name='xy')
             b = a.localize(t)
@@ -217,9 +217,9 @@ class TranslatablePluralForms(unittest.TestCase):
 
     def test_replace(self):
         loc = lcg.Localizer('cs', translation_path=translation_path)
-        for n, ta, tb in ((1, u"Mám 1 problém.", u"1 záznam nalezen v tabulce xy."),
-                          (2, u"Mám 2 problémy.", u"2 záznamy nalezeny v tabulce xy."),
-                          (5, u"Mám 5 problémů.", u"5 záznamů nalezeno v tabulce xy.")):
+        for n, ta, tb in ((1, "Mám 1 problém.", "1 záznam nalezen v tabulce xy."),
+                          (2, "Mám 2 problémy.", "2 záznamy nalezeny v tabulce xy."),
+                          (5, "Mám 5 problémů.", "5 záznamů nalezeno v tabulce xy.")):
             a = _.ngettext("I have %d problem.", "I have %d problems.", n)
             a1 = a.replace('5', '123')
             a2 = a1.localize(loc)
@@ -237,18 +237,18 @@ class SelfTranslatableText(unittest.TestCase):
 
     def test_interpolation(self):
         text = "%(person1)s is smarter than %(person2)s."
-        translations = {'cs': u"%(person1)s je chytřejší než %(person2)s."}
+        translations = {'cs': "%(person1)s je chytřejší než %(person2)s."}
         a = lcg.SelfTranslatableText(text, person1="Joe", person2="Ann", translations=translations)
         a2 = lcg.SelfTranslatableText(text, translations=translations)
         a3 = a2.interpolate(lambda key: '-' + key + '-')
         assert a.localize(lcg.Localizer()) == \
             "Joe is smarter than Ann."
         assert a.localize(lcg.Localizer('cs', translation_path=translation_path)) == \
-            u"Joe je chytřejší než Ann."
+            "Joe je chytřejší než Ann."
         assert a3.localize(lcg.Localizer()) == \
             "-person1- is smarter than -person2-."
         assert a3.localize(lcg.Localizer('cs', translation_path=translation_path)) == \
-            u"-person1- je chytřejší než -person2-."
+            "-person1- je chytřejší než -person2-."
 
 
 class LocalizableDateTime(unittest.TestCase):
@@ -324,19 +324,19 @@ class LocalizableDateTime(unittest.TestCase):
         assert (localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_seconds=False)
                 == "21.12.2006 01:43")
         assert (localize("2006-12-21 18:43:32", cs, show_weekday=True)
-                == u"Čt 21.12.2006 18:43:32")
+                == "Čt 21.12.2006 18:43:32")
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs)
-                == u"21.12.2006 18:43:32")
+                == "21.12.2006 18:43:32")
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32, tzinfo=utc), cs)
-                == u"21.12.2006 17:43:32")
+                == "21.12.2006 17:43:32")
         assert (localize("2006-01-30", cs, leading_zeros=False)
                 == "30.1.2006")
         assert (localize(datetime.date(2006, 1, 30), cs, leading_zeros=False)
                 == "30.1.2006")
         assert (localize("2006-12-21 18:43:32", cs, utc=True)
-                == u"21.12.2006 17:43:32")
+                == "21.12.2006 17:43:32")
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs, utc=True)
-                == u"21.12.2006 17:43:32")
+                == "21.12.2006 17:43:32")
 
     def test_concat(self):
         c = "Date is: " + lcg.LocalizableDateTime("2006-01-30")
@@ -391,7 +391,7 @@ class TranslatedTextFactory(unittest.TestCase):
         __ = lcg.TranslatedTextFactory('test', lang='cs', translation_path=translation_path)
         assert __("Bob") == 'Bobik'
         assert __.pgettext('verb', 'force') == 'donutit'
-        assert __.pgettext('noun', 'force') == u'síla'
+        assert __.pgettext('noun', 'force') == 'síla'
         assert __.ngettext("I have %d problem.", "I have %d problems.", 1) == "Mám 1 problém."
         assert __.ngettext("I have %d problem.", "I have %d problems.", 4) == "Mám 4 problémy."
         assert __.ngettext("I have %d problem.", "I have %d problems.", 6) == "Mám 6 problémů."
@@ -405,7 +405,7 @@ class Monetary(unittest.TestCase):
         a2 = lcg.Localizer('cs').localize(a)
         a3 = lcg.Localizer('en').localize(a)
         assert a1 == '8975.50'
-        assert a2 == u'8\xa0975,50'
+        assert a2 == '8\xa0975,50'
         assert a3 == '8,975.50'
 
     def test_precision(self):
@@ -425,7 +425,7 @@ class GettextTranslator(unittest.TestCase):
     def test_translate(self):
         t = lcg.Localizer('cs', translation_path=translation_path).translator()
         assert t.gettext("%(name1)s is smarter than %(name2)s.", domain='test') == \
-            u"%(name1)s je chytřejší než %(name2)s."
+            "%(name1)s je chytřejší než %(name2)s."
 
 
 class ContentNode(unittest.TestCase):
@@ -919,7 +919,7 @@ class HtmlImport(unittest.TestCase):
     def test_html(self):
         # This HTML preserves the formatting produced by ckeditor, only long lines are wrapped
         # in order to make Flycheck happy...
-        html = u''' <p>some text
+        html = ''' <p>some text
    <span class="lcg-mathml" contenteditable="false" style="display: inline-block;">
      <math contenteditable="false" style="display:inline-block"
          xmlns="http://www.w3.org/1998/Math/MathML">
@@ -1063,31 +1063,31 @@ class HtmlExport(unittest.TestCase):
         for tag in ('link', 'meta', 'br', 'hr', 'param'):
             assert getattr(g, tag)() == '<%s/>' % tag
         # These tags require positional arguemnts or have non-trivial export.
-        assert g.script('x') == u'<script type="text/javascript">x</script>'
-        assert g.submit('x') == u'<button type="submit">x</button>'
-        assert g.form('x') == u'<form action="#">x</form>'
-        assert g.h('x', level=8) == u'<h8>x</h8>'
-        assert g.img('x') == u'<img alt="" src="x"/>'
-        assert g.iframe('x') == u'<iframe src="x"><a href="x">x</a></iframe>'
-        assert g.input(type='text') == u'<input type="text"/>'
-        assert g.field(name='a') == (u'<input class="text" name="a" size="20" '
-                                     u'type="text" value=""/>')
-        assert g.checkbox('a') == u'<input name="a" type="checkbox"/>'
-        assert g.hidden('a', 'x') == u'<input name="a" type="hidden" value="x"/>'
-        assert g.radio('a') == u'<input name="a" type="radio"/>'
-        assert g.upload('a') == u'<input name="a" type="file"/>'
-        assert g.audio('x') == u'<audio controls="controls" src="x"/>'
-        assert g.video('x') == u'<video controls="controls" src="x"/>'
-        assert g.source('x') == u'<source src="x"/>'
+        assert g.script('x') == '<script type="text/javascript">x</script>'
+        assert g.submit('x') == '<button type="submit">x</button>'
+        assert g.form('x') == '<form action="#">x</form>'
+        assert g.h('x', level=8) == '<h8>x</h8>'
+        assert g.img('x') == '<img alt="" src="x"/>'
+        assert g.iframe('x') == '<iframe src="x"><a href="x">x</a></iframe>'
+        assert g.input(type='text') == '<input type="text"/>'
+        assert g.field(name='a') == ('<input class="text" name="a" size="20" '
+                                     'type="text" value=""/>')
+        assert g.checkbox('a') == '<input name="a" type="checkbox"/>'
+        assert g.hidden('a', 'x') == '<input name="a" type="hidden" value="x"/>'
+        assert g.radio('a') == '<input name="a" type="radio"/>'
+        assert g.upload('a') == '<input name="a" type="file"/>'
+        assert g.audio('x') == '<audio controls="controls" src="x"/>'
+        assert g.video('x') == '<video controls="controls" src="x"/>'
+        assert g.source('x') == '<source src="x"/>'
         # Now test with *some* typical optional arguments.
         assert g.a('x', href='a') == '<a href="a">x</a>'
         assert g.a('x', name='a') == '<a name="a">x</a>'
         assert g.button('X', disabled=True) == '<button disabled="disabled">X</button>'
         # Testing backwards compatibility of deprecated select() arguemnts.
-        assert g.select([], name='a') == u'<select name="a"></select>'
-        assert g.option('X', value='x') == u'<option value="x">X</option>'
+        assert g.select([], name='a') == '<select name="a"></select>'
+        assert g.option('X', value='x') == '<option value="x">X</option>'
         assert g.option('X', value='x', disabled=True, cls='c') == (
-            u'<option class="c" disabled="disabled" value="x">X</option>')
+            '<option class="c" disabled="disabled" value="x">X</option>')
         assert g.optgroup([], label='aa') == '<optgroup label="aa"></optgroup>'
 
     def test_export(self):
@@ -1105,10 +1105,10 @@ class HtmlExport(unittest.TestCase):
             (lcg.hr(),
              '<hr/>'),
             (lcg.Quotation(lcg.p("blah")),
-             u'<blockquote class="lcg-quotation"><p>blah</p></blockquote>'),
+             '<blockquote class="lcg-quotation"><p>blah</p></blockquote>'),
             (lcg.Quotation(lcg.TextContent("blah"), source='Hugo', uri='http://hugo.org'),
-             (u'<blockquote class="lcg-quotation">blah<footer>— '
-              u'<a href="http://hugo.org">Hugo</a></footer></blockquote>')),
+             ('<blockquote class="lcg-quotation">blah<footer>— '
+              '<a href="http://hugo.org">Hugo</a></footer></blockquote>')),
             (lcg.NewPage(),
              '<hr class="new-page"/>'),
             (lcg.Substitution('x'),
@@ -1214,57 +1214,57 @@ class HtmlExport(unittest.TestCase):
              '<a href="http://xss.me">&lt;script&gt;alert("XSS");&lt;/script&gt;</a>'),
             # Inline images
             ('[aa.jpg]',
-             u'<img alt="" class="lcg-image image-aa" src="images/aa.jpg"/>'),
+             '<img alt="" class="lcg-image image-aa" src="images/aa.jpg"/>'),
             ('*[aa.jpg]*',
              '<strong><img alt="" class="lcg-image image-aa" src="images/aa.jpg"/></strong>'),
             ('[aa.jpg label]',
-             u'<img alt="label" class="lcg-image image-aa" src="images/aa.jpg"/>'),
+             '<img alt="label" class="lcg-image image-aa" src="images/aa.jpg"/>'),
             ('[aa.jpg:20x30 label]',
-             (u'<img alt="label" class="lcg-image image-aa"'
-              u' src="images/aa.jpg" style="width: 20px; height: 30px;"/>')),
+             ('<img alt="label" class="lcg-image image-aa"'
+              ' src="images/aa.jpg" style="width: 20px; height: 30px;"/>')),
             ('[>aa.jpg]',
-             (u'<img align="right" alt="" class="lcg-image right-aligned image-aa"'
-              u' src="images/aa.jpg"/>')),
+             ('<img align="right" alt="" class="lcg-image right-aligned image-aa"'
+              ' src="images/aa.jpg"/>')),
             ('[<aa.jpg]',
-             (u'<img align="left" alt="" class="lcg-image left-aligned image-aa" '
-              u'src="images/aa.jpg"/>')),
+             ('<img align="left" alt="" class="lcg-image left-aligned image-aa" '
+              'src="images/aa.jpg"/>')),
             ('[aa.jpg label | descr]',
-             u'<img alt="label: descr" class="lcg-image image-aa" src="images/aa.jpg"/>'),
-            (u'[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
-             (u'<img alt="Free(b)soft logo" class="lcg-image image-logo"'
-              u' src="http://www.freebsoft.org/img/logo.gif"/>')),
+             '<img alt="label: descr" class="lcg-image image-aa" src="images/aa.jpg"/>'),
+            ('[http://www.freebsoft.org/img/logo.gif Free(b)soft logo]',
+             ('<img alt="Free(b)soft logo" class="lcg-image image-logo"'
+              ' src="http://www.freebsoft.org/img/logo.gif"/>')),
             ('[cc.png]',
-             u'<img alt="Image C: Nice picture" class="lcg-image image-cc" src="images/cc.png"/>'),
+             '<img alt="Image C: Nice picture" class="lcg-image image-cc" src="images/cc.png"/>'),
             # Image links (links with an image instead of a label)
             ('[aa.jpg bb.jpg label | descr]',
-             (u'<a href="images/aa.jpg" title="descr">'
-              u'<img alt="label" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
+             ('<a href="images/aa.jpg" title="descr">'
+              '<img alt="label" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
             ('[aa.jpg bb.jpg | descr]',
              ('<a href="images/aa.jpg" title="descr">'
-              u'<img alt="" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
+              '<img alt="" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
             ('[>aa.jpg bb.jpg label | descr]',
-             (u'<a href="images/aa.jpg" title="descr">'
-              u'<img align="right" alt="label"'
-              u' class="lcg-image right-aligned image-bb" src="images/bb.jpg"/></a>')),
+             ('<a href="images/aa.jpg" title="descr">'
+              '<img align="right" alt="label"'
+              ' class="lcg-image right-aligned image-bb" src="images/bb.jpg"/></a>')),
             ('[test bb.jpg bb]',
-             (u'<a href="test" title="Some description">'
-              u'<img alt="bb" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
+             ('<a href="test" title="Some description">'
+              '<img alt="bb" class="lcg-image image-bb" src="images/bb.jpg"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif]',
-             (u'<a href="http://www.freebsoft.org">'
-              u'<img alt="" class="lcg-image image-logo" src="/img/logo.gif"/></a>')),
+             ('<a href="http://www.freebsoft.org">'
+              '<img alt="" class="lcg-image image-logo" src="/img/logo.gif"/></a>')),
             ('[http://www.freebsoft.org /img/logo.gif Free(b)soft website]',
-             (u'<a href="http://www.freebsoft.org">'
-              u'<img alt="Free(b)soft website" class="lcg-image image-logo" src="/img/logo.gif"/>'
-              u'</a>')),
+             ('<a href="http://www.freebsoft.org">'
+              '<img alt="Free(b)soft website" class="lcg-image image-logo" src="/img/logo.gif"/>'
+              '</a>')),
             (('[http://www.freebsoft.org /img/logo.gif Free(b)soft website | '
               'Go to Free(b)soft website]'),
-             (u'<a href="http://www.freebsoft.org" title="Go to Free(b)soft website">'
-              u'<img alt="Free(b)soft website" class="lcg-image image-logo" '
+             ('<a href="http://www.freebsoft.org" title="Go to Free(b)soft website">'
+              '<img alt="Free(b)soft website" class="lcg-image image-logo" '
               'src="/img/logo.gif"/></a>')),
             # Absolute image links
             ('http://www.freebsoft.org/img/logo.gif',
-             (u'<img alt="" class="lcg-image image-logo"'
-              u' src="http://www.freebsoft.org/img/logo.gif"/>')),
+             ('<img alt="" class="lcg-image image-logo"'
+              ' src="http://www.freebsoft.org/img/logo.gif"/>')),
             # Audio player links
             ('[xx.mp3]',
              re.compile(r'<a class="media-control-link" href="media/xx.mp3"'
@@ -1274,13 +1274,13 @@ class HtmlExport(unittest.TestCase):
                         r'>/somewhere/some.mp3</a>')),
             # Internal Reference Links
             ('[text.txt]',
-             u'<a href="/resources/texts/text.txt">text.txt</a>'),
+             '<a href="/resources/texts/text.txt">text.txt</a>'),
             ('[test]',
-             u'<a href="test" title="Some description">Test Node</a>'),
+             '<a href="test" title="Some description">Test Node</a>'),
             ('[test#sec1]',
-             u'<a href="test#sec1">Section One</a>'),
+             '<a href="test#sec1">Section One</a>'),
             ('[#sec1]',
-             u'<a href="test#sec1">Section One</a>'),
+             '<a href="test#sec1">Section One</a>'),
             # HTML special
             (r'<bla>',
              r'&lt;bla&gt;'),
@@ -1299,7 +1299,7 @@ class HtmlExport(unittest.TestCase):
 
         def export(content):
             return content.export(context)
-        mathml = u"""
+        mathml = """
 <math xmlns="http://www.w3.org/1998/Math/MathML">
   <mi>&#x03C0;<!-- π --></mi>
   <mo>&#x2062;&eplus;<!-- &InvisibleTimes; --></mo>
@@ -1310,14 +1310,14 @@ class HtmlExport(unittest.TestCase):
 </math>"""
         content = lcg.MathML(mathml)
         assert export(content).replace('\n', '') == mathml.replace('\n', '')
-        for xml in (u'</math><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',
-                    u'<math xmlns="http://www.w3.org/1998/Math/MathML"><script>1</script></math>',
-                    u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>' +
-                    u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',):
+        for xml in ('</math><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',
+                    '<math xmlns="http://www.w3.org/1998/Math/MathML"><script>1</script></math>',
+                    '<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>' +
+                    '<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>',):
             content = lcg.MathML(xml)
             with pytest.raises(lcg.ParseError):
                 export(content)
-        mathml = u'<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>'
+        mathml = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math>'
         content = lcg.MathML(mathml)
         assert export(content).replace('\n', '') == mathml.replace('\n', '')
 
@@ -1404,93 +1404,93 @@ class BrailleExport(unittest.TestCase):
     def test_formatting(self):
         presentation = self._load_presentation()
         for text, braille in (
-            (u'abc', u'⠁⠃⠉',),
-            (u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),
-            (u'*tučný*', u'⠔⠰⠞⠥⠩⠝⠯⠰⠔',),
-            (u'/šikmý/', u'⠔⠨⠱⠊⠅⠍⠯⠨⠔',),
-            (u'_podtržený_', u'⠸⠏⠕⠙⠞⠗⠮⠑⠝⠯',),
-            (u'_hodně podtržený_', u'⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
-            (u'zkouška českého dělení slov', u'⠵⠅⠕⠥⠱⠅⠁⠀⠩⠑⠎⠅⠜⠓⠕⠀⠙⠣⠤\n⠇⠑⠝⠌⠀⠎⠇⠕⠧',),
+            ('abc', '⠁⠃⠉',),
+            ('a a11a 1', '⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),
+            ('*tučný*', '⠔⠰⠞⠥⠩⠝⠯⠰⠔',),
+            ('/šikmý/', '⠔⠨⠱⠊⠅⠍⠯⠨⠔',),
+            ('_podtržený_', '⠸⠏⠕⠙⠞⠗⠮⠑⠝⠯',),
+            ('_hodně podtržený_', '⠔⠸⠓⠕⠙⠝⠣⠀⠏⠕⠙⠞⠗⠮⠑⠝⠯⠸⠔',),
+            ('zkouška českého dělení slov', '⠵⠅⠕⠥⠱⠅⠁⠀⠩⠑⠎⠅⠜⠓⠕⠀⠙⠣⠤\n⠇⠑⠝⠌⠀⠎⠇⠕⠧',),
         ):
-            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+            self._test(text, braille, '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
                        presentation, 'cs')
-        tests = ((u'abc', u'⠁⠃⠉',),
-                 (u'long line to be hyphenated', u'⠇⠕⠝⠛⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠤\n⠏⠓⠑⠝⠁⠞⠑⠙',),
-                 (u'*bold*', u'⠸⠃⠕⠇⠙',),
-                 (u'/italic/', u'⠨⠊⠞⠁⠇⠊⠉',),
-                 (u'_underlined_', u'⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),)
+        tests = (('abc', '⠁⠃⠉',),
+                 ('long line to be hyphenated', '⠇⠕⠝⠛⠀⠇⠊⠝⠑⠀⠞⠕⠀⠃⠑⠀⠓⠽⠤\n⠏⠓⠑⠝⠁⠞⠑⠙',),
+                 ('*bold*', '⠸⠃⠕⠇⠙',),
+                 ('/italic/', '⠨⠊⠞⠁⠇⠊⠉',),
+                 ('_underlined_', '⠥⠝⠙⠑⠗⠇⠊⠝⠑⠙',),)
         if False:
             # buggy in current liblouis
-            tests += ((u'a a11a 1', u'⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),)
+            tests += (('a a11a 1', '⠁⠀⠁⠼⠁⠁⠐⠁⠀⠼⠁',),)
         for text, braille in tests:
-            self._test(text, braille, u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+            self._test(text, braille, '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
                        presentation, 'en')
 
     def test_languages(self):
         presentation = self._load_presentation()
-        self._test(u'řwe >>world<< řwe', u'⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
-                   u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', 'en')
+        self._test('řwe >>world<< řwe', '⠺⠷⠑⠀⠺⠕⠗⠇⠙⠀⠺⠷⠑', '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
+                   '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', 'en')
 
     def test_special_formatting(self):
         presentation = self._load_presentation()
-        self._test(u'50 %, 12 ‰', u'⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+        self._test('50 %, 12 ‰', '⠼⠑⠚⠼⠏⠂⠀⠼⠁⠃⠼⠗', '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
                    presentation, 'cs')
 
     def test_tables(self):
         presentation = self._load_presentation()
         # Simple tables
-        self._test(u'| first | line | x |\n| second | row | y |',
-                   u'⠋⠊⠗⠎⠞⠀⠀⠀⠇⠊⠝⠑⠀⠀⠭\n⠎⠑⠉⠕⠝⠙⠀⠀⠗⠕⠷⠀⠀⠀⠽',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
-        self._test(u'| *heading* | *h* | *h* |\n| first | line | x |\n| second | row | y |',
-                   u'⠓⠑⠁⠙⠊⠝⠛⠀⠀⠓⠀⠀⠀⠀⠀⠓\n⠋⠊⠗⠎⠞⠀⠀⠀⠀⠇⠊⠝⠑⠀⠀⠭\n⠎⠑⠉⠕⠝⠙⠀⠀⠀⠗⠕⠷⠀⠀⠀⠽',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+        self._test('| first | line | x |\n| second | row | y |',
+                   '⠋⠊⠗⠎⠞⠀⠀⠀⠇⠊⠝⠑⠀⠀⠭\n⠎⠑⠉⠕⠝⠙⠀⠀⠗⠕⠷⠀⠀⠀⠽',
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+        self._test('| *heading* | *h* | *h* |\n| first | line | x |\n| second | row | y |',
+                   '⠓⠑⠁⠙⠊⠝⠛⠀⠀⠓⠀⠀⠀⠀⠀⠓\n⠋⠊⠗⠎⠞⠀⠀⠀⠀⠇⠊⠝⠑⠀⠀⠭\n⠎⠑⠉⠕⠝⠙⠀⠀⠀⠗⠕⠷⠀⠀⠀⠽',
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         # Compact wide tables
-        self._test(u'| Narrow | Table |', u'⠠⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
-        self._test(u'| Less Narrow | Table |', u'⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
-        self._test(u'| Less Narrow | Table |\n| Less Narrow | Table |',
-                   u'⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑\n⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
-        self._test(u'| *a* | *b* |\n| prefixed lines | table |\n| prefixed rows | cell |\n',
-                   u'⠏⠗⠑⠋⠊⠭⠑⠙⠀⠁⠀⠀⠃⠀⠀⠀⠀\n⠇⠊⠝⠑⠎⠀⠀⠀⠀⠀⠀⠀⠞⠁⠃⠇⠑\n⠗⠕⠷⠎⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠇⠇⠀',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
-        self._test(u'| *a* | *b* |\n| line & suffix | table |\n| row & suffix | cell |\n',
-                   u'⠁⠀⠼⠯⠀⠎⠥⠋⠋⠊⠭⠀⠀⠃⠀⠀⠀⠀\n⠇⠊⠝⠑⠀⠀⠀⠀⠀⠀⠀⠀⠀⠞⠁⠃⠇⠑\n⠗⠕⠷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠇⠇⠀',
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+        self._test('| Narrow | Table |', '⠠⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+        self._test('| Less Narrow | Table |', '⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+        self._test('| Less Narrow | Table |\n| Less Narrow | Table |',
+                   '⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑\n⠇⠑⠎⠎⠀⠝⠁⠗⠗⠕⠷⠀⠀⠠⠞⠁⠃⠇⠑',
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+        self._test('| *a* | *b* |\n| prefixed lines | table |\n| prefixed rows | cell |\n',
+                   '⠏⠗⠑⠋⠊⠭⠑⠙⠀⠁⠀⠀⠃⠀⠀⠀⠀\n⠇⠊⠝⠑⠎⠀⠀⠀⠀⠀⠀⠀⠞⠁⠃⠇⠑\n⠗⠕⠷⠎⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠇⠇⠀',
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
+        self._test('| *a* | *b* |\n| line & suffix | table |\n| row & suffix | cell |\n',
+                   '⠁⠀⠼⠯⠀⠎⠥⠋⠋⠊⠭⠀⠀⠃⠀⠀⠀⠀\n⠇⠊⠝⠑⠀⠀⠀⠀⠀⠀⠀⠀⠀⠞⠁⠃⠇⠑\n⠗⠕⠷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠇⠇⠀',
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁', presentation, 'cs', full_parse=True)
         # Double page tables
-        self._test(u'| this is | a double page | table |\n| the | columns | are too wide |',
-                   (u'⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
-                    u'⠞⠓⠊⠎⠀⠊⠎⠀⠀⠁⠀⠙⠕⠥⠃⠇⠑⠀⠏⠁\n⠞⠓⠑⠀⠀⠀⠀⠀⠀⠉⠕⠇⠥⠍⠝⠎⠀⠀⠀⠀',
-                    u'⠛⠑⠀⠀⠞⠁⠃⠇⠑⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠁⠗⠑⠀⠞⠕⠕⠀⠷⠊⠙⠑',),
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
-                   (u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
-                    u'⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
-                    u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',),
+        self._test('| this is | a double page | table |\n| the | columns | are too wide |',
+                   ('⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
+                    '⠞⠓⠊⠎⠀⠊⠎⠀⠀⠁⠀⠙⠕⠥⠃⠇⠑⠀⠏⠁\n⠞⠓⠑⠀⠀⠀⠀⠀⠀⠉⠕⠇⠥⠍⠝⠎⠀⠀⠀⠀',
+                    '⠛⠑⠀⠀⠞⠁⠃⠇⠑⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠁⠗⠑⠀⠞⠕⠕⠀⠷⠊⠙⠑',),
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
+                   ('⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+                    '⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+                    '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',),
                    presentation, 'cs', full_parse=True)
-        self._test((u'some text\n\n'
-                    u'| this is | a double page | table |\n| the | columns | are too wide |\n\n'
-                    u'another text\n'),
-                   (u'⠎⠕⠍⠑⠀⠞⠑⠭⠞\n\n⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
-                    u'⠞⠓⠊⠎⠀⠊⠎⠀⠀⠁⠀⠙⠕⠥⠃⠇⠑⠀⠏⠁\n⠞⠓⠑⠀⠀⠀⠀⠀⠀⠉⠕⠇⠥⠍⠝⠎⠀⠀⠀⠀',
-                    u'⠛⠑⠀⠀⠞⠁⠃⠇⠑⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠁⠗⠑⠀⠞⠕⠕⠀⠷⠊⠙⠑',
-                    u'⠁⠝⠕⠞⠓⠑⠗⠀⠞⠑⠭⠞',),
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
-                   (u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
-                    u'⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
-                    u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',
-                    u'⠼⠙⠀⠀⠀⠀⠀⠀⠀⠀⠀',),
+        self._test(('some text\n\n'
+                    '| this is | a double page | table |\n| the | columns | are too wide |\n\n'
+                    'another text\n'),
+                   ('⠎⠕⠍⠑⠀⠞⠑⠭⠞\n\n⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
+                    '⠞⠓⠊⠎⠀⠊⠎⠀⠀⠁⠀⠙⠕⠥⠃⠇⠑⠀⠏⠁\n⠞⠓⠑⠀⠀⠀⠀⠀⠀⠉⠕⠇⠥⠍⠝⠎⠀⠀⠀⠀',
+                    '⠛⠑⠀⠀⠞⠁⠃⠇⠑⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠁⠗⠑⠀⠞⠕⠕⠀⠷⠊⠙⠑',
+                    '⠁⠝⠕⠞⠓⠑⠗⠀⠞⠑⠭⠞',),
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
+                   ('⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+                    '⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+                    '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',
+                    '⠼⠙⠀⠀⠀⠀⠀⠀⠀⠀⠀',),
                    presentation, 'cs', full_parse=True)
         # Super wide tables
-        self._test(u'| extremely wide table | very very wide table |\n| next | line |',
-                   (u'⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎\n⠞⠗⠁⠝⠎⠏⠕⠎⠑⠙⠄\n\n⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
-                    u'⠑⠭⠞⠗⠑⠍⠑⠇⠽⠀⠷⠊⠙⠑⠀⠞⠁⠃⠇⠑\n⠧⠑⠗⠽⠀⠧⠑⠗⠽⠀⠷⠊⠙⠑⠀⠞⠁⠃⠇⠑',
-                    u'⠀⠀⠝⠑⠭⠞\n⠀⠀⠇⠊⠝⠑',),
-                   u'⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
-                   (u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
-                    u'⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
-                    u'⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',),
+        self._test('| extremely wide table | very very wide table |\n| next | line |',
+                   ('⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎\n⠞⠗⠁⠝⠎⠏⠕⠎⠑⠙⠄\n\n⠠⠞⠓⠑⠀⠞⠁⠃⠇⠑⠀⠊⠎⠀⠗⠑⠁⠙\n⠁⠉⠗⠕⠎⠎⠀⠋⠁⠉⠊⠝⠛⠀⠏⠁⠛⠑⠎⠄',
+                    '⠑⠭⠞⠗⠑⠍⠑⠇⠽⠀⠷⠊⠙⠑⠀⠞⠁⠃⠇⠑\n⠧⠑⠗⠽⠀⠧⠑⠗⠽⠀⠷⠊⠙⠑⠀⠞⠁⠃⠇⠑',
+                    '⠀⠀⠝⠑⠭⠞\n⠀⠀⠇⠊⠝⠑',),
+                   '⠠⠞⠑⠎⠞⠀⠠⠝⠕⠙⠑\n\n',
+                   ('⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁',
+                    '⠼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀',
+                    '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉',),
                    presentation, 'cs', full_parse=True)
 
     def test_mathml(self):
@@ -1527,40 +1527,40 @@ class BrailleExport(unittest.TestCase):
             assert result == expected_result, (
                 "\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
                 (mathml, expected_result, result))
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,14</mn></mrow>
-</math>''', u'⠼⠉⠂⠁⠙')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠉⠂⠁⠙')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1 000,5</mn></mrow>
-</math>''', u'⠼⠁⠚⠚⠚⠂⠑')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠁⠚⠚⠚⠂⠑')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow>
-</math>''', u'⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>a</mi><mo>=</mo><mo>-</mo><mn>7</mn></mrow>
-</math>''', u'⠁⠀⠶⠤⠼⠛')
-        test(u'''<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠁⠀⠶⠤⠼⠛')
+        test('''<math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow>
   <mfrac>
     <mrow><mfrac><mrow><mn>1</mn></mrow><mrow><mn>2</mn></mrow></mfrac></mrow>
     <mrow><mfrac><mrow><mn>3</mn><mo>+</mo><mn>4</mn></mrow><mrow><mn>5</mn></mrow></mfrac></mrow>
   </mfrac>
 </mrow>
-</math>''', u'''⠆⠆⠼⠁⠻⠼⠃⠰⠻⠻⠆⠼⠉⠀⠲⠼⠙⠻
+</math>''', '''⠆⠆⠼⠁⠻⠼⠃⠰⠻⠻⠆⠼⠉⠀⠲⠼⠙⠻
 ⠻⠼⠑⠰⠰''')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>12</mn><mi>a</mi></mrow>
-</math>''', u'⠼⠁⠃⠐⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠁⠃⠐⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>12</mn></mrow><mrow><mi>a</mi></mrow>
-</math>''', u'⠼⠁⠃⠐⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠁⠃⠐⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>12</mn><mi>k</mi></mrow>
-</math>''', u'⠼⠁⠃⠅')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠁⠃⠅')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>12</mn></mrow><mrow><mi mathvariant="bold">a</mi><mi>b</mi></mrow>
-</math>''', u'⠼⠁⠃⠔⠰⠁⠰⠔⠃')
-        test(u'''<?xml version="1.0" encoding="UTF-8"?>
+</math>''', '⠼⠁⠃⠔⠰⠁⠰⠔⠃')
+        test('''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"
   "http://www.w3.org/TR/MathML2/dtd/xhtml-math11-f.dtd" [
  <!ENTITY mathml "http://www.w3.org/1998/Math/MathML">
@@ -1577,50 +1577,50 @@ class BrailleExport(unittest.TestCase):
 </mrow></mfrac>
 </mrow></math>
 </body></html>
-''', u'''⠭⠡⠼⠁⠂⠀⠼⠃⠱⠀⠶⠆⠤⠃⠀⠲⠤⠩
+''', '''⠭⠡⠼⠁⠂⠀⠼⠃⠱⠀⠶⠆⠤⠃⠀⠲⠤⠩
 ⠩⠃⠌⠼⠃⠱⠀⠤⠼⠙⠐⠁⠉⠱⠻⠼⠃⠐⠁⠰''')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msqrt><mn>2</mn></msqrt><mo>+</mo><mroot><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow>
 </mroot></mrow>
-</math>''', u'⠩⠼⠃⠱⠀⠲⠠⠌⠼⠉⠩⠼⠃⠱')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠩⠼⠃⠱⠀⠲⠠⠌⠼⠉⠩⠼⠃⠱')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>&#x2208;</mo><mi>R</mi></mrow>
-</math>''', u'⠭⠀⠘⠑⠀⠠⠗')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠀⠘⠑⠀⠠⠗')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>∈</mo><mi>R</mi></mrow>
-</math>''', u'⠭⠀⠘⠑⠀⠠⠗')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠀⠘⠑⠀⠠⠗')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>α</mi><mo>+</mo><mi>β</mi></mrow>
-</math>''', u'⠘⠁⠀⠲⠘⠃')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠘⠁⠀⠲⠘⠃')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mrow><mn>5</mn></mrow><mrow><mn>6</mn></mrow></mfrac><mo>-</mo><mfrac><mrow><mn>2</mn>
 </mrow><mrow><mn>3</mn></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>5</mn><mo>-</mo><mn>4</mn></mrow>
 <mrow><mn>6</mn></mrow></mfrac></mrow>
-</math>''', u'⠆⠼⠑⠻⠼⠋⠰⠀⠤⠆⠼⠃⠻⠼⠉⠰⠀⠶\n⠶⠆⠼⠑⠀⠤⠼⠙⠻⠼⠋⠰')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠆⠼⠑⠻⠼⠋⠰⠀⠤⠆⠼⠃⠻⠼⠉⠰⠀⠶\n⠶⠆⠼⠑⠀⠤⠼⠙⠻⠼⠋⠰')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>5</mn><mfrac><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mfrac></mrow>
-</math>''', u'⠼⠑⠆⠼⠃⠻⠼⠉⠰')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠑⠆⠼⠃⠻⠼⠉⠰')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>2,</mn><mover accent="true"><mn>32</mn><mo>&macr;</mo></mover></mrow>
-</math>''', u'⠼⠃⠂⠉⠃⠉⠃⠤')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠃⠂⠉⠃⠉⠃⠤')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="&langle;" close="&rangle;" separators="|"><mi>a</mi><mi>b</mi><mi>c</mi></mfenced>
-</math>''', u'⠈⠣⠁⠸⠀⠃⠸⠀⠉⠈⠜')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠈⠣⠁⠸⠀⠃⠸⠀⠉⠈⠜')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="&langle;" close="&rangle;" separators=","><mi>a</mi><mi>b</mi></mfenced>
-</math>''', u'⠈⠣⠁⠂⠀⠃⠈⠜')
-        test(u'''<math contenteditable="false" style="display:inline-block"
+</math>''', '⠈⠣⠁⠂⠀⠃⠈⠜')
+        test('''<math contenteditable="false" style="display:inline-block"
         xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true">
 <msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mstyle>
 <annotation encoding="ASCII">x^2 + y^2</annotation></semantics></math>''',
-             u'⠭⠌⠼⠃⠱⠀⠲⠽⠌⠼⠃⠱')
+             '⠭⠌⠼⠃⠱⠀⠲⠽⠌⠼⠃⠱')
 
     def test_inline_mathml(self):
-        mathml = u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        mathml = '''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn></mrow>
 </math>'''
         mathml_content = lcg.MathML(mathml)
-        content = lcg.p(u"Trocha matematiky (", mathml_content, u") neuškodí.")
+        content = lcg.p("Trocha matematiky (", mathml_content, ") neuškodí.")
         presentation = self._load_presentation()
         presentation_set = lcg.PresentationSet(((presentation, lcg.TopLevelMatcher(),),))
         n = lcg.ContentNode('test', title='Test Node', descr="Some description", content=content)
@@ -1628,7 +1628,7 @@ class BrailleExport(unittest.TestCase):
         context = exporter.context(n, lang='cs', presentation=presentation_set)
         exported = exporter.export(context)
         result = exported.replace('\r\n', '\n').split('\n\n')[1]
-        assert result == u'''⠠⠞⠗⠕⠉⠓⠁⠀⠍⠁⠞⠑⠍⠁⠞⠊⠅⠽
+        assert result == '''⠠⠞⠗⠕⠉⠓⠁⠀⠍⠁⠞⠑⠍⠁⠞⠊⠅⠽
 ⠦⠼⠁⠀⠲⠼⠁⠀⠶⠼⠃⠴
 ⠝⠑⠥⠱⠅⠕⠙⠌⠄'''
 
@@ -1666,9 +1666,9 @@ class BrailleExport(unittest.TestCase):
             exported = exporter.export(context)
             result = exported.replace('\r\n', '\n').split('\n\n')[1]
             if post == '.':
-                result = result[:-2] + u'⠲'
+                result = result[:-2] + '⠲'
             elif post == ',':
-                result = result[:-2] + u'⠠'
+                result = result[:-2] + '⠠'
             if result != expected_result:
                 print('---')
                 print(mathml)
@@ -1678,593 +1678,593 @@ class BrailleExport(unittest.TestCase):
                 print('---')
             assert result == expected_result
         # §8
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3,76</mn></mrow>
-</math>''', u'⠼⠒⠨⠶⠖', lang='cs')  # decimal point
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠒⠨⠶⠖', lang='cs')  # decimal point
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.76</mn></mrow>
-</math>''', u'⠼⠒⠨⠶⠖', lang='cs')  # decimal point
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠒⠨⠶⠖', lang='cs')  # decimal point
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1,378</mn></mrow>
-</math>''', u'⠼⠂⠠⠒⠶⠦', lang='en')  # comma
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠂⠠⠒⠶⠦', lang='en')  # comma
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.76</mn></mrow>
-</math>''', u'⠼⠒⠨⠶⠖', lang='en')  # decimal point
+</math>''', '⠼⠒⠨⠶⠖', lang='en')  # decimal point
         # §9
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>27</mn></mrow>
-</math>''', u'⠼⠆⠶')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠆⠶')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>7</mn></mrow>
-</math>''', u'⠠⠐⠮⠀⠶⠀⠼⠶⠀⠃⠁⠇⠇⠎⠲', lang='en2', pre="There were ", post=" balls.")
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠠⠐⠮⠀⠶⠀⠼⠶⠀⠃⠁⠇⠇⠎⠲', lang='en2', pre="There were ", post=" balls.")
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1</mn><mo>+</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>0</mn></mrow>
-</math>''', u'⠼⠂⠬⠭⠬⠽⠀⠨⠅⠀⠼⠴')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠂⠬⠭⠬⠽⠀⠨⠅⠀⠼⠴')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>y</mi><mo>=</mo><mn>2</mn><mi>sin</mi><mo>&ApplyFunction;</mo><mi>x</mi></mrow>
-</math>''', u'⠽⠀⠨⠅⠀⠼⠆⠎⠊⠝⠀⠭')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠽⠀⠨⠅⠀⠼⠆⠎⠊⠝⠀⠭')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mn>1</mn></mrow>
-</math>''', u'⠎⠊⠝⠀⠼⠂')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠎⠊⠝⠀⠼⠂')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>sin</mi><mn>2</mn></msup><mo>&ApplyFunction;</mo><mn>2</mn><mi>x</mi></mrow>
-</math>''', u'⠎⠊⠝⠘⠆⠀⠼⠆⠭')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠎⠊⠝⠘⠆⠀⠼⠆⠭')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>0.333</mn><mo>&hellip;</mo><mn>3</mn><mo>&hellip;</mo></mrow>
-</math>''', u'⠼⠴⠨⠒⠒⠒⠀⠄⠄⠄⠀⠼⠒⠀⠄⠄⠄', lang='en')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠴⠨⠒⠒⠒⠀⠄⠄⠄⠀⠼⠒⠀⠄⠄⠄', lang='en')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>log</mi><mn>10</mn></msub><mo>&ApplyFunction;</mo><mn>2</mn></mrow>
-</math>''', u'⠇⠕⠛⠂⠴⠀⠼⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠇⠕⠛⠂⠴⠀⠼⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&angle;</mo><mn>1</mn></mrow>
-</math>''', u'⠫⠪⠀⠼⠂')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠫⠪⠀⠼⠂')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><mi>x</mi><mo>=</mo><mn>0</mn><mo>)</mo></mrow>
-</math>''', u'⠷⠭⠀⠨⠅⠀⠼⠴⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠭⠀⠨⠅⠀⠼⠴⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>-1</mn></mrow>
-</math>''', u'⠤⠼⠂')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠤⠼⠂')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>-.3</mn></mrow>
-</math>''', u'⠤⠼⠨⠒')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠤⠼⠨⠒')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="|" close="|" separators=","><mtable>
  <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr>
  <mtr><mtd><mn>-3</mn></mtd><mtd><mn>-4</mn></mtd></mtr>
-</mtable></mfenced></math>''', u'⠠⠳⠼⠂⠀⠀⠼⠆⠀⠠⠳\n⠠⠳⠤⠼⠒⠀⠤⠼⠲⠠⠳')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</mtable></mfenced></math>''', '⠠⠳⠼⠂⠀⠀⠼⠆⠀⠠⠳\n⠠⠳⠤⠼⠒⠀⠤⠼⠲⠠⠳')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3</mn><mo>#</mo><mn>4</mn></mrow>
-</math>''', u'⠼⠒⠨⠼⠼⠲')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠒⠨⠼⠼⠲')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3</mn><mo>*</mo><mn>4</mn></mrow>
-</math>''', u'⠼⠒⠈⠼⠼⠲')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠒⠈⠼⠼⠲')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn mathvariant="italic">3</mn></mrow>
-</math>''', u'⠨⠼⠒')
+</math>''', '⠨⠼⠒')
         # §11
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>]</mo></mrow>
-</math>''', u'⠈⠷⠴⠠⠀⠂⠈⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠈⠷⠴⠠⠀⠂⠈⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="[" close="]" separators=","><mn>0</mn><mn>1</mn></mfenced></mrow>
-</math>''', u'⠈⠷⠴⠠⠀⠂⠈⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠈⠷⠴⠠⠀⠂⠈⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=",">
   <mrow><mn>1</mn><mo>+</mo><mi>h</mi></mrow>
   <mrow><mn>2</mn><mo>+</mo><mi>k</mi></mrow>
   <mrow><mn>0</mn></mrow>
-</mfenced></mrow></math>''', u'⠷⠂⠬⠓⠠⠀⠆⠬⠅⠠⠀⠴⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</mfenced></mrow></math>''', '⠷⠂⠬⠓⠠⠀⠆⠬⠅⠠⠀⠴⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=",">
  <mrow><mn>0</mn></mrow><mrow><mo>-</mo><mn>1</mn></mrow><mrow><mo>&PlusMinus;</mo><mn>2</mn></mrow>
-</mfenced></mrow></math>''', u'⠷⠴⠠⠀⠤⠂⠠⠀⠬⠤⠆⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</mfenced></mrow></math>''', '⠷⠴⠠⠀⠤⠂⠠⠀⠬⠤⠆⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=",">
   <mrow><mn>2</mn><mi>sin</mi><mo>&ApplyFunction;</mo><mn>30</mn><mo>°</mo></mrow>
   <mrow><mn>3</mn><mi>cos</mi><mo>&ApplyFunction;</mo><mn>60</mn><mo>°</mo></mrow>
-</mfenced></mrow></math>''', u'⠷⠆⠎⠊⠝⠀⠼⠒⠴⠘⠨⠡⠠⠀⠒⠉⠕⠎\n⠀⠀⠼⠖⠴⠘⠨⠡⠐⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</mfenced></mrow></math>''', '⠷⠆⠎⠊⠝⠀⠼⠒⠴⠘⠨⠡⠠⠀⠒⠉⠕⠎\n⠀⠀⠼⠖⠴⠘⠨⠡⠐⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=",">
   <mrow><mi>x</mi></mrow><mrow><mn>7</mn></mrow><mrow><mn mathvariant="bold">8</mn></mrow>
   <mrow><mi>y</mi></mrow>
-</mfenced></mrow></math>''', u'⠷⠭⠠⠀⠶⠠⠀⠸⠼⠦⠠⠀⠽⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</mfenced></mrow></math>''', '⠷⠭⠠⠀⠶⠠⠀⠸⠼⠦⠠⠀⠽⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>&pi;</mi><mo>=</mo><mn>3,14159 26535</mn><mo>&hellip;</mo></mrow>
-</math>''', u'⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢\n⠀⠀⠄⠄⠄')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢\n⠀⠀⠄⠄⠄')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>&pi;</mi><mo>=</mo><mn>3,14159 26535 9</mn></mrow>
-</math>''', u'⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢\n⠀⠀⠼⠔')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢\n⠀⠀⠼⠔')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mn>2</mn></msup></mrow>
-</math>''', u'⠭⠘⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfrac><mrow><mn>3</mn></mrow><mrow><mi>x</mi></mrow></mfrac>
-</math>''', u'⠹⠒⠌⠭⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠹⠒⠌⠭⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>-</mo><mn>5</mn></mrow>
-</math>''', u'⠭⠤⠢')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠤⠢')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>2</mn><mo>&times;</mo><mn>4</mn></mrow>
-</math>''', u'⠼⠆⠈⠡⠲')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠆⠈⠡⠲')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mn>10,000</mn>
-</math>''', u'⠼⠂⠴⠠⠴⠴⠴', lang='en')  # comma
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠂⠴⠠⠴⠴⠴', lang='en')  # comma
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="|" close="|" separators=","><mrow><mo>-</mo><mn>3</mn></mrow></mfenced>
-</math>''', u'⠳⠤⠒⠳')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠳⠤⠒⠳')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="|" close="|" separators=","><mrow><mn>-3</mn></mrow></mfenced>
-</math>''', u'⠳⠤⠒⠳')
+</math>''', '⠳⠤⠒⠳')
         # §24
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mi>&alpha;</mi>
-</math>''', u'⠨⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠨⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mi>&Sigma;</mi>
-</math>''', u'⠨⠠⠎')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠨⠠⠎')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>&alefsym;</mi><mn>0</mn></msub>
-</math>''', u'⠠⠠⠁⠴')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠠⠠⠁⠴')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>&alpha;</mi><mi>&beta;</mi></mrow>
-</math>''', u'⠨⠁⠨⠃')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠨⠁⠨⠃')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>&alpha;&beta;</mi></mrow>
-</math>''', u'⠨⠁⠨⠃')
+</math>''', '⠨⠁⠨⠃')
         # §25
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mo>&prime;</mo></msup><mo>,</mo><msup><mi>x</mi><mo>&Prime;</mo></msup>
 <mo>,</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mi>a</mi></msub><mo>,</mo>
 <msup><mi>x</mi><mn>2</mn></msup><mo>,</mo><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover>
 </mrow>
-</math>''', u'⠭⠄⠠⠀⠭⠄⠄⠠⠀⠭⠂⠠⠀⠭⠰⠁⠠⠀⠭⠘⠆⠠⠀⠭⠱', page_width=True)
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠄⠠⠀⠭⠄⠄⠠⠀⠭⠂⠠⠀⠭⠰⠁⠠⠀⠭⠘⠆⠠⠀⠭⠱', page_width=True)
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow>
-</math>''', u'⠭⠬⠽')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠬⠽')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>cd</mi></mrow>
-</math>''', u'⠰⠉⠙⠀⠊⠎⠀⠏⠜⠁⠇⠇⠑⠇⠀⠞⠕⠀', lang='en2', post=' is parallel to ')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠰⠉⠙⠀⠊⠎⠀⠏⠜⠁⠇⠇⠑⠇⠀⠞⠕⠀', lang='en2', post=' is parallel to ')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>e</mi><mi>f</mi></mrow>
-</math>''', u'⠀⠊⠎⠀⠏⠜⠁⠇⠇⠑⠇⠀⠞⠕⠀⠑⠋⠸⠲', lang='en2', pre=' is parallel to ', post='.')
+</math>''', '⠀⠊⠎⠀⠏⠜⠁⠇⠇⠑⠇⠀⠞⠕⠀⠑⠋⠸⠲', lang='en2', pre=' is parallel to ', post='.')
         # §26
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi mathvariant="bold">A</mi><mi mathvariant="bold">B</mi></mrow>
-</math>''', u'⠸⠰⠠⠁⠸⠰⠠⠃')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠸⠰⠠⠁⠸⠰⠠⠃')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi mathvariant="italic">a</mi><mi mathvariant="italic">b</mi></mrow>
-</math>''', u'⠨⠰⠁⠨⠰⠃')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠨⠰⠁⠨⠰⠃')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="(" close=")" separators=","><mi>a</mi><mrow><mn>2</mn><mi>x</mi></mrow>
 <mrow><mi>y</mi><mo>=</mo><mi>z</mi></mrow></mfenced>
-</math>''', u'⠷⠰⠁⠠⠀⠼⠆⠭⠠⠀⠽⠀⠨⠅⠀⠵⠾')
+</math>''', '⠷⠰⠁⠠⠀⠼⠆⠭⠠⠀⠽⠀⠨⠅⠀⠵⠾')
         # §27
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>cos</mi><mo>&ApplyFunction;</mo><mi>A</mi></mrow>
-</math>''', u'⠉⠕⠎⠀⠠⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠉⠕⠎⠀⠠⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>arc</mi><mo>&ApplyFunction;</mo><mi>a</mi><mi>b</mi></mrow>
-</math>''', u'⠁⠗⠉⠀⠁⠃')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠁⠗⠉⠀⠁⠃')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>e</mi><mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mi>x</mi></mrow></msup></mrow>
-</math>''', u'⠑⠘⠎⠊⠝⠀⠭')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠑⠘⠎⠊⠝⠀⠭')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&angle;</mo><mi>a</mi></mrow>
-</math>''', u'⠫⠪⠀⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠫⠪⠀⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&triangle;</mo><mi>a</mi><mi>c</mi><mi>r</mi></mrow>
-</math>''', u'⠫⠞⠀⠁⠉⠗')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠫⠞⠀⠁⠉⠗')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>&#x25FD;</mo><mi>y</mi></mrow>
-</math>''', u'⠭⠀⠫⠲⠀⠽')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠀⠫⠲⠀⠽')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>|</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr>
 <mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr>
 <mtr><mtd><mi>g</mi></mtd><mtd><mi>h</mi></mtd><mtd><mi>i</mi></mtd></mtr></mtable><mo>|</mo></mrow>
-</math>''', u'⠠⠳⠁⠀⠃⠀⠉⠠⠳\n⠠⠳⠙⠀⠑⠀⠋⠠⠳\n⠠⠳⠛⠀⠓⠀⠊⠠⠳')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠠⠳⠁⠀⠃⠀⠉⠠⠳\n⠠⠳⠙⠀⠑⠀⠋⠠⠳\n⠠⠳⠛⠀⠓⠀⠊⠠⠳')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="(" close=")" separators=","><mn>0</mn><mi>a</mi><mn>1</mn><mi>b</mi><mn>2</mn>
 </mfenced>
-</math>''', u'⠷⠴⠠⠀⠁⠠⠀⠂⠠⠀⠃⠠⠀⠆⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠴⠠⠀⠁⠠⠀⠂⠠⠀⠃⠠⠀⠆⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="{" close="}" separators=","><mi>a</mi><mi>b</mi><mi>c</mi><mi>d</mi>
 </mfenced>
-</math>''', u'⠨⠷⠁⠠⠀⠃⠠⠀⠉⠠⠀⠙⠨⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠨⠷⠁⠠⠀⠃⠠⠀⠉⠠⠀⠙⠨⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="(" close=")" separators=",">
 <mrow><mi>a</mi><mi>b</mi></mrow><mrow><mi>c</mi><mi>d</mi></mrow><mrow><mi>e</mi><mi>f</mi></mrow>
 </mfenced>
-</math>''', u'⠷⠁⠃⠠⠀⠉⠙⠠⠀⠑⠋⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠁⠃⠠⠀⠉⠙⠠⠀⠑⠋⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="(" close=")" separators=","><mi>a</mi><mrow><mn>2</mn><mi>x</mi></mrow><mi>b</mi>
 </mfenced>
-</math>''', u'⠷⠁⠠⠀⠆⠭⠠⠀⠃⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠁⠠⠀⠆⠭⠠⠀⠃⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>a</mi><mi>cos</mi><mo>&ApplyFunction;</mo><mi>B</mi></mrow>
-</math>''', u'⠁⠉⠕⠎⠀⠠⠃')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠁⠉⠕⠎⠀⠠⠃')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>m</mi><mo>&angle;</mo><mi>b</mi></mrow>
-</math>''', u'⠍⠫⠪⠀⠃')
+</math>''', '⠍⠫⠪⠀⠃')
         # §28
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfenced open="" close="" separators=",">
 <mfenced open="|" close="|"><mi>x</mi></mfenced>
 <mfenced open="[" close="]"><mi>x</mi></mfenced>
 <mfenced open="&DoubleVerticalBar;" close="&DoubleVerticalBar;"><mi>f</mi></mfenced>
 </mfenced>
-</math>''', u'⠳⠭⠳⠠⠀⠈⠷⠭⠈⠾⠠⠀⠳⠳⠋⠳⠳')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠳⠭⠳⠠⠀⠈⠷⠭⠈⠾⠠⠀⠳⠳⠋⠳⠳')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><mi>a</mi><mi>b</mi><mo>)</mo><mo>+</mo><mo>(</mo><mi>c</mi><mi>d</mi><mo>)</mo>
 </mrow>
-</math>''', u'⠷⠁⠃⠾⠬⠷⠉⠙⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠁⠃⠾⠬⠷⠉⠙⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><mi>j</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mo>&hellip;</mo>
 <mo>,</mo><mi>n</mi><mo>)</mo></mrow>
-</math>''', u'⠷⠚⠀⠨⠅⠀⠼⠂⠠⠀⠼⠆⠠⠀⠄⠄⠄⠠⠀⠰⠝⠾', page_width=True)
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠚⠀⠨⠅⠀⠼⠂⠠⠀⠼⠆⠠⠀⠄⠄⠄⠠⠀⠰⠝⠾', page_width=True)
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><mi>a</mi><mi>b</mi><mo>=</mo><mi>c</mi><mi>d</mi><mo>)</mo></mrow>
-</math>''', u'⠷⠁⠃⠀⠨⠅⠀⠉⠙⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠁⠃⠀⠨⠅⠀⠉⠙⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msubsup><mrow><mi>s</mi><mo>]</mo></mrow><mi>a</mi><mi>b</mi></msubsup></mrow>
-</math>''', u'⠎⠈⠾⠰⠁⠘⠃')
+</math>''', '⠎⠈⠾⠰⠁⠘⠃')
         # §32
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn mathvariant="bold">0</mn></mrow>
-</math>''', u'⠸⠼⠴')
+</math>''', '⠸⠼⠴')
         # §37
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow>
-</math>''', u'⠹⠂⠌⠆⠼⠠', lang='en2', post=',')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠹⠂⠌⠆⠼⠠', lang='en2', post=',')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow>
-</math>''', u'⠹⠒⠌⠲⠼⠸⠲', lang='en2', post='.')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠹⠒⠌⠲⠼⠸⠲', lang='en2', post='.')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>0</mn></mrow>
-</math>''', u'⠼⠴⠸⠲', lang='en2', post='.')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠴⠸⠲', lang='en2', post='.')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>c</mi></mrow>
-</math>''', u'⠰⠉⠸⠲', lang='en2', post='.')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠰⠉⠸⠲', lang='en2', post='.')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo lspace="0" rspace="0">&square;</mo><mo>+</mo>
 <mo lspace="0" rspace="0">&bigcirc;</mo><mo>=</mo><mo>&bigtriangleup;</mo></mrow>
-</math>''', u'⠦⠫⠲⠬⠫⠉⠀⠨⠅⠀⠫⠞⠸⠴', lang='en2', pre=u'“', post=u'”')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠦⠫⠲⠬⠫⠉⠀⠨⠅⠀⠫⠞⠸⠴', lang='en2', pre='“', post='”')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>sin</mi></mrow>
-</math>''', u'⠦⠎⠊⠝⠸⠴', lang='en2', pre=u'“', post=u'”')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠦⠎⠊⠝⠸⠴', lang='en2', pre='“', post='”')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>0</mn></mrow>
-</math>''', u'⠼⠴⠠⠸⠴', lang='en2', post=u',”')
+</math>''', '⠼⠴⠠⠸⠴', lang='en2', post=',”')
         # §42
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mo>&mdash;</mo><mn>15</mn></mfrac><mo>=</mo><mfrac><mn>2</mn><mn>3</mn></mfrac></mrow>
-</math>''', u'⠹⠤⠤⠤⠤⠀⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠹⠤⠤⠤⠤⠀⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=","><mo>&mdash;</mo><mn>4</mn><mn>6</mn><mn>8</mn>
 <mo>&mdash;</mo></mfenced></mrow>
-</math>''', u'⠷⠤⠤⠤⠤⠠⠀⠲⠠⠀⠖⠠⠀⠦⠠⠀⠤⠤⠤⠤⠾', page_width=True)
+</math>''', '⠷⠤⠤⠤⠤⠠⠀⠲⠠⠀⠖⠠⠀⠦⠠⠀⠤⠤⠤⠤⠾', page_width=True)
         # §43
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>+</mo><mi>&hellip;</mi></mrow>
-</math>''', u'⠭⠬⠽⠬⠀⠄⠄⠄⠸⠲', lang='en2', post='.')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠬⠽⠬⠀⠄⠄⠄⠸⠲', lang='en2', post='.')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="" close="" separators=","><mn>1</mn><mn>3</mn><mn>5</mn><mo>&hellip;</mo>
 <mn>15</mn></mfenced></mrow>
-</math>''', u'⠼⠂⠠⠀⠼⠒⠠⠀⠼⠢⠠⠀⠄⠄⠄⠠⠀⠼⠂⠢⠸⠲', lang='en2', post='.', page_width=True)
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠂⠠⠀⠼⠒⠠⠀⠼⠢⠠⠀⠄⠄⠄⠠⠀⠼⠂⠢⠸⠲', lang='en2', post='.', page_width=True)
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow>
 <msup><msub><mi>p</mi><mn>1</mn></msub><msub><mi>&alpha;</mi><mn>1</mn></msub></msup>
 <mo>&hellip;</mo>
 <msup><msub><mi>p</mi><mi>r</mi></msub><msub><mi>&alpha;</mi><mi>r</mi></msub></msup>
 </mrow>
-</math>''', u'⠏⠂⠘⠨⠁⠘⠰⠂⠐⠄⠄⠄⠀⠏⠰⠗⠘⠨⠁⠘⠰⠗', page_width=True)
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠏⠂⠘⠨⠁⠘⠰⠂⠐⠄⠄⠄⠀⠏⠰⠗⠘⠨⠁⠘⠰⠗', page_width=True)
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfenced open="(" close=")" separators=","><mo>&hellip;</mo><mn>-1</mn><mn>0</mn><mn>1</mn>
 <mo>&hellip;</mo></mfenced></mrow>
-</math>''', u'⠷⠄⠄⠄⠠⠀⠤⠂⠠⠀⠴⠠⠀⠂⠠⠀⠄⠄⠄⠾')
+</math>''', '⠷⠄⠄⠄⠠⠀⠤⠂⠠⠀⠴⠠⠀⠂⠠⠀⠄⠄⠄⠾')
         # §57
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>?</mo><mo>+</mo><mo>?</mo><mo>=</mo><mn>10</mn></mrow>
-</math>''', u'⠿⠬⠿⠀⠨⠅⠀⠼⠂⠴')
+</math>''', '⠿⠬⠿⠀⠨⠅⠀⠼⠂⠴')
         # §62
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow>
-</math>''', u'⠹⠂⠌⠒⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠹⠂⠌⠒⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mi>c</mi></mfrac></mrow>
-</math>''', u'⠹⠁⠬⠃⠌⠉⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠹⠁⠬⠃⠌⠉⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><msup><mi>x</mi><mfrac><mn>1</mn><mn>2</mn></mfrac></msup><mn>2</mn></mfrac></mrow>
-</math>''', u'⠹⠭⠘⠹⠂⠌⠆⠼⠐⠌⠆⠼')
+</math>''', '⠹⠭⠘⠹⠂⠌⠆⠼⠐⠌⠆⠼')
         # §64
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>4</mn><mfrac><mn>3</mn><mn>8</mn></mfrac></mrow>
-</math>''', u'⠼⠲⠸⠹⠒⠌⠦⠸⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠲⠸⠹⠒⠌⠦⠸⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mfrac><mn>3</mn><mn>8</mn></mfrac></mrow>
-</math>''', u'⠭⠹⠒⠌⠦⠼')
+</math>''', '⠭⠹⠒⠌⠦⠼')
         # §65
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mfrac><mn>3</mn><mn>8</mn></mfrac><mn>5</mn></mfrac></mrow>
-</math>''', u'⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mfrac><mn>5</mn><mrow><mn>4</mn><mfrac><mn>3</mn><mn>8</mn></mfrac></mrow></mfrac></mrow>
-</math>''', u'⠠⠹⠢⠠⠌⠲⠸⠹⠒⠌⠦⠸⠼⠠⠼')
+</math>''', '⠠⠹⠢⠠⠌⠲⠸⠹⠒⠌⠦⠸⠼⠠⠼')
         # §67
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfrac><mi>a</mi><msup><mi>b</mi>
 <mfrac><mfrac><mn>3</mn><mn>4</mn></mfrac><mfrac><mn>5</mn><mn>6</mn></mfrac></mfrac></msup></mfrac>
-</math>''', u'⠹⠁⠌⠃⠘⠠⠹⠹⠒⠌⠲⠼⠠⠌⠹⠢⠌⠖⠼⠠⠼⠐⠼', page_width=True)
+</math>''', '⠹⠁⠌⠃⠘⠠⠹⠹⠒⠌⠲⠼⠠⠌⠹⠢⠌⠖⠼⠠⠼⠐⠼', page_width=True)
         # §74
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>x</mi><mn>2</mn></msup>
-</math>''', u'⠭⠘⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>x</mi><mo>*</mo></msup>
-</math>''', u'⠭⠘⠈⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠈⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>x</mi><mn>-2</mn></msup>
-</math>''', u'⠭⠘⠤⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠤⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><mi>a</mi></msub>
-</math>''', u'⠭⠰⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠰⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><mn>-2</mn></msub>
-</math>''', u'⠭⠰⠤⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠰⠤⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>n</mi><msup><mi>x</mi><mi>y</mi></msup></msup>
-</math>''', u'⠝⠘⠭⠘⠘⠽')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠝⠘⠭⠘⠘⠽')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><msup><mi>n</mi><mi>a</mi></msup></msub>
-</math>''', u'⠭⠰⠝⠰⠘⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠰⠝⠰⠘⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>x</mi><msub><mi>y</mi><msup><mi>a</mi><mi>n</mi></msup></msub></msup>
-</math>''', u'⠭⠘⠽⠘⠰⠁⠘⠰⠘⠝')
+</math>''', '⠭⠘⠽⠘⠰⠁⠘⠰⠘⠝')
         # §77
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><mn>1</mn></msub>
-</math>''', u'⠭⠂')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠂')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><mn>11</mn></msub>
-</math>''', u'⠭⠂⠂')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠂⠂')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><msup><mi>x</mi><mo>&prime;</mo></msup><mn>1</mn></msub>
-</math>''', u'⠭⠄⠂')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠄⠂')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><msub><mi>i</mi><mn>1</mn></msub></msub>
-</math>''', u'⠭⠰⠊⠰⠰⠂')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠰⠊⠰⠰⠂')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>log</mi><mn>2</mn></msub><mo>&ApplyFunction;</mo><mi>x</mi></mrow>
-</math>''', u'⠇⠕⠛⠆⠀⠭')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠇⠕⠛⠆⠀⠭')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mn>12</mn><mn>7</mn></msub>
-</math>''', u'⠼⠂⠆⠰⠶')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠂⠆⠰⠶')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mrow><mo>(</mo><mi>C</mi><msub><mi>O</mi><mn>3</mn></msub><mo>)</mo></mrow><mi>2</mi></msub>
-</math>''', u'⠷⠠⠉⠠⠕⠒⠾⠰⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠠⠉⠠⠕⠒⠾⠰⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>Na</mi><mn>2</mn></msub><mi>C</mi><msub><mi>O</mi><mn>3</mn></msub></mrow>
-</math>''', u'⠠⠝⠁⠆⠠⠉⠠⠕⠒')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠠⠝⠁⠆⠠⠉⠠⠕⠒')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>seven</mi><mn>3</mn></msub>
-</math>''', u'⠎⠑⠧⠑⠝⠰⠒')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠎⠑⠧⠑⠝⠰⠒')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msubsup><mo>&Sum;</mo><mn>0</mn><mi>n</mi></msubsup><msub><mi>a</mi><mi>k</mi></msub></mrow>
-</math>''', u'⠨⠠⠎⠴⠘⠝⠐⠁⠰⠅')
+</math>''', '⠨⠠⠎⠴⠘⠝⠐⠁⠰⠅')
         # §78
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><mfenced open="" close="" separators=","><mi>i</mi><mi>j</mi><mi>k</mi></mfenced>
 </msub>
-</math>''', u'⠭⠰⠊⠪⠚⠪⠅')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠰⠊⠪⠚⠪⠅')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><mfenced open="(" close=")" separators=","><mi>a</mi><mi>b</mi></mfenced></msub>
-</math>''', u'⠭⠰⠷⠁⠪⠃⠾')
+</math>''', '⠭⠰⠷⠁⠪⠃⠾')
         # §79
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>x</mi><mi>a</mi></msub><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mrow>
-</math>''', u'⠭⠰⠁⠐⠬⠽⠘⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠰⠁⠐⠬⠽⠘⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mfrac><msup><mi>e</mi><msup><mi>x</mi><mn>2</mn></msup></msup><mn>2</mn></mfrac>
-</math>''', u'⠹⠑⠘⠭⠘⠘⠆⠐⠌⠆⠼')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠹⠑⠘⠭⠘⠘⠆⠐⠌⠆⠼')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>x</mi><mn>2</mn></msup>
-</math>''', u'⠭⠘⠆⠸⠲', lang='en2', post='.')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠆⠸⠲', lang='en2', post='.')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mn>2</mn></msup><mo>,</mo><msup><mi>x</mi><mn>3</mn></msup></mrow>
-</math>''', u'⠭⠘⠆⠠⠀⠭⠘⠒')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠆⠠⠀⠭⠘⠒')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mn>10,000</mn></msup></mrow>
-</math>''', u'⠭⠘⠂⠴⠠⠴⠴⠴', lang='en2')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠂⠴⠠⠴⠴⠴', lang='en2')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub>
-</math>''', u'⠭⠰⠊⠪⠚')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠰⠊⠪⠚')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>P</mi><mfenced open="" close="" separators=",">
 <msub><mi>n</mi><mn>1</mn></msub><msub><mi>n</mi><mn>2</mn></msub><mo>&hellip;</mo></mfenced></msub>
-</math>''', u'⠠⠏⠰⠝⠰⠰⠂⠰⠪⠝⠰⠰⠆⠰⠪⠀⠄⠄⠄')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠠⠏⠰⠝⠰⠰⠂⠰⠪⠝⠰⠰⠆⠰⠪⠀⠄⠄⠄')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>b</mi><mrow><mo>&triangle;</mo><mi>A</mi><mi>B</mi><mi>C</mi></mrow></msub>
-</math>''', u'⠃⠰⠫⠞⠀⠠⠁⠠⠃⠠⠉')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠃⠰⠫⠞⠀⠠⠁⠠⠃⠠⠉')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>cos</mi><mn>2</mn></msup><mo>&ApplyFunction;</mo><mi>x</mi></mrow>
-</math>''', u'⠉⠕⠎⠘⠆⠀⠭')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠉⠕⠎⠘⠆⠀⠭')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>e</mi><mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mi>x</mi><mo>+</mo>
 <mi>i</mi><mi>cos</mi><mo>&ApplyFunction;</mo><mi>x</mi></mrow></msup>
-</math>''', u'⠑⠘⠎⠊⠝⠀⠭⠬⠊⠉⠕⠎⠀⠭')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠑⠘⠎⠊⠝⠀⠭⠬⠊⠉⠕⠎⠀⠭')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>e</mi><mrow><msup><mi>sin</mi><mn>2</mn></msup><mo>&ApplyFunction;</mo><mi>x</mi>
 <mo>+</mo><msup><mi>sin</mi><mn>2</mn></msup><mo>&ApplyFunction;</mo><mi>y</mi></mrow></msup>
-</math>''', u'⠑⠘⠎⠊⠝⠘⠘⠆⠀⠭⠬⠎⠊⠝⠘⠘⠆⠀⠽')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠑⠘⠎⠊⠝⠘⠘⠆⠀⠭⠬⠎⠊⠝⠘⠘⠆⠀⠽')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>s</mi><mn>1</mn></msub><mo>&hellip;</mo><msub><mi>s</mi><mi>n</mi></msub></mrow>
-</math>''', u'⠎⠂⠀⠄⠄⠄⠀⠎⠰⠝')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠎⠂⠀⠄⠄⠄⠀⠎⠰⠝')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup><mo>+</mo>
 <msup><mi>z</mi><mn>2</mn></msup><mo>=</mo><msup><mi>r</mi><mn>2</mn></msup></mrow>
-</math>''', u'⠭⠘⠆⠐⠬⠽⠘⠆⠐⠬⠵⠘⠆⠀⠨⠅⠀⠗⠘⠆', page_width=True)
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠘⠆⠐⠬⠽⠘⠆⠐⠬⠵⠘⠆⠀⠨⠅⠀⠗⠘⠆', page_width=True)
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mi>q</mi><mrow><msub><mi>log</mi><mi>q</mi></msub><mo>&ApplyFunction;</mo><mi>a</mi>
 </mrow></msup><mo>=</mo><mi>a</mi></mrow>
-</math>''', u'⠟⠘⠇⠕⠛⠘⠰⠟⠀⠁⠀⠨⠅⠀⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠟⠘⠇⠕⠛⠘⠰⠟⠀⠁⠀⠨⠅⠀⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msup><mrow><mo>(</mo><mn>1</mn><mo>-</mo><msup><mi>sin</mi><mn>2</mn></msup>
 <mo>&ApplyFunction;</mo><mi>x</mi><mo>)</mo></mrow><mi>2</mi></msup><mo>=</mo>
 <msup><mi>cos</mi><mn>4</mn></msup><mo>&ApplyFunction;</mo><mi>x</mi></mrow>
-</math>''', u'⠷⠂⠤⠎⠊⠝⠘⠆⠀⠭⠾⠘⠆⠀⠨⠅⠀⠉⠕⠎⠘⠲⠀⠭', page_width=True)
+</math>''', '⠷⠂⠤⠎⠊⠝⠘⠆⠀⠭⠾⠘⠆⠀⠨⠅⠀⠉⠕⠎⠘⠲⠀⠭', page_width=True)
         # §81
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><msub><mi>y</mi><mn>1</mn></msub><mo>+</mo>
 <msub><mi>x</mi><mn>2</mn></msub><msub><mi>y</mi><mn>2</mn></msub><mo>)</mo></mrow>
-</math>''', u'⠷⠭⠂⠽⠂⠬⠭⠆⠽⠆⠾')
+</math>''', '⠷⠭⠂⠽⠂⠬⠭⠆⠽⠆⠾')
         # §83
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>x</mi><mo>&prime;</mo></msup>
-</math>''', u'⠭⠄')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠄')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msubsup><mi>x</mi><mi>a</mi><mo>&prime;</mo></msubsup>
-</math>''', u'⠭⠄⠰⠁')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠄⠰⠁')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mi>x</mi><mrow><mo>&prime;</mo><mn>2</mn></mrow></msup>
-</math>''', u'⠭⠄⠘⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠄⠘⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msubsup><mi>x</mi><mi>a</mi><mrow><mo>&prime;</mo><mi>b</mi></mrow></msubsup>
-</math>''', u'⠭⠄⠰⠁⠘⠃')
+</math>''', '⠭⠄⠰⠁⠘⠃')
         # §86
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <munder accentunder="true"><mi>x</mi><mo>&macr;</mo></munder>
-</math>''', u'⠐⠭⠩⠱⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠐⠭⠩⠱⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mover accent="true"><mrow><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></mrow><mo>&macr;</mo></mover>
-</math>''', u'⠐⠭⠬⠽⠣⠱⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠐⠭⠬⠽⠣⠱⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><munder accentunder="true"><mi>lim</mi><mrow><mi>x</mi><mo>&rarr;</mo><mn>0</mn></mrow>
 </munder><mo>&ApplyFunction;</mo>
 <mi>f</mi><mfenced open="(" close=")" separators=","><mrow><mi>x</mi></mrow></mfenced>
 </mrow>
-</math>''', u'⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠀⠋⠷⠭⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠀⠋⠷⠭⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mover accent="true"><msup><mi>x</mi><mn>2</mn></msup><mo>&macr;</mo></mover>
-</math>''', u'⠐⠭⠘⠆⠐⠣⠱⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠐⠭⠘⠆⠐⠣⠱⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mover accent="true"><msup><mi>x</mi><mo>&prime;</mo></msup><mo>&macr;</mo></mover>
-</math>''', u'⠐⠭⠄⠣⠱⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠐⠭⠄⠣⠱⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mover accent="true"><msub><mi>x</mi><mn>1</mn></msub><mo>&macr;</mo></mover>
-</math>''', u'⠐⠭⠂⠣⠱⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠐⠭⠂⠣⠱⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mover accent="true"><mi>x</mi><mo>&macr;</mo></mover>
-</math>''', u'⠭⠱')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠱')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover><mo>+</mo>
 <mover accent="true"><mi>y</mi><mo>&macr;</mo></mover></mrow>
-</math>''', u'⠭⠱⠬⠽⠱')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠱⠬⠽⠱')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover><mn>2</mn></msup>
-</math>''', u'⠭⠱⠘⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠱⠘⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msup><mover accent="true"><mi>x</mi><mo>&macr;</mo></mover><mo>&prime;</mo></msup>
-</math>''', u'⠭⠱⠄')
+</math>''', '⠭⠱⠄')
         # §88
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <munderover><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>&macr;</mo><mo>&macr;</mo></munderover>
-</math>''', u'⠐⠭⠬⠽⠩⠱⠣⠱⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠐⠭⠬⠽⠩⠱⠣⠱⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><munderover><mo>&Sum;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mo>&infin;</mo>
 </munderover><mfrac><mrow><mn>1</mn></mrow><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow></mfrac>
 <mo>=</mo><mn>1</mn></mrow>
-</math>''', u'⠐⠨⠠⠎⠩⠝⠀⠨⠅⠀⠼⠂⠣⠠⠿⠻⠹⠂⠌⠆⠘⠝⠐⠼⠀⠨⠅⠀⠼⠂', page_width=True)
+</math>''', '⠐⠨⠠⠎⠩⠝⠀⠨⠅⠀⠼⠂⠣⠠⠿⠻⠹⠂⠌⠆⠘⠝⠐⠼⠀⠨⠅⠀⠼⠂', page_width=True)
         # §90
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac><mo>)</mo></mrow>
-</math>''', u'⠷⠝⠩⠅⠾')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠷⠝⠩⠅⠾')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>(</mo><mfrac linethickness="0"><msub><mi>g</mi><mi>j</mi></msub><msub><mi>a</mi><mi>j</mi>
 </msub></mfrac><mo>)</mo></mrow>
-</math>''', u'⠷⠛⠰⠚⠐⠩⠁⠰⠚⠐⠾')
+</math>''', '⠷⠛⠰⠚⠐⠩⠁⠰⠚⠐⠾')
         # §91
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>A</mi><mrow><mover><mi>x</mi><mo>~</mo></mover><mo>+</mo><mover><mi>y</mi><mo>~</mo>
 </mover></mrow></msub>
-</math>''', u'⠠⠁⠰⠐⠭⠣⠈⠱⠻⠬⠰⠐⠽⠣⠈⠱⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠠⠁⠰⠐⠭⠣⠈⠱⠻⠬⠰⠐⠽⠣⠈⠱⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msub><mi>A</mi><mrow><mover><mi>x</mi><mo>&macr;</mo></mover><mo>+</mo><mover><mi>y</mi>
 <mo>&macr;</mo></mover></mrow></msub>
-</math>''', u'⠠⠁⠰⠭⠱⠬⠽⠱')
+</math>''', '⠠⠁⠰⠭⠱⠬⠽⠱')
         # §96
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mover accent="true"><mrow><mrow><mi>A</mi><mi>B</mi></mrow></mrow><mo>&rarr;</mo></mover>
-</math>''', u'⠐⠠⠁⠠⠃⠣⠫⠕⠻')
+</math>''', '⠐⠠⠁⠠⠃⠣⠫⠕⠻')
         # §97
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.57</mn><mover><mn>29</mn><mo>&macr;</mo></mover></mrow>
-</math>''', u'⠼⠒⠨⠢⠶⠐⠆⠔⠣⠱⠻')
+</math>''', '⠼⠒⠨⠢⠶⠐⠆⠔⠣⠱⠻')
         # §103
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msqrt><mn>2</mn></msqrt>
-</math>''', u'⠜⠆⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠜⠆⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <msqrt><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></msqrt>
-</math>''', u'⠜⠭⠘⠆⠐⠬⠂⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠜⠭⠘⠆⠐⠬⠂⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mroot><mrow><mn>2</mn></mrow><mrow><mn>3</mn></mrow></mroot>
-</math>''', u'⠣⠒⠜⠆⠻')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠣⠒⠜⠆⠻')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mroot><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mroot><mrow>
 <msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mrow><mrow>
 <mn>3</mn></mrow></mroot><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></mrow><mrow><mn>3</mn></mrow>
 </mroot>
-</math>''', u'⠣⠒⠜⠭⠘⠆⠐⠬⠨⠣⠒⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠨⠻⠬⠽⠘⠆⠐⠻', page_width=True)
+</math>''', '⠣⠒⠜⠭⠘⠆⠐⠬⠨⠣⠒⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠨⠻⠬⠽⠘⠆⠐⠻', page_width=True)
         # §138
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mo>=</mo><mo>-</mo><mi>y</mi></mrow>
-</math>''', u'⠭⠀⠨⠅⠀⠤⠽')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠀⠨⠅⠀⠤⠽')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>sin</mi><mo>&ApplyFunction;</mo><mo>-</mo><mi>x</mi></mrow>
-</math>''', u'⠎⠊⠝⠀⠤⠭')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠎⠊⠝⠀⠤⠭')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mo>&hellip;</mo><mo>+</mo><mi>n</mi></mrow>
-</math>''', u'⠼⠂⠬⠆⠬⠀⠄⠄⠄⠀⠬⠝')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠂⠬⠆⠬⠀⠄⠄⠄⠀⠬⠝')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1</mn><mi mathvariant="normal">yd</mi><mo>+</mo>
 <mn>2</mn><mi mathvariant="normal">yd</mi><mo>=</mo>
 <mn>3</mn><mi mathvariant="normal">yd</mi></mrow>
-</math>''', u'⠼⠂⠀⠽⠙⠀⠬⠆⠀⠽⠙⠀⠨⠅⠀⠼⠒⠀⠽⠙', page_width=True)
+</math>''', '⠼⠂⠀⠽⠙⠀⠬⠆⠀⠽⠙⠀⠨⠅⠀⠼⠒⠀⠽⠙', page_width=True)
         # §169
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>n</mi><mo>!</mo></mrow>
-</math>''', u'⠝⠯')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠝⠯')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>&forall;</mo><mi>x</mi><mo>&isin;</mo><mi>A</mi></mrow>
-</math>''', u'⠈⠯⠭⠀⠈⠑⠀⠠⠁')
+</math>''', '⠈⠯⠭⠀⠈⠑⠀⠠⠁')
         # §177
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mi>x</mi><mn>5</mn></mrow>
-</math>''', u'⠭⠐⠢')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠭⠐⠢')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><msub><mi>c</mi><mn>0</mn></msub><msup><mn>10</mn><mn>2</mn></msup><mo>+</mo>
 <msub><mi>c</mi><mn>1</mn></msub><mn>10</mn><mo>+</mo><msub><mi>c</mi><mn>2</mn></msub></mrow>
-</math>''', u'⠉⠴⠐⠂⠴⠘⠆⠐⠬⠉⠂⠐⠂⠴⠬⠉⠆')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠉⠴⠐⠂⠴⠘⠆⠐⠬⠉⠂⠐⠂⠴⠬⠉⠆')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mo>|</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>y</mi><mo>|</mo></mrow>
-</math>''', u'⠳⠭⠳⠐⠳⠽⠳')
+</math>''', '⠳⠭⠳⠐⠳⠽⠳')
         # §178
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mstack>
 <mn>508</mn><mn>2876</mn><mn>59</mn><msrow><mo>+</mo><mn>427</mn></msrow><msline/><mn>3870</mn>
 </mstack>
-</math>''', u'⠀⠀⠀⠢⠴⠦\n⠀⠀⠆⠦⠶⠖\n⠀⠀⠀⠀⠢⠔\n⠀⠬⠀⠲⠆⠶\n⠒⠒⠒⠒⠒⠒⠒\n⠀⠀⠒⠦⠶⠴')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠀⠀⠀⠢⠴⠦\n⠀⠀⠆⠦⠶⠖\n⠀⠀⠀⠀⠢⠔\n⠀⠬⠀⠲⠆⠶\n⠒⠒⠒⠒⠒⠒⠒\n⠀⠀⠒⠦⠶⠴')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mstack>
 <mn>35.50</mn><msrow><mo>+</mo><mn>77.25</mn></msrow><msline/><mn>112.75</mn>
 </mstack>
-</math>''', u'⠀⠀⠒⠢⠨⠢⠴\n⠀⠬⠶⠶⠨⠆⠢\n⠒⠒⠒⠒⠒⠒⠒⠒\n⠀⠂⠂⠆⠨⠶⠢')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠀⠀⠒⠢⠨⠢⠴\n⠀⠬⠶⠶⠨⠆⠢\n⠒⠒⠒⠒⠒⠒⠒⠒\n⠀⠂⠂⠆⠨⠶⠢')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mstack>
 <mn>3.704</mn><msrow><mo>-</mo><mn>.915</mn></msrow><msline/><mn>2.789</mn>
 </mstack>
-</math>''', u'⠀⠀⠒⠨⠶⠴⠲\n⠀⠤⠀⠨⠔⠂⠢\n⠒⠒⠒⠒⠒⠒⠒⠒\n⠀⠀⠆⠨⠶⠦⠔')
+</math>''', '⠀⠀⠒⠨⠶⠴⠲\n⠀⠤⠀⠨⠔⠂⠢\n⠒⠒⠒⠒⠒⠒⠒⠒\n⠀⠀⠆⠨⠶⠦⠔')
         # §179
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mstack>
   <msgroup>
     <mn>23</mn>
@@ -2278,7 +2278,7 @@ class BrailleExport(unittest.TestCase):
   <msline/>
   <mn>1242</mn>
 </mstack>
-</math>''', u'⠀⠀⠀⠆⠒\n⠀⠈⠡⠢⠲\n⠒⠒⠒⠒⠒⠒\n⠀⠀⠀⠔⠆\n⠀⠂⠂⠢\n⠒⠒⠒⠒⠒⠒\n⠀⠂⠆⠲⠆', page_height=True)
+</math>''', '⠀⠀⠀⠆⠒\n⠀⠈⠡⠢⠲\n⠒⠒⠒⠒⠒⠒\n⠀⠀⠀⠔⠆\n⠀⠂⠂⠢\n⠒⠒⠒⠒⠒⠒\n⠀⠂⠆⠲⠆', page_height=True)
 
     def test_mathml_nemeth_liblouis(self):
         # We don't aim to test correctness of liblouisutdml here, just that the
@@ -2297,25 +2297,25 @@ class BrailleExport(unittest.TestCase):
             assert result == expected_result, (
                 "\n  - source text: %r\n  - expected:    %r\n  - got:         %r" %
                 (mathml, expected_result, result))
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>3.76</mn></mrow>
-</math>''', u'⠼⠒⠨⠶⠖')
-        test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+</math>''', '⠼⠒⠨⠶⠖')
+        test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 <mrow><mn>1</mn><mo>+</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>0</mn></mrow>
-</math>''', u'⠼⠂⠬⠭⠬⠽⠀⠨⠅⠀⠼⠴')
+</math>''', '⠼⠂⠬⠭⠬⠽⠀⠨⠅⠀⠼⠴')
         # Of course, comma is not recognized as a decimal point, how could
         # liblouisutdml know about that?
-#         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+#         test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 # <mrow><mn>3,76</mn></mrow>
-# </math>''', u'⠼⠒⠨⠶⠖')
+# </math>''', '⠼⠒⠨⠶⠖')
         # Doesn't work correctly in liblouisutdml:
-#         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+#         test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 # <mrow><msub><mi>log</mi><mtext>10</mtext></msub><mn>2</mn></mrow>
-# </math>''', u'⠇⠕⠛⠂⠴⠀⠼⠆')
+# </math>''', '⠇⠕⠛⠂⠴⠀⠼⠆')
         # Doesn't work correctly in liblouisutdml:
-#         test(u'''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+#         test('''<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
 # <mfrac><mfrac><mn>3</mn><mn>8</mn></mfrac><mn>5</mn></mfrac>
-# </math>''', u'⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼')
+# </math>''', '⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼')
 
 
 class PDFExport(unittest.TestCase):
