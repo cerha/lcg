@@ -392,6 +392,9 @@ class TranslatedTextFactory(unittest.TestCase):
         assert __("Bob") == 'Bobik'
         assert __.pgettext('verb', 'force') == 'donutit'
         assert __.pgettext('noun', 'force') == u'síla'
+        assert __.ngettext("I have %d problem.", "I have %d problems.", 1) == "Mám 1 problém."
+        assert __.ngettext("I have %d problem.", "I have %d problems.", 4) == "Mám 4 problémy."
+        assert __.ngettext("I have %d problem.", "I have %d problems.", 6) == "Mám 6 problémů."
 
 
 class Monetary(unittest.TestCase):
