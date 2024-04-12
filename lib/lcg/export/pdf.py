@@ -664,10 +664,11 @@ class RLText(reportlab.platypus.flowables.Flowable):
     _fixedWidth = 1
     _fixedHeight = 1
 
-    def __init__(self, text, style, halign=None, max_width=None):
+    def __init__(self, text, style, halign=None, baseline_shift=None, max_width=None):
         reportlab.platypus.flowables.Flowable.__init__(self)
         self._text = text.split('\n')
         self._style = style
+        self._baseline_shift = baseline_shift or 0
         self.width = 0
         for i in range(len(self._text)):
             while True:
@@ -688,7 +689,7 @@ class RLText(reportlab.platypus.flowables.Flowable):
         if self._style.textColor:
             self.canv.setFillColor(self._style.textColor)
         for line in self._text:
-            tx = self.canv.beginText(x, y)
+            tx = self.canv.beginText(x, y + self._baseline_shift * self._style.fontSize)
             tx.setFont(self._style.fontName,
                        self._style.fontSize,
                        self._style.leading)
@@ -1540,6 +1541,7 @@ class Text(Element):
     _CATEGORY = 'text'
     style = None
     halign = None
+    baseline_shift = None
 
     def init(self):
         assert isinstance(self.content, (basestring, Text)), ('type error', self.content,)
@@ -1562,9 +1564,10 @@ class Text(Element):
             result = content.export(context)
         assert _ok_export_result(result), ('wrong export', result,)
         result = unistr(result)
-        if self.style is not None:
+        if self.style is not None or self.baseline_shift is not None:
             result = _unescape(result)
-            result = RLText(result, self.style, halign=self.halign)
+            result = RLText(result, self.style, halign=self.halign,
+                            baseline_shift=self.baseline_shift)
         return result
 
     def prepend_text(self, text):
@@ -2004,10 +2007,12 @@ class Container(Element):
 
         def transform_content(c):
             if isinstance(c, basestring):
-                c = make_element(Text, content=unistr(c), style=style, halign=halign)
+                c = make_element(Text, content=unistr(c), style=style, halign=halign,
+                                 baseline_shift=presentation.baseline_shift)
             elif isinstance(c, Text):
                 if c.style is None:
                     c.style = style
+                    c.baseline_shift = presentation.baseline_shift
                     c.halign = halign
             return c
         for c in self.content:
@@ -3094,11 +3099,30 @@ class PDFExporter(FileExporter, Exporter):
     def _export_underlined(self, context, element):
         return self._markup_container(context, element, 'u')
 
+    def _export_shifted(self, context, element, font_size, baseline_shift):
+        # Work around: Subscript/superscript was originally implemented using
+        # _markup_container(), but it uses a 'reportlab.platypus.Paragraph'
+        # which spans to the available width.  Thus it produces an unwanted
+        # (potentially huge) space between the sub/super script and the
+        # adjacent text.  This is unusable so this is why 'baseline_shift' was
+        # introduced to help implement subscript and superscript.  If the
+        # spacing after 'reportlab.platypus.Paragraph' can be avoided, we can
+        # revert back to using _markup_container().  This problem probably also
+        # applies to other elements using _markup_container(), but these are
+        # not widely used (Containers with custom Presentation are used instead
+        # in Pytis print for example).
+        presentation = element.presentation() or lcg.Presentation()
+        presentation.font_size = font_size
+        presentation.baseline_shift = baseline_shift
+        exported_content = self._content_export(context, element, collapse=False)
+        return make_element(Container, content=exported_content,
+                            presentation=presentation)
+
     def _export_superscript(self, context, element):
-        return self._markup_container(context, element, 'super')
+        return self._export_shifted(context, element, 0.8, 0.1)
 
     def _export_subscript(self, context, element):
-        return self._markup_container(context, element, 'sub')
+        return self._export_shifted(context, element, 0.8, -0.5)
 
     def _export_citation(self, context, element):
         return self._export_emphasized(context, element)

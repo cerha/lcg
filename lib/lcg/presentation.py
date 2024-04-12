@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2011-2016 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -82,6 +82,10 @@ class Presentation(object):
     "True when bold font face should be used, False otherwise."
     italic = None
     "True when italic font face should be used, False otherwise."
+    baseline_shift = None
+    """Shift the text baseline up/down relatively to font size, float.
+    Positive number shifts the text up, negative down from the current baseline level.
+    """
     boxed = None
     "'True' when the content should be surrounded by a box."
     box_margin = None
