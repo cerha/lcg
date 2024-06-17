@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015, 2017 OUI Technology Ltd.
-# Copyright (C) 2019-2023 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,6 +72,9 @@ class TranslatableTextFactory(object):
         kwargs['_origin'] = self._origin
         return TranslatablePluralForms(*args, **kwargs)
 
+    def datetime(self, dt, **kwargs):
+        return LocalizableDateTime(dt, **kwargs)
+
     def pgettext(self, context, text, *args, **kwargs):
         kwargs['_context'] = context
         return self.__call__(text, *args, **kwargs)
@@ -105,12 +108,11 @@ class TranslatedTextFactory(TranslatableTextFactory):
 
         """
         # Create localizer to make use of its translator instance cache.
-        localizer = lcg.Localizer(lang=lang, translation_path=translation_path, timezone=None)
-        self._translator = localizer.translator()
+        self._localizer = lcg.Localizer(lang=lang, translation_path=translation_path, timezone=None)
         super(TranslatedTextFactory, self).__init__(domain, origin=origin)
 
     def _gettext(self, text):
-        return self._translator.gettext(text, domain=self._domain, origin=self._origin)
+        return self._localizer.translator().gettext(text, domain=self._domain, origin=self._origin)
 
     def __call__(self, text, *args, **kwargs):
         kwargs['_orig_text'] = text
@@ -122,11 +124,17 @@ class TranslatedTextFactory(TranslatableTextFactory):
         else:
             # Accept missing 'n' here to let the assertion in TranslatablePluralForms.__new__ act.
             n = kwargs.get('n', 0)
-        translated = self._translator.ngettext(singular, plural, n,
-                                               domain=self._domain, origin=self._origin)
+        translated = self._localizer.translator().ngettext(singular, plural, n,
+                                                           domain=self._domain, origin=self._origin)
         kwargs['_singular_orig_text'] = singular
         kwargs['_plural_orig_text'] = plural
         return super(TranslatedTextFactory, self).ngettext(translated, translated, *args, **kwargs)
+
+    def datetime(self, *args, **kwargs):
+        instance = super(TranslatedTextFactory, self).datetime(*args, **kwargs)
+        localized = instance.localize(self._localizer)
+        kwargs['string'] = localized
+        return LocalizableDateTime(*args, **kwargs)
 
     def pgettext(self, context, text, *args, **kwargs):
         kwargs['_orig_text'] = text
@@ -574,17 +582,20 @@ class LocalizableDateTime(Localizable):
             return self._ZERO_DIFF
     _UTC_TZ = _UTCTimezone()
 
-    def __new__(cls, dt, **kwargs):
-        if isinstance(dt, datetime.datetime):
-            string = dt.strftime('%Y-%m-%d %H:%M:%S')
-        elif isinstance(dt, datetime.date):
-            string = dt.isoformat()
+    def __new__(cls, dt, string=None, **kwargs):
+        if string is None:
+            if isinstance(dt, datetime.datetime):
+                string = dt.strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(dt, datetime.date):
+                string = dt.isoformat()
+            else:
+                string = dt
         else:
-            string = dt
+            assert isinstance(dt, (datetime.datetime, datetime.date)), dt
         return Localizable.__new__(cls, string, **kwargs)
 
-    def __init__(self, dt, show_seconds=True, show_weekday=False, show_time=True, utc=False,
-                 leading_zeros=True, **kwargs):
+    def __init__(self, dt, string=None, show_seconds=True, show_weekday=False, show_time=True,
+                 utc=False, leading_zeros=True, **kwargs):
         """Initialize the instance.
 
         Arguments:
@@ -593,6 +604,12 @@ class LocalizableDateTime(Localizable):
             datetime.date or string.  If string is passed, it must be in format
             'yyyy-mm-dd' for date values or one of 'yyyy-mm-dd HH:MM' or
             'yyyy-mm-dd HH:MM:SS' for datetime values.
+
+          string -- the string representation of 'dt' when passed as a datetime
+            instance.  If None, the default string representation of the
+            instance before localization is 'yyyy-mm-dd' for date values or
+            'yyyy-mm-dd HH:MM:SS' for datetime values.
+
           show_time -- if true and if the passed datetime contains the time
             information, the time is also shown on output.  If false, only date
             is shown even if the input contains time.  The difference between
@@ -620,6 +637,7 @@ class LocalizableDateTime(Localizable):
         """
         super(LocalizableDateTime, self).__init__(**kwargs)
         if isinstance(dt, basestring):
+            assert string is None
             m = self._RE.match(dt)
             if not m:
                 raise ValueError("Invalid date/time format", dt)

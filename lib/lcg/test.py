@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -395,6 +395,14 @@ class TranslatedTextFactory(unittest.TestCase):
         assert __.ngettext("I have %d problem.", "I have %d problems.", 1) == "Mám 1 problém."
         assert __.ngettext("I have %d problem.", "I have %d problems.", 4) == "Mám 4 problémy."
         assert __.ngettext("I have %d problem.", "I have %d problems.", 6) == "Mám 6 problémů."
+
+    def test_datetime(self):
+        __ = lcg.TranslatedTextFactory('test', lang='cs', translation_path=translation_path)
+        dt = __.datetime(datetime.datetime(2024, 6, 11, 10, 44, 37), leading_zeros=False)
+        assert dt == '11.6.2024 10:44:37'
+        assert isinstance(dt, lcg.LocalizableDateTime)
+        de = lcg.Localizer('en', translation_path=translation_path)
+        assert dt.localize(de) == '11/6/2024 10:44:37 AM'
 
 
 class Monetary(unittest.TestCase):
