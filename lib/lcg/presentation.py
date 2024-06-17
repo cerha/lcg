@@ -65,143 +65,181 @@ class Presentation(object):
 
     """
     font_size = None
-    "Font size relative to the current font size (1.0 is the same size), float."
+    """Font size relative to the current font size (1.0 is the same size), float."""
+
     font_name = None
-    "Name of the font to use, e.g. 'Free' or 'DejaVu', string."
+    """Name of the font to use, e.g. 'Free' or 'DejaVu', string."""
+
     font_family = None
-    "Font family to be used for typesetting text, one of 'FontFamily' constants."
+    """Font family to be used for typesetting text, one of 'FontFamily' constants."""
+
     font_color = None
     """Font color, 'Color'."""
+
     background_color = None
     """Background color, 'Color'."""
+
     heading_font_family = None
-    "Font family to be used for typesetting headings, one of 'FontFamily' constants."
+    """Font family to be used for typesetting headings, one of 'FontFamily' constants."""
+
     noindent = None
-    "If true, don't indent first lines of paragraphs."
+    """If true, don't indent first lines of paragraphs."""
+
     bold = None
-    "True when bold font face should be used, False otherwise."
+    """True when bold font face should be used, False otherwise."""
+
     italic = None
-    "True when italic font face should be used, False otherwise."
+    """True when italic font face should be used, False otherwise."""
+
     baseline_shift = None
     """Shift the text baseline up/down relatively to font size, float.
     Positive number shifts the text up, negative down from the current baseline level.
     """
+
     boxed = None
-    "'True' when the content should be surrounded by a box."
+    """'True' when the content should be surrounded by a box."""
+
     box_margin = None
     """Space between the box and the content, 'Unit'.
     It may be ignored in some boxed elements.
     """
+
     box_width = None
     """Box line width, 'Unit'."""
+
     box_color = None
     """Box line color, 'Color'."""
+
     box_radius = None
     """Radius of box corners, if the corners should be rounded, 'Unit'."""
+
     box_mask = None
     """Mask of visible box sides as a sequence of 4 bools (top, right, bottom, left)."""
+
     separator_height = None
     """Height of lines separating objects, 'Unit'.
     It currently works only for row separators in tables.
     """
+
     separator_width = None
     """Width of lines separating objects, 'Unit'.
     It currently works only for column separators in tables.
     """
+
     separator_margin = None
     """Amount of space between objects, 'Unit'.
     It currently works only for spaces between table rows.
     """
+
     header_separator_height = None
     """Height of line separating headers from content, 'Unit'.
     It currently works only for tables.
     """
+
     header_separator_margin = None
     """Amount of space separating headers from content, 'Unit'.
     It currently works only for tables.
     """
+
     left_indent = None
     """Amount of space to put on left of the object, 'Unit'."""
+
     line_spacing = None
     """Distance between line bases, 'Unit'."""
+
     top_margin = None
     """Amount of space on the top of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages and Braille if set for the top level node.
     """
+
     bottom_margin = None
     """Amount of space on the bottom of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages and Braille if set for the top level node.
     """
+
     left_margin = None
     """Amount of space on the left of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
     """
+
     right_margin = None
     """Amount of space on the right of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
     """
+
     inner_margin = None
     """Amount of space on the inner side of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for Braille if set for the top level node.
     """
+
     outer_margin = None
     """Amount of space on the outer side of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for Braille if set for the top level node.
     """
+
     page_width = None
     """Page width, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages or Braille output (restricted to
     UFont and USpace instances) if set for the top level node.
     """
+
     page_height = None
     """Page height, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages or Braille output (restricted to
     UFont and USpace instances) if set for the top level node.
     """
+
     landscape = None
     """Page orientation.
     If False then use portrait orientation, if True then use landscape orientation.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
     """
+
     device_output = None
     """Device output specification.
     It is currently used only for Braille output where it is a dictionary
     mapping Unicode Braille and whitespace characters to output device
     characters.
     """
+
     device_init = None
     """Function returning initial string to send to the Braille printer.
     The function takes two integer arguments: page width (number of characters)
     and page height (number of lines).
     """
+
     device_finish = None
     """Final string to send to the Braille printer."""
+
     braille_tables = None
     """Dictionary of Braille tables to use.
     Keys are language codes (strings), values are lists of Braille table names
     (strings) for liblouis.
     Useful only for Braille output.
     """
+
     braille_hyphenation_tables = None
     """Dictionary of Braille hyphenation tables to use.
     Keys are language codes (strings), values are Braille hyphenation table
     names (strings) for liblouis.
     Useful only for Braille output.
     """
+
     braille_math_rules = 'nemeth'
     """System to use for typesetting mathematics in Braille.
     Currently supported values are 'nemeth' and 'czech'.
     Useful only for Braille output.
     """
+
     printers = None
     """Dictionary of printer names (keys) and their properties (values).
     Printer properties are represented by a dictionary with property names as
@@ -210,12 +248,15 @@ class Presentation(object):
     recognized.
     Useful only for Braille output.
     """
+
     default_printer = None
     """Default printer, one of the 'printers' keys or 'None'.
     Useful only for Braille output.
     """
+
     left_page_footer = None
     """Custom left page footer, 'lcg.Content' instance or 'None'."""
+
     right_page_footer = None
     """Custom right page footer, 'lcg.Content' instance or 'None'."""
 
@@ -373,7 +414,7 @@ class PresentationSet(object):
         return [p for p, m in self._presentations if m.matches(content, lang)]
 
     @classmethod
-    def merge_presentations(class_, presentations, override=()):
+    def merge_presentations(cls, presentations, override=()):
         """Return a common presentation created from 'presentations'.
 
         The presentations are merged in their order; non-default parameters of
@@ -484,20 +525,22 @@ class StyleFile(object):
     recommended) and inherit them in the supported styles or his other styles.
 
     """
-    _MATCHERS = (('Common', TopLevelMatcher(),),
-                 ('Heading_1', LCGHeadingMatcher(1),),
-                 ('Heading_2', LCGHeadingMatcher(2),),
-                 ('Heading_3', LCGHeadingMatcher(3),),
-                 ('Table_Of_Contents', LCGClassMatcher(lcg.TableOfContents),),
-                 ('Preformatted_Text', LCGClassMatcher(lcg.PreformattedText),),
-                 )
+    _MATCHERS = (
+        ('Common', TopLevelMatcher(),),
+        ('Heading_1', LCGHeadingMatcher(1),),
+        ('Heading_2', LCGHeadingMatcher(2),),
+        ('Heading_3', LCGHeadingMatcher(3),),
+        ('Table_Of_Contents', LCGClassMatcher(lcg.TableOfContents),),
+        ('Preformatted_Text', LCGClassMatcher(lcg.PreformattedText),),
+    )
 
-    _PROPERTY_MAPPING = (('font_size', 'font_size', _parse_ufont,),
-                         ('font_name', 'font_name', _parse_string,),
-                         ('font_family', 'font_family', _parse_font_family,),
-                         ('bold', 'bold', _parse_boolean,),
-                         ('italic', 'italic', _parse_boolean,),
-                         )
+    _PROPERTY_MAPPING = (
+        ('font_size', 'font_size', _parse_ufont,),
+        ('font_name', 'font_name', _parse_string,),
+        ('font_family', 'font_family', _parse_font_family,),
+        ('bold', 'bold', _parse_boolean,),
+        ('italic', 'italic', _parse_boolean,),
+    )
 
     class _Style(object):
         name = None
