@@ -1,7 +1,7 @@
 ;;; structured-text-mode.el -- Mode for editing LCG structured text files
 
 ;; Copyright (C) 2006 OUI Technology Ltd.
-;; Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+;; Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
 
 ;; This file is not part of GNU Emacs.
 
@@ -59,8 +59,8 @@
   (set (make-local-variable 'font-lock-defaults)
        '(structured-text-font-lock-keywords
 	 nil t))
-  (setq major-mode 'lcg-mode
+  (setq major-mode 'structured-text-mode
 	fill-column 79)
-  (run-hooks 'lcg-mode-hook))
+  (run-hooks 'structured-text-mode-hook))
 
 (provide 'structured-text-mode)
