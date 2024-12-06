@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -165,7 +165,7 @@ class BasePlot(lcg.InlineSVG):
                 if line is True:
                     kwargs = dict(color='#dddddd' if which == 'major' else '#eeeeee')
                 elif line is False:
-                    kwargs = dict(b=False)
+                    kwargs = dict(visible=False)
                 elif isinstance(line, dict):
                     # Undocumented backwards compatibility (probably not used anywhere).
                     kwargs = line
