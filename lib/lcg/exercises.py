@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -366,7 +366,7 @@ class ExerciseParser(object):
         lines = text.splitlines()
         if len(self._GAP_MATCHER.findall(lines[0])) != 1:
             self._error(_("Gap mark (three or more underscores) not found statement."))
-        prompt = self._GAP_MATCHER.sub("\____", lines[0])
+        prompt = self._GAP_MATCHER.sub(r'\____', lines[0])
         choices = self._process_choices(lines[1:])
         return ChoiceTask(self._parse_text(prompt), choices, comment=comment)
 
