@@ -562,7 +562,8 @@ class HtmlGenerator(object):
                          allow=('src', 'type'))
 
     def script(self, content=None, type="text/javascript", **kwargs):
-        return self._tag('script', content, dict(kwargs, type=type), allow=('src', 'type'))
+        return self._tag('script', content, dict(kwargs, type=type),
+                         allow=('src', 'type', 'integrity', 'crossorigin'))
 
     def noscript(self, content):
         return self._tag('noscript', content)
