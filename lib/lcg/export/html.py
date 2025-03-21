@@ -188,9 +188,9 @@ class HtmlGenerator(object):
             if value is not None and value is not False:
                 if name == 'cls':
                     name = 'class'
-                assert (name in common_attributes or name in allow or
-                        name.startswith('aria-') or name.startswith('data-')), \
-                    "Invalid attribute '%s' for HTML tag '%s'." % (name, tag)
+                if not (name in common_attributes or name in allow or
+                        name.startswith('aria-') or name.startswith('data-')):
+                    raise Exception("Invalid attribute '%s' for HTML tag '%s'." % (name, tag))
                 result.append(' ' + name + '=')
                 if value is True:
                     # Use boolean value syntax, which is compatible with both HTML4 and XHTML.
