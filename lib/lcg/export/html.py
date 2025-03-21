@@ -598,16 +598,6 @@ class HtmlGenerator(object):
         fargs = [self.js_value(arg) for arg in args]
         return self._JavaScriptCode('%s(%s)' % (fname, concat(fargs, separator=", ")))
 
-    def script_write(self, content, noscript=None, condition=None):
-        # Deprecated! Don't use!
-        if content:
-            c = content.replace('"', '\\"').replace("'", "\\'")
-            c = c.replace('</', '<\\/').replace('\n', '\\n')
-            content = 'document.write("' + c + '");'
-            if condition:
-                content = 'if (' + condition + ') ' + content
-        return self.script(content, noscript)
-
 
 class XhtmlGenerator(HtmlGenerator):
     pass
