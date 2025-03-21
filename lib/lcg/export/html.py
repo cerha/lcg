@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2018 OUI Technology Ltd.
-# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2022, 2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -306,6 +306,9 @@ class HtmlGenerator(object):
     def div(self, content, **kwargs):
         return self._tag('div', content, kwargs)
 
+    def nav(self, content, **kwargs):
+        return self._tag('nav', content, kwargs)
+
     def template(self, content, **kwargs):
         return self._tag('template', content, kwargs)
 
@@ -347,6 +350,9 @@ class HtmlGenerator(object):
 
     def u(self, content, **kwargs):
         return self._tag('u', content, kwargs)
+
+    def i(self, content, **kwargs):
+        return self._tag('i', content, kwargs)
 
     def code(self, content, **kwargs):
         return self._tag('code', content, kwargs)
