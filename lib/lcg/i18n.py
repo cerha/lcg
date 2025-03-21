@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015, 2017 OUI Technology Ltd.
-# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ class TranslatedTextFactory(TranslatableTextFactory):
 
     """
 
-    def __init__(self, domain, origin='en', lang=None, translation_path=()):
+    def __init__(self, domain, origin='en', lang=None, translation_path=(), timezone=None):
         """Arguments:
 
           domain, origin -- as in base class.
@@ -108,7 +108,8 @@ class TranslatedTextFactory(TranslatableTextFactory):
 
         """
         # Create localizer to make use of its translator instance cache.
-        self._localizer = lcg.Localizer(lang=lang, translation_path=translation_path, timezone=None)
+        self._localizer = lcg.Localizer(lang=lang, translation_path=translation_path,
+                                        timezone=timezone)
         super(TranslatedTextFactory, self).__init__(domain, origin=origin)
 
     def _gettext(self, text):

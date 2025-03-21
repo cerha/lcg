@@ -1040,6 +1040,21 @@ A screen reader is:
 </pre>
 </div>
 
+<div class="lcg-exercise" contenteditable="false" data-type="GapFilling"
+     style="display: inline-block;">
+<pre class="lcg-exercise-src">
+If you want to send money to somebody, you can ____ a transfer.
+- do
++ make
+- have
+
+To change money between two currencies you need to know the ____ rate.
+- success
+- interest
++ exchange
+</pre>
+</div>
+
  '''
         content = lcg.html2lcg(html)
         p = lcg.ResourceProvider()
