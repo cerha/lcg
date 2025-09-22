@@ -165,14 +165,14 @@ class BasePlot(lcg.InlineSVG):
             for line, which, axis in zip(self._grid, ('major', 'major', 'minor', 'minor'),
                                          ('x', 'y', 'x', 'y')):
                 if line is True:
-                    kwargs = dict(color='#dddddd' if which == 'major' else '#eeeeee')
+                    kwargs = dict(zorder=0, color='#dddddd' if which == 'major' else '#eeeeee')
                 elif line is False:
                     kwargs = dict(visible=False)
                 else:
-                    kwargs = line.attr
+                    kwargs = dict(zorder=0, **line.attr)
                 if line and which == 'minor':
                     ax.minorticks_on()
-                ax.grid(which=which, axis=axis, zorder=0, **kwargs)
+                ax.grid(which=which, axis=axis, **kwargs)
         for line in self._lines:
             if line.x:
                 ax.axvline(x=line.x, **line.attr)
