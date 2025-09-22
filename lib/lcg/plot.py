@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -136,13 +136,15 @@ class BasePlot(lcg.InlineSVG):
         elif grid is True:
             grid = (True, True, False, False)
         else:
-            assert isinstance(grid, (tuple, list))
+            assert isinstance(grid, (tuple, list)), grid
+            assert all(isinstance(g, (bool, Line)) for g in grid), grid
             if len(grid) == 2:
                 major, minor = grid
                 grid = (major, major, minor, minor)
             else:
                 assert len(grid) == 4
         self._grid = grid
+        assert all(isinstance(l, Line) for l in lines), lines
         self._lines = lines
         super(BasePlot, self).__init__(self._svg)
 
@@ -166,9 +168,6 @@ class BasePlot(lcg.InlineSVG):
                     kwargs = dict(color='#dddddd' if which == 'major' else '#eeeeee')
                 elif line is False:
                     kwargs = dict(visible=False)
-                elif isinstance(line, dict):
-                    # Undocumented backwards compatibility (probably not used anywhere).
-                    kwargs = line
                 else:
                     kwargs = line.attr
                 if line and which == 'minor':
