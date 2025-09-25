@@ -1,14 +1,12 @@
 .PHONY: translations doc test
 
 export LCGDIR=.
-export PYTHONPATH=lib
 
 all: compile translations
 
 compile:
-	@echo "Compiling Python libraries from source..."
-	@python -c "import compileall; compileall.compile_dir('lib')" >/dev/null
-	@python -O -c "import compileall; compileall.compile_dir('lib')" >/dev/null
+	python -m compileall -d . lcg
+	python -O -m compileall -d . lcg
 
 translations:
 	make -C translations
@@ -20,10 +18,14 @@ doc:
 	bin/lcgmake.py doc/src doc/html
 
 test:
-	python -m pytest lib/lcg/test.py
+	python -m pytest lcg/test.py
+
+# Only for development installs.  Use pip for production/user installs.
+install:
+	flit install --symlink
 
 coverage:
-	coverage run --source=lib/lcg -m pytest lib/lcg/test.py
+	coverage run --source=lcg -m pytest lcg/test.py
 	coverage report
 
 deps-dev:
@@ -33,7 +35,7 @@ deps-dev:
 lint: lint-flake8 lint-eslint
 
 lint-flake8:
-	flake8 lib bin
+	flake8 lcg bin
 
 lint-eslint:
 	npm run eslint resources/scripts/{flash,lcg-exercises,lcg}.js

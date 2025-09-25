@@ -1,0 +1,47 @@
+[build-system]
+requires = ["flit_core>=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "lcg"
+description = "LCG — Python library for content abstraction and multi-format document processing"
+dynamic = ["version"]
+authors = [
+    { name = "Tomas Cerha", email = "cerha@truecode.cz" },
+    { name = "Milan Zamazal", email = "pdm@zamazal.org" },
+]
+license = { file = "COPYING" }
+readme = "readme.md"
+requires-python = ">=2.7"
+classifiers = [
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3.5",
+    "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+]
+
+[project.optional-dependencies]
+# Plotting support
+plot = ["matplotlib", "pandas", "svglib"]
+# Syntax highlighting for PreformattedText in HTML output
+syntax-highlight = ["pygments"]
+# Image scaling for PDF and EPUB output
+image-scaling = ["pillow"]
+# PDF output
+pdf = ["reportlab"]
+# HTML SVG → PNG conversion when exporting plots and allow_svg is False
+html-png = ["cairosvg==0.5"]
+# Convenience: install all optional dependencies
+all = [
+    "matplotlib", "pandas", "svglib",
+    "pygments",
+    "pillow",
+    "reportlab",
+    "cairosvg==0.5",
+]
+
+[tool.flit.module]
+module = "lcg"
+
+[tool.flit.sdist]
+include = ["COPYING"]
+

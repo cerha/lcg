@@ -1,42 +1,61 @@
-LCG framework
-=============
+# LCG Framework
 
-LCG is a Python framework for content abstraction and generic document
-processing.  Documents can be constructed as a structure of Python objects.
-LCG defines standard content elements (paragraphs, sections, formatted text,
-etc...) as well as many advanced constructs (multimedia, mathematics,
-interactive widgets) and supports extensibility through definition of third
-party content elements.  Content can be exported into different output formats,
-such as HTML, PDF, Braille, IMS, EPUB and others and imported from different
-source formats (text markup, internal serialization, etc.).
+**LCG** is a Python framework for content abstraction and generic document
+processing.  Documents are constructed as a hierarchy of Python objects.  LCG
+defines standard content elements (paragraphs, sections, lists, formatted text,
+etc.) and advanced constructs (multimedia, mathematics, interactive widgets),
+and supports extensibility through third-party content elements.  Content can be
+exported to multiple formats (HTML, PDF, Braille, IMS, EPUB, etc.) and imported
+from various source formats (text markup, internal serialization, etc.).
 
-LCG is mostly a tool for software developers who need to build structured
-documents programatically or import them from different source formats and want
-to export those documents into different output formats.  These documents can
-consist of generic content elements (defined by LCG itself) or custom content
-elements (defined by the developer).  LCG can also be directly used by end
-users as a tool for processing documents written in a simple and well readable
-source format into various target formats (such as HTML or PDF).
+LCG is primarily intended for software developers who need to programmatically
+build structured documents or import them from different sources and export
+them to multiple formats.  Documents can contain generic content elements
+(defined by LCG) or custom elements (defined by the developer).  LCG can also be
+used directly by end-users to process documents written in a simple,
+human-readable source format into various target formats (such as HTML or PDF).
 
-Some key requirements leading to developing LCG were:
-* True separation of content and its presentation.
-* Support for multimedia and interactive content.
-* Accessibility for users of assistive technologies.
-* Extensibility allowing definition of new content elements and customizing the
-  output presentation of pre-defined elements.
-* Respect to standards (namely W3C standards for the relevant output formats).
-* Internationalization (support for several language variants of one document,
-  as well as intermixing more languages in one document).
 
-LCG is a Free Software distributed under the terms of GNU General Public
-License.
+## Key Features
 
-The name LCG comes from Learning Content Generator as LCG was initially
-developed to generate on-line e-learning courses for the Eurochance project
-(https://langschool.eu).
+- **Separation of content and presentation**: Keeps structure and formatting
+  independent.
+- **Multimedia and interactive content**: Supports rich, dynamic elements.
+- **Accessibility**: Designed for users of assistive technologies.
+- **Extensibility**: Easily define new content elements or customize output for
+  existing elements.
+- **Standards compliance**: Adheres to relevant standards, notably W3C specs.
+- **Internationalization**: Supports multiple language variants in one document
+  and mixed-language content.
 
-LCG is used as content abstraction layer in Wiking
-(https://github.com/cerha/wiking) web application development framework.
 
-LCG documentation is included in the package.  To generate the HTML version run
-"make doc" within the package root directory.
+## License
+
+LCG is Free Software, distributed under the terms of the **GNU General Public
+License v2 (GPLv2)**.  See the `COPYING` file for details.
+
+
+## History
+
+**LCG** stands for *Learning Content Generator*.  It was initially developed to
+generate online e-learning material for the [Eurochance project](https://langschool.eu).
+
+
+## Installation
+
+LCG is a pure Python library running on Python 2.7 or Python 3.5 or later and
+may be installed simply by `pip install lcg[all]`.
+
+When using PDF output, you additionally need the following system packages:
+- Fontconfig (Debian package `fontconfig`)
+- Freefont (Debian package `ttf-freefont`, Ubuntu package `fonts-freefont-ttf`)
+
+
+## Usage
+
+LCG is used as a content abstraction layer in the
+[Wiking](https://github.com/cerha/wiking) web application development
+framework.
+
+Documentation is included in the package; to generate the HTML version, run
+`make doc` from the package root directory.
