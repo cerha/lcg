@@ -1,7 +1,5 @@
 .PHONY: translations doc test
 
-export LCGDIR=.
-
 all: compile translations
 
 compile:
@@ -23,6 +21,9 @@ test:
 # Only for development installs.  Use pip for production/user installs.
 install:
 	flit install --symlink
+
+build: translations
+	flit build
 
 coverage:
 	coverage run --source=lcg -m pytest lcg/test.py

@@ -16,8 +16,10 @@
 # are git controlled).  We need just the git versions of PO files
 # to create/update MO files.
 
+mo_dir := ../lcg/translations
 mo_files := $(foreach d, lcg lcg-exercises test, \
-              $(patsubst $(d).%.po,%/LC_MESSAGES/$(d).mo, $(wildcard $(d).*.po)))
+              $(patsubst $(d).%.po,$(mo_dir)/%/LC_MESSAGES/$(d).mo, \
+              $(wildcard $(d).*.po)))
 #resource_po_files := $(patsubst %.po,../resources/translations/%.po, $(wildcard *.po))
 
 all: $(mo_files)
@@ -39,13 +41,13 @@ $(wildcard *.po):
 
 endif
 
-%/LC_MESSAGES:
-	mkdir -p $*/LC_MESSAGES/
-%/LC_MESSAGES/lcg.mo: lcg.%.po %/LC_MESSAGES
+$(mo_dir)/%/LC_MESSAGES:
+	mkdir -p $(mo_dir)/$*/LC_MESSAGES/
+$(mo_dir)/%/LC_MESSAGES/lcg.mo: lcg.%.po $(mo_dir)/%/LC_MESSAGES
 	msgfmt -v $< -o $@
-%/LC_MESSAGES/lcg-exercises.mo: lcg-exercises.%.po %/LC_MESSAGES
+$(mo_dir)/%/LC_MESSAGES/lcg-exercises.mo: lcg-exercises.%.po $(mo_dir)/%/LC_MESSAGES
 	msgfmt -v $< -o $@
-%/LC_MESSAGES/test.mo: test.%.po %/LC_MESSAGES
+$(mo_dir)/%/LC_MESSAGES/test.mo: test.%.po $(mo_dir)/%/LC_MESSAGES
 	msgfmt -v $< -o $@
 
 #../resources/translations:
@@ -56,6 +58,9 @@ endif
 
 clean:
 	rm -f *.pot
-#	rm -rf ../resources/translations/
+	rm -rf $(mo_dir)
 
 .PHONY: all clean
+
+# Prevent make from trying to remove the directories.
+.PRECIOUS: $(mo_dir)/%/LC_MESSAGES

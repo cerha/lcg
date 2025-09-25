@@ -54,10 +54,8 @@ unistr = type('')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
 
-
-lcg_dir = os.path.normpath(os.path.join(__file__, '..', '..', '..'))
-os.environ['LCGDIR'] = lcg_dir
-translation_path = [os.path.join(lcg_dir, 'translations')]
+lcg_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
+translation_path = [os.path.join(os.path.normpath(os.path.dirname(__file__)), 'translations')]
 
 
 class TranslatableText(unittest.TestCase):

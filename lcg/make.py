@@ -48,8 +48,7 @@ OPTIONS = (
           "searched when LCG localizes the generated documents. "
           "These directories are supposed to contain compiled GNU Gettext "
           "message catalogs in their usual structure (with subdirectories for "
-          "each of the supported locales, such as 'de/LC_MESSAGES/lcg.mo' "
-          "for german translations of the texts supplied by LCG itself)).")),
+          "each of the supported locales, such as 'de/LC_MESSAGES/domain.mo').")),
         ('presentation=', None, ("Presentation file.")),
     )),
     ("Output format selection", (
@@ -137,11 +136,8 @@ def main(argv, opt, args):
             dst = '.'
         else:
             die("You must specify the destination directory!")
-    # Initialize translation and resource directories.
-    translations = []
-    lcg_dir = os.environ.get('LCGDIR', os.path.join(__file__, '..'))
-    if lcg_dir:
-        translations.append(os.path.abspath(os.path.join(lcg_dir, 'translations')))
+    # Initialize translation path.
+    translations = [os.path.join(os.path.dirname(__file__), 'translations')]
     if opt['translations']:
         translations.extend([os.path.abspath(d) for d in opt['translations'].split(':')])
     #######################################################################################
@@ -300,15 +296,6 @@ single source document (resulting in one output file too).  The output is
 placed in the current directory in this case.  In other cases the destination
 directory is required to prevent unwanted polution of the current directory by
 the output files.
-
-Environment variables:
-
-  LCGDIR ... If specified the directory '$LCGDIR/resources' will be added to
-             the first position of the default resource path (which normally
-             includes only source directories).  Also the directory
-             '$LCGDIR/translations' will be added to the beginning of the
-             translation path (specified by --translations).
-
 
 """
     die(help % (os.path.split(argv[0])[-1], dumpoptions(width=80, indent=2)))

@@ -43,5 +43,9 @@ all = [
 module = "lcg"
 
 [tool.flit.sdist]
-include = ["COPYING"]
+include = [
+    "COPYING",
+    "lcg/translations/**/**.mo",
+    "lcg/**/test.py",  # Include in sdist even if excluded in .flitignore
+]
 
