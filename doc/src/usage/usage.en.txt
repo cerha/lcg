@@ -1,12 +1,12 @@
 # -*- coding: utf-8; mode: structured-text -*-
 # Copyright (C) 2005-2007, 2009 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2025 Tomáš Cerha <t.cerha@gmail.com>
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
 = Using LCG =
 
-This document describes usage of LCG end-user tools, namely the =lcgmake=
+This document describes usage of LCG end-user tools, namely the =lcg.make=
 program, which is distributred together with LCG and which may be used directly
 to generate publications, such as manuals, help systems, e-learning courses etc.
 
@@ -131,14 +131,14 @@ publication is undefined and you don't need to use language suffixes for any
 other source files.
 
 
-== Running lcgmake == run
+== Running lcg.make == run
 
-Launch =lcgmake= with the =--help= argument to see the supported options:
+Launch =lcg.make= with the =--help= argument to see the supported options:
 
 -----
-lcgmake --help
+python -m lcg.make --help
 -----
 
-A good example of a simple source document structure and =lcgmake= invocation is
+A good example of a simple source document structure and =lcg.make= invocation is
 the LCG documentation itself.  It is generated into HTML by invoking =make doc=
 in the root directory of the LCG source archive.

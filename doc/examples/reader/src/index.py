@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019, 2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class Reader(lcg.DocFileReader):
     documents by default (since 'lcg.DocFileReader' is the default reader
     class).  Thus this example is useful only as a template for other custom
     readers.  If you really wanted to just process one (structued) text file,
-    you could simply invoke 'lcgmake file.txt'.
+    you could simply invoke 'python -m lcg file.txt'.
 
     """
 

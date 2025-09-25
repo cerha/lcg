@@ -53,9 +53,15 @@ When using PDF output, you additionally need the following system packages:
 
 ## Usage
 
-LCG is used as a content abstraction layer in the
-[Wiking](https://github.com/cerha/wiking) web application development
+LCG comes with a command line tool which can be run directly using `python -m
+lcg.make` to build and export documents into different output formats.  Run
+with `--help` to find out how to use it.
+
+LCG is also used as a content abstraction layer in the
+[Wiking](https://github.com/cerha/wiking) web application development framework
+and for document construction and as a print backend in
+[Pytis](https://github.com/cerha/pytis) information systems development
 framework.
 
-Documentation is included in the package; to generate the HTML version, run
+Documentation is included in the package.  To generate the HTML version, run
 `make doc` from the package root directory.

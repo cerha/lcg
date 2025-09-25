@@ -1,31 +1,36 @@
 # -*- coding: utf-8; mode: structured-text -*-
-# Copyright (C) 2005, 2006, 2007, 2008 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2005-2008 OUI Technology Ltd.
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 # This is part of the LCG Documentation.
 # See the file index.en.txt for copying conditions.
 
 = Examples =
 
 This document contains descriptions of some examples of how to use key
-LCG features. 
+LCG features.
 
 Table of Contents: @TOC(1)@
 
-== lcgmake == lcgmake-examples
+== Compilation of simple document structure ==
 
-=== Compilation of simple document structure ===
+Generating LCG documentation may be used as an example of using LCG to generate
+HTML output from a directory containing LCG source files controlled by
+=index.txt= file.
 
-The target /doc/ in Makefile of this package presents a basic example
-of how to use lcgmake to generate HTML output from a directory
-containing LCG files (including the index.txt file).
+Execute it using
+----
+python -m lcg.make doc/src doc/html
+---
+in the LCG source tree.
 
-Execute it using 'make doc' in the LCG source tree.
+== Basic reader and usage ==
 
-=== Basic reader and usage ===
+/LCG Reader/ can read source data and construct document structure dynamically
+in Python code.  You can find an example of definition and usage of /LCG
+Reader/ using the =index.py= file in =doc/examples/reader=.  The example
+also shows how to override some LCG behavior.
 
-In \/doc/examples/lcgmake-basic-reader you can find an example of how
-to define and use a basic LCG Reader using the /index.py/ file, which
-you can use as a template to override some of LCG behavior.
-
-Execute lcgmake-basic-reader/example.sh and examine also
-lcgmake-basic-reader/src/index.py .
+Examine =doc/examples/reader/src/index.py= and execute using
+----
+python -m lcg.make doc/examples/reader/src doc/examples/reader/html
+----

@@ -15,7 +15,7 @@ extract:
 	make -C translations extract
 
 doc:
-	bin/lcgmake.py doc/src doc/html
+	python -m lcg.make doc/src doc/html
 
 test:
 	python -m pytest lcg/test.py
