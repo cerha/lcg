@@ -184,8 +184,11 @@ class HtmlGenerator(object):
         if self._sorted_attributes:
             attributes = sorted(attributes)
         for name, value in attributes:
-            name = name.replace('_', '-')
             if value is not None and value is not False:
+                if name.endswith('_'):
+                    # Python keywords, such as 'for' or 'async' must be suffixed by underscore.
+                    name = name[:-1]
+                name = name.replace('_', '-')
                 if name == 'cls':
                     name = 'class'
                 if not (name in common_attributes or name in allow or
@@ -563,7 +566,7 @@ class HtmlGenerator(object):
 
     def script(self, content=None, type="text/javascript", **kwargs):
         return self._tag('script', content, dict(kwargs, type=type),
-                         allow=('src', 'type', 'integrity', 'crossorigin'))
+                         allow=('src', 'type', 'integrity', 'crossorigin', 'async'))
 
     def noscript(self, content):
         return self._tag('noscript', content)
