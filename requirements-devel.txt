@@ -1,0 +1,6 @@
+babel
+coverage
+coveralls
+flake8
+flit
+pytest
