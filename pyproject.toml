@@ -46,6 +46,7 @@ module = "lcg"
 include = [
     "COPYING",
     "lcg/translations/**/**.mo",
+    "lcg/resources/**",
     "lcg/**/test.py",  # Include in sdist even if excluded in .flitignore
 ]
 

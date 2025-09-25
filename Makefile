@@ -23,7 +23,13 @@ install:
 	flit install --symlink
 
 build: translations
+	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
 	flit build
+
+clean:
+	rm -rf dist/
+	rm -rf lcg/resources
+	make -C translations clean
 
 coverage:
 	coverage run --source=lcg -m pytest lcg/test.py

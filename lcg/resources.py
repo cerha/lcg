@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -337,10 +337,7 @@ class ResourceProvider(object):
         """
         assert isinstance(dirs, (list, tuple)), dirs
         assert isinstance(resources, (list, tuple)), resources
-        self._dirs = tuple(dirs)
-        lcgdir = os.environ.get('LCGDIR', os.path.join(__file__, '..', '..', '..'))
-        if lcgdir:
-            self._dirs += (os.path.normpath(os.path.join(lcgdir, 'resources')),)
+        self._dirs = tuple(dirs) + (os.path.join(os.path.dirname(__file__), 'resources'),)
         self._cache = self.OrderedDict([(self._cache_key(r.filename(), {}), (r, [None]))
                                         for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)
