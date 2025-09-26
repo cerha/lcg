@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2008-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2021, 2023 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -2417,11 +2417,11 @@ class SVGDrawing(Element):
     def _export(self, context):
         from svglib.svglib import svg2rlg
         svg = self.svg
-        if 'Created with matplotlib' in svg[:200]:
+        if b'Created with matplotlib' in svg[:200]:
             factor = 1 / context.exporter().MATPLOTLIB_RESCALE_FACTOR
         else:
             factor = 1
-        drawing = svg2rlg(io.BytesIO(svg.encode('utf-8')))
+        drawing = svg2rlg(io.BytesIO(svg))
         page_width = context.pdf_context.page_size()[0]
         if drawing.width * factor > page_width:
             factor *= page_width / (drawing.width * factor)

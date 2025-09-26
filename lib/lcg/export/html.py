@@ -1412,13 +1412,13 @@ class HtmlExporter(lcg.Exporter):
     def _export_inline_svg(self, context, element):
         svg = element.svg(context)
         if self._allow_svg:
-            return self._generator.noescape(svg)
+            return self._generator.noescape(svg.decode('utf-8'))
         else:
             import cairosvg
             png = io.BytesIO()
-            cairosvg.svg2png(bytestring=svg.encode('utf-8'), write_to=png)
+            cairosvg.svg2png(bytestring=svg, write_to=png)
             return self._generator.img(src='data:image/png;base64, ' +
-                                       base64.b64encode(png.getvalue()))
+                                       base64.b64encode(png.getvalue()).decode('ascii'))
 
     def _export_audio_player(self, context):
         g = self._generator

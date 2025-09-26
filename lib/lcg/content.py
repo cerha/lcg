@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2021 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1975,10 +1975,11 @@ class InlineSVG(Content):
         Arguments:
 
           content -- the actual SVG content of this element as a string, bytes
-            or a function of one argument (exporter context).
+            or a function of one argument (exporter context) returning the SVG
+            as string or bytes.
           *args -- additional positional arguments passed to the export
             function (given in 'content').  No arguments are allowed when
-            'content' is a string.
+            'content' is string or bytes.
           **kwargs -- keyword arguments for parent class constructor.
 
         """
@@ -1988,10 +1989,12 @@ class InlineSVG(Content):
         super(InlineSVG, self).__init__(**kwargs)
 
     def svg(self, context):
-        """Return the SVG content as a string."""
+        """Return the SVG as bytes."""
         content = self._content
         if callable(content):
-            content = content(context)
+            content = content(context, *self._export_args)
+        if not isinstance(content, bytes):
+            content = content.encode('utf-8')
         return content
 
 # Convenience functions for simple content construction.
