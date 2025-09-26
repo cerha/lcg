@@ -30,7 +30,6 @@ from contextlib import contextmanager
 import copy
 import ctypes
 import ctypes.util
-import imp
 import os
 import re
 import string
@@ -104,9 +103,18 @@ def braille_presentation(presentation_file='presentation-braille.py'):
     """
     presentation = Presentation()
     filename = os.path.join(os.path.dirname(__file__), 'styles', presentation_file)
-    f = open(filename)
-    confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
-    f.close()
+    try:
+        import importlib.util
+    except ImportError:
+        # TODO NOPY2: Remove this Python 2 compatibility workaround.
+        import imp
+        f = open(filename)
+        confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
+        f.close()
+    else:
+        spec = importlib.util.spec_from_file_location('_lcg_presentation', filename)
+        confmodule = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(confmodule)
     for o in dir(confmodule):
         if o[0] in string.lowercase and hasattr(presentation, o):
             setattr(presentation, o, confmodule.__dict__[o])

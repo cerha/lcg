@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -362,32 +362,42 @@ def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, recourse
 
     """
     if cls is None:
-        import imp
         try:
-            file, path, descr = imp.find_module(name, [dir])
-        except ImportError:
-            if parent is None and recourse:
+            import importlib.util
+        except ImportError as e:
+            # TODO NOPY2: Remove this Python 2 compatibility workaround.
+            import imp
+            try:
+                f, filename, descr = imp.find_module(name, [dir])
+            except ImportError:
+                module = None
+            else:
+                module = imp.load_module(name, f, filename, descr)
+        else:
+            filename = os.path.join(dir, name + '.py')
+            if os.path.exists(filename):
+                spec = importlib.util.spec_from_file_location(name, filename)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+            else:
+                module = None
+        if module:
+            if hasattr(module, 'IndexNode'):
+                cls = module.IndexNode  # Just for backwards compatibility
+            elif hasattr(module, 'Reader'):
+                cls = module.Reader
+            else:
+                raise lcg.ProcessingError("{} does not define a 'Reader' class.".format(filename))
+        elif parent is None and recourse:
+            cls = DocDirReader
+        else:
+            subdir = os.path.join(dir, name)
+            if os.path.isdir(subdir):
+                dir = subdir
                 cls = DocDirReader
             else:
-                subdir = os.path.join(dir, name)
-                if os.path.isdir(subdir):
-                    dir = subdir
-                    cls = DocDirReader
-                else:
-                    cls = DocFileReader
-        else:
-            m = imp.load_module(name, file, path, descr)
-            if hasattr(m, 'IndexNode'):
-                # Just for backwards compatibility
-                cls = m.IndexNode
-            else:
-                try:
-                    cls = m.Reader
-                except AttributeError:
-                    reason = (("`Reader' not found in %s file.\n"
-                               "Maybe %s is not an LCG customization file and "
-                               "should be removed to make LCG happy?") % (path, path,))
-                    raise lcg.ProcessingError(reason)
+                cls = DocFileReader
+
     if issubclass(cls, FileReader):
         kwargs = dict(kwargs, dir=dir, encoding=encoding)
         if issubclass(cls, DocFileReader):
