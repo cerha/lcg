@@ -18,25 +18,28 @@ classifiers = [
     "Programming Language :: Python :: 3.5",
     "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
 ]
-
-[project.optional-dependencies]
-# Plotting support
-plot = ["matplotlib", "pandas", "svglib"]
-# Syntax highlighting for PreformattedText in HTML output
-syntax-highlight = ["pygments"]
-# Image scaling for PDF and EPUB output
-image-scaling = ["pillow"]
-# PDF output
-pdf = ["reportlab"]
-# HTML SVG → PNG conversion when exporting plots and allow_svg is False
-html-png = ["cairosvg==0.5"]
-# Convenience: install all optional dependencies
-all = [
-    "matplotlib", "pandas", "svglib",
+dependencies = [
+    "future",
     "pygments",
     "pillow",
+]
+
+[project.optional-dependencies]
+# PDF output
+pdf = ["reportlab"]
+# Plot support (cairo/pycairo only used if  allow_svg is False
+plot = ["matplotlib", "pandas", "svglib", "cairosvg==0.5", "pycairo"]
+# liblouis is used for Braille output.
+braille = ["louis"]
+# Convenience: install all optional dependencies except for "louis" as this one
+# is not as simple as pip install...
+all = [
     "reportlab",
+    "matplotlib",
+    "pandas",
+    "svglib",
     "cairosvg==0.5",
+    "pycairo",
 ]
 
 [tool.flit.module]
