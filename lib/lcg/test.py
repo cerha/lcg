@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,8 +35,18 @@ import unittest
 import zipfile
 import pytest
 import tempfile
+import warnings
+
+from decimal import Decimal
 
 import lcg
+try:
+    from matplotlib import pyplot
+except ImportError:
+    pyplot = None
+else:
+    import lcg.plot
+
 
 _ = lcg.TranslatableTextFactory('test')
 standard_library.install_aliases()
@@ -503,22 +513,22 @@ class Resources(unittest.TestCase):
 
     def test_provider(self):
         def warn(msg):
-            warnings.append(msg)
+            messages.append(msg)
 
-        warnings = []
+        messages= []
         p = lcg.ResourceProvider(resources=(lcg.Audio('xxx.ogg'),))
         r = p.resource('xxx.xx', warn=warn)
         assert r is None
-        assert len(warnings) == 1
+        assert len(messages) == 1
         r = p.resource('xxx.mp3', warn=warn)
         assert r is None
-        assert len(warnings) == 2
+        assert len(messages) == 2
         r = p.resource('xxx.ogg')
         assert isinstance(r, lcg.Audio)
-        assert len(warnings) == 2
+        assert len(messages) == 2
         r = p.resource('default.css')
         assert isinstance(r, lcg.Stylesheet)
-        assert len(warnings) == 2
+        assert len(messages) == 2
 
     def test_dependencies(self):
         p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),
@@ -2375,5 +2385,229 @@ class Presentations(unittest.TestCase):
                     assert value_1 == value_2
 
 
+@pytest.mark.skipif(pyplot is None, reason="matplotlib.pyplot not installed.")
+class TestPlots:
+
+    def _test_formatter(self, formatter, pairs, lang='en'):
+        exporter = lcg.HtmlExporter(translations=translation_path)
+        context = exporter.context(None, lang)
+        for number, formatted in pairs:
+            assert formatter(context, number, 0).replace(u'\xa0', ' ') == formatted
+
+
+    def test_decimal_formatter(self):
+        self._test_formatter(lcg.plot.DecimalFormatter(), (
+            (1.0, '1'),
+            (3.4, '3.40'),
+            (120000, '120,000'),
+            (2300000, '2,300,000'),
+            (4234500000000, '4,234,500,000,000'),
+        ))
+
+
+    def test_decimal_formatter_with_precision(self):
+        self._test_formatter(lcg.plot.DecimalFormatter(precision=3), (
+            (1.0, '1.000'),
+            (3.4, '3.400'),
+            (1200, '1,200.000'),
+        ))
+
+
+    def test_abbreviating_monetary_formatter(self):
+        self._test_formatter(lcg.plot.MonetaryFormatter(abbreviate=True), (
+            (140000, '140,000'),
+            (2400000, '2.4 mil.'),
+            (3340000, '3.34 mil.'),
+            (4341000, '4,341,000'),
+            (5345100, '5,345,100'),
+            (6500000000, '6.5 bil.'),
+            (7530000000, '7.53 bil.'),
+            (8532000000, '8.532 bil.'),
+            (9000000000000, '9 tril.'),
+            (1100000000000, '1.1 tril.'),
+            (2120000000000, '2.12 tril.'),
+            (3123000000000, '3.123 tril.'),
+            (4123400000000, '4,123.400 bil.'),
+            (5 * 10 ** 12, '5 tril.'),
+        ))
+
+    def test_translated_abbreviations(self):
+        self._test_formatter(lcg.plot.MonetaryFormatter(abbreviate=True), (
+            (1340000, '1,34 mil.'),
+            (2500000000, '2,5 mld.'),
+            (3100000000000, '3,1 bil.'),
+        ), lang='cs')
+
+    def plots(self):
+        return (
+            lcg.plot.LinePlot(
+                (
+                    (datetime.date(2019, 9, 10), 24),
+                    (datetime.date(2019, 9, 18), 35),
+                    (datetime.date(2019, 9, 24), 34),
+                    (datetime.date(2019, 9, 25), 12),
+                    (datetime.date(2019, 9, 28), 14),
+                ),
+                title='Zůstatek na účtu',
+                lines=(lcg.plot.Line(x=datetime.date(2019, 9, 21), color='red'),),
+            ),
+
+            lcg.plot.LinePlot(
+                (
+                    (datetime.date(2019, 9, 10), 24),
+                    (datetime.date(2019, 9, 18), 24),
+                    (datetime.date(2019, 9, 18), 35),
+                    (datetime.date(2019, 9, 24), 35),
+                    (datetime.date(2019, 9, 24), 34),
+                    (datetime.date(2019, 9, 25), 34),
+                    (datetime.date(2019, 9, 25), 12),
+                    (datetime.date(2019, 9, 28), 12),
+                    (datetime.date(2019, 9, 28), 14),
+                    (datetime.date(2019, 9, 30), 14),
+                ),
+                title='Zůstatek na účtu se skokovými změnami',
+                size=(140, 50),
+                lines=(
+                    lcg.plot.Line(x=datetime.date(2019, 9, 21), color='red', style=':'),
+                    lcg.plot.Line(y=15, color='red', style=':'),
+                ),
+            ),
+
+            lcg.plot.LinePlot(
+                ((1, 24, 11), (2, 35, 34), (3, 12, 32),
+                 (5, 15, 20), (7, 10, 22), (8, 14, 4),
+                 (10, 22, 8), (11, 18, 16), (12, 15, 20)),
+                title='Dva grafy v jednom + grid',
+                legend=('Praha', 'Brno'),
+                grid=True,
+                size=(300, 150),
+                lines=(
+                    lcg.plot.Line(x=8, width=3, style='dotted', color='red'),
+                ),
+            ),
+
+            lcg.plot.LinePlot(
+                (('leden', 24), ('únor', 15), ('březen', 28), ('duben', 14),
+                 ('květen', 18), ('červen', 16), ('červenec', 24), ('srpen', 6),
+                 ('zaří', 8), ('říjen', 14), ('listopad', 18), ('prosinec', 4)),
+                title='Řetězcové hodnoty na ose X a anotace hodnot',
+                annotate=True,
+                grid=(True, True),
+                size=(300, 150),
+                xlabel='čas',
+                ylabel='zůstatek',
+            ),
+
+            lcg.plot.BarPlot(
+                (('leden', 24), ('únor', 15), ('březen', 28), ('duben', 14),
+                 ('květen', 18), ('červen', 16), ('červenec', 24), ('srpen', 6),
+                 ('zaří', 8), ('říjen', 14), ('listopad', 18), ('prosinec', 4)),
+                title='Sloupcový graf',
+                lines=(
+                    lcg.plot.Line(y=20, width=3, style='dotted', color='red'),
+                ),
+                size=(300, 150),
+            ),
+
+
+            lcg.plot.BarPlot(
+                ((1, 24, 11), (2, 35, 34), (3, 12, 32),
+                 (5, 15, 20), (7, 10, 22), (8, 14, 4),
+                 (10, 22, 8), (11, 18, 16), (12, 15, 20)),
+                title='Vícesloupcový graf (dvě y hodnoty pro každou x)',
+                legend=('Praha', 'Brno'),
+                annotate=True,
+                size=(300, 150),
+            ),
+
+            lcg.plot.BarPlot(
+                (('leden', 24, 10), ('únor', 15, 20), ('březen', 28, 30), ('duben', 14, 20),
+                 ('květen', 18, 10), ('červen', 16, 5), ('červenec', 24, 4), ('srpen', 6, 3),
+                 ('zaří', 8, 2), ('říjen', 14, 1), ('listopad', 18, 1), ('prosinec', 4, 2)),
+                title='Vícesloupcový graf s gridem',
+                annotate=True,
+                grid=(True, True),
+                size=(300, 150),
+            ),
+
+            lcg.plot.BarPlot(
+                (('leden', 24, 10, 2), ('únor', 15, 20, 4), ('březen', 28, 30, 8),
+                 ('duben', 14, 20, 16), ('květen', 18, 10, 32), ('červen', 16, 5, 64),
+                 ('červenec', 24, 4, 32), ('srpen', 6, 3, 16), ('zaří', 8, 2, 8),
+                 ('říjen', 14, 1, 4), ('listopad', 18, 1, 2), ('prosinec', 4, 2, 1)),
+                title='Vícenásobný sloupcový graf',
+                legend=('foo', 'bar', 'baz'),
+                annotate=True,
+                grid=(True, True),
+                xlabel='čas',
+                ylabel='zůstatek',
+                size=(300, 150),
+            ),
+
+            lcg.plot.BarPlot(
+                (
+                 (datetime.date(2019, 10, 1), Decimal('7439941.38'), Decimal('7034675.23')),
+                 (datetime.date(2019, 10, 2), Decimal('7649941.38'), Decimal('6345646.70')),
+                 (datetime.date(2019, 10, 3), Decimal('7196818.98'), Decimal('6718642.18')),
+                ),
+                title='Pokus',
+                annotate=True,
+                legend=('Moje', 'Tvoje'),
+                size=(300, 150),
+            ),
+
+            lcg.plot.LinePlot(
+                [(datetime.date(2019, 10, 1), Decimal('7589272.38'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 1), Decimal('7649941.38'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 2), Decimal('7649941.38'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 2), Decimal('7196818.98'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 3), Decimal('7196818.98'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 3), Decimal('7262582.48'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 4), Decimal('7262582.48'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 4), Decimal('7326663.36'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 5), Decimal('7326663.36'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 6), Decimal('7326663.36'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 7), Decimal('7326663.36'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 7), Decimal('7443477.51'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 8), Decimal('7443477.51'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 8), Decimal('7629532.21'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 9), Decimal('7629532.21'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 9), Decimal('7445157.82'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 10), Decimal('7445157.82'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 10), Decimal('7630049.76'), Decimal('7200000.00')),
+                 (datetime.date(2019, 10, 11), Decimal('7630049.76'), Decimal('7200000.00'))],
+                yformatter=lcg.plot.MonetaryFormatter(abbreviate=True),
+                grid=(
+                    lcg.plot.Line(style=':', color='black'),
+                    True,
+                    lcg.plot.Line(style=':', color='#eeeeee'),
+                    True,
+                ),
+                size=(300, 150),
+            ),
+        )
+
+    @pytest.mark.parametrize("output_format, exporter_cls, kwargs", [
+        ('pdf', lcg.export.pdf.PDFExporter, {}),
+        ('html', lcg.HtmlExporter, dict(allow_svg=True)),
+        ('html', lcg.HtmlExporter, dict(allow_svg=False)),
+    ])
+    def test_plots(self, output_format, exporter_cls, kwargs):
+        exporter = exporter_cls(translations=translation_path, **kwargs)
+        node = lcg.ContentNode('x', title='Grafy', content=self.plots())
+        context = exporter.context(node, 'cs')
+        result = exporter.export(context)
+        # HACK: Allow saving exported output to a file for review.
+        if os.getenv('SAVE_PLOTS'):
+            filename = '{}{}.{}'.format(os.getenv('SAVE_PLOTS'),
+                                        '-svg' if kwargs.get('allow_svg') else '',
+                                        output_format)
+            warnings.warn("Writing output file: {}\n".format(filename))
+            if output_format == 'html':
+                result = result.encode('utf-8')
+            with open(filename, 'wb') as f:
+                f.write(result)
+
+
 if __name__ == '__main__':
-    unittest.main()
+    raise SystemExit(pytest.main([__file__]))
