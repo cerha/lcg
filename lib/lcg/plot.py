@@ -192,6 +192,7 @@ class BasePlot(lcg.InlineSVG):
             ax.legend()
         f = io.StringIO()
         fig.savefig(f, format='svg')
+        pyplot.close(fig)
         return f.getvalue()
 
 
