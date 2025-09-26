@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019, 2020 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ from .i18n import TranslatableTextFactory, TranslatedTextFactory, \
     TranslatablePluralForms, LocalizableDateTime, LocalizableTime, \
     Decimal, Monetary, Concatenation, Translator, NullTranslator, \
     GettextTranslator, Localizer, \
-    concat, format, source_files_by_domain
+    concat, format
 
 from .util import is_sequence_of, camel_case_to_lower, text_to_id, \
     unindent_docstring, positive_id, log, caller, \
