@@ -17,5 +17,6 @@
 /.project
 /.pydevproject
 /.settings/
+/.venv/
 /lcg/translations/
 /lcg/resources/

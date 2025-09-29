@@ -1,0 +1,93 @@
+name: Run Tests
+
+on:
+
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+jobs:
+
+  test-py27:
+    # The base system is Ubuntu, but the Python 2.7 image actually runs Debian 10 (Buster).
+    runs-on: ubuntu-latest
+
+    container:
+      image: python:2.7
+
+    env:
+      MPLBACKEND: svg
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fix APT for archived Debian
+        run: |
+          sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list
+          sed -i 's|http://security.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list
+          echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+
+      - name: Install system dependencies
+        run: |
+          # This test runs on Python 2.7, but wee need Python 3 to build the wheel...
+          apt-get update
+          apt-get install -y fontconfig fonts-freefont-ttf gettext rsync python3-pip
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade 'pip<21' 'setuptools<45' 'wheel<0.34' pytest
+          python3 -m pip install flit
+          # Beware: 'make build' duplication here, but we need python3 to run flit.
+          make translations
+          make resources
+          git status --porcelain --untracked-files=normal
+          python3 -m flit build
+          pip install $(echo dist/lcg-*-any.whl)[all]
+
+      - name: Run tests
+        run: make test
+
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.11]
+
+    env:
+      MPLBACKEND: svg
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y fontconfig fonts-freefont-ttf gettext rsync
+
+      - name: Create virtualenv
+        run: |
+          python -m venv .venv
+          echo "${PWD}/.venv/bin" >> $GITHUB_PATH
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install flit pytest
+
+      - name: Build and install the wheel
+        run: |
+          make build
+          pip install $(echo dist/lcg-*-any.whl)[all]
+
+      - name: Run tests
+        run: make test

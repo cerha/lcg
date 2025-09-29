@@ -1,6 +1,6 @@
-.PHONY: translations doc test
+.PHONY: doc test translations resources
 
-all: compile translations
+all: compile translations resources
 
 compile:
 	python -m compileall -d . lcg
@@ -9,6 +9,9 @@ compile:
 translations:
 	make -C translations
 
+resources:
+	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
+
 extract:
 	make -C translations extract
 
@@ -16,19 +19,17 @@ doc:
 	python -m lcg.make doc/src doc/html
 
 test:
-	python -m pytest lcg/test.py
+	python -m pytest lcg/test.py -v
 
-# Only for development installs.  Use pip for production/user installs.
-install:
-	flit install --symlink
-
-build: translations
-	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
+build: translations resources
 	flit build
 
+install:
+        # Only for development installs.  Use pip for production/user installs.
+	flit install --symlink
+
 clean:
-	rm -rf dist/
-	rm -rf lcg/resources
+	rm -rf dist lcg/resources
 	make -C translations clean
 
 coverage:
