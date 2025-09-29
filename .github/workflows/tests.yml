@@ -71,8 +71,8 @@ jobs:
 
       - name: Install system dependencies
         run: |
-          apt-get update
-          apt-get install -y fontconfig fonts-freefont-ttf gettext rsync
+          sudo apt-get update
+          sudo apt-get install -y fontconfig fonts-freefont-ttf gettext rsync
 
       - name: Create virtualenv
         run: |
