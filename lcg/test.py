@@ -39,6 +39,14 @@ import warnings
 
 from decimal import Decimal
 
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+translation_path = [os.path.join(os.path.normpath(os.path.dirname(__file__)), 'translations')]
+
+if os.getenv('CI') == 'true' and repo_root in sys.path:
+    # Make sure to import lcg from the installed package, not from the current directory
+    # when running within a CI workflow
+    sys.path.remove(repo_root)
+
 import lcg
 try:
     from matplotlib import pyplot
@@ -47,15 +55,11 @@ except ImportError:
 else:
     import lcg.plot
 
-
 _ = lcg.TranslatableTextFactory('test')
 standard_library.install_aliases()
 unistr = type('')  # Python 2/3 transition hack.
 if sys.version_info[0] > 2:
     basestring = str
-
-lcg_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '..'))
-translation_path = [os.path.join(os.path.normpath(os.path.dirname(__file__)), 'translations')]
 
 
 class TranslatableText(unittest.TestCase):
@@ -2353,7 +2357,7 @@ class PDFExport(unittest.TestCase):
 
     def test_export(self):
         # Just test for crashes
-        path = os.path.join(lcg_dir, 'doc/src')
+        path = os.path.join(repo_root, 'doc/src')
         name = 'structured-text'
         reader = lcg.reader(path, name, ext='txt', recourse=False)
         node = reader.build()
@@ -2366,7 +2370,7 @@ class Presentations(unittest.TestCase):
 
     def test_style_file(self):
         style_file = lcg.StyleFile()
-        f = open(os.path.join(lcg_dir, 'styles', 'standard'))
+        f = open(os.path.join(repo_root, 'styles', 'standard'))
         style_file.read(f)
         f.close()
         f = tempfile.NamedTemporaryFile(mode='w+t')
