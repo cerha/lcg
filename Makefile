@@ -15,7 +15,7 @@ resources:
 extract:
 	make -C translations extract
 
-doc:
+doc: resources
 	python -m lcg.make doc/src doc/html
 
 test:
@@ -29,7 +29,7 @@ install:
 	flit install --symlink
 
 clean:
-	rm -rf dist lcg/resources
+	rm -rf dist lcg/resources doc/html
 	make -C translations clean
 
 coverage:
