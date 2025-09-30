@@ -22,6 +22,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y rsync
 
+      - name: Create virtualenv
+        run: |
+          python -m venv .venv
+          echo "${PWD}/.venv/bin" >> $GITHUB_PATH
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install future pygments pillow
+          
       - name: Build documentation
         run: make doc
 
