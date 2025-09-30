@@ -1,0 +1,180 @@
+/* Generic content styles */
+html, body {
+    background: #fff;
+    font-family: sans-serif;
+}
+h1 { font-size: 2.0em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.6em; }
+h4 { font-size: 1.4em; margin-top: 0.2em; margin-bottom: 0.1em; }
+h5 { font-size: 1.3em; margin-top: 0.2em; margin-bottom: 0.1em; }
+h6 { font-size: 1.2em; margin-top: 0.2em; margin-bottom: 0.1em; }
+h7,h8,h9 { font-size: 1.1em; }
+
+a:link, a:visited { color: #04b; }
+a:hover, .speaking-text:hover { color: #f60; }
+a.backref, a:link.backref {
+    color: #000;
+    text-decoration: none;
+}
+
+.hidden { display: none; }
+
+/* Exporter generated parts */
+
+#language-selection {
+    border: 0 solid #c8ccd0;
+    font-size: 0.9em;
+    padding: 0.2em;
+    border-top-width: 1px;
+    text-align: right;
+}
+#language-selection img {
+    margin: 0 0.2em;
+    border: 0;
+}
+#content {
+    margin-bottom: 1.6em;
+}
+#copyright {
+    font-size: 0.8em;
+    float: right;
+}
+#version {
+    font-size: 0.8em;
+}
+
+#navigation, #top-navigation, #bottom-navigation {
+    border: solid #c8ccd0;
+    border-width: 1px 0;
+    background: #e8ecf0;
+    padding: .3em 0;
+}
+#navigation span.separator, #top-navigation span.separator, #bottom-navigation span.separator {
+    display: none;
+}
+#navigation span.next, #top-navigation span.next, #bottom-navigation span.next {
+    float: right;
+}
+#navigation hr, #top-navigation hr, #bottom-navigation hr { display: none; }
+
+/* Generic content elements */
+
+table.lcg-fieldset { margin: 0.5em 0; }
+table.lcg-fieldset td.label {
+    white-space: nowrap;
+    text-align: left;
+    padding-right: 0.5em;
+    vertical-align: top;
+    font-weight: bold;
+}
+
+table.lcg-table {
+    border-collapse: collapse;
+    margin: 0.5em 0;
+}
+table.lcg-table td, table.lcg-table th {
+    padding: 2pt;
+    vertical-align: top;
+    white-space: nowrap;
+    border: #ccc solid 1px;
+}
+table.lcg-table td { background: #f4f4f4; }
+table.lcg-table th { background: #eee; }
+table.lcg-table caption {
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: left;
+}
+
+.lcg-preformatted-text {
+    background: #fff4C0;
+    border: 1px solid #dcc;
+    margin: 1em 0;
+    padding: 4px;
+}
+.lcg-preformatted-text pre {
+    white-space: pre;
+    margin: 0;
+}
+.table-of-contents {
+    border: solid #c8ccd0;
+    border-width: 1px 0;
+    background: #f0f0f0;
+    margin: 1em 0;
+    padding: 3pt;
+    clear: both;
+}
+.table-of-contents ul {
+    margin-top: 3pt;
+    margin-bottom: 0;
+}
+
+/* Formatter */
+
+.citation, .quotation {
+    font-style: italic;
+}
+.underline {
+    text-decoration: underline;
+}
+dl dt {
+    font-weight: bold;
+}
+dl dt .citation {
+    font-style: normal;
+}
+
+
+figure {
+  border: thin silver solid;
+  margin: 0.5em;
+  padding: 0.5em;
+  width: auto;
+  display: table-cell;
+}
+
+figure a, figure img {
+    display: table-cell;
+    margin: auto;
+}
+
+figure.left-aligned {
+    float: left;
+}
+
+figure.right-aligned {
+    float: right;
+}
+
+figcaption{
+    display: table-caption;
+    caption-side: bottom;
+    text-align: center;
+    font-style: italic;
+    font-size: smaller;
+    text-indent: 0;
+    min-width: 16em;
+}
+
+.external-video {
+    margin: 1.6em auto .8em auto;
+}
+.external-video .wrapper {
+    /* Responsive iframe according to:
+     * https://www.smashingmagazine.com/2014/02/making-embedded-content-work-in-responsive-design/
+     * https://alistapart.com/article/creating-intrinsic-ratios-for-video/
+     */
+    position: relative;
+    text-align: center;
+    padding-bottom: 75%; /* Actually overridden by the real aspect ratio in the HTML style attr. */
+    height: 0;
+    overflow: hidden;
+}
+.external-video iframe {
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}

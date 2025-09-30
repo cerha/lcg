@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en"><head><title>Using LCG</title><meta http-equiv="Content-Language" content="en"/><meta http-equiv="Content-Script-Type" content="text/javascript"/><meta http-equiv="Content-Style-Type" content="text/css"/><meta http-equiv="X-UA-Compatible" content="edge"/><meta name="generator" content="LCG 0.6.1 (http://www.freebsoft.org/lcg)"/><link rel="stylesheet" type="text/css" href="css/default.css" media="all"/><link rel="top" href="index.html" title="LCG Documentation"/><link rel="prev" href="intro.html" title="Introduction"/><link rel="next" href="structured-text.html" title="Structured Text Formatting Manual"/><link rel="parent" href="index.html" title="LCG Documentation"/><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body><div id="top-navigation"><div>You are here: <a href="index.html" title="LCG Documentation" accesskey="4">LCG Documentation</a><a href="index.html" accesskey="2" class="hidden"></a> / <a href="usage.html" title="Using LCG">Using LCG</a></div><span class="next">Next: <a href="structured-text.html" title="Structured Text Formatting Manual" accesskey="3">Structured Text Formatting Manual</a></span><span class="separator"> |
+</span><span class="prev">Previous: <a href="intro.html" title="Introduction" accesskey="1">Introduction</a></span><hr/></div><div id="heading"><h1>Using LCG</h1></div><div id="content"><p>This document describes usage of LCG end-user tools, namely the <code>lcg.make</code>
+program, which is distributred together with LCG and which may be used directly
+to generate publications, such as manuals, help systems, e-learning courses etc.</p><p>The basic concept is based on files arranged into a directory tree according to
+the logical structure of the publication.  The files are read by the LCG and
+the corresponding content hierarchy is built in the computer memory in an
+independent internal representation.  Then this model is exported into one of
+the supported output formats.</p><p>The input files are either source documents in the Structured Text format (see
+<a href="structured-text.html">Structured Text Formatting Manual</a>) or Python files, which define the 'Reader' class to read the
+document in a custom way.  This makes the LCG input very versatile, however
+requires some programming and knowledge of LCG APIs.  You can write a plug-in
+to parse your own document syntax or read the content from a database, python
+docstrings or whateher else source one can imagine.</p><p>Please note, that you can also use images, sound and video files, scripts,
+stylesheets and other media within your content, but these are not considered
+<em>source files</em> from this point of view.  They are called <em>resources</em> in this
+manual.  To include a resource, you usually refer to it from your source file,
+so you will also find the relavant information in the later sections.</p><div class="table-of-contents"><div class="title"><strong>Index:</strong></div><ul><li class="i1"><a href="#sec1" name="backref-sec1">Terminology</a></li><li class="i2"><a href="#sec2" name="backref-sec2">Organization of the Source Data</a><ul><li class="i1"><a href="#names" name="backref-names">File and Directory Name Restrictions</a></li><li class="i2"><a href="#index-file" name="backref-index-file">Index File</a></li><li class="i3"><a href="#language-variants" name="backref-language-variants">Language Variants</a></li></ul></li><li class="i3"><a href="#run" name="backref-run">Running lcg.make</a></li></ul></div><div id="sec1" class="section section-level-2 default-section"><div class="section-container section-level-2"><div class="section-heading section-level-2"><h2><a href="#backref-sec1" class="backref">Terminology</a></h2></div><div class="section-content section-level-2"><div class="section-content-wrapper"><p>We use the following terminology in the text below:</p><dl><dt>Publication</dt><dd><p>A general term for the whole hierarchy of documents, which together make the
+  manual, e-learning course, help system or whatever you are using the LCG for.</p></dd><dt>Node </dt><dd><p>A node represents one document within the hierarchy.  This may be a
+  chapter of a book, unit of a course or any other logically complete unit of
+  the material.  A publication is a hierarchy of nodes.  Each node has a unique
+  identifier.</p></dd><dt>Content</dt><dd><p>Each node contains some actual text.  LCG recognizes the logical structure of
+  the content.  Thus we have a hierarchy of content elements, such as sections,
+  paragraphs, itemized lists, code samples, tables, images etc.</p></dd></dl></div></div></div></div><div id="sec2" class="section section-level-2 default-section"><div class="section-container section-level-2"><div class="section-heading section-level-2"><h2><a href="#backref-sec2" class="backref">Organization of the Source Data</a></h2></div><div class="section-content section-level-2"><div class="section-content-wrapper"><p>There is just one <em>source directory</em>, which contains files and subdirectories,
+which are read recursively.</p><p>The following rules apply:</p><ul><li class="i1">The root node is located first.  By default, the root node's identifier is
+    'index', but any other id can be passed (see <a href="usage.html#run">Running lcg.make</a>).</li><li class="i2">The list of child nodes is built.  In short, a child node is created for
+    each file or directory found in the source directory, which has a
+    suitable name (see <a href="usage.html#names">File and Directory Name Restrictions</a>).</li><li class="i3">A file represents a leave node (it has no children).  The node's id is the
+    base name of this file.  Node's content is read from the file in the
+    Structured Text format.  Each file can have multiple <a href="usage.html#language-variants">Language Variants</a>.
+    See <a href="structured-text.html">Structured Text Formatting Manual</a> for details about the input format.</li><li class="i4">A directory represents a node with children.  The node's id is the name of
+    this directory.  The node's content is read from the file of the same name
+    within this directory, plus the suffix (e.g. <code>intro/intro.txt</code>).  All other
+    files and directories within the directory are child nodes of this node.
+    The process starts recursively as for the root node.</li><li class="i5">A Python source file represents an extensible reader.  The file must define
+    a class named 'Reader', which implements 'lcg.Reader' API.  This reader
+    will be instantiated and used to construct the content of the node and may
+    also build a sub-hierarchy of nodes.</li><li class="i6">It is possible to enforce the order and visibility of nodes using the
+    <a href="usage.html#index-file">Index File</a>.</li></ul><p>Files within the whole directory structure must have unique names, since they
+are used as node identifiers.  This also means that it is possible to refer to
+any node using it's id, without caring where in the hierarchy it is located.</p><div id="names" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-names" class="backref">File and Directory Name Restrictions</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>A valid <em>source directory</em> name is any name, which doesn't begin with a dot or
+an underscore.  Also 'CVS' directories are ignored.</p><p>A valid <em>source file</em> must have the source file suffix.  This is '.txt' by
+default, but any other suffix can be passed (see <a href="usage.html#run">Running lcg.make</a>).  The suffix '.py' is,
+however, reserved for Python source files.  Filenames beginning with a dot, an
+underscore and ending with a tilde are ignored.</p></div></div></div></div><div id="index-file" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-index-file" class="backref">Index File</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>The nodes are ordered alphabetically by default, but the order can be also
+defined explicitly using a file named '_index.txt', which contains the list of
+child node identifiers one per line.</p><p>Nodes, which don't appear in the index file, but for which an input file is
+found, are still created, however they are considered "hidden" and thus they
+don't appear in the table of contents.</p><p>Empty lines and lines beginning with a hash ('#') are ignored.</p></div></div></div></div><div id="language-variants" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-language-variants" class="backref">Language Variants</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Each source file can have multiple language variants.  The language of the
+source file is identified by the file name suffix.  This suffix must correspond
+to the ISO 639-1 Alpha-2 language code and must appear before the file type
+suffix.  Thus for example 'index.en.txt' defines the English variant of the
+'index' node content.</p><p>The existing variants of the root document determine the available variants of
+the whole publication.  Thus the publication will be exported into all the
+languages, which exist for the root node.</p><p>If you omit the language suffix for the root file, the language of the
+publication is undefined and you don't need to use language suffixes for any
+other source files.</p></div></div></div></div></div></div></div></div><div id="run" class="section section-level-2 default-section"><div class="section-container section-level-2"><div class="section-heading section-level-2"><h2><a href="#backref-run" class="backref">Running lcg.make</a></h2></div><div class="section-content section-level-2"><div class="section-content-wrapper"><p>Launch <code>lcg.make</code> with the <code>--help</code> argument to see the supported options:</p><div class="lcg-preformatted-text"><pre>python -m lcg.make --help
+</pre></div><p>A good example of a simple source document structure and <code>lcg.make</code> invocation is
+the LCG documentation itself.  It is generated into HTML by invoking <code>make doc</code>
+in the root directory of the LCG source archive.</p></div></div></div></div></div><div id="bottom-navigation"><hr/><div>You are here: <a href="index.html" title="LCG Documentation" accesskey="4">LCG Documentation</a><a href="index.html" accesskey="2" class="hidden"></a> / <a href="usage.html" title="Using LCG">Using LCG</a></div><span class="next">Next: <a href="structured-text.html" title="Structured Text Formatting Manual" accesskey="3">Structured Text Formatting Manual</a></span><span class="separator"> |
+</span><span class="prev">Previous: <a href="intro.html" title="Introduction" accesskey="1">Introduction</a></span></div></body></html>

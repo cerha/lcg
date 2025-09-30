@@ -1,0 +1,517 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en"><head><title>Structured Text Formatting Manual</title><meta http-equiv="Content-Language" content="en"/><meta http-equiv="Content-Script-Type" content="text/javascript"/><meta http-equiv="Content-Style-Type" content="text/css"/><meta http-equiv="X-UA-Compatible" content="edge"/><meta name="generator" content="LCG 0.6.1 (http://www.freebsoft.org/lcg)"/><script src="scripts/prototype.js" type="text/javascript"></script><script src="scripts/lcg.js" type="text/javascript"></script><script src="scripts/lcg-exercises.js" type="text/javascript"></script><script src="scripts/effects.js" type="text/javascript"></script><link rel="stylesheet" type="text/css" href="css/default.css" media="all"/><link rel="stylesheet" type="text/css" href="css/lcg-exercises.css" media="all"/><link rel="top" href="index.html" title="LCG Documentation"/><link rel="prev" href="usage.html" title="Using LCG"/><link rel="next" href="examples.html" title="Examples"/><link rel="parent" href="index.html" title="LCG Documentation"/><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body><div id="top-navigation"><div>You are here: <a href="index.html" title="LCG Documentation" accesskey="4">LCG Documentation</a><a href="index.html" accesskey="2" class="hidden"></a> / <a href="structured-text.html" title="Structured Text Formatting Manual">Structured Text Formatting Manual</a></div><span class="next">Next: <a href="examples.html" title="Examples" accesskey="3">Examples</a></span><span class="separator"> |
+</span><span class="prev">Previous: <a href="usage.html" title="Using LCG" accesskey="1">Using LCG</a></span><hr/></div><div id="heading"><h1>Structured Text Formatting Manual</h1></div><div id="content"><p>This document describes the Structured Text format used by the
+<a href="http://www.freebsoft.org/lcg">LCG</a>.</p><div class="table-of-contents"><div class="title"><strong>Table of Contents:</strong></div><ul><li class="i1"><a href="#intro" name="backref-intro">Introduction</a></li><li class="i2"><a href="#overview" name="backref-overview">Brief Overview of Most Important Constructs</a></li><li class="i3"><a href="#sec3" name="backref-sec3">General Recommendations</a></li><li class="i4"><a href="#complete-manual" name="backref-complete-manual">Detailed Structured Text Formatting Manual</a></li></ul></div><div id="intro" class="section section-level-2 default-section"><div class="section-container section-level-2"><div class="section-heading section-level-2"><h2><a href="#backref-intro" class="backref">Introduction</a></h2></div><div class="section-content section-level-2"><div class="section-content-wrapper"><p>Structured text is a very simple and straightforward set of rules how to format
+a plain text document.  The formatting allows to mark the logical structure of
+sections, paragraphs, bullet lists etc.</p><p>The constructs mostly have a semantical, not presentational nature.  This means
+that we should not decide based on the intended appearance of the content, but
+it's semantical meaning.  For example we don't use a heading, because we want a
+large font in bold, but because it is the title of following logical section of
+the document.</p><p>Presentational properties of particular logical elements can be systematically
+changed using style sheets.  Thus they are completely independent of the
+content itself.  This is on of the major preconditions for the consistence of
+the final document and a smooth user experience.</p><p>Another advantage of this approach is that the document source stays easily
+readable and editable without any particular software tool.  Just a simple text
+editor can do the job.  This makes it totally portable and accessible.  A
+number of different target formats may be generated from one source.</p><p>Misunderstanding or not respecting the fundamental principal of separation of
+the logical and the presentational aspect of the document may lead to an
+initial frustration for users, who are used to format documents visually,
+however once you get used to the fact that your only goal is to mark the text
+up properly and you leave all the job of choosing the right presentation to the
+computer, you discover it does not restrict you, but it gives you more freedom.
+You can fully concentrate on the content itself and don't care too much of its
+presentation.  This, however, would not work without your knowledge of the
+rules used for recognizing different logical elements of the document.  So we
+will explain the most important constructs now.</p></div></div></div></div><div id="overview" class="section section-level-2 default-section"><div class="section-container section-level-2"><div class="section-heading section-level-2"><h2><a href="#backref-overview" class="backref">Brief Overview of Most Important Constructs</a></h2></div><div class="section-content section-level-2"><div class="section-content-wrapper"><p>The following section contains only a brief and simplified description of the
+most important constructs.  You will find a complete description of all
+supported constructs in the second part of this document called
+<a href="structured-text.html#complete-manual">Detailed Structured Text Formatting Manual</a>.</p><div class="table-of-contents"><div class="title"><strong>Table of Contents:</strong></div><ul><li class="i1"><a href="#overview.1" name="backref-overview.1">Paragraphs</a></li><li class="i2"><a href="#overview.2" name="backref-overview.2">Sections</a></li><li class="i3"><a href="#overview.3" name="backref-overview.3">Bullet Lists</a></li><li class="i4"><a href="#overview.4" name="backref-overview.4">Definition Lists</a></li><li class="i5"><a href="#overview.5" name="backref-overview.5">Field-Sets</a></li><li class="i6"><a href="#overview.6" name="backref-overview.6">Links</a></li><li class="i7"><a href="#overview.7" name="backref-overview.7">Images</a></li><li class="i8"><a href="#overview.8" name="backref-overview.8">Audio and Video</a></li></ul></div><div id="overview.1" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.1" class="backref">Paragraphs</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>A paragraph is each continual block of text.  Whenever you leave a blank line,
+you start a new paragraph.  The line-breaks within the paragraph are ignored,
+since the paragraph will be reformatted to fit the output media (i.e. browser
+window).</p></div></div></div></div><div id="overview.2" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.2" class="backref">Sections</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Sections let you create an additional logical structure within the text
+content.  The section hierarchy can be listed in a Table of Contents, which
+allows easy navigation within this hierarchy (similarly as in this manual).</p><p>A section starts with a sections header.  The header is marked by a section
+title surrounded by equation signs.  The number of the
+equation signs determines the level.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre> = Main Heading =
+
+ Top level content.
+
+ == First Section ==
+
+ This paragraph belongs to the first section.
+
+ === Subsection of the First Section ===
+
+ This text belongs to the subsection.
+
+ == Second Section ==
+
+ This is a second section on the same level as the first one.
+</pre></div></div></div></div></div><div id="overview.3" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.3" class="backref">Bullet Lists</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Bullet lists should be used whenever the content can be split into a sequence
+of separate items.  Each item is marked by an asterisk and may be indented.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre> * cat
+ * dog
+ * hamster
+</pre></div><p>This will be presented as:</p><ul><li class="i1">cat</li><li class="i2">dog</li><li class="i3">hamster</li></ul><p>Bullet lists can be nested, you can also make ordered lists etc.  More details
+can be found in the <a href="structured-text.html#bullet-lists">Bullet Lists</a> and <a href="structured-text.html#ordered-lists">Ordered Lists</a>.</p></div></div></div></div><div id="overview.4" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.4" class="backref">Definition Lists</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Definition lists are useful for writing down a series of terms or expressions
+and their corresponding descriptions.  You write them down by indenting the
+description following immediately after the term.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>Learning Content Generator (LCG)
+  LCG is a software tool able to process structured textual and
+  multimedia data and produce an output presentation which is
+  suitable for use in an on-line or off-line learning
+  environment.
+
+Wiking
+  Wiking is an accessible content management system written on
+  top of the Pytis toolkit and LCG.
+</pre></div><p>This will be presented as:</p><dl><dt>Learning Content Generator (LCG)</dt><dd><p>LCG is a software tool able to process structured textual and multimedia data
+  and produce an output presentation which is suitable for use in an on-line or
+  off-line learning environment.</p></dd><dt>Wiking</dt><dd><p>Wiking is an accessible content management system written on top of the Pytis
+  toolkit and LCG.</p></dd></dl><p>See <a href="structured-text.html#definition-lists">Definition Lists</a> for a detailed syntax description.</p></div></div></div></div><div id="overview.5" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.5" class="backref">Field-Sets</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>In general, a field-set can be used to represent any logically paired data set.
+They are similar to definition lists, but they are more suitable for
+label/value type of pairs (rather than term/description).</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>:Phone:   254 354 645
+:Fax:     254 354 648
+:e-mail:  info@yourdomain.com
+</pre></div><p>This will be presented as:</p><table class="lcg-fieldset" role="presentation"><tr><td class="label">Phone</td><td>254 354 645</td></tr><tr><td class="label">Fax</td><td>254 354 648</td></tr><tr><td class="label">e-mail</td><td><a href="mailto:info@yourdomain.com">info@yourdomain.com</a></td></tr></table><p>See <a href="structured-text.html#field-sets">Field-Sets</a> for a detailed syntax description.</p></div></div></div></div><div id="overview.6" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.6" class="backref">Links</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Links are hypertext references to other documents or sections within them.
+They are written using square brackets.  Each link has its target, may have an
+explicit label (text displayed in place of the link) and an optional
+description for tooltip text.  Target is the first text in the brackets up to
+the first space, label follows and description may follow after the pipe
+character (`|').  If the link label is not defined explicitly, the
+system will use the title of the target document or section where possible.
+Certain kinds of targets are recognized automatically and thus don't require
+square brackets.</p><p><strong>Examples</strong>:</p><div class="lcg-preformatted-text"><pre> * link to another document: [intro]
+ * link to another section of the same document: [#bullet-lists]
+ * with an explicit name: [#bullet-lists Bullets]
+ * with a description (tooltip):
+   [#bullet-lists Bullets | Using Bullet Lists]
+ * external link:
+   [http://www.freebsoft.org Free(b)soft laboratory]
+ * automatic link: http://www.gnu.org
+ * email address: yourname@yourdomain.com
+</pre></div><p>Resulting links:</p><ul><li class="i1">link to another document: <a href="intro.html">Introduction</a></li><li class="i2">link to another section of the same document: <a href="structured-text.html#bullet-lists">Bullet Lists</a></li><li class="i3">with an explicit name: <a href="structured-text.html#bullet-lists">Bullets</a></li><li class="i4">with a description (tooltip): <a href="structured-text.html#bullet-lists" title="Using Bullet Lists">Bullets</a></li><li class="i5">external link: <a href="http://www.freebsoft.org">Free(b)soft laboratory</a></li><li class="i6">automatic link: <a href="http://www.gnu.org">http://www.gnu.org</a></li><li class="i7">email address: <a href="mailto:yourname@yourdomain.com">yourname@yourdomain.com</a></li></ul><p>See <a href="structured-text.html#links">Links</a> and <a href="structured-text.html#automatic-links">Automatic Links</a> for more details.</p></div></div></div></div><div id="overview.7" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.7" class="backref">Images</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Links with an image in place of a link target display the image inline.  Links
+with an image instead of link label display an image which acts as a link.</p><div class="lcg-preformatted-text"><pre> * simple image:
+   [http://www.google.com/accounts/google_white.gif]
+ * with ALT text:
+   [http://www.google.com/accounts/google_white.gif Google logo]
+ * simple image link: [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png]
+ * image link with label and description:
+   [http://www.opensource.org
+   http://www.opensource.org/trademarks/open_source_button.png
+   OSI | Open Source Initiative]
+</pre></div><p>Resulting images:</p><ul><li class="i1">simple image:
+   <img class="lcg-image image-google_white" src="http://www.google.com/accounts/google_white.gif" alt=""/></li><li class="i2">with ALT text:
+   <img class="lcg-image image-google_white" src="http://www.google.com/accounts/google_white.gif" alt="Google logo"/></li><li class="i3">simple image link: <a href="http://www.opensource.org"><img class="lcg-image image-open_source_button" src="http://www.opensource.org/trademarks/open_source_button.png" alt=""/></a></li><li class="i4">image link with label and description:
+   <a href="http://www.opensource.org" title="Open Source Initiative"><img class="lcg-image image-open_source_button" src="http://www.opensource.org/trademarks/open_source_button.png" alt="OSI"/></a></li></ul><p>See <a href="structured-text.html#images">Images</a> and <a href="structured-text.html#image-links">Image Links</a> for more details.</p></div></div></div></div><div id="overview.8" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-overview.8" class="backref">Audio and Video</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Links to audio recordings in MP3 format will appear as ordinary links in HTML,
+but these links will act as a remote control of the audio player displayed at
+the bottom right corner of the browser window.  Full keyboard accessibility is
+also implemented.  See <a href="structured-text.html#audio">Audio</a> for more information.</p><p>Similarly as images, also video files in OGV, MP4, WEBM a 3GP formats and links
+to YouTube and Vimeo services are automatically recognized and displayed as an
+embedded player.  See <a href="structured-text.html#video">Video</a> for more information.</p></div></div></div></div></div></div></div></div><div id="sec3" class="section section-level-2 default-section"><div class="section-container section-level-2"><div class="section-heading section-level-2"><h2><a href="#backref-sec3" class="backref">General Recommendations</a></h2></div><div class="section-content section-level-2"><div class="section-content-wrapper"><ul><li class="i1">Get familiar with the available constructs and always use those, which
+    best fit given purpose.  Nearly everything can be written down as one long
+    paragraph of text, but using the constructs, such as bullet lists,
+    definition lists etc. can make the text much better readable.  You will
+    also greatly simplify the orientation and navigation for users of assistive
+    technologies.</li><li class="i2">Never miss-use any logical construct just to achieve it's presentational
+    properties (such as font size or type, indentation etc.) unless it really
+    fits logically.  Try to re-consider the logical structure of the
+    information if you can't find a suitable construct.</li><li class="i3">Use tables only if there is no other means to express the information and
+    only when it really is tabular data.  It is, for example, often possible to
+    express the same information by nested lists instead of tables.  This form
+    may be often more accessible to the users of assistive technologies.</li><li class="i4">Use hypertext links as much as possible to simplify navigation between
+    documents and their sections.  See <a href="structured-text.html#links">Links</a> for more information.</li><li class="i5">Whenever there is some information repeated at different places, detach it
+    to a separate document/section and link to it from those places.</li><li class="i6">Avoid long sentences.  Short, simple and clear sentences are much better
+    readable.</li><li class="i7">Don't overuse text emphasizing.  A document blazing with many different font
+    sizes and styles is hard to read.</li></ul></div></div></div></div><div id="complete-manual" class="section section-level-2 default-section"><div class="section-container section-level-2"><div class="section-heading section-level-2"><h2><a href="#backref-complete-manual" class="backref">Detailed Structured Text Formatting Manual</a></h2></div><div class="section-content section-level-2"><div class="section-content-wrapper"><p>This section describes all the supported constructs and their syntax in depth.
+See the <a href="structured-text.html#overview">Brief Overview of Most Important Constructs</a> for a simplified description.</p><div class="table-of-contents"><div class="title"><strong>Table of Contents:</strong></div><ul><li class="i1"><a href="#complete-manual.1" name="backref-complete-manual.1">Block Constructs</a><ul><li class="i1"><a href="#complete-manual.1.1" name="backref-complete-manual.1.1">Sections</a></li><li class="i2"><a href="#anchors" name="backref-anchors">Anchors</a></li><li class="i3"><a href="#toc" name="backref-toc">Tables of Contents</a></li><li class="i4"><a href="#bullet-lists" name="backref-bullet-lists">Bullet Lists</a></li><li class="i5"><a href="#ordered-lists" name="backref-ordered-lists">Ordered Lists</a></li><li class="i6"><a href="#definition-lists" name="backref-definition-lists">Definition Lists</a></li><li class="i7"><a href="#field-sets" name="backref-field-sets">Field-Sets</a></li><li class="i8"><a href="#preformatted-text" name="backref-preformatted-text">Preformatted Text</a></li><li class="i9"><a href="#complete-manual.1.9" name="backref-complete-manual.1.9">Tables</a></li><li class="i10"><a href="#complete-manual.1.10" name="backref-complete-manual.1.10">Horizontal Alignment</a></li></ul></li><li class="i2"><a href="#inline-constructs" name="backref-inline-constructs">Inline Constructs</a><ul><li class="i1"><a href="#inline-constructs.1" name="backref-inline-constructs.1">Text Emphasizing</a></li><li class="i2"><a href="#links" name="backref-links">Links</a></li><li class="i3"><a href="#automatic-links" name="backref-automatic-links">Automatic Links</a></li><li class="i4"><a href="#images" name="backref-images">Images</a></li><li class="i5"><a href="#image-links" name="backref-image-links">Image Links</a></li><li class="i6"><a href="#audio" name="backref-audio">Audio</a></li><li class="i7"><a href="#video" name="backref-video">Video</a><ul><li class="i1"><a href="#video.1" name="backref-video.1">Embedded Video from YouTube or Vimeo</a></li></ul></li><li class="i8"><a href="#inline-constructs.8" name="backref-inline-constructs.8">Interactive exercises</a><ul><li class="i1"><a href="#inline-constructs.8.1" name="backref-inline-constructs.8.1">MultipleChoiceQuestions</a></li><li class="i2"><a href="#inline-constructs.8.2" name="backref-inline-constructs.8.2">Selections</a></li><li class="i3"><a href="#inline-constructs.8.3" name="backref-inline-constructs.8.3">TrueFalseStatements</a></li><li class="i4"><a href="#inline-constructs.8.4" name="backref-inline-constructs.8.4">GapFilling</a></li><li class="i5"><a href="#inline-constructs.8.5" name="backref-inline-constructs.8.5">HiddenAnswers</a></li><li class="i6"><a href="#inline-constructs.8.6" name="backref-inline-constructs.8.6">WrittenAnswers</a></li><li class="i7"><a href="#inline-constructs.8.7" name="backref-inline-constructs.8.7">Cloze</a></li><li class="i8"><a href="#inline-constructs.8.8" name="backref-inline-constructs.8.8">Numbered Cloze</a></li></ul></li><li class="i9"><a href="#inline-constructs.9" name="backref-inline-constructs.9">Vertical Space</a></li><li class="i10"><a href="#inline-constructs.10" name="backref-inline-constructs.10">Page Numbers</a></li></ul></li><li class="i3"><a href="#complete-manual.3" name="backref-complete-manual.3">Other Features</a><ul><li class="i1"><a href="#complete-manual.3.1" name="backref-complete-manual.3.1">Escaping</a></li><li class="i2"><a href="#complete-manual.3.2" name="backref-complete-manual.3.2">Explicit Line Break</a></li><li class="i3"><a href="#complete-manual.3.3" name="backref-complete-manual.3.3">Horizontal Lines</a></li><li class="i4"><a href="#complete-manual.3.4" name="backref-complete-manual.3.4">Page Headers and Footers</a></li><li class="i5"><a href="#complete-manual.3.5" name="backref-complete-manual.3.5">Presentation Parameters</a></li><li class="i6"><a href="#complete-manual.3.6" name="backref-complete-manual.3.6">Variables</a></li><li class="i7"><a href="#complete-manual.3.7" name="backref-complete-manual.3.7">Comments</a></li></ul></li><li class="i4"><a href="#complete-manual.4" name="backref-complete-manual.4">Deprecated Features</a><ul><li class="i1"><a href="#complete-manual.4.1" name="backref-complete-manual.4.1">Non-breakable Space</a></li><li class="i2"><a href="#complete-manual.4.2" name="backref-complete-manual.4.2">Long Dash</a></li></ul></li></ul></div><div id="complete-manual.1" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-complete-manual.1" class="backref">Block Constructs</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Block (or structural) constructs influence the document structure.  They
+usually work with blocks of text.  <a href="structured-text.html#inline-constructs">Inline Constructs</a>, on the other hand, are
+used within these blocks.</p><div id="complete-manual.1.1" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.1.1" class="backref">Sections</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>As described in the <a href="structured-text.html#overview">Brief Overview of Most Important Constructs</a>, sections form a hierarchical structure of the
+document.</p><p>Section headings are marked by equation characters at the beginning and end of
+the line.  The text between the equation signs is a section title.  The number
+of the equation signs determines the level.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre> = Main Heading =
+
+ Everything after the section heading belongs to this section,
+ until another section heading is found.  Any number of
+ paragraphs or other constructs can be used within the text of a
+ section.
+
+ == First Section ==
+
+ Since the heading has more equation signs than the previous one,
+ this section logically belongs to the previous section in the
+ hierarchy.
+
+ === Subsection of the First Section ===
+
+ This text belongs to the subsection.
+
+ == Second Section ==
+
+ This is a second section on the same level as the first one.
+</pre></div><p>The space between the title and the equation marks is important.  Otherwise the
+section is not recognized.</p></div></div></div></div><div id="anchors" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-anchors" class="backref">Anchors</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Additionally an anchor name can be defined for each section heading.  The
+anchor can consist of alpha-numerical characters, underscores and dashes and is
+written at the end of the heading line separated with at least one blank
+character (space).</p><div class="lcg-preformatted-text"><pre> == Introduction == intro
+</pre></div><p>An anchor can be used to refer to the section.  The link [#intro], for
+example, will refer to the above section header and the full section title will
+be supplied as the link name (see <a href="structured-text.html#links">Links</a> for more details).</p></div></div></div></div><div id="toc" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-toc" class="backref">Tables of Contents</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Table of contents is a hierarchical list of all sections within a document or
+it's part.  It can be included in the document using the <code>@TOC@</code> macro.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>Table of Contents: @TOC@
+</pre></div><p>This source line will be replaced with the table of contents.  The text before
+the colon is used for the caption and the TOC includes all the subsections of
+the section, within which the macro is used.  This means you can also create
+local tables of contents in particular subsections.</p><p>The TOC at the beginning of the <a href="structured-text.html#complete-manual">Detailed Structured Text Formatting Manual</a> was made the same way.</p><p><code>@TOC@</code> is used to list sections within one document.  You may also wish to
+list documents of the document hierarchy.  This can be done by using the
+<code>@NodeIndex@</code> macro.  The syntax is the same.</p><p>The Tables of Content are hierarchical by default.  You may wish to <em>restrict
+the depth</em> of the hierarchy.  This can be done by supplying a number in round
+brackets, such as:</p><div class="lcg-preformatted-text"><pre>Index: @TOC(1)@
+</pre></div><p>This will list just the top level sections without their subsections.  The TOC
+at the top of this document was made the same way.</p></div></div></div></div><div id="bullet-lists" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-bullet-lists" class="backref">Bullet Lists</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Bullet lists are marked by an asterisk (or optionally a minus sign) at the
+beginning of each item.  The indentation determines the level (lists can be
+nested).</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre> * cats
+   - black
+   - white
+   - other
+ * dogs
+   * big
+   * little
+ * frogs
+</pre></div><p>This will be presented as:</p><ul><li class="i1">cats<ul><li class="i1">black</li><li class="i2">white</li><li class="i3">other</li></ul></li><li class="i2">dogs<ul><li class="i1">big</li><li class="i2">little</li></ul></li><li class="i3">frogs</li></ul></div></div></div></div><div id="ordered-lists" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-ordered-lists" class="backref">Ordered Lists</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Ordered lists work like <a href="structured-text.html#bullet-lists">Bullet Lists</a> but you use a number or a letter with a
+period (or round brackets) instead of an asterisk.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre> * General rules:
+   1. Longer item texts can be split over multiple lines,
+      provided that they are indented properly.
+   2. Tabs and spaces can be used for indentation, but tab is
+      always considered 8 characters wide, so you may have
+      problems when your editor sets the tab width differently
+      (then converting tabs to spaces is recommended).
+   3. A list item may contain one or more paragraphs of text.
+   4. Empty lines between the list items are optional and have no
+      effect on the output.  That's just a matter of your
+      preference.
+
+ * Rules for ordered lists:
+   0. The numbers in the source document are ignored, since the
+      output numbers are automatically generated.  Thus you are
+      free to mark all items with zero, for example, or you can
+      use real order numbers if you prefer.
+   0. You can also use letters for alphabetically ordered lists.
+
+ * Intermixing different kinds of lists:
+   a) There are basically three different kinds of lists:
+      (1) unordered
+      (2) numerically ordered
+      (3) alpha-ordered
+   b) Whenever you switch from one kind to another (at the same
+      indentation level), the previous list is finished and
+      ordering starts from the beginning.
+   c. It does not matter, whether you use a dot or brackets in
+      the source text.  The output style of each list kind is
+      given by the style sheet.
+</pre></div><p>This will be presented as:</p><ul><li class="i1">General rules:<ol><li class="i1">Longer item texts can be split over multiple lines,
+      provided that they are indented properly.</li><li class="i2">Tabs and spaces can be used for indentation, but tab is
+      always considered 8 characters wide, so you may have
+      problems when your editor sets the tab width differently
+      (then converting tabs to spaces is recommended).</li><li class="i3">A list item may contain one or more paragraphs of text.</li><li class="i4">Empty lines between the list items are optional and have no
+      effect on the output.  That's just a matter of your
+      preference.</li></ol></li><li class="i2">Rules for ordered lists:<ol><li class="i1">The numbers in the source document are ignored, since the
+      output numbers are automatically generated.  Thus you are
+      free to mark all items with zero, for example, or you can
+      use real order numbers if you prefer.</li><li class="i2">You can also use letters for alphabetically ordered lists.</li></ol></li><li class="i3">Intermixing different kinds of lists:<ol style="list-style-type: lower-alpha"><li class="i1">There are basically three different kinds of lists:<ol style="list-style-type: lower-alpha"><li class="i1">unordered</li><li class="i2">numerically ordered</li><li class="i3">alpha-ordered</li></ol></li><li class="i2">Whenever you switch from one kind to another (at the same
+      indentation level), the previous list is finished and
+      ordering starts from the beginning.</li><li class="i3">It does not matter, whether you use a dot or brackets in
+      the source text.  The output style of each list kind is
+      given by the style sheet.</li></ol></li></ul></div></div></div></div><div id="definition-lists" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-definition-lists" class="backref">Definition Lists</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Definition lists are useful for writing down a series of terms or expressions
+and their corresponding descriptions.  The term/description pairs are separated
+by blank lines from each other.</p><p><strong>Example</strong>:</p><div class="lcg-preformatted-text"><pre>Term syntax
+   Definition term is a one line text immediately followed by a
+   description.
+
+Description syntax
+   Definition description follows immediately after the term and
+   is indented by one or more spaces.  Multiple lines are allowed
+   as long as they are all indented.
+</pre></div><p>This will be presented as:</p><dl><dt>Term syntax</dt><dd><p>Definition term is a one line text immediately followed by a
+   description.</p></dd><dt>Description syntax</dt><dd><p>Definition description follows immediately after the term and
+   is indented by one or more spaces.  Multiple lines are allowed
+   as long as they are all indented.</p></dd></dl></div></div></div></div><div id="field-sets" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-field-sets" class="backref">Field-Sets</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Field-sets can be used for generic two-column tabular data, where the first
+column is the label and the second column is the corresponding value.  The
+label is marked with colons from both sides.  Values can be multi-line, but
+must be indented properly.</p><div class="lcg-preformatted-text"><pre>:Birth Date: 1975-08-30
+:Address:
+   38 Ocean View Dr. //
+   Laguna Beach
+:Occupation: Oil Magnate
+</pre></div><table class="lcg-fieldset" role="presentation"><tr><td class="label">Birth Date</td><td>1975-08-30</td></tr><tr><td class="label">Address</td><td>
+   38 Ocean View Dr. <br/>
+   Laguna Beach</td></tr><tr><td class="label">Occupation</td><td>Oil Magnate</td></tr></table></div></div></div></div><div id="preformatted-text" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-preformatted-text" class="backref">Preformatted Text</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can mark a block of text as a preformatted text by surrounding it by lines
+of five or more dashes.</p><p>No further formatting is then applied to the preformatted text.  It is rendered
+as it appears in the source document.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre> ------
+  foo   bar
+   x     y
+   1     2
+ ------
+</pre></div><p>This will be presented as:</p><div class="lcg-preformatted-text"><pre> foo   bar
+  x     y
+  1     2
+</pre></div><p>All the examples in this manual are written as preformatted text.</p></div></div></div></div><div id="complete-manual.1.9" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.1.9" class="backref">Tables</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can make simple tables with constant number of cells per row.  Each row is
+on one line and vertical bars characters are used to separate the cells.  The
+line must also begin and end with a vertical bar character.  If the vertical
+bar character is immediately followed by a dash, horizontal line is generated
+at that place (some backends may omit the horizontal line).</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>|        | *Height* | *Weight* | *Sex*  |
+|---------------------------------------|
+| Dick   |      72" |   130lbs | male   |
+| Jane   |      65" |   150lbs | female |
+</pre></div><table class="lcg-table"><tr><th></th><th>Height</th><th>Weight</th><th>Sex</th></tr><tr><td>Dick</td><td align="RIGHT">72"</td><td align="RIGHT">130lbs</td><td>male</td></tr><tr><td>Jane</td><td align="RIGHT">65"</td><td align="RIGHT">150lbs</td><td>female</td></tr></table><p><em>Column headers</em> are automatically recognized if the whole first row contains
+only bold or empty cells, as in the example above.</p><p><em>Cell alignment</em> is also detected — if left padding (spaces or tabs) is greater
+than right padding within a cell, the cell is aligned left.  You can also
+define cell alignments and widths explicitly by including a special row with
+cells of the form like <code>&lt;r20&gt;</code> or <code>&lt;c&gt;</code> where the letter is one of <code>l</code> (left),
+<code>r</code> (right), <code>c</code> (center) and the optional number defines cell width in
+characters.  Paddings within cells are ignored if such a specification row is
+present and the specification row doesn't appear in the output.  Note that some
+backends may ignore alignment and width specifications.</p><p>If you want to separate table columns by vertical bars, you can use another
+specification row containing cells of the form <code>&lt;</code> (bar on the left), <code>&gt;</code> (bar
+on the right) or <code>&lt;&gt;</code> (bars on both left and right).  Note that some backends
+may not produce the vertical bars.</p><p><strong>Example of a table with format specification rows:</strong></p><div class="lcg-preformatted-text"><pre>| &lt;&gt;     | &lt;        |          | &gt;      |
+| &lt;l10&gt;  | &lt;r&gt;      | &lt;r10&gt;    | &lt;l&gt;    |
+|        | *Height* | *Weight* | *Sex*  |
+|---------------------------------------|
+| Dick   |      72" |   130lbs | male   |
+| Jane   |      65" |   150lbs | female |
+</pre></div><table class="lcg-table"><tr><th></th><th>Height</th><th>Weight</th><th>Sex</th></tr><tr><td style="width: 10.0em; max-width: 10.0em;" align="LEFT">Dick</td><td align="RIGHT">72"</td><td style="width: 10.0em; max-width: 10.0em;" align="RIGHT">130lbs</td><td align="LEFT">male</td></tr><tr><td style="width: 10.0em; max-width: 10.0em;" align="LEFT">Jane</td><td align="RIGHT">65"</td><td style="width: 10.0em; max-width: 10.0em;" align="RIGHT">150lbs</td><td align="LEFT">female</td></tr></table></div></div></div></div><div id="complete-manual.1.10" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.1.10" class="backref">Horizontal Alignment</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can request the following object to be put on the left, on the right or in
+the center by preceding it with <code>@left</code>, <code>@right</code> or <code>@center</code> (or <code>@centre</code>)
+respectively on a separate line.  Note alignment currently works only on tables
+and paragraphs and only in some backends.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>@left
+This text will be placed on the left.
+
+@right
+This text will be placed on the right.
+</pre></div><p style="text-align: left;">This text will be placed on the left.</p><p style="text-align: right;">This text will be placed on the right.</p></div></div></div></div></div></div></div></div><div id="inline-constructs" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-inline-constructs" class="backref">Inline Constructs</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>Inline constructs are used inside blocks of text.  They don't influence the
+document structure, but they allow you to use different kinds of elements
+within blocks.</p><div id="inline-constructs.1" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-inline-constructs.1" class="backref">Text Emphasizing</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can use <em>emphasized text</em>, <strong>strong text</strong>, <u>underlined text</u>, <code>fixed font</code>,
+<em><strong>or their <u>combinations</u></strong></em>.</p><p>The source code for the paragraph above looks like:</p><div class="lcg-preformatted-text"><pre>You can use /emphasized text/, *strong text*, _underlined text_,
+=fixed font=, /*or their _combinations_*/.
+</pre></div></div></div></div></div><div id="links" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-links" class="backref">Links</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Links can be used to refer to other documents, web addresses, sections etc.
+They are marked by square brackets and they have the following structure:</p><p><code>[&lt;link-target&gt; &lt;link-label&gt; | &lt;link-description&gt;]</code></p><dl><dt>Link target</dt><dd><p>This is the first text within square brackets up to the first space.  It can
+  be a document or section identifier or an external URL.  See examples below
+  for possible link targets.</p></dd><dt>Link label</dt><dd><p>Defines the user visible link text.  If not present, the system will try to
+  supply the label automatically (depending on link target type as described
+  below).  An image may be used in place of label to produce an <a href="structured-text.html#image-links">image link</a>.</p></dd><dt>Link description</dt><dd><p>Also optional, separated by the `|' pipe character.  It's output presentation
+  depends on the output media.  In HTML, for example, the description is
+  represented as a tooltip by most browsers.</p></dd></dl><p>Possible link targets are:</p><dl><dt>Local document</dt><dd><p>Local documents (other documents within the same hierarchy) are referenced by
+  their identifier directly.  Document title becomes the link label
+  automatically.</p></dd><dt>Local section</dt><dd><p>A section within the same document is referenced by its anchor
+  name (see <a href="structured-text.html#anchors">Anchors</a>) prefixed by a hash (`#' character).  A section of
+  another document is a concatenation of document title and anchor.  Section
+  title is used for link label automatically.</p></dd><dt>External target</dt><dd><p>Target which is not recognized as local document or section is treated as an
+  external URL.  Labels are not determined automatically for external links so
+  if you don't specify an explicit label, the URL itself is used for the label.</p></dd><dt>Image </dt><dd><p>If the target is detected to be an image the link is presented as <a href="structured-text.html#images">inline image</a>.</p></dd></dl><p><strong>Examples:</strong></p><div class="lcg-preformatted-text"><pre> * Local document: 
+   - automatic label: [intro]
+   - explicit label: [intro LCG Introduction]
+ * Local section:
+   - same document: [#anchors]
+   - other document: [usage#run]
+   - explicit label: [#links Using links in documents]
+   - description: [#links Links | Complete description of using
+     links in LCG structured text]
+ * External links:
+   - [http://www.gnu.org GNU | Homepage of the GNU project]
+</pre></div><ul><li class="i1">Local document:<ul><li class="i1">automatic label: <a href="intro.html">Introduction</a></li><li class="i2">explicit label: <a href="intro.html">LCG Introduction</a></li></ul></li><li class="i2">Local section:<ul><li class="i1">same document: <a href="structured-text.html#anchors">Anchors</a></li><li class="i2">other document: <a href="usage.html#run" title="Running lcg.make (Using LCG)">Running lcg.make</a></li><li class="i3">explicit label: <a href="structured-text.html#links">Using links in documents</a></li><li class="i4">description: <a href="structured-text.html#links" title="Complete description of using&#10;     links in LCG structured text">Links</a></li></ul></li><li class="i3">External links:<ul><li class="i1"><a href="http://www.gnu.org" title="Homepage of the GNU project">GNU</a></li></ul></li></ul></div></div></div></div><div id="automatic-links" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-automatic-links" class="backref">Automatic Links</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>External links beginning with URL scheme, such as 'http://', are recognized
+automatically, so the square brackets are not necessary, unless you want to
+give the link a more descriptive name.  Also e-mail addresses become links
+automatically.</p><div class="lcg-preformatted-text"><pre>See GNU project homepage at http://www.gnu.org (contact
+bill@microsoft.com for more information).
+</pre></div><p>See GNU project homepage at <a href="http://www.gnu.org">http://www.gnu.org</a> (contact
+<a href="mailto:bill@microsoft.com">bill@microsoft.com</a> for more information).</p></div></div></div></div><div id="images" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-images" class="backref">Images</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Images are a special kind of <a href="structured-text.html#links">Links</a>.  Any link pointing to an image will
+automatically display the target image in-line.  Images are recognized by
+filename extension.  JPEG, PNG and GIF images are currently supported.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>http://www.google.com/images/logo_sm.gif
+</pre></div><p><img class="lcg-image image-logo_sm" src="http://www.google.com/images/logo_sm.gif" alt=""/></p><p>If a link label is given, this label is used as the accessible ALT text for the
+image.  Similarly, if link description is defined, it is also included in the
+ALT text (see the example below).</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>[http://www.gnu.org/graphics/heckert_gnu.small.png GNU logo | A
+handsome GNU Head with typical beard and smart-looking curled
+horns]
+</pre></div><p><img class="lcg-image image-heckert_gnu.small" src="http://www.gnu.org/graphics/heckert_gnu.small.png" alt="GNU logo: A&#10;handsome GNU Head with typical beard and smart-looking curled&#10;horns"/></p><p><img align="left" class="lcg-image left-aligned image-open_source_button" src="http://www.opensource.org/trademarks/open_source_button.png" alt=""/>
+Images can be also aligned to the left or right side of the text which follows
+them.  Simply use a left or right angle bracket (less than or greater than
+sign) preceding the image name inside square brackets.  The OSI logo floating on
+the left side of this paragraph was written like this:</p><div class="lcg-preformatted-text"><pre>[&lt;http://www.opensource.org/trademarks/open_source_button.png]
+Images can be also aligned ...
+</pre></div><p>Images can be styled through external <em>style sheets</em>.  In HTML output, each
+image automatically has the `class' attribute set according to the name of the
+image without file type extension.  For example the image
+`http://www.google.com/images/logo_sm.gif' will have class `logo_sm'.</p><p>The image size may be specified explicitly using a colon and width x height in
+pixels at the end of the image filename:</p><div class="lcg-preformatted-text"><pre>[http://www.gnu.org/graphics/heckert_gnu.small.png:24x24]
+</pre></div><p><img class="lcg-image image-heckert_gnu.small" style="width: 24px; height: 24px;" src="http://www.gnu.org/graphics/heckert_gnu.small.png" alt=""/></p></div></div></div></div><div id="image-links" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-image-links" class="backref">Image Links</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Image links are a combination of image and link, presented as an inline image
+which acts as a link (can be clicked to get to the link target).  They are
+created simply by using an image target (document-local resource filename or
+URL) in place of the link label.  Textual link label (used for image accessible
+ALT text) and description (used for link tooltip) may follow in the usual form.</p><div class="lcg-preformatted-text"><pre>[http://www.google.com
+ http://www.google.com/accounts/google_white.gif]
+[http://www.opensource.org
+ http://www.opensource.org/trademarks/open_source_button.png
+OSI logo | Open Source Initiative]
+</pre></div><p><a href="http://www.google.com"><img class="lcg-image image-google_white" src="http://www.google.com/accounts/google_white.gif" alt=""/></a>
+<a href="http://www.opensource.org" title="Open Source Initiative"><img class="lcg-image image-open_source_button" src="http://www.opensource.org/trademarks/open_source_button.png" alt="OSI logo"/></a></p><p>Image links can be aligned using &lt; and &gt; similarly as ordinary images and
+styled (see above).</p></div></div></div></div><div id="audio" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-audio" class="backref">Audio</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Links to audio recordings in MP3 format will appear as ordinary links in HTML,
+but these links will act as a remote control of the audio player displayed at
+the bottom right corner of the browser window.  Single player is used for all
+recordings present on the page, so only one recording will be played at a time.</p><p>Full keyboard accessibility is also implemented.  The following keyboard
+commands are available when the audio file link has keyboard focus:</p><ul><li class="i1">Space — Start/stop playback</li><li class="i2">Arrow left — Fast forward</li><li class="i3">Arrow right — Rewind</li><li class="i4">Arrow up — Increase volume</li><li class="i5">Arrow down — Decrease volume</li></ul><p>Since the technical requirements (see below) can not be easily enforced for
+distribution of this documentation, the examples don't include a player demo,
+but a simple link like this should work:</p><div class="lcg-preformatted-text"><pre>If you are interested, [recording.mp3 listen to the recording].
+</pre></div><p>If it doesn't, check the requirements below.</p><p><em>Note:</em> The player is currently not used for external links.  Only local files
+will work.</p></div></div></div></div><div id="video" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-video" class="backref">Video</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Video can be embedded into the webpage either locally as a file in the OGV,
+MP4, WEBM a 3GP formats or as a link to the YouTube or Vimeo services.  In
+either case, the user is presented with an embedded player, in which it is
+possible to directly play the video.</p><p>For local files it is possible to control the size of the player in the same
+way as the size of images (colon and width x height after the filename).</p><p>If an image is used in place of link label, this image will be used as the
+video preview (the player will display the image until the user starts
+playback).</p><p><em>Note:</em> Embedding doesn't work for external links.  Only local videos may be
+embedded this way, but see below how to embed videos from public video
+services, such as YouTube.</p><div id="video.1" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-video.1" class="backref">Embedded Video from YouTube or Vimeo</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><p>A link to a video on YouTube or Vimeo will be in HTML rendered as an embedded
+video player.  Thus you don't need to use any special code to embed these
+videos.  Just the URI is enough.  With square brackets you may set title,
+description, cover image or dimensions similarly as with ordinary links or
+images.</p><div class="lcg-preformatted-text"><pre>https://www.youtube.com/watch?v=BMUiFMZr7vk
+</pre></div><p><div class="external-video" style="max-width: 640px;"><div class="wrapper" style="padding-bottom: 75.0%"><iframe type="text/html" width="640" height="480" title="Video" frameborder="0" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen" allowfullscreen="allowfullscreen" src="https://www.youtube.com/embed/BMUiFMZr7vk"><a href="https://www.youtube.com/embed/BMUiFMZr7vk">https://www.youtube.com/embed/BMUiFMZr7vk</a></iframe></div></div></p><p>Vimeo links work in the same way:</p><div class="lcg-preformatted-text"><pre>http://www.vimeo.com/8719387
+</pre></div><p><div class="external-video" style="max-width: 640px;"><div class="wrapper" style="padding-bottom: 75.0%"><iframe type="text/html" width="640" height="480" title="Video" frameborder="0" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen" allowfullscreen="allowfullscreen" src="https://player.vimeo.com/video/8719387"><a href="https://player.vimeo.com/video/8719387">https://player.vimeo.com/video/8719387</a></iframe></div></div></p><p>Explicit video size may be set in the same way as for images (width x
+height in pixels after a colon).</p><div class="lcg-preformatted-text"><pre>[https://www.youtube.com/watch?v=Wl98eZpkp-c:400x300]
+</pre></div><p><div class="external-video" style="max-width: 400px;"><div class="wrapper" style="padding-bottom: 75.0%"><iframe type="text/html" width="400" height="300" title="Video" frameborder="0" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen" allowfullscreen="allowfullscreen" src="https://www.youtube.com/embed/Wl98eZpkp-c"><a href="https://www.youtube.com/embed/Wl98eZpkp-c">https://www.youtube.com/embed/Wl98eZpkp-c</a></iframe></div></div></p><p><em>Note:</em> This way of embedding has the advantage of no server side technical
+requirements.</p></div></div></div></div></div></div></div></div><div id="inline-constructs.8" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-inline-constructs.8" class="backref">Interactive exercises</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><div id="inline-constructs.8.1" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.1" class="backref">MultipleChoiceQuestions</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="exercise multiple-choice-questions"><form id="rre9w4q6bn5t1" action="#"><ol class="tasks"><li><div class="task multiple-choice-questions-task choice-based-task">Screen reader is:<ol class="choices"><li><input name="rre9w4q6bn5t1-t1" id="rre9w4q6bn5t1-t1-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t1-t1-ch1">a person.</label></li><li><input name="rre9w4q6bn5t1-t1" id="rre9w4q6bn5t1-t1-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t1-t1-ch2">a device.</label></li><li><input name="rre9w4q6bn5t1-t1" id="rre9w4q6bn5t1-t1-ch3" value="2" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t1-t1-ch3">a program.</label></li></ol></div></li><li><div class="task multiple-choice-questions-task choice-based-task">GNU/Linux is:<ol class="choices"><li><input name="rre9w4q6bn5t1-t2" id="rre9w4q6bn5t1-t2-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t1-t2-ch1">a word processor</label></li><li><input name="rre9w4q6bn5t1-t2" id="rre9w4q6bn5t1-t2-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t1-t2-ch2">an operating system</label></li><li><input name="rre9w4q6bn5t1-t2" id="rre9w4q6bn5t1-t2-ch3" value="2" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t1-t2-ch3">a computer manufacturer</label></li></ol></div></li></ol><div class="results"><div class="display"><label for="rre9w4q6bn5t1.answered">Answered:</label><input name="answered" id="rre9w4q6bn5t1.answered" size="30" readonly="readonly" type="text"/><br/><label for="rre9w4q6bn5t1.result">Correct:</label><input name="result" id="rre9w4q6bn5t1.result" size="30" readonly="readonly" type="text"/></div><div class="buttons"><button class="evaluate-button" title="Evaluate the entire exercise.  If an error is found, the cursor is moved to the first incorrect answer.  Within a text box, the cursor is also moved to the first incorrect character of your answer." type="button">Evaluate</button><button class="fill-button" title="Fill in the whole exercise with the correct answers." type="button">Fill</button><button class="reset-button" title="Reset all your answers and start again." type="reset">Reset</button></div></div></form><script type="text/javascript">new lcg.ChoiceBasedExercise("rre9w4q6bn5t1", [2, 1], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"on first attempt": "on first attempt"})</script></div><div class="lcg-preformatted-text"><pre>&lt;exercise type="MultipleChoiceQuestions"&gt;
+Screen reader is:
+- a person.
+- a device.
++ a program.
+
+GNU/Linux is:
+- a word processor
++ an operating system
+- a computer manufacturer
+&lt;/exercise&gt;
+</pre></div></div></div></div></div><div id="inline-constructs.8.2" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.2" class="backref">Selections</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="lcg-preformatted-text"><pre>&lt;exercise type="Selections"&gt;
++ India is located in Asia.
+- China is located in Africa.
+
++ Australia is the smallest continent.
+- Australia is the largest continent.
+&lt;/exercise&gt;
+</pre></div><div class="exercise selections"><form id="rre9w4q6bn5t2" action="#"><ol class="tasks"><li><div class="task selections-task choice-based-task"><ol class="choices"><li><input name="rre9w4q6bn5t2-t1" id="rre9w4q6bn5t2-t1-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t2-t1-ch1">India is located in Asia.</label></li><li><input name="rre9w4q6bn5t2-t1" id="rre9w4q6bn5t2-t1-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t2-t1-ch2">China is located in Africa.</label></li></ol></div></li><li><div class="task selections-task choice-based-task"><ol class="choices"><li><input name="rre9w4q6bn5t2-t2" id="rre9w4q6bn5t2-t2-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t2-t2-ch1">Australia is the smallest continent.</label></li><li><input name="rre9w4q6bn5t2-t2" id="rre9w4q6bn5t2-t2-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t2-t2-ch2">Australia is the largest continent.</label></li></ol></div></li></ol><div class="results"><div class="display"><label for="rre9w4q6bn5t2.answered">Answered:</label><input name="answered" id="rre9w4q6bn5t2.answered" size="30" readonly="readonly" type="text"/><br/><label for="rre9w4q6bn5t2.result">Correct:</label><input name="result" id="rre9w4q6bn5t2.result" size="30" readonly="readonly" type="text"/></div><div class="buttons"><button class="evaluate-button" title="Evaluate the entire exercise.  If an error is found, the cursor is moved to the first incorrect answer.  Within a text box, the cursor is also moved to the first incorrect character of your answer." type="button">Evaluate</button><button class="fill-button" title="Fill in the whole exercise with the correct answers." type="button">Fill</button><button class="reset-button" title="Reset all your answers and start again." type="reset">Reset</button></div></div></form><script type="text/javascript">new lcg.ChoiceBasedExercise("rre9w4q6bn5t2", [0, 0], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"on first attempt": "on first attempt"})</script></div></div></div></div></div><div id="inline-constructs.8.3" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.3" class="backref">TrueFalseStatements</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="lcg-preformatted-text"><pre>&lt;exercise type="TrueFalseStatements"&gt;
+The Microsoft Windows operating system never crashes. [F]
+
+The largest tropical rainforest in the world is in Brazil. [T]
+&lt;/exercise&gt;
+</pre></div><div class="exercise true-false-statements"><form id="rre9w4q6bn5t3" action="#"><ol class="tasks"><li><div class="task true-false-statements-task choice-based-task">The Microsoft Windows operating system never crashes.<div class="choices"><div><input name="rre9w4q6bn5t3-t1" id="rre9w4q6bn5t3-t1-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t3-t1-ch1">TRUE</label></div><div><input name="rre9w4q6bn5t3-t1" id="rre9w4q6bn5t3-t1-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t3-t1-ch2">FALSE</label></div></div></div></li><li><div class="task true-false-statements-task choice-based-task">The largest tropical rainforest in the world is in Brazil.<div class="choices"><div><input name="rre9w4q6bn5t3-t2" id="rre9w4q6bn5t3-t2-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t3-t2-ch1">TRUE</label></div><div><input name="rre9w4q6bn5t3-t2" id="rre9w4q6bn5t3-t2-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t3-t2-ch2">FALSE</label></div></div></div></li></ol><div class="results"><div class="display"><label for="rre9w4q6bn5t3.answered">Answered:</label><input name="answered" id="rre9w4q6bn5t3.answered" size="30" readonly="readonly" type="text"/><br/><label for="rre9w4q6bn5t3.result">Correct:</label><input name="result" id="rre9w4q6bn5t3.result" size="30" readonly="readonly" type="text"/></div><div class="buttons"><button class="evaluate-button" title="Evaluate the entire exercise.  If an error is found, the cursor is moved to the first incorrect answer.  Within a text box, the cursor is also moved to the first incorrect character of your answer." type="button">Evaluate</button><button class="fill-button" title="Fill in the whole exercise with the correct answers." type="button">Fill</button><button class="reset-button" title="Reset all your answers and start again." type="reset">Reset</button></div></div></form><script type="text/javascript">new lcg.ChoiceBasedExercise("rre9w4q6bn5t3", [1, 0], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"on first attempt": "on first attempt"})</script></div></div></div></div></div><div id="inline-constructs.8.4" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.4" class="backref">GapFilling</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="lcg-preformatted-text"><pre>&lt;exercise type="GapFilling"&gt;
+If you want to send money to somebody, you can ____ a transfer.
+- do
++ make
+- have
+
+To change money between two currencies you need to know the ____ rate.
+- success
+- interest
++ exchange
+&lt;/exercise&gt;
+</pre></div><div class="exercise gap-filling"><form id="rre9w4q6bn5t4" action="#"><ol class="tasks"><li><div class="task gap-filling-task choice-based-task"><span>If you want to send money to somebody, you can <span class="exercise-gap">____</span> a transfer.</span><ol class="choices"><li><input name="rre9w4q6bn5t4-t1" id="rre9w4q6bn5t4-t1-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t4-t1-ch1">do</label></li><li><input name="rre9w4q6bn5t4-t1" id="rre9w4q6bn5t4-t1-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t4-t1-ch2">make</label></li><li><input name="rre9w4q6bn5t4-t1" id="rre9w4q6bn5t4-t1-ch3" value="2" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t4-t1-ch3">have</label></li></ol></div></li><li><div class="task gap-filling-task choice-based-task"><span>To change money between two currencies you need to know the <span class="exercise-gap">____</span> rate.</span><ol class="choices"><li><input name="rre9w4q6bn5t4-t2" id="rre9w4q6bn5t4-t2-ch1" value="0" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t4-t2-ch1">success</label></li><li><input name="rre9w4q6bn5t4-t2" id="rre9w4q6bn5t4-t2-ch2" value="1" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t4-t2-ch2">interest</label></li><li><input name="rre9w4q6bn5t4-t2" id="rre9w4q6bn5t4-t2-ch3" value="2" class="answer-control" type="radio"/> <label for="rre9w4q6bn5t4-t2-ch3">exchange</label></li></ol></div></li></ol><div class="results"><div class="display"><label for="rre9w4q6bn5t4.answered">Answered:</label><input name="answered" id="rre9w4q6bn5t4.answered" size="30" readonly="readonly" type="text"/><br/><label for="rre9w4q6bn5t4.result">Correct:</label><input name="result" id="rre9w4q6bn5t4.result" size="30" readonly="readonly" type="text"/></div><div class="buttons"><button class="evaluate-button" title="Evaluate the entire exercise.  If an error is found, the cursor is moved to the first incorrect answer.  Within a text box, the cursor is also moved to the first incorrect character of your answer." type="button">Evaluate</button><button class="fill-button" title="Fill in the whole exercise with the correct answers." type="button">Fill</button><button class="reset-button" title="Reset all your answers and start again." type="reset">Reset</button></div></div></form><script type="text/javascript">new lcg.ChoiceBasedExercise("rre9w4q6bn5t4", [1, 2], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"on first attempt": "on first attempt"})</script></div></div></div></div></div><div id="inline-constructs.8.5" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.5" class="backref">HiddenAnswers</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="lcg-preformatted-text"><pre>&lt;exercise type="HiddenAnswers"&gt;
+What is the name of the highest mountain in the world?
+Mount Everest.
+
+What is its height?
+8,848m
+&lt;/exercise&gt;
+</pre></div><div class="exercise hidden-answers"><form id="rre9w4q6bn5t5" action="#"><ol class="tasks"><li><div class="task hidden-answers-task"><div class="question">What is the name of the highest mountain in the world?</div><button class="toggle-button" title="Show/Hide the correct answer.">Show Answer</button><div class="answer" style="display: none;"><div><span class="label">Correct answer:</span> Mount Everest.</div></div></div></li><li><div class="task hidden-answers-task"><div class="question">What is its height?</div><button class="toggle-button" title="Show/Hide the correct answer.">Show Answer</button><div class="answer" style="display: none;"><div><span class="label">Correct answer:</span> 8,848m</div></div></div></li></ol><div class="results"><div class="display"></div><div class="buttons"><button class="evaluate-button" title="Show all answers." type="button">Show All</button><button class="reset-button" title="Reset all your answers and start again." type="button">Hide All</button></div></div></form><script type="text/javascript">new lcg.HiddenAnswers("rre9w4q6bn5t5", [], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"Show Answer": "Show Answer", "Hide Answer": "Hide Answer"})</script></div></div></div></div></div><div id="inline-constructs.8.6" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.6" class="backref">WrittenAnswers</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="lcg-preformatted-text"><pre>&lt;exercise type="WrittenAnswers"&gt;
+What is the name of the largest continent?
+[Asia]
+
+Use the correct form of the verb "to be":
+Children [are] our future.
+&lt;/exercise&gt;
+</pre></div><div class="exercise written-answers"><form id="rre9w4q6bn5t6" action="#"><ol class="tasks"><li><div class="task written-answers-task">What is the name of the largest continent?<br/><input name="rre9w4q6bn5t6-t1-f1" id="rre9w4q6bn5t6-t1-f1" size="4" value="" style="box-model: content-box; width: 4em;" class="fill-in-task" type="text"/></div></li><li><div class="task written-answers-task">Use the correct form of the verb "to be":<br/>Children <input name="rre9w4q6bn5t6-t2-f1" id="rre9w4q6bn5t6-t2-f1" size="3" value="" style="box-model: content-box; width: 3em;" class="fill-in-task" type="text"/> our future.</div></li></ol><div class="results"><div class="display"><label for="rre9w4q6bn5t6.answered">Answered:</label><input name="answered" id="rre9w4q6bn5t6.answered" size="30" readonly="readonly" type="text"/><br/><label for="rre9w4q6bn5t6.result">Correct:</label><input name="result" id="rre9w4q6bn5t6.result" size="30" readonly="readonly" type="text"/></div><div class="buttons"><button class="evaluate-button" title="Evaluate the entire exercise.  If an error is found, the cursor is moved to the first incorrect answer.  Within a text box, the cursor is also moved to the first incorrect character of your answer." type="button">Evaluate</button><button class="fill-button" title="Fill in the whole exercise with the correct answers." type="button">Fill</button><button class="reset-button" title="Reset all your answers and start again." type="reset">Reset</button></div></div></form><script type="text/javascript">new lcg.FillInExercise("rre9w4q6bn5t6", ["Asia", "are"], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"on first attempt": "on first attempt"})</script></div></div></div></div></div><div id="inline-constructs.8.7" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.7" class="backref">Cloze</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="lcg-preformatted-text"><pre>&lt;exercise type="Cloze"&gt;
+Commercial banks and savings banks receive and hold deposits
+[in] current accounts, savings accounts and deposit accounts,
+make payments [for] their customers, lend money, [and] offer
+investment advice, foreign exchange facilities, and so on.
+&lt;/exercise&gt;
+</pre></div><div class="exercise cloze"><form id="rre9w4q6bn5t7" action="#"><div class="task cloze-task">Commercial banks and savings banks receive and hold deposits <input name="rre9w4q6bn5t7-t1-f1" id="rre9w4q6bn5t7-t1-f1" size="2" value="" style="box-model: content-box; width: 2em;" class="fill-in-task" type="text"/> current accounts, savings accounts and deposit accounts, make payments <input name="rre9w4q6bn5t7-t1-f2" id="rre9w4q6bn5t7-t1-f2" size="3" value="" style="box-model: content-box; width: 3em;" class="fill-in-task" type="text"/> their customers, lend money, <input name="rre9w4q6bn5t7-t1-f3" id="rre9w4q6bn5t7-t1-f3" size="3" value="" style="box-model: content-box; width: 3em;" class="fill-in-task" type="text"/> offer investment advice, foreign exchange facilities, and so on. </div><div class="results"><div class="display"><label for="rre9w4q6bn5t7.answered">Answered:</label><input name="answered" id="rre9w4q6bn5t7.answered" size="30" readonly="readonly" type="text"/><br/><label for="rre9w4q6bn5t7.result">Correct:</label><input name="result" id="rre9w4q6bn5t7.result" size="30" readonly="readonly" type="text"/></div><div class="buttons"><button class="evaluate-button" title="Evaluate the entire exercise.  If an error is found, the cursor is moved to the first incorrect answer.  Within a text box, the cursor is also moved to the first incorrect character of your answer." type="button">Evaluate</button><button class="fill-button" title="Fill in the whole exercise with the correct answers." type="button">Fill</button><button class="reset-button" title="Reset all your answers and start again." type="reset">Reset</button></div></div></form><script type="text/javascript">new lcg.FillInExercise("rre9w4q6bn5t7", ["in", "for", "and"], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"on first attempt": "on first attempt"})</script></div></div></div></div></div><div id="inline-constructs.8.8" class="section section-level-5 default-section"><div class="section-container section-level-5"><div class="section-heading section-level-5"><h5><a href="#backref-inline-constructs.8.8" class="backref">Numbered Cloze</a></h5></div><div class="section-content section-level-5"><div class="section-content-wrapper"><div class="lcg-preformatted-text"><pre>&lt;exercise type="NumberedCloze"&gt;
+[London] is the capital of the United Kingdom.
+
+The city is split by the River [Thames] into North and South.
+&lt;/exercise&gt;
+</pre></div><div class="exercise numbered-cloze"><form id="rre9w4q6bn5t8" action="#"><ol class="tasks"><li><div class="task numbered-cloze-task"><input name="rre9w4q6bn5t8-t1-f1" id="rre9w4q6bn5t8-t1-f1" size="6" value="" style="box-model: content-box; width: 6em;" class="fill-in-task" type="text"/> is the capital of the United Kingdom.</div></li><li><div class="task numbered-cloze-task">The city is split by the River <input name="rre9w4q6bn5t8-t2-f1" id="rre9w4q6bn5t8-t2-f1" size="6" value="" style="box-model: content-box; width: 6em;" class="fill-in-task" type="text"/> into North and South.</div></li></ol><div class="results"><div class="display"><label for="rre9w4q6bn5t8.answered">Answered:</label><input name="answered" id="rre9w4q6bn5t8.answered" size="30" readonly="readonly" type="text"/><br/><label for="rre9w4q6bn5t8.result">Correct:</label><input name="result" id="rre9w4q6bn5t8.result" size="30" readonly="readonly" type="text"/></div><div class="buttons"><button class="evaluate-button" title="Evaluate the entire exercise.  If an error is found, the cursor is moved to the first incorrect answer.  Within a text box, the cursor is also moved to the first incorrect character of your answer." type="button">Evaluate</button><button class="fill-button" title="Fill in the whole exercise with the correct answers." type="button">Fill</button><button class="reset-button" title="Reset all your answers and start again." type="reset">Reset</button></div></div></form><script type="text/javascript">new lcg.FillInExercise("rre9w4q6bn5t8", ["London", "Thames"], {"correct": ["media/exercise-responses/en/correct-01.mp3", "media/exercise-responses/en/correct-02.mp3", "media/exercise-responses/en/correct-03.mp3", "media/exercise-responses/en/correct-04.mp3", "media/exercise-responses/en/correct-05.mp3", "media/exercise-responses/en/correct-06.mp3", "media/exercise-responses/en/correct-07.mp3", "media/exercise-responses/en/correct-08.mp3", "media/exercise-responses/en/correct-09.mp3"], "incorrect": ["media/exercise-responses/en/incorrect-01.mp3", "media/exercise-responses/en/incorrect-02.mp3", "media/exercise-responses/en/incorrect-03.mp3", "media/exercise-responses/en/incorrect-04.mp3", "media/exercise-responses/en/incorrect-05.mp3", "media/exercise-responses/en/incorrect-06.mp3", "media/exercise-responses/en/incorrect-07.mp3", "media/exercise-responses/en/incorrect-08.mp3", "media/exercise-responses/en/incorrect-09.mp3", "media/exercise-responses/en/incorrect-10.mp3", "media/exercise-responses/en/incorrect-11.mp3"], "poor": ["media/exercise-responses/en/poor-01.mp3", "media/exercise-responses/en/poor-02.mp3", "media/exercise-responses/en/poor-03.mp3"], "sufficient": ["media/exercise-responses/en/sufficient-01.mp3", "media/exercise-responses/en/sufficient-02.mp3", "media/exercise-responses/en/sufficient-03.mp3"], "good": ["media/exercise-responses/en/good-01.mp3", "media/exercise-responses/en/good-02.mp3", "media/exercise-responses/en/good-03.mp3", "media/exercise-responses/en/good-04.mp3"], "excellent": ["media/exercise-responses/en/excellent-01.mp3", "media/exercise-responses/en/excellent-02.mp3", "media/exercise-responses/en/excellent-03.mp3"], "perfect": ["media/exercise-responses/en/perfect-01.mp3", "media/exercise-responses/en/perfect-02.mp3", "media/exercise-responses/en/perfect-03.mp3", "media/exercise-responses/en/perfect-04.mp3"]}, {"on first attempt": "on first attempt"})</script></div></div></div></div></div></div></div></div></div><div id="inline-constructs.9" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-inline-constructs.9" class="backref">Vertical Space</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Explicit vertical space may be added using <code>\@vspace</code> mark with the required
+space given in millimeters:</p><div class="lcg-preformatted-text"><pre>@vspace 20mm
+</pre></div><p>This mark should be used only in places where explicit vertical space is
+needed.  In many cases better means such as higher level elements, alignment or
+style sheets can be used.</p></div></div></div></div><div id="inline-constructs.10" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-inline-constructs.10" class="backref">Page Numbers</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can include page numbers and total number of pages in document headers and
+footers by using the marks <code>@PAGE@</code> and <code>@PAGES@</code>.  Note this works only in
+document headers and footers and only those backends where actual document
+pages are created (e.g. in PDF, but not in HTML).</p></div></div></div></div></div></div></div></div><div id="complete-manual.3" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-complete-manual.3" class="backref">Other Features</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><div id="complete-manual.3.1" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.3.1" class="backref">Escaping</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can avoid the special meaning of all the constructs described in this
+document by prefixing them with a backslash.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>Slashes are used for /emphasizing/, however sometimes you want
+them \/like here\/.  Double backslash must be used to force the
+\\/backslash/ itself in front of a markup (anywhere else in the
+text, backslashes can be used freely).  Other backslash
+combination examples: \*one* \\*two* \\\*three* \\\\*four*
+\\\\\*five*.
+</pre></div><p>This will be presented as:</p><p>Slashes are used for <em>emphasizing</em>, however sometimes you want
+them /like here/.  Double backslash must be used to force the
+\<em>backslash</em> itself in front of a markup (anywhere else in the
+text, backslashes can be used freely).  Other backslash
+combination examples: *one* \<strong>two</strong> \*three* \\<strong>four</strong>
+\\*five*.</p></div></div></div></div><div id="complete-manual.3.2" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.3.2" class="backref">Explicit Line Break</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Two slashes force a line break:</p><div class="lcg-preformatted-text"><pre>This sentence will break//in the middle.
+</pre></div><p>This sentence will break<br/>in the middle.</p></div></div></div></div><div id="complete-manual.3.3" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.3.3" class="backref">Horizontal Lines</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Horizontal line can be made with 4 dashes on a separate line surrounded by
+blank lines.</p><p><strong>Example:</strong></p><div class="lcg-preformatted-text"><pre>Above
+
+----
+
+Below
+</pre></div><p>This will be presented as:</p><p>Above</p><hr/><p>Below</p></div></div></div></div><div id="complete-manual.3.4" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.3.4" class="backref">Page Headers and Footers</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can set document headers and footers by declaring corresponding parameters:</p><dl><dt>\@parameter header TEXT</dt><dd><p>Text to be put into the header of every page.</p></dd><dt>\@parameter first_page_header TEXT</dt><dd><p>Header to be used on the first page of the document.  If this parameter is
+  not present, the header is the same as on other pages.</p></dd><dt>\@parameter footer TEXT</dt><dd><p>Text to be put into the footer of every page.</p></dd><dt>\@parameter background TEXT</dt><dd><p>Text to be put on the background of every page.</p></dd></dl><p>If the text is longer or more complicated, you can use the multiline form of
+parameter definition, e.g.:</p><div class="lcg-preformatted-text"><pre>@parameter footer
+@center
+@PAGE@/@PAGES@
+@end footer
+</pre></div><p>Note that page headers and footers may make sense only in some document formats
+and may be supported only by some backends while being ignored by other
+backends.</p></div></div></div></div><div id="complete-manual.3.5" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.3.5" class="backref">Presentation Parameters</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>It is possible to set some presentation parameters using <code>@parameter</code> mark:</p><dl><dt>\@parameter font_size NUMBER</dt><dd><p>Changing default font size by multiplying it by NUMBER.</p></dd><dt>\@parameter font_name NAME</dt><dd><p>Name of the default font of the document, e.g. <code>DejaVu</code> or <code>Bitstream Vera</code>.
+  Whether the given font can be actually used in the document depends on the
+  system installation.  If the given font cannot be found, another font is
+  used.</p></dd><dt>\@parameter font_family NAME</dt><dd><p>Default font family of the document, NAME can be one of <code>SERIF</code>,
+  <code>SANS_SERIF</code>, <code>FIXED_WIDTH</code>.</p></dd><dt>\@parameter heading_font_family NAME</dt><dd><p>The same as font_family except that it applies only to section headings.</p></dd><dt>\@parameter noindent ONE_OR_ZERO</dt><dd><p>If set to <code>1</code>, don't indent first lines of paragraphs.  If set to <code>0</code>, indent
+  them.</p></dd><dt>\@parameter line_spacing NUMBER</dt><dd><p>Line spacing is set to NUMBER times the size of the current font.</p></dd></dl><p>Note that not all presentation parameters make sense in all backends or are
+supported by all of them, the may be ignored.</p></div></div></div></div><div id="complete-manual.3.6" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.3.6" class="backref">Variables</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can define a named piece of a structured text (variable) for later
+(typically repeated) use:</p><div class="lcg-preformatted-text"><pre>@define pi 3.14
+@define repeated_text
+One of the most famous mathematical constants is π.
+Its value is $pi.
+@end repeated_text
+
+$repeated_text
+
+I repeat: $repeated_text
+
+@define pi 3.14159
+Let's be more exact now:
+$repeated_text
+</pre></div><p>This will be presented as:</p><p><p>One of the most famous mathematical constants is π.
+Its value is 3.14.</p></p><p>I repeat: <p>One of the most famous mathematical constants is π.
+Its value is 3.14.</p></p><p>Let's be more exact now:
+<p>One of the most famous mathematical constants is π.
+Its value is 3.14159.</p></p><p>Variable names (e.g. <code>pi</code> or <code>repeated_text</code>) may consist only of lower-case
+English letters and underscores.  The replacement text is a standard structured
+text.  Note that in the multi-line version of a variable definition the text is
+interpreted as a block while in the single-line version the text can be
+embedded in a paragraph.  A variable definition applies from its first
+occurrence, until it possibly gets redefined by another definition of a
+variable of the same name.</p></div></div></div></div><div id="complete-manual.3.7" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.3.7" class="backref">Comments</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>You can comment out any text with '# ' at the beginning of a line.  This will
+make the text invisible on output media (e.g. by making it an HTML comment in
+the HTML output):</p><div class="lcg-preformatted-text"><pre> The first line.
+ # These lines have been 
+ # commented out.
+ The last line.
+</pre></div><p>This will be presented as:</p><p>The first line.
+The last line.</p></div></div></div></div></div></div></div></div><div id="complete-manual.4" class="section section-level-3 default-section"><div class="section-container section-level-3"><div class="section-heading section-level-3"><h3><a href="#backref-complete-manual.4" class="backref">Deprecated Features</a></h3></div><div class="section-content section-level-3"><div class="section-content-wrapper"><p>The following features remain for backwards compatibility, but should not be
+used in new documents, since they may be removed in future LCG versions.</p><div id="complete-manual.4.1" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.4.1" class="backref">Non-breakable Space</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>A tilde character (=~=) is interpreted as a non-breakable space, but is now
+deprecated in favor of the Unicode character for non-breakable space (U+00A0).
+Please avoid using tildes since they may not be recognized in future.</p></div></div></div></div><div id="complete-manual.4.2" class="section section-level-4 default-section"><div class="section-container section-level-4"><div class="section-heading section-level-4"><h4><a href="#backref-complete-manual.4.2" class="backref">Long Dash</a></h4></div><div class="section-content section-level-4"><div class="section-content-wrapper"><p>Double dash (two minus signs) produce a long dash on the output, but is now
+deprecated in favor of the Unicode character "EM DASH" (U+00A0).  Please avoid
+using double dashes since they may not be recognized in future.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div id="bottom-navigation"><hr/><div>You are here: <a href="index.html" title="LCG Documentation" accesskey="4">LCG Documentation</a><a href="index.html" accesskey="2" class="hidden"></a> / <a href="structured-text.html" title="Structured Text Formatting Manual">Structured Text Formatting Manual</a></div><span class="next">Next: <a href="examples.html" title="Examples" accesskey="3">Examples</a></span><span class="separator"> |
+</span><span class="prev">Previous: <a href="usage.html" title="Using LCG" accesskey="1">Using LCG</a></span></div></body></html>
