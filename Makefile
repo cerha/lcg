@@ -9,11 +9,11 @@ compile:
 translations:
 	make -C translations
 
-resources:
-	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
-
 extract:
 	make -C translations extract
+
+resources:
+	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
 
 doc: resources
 	python -m lcg.make doc/src doc/html
