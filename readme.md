@@ -1,5 +1,7 @@
 # LCG Framework
 
+[![Tests](https://github.com/cerha/lcg/actions/workflows/tests.yml/badge.svg)](https://github.com/cerha/lcg/actions/workflows/tests.yml)
+
 **LCG** is a Python framework for content abstraction and generic document
 processing.  Documents are constructed as a hierarchy of Python objects.  LCG
 defines standard content elements (paragraphs, sections, lists, formatted text,
