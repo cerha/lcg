@@ -20,6 +20,8 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
+__version__ = '0.7.0'
+
 from .locales import LocaleData, LocaleData_cs, LocaleData_de, \
     LocaleData_en, LocaleData_es, LocaleData_no, LocaleData_pl, \
     LocaleData_sk
@@ -111,6 +113,3 @@ from .read import Reader, FileReader, StructuredTextReader, DocFileReader, \
 
 from .transform import data2content, data2html, html2data, \
     HTML2XML, XML2HTML, XML2Content
-
-
-__version__ = '0.6.1'
