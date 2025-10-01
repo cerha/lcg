@@ -56,7 +56,7 @@ may be installed by `pip install lcg-framework[all]`.
 
 When using PDF output, you additionally need the following system packages:
 - Fontconfig (Debian/Ubuntu package `fontconfig`)
-- Freefont (Debian package `ttf-freefont`, Ubuntu package `fonts-freefont-ttf`)
+- Freefont (Debian/Ubuntu package `fonts-freefont-ttf` or `ttf-freefont`)
 
 
 ## Usage
