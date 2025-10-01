@@ -3,7 +3,7 @@ requires = ["flit_core>=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "lcg"
+name = "lcg-framework"
 description = "LCG — Python library for content abstraction and multi-format document processing"
 dynamic = ["version"]
 authors = [
@@ -43,7 +43,7 @@ all = [
 ]
 
 [tool.flit.module]
-module = "lcg"
+name = "lcg"
 
 [tool.flit.sdist]
 include = [

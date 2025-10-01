@@ -52,7 +52,7 @@ For a history of changes in each version, see the
 ## Installation
 
 LCG is a pure Python library running on Python 2.7 or Python 3.5 or later and
-may be installed simply by `pip install lcg[all]`.
+may be installed by `pip install lcg-framework[all]`.
 
 When using PDF output, you additionally need the following system packages:
 - Fontconfig (Debian/Ubuntu package `fontconfig`)
