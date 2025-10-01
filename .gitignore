@@ -11,7 +11,7 @@
 /translations/*/LC_MESSAGES/*.mo
 /translations/*.pot
 /resources/translations/*.po
-/lib/lcg/export/styles/presentation-braille-local.py
+/lcg/export/styles/presentation-braille-local.py
 /TAGS
 /.ropeproject
 /.project
