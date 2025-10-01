@@ -41,6 +41,12 @@ License v2 (GPLv2)**.  See the `COPYING` file for details.
 generate online e-learning material for the [Eurochance project](https://langschool.eu).
 
 
+## Changelog
+
+For a history of changes in each version, see the
+[changelog](https://github.com/cerha/lcg/blob/main/changelog.md).
+
+
 ## Installation
 
 LCG is a pure Python library running on Python 2.7 or Python 3.5 or later and
