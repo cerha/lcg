@@ -42,9 +42,8 @@ jobs:
           # Beware: 'make build' duplication here, but we need python3 to run flit.
           make translations
           make resources
-          git status --porcelain --untracked-files=normal
           python3 -m flit build
-          pip install $(echo dist/lcg-*-any.whl)[all]
+          pip install $(echo dist/lcg_framework-*-any.whl)[all]
 
       - name: Run tests
         run: make test
@@ -88,7 +87,7 @@ jobs:
       - name: Build and install the wheel
         run: |
           make build
-          pip install $(echo dist/lcg-*-any.whl)[all]
+          pip install $(echo dist/lcg_framework-*-any.whl)[all]
 
       - name: Run tests
         run: make test
