@@ -3,4 +3,5 @@ coverage
 coveralls
 flake8
 flit
+pojson
 pytest

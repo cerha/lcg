@@ -16,15 +16,17 @@
 
 domains := lcg lcg-exercises test
 mo_dir := ../lcg/translations
+json_dir := ../lcg/resources/translations
 mo_files := $(foreach d, $(domains), $(patsubst $(d).%.po,\
                                        $(mo_dir)/%/LC_MESSAGES/$(d).mo,\
                                        $(wildcard $(d).*.po)))
+json_files := $(foreach d, $(domains), $(patsubst $(d).%.po,\
+                                       $(json_dir)/$(d).%.po.json,\
+                                       $(wildcard $(d).*.po)))
 pot_files := $(patsubst %,%.pot,$(domains))
 
-#resource_po_files := $(patsubst %.po,../resources/translations/%.po, $(wildcard *.po))
-
-all: $(mo_files)
-extract: $(wildcard *.po) $(pot_files) $(mo_files)
+all: $(mo_files) $(json_files)
+extract: $(wildcard *.po) $(pot_files) $(mo_files) $(json_files)
 
 ifeq ($(MAKECMDGOALS),extract)
 
@@ -61,6 +63,10 @@ $(mo_dir)/%/LC_MESSAGES/lcg-exercises.mo: lcg-exercises.%.po
 $(mo_dir)/%/LC_MESSAGES/test.mo: test.%.po
 	@mkdir -p $(dir $@)
 	msgfmt -v $< -o $@
+
+$(json_dir)/%.po.json: %.po
+	@mkdir -p $(dir $@)
+	pojson $< > $@
 
 #../resources/translations/lcg.%.po: lcg.%.po
 #	@mkdir -p ../resources/translations/

@@ -1421,6 +1421,7 @@ class HtmlExporter(lcg.Exporter):
             return g.button(g.span(label), title=label, **kwargs)
 
         context.resource('jquery.min.js')
+        context.resource('jed.min.js')
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
         context.resource('jplayer.min.js')

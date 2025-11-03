@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019, 2021 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ class Widget(object):
 
     def export(self, context):
         context.resource('jquery.min.js')
-        context.resource('gettext.js')
+        context.resource('jed.min.js')
         context.resource('lcg.js')
         context.resource('lcg-widgets.css')
         g = context.generator()

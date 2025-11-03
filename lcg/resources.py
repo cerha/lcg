@@ -54,15 +54,29 @@ class Resource(object):
     _type_map = None
 
     @classmethod
+    def subclasses(cls):
+        """Return all known subclasses of this class (recursively)."""
+        subclasses = cls.__subclasses__()
+        return subclasses + [s for c in subclasses for s in c.subclasses()]
+
+    @classmethod
     def subclass(cls, filename):
-        """Return the Resource subclass matching given filename (by extension)."""
-        def all_subclasses(c):
-            subclasses = c.__subclasses__()
-            return subclasses + [x for s in c.__subclasses__() for x in all_subclasses(s)]
-        if cls._type_map is None:
-            cls._type_map = dict((ext, c) for c in all_subclasses(cls) for ext in c.EXTENSIONS)
-        ext = os.path.splitext(filename)[1].lower().lstrip('.')
-        return cls._type_map.get(ext, Resource)
+        if Resource._type_map is None:
+            Resource._type_map = {ext: c for c in Resource.subclasses() for ext in c.EXTENSIONS}
+        # Build the list of possible filename extensions from longest to shortest.
+        # For example ['.cs.po.json', '.po.json', '.json'] for 'lcg.cs.po.json'.
+        extensions = []
+        basename, ext = os.path.splitext(filename)
+        while ext:
+            extensions.insert(0, ext.lower() + (extensions[0] if extensions else ''))
+            basename, ext = os.path.splitext(basename)
+        for ext in extensions:
+            # Find the longest possible extension (such as '.po.json') in the type map.
+            try:
+                return Resource._type_map[ext]
+            except KeyError:
+                pass
+        return Resource
 
     def __init__(self, filename, title=None, descr=None, uri=None,
                  src_file=None, content=None, info=None):
@@ -169,7 +183,7 @@ class Resource(object):
 class Image(Resource):
     """An image of undefined type."""
     SUBDIR = 'images'
-    EXTENSIONS = ('jpeg', 'jpg', 'gif', 'png', 'svg')
+    EXTENSIONS = ('.jpeg', '.jpg', '.gif', '.png', '.svg')
 
     def __init__(self, filename, size=None, thumbnail=None, **kwargs):
         """Arguments:
@@ -199,7 +213,7 @@ class Image(Resource):
 class Stylesheet(Resource):
     """A cascading style sheet."""
     SUBDIR = 'css'
-    EXTENSIONS = ('css',)
+    EXTENSIONS = ('.css',)
 
     def __init__(self, filename, media='all', **kwargs):
         """Arguments:
@@ -218,7 +232,7 @@ class Stylesheet(Resource):
 class Script(Resource):
     """A JavaScript object used within the content."""
     SUBDIR = 'scripts'
-    EXTENSIONS = ('js',)
+    EXTENSIONS = ('.js',)
 
     def __init__(self, filename, type=None, **kwargs):
         """Arguments:
@@ -238,9 +252,9 @@ class Script(Resource):
 
 
 class Translations(Resource):
-    """Gettext translations .po file"""
+    """Gettext translations."""
     SUBDIR = 'translations'
-    EXTENSIONS = ('po',)
+    EXTENSIONS = ('.po', '.po.json',)
 
 
 class Media(Resource):
@@ -250,18 +264,18 @@ class Media(Resource):
 
 class Audio(Media):
     """Audio media file."""
-    EXTENSIONS = ('mp3', 'wave', 'ogg', 'oga', 'wav', 'aac', 'm4a')
+    EXTENSIONS = ('.mp3', '.wave', '.ogg', '.oga', '.wav', '.aac', '.m4a')
 
 
 class Video(Media):
     """Video media file."""
-    EXTENSIONS = ('ogv', 'mp4', 'webm', '3gp')
+    EXTENSIONS = ('.ogv', '.mp4', '.webm', '.3gp')
 
 
 class Flash(Resource):
     """Adobe/Macromedia Flash object."""
     SUBDIR = 'flash'
-    EXTENSIONS = ('swf',)
+    EXTENSIONS = ('.swf',)
 
 
 ###################################################################################################
@@ -345,31 +359,26 @@ class ResourceProvider(object):
     def _cache_key(self, filename, kwargs):
         return (filename, tuple(kwargs.items()))
 
-    def _resource(self, filename, searchdir, warn, **kwargs):
-        dirs = self._dirs
+    def _resource(self, filename, searchdir, warn, content=None, **kwargs):
         cls = Resource.subclass(filename)
-        if kwargs.get('content') is not None:
-            return cls(filename, **kwargs)
+        dirs = self._dirs
+        if content is not None:
+            return cls(filename, content=content, **kwargs)
         if cls.SUBDIR:
-            dirs = tuple(functools.reduce(
-                lambda a, b: a + b, ((os.path.join(dir, cls.SUBDIR), dir) for dir in dirs), ()
-            ))
+            dirs = tuple(path for d in dirs for path in (os.path.join(d, cls.SUBDIR), d))
         if searchdir is not None:
             dirs = (searchdir,) + dirs
-        basename, ext = os.path.splitext(filename)
         for directory in dirs:
             src_path = os.path.join(directory, filename)
             if sys.version_info[0] == 2:
                 src_path = src_path.encode('utf-8')
             if os.path.isfile(src_path):
                 return cls(filename, src_file=src_path, **kwargs)
-            elif src_path.find('*') != -1:
-                pathlist = [path for path in glob.glob(src_path) if os.path.isfile(path)]
+            elif '*' in filename:
+                pathlist = sorted([path for path in glob.glob(src_path) if os.path.isfile(path)])
                 if pathlist:
-                    pathlist.sort()
-                    i = len(directory) + 1
-                    return [cls(os.path.splitext(path[i:])[0] + ext, src_file=path, **kwargs)
-                            for path in pathlist]
+                    i = len(directory) + len(os.path.sep)
+                    return [cls(path[i:], src_file=path, **kwargs) for path in pathlist]
         if warn:
             warn(_("Resource file not found: %(filename)s %(search_path)s",
                    filename=filename,

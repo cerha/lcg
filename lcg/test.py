@@ -513,6 +513,13 @@ class ContentNode(unittest.TestCase):
 
 class Resources(unittest.TestCase):
 
+    def test_subclass(self):
+        assert lcg.Resource.subclass('xxx.mp3') == lcg.Audio
+        assert lcg.Resource.subclass('xxx.ogg') == lcg.Audio
+        assert lcg.Resource.subclass('default.css') == lcg.Stylesheet
+        assert lcg.Resource.subclass('lcg.cs.po.json') == lcg.Translations
+        assert lcg.Resource.subclass('exercise-responses/cs/good*.mp3') == lcg.Audio
+
     def test_provider(self):
         def warn(msg):
             messages.append(msg)
@@ -527,10 +534,13 @@ class Resources(unittest.TestCase):
         assert len(messages) == 2
         r = p.resource('xxx.ogg')
         assert isinstance(r, lcg.Audio)
-        assert len(messages) == 2
         r = p.resource('default.css')
         assert isinstance(r, lcg.Stylesheet)
-        assert len(messages) == 2
+        r = p.resource('lcg.cs.po.json')
+        assert isinstance(r, lcg.Translations)
+        resources = p.resource('exercise-responses/cs/good*.mp3')
+        assert isinstance(resources, list)
+        assert all(isinstance(r, lcg.Audio) for r in resources)
 
     def test_dependencies(self):
         p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),

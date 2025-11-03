@@ -1,7 +1,7 @@
 /* -*- coding: utf-8 -*-
  *
  * Copyright (C) 2012-2018 OUI Technology Ltd.
- * Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
+ * Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 
 window.lcg = {
-    dedent: str => ('' + str).replace(/\n\s+/g, ''),
 }
 
 
@@ -1695,6 +1694,10 @@ lcg.Cookies = class {
 
 lcg.cookies = new lcg.Cookies()
 
+lcg.dedent = function (str) {
+    return ('' + str).replace(/\n\s+/g, '');
+}
+
 lcg.widget_instance = function (element) {
     /* Return a JavaScript widget instance for given DOM element or null.
      *
@@ -1712,4 +1715,75 @@ lcg.widget_instance = function (element) {
         return element._lcg_widget_instance
     }
     return null
+}
+
+
+lcg.lang = (navigator.language || 'en').split('-')[0]
+lcg.catalogs = {}
+lcg._catalogs_ready = {}
+
+lcg.gettext = function (domain) {
+    /* Return a gettext-like function for translating UI strings to the current browser language.
+     *
+     * Usage:
+     * const _ = lcg.gettext('my-domain')
+     * console.log(_("Hello"))
+     * console.log(_.pgettext("kings", "Crown"))
+     * console.log(_.ngettext("1 file", "%d files", 2))
+     *
+     * Notes:
+     * - Translations are loaded asynchronously from `${domain}.${lcg.lang}.po.json`.
+     * - To avoid making the translation function asynchronous, the original
+     *   string is returned until the translation file is downloaded.
+     * - When waiting for the translations is essential, .ready may be used:
+     *   _.ready.then(() => console.log(_("Hello")))
+     *
+     */
+    function locale_data(data) {
+        /* Convert locale data produced by pojson 0.7 to the format expected by Jed.
+         * See https://pypi.org/project/pojson/
+         */
+        const meta = data[''] || {}
+        const result = {'': {
+            'domain': domain,
+            'lang': lcg.lang,
+            'plural_forms': meta['Plural-Forms'] || 'nplurals=2; plural=(n != 1);'
+        }}
+        for (const [key, value] of Object.entries(data)) {
+            if (key !== '') {
+                result[key] = value.slice(1)
+            }
+        }
+        return result
+    }
+
+    if (!lcg._catalogs_ready[domain]) {
+        lcg._catalogs_ready[domain] = fetch(`/_resources/${domain}.${lcg.lang}.po.json`)
+            .then(r => r.json())
+            .then(data => lcg.catalogs[domain] = new Jed({
+                'domain': domain,
+                'locale_data': {[domain]: locale_data(data)},
+            }))
+            .catch(err => {
+                console.warn(`Could not load translations for domain ${domain}:`, err);
+                lcg.catalogs[domain] = new Jed({locale_data: {}}); // empty fallback
+            })
+    }
+
+    function translate(msgid) {
+        return lcg.catalogs[domain]?.gettext(msgid) ?? msgid
+    }
+    translate.pgettext = function(context, msgid) {
+        return lcg.catalogs[domain]?.pgettext(context, msgid) ?? msgid
+    }
+    translate.ngettext = function(singular, plural, n) {
+        let catalog = lcg.catalogs[domain]
+        if (catalog) {
+            return catalog.ngettext(singular, plural, n)
+        } else {
+            return (n === 1 ? singular : plural)
+        }
+    }
+    translate.ready = lcg._catalogs_ready[domain]
+    return translate
 }

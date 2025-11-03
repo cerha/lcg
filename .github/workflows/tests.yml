@@ -37,7 +37,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install --upgrade 'pip<21' 'setuptools<45' 'wheel<0.34' pytest
+          pip install --upgrade 'pip<21' 'setuptools<45' 'wheel<0.34' pytest pojson
           python3 -m pip install flit
           # Beware: 'make build' duplication here, but we need python3 to run flit.
           make translations
@@ -82,7 +82,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install flit pytest
+          pip install flit pytest pojson
 
       - name: Build and install the wheel
         run: |
