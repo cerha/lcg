@@ -24,6 +24,12 @@ test:
 build: translations resources
 	flit build
 
+publish:
+	python -m twine upload --repository pypi dist/*.whl
+
+publish-test:
+	python -m twine upload --repository testpypi dist/*.whl
+
 install:
         # Only for development installs.  Use pip for production/user installs.
 	flit install --symlink
