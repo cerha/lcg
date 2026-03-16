@@ -1,7 +1,7 @@
 /* -*- coding: utf-8 -*-
  *
  * Copyright (C) 2012-2018 OUI Technology Ltd.
- * Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
+ * Copyright (C) 2019-2026 Tomáš Cerha <t.cerha@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ lcg.KeyHandler = class {
             // Returning false doesn't work here for some reason...
             event.preventDefault()
             event.stopPropagation()
-            command.bind(this)(event, $(event.target))
+            command.bind(this)(event, event.target)
         }
     }
 
@@ -213,10 +213,11 @@ lcg.Menu = class extends lcg.Widget {
      *
      */
 
+    _MANAGE_TABINDEX = true
+
     constructor(element) {
         super(element)
         this._init_menu(this.element.find('ul').first())
-        this._MANAGE_TABINDEX = true
     }
 
     _init_menu(ul) {
@@ -275,7 +276,7 @@ lcg.Menu = class extends lcg.Widget {
         let item
         if (this.items.length !== 0) {
             let current = this.element.find('a.current').first()
-            if (current) {
+            if (current.length) {
                 item = current
             } else {
                 item = this.items[0]
@@ -465,7 +466,7 @@ lcg.Notebook = class extends lcg.Menu {
         let i, callback, repeat
         let previously_selected_item = this._selected_item()
         super._select_item(item)
-        if (previously_selected_item !== item) {
+        if (!previously_selected_item || previously_selected_item[0] !== item[0]) {
             if (previously_selected_item) {
                 previously_selected_item.removeClass('current')
                 previously_selected_item[0]._lcg_notebook_page.hide()
@@ -588,11 +589,11 @@ lcg.FoldableTree = class extends lcg.Menu {
         super._init_item(item, prev, parent)
         item.attr('role', 'treeitem')
         let icon = item.find('.icon')
-        if (icon) {
+        if (icon.length) {
             icon.attr('role', 'presentation')
         }
         let label = item.find('.label')
-        if (label) {
+        if (label.length) {
             // Needed for VoiceOver to read the labels after adding the icon span
             // inside the a tag (because of MSIE as described in widgets.py...).
             let label_id = item.attr('id') + '-label'
@@ -602,7 +603,7 @@ lcg.FoldableTree = class extends lcg.Menu {
         let li = item.closest('li')
         // Append hierarchical submenu if found.
         let submenu = li.find('ul').first()
-        if (submenu) {
+        if (submenu.length) {
             if (li.hasClass('foldable')) {
                 if (!submenu.attr('id')) {
                     submenu.attr('id', item.attr('id') + '-submenu')
@@ -851,7 +852,7 @@ lcg.PopupMenuBase = class extends lcg.Menu {
                 },
             })
         } else {
-            menu.slideToggle(0.2, () => this._set_focus(selected_item))
+            menu.slideToggle(200, () => this._set_focus(selected_item))
         }
         this._on_touchstart_handler = (e) => { this._touch_moved = false }
         this._on_touchmove_handler = (e) => { this._touch_moved = true }
@@ -1139,7 +1140,7 @@ lcg.PopupMenuCtrl = class extends lcg.Widget {
         ctrl.on('keydown', this._on_key_down.bind(this))
         ctrl.find('.popup-arrow').on('click', e => menu.popup(e, ctrl))
         ctrl.attr('role', 'button')
-        ctrl.attr('aria-hapsopup', 'true')
+        ctrl.attr('aria-haspopup', 'true')
         ctrl.attr('aria-expanded', 'false')
         ctrl.attr('aria-controls', menu.element.attr('id'))
         if (selector) {
@@ -1243,7 +1244,7 @@ lcg.DropdownSelection = class extends lcg.PopupMenuBase {
     _select_item(item) {
         let previously_selected_item = this._selected_item()
         super._select_item(item)
-        if (previously_selected_item && previously_selected_item !== item) {
+        if (previously_selected_item && previously_selected_item[0] !== item[0]) {
             previously_selected_item.closest('li').removeClass('selected')
         }
         item.closest('li').addClass('selected')
@@ -1366,14 +1367,14 @@ lcg.CollapsibleWidget = class extends lcg.Widget {
         this.element.removeClass('collapsed')
         this.element.addClass('expanded')
         this._heading.attr('aria-expanded', 'true')
-        this._content.slideDown(0.2)
+        this._content.slideDown(200)
     }
 
     collapse() {
         this.element.removeClass('expanded')
         this.element.addClass('collapsed')
         this._heading.attr('aria-expanded', 'false')
-        this._content.slideUp(0.2)
+        this._content.slideUp(200)
     }
 
     toggle() {
@@ -1396,7 +1397,7 @@ lcg.CollapsibleSection = class extends lcg.CollapsibleWidget {
         let heading = this.element.find('h1,h2,h3,h4,h5,h6,h7,h8').first()
         heading.addClass('collapsible-section-heading')
         let backref = heading.find('a.backref')
-        if (backref) {
+        if (backref.length) {
             backref.attr('href', '')
         }
         return heading
@@ -1429,7 +1430,7 @@ lcg.CollapsiblePane = class extends lcg.CollapsibleWidget {
 lcg.AudioPlayer = class extends lcg.Widget {
 
     constructor(elements, swf_uri) {
-        super(element)
+        super(elements)
         this._volume = 0.8
         this._player = this.element.find('.jp-player')
         this._player.jPlayer({
@@ -1605,7 +1606,7 @@ lcg.AudioPlayer = class extends lcg.Widget {
             return false
         }
         let audio = this.element.find('audio')
-        if (audio) {
+        if (audio.length) {
             // If the browser supports the <audio> tag, jPlayer will use it and
             // we can get the media support information from its API.
             return !!(audio.canPlayType && audio.canPlayType(type.media).replace(/no/, ''))
@@ -1658,7 +1659,7 @@ lcg.Cookies = class {
     }
 
     set(name, value, days) {
-        let cookie = (name +'='+ escape(String(value)) + '; ' +
+        let cookie = (name +'='+ encodeURIComponent(String(value)) + '; ' +
                       'SameSite=Lax; ' +
                       'Path=' + escape(this.path))
         if (days) {
@@ -1685,7 +1686,7 @@ lcg.Cookies = class {
     }
 
     clearAll() {
-        for (let name of document.cookie.split(';').collect(s => s.split('=').first().trim())) {
+        for (let name of document.cookie.split(';').map(s => s.split('=')[0].trim())) {
             this.clear(name)
         }
     }

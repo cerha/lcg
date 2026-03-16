@@ -1,7 +1,7 @@
 /* -*- coding: utf-8 -*-
  *
  * Copyright (C) 2004-2017 OUI Technology Ltd.
- * Copyright (C) 2019, 2021 Tomáš Cerha <t.cerha@gmail.com>
+ * Copyright (C) 2019-2026 Tomáš Cerha <t.cerha@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -189,27 +189,6 @@ lcg.Exercise = class extends lcg.Widget {
         this._display_results()
     }
 
-    _slide_up(element, duration) {
-        if (Effect !== undefined) {
-            if (duration === 'undefined') {
-                duration = 0.2
-            }
-            new Effect.SlideUp(element, {duration: duration})
-        } else {
-            element.hide()
-        }
-    }
-
-    _slide_down(element, duration) {
-        if (Effect !== undefined) {
-            if (duration === undefined)
-                duration = 0.2
-            new Effect.SlideDown(element, {duration: duration})
-        } else {
-            element.show()
-        }
-    }
-
     _play_audio(uri) {
         if (!lcg.audio && typeof Audio !== 'undefined') {
             lcg.audio = new Audio()
@@ -333,7 +312,6 @@ lcg.FillInExercise = class extends lcg.Exercise {
 
     _init_field(field) {
         field.answer_index = this._last_answer_index++
-        console.log('>>', field.answer_index, field)
         $(field).on('keydown', this._on_key_down.bind(this))
         $(field).on('dblclick', this._on_eval_answer.bind(this))
         $(field).on('touchstart', this._on_touch_start.bind(this))
@@ -347,11 +325,11 @@ lcg.FillInExercise = class extends lcg.Exercise {
         if (element.disabled)
             element.disabled = false
         element.focus()
-        event.stop()
+        event.preventDefault()
+        event.stopPropagation()
     }
 
     _find_answer(field) {
-        console.log('--', field, field.answer_index, this._answers)
         const answers = this._answers[field.answer_index].split('|')
         const value = field.value
         let answer_index = 0
@@ -384,7 +362,6 @@ lcg.FillInExercise = class extends lcg.Exercise {
     }
 
     _error_handler(field) {
-        console.log('..', field)
         const found = this._find_answer(field)
         const index = found.index
         field.focus()
@@ -412,7 +389,7 @@ lcg.HiddenAnswers = class extends lcg.Exercise {
 
     constructor(form_name, answers, responses, messages) {
         super(form_name, answers, responses, messages)
-        this.element.find('.toggle-button').on('click', this._on_toggle_button)
+        this.element.find('.toggle-button').on('click', this._on_toggle_button.bind(this))
     }
 
     _recognize_field(field) {
@@ -420,7 +397,12 @@ lcg.HiddenAnswers = class extends lcg.Exercise {
     }
 
     _on_toggle_button(event) {
-        $(event.target).closest('.task').find('.answer').slideToggle(200)
+        let button = $(event.target).closest('.toggle-button')
+        let answer = button.closest('.task').find('.answer')
+        answer.slideToggle(200, () => {
+            let label = answer.is(':visible') ? this._messages["Hide Answer"] : this._messages["Show Answer"]
+            button.text(label)
+        })
         return false;
     }
 
