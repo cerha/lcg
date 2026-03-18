@@ -1,6 +1,6 @@
 # LCG test translations
 # Copyright (C) 2006-2008 OUI Technology Ltd.
-# Copyright (C) 2019-2022 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2022 Tomáš Cerha <cerha@truecode.cz>
 # This file is distributed under the same license as the LCG package.
 #
 msgid ""

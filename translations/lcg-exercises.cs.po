@@ -1,6 +1,6 @@
 # LCG e-Learrning Extension
 # Copyright (C) 2007-2015, OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019 Tomáš Cerha <cerha@truecode.cz>
 # This file is distributed under the same license as the LCG package.
 # Tomas Cerha <cerha@brailcom.org>, 2007.
 #

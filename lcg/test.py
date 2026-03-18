@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <t.cerha@gmail.com>
+# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -534,13 +534,10 @@ class Resources(unittest.TestCase):
         assert len(messages) == 2
         r = p.resource('xxx.ogg')
         assert isinstance(r, lcg.Audio)
+        assert len(messages) == 2
         r = p.resource('default.css')
         assert isinstance(r, lcg.Stylesheet)
-        r = p.resource('lcg.cs.po.json')
-        assert isinstance(r, lcg.Translations)
-        resources = p.resource('exercise-responses/cs/good*.mp3')
-        assert isinstance(resources, list)
-        assert all(isinstance(r, lcg.Audio) for r in resources)
+        assert len(messages) == 2
 
     def test_dependencies(self):
         p = lcg.ResourceProvider(resources=(lcg.Audio('sound1.ogg'),

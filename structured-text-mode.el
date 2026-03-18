@@ -1,7 +1,7 @@
 ;;; structured-text-mode.el -- Mode for editing LCG structured text files
 
 ;; Copyright (C) 2006 OUI Technology Ltd.
-;; Copyright (C) 2019-2024 Tomáš Cerha <t.cerha@gmail.com>
+;; Copyright (C) 2019-2024 Tomáš Cerha <cerha@truecode.cz>
 
 ;; This file is not part of GNU Emacs.
 
