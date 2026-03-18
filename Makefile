@@ -1,4 +1,7 @@
-.PHONY: doc test translations resources
+.PHONY: doc test translations resources javascript
+
+js_src := $(wildcard javascript/*.js)
+js_out := $(js_src:javascript/%.js=lcg/resources/scripts/%.js)
 
 all: compile translations resources
 
@@ -11,6 +14,12 @@ translations:
 
 extract:
 	make -C translations extract
+
+javascript: $(js_out)
+
+lcg/resources/scripts/%.js: javascript/%.js
+	mkdir -p $(@D)
+	python3 -m rjsmin < $< > $@
 
 resources:
 	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/

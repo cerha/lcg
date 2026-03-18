@@ -1,5 +1,6 @@
 babel
 coverage
+rjsmin
 coveralls
 flake8
 flit
