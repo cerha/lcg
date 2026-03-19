@@ -1,19 +1,16 @@
-.PHONY: doc test translations resources javascript
+.PHONY: all update resources sync-resources javascript translations extract doc test build install clean coverage lint lint-flake8 lint-eslint
 
 js_src := $(wildcard javascript/*.js)
 js_out := $(js_src:javascript/%.js=lcg/resources/scripts/%.js)
 
-all: compile translations resources
+all: doc update
 
-compile:
-	python -m compileall -d . lcg
-	python -O -m compileall -d . lcg
+update: translations resources
 
-translations:
-	make -C translations
+resources: sync-resources javascript
 
-extract:
-	make -C translations extract
+sync-resources:
+	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
 
 javascript: $(js_out)
 
@@ -21,8 +18,11 @@ lcg/resources/scripts/%.js: javascript/%.js
 	mkdir -p $(@D)
 	python3 -m rjsmin < $< > $@
 
-resources:
-	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
+translations:
+	make -C translations
+
+extract:
+	make -C translations extract
 
 doc: resources
 	python -m lcg.make doc/src doc/html
@@ -30,7 +30,7 @@ doc: resources
 test:
 	python -m pytest lcg/test.py -v
 
-build: translations resources
+build: update
 	flit build
 
 publish:
@@ -40,7 +40,7 @@ publish-test:
 	python -m twine upload --repository testpypi dist/*.whl
 
 install:
-        # Only for development installs.  Use pip for production/user installs.
+	# Only for development installs.  Use pip for production/user installs.
 	flit install --symlink
 
 clean:
