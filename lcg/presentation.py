@@ -32,6 +32,11 @@ currently processed 'Content' instance and current language.
 
 from __future__ import unicode_literals
 
+try:
+    from typing import Any, Optional
+except ImportError:
+    pass
+
 import sys
 import copy
 import lcg
@@ -64,183 +69,183 @@ class Presentation(object):
     relevant attributes.
 
     """
-    font_size = None
+    font_size = None  # type: Optional[float]
     """Font size relative to the current font size (1.0 is the same size), float."""
 
-    font_name = None
+    font_name = None  # type: Optional[str]
     """Name of the font to use, e.g. 'Free' or 'DejaVu', string."""
 
-    font_family = None
+    font_family = None  # type: Optional[str]
     """Font family to be used for typesetting text, one of 'FontFamily' constants."""
 
-    font_color = None
+    font_color = None  # type: Optional[Any]
     """Font color, 'Color'."""
 
-    background_color = None
+    background_color = None  # type: Optional[Any]
     """Background color, 'Color'."""
 
-    heading_font_family = None
+    heading_font_family = None  # type: Optional[Any]
     """Font family to be used for typesetting headings, one of 'FontFamily' constants."""
 
-    noindent = None
+    noindent = None  # type: Optional[bool]
     """If true, don't indent first lines of paragraphs."""
 
-    bold = None
+    bold = None  # type: Optional[bool]
     """True when bold font face should be used, False otherwise."""
 
-    italic = None
+    italic = None  # type: Optional[bool]
     """True when italic font face should be used, False otherwise."""
 
-    baseline_shift = None
+    baseline_shift = None  # type: Optional[float]
     """Shift the text baseline up/down relatively to font size, float.
     Positive number shifts the text up, negative down from the current baseline level.
     """
 
-    boxed = None
+    boxed = None  # type: Optional[bool]
     """'True' when the content should be surrounded by a box."""
 
-    box_margin = None
+    box_margin = None  # type: Optional[Any]
     """Space between the box and the content, 'Unit'.
     It may be ignored in some boxed elements.
     """
 
-    box_width = None
+    box_width = None  # type: Optional[Any]
     """Box line width, 'Unit'."""
 
-    box_color = None
+    box_color = None  # type: Optional[Any]
     """Box line color, 'Color'."""
 
-    box_radius = None
+    box_radius = None  # type: Optional[Any]
     """Radius of box corners, if the corners should be rounded, 'Unit'."""
 
-    box_mask = None
+    box_mask = None  # type: Optional[Any]
     """Mask of visible box sides as a sequence of 4 bools (top, right, bottom, left)."""
 
-    separator_height = None
+    separator_height = None  # type: Optional[Any]
     """Height of lines separating objects, 'Unit'.
     It currently works only for row separators in tables.
     """
 
-    separator_width = None
+    separator_width = None  # type: Optional[Any]
     """Width of lines separating objects, 'Unit'.
     It currently works only for column separators in tables.
     """
 
-    separator_margin = None
+    separator_margin = None  # type: Optional[Any]
     """Amount of space between objects, 'Unit'.
     It currently works only for spaces between table rows.
     """
 
-    header_separator_height = None
+    header_separator_height = None  # type: Optional[Any]
     """Height of line separating headers from content, 'Unit'.
     It currently works only for tables.
     """
 
-    header_separator_margin = None
+    header_separator_margin = None  # type: Optional[Any]
     """Amount of space separating headers from content, 'Unit'.
     It currently works only for tables.
     """
 
-    left_indent = None
+    left_indent = None  # type: Optional[Any]
     """Amount of space to put on left of the object, 'Unit'."""
 
-    line_spacing = None
+    line_spacing = None  # type: Optional[Any]
     """Distance between line bases, 'Unit'."""
 
-    top_margin = None
+    top_margin = None  # type: Optional[Any]
     """Amount of space on the top of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages and Braille if set for the top level node.
     """
 
-    bottom_margin = None
+    bottom_margin = None  # type: Optional[Any]
     """Amount of space on the bottom of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages and Braille if set for the top level node.
     """
 
-    left_margin = None
+    left_margin = None  # type: Optional[Any]
     """Amount of space on the left of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
     """
 
-    right_margin = None
+    right_margin = None  # type: Optional[Any]
     """Amount of space on the right of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
     """
 
-    inner_margin = None
+    inner_margin = None  # type: Optional[Any]
     """Amount of space on the inner side of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for Braille if set for the top level node.
     """
 
-    outer_margin = None
+    outer_margin = None  # type: Optional[Any]
     """Amount of space on the outer side of the object, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for Braille if set for the top level node.
     """
 
-    page_width = None
+    page_width = None  # type: Optional[Any]
     """Page width, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages or Braille output (restricted to
     UFont and USpace instances) if set for the top level node.
     """
 
-    page_height = None
+    page_height = None  # type: Optional[Any]
     """Page height, non-relative 'Unit'.
     If 'None', use the default value.
     It currently works only for PDF pages or Braille output (restricted to
     UFont and USpace instances) if set for the top level node.
     """
 
-    landscape = None
+    landscape = None  # type: Optional[bool]
     """Page orientation.
     If False then use portrait orientation, if True then use landscape orientation.
     If 'None', use the default value.
     It currently works only for PDF pages if set for the top level node.
     """
 
-    device_output = None
+    device_output = None  # type: Optional[Any]
     """Device output specification.
     It is currently used only for Braille output where it is a dictionary
     mapping Unicode Braille and whitespace characters to output device
     characters.
     """
 
-    device_init = None
+    device_init = None  # type: Optional[Any]
     """Function returning initial string to send to the Braille printer.
     The function takes two integer arguments: page width (number of characters)
     and page height (number of lines).
     """
 
-    device_finish = None
+    device_finish = None  # type: Optional[str]
     """Final string to send to the Braille printer."""
 
-    braille_tables = None
+    braille_tables = None  # type: Optional[Any]
     """Dictionary of Braille tables to use.
     Keys are language codes (strings), values are lists of Braille table names
     (strings) for liblouis.
     Useful only for Braille output.
     """
 
-    braille_hyphenation_tables = None
+    braille_hyphenation_tables = None  # type: Optional[Any]
     """Dictionary of Braille hyphenation tables to use.
     Keys are language codes (strings), values are Braille hyphenation table
     names (strings) for liblouis.
     Useful only for Braille output.
     """
 
-    braille_math_rules = 'nemeth'
+    braille_math_rules = 'nemeth'  # type: str
     """System to use for typesetting mathematics in Braille.
     Currently supported values are 'nemeth' and 'czech'.
     Useful only for Braille output.
     """
 
-    printers = None
+    printers = None  # type: Optional[Any]
     """Dictionary of printer names (keys) and their properties (values).
     Printer properties are represented by a dictionary with property names as
     keys and their corresponding values as values.
@@ -249,15 +254,15 @@ class Presentation(object):
     Useful only for Braille output.
     """
 
-    default_printer = None
+    default_printer = None  # type: Optional[str]
     """Default printer, one of the 'printers' keys or 'None'.
     Useful only for Braille output.
     """
 
-    left_page_footer = None
+    left_page_footer = None  # type: Optional[Any]
     """Custom left page footer, 'lcg.Content' instance or 'None'."""
 
-    right_page_footer = None
+    right_page_footer = None  # type: Optional[Any]
     """Custom right page footer, 'lcg.Content' instance or 'None'."""
 
     def __init__(self, **kwargs):
