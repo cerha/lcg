@@ -37,12 +37,13 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install --upgrade 'pip<21' 'setuptools<45' 'wheel<0.34' pytest pojson
-          python3 -m pip install flit
-          # Beware: 'make build' duplication here, but we need python3 to run flit.
-          make translations
-          make resources
-          python3 -m flit build
+          pip install -U 'pip<21' 'setuptools<45' 'wheel<0.34'
+          # Flit in not available in Python 2.
+          grep -v flit requirements-devel.txt | pip install -r /dev/stdin
+          # Makefile build uses Python 3 explicitly, so prepare a Python 3
+          # environment too.
+          python3 -m pip install -r requirements-devel.txt
+          make build
           pip install $(echo dist/lcg_framework-*-any.whl)[all]
 
       - name: Run tests
@@ -82,7 +83,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install flit pytest pojson
+          pip install -r requirements-devel.txt
 
       - name: Build and install the wheel
         run: |

@@ -31,7 +31,10 @@ test:
 	python -m pytest lcg/test.py -v
 
 build: update
-	flit build
+	# Beware: Use explicitly 'python3' in build and depending targets
+	# to make sure the wheel is built correctly within the Python2 test
+	# workflow (flit is not available for Python 2).
+	python3 -m flit build
 
 publish:
 	python -m twine upload --repository pypi dist/*.whl
