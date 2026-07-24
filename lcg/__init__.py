@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-__version__ = '0.8.0.dev0'
+__version__ = '0.8.0'
 
 from .locales import LocaleData, LocaleData_cs, LocaleData_de, \
     LocaleData_en, LocaleData_es, LocaleData_no, LocaleData_pl, \
