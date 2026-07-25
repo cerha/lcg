@@ -1062,7 +1062,9 @@ class GettextTranslator(Translator):
         msg = "No translation file found: domain=%r, path=%r, lang=%r, origin=%r" % \
               (domain, self._path, self._lang, origin)
         if self._fallback or self._lang == origin:
-            if self._lang != origin:
+            # The C/POSIX locale means "no localization", so a missing translation
+            # is expected there and not worth warning about.
+            if self._lang != origin and self._lang.split('.')[0] not in ('C', 'POSIX'):
                 lcg.log(msg)
             return gettext.NullTranslations()
         else:
