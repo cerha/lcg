@@ -10,7 +10,7 @@ update: translations resources
 resources: sync-resources javascript
 
 sync-resources:
-	git ls-files resources | rsync -av --delete --files-from=- ./ lcg/
+	git ls-files resources | rsync -a --info=name --delete --files-from=- ./ lcg/
 
 javascript: $(js_out)
 
