@@ -1745,11 +1745,11 @@ msgstr "pro"
 
 #: ../lcg/widgets.py:248
 msgid "Expand"
-msgstr ""
+msgstr "Rozbalit"
 
 #: ../lcg/widgets.py:248
 msgid "Collapse"
-msgstr ""
+msgstr "Sbalit"
 
 #: ../lcg/widgets.py:398
 #, python-format
@@ -1802,55 +1802,55 @@ msgstr "Zvolte jazyk:"
 
 #: ../lcg/export/html.py:1384
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 #: ../lcg/export/html.py:1439
 msgid "Play"
-msgstr ""
+msgstr "Přehrát"
 
 #: ../lcg/export/html.py:1439
 msgid "Pause"
-msgstr ""
+msgstr "Pozastavit"
 
 #: ../lcg/export/html.py:1440
 msgid "Rewind"
-msgstr ""
+msgstr "Vrátit zpět"
 
 #: ../lcg/export/html.py:1441
 msgid "Fast Forward"
-msgstr ""
+msgstr "Přeskočit vpřed"
 
 #: ../lcg/export/html.py:1448 ../lcg/export/html.py:1449
 msgid "Current position"
-msgstr ""
+msgstr "Aktuální pozice"
 
 #: ../lcg/export/html.py:1452 ../lcg/export/html.py:1453
 msgid "Remaining time"
-msgstr ""
+msgstr "Zbývající čas"
 
 #: ../lcg/export/html.py:1454
 msgid "Total time"
-msgstr ""
+msgstr "Celkový čas"
 
 #: ../lcg/export/html.py:1460
 msgid "Volume"
-msgstr ""
+msgstr "Hlasitost"
 
 #: ../lcg/export/html.py:1464
 msgid "Volume Down"
-msgstr ""
+msgstr "Snížit hlasitost"
 
 #: ../lcg/export/html.py:1465
 msgid "Volume Up"
-msgstr ""
+msgstr "Zvýšit hlasitost"
 
 #: ../lcg/export/html.py:1472
 msgid "Player"
-msgstr ""
+msgstr "Přehrávač"
 
 #: ../lcg/export/html.py:1475
 msgid "Update Required:"
-msgstr ""
+msgstr "Je potřeba aktualizace:"
 
 #: ../lcg/export/html.py:1478
 #, python-format
@@ -1858,6 +1858,8 @@ msgid ""
 "To play audio you will need to either update your browser to a recent "
 "version or update %s."
 msgstr ""
+"Chcete-li přehrávat zvuk, aktualizujte prohlížeč na novější verzi nebo "
+"aktualizujte %s."
 
 #. Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next:
