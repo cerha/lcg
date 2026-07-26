@@ -612,6 +612,17 @@ lcg.FoldableTree = class extends lcg.Menu {
                 let expander = li.find('.expander').first()
                 expander.attr('aria-controls', submenu.attr('id'))
                 expander.on('click', event => this._on_expander_click(event, item))
+                // The expander is an ARIA button, so it must also react to Enter
+                // and Space.  Without it, the submenu can only be expanded by
+                // mouse, which locks out keyboard and screen reader users.
+                expander.on('keydown', event => {
+                    let key = this._event_key(event)
+                    if (key === 'Enter' || key === 'Space') {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        this._on_expander_click(event, item)
+                    }
+                })
                 this._update_item(item, li.hasClass('expanded'))
                 this._foldable = true
             }
