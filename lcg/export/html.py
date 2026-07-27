@@ -822,7 +822,45 @@ class HtmlExporter(lcg.Exporter):
         """
         self._generator = self.Generator(sorted_attributes=kwargs.pop('sorted_attributes', False))
         self._allow_svg = kwargs.pop('allow_svg', True)
+        self._gettext_domains = {}
         super(HtmlExporter, self).__init__(*args, **kwargs)
+
+    _GETTEXT_DOMAIN_MATCHER = re.compile(br"""lcg\.gettext\(\s*['"]([\w.-]+)['"]""")
+
+    def _gettext_domains_in(self, source):
+        """Return gettext domains used in given JavaScript source (bytes)."""
+        domains = []
+        for match in self._GETTEXT_DOMAIN_MATCHER.findall(source):
+            domain = match.decode('ascii')
+            if domain not in domains:
+                domains.append(domain)
+        return tuple(domains)
+
+    def _script_gettext_domains(self, script):
+        """Return gettext domains used by given JavaScript resource.
+
+        The domains are discovered by scanning the script source for
+        'lcg.gettext()' calls (see lcg.js).  The domain can not be derived from
+        the script file name, as the two don't necessarily match.
+
+        The results are cached for the lifetime of the exporter instance, so a
+        script is only scanned once.  Scripts changed on disk are thus only
+        picked up after a restart, which is when installation changes take
+        effect anyway.
+
+        """
+        filename = script.src_file()
+        if not filename:
+            return self._gettext_domains_in((script.content() or '').encode('utf-8'))
+        if filename not in self._gettext_domains:
+            try:
+                with io.open(filename, 'rb') as f:
+                    domains = self._gettext_domains_in(f.read())
+            except IOError as e:
+                lcg.log("Error reading %s: %s" % (filename, e))
+                domains = ()
+            self._gettext_domains[filename] = domains
+        return self._gettext_domains[filename]
 
     def _title(self, context):
         return context.node().title()
@@ -834,23 +872,25 @@ class HtmlExporter(lcg.Exporter):
     def _head(self, context):
         g = context.generator()
         node = context.node()
-        # Client-side i18n (see lcg.js): each JavaScript module translates its UI
-        # strings through the gettext domain matching its file name, loaded from
-        # '<domain>.<lang>.po.json'.  Emit a link to each such catalog available
-        # for the current language so that the browser code can locate it through
-        # a version-aware URI (context.uri()) instead of guessing the path.
-        # NOTE: The domain is derived from the script file name by convention.
-        # Being sure would require parsing the JavaScript or introducing an
-        # explicit resource dependency declaration (which could also express
-        # script/stylesheet dependencies -- a separate effort).
+        # Client-side i18n (see lcg.gettext() in lcg.js): JavaScript code translates
+        # its UI strings through gettext catalogs served as '<domain>.<lang>.po.json'
+        # resources.  Pass the URI of the catalog of each domain used by the scripts
+        # present on the page, so that the browser code can locate it through
+        # context.uri() (respecting the application's resource path and its
+        # versioning) rather than guessing the path.
         gettext_links = []
+        domains = []
         for script in node.resources(lcg.Script):
-            if script.filename().endswith('.js'):
-                domain = script.filename()[:-len('.js')]
-                catalog = context.resource('%s.%s.po.json' % (domain, context.lang()), warn=False)
-                if catalog:
-                    gettext_links.append(g.link(rel='gettext', type='application/x-po',
-                                                 data_domain=domain, href=context.uri(catalog)))
+            for domain in self._script_gettext_domains(script):
+                if domain not in domains:
+                    domains.append(domain)
+        for domain in domains:
+            # A missing catalog is logged -- the script asks for translations
+            # which the installation doesn't provide for the current language.
+            catalog = context.resource('%s.%s.po.json' % (domain, context.lang()))
+            if catalog:
+                gettext_links.append(g.link(rel='gettext', type='application/json',
+                                            data_domain=domain, href=context.uri(catalog)))
         return (
             [g.title(self._title(context))] +
             [g.meta(http_equiv=header, content=value)
