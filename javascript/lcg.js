@@ -77,7 +77,9 @@ lcg.KeyHandler = class {
             // Returning false doesn't work here for some reason...
             event.preventDefault()
             event.stopPropagation()
-            command.bind(this)(event, event.target)
+            // The command handlers work with jQuery objects (as do the mouse
+            // event handlers, which pass them the same elements).
+            command.bind(this)(event, $(event.target))
         }
     }
 
