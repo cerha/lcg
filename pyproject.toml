@@ -48,8 +48,7 @@ name = "lcg"
 [tool.flit.sdist]
 include = [
     "COPYING",
-    "lcg/translations/**/**.mo",
-    "lcg/resources/**",
+    "lcg/assets/**",
     "lcg/**/test.py",  # Include in sdist even if excluded in .flitignore
 ]
 

@@ -351,7 +351,7 @@ class ResourceProvider(object):
         """
         assert isinstance(dirs, (list, tuple)), dirs
         assert isinstance(resources, (list, tuple)), resources
-        self._dirs = tuple(dirs) + (os.path.join(os.path.dirname(__file__), 'resources'),)
+        self._dirs = tuple(dirs) + (os.path.join(os.path.dirname(__file__), 'assets', 'resources'),)
         self._cache = self.OrderedDict([(self._cache_key(r.filename(), {}), (r, [None]))
                                         for r in resources])
         super(ResourceProvider, self).__init__(**kwargs)

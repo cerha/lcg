@@ -15,8 +15,8 @@
 # the git versions of PO files to create/update MO files.
 
 domains := lcg lcg-exercises test
-mo_dir := ../lcg/translations
-json_dir := ../lcg/resources/translations
+mo_dir := ../lcg/assets/translations
+json_dir := ../lcg/assets/resources/translations
 mo_files := $(foreach d, $(domains), $(patsubst $(d).%.po,\
                                        $(mo_dir)/%/LC_MESSAGES/$(d).mo,\
                                        $(wildcard $(d).*.po)))

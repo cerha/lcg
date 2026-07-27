@@ -18,5 +18,4 @@
 /.pydevproject
 /.settings/
 /.venv/
-/lcg/translations/
-/lcg/resources/
+/lcg/assets/
