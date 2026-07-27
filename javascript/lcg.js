@@ -1719,7 +1719,10 @@ lcg.widget_instance = function (element) {
 }
 
 
-lcg.lang = (navigator.language || 'en').split('-')[0]
+// Use the page language (set by the server as the <html> 'lang' attribute) so
+// that JavaScript UI strings are translated consistently with the page content,
+// falling back to the browser language when the attribute is not present.
+lcg.lang = (document.documentElement.lang || navigator.language || 'en').split('-')[0]
 lcg.catalogs = {}
 lcg._catalogs_ready = {}
 
@@ -1759,16 +1762,26 @@ lcg.gettext = function (domain) {
     }
 
     if (!lcg._catalogs_ready[domain]) {
-        lcg._catalogs_ready[domain] = fetch(`/_resources/${domain}.${lcg.lang}.po.json`)
-            .then(r => r.json())
-            .then(data => lcg.catalogs[domain] = new Jed({
-                'domain': domain,
-                'locale_data': {[domain]: locale_data(data)},
-            }))
-            .catch(err => {
-                console.warn(`Could not load translations for domain ${domain}:`, err);
-                lcg.catalogs[domain] = new Jed({locale_data: {}}); // empty fallback
-            })
+        // The translation catalog URI is provided by the server as a
+        // <link rel="gettext"> element (see LCG's HtmlExporter._head), so that
+        // the application controls the resource path and its versioning.  LCG
+        // itself knows nothing about where resources are served from.
+        const link = document.querySelector(`link[rel=gettext][data-domain="${domain}"]`)
+        if (link) {
+            lcg._catalogs_ready[domain] = fetch(link.getAttribute('href'))
+                .then(r => r.json())
+                .then(data => lcg.catalogs[domain] = new Jed({
+                    'domain': domain,
+                    'locale_data': {[domain]: locale_data(data)},
+                }))
+                .catch(err => {
+                    console.warn(`Could not load translations for domain ${domain}:`, err);
+                    lcg.catalogs[domain] = new Jed({locale_data: {}}); // empty fallback
+                })
+        } else {
+            lcg.catalogs[domain] = new Jed({locale_data: {}}); // no catalog on this page
+            lcg._catalogs_ready[domain] = Promise.resolve()
+        }
     }
 
     function translate(msgid) {

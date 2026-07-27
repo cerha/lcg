@@ -834,6 +834,23 @@ class HtmlExporter(lcg.Exporter):
     def _head(self, context):
         g = context.generator()
         node = context.node()
+        # Client-side i18n (see lcg.js): each JavaScript module translates its UI
+        # strings through the gettext domain matching its file name, loaded from
+        # '<domain>.<lang>.po.json'.  Emit a link to each such catalog available
+        # for the current language so that the browser code can locate it through
+        # a version-aware URI (context.uri()) instead of guessing the path.
+        # NOTE: The domain is derived from the script file name by convention.
+        # Being sure would require parsing the JavaScript or introducing an
+        # explicit resource dependency declaration (which could also express
+        # script/stylesheet dependencies -- a separate effort).
+        gettext_links = []
+        for script in node.resources(lcg.Script):
+            if script.filename().endswith('.js'):
+                domain = script.filename()[:-len('.js')]
+                catalog = context.resource('%s.%s.po.json' % (domain, context.lang()), warn=False)
+                if catalog:
+                    gettext_links.append(g.link(rel='gettext', type='application/x-po',
+                                                 data_domain=domain, href=context.uri(catalog)))
         return (
             [g.title(self._title(context))] +
             [g.meta(http_equiv=header, content=value)
@@ -844,8 +861,7 @@ class HtmlExporter(lcg.Exporter):
             [g.meta(name=name, content=value) for name, value in self._meta(context)] +
             [g.link(rel='alternate', lang=lang, href=self._uri_node(context, node, lang=lang))
              for lang in node.variants() if lang != context.lang()] +
-            [g.link(rel='gettext', type='application/x-po', href=context.uri(t))
-             for t in context.node().resources(lcg.Translations)] +
+            gettext_links +
             [g.script(src=context.uri(script) if script.src_file() else None,
                       type=script.type() or "text/javascript",
                       content=script.content())
