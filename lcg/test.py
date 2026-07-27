@@ -40,7 +40,8 @@ import warnings
 from decimal import Decimal
 
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-translation_path = [os.path.join(os.path.normpath(os.path.dirname(__file__)), 'translations')]
+translation_path = [os.path.join(os.path.normpath(os.path.dirname(__file__)),
+                                 'assets', 'translations')]
 
 if os.getenv('CI') == 'true' and repo_root in sys.path:
     # Make sure to import lcg from the installed package, not from the current directory
