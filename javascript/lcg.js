@@ -1786,13 +1786,17 @@ lcg.gettext = function (domain) {
                     'locale_data': {[domain]: locale_data(data)},
                 }))
                 .catch(err => {
-                    console.warn(`Could not load translations for domain ${domain}:`, err);
-                    lcg.catalogs[domain] = new Jed({locale_data: {}}); // empty fallback
+                    console.warn(`Could not load translations for domain ${domain}:`, err)
                 })
         } else {
-            lcg.catalogs[domain] = new Jed({locale_data: {}}); // no catalog on this page
+            // No catalog for this domain and language (an untranslated language or
+            // an application which ships no catalog for the domain).
             lcg._catalogs_ready[domain] = Promise.resolve()
         }
+        // Note: The catalog is intentionally left undefined when unavailable.  The
+        // translation functions below then simply return the original strings.  An
+        // "empty" Jed instance can not be used for that, as it raises an error on
+        // any translation attempt.
     }
 
     function translate(msgid) {
