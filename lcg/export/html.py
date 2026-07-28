@@ -893,11 +893,6 @@ class HtmlExporter(lcg.Exporter):
                                             data_domain=domain, href=context.uri(catalog)))
         return (
             [g.title(self._title(context))] +
-            [g.meta(http_equiv=header, content=value)
-             for header, value in (('Content-Language', context.lang()),
-                                   ('Content-Script-Type', 'text/javascript'),
-                                   ('Content-Style-Type', 'text/css'),
-                                   ('X-UA-Compatible', 'edge'))] +
             [g.meta(name=name, content=value) for name, value in self._meta(context)] +
             [g.link(rel='alternate', lang=lang, href=self._uri_node(context, node, lang=lang))
              for lang in node.variants() if lang != context.lang()] +
