@@ -564,7 +564,7 @@ class HtmlGenerator(object):
         return self._tag('source', None, dict(kwargs, src=src), paired=False,
                          allow=('src', 'type'))
 
-    def script(self, content=None, type="text/javascript", **kwargs):
+    def script(self, content=None, type=None, **kwargs):
         return self._tag('script', content, dict(kwargs, type=type),
                          allow=('src', 'type', 'integrity', 'crossorigin', 'async'))
 
@@ -898,7 +898,7 @@ class HtmlExporter(lcg.Exporter):
              for lang in node.variants() if lang != context.lang()] +
             gettext_links +
             [g.script(src=context.uri(script) if script.src_file() else None,
-                      type=script.type() or "text/javascript",
+                      type=script.type(),
                       content=script.content())
              for script in context.node().resources(lcg.Script)]
         )
@@ -1611,11 +1611,11 @@ class StyledHtmlExporter(object):
             context.resource(style)
         styles = self._stylesheets(context)
         if self._inlinestyles:
-            tags = [g.style(content, type='text/css', media=media)
+            tags = [g.style(content, media=media)
                     for media, content in [(s.media(), s.get().decode('utf-8')) for s in styles]
                     if content is not None]
         else:
-            tags = [g.link(rel='stylesheet', type='text/css', href=context.uri(s), media=s.media())
+            tags = [g.link(rel='stylesheet', href=context.uri(s), media=s.media())
                     for s in styles]
         return super(StyledHtmlExporter, self)._head(context) + tags
 

@@ -1106,7 +1106,8 @@ class HtmlExport(unittest.TestCase):
         for tag in ('link', 'meta', 'br', 'hr', 'param'):
             assert getattr(g, tag)() == '<%s/>' % tag
         # These tags require positional arguemnts or have non-trivial export.
-        assert g.script('x') == '<script type="text/javascript">x</script>'
+        assert g.script('x') == '<script>x</script>'
+        assert g.script('x', type='module') == '<script type="module">x</script>'
         assert g.submit('x') == '<button type="submit">x</button>'
         assert g.form('x') == '<form action="#">x</form>'
         assert g.h('x', level=8) == '<h8>x</h8>'

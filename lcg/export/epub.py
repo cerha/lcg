@@ -77,9 +77,9 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
         g = context.generator()
         stylesheet = context.resource('epub.css')
         return ([g.title(self._title(context)),
-                 g.link(rel="stylesheet", type="text/css", href=context.uri(stylesheet))] +
+                 g.link(rel="stylesheet", href=context.uri(stylesheet))] +
                 [g.script(src=context.uri(script) if script.src_file() else None,
-                          type=script.type() or "text/javascript",
+                          type=script.type(),
                           content=script.content())
                  for script in context.node().resources(lcg.Script)])
 

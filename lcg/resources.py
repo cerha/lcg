@@ -239,8 +239,8 @@ class Script(Resource):
 
         type -- script type analogous to HTML <script> tag type attribute.  Can
           contain a valid JavaScript MIME type or 'module' to indicate the
-          script is actually a JavaScript module.  If None, defaults to
-          'text/javascript'.
+          script is actually a JavaScript module.  If None, the attribute is
+          omitted, which means a classic JavaScript script.
 
         """
         self._type = type
