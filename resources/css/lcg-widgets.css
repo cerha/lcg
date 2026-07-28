@@ -147,10 +147,6 @@
     font-weight: bold;
     white-space: nowrap;
     text-decoration: none;
-    outline: none;
-}
-.notebook-widget li.notebook-tab a:focus {
-    outline: rgba(0, 0, 0, .3) dotted 1px;
 }
 .notebook-widget li.notebook-tab a.current {
     background-color: #fff;
@@ -234,7 +230,6 @@
     padding: 5px 10px;
     text-decoration: none;
     min-height: 14px;
-    outline: none;
 }
 .popup-menu-widget li.active a,
 .dropdown-selection-widget li.active a {
@@ -242,12 +237,6 @@
 }
 .popup-menu-widget li.active:hover {
     background-color: #fff;
-}
-.popup-menu-widget.keyboard-navigated li.active a:focus {
-    outline: #000 dotted 1px;
-}
-.dropdown-selection-widget li.active a:focus {
-    background-color: #3af;
 }
 .popup-menu-widget .close-menu {
     display: inline-block;
@@ -376,7 +365,6 @@
     width: 16px;
     height: 16px;
 }
-.audio-player-widget button:focus { outline: none; }
 .audio-player-widget button::-moz-focus-inner { border: 0; }
 
 .audio-player-widget .hidden-label {
