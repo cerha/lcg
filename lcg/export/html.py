@@ -602,12 +602,20 @@ class HtmlGenerator(object):
         return self._JavaScriptCode('%s(%s)' % (fname, concat(fargs, separator=", ")))
 
 
-class XhtmlGenerator(HtmlGenerator):
-    pass
+XhtmlGenerator = HtmlGenerator
+"""Deprecated alias -- 'HtmlGenerator' produces markup valid in XHTML as well."""
 
 
 class HtmlExporter(lcg.Exporter):
     Generator = HtmlGenerator
+
+    _XHTML = False
+    """Iff true, export XHTML (the XML syntax of HTML) rather than HTML.
+
+    XHTML is required by the formats based on XML, such as EPUB.  Documents
+    served as 'text/html' must use the HTML syntax, which is the default.
+
+    """
 
     class Context(lcg.Exporter.Context):
 
@@ -1141,11 +1149,10 @@ class HtmlExporter(lcg.Exporter):
         return self._export_container(context, element)
 
     def _export_section(self, context, element):
-        # Use div in HTML4, but allow overriding for HTML 5.
         g = self._generator
         level = len(element.section_path()) + 1
-        return g.div(self._export_section_container(context, element), id=element.id(),
-                     cls=' '.join(('section', 'section-level-%d' % level,) + element.names()))
+        return g.section(self._export_section_container(context, element), id=element.id(),
+                         cls=' '.join(('section', 'section-level-%d' % level,) + element.names()))
 
     def _export_section_container(self, context, element):
         context.position_info.append(element.title())
@@ -1554,26 +1561,22 @@ class HtmlExporter(lcg.Exporter):
 
     def export(self, context):
         g = self._generator
-        return concat(g.noescape('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" '
-                                 '"http://www.w3.org/TR/html4/strict.dtd">\n\n'),
-                      g.html(self._html_content(context), lang=context.lang()))
+        if self._XHTML:
+            # The XML declaration and the namespace are only valid in XHTML.  In
+            # a document served as 'text/html' the declaration is not allowed at
+            # all (HTML parsers treat it as a bogus comment) and the namespace is
+            # meaningless.
+            return concat(g.noescape('<?xml version="1.0" encoding="UTF-8"?>\n'
+                                     '<!DOCTYPE html>\n'),
+                          g.html(self._html_content(context), lang=context.lang(),
+                                 xmlns='http://www.w3.org/1999/xhtml'))
+        else:
+            return concat(g.noescape('<!DOCTYPE html>\n'),
+                          g.html(self._html_content(context), lang=context.lang()))
 
 
-class Html5Exporter(HtmlExporter):
-    Generator = XhtmlGenerator
-
-    def _export_section(self, context, element):
-        g = self._generator
-        level = len(element.section_path()) + 1
-        return g.section(self._export_section_container(context, element), id=element.id(),
-                         cls=' '.join(('section', 'section-level-%d' % level,) + element.names()))
-
-    def export(self, context):
-        g = self._generator
-        return concat(g.noescape('<?xml version="1.0" encoding="UTF-8"?>\n'
-                                 '<!DOCTYPE html>\n'),
-                      g.html(self._html_content(context), lang=context.lang(),
-                             xmlns='http://www.w3.org/1999/xhtml'))
+Html5Exporter = HtmlExporter
+"""Deprecated alias -- 'HtmlExporter' exports HTML 5 by itself now."""
 
 
 class HtmlFileExporter(lcg.FileExporter, HtmlExporter):

@@ -49,18 +49,19 @@ class Constants(object):
     DC_NS = 'http://purl.org/dc/elements/1.1/'
 
 
-class EpubHtml5Exporter(lcg.Html5Exporter):
+class EpubXhtmlExporter(lcg.HtmlExporter):
 
     _ALLOW_BACKREF = False
+    _XHTML = True  # EPUB content documents are XHTML.
 
-    class Generator(lcg.Html5Exporter.Generator):
+    class Generator(lcg.HtmlExporter.Generator):
 
         def script(self, *args, **kwargs):
             # We need to be able to find out, whether a script was used
             # within a particular node export.  Thus we assign the current context
             # to the generator in _xhtml_content_document to be able to access it here.
             self.context.scripted = True
-            return super(EpubHtml5Exporter.Generator, self).script(*args, **kwargs)
+            return super(EpubXhtmlExporter.Generator, self).script(*args, **kwargs)
 
     _SUPPRESSED_MATHML = re.compile(
         # Annotations are otherwise displayed in iBooks.
@@ -70,7 +71,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
     _INVALID_RESOURCE_URI_CHARACTERS = re.compile(r'[^a-z0-9;,_+*/=\-\.\(\)]')
 
     def __init__(self, *args, **kwargs):
-        super(EpubHtml5Exporter, self).__init__(*args, **kwargs)
+        super(EpubXhtmlExporter, self).__init__(*args, **kwargs)
         self._resource_uri_dict = {}
 
     def _head(self, context):
@@ -119,7 +120,7 @@ class EpubHtml5Exporter(lcg.Html5Exporter):
 
     def _export_mathml(self, context, element):
         context.mathml = True
-        result = super(EpubHtml5Exporter, self)._export_mathml(context, element)
+        result = super(EpubXhtmlExporter, self)._export_mathml(context, element)
         return self._generator.noescape(self._SUPPRESSED_MATHML.sub('', result))
 
     def _uri_node(self, context, node, lang=None):
@@ -195,7 +196,7 @@ class EpubExporter(lcg.Exporter):
     def __init__(self, *args, **kwargs):
         kwargs.pop('force_lang_ext', None)
         super(EpubExporter, self).__init__(*args, **kwargs)
-        self._html_exporter = EpubHtml5Exporter(translations=self._translation_path)
+        self._html_exporter = EpubXhtmlExporter(translations=self._translation_path)
 
     def dump(self, node, directory, filename=None, variant=None, **kwargs):
         variants = (variant,) if variant else node.variants() or (None,)

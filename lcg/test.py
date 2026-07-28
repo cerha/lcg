@@ -1172,17 +1172,17 @@ class HtmlExport(unittest.TestCase):
             (lcg.container('blah', id='foo', name='bar'),
              '<div class="bar" id="foo">blah</div>'),
             (lcg.sec('Section', 'blah'),
-             ('<div class="section section-level-2 default-section" id="sec1">'
+             ('<section class="section section-level-2 default-section" id="sec1">'
               '<div class="section-container section-level-2">'
               '<div class="section-heading section-level-2"><h2>Section</h2></div>'
               '<div class="section-content section-level-2">'
-              '<div class="section-content-wrapper">blah</div></div></div></div>')),
+              '<div class="section-content-wrapper">blah</div></div></div></section>')),
             (lcg.sec('Section', 'blah', id='foo', heading='The Section'),
-             ('<div class="section section-level-2 default-section" id="foo">'
+             ('<section class="section section-level-2 default-section" id="foo">'
               '<div class="section-container section-level-2">'
               '<div class="section-heading section-level-2"><h2>The Section</h2></div>'
               '<div class="section-content section-level-2">'
-              '<div class="section-content-wrapper">blah</div></div></div></div>')),
+              '<div class="section-content-wrapper">blah</div></div></div></section>')),
             (lcg.InlineExternalVideo('vimeo', 'xyz'),
              ('<div class="external-video" style="max-width: 640px;">'
               '<div class="wrapper" style="padding-bottom: 75.0%">'
