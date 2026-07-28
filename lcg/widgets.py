@@ -257,7 +257,13 @@ class FoldableTree(Widget, lcg.Content):
                          g.span(label, cls='label')),
                         data_expand_label=labels[0],
                         data_collapse_label=labels[1],
-                        role='button', title=label, tabindex=0,
+                        # The expander is not a part of the tab order -- the menu is
+                        # traversed by arrow keys, which also fold/unfold the items
+                        # (see lcg.Menu in lcg.js), so a separate tab stop for every
+                        # foldable item would only make tabbing through the page
+                        # unnecessarily long.  The negative tabindex still allows
+                        # focusing the expander programmatically.
+                        role='button', title=label, tabindex=-1,
                         cls='expander') if child.foldable() and submenu else '',
                     submenu),
                 cls=((('foldable ' + ('expanded ' if in_path else 'collapsed '))

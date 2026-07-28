@@ -215,10 +215,20 @@ lcg.Menu = class extends lcg.Widget {
      *
      */
 
-    _MANAGE_TABINDEX = true
+    // Note: This is a static property (read through 'this.constructor') rather
+    // than an instance field, so that a derived class override already applies
+    // in _init_menu() below.  Instance fields of a derived class are only
+    // initialized after the base class constructor returns.
+    static _MANAGE_TABINDEX = true
 
     constructor(element) {
         super(element)
+        // A menu hidden from assistive technologies must not be reachable by the
+        // keyboard either.  Such a menu duplicates another part of the page (as
+        // Wiking's submenu duplicates the dropdown of the current main menu item),
+        // so leaving it in the tab order would make the user traverse the same
+        // items twice.  It remains fully operable by mouse.
+        this._hidden = this.element.closest('[aria-hidden="true"]').length !== 0
         this._init_menu(this.element.find('ul').first())
     }
 
@@ -255,7 +265,7 @@ lcg.Menu = class extends lcg.Widget {
         item.attr('aria-selected', 'false')
         item.on('keydown', this._on_key_down.bind(this))
         item.on('click', event => this._on_item_click(event, item))
-        if (this._MANAGE_TABINDEX) {
+        if (this.constructor._MANAGE_TABINDEX || this._hidden) {
             item.attr('tabindex', '-1')
         }
         item[0]._lcg_menu_item_data = {
@@ -323,7 +333,7 @@ lcg.Menu = class extends lcg.Widget {
                 previously_selected_item.attr('aria-selected', 'false')
             }
         }
-        if (this._MANAGE_TABINDEX) {
+        if (this.constructor._MANAGE_TABINDEX && !this._hidden) {
             item.attr('tabindex', '0')
             if (previously_selected_item) {
                 previously_selected_item.attr('tabindex', '-1')
@@ -549,9 +559,12 @@ lcg.FoldableTree = class extends lcg.Menu {
         this._expanded = false
         $(this.element).attr('role', 'tree')
         if (this._foldable && toggle_button_tooltip) {
-            $(this.element).find('ul').first().append(
-                $(`<button class="toggle-menu-expansion" title="${toggle_button_tooltip}">`)
-                    .on('click', this._on_toggle_full_expansion.bind(this)))
+            let button = $(`<button class="toggle-menu-expansion" title="${toggle_button_tooltip}">`)
+                .on('click', this._on_toggle_full_expansion.bind(this))
+            if (this._hidden) {
+                button.attr('tabindex', '-1')
+            }
+            $(this.element).find('ul').first().append(button)
         }
     }
 
