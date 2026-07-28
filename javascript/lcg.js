@@ -764,7 +764,10 @@ lcg.FoldableTree = class extends lcg.Menu {
     }
 
     _cmd_quit(event, item) {
-        this._set_focus($('#main-heading'))
+        // Leave the menu.  Where the focus goes depends on the page layout, so
+        // the applications are supposed to override this method (Wiking moves
+        // the focus to the main heading of the page).
+        return
     }
 
     _on_toggle_full_expansion(event) {
