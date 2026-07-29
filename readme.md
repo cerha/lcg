@@ -71,5 +71,11 @@ and for document construction and as a print backend in
 [Pytis](https://github.com/cerha/pytis) information systems development
 framework.
 
-Documentation is included in the package.  To generate the HTML version, run
-`make doc` from the package root directory.
+
+## Documentation
+
+The documentation is published at
+[cerha.github.io/lcg](https://cerha.github.io/lcg/).
+
+Its source is also included in the package.  To generate the HTML version
+locally, run `make doc` from the package root directory.
