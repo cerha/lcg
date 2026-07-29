@@ -1,9 +1,0 @@
-babel
-coverage
-rjsmin
-coveralls
-flake8
-flit
-pojson
-pytest
-twine

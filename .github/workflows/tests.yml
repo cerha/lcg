@@ -38,11 +38,15 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install -U 'pip<21' 'setuptools<45' 'wheel<0.34'
-          # Flit in not available in Python 2.
-          grep -v flit requirements-devel.txt | pip install -r /dev/stdin
+          # Neither pip nor Python 3 are recent enough here to read the
+          # dependency groups ('pip install --group'), so we pass them through
+          # the helper script.  Python 3.11 reads TOML by itself, older ones
+          # need tomli.
+          python3 -m pip install tomli
+          python3 tools/dependency-group.py test | pip install -r /dev/stdin
           # Makefile build uses Python 3 explicitly, so prepare a Python 3
-          # environment too.
-          python3 -m pip install -r requirements-devel.txt
+          # environment too.  The build group is Python 3 only anyway (flit).
+          python3 tools/dependency-group.py build | python3 -m pip install -r /dev/stdin
           make build
           pip install $(echo dist/lcg_framework-*-any.whl)[all]
 
@@ -83,7 +87,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements-devel.txt
+          pip install --group build --group test --group lint
 
       - name: Build and install the wheel
         run: |
