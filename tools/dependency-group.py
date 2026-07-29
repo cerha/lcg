@@ -11,6 +11,9 @@ Usage: dependency-group.py GROUP [GROUP ...]
 
 """
 
+# TODO NOPY2: Remove this script completely.  It only exists for the Python 2
+# test job -- everywhere else pip reads the dependency groups by itself.
+
 import os
 import sys
 

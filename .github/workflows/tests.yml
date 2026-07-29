@@ -10,6 +10,7 @@ on:
 jobs:
 
   test-py27:
+    # TODO NOPY2: Remove this whole job.
     # The base system is Ubuntu, but the Python 2.7 image actually runs Debian 10 (Buster).
     runs-on: ubuntu-latest
 
