@@ -20,7 +20,7 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-__version__ = '0.8.1'
+__version__ = '0.8.2'
 
 from .locales import LocaleData, LocaleData_cs, LocaleData_de, \
     LocaleData_en, LocaleData_es, LocaleData_no, LocaleData_pl, \
