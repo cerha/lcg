@@ -3,6 +3,20 @@ html, body {
     background: #fff;
     font-family: sans-serif;
 }
+
+/* Keyboard focus indication for the whole page.
+ *
+ * Applies to any focusable element, so that nothing can be left out.  We use
+ * 'outline' rather than 'box-shadow', because box shadows are dropped in the
+ * forced colors mode (Windows High Contrast), where the indication matters the
+ * most.  Modern browsers follow the element's border radius, so the outline has
+ * no drawback here anymore.  The color is taken from the element itself, so that
+ * the indication doesn't introduce any foreign color into the page style and
+ * works on light and dark backgrounds alike. */
+:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
 h1 { font-size: 2.0em; }
 h2 { font-size: 1.8em; }
 h3 { font-size: 1.6em; }
