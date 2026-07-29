@@ -46,7 +46,7 @@ generate online e-learning material for the [Eurochance project](https://langsch
 ## Changelog
 
 For a history of changes in each version, see the
-[changelog](https://github.com/cerha/lcg/blob/main/changelog.md).
+[changelog](https://github.com/cerha/lcg/blob/master/changelog.md).
 
 
 ## Installation
