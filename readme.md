@@ -1,34 +1,45 @@
 # LCG Framework
 
+[![PyPI](https://img.shields.io/pypi/v/lcg-framework.svg)](https://pypi.org/project/lcg-framework/)
 [![Tests](https://github.com/cerha/lcg/actions/workflows/tests.yml/badge.svg)](https://github.com/cerha/lcg/actions/workflows/tests.yml)
 
 **LCG** is a Python framework for content abstraction and generic document
-processing.  Documents are constructed as a hierarchy of Python objects.  LCG
-defines standard content elements (paragraphs, sections, lists, formatted text,
-etc.) and advanced constructs (multimedia, mathematics, interactive widgets),
-and supports extensibility through third-party content elements.  Content can be
-exported to multiple formats (HTML, PDF, Braille, IMS, EPUB, etc.) and imported
-from various source formats (text markup, internal serialization, etc.).
+processing.  A document is built as a hierarchy of Python objects, independent
+of any output format, and exported to HTML, PDF, EPUB, Braille and others.
 
-LCG is primarily intended for software developers who need to programmatically
-build structured documents or import them from different sources and export
-them to multiple formats.  Documents can contain generic content elements
-(defined by LCG) or custom elements (defined by the developer).  LCG can also be
-used directly by end-users to process documents written in a simple,
-human-readable source format into various target formats (such as HTML or PDF).
+It is meant for developers who need to produce structured documents
+programmatically -- or read them from a source format -- and publish them in
+several formats at once.  It can also be used directly, as a command line tool
+turning documents written in a human readable markup into the target format.
 
 
-## Key Features
+## What LCG provides
 
-- **Separation of content and presentation**: Keeps structure and formatting
-  independent.
-- **Multimedia and interactive content**: Supports rich, dynamic elements.
-- **Accessibility**: Designed for users of assistive technologies.
-- **Extensibility**: Easily define new content elements or customize output for
-  existing elements.
-- **Standards compliance**: Adheres to relevant standards, notably W3C specs.
-- **Internationalization**: Supports multiple language variants in one document
-  and mixed-language content.
+- **One document, many formats.**  Write the content once and export it to
+  HTML, PDF, EPUB, plain text, MS HTML Help or an IMS package for e-learning
+  systems.  Each exporter can be extended or replaced.
+- **Content, not markup.**  Documents are composed of content elements --
+  paragraphs, sections, tables, definition lists, quotations, figures,
+  mathematics (MathML), inline SVG, plots, audio and video.  Custom elements
+  are just new classes, so the framework grows with the application.
+- **Braille output that means it.**  Text is translated through
+  [liblouis](https://liblouis.io) with the document layout handled by
+  louisutdml, and mathematics is transcribed in the Nemeth code.  Documents can
+  be embossed, not just approximated.
+- **Accessibility as a design goal.**  The HTML output follows the W3C
+  standards, and the interactive widgets -- foldable trees, notebooks, popup
+  menus, collapsible sections, an audio player -- are operable by keyboard and
+  announced properly by screen readers.
+- **Internationalization beyond gettext.**  Translation is deferred until
+  export, so one document tree serves several language variants and may mix
+  languages within a single page.  Dates, times, decimal and monetary values
+  are localized, plural forms included.
+- **Presentation kept apart.**  Layout and styling are described by
+  presentation sets matched against the content, so the same document can be
+  published in different looks without touching it.
+- **E-learning exercises.**  Multiple choice questions, selections, true/false
+  statements, gap filling and other interactive exercise types are built in --
+  the framework's original purpose, still supported.
 
 
 ## License
