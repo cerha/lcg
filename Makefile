@@ -94,8 +94,11 @@ lint: lint-flake8 lint-eslint
 lint-flake8:
 	flake8 lcg bin
 
+# The linters are run through npx, so that they don't need to be installed
+# (npx caches them itself).  ESLint is pinned to 8, because the newer versions
+# no longer read the .eslintrc.js configuration.
 lint-eslint:
-	npm run eslint javascript/{lcg-exercises,lcg}.js
+	npx --yes eslint@8 javascript/{lcg-exercises,lcg}.js
 
 lint-csslint:
-	npm run csslint resources/css
+	npx --yes csslint@1 resources/css
