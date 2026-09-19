@@ -14,6 +14,12 @@
 # cause conflicts on next git pull (PO files are git controlled).  We need just
 # the git versions of PO files to create/update MO files.
 
+# Don't leave a truncated output file behind when a recipe fails.  The shell
+# redirections used below create the target before the command which should
+# produce its contents even runs, so a failure would result in an empty file
+# which make would consider up to date on the next run.
+.DELETE_ON_ERROR:
+
 domains := lcg lcg-exercises test
 mo_dir := ../lcg/assets/translations
 json_dir := ../lcg/assets/resources/translations

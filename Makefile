@@ -1,5 +1,11 @@
 .PHONY: all update resources sync-resources sync-doc clean-obsolete javascript translations extract doc test build check-release publish publish-test install clean coverage lint lint-flake8 lint-eslint
 
+# Don't leave a truncated output file behind when a recipe fails.  The shell
+# redirections used below create the target before the command which should
+# produce its contents even runs, so a failure would result in an empty file
+# which make would consider up to date on the next run.
+.DELETE_ON_ERROR:
+
 js_src := $(wildcard javascript/*.js)
 js_out := $(js_src:javascript/%.js=lcg/assets/resources/scripts/%.js)
 
@@ -25,6 +31,8 @@ sync-doc:
 javascript: $(js_out)
 
 lcg/assets/resources/scripts/%.js: javascript/%.js
+	@python3 -c "import rjsmin" 2>/dev/null || { echo "Error: The Python module \
+'rjsmin' is not installed.  Run 'pip install -e . --group build'." >&2; exit 1; }
 	mkdir -p $(@D)
 	python3 -m rjsmin < $< > $@
 
