@@ -831,6 +831,7 @@ class HtmlExporter(lcg.Exporter):
         self._generator = self.Generator(sorted_attributes=kwargs.pop('sorted_attributes', False))
         self._allow_svg = kwargs.pop('allow_svg', True)
         self._gettext_domains = {}
+        self._gettext_catalogs = {}
         super(HtmlExporter, self).__init__(*args, **kwargs)
 
     _GETTEXT_DOMAIN_MATCHER = re.compile(br"""lcg\.gettext\(\s*['"]([\w.-]+)['"]""")
@@ -870,6 +871,37 @@ class HtmlExporter(lcg.Exporter):
             self._gettext_domains[filename] = domains
         return self._gettext_domains[filename]
 
+    def _gettext_catalog(self, context, domain):
+        """Return the JSON gettext catalog of given domain for the current language.
+
+        Returns None when the installation provides no catalog of given domain
+        for the current language.
+
+        The results are cached for the lifetime of the exporter instance, so a
+        catalog is only read once.  Catalogs changed on disk are thus only
+        picked up after a restart, which is when installation changes take
+        effect anyway.
+
+        """
+        key = (domain, context.lang())
+        if key not in self._gettext_catalogs:
+            content = None
+            # A missing catalog is logged by context.resource() -- the scripts ask
+            # for translations which the installation doesn't provide for the
+            # current language.
+            resource = context.resource('%s.%s.po.json' % key)
+            if resource:
+                filename = resource.src_file()
+                try:
+                    with io.open(filename, encoding='utf-8') as f:
+                        # Escape '<' to avoid ending the script element prematurely
+                        # by a '</script>' sequence contained in the translations.
+                        content = f.read().replace('<', '\\u003c')
+                except IOError as e:
+                    lcg.log("Error reading %s: %s" % (filename, e))
+            self._gettext_catalogs[key] = content
+        return self._gettext_catalogs[key]
+
     def _title(self, context):
         return context.node().title()
 
@@ -881,30 +913,30 @@ class HtmlExporter(lcg.Exporter):
         g = context.generator()
         node = context.node()
         # Client-side i18n (see lcg.gettext() in lcg.js): JavaScript code translates
-        # its UI strings through gettext catalogs served as '<domain>.<lang>.po.json'
-        # resources.  Pass the URI of the catalog of each domain used by the scripts
-        # present on the page, so that the browser code can locate it through
-        # context.uri() (respecting the application's resource path and its
-        # versioning) rather than guessing the path.
-        gettext_links = []
+        # its UI strings through gettext catalogs built from the '<domain>.<lang>.po.json'
+        # resources.  The catalogs of all domains used by the scripts present on the
+        # page are embedded in the page (before the scripts themselves), so that the
+        # translations are available synchronously.  The scripts typically translate
+        # their UI strings during page load, so a catalog loaded asynchronously would
+        # come too late.  The catalogs only contain the strings used by the JavaScript
+        # code, so they are small enough to be embedded in each page.
+        gettext_catalogs = []
         domains = []
         for script in node.resources(lcg.Script):
             for domain in self._script_gettext_domains(script):
                 if domain not in domains:
                     domains.append(domain)
         for domain in domains:
-            # A missing catalog is logged -- the script asks for translations
-            # which the installation doesn't provide for the current language.
-            catalog = context.resource('%s.%s.po.json' % (domain, context.lang()))
+            catalog = self._gettext_catalog(context, domain)
             if catalog:
-                gettext_links.append(g.link(rel='gettext', type='application/json',
-                                            data_domain=domain, href=context.uri(catalog)))
+                gettext_catalogs.append(g.script(g.noescape(catalog), type='application/json',
+                                                 data_gettext=domain))
         return (
             [g.title(self._title(context))] +
             [g.meta(name=name, content=value) for name, value in self._meta(context)] +
             [g.link(rel='alternate', lang=lang, href=self._uri_node(context, node, lang=lang))
              for lang in node.variants() if lang != context.lang()] +
-            gettext_links +
+            gettext_catalogs +
             [g.script(src=context.uri(script) if script.src_file() else None,
                       type=script.type(),
                       content=script.content())

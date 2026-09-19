@@ -1753,23 +1753,20 @@ lcg.widget_instance = function (element) {
 // falling back to the browser language when the attribute is not present.
 lcg.lang = (document.documentElement.lang || navigator.language || 'en').split('-')[0]
 lcg.catalogs = {}
-lcg._catalogs_ready = {}
 
 lcg.gettext = function (domain) {
-    /* Return a gettext-like function for translating UI strings to the current browser language.
+    /* Return a gettext-like function for translating UI strings to the current page language.
      *
-     * Usage:
-     * const _ = lcg.gettext('my-domain')
+     * Usage (where 'domain' is the name of the gettext domain of the application):
+     * const _ = lcg.gettext(domain)
      * console.log(_("Hello"))
      * console.log(_.pgettext("kings", "Crown"))
      * console.log(_.ngettext("1 file", "%d files", 2))
      *
-     * Notes:
-     * - Translations are loaded asynchronously from `${domain}.${lcg.lang}.po.json`.
-     * - To avoid making the translation function asynchronous, the original
-     *   string is returned until the translation file is downloaded.
-     * - When waiting for the translations is essential, .ready may be used:
-     *   _.ready.then(() => console.log(_("Hello")))
+     * The translations are read from the catalog embedded in the page by the
+     * server (see LCG's HtmlExporter._head).  Untranslated strings (as well as
+     * all strings when the installation provides no catalog for the current
+     * language) are returned unchanged.
      *
      */
     function locale_data(data) {
@@ -1790,31 +1787,22 @@ lcg.gettext = function (domain) {
         return result
     }
 
-    if (!lcg._catalogs_ready[domain]) {
-        // The translation catalog URI is provided by the server as a
-        // <link rel="gettext"> element (see LCG's HtmlExporter._head), so that
-        // the application controls the resource path and its versioning.  LCG
-        // itself knows nothing about where resources are served from.
-        const link = document.querySelector(`link[rel=gettext][data-domain="${domain}"]`)
-        if (link) {
-            lcg._catalogs_ready[domain] = fetch(link.getAttribute('href'))
-                .then(r => r.json())
-                .then(data => lcg.catalogs[domain] = new Jed({
-                    'domain': domain,
-                    'locale_data': {[domain]: locale_data(data)},
-                }))
-                .catch(err => {
-                    console.warn(`Could not load translations for domain ${domain}:`, err)
-                })
-        } else {
-            // No catalog for this domain and language (an untranslated language or
-            // an application which ships no catalog for the domain).
-            lcg._catalogs_ready[domain] = Promise.resolve()
-        }
-        // Note: The catalog is intentionally left undefined when unavailable.  The
-        // translation functions below then simply return the original strings.  An
-        // "empty" Jed instance can not be used for that, as it raises an error on
-        // any translation attempt.
+    if (!(domain in lcg.catalogs)) {
+        // The catalog is embedded in the page rather than loaded asynchronously,
+        // so that the translations are available immediately.  The scripts
+        // typically translate their UI strings during page load, so anything
+        // loaded asynchronously would come too late.  The catalogs only contain
+        // the strings used by the JavaScript code, so they are small.
+        const script = document.querySelector(`script[type="application/json"][data-gettext="${domain}"]`)
+        // The catalog is intentionally left undefined when unavailable (an
+        // untranslated language or an application which ships no catalog for
+        // the domain).  The translation functions below then simply return the
+        // original strings.  An "empty" Jed instance can not be used for that,
+        // as it raises an error on any translation attempt.
+        lcg.catalogs[domain] = script ? new Jed({
+            'domain': domain,
+            'locale_data': {[domain]: locale_data(JSON.parse(script.textContent))},
+        }) : null
     }
 
     function translate(msgid) {
@@ -1831,6 +1819,5 @@ lcg.gettext = function (domain) {
             return (n === 1 ? singular : plural)
         }
     }
-    translate.ready = lcg._catalogs_ready[domain]
     return translate
 }
