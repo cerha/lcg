@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-01 10:22+0200\n"
+"POT-Creation-Date: 2026-09-19 23:58+0200\n"
 "PO-Revision-Date: 2022-07-30 20:39+0200\n"
 "Last-Translator: Tomas Cerha <cerha@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
@@ -17,42 +17,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 
-#: ../lcg/test.py:131 ../lcg/test.py:141
+#: ../lcg/test.py:132 ../lcg/test.py:142
 #, python-format
 msgid "His name is \"%s\""
 msgstr "Jmenuje se \"%s\""
 
-#: ../lcg/test.py:131 ../lcg/test.py:134 ../lcg/test.py:141 ../lcg/test.py:145
-#: ../lcg/test.py:394
+#: ../lcg/test.py:132 ../lcg/test.py:135 ../lcg/test.py:142 ../lcg/test.py:146
+#: ../lcg/test.py:395
 msgid "Bob"
 msgstr "Bobik"
 
-#: ../lcg/test.py:134 ../lcg/test.py:145 ../lcg/test.py:394
+#: ../lcg/test.py:135 ../lcg/test.py:146 ../lcg/test.py:395
 msgid "Joe"
 msgstr "Pepa"
 
-#: ../lcg/test.py:159
+#: ../lcg/test.py:160
 msgctxt "dont translete this msg"
 msgid "untranslated"
 msgstr ""
 
-#: ../lcg/test.py:160 ../lcg/test.py:402 ../lcg/test.py:405
+#: ../lcg/test.py:161 ../lcg/test.py:403 ../lcg/test.py:406
 msgctxt "verb"
 msgid "force"
 msgstr "donutit"
 
-#: ../lcg/test.py:161 ../lcg/test.py:406
+#: ../lcg/test.py:162 ../lcg/test.py:407
 msgctxt "noun"
 msgid "force"
 msgstr "síla"
 
-#: ../lcg/test.py:198
+#: ../lcg/test.py:199
 #, python-format
 msgid "post #%s"
 msgstr "příspěvek #%s"
 
-#: ../lcg/test.py:216 ../lcg/test.py:235 ../lcg/test.py:407 ../lcg/test.py:408
-#: ../lcg/test.py:409
+#: ../lcg/test.py:217 ../lcg/test.py:236 ../lcg/test.py:408 ../lcg/test.py:409
+#: ../lcg/test.py:410
 #, python-format
 msgid "I have %d problem."
 msgid_plural "I have %d problems."
@@ -60,7 +60,7 @@ msgstr[0] "Mám %d problém."
 msgstr[1] "Mám %d problémy."
 msgstr[2] "Mám %d problémů."
 
-#: ../lcg/test.py:225 ../lcg/test.py:240
+#: ../lcg/test.py:226 ../lcg/test.py:241
 #, python-format
 msgid "%(n)d record found in table %(name)s."
 msgid_plural "%(n)d records found in table %(name)s."
@@ -68,7 +68,7 @@ msgstr[0] "%(n)d záznam nalezen v tabulce %(name)s."
 msgstr[1] "%(n)d záznamy nalezeny v tabulce %(name)s."
 msgstr[2] "%(n)d záznamů nalezeno v tabulce %(name)s."
 
-#: ../lcg/test.py:394 ../lcg/test.py:447
+#: ../lcg/test.py:395
 #, python-format
 msgid "%(name1)s is smarter than %(name2)s."
 msgstr "%(name1)s je chytřejší než %(name2)s."

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-01 19:50+0200\n"
+"POT-Creation-Date: 2026-09-19 23:56+0200\n"
 "PO-Revision-Date: 2009-11-30 23:40+0100\n"
 "Last-Translator: kkkk <kkkkkkkkkkk>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -31,7 +31,7 @@ msgstr ""
 msgid "tril."
 msgstr ""
 
-#: ../lcg/resources.py:376
+#: ../lcg/resources.py:383
 #, python-format
 msgid "Resource file not found: %(filename)s %(search_path)s"
 msgstr ""
@@ -1807,20 +1807,20 @@ msgstr ""
 msgid "Dec"
 msgstr ""
 
-#: ../lcg/widgets.py:248
+#: ../lcg/widgets.py:247
 msgid "Expand"
 msgstr ""
 
-#: ../lcg/widgets.py:248
+#: ../lcg/widgets.py:247
 msgid "Collapse"
 msgstr ""
 
-#: ../lcg/widgets.py:398
+#: ../lcg/widgets.py:403
 #, python-format
 msgid "Close menu %s"
 msgstr ""
 
-#: ../lcg/widgets.py:399
+#: ../lcg/widgets.py:404
 msgid "Close menu"
 msgstr ""
 
@@ -1859,63 +1859,63 @@ msgstr ""
 msgid "%s: file copied."
 msgstr ""
 
-#: ../lcg/export/html.py:916
+#: ../lcg/export/html.py:965
 msgid "Choose your language:"
 msgstr "Scegli la lingua:"
 
-#: ../lcg/export/html.py:1384
+#: ../lcg/export/html.py:1432
 msgid "Video"
 msgstr ""
 
-#: ../lcg/export/html.py:1439
+#: ../lcg/export/html.py:1488
 msgid "Play"
 msgstr ""
 
-#: ../lcg/export/html.py:1439
+#: ../lcg/export/html.py:1488
 msgid "Pause"
 msgstr ""
 
-#: ../lcg/export/html.py:1440
+#: ../lcg/export/html.py:1489
 msgid "Rewind"
 msgstr ""
 
-#: ../lcg/export/html.py:1441
+#: ../lcg/export/html.py:1490
 msgid "Fast Forward"
 msgstr ""
 
-#: ../lcg/export/html.py:1448 ../lcg/export/html.py:1449
+#: ../lcg/export/html.py:1497 ../lcg/export/html.py:1498
 msgid "Current position"
 msgstr ""
 
-#: ../lcg/export/html.py:1452 ../lcg/export/html.py:1453
+#: ../lcg/export/html.py:1501 ../lcg/export/html.py:1502
 msgid "Remaining time"
 msgstr ""
 
-#: ../lcg/export/html.py:1454
+#: ../lcg/export/html.py:1503
 msgid "Total time"
 msgstr ""
 
-#: ../lcg/export/html.py:1460
+#: ../lcg/export/html.py:1509
 msgid "Volume"
 msgstr ""
 
-#: ../lcg/export/html.py:1464
+#: ../lcg/export/html.py:1513
 msgid "Volume Down"
 msgstr ""
 
-#: ../lcg/export/html.py:1465
+#: ../lcg/export/html.py:1514
 msgid "Volume Up"
 msgstr ""
 
-#: ../lcg/export/html.py:1472
+#: ../lcg/export/html.py:1521
 msgid "Player"
 msgstr ""
 
-#: ../lcg/export/html.py:1475
+#: ../lcg/export/html.py:1524
 msgid "Update Required:"
 msgstr ""
 
-#: ../lcg/export/html.py:1478
+#: ../lcg/export/html.py:1525
 #, python-format
 msgid ""
 "To play audio you will need to either update your browser to a recent "
@@ -1925,21 +1925,21 @@ msgstr ""
 #. Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next:
 #. None".
-#: ../lcg/export/html.py:1665
+#: ../lcg/export/html.py:1710
 msgid "None"
 msgstr "Nessuna"
 
-#: ../lcg/export/html.py:1667
+#: ../lcg/export/html.py:1712
 msgid "You are here:"
 msgstr "Ti trovi qui:"
 
 #. Label of a link to the next page in sequential navigation.
-#: ../lcg/export/html.py:1671
+#: ../lcg/export/html.py:1716
 msgid "Next"
 msgstr "Avanti"
 
 #. Label of a link to the next page in sequential navigation.
-#: ../lcg/export/html.py:1673
+#: ../lcg/export/html.py:1718
 msgid "Previous"
 msgstr "Indietro"
 
@@ -1952,7 +1952,7 @@ msgstr ""
 msgid "Page content extremely large, giving up"
 msgstr ""
 
-#: ../lcg/export/pdf.py:2973
+#: ../lcg/export/pdf.py:2972
 #, python-format
 msgid "Page content too large, reducing it by %s"
 msgstr ""

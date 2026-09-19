@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-01 19:50+0200\n"
+"POT-Creation-Date: 2026-09-19 23:56+0200\n"
 "PO-Revision-Date: 2019-11-19 20:50+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: Czech <lcg@lists.freebsoft.org>\n"
@@ -32,7 +32,7 @@ msgstr "mld."
 msgid "tril."
 msgstr "bil."
 
-#: ../lcg/resources.py:376
+#: ../lcg/resources.py:383
 #, python-format
 msgid "Resource file not found: %(filename)s %(search_path)s"
 msgstr "Zdrojový soubor nenalezen: %(filename)s %(search_path)s"
@@ -1743,20 +1743,20 @@ msgstr "lis"
 msgid "Dec"
 msgstr "pro"
 
-#: ../lcg/widgets.py:248
+#: ../lcg/widgets.py:247
 msgid "Expand"
 msgstr "Rozbalit"
 
-#: ../lcg/widgets.py:248
+#: ../lcg/widgets.py:247
 msgid "Collapse"
 msgstr "Sbalit"
 
-#: ../lcg/widgets.py:398
+#: ../lcg/widgets.py:403
 #, python-format
 msgid "Close menu %s"
 msgstr "Uzavřít nabídku %s"
 
-#: ../lcg/widgets.py:399
+#: ../lcg/widgets.py:404
 msgid "Close menu"
 msgstr "Uzavřít nabídku"
 
@@ -1796,63 +1796,63 @@ msgstr "%s: soubor vytvořen."
 msgid "%s: file copied."
 msgstr "%s: soubor zkopírován."
 
-#: ../lcg/export/html.py:916
+#: ../lcg/export/html.py:965
 msgid "Choose your language:"
 msgstr "Zvolte jazyk:"
 
-#: ../lcg/export/html.py:1384
+#: ../lcg/export/html.py:1432
 msgid "Video"
 msgstr "Video"
 
-#: ../lcg/export/html.py:1439
+#: ../lcg/export/html.py:1488
 msgid "Play"
 msgstr "Přehrát"
 
-#: ../lcg/export/html.py:1439
+#: ../lcg/export/html.py:1488
 msgid "Pause"
 msgstr "Pozastavit"
 
-#: ../lcg/export/html.py:1440
+#: ../lcg/export/html.py:1489
 msgid "Rewind"
 msgstr "Vrátit zpět"
 
-#: ../lcg/export/html.py:1441
+#: ../lcg/export/html.py:1490
 msgid "Fast Forward"
 msgstr "Přeskočit vpřed"
 
-#: ../lcg/export/html.py:1448 ../lcg/export/html.py:1449
+#: ../lcg/export/html.py:1497 ../lcg/export/html.py:1498
 msgid "Current position"
 msgstr "Aktuální pozice"
 
-#: ../lcg/export/html.py:1452 ../lcg/export/html.py:1453
+#: ../lcg/export/html.py:1501 ../lcg/export/html.py:1502
 msgid "Remaining time"
 msgstr "Zbývající čas"
 
-#: ../lcg/export/html.py:1454
+#: ../lcg/export/html.py:1503
 msgid "Total time"
 msgstr "Celkový čas"
 
-#: ../lcg/export/html.py:1460
+#: ../lcg/export/html.py:1509
 msgid "Volume"
 msgstr "Hlasitost"
 
-#: ../lcg/export/html.py:1464
+#: ../lcg/export/html.py:1513
 msgid "Volume Down"
 msgstr "Snížit hlasitost"
 
-#: ../lcg/export/html.py:1465
+#: ../lcg/export/html.py:1514
 msgid "Volume Up"
 msgstr "Zvýšit hlasitost"
 
-#: ../lcg/export/html.py:1472
+#: ../lcg/export/html.py:1521
 msgid "Player"
 msgstr "Přehrávač"
 
-#: ../lcg/export/html.py:1475
+#: ../lcg/export/html.py:1524
 msgid "Update Required:"
 msgstr "Je potřeba aktualizace:"
 
-#: ../lcg/export/html.py:1478
+#: ../lcg/export/html.py:1525
 #, python-format
 msgid ""
 "To play audio you will need to either update your browser to a recent "
@@ -1864,21 +1864,21 @@ msgstr ""
 #. Label used instead of a link when the target does not exist.  For
 #. example sequential navigation may contain: "Previous: Introduction, Next:
 #. None".
-#: ../lcg/export/html.py:1665
+#: ../lcg/export/html.py:1710
 msgid "None"
 msgstr "není"
 
-#: ../lcg/export/html.py:1667
+#: ../lcg/export/html.py:1712
 msgid "You are here:"
 msgstr "Nacházíte se zde:"
 
 #. Label of a link to the next page in sequential navigation.
-#: ../lcg/export/html.py:1671
+#: ../lcg/export/html.py:1716
 msgid "Next"
 msgstr "Další"
 
 #. Label of a link to the next page in sequential navigation.
-#: ../lcg/export/html.py:1673
+#: ../lcg/export/html.py:1718
 msgid "Previous"
 msgstr "Předchozí"
 
@@ -1891,7 +1891,7 @@ msgstr "Chybějící obrázek: %s"
 msgid "Page content extremely large, giving up"
 msgstr "Příliš veliký obsah stránky, vynechávám"
 
-#: ../lcg/export/pdf.py:2973
+#: ../lcg/export/pdf.py:2972
 #, python-format
 msgid "Page content too large, reducing it by %s"
 msgstr "Příliš veliký obsah stránky, zmenšuji o %s"

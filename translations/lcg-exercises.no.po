@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-01 10:22+0200\n"
+"POT-Creation-Date: 2026-09-19 23:56+0200\n"
 "PO-Revision-Date: 2009-11-24 12:59+0100\n"
 "Last-Translator: Hynek Hanke <hanke@brailcom.org>\n"
 "Language-Team: \n"
@@ -506,8 +506,8 @@ msgid ""
 "[telescope]."
 msgstr ""
 
-#: ../lcg/exercises.py:909 ../lcg/export/exercises_html.py:551
-#: ../lcg/export/exercises_html.py:587 ../lcg/export/exercises_html.py:590
+#: ../lcg/exercises.py:909 ../lcg/export/exercises_html.py:550
+#: ../lcg/export/exercises_html.py:586 ../lcg/export/exercises_html.py:589
 msgid "Total points:"
 msgstr "Totalpoeng:"
 
@@ -574,12 +574,12 @@ msgstr "Fyll"
 msgid "Fill in the whole exercise with the correct answers."
 msgstr "Fyll ut hele oppgaven med de riktige svarene."
 
-#: ../lcg/export/exercises_html.py:52 ../lcg/export/exercises_html.py:490
+#: ../lcg/export/exercises_html.py:52 ../lcg/export/exercises_html.py:489
 msgid "Reset"
 msgstr "Tilbakestill"
 
-#: ../lcg/export/exercises_html.py:53 ../lcg/export/exercises_html.py:327
-#: ../lcg/export/exercises_html.py:491
+#: ../lcg/export/exercises_html.py:53 ../lcg/export/exercises_html.py:326
+#: ../lcg/export/exercises_html.py:490
 msgid "Reset all your answers and start again."
 msgstr "Tilbakestill alle svarene og begynn på nytt."
 
@@ -616,43 +616,43 @@ msgstr "Spill"
 msgid "Answers: %s"
 msgstr "Svarte:"
 
-#: ../lcg/export/exercises_html.py:324
+#: ../lcg/export/exercises_html.py:323
 #, fuzzy
 msgid "Show All"
 msgstr "Vis transkripsjon"
 
-#: ../lcg/export/exercises_html.py:325
+#: ../lcg/export/exercises_html.py:324
 #, fuzzy
 msgid "Show all answers."
 msgstr "Vis løsningene."
 
-#: ../lcg/export/exercises_html.py:326
+#: ../lcg/export/exercises_html.py:325
 #, fuzzy
 msgid "Hide All"
 msgstr "Skjul transkripsjon"
 
-#: ../lcg/export/exercises_html.py:329 ../lcg/export/exercises_html.py:336
-#: ../lcg/export/exercises_html.py:493
+#: ../lcg/export/exercises_html.py:328 ../lcg/export/exercises_html.py:335
+#: ../lcg/export/exercises_html.py:492
 #, fuzzy
 msgid "Show Answer"
 msgstr "Vis transkripsjon"
 
-#: ../lcg/export/exercises_html.py:330 ../lcg/export/exercises_html.py:494
+#: ../lcg/export/exercises_html.py:329 ../lcg/export/exercises_html.py:493
 #, fuzzy
 msgid "Hide Answer"
 msgstr "Skjul transkripsjon"
 
-#: ../lcg/export/exercises_html.py:337
+#: ../lcg/export/exercises_html.py:336
 #, fuzzy
 msgid "Show/Hide the correct answer."
 msgstr "Velg det rette svaret."
 
-#: ../lcg/export/exercises_html.py:340
+#: ../lcg/export/exercises_html.py:339
 #, fuzzy
 msgid "Correct answer:"
 msgstr "riktig svar"
 
-#: ../lcg/export/exercises_html.py:358
+#: ../lcg/export/exercises_html.py:357
 msgid ""
 "In all the exercises where you fill in the text into a text box you can use "
 "the two shortcut keys described below."
@@ -660,11 +660,11 @@ msgstr ""
 "I alle oppgavene hvor du fyller inn tekst i en tekstboks kan du bruke de to "
 "hurtigtastene beskrevet nedenfor."
 
-#: ../lcg/export/exercises_html.py:360
+#: ../lcg/export/exercises_html.py:359
 msgid "Enter"
 msgstr "Enter"
 
-#: ../lcg/export/exercises_html.py:361
+#: ../lcg/export/exercises_html.py:360
 msgid ""
 "Use this key within the text field to evaluate the current answer. You hear "
 "a sound response and in case of an error, the cursor is moved to the "
@@ -678,11 +678,11 @@ msgstr ""
 "evaluere igjen. Hvis du ikke vet hvordan du kan korrigere en feil, kan du "
 "bruke 'hint'-tasten beskrevet nedenfor."
 
-#: ../lcg/export/exercises_html.py:367
+#: ../lcg/export/exercises_html.py:366
 msgid "Ctrl-Space"
 msgstr "Ctrl-mellomrom"
 
-#: ../lcg/export/exercises_html.py:368
+#: ../lcg/export/exercises_html.py:367
 msgid ""
 "This function is called a ‘hint’.  It helps you in case you don't know the "
 "answer or you don't know how to fix an error in your answer. Just press the "
@@ -705,38 +705,38 @@ msgstr ""
 "Etterpå kan du evaluere svaret ditt ved hjelp av ‘Enter’ -tasten (se over) "
 "eller bruke ‘hint’ igjen, til du finner hele svaret."
 
-#: ../lcg/export/exercises_html.py:488
+#: ../lcg/export/exercises_html.py:487
 #, fuzzy
 msgid "Show Answers"
 msgstr "Vis transkripsjon"
 
-#: ../lcg/export/exercises_html.py:489
+#: ../lcg/export/exercises_html.py:488
 #, fuzzy
 msgid "Show model answers."
 msgstr "Vis løsningene."
 
-#: ../lcg/export/exercises_html.py:581
+#: ../lcg/export/exercises_html.py:580
 msgid "Invalid value in added points!"
 msgstr "Ugyldig verdi i poeng lagt til!"
 
-#: ../lcg/export/exercises_html.py:582
+#: ../lcg/export/exercises_html.py:581
 msgid "Max. points exceeded!"
 msgstr "Maks. poeng overskredet!"
 
-#: ../lcg/export/exercises_html.py:584
+#: ../lcg/export/exercises_html.py:583
 msgid "Automatic evaluation:"
 msgstr "Automatisk evaluering:"
 
-#: ../lcg/export/exercises_html.py:585
+#: ../lcg/export/exercises_html.py:584
 msgid "Additional points by tutor:"
 msgstr "Ekstra poeng fra veileder:"
 
-#: ../lcg/export/exercises_html.py:609
+#: ../lcg/export/exercises_html.py:608
 msgid "correct answer"
 msgstr "riktig svar"
 
 #. Incorrect (answer)
-#: ../lcg/export/exercises_html.py:614
+#: ../lcg/export/exercises_html.py:613
 msgid "incorrect"
 msgstr "feil"
 
