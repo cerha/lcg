@@ -529,16 +529,14 @@ if(element&&element._lcg_widget_instance){return element._lcg_widget_instance}
 return null}
 lcg.lang=(document.documentElement.lang||navigator.language||'en').split('-')[0]
 lcg.catalogs={}
-lcg._catalogs_ready={}
 lcg.gettext=function(domain){function locale_data(data){const meta=data['']||{}
 const result={'':{'domain':domain,'lang':lcg.lang,'plural_forms':meta['Plural-Forms']||'nplurals=2; plural=(n != 1);'}}
 for(const[key,value]of Object.entries(data)){if(key!==''){result[key]=value.slice(1)}}
 return result}
-if(!lcg._catalogs_ready[domain]){const link=document.querySelector(`link[rel=gettext][data-domain="${domain}"]`)
-if(link){lcg._catalogs_ready[domain]=fetch(link.getAttribute('href')).then(r=>r.json()).then(data=>lcg.catalogs[domain]=new Jed({'domain':domain,'locale_data':{[domain]:locale_data(data)},})).catch(err=>{console.warn(`Could not load translations for domain ${domain}:`,err)})}else{lcg._catalogs_ready[domain]=Promise.resolve()}}
+if(!(domain in lcg.catalogs)){const script=document.querySelector(`script[type="application/json"][data-gettext="${domain}"]`)
+lcg.catalogs[domain]=script?new Jed({'domain':domain,'locale_data':{[domain]:locale_data(JSON.parse(script.textContent))},}):null}
 function translate(msgid){return lcg.catalogs[domain]?.gettext(msgid)??msgid}
 translate.pgettext=function(context,msgid){return lcg.catalogs[domain]?.pgettext(context,msgid)??msgid}
 translate.ngettext=function(singular,plural,n){let catalog=lcg.catalogs[domain]
 if(catalog){return catalog.ngettext(singular,plural,n)}else{return(n===1?singular:plural)}}
-translate.ready=lcg._catalogs_ready[domain]
 return translate}
