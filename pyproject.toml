@@ -25,10 +25,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# PDF output
-pdf = ["reportlab"]
+# PDF output.  Svglib is used by the PDF exporter to embed SVG images.
+pdf = ["reportlab", "svglib"]
 # Plot support (cairo/pycairo only used if  allow_svg is False
-plot = ["matplotlib", "pandas", "svglib", "cairosvg==0.5", "pycairo"]
+plot = ["matplotlib", "pandas", "cairosvg==0.5", "pycairo"]
 # liblouis is used for Braille output.
 braille = ["louis"]
 # Convenience: install all optional dependencies except for "louis" as this one
