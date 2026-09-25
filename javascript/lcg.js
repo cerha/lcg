@@ -1357,13 +1357,15 @@ lcg.CollapsibleWidget = class extends lcg.Widget {
      *
      * The content can be collapsed or expanded.  When collapsed, only
      * the title is displayed.  The title may be clicked to toggle the
-     * content expansion state.
+     * content expansion state.  The title also contains a focusable control
+     * (ARIA button), which toggles the expansion state from keyboard.
      *
      */
 
     constructor(element, collapsed) {
         super(element)
         let heading = this._heading = this._collapsible_heading()
+        let control = this._control = this._collapsible_control(heading)
         let content = this._content = this._collapsible_content()
         heading.append('<span class="icon">')
         if (collapsed) {
@@ -1376,14 +1378,28 @@ lcg.CollapsibleWidget = class extends lcg.Widget {
             this.toggle()
             return false
         })
+        control.on('keydown', this._on_key_down.bind(this))
         if (!content.attr('id')) {
             content.attr('id', this.element.attr('id') + '-collapsible-content')
         }
-        heading.attr('aria-expanded', collapsed ? 'false' : 'true')
-        heading.attr('aria-controls', content.attr('id'))
+        control.attr('aria-expanded', collapsed ? 'false' : 'true')
+        control.attr('aria-controls', content.attr('id'))
+    }
+
+    _define_keymap() {
+        return {
+            'Enter': this.toggle,
+            'Space': this.toggle
+        }
     }
 
     _collapsible_heading() {
+        // Return the element toggling the expansion state when clicked.
+    }
+
+    _collapsible_control(heading) {
+        // Return the focusable element inside heading (or heading itself).
+        return heading
     }
 
     _collapsible_content() {
@@ -1396,14 +1412,14 @@ lcg.CollapsibleWidget = class extends lcg.Widget {
     expand() {
         this.element.removeClass('collapsed')
         this.element.addClass('expanded')
-        this._heading.attr('aria-expanded', 'true')
+        this._control.attr('aria-expanded', 'true')
         this._content.slideDown(200)
     }
 
     collapse() {
         this.element.removeClass('expanded')
         this.element.addClass('collapsed')
-        this._heading.attr('aria-expanded', 'false')
+        this._control.attr('aria-expanded', 'false')
         this._content.slideUp(200)
     }
 
@@ -1426,11 +1442,20 @@ lcg.CollapsibleSection = class extends lcg.CollapsibleWidget {
     _collapsible_heading() {
         let heading = this.element.find('h1,h2,h3,h4,h5,h6,h7,h8').first()
         heading.addClass('collapsible-section-heading')
-        let backref = heading.find('a.backref')
-        if (backref.length) {
-            backref.attr('href', '')
-        }
         return heading
+    }
+
+    _collapsible_control(heading) {
+        // The heading itself must keep its role (for navigation by headings),
+        // so the control is a link inside it.  The backref link is reused if
+        // present, as links can not be nested.
+        let control = heading.find('a.backref').first()
+        if (!control.length) {
+            control = heading.wrapInner('<a>').children('a').first()
+        }
+        control.attr('href', '#')
+        control.attr('role', 'button')
+        return control
     }
 
     _collapsible_content() {

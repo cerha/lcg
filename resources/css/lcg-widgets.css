@@ -299,8 +299,12 @@
 .collapsible-pane-widget .pane-title .icon {
     margin-left: 4px;
 }
-.collapsible-pane-widget .pane-title a {
+.collapsible-pane-widget .pane-title a,
+.collapsible-section-widget .collapsible-section-heading > a {
     text-decoration: none;
+}
+.collapsible-section-widget .collapsible-section-heading > a {
+    color: inherit;
 }
 .collapsible-section-widget.expanded > div > div > div > .collapsible-section-heading .icon,
 .collapsible-pane-widget.expanded > .pane-title .icon {
