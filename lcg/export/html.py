@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2018 OUI Technology Ltd.
-# Copyright (C) 2019-2022, 2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -250,7 +250,7 @@ class HtmlGenerator(object):
         else:
             anchor = None
 
-        query = ';'.join([k + '=' + urllib.parse.quote(unistr(v).encode('utf-8'))
+        query = '&'.join([k + '=' + urllib.parse.quote(unistr(v).encode('utf-8'))
                           for k, v in args + tuple(kwargs.items()) if v is not None])
         if query:
             uri += '?' + query

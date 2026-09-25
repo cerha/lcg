@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1133,6 +1133,15 @@ class HtmlExport(unittest.TestCase):
         assert g.option('X', value='x', disabled=True, cls='c') == (
             '<option class="c" disabled="disabled" value="x">X</option>')
         assert g.optgroup([], label='aa') == '<optgroup label="aa"></optgroup>'
+
+    def test_uri(self):
+        g = lcg.HtmlGenerator()
+        assert g.uri('/a b') == '/a%20b'
+        # Arguments must be separated by '&' as ';' is not recognized by
+        # 'urllib.parse.parse_qsl()' since Python 3.9.2.
+        assert g.uri('/x', ('a', 1), ('b', 'č d'), ('c', None)) == '/x?a=1&b=%C4%8D%20d'
+        assert g.uri('/x', 'anchor', ('a', 1), b=2) == '/x?a=1&b=2#anchor'
+        assert g.a('x', href=g.uri('/x', a=1, b=2)) == '<a href="/x?a=1&amp;b=2">x</a>'
 
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
