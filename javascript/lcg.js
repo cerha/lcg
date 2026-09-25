@@ -424,7 +424,8 @@ lcg.Notebook = class extends lcg.Menu {
         let page = $(href.substr(href.indexOf('#')))
         item[0]._lcg_notebook_page = page
         page[0]._lcg_notebook_item = item
-        page.find('h1,h2,h3,h4,h5,h6').hide()
+        // Hide only the page's own heading, not the headings nested in its content.
+        page.find('h1,h2,h3,h4,h5,h6').first().hide()
         page.hide()
         page.addClass('notebook-page')
         page.attr('role', 'tabpanel')
