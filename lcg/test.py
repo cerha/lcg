@@ -323,40 +323,40 @@ class LocalizableDateTime(unittest.TestCase):
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), en)
                 == "21/12/2006 06:43:32 PM")
         assert (localize("2006-12-21", cs)
-                == "21.12.2006")
+                == "21.\xa012.\xa02006")
         assert (localize(datetime.date(2006, 12, 21), cs)
-                == "21.12.2006")
+                == "21.\xa012.\xa02006")
         assert (localize("2006-12-21 02:43", cs, show_time=False)
-                == "21.12.2006")
+                == "21.\xa012.\xa02006")
         assert (localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_time=False)
-                == "21.12.2006")
+                == "21.\xa012.\xa02006")
         assert (localize("2006-12-21 02:43", cs)
-                == "21.12.2006 02:43")
+                == "21.\xa012.\xa02006 02:43")
         assert (localize("2006-12-21 02:43", cs, utc=True)
-                == "21.12.2006 01:43")
+                == "21.\xa012.\xa02006 01:43")
         assert (localize(datetime.datetime(2006, 12, 21, 2, 43, tzinfo=utc), cs, show_seconds=False)
-                == "21.12.2006 01:43")
+                == "21.\xa012.\xa02006 01:43")
         assert (localize("2006-12-21 18:43:32", cs, show_weekday=True)
-                == "Čt 21.12.2006 18:43:32")
+                == "Čt 21.\xa012.\xa02006 18:43:32")
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs)
-                == "21.12.2006 18:43:32")
+                == "21.\xa012.\xa02006 18:43:32")
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32, tzinfo=utc), cs)
-                == "21.12.2006 17:43:32")
+                == "21.\xa012.\xa02006 17:43:32")
         assert (localize("2006-01-30", cs, leading_zeros=False)
-                == "30.1.2006")
+                == "30.\xa01.\xa02006")
         assert (localize(datetime.date(2006, 1, 30), cs, leading_zeros=False)
-                == "30.1.2006")
+                == "30.\xa01.\xa02006")
         assert (localize("2006-12-21 18:43:32", cs, utc=True)
-                == "21.12.2006 17:43:32")
+                == "21.\xa012.\xa02006 17:43:32")
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs, utc=True)
-                == "21.12.2006 17:43:32")
+                == "21.\xa012.\xa02006 17:43:32")
 
     def test_concat(self):
         c = "Date is: " + lcg.LocalizableDateTime("2006-01-30")
         assert c.localize(lcg.Localizer('en', translation_path=translation_path)) == \
             "Date is: 30/01/2006"
         assert c.localize(lcg.Localizer('cs', translation_path=translation_path)) == \
-            "Date is: 30.01.2006"
+            "Date is: 30.\xa001.\xa02006"
 
     def test_replace(self):
         a = lcg.LocalizableDateTime("2006-01-30")
@@ -365,15 +365,15 @@ class LocalizableDateTime(unittest.TestCase):
         b = a.replace('-', '+')
         assert unistr(b) == "2006+01+30"
         assert b.localize(en) == "30/01/2006"
-        assert b.localize(cs) == "30.01.2006"
+        assert b.localize(cs) == "30.\xa001.\xa02006"
         c = a.replace('/', '|')
         assert unistr(c) == "2006-01-30"
         assert c.localize(en) == "30|01|2006"
-        assert c.localize(cs) == "30.01.2006"
+        assert c.localize(cs) == "30.\xa001.\xa02006"
         d = a.replace('.', ':')
         assert unistr(d) == "2006-01-30"
         assert d.localize(en) == "30/01/2006"
-        assert d.localize(cs) == "30:01:2006"
+        assert d.localize(cs) == "30:\xa001:\xa02006"
 
 
 class LocalizableTime(unittest.TestCase):
@@ -412,7 +412,7 @@ class TranslatedTextFactory(unittest.TestCase):
     def test_datetime(self):
         __ = lcg.TranslatedTextFactory('test', lang='cs', translation_path=translation_path)
         dt = __.datetime(datetime.datetime(2024, 6, 11, 10, 44, 37), leading_zeros=False)
-        assert dt == '11.6.2024 10:44:37'
+        assert dt == '11.\xa06.\xa02024 10:44:37'
         assert isinstance(dt, lcg.LocalizableDateTime)
         de = lcg.Localizer('en', translation_path=translation_path)
         assert dt.localize(de) == '11/6/2024 10:44:37 AM'

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,7 +64,11 @@ class LocaleData(object):
 
 
 class LocaleData_cs(LocaleData):
-    date_format = "%d.%m.%Y"
+    # The spaces are required by Czech typography and they also make speech
+    # synthesizers read the date as a date rather than as a decimal number.
+    # A narrow no-break space would be typographically better, but its support
+    # in speech synthesizers, braille displays and fonts is uncertain.
+    date_format = "%d.\xa0%m.\xa0%Y"
     decimal_point = ','
     thousands_sep = u'\xa0'
 
