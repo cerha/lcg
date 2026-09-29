@@ -1118,8 +1118,10 @@ class HtmlExporter(lcg.Exporter):
 
     def _export_abbreviation(self, context, element):
         g = self._generator
-        return g.abbr(self._export_text_content(context, element), title=element.descr(),
-                      aria_label=element.descr())
+        # The description is not the accessible name (aria-label), which is not
+        # allowed for 'abbr' and makes Safari present it as a group.  The
+        # description (title) is announced after the abbreviation.
+        return g.abbr(self._export_text_content(context, element), title=element.descr())
 
     def _export_anchor(self, context, element):
         g = self._generator
