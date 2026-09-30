@@ -1215,6 +1215,53 @@ class HtmlExport(unittest.TestCase):
         ):
             assert lcg.coerce(content).export(context) == html
 
+    def test_dropdown(self):
+        n = lcg.ContentNode('test', title='Test', content=lcg.Content())
+        context = lcg.HtmlExporter().context(n, None)
+        context._generator._sorted_attributes = True
+        dropdown = lcg.Dropdown('Choose', lcg.link('/x', 'X'), title='Tooltip',
+                                labelledby='label-id', cls='my-dropdown', id='dd')
+        html = dropdown.export(context)
+        match = re.match(
+            '<span class="dropdown-widget my-dropdown" id="dd">'
+            '<button aria-controls="([^"]+)" aria-expanded="true" aria-labelledby="label-id" '
+            'class="dropdown-toggle" title="Tooltip" type="button">'
+            'Choose<span class="icon"></span></button>'
+            '<span class="dropdown-panel" id="([^"]+)"><a href="/x">X</a></span>'
+            '</span><script>new lcg.Dropdown\\("dd"\\)</script>$', html)
+        assert match, html
+        assert match.group(1) == match.group(2)
+
+    def test_dropdown_selection(self):
+        n = lcg.ContentNode('test', title='Test', content=lcg.Content())
+        context = lcg.HtmlExporter().context(n, None)
+        context._generator._sorted_attributes = True
+        selection = lcg.DropdownSelection((('1', '/p1', False), ('2', '/p2', True)),
+                                          label='Page:', suffix='of 2', cls='pages', id='ds')
+        html = selection.export(context)
+        match = re.match(
+            '<span class="dropdown-selection pages">'
+            '<span class="label" id="([^"]+)">Page:</span> '
+            '<span class="dropdown-widget dropdown-selection-widget" id="ds">'
+            '<button aria-controls="([^"]+)" aria-expanded="true" '
+            'aria-labelledby="([^"]+) ([^"]+) ([^"]+)" class="dropdown-toggle" type="button">'
+            '<span class="value" id="([^"]+)">2</span><span class="icon"></span></button>'
+            '<span class="dropdown-panel" id="([^"]+)">'
+            '<span aria-labelledby="([^"]+)" class="choices" role="group">'
+            '<a href="/p1">1</a> <a aria-current="true" href="/p2">2</a></span></span>'
+            '</span><script>new lcg.DropdownSelection\\("ds"\\)</script> '
+            '<span class="suffix" id="([^"]+)">of 2</span></span>$', html)
+        assert match, html
+        label_id, panel_id, l1, l2, l3, value_id, panel_id2, group_label_id, suffix_id = \
+            match.groups()
+        assert (l1, l2, l3) == (label_id, value_id, suffix_id)
+        assert panel_id == panel_id2
+        assert group_label_id == label_id
+        # Without a label and a suffix.
+        html = lcg.DropdownSelection((('A', '/a', True),), value='X').export(context)
+        assert '<span class="label"' not in html and 'role="group"' not in html, html
+        assert '<span class="value" id="' in html and '>X</span>' in html, html
+
     def test_formatting(self):
         resources = (lcg.Resource('text.txt', uri='/resources/texts/text.txt'),
                      lcg.Audio('xx.mp3'),

@@ -174,7 +174,7 @@
     overflow: hidden;
     outline: none;
 }
-.popup-menu-widget, .dropdown-selection-widget {
+.popup-menu-widget {
     position: absolute;
     width: auto;
     padding: 0;
@@ -191,18 +191,12 @@
     -moz-box-shadow: 1px 1px 12px rgba(0, 0, 0, .6);
     -webkit-box-shadow: rgba(0, 0, 0, .6) 1px 1px 12px;
 }
-.dropdown-selection-widget {
-    background-color: #fff;
-    border-color: #777;
-    max-height: 400px;
-    overflow-y: auto;
-}
-.popup-menu-widget ul, .dropdown-selection-widget ul {
+.popup-menu-widget ul {
     margin: 0;
     padding: 0;
     list-style: none;
 }
-.popup-menu-widget ul li, .dropdown-selection-widget ul li {
+.popup-menu-widget ul li {
     font-weight: normal; /* Avoid inherited bold when used inside h3 etc. */
     white-space: nowrap;
     min-width: 100px;
@@ -222,17 +216,14 @@
 }
 
 .popup-menu-widget li a,
-.popup-menu-widget li a:hover,
-.dropdown-selection-widget li a,
-.dropdown-selection-widget li a:hover {
+.popup-menu-widget li a:hover {
     display: block;
     color: #777;
     padding: 5px 10px;
     text-decoration: none;
     min-height: 14px;
 }
-.popup-menu-widget li.active a,
-.dropdown-selection-widget li.active a {
+.popup-menu-widget li.active a {
     color: #000;
 }
 .popup-menu-widget li.active:hover {
@@ -252,6 +243,81 @@
     -moz-border-radius: 7px;
     -webkit-border-radius: 7px;
     background: url(lcg-icons.png) -23px -39px no-repeat #ddd;
+}
+
+/* Dropdown widget */
+
+.dropdown-widget {
+    /* The dropdown is positioned below (or above) the button.  The inline
+       block makes the widget as high as the button (an inline element would
+       only be as high as the line). */
+    position: relative;
+    display: inline-block;
+}
+.dropdown-widget > .dropdown-toggle {
+    /* Only displayed with JavaScript (the content is displayed directly otherwise). */
+    display: none;
+}
+.dropdown-widget.collapsed > .dropdown-toggle,
+.dropdown-widget.expanded > .dropdown-toggle {
+    display: inline-block;
+    /* The arrow is visually light, so it doesn't need much space. */
+    padding-right: 0.45em;
+}
+.dropdown-widget > .dropdown-toggle .icon {
+    /* Down pointing arrow. */
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.3em;
+    margin-right: 0;
+    border: 4px solid transparent;
+    border-top-color: currentColor;
+    border-bottom: none;
+}
+.dropdown-widget.expanded > .dropdown-toggle .icon {
+    transform: rotate(180deg);
+}
+.dropdown-widget.collapsed > .dropdown-panel {
+    display: none;
+}
+.dropdown-widget.expanded > .dropdown-panel {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 240;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 100%;
+    max-width: calc(100vw - 2em);
+    margin-top: 2px;
+    /* The items span the whole width, only leave space for the rounded corners. */
+    padding: 4px 0;
+    white-space: normal;
+    line-height: 1.6;
+    text-align: left;
+    background-color: #eee;
+    border-radius: 4px;
+    box-shadow: 1px 1px 12px rgba(0, 0, 0, .3);
+}
+.dropdown-widget.expanded.upward > .dropdown-panel {
+    /* The dropdown doesn't fit below the button (see lcg.Dropdown in JavaScript). */
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 2px;
+}
+.dropdown-widget.expanded > .dropdown-panel a {
+    /* The links look like the items of a selection rather than ordinary links. */
+    color: inherit;
+    text-decoration: none;
+    padding: 0.1em 0.6em;
+}
+.dropdown-widget.expanded > .dropdown-panel a:hover {
+    background-color: #fff;
+}
+.dropdown-widget.expanded > .dropdown-panel a[aria-current="true"] {
+    background-color: #ddd;
 }
 
 .tooltip-widget {

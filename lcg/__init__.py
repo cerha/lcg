@@ -59,7 +59,8 @@ from .content import Content, Container, Strong, Emphasized, \
     code, cite, container, br, hr, pre, abbr
 
 from .widgets import Widget, Button, FoldableTree, Notebook, PopupMenuCtrl, \
-    PopupMenuItem, CollapsiblePane, CollapsibleSection
+    PopupMenuItem, Dropdown, DropdownSelection, CollapsiblePane, \
+    CollapsibleSection
 
 from .presentation import Presentation, ContentMatcher, \
     TopLevelMatcher, LanguageMatcher, LCGClassMatcher, \

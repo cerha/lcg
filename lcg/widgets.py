@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -469,6 +469,168 @@ class PopupMenuCtrl(Widget, lcg.Container):
         g = context.generator()
         # Using spans is important to make display: inline-block work in MSIE 8.
         return g.span(content, **kwargs)
+
+
+class Dropdown(Widget, lcg.Container):
+    """Button displaying its content in a dropdown panel.
+
+    The content is typically a set of links, such as a selection of a value
+    or an alphabetical index.  The dropdown panel is displayed below the
+    button when the button is activated.  The widget consists of inline
+    elements only, so it may be placed within other inline content, such as a
+    row of buttons.
+
+    Keyboard interaction: The button expands/collapses the dropdown as any
+    other button (Enter/Space) and also expands it by the Down arrow (or by
+    Alt+Down as a select box, which is useful when the application uses the
+    arrows on the button otherwise).  The focus is moved to the current link on
+    expansion from keyboard (the link with the 'aria-current' attribute) if
+    there is one.  The arrow keys move the focus between the links within the
+    dropdown.  The links may be displayed in rows (such as a grid of numbers),
+    so the up/down arrows move to the closest link in the previous/next row.
+    Up from the first row returns the focus to the button.  Home/End move to
+    the first/last link.  A link is activated by Enter or Space.  Escape
+    collapses the dropdown and returns the focus to the button.  The dropdown
+    is also collapsed when a link is activated, when the focus leaves the
+    widget or on a click outside it (including a click on another dropdown
+    button).
+
+    The dropdown is displayed above the button when it doesn't fit below it
+    (and there is more space above) and it is scrollable when it doesn't fit
+    either way.
+
+    Without JavaScript, the button is hidden and the content is displayed
+    directly in place of the widget.
+
+    """
+
+    def __init__(self, label, content, title=None, labelledby=None, cls=None, **kwargs):
+        """Arguments:
+
+           label -- button label as a string or 'lcg.Content' instance.
+           content -- the dropdown content as 'lcg.Content' instance or a
+             sequence of 'lcg.Content' instances.
+           title -- button tooltip as a string or None.
+           labelledby -- space separated HTML ids of the elements labeling the
+             button (its 'aria-labelledby' attribute).  The button is labeled by
+             its content when None.
+           cls -- additional CSS class name(s) of the widget root element as a
+             string or None.
+           **kwargs -- other arguments defined by the parent class
+
+        """
+        self._button_label = label
+        self._title = title
+        self._labelledby = labelledby
+        self._cls = cls
+        super(Dropdown, self).__init__(content, **kwargs)
+
+    def _css_class_name(self, context):
+        cls = super(Dropdown, self)._css_class_name(context)
+        return cls + ' ' + self._cls if self._cls else cls
+
+    def _export_button_label(self, context):
+        label = self._button_label
+        if isinstance(label, lcg.Content):
+            label = label.export(context)
+        return label
+
+    def _export_dropdown_content(self, context):
+        return lcg.Container.export(self, context)
+
+    def _export_widget(self, context):
+        g = context.generator()
+        dropdown_id = context.unique_id()
+        return g.concat(
+            g.button(g.concat(self._export_button_label(context), g.span('', cls='icon')),
+                     type='button', cls='dropdown-toggle', title=self._title,
+                     aria_expanded='true', aria_controls=dropdown_id,
+                     aria_labelledby=self._labelledby),
+            g.span(self._export_dropdown_content(context), id=dropdown_id,
+                   cls='dropdown-panel'),
+        )
+
+    def _wrap_exported_widget(self, context, content, **kwargs):
+        g = context.generator()
+        return g.span(content, **kwargs)
+
+
+class DropdownSelection(Dropdown):
+    """Dropdown for selecting one of given choices by links.
+
+    The button displays the current value and the dropdown contains the links
+    of all choices (the current one is marked by the 'aria-current' attribute).
+    The optional label and suffix are displayed before and after the button
+    and together with the current value they make the accessible name of the
+    button (such as "Page: 5 of 20").
+
+    The links are followed as ordinary links by default.  The JavaScript
+    counterpart of the widget allows handling the selection by a callback
+    instead (see 'lcg.DropdownSelection.on_select()' in JavaScript).
+
+    The widget is exported inside an outer element with the CSS class
+    'dropdown-selection', which contains also the label and the suffix.
+
+    """
+
+    def __init__(self, choices, label=None, value=None, suffix=None, cls=None, **kwargs):
+        """Arguments:
+
+           choices -- sequence of (display, uri, current) triples, where
+             'display' is the displayed choice (string), 'uri' is the link target
+             and 'current' is True for the currently selected choice.
+           label -- the selection label displayed before the button as a
+             string or None.
+           value -- the current value displayed in the button as a string.  The
+             display of the current choice is used when None.
+           suffix -- text displayed after the button as a string or None.
+           cls -- additional CSS class name(s) of the outer element as a
+             string or None.
+           **kwargs -- other arguments defined by the parent class
+
+        """
+        self._choices = choices
+        self._selection_label = label
+        self._value = value
+        self._suffix = suffix
+        self._selection_cls = cls
+        super(DropdownSelection, self).__init__(None, (), **kwargs)
+
+    def _css_class_name(self, context):
+        # Keep the class of the parent widget to apply its styles.
+        return 'dropdown-widget ' + super(DropdownSelection, self)._css_class_name(context)
+
+    def _export_button_label(self, context):
+        value = self._value
+        if value is None:
+            value = next((display for display, uri, current in self._choices if current), '')
+        return context.generator().span(value, id=self._value_id, cls='value')
+
+    def _export_dropdown_content(self, context):
+        g = context.generator()
+        links = [g.a(display, href=uri, aria_current='true' if current else None)
+                 for display, uri, current in self._choices]
+        return g.span(lcg.concat(links, separator=' '), cls='choices',
+                      role='group' if self._label_id else None,
+                      aria_labelledby=self._label_id)
+
+    def export(self, context):
+        g = context.generator()
+        self._label_id = context.unique_id() if self._selection_label else None
+        self._value_id = context.unique_id()
+        self._suffix_id = context.unique_id() if self._suffix else None
+        self._labelledby = ' '.join(i for i in (self._label_id, self._value_id, self._suffix_id)
+                                    if i)
+        cls = 'dropdown-selection'
+        if self._selection_cls:
+            cls += ' ' + self._selection_cls
+        return g.span((
+            g.concat(g.span(self._selection_label, id=self._label_id, cls='label'), ' ')
+            if self._selection_label else '',
+            super(DropdownSelection, self).export(context),
+            g.concat(' ', g.span(self._suffix, id=self._suffix_id, cls='suffix'))
+            if self._suffix else '',
+        ), cls=cls)
 
 
 class CollapsibleWidget(Widget):

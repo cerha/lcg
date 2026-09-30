@@ -1193,110 +1193,228 @@ lcg.PopupMenuCtrl = class extends lcg.Widget {
 }
 
 
-lcg.DropdownSelection = class extends lcg.PopupMenuBase {
-    /* Dropdown selection menu widget
+lcg.Dropdown = class extends lcg.Widget {
+    /* Button displaying its content in a dropdown panel.
      *
-     * Constructor arguments:
+     * This is the JavaScript counterpart of the Python class 'lcg.Dropdown'.
+     * See its documentation for the description of the widget behavior.
      *
-     *   element -- The root element of the widget as a string (HTML element id),
-     *     DOM element or a jQuery object.
-     *   button_id -- HTML id of the element inoking the selection
-     *   activation_callback -- callback called on item item activation
-     *     with one argument (the activated item)
-     *   get_selected_item_index -- function returning the initially selected
-     *     item.  Called with no arguments every time before the dropdown
-     *     is expanded.
      */
 
-    constructor(element, button_id, activation_callback, get_selected_item_index) {
+    constructor(element) {
         super(element)
-        if (get_selected_item_index === undefined) {
-            get_selected_item_index = function () { return 0 }
+        this._button = this.element.children('.dropdown-toggle')
+        this._dropdown = this.element.children('.dropdown-panel')
+        this._button.on('click', event => {
+            // The event propagates to the document to collapse the other dropdowns.
+            // The keyboard invoked click (Enter/Space) has no mouse click count.
+            this.toggle(event.detail === 0)
+        })
+        this.element.on('keydown', this._on_key_down.bind(this))
+        // Collapse when a link is activated (it may be handled in place).
+        this._dropdown.on('click', 'a[href]', event => this.collapse())
+        this.element.on('focusout', event => {
+            // Collapse when the keyboard focus leaves the widget.
+            if (event.relatedTarget && !this.element[0].contains(event.relatedTarget)) {
+                this.collapse()
+            }
+        })
+        let on_document_click = (event) => {
+            if (!document.contains(this.element[0])) {
+                // The widget was removed (such as when the content is reloaded).
+                $(document).off('click', on_document_click)
+            } else if (!this.element[0].contains(event.target)) {
+                this.collapse()
+            }
         }
-        this._activation_callback = activation_callback
-        this._get_selected_item_index = get_selected_item_index
-        this.element.attr('role', 'listbox')
-        let button = this._element(button_id)
-        this._button = button
-        button.attr('tabindex', '0')
-        button.attr('role', 'button')
-        button.attr('aria-haspopup', 'true')
-        button.attr('aria-expanded', 'false')
-        button.attr('aria-controls', this.element.attr('id'))
-        button.on('click', this._on_button_click.bind(this))
-        button.on('keydown', this._on_button_key_down.bind(this))
+        $(document).on('click', on_document_click)
+        this.collapse()
     }
 
-    _on_button_key_down(event) {
+    _on_key_down(event) {
         let key = this._event_key(event)
-        if (key === 'Enter' || key === 'Space' || key === 'Alt-Down') {
-            this.dropdown()
+        let target = event.target
+        if (key === 'Escape' && this.expanded()) {
+            this.collapse()
+            this._button.focus()
+        } else if (target === this._button[0]) {
+            // Alt+Down works as in a select box (when the application
+            // uses the arrows on the button otherwise).
+            if (key !== 'Down' && key !== 'Alt-Down') {
+                return
+            }
+            if (!this.expanded()) {
+                this.expand(true)
+            }
+            if (!this._dropdown[0].contains(document.activeElement)) {
+                this._links().first().focus()
+            }
+        } else if (this.expanded() && $(target).is('a') && key === 'Space') {
+            // Activate the link by Space as well as by Enter (as a menu item).
+            target.click()
+        } else if (this.expanded() && $(target).is('a')) {
+            let link = this._link_in_direction(target, key)
+            if (link === undefined) {
+                return
+            }
+            if (link) {
+                link.focus()
+            }
+        } else {
+            return
+        }
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    _links() {
+        return this._dropdown.find('a[href]')
+    }
+
+    _link_in_direction(link, key) {
+        // Return the element to move the focus to from 'link' by given key.
+        // Return the button when moving up from the first row, null when there
+        // is no link in given direction and undefined for unhandled keys.
+        let links = this._links().get()
+        let index = links.indexOf(link)
+        let rect = link.getBoundingClientRect()
+        let center = (r) => r.left + r.width / 2
+        let closest = (candidates) => {
+            // Return the closest link horizontally in the closest row.
+            if (candidates.length === 0) {
+                return null
+            }
+            let distance = (r) => Math.abs(r.top - rect.top)
+            let rects = candidates.map(a => [a, a.getBoundingClientRect()])
+            let min_distance = Math.min(...rects.map(([a, r]) => distance(r)))
+            return rects.filter(([a, r]) => distance(r) - min_distance < rect.height / 2)
+                .sort(([a1, r1], [a2, r2]) => (Math.abs(center(r1) - center(rect)) -
+                                               Math.abs(center(r2) - center(rect))))[0][0]
+        }
+        switch (key) {
+        case 'Right':
+            return links[index + 1] || null
+        case 'Left':
+            return links[index - 1] || null
+        case 'Home':
+            return links[0]
+        case 'End':
+            return links[links.length - 1]
+        case 'Down':
+            return closest(links.filter(a => (a.getBoundingClientRect().top >
+                                               rect.top + rect.height / 2)))
+        case 'Up':
+            return (closest(links.filter(a => (a.getBoundingClientRect().top <
+                                                rect.top - rect.height / 2))) ||
+                    this._button[0])
+        }
+        return undefined
+    }
+
+    expanded() {
+        return this.element.hasClass('expanded')
+    }
+
+    expand(focus_current) {
+        // Expand the dropdown.  If 'focus_current' is true, the focus is moved
+        // to the current link (when invoked from keyboard), so that the user
+        // continues from there.  Doing so on mouse click would display the
+        // keyboard focus indication unexpectedly.
+        let dropdown = this._dropdown
+        this.element.removeClass('collapsed').addClass('expanded')
+        this._button.attr('aria-expanded', 'true')
+        // Shift the dropdown to the left when it doesn't fit the window.
+        dropdown.css({left: '', maxHeight: '', overflowY: ''})
+        this.element.removeClass('upward')
+        let margin = 8
+        let rect = dropdown[0].getBoundingClientRect()
+        let overflow = rect.right - (document.documentElement.clientWidth - margin)
+        if (overflow > 0) {
+            dropdown.css('left', -Math.max(0, Math.min(overflow, rect.left - margin)) + 'px')
+        }
+        // Display the dropdown above the button when it doesn't fit below it
+        // and there is more space above.  Make it scrollable when it doesn't
+        // fit either way.
+        let button = this._button[0].getBoundingClientRect()
+        let below = document.documentElement.clientHeight - button.bottom - margin
+        let above = button.top - margin
+        if (rect.height > below && above > below) {
+            this.element.addClass('upward')
+        }
+        let space = Math.max(above, below)
+        if (rect.height > (this.element.hasClass('upward') ? above : below)) {
+            dropdown.css({maxHeight: Math.max(space, 0) + 'px', overflowY: 'auto'})
+        }
+        // Scroll the current link into view in a long scrollable dropdown.
+        let current = this._links().filter('[aria-current]:not([aria-current="false"])')[0]
+        if (current) {
+            dropdown.scrollTop(current.offsetTop - dropdown.height() / 2)
+            if (focus_current) {
+                current.focus({preventScroll: true})
+            }
+        }
+    }
+
+    collapse() {
+        this.element.removeClass('expanded').addClass('collapsed')
+        this._button.attr('aria-expanded', 'false')
+    }
+
+    set_current(link) {
+        // Mark given link (DOM element or jQuery object) as the current one.
+        this._links().removeAttr('aria-current')
+        $(link).attr('aria-current', 'true')
+    }
+
+    toggle(focus_current) {
+        if (this.expanded()) {
+            this.collapse()
+        } else {
+            this.expand(focus_current)
+        }
+    }
+
+}
+
+
+lcg.DropdownSelection = class extends lcg.Dropdown {
+    /* Dropdown for selecting one of the choices by links.
+     *
+     * This is the JavaScript counterpart of the Python class
+     * 'lcg.DropdownSelection'.  The links are followed as ordinary links
+     * unless a callback is set by 'on_select()'.
+     *
+     */
+
+    constructor(element) {
+        super(element)
+        this._on_select_callback = null
+        this._dropdown.on('click', 'a[href]', this._on_link_click.bind(this))
+    }
+
+    _on_link_click(event) {
+        if (this._on_select_callback) {
+            let link = event.currentTarget
+            this.set_current(link)
+            this._button.focus()
+            this._on_select_callback(link)
             return false
         }
     }
 
-    _on_button_click(event) {
-        if (this._button.attr('aria-expanded') === 'true') {
-            this.dismiss()
-        } else {
-            this.dropdown()
-        }
-        return false
+    on_select(callback) {
+        /* Handle the selection by given function instead of following the links.
+         *
+         * The function is called with the selected link (DOM element) as the
+         * argument after it is made the current choice.
+         */
+        this._on_select_callback = callback
     }
 
-    _cmd_activate(event, item) {
-        this.dismiss()
-        this._activation_callback(item)
-    }
-
-    _define_keymap() {
-        return {
-            'Up': this._cmd_prev,
-            'Down': this._cmd_next,
-            'Enter': this._cmd_activate,
-            'Space': this._cmd_activate,
-            'Escape': this._cmd_quit
-        }
-    }
-
-    _init_items(ul, parent) {
-        let items = super._init_items(ul, parent)
-        ul.attr('role', 'presentation')
-        return items
-    }
-
-    _init_item(item, prev, parent) {
-        super._init_item(item, prev, parent)
-        item.attr('role', 'option')
-        item.on('mouseover', e => this._select_item($(e.target)))
-    }
-
-    _select_item(item) {
-        let previously_selected_item = this._selected_item()
-        super._select_item(item)
-        if (previously_selected_item && previously_selected_item[0] !== item[0]) {
-            previously_selected_item.closest('li').removeClass('selected')
-        }
-        item.closest('li').addClass('selected')
-        this._set_focus(item)
-    }
-
-    dropdown() {
-        let y, direction
-        let menu = this.element
-        let bottom = $(window).scrollTop() + $(window).height()
-        let height = menu.height()
-        let offset = this._button.offset()
-        if (offset.top + this._button.height() + height > bottom && offset.top > height) {
-            y = 0
-            direction = 'up'
-        } else {
-            y = this._button.height()
-            direction = 'down'
-        }
-        let padding = menu.outerWidth() - menu.innerWidth()
-        menu.css({width: this._button.width() - padding + 'px'})
-        this.popup(this._button, 0, y, direction, this._get_selected_item_index())
+    set_current(link) {
+        // Mark given link as the current choice and display it in the button.
+        super.set_current(link)
+        this._button.find('.value').text($(link).text())
     }
 
 }
