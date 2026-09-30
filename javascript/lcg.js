@@ -1600,6 +1600,106 @@ lcg.CollapsiblePane = class extends lcg.CollapsibleWidget {
 }
 
 
+lcg.AudioPositionSlider = class extends lcg.KeyHandler {
+    /* Make the progress bar of a jPlayer based player a keyboard operable slider.
+     *
+     * The progress bar gets the ARIA 'slider' role, so that it is focusable,
+     * assistive technologies announce the current playback position and the
+     * user can move to any position within the current track: the arrow keys
+     * move by a few seconds, PageUp/PageDown by a minute and Home/End to the
+     * beginning/end.  Mouse and touch operation remains handled by jPlayer.
+     *
+     * Constructor arguments:
+     *
+     *   element -- The progress bar element as a jQuery object (usually the
+     *     element with the class 'jp-progress').
+     *   player -- The jPlayer instance element as a jQuery object.
+     *
+     */
+    _STEP = 5 // Seconds
+    _PAGE_STEP = 60 // Seconds
+
+    constructor(element, player) {
+        super()
+        const _ = lcg.gettext('lcg')
+        this._slider = element
+        this._player = player
+        this._value_text = _("%(position)s of %(duration)s")
+        element.attr({
+            'role': 'slider',
+            'tabindex': 0,
+            'aria-label': _("Playback position"),
+            'aria-valuemin': 0
+        })
+        element.on('keydown', this._on_key_down.bind(this))
+        element.on('focus', event => this._update())
+        let events = ['setmedia', 'loadedmetadata', 'durationchange', 'timeupdate']
+        player.bind(events.map(name => $.jPlayer.event[name]).join(' '),
+                    this._on_player_update.bind(this))
+        this._update()
+    }
+
+    _define_keymap() {
+        return {
+            'Left': function (event) { this._move(-this._STEP) },
+            'Down': function (event) { this._move(-this._STEP) },
+            'Right': function (event) { this._move(this._STEP) },
+            'Up': function (event) { this._move(this._STEP) },
+            'PageDown': function (event) { this._move(-this._PAGE_STEP) },
+            'PageUp': function (event) { this._move(this._PAGE_STEP) },
+            'Home': function (event) { this._seek(0) },
+            'End': function (event) { this._seek(Infinity) }
+        }
+    }
+
+    _status() {
+        return this._player.data('jPlayer').status
+    }
+
+    _move(offset) {
+        this._seek(this._status().currentTime + offset)
+    }
+
+    _seek(time) {
+        let status = this._status()
+        if (status.duration) {
+            // Seeking to the very end would finish the playback (and possibly
+            // start the next track), which is not what the user expects from
+            // moving the slider, so stay a moment before the end.
+            time = Math.max(0, Math.min(time, status.duration - 1))
+            this._player.jPlayer(status.paused ? 'pause' : 'play', time)
+            this._update(time)
+        }
+    }
+
+    _on_player_update(event) {
+        // Avoid announcing the steadily changing value of the focused slider
+        // during playback.  The value is updated on the user's actions then.
+        if (!(this._slider.is(':focus') && !event.jPlayer.status.paused)) {
+            this._update()
+        }
+    }
+
+    _update(time) {
+        let status = this._status()
+        let duration = Math.floor(status.duration || 0)
+        let position = Math.min(Math.floor(time === undefined ? status.currentTime : time),
+                                duration)
+        let text = $.jPlayer.convertTime(position)
+        if (duration) {
+            text = this._value_text.replace('%(position)s', text)
+                .replace('%(duration)s', $.jPlayer.convertTime(duration))
+        }
+        this._slider.attr({
+            'aria-valuemax': duration,
+            'aria-valuenow': position,
+            'aria-valuetext': text
+        })
+    }
+
+}
+
+
 lcg.AudioPlayer = class extends lcg.Widget {
 
     constructor(elements, swf_uri) {
@@ -1623,6 +1723,7 @@ lcg.AudioPlayer = class extends lcg.Widget {
             toggleDuration: true,
             volume: this._volume
         })
+        new lcg.AudioPositionSlider(this.element.find('.jp-progress'), this._player)
         this.element.find('.jp-volume-bar-value').html(Math.round(100 * this._volume) + '%')
         let play_button = this.element.find('button.play-pause')
         this._play_label = play_button.attr('title')
