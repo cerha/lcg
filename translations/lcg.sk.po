@@ -20,11 +20,11 @@ msgstr ""
 #: ../javascript/lcg.js:1627
 #, python-format
 msgid "%(position)s of %(duration)s"
-msgstr ""
+msgstr "%(position)s z %(duration)s"
 
 #: ../javascript/lcg.js:1631
 msgid "Playback position"
-msgstr ""
+msgstr "Pozícia prehrávania"
 
 #. Abbreviation for a million (10 ** 6).
 #: ../lcg/plot.py:298
