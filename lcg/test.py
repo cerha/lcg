@@ -1247,6 +1247,15 @@ class HtmlExport(unittest.TestCase):
         assert (l1, l2, l3) == (label_id, value_id, suffix_id)
         assert panel_id == panel_id2
         assert group_label_id == label_id
+        # Secondary choices.
+        html = lcg.DropdownSelection((('1', '/p1', True), ('2', '/p2', False, True),
+                                      ('3', '/p3', False, True), ('4', '/p4', False),
+                                      ('5', '/p5', False, True))).export(context)
+        assert ('<a aria-current="true" href="/p1">1</a> '
+                '<a class="secondary" href="/p2">2</a> <a class="secondary" href="/p3">3</a> '
+                '<span aria-hidden="true" class="gap">…</span> <a href="/p4">4</a> '
+                '<a class="secondary" href="/p5">5</a> '
+                '<span aria-hidden="true" class="gap">…</span></span>') in html, html
         # Without a label and a suffix.
         html = lcg.DropdownSelection((('A', '/a', True),), value='X').export(context)
         assert '<span class="label"' not in html and 'role="group"' not in html, html

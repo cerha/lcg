@@ -568,6 +568,12 @@ class DropdownSelection(Dropdown):
     The widget is exported inside an outer element with the CSS class
     'dropdown-selection', which contains also the label and the suffix.
 
+    Without JavaScript, the links are displayed directly in place of the
+    widget.  Long selections (such as page numbers) may mark some choices as
+    secondary to keep this list reasonably short.  The secondary choices are
+    only displayed in the dropdown, the gaps after them are marked by an
+    ellipsis in the list displayed without JavaScript.
+
     """
 
     def __init__(self, choices, label=None, value=None, suffix=None, cls=None, **kwargs):
@@ -575,7 +581,9 @@ class DropdownSelection(Dropdown):
 
            choices -- sequence of (display, uri, current) triples, where
              'display' is the displayed choice (string), 'uri' is the link target
-             and 'current' is True for the currently selected choice.
+             and 'current' is True for the currently selected choice.  The
+             fourth item 'secondary' may be added to mark the choices left out
+             when JavaScript is off (see the class docstring).
            label -- the selection label displayed before the button as a
              string or None.
            value -- the current value displayed in the button as a string.  The
@@ -600,13 +608,22 @@ class DropdownSelection(Dropdown):
     def _export_button_label(self, context):
         value = self._value
         if value is None:
-            value = next((display for display, uri, current in self._choices if current), '')
+            value = next((c[0] for c in self._choices if c[2]), '')
         return context.generator().span(value, id=self._value_id, cls='value')
 
     def _export_dropdown_content(self, context):
         g = context.generator()
-        links = [g.a(display, href=uri, aria_current='true' if current else None)
-                 for display, uri, current in self._choices]
+        links = []
+        gap = False
+        for display, uri, current, secondary in [tuple(c) + (False,) * (4 - len(c))
+                                                 for c in self._choices]:
+            if not secondary and gap:
+                links.append(g.span('…', cls='gap', aria_hidden='true'))
+            links.append(g.a(display, href=uri, aria_current='true' if current else None,
+                             cls='secondary' if secondary else None))
+            gap = secondary
+        if gap:
+            links.append(g.span('…', cls='gap', aria_hidden='true'))
         return g.span(lcg.concat(links, separator=' '), cls='choices',
                       role='group' if self._label_id else None,
                       aria_labelledby=self._label_id)

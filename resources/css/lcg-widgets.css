@@ -258,6 +258,13 @@
     /* Only displayed with JavaScript (the content is displayed directly otherwise). */
     display: none;
 }
+.dropdown-widget:not(.collapsed):not(.expanded) .choices a.secondary,
+.dropdown-widget.collapsed .choices .gap,
+.dropdown-widget.expanded .choices .gap {
+    /* The secondary choices of 'DropdownSelection' are left out without
+       JavaScript, the gaps after them are only marked in this case. */
+    display: none;
+}
 .dropdown-widget.collapsed > .dropdown-toggle,
 .dropdown-widget.expanded > .dropdown-toggle {
     display: inline-block;
