@@ -915,7 +915,18 @@
     background: #009be3;
 }
 .audio-player-widget .jp-seeking-bg {
-    background: url("jplayer-seeking.gif");
+    /* Moving diagonal stripes while seeking or loading. */
+    background: linear-gradient(-45deg, rgba(255, 255, 255, .3) 25%, transparent 25% 50%,
+                                rgba(255, 255, 255, .3) 50% 75%, transparent 75%) 0 0 / 12px 12px #009be3;
+    animation: lcg-seeking .6s linear infinite;
+}
+@keyframes lcg-seeking {
+    to { background-position: 12px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .audio-player-widget .jp-seeking-bg {
+        animation: none;
+    }
 }
 
 /* Current track, time and duration */
