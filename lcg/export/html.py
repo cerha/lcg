@@ -1298,8 +1298,13 @@ class HtmlExporter(lcg.Exporter):
         return result
 
     def _export_table(self, context, element):
-        return self._export_container(context, element, wrap=self._generator.table,
-                                      cls='lcg-table', title=element.title())
+        # The wrapper allows scrolling the table horizontally when it doesn't
+        # fit the available width (see the CSS).
+        return self._generator.div(
+            self._export_container(context, element, wrap=self._generator.table,
+                                   cls='lcg-table', title=element.title()),
+            cls='lcg-table-wrapper',
+        )
 
     def _export_table_row(self, context, element):
         return self._export_container(context, element, wrap=self._generator.tr)
