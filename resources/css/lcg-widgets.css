@@ -399,13 +399,24 @@
     float: left;
     position: relative;
     top: .5em;
-    background: url(lcg-icons.png) 0 -40px no-repeat;
+    /* A dot for an item without subitems (drawn by an SVG mask as the other
+       icons, see the generic icons above). */
+    background: none;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
+    -webkit-mask-image: var(--lcg-dot-icon);
+    mask-image: var(--lcg-dot-icon);
 }
 .foldable-tree-widget .foldable > .item .icon {
-    background-position: 0 -28px;
+    /* A down pointing triangle for an expanded item. */
+    -webkit-mask-image: var(--lcg-triangle-down-icon);
+    mask-image: var(--lcg-triangle-down-icon);
 }
 .foldable-tree-widget .foldable.collapsed > .item .icon {
-    background-position: 0 -16px;
+    /* A right pointing triangle for a collapsed item. */
+    -webkit-mask-image: var(--lcg-triangle-right-icon);
+    mask-image: var(--lcg-triangle-right-icon);
 }
 .foldable-tree-widget .item .label {
     display: block;
@@ -435,7 +446,13 @@
 }
 .foldable-tree-widget .expander .icon {
     display: block;
-    background: url(lcg-icons.png) -68px 0 no-repeat;
+    /* Expand: a plus sign. */
+    background: none;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
+    -webkit-mask-image: var(--lcg-expand-icon);
+    mask-image: var(--lcg-expand-icon);
     width: 16px;
     height: 16px;
     margin: 0 auto;
@@ -445,7 +462,9 @@
     transform: translate(-50%, -50%);
 }
 .foldable-tree-widget .expanded > .expander .icon {
-    background-position: -68px -16px;
+    /* Collapse: a minus sign. */
+    -webkit-mask-image: var(--lcg-collapse-icon);
+    mask-image: var(--lcg-collapse-icon);
 }
 .foldable-tree-widget .expander .label {
     /* Hide the label from the screen and leave it present for VoiceOver, but work around
@@ -475,10 +494,18 @@
     border: none;
     width: 12px;
     height: 12px;
-    background: url(lcg-icons.png) 0 -16px no-repeat;
+    /* Expand all: a right pointing triangle. */
+    background: none;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
+    -webkit-mask-image: var(--lcg-triangle-right-icon);
+    mask-image: var(--lcg-triangle-right-icon);
 }
 .foldable-tree-widget button.toggle-menu-expansion.expanded {
-    background-position: 0 -28px;
+    /* Collapse all: a down pointing triangle. */
+    -webkit-mask-image: var(--lcg-triangle-down-icon);
+    mask-image: var(--lcg-triangle-down-icon);
 }
 
 /* Notebook widget */
@@ -529,14 +556,23 @@
     display: inline-block;
     width: 16px;
     height: 12px;
-    background: url(lcg-icons.png) 0px 0px no-repeat;
     position: relative;
-    bottom: -1px;
     margin: 0 2px;
     text-indent: -9999px;
     text-align: left;
     overflow: hidden;
     outline: none;
+}
+.popup-menu-ctrl-widget .popup-arrow::after {
+    /* Down pointing arrow (the same as of the 'Dropdown' widget). */
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -2px 0 0 -4px;
+    border: 4px solid transparent;
+    border-top-color: currentColor;
+    border-bottom: none;
 }
 .popup-menu-widget {
     position: absolute;
@@ -606,7 +642,23 @@
     border-radius: 7px;
     -moz-border-radius: 7px;
     -webkit-border-radius: 7px;
-    background: url(lcg-icons.png) -23px -39px no-repeat #ddd;
+    background-color: #ddd;
+    color: #555;
+}
+.popup-menu-widget .close-menu::after {
+    /* Close: a cross. */
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: none;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
+    -webkit-mask-image: var(--lcg-close-icon);
+    mask-image: var(--lcg-close-icon);
 }
 
 /* Dropdown widget */
@@ -723,9 +775,15 @@
 .collapsible-pane-widget .pane-title .icon {
     vertical-align: middle;
     display: inline-block;
-    width: 12px;
-    height: 12px;
-    background: url(lcg-icons.png) -13px -16px no-repeat;
+    width: .75em;
+    height: .75em;
+    /* Expand: a right pointing triangle. */
+    background: none;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
+    -webkit-mask-image: var(--lcg-triangle-right-icon);
+    mask-image: var(--lcg-triangle-right-icon);
 }
 .collapsible-pane-widget .collapsible-pane-heading,
 .collapsible-section-widget .collapsible-section-heading,
@@ -744,12 +802,11 @@
     color: inherit;
 }
 .collapsible-section-widget.expanded > div > div > div > .collapsible-section-heading .icon,
+.collapsible-section-widget.expanded > section > div > div > .collapsible-section-heading .icon,
 .collapsible-pane-widget.expanded > .pane-title .icon {
-    background-position: -12px -28px;
-}
-.collapsible-section-widget.expanded > section > div > div > .collapsible-section-heading .icon {
-    /* For unknown reasons, HTML 5 <section> needs this icon offsets. */
-    background-position: -48px -37px;
+    /* Collapse: a down pointing triangle. */
+    -webkit-mask-image: var(--lcg-triangle-down-icon);
+    mask-image: var(--lcg-triangle-down-icon);
 }
 
 /* Audio player displayed at the bottom of the page. */
@@ -802,7 +859,10 @@
     display: inline-block;
     overflow: hidden;
     text-indent: -9999px;
-    background: url("lcg-icons.png") 0 0 no-repeat;
+    background: none;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
     width: 16px;
     height: 16px;
 }
@@ -815,18 +875,22 @@
 /* Playback controls */
 
 .audio-player-widget .play-pause span {
-    background-position: -34px 0;
+    -webkit-mask-image: var(--lcg-play-icon);
+    mask-image: var(--lcg-play-icon);
 }
 .audio-player-widget .jp-state-playing .play-pause span {
-    background-position: -52px 0;
+    -webkit-mask-image: var(--lcg-pause-icon);
+    mask-image: var(--lcg-pause-icon);
 }
 .audio-player-widget .fast-forward span {
     left: 0px;
-    background-position: -34px -16px;
+    -webkit-mask-image: var(--lcg-fast-forward-icon);
+    mask-image: var(--lcg-fast-forward-icon);
 }
 .audio-player-widget .rewind span {
     left: 66px;
-    background-position: -52px -16px;
+    -webkit-mask-image: var(--lcg-rewind-icon);
+    mask-image: var(--lcg-rewind-icon);
 }
 
 /* Progress bar */
@@ -903,11 +967,13 @@
     left: 0;
 }
 .audio-player-widget .volume-down span {
-    background-position: -34px -32px;
+    -webkit-mask-image: var(--lcg-volume-down-icon);
+    mask-image: var(--lcg-volume-down-icon);
 }
 .audio-player-widget .volume-up {
     left: 31px;
 }
 .audio-player-widget .volume-up span {
-    background-position: -52px -32px;
+    -webkit-mask-image: var(--lcg-volume-up-icon);
+    mask-image: var(--lcg-volume-up-icon);
 }
