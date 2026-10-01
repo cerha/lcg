@@ -1,5 +1,369 @@
 /* Styles for LCG widgets implemented in widgets.py and lcg.js */
 
+/* Generic icons
+
+   The icons are referred to by their class names, such as 'search-icon', given
+   to the widgets (see the 'icon' argument of 'PopupMenuItem' or 'Button') or
+   to any other element, such as <span class="icon search-icon"></span>.
+   They are drawn by SVG masks to scale with the text and follow its color.
+   All icons (including those used internally by the widgets below) are also
+   defined as custom properties, such as '--lcg-search-icon', to be used as
+   'mask-image' in other style sheets (such as for pseudo elements).
+   Applications may define additional icons of their own in the same way. */
+
+:root {
+    /* Confirm: a check mark. */
+    --lcg-ok-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 8.5l3.5 3.5L13 4.5'/></svg>");
+    /* Remove, cancel: a cross. */
+    --lcg-remove-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 4l8 8M12 4l-8 8'/></svg>");
+    /* Undo: an arrow making a U-turn back to the left. */
+    --lcg-undo-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5.5 2.5L2.5 5.5l3 3'/><path d='M3 5.5h6.5a4 4 0 0 1 0 8H6.5'/></svg>");
+    /* Search: a magnifying glass. */
+    --lcg-search-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='6.5' cy='6.5' r='4.5'/><path d='M10 10l4.5 4.5'/></svg>");
+    /* Refresh: a circular arrow (an almost closed circle ending in the corner of
+       an arrowhead at its upper right). */
+    --lcg-refresh-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M13 10.3A5.5 5.5 0 1 1 8 2.5c1.6 0 3.1.7 4.2 1.8L13.5 5.5'/><path d='M13.5 2v3.5H10'/></svg>");
+    /* User: a silhouette of a head and shoulders. */
+    --lcg-user-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><g fill='%23000'><ellipse cx='8' cy='4.9' rx='3.3' ry='3.7'/><path d='M1 15.5V13.5C1 10.8 3.4 9.3 5.6 8.9A4 4.5 0 0 0 10.4 8.9C12.6 9.3 15 10.8 15 13.5v2z'/></g></svg>");
+    /* Log in, enter: an arrow entering a door frame from the left. */
+    --lcg-login-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5h2A1.5 1.5 0 0 1 13.5 4v8a1.5 1.5 0 0 1-1.5 1.5h-2'/><path d='M2.5 8H10M7 5l3 3-3 3'/></svg>");
+    /* Log out, leave: an arrow leaving a door frame to the right. */
+    --lcg-logout-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2.5H4A1.5 1.5 0 0 0 2.5 4v8A1.5 1.5 0 0 0 4 13.5h2'/><path d='M6 8h7.5M10.5 5l3 3-3 3'/></svg>");
+    /* Password: a key (a round bow with a hole and a shaft with fine teeth). */
+    --lcg-key-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='%23000' fill-rule='evenodd' d='M11 .8a4.4 4.4 0 1 1 0 8.8a4.4 4.4 0 1 1 0-8.8zM11.4 3h1.6v1.6h-1.6z'/><path d='M8.2 7.8L2.6 13.4' stroke='%23000' stroke-width='3.2' stroke-linecap='round' fill='none'/><path d='M4.15 13.25l1.1 1.1M5.3 12.1l1.1 1.1M6.45 10.95l1.1 1.1' stroke='%23000' stroke-width='1.1' fill='none'/></svg>");
+    /* New user: a silhouette of a head and shoulders with a plus sign. */
+    --lcg-new-user-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><g fill='%23000' transform='matrix(.75 0 0 .85 -.25 2.3)'><ellipse cx='8' cy='4.9' rx='3.3' ry='3.7'/><path d='M1 15.5V13.5C1 10.8 3.4 9.3 5.6 8.9A4 4.5 0 0 0 10.4 8.9C12.6 9.3 15 10.8 15 13.5v2z'/></g><path d='M12.5 2.5v5M10 5h5' stroke='%23000' stroke-width='2' stroke-linecap='round'/></svg>");
+    /* Settings, administration: a gear wheel (six teeth around a hole with an
+       axle). */
+    --lcg-gear-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='%23000' stroke='%23000' stroke-width='.8' stroke-linejoin='round' fill-rule='evenodd' d='M8 .7Q10.6 3.5 14.32 4.35Q13.2 8 14.32 11.65Q10.6 12.5 8 15.3Q5.4 12.5 1.68 11.65Q2.8 8 1.68 4.35Q5.4 3.5 8 .7zM8 3.6a4.4 4.4 0 1 0 0 8.8a4.4 4.4 0 1 0 0-8.8z'/><circle cx='8' cy='8' r='1.6' fill='%23000'/></svg>");
+    /* Edit: a pencil. */
+    --lcg-edit-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10.5 2.5l3 3-8 8h-3v-3z'/><path d='M8.5 4.5l3 3'/></svg>");
+    /* Create, add: a plus sign. */
+    --lcg-create-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 2.5v11M2.5 8h11'/></svg>");
+    /* Maximize: four corners pointing outwards. */
+    --lcg-maximize-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10'/></svg>");
+    /* Restore the original size: four corners pointing inwards. */
+    --lcg-unmaximize-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2.5V6H2.5M10 2.5V6h3.5M13.5 10H10v3.5M6 13.5V10H2.5'/></svg>");
+    /* Menu: three horizontal lines. */
+    --lcg-menu-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M2.5 4h11M2.5 8h11M2.5 12h11'/></svg>");
+    /* View: an eye. */
+    --lcg-view-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linejoin='round'><path d='M1 8c1.6-3.2 4-4.8 7-4.8s5.4 1.6 7 4.8c-1.6 3.2-4 4.8-7 4.8S2.6 11.2 1 8z'/><circle cx='8' cy='8' r='2.3' fill='%23000' stroke='none'/></svg>");
+    /* Copy: two overlapping pages. */
+    --lcg-copy-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='5.3' y='5.3' width='9' height='9.4' rx='1.2'/><path d='M3.3 10.7h-.5a1.2 1.2 0 0 1-1.2-1.2V2.5a1.2 1.2 0 0 1 1.2-1.2h6.6a1.2 1.2 0 0 1 1.2 1.2v.6'/></svg>");
+    /* List: three bullets with lines. */
+    --lcg-list-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'><path d='M6 3.5h8M6 8h8M6 12.5h8'/><g fill='%23000' stroke='none'><circle cx='2.3' cy='3.5' r='1.3'/><circle cx='2.3' cy='8' r='1.3'/><circle cx='2.3' cy='12.5' r='1.3'/></g></svg>");
+    /* More options: three dots. */
+    --lcg-ellipsis-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><circle cx='2.8' cy='8' r='1.5'/><circle cx='8' cy='8' r='1.5'/><circle cx='13.2' cy='8' r='1.5'/></svg>");
+    /* Mail: an envelope. */
+    --lcg-mail-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='1.3' y='3.3' width='13.4' height='9.4' rx='1.2'/><path d='M1.8 4l6.2 4.8L14.2 4'/></svg>");
+    /* Attachment: a paper clip. */
+    --lcg-attachment-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M13.5 7.5l-5.8 5.8a3.3 3.3 0 0 1-4.7-4.7l6.3-6.3a2.2 2.2 0 0 1 3.1 3.1l-6.2 6.2a1.1 1.1 0 0 1-1.6-1.6l5.6-5.6'/></svg>");
+    /* Tag: a label with a hole. */
+    --lcg-tag-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='%23000' stroke='%23000' stroke-width='1.2' stroke-linejoin='round' fill-rule='evenodd' d='M1.5 1.5h6l7 7-6 6-7-7zM5 3.2a1.8 1.8 0 1 0 0 3.6a1.8 1.8 0 1 0 0-3.6z'/></svg>");
+    /* Disable: a crossed out circle. */
+    --lcg-disable-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'><circle cx='8' cy='8' r='6.3'/><path d='M3.6 12.4l8.8-8.8'/></svg>");
+    /* Approve, enable: a thumb up. */
+    --lcg-thumb-up-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><rect x='1' y='7' width='3.2' height='8' rx='.6'/><path d='M5.3 7.3L8.4 1.2c1.4 0 2.3 1 2 2.4L9.9 6.3h3.6a1.6 1.6 0 0 1 1.55 2l-1.4 5.4A1.6 1.6 0 0 1 12.1 15H5.3z'/></svg>");
+    /* Reject, disable: a thumb down. */
+    --lcg-thumb-down-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><g transform='matrix(1 0 0 -1 0 16)'><rect x='1' y='7' width='3.2' height='8' rx='.6'/><path d='M5.3 7.3L8.4 1.2c1.4 0 2.3 1 2 2.4L9.9 6.3h3.6a1.6 1.6 0 0 1 1.55 2l-1.4 5.4A1.6 1.6 0 0 1 12.1 15H5.3z'/></g></svg>");
+    /* Shopping cart: a cart with two wheels. */
+    --lcg-cart-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M1 2h2.3l1.8 8h7.8l1.6-5.8H4'/><circle cx='6' cy='13.3' r='1.3' fill='%23000' stroke='none'/><circle cx='12' cy='13.3' r='1.3' fill='%23000' stroke='none'/></svg>");
+    /* Download: an arrow pointing down into a tray. */
+    --lcg-download-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 1.5v8M4.5 6L8 9.5 11.5 6M1.5 10v3.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V10'/></svg>");
+    /* Publish, activate: an arrow pointing up from a line. */
+    --lcg-publish-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 11V2M4 6l4-4 4 4M2.5 14.5h11'/></svg>");
+    /* Upload: an arrow pointing up out of a tray. */
+    --lcg-upload-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 9.5v-8M4.5 5L8 1.5 11.5 5M1.5 10v3.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V10'/></svg>");
+    /* Reply: an arrow turning back to the left. */
+    --lcg-reply-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2.5L1.5 7 6 11.5'/><path d='M2 7h6a6 6 0 0 1 6 6v.5'/></svg>");
+    /* Quote: a closing quotation mark. */
+    --lcg-quote-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round'><path d='M6.7 6.5c0 3.4-1.6 5.6-4.2 6.8M14.2 6.5c0 3.4-1.6 5.6-4.2 6.8'/><g fill='%23000' stroke='none'><circle cx='4.3' cy='6.2' r='2.5'/><circle cx='11.8' cy='6.2' r='2.5'/></g></svg>");
+    /* Feed: a dot with two radio waves. */
+    --lcg-feed-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'><path d='M2.5 7.5a6 6 0 0 1 6 6M2.5 2.5a11 11 0 0 1 11 11'/><circle cx='3.2' cy='12.8' r='1.6' fill='%23000' stroke='none'/></svg>");
+    /* Print: a printer with a sheet of paper. */
+    --lcg-print-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M4.5 5.5V1.8h7v3.7'/><path d='M4.5 12H2.6a1.1 1.1 0 0 1-1.1-1.1V6.6a1.1 1.1 0 0 1 1.1-1.1h10.8a1.1 1.1 0 0 1 1.1 1.1v4.3a1.1 1.1 0 0 1-1.1 1.1H11.5'/><path d='M4.5 9.3h7v5h-7z'/></svg>");
+    /* Loading: a quarter of a circle on a faint ring (rotated by the
+       'loading-icon' class). */
+    --lcg-loading-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'><circle cx='8' cy='8' r='6' stroke-opacity='.25'/><path d='M8 2a6 6 0 0 1 6 6'/></svg>");
+    /* Back, previous: a left pointing chevron. */
+    --lcg-arrow-left-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M10 2.5L4.5 8l5.5 5.5'/></svg>");
+    /* Forward, next: a right pointing chevron. */
+    --lcg-arrow-right-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2.5L11.5 8 6 13.5'/></svg>");
+    /* Up, return to the parent: an up pointing chevron. */
+    --lcg-arrow-up-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M2.5 10.5L8 5l5.5 5.5'/></svg>");
+    /* Down: a down pointing chevron. */
+    --lcg-arrow-down-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M2.5 5.5L8 11l5.5-5.5'/></svg>");
+    /* Information: a letter 'i' in a circle. */
+    --lcg-info-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><path fill-rule='evenodd' d='M8 1a7 7 0 1 0 0 14A7 7 0 1 0 8 1zM7 3.6h2v2H7zM7 6.8h2v5.6H7z'/></svg>");
+    /* Success: a check mark. */
+    --lcg-success-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><path d='M2.5 8.5L6 12l7.5-8' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    /* Error: a horizontal bar in a circle (a no entry sign). */
+    --lcg-error-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><path fill-rule='evenodd' d='M8 1a7 7 0 1 0 0 14A7 7 0 1 0 8 1zM3.8 6.9h8.4v2.2H3.8z'/></svg>");
+    /* Warning: an exclamation mark in a triangle with rounded corners. */
+    --lcg-warning-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'><path d='M8.85 1.86L15.15 13.37Q16 14.92 14.2 14.92H1.8Q0 14.92 .85 13.37L7.15 1.86Q8 .31 8.85 1.86z' fill='none' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'/><path d='M8 5.6v4' stroke='%23000' stroke-width='1.8' stroke-linecap='round'/><circle cx='8' cy='12.1' r='1.05'/></svg>");
+    /* Play: a right pointing triangle. */
+    --lcg-play-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'><path d='M4.5 2.5L13.5 8l-9 5.5z'/></svg>");
+    /* Pause: two vertical bars. */
+    --lcg-pause-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'><rect x='3.5' y='2.5' width='3' height='11' rx='.6'/><rect x='9.5' y='2.5' width='3' height='11' rx='.6'/></svg>");
+    /* Fast forward: two right pointing triangles. */
+    --lcg-fast-forward-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'><path d='M1.5 3.5L8 8l-6.5 4.5zM8 3.5L14.5 8 8 12.5z'/></svg>");
+    /* Rewind: two left pointing triangles. */
+    --lcg-rewind-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'><path d='M14.5 3.5L8 8l6.5 4.5zM8 3.5L1.5 8 8 12.5z'/></svg>");
+    /* Volume down: a speaker with one sound wave. */
+    --lcg-volume-down-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'><path d='M1.5 6h3l4-3.5v11l-4-3.5h-3z'/><path d='M11 5.5a3 3 0 0 1 0 5' fill='none' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    /* Volume up: a speaker with two sound waves. */
+    --lcg-volume-up-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'><path d='M1.5 6h3l4-3.5v11l-4-3.5h-3z'/><path d='M11 5.5a3 3 0 0 1 0 5M12.8 3.5a6 6 0 0 1 0 9' fill='none' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    /* A small dot (a tree item without subitems). */
+    --lcg-dot-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='%23000'><circle cx='6' cy='6' r='1.75'/></svg>");
+    /* Expanded, collapse: a small down pointing triangle. */
+    --lcg-triangle-down-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='%23000'><path d='M1 3.5h10L6 8.5z'/></svg>");
+    /* Collapsed, expand: a small right pointing triangle. */
+    --lcg-triangle-right-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='%23000'><path d='M3.75 1l5 5-5 5z'/></svg>");
+    /* A small up pointing triangle. */
+    --lcg-triangle-up-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='%23000'><path d='M1 8.5h10L6 3.5z'/></svg>");
+    /* Expand: a plus sign (slightly smaller than 'create'). */
+    --lcg-expand-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M8 3v10M3 8h10'/></svg>");
+    /* Collapse: a minus sign. */
+    --lcg-collapse-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 8h10'/></svg>");
+    /* Close: a small cross (with a wider padding than 'remove'). */
+    --lcg-close-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 3.5l5 5M8.5 3.5l-5 5'/></svg>");
+}
+.ok-icon, .remove-icon, .undo-icon, .search-icon, .refresh-icon, .user-icon,
+.login-icon, .logout-icon, .key-icon, .new-user-icon,
+.gear-icon, .edit-icon, .create-icon, .maximize-icon, .unmaximize-icon, .menu-icon,
+.view-icon, .copy-icon, .list-icon, .ellipsis-icon, .mail-icon, .attachment-icon,
+.tag-icon, .disable-icon, .thumb-up-icon, .thumb-down-icon, .cart-icon,
+.download-icon, .publish-icon, .upload-icon, .reply-icon, .quote-icon, .feed-icon,
+.print-icon, .loading-icon,
+.play-icon, .pause-icon, .fast-forward-icon, .rewind-icon, .volume-down-icon, .volume-up-icon,
+.arrow-left-icon, .arrow-right-icon, .arrow-up-icon, .arrow-down-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -.15em;
+    background-color: currentColor;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
+}
+.ok-icon {
+    -webkit-mask-image: var(--lcg-ok-icon);
+    mask-image: var(--lcg-ok-icon);
+}
+.remove-icon {
+    -webkit-mask-image: var(--lcg-remove-icon);
+    mask-image: var(--lcg-remove-icon);
+}
+.undo-icon {
+    -webkit-mask-image: var(--lcg-undo-icon);
+    mask-image: var(--lcg-undo-icon);
+}
+.search-icon {
+    -webkit-mask-image: var(--lcg-search-icon);
+    mask-image: var(--lcg-search-icon);
+}
+.refresh-icon {
+    -webkit-mask-image: var(--lcg-refresh-icon);
+    mask-image: var(--lcg-refresh-icon);
+}
+.user-icon {
+    -webkit-mask-image: var(--lcg-user-icon);
+    mask-image: var(--lcg-user-icon);
+}
+.login-icon {
+    -webkit-mask-image: var(--lcg-login-icon);
+    mask-image: var(--lcg-login-icon);
+}
+.logout-icon {
+    -webkit-mask-image: var(--lcg-logout-icon);
+    mask-image: var(--lcg-logout-icon);
+}
+.key-icon {
+    -webkit-mask-image: var(--lcg-key-icon);
+    mask-image: var(--lcg-key-icon);
+}
+.new-user-icon {
+    -webkit-mask-image: var(--lcg-new-user-icon);
+    mask-image: var(--lcg-new-user-icon);
+}
+.gear-icon {
+    -webkit-mask-image: var(--lcg-gear-icon);
+    mask-image: var(--lcg-gear-icon);
+}
+.edit-icon {
+    -webkit-mask-image: var(--lcg-edit-icon);
+    mask-image: var(--lcg-edit-icon);
+}
+.create-icon {
+    -webkit-mask-image: var(--lcg-create-icon);
+    mask-image: var(--lcg-create-icon);
+}
+.maximize-icon {
+    -webkit-mask-image: var(--lcg-maximize-icon);
+    mask-image: var(--lcg-maximize-icon);
+}
+.unmaximize-icon {
+    -webkit-mask-image: var(--lcg-unmaximize-icon);
+    mask-image: var(--lcg-unmaximize-icon);
+}
+.menu-icon {
+    -webkit-mask-image: var(--lcg-menu-icon);
+    mask-image: var(--lcg-menu-icon);
+}
+.view-icon {
+    -webkit-mask-image: var(--lcg-view-icon);
+    mask-image: var(--lcg-view-icon);
+}
+.copy-icon {
+    -webkit-mask-image: var(--lcg-copy-icon);
+    mask-image: var(--lcg-copy-icon);
+}
+.list-icon {
+    -webkit-mask-image: var(--lcg-list-icon);
+    mask-image: var(--lcg-list-icon);
+}
+.ellipsis-icon {
+    -webkit-mask-image: var(--lcg-ellipsis-icon);
+    mask-image: var(--lcg-ellipsis-icon);
+}
+.mail-icon {
+    -webkit-mask-image: var(--lcg-mail-icon);
+    mask-image: var(--lcg-mail-icon);
+}
+.attachment-icon {
+    -webkit-mask-image: var(--lcg-attachment-icon);
+    mask-image: var(--lcg-attachment-icon);
+}
+.tag-icon {
+    -webkit-mask-image: var(--lcg-tag-icon);
+    mask-image: var(--lcg-tag-icon);
+}
+.disable-icon {
+    -webkit-mask-image: var(--lcg-disable-icon);
+    mask-image: var(--lcg-disable-icon);
+}
+.thumb-up-icon {
+    -webkit-mask-image: var(--lcg-thumb-up-icon);
+    mask-image: var(--lcg-thumb-up-icon);
+}
+.thumb-down-icon {
+    -webkit-mask-image: var(--lcg-thumb-down-icon);
+    mask-image: var(--lcg-thumb-down-icon);
+}
+.cart-icon {
+    -webkit-mask-image: var(--lcg-cart-icon);
+    mask-image: var(--lcg-cart-icon);
+}
+.download-icon {
+    -webkit-mask-image: var(--lcg-download-icon);
+    mask-image: var(--lcg-download-icon);
+}
+.publish-icon {
+    -webkit-mask-image: var(--lcg-publish-icon);
+    mask-image: var(--lcg-publish-icon);
+}
+.upload-icon {
+    -webkit-mask-image: var(--lcg-upload-icon);
+    mask-image: var(--lcg-upload-icon);
+}
+.reply-icon {
+    -webkit-mask-image: var(--lcg-reply-icon);
+    mask-image: var(--lcg-reply-icon);
+}
+.quote-icon {
+    -webkit-mask-image: var(--lcg-quote-icon);
+    mask-image: var(--lcg-quote-icon);
+}
+.feed-icon {
+    -webkit-mask-image: var(--lcg-feed-icon);
+    mask-image: var(--lcg-feed-icon);
+}
+.print-icon {
+    -webkit-mask-image: var(--lcg-print-icon);
+    mask-image: var(--lcg-print-icon);
+}
+.loading-icon {
+    -webkit-mask-image: var(--lcg-loading-icon);
+    mask-image: var(--lcg-loading-icon);
+    animation: lcg-spin 1s linear infinite;
+}
+@keyframes lcg-spin {
+    to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .loading-icon {
+        animation-duration: 3s;
+    }
+}
+.arrow-left-icon {
+    -webkit-mask-image: var(--lcg-arrow-left-icon);
+    mask-image: var(--lcg-arrow-left-icon);
+}
+.arrow-right-icon {
+    -webkit-mask-image: var(--lcg-arrow-right-icon);
+    mask-image: var(--lcg-arrow-right-icon);
+}
+.arrow-up-icon {
+    -webkit-mask-image: var(--lcg-arrow-up-icon);
+    mask-image: var(--lcg-arrow-up-icon);
+}
+.arrow-down-icon {
+    -webkit-mask-image: var(--lcg-arrow-down-icon);
+    mask-image: var(--lcg-arrow-down-icon);
+}
+/* The message icons have their own colors and a larger size by default. */
+.info-icon, .success-icon, .error-icon, .warning-icon {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    vertical-align: -.25em;
+    -webkit-mask: center / contain no-repeat;
+    mask: center / contain no-repeat;
+}
+.info-icon {
+    background-color: #444;
+    -webkit-mask-image: var(--lcg-info-icon);
+    mask-image: var(--lcg-info-icon);
+}
+.success-icon {
+    background-color: #2a9a2a;
+    -webkit-mask-image: var(--lcg-success-icon);
+    mask-image: var(--lcg-success-icon);
+}
+.error-icon {
+    background-color: #d02020;
+    -webkit-mask-image: var(--lcg-error-icon);
+    mask-image: var(--lcg-error-icon);
+}
+.warning-icon {
+    background-color: #333;
+    -webkit-mask-image: var(--lcg-warning-icon);
+    mask-image: var(--lcg-warning-icon);
+}
+.play-icon {
+    -webkit-mask-image: var(--lcg-play-icon);
+    mask-image: var(--lcg-play-icon);
+}
+.pause-icon {
+    -webkit-mask-image: var(--lcg-pause-icon);
+    mask-image: var(--lcg-pause-icon);
+}
+.fast-forward-icon {
+    -webkit-mask-image: var(--lcg-fast-forward-icon);
+    mask-image: var(--lcg-fast-forward-icon);
+}
+.rewind-icon {
+    -webkit-mask-image: var(--lcg-rewind-icon);
+    mask-image: var(--lcg-rewind-icon);
+}
+.volume-down-icon {
+    -webkit-mask-image: var(--lcg-volume-down-icon);
+    mask-image: var(--lcg-volume-down-icon);
+}
+.volume-up-icon {
+    -webkit-mask-image: var(--lcg-volume-up-icon);
+    mask-image: var(--lcg-volume-up-icon);
+}
+
 /* FoldableTree widget */
 
 .foldable-tree-widget {
