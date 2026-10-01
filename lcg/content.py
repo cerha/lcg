@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,22 +33,13 @@ the hierarchy of the nodes themselves.
 
 """
 
-from __future__ import unicode_literals
-from future import standard_library
-from builtins import range
 
-import sys
 import copy
 import re
 import lcg
 
 
 _ = lcg.TranslatableTextFactory('lcg')
-
-standard_library.install_aliases()
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class Content(object):
@@ -125,10 +114,10 @@ class Content(object):
 
         Arguments:
 
-          number -- the page number; basestring
+          number -- the page number; str
 
         """
-        assert isinstance(number, basestring), number
+        assert isinstance(number, str), number
         self._page_number = number
 
     def parent(self):
@@ -317,17 +306,17 @@ class Container(Content):
 
         """
         super(Container, self).__init__(**kwargs)
-        assert isinstance(name, basestring) or lcg.is_sequence_of(name, basestring), name
-        assert halign is None or isinstance(halign, basestring), halign
-        assert valign is None or isinstance(valign, basestring), valign
-        assert orientation is None or isinstance(orientation, basestring), orientation
-        assert id is None or isinstance(id, basestring), id
+        assert isinstance(name, str) or lcg.is_sequence_of(name, str), name
+        assert halign is None or isinstance(halign, str), halign
+        assert valign is None or isinstance(valign, str), valign
+        assert orientation is None or isinstance(orientation, str), orientation
+        assert id is None or isinstance(id, str), id
         assert width is None or isinstance(width, lcg.Unit), width
         assert height is None or isinstance(height, lcg.Unit), height
         assert (padding is None or isinstance(padding, lcg.Unit)
                 or lcg.is_sequence_of(padding, lcg.Unit) and len(padding) in (2, 4)), padding
         self._id = id
-        if isinstance(name, basestring):
+        if isinstance(name, str):
             names = (name,)
         else:
             names = tuple(name)
@@ -477,12 +466,12 @@ class Quotation(Container):
 
           content -- quoted content as lcg.Content instance
           source -- reference to the source of the quotation, such as the
-            original author, publication, web page etc. (basestring)
-          uri -- link to the source (basestring)
+            original author, publication, web page etc. (str)
+          uri -- link to the source (str)
 
         """
-        assert source is None or isinstance(source, basestring), source
-        assert uri is None or isinstance(uri, basestring), uri
+        assert source is None or isinstance(source, str), source
+        assert uri is None or isinstance(uri, str), uri
         self._source = source
         self._uri = uri
         super(Quotation, self).__init__(content, **kwargs)
@@ -519,11 +508,11 @@ class TextContent(Content):
           kwargs -- keyword arguments for parent class constructor.
 
         """
-        assert isinstance(text, basestring), text
+        assert isinstance(text, str), text
         super(TextContent, self).__init__(**kwargs)
         self._text = text
 
-    def __unicode__(self):
+    def __str__(self):
         text = self._text.strip()
         sample = text and text.splitlines()[0] or ''
         if len(sample) > 20:
@@ -542,7 +531,7 @@ class TextContent(Content):
 
         Arguments:
 
-          text -- text content of the element copy; basestring
+          text -- text content of the element copy; str
 
         """
         cloned = copy.copy(self)
@@ -586,7 +575,7 @@ class Link(Container):
         """Arguments:
 
           target -- target of the link, instance of 'Section', 'lcg.ContentNode',
-            'lcg.Resource', 'Link.ExternalTarget' or 'basestring'.  If a string is
+            'lcg.Resource', 'Link.ExternalTarget' or 'str'.  If a string is
             used, it is a temporary reference to be resolved in export time.
             It allows creation of links which refer to objects, which can not
             be resolved at the time of Link instance creation (their instances
@@ -602,12 +591,12 @@ class Link(Container):
 
         """
         assert isinstance(target, (Section, lcg.ContentNode, lcg.Resource, self.ExternalTarget,
-                                   basestring)), target
-        assert label is None or isinstance(label, (basestring, Content)), label
-        assert descr is None or isinstance(descr, basestring), descr
-        assert type is None or isinstance(type, basestring), type
-        assert lang is None or isinstance(lang, basestring), lang
-        if isinstance(label, basestring):
+                                   str)), target
+        assert label is None or isinstance(label, (str, Content)), label
+        assert descr is None or isinstance(descr, str), descr
+        assert type is None or isinstance(type, str), type
+        assert lang is None or isinstance(lang, str), lang
+        if isinstance(label, str):
             content = TextContent(label)
         elif label is not None:
             content = label
@@ -627,7 +616,7 @@ class Link(Container):
 
         """
         target = self._target
-        if isinstance(target, basestring):
+        if isinstance(target, str):
             reference = target
             target = context.resource(reference, warn=False)
             if target is None and '@' not in reference:
@@ -653,9 +642,9 @@ class Link(Container):
         return self._type
 
     def node_id(self):
-        "Return target node id (basestring) or 'None'."
+        "Return target node id (str) or 'None'."
         target = self._target
-        if isinstance(target, basestring) and '#' in target:
+        if isinstance(target, str) and '#' in target:
             return target.split('#', 1)[0]
         return None
 
@@ -670,7 +659,7 @@ class Abbreviation(TextContent):
           descr -- the description as a string or unicode.
 
         """
-        assert isinstance(descr, basestring), descr
+        assert isinstance(descr, str), descr
         self._descr = descr
         super(Abbreviation, self).__init__(text, **kwargs)
 
@@ -689,7 +678,7 @@ class Anchor(TextContent):
           text -- text of the target place as a string or unicode.
 
         """
-        assert isinstance(anchor, basestring), anchor
+        assert isinstance(anchor, str), anchor
         self._anchor = anchor
         super(Anchor, self).__init__(text, **kwargs)
 
@@ -713,16 +702,16 @@ class _InlineObject(Content):
           lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
 
         """
-        assert title is None or isinstance(title, basestring), title
-        assert descr is None or isinstance(descr, basestring), descr
-        assert name is None or isinstance(name, basestring), name
+        assert title is None or isinstance(title, str), title
+        assert descr is None or isinstance(descr, str), descr
+        assert name is None or isinstance(name, str), name
         self._title = title
         self._descr = descr
         self._name = name
         super(_InlineObject, self).__init__(lang=lang)
 
     def _resource_instance(self, context, resource, cls):
-        if isinstance(resource, basestring):
+        if isinstance(resource, str):
             filename = resource
             if ((filename.startswith('http:') or filename.startswith('https:') or
                  filename.startswith('ftp:'))):
@@ -784,7 +773,7 @@ class InlineImage(_InlineObject):
         All other keyword arguments are passed to the parent class constructor.
 
         """
-        assert isinstance(image, (lcg.Image, basestring)), image
+        assert isinstance(image, (lcg.Image, str)), image
         assert align in (None, self.LEFT, self.RIGHT, self.TOP, self.BOTTOM, self.MIDDLE), align
         assert width is None or isinstance(width, lcg.Unit), width
         assert height is None or isinstance(height, lcg.Unit), height
@@ -839,8 +828,8 @@ class InlineAudio(_InlineObject):
         All other arguments are passed to the parent class constructor.
 
         """
-        assert isinstance(audio, (lcg.Audio, basestring)), audio
-        assert image is None or isinstance(image, (lcg.Image, basestring)), image
+        assert isinstance(audio, (lcg.Audio, str)), audio
+        assert image is None or isinstance(image, (lcg.Image, str)), image
         self._audio = audio
         self._image = image
         super(InlineAudio, self).__init__(**kwargs)
@@ -882,8 +871,8 @@ class InlineVideo(_InlineObject):
         All other keyword arguments are passed to the parent class constructor.
 
         """
-        assert isinstance(video, (lcg.Video, basestring)), video
-        assert image is None or isinstance(image, (lcg.Image, basestring)), image
+        assert isinstance(video, (lcg.Video, str)), video
+        assert image is None or isinstance(image, (lcg.Image, str)), image
         assert size is None or isinstance(size, tuple), size
         self._video = video
         self._image = image
@@ -934,7 +923,7 @@ class InlineExternalVideo(Content):
 
         """
         assert service in ('youtube', 'vimeo'), service
-        assert isinstance(video_id, basestring), video_id
+        assert isinstance(video_id, str), video_id
         assert size is None or isinstance(size, tuple), size
         self._service = service
         self._video_id = video_id
@@ -1050,7 +1039,7 @@ class PageNumber(Content):
           total -- iff true, output not only the page number, but also the
             total number of pages; if 'separator' is 'None', output only the
             total number of pages
-          separator -- basestring or 'None'; if it is a basestring and 'total'
+          separator -- str or 'None'; if it is a str and 'total'
             is true, insert it betwenn the page numebr and the total number of
             pages
           lang -- content language as an ISO 639-1 Alpha-2 language code (lowercase)
@@ -1142,15 +1131,15 @@ class HtmlContent(Content):
 
         Arguments:
 
-          content -- the actual HTML content of this element as a basestring
+          content -- the actual HTML content of this element as a str
             or an export function (see class docstring for details).
           *args -- additional positional arguments passed to the export
             function (given in 'content').  No arguments are allowed when
-            'content' is a basestring.
+            'content' is a str.
           kwargs -- keyword arguments for parent class constructor.
 
         """
-        assert isinstance(content, basestring) or callable(content), content
+        assert isinstance(content, str) or callable(content), content
         self._content = content
         self._export_args = args
         super(HtmlContent, self).__init__(**kwargs)
@@ -1158,7 +1147,7 @@ class HtmlContent(Content):
     def export(self, context):
         assert isinstance(context.exporter(), lcg.HtmlExporter), \
             "Only HTML export is supported for this element."
-        if isinstance(self._content, basestring):
+        if isinstance(self._content, str):
             g = context.generator()
             return g.noescape(self._content)
         else:
@@ -1199,8 +1188,8 @@ class PreformattedText(TextContent):
     def __init__(self, text, mime_type=None, **kwargs):
         """Arguments:
 
-          text -- the text itself as a basestring.
-          mime_type -- MIME type of the text as a basestring.  Used for
+          text -- the text itself as a str.
+          mime_type -- MIME type of the text as a str.  Used for
             syntax highlighting in HTML export.
 
         """
@@ -1387,7 +1376,7 @@ class Table(Container):
             narrower tables).
 
         """
-        assert title is None or isinstance(title, basestring)
+        assert title is None or isinstance(title, str)
         assert isinstance(long, bool), long
         assert column_widths is None or isinstance(column_widths, (tuple, list)), column_widths
         assert isinstance(bars, (tuple, list)), bars
@@ -1454,7 +1443,7 @@ class Section(Container):
                  descr=None, in_toc=True, **kwargs):
         """Arguments:
 
-          title -- plain text section title; basestring
+          title -- plain text section title; str
           content -- the actual content wrapped into this section as a
             sequence of 'Content' instances in the order in which they should
             appear in the output
@@ -1472,7 +1461,7 @@ class Section(Container):
         if anchor:
             assert id is None
             id = anchor
-        assert isinstance(title, basestring), title
+        assert isinstance(title, str), title
         assert heading is None or isinstance(heading, Content), heading
         assert isinstance(in_toc, bool), in_toc
         self._title = title
@@ -1492,11 +1481,11 @@ class Section(Container):
         return [c for c in self.container_path() if isinstance(c, Section)]
 
     def title(self):
-        """Return the section title as a basestring."""
+        """Return the section title as a str."""
         return self._title
 
     def descr(self):
-        """Return a breif (but more verbose than title) description as a basestring or None."""
+        """Return a breif (but more verbose than title) description as a str or None."""
         return self._descr
 
     def heading(self):
@@ -1534,9 +1523,9 @@ class Section(Container):
         if self._id is None:
             path = self.section_path()
             if len(path) >= 2:
-                self._id = path[-2].id() + '.' + unistr(section_number(self))
+                self._id = path[-2].id() + '.' + str(section_number(self))
             else:
-                numbers = [unistr(section_number(x)) for x in path]
+                numbers = [str(section_number(x)) for x in path]
                 self._id = self._ID_PREFIX + '.'.join(numbers)
         return self._id
 
@@ -1581,7 +1570,7 @@ class TableOfContents(Content):
 
         """
         assert item is None or isinstance(item, self._TOC_ITEM_TYPE)
-        assert title is None or isinstance(title, basestring)
+        assert title is None or isinstance(title, str)
         assert depth is None or isinstance(depth, int)
         assert isinstance(detailed, bool)
         self._item = item
@@ -1692,7 +1681,7 @@ class SetVariable(Content):
           value -- value of the variable, 'Content' instance
 
         """
-        assert isinstance(name, basestring), name
+        assert isinstance(name, str), name
         assert isinstance(value, Content), value
         self._name = name
         self._value = value
@@ -1721,8 +1710,8 @@ class Substitution(Content):
             supposed.
 
         """
-        assert isinstance(name, basestring), name
-        assert markup is None or isinstance(markup, basestring), markup
+        assert isinstance(name, str), name
+        assert markup is None or isinstance(markup, str), markup
         self._name = name
         self._markup = markup or '$' + name
         super(Substitution, self).__init__(**kwargs)
@@ -1799,7 +1788,7 @@ class MathML(Content):
 
         """
         super(MathML, self).__init__()
-        assert isinstance(content, basestring), content
+        assert isinstance(content, str), content
         self._content = content
 
     def content(self):
@@ -1871,17 +1860,12 @@ class MathML(Content):
         from xml.etree import ElementTree
         import io
         parser = ElementTree.XMLParser()
-        if sys.version_info[0] == 2:
-            # TODO: This doesn't work in Python 3.  The only way of getting it to work
-            # seems to be defining all entities in a DOCTYPE  as suggested in:
-            # https://stackoverflow.com/questions/35591478/ +
-            # how-to-parse-html-with-entities-such-as-nbsp-using-builtin-library-elementtree
-            # But is this really needed?  Valid MathML entities are already defined.
-            # Do we need to allow invalid entities for some reasons?
-            parser.parser.UseForeignDTD(True)
-            if entity_dictionary is None:
-                entity_dictionary = self.EntityHandler()
-            parser.entity = entity_dictionary
+        # TODO: 'entity_dictionary' is ignored, as custom entities can't be
+        # passed to the parser in Python 3.  The only way of getting it to work
+        # seems to be defining all entities in a DOCTYPE as suggested in:
+        # https://stackoverflow.com/questions/35591478/ +
+        # how-to-parse-html-with-entities-such-as-nbsp-using-builtin-library-elementtree
+        # But is this really needed?  Valid MathML entities are already defined.
         etree = ElementTree.ElementTree()
         content = self._str_content()
         try:
@@ -2028,7 +2012,7 @@ def coerce(content, formatted=False):
                     item = coerce(item, formatted=formatted)
                 items.append(item)
         return container(items)
-    elif isinstance(content, basestring):
+    elif isinstance(content, str):
         if formatted:
             from lcg import Parser
             return Parser().parse_inline_markup(content)
@@ -2066,7 +2050,7 @@ def link(target, label=None, type=None, descr=None):
         the link target is a direct URI.
 
     """
-    if isinstance(target, basestring):
+    if isinstance(target, str):
         assert label is not None
         target = Link.ExternalTarget(target, None, descr=descr)
     else:

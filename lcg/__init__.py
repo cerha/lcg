@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2017 OUI Technology Ltd.
 # Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
@@ -17,8 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from __future__ import unicode_literals
-from __future__ import absolute_import
 
 __version__ = '0.9.0.dev0'
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2018 OUI Technology Ltd.
 # Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
@@ -17,17 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from __future__ import unicode_literals
-from __future__ import absolute_import
-from __future__ import division
-from future import standard_library
-from builtins import map
 
 import base64
 import io
 import random
 import re
-import sys
 import string
 import urllib.request
 import urllib.parse
@@ -40,13 +32,9 @@ from lcg import concat
 from . import mathml
 
 _ = lcg.TranslatableTextFactory('lcg')
-standard_library.install_aliases()
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
-class HtmlEscapedUnicode(unistr):
+class HtmlEscapedUnicode(str):
     """Escaping wrapper for unicodes.
 
     In order to prevent display errors, XSS, CSRF, etc., it is necessary to
@@ -81,13 +69,13 @@ class HtmlEscapedUnicode(unistr):
         if isinstance(other, lcg.Localizable):
             result = concat(self, other)
         else:
-            result = self.__class__(unistr(self) + unistr(other), escape=False)
+            result = self.__class__(str(self) + str(other), escape=False)
         return result
 
     def __mod__(self, other):
         def escape(x):
-            return HtmlEscapedUnicode(x, escape=True) if isinstance(x, basestring) else x
-        if isinstance(other, basestring):
+            return HtmlEscapedUnicode(x, escape=True) if isinstance(x, str) else x
+        if isinstance(other, str):
             arguments = escape(other)
         elif isinstance(other, (tuple, list)):
             arguments = tuple(map(escape, other))
@@ -148,9 +136,9 @@ class HtmlGenerator(object):
     attribute, please help your self and add it.
 
     """
-    class _JavaScriptCode(unistr):
+    class _JavaScriptCode(str):
         def __new__(cls, text):
-            return unistr.__new__(cls, text)
+            return str.__new__(cls, text)
 
     # Characters to be replaced in Javascript string literals for their
     # safe usage within HTML <script> tags.
@@ -207,7 +195,7 @@ class HtmlGenerator(object):
                     str_value = self.noescape(saxutils.quoteattr(value))
                 result.append(str_value)
         if content is not None and not isinstance(content, HtmlEscapedUnicode):
-            if content.__class__ in (str, unistr):
+            if content.__class__ is str:
                 content = self.escape(content)
             else:
                 dirty = True
@@ -244,13 +232,13 @@ class HtmlGenerator(object):
 
         """
         uri = urllib.parse.quote(base.encode('utf-8'))
-        if args and isinstance(args[0], basestring):
-            anchor = urllib.parse.quote(unistr(args[0]).encode('utf-8'))
+        if args and isinstance(args[0], str):
+            anchor = urllib.parse.quote(str(args[0]).encode('utf-8'))
             args = args[1:]
         else:
             anchor = None
 
-        query = '&'.join([k + '=' + urllib.parse.quote(unistr(v).encode('utf-8'))
+        query = '&'.join([k + '=' + urllib.parse.quote(str(v).encode('utf-8'))
                           for k, v in args + tuple(kwargs.items()) if v is not None])
         if query:
             uri += '?' + query
@@ -272,7 +260,7 @@ class HtmlGenerator(object):
                 result = element.transform(self._concat_escape)
         elif isinstance(element, HtmlEscapedUnicode):
             result = element
-        elif isinstance(element, basestring):
+        elif isinstance(element, str):
             result = self.escape(element)
         elif isinstance(element, (tuple, list)):
             result = [self._concat_escape(e) for e in element]
@@ -577,19 +565,19 @@ class HtmlGenerator(object):
             return 'null'
         elif isinstance(value, self._JavaScriptCode):
             return value
-        elif isinstance(value, basestring):
+        elif isinstance(value, str):
             # Use double quotes (not single) to make output JSON compatible!
             return '"' + self._JAVASCRIPT_ESCAPE_REGEX.sub(self._js_escape_char, value) + '"'
         elif isinstance(value, bool):
             return (value and 'true' or 'false')
         elif isinstance(value, int):
-            return unistr(value)
+            return str(value)
         elif isinstance(value, (tuple, list)):
             return concat('[', concat([self.js_value(v) for v in value], separator=", "), ']')
         elif isinstance(value, dict):
             # Only string keys are supported in JavaScript (int works too, but is actually
             # converted to string, which might be unexpected, so we don't support it).
-            assert lcg.is_sequence_of(list(value.keys()), basestring)
+            assert lcg.is_sequence_of(list(value.keys()), str)
             return concat('{', concat([concat(self.js_value(k), ': ', self.js_value(v))
                                        for k, v in list(value.items())],
                                       separator=", "),
@@ -1030,7 +1018,7 @@ class HtmlExporter(lcg.Exporter):
         if isinstance(value, float):
             strvalue = '%.2f' % (value,)
         else:
-            strvalue = unistr(value)
+            strvalue = str(value)
         return strvalue + unit
 
     def _image_style(self, width, height):
@@ -1084,7 +1072,7 @@ class HtmlExporter(lcg.Exporter):
             else:
                 source = element.source()
             if source or uri:
-                content += g.footer(g.escape(u'— ') + source)
+                content += g.footer(g.escape('— ') + source)
             return g.blockquote(content, cls=cls, **kwargs)
 
         return self._export_container(context, element, wrap=wrap)

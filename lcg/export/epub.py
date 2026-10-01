@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2012-2016 by OUI Technology Ltd.
-# Copyright (C) 2019, 2022 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,9 +16,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from __future__ import unicode_literals
-from future import standard_library
-from builtins import map
 
 import lcg
 
@@ -31,10 +27,6 @@ import mimetypes
 import re
 import unicodedata
 import os
-import sys
-
-standard_library.install_aliases()
-unistr = type(u'')  # Python 2/3 transition hack.
 
 
 class Constants(object):
@@ -160,7 +152,7 @@ class EpubXhtmlExporter(lcg.HtmlExporter):
         # Normalize and disambiguate the URI (several source URIs may have
         # the same normalized form or the normalized form may match an existing
         # resource URI).
-        if isinstance(uri, unistr):
+        if isinstance(uri, str):
             uri = unicodedata.normalize('NFKD', uri).encode('ascii', 'ignore').decode('ascii')
         uri = self._INVALID_RESOURCE_URI_CHARACTERS.sub('-', uri.lower())
         n = 0
@@ -273,12 +265,6 @@ class EpubExporter(lcg.Exporter):
 
     def _container_path(self, *components):
         # TODO: replace forbidden characters as per spec
-        if sys.version_info[0] == 2:
-            def ensure_pathenc(component):
-                if isinstance(component, unistr):
-                    return component.encode(Constants.PATHENC)
-                return component
-            components = map(ensure_pathenc, components)
         return Constants.PATHSEP.join(components)
 
     def _meta_path(self, *components):

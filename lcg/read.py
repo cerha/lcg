@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,19 +17,14 @@
 
 """Tools for building the LCG 'ContentNode' hierarchy."""
 
-from __future__ import unicode_literals
 import codecs
 import glob
+import importlib.util
 import os
 import re
-import sys
 import unicodedata
 
 import lcg
-
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class Reader(object):
@@ -156,8 +149,8 @@ class FileReader(Reader):
     _EMACS_CODING_EXTENSION_MATCHER = re.compile(br'(^mule-|-(dos|unix|mac)$)')
 
     def __init__(self, id='index', dir='.', encoding=None, **kwargs):
-        assert isinstance(dir, basestring), dir
-        assert encoding is None or isinstance(encoding, basestring) and codecs.lookup(encoding), \
+        assert isinstance(dir, str), dir
+        assert encoding is None or isinstance(encoding, str) and codecs.lookup(encoding), \
             encoding
         self._dir = os.path.normpath(dir)
         super(FileReader, self).__init__(id, **kwargs)
@@ -197,8 +190,7 @@ class FileReader(Reader):
             match = self._ENCODING_HEADER_MATCHER.match(lines[0])
             if match:
                 enc = self._EMACS_CODING_EXTENSION_MATCHER.sub('', match.group(1))
-                if sys.version_info[0] > 2:
-                    enc = str(enc, 'ascii')
+                enc = str(enc, 'ascii')
                 try:
                     codecs.lookup(str(enc))
                 except LookupError:
@@ -213,7 +205,7 @@ class FileReader(Reader):
                 lines = [l for l in lines if not comment_matcher.match(l)]
         content = b''.join(lines)
         try:
-            return unistr(content, encoding=encoding)
+            return str(content, encoding=encoding)
         except UnicodeDecodeError as e:
             raise Exception("File %s: %s" % (filename, e))
 
@@ -362,25 +354,13 @@ def reader(dir, name, root=True, encoding=None, ext='txt', parent=None, recourse
 
     """
     if cls is None:
-        try:
-            import importlib.util
-        except ImportError as e:
-            # TODO NOPY2: Remove this Python 2 compatibility workaround.
-            import imp
-            try:
-                f, filename, descr = imp.find_module(name, [dir])
-            except ImportError:
-                module = None
-            else:
-                module = imp.load_module(name, f, filename, descr)
+        filename = os.path.join(dir, name + '.py')
+        if os.path.exists(filename):
+            spec = importlib.util.spec_from_file_location(name, filename)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
         else:
-            filename = os.path.join(dir, name + '.py')
-            if os.path.exists(filename):
-                spec = importlib.util.spec_from_file_location(name, filename)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-            else:
-                module = None
+            module = None
         if module:
             if hasattr(module, 'IndexNode'):
                 cls = module.IndexNode  # Just for backwards compatibility

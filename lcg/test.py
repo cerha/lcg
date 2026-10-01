@@ -18,12 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import print_function
-from future import standard_library
-from builtins import zip
-from builtins import range
 
 import datetime
 import io
@@ -57,10 +51,6 @@ else:
     import lcg.plot
 
 _ = lcg.TranslatableTextFactory('test')
-standard_library.install_aliases()
-unistr = type('')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class TranslatableText(unittest.TestCase):
@@ -102,10 +92,10 @@ class TranslatableText(unittest.TestCase):
         assert len(items) == 2
         assert items[1] == ('xx\nyy')
         b = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
-        assert isinstance(b, unistr)
+        assert isinstance(b, str)
         assert b == 'a-b-c-d-e-f'
         c = lcg.concat('a', ('b', 'c', 'd'), 'e', 'f', separator='-')
-        assert isinstance(c, unistr)
+        assert isinstance(c, str)
         assert c == 'a-b-c-d-e-f'
 
     def test_replace(self):
@@ -122,10 +112,10 @@ class TranslatableText(unittest.TestCase):
         bx = b.localize(lcg.Localizer())
         cx = c.localize(lcg.Localizer())
         dx = d.localize(lcg.Localizer())
-        assert unistr(a) == ax == 'Version xox-yoy', (a, ax)
-        assert unistr(b) == bx == 'Versi-n x-x', (b, bx)
-        assert unistr(c) == cx == 'Versi-n x-x-y-y', (c, cx)
-        assert unistr(d) == dx == 'versi-n x-x-y-y', (d, dx)
+        assert str(a) == ax == 'Version xox-yoy', (a, ax)
+        assert str(b) == bx == 'Versi-n x-x', (b, bx)
+        assert str(c) == cx == 'Versi-n x-x-y-y', (c, cx)
+        assert str(d) == dx == 'versi-n x-x-y-y', (d, dx)
 
     def test_translate(self):
         cs = lcg.Localizer('cs', translation_path=translation_path)
@@ -363,15 +353,15 @@ class LocalizableDateTime(unittest.TestCase):
         en = lcg.Localizer('en', translation_path=translation_path)
         cs = lcg.Localizer('cs', translation_path=translation_path)
         b = a.replace('-', '+')
-        assert unistr(b) == "2006+01+30"
+        assert str(b) == "2006+01+30"
         assert b.localize(en) == "30/01/2006"
         assert b.localize(cs) == "30.\xa001.\xa02006"
         c = a.replace('/', '|')
-        assert unistr(c) == "2006-01-30"
+        assert str(c) == "2006-01-30"
         assert c.localize(en) == "30|01|2006"
         assert c.localize(cs) == "30.\xa001.\xa02006"
         d = a.replace('.', ':')
-        assert unistr(d) == "2006-01-30"
+        assert str(d) == "2006-01-30"
         assert d.localize(en) == "30/01/2006"
         assert d.localize(cs) == "30:\xa001:\xa02006"
 
@@ -1387,7 +1377,7 @@ class HtmlExport(unittest.TestCase):
         ):
             content = lcg.Parser().parse_inline_markup(text)
             result = content.export(context)
-            if isinstance(expected, basestring):
+            if isinstance(expected, str):
                 assert result == expected
             else:
                 assert expected.match(result)
@@ -1487,7 +1477,7 @@ class BrailleExport(unittest.TestCase):
         exporter = lcg.BrailleExporter()
         context = exporter.context(n, lang=lang, sec_lang=sec_lang, presentation=presentation_set)
         page_lines = page_height.size()
-        if isinstance(braille, basestring):
+        if isinstance(braille, str):
             n_lines = page_lines - len(braille.split('\n')) - 2
             expected = [header + braille + '\n' * n_lines + footer]
         elif isinstance(braille, (tuple, list)):
@@ -1595,15 +1585,9 @@ class BrailleExport(unittest.TestCase):
 
     def test_mathml(self):
         import louis
-        python_version = sys.version_info
         louis_version = louis.version().split()[0].split('.')
-        can_parse_entities = (python_version[0] >= 3 or
-                              python_version[0] == 2 and python_version[1] >= 7)
-        entity_regexp = re.compile('&[a-zA-Z]+;')
 
         def test(mathml, expected_result, min_louis=None):
-            if not can_parse_entities and entity_regexp.search(mathml):
-                return
             if min_louis:
                 min_louis_list = min_louis.split('.')
                 for i in range(len(min_louis_list)):
@@ -1733,15 +1717,8 @@ class BrailleExport(unittest.TestCase):
 ⠝⠑⠥⠱⠅⠕⠙⠌⠄'''
 
     def test_mathml_nemeth(self):
-        python_version = sys.version_info
-        can_parse_entities = (python_version[0] >= 3 or
-                              python_version[0] == 2 and python_version[1] >= 7)
-        entity_regexp = re.compile('&[a-zA-Z]+;')
-
         def test(mathml, expected_result, lang='cs', page_width=None, page_height=None,
                  pre=None, post=None):
-            if not can_parse_entities and entity_regexp.search(mathml):
-                return
             content = lcg.MathML(mathml)
             if pre is not None or post is not None:
                 content = (content,)
@@ -2459,7 +2436,7 @@ class TestPlots:
         exporter = lcg.HtmlExporter(translations=translation_path)
         context = exporter.context(None, lang)
         for number, formatted in pairs:
-            assert formatter(context, number, 0).replace(u'\xa0', ' ') == formatted
+            assert formatter(context, number, 0).replace('\xa0', ' ') == formatted
 
 
     def test_decimal_formatter(self):

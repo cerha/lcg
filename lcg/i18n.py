@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2015, 2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,20 +22,13 @@ important to retain the original strings while constructing LCG content.  This
 allows us to decide for the output language at the export time.
 
 """
-from __future__ import unicode_literals
-from __future__ import print_function
 import lcg
 
 import datetime
 import operator
 import os
 import re
-import sys
 from functools import reduce
-
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class TranslatableTextFactory(object):
@@ -53,8 +44,8 @@ class TranslatableTextFactory(object):
     """
 
     def __init__(self, domain, origin='en'):
-        assert isinstance(domain, basestring), domain
-        assert isinstance(origin, basestring), origin
+        assert isinstance(domain, str), domain
+        assert isinstance(origin, str), origin
         self._domain = domain
         self._origin = origin
 
@@ -146,7 +137,7 @@ class TranslatedTextFactory(TranslatableTextFactory):
         return super(TranslatedTextFactory, self).pgettext(context, text, *args, **kwargs)
 
 
-class Localizable(unistr):
+class Localizable(str):
     """Common superclass of all localizable classes.
 
     This class is derived from Python 'unicode' type.  Thus it behaves as an
@@ -173,12 +164,12 @@ class Localizable(unistr):
         for f in _transforms:
             transformed = f(transformed)
         try:
-            instance = unistr.__new__(cls, transformed)
+            instance = str.__new__(cls, transformed)
         except UnicodeDecodeError:
             # Necessary to display some tracebacks
             def escape(text):
                 return re.sub(r'[^\x01-\x7F]', '?', text)
-            instance = unistr.__new__(cls, escape(transformed))
+            instance = str.__new__(cls, escape(transformed))
         instance._text = text
         return instance
 
@@ -187,12 +178,12 @@ class Localizable(unistr):
         self._transforms = _transforms
 
     def __add__(self, other):
-        if not isinstance(other, basestring):
+        if not isinstance(other, str):
             return NotImplemented
         return concat((self, other))
 
     def __radd__(self, other):
-        if not isinstance(other, basestring):
+        if not isinstance(other, str):
             return NotImplemented
         return concat((other, self))
 
@@ -321,7 +312,7 @@ class TranslatableText(Localizable):
             try:
                 localized_value = self._cache[key]
             except KeyError:
-                value = self._func(unistr(key))
+                value = self._func(str(key))
                 localized_value = self._localizer.localize(value)
                 if isinstance(value, lcg.HtmlEscapedUnicode):
                     self._contains_escaped_html = True
@@ -383,16 +374,16 @@ class TranslatableText(Localizable):
         arguments didn't correspond to the format string.
 
         """
-        assert isinstance(text, basestring), (text, type(text))
+        assert isinstance(text, str), (text, type(text))
         self._text = text
         self._args = args
         self._init_kwargs(**kwargs)
 
     def _init_kwargs(self, _context=None, _orig_text=None, _domain=None, _origin='en',
                      _interpolate=None, _transforms=(), escape_html=None, **kwargs):
-        assert isinstance(_domain, basestring) or _domain is None, _domain
-        assert isinstance(_origin, basestring), _origin
-        assert _context is None or isinstance(_context, basestring), _context
+        assert isinstance(_domain, str) or _domain is None, _domain
+        assert isinstance(_origin, str), _origin
+        assert _context is None or isinstance(_context, str), _context
         assert _interpolate is None or callable(_interpolate), _interpolate
         assert escape_html is None or isinstance(escape_html, bool), escape_html
         self._orig_text = _orig_text or self._text
@@ -535,8 +526,8 @@ class TranslatablePluralForms(TranslatableText):
         else:
             n = kwargs['n']
         text = n == 1 and singular or plural
-        self._singular = unistr(singular)
-        self._plural = unistr(plural)
+        self._singular = str(singular)
+        self._plural = str(plural)
         self._n = n
         super(TranslatablePluralForms, self).__init__(text, *args, **kwargs)
 
@@ -637,7 +628,7 @@ class LocalizableDateTime(Localizable):
 
         """
         super(LocalizableDateTime, self).__init__(**kwargs)
-        if isinstance(dt, basestring):
+        if isinstance(dt, str):
             assert string is None
             m = self._RE.match(dt)
             if not m:
@@ -900,7 +891,7 @@ class Concatenation(Localizable):
                 elif isinstance(x, (tuple, list)):
                     flatten(x)
                 else:
-                    assert isinstance(x, basestring)
+                    assert isinstance(x, str)
                     if h_escape:
                         x = lcg.HtmlEscapedUnicode(x, escape=True)
                     last.append(x)
@@ -1041,9 +1032,9 @@ class GettextTranslator(Translator):
             desired translation files are not found.
 
         """
-        assert isinstance(lang, basestring), lang
+        assert isinstance(lang, str), lang
         assert isinstance(path, (list, tuple)), path
-        assert isinstance(default_domain, basestring), default_domain
+        assert isinstance(default_domain, str), default_domain
         assert isinstance(fallback, bool), fallback
         self._default_domain = default_domain
         self._fallback = fallback
@@ -1075,9 +1066,6 @@ class GettextTranslator(Translator):
             gettext = self._cache[(domain, origin)]
         except KeyError:
             gettext = self._cache[(domain, origin)] = self._gettext_instance(domain, origin)
-            if sys.version_info[0] == 2:
-                gettext.gettext = gettext.ugettext
-                gettext.ngettext = gettext.ungettext
         return gettext
 
     def gettext(self, text, domain=None, origin=None):
@@ -1131,7 +1119,7 @@ class Localizer(object):
         return locale_data
 
     def __init__(self, lang=None, translation_path=(), timezone=None):
-        assert lang is None or isinstance(lang, basestring)
+        assert lang is None or isinstance(lang, str)
         assert timezone is None or isinstance(timezone, datetime.tzinfo)
         self._lang = lang
         self._timezone = timezone
@@ -1194,11 +1182,11 @@ def concat(*args, **kwargs):
         if len(args) == 1 and isinstance(args[0], (list, tuple)):
             args = args[0]
         for a in args:
-            if not isinstance(a, basestring) or isinstance(a, Localizable):
+            if not isinstance(a, str) or isinstance(a, Localizable):
                 break
         else:
             if len(args) == 0:
-                return u''
+                return ''
             else:
                 return reduce(operator.add, args[1:], args[0])
     # Standard processing

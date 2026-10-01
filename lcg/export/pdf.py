@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2008-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,13 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-from builtins import range
-from past.builtins import long
-from past.utils import old_div
 
 import copy
 import decimal
@@ -58,10 +49,6 @@ import lcg
 from lcg import FontFamily, UMm, UPoint, UPercent, UFont, USpace, UAny, HorizontalAlignment
 from .export import Exporter, FileExporter
 
-standard_library.install_aliases()
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 _ = lcg.TranslatableTextFactory('lcg')
 
@@ -135,15 +122,15 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
             flowable = content.export(context)
             if isinstance(flowable, Element):
                 flowable = flowable.export(context)
-            if isinstance(flowable, basestring):
-                flowable = reportlab.platypus.Paragraph(unistr(flowable), style)
+            if isinstance(flowable, str):
+                flowable = reportlab.platypus.Paragraph(str(flowable), style)
             while isinstance(flowable, (tuple, list)):
                 if len(flowable) == 1:
                     flowable = flowable[0]
                 else:
                     flowable = RLContainer(flowable, vertical=True)
             # Set max height so that header, footer and content have all chance to fit.
-            max_height = old_div(self.height, 3)
+            max_height = self.height / 3
             width, height = flowable.wrap(self.width, max_height)
             return flowable, width, height
 
@@ -172,7 +159,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
 
             def add_flowable(content, position):
                 flowable, width, height = make_flowable(content)
-                x = old_div((self.pagesize[0] - width), 2)
+                x = (self.pagesize[0] - width) / 2
                 if isinstance(content, lcg.Container):
                     if content.halign() == lcg.HorizontalAlignment.LEFT:
                         x = self.leftMargin
@@ -183,7 +170,7 @@ class DocTemplate(reportlab.platypus.BaseDocTemplate):
                 elif position == 'bottom':
                     y = self.bottomMargin
                 elif position == 'center':
-                    y = self.bottomMargin + old_div((self.height - height), 2)
+                    y = self.bottomMargin + (self.height - height) / 2
                 else:
                     raise Exception("Program error", position)
                 flowable.drawOn(canvas, x, y)
@@ -321,9 +308,9 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
         assert box_mask is None or (isinstance(box_mask, (tuple, list)) and
                                     len(box_mask) == 4 and
                                     all(isinstance(x, bool) for x in box_mask)), box_mask
-        assert width is None or isinstance(width, (float, int, long, decimal.Decimal, UPercent)), \
+        assert width is None or isinstance(width, (float, int, decimal.Decimal, UPercent)), \
             width
-        assert height is None or isinstance(width, (float, int, long, decimal.Decimal, UPercent)), \
+        assert height is None or isinstance(width, (float, int, decimal.Decimal, UPercent)), \
             height
         assert padding is None or isinstance(padding, (tuple, list,)) and len(padding) == 4, \
             padding
@@ -480,7 +467,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
             # desirable.  So we must be careful and hope the layout (or even
             # the content!) won't get destroyed here.
             wrapped = []
-            average_avail = old_div((avail_length - self._box_total_length), len(variable_content))
+            average_avail = (avail_length - self._box_total_length) / len(variable_content)
             if average_avail < 0:
                 average_avail = 0
             if vertical:
@@ -496,8 +483,8 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 i, c, width = variable_content[n]
                 if ((vertical and not spacers_started and
                      isinstance(c, RLSpacer) and c.height is None)):
-                    average_avail = (old_div((avail_length - self._box_total_length),
-                                     (len(variable_content) - n)))
+                    average_avail = ((avail_length - self._box_total_length) /
+                                     (len(variable_content) - n))
                     if average_avail < 0:
                         average_avail = 0
                     spacers_started = True
@@ -521,7 +508,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                         avail = average_avail
                         while avail < max_avail:
                             c = unwrap(i)
-                            avail = min(avail + old_div(max_avail, 10), max_avail)
+                            avail = min(avail + max_avail / 10, max_avail)
                             args[length_index] = avail
                             sizes = wrap(c, i, *args)
                             if sizes[length_index] <= avail:
@@ -629,7 +616,7 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 y -= length
             x_shift = y_shift = 0
             if align == self.BOX_CENTER:
-                shift = old_div((self._box_max_depth - self._box_depths[i]), 2)
+                shift = (self._box_max_depth - self._box_depths[i]) / 2
                 if vertical:
                     x_shift = shift
                 else:
@@ -643,11 +630,11 @@ class RLContainer(reportlab.platypus.flowables.Flowable):
                 x += length
             i += 1
 
-    def __unicode__(self):
+    def __str__(self):
         result = ('RLContainer(vertical=%s, align=%s, boxed=%s):\n' %
                   (self._box_vertical, self._box_align, self._box_boxed,))
         for c in self._box_content:
-            u = unistr(c)
+            u = str(c)
             if u and u[-1] != '\n':
                 u += '\n'
             result += ('  ----\n' + '\n'.join([' ' + l if l else '' for l in u.split('\n')]))
@@ -677,7 +664,7 @@ class RLText(reportlab.platypus.flowables.Flowable):
                 if max_width is None or width <= max_width:
                     break
                 text_length = len(self._text[i])
-                cut_length = min(int(old_div(text_length * width, max_width)), text_length - 1)
+                cut_length = min(int(text_length * width / max_width), text_length - 1)
                 self._text[i] = self._text[i][:cut_length]
             self.width = max(self.width, width)
         self.height = style.leading * len(self._text)
@@ -697,7 +684,7 @@ class RLText(reportlab.platypus.flowables.Flowable):
             self.canv.drawText(tx)
             y -= self._style.leading
 
-    def __unicode__(self):
+    def __str__(self):
         return 'RLText(%s)' % ('\n'.join(self._text),)
 
 
@@ -763,9 +750,9 @@ class RLImage(reportlab.platypus.flowables.Image):
                 w, h = img.size
                 xdpi, ydpi = img.info.get('dpi', (None, None,))
                 if self._width is None and xdpi:
-                    self._width = old_div(w * reportlab.lib.units.inch, xdpi)
+                    self._width = w * reportlab.lib.units.inch / xdpi
                 if self._height is None and ydpi:
-                    self._height = old_div(h * reportlab.lib.units.inch, ydpi)
+                    self._height = h * reportlab.lib.units.inch / ydpi
             except Exception:
                 pass
         reportlab.platypus.flowables.Image._setup_inner(self)
@@ -847,7 +834,7 @@ class Context(object):
         self._code_style.fontSize = self.default_font_size
         self.adjust_style_leading(self._code_style)
         # Bullet
-        self._styles['Bullet'].space_before = old_div(self.default_font_size, 2)
+        self._styles['Bullet'].space_before = self.default_font_size / 2
         # Label
         self._label_style = copy.copy(self._styles['Normal'])
         self._label_style.name = 'Label'
@@ -1117,7 +1104,7 @@ class Context(object):
         style.fontSize = self.default_font_size
         style.bulletFontSize = style.fontSize
         self.adjust_style_leading(style)
-        style.space_before = old_div(self.default_font_size, 2)
+        style.space_before = self.default_font_size / 2
         return style
 
     def style(self, style=None):
@@ -1188,7 +1175,7 @@ class Context(object):
 
         Parameters:
 
-          name -- name of the anchor, basestring
+          name -- name of the anchor, str
 
         """
         if name not in self._anchors:
@@ -1203,7 +1190,7 @@ class Context(object):
 
         Parameters:
 
-          name -- name of the anchor, basestring
+          name -- name of the anchor, str
 
         """
         self._anchors[name] = True
@@ -1381,7 +1368,7 @@ class Context(object):
           note -- the note, string
 
         """
-        assert isinstance(note, basestring)
+        assert isinstance(note, str)
         self._export_notes.append(note)
 
     def pop_export_note(self):
@@ -1398,14 +1385,14 @@ class Context(object):
 def _ok_export_result(result):
     if not isinstance(result, (tuple, list)) or not result:
         return True
-    if isinstance(result[0], basestring):
+    if isinstance(result[0], str):
         expected = 'string'
     else:
         expected = 'nonstring'
     for r in result[1:]:
         if isinstance(r, (tuple, list)):
             return False
-        if isinstance(r, basestring):
+        if isinstance(r, str):
             if expected != 'string':
                 return False
         else:
@@ -1489,7 +1476,7 @@ class Element(object):
 
         Arguments:
 
-          text -- basestring to prepend
+          text -- str to prepend
 
         """
         raise Exception('Not implemented')
@@ -1533,7 +1520,7 @@ class Element(object):
 class Text(Element):
     """Basic text.
 
-    Its content is basestring (preferably unicode) or another 'Text' instance.
+    Its content is str (preferably unicode) or another 'Text' instance.
     No text may be placed into the document hierarchy directly; always use
     'Text' or one of its subclasses to store text into the document.
 
@@ -1544,8 +1531,8 @@ class Text(Element):
     baseline_shift = None
 
     def init(self):
-        assert isinstance(self.content, (basestring, Text)), ('type error', self.content,)
-        if isinstance(self.content, basestring):
+        assert isinstance(self.content, (str, Text)), ('type error', self.content,)
+        if isinstance(self.content, str):
             self.content = _escape(self.content)
             # The following two lines of code are tricky.  In order to prevent
             # some coding issues with pytis data retrieved from the database we
@@ -1553,17 +1540,17 @@ class Text(Element):
             # shouldn't touch the original object unless needed, otherwise the
             # mysterious Context.localize method may stop produce texts from
             # symbolic labels.
-            if not isinstance(self.content, basestring):
-                self.content = unistr(self.content)
+            if not isinstance(self.content, str):
+                self.content = str(self.content)
 
     def _export(self, context):
         content = self.content
-        if isinstance(content, basestring):
+        if isinstance(content, str):
             result = context.localize(self.content)
         else:
             result = content.export(context)
         assert _ok_export_result(result), ('wrong export', result,)
-        result = unistr(result)
+        result = str(result)
         if self.style is not None or self.baseline_shift is not None:
             result = _unescape(result)
             result = RLText(result, self.style, halign=self.halign,
@@ -1572,7 +1559,7 @@ class Text(Element):
 
     def prepend_text(self, text):
         assert isinstance(text, Text), ('type error', text,)
-        if isinstance(self.content, basestring):
+        if isinstance(self.content, str):
             new_content = [text, copy.copy(self)]
             self.content = make_element(TextContainer, content=new_content)
         else:
@@ -1612,7 +1599,7 @@ class SimpleMarkup(Text):
     attributes = {}
 
     def init(self):
-        assert isinstance(self.content, basestring), ('type error', self.content,)
+        assert isinstance(self.content, str), ('type error', self.content,)
 
     def _export(self, context):
         mark = self.content
@@ -1657,7 +1644,7 @@ class TextContainer(Text):
     def _export(self, context):
         pdf_context = context.pdf_context
         content = self._expand_content()
-        result = u''
+        result = ''
         for c in content:
             result += c.export(context)
         if ((pdf_context.in_paragraph is None and
@@ -1665,7 +1652,7 @@ class TextContainer(Text):
             style = pdf_context.style()
             style.firstLineIndent = 0
             result = reportlab.platypus.Paragraph(result, style)
-        elif isinstance(result, basestring) and self.style:
+        elif isinstance(result, str) and self.style:
             result = RLText(_unescape(result), style=self.style, halign=self.halign)
         assert _ok_export_result(result), ('wrong export', result,)
         return result
@@ -1696,7 +1683,7 @@ class MarkedText(TextContainer):
 
     def init(self):
         super(MarkedText, self).init()
-        assert isinstance(self.tag, basestring), ('type error', self.tag,)
+        assert isinstance(self.tag, str), ('type error', self.tag,)
         assert isinstance(self.attributes, dict)
 
     def export(self, context):
@@ -1713,7 +1700,7 @@ class MarkedText(TextContainer):
         start_mark = self.tag
         for k, v in list(self.attributes.items()):
             start_mark += ' %s="%s"' % (k, v,)
-        result = u'<%s>%s</%s>' % (start_mark, exported, self.tag,)
+        result = '<%s>%s</%s>' % (start_mark, exported, self.tag,)
         return result
 
     def prepend_text(self, text):
@@ -1734,7 +1721,7 @@ class PreformattedText(Element):
 
     def init(self):
         super(PreformattedText, self).init()
-        assert isinstance(self.content, basestring), ('type error', self.content,)
+        assert isinstance(self.content, str), ('type error', self.content,)
 
     def _export(self, context):
         pdf_context = context.pdf_context
@@ -1924,7 +1911,7 @@ class PageNumber(Text):
     'total' parameter determines whether total number of pages should be output
     instead of the current page number.  If 'separator' parameter is given and
     'total' is true, output both numbers, separated by 'separator'
-    (basestring).
+    (str).
 
     """
     # This implementation is an ugly hack to make the class a subclass of Text
@@ -1941,13 +1928,13 @@ class PageNumber(Text):
         if self.total:
             total = pdf_context.total_pages()
             if total:
-                text = unistr(total)
+                text = str(total)
             else:
                 text = '?'
             if self.separator is not None:
-                text = unistr(pdf_context.page) + self.separator + text
+                text = str(pdf_context.page) + self.separator + text
         else:
-            text = unistr(pdf_context.page)
+            text = str(pdf_context.page)
         self.content = text
         Text.init(self)
         return Text._export(self, context)
@@ -2006,8 +1993,8 @@ class Container(Element):
         # Let's first transform simple text elements into real exportable elements.
 
         def transform_content(c):
-            if isinstance(c, basestring):
-                c = make_element(Text, content=unistr(c), style=style, halign=halign,
+            if isinstance(c, str):
+                c = make_element(Text, content=str(c), style=style, halign=halign,
                                  baseline_shift=presentation.baseline_shift)
             elif isinstance(c, Text):
                 if c.style is None:
@@ -2172,13 +2159,13 @@ class List(Element):
             seqid = pdf_context.get_seqid()
             bullet_element = make_element(TextContainer, content=[
                 make_element(SimpleMarkup, content='seq', attributes=dict(id='list%d' % (seqid,))),
-                make_element(Text, content=u'.'),
+                make_element(Text, content='.'),
             ])
         elif self.order is None:
             if list_nesting_level == 0:
-                bullet_string = u'•'
+                bullet_string = '•'
             else:
-                bullet_string = u'-'
+                bullet_string = '-'
             bullet_element = make_element(Text, content=bullet_string)
         else:
             bullet_element = None
@@ -2196,7 +2183,7 @@ class List(Element):
             if self.order in ('lower-alpha', 'upper-alpha'):
                 letters = (string.ascii_lowercase if self.order == 'lower-alpha' else
                            string.ascii_uppercase)
-                bullet = make_element(Text, content=letters[i] + u')')
+                bullet = make_element(Text, content=letters[i] + ')')
             else:
                 bullet = bullet_element
             item.prepend_text(make_element(MarkedText, content=[bullet], tag='bullet'))
@@ -2237,17 +2224,17 @@ class Link(Text):
 
     def init(self):
         super(Link, self).init()
-        assert isinstance(self.uri, basestring), ('type error', self.uri,)
+        assert isinstance(self.uri, str), ('type error', self.uri,)
         assert self.uri, ('empty URI', self.uri,)
 
     def _export(self, context):
         exported_content = super(Link, self)._export(context)
         if self.uri[:5] == 'http:' or self.uri[0] == '#':
-            result = u'<link href="%s">%s</link>' % (self.uri, exported_content,)
+            result = '<link href="%s">%s</link>' % (self.uri, exported_content,)
             if self.uri[0] == '#':
                 context.pdf_context.register_anchor_reference(self.uri[1:])
         else:
-            result = u'<i>%s</i>' % (exported_content,)
+            result = '<i>%s</i>' % (exported_content,)
         return result
 
 
@@ -2263,13 +2250,13 @@ class LinkTarget(Text):
 
     def init(self):
         super(LinkTarget, self).init()
-        assert isinstance(self.name, basestring), ('type error', self.name,)
+        assert isinstance(self.name, str), ('type error', self.name,)
         assert self.name, ('empty target name', self.name,)
 
     def _export(self, context):
         exported_text = super(LinkTarget, self)._export(context)
         context.pdf_context.clear_anchor_reference(self.name)
-        result = u'<a name="%s"/>%s' % (self.name, exported_text,)
+        result = '<a name="%s"/>%s' % (self.name, exported_text,)
         return result
 
 
@@ -2282,11 +2269,11 @@ class ImageBase(Element):
     def init(self):
         super(ImageBase, self).init()
         assert isinstance(self.image, lcg.resources.Image), ('type error', self.image,)
-        assert self.filename is None or isinstance(self.filename, basestring), \
+        assert self.filename is None or isinstance(self.filename, str), \
             ('type error', self.filename,)
         assert self.width is None or isinstance(self.width, lcg.Unit), self.width
         assert self.height is None or isinstance(self.height, lcg.Unit), self.height
-        assert self.align is None or isinstance(self.align, basestring), self.align
+        assert self.align is None or isinstance(self.align, str), self.align
 
     def _size(self, context, filename):
         style = context.pdf_context.style()
@@ -2297,10 +2284,10 @@ class ImageBase(Element):
             img_width, img_height = img.getSize()
             if self.width is not None:
                 width = self._unit2points(self.width, style)
-                height = old_div(width * img_height, img_width)
+                height = width * img_height / img_width
             elif self.height is not None:
                 height = self._unit2points(self.height, style)
-                width = old_div(height * img_width, img_height)
+                width = height * img_width / img_height
             else:
                 width, height = img_width, img_height
         return width, height
@@ -2357,10 +2344,10 @@ class InlineImage(ImageBase, Text):
                     page_width, page_height = context.pdf_context.page_size()
                     max_width, max_height = page_width * 0.5, page_height * 0.5
                     if width > max_width:
-                        height *= (old_div(max_width, width))
+                        height *= (max_width / width)
                         width = max_width
                     if height > max_height:
-                        width *= (old_div(max_height, height))
+                        width *= (max_height / height)
                         height = max_height
             if ((isinstance(pdf_context.in_paragraph, list) and
                  align in (lcg.InlineImage.LEFT, lcg.InlineImage.RIGHT,))):
@@ -2369,7 +2356,7 @@ class InlineImage(ImageBase, Text):
                 pdf_context.in_paragraph.append(rl_image)
                 result = ''
             else:
-                result = (u'<img src="%s"%s width="%s" height="%s"/>' %
+                result = ('<img src="%s"%s width="%s" height="%s"/>' %
                           (filename, alignment, width, height))
         else:
             result = image.title() or image.filename()
@@ -2388,7 +2375,7 @@ class Image(ImageBase):
 
     def init(self):
         super(Image, self).init()
-        assert self.uri is None or isinstance(self.uri, basestring), ('type error', self.uri,)
+        assert self.uri is None or isinstance(self.uri, str), ('type error', self.uri,)
 
     def _export(self, context):
         image = self.image
@@ -2563,18 +2550,18 @@ class Table(Element):
                     # ReportLab can't take anything as a cell content, let's prepare for it
 
                     def simplify(exported_column):
-                        if isinstance(exported_column, basestring):
-                            result = unistr(exported_column)
+                        if isinstance(exported_column, str):
+                            result = str(exported_column)
                         elif isinstance(exported_column, (tuple, list)):
                             exported_column = [simplify(x) for x in exported_column]
                             if len(exported_column) == 1:
                                 result = exported_column[0]
-                            elif all(isinstance(x, basestring) for x in exported_column):
+                            elif all(isinstance(x, str) for x in exported_column):
                                 result = ' '.join(exported_column)
                             else:
                                 result = []
                                 for x in exported_column:
-                                    if isinstance(x, basestring):
+                                    if isinstance(x, str):
                                         para = make_element(Paragraph, content=[Text(content=x)])
                                         x = para.export(context)
                                     result.append(x)
@@ -2582,7 +2569,7 @@ class Table(Element):
                             result = exported_column
                         return result
                     exported_column = simplify(column.export(context, **kwargs))
-                    if isinstance(exported_column, basestring):
+                    if isinstance(exported_column, str):
                         exported_column = _unescape(exported_column)
                     row_content.append(exported_column)
                     if (p is not None and
@@ -2612,13 +2599,13 @@ class Table(Element):
                 table_style_data.append(('LINEAFTER', (0, 0), (-1, -1), size, black,))
                 table_style_data.append(('LINEBEFORE', (0, 0), (-1, 0), size, black,))
             if presentation.separator_margin:
-                size = old_div(self._unit2points(presentation.separator_margin, style), 2)
+                size = self._unit2points(presentation.separator_margin, style) / 2
             else:
                 size = 0
             table_style_data.append(('TOPPADDING', (0, 0), (-1, -1), size,))
             table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, -1), size,))
             if header_row_p and presentation.header_separator_margin is not None:
-                size = old_div(self._unit2points(presentation.header_separator_margin, style), 2)
+                size = self._unit2points(presentation.header_separator_margin, style) / 2
                 table_style_data.append(('TOPPADDING', (0, 0), (-1, 0), size,))
                 table_style_data.append(('BOTTOMPADDING', (0, 0), (-1, 0), size,))
         elif self.compact:
@@ -2660,7 +2647,7 @@ class Table(Element):
                             cell = row[i]
                         except IndexError:
                             continue
-                        if isinstance(cell, basestring):
+                        if isinstance(cell, str):
                             if row is exported_content[0] and header_row_p:
                                 s = header_style
                             else:
@@ -2701,11 +2688,11 @@ def make_marked_text(text, **kwargs):
 
     Arguments:
 
-      text -- text content of the MarkedText instance; basestring
+      text -- text content of the MarkedText instance; str
       kwargs -- kwargs to pass to MarkedText constructor
 
     """
-    assert isinstance(text, basestring), text
+    assert isinstance(text, str), text
     text_element = make_element(Text, content=text)
     return make_element(MarkedText, content=[text_element], **kwargs)
 
@@ -2747,7 +2734,7 @@ class PDFExporter(FileExporter, Exporter):
         else:
             result_content = exported_content
         if presentation is not None and collapse:
-            if isinstance(result_content, basestring):
+            if isinstance(result_content, str):
                 result_content = make_element(Container,
                                               content=[make_element(Text, result_content)],
                                               presentation=presentation)
@@ -2765,7 +2752,7 @@ class PDFExporter(FileExporter, Exporter):
             for e in exported:
                 if not isinstance(e, Text):
                     def transform(item):
-                        if isinstance(item, basestring):
+                        if isinstance(item, str):
                             item = make_element(Text, content=item)
                         if isinstance(item, Text):
                             result = make_element(Paragraph, content=[item])
@@ -2790,7 +2777,7 @@ class PDFExporter(FileExporter, Exporter):
         return exported
 
     def text(self, context, text, lang=None, reformat=False):
-        assert isinstance(text, basestring), text
+        assert isinstance(text, str), text
         if text:
             # We should get reasonable input from the parsers but this is
             # currently not the case.
@@ -2935,7 +2922,7 @@ class PDFExporter(FileExporter, Exporter):
             return b''
         exported_content = self.concat(*exported_structure)
         document = exported_content.export(first_subcontext)
-        if len(document) == 1 and isinstance(document[0], basestring):
+        if len(document) == 1 and isinstance(document[0], str):
             document = [reportlab.platypus.Paragraph(document[0], pdf_context.style())]
         # It is necessary to check for invalid anchors before doc.build gets
         # called, otherwise Reportlab throws an ugly error.
@@ -2955,7 +2942,7 @@ class PDFExporter(FileExporter, Exporter):
             try:
                 doc.multi_build(document, context=first_subcontext)
             except reportlab.platypus.doctemplate.LayoutError as e:
-                if unistr(e).find('too large') >= 0:
+                if str(e).find('too large') >= 0:
                     pdf_context.set_relative_font_size(pdf_context.relative_font_size() / 1.2)
                     if pdf_context.relative_font_size() < 0.1:
                         tb = sys.exc_info()[2]
@@ -2967,7 +2954,7 @@ class PDFExporter(FileExporter, Exporter):
                         else:
                             obj = None
                         if obj is not None:
-                            e = (e, unistr(obj),)
+                            e = (e, str(obj),)
                         context.log(_("Page content extremely large, giving up"), kind=lcg.ERROR)
                     context.log(_("Page content too large, reducing it by %s",
                                   (pdf_context.relative_font_size())))
@@ -3028,7 +3015,7 @@ class PDFExporter(FileExporter, Exporter):
     def _export_container(self, context, element):
         exported_content = self._content_export(context, element, collapse=False)
         assert isinstance(exported_content, (list, tuple,)), exported_content
-        texts = [isinstance(c, (Text, basestring,)) for c in exported_content]
+        texts = [isinstance(c, (Text, str,)) for c in exported_content]
         # This is going to be a really wild guesswork.  There can be two very
         # distinct kinds of containers: 1. alignment containers; 2. paragraphs
         # (Containers inside Paragraphs).  And of course there are many common
@@ -3037,7 +3024,7 @@ class PDFExporter(FileExporter, Exporter):
         plain_container = (element.presentation() is None and element.orientation() is None and
                            element.halign() is None and element.valign() is None)
         assert isinstance(exported_content, (list, tuple)), exported_content
-        texts = [isinstance(c, (Text, basestring)) for c in exported_content]
+        texts = [isinstance(c, (Text, str)) for c in exported_content]
         if plain_container:
             # Just a container without any special purpose.  Maybe we can avoid
             # it.
@@ -3135,9 +3122,9 @@ class PDFExporter(FileExporter, Exporter):
             lang = element.lang()
             extra = [self.text(context, '--', lang=lang)]
             if source:
-                extra.append(self.text(context, u' ' + source, lang=lang, reformat=True))
+                extra.append(self.text(context, ' ' + source, lang=lang, reformat=True))
             if uri:
-                format_ = u' (%s)' if source else u' %s'
+                format_ = ' (%s)' if source else ' %s'
                 extra.append(self.text(context, format_ % (uri,), lang=lang, reformat=True))
             text = self.concat(*extra)
             exported = make_element(Paragraph, content=[text], halign=HorizontalAlignment.RIGHT)
@@ -3165,7 +3152,7 @@ class PDFExporter(FileExporter, Exporter):
             def filter_(c):
                 if isinstance(c, Text):
                     result = [c]
-                elif isinstance(c, basestring):
+                elif isinstance(c, str):
                     result = [make_element(Text, content=c)]
                 elif isinstance(c, Image):
                     link_content = make_element(Text, content=(c.text or c.content or 'image'))
@@ -3418,7 +3405,7 @@ class PDFExporter(FileExporter, Exporter):
         style = context.pdf_context.normal_style()
         font_size = style.fontSize
         scale = 2.0
-        args = [tempfile_mml, tempfile_png, '-fontSize', unistr(font_size * scale)]
+        args = [tempfile_mml, tempfile_png, '-fontSize', str(font_size * scale)]
         font_name = style.fontName
         if font_name is not None and font_name.startswith('DejaVu'):
             args.extend(['-fontsMonospaced', 'DejaVuSansMono',
@@ -3433,7 +3420,7 @@ class PDFExporter(FileExporter, Exporter):
             image = lcg.Image(tempfile_png, src_file=tempfile_png)
             import PIL.Image
             pil_image = PIL.Image.open(tempfile_png)
-            height = old_div(pil_image.size[1], scale)
+            height = pil_image.size[1] / scale
             # There is some magic in the vertical positioning, we try some wild guess here
             shift = min(0, font_size - height - 2.5)
             result = make_element(InlineImage, image=image, resize=(1.0 / scale), align=shift)

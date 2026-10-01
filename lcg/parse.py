@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2021 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,28 +15,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-from builtins import chr
-from builtins import map
-from builtins import range
 
 import copy
 import html.parser
 import html.entities
 import re
 import string
-import sys
 import xml.etree.ElementTree
 
 import lcg
-
-standard_library.install_aliases()
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class ProcessingError(Exception):
@@ -68,7 +53,7 @@ class ProcessingError(Exception):
         both must be strings.  See the 'info()' method.
 
         """
-        assert isinstance(caption, basestring)
+        assert isinstance(caption, str)
         self._info.append((caption, information))
 
     def info(self):
@@ -669,7 +654,7 @@ class Parser(object):
             else:                       # unfinished variable
                 return None, position
             variable_content = lcg.Container(self.parse(value))
-        content = lcg.SetVariable(unistr(identifier), variable_content)
+        content = lcg.SetVariable(str(identifier), variable_content)
         return content, position
 
     def _style_processor(self, text, position, **kwargs):
@@ -896,10 +881,10 @@ class Parser(object):
         return lcg.Content()
 
     def _dash_markup_handler(self, markup):
-        return lcg.TextContent(u'—')
+        return lcg.TextContent('—')
 
     def _nbsp_markup_handler(self, markup):
-        return lcg.TextContent(u' ')
+        return lcg.TextContent(' ')
 
     # The following handlers receive the already parsed lcg.Content instance as
     # argument (as they have paired markup on input).
@@ -1011,7 +996,7 @@ class Parser(object):
             'ContentNode' constructor are stored to
 
         """
-        assert isinstance(text, basestring), text
+        assert isinstance(text, str), text
         if __debug__:
             self._old_position = -1
         presentation = lcg.Presentation()
@@ -1094,9 +1079,9 @@ class MacroParser(object):
             try:
                 result = self._evaluate(self._condition)
             except Exception as e:
-                return e.__class__.__name__ + ': ' + unistr(e)
+                return e.__class__.__name__ + ': ' + str(e)
             else:
-                return ''.join([unistr(x) for x in self._content[bool(result)]])
+                return ''.join([str(x) for x in self._content[bool(result)]])
 
     def __init__(self, globals=None, evaluate=None, include=None):
         """Arguments:
@@ -1128,7 +1113,7 @@ class MacroParser(object):
 
     def _default_include(self, name):
         try:
-            return unistr(self._globals[name])
+            return str(self._globals[name])
         except KeyError:
             return ''
 
@@ -1148,7 +1133,7 @@ class MacroParser(object):
                 current = current.parent
             else:
                 current.append(t)
-        return unistr(result)
+        return str(result)
 
 
 class HTMLProcessor(object):
@@ -1264,7 +1249,7 @@ class HTMLProcessor(object):
                 if expanded[0] == b'&' and expanded[-1] == b';':
                     self.handle_charref(expanded)
                 else:
-                    self.handle_data(unistr(expanded, 'iso-8859-1'))
+                    self.handle_data(str(expanded, 'iso-8859-1'))
 
         def close(self):
             while self._open_tags:
@@ -1400,7 +1385,7 @@ class HTMLProcessor(object):
                 # Convert the <footer> content inside <blockquote> into Quotation 'kwargs'.
                 element.remove(footer)
                 text = self._plain_text(footer).strip()
-                if text.startswith(u'— '):
+                if text.startswith('— '):
                     text = text[2:]
                 kwargs['source'] = text
                 link = footer.find('a')
@@ -1538,7 +1523,7 @@ class HTMLProcessor(object):
             matchers = self._matchers()
             compiled_matchers = []
             for test, handler in matchers:
-                if isinstance(test, basestring):
+                if isinstance(test, str):
                     test = (test,)
                 if isinstance(test, (tuple, list)):
                     tag_regexp = re.compile(test[0] + '$')
@@ -1577,7 +1562,7 @@ class HTMLProcessor(object):
         (re.compile('</(?P<tag>em|strong)>( *)<(?P=tag)>'), '\\2',),
         (re.compile('<(?P<tag>em|strong|p)>(( |&nbsp;)*)</(?P=tag)>'), '\\2',),
         # Filter out all special characters (simply use the valid XML character ranges).
-        (re.compile(u'[^\u0020-\uD7FF\x09\x0A\x0D\uE000-\uFFFD\u10000-\u10FFFF]', re.U), u'')
+        (re.compile('[^\u0020-\uD7FF\x09\x0A\x0D\uE000-\uFFFD\u10000-\u10FFFF]', re.U), '')
     )
 
     def _text_process(self, html):
@@ -1603,7 +1588,7 @@ class HTMLProcessor(object):
           html -- unicode containing input LCG HTML
 
         """
-        assert isinstance(html, basestring), html
+        assert isinstance(html, str), html
         tree = self._tree_content(html)
         lcg = self._lcg_content(tree)
         return lcg

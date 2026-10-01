@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2015 OUI Technology Ltd.
 # Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
@@ -22,8 +20,6 @@
 This module defines the base class for locale data and a derived class for each supported locale.
 
 """
-
-from __future__ import unicode_literals
 
 
 class LocaleData(object):
@@ -70,7 +66,7 @@ class LocaleData_cs(LocaleData):
     # in speech synthesizers, braille displays and fonts is uncertain.
     date_format = "%d.\xa0%m.\xa0%Y"
     decimal_point = ','
-    thousands_sep = u'\xa0'
+    thousands_sep = '\xa0'
 
 
 class LocaleData_de(LocaleData):
@@ -104,4 +100,4 @@ class LocaleData_pl(LocaleData):
 class LocaleData_sk(LocaleData):
     date_format = "%d.%m.%Y"
     decimal_point = ','
-    thousands_sep = u'\xa0'
+    thousands_sep = '\xa0'

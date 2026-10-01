@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,15 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from __future__ import unicode_literals
 
 import re
 import lcg
 from lcg import concat
 
 _ = lcg.TranslatableTextFactory('lcg-exercises')
-
-unistr = type(u'')  # Python 2/3 transition hack.
 
 
 class ExerciseExporter(object):
@@ -40,7 +35,7 @@ class ExerciseExporter(object):
                       "first pair of numbers shows the results of all current answers.  If "
                       "you didn't answer all of them correctly on first attempt, there is "
                       "also a second pair of numbers showing how many answers you did "
-                      u"successfully on the first try.  Use the ‘Reset’ button to start "
+                      "successfully on the first try.  Use the ‘Reset’ button to start "
                       "again.")))
     _BUTTONS = ((_("Evaluate"), 'button', 'evaluate-button',
                  _("Evaluate the entire exercise.  If an error is found, the cursor is moved to "
@@ -361,10 +356,10 @@ class _FillInExerciseExporter(ExerciseExporter):
                            "You hear a sound response and in case of an error, the cursor is "
                            "moved to the position of the first incorrect character within the "
                            "text.  This way you can locate the error, fix it and evaluate again. "
-                           u"When you don't know how to fix an error, you can use the ‘hint’ "
+                           "When you don't know how to fix an error, you can use the ‘hint’ "
                            "key described below.")),
                         (_("Ctrl-Space"),
-                         _(u"This function is called a ‘hint’.  It helps you in case you don't "
+                         _("This function is called a ‘hint’.  It helps you in case you don't "
                            "know the answer or you don't know how to fix an error in your answer. "
                            "Just press the key combination (holding the Ctrl key, press the "
                            "spacebar) and one letter of the correct answer will be filled in "
@@ -373,7 +368,7 @@ class _FillInExerciseExporter(ExerciseExporter):
                            "be inserted.  This also means that if there is some text after the "
                            "cursor, there is at least one error in it.  Try to locate this error "
                            "and correct it.  Then you can evaluate your answer using the "
-                           u"‘Enter’ key (see above) or use ‘hint’ again, until you find the "
+                           "‘Enter’ key (see above) or use ‘hint’ again, until you find the "
                            "complete answer.")))),)
 
     def _has_real_answers(self, exercise):
@@ -597,7 +592,7 @@ class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
 
     def _checked(self, context, exercise, exercise_id, task, i):
         task_name = self._task_id(exercise, exercise_id, task)
-        return self._param(context.req(), task_name, False) == unistr(i)
+        return self._param(context.req(), task_name, False) == str(i)
 
     def _choice_text(self, context, exercise, exercise_id, task, choice):
         text = super(ChoiceBasedTestExporter, self)._choice_text(context, exercise, exercise_id,
@@ -608,7 +603,7 @@ class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
                 result = _("correct answer")
             else:
                 name = self._task_id(exercise, exercise_id, task)
-                if self._param(context.req(), name) == unistr(task.choices().index(choice)):
+                if self._param(context.req(), name) == str(task.choices().index(choice)):
                     # Translators: Incorrect (answer)
                     result = _("incorrect")
             if result:
@@ -621,7 +616,7 @@ class ChoiceBasedTestExporter(_TestExporter, _ChoiceBasedExerciseExporter):
                                                                       exercise_id, task, choice)
         if self._show_results(context):
             name = self._task_id(exercise, exercise_id, task)
-            if self._param(context.req(), name) == unistr(task.choices().index(choice)):
+            if self._param(context.req(), name) == str(task.choices().index(choice)):
                 cls = choice.correct() and 'correct-answer' or 'incorrect-answer'
             else:
                 cls = 'non-selected-answer'

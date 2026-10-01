@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2012-2015 OUI Technology Ltd.
 # Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
@@ -18,18 +16,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """Export to Braille notation."""
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
 
-from builtins import chr
-from builtins import zip
-from builtins import range
 
 from contextlib import contextmanager
 import copy
 import ctypes
 import ctypes.util
+import importlib.util
 import os
 import re
 import string
@@ -44,10 +37,6 @@ from . import mathml
 from .export import Exporter, FileExporter
 
 _ = TranslatableTextFactory('lcg')
-
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 _braille_whitespace = ' ⠀'
@@ -102,20 +91,11 @@ def braille_presentation(presentation_file='presentation-braille.py'):
     """
     presentation = Presentation()
     filename = os.path.join(os.path.dirname(__file__), 'styles', presentation_file)
-    try:
-        import importlib.util
-    except ImportError:
-        # TODO NOPY2: Remove this Python 2 compatibility workaround.
-        import imp
-        f = open(filename)
-        confmodule = imp.load_module('_lcg_presentation', f, filename, ('.py', 'r', imp.PY_SOURCE))
-        f.close()
-    else:
-        spec = importlib.util.spec_from_file_location('_lcg_presentation', filename)
-        confmodule = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(confmodule)
+    spec = importlib.util.spec_from_file_location('_lcg_presentation', filename)
+    confmodule = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(confmodule)
     for o in dir(confmodule):
-        if o[0] in string.lowercase and hasattr(presentation, o):
+        if o[0] in string.ascii_lowercase and hasattr(presentation, o):
             setattr(presentation, o, confmodule.__dict__[o])
     return presentation
 
@@ -123,8 +103,8 @@ def braille_presentation(presentation_file='presentation-braille.py'):
 class _Braille(object):
 
     def __init__(self, text, hyphenation=None):
-        assert isinstance(text, basestring), text
-        assert hyphenation is None or isinstance(hyphenation, basestring), hyphenation
+        assert isinstance(text, str), text
+        assert hyphenation is None or isinstance(hyphenation, str), hyphenation
         self._text = text
         self._hyphenation = hyphenation or self._default_hyphenation(text)
         assert len(self._text) == len(self._hyphenation), (self._text, self._hyphenation,)
@@ -143,9 +123,6 @@ class _Braille(object):
 
     def __bool__(self):
         return not not self._text
-
-    # Just for Python 2 compatibility.
-    __nonzero__ = __bool__
 
     def __add__(self, braille):
         return _Braille(self.text() + braille.text(), self.hyphenation() + braille.hyphenation())
@@ -189,11 +166,11 @@ class BrailleError(Exception):
           message -- message explaining the error; unicode
 
         """
-        assert isinstance(message, basestring), message
+        assert isinstance(message, str), message
         super(BrailleError, self).__init__(message, *args)
 
     def message(self):
-        """Return message explaining the error; basestring.
+        """Return message explaining the error; str.
         """
         return self.args[0]
 
@@ -213,70 +190,70 @@ else:
 
 _louisutdml_initialized = False
 _en6backmapping = {
-    u' ': u'⠀',
-    u'a': u'⠁',
-    u'1': u'⠂',
-    u'b': u'⠃',
-    u"'": u'⠄',
-    u'k': u'⠅',
-    u'2': u'⠆',
-    u'l': u'⠇',
-    u'`': u'⠈',
-    u'c': u'⠉',
-    u'i': u'⠊',
-    u'f': u'⠋',
-    u'/': u'⠌',
-    u'm': u'⠍',
-    u's': u'⠎',
-    u'p': u'⠏',
-    u'"': u'⠐',
-    u'e': u'⠑',
-    u'3': u'⠒',
-    u'h': u'⠓',
-    u'9': u'⠔',
-    u'o': u'⠕',
-    u'6': u'⠖',
-    u'r': u'⠗',
-    u'~': u'⠘',
-    u'd': u'⠙',
-    u'j': u'⠚',
-    u'g': u'⠛',
-    u'>': u'⠜',
-    u'n': u'⠝',
-    u't': u'⠞',
-    u'q': u'⠟',
-    u',': u'⠠',
-    u'*': u'⠡',
-    u'5': u'⠢',
-    u'<': u'⠣',
-    u'-': u'⠤',
-    u'u': u'⠥',
-    u'8': u'⠦',
-    u'v': u'⠧',
-    u'.': u'⠨',
-    u'%': u'⠩',
-    u'{': u'⠪',
-    u'$': u'⠫',
-    u'+': u'⠬',
-    u'x': u'⠭',
-    u'!': u'⠮',
-    u'&': u'⠯',
-    u';': u'⠰',
-    u':': u'⠱',
-    u'4': u'⠲',
-    u'|': u'⠳',
-    u'0': u'⠴',
-    u'z': u'⠵',
-    u'7': u'⠶',
-    u'(': u'⠷',
-    u'_': u'⠸',
-    u'?': u'⠹',
-    u'w': u'⠺',
-    u'}': u'⠻',
-    u'#': u'⠼',
-    u'y': u'⠽',
-    u')': u'⠾',
-    u'=': u'⠿',
+    ' ': '⠀',
+    'a': '⠁',
+    '1': '⠂',
+    'b': '⠃',
+    "'": '⠄',
+    'k': '⠅',
+    '2': '⠆',
+    'l': '⠇',
+    '`': '⠈',
+    'c': '⠉',
+    'i': '⠊',
+    'f': '⠋',
+    '/': '⠌',
+    'm': '⠍',
+    's': '⠎',
+    'p': '⠏',
+    '"': '⠐',
+    'e': '⠑',
+    '3': '⠒',
+    'h': '⠓',
+    '9': '⠔',
+    'o': '⠕',
+    '6': '⠖',
+    'r': '⠗',
+    '~': '⠘',
+    'd': '⠙',
+    'j': '⠚',
+    'g': '⠛',
+    '>': '⠜',
+    'n': '⠝',
+    't': '⠞',
+    'q': '⠟',
+    ',': '⠠',
+    '*': '⠡',
+    '5': '⠢',
+    '<': '⠣',
+    '-': '⠤',
+    'u': '⠥',
+    '8': '⠦',
+    'v': '⠧',
+    '.': '⠨',
+    '%': '⠩',
+    '{': '⠪',
+    '$': '⠫',
+    '+': '⠬',
+    'x': '⠭',
+    '!': '⠮',
+    '&': '⠯',
+    ';': '⠰',
+    ':': '⠱',
+    '4': '⠲',
+    '|': '⠳',
+    '0': '⠴',
+    'z': '⠵',
+    '7': '⠶',
+    '(': '⠷',
+    '_': '⠸',
+    '?': '⠹',
+    'w': '⠺',
+    '}': '⠻',
+    '#': '⠼',
+    'y': '⠽',
+    ')': '⠾',
+    '=': '⠿',
 }
 _entity_regexp = re.compile('&([A-Za-z]+);')
 
@@ -312,7 +289,7 @@ def xml2braille(xml):
         except AttributeError:
             pass
     # Make the foreign call and process the results
-    result = _louisutdml.lbu_translateString(unistr("preferences.cfg"), inbuf, len(inbuf) + 1,
+    result = _louisutdml.lbu_translateString(str("preferences.cfg"), inbuf, len(inbuf) + 1,
                                              outbuf, ctypes.byref(outlen), None, None, mode)
     if not result:
         raise BrailleError("XML processing failed", xml)
@@ -539,7 +516,7 @@ class BrailleExporter(FileExporter, Exporter):
 
             def split(page):
                 lines = page.split('\n')
-                if lines[-1] == u'':
+                if lines[-1] == '':
                     lines = lines[:-1]
                 return lines
             pages = [split(p) for p in page_strings]
@@ -792,7 +769,7 @@ class BrailleExporter(FileExporter, Exporter):
                         else:
                             marker, arg = mark
                             if marker == self._TOC_MARKER_CHAR:
-                                page_number = unistr(context.page_number())
+                                page_number = str(context.page_number())
                                 element = context.toc_element(arg)
                                 element.set_page_number(page_number)
                                 if isinstance(element, Section):
@@ -834,21 +811,21 @@ class BrailleExporter(FileExporter, Exporter):
                         if isinstance(status_line, Container):
                             c = status_line.content()
                             if c and isinstance(c[0], PageNumber):
-                                pos = exported_status_line.find(u'⠀')
+                                pos = exported_status_line.find('⠀')
                                 if pos > 0:
-                                    title = exported_status_line[pos:].strip(u'⠀ ')
+                                    title = exported_status_line[pos:].strip('⠀ ')
                                     text_len = len(title) + pos
                                     fill = (page_width - text_len) // 2
                                     exported_status_line = (exported_status_line[:pos] +
-                                                            u'⠀' * fill + title)
+                                                            '⠀' * fill + title)
                             elif c and isinstance(c[-1], PageNumber):
-                                pos = exported_status_line.rfind(u'⠀')
+                                pos = exported_status_line.rfind('⠀')
                                 if pos >= 0 and pos != len(exported_status_line) - 1:
-                                    title = exported_status_line[:pos].strip(u'⠀ ')
+                                    title = exported_status_line[:pos].strip('⠀ ')
                                     text_len = len(title) + (len(exported_status_line) - pos)
                                     fill_2 = (page_width - text_len) // 2
                                     fill_1 = page_width - text_len - fill_2
-                                    exported_status_line = (u'⠀' * fill_1 + title + u'⠀' * fill_2 +
+                                    exported_status_line = ('⠀' * fill_1 + title + '⠀' * fill_2 +
                                                             exported_status_line[pos + 1:])
                         add_line(exported_status_line, lines, True)
                     new_pages.append(lines)
@@ -922,8 +899,8 @@ class BrailleExporter(FileExporter, Exporter):
 
         """
         assert isinstance(context, self.Context), context
-        assert isinstance(text, basestring), text
-        assert lang is None or isinstance(lang, basestring), lang
+        assert isinstance(text, str), text
+        assert lang is None or isinstance(lang, str), lang
         if lang is None:
             lang = context.lang()
         if reformat:
@@ -1155,13 +1132,13 @@ class BrailleExporter(FileExporter, Exporter):
         return self.text(context, title, lang=element.lang())
 
     def _export_page_number(self, context, element):
-        return self.text(context, unistr(context.page_number()), lang=element.lang())
+        return self.text(context, str(context.page_number()), lang=element.lang())
 
     def _export_page_heading(self, context, element):
         return context.page_heading()
 
     def _page_formatter(self, context, **kwargs):
-        return self.text(context, unistr(context.page_number()))
+        return self.text(context, str(context.page_number()))
 
     def _export_section(self, context, element):
         level = len(element.section_path())
@@ -1304,10 +1281,10 @@ class BrailleExporter(FileExporter, Exporter):
                                          self._export_table(context, table_2, recursive=True))
                     break
                 else:
-                    context.log(unistr(exception), kind=lcg.ERROR)
+                    context.log(str(exception), kind=lcg.ERROR)
                     return _Braille('')
             else:
-                context.log(unistr(exception), kind=lcg.ERROR)
+                context.log(str(exception), kind=lcg.ERROR)
                 return _Braille('')
         return result
 
@@ -1383,10 +1360,10 @@ class BrailleExporter(FileExporter, Exporter):
     def _table_row_separator(self, context, width, cell_widths, row_number, vertical_separator,
                              last_row, heading_present):
         if row_number <= 0:
-            filler = u'⠶' if row_number == 0 else u'⠛'
+            filler = '⠶' if row_number == 0 else '⠛'
             separator = self.concat(_Braille(filler * width), self._newline(context))
         elif row_number == 1 and cell_widths and heading_present:
-            cell_separators = [_Braille(u'⠐' + u'⠒' * (w - 1) if c else ' ' * w, self.HYPH_NO * w)
+            cell_separators = [_Braille('⠐' + '⠒' * (w - 1) if c else ' ' * w, self.HYPH_NO * w)
                                for w, c in zip(cell_widths, last_row)]
             elements = [cell_separators[0]]
             for c in cell_separators[1:]:
@@ -1647,7 +1624,7 @@ class BrailleExporter(FileExporter, Exporter):
             # languages than just Czech.  But it returns something like
             # character code on unknown characters, we try to identify and
             # handle such a situation here.
-            if (((not op_braille or op_braille.find(u'⠈⠀⠭') >= 0) and
+            if (((not op_braille or op_braille.find('⠈⠀⠭') >= 0) and
                  translation is not None)):
                 __, op_braille, hyphenation = translation
             else:
@@ -1657,7 +1634,7 @@ class BrailleExporter(FileExporter, Exporter):
                     hyphenation = self.HYPH_CZECH_MATH_WS
                 else:
                     hyphenation = self.HYPH_NO * len(op_braille)
-            if op_braille.find(u'⠈⠀⠭') >= 0:
+            if op_braille.find('⠈⠀⠭') >= 0:
                 # Still a Unicode character?  We should do something about it.
                 op_braille = self.braille_unknown_char(op_braille, operator)
                 hyphenation = self.HYPH_NO * len(op_braille)
@@ -1741,7 +1718,7 @@ class BrailleExporter(FileExporter, Exporter):
             # We don't know what follows so we put the lower case letter prefix
             # here.  It should be present here only if lower case a-h follows;
             # this will be fixed in final MathML result processing.
-            braille.append(u'⠐', self.HYPH_NO)
+            braille.append('⠐', self.HYPH_NO)
             return braille
 
         def export_mo(node, op_form=None, **kwargs):

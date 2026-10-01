@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2012-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,25 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from __future__ import unicode_literals
-from future import standard_library
-from builtins import chr
-from builtins import range
-
 import html.parser
 import html.entities
 import io
 import re
-import sys
 import xml.dom.minidom
 import xml.etree.ElementTree
 
 import lcg
-
-standard_library.install_aliases()
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class Processor(object):
@@ -127,7 +114,7 @@ class Processor(object):
             matchers = self._matchers()
             compiled_matchers = []
             for test, handler in matchers:
-                if isinstance(test, basestring):
+                if isinstance(test, str):
                     test = (test,)
                 if isinstance(test, (tuple, list)):
                     tag_regexp = re.compile(test[0] + '$')
@@ -164,7 +151,7 @@ class Processor(object):
                 element
               childern -- sequence of 'xml.etree.ElementTree.Element' instances
                 to be set as children of the newly created element.
-              text -- if not 'None' then add the text (basestring) to the
+              text -- if not 'None' then add the text (str) to the
                 element.  Note this represents just the text immediately after
                 the opening tag in XML serialization; it is often a good idea
                 not to make elements combining both text and children (although
@@ -215,7 +202,7 @@ class Processor(object):
         The result is dependent on particular 'Processor' class.
 
         """
-        assert isinstance(data, basestring), data
+        assert isinstance(data, str), data
         tree = self.Parser().lcg_parse(data)
         return self.Transformer().transform(tree)
 
@@ -516,7 +503,7 @@ class XML2HTML(XMLProcessor):
             children = list(children)
             while children:
                 c = children.pop(0)
-                if isinstance(c, basestring):
+                if isinstance(c, str):
                     if last is element:
                         last.text = (last.text or '') + c
                     else:
@@ -835,7 +822,7 @@ class HTML2XML(Processor):
                 followers.pop(0)
             transformed_title = self._transform_sub(element)
             if not transformed_title:
-                transformed_title = self._make_content('text', {}, (), u'')
+                transformed_title = self._make_content('text', {}, (), '')
             title_content = self._make_content('heading', {}, transformed_title)
             text_title = self._plain_text(element)
             content = [title_content] + self._transform_sub(section_children)

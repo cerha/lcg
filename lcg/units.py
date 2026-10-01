@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2010-2016 OUI Technology Ltd.
-# Copyright (C) 2019-2021 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,14 +28,9 @@ Additionally various enumerations are defined here, for instance:
 @L{HorizontalAlignment}, L{VerticalAlignment}, L{Orientation}, L{FontFamily}.
 
 """
-from __future__ import unicode_literals
-from past.builtins import cmp
 
-import sys
 import decimal
 
-if sys.version_info[0] > 2:
-    basestring = str
 
 class Unit(object):
     """Dimension unit representation.
@@ -65,9 +58,6 @@ class Unit(object):
         """
         return self._size != 0
 
-    # Just for Python 2 compatibility.
-    __nonzero__ = __bool__
-
     def __add__(self, size):
         """
         @type size: integer, float or decimal.Decimal
@@ -85,13 +75,6 @@ class Unit(object):
         """
         assert isinstance(size, (float, int, decimal.Decimal)), size
         return self.__class__(self._size * size)
-
-    def __cmp__(self, other):
-        if self.__class__ == other.__class__:
-            result = cmp(self.__class__, other.__class__)
-        else:
-            result = cmp(self.size(), other.size())
-        return result
 
     def size(self):
         """
@@ -179,9 +162,9 @@ class Color(object):
             rgb = args
         elif n == 3 and all(isinstance(a, (int, float)) and a >= 0 and a <= 1 for a in args):
             rgb = [int(a * 255) for a in args]
-        elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 7:
+        elif n == 1 and isinstance(arg, str) and arg.startswith('#') and len(arg) == 7:
             rgb = [int(x, 16) for x in (arg[1:3], arg[3:5], arg[5:7])]
-        elif n == 1 and isinstance(arg, basestring) and arg.startswith('#') and len(arg) == 4:
+        elif n == 1 and isinstance(arg, str) and arg.startswith('#') and len(arg) == 4:
             rgb = [int(x + x, 16) for x in arg[1:]]
         else:
             raise ValueError("Invalid color specification: %r" % (args,))

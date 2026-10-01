@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2015, 2017 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +17,6 @@
 
 """Exporter class which generates an IMS compliant package."""
 
-from __future__ import unicode_literals
 
 import lcg
 import xml.dom.domreg

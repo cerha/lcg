@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2024 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,18 +35,11 @@ present in the code may still not be fully supported.
 
 """
 
-from __future__ import unicode_literals
-from builtins import map
 
-import sys
 import lcg
 import re
 
 _ = lcg.TranslatableTextFactory('lcg-exercises')
-
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 ################################################################################
@@ -66,7 +57,7 @@ class Task(object):
 
     def __init__(self, prompt, comment=None, media=None):
         assert isinstance(prompt, lcg.Content) or prompt is None, prompt
-        assert isinstance(comment, basestring) or comment is None, comment
+        assert isinstance(comment, str) or comment is None, comment
         if media is None:
             media = ()
         elif isinstance(media, lcg.Media):
@@ -106,7 +97,7 @@ class TextTask(Task):
 
     def __init__(self, prompt, text, **kwargs):
         super(TextTask, self).__init__(prompt, **kwargs)
-        assert isinstance(text, basestring)
+        assert isinstance(text, str)
         self._text = self._NEWLINE_MATCHER.sub(' ', text)
 
     def text(self):
@@ -195,7 +186,7 @@ class Choice(object):
     """
 
     def __init__(self, answer, correct=False):
-        assert isinstance(answer, basestring), answer
+        assert isinstance(answer, str), answer
         assert correct is None or isinstance(correct, bool), correct
         self._answer = answer
         self._correct = correct
@@ -644,7 +635,7 @@ class TrueFalseStatements(_ChoiceBasedExercise):
     _NAME = _("True/False Statements")
     _HELP_INTRO = (
         _("Each sentence in this exercise is followed by two controls labeled "
-          u"‘TRUE’ and ‘FALSE’.  Decide whether the sentence is true or not "
+          "‘TRUE’ and ‘FALSE’.  Decide whether the sentence is true or not "
           "and press the corresponding button."),
     ) + _ChoiceBasedExercise._HELP_INTRO
     _SOURCE_FORMATTING = (
@@ -767,7 +758,7 @@ class VocabExercise(_SingleTextBoxFillInExercise):
           "exercise both ways to get the best results."),
         _("To do the exercise orally is simple.  Go through the vocabulary list "
           "and think of the correct translation for each word or expression. "
-          u"There is a ‘Play’ button after the text box for each item which "
+          "There is a ‘Play’ button after the text box for each item which "
           "allows you to hear the correct answer.  Repeat the answer to practice "
           "the correct pronunciation.  Some items have more than one correct "
           "answer, so there may be multiple buttons to play each of them.  Since "
@@ -915,7 +906,7 @@ class _Test(object):
             name = '%s-a%d' % (self.id(), i + 1)
             answer = self._param(req, name)
             # Correct answer is a numer or string.
-            if answer == unistr(correct_answer):
+            if answer == str(correct_answer):
                 points += self.points()
             # elif not answer:
             #    empty += self.points()

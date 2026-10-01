@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2017 OUI Technology Ltd.
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,19 +23,13 @@ these files, they just provide their abstract representation.  The resources
 are managed by the 'ResourceProvider' (see below).
 
 """
-from __future__ import unicode_literals
 
 import os
 import glob
-import sys
 import lcg
 import functools
 
 _ = lcg.TranslatableTextFactory('lcg')
-
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class Resource(object):
@@ -117,11 +109,11 @@ class Resource(object):
 
         """
         super(Resource, self).__init__()
-        assert isinstance(filename, basestring), filename
-        assert title is None or isinstance(title, basestring), title
-        assert descr is None or isinstance(descr, basestring), descr
-        assert uri is None or isinstance(uri, basestring), uri
-        assert src_file is None or isinstance(src_file, basestring), src_file
+        assert isinstance(filename, str), filename
+        assert title is None or isinstance(title, str), title
+        assert descr is None or isinstance(descr, str), descr
+        assert uri is None or isinstance(uri, str), uri
+        assert src_file is None or isinstance(src_file, str), src_file
         assert content is None or isinstance(content, bytes) or hasattr(content, 'read'), content
         self._filename = filename
         self._title = title
@@ -370,8 +362,6 @@ class ResourceProvider(object):
             dirs = (searchdir,) + dirs
         for directory in dirs:
             src_path = os.path.join(directory, filename)
-            if sys.version_info[0] == 2:
-                src_path = src_path.encode('utf-8')
             if os.path.isfile(src_path):
                 return cls(filename, src_file=src_path, **kwargs)
             elif '*' in filename:

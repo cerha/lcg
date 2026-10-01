@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2011-2016 OUI Technology Ltd.
-# Copyright (C) 2019-2024 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,22 +28,16 @@ currently processed 'Content' instance and current language.
 
 """
 
-from __future__ import unicode_literals
 
 try:
     from typing import Any, Optional
 except ImportError:
     pass
 
-import sys
 import copy
 import lcg
 import re
 import string
-
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 class Presentation(object):
@@ -319,7 +311,7 @@ class LanguageMatcher(ContentMatcher):
 
         """
         super(LanguageMatcher, self).__init__()
-        assert lang is None or isinstance(lang, basestring), lang
+        assert lang is None or isinstance(lang, str), lang
         self._lang = None
 
     def matches(self, content, lang):
@@ -330,7 +322,7 @@ class LanguageMatcher(ContentMatcher):
         'content' is ignored.
 
         """
-        assert lang is None or isinstance(lang, basestring), lang
+        assert lang is None or isinstance(lang, str), lang
         return self._lang is None or lang is None or lang == self._lang
 
 
@@ -380,7 +372,7 @@ class LCGContainerMatcher(LCGClassMatcher):
           name -- container name to match, string
 
         """
-        assert isinstance(name, basestring), name
+        assert isinstance(name, str), name
         super(LCGContainerMatcher, self).__init__(lcg.Container)
         self._name = name
 
@@ -471,7 +463,7 @@ class PresentationSet(object):
 
         """
         assert isinstance(content, lcg.Content) or content is None, content
-        assert lang is None or isinstance(lang, basestring), lang
+        assert lang is None or isinstance(lang, str), lang
         applicable_presentations = self._matching_presentations(content, lang)
         key = tuple([id(p) for p in applicable_presentations])
         presentation = self._merge_cache.get(key)
@@ -647,7 +639,7 @@ class StyleFile(object):
                         str_value = 'yes'
                     else:
                         str_value = 'no'
-                elif isinstance(value, basestring):
+                elif isinstance(value, str):
                     str_value = value
                 elif isinstance(value, float):
                     str_value = str(value)

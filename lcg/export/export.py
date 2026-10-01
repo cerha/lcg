@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2016 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,10 +25,6 @@ The module contains the following important classes:
 See documentation of the individual classes for more details.
 
 """
-from __future__ import unicode_literals
-from __future__ import division
-from builtins import range
-from past.utils import old_div
 
 from contextlib import contextmanager
 import os
@@ -41,10 +35,6 @@ import sys
 import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')
-
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 
 INFO = 'INFO'
@@ -154,10 +144,10 @@ class Exporter(object):
     """
 
     _RE_SPACE_MATCHER = re.compile('  +')
-    _RE_MARKER_MATCHER = re.compile(u'[\ue000-\uffff]')
-    _TOC_MARKER_CHAR = u'\ue000'
-    _HFILL = u'\ue001\ue001\ue001'
-    _END_MARKER_CHAR = u'\n'
+    _RE_MARKER_MATCHER = re.compile('[\ue000-\uffff]')
+    _TOC_MARKER_CHAR = '\ue000'
+    _HFILL = '\ue001\ue001\ue001'
+    _END_MARKER_CHAR = '\n'
 
     MATPLOTLIB_RESCALE_FACTOR = 1
     """Hack to improve matplotlib output in PDF.  See 'PDFExporter.MATPLOTLIB_RESCALE_FACTOR'."""
@@ -234,7 +224,7 @@ class Exporter(object):
 
         def _default_logging_function(self, message, kind=INFO):
             assert kind in (ERROR, WARNING, INFO)
-            assert isinstance(message, basestring)
+            assert isinstance(message, str)
             self._messages.append((kind, message))
 
         def exporter(self):
@@ -289,7 +279,7 @@ class Exporter(object):
             return self._toc_markers[marker]
 
         def add_toc_marker(self, element):
-            marker = unistr(len(self._toc_markers))
+            marker = str(len(self._toc_markers))
             self._toc_markers[marker] = element
             return marker
 
@@ -566,7 +556,7 @@ class Exporter(object):
           reformat -- iff true, make some 'text' sanitization
 
         """
-        assert isinstance(text, basestring), text
+        assert isinstance(text, str), text
         if reformat:
             text = self._reformat_text(context, text)
         elif self._text_mark(text):
@@ -585,7 +575,7 @@ class Exporter(object):
         return text
 
     def _newline(self, context, number=1, soft=False, page_start=None, page_end=False):
-        return u'\n' * number
+        return '\n' * number
 
     def _ensure_newlines(self, context, exported, number=1):
         real_number = 0
@@ -595,7 +585,7 @@ class Exporter(object):
         return exported + '\n' * (number - real_number)
 
     def _space(self, context, number=1):
-        return u' ' * number
+        return ' ' * number
 
     def _indent(self, exported, indentation, init_indentation=None, no_page_break=False,
                 first_indented=0, restart=False):
@@ -603,20 +593,20 @@ class Exporter(object):
             init_indentation = indentation
         lines = exported.split('\n')
         if lines:
-            space = u' ' * indentation
+            space = ' ' * indentation
             lines = (lines[:first_indented] +
-                     [u' ' * init_indentation + lines[first_indented]] +
+                     [' ' * init_indentation + lines[first_indented]] +
                      [space + l if l else '' for l in lines[first_indented + 1:]])
         return '\n'.join(lines)
 
     def _list_item_prefix(self, context, lang=None):
-        return u'• '
+        return '• '
 
     def _separator(self, context, lang=None):
-        return self.text(context, u' — ', lang=lang)
+        return self.text(context, ' — ', lang=lang)
 
     def _marker(self, marker, argument=''):
-        return u'%s%s%s' % (marker, argument, self._END_MARKER_CHAR,)
+        return '%s%s%s' % (marker, argument, self._END_MARKER_CHAR,)
 
     def _text_mark(self, text):
         if text:
@@ -681,7 +671,7 @@ class Exporter(object):
 
     def _export_horizontal_separator(self, context, element, width=64):
         """Export the given 'HorizontalSeparator' element."""
-        separator = u'─' * width
+        separator = '─' * width
         return self.concat(self.text(context, separator), self._newline(context))
 
     def _export_page_number(self, context, element):
@@ -741,9 +731,9 @@ class Exporter(object):
             lang = element.lang()
             extra = [self.text(context, '--', lang=lang)]
             if source:
-                extra.append(self.text(context, u' ' + source, lang=lang, reformat=True))
+                extra.append(self.text(context, ' ' + source, lang=lang, reformat=True))
             if uri:
-                format_ = u' (%s)' if source else u' %s'
+                format_ = ' (%s)' if source else ' %s'
                 extra.append(self.text(context, format_ % (uri,), lang=lang, reformat=True))
             exported = self.concat(exported, *extra)
         exported = self._ensure_newlines(context, exported, 2)
@@ -810,13 +800,13 @@ class Exporter(object):
         if not name:
             return self.escape(element.markup())
         names = name.split('.')
-        value = context.node().global_(unistr(names[0]))
+        value = context.node().global_(str(names[0]))
         for xname in names[1:]:
             if value is None:
                 break
             if isinstance(value, SubstitutionIterator):
                 value = value.value()
-            key = unistr(xname)
+            key = str(xname)
             dictionary = value
             try:
                 value = value.get(key)
@@ -835,7 +825,7 @@ class Exporter(object):
             result = value.export(context)
         else:
             if not isinstance(value, lcg.Localizable):
-                value = unistr(value)
+                value = str(value)
             result = self.escape(value)
         return result
 
@@ -925,7 +915,7 @@ class Exporter(object):
     def _export_itemized_list(self, context, element, lang=None):
         """Export given 'ItemizedList' element."""
         numbering = element.order()
-        letters = u'abcdefghijklmnopqrstuvwxyz'
+        letters = 'abcdefghijklmnopqrstuvwxyz'
         n_letters = len(letters)
         item_number = [1]
 
@@ -933,16 +923,16 @@ class Exporter(object):
             n = item_number[0]
             item_number[0] += 1
             if numbering == lcg.ItemizedList.NUMERIC:
-                result = u'%d. ' % (n,)
+                result = '%d. ' % (n,)
                 exported = self.text(context, result, lang=lang)
             elif numbering in (lcg.ItemizedList.LOWER_ALPHA, lcg.ItemizedList.UPPER_ALPHA,):
                 result = letters[(n - 1) % n_letters]
                 while n > n_letters:
-                    n = old_div(n, n_letters)
+                    n = n // n_letters
                     result = letters[(n - 1) % n_letters] + result
                 if numbering == lcg.ItemizedList.UPPER_ALPHA:
                     result = result.upper()
-                result += u'. '
+                result += '. '
                 exported = self.text(context, result, lang=lang)
             else:
                 exported = self._list_item_prefix(context, lang=lang)
@@ -1134,11 +1124,11 @@ class Exporter(object):
 
     def _vertical_cell_separator(self, context, position):
         if position == 0:
-            return u'│ '
+            return '│ '
         elif position == -1:
-            return u' │'
+            return ' │'
         else:
-            return u' │ '
+            return ' │ '
 
     def _table_row_separator(self, context, width, cell_widths, outer, vertical_separator,
                              last_row, heading_present):
@@ -1214,7 +1204,7 @@ class Exporter(object):
             content.append(self.concat(instructions.export(context),
                                        self._newline(context, 1, page_start=3)))
         # Tasks
-        fill_in_char = u'_'
+        fill_in_char = '_'
         fill_in_area = fill_in_char * 4
 
         def choice_text(task, choice, show_answers):
@@ -1330,7 +1320,7 @@ class Exporter(object):
             with_answers = add_part(True, True)
             result = add_part(False, not with_answers)
             if with_answers:
-                result.append(self.text(context, u'-----------------'))
+                result.append(self.text(context, '-----------------'))
                 result.append(self._newline(context, page_start=3))
                 result.append(self.concat(*with_answers))
             return self.concat(*result)
@@ -1345,7 +1335,7 @@ class Exporter(object):
             n = 1
             for t in exported_tasks:
                 if numbered:
-                    separated_tasks.append(self.text(context, u'%d. ' % (n,)))
+                    separated_tasks.append(self.text(context, '%d. ' % (n,)))
                     n += 1
                 separated_tasks.append(t)
                 separated_tasks.append(self._newline(context))
@@ -1387,7 +1377,7 @@ class FileExporter(object):
         directory = os.path.split(filename)[0]
         if directory and not os.path.isdir(directory):
             os.makedirs(directory)
-        if isinstance(content, unistr):
+        if isinstance(content, str):
             content = content.encode('utf-8')
         file = open(filename, 'wb')
         try:

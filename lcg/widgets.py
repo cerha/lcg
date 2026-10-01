@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2017 OUI Technology Ltd.
 # Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
@@ -36,7 +34,6 @@ don't work.
 
 """
 
-from __future__ import unicode_literals
 import lcg
 
 _ = lcg.TranslatableTextFactory('lcg')

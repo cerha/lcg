@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2019-2025 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from __future__ import division
 
 import datetime
 import io
@@ -344,7 +341,7 @@ class DecimalFormatter(LocalizingFormatter):
             precision = 2
         result = self._LOCALIZABLE(value, precision=precision)
         if unit:
-            result = lcg.concat(result, u'\xa0', unit)
+            result = lcg.concat(result, '\xa0', unit)
         return result
 
 

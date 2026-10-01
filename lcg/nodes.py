@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2004-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,18 +24,13 @@ represented by a single 'ContentNode' instance (defined below).
 
 """
 
-from __future__ import unicode_literals
 
-import sys
 import lcg
 import functools
 import copy
 
 from lcg import is_sequence_of
 
-unistr = type(u'')  # Python 2/3 transition hack.
-if sys.version_info[0] > 2:
-    basestring = str
 
 class ContentNode(object):
     """Representation of one node within an LCG publication.
@@ -114,7 +107,7 @@ class ContentNode(object):
             content.
 
         """
-        assert isinstance(id, basestring), repr(id)
+        assert isinstance(id, str), repr(id)
         assert isinstance(hidden, bool), hidden
         assert isinstance(active, bool), active
         assert isinstance(foldable, bool), foldable
@@ -305,7 +298,7 @@ class ContentNode(object):
           top -- iff true, set the value in the top node
 
         """
-        assert isinstance(name, basestring), name
+        assert isinstance(name, str), name
         assert isinstance(value, lcg.Content), value
         node = self
         if top:
@@ -496,7 +489,7 @@ class Variant(object):
                 x = lcg.Container(x)
             assert x is None or isinstance(x, lcg.Content), x
             return x
-        assert isinstance(lang, basestring) and len(lang) == 2, lang
+        assert isinstance(lang, str) and len(lang) == 2, lang
         if isinstance(presentation, dict) and tuple(presentation.keys()) == (None,):
             # Handle old hacks gracefully.
             presentation = presentation[None]
@@ -568,9 +561,9 @@ class Metadata(object):
                 assert hasattr(self, key), "Unknown meta data attribute: %s" % key
                 if key in ('authors', 'contributors'):
                     assert isinstance(value, (tuple, list)) and \
-                        all(isinstance(name, basestring) for name in value), \
+                        all(isinstance(name, str) for name in value), \
                         "Invalid value for meta data attribute %s: %s" % (key, value)
                 else:
-                    assert value is None or isinstance(value, basestring), \
+                    assert value is None or isinstance(value, str), \
                         "Invalid value for meta data attribute %s: %s" % (key, value)
             self.__dict__.update(**kwargs)

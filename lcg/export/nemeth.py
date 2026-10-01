@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Copyright (C) 2013-2015 OUI Technology Ltd.
-# Copyright (C) 2019 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,11 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-from __future__ import absolute_import
 
-from builtins import zip
-from builtins import range
 from contextlib import contextmanager
 import copy
 import re
@@ -428,7 +422,7 @@ def mathml_nemeth(exporter, context, element):
                 m = _punctuation_regexp.match(post_text)
                 if m is not None:
                     pos = m.end(1)
-                    context.set_alternate_text(post, post_text[:pos] + u'_' + post_text[pos:])
+                    context.set_alternate_text(post, post_text[:pos] + '_' + post_text[pos:])
         if punctuated:
             indicate = single_letter
             for indicator in _braille_right_indicators:
