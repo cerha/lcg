@@ -866,14 +866,23 @@ lcg.PopupMenuBase = class extends lcg.Menu {
         }
         this._select_item(selected_item)
         menu.attr('style', 'display: none') // Force consistent initial state
-        menu.css({left: x + 'px', top: y + 'px'})
+        // The menu is positioned relative to the viewport (see the CSS), so
+        // that it is not clipped by scrollable ancestors, such as a wrapper of
+        // a wide table.  The position is updated to follow the invoking element
+        // when the page or any of its parts is scrolled.
+        let position = (y) => {
+            let rect = element ? element[0].getBoundingClientRect() : {left: 0, top: 0}
+            return {left: rect.left + x + 'px', top: rect.top + y + 'px'}
+        }
+        menu.css(position(y))
         if (direction === 'up') {
             let total_height = menu.height()
             let css_height = menu.height()
+            y -= total_height
             menu.css({height: 0, display: 'block', overflowY: 'hidden'})
             menu.animate({
                 height: css_height + 'px',
-                top: y - total_height + 'px',
+                top: position(y).top,
             }, {
                 duration: 200,
                 done: () => {
@@ -888,7 +897,10 @@ lcg.PopupMenuBase = class extends lcg.Menu {
         this._on_touchmove_handler = (e) => { this._touch_moved = true }
         this._on_touchend_handler = this._on_touchend.bind(this)
         this._on_click_handler = this._on_click.bind(this)
+        this._on_scroll_handler = () => menu.css(position(y))
 
+        // Capture the scroll events of all scrollable elements (they don't bubble).
+        window.addEventListener('scroll', this._on_scroll_handler, true)
         $(document).on('touchstart', this._on_touchstart_handler)
         $(document).on('touchmove', this._on_touchmove_handler)
         $(document).on('touchend', this._on_touchend_handler)
@@ -899,6 +911,7 @@ lcg.PopupMenuBase = class extends lcg.Menu {
     }
 
     dismiss() {
+        window.removeEventListener('scroll', this._on_scroll_handler, true)
         $(document).off('touchstart', this._on_touchstart_handler)
         $(document).off('touchmove', this._on_touchmove_handler)
         $(document).off('touchend', this._on_touchend_handler)

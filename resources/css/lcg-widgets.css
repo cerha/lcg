@@ -575,7 +575,7 @@
     border-bottom: none;
 }
 .popup-menu-widget {
-    position: absolute;
+    position: fixed; /* Relative to the viewport, see lcg.PopupMenuBase.popup(). */
     width: auto;
     padding: 0;
     border: 1px solid #aaa;
