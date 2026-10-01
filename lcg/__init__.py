@@ -16,7 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-__version__ = '0.9.0.dev0'
+__version__ = '0.9.0.dev1'
 
 from .locales import LocaleData, LocaleData_cs, LocaleData_de, \
     LocaleData_en, LocaleData_es, LocaleData_no, LocaleData_pl, \
