@@ -106,7 +106,7 @@ let href=item.attr('href')
 let page=$(href.substr(href.indexOf('#')))
 item[0]._lcg_notebook_page=page
 page[0]._lcg_notebook_item=item
-page.find('h1,h2,h3,h4,h5,h6').hide()
+page.find('h1,h2,h3,h4,h5,h6').first().hide()
 page.hide()
 page.addClass('notebook-page')
 page.attr('role','tabpanel')
@@ -351,50 +351,79 @@ if(selector){this.element.closest(selector).on('contextmenu',e=>menu.popup(e,ctr
 this._menu=menu}
 _define_keymap(){return{'Enter':this._cmd_activate,'Space':this._cmd_activate}}
 _cmd_activate(event,element){this._menu.popup(undefined,element)}}
-lcg.DropdownSelection=class extends lcg.PopupMenuBase{constructor(element,button_id,activation_callback,get_selected_item_index){super(element)
-if(get_selected_item_index===undefined){get_selected_item_index=function(){return 0}}
-this._activation_callback=activation_callback
-this._get_selected_item_index=get_selected_item_index
-this.element.attr('role','listbox')
-let button=this._element(button_id)
-this._button=button
-button.attr('tabindex','0')
-button.attr('role','button')
-button.attr('aria-haspopup','true')
-button.attr('aria-expanded','false')
-button.attr('aria-controls',this.element.attr('id'))
-button.on('click',this._on_button_click.bind(this))
-button.on('keydown',this._on_button_key_down.bind(this))}
-_on_button_key_down(event){let key=this._event_key(event)
-if(key==='Enter'||key==='Space'||key==='Alt-Down'){this.dropdown()
+lcg.Dropdown=class extends lcg.Widget{constructor(element){super(element)
+this._button=this.element.children('.dropdown-toggle')
+this._dropdown=this.element.children('.dropdown-panel')
+this._button.on('click',event=>{this.toggle(event.detail===0)})
+this.element.on('keydown',this._on_key_down.bind(this))
+this._dropdown.on('click','a[href]',event=>this.collapse())
+this.element.on('focusout',event=>{if(event.relatedTarget&&!this.element[0].contains(event.relatedTarget)){this.collapse()}})
+let on_document_click=(event)=>{if(!document.contains(this.element[0])){$(document).off('click',on_document_click)}else if(!this.element[0].contains(event.target)){this.collapse()}}
+$(document).on('click',on_document_click)
+this.collapse()}
+_on_key_down(event){let key=this._event_key(event)
+let target=event.target
+if(key==='Escape'&&this.expanded()){this.collapse()
+this._button.focus()}else if(target===this._button[0]){if(key!=='Down'&&key!=='Alt-Down'){return}
+if(!this.expanded()){this.expand(true)}
+if(!this._dropdown[0].contains(document.activeElement)){this._links().first().focus()}}else if(this.expanded()&&$(target).is('a')&&key==='Space'){target.click()}else if(this.expanded()&&$(target).is('a')){let link=this._link_in_direction(target,key)
+if(link===undefined){return}
+if(link){link.focus()}}else{return}
+event.preventDefault()
+event.stopPropagation()}
+_links(){return this._dropdown.find('a[href]')}
+_link_in_direction(link,key){let links=this._links().get()
+let index=links.indexOf(link)
+let rect=link.getBoundingClientRect()
+let center=(r)=>r.left+r.width/2
+let closest=(candidates)=>{if(candidates.length===0){return null}
+let distance=(r)=>Math.abs(r.top-rect.top)
+let rects=candidates.map(a=>[a,a.getBoundingClientRect()])
+let min_distance=Math.min(...rects.map(([a,r])=>distance(r)))
+return rects.filter(([a,r])=>distance(r)-min_distance<rect.height/2).sort(([a1,r1],[a2,r2])=>(Math.abs(center(r1)-center(rect))-
+Math.abs(center(r2)-center(rect))))[0][0]}
+switch(key){case'Right':return links[index+1]||null
+case'Left':return links[index-1]||null
+case'Home':return links[0]
+case'End':return links[links.length-1]
+case'Down':return closest(links.filter(a=>(a.getBoundingClientRect().top>rect.top+rect.height/2)))
+case'Up':return(closest(links.filter(a=>(a.getBoundingClientRect().top<rect.top-rect.height/2)))||this._button[0])}
+return undefined}
+expanded(){return this.element.hasClass('expanded')}
+expand(focus_current){let dropdown=this._dropdown
+this.element.removeClass('collapsed').addClass('expanded')
+this._button.attr('aria-expanded','true')
+dropdown.css({left:'',maxHeight:'',overflowY:''})
+this.element.removeClass('upward')
+let margin=8
+let rect=dropdown[0].getBoundingClientRect()
+let overflow=rect.right-(document.documentElement.clientWidth-margin)
+if(overflow>0){dropdown.css('left',-Math.max(0,Math.min(overflow,rect.left-margin))+'px')}
+let button=this._button[0].getBoundingClientRect()
+let below=document.documentElement.clientHeight-button.bottom-margin
+let above=button.top-margin
+if(rect.height>below&&above>below){this.element.addClass('upward')}
+let space=Math.max(above,below)
+if(rect.height>(this.element.hasClass('upward')?above:below)){dropdown.css({maxHeight:Math.max(space,0)+'px',overflowY:'auto'})}
+let current=this._links().filter('[aria-current]:not([aria-current="false"])')[0]
+if(current){dropdown.scrollTop(current.offsetTop-dropdown.height()/2)
+if(focus_current){current.focus({preventScroll:true})}}}
+collapse(){this.element.removeClass('expanded').addClass('collapsed')
+this._button.attr('aria-expanded','false')}
+set_current(link){this._links().removeAttr('aria-current')
+$(link).attr('aria-current','true')}
+toggle(focus_current){if(this.expanded()){this.collapse()}else{this.expand(focus_current)}}}
+lcg.DropdownSelection=class extends lcg.Dropdown{constructor(element){super(element)
+this._on_select_callback=null
+this._dropdown.on('click','a[href]',this._on_link_click.bind(this))}
+_on_link_click(event){if(this._on_select_callback){let link=event.currentTarget
+this.set_current(link)
+this._button.focus()
+this._on_select_callback(link)
 return false}}
-_on_button_click(event){if(this._button.attr('aria-expanded')==='true'){this.dismiss()}else{this.dropdown()}
-return false}
-_cmd_activate(event,item){this.dismiss()
-this._activation_callback(item)}
-_define_keymap(){return{'Up':this._cmd_prev,'Down':this._cmd_next,'Enter':this._cmd_activate,'Space':this._cmd_activate,'Escape':this._cmd_quit}}
-_init_items(ul,parent){let items=super._init_items(ul,parent)
-ul.attr('role','presentation')
-return items}
-_init_item(item,prev,parent){super._init_item(item,prev,parent)
-item.attr('role','option')
-item.on('mouseover',e=>this._select_item($(e.target)))}
-_select_item(item){let previously_selected_item=this._selected_item()
-super._select_item(item)
-if(previously_selected_item&&previously_selected_item[0]!==item[0]){previously_selected_item.closest('li').removeClass('selected')}
-item.closest('li').addClass('selected')
-this._set_focus(item)}
-dropdown(){let y,direction
-let menu=this.element
-let bottom=$(window).scrollTop()+$(window).height()
-let height=menu.height()
-let offset=this._button.offset()
-if(offset.top+this._button.height()+height>bottom&&offset.top>height){y=0
-direction='up'}else{y=this._button.height()
-direction='down'}
-let padding=menu.outerWidth()-menu.innerWidth()
-menu.css({width:this._button.width()-padding+'px'})
-this.popup(this._button,0,y,direction,this._get_selected_item_index())}}
+on_select(callback){this._on_select_callback=callback}
+set_current(link){super.set_current(link)
+this._button.find('.value').text($(link).text())}}
 lcg.Tooltip=class extends lcg.Widget{constructor(url,x,y){super($())
 this._abort=false
 this._ajax({url:url,method:'GET',},(response,status,xhr)=>{if(this._abort){return}
@@ -407,39 +436,74 @@ remove(){this.element.remove()
 this._abort=true}}
 lcg.CollapsibleWidget=class extends lcg.Widget{constructor(element,collapsed){super(element)
 let heading=this._heading=this._collapsible_heading()
+let control=this._control=this._collapsible_control(heading)
 let content=this._content=this._collapsible_content()
 heading.append('<span class="icon">')
 if(collapsed){this.element.addClass('collapsed')
 content.hide()}else{this.element.addClass('expanded')}
 heading.on('click',e=>{this.toggle()
 return false})
+control.on('keydown',this._on_key_down.bind(this))
 if(!content.attr('id')){content.attr('id',this.element.attr('id')+'-collapsible-content')}
-heading.attr('aria-expanded',collapsed?'false':'true')
-heading.attr('aria-controls',content.attr('id'))}
+control.attr('aria-expanded',collapsed?'false':'true')
+control.attr('aria-controls',content.attr('id'))}
+_define_keymap(){return{'Enter':this.toggle,'Space':this.toggle}}
 _collapsible_heading(){}
+_collapsible_control(heading){return heading}
 _collapsible_content(){}
 expanded(){return this.element.hasClass('expanded')}
 expand(){this.element.removeClass('collapsed')
 this.element.addClass('expanded')
-this._heading.attr('aria-expanded','true')
+this._control.attr('aria-expanded','true')
 this._content.slideDown(200)}
 collapse(){this.element.removeClass('expanded')
 this.element.addClass('collapsed')
-this._heading.attr('aria-expanded','false')
+this._control.attr('aria-expanded','false')
 this._content.slideUp(200)}
 toggle(){if(this.element.hasClass('collapsed')){this.expand()}else{this.collapse()}}}
 lcg.CollapsibleSection=class extends lcg.CollapsibleWidget{_collapsible_heading(){let heading=this.element.find('h1,h2,h3,h4,h5,h6,h7,h8').first()
 heading.addClass('collapsible-section-heading')
-let backref=heading.find('a.backref')
-if(backref.length){backref.attr('href','')}
 return heading}
+_collapsible_control(heading){let control=heading.find('a.backref').first()
+if(!control.length){control=heading.wrapInner('<a>').children('a').first()}
+control.attr('href','#')
+control.attr('role','button')
+return control}
 _collapsible_content(){return this.element.find('div.section-content').first()}}
 lcg.CollapsiblePane=class extends lcg.CollapsibleWidget{_collapsible_heading(){return this.element.find('.pane-title').find('a')}
 _collapsible_content(){return this.element.find('.pane-content').first()}}
+lcg.AudioPositionSlider=class extends lcg.KeyHandler{_STEP=5
+_PAGE_STEP=60
+constructor(element,player){super()
+const _=lcg.gettext('lcg')
+this._slider=element
+this._player=player
+this._value_text=_("%(position)s of %(duration)s")
+element.attr({'role':'slider','tabindex':0,'aria-label':_("Playback position"),'aria-valuemin':0})
+element.on('keydown',this._on_key_down.bind(this))
+element.on('focus',event=>this._update())
+let events=['setmedia','loadedmetadata','durationchange','timeupdate']
+player.bind(events.map(name=>$.jPlayer.event[name]).join(' '),this._on_player_update.bind(this))
+this._update()}
+_define_keymap(){return{'Left':function(event){this._move(-this._STEP)},'Down':function(event){this._move(-this._STEP)},'Right':function(event){this._move(this._STEP)},'Up':function(event){this._move(this._STEP)},'PageDown':function(event){this._move(-this._PAGE_STEP)},'PageUp':function(event){this._move(this._PAGE_STEP)},'Home':function(event){this._seek(0)},'End':function(event){this._seek(Infinity)}}}
+_status(){return this._player.data('jPlayer').status}
+_move(offset){this._seek(this._status().currentTime+offset)}
+_seek(time){let status=this._status()
+if(status.duration){time=Math.max(0,Math.min(time,status.duration-1))
+this._player.jPlayer(status.paused?'pause':'play',time)
+this._update(time)}}
+_on_player_update(event){if(!(this._slider.is(':focus')&&!event.jPlayer.status.paused)){this._update()}}
+_update(time){let status=this._status()
+let duration=Math.floor(status.duration||0)
+let position=Math.min(Math.floor(time===undefined?status.currentTime:time),duration)
+let text=$.jPlayer.convertTime(position)
+if(duration){text=this._value_text.replace('%(position)s',text).replace('%(duration)s',$.jPlayer.convertTime(duration))}
+this._slider.attr({'aria-valuemax':duration,'aria-valuenow':position,'aria-valuetext':text})}}
 lcg.AudioPlayer=class extends lcg.Widget{constructor(elements,swf_uri){super(elements)
 this._volume=0.8
 this._player=this.element.find('.jp-player')
 this._player.jPlayer({volumechange:this._on_player_volume_change.bind(this),play:this._on_player_play.bind(this),pause:this._on_player_pause.bind(this),timeupdate:this._on_player_time_update.bind(this),swfPath:swf_uri||undefined,supplied:"mp3",wmode:"window",useStateClassSkin:true,autoBlur:false,smoothPlayBar:true,keyEnabled:true,remainingDuration:true,captureDuration:false,toggleDuration:true,volume:this._volume})
+new lcg.AudioPositionSlider(this.element.find('.jp-progress'),this._player)
 this.element.find('.jp-volume-bar-value').html(Math.round(100*this._volume)+'%')
 let play_button=this.element.find('button.play-pause')
 this._play_label=play_button.attr('title')
