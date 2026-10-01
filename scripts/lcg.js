@@ -253,22 +253,28 @@ let selected_item
 if(selected_item_index!==undefined&&selected_item_index!==null&&selected_item_index!==-1){selected_item=$(menu.find('ul').children()[selected_item_index]).find('a')}else{selected_item=menu.find('li.active a').first()}
 this._select_item(selected_item)
 menu.attr('style','display: none')
-menu.css({left:x+'px',top:y+'px'})
+let position=(y)=>{let rect=element?element[0].getBoundingClientRect():{left:0,top:0}
+return{left:rect.left+x+'px',top:rect.top+y+'px'}}
+menu.css(position(y))
 if(direction==='up'){let total_height=menu.height()
 let css_height=menu.height()
+y-=total_height
 menu.css({height:0,display:'block',overflowY:'hidden'})
-menu.animate({height:css_height+'px',top:y-total_height+'px',},{duration:200,done:()=>{menu.css({overflowY:'auto'})
+menu.animate({height:css_height+'px',top:position(y).top,},{duration:200,done:()=>{menu.css({overflowY:'auto'})
 this._set_focus(selected_item)},})}else{menu.slideToggle(200,()=>this._set_focus(selected_item))}
 this._on_touchstart_handler=(e)=>{this._touch_moved=false}
 this._on_touchmove_handler=(e)=>{this._touch_moved=true}
 this._on_touchend_handler=this._on_touchend.bind(this)
 this._on_click_handler=this._on_click.bind(this)
+this._on_scroll_handler=()=>menu.css(position(y))
+window.addEventListener('scroll',this._on_scroll_handler,true)
 $(document).on('touchstart',this._on_touchstart_handler)
 $(document).on('touchmove',this._on_touchmove_handler)
 $(document).on('touchend',this._on_touchend_handler)
 $(document).on('click',this._on_click_handler)
 if(element){element.attr('aria-expanded','true')}}
-dismiss(){$(document).off('touchstart',this._on_touchstart_handler)
+dismiss(){window.removeEventListener('scroll',this._on_scroll_handler,true)
+$(document).off('touchstart',this._on_touchstart_handler)
 $(document).off('touchmove',this._on_touchmove_handler)
 $(document).off('touchend',this._on_touchend_handler)
 $(document).off('click',this._on_click_handler)
