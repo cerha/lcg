@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2012-2015 OUI Technology Ltd.
-# Copyright (C) 2019-2020 Tomáš Cerha <cerha@truecode.cz>
+# Copyright (C) 2019-2026 Tomáš Cerha <cerha@truecode.cz>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ from lcg import Presentation, UFont, USpace, ContentNode, Section, Resource, Pag
 import lcg
 from . import mathml
 from .export import Exporter, FileExporter
-from .nemeth import mathml_nemeth
 
 _ = TranslatableTextFactory('lcg')
 
@@ -1574,6 +1573,8 @@ class BrailleExporter(FileExporter, Exporter):
         return _Braille(braille, ''.join(hyphenation_list))
 
     def _export_mathml_nemeth(self, context, element):
+        # Imported here to avoid a circular import (nemeth imports from this module).
+        from .nemeth import mathml_nemeth
         return mathml_nemeth(self, context, element)
 
     def _export_mathml_czech(self, context, element):
