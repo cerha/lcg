@@ -62,8 +62,9 @@ For a history of changes in each version, see the
 
 ## Installation
 
-LCG is a pure Python library running on Python 2.7 or Python 3.5 or later and
-may be installed by `pip install lcg-framework[all]`.
+LCG is a pure Python library running on Python 3.5 or later and may be
+installed by `pip install lcg-framework[all]`.  The last version supporting
+Python 2.7 is 0.8.2.
 
 When using PDF output, you additionally need the following system packages:
 - Fontconfig (Debian/Ubuntu package `fontconfig`)

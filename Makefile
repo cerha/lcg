@@ -31,10 +31,10 @@ sync-doc:
 javascript: $(js_out)
 
 lcg/assets/resources/scripts/%.js: javascript/%.js
-	@python3 -c "import rjsmin" 2>/dev/null || { echo "Error: The Python module \
+	@python -c "import rjsmin" 2>/dev/null || { echo "Error: The Python module \
 'rjsmin' is not installed.  Run 'pip install -e . --group build'." >&2; exit 1; }
 	mkdir -p $(@D)
-	python3 -m rjsmin < $< > $@
+	python -m rjsmin < $< > $@
 
 translations:
 	make -C translations
@@ -49,10 +49,7 @@ test:
 	python -m pytest lcg/test.py -v
 
 build: update
-	# Beware: Use explicitly 'python3' in build and depending targets
-	# to make sure the wheel is built correctly within the Python2 test
-	# workflow (flit is not available for Python 2).
-	python3 -m flit build
+	python -m flit build
 
 # The files uploaded by the publishing targets below -- the wheel and the
 # source distribution, both created by the build.
