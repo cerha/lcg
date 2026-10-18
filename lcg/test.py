@@ -1140,6 +1140,15 @@ class HtmlExport(unittest.TestCase):
         assert exporter._script_gettext_domains(script) == ('lcg', 'wiking')
         assert exporter._script_gettext_domains(lcg.Script('y.js')) == ()
 
+    def test_inline_script(self):
+        code = "if (a && b < c) {x('ž');}"
+        script = lcg.Script('x.js', type='module', content=code.encode('utf-8'))
+        n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
+                            resource_provider=lcg.ResourceProvider(resources=(script,)))
+        exporter = lcg.HtmlExporter()
+        html = exporter.export(exporter.context(n, None))
+        assert '<script type="module">%s</script>' % code in html
+
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
                             globals=dict(x='value of x'))

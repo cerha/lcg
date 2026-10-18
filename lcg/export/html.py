@@ -900,6 +900,14 @@ class HtmlExporter(lcg.Exporter):
         """Return the list of pairs (NAME, CONTENT) for meta tags of given context/node."""
         return (('generator', 'LCG %s (http://www.freebsoft.org/lcg)' % lcg.__version__),)
 
+    def _script_content(self, context, script):
+        # Inline script content is JavaScript code as UTF-8 encoded bytes (see
+        # Resource), so it must neither be escaped nor concatenated as bytes.
+        content = script.content()
+        if isinstance(content, bytes):
+            return context.generator().noescape(content.decode('utf-8'))
+        return None
+
     def _head(self, context):
         g = context.generator()
         node = context.node()
@@ -930,7 +938,7 @@ class HtmlExporter(lcg.Exporter):
             gettext_catalogs +
             [g.script(src=context.uri(script) if script.src_file() else None,
                       type=script.type(),
-                      content=script.content())
+                      content=self._script_content(context, script))
              for script in context.node().resources(lcg.Script)]
         )
 
