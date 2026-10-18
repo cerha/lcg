@@ -848,7 +848,10 @@ class HtmlExporter(lcg.Exporter):
         """
         filename = script.src_file()
         if not filename:
-            return self._gettext_domains_in((script.content() or '').encode('utf-8'))
+            # Resource content is bytes or a file-like object; reading the
+            # latter here would consume the data before they are served.
+            content = script.content()
+            return self._gettext_domains_in(content if isinstance(content, bytes) else b'')
         if filename not in self._gettext_domains:
             try:
                 with io.open(filename, 'rb') as f:

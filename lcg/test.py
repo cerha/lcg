@@ -1133,6 +1133,13 @@ class HtmlExport(unittest.TestCase):
         assert g.uri('/x', 'anchor', ('a', 1), b=2) == '/x?a=1&b=2#anchor'
         assert g.a('x', href=g.uri('/x', a=1, b=2)) == '<a href="/x?a=1&amp;b=2">x</a>'
 
+    def test_script_gettext_domains(self):
+        exporter = lcg.HtmlExporter()
+        # Inline script content is bytes, such as the photoswipe.js module.
+        script = lcg.Script('x.js', content=b"lcg.gettext('lcg'); lcg.gettext(\"wiking\")")
+        assert exporter._script_gettext_domains(script) == ('lcg', 'wiking')
+        assert exporter._script_gettext_domains(lcg.Script('y.js')) == ()
+
     def test_export(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content(),
                             globals=dict(x='value of x'))
