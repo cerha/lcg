@@ -96,11 +96,11 @@ class Resource(object):
             necessary on export (such as WAV to MP3).  The particular
             'Exporter' class is responsible for handling such conversions when
             necessary.
-          content -- resource data as a bytes instance or a file-like object.
-            Typically used when passing 'Resource' instances from application
-            code.  Textual content (such as scripts, stylesheets, etc.) should
-            be encoded in UTF-8.  Resources with 'content' are not located by
-            the 'ResourceProvider' and may not be bound to files on the file
+          content -- resource data as a bytes instance.  Typically used when
+            passing 'Resource' instances from application code.  Textual
+            content (such as scripts, stylesheets, etc.) should be encoded in
+            UTF-8.  Resources with 'content' are not located by the
+            'ResourceProvider' and may not be bound to files on the file
             system.
 
           info -- additional application specific
@@ -114,7 +114,7 @@ class Resource(object):
         assert descr is None or isinstance(descr, str), descr
         assert uri is None or isinstance(uri, str), uri
         assert src_file is None or isinstance(src_file, str), src_file
-        assert content is None or isinstance(content, bytes) or hasattr(content, 'read'), content
+        assert content is None or isinstance(content, bytes), content
         self._filename = filename
         self._title = title
         self._descr = descr
@@ -157,19 +157,11 @@ class Resource(object):
         None is returned if this instance is not bound to any particular data
         (when neither 'src_file' nor 'content' was passed to its constructor).
 
-        This method may only be called once, otherwise the behavior is undefined.
-
         """
         if self._src_file is not None:
-            f = open(self._src_file, 'rb')
-        elif isinstance(self._content, bytes):
-            return self._content
-        elif self._content:
-            f = self._content
-        else:
-            return None
-        with f:
-            return f.read()
+            with open(self._src_file, 'rb') as f:
+                return f.read()
+        return self._content
 
 
 class Image(Resource):

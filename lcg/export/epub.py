@@ -73,7 +73,7 @@ class EpubXhtmlExporter(lcg.HtmlExporter):
                  g.link(rel="stylesheet", href=context.uri(stylesheet))] +
                 [g.script(src=context.uri(script) if script.src_file() else None,
                           type=script.type(),
-                          content=script.content())
+                          content=self._script_content(context, script))
                  for script in context.node().resources(lcg.Script)])
 
     def _export_table_of_contents(self, context, element):

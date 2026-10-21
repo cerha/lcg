@@ -848,10 +848,7 @@ class HtmlExporter(lcg.Exporter):
         """
         filename = script.src_file()
         if not filename:
-            # Resource content is bytes or a file-like object; reading the
-            # latter here would consume the data before they are served.
-            content = script.content()
-            return self._gettext_domains_in(content if isinstance(content, bytes) else b'')
+            return self._gettext_domains_in(script.content() or b'')
         if filename not in self._gettext_domains:
             try:
                 with io.open(filename, 'rb') as f:
@@ -904,7 +901,7 @@ class HtmlExporter(lcg.Exporter):
         # Inline script content is JavaScript code as UTF-8 encoded bytes (see
         # Resource), so it must neither be escaped nor concatenated as bytes.
         content = script.content()
-        if isinstance(content, bytes):
+        if content is not None:
             return context.generator().noescape(content.decode('utf-8'))
         return None
 
