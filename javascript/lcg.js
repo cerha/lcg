@@ -1226,6 +1226,9 @@ lcg.Dropdown = class extends lcg.Widget {
         this.element.on('keydown', this._on_key_down.bind(this))
         // Collapse when a link is activated (it may be handled in place).
         this._dropdown.on('click', 'a[href]', event => this.collapse())
+        // Only one link is in the Tab order (the arrows move between them), so
+        // that Tab leaves the dropdown instead of passing through all links.
+        this._dropdown.on('focusin', 'a[href]', event => this._set_tab_stop(event.currentTarget))
         this.element.on('focusout', event => {
             // Collapse when the keyboard focus leaves the widget.
             if (event.relatedTarget && !this.element[0].contains(event.relatedTarget)) {
@@ -1242,6 +1245,14 @@ lcg.Dropdown = class extends lcg.Widget {
         }
         $(document).on('click', on_document_click)
         this.collapse()
+        if (this.element[0].id && window.location.hash === '#focus-' + this.element[0].id) {
+            // The page was loaded by a link from this dropdown, so the user
+            // continues from here.  The fragment has served its purpose, so it
+            // is removed from the URL.
+            history.replaceState(history.state, '',
+                                 window.location.pathname + window.location.search)
+            lcg.initial_focus(this._button[0])
+        }
     }
 
     _on_key_down(event) {
@@ -1282,6 +1293,16 @@ lcg.Dropdown = class extends lcg.Widget {
 
     _links() {
         return this._dropdown.find('a[href]')
+    }
+
+    _current_link() {
+        return this._links().filter('[aria-current]:not([aria-current="false"])')[0]
+    }
+
+    _set_tab_stop(link) {
+        // Make given link the only link of the dropdown in the Tab order.
+        this._links().attr('tabindex', '-1')
+        $(link).removeAttr('tabindex')
     }
 
     _link_in_direction(link, key) {
@@ -1359,7 +1380,8 @@ lcg.Dropdown = class extends lcg.Widget {
             dropdown.css({maxHeight: Math.max(space, 0) + 'px', overflowY: 'auto'})
         }
         // Scroll the current link into view in a long scrollable dropdown.
-        let current = this._links().filter('[aria-current]:not([aria-current="false"])')[0]
+        let current = this._current_link()
+        this._set_tab_stop(current || this._links()[0])
         if (current) {
             dropdown.scrollTop(current.offsetTop - dropdown.height() / 2)
             if (focus_current) {
@@ -2003,6 +2025,28 @@ lcg.widget_instance = function (element) {
         return element._lcg_widget_instance
     }
     return null
+}
+
+lcg.initial_focus = function (element) {
+    /* Move the focus to given DOM element on page load.
+     *
+     * The page is only scrolled when the element is not entirely visible in
+     * the window.  The focus indication is suppressed until the user
+     * interacts with the page by the CSS class 'initial-focus' (see
+     * lcg-widgets.css), as a focused element on a freshly opened page looks
+     * odd to sighted users.  ':focus-visible' alone doesn't ensure that,
+     * because browsers also take the last user interaction into account, so
+     * opening the page from the keyboard makes even the scripted focus count
+     * as keyboard induced.
+     *
+     */
+    let rect = element.getBoundingClientRect()
+    let visible = rect.top >= 0 && rect.bottom <= document.documentElement.clientHeight
+    let reveal = () => element.classList.remove('initial-focus')
+    element.classList.add('initial-focus')
+    element.addEventListener('blur', reveal, {once: true})
+    document.addEventListener('keydown', reveal, {once: true})
+    element.focus({preventScroll: visible})
 }
 
 

@@ -988,3 +988,12 @@
     -webkit-mask-image: var(--lcg-volume-up-icon);
     mask-image: var(--lcg-volume-up-icon);
 }
+
+/* Initial focus */
+
+.initial-focus:focus-visible {
+    /* The element was focused on page load by 'lcg.initial_focus()'.  The class
+     * is removed as soon as the user interacts with the page, so the focus
+     * indication appears normally when the user navigates by keyboard. */
+    outline: none;
+}

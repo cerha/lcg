@@ -518,7 +518,7 @@ class HtmlGenerator(object):
     def button(self, content, type=None, **kwargs):
         assert type in (None, 'button', 'reset', 'submit', 'menu'), type
         return self._tag('button', content, dict(kwargs, type=type),
-                         allow=('name', 'value', 'type', 'onclick', 'disabled'))
+                         allow=('name', 'value', 'type', 'onclick', 'disabled', 'formaction'))
 
     def submit(self, content, **kwargs):
         return self.button(content, type='submit', **kwargs)

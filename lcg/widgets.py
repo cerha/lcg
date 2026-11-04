@@ -70,6 +70,8 @@ class Widget(object):
 
            label -- text to be used for aria-label attribute or the widget's
              root HTML element
+           id -- HTML id of the widget's root element as a string or None to
+             generate a unique id automatically
            **kwargs -- other arguments passed to parent classes
 
         """
@@ -486,11 +488,22 @@ class Dropdown(Widget, lcg.Container):
     dropdown.  The links may be displayed in rows (such as a grid of numbers),
     so the up/down arrows move to the closest link in the previous/next row.
     Up from the first row returns the focus to the button.  Home/End move to
-    the first/last link.  A link is activated by Enter or Space.  Escape
-    collapses the dropdown and returns the focus to the button.  The dropdown
-    is also collapsed when a link is activated, when the focus leaves the
-    widget or on a click outside it (including a click on another dropdown
+    the first/last link.  Only one link is in the Tab order (the most recently
+    focused one, initially the current or the first link), so Tab leaves the
+    dropdown instead of passing through all its links.  A link is activated by Enter or Space.
+    Escape collapses the dropdown and returns the focus to the button.  The
+    dropdown is also collapsed when a link is activated, when the focus leaves
+    the widget or on a click outside it (including a click on another dropdown
     button).
+
+    When the page is loaded with the URI fragment 'focus-<id>', where <id> is
+    the widget id (given by the 'id' argument), the focus is moved to the
+    button and the fragment is removed from the URI.  Thus the links may use
+    this fragment to let the user continue from the dropdown when the link
+    loads a new page (such as when selecting a value reloads the page with
+    the new value).  The fragment doesn't point to any element, so that the
+    browser doesn't scroll the page to it (see 'lcg.initial_focus()' in
+    JavaScript for how the focus is moved).
 
     The dropdown is displayed above the button when it doesn't fit below it
     (and there is more space above) and it is scrollable when it doesn't fit

@@ -4,6 +4,26 @@ All notable user visible changes to LCG.  The entries are brief, see the
 documentation of the linked code for details.  The rules for maintaining this
 file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 
+## Unreleased
+
+### HTML
+- New JavaScript function [`lcg.initial_focus()`](javascript/lcg.js) moving
+  the focus on page load.  The page is not scrolled when the element is
+  visible and the focus indication appears only after the user starts
+  interacting with the page
+  ([#520](https://itsng.oui.technology/its/issues/520)).
+- New attribute `formaction` of [`HtmlGenerator.button()`](lcg/export/html.py).
+
+#### Accessibility
+- [`Dropdown`](lcg/widgets.py) moves the focus to its button when the page
+  is loaded with the URI fragment `focus-<id>` (where `<id>` is the widget
+  id), so that the links of the dropdown may keep the focus on it when they
+  reload the page ([#520](https://itsng.oui.technology/its/issues/520)).
+- Only one link of an expanded [`Dropdown`](lcg/widgets.py) is in the Tab
+  order (the arrow keys move between the links), so Tab leaves the dropdown
+  instead of passing through all its links
+  ([#520](https://itsng.oui.technology/its/issues/520)).
+
 ## 0.9.0 (2026-10-21)
 
 ### Common
