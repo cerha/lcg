@@ -9,6 +9,8 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 ### HTML
 - Right click invoking a popup menu (such as the menu of actions of a table
   row) no longer displays also the browser's own context menu.
+- A popup menu invoked by mouse (click or right click) doesn't indicate the
+  keyboard focus of its first item until the user starts using the keyboard.
 
 ## 0.9.1 (2026-11-04)
 

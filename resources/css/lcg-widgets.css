@@ -626,6 +626,12 @@
 .popup-menu-widget li.active a {
     color: #000;
 }
+.popup-menu-widget:not(.keyboard-navigated) li a:focus-visible {
+    /* The menu was invoked by mouse (see 'lcg.PopupMenu.popup()'), so the focus
+     * of its first item is not indicated until the user starts using the
+     * keyboard. */
+    outline: none;
+}
 .popup-menu-widget li.active:hover {
     background-color: #fff;
 }
