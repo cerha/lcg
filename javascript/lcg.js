@@ -1114,6 +1114,8 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
          *     initially selected
          */
         if (event) {
+            // Prevent also the browser's own context menu on right click.
+            event.preventDefault()
             event.stopPropagation()
         }
         if (element === undefined) {
