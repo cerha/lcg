@@ -363,10 +363,13 @@ this._dropdown=this.element.children('.dropdown-panel')
 this._button.on('click',event=>{this.toggle(event.detail===0)})
 this.element.on('keydown',this._on_key_down.bind(this))
 this._dropdown.on('click','a[href]',event=>this.collapse())
+this._dropdown.on('focusin','a[href]',event=>this._set_tab_stop(event.currentTarget))
 this.element.on('focusout',event=>{if(event.relatedTarget&&!this.element[0].contains(event.relatedTarget)){this.collapse()}})
 let on_document_click=(event)=>{if(!document.contains(this.element[0])){$(document).off('click',on_document_click)}else if(!this.element[0].contains(event.target)){this.collapse()}}
 $(document).on('click',on_document_click)
-this.collapse()}
+this.collapse()
+if(this.element[0].id&&window.location.hash==='#focus-'+this.element[0].id){history.replaceState(history.state,'',window.location.pathname+window.location.search)
+lcg.initial_focus(this._button[0])}}
 _on_key_down(event){let key=this._event_key(event)
 let target=event.target
 if(key==='Escape'&&this.expanded()){this.collapse()
@@ -378,6 +381,9 @@ if(link){link.focus()}}else{return}
 event.preventDefault()
 event.stopPropagation()}
 _links(){return this._dropdown.find('a[href]')}
+_current_link(){return this._links().filter('[aria-current]:not([aria-current="false"])')[0]}
+_set_tab_stop(link){this._links().attr('tabindex','-1')
+$(link).removeAttr('tabindex')}
 _link_in_direction(link,key){let links=this._links().get()
 let index=links.indexOf(link)
 let rect=link.getBoundingClientRect()
@@ -411,7 +417,8 @@ let above=button.top-margin
 if(rect.height>below&&above>below){this.element.addClass('upward')}
 let space=Math.max(above,below)
 if(rect.height>(this.element.hasClass('upward')?above:below)){dropdown.css({maxHeight:Math.max(space,0)+'px',overflowY:'auto'})}
-let current=this._links().filter('[aria-current]:not([aria-current="false"])')[0]
+let current=this._current_link()
+this._set_tab_stop(current||this._links()[0])
 if(current){dropdown.scrollTop(current.offsetTop-dropdown.height()/2)
 if(focus_current){current.focus({preventScroll:true})}}}
 collapse(){this.element.removeClass('expanded').addClass('collapsed')
@@ -597,6 +604,13 @@ lcg.dedent=function(str){return(''+str).replace(/\n\s+/g,'');}
 lcg.widget_instance=function(element){if(element instanceof jQuery){element=element[0]}else if(typeof element==='string'){element=document.getElementById(element)}
 if(element&&element._lcg_widget_instance){return element._lcg_widget_instance}
 return null}
+lcg.initial_focus=function(element){let rect=element.getBoundingClientRect()
+let visible=rect.top>=0&&rect.bottom<=document.documentElement.clientHeight
+let reveal=()=>element.classList.remove('initial-focus')
+element.classList.add('initial-focus')
+element.addEventListener('blur',reveal,{once:true})
+document.addEventListener('keydown',reveal,{once:true})
+element.focus({preventScroll:visible})}
 lcg.lang=(document.documentElement.lang||navigator.language||'en').split('-')[0]
 lcg.catalogs={}
 lcg.gettext=function(domain){function locale_data(data){const meta=data['']||{}
