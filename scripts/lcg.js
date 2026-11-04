@@ -326,7 +326,8 @@ if(callback){if(typeof callback==='string'){callback=this._get_object_by_name(ca
 let args=[event,this._popup_element]
 if(spec.callback_args){args=args.concat(spec.callback_args)}
 return callback.apply(this,args)}}
-popup(event,element,selected_item_index){if(event){event.stopPropagation()}
+popup(event,element,selected_item_index){if(event){event.preventDefault()
+event.stopPropagation()}
 if(element===undefined){element=$(event.target)}
 let menu=this.element
 if(menu.children().length===0){this.create()}
@@ -335,7 +336,7 @@ let bottom=$(window).scrollTop()+$(window).height()
 let menu_height=menu.height()
 let direction,x,y
 if(offset.top+element.height()+menu_height>bottom&&offset.top>menu_height){direction='up'}else{direction='down'}
-if(event&&event.detail===1){x=Math.min(event.pageX-offset.left,element.width())
+if(event&&(event.detail===1||event.type==='contextmenu')){x=Math.min(event.pageX-offset.left,element.width())
 y=Math.min(event.pageY-offset.top,element.height())
 menu.removeClass('keyboard-navigated')}else{x=0
 y=direction==='up'?0:element.height()
