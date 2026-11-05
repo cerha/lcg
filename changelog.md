@@ -7,6 +7,8 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 ## Unreleased
 
 ### HTML
+- Horizontally scrollable tables and preformatted text fade out at the edges
+  behind which they continue in the default style sheet.
 - Preformatted text inserted as HTML (not through
   [`PreformattedText`](lcg/content.py)) scrolls horizontally in the default
   style sheet.

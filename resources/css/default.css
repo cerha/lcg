@@ -119,6 +119,30 @@ table.lcg-table caption {
     /* Also the preformatted text not formatted by LCG (inserted as HTML). */
     overflow-x: auto;
 }
+
+/* Fade out the edges of horizontally scrollable content behind which the
+   content continues, so that the user notices the hidden part also when the
+   scrollbar is not displayed until scrolling (macOS).  The width of the faded
+   edges follows the scroll position and the animation doesn't apply at all
+   when the content is not scrollable (it fits into the available width). */
+@property --scroll-fade-start { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --scroll-fade-end { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@keyframes scroll-fade {
+    0% { --scroll-fade-start: 0px; --scroll-fade-end: 3em; }
+    10% { --scroll-fade-start: 3em; }
+    90% { --scroll-fade-end: 3em; }
+    100% { --scroll-fade-start: 3em; --scroll-fade-end: 0px; }
+}
+.lcg-table-wrapper,
+.lcg-preformatted-text,
+:where(pre) {
+    mask-image: linear-gradient(to right, transparent,
+                                #000 var(--scroll-fade-start),
+                                #000 calc(100% - var(--scroll-fade-end)),
+                                transparent);
+    animation: scroll-fade linear both;
+    animation-timeline: scroll(self inline);
+}
 .table-of-contents {
     border: solid #c8ccd0;
     border-width: 1px 0;
