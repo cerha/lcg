@@ -208,7 +208,7 @@ class Exporter(object):
             self.toc_elements = ()
 
         def _init_kwargs(self, lang, sec_lang=None, log=None, presentation=None, timezone=None,
-                         text_preprocessor=None):
+                         default_timezone=None, text_preprocessor=None):
             self._lang = lang
             self._sec_lang = sec_lang
             if log is not None:
@@ -219,7 +219,8 @@ class Exporter(object):
                 self._messages = []
                 self._log = self._default_logging_function
             self._presentation = presentation
-            self._localizer = self._exporter.localizer(lang, timezone=timezone)
+            self._localizer = self._exporter.localizer(lang, timezone=timezone,
+                                                       default_timezone=default_timezone)
             self._text_preprocessor = text_preprocessor
 
         def _default_logging_function(self, message, kind=INFO):
@@ -454,9 +455,10 @@ class Exporter(object):
             raise Exception("Invalid URI target:", target)
         return method(context, target, **kwargs)
 
-    def localizer(self, lang, timezone=None):
-        """Return a 'lcg.Localizer' instance for given language and time zone."""
-        return lcg.Localizer(lang, timezone=timezone, translation_path=self._translation_path)
+    def localizer(self, lang, timezone=None, default_timezone=None):
+        """Return a 'lcg.Localizer' instance for given language and time zones."""
+        return lcg.Localizer(lang, timezone=timezone, default_timezone=default_timezone,
+                             translation_path=self._translation_path)
 
     translator = localizer
     """Deprecated backwards compatibility alias - please use 'localizer' instead."""

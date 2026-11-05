@@ -6,6 +6,12 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 
 ## Unreleased
 
+### Common
+- New argument `default_timezone` of [`Localizer`](lcg/i18n.py) giving the
+  time zone used when the user's time zone is not known.  The times
+  converted to it are displayed together with the name of the time zone, as
+  the user may be in another time zone.
+
 ### HTML
 - Horizontally scrollable tables and preformatted text fade out at the edges
   behind which they continue in the default style sheet.

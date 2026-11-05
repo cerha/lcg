@@ -620,7 +620,10 @@ class LocalizableDateTime(Localizable):
             localization.  If false, the time is not subject to time zone
             conversion.  If timezone aware datetime instance is passed, its
             timezone is always respected and converted to local timezone on
-            output (if known).
+            output (if known).  When the local time zone is not known, the
+            time is converted to the default time zone of the localizer (see
+            'Localizer') and the name of the time zone is displayed after the
+            time, as the user may be in another time zone.
 
           leading_zeros -- if true the numeric values are always padded by
             leading zeros on output to maintain the same character width for
@@ -680,7 +683,10 @@ class LocalizableDateTime(Localizable):
             weekday = localizer.localize(lcg.week_day_name(dt.weekday(), abbrev=True))
             result = weekday + ' ' + result
         if self._is_datetime:
-            timezone = localizer.timezone() or data.default_timezone
+            timezone = localizer.timezone()
+            local = timezone is not None
+            if not local:
+                timezone = localizer.default_timezone() or data.default_timezone
             # TODO: Add tests for corner cases, such as all (dt.tzinfo, timezone,
             # self._show_time) combinations (in their existence or nonexistence).
             if dt.tzinfo and timezone:
@@ -688,8 +694,8 @@ class LocalizableDateTime(Localizable):
             if self._show_time:
                 time_format = (self._show_seconds and data.exact_time_format or data.time_format)
                 result += ' ' + dt.strftime(time_format)
-            if not timezone and dt.tzinfo:
-                result += ' ' + dt.tzinfo.tzname(dt)
+            if not local and dt.tzinfo:
+                result += ' ' + localizer.localize(dt.tzinfo.tzname(dt))
         return result
 
 
@@ -1118,11 +1124,26 @@ class Localizer(object):
             cls._locale_data_cache[lang] = locale_data = locale_data_class()
         return locale_data
 
-    def __init__(self, lang=None, translation_path=(), timezone=None):
+    def __init__(self, lang=None, translation_path=(), timezone=None, default_timezone=None):
+        """Arguments:
+
+          lang -- target language code as a string or None.
+          translation_path -- a sequence of directory names to search for
+            translations.
+          timezone -- the local time zone of the user as a 'datetime.tzinfo'
+            instance or None when not known.
+          default_timezone -- the time zone used when 'timezone' is not known
+            as a 'datetime.tzinfo' instance or None.  The times converted to
+            this time zone are displayed together with its name, as the user
+            may be in another time zone (see 'LocalizableDateTime').
+
+        """
         assert lang is None or isinstance(lang, str)
         assert timezone is None or isinstance(timezone, datetime.tzinfo)
+        assert default_timezone is None or isinstance(default_timezone, datetime.tzinfo)
         self._lang = lang
         self._timezone = timezone
+        self._default_timezone = default_timezone
         self._translator = self._get_translator(lang, translation_path)
         self._locale_data = self._get_locale_data(lang)
 
@@ -1133,6 +1154,10 @@ class Localizer(object):
     def timezone(self):
         """Return the target time zone for output datetime conversion."""
         return self._timezone
+
+    def default_timezone(self):
+        """Return the time zone used when the target time zone is not known."""
+        return self._default_timezone
 
     def locale_data(self):
         """Return the locale data for the current locale as a 'LocaleData' instance."""

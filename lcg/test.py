@@ -341,6 +341,25 @@ class LocalizableDateTime(unittest.TestCase):
         assert (localize(datetime.datetime(2006, 12, 21, 18, 43, 32), cs, utc=True)
                 == "21.\xa012.\xa02006 17:43:32")
 
+    def test_localize_default_timezone(self):
+        # The default time zone is used when the local time zone is not
+        # known and its name is displayed, as the user may be elsewhere.
+        default = self.tzinfo(120)
+        unknown = lcg.Localizer('cs', translation_path=translation_path,
+                                default_timezone=default)
+        known = lcg.Localizer('cs', translation_path=translation_path,
+                              timezone=self.tzinfo(-60), default_timezone=default)
+
+        def localize(dt, localizer, **kwargs):
+            return lcg.LocalizableDateTime(dt, **kwargs).localize(localizer)
+
+        assert (localize("2006-12-21 18:43", unknown, utc=True)
+                == "21.\xa012.\xa02006 20:43 GMT +2")
+        assert (localize("2006-12-21 18:43", known, utc=True)
+                == "21.\xa012.\xa02006 17:43")
+        assert (localize("2006-12-21 18:43", unknown)
+                == "21.\xa012.\xa02006 18:43")
+
     def test_concat(self):
         c = "Date is: " + lcg.LocalizableDateTime("2006-01-30")
         assert c.localize(lcg.Localizer('en', translation_path=translation_path)) == \
