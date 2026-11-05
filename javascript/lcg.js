@@ -804,6 +804,26 @@ lcg.PopupMenuBase = class extends lcg.Menu {
     constructor(element) {
         super(element)
         this._ignore_next_click = false
+        // Tab is handled for the whole menu element, so that it works on menu
+        // items as well as on the close button.
+        this.element.on('keydown', this._on_tab.bind(this))
+    }
+
+    _on_tab(event) {
+        // Close the menu on Tab and let the browser move the focus from the
+        // element invoking the menu to the next (or previous on Shift-Tab)
+        // element in the sequential navigation order (as recommended by
+        // WAI-ARIA Authoring Practices for menu buttons).  The menu is in the
+        // document body while popped up, so the browser would move the focus
+        // to an unrelated place otherwise.
+        if (event.key === 'Tab' && lcg.popup_menu === this) {
+            let element = this._popup_element
+            this.dismiss(false)
+            if (element) {
+                // Focus synchronously before the browser's default action.
+                element.focus()
+            }
+        }
     }
 
     _define_keymap() {
@@ -837,7 +857,8 @@ lcg.PopupMenuBase = class extends lcg.Menu {
         if (!this._touch_moved) {
             let element = $(event.target)
             // Detect touch outside the menu div:
-            if (element.closest('div')[0] !== this.element[0]) {
+            if (element.closest('div')[0] !== this.element[0]
+                || element.closest('.close-menu').length) {
                 this.dismiss()
             } else {
                 this._cmd_activate(event, element.closest('a'))
@@ -866,10 +887,21 @@ lcg.PopupMenuBase = class extends lcg.Menu {
         }
         this._select_item(selected_item)
         menu.attr('style', 'display: none') // Force consistent initial state
-        // The menu is positioned relative to the viewport (see the CSS), so
-        // that it is not clipped by scrollable ancestors, such as a wrapper of
-        // a wide table.  The position is updated to follow the invoking element
-        // when the page or any of its parts is scrolled.
+        // The menu is moved to the document body while popped up, so that it
+        // is not clipped by any of its ancestors, such as a scrollable wrapper
+        // of a wide table or an element with a CSS mask.  It is positioned
+        // relative to the viewport (see the CSS) and the position is updated to
+        // follow the invoking element when the page or any of its parts is
+        // scrolled.  The placeholder marks the original location of the menu
+        // to which it is returned in 'dismiss()'.
+        // The 'aria-owns' attribute of the original parent keeps the menu at its
+        // original place in the accessibility tree, so that the reading order
+        // of screen readers is not affected.
+        this._placeholder = $(document.createComment('popup-menu')).insertBefore(menu)
+        if (menu.attr('id')) {
+            this._placeholder.parent().attr('aria-owns', menu.attr('id'))
+        }
+        menu.appendTo(document.body)
         let position = (y) => {
             let rect = element ? element[0].getBoundingClientRect() : {left: 0, top: 0}
             return {left: rect.left + x + 'px', top: rect.top + y + 'px'}
@@ -910,18 +942,25 @@ lcg.PopupMenuBase = class extends lcg.Menu {
         }
     }
 
-    dismiss() {
+    dismiss(restore_focus = true) {
         window.removeEventListener('scroll', this._on_scroll_handler, true)
         $(document).off('touchstart', this._on_touchstart_handler)
         $(document).off('touchmove', this._on_touchmove_handler)
         $(document).off('touchend', this._on_touchend_handler)
         $(document).off('click', this._on_click_handler)
         this.element.hide()
+        if (this._placeholder) {
+            this._placeholder.parent().removeAttr('aria-owns')
+            this._placeholder.replaceWith(this.element)
+            this._placeholder = null
+        }
         lcg.popup_menu = null
         let element = this._popup_element
         if (element) {
             element.attr('aria-expanded', 'false')
-            this._set_focus(element)
+            if (restore_focus) {
+                this._set_focus(element)
+            }
         }
     }
 

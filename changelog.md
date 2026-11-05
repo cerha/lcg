@@ -9,6 +9,13 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 ### HTML
 - Horizontally scrollable tables and preformatted text fade out at the edges
   behind which they continue in the default style sheet.
+- Popup menus are not clipped by their ancestors, such as a scrollable or
+  masked wrapper of a table with menus of actions for its rows.
+- Tab (or Shift-Tab) in a popup menu closes the menu and moves the focus to
+  the next (or previous) element after the control which invoked the menu.
+- The close button of a popup menu (needed for screen readers on touch
+  screens) is only displayed when focused and it works on touch screens (it
+  was ignored).
 - Preformatted text inserted as HTML (not through
   [`PreformattedText`](lcg/content.py)) scrolls horizontally in the default
   style sheet.

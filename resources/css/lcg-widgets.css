@@ -651,6 +651,13 @@
     background-color: #ddd;
     color: #555;
 }
+.popup-menu-widget .close-menu:not(:focus) {
+    /* The close button is only needed for screen readers on touch screens,
+     * such as VoiceOver on iOS (see 'lcg.PopupMenu'), so it is only displayed
+     * when focused.  It stays in place (rather than being clipped) to let the
+     * screen reader indicate its position. */
+    opacity: 0;
+}
 .popup-menu-widget .close-menu::after {
     /* Close: a cross. */
     content: "";
