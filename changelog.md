@@ -4,6 +4,13 @@ All notable user visible changes to LCG.  The entries are brief, see the
 documentation of the linked code for details.  The rules for maintaining this
 file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 
+## Unreleased
+
+### HTML
+- Preformatted text inserted as HTML (not through
+  [`PreformattedText`](lcg/content.py)) scrolls horizontally in the default
+  style sheet.
+
 ## 0.9.2 (2026-11-04)
 
 ### HTML

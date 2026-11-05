@@ -115,6 +115,10 @@ table.lcg-table caption {
     white-space: pre;
     margin: 0;
 }
+:where(pre) {
+    /* Also the preformatted text not formatted by LCG (inserted as HTML). */
+    overflow-x: auto;
+}
 .table-of-contents {
     border: solid #c8ccd0;
     border-width: 1px 0;
