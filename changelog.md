@@ -19,6 +19,7 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 - Preformatted text inserted as HTML (not through
   [`PreformattedText`](lcg/content.py)) scrolls horizontally in the default
   style sheet.
+- New attribute `autofocus` of [`HtmlGenerator.button()`](lcg/export/html.py).
 
 ## 0.9.2 (2026-11-04)
 
