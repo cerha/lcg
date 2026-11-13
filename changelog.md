@@ -4,6 +4,12 @@ All notable user visible changes to LCG.  The entries are brief, see the
 documentation of the linked code for details.  The rules for maintaining this
 file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 
+## Unreleased
+
+### HTML
+- Table cells are lighter and the backgrounds of table rows alternate
+  (default stylesheet).
+
 ## 0.9.3 (2026-11-05)
 
 ### Common
