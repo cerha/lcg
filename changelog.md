@@ -9,6 +9,8 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 ### HTML
 - Table cells are lighter and the backgrounds of table rows alternate
   (default stylesheet).
+- New icon `actions-icon` (three dots in a column) for menus of actions of
+  rows or items.
 
 ## 0.9.3 (2026-11-05)
 
