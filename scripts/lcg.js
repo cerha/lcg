@@ -17,7 +17,7 @@ _set_focus(element){if(element){setTimeout(()=>element.focus(),0)}}}
 lcg.Widget=class extends lcg.KeyHandler{constructor(element){super()
 this.element=this._element(element)
 for(let e of this.element){e._lcg_widget_instance=this}}
-_element(element){if(element instanceof jQuery){return element}else if(typeof element==='string'){return $('#'+element.replace('.','\\.'))}else{return $(element)}}
+_element(element){if(element instanceof jQuery){return element}else if(typeof element==='string'){return $('#'+$.escapeSelector(element))}else{return $(element)}}
 _get_object_by_name(name){let namespaces=name.split(".")
 let last_name=namespaces.pop()
 let context=window
@@ -151,7 +151,7 @@ $(this.element).attr('role','tree')
 if(this._foldable&&toggle_button_tooltip){let button=$(`<button class="toggle-menu-expansion" title="${toggle_button_tooltip}">`).on('click',this._on_toggle_full_expansion.bind(this))
 if(this._hidden){button.attr('tabindex','-1')}
 $(this.element).find('ul').first().append(button)}}
-_define_keymap(){return{'Up':this._cmd_up,'Ctrl-Shift-Up':this._cmd_up,'Down':this._cmd_down,'Ctrl-Shift-Down':this._cmd_down,'Shift-Up':this._cmd_prev,'Shift-Shift-Down':this._cmd_next,'Shift-Right':this._cmd_expand,'Shift-Left':this._cmd_collapse,'Right':this._cmd_expand,'Ctrl-Shift-Right':this._cmd_expand,'Left':this._cmd_collapse,'Ctrl-Shift-Left':this._cmd_collapse,'Escape':this._cmd_quit,'Enter':this._cmd_activate,'Space':this._cmd_activate}}
+_define_keymap(){return{'Up':this._cmd_up,'Ctrl-Shift-Up':this._cmd_up,'Down':this._cmd_down,'Ctrl-Shift-Down':this._cmd_down,'Shift-Up':this._cmd_prev,'Shift-Down':this._cmd_next,'Shift-Right':this._cmd_expand,'Shift-Left':this._cmd_collapse,'Right':this._cmd_expand,'Ctrl-Shift-Right':this._cmd_expand,'Left':this._cmd_collapse,'Ctrl-Shift-Left':this._cmd_collapse,'Escape':this._cmd_quit,'Enter':this._cmd_activate,'Space':this._cmd_activate}}
 _init_menu(ul){this._foldable=false
 super._init_menu(ul)}
 _init_items(ul,parent){ul.attr('role','group')

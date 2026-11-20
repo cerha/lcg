@@ -96,7 +96,11 @@ table.lcg-table td, table.lcg-table th {
     white-space: nowrap;
     border: #ccc solid 1px;
 }
-table.lcg-table td { background: #f4f4f4; }
+/* Light cells with alternating row backgrounds.  The first row of the table is
+   usually the heading row, so the first data row is even and it is the
+   lightest one to contrast with the headings. */
+table.lcg-table td { background: #f8f8f8; }
+table.lcg-table tr:nth-child(even) td { background: #fff; }
 table.lcg-table th { background: #eee; }
 table.lcg-table caption {
     font-weight: bold;
