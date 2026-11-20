@@ -14,6 +14,10 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 - Shift-Down in a foldable tree menu moves to the next item at the same level
   (it did nothing).
 
+### Other formats
+- PDF tables with a cell narrower than its horizontal padding no longer fail
+  with ReportLab 4.4.4 and newer (the padding of such cells is reduced).
+
 ## 0.9.3 (2026-11-05)
 
 ### Common

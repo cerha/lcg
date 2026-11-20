@@ -287,6 +287,15 @@ class RLTable(reportlab.platypus.Table):
                     return 1
         return 0
 
+    def _listCellGeom(self, V, w, s, W=None, H=None, aH=72000):
+        # ReportLab >= 4.4.4 raises ValueError when a cell is narrower than its
+        # horizontal padding (older versions let the content overflow).  Shrink
+        # the padding of such cells for the content geometry computation instead.
+        if V and w < s.leftPadding + s.rightPadding:
+            s = copy.copy(s)
+            s.leftPadding = s.rightPadding = max(w, 0) / 2.0
+        return super()._listCellGeom(V, w, s, W=W, H=H, aH=aH)
+
 
 class RLContainer(reportlab.platypus.flowables.Flowable):
     # Using tables for container management is actually not reasonably
