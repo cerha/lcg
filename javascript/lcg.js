@@ -112,7 +112,7 @@ lcg.Widget = class extends lcg.KeyHandler {
         if (element instanceof jQuery) {
             return element
         } else if (typeof element === 'string') {
-            return $('#' + element.replace('.', '\\.'))
+            return $('#' + $.escapeSelector(element))
         } else {
             return $(element)
         }

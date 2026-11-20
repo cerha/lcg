@@ -13,6 +13,8 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
   rows or items.
 - Shift-Down in a foldable tree menu moves to the next item at the same level
   (it did nothing).
+- `Menu.focus()` moves the focus to the selected item nested deeper than the
+  second level of a foldable tree menu (it did nothing).
 
 ### Other formats
 - PDF tables with a cell narrower than its horizontal padding no longer fail
