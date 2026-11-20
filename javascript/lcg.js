@@ -578,7 +578,7 @@ lcg.FoldableTree = class extends lcg.Menu {
             'Down': this._cmd_down,
             'Ctrl-Shift-Down': this._cmd_down,
             'Shift-Up': this._cmd_prev,
-            'Shift-Shift-Down': this._cmd_next,
+            'Shift-Down': this._cmd_next,
             'Shift-Right': this._cmd_expand,
             'Shift-Left': this._cmd_collapse,
             'Right': this._cmd_expand,

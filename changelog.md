@@ -11,6 +11,8 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
   (default stylesheet).
 - New icon `actions-icon` (three dots in a column) for menus of actions of
   rows or items.
+- Shift-Down in a foldable tree menu moves to the next item at the same level
+  (it did nothing).
 
 ## 0.9.3 (2026-11-05)
 
