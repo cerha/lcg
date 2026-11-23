@@ -1248,10 +1248,19 @@ lcg.Dropdown = class extends lcg.Widget {
      *
      */
 
-    constructor(element) {
+    constructor(element, menu) {
+        // menu -- if true, the dropdown is presented as a menu (see the
+        //   Python class).
         super(element)
         this._button = this.element.children('.dropdown-toggle')
         this._dropdown = this.element.children('.dropdown-panel')
+        this._type_ahead_text = ''
+        this._type_ahead_timeout = null
+        if (menu) {
+            this._button.attr('aria-haspopup', 'menu')
+            this._dropdown.attr('role', 'menu')
+            this._links().attr('role', 'menuitem')
+        }
         this._button.on('click', event => {
             // The event propagates to the document to collapse the other dropdowns.
             // The keyboard invoked click (Enter/Space) has no mouse click count.
@@ -1310,6 +1319,12 @@ lcg.Dropdown = class extends lcg.Widget {
         } else if (this.expanded() && $(target).is('a') && key === 'Space') {
             // Activate the link by Space as well as by Enter (as a menu item).
             target.click()
+        } else if (this.expanded() && $(target).is('a') && event.key.length === 1 &&
+                   !event.ctrlKey && !event.altKey && !event.metaKey) {
+            let link = this._type_ahead(target, event.key)
+            if (link) {
+                link.focus()
+            }
         } else if (this.expanded() && $(target).is('a')) {
             let link = this._link_in_direction(target, key)
             if (link === undefined) {
@@ -1339,12 +1354,39 @@ lcg.Dropdown = class extends lcg.Widget {
         $(link).removeAttr('tabindex')
     }
 
+    _group(link) {
+        // Return the group of given link (the panel when it is not in a group).
+        return $(link).closest('[role="group"], .dropdown-panel')[0]
+    }
+
+    _type_ahead(link, char) {
+        // Return the link to move the focus to from 'link' when 'char' is typed.
+        // The characters typed in a quick succession are accumulated and the
+        // link beginning with them is searched from 'link' on (the search for a
+        // new text starts after it).  Repeating the same character cycles
+        // through the links beginning with it.  Return null if none matches.
+        clearTimeout(this._type_ahead_timeout)
+        this._type_ahead_timeout = setTimeout(() => { this._type_ahead_text = '' }, 1000)
+        let text = this._type_ahead_text + char.toLocaleLowerCase()
+        this._type_ahead_text = text
+        let repeated = [...text].every(c => c === text[0])
+        let prefix = repeated ? text[0] : text
+        let links = this._links().get()
+        let start = links.indexOf(link) + (repeated ? 1 : 0)
+        return (links.slice(start).concat(links.slice(0, start)).find(
+            a => $(a).text().trim().toLocaleLowerCase().startsWith(prefix)) || null)
+    }
+
     _link_in_direction(link, key) {
         // Return the element to move the focus to from 'link' by given key.
         // Return the button when moving up from the first row, null when there
-        // is no link in given direction and undefined for unhandled keys.
+        // is no link in given direction and undefined for unhandled keys.  The
+        // up/down arrows move by rows within the group of 'link' and from its
+        // first/last row to the first link of the previous/next group.
         let links = this._links().get()
         let index = links.indexOf(link)
+        let group = this._group(link)
+        let in_group = links.filter(a => this._group(a) === group)
         let rect = link.getBoundingClientRect()
         let center = (r) => r.left + r.width / 2
         let closest = (candidates) => {
@@ -1369,12 +1411,17 @@ lcg.Dropdown = class extends lcg.Widget {
         case 'End':
             return links[links.length - 1]
         case 'Down':
-            return closest(links.filter(a => (a.getBoundingClientRect().top >
-                                               rect.top + rect.height / 2)))
-        case 'Up':
-            return (closest(links.filter(a => (a.getBoundingClientRect().top <
-                                                rect.top - rect.height / 2))) ||
+            return (closest(in_group.filter(a => (a.getBoundingClientRect().top >
+                                                  rect.top + rect.height / 2))) ||
+                    links.slice(index + 1).find(a => this._group(a) !== group) ||
+                    null)
+        case 'Up': {
+            let previous = links.slice(0, index).reverse().find(a => this._group(a) !== group)
+            return (closest(in_group.filter(a => (a.getBoundingClientRect().top <
+                                                  rect.top - rect.height / 2))) ||
+                    (previous && links.find(a => this._group(a) === this._group(previous))) ||
                     this._button[0])
+        }
         }
         return undefined
     }

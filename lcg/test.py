@@ -1256,6 +1256,8 @@ class HtmlExport(unittest.TestCase):
             '</span><script>new lcg.Dropdown\\("dd"\\)</script>$', html)
         assert match, html
         assert match.group(1) == match.group(2)
+        html = lcg.Dropdown('Choose', lcg.link('/x', 'X'), menu=True, id='dm').export(context)
+        assert html.endswith('<script>new lcg.Dropdown("dm", true)</script>'), html
 
     def test_dropdown_selection(self):
         n = lcg.ContentNode('test', title='Test', content=lcg.Content())

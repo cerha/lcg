@@ -488,9 +488,17 @@ class Dropdown(Widget, lcg.Container):
     dropdown.  The links may be displayed in rows (such as a grid of numbers),
     so the up/down arrows move to the closest link in the previous/next row.
     Up from the first row returns the focus to the button.  Home/End move to
-    the first/last link.  Only one link is in the Tab order (the most recently
-    focused one, initially the current or the first link), so Tab leaves the
-    dropdown instead of passing through all its links.  A link is activated by Enter or Space.
+    the first/last link.  The links may be divided into groups (elements with
+    the role 'group', such as levels of an alphabetical index).  The up/down
+    arrows don't cross the group boundary by rows, they move from the
+    first/last row of a group to the first link of the previous/next group, so
+    that entering a group is predictable.  Typing printable characters moves
+    the focus to the next link beginning with the typed text (type-ahead, the
+    characters typed in a quick succession are accumulated, so typing 'sch'
+    moves to the first link beginning with 'Sch').  Only one link is in the
+    Tab order (the most recently focused one, initially the current or the
+    first link), so Tab leaves the dropdown instead of passing through all its
+    links.  A link is activated by Enter or Space.
     Escape collapses the dropdown and returns the focus to the button.  The
     dropdown is also collapsed when a link is activated, when the focus leaves
     the widget or on a click outside it (including a click on another dropdown
@@ -514,7 +522,8 @@ class Dropdown(Widget, lcg.Container):
 
     """
 
-    def __init__(self, label, content, title=None, labelledby=None, cls=None, **kwargs):
+    def __init__(self, label, content, title=None, labelledby=None, cls=None, menu=False,
+                 **kwargs):
         """Arguments:
 
            label -- button label as a string or 'lcg.Content' instance.
@@ -526,6 +535,13 @@ class Dropdown(Widget, lcg.Container):
              its content when None.
            cls -- additional CSS class name(s) of the widget root element as a
              string or None.
+           menu -- if True, the dropdown is presented to assistive technologies
+             as a menu: the dropdown panel gets the role 'menu' and its links
+             the role 'menuitem' (assigned by JavaScript, so the links remain
+             ordinary links without it).  Screen readers then announce the
+             group (an element with the role 'group' labeled by
+             'aria-labelledby' or 'aria-label') when the focus moves into it,
+             which helps to distinguish the groups of links.
            **kwargs -- other arguments defined by the parent class
 
         """
@@ -533,7 +549,11 @@ class Dropdown(Widget, lcg.Container):
         self._title = title
         self._labelledby = labelledby
         self._cls = cls
+        self._menu = menu
         super(Dropdown, self).__init__(content, **kwargs)
+
+    def _javascript_widget_arguments(self, context):
+        return (True,) if self._menu else ()
 
     def _css_class_name(self, context):
         cls = super(Dropdown, self)._css_class_name(context)
