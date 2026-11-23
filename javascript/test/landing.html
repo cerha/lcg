@@ -149,7 +149,10 @@ if (scenario === 'heading') {
         $('<button type="button">').text("Log in"),
     ))
     expected("The Login field is focused (the 'autofocus' attribute), followed by " +
-             "“Invalid login or password.” read once.")
+             "“Invalid login or password.” read once.  After switching to another " +
+             "application and back (Cmd+Tab), the field is announced with the " +
+             "message again.  After moving to the Password field and back " +
+             "(Tab, Shift+Tab), the field is announced without the message.")
 
 } else if (scenario === 'search') {
     content.append(search_form('search-field', true))

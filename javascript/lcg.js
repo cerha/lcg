@@ -2136,7 +2136,8 @@ lcg.Landing = class {
      *     as its description ('aria-describedby'), so the screen reader
      *     announces them together with the focused element, regardless of
      *     whether it reads the page automatically.  The original description
-     *     is restored when the element loses focus.
+     *     is restored when the focus moves to another element (not when only
+     *     the window loses focus, such as for a dialog of the browser).
      *
      *   - The content loaded asynchronously on page load may postpone the
      *     landing by 'defer()' to register its candidates and messages.
@@ -2273,14 +2274,25 @@ lcg.Landing = class {
         })
         let original = target.getAttribute('aria-describedby')
         target.setAttribute('aria-describedby', [original, ...ids].filter(x => x).join(' '))
-        target.addEventListener('blur', () => {
+        // The element also loses focus when the whole window does, such as
+        // when the browser opens its own dialog (Safari offers to save the
+        // password after submitting a login form) or the user switches to
+        // another application.  The element remains active then and receives
+        // the focus back when the window does, so the description is kept for
+        // the screen reader to announce the messages on return.
+        let restore = () => {
+            if (document.activeElement === target) {
+                target.addEventListener('blur', restore, {once: true})
+                return
+            }
             if (original) {
                 target.setAttribute('aria-describedby', original)
             } else {
                 target.removeAttribute('aria-describedby')
             }
             created.forEach(element => element.remove())
-        }, {once: true})
+        }
+        target.addEventListener('blur', restore, {once: true})
     }
 
     _focus(element) {

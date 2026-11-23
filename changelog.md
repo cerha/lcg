@@ -14,7 +14,10 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
   candidates with priorities and messages to announce (also the elements
   marked by `data-lcg-announce`), and the page lands once, attaching the
   messages to the focused element as its description, so VoiceOver in Safari
-  announces them (with or without reading the page automatically).  After
+  announces them (with or without reading the page automatically).  The
+  description stays when only the window loses focus (such as for the dialog
+  of Safari offering to save the password after a failed login), so the
+  messages are announced again when the window gets the focus back.  After
   landing, the messages are announced through a shared live region.
   **Incompatible:** `lcg.initial_focus()` is replaced by
   `lcg.landing.focus()`, which only registers a candidate, so the callers
