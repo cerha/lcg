@@ -233,6 +233,13 @@ lcg.Menu = class extends lcg.Widget {
     }
 
     _init_menu(ul) {
+        // The selected item is tracked here rather than by the attribute
+        // 'aria-activedescendant'.  The menus move the browser focus to the
+        // items themselves (roving tabindex), so the attribute would have no
+        // meaning for assistive technologies, while it was harmful in WebKit:
+        // VoiceOver didn't see the contents of Notebook pages under the widget
+        // root element bearing the attribute.
+        this._selected = null
         // Go through the menu and assign aria roles and key bindings.
         this.items = this._init_items(ul, null)
         // Set the active item.
@@ -299,45 +306,30 @@ lcg.Menu = class extends lcg.Widget {
         return item
     }
 
-    _active_descendant_parent() {
-        // The attribute aria-activedescendant may not always be on the root element.
-        let element = this.element.find('*[aria-activedescendant]')
-        if (!element.length) {
-            element = this.element
-        }
-        return element
-    }
-
     _selected_item() {
-        let p = this._active_descendant_parent()
-        let id = p.attr('aria-activedescendant')
-        if (id) {
-            let element = this._element(id)
-            if (element.length) {
-                return element
-            }
-        }
-        return null
+        return this._selected
     }
 
     _select_item(item) {
         let previously_selected_item = this._selected_item()
-        this._active_descendant_parent().attr('aria-activedescendant', item.attr('id'))
+        this._selected = item
+        // The previous item is deselected first, as it may be the same as the
+        // newly selected item.
         if (item.attr('aria-selected') !== undefined) {
             // Note: Derived classes (Wiking's MainMenu) may unset
             // 'aria-selected' because they are using ARIA roles which
             // don't support the aria-selected attribute.  So we
             // manipulate this attribute only when already set.
-            item.attr('aria-selected', 'true')
             if (previously_selected_item) {
                 previously_selected_item.attr('aria-selected', 'false')
             }
+            item.attr('aria-selected', 'true')
         }
         if (this.constructor._MANAGE_TABINDEX && !this._hidden) {
-            item.attr('tabindex', '0')
             if (previously_selected_item) {
                 previously_selected_item.attr('tabindex', '-1')
             }
+            item.attr('tabindex', '0')
         }
     }
 
@@ -429,6 +421,9 @@ lcg.Notebook = class extends lcg.Menu {
         page.hide()
         page.addClass('notebook-page')
         page.attr('role', 'tabpanel')
+        // Make the page focusable, so that tab activation can move the focus
+        // into the page (see _cmd_activate()).
+        page.attr('tabindex', '0')
         if (!page.attr('id')) {
             page.attr('id', item.attr('id') + '-tabpanel')
         }
@@ -1049,13 +1044,11 @@ lcg.PopupMenu = class extends lcg.PopupMenuBase {
             this.element.addClass('with-icons')
         }
 
-        for (let attr of ['aria-label', 'aria-activedescendant']) {
-            // The ul must be to root element of the menu, because otherwise
-            // the close button would be considered as another menu item by
-            // screen readers and item count would be announced incorrectly.
-            ul.attr(attr, this.element.attr(attr))
-            this.element.removeAttr(attr)
-        }
+        // The ul must be to root element of the menu, because otherwise the
+        // close button would be considered as another menu item by screen
+        // readers and item count would be announced incorrectly.
+        ul.attr('aria-label', this.element.attr('aria-label'))
+        this.element.removeAttr('aria-label')
         let label_class = 'label'
         for (let spec of this.items) {
             let item = $(`<a href="${spec.uri || '#'}"><span class="label">${spec.label}</span></a>`)

@@ -4,6 +4,21 @@ All notable user visible changes to LCG.  The entries are brief, see the
 documentation of the linked code for details.  The rules for maintaining this
 file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 
+## Unreleased
+
+### HTML
+
+#### Accessibility
+- VoiceOver in Safari sees the contents of notebook pages (it only found the
+  tabs).  The menu widgets no longer set `aria-activedescendant`, as they
+  move the focus to the items themselves; the selected item is tracked by
+  `Menu._selected_item()`.
+- Enter or Space on a notebook tab moves the focus into its page (it did
+  nothing, as the page was not focusable).
+- Selecting the already selected menu item (such as clicking the current
+  notebook tab) keeps it marked as selected and reachable by Tab (it was
+  marked as unselected and removed from the tab order).
+
 ## 0.9.4 (2026-11-20)
 
 ### HTML
