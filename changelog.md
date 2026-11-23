@@ -31,9 +31,9 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
   marked as unselected and removed from the tab order).
 - `Dropdown` may be presented to assistive technologies as a menu (`menu`
   argument), so screen readers announce the group of links when the focus
-  moves into it.  Typing in the dropdown moves the focus to the next link beginning
-  with the typed text (type-ahead).  The up/down arrows don't cross the
-  boundary of link groups by rows, they move to the first link of the
+  moves into it.  Typing in the dropdown moves the focus to the next link
+  beginning with the typed text (type-ahead).  The up/down arrows don't cross
+  the boundary of link groups by rows, they move to the first link of the
   previous/next group.
 
 ## 0.9.4 (2026-11-20)
