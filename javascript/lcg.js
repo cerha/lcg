@@ -1285,7 +1285,7 @@ lcg.Dropdown = class extends lcg.Widget {
             // is removed from the URL.
             history.replaceState(history.state, '',
                                  window.location.pathname + window.location.search)
-            lcg.initial_focus(this._button[0])
+            lcg.landing.focus(this._button[0], lcg.Landing.CONTROL)
         }
     }
 
@@ -2061,27 +2061,282 @@ lcg.widget_instance = function (element) {
     return null
 }
 
-lcg.initial_focus = function (element) {
-    /* Move the focus to given DOM element on page load.
+lcg.Landing = class {
+    /* Coordinate the initial focus and the announcements on page load.
      *
-     * The page is only scrolled when the element is not entirely visible in
-     * the window.  The focus indication is suppressed until the user
-     * interacts with the page by the CSS class 'initial-focus' (see
-     * lcg-widgets.css), as a focused element on a freshly opened page looks
-     * odd to sighted users.  ':focus-visible' alone doesn't ensure that,
-     * because browsers also take the last user interaction into account, so
-     * opening the page from the keyboard makes even the scripted focus count
-     * as keyboard induced.
+     * Screen reader users "land" on the page at the element which receives
+     * the focus after the page is loaded.  Several parts of the page may want
+     * to decide where it is (the main heading, a form control which reloaded
+     * the page, a field with the 'autofocus' attribute) and what the screen
+     * reader should announce (messages, the number of found records).  If
+     * each of them moved the focus or filled a live region on its own, the
+     * result would depend on their timing, and VoiceOver in Safari ignores
+     * both the focus moved and the live regions changed before it finishes
+     * processing the loaded page.
+     *
+     * So the parts of the page only register their wishes here and the page
+     * lands once, after a delay:
+     *
+     *   - The focus candidates are registered by 'focus()' with a priority.
+     *     The element with the 'autofocus' attribute is a candidate with the
+     *     priority 'lcg.Landing.AUTOFOCUS'.  The candidate of the highest
+     *     priority is focused (the first registered one of equal priorities).
+     *
+     *   - The messages to announce are registered by 'announce()' and the
+     *     elements marked by the attribute 'data-lcg-announce' are collected
+     *     on landing (its value 'alert' marks important messages, such as
+     *     errors, which go first).  They are attached to the focused element
+     *     as its description ('aria-describedby'), so the screen reader
+     *     announces them together with the focused element, regardless of
+     *     whether it reads the page automatically.  The original description
+     *     is restored when the element loses focus.
+     *
+     *   - The content loaded asynchronously on page load may postpone the
+     *     landing by 'defer()' to register its candidates and messages.
+     *
+     * The focus is not moved when the user moved it before landing.  The
+     * messages are then announced through the live region, as well as when
+     * there is no candidate to focus.
+     *
+     * After landing, 'focus()' moves the focus immediately (for content loaded
+     * later, which was not deferred) and 'announce()' announces through the
+     * live region, which is used for all changes of the page content after
+     * landing.  The live regions exist from the start, as screen readers
+     * ignore the live regions inserted with their content.
+     *
+     * Use the shared instance 'lcg.landing'.
      *
      */
-    let rect = element.getBoundingClientRect()
-    let visible = rect.top >= 0 && rect.bottom <= document.documentElement.clientHeight
-    let reveal = () => element.classList.remove('initial-focus')
-    element.classList.add('initial-focus')
-    element.addEventListener('blur', reveal, {once: true})
-    document.addEventListener('keydown', reveal, {once: true})
-    element.focus({preventScroll: visible})
+
+    // Conventional priorities of focus candidates (any numbers may be used).
+    static DEFAULT = 0  // Generic default, such as the main heading.
+    static CONTENT = 10  // Content-specific place, such as a found record.
+    static CONTROL = 20  // The form control which reloaded the page.
+    static AUTOFOCUS = 30  // The element with the 'autofocus' attribute.
+
+    // VoiceOver in Safari ignores the focus moved and live regions changed
+    // before it finishes processing the loaded page.
+    _DELAY = 500  // Milliseconds.
+    // The longest time to wait for deferred content (see 'defer()').
+    _MAX_DEFER = 3000  // Milliseconds.
+    // The live region is cleared and filled after this delay, so that the
+    // same message is announced again if repeated.
+    _LIVE_REGION_DELAY = 100  // Milliseconds.
+
+    constructor() {
+        this._candidates = []
+        this._messages = []
+        this._deferred = []
+        this._landed = false
+        this._regions = null
+        this._queue = {status: [], alert: []}
+        this._counter = 0
+        $(() => this._init())
+    }
+
+    async _init() {
+        this._regions = {
+            status: this._hidden_element('role', 'status'),
+            alert: this._hidden_element('role', 'alert'),
+        }
+        await new Promise(resolve => setTimeout(resolve, this._DELAY))
+        await Promise.race([
+            Promise.allSettled(this._deferred),
+            new Promise(resolve => setTimeout(resolve, this._MAX_DEFER - this._DELAY)),
+        ])
+        this._land()
+    }
+
+    _hidden_element(...attr) {
+        // Return a new element present only for assistive technologies.
+        return $('<div class="lcg-assistive">').attr(...attr).css({
+            position: 'absolute', width: '1px', height: '1px', overflow: 'hidden',
+            clip: 'rect(0 0 0 0)', 'white-space': 'nowrap',
+        }).appendTo(document.body)
+    }
+
+    _land() {
+        this._landed = true
+        let autofocus = document.querySelector('[autofocus]')
+        if (autofocus) {
+            this._candidates.push({element: autofocus, priority: lcg.Landing.AUTOFOCUS})
+        }
+        let target = null
+        let priority = null
+        for (let candidate of this._candidates) {
+            let element = this._resolve(candidate.element)
+            if (element && document.contains(element)
+                && (target === null || candidate.priority > priority)) {
+                target = element
+                priority = candidate.priority
+            }
+        }
+        let messages = [
+            ...[...document.querySelectorAll('[data-lcg-announce]')].map(element => ({
+                message: element, alert: element.dataset.lcgAnnounce === 'alert',
+            })),
+            ...this._messages,
+        ]
+        messages.sort((a, b) => b.alert - a.alert) // Stable, keeps the order otherwise.
+        let active = document.activeElement
+        // The browser focuses the 'autofocus' element itself, so that doesn't
+        // count as the user's move.
+        if (target && (!active || active === document.body || active === autofocus)) {
+            if (active) {
+                // Focus the target (even if focused already) after attaching
+                // the messages for the screen reader to announce them.
+                active.blur()
+            }
+            if (messages.length) {
+                this._describe(target, messages.map(m => m.message))
+            }
+            this._focus(target)
+        } else {
+            for (let m of messages) {
+                this._announce(m.message, m.alert)
+            }
+        }
+    }
+
+    _resolve(element) {
+        if (typeof element === 'function') {
+            element = element()
+        }
+        if (element instanceof jQuery) {
+            element = element[0]
+        } else if (typeof element === 'string') {
+            element = document.getElementById(element)
+        }
+        return element || null
+    }
+
+    _describe(target, messages) {
+        // Attach given messages (strings or DOM elements) to the target
+        // element's description until it loses focus.
+        let created = []
+        let ids = messages.map(message => {
+            if (typeof message === 'string') {
+                message = this._hidden_element('class', 'lcg-assistive').text(message)[0]
+                created.push(message)
+            }
+            if (!message.id) {
+                message.id = 'lcg-announcement-' + ++this._counter
+            }
+            return message.id
+        })
+        let original = target.getAttribute('aria-describedby')
+        target.setAttribute('aria-describedby', [original, ...ids].filter(x => x).join(' '))
+        target.addEventListener('blur', () => {
+            if (original) {
+                target.setAttribute('aria-describedby', original)
+            } else {
+                target.removeAttribute('aria-describedby')
+            }
+            created.forEach(element => element.remove())
+        }, {once: true})
+    }
+
+    _focus(element) {
+        // The page is only scrolled when the element is not entirely visible
+        // in the window.  The focus indication is suppressed until the user
+        // interacts with the page by the CSS class 'initial-focus' (see
+        // lcg-widgets.css), as a focused element on a freshly opened page
+        // looks odd to sighted users.  ':focus-visible' alone doesn't ensure
+        // that, because browsers also take the last user interaction into
+        // account, so opening the page from the keyboard makes even the
+        // scripted focus count as keyboard induced.
+        let rect = element.getBoundingClientRect()
+        let visible = rect.top >= 0 && rect.bottom <= document.documentElement.clientHeight
+        let reveal = () => element.classList.remove('initial-focus')
+        element.classList.add('initial-focus')
+        element.addEventListener('blur', reveal, {once: true})
+        document.addEventListener('keydown', reveal, {once: true})
+        element.focus({preventScroll: visible})
+    }
+
+    _announce(message, alert) {
+        // Announce through the live region.  The messages announced shortly
+        // after each other are announced together.
+        let kind = alert ? 'alert' : 'status'
+        let queue = this._queue[kind]
+        queue.push(typeof message === 'string' ? message : message.textContent.trim())
+        if (queue.length === 1) {
+            let region = this._regions[kind]
+            region.text('')
+            setTimeout(() => {
+                region.text(queue.join(' '))
+                queue.length = 0
+            }, this._LIVE_REGION_DELAY)
+        }
+    }
+
+    focus(element, priority = lcg.Landing.DEFAULT) {
+        /* Register given element as a candidate for the initial focus.
+         *
+         * Arguments:
+         *
+         *   element -- DOM element, jQuery object, HTML element id or a
+         *     function returning any of these or null.  The function is
+         *     called on landing, so it may decide according to the state of
+         *     the page at that time (when it returns null, the candidate is
+         *     ignored).
+         *   priority -- Number, see the class constants for the conventions.
+         *
+         * After landing, the element is focused immediately (if given).
+         *
+         */
+        if (this._landed) {
+            element = this._resolve(element)
+            if (element) {
+                this._focus(element)
+            }
+        } else {
+            this._candidates.push({element, priority})
+        }
+    }
+
+    announce(message, alert = false) {
+        /* Announce given message to screen reader users.
+         *
+         * Arguments:
+         *
+         *   message -- String or DOM element (or jQuery object) containing the
+         *     message.  When the element is displayed in the page, it is
+         *     preferred to a string, as the message is then attached to the
+         *     focused element on landing without creating a hidden copy which
+         *     the screen reader would read once more when reading the page.
+         *   alert -- True for important messages, such as errors.
+         *
+         */
+        if (message instanceof jQuery) {
+            message = message[0]
+        }
+        if (!message) {
+            return
+        }
+        if (this._landed) {
+            this._announce(message, alert)
+        } else {
+            this._messages.push({message, alert})
+        }
+    }
+
+    defer(promise) {
+        /* Postpone landing until given promise is settled.
+         *
+         * Used by the content loaded asynchronously on page load, which wants
+         * to register its focus candidates and messages.  Landing doesn't wait
+         * longer than '_MAX_DEFER' milliseconds since page load.  The promise
+         * must be registered before the initial delay passes, typically when
+         * the asynchronous request is sent on page load.
+         *
+         */
+        this._deferred.push(promise)
+    }
+
 }
+
+lcg.landing = new lcg.Landing()
 
 
 // Use the page language (set by the server as the <html> 'lang' attribute) so

@@ -502,8 +502,8 @@ class Dropdown(Widget, lcg.Container):
     this fragment to let the user continue from the dropdown when the link
     loads a new page (such as when selecting a value reloads the page with
     the new value).  The fragment doesn't point to any element, so that the
-    browser doesn't scroll the page to it (see 'lcg.initial_focus()' in
-    JavaScript for how the focus is moved).
+    browser doesn't scroll the page to it (see 'lcg.Landing' in JavaScript
+    for how the focus is moved).
 
     The dropdown is displayed above the button when it doesn't fit below it
     (and there is more space above) and it is scrollable when it doesn't fit
