@@ -2228,8 +2228,11 @@ lcg.Landing = class {
         messages.sort((a, b) => b.alert - a.alert) // Stable, keeps the order otherwise.
         let active = document.activeElement
         // The browser focuses the 'autofocus' element itself, so that doesn't
-        // count as the user's move.
-        if (target && (!active || active === document.body || active === autofocus)) {
+        // count as the user's move.  Neither does the target focused already,
+        // as the browser also focuses the target of the URL fragment when it
+        // becomes focusable (such as the found record of a list).
+        if (target && (!active || active === document.body || active === autofocus
+                       || active === target)) {
             if (active) {
                 // Focus the target (even if focused already) after attaching
                 // the messages for the screen reader to announce them.
