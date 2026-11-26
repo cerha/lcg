@@ -4,7 +4,7 @@ All notable user visible changes to LCG.  The entries are brief, see the
 documentation of the linked code for details.  The rules for maintaining this
 file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 
-## Unreleased
+## 0.9.5 (2026-11-26)
 
 ### Common
 - New pytest plugin `lcg.testing` for testing the exported content in a web
