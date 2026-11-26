@@ -44,7 +44,8 @@ lcg.Menu=class extends lcg.Widget{static _MANAGE_TABINDEX=true
 constructor(element){super(element)
 this._hidden=this.element.closest('[aria-hidden="true"]').length!==0
 this._init_menu(this.element.find('ul').first())}
-_init_menu(ul){this.items=this._init_items(ul,null)
+_init_menu(ul){this._selected=null
+this.items=this._init_items(ul,null)
 let selected=this._initially_selected_item()
 if(selected){this._select_item(selected)}}
 _init_items(ul,parent){let items=[]
@@ -68,20 +69,13 @@ _initially_selected_item(){let item
 if(this.items.length!==0){let current=this.element.find('a.current').first()
 if(current.length){item=current}else{item=this.items[0]}}else{item=null}
 return item}
-_active_descendant_parent(){let element=this.element.find('*[aria-activedescendant]')
-if(!element.length){element=this.element}
-return element}
-_selected_item(){let p=this._active_descendant_parent()
-let id=p.attr('aria-activedescendant')
-if(id){let element=this._element(id)
-if(element.length){return element}}
-return null}
+_selected_item(){return this._selected}
 _select_item(item){let previously_selected_item=this._selected_item()
-this._active_descendant_parent().attr('aria-activedescendant',item.attr('id'))
-if(item.attr('aria-selected')!==undefined){item.attr('aria-selected','true')
-if(previously_selected_item){previously_selected_item.attr('aria-selected','false')}}
-if(this.constructor._MANAGE_TABINDEX&&!this._hidden){item.attr('tabindex','0')
-if(previously_selected_item){previously_selected_item.attr('tabindex','-1')}}}
+this._selected=item
+if(item.attr('aria-selected')!==undefined){if(previously_selected_item){previously_selected_item.attr('aria-selected','false')}
+item.attr('aria-selected','true')}
+if(this.constructor._MANAGE_TABINDEX&&!this._hidden){if(previously_selected_item){previously_selected_item.attr('tabindex','-1')}
+item.attr('tabindex','0')}}
 _expand_item(item){return false}
 _on_item_click(event,item){this._cmd_activate(event,item)
 return false}
@@ -110,6 +104,7 @@ page.find('h1,h2,h3,h4,h5,h6').first().hide()
 page.hide()
 page.addClass('notebook-page')
 page.attr('role','tabpanel')
+page.attr('tabindex','0')
 if(!page.attr('id')){page.attr('id',item.attr('id')+'-tabpanel')}
 item.attr('aria-controls',page.attr('id'))}
 _current_location_selected_item(){let match=self.location.href.match('#.+')
@@ -304,8 +299,8 @@ create(){if(this.element.children().length!==0){return}
 var ul=$('<ul role="menu">')
 this.element.html(ul)
 if(this.items.some(item=>item.icon)){this.element.addClass('with-icons')}
-for(let attr of['aria-label','aria-activedescendant']){ul.attr(attr,this.element.attr(attr))
-this.element.removeAttr(attr)}
+ul.attr('aria-label',this.element.attr('aria-label'))
+this.element.removeAttr('aria-label')
 let label_class='label'
 for(let spec of this.items){let item=$(`<a href="${spec.uri || '#'}"><span class="label">${spec.label}</span></a>`)
 let li=$('<li>').append(item)
@@ -368,9 +363,14 @@ if(selector){this.element.closest(selector).on('contextmenu',e=>menu.popup(e,ctr
 this._menu=menu}
 _define_keymap(){return{'Enter':this._cmd_activate,'Space':this._cmd_activate}}
 _cmd_activate(event,element){this._menu.popup(undefined,element)}}
-lcg.Dropdown=class extends lcg.Widget{constructor(element){super(element)
+lcg.Dropdown=class extends lcg.Widget{constructor(element,menu){super(element)
 this._button=this.element.children('.dropdown-toggle')
 this._dropdown=this.element.children('.dropdown-panel')
+this._type_ahead_text=''
+this._type_ahead_timeout=null
+if(menu){this._button.attr('aria-haspopup','menu')
+this._dropdown.attr('role','menu')
+this._links().attr('role','menuitem')}
 this._button.on('click',event=>{this.toggle(event.detail===0)})
 this.element.on('keydown',this._on_key_down.bind(this))
 this._dropdown.on('click','a[href]',event=>this.collapse())
@@ -380,13 +380,14 @@ let on_document_click=(event)=>{if(!document.contains(this.element[0])){$(docume
 $(document).on('click',on_document_click)
 this.collapse()
 if(this.element[0].id&&window.location.hash==='#focus-'+this.element[0].id){history.replaceState(history.state,'',window.location.pathname+window.location.search)
-lcg.initial_focus(this._button[0])}}
+lcg.landing.focus(this._button[0],lcg.Landing.CONTROL)}}
 _on_key_down(event){let key=this._event_key(event)
 let target=event.target
 if(key==='Escape'&&this.expanded()){this.collapse()
 this._button.focus()}else if(target===this._button[0]){if(key!=='Down'&&key!=='Alt-Down'){return}
 if(!this.expanded()){this.expand(true)}
-if(!this._dropdown[0].contains(document.activeElement)){this._links().first().focus()}}else if(this.expanded()&&$(target).is('a')&&key==='Space'){target.click()}else if(this.expanded()&&$(target).is('a')){let link=this._link_in_direction(target,key)
+if(!this._dropdown[0].contains(document.activeElement)){this._links().first().focus()}}else if(this.expanded()&&$(target).is('a')&&key==='Space'){target.click()}else if(this.expanded()&&$(target).is('a')&&event.key.length===1&&!event.ctrlKey&&!event.altKey&&!event.metaKey){let link=this._type_ahead(target,event.key)
+if(link){link.focus()}}else if(this.expanded()&&$(target).is('a')){let link=this._link_in_direction(target,key)
 if(link===undefined){return}
 if(link){link.focus()}}else{return}
 event.preventDefault()
@@ -395,8 +396,20 @@ _links(){return this._dropdown.find('a[href]')}
 _current_link(){return this._links().filter('[aria-current]:not([aria-current="false"])')[0]}
 _set_tab_stop(link){this._links().attr('tabindex','-1')
 $(link).removeAttr('tabindex')}
+_group(link){return $(link).closest('[role="group"], .dropdown-panel')[0]}
+_type_ahead(link,char){clearTimeout(this._type_ahead_timeout)
+this._type_ahead_timeout=setTimeout(()=>{this._type_ahead_text=''},1000)
+let text=this._type_ahead_text+char.toLocaleLowerCase()
+this._type_ahead_text=text
+let repeated=[...text].every(c=>c===text[0])
+let prefix=repeated?text[0]:text
+let links=this._links().get()
+let start=links.indexOf(link)+(repeated?1:0)
+return(links.slice(start).concat(links.slice(0,start)).find(a=>$(a).text().trim().toLocaleLowerCase().startsWith(prefix))||null)}
 _link_in_direction(link,key){let links=this._links().get()
 let index=links.indexOf(link)
+let group=this._group(link)
+let in_group=links.filter(a=>this._group(a)===group)
 let rect=link.getBoundingClientRect()
 let center=(r)=>r.left+r.width/2
 let closest=(candidates)=>{if(candidates.length===0){return null}
@@ -409,8 +422,9 @@ switch(key){case'Right':return links[index+1]||null
 case'Left':return links[index-1]||null
 case'Home':return links[0]
 case'End':return links[links.length-1]
-case'Down':return closest(links.filter(a=>(a.getBoundingClientRect().top>rect.top+rect.height/2)))
-case'Up':return(closest(links.filter(a=>(a.getBoundingClientRect().top<rect.top-rect.height/2)))||this._button[0])}
+case'Down':return(closest(in_group.filter(a=>(a.getBoundingClientRect().top>rect.top+rect.height/2)))||links.slice(index+1).find(a=>this._group(a)!==group)||null)
+case'Up':{let previous=links.slice(0,index).reverse().find(a=>this._group(a)!==group)
+return(closest(in_group.filter(a=>(a.getBoundingClientRect().top<rect.top-rect.height/2)))||(previous&&links.find(a=>this._group(a)===this._group(previous)))||this._button[0])}}
 return undefined}
 expanded(){return this.element.hasClass('expanded')}
 expand(focus_current){let dropdown=this._dropdown
@@ -615,13 +629,76 @@ lcg.dedent=function(str){return(''+str).replace(/\n\s+/g,'');}
 lcg.widget_instance=function(element){if(element instanceof jQuery){element=element[0]}else if(typeof element==='string'){element=document.getElementById(element)}
 if(element&&element._lcg_widget_instance){return element._lcg_widget_instance}
 return null}
-lcg.initial_focus=function(element){let rect=element.getBoundingClientRect()
+lcg.Landing=class{static DEFAULT=0
+static CONTENT=10
+static CONTROL=20
+static AUTOFOCUS=30
+_DELAY=500
+_MAX_DEFER=3000
+_LIVE_REGION_DELAY=100
+constructor(){this._candidates=[]
+this._messages=[]
+this._deferred=[]
+this._landed=false
+this._regions=null
+this._queue={status:[],alert:[]}
+this._counter=0
+$(()=>this._init())}
+async _init(){this._regions={status:this._hidden_element('role','status'),alert:this._hidden_element('role','alert'),}
+await new Promise(resolve=>setTimeout(resolve,this._DELAY))
+await Promise.race([Promise.allSettled(this._deferred),new Promise(resolve=>setTimeout(resolve,this._MAX_DEFER-this._DELAY)),])
+this._land()}
+_hidden_element(...attr){return $('<div class="lcg-assistive">').attr(...attr).css({position:'absolute',width:'1px',height:'1px',overflow:'hidden',clip:'rect(0 0 0 0)','white-space':'nowrap',}).appendTo(document.body)}
+_land(){this._landed=true
+let autofocus=document.querySelector('[autofocus]')
+if(autofocus){this._candidates.push({element:autofocus,priority:lcg.Landing.AUTOFOCUS})}
+let target=null
+let priority=null
+for(let candidate of this._candidates){let element=this._resolve(candidate.element)
+if(element&&document.contains(element)&&(target===null||candidate.priority>priority)){target=element
+priority=candidate.priority}}
+let messages=[...[...document.querySelectorAll('[data-lcg-announce]')].map(element=>({message:element,alert:element.dataset.lcgAnnounce==='alert',})),...this._messages,]
+messages.sort((a,b)=>b.alert-a.alert)
+let active=document.activeElement
+if(target&&(!active||active===document.body||active===autofocus||active===target)){if(active){active.blur()}
+if(messages.length){this._describe(target,messages.map(m=>m.message))}
+this._focus(target)}else{for(let m of messages){this._announce(m.message,m.alert)}}}
+_resolve(element){if(typeof element==='function'){element=element()}
+if(element instanceof jQuery){element=element[0]}else if(typeof element==='string'){element=document.getElementById(element)}
+return element||null}
+_describe(target,messages){let created=[]
+let ids=messages.map(message=>{if(typeof message==='string'){message=this._hidden_element('class','lcg-assistive').text(message)[0]
+created.push(message)}
+if(!message.id){message.id='lcg-announcement-'+ ++this._counter}
+return message.id})
+let original=target.getAttribute('aria-describedby')
+target.setAttribute('aria-describedby',[original,...ids].filter(x=>x).join(' '))
+let restore=()=>{if(document.activeElement===target){target.addEventListener('blur',restore,{once:true})
+return}
+if(original){target.setAttribute('aria-describedby',original)}else{target.removeAttribute('aria-describedby')}
+created.forEach(element=>element.remove())}
+target.addEventListener('blur',restore,{once:true})}
+_focus(element){let rect=element.getBoundingClientRect()
 let visible=rect.top>=0&&rect.bottom<=document.documentElement.clientHeight
 let reveal=()=>element.classList.remove('initial-focus')
 element.classList.add('initial-focus')
 element.addEventListener('blur',reveal,{once:true})
 document.addEventListener('keydown',reveal,{once:true})
 element.focus({preventScroll:visible})}
+_announce(message,alert){let kind=alert?'alert':'status'
+let queue=this._queue[kind]
+queue.push(typeof message==='string'?message:message.textContent.trim())
+if(queue.length===1){let region=this._regions[kind]
+region.text('')
+setTimeout(()=>{region.text(queue.join(' '))
+queue.length=0},this._LIVE_REGION_DELAY)}}
+focus(element,priority=lcg.Landing.DEFAULT){if(this._landed){element=this._resolve(element)
+if(element){this._focus(element)}}else{this._candidates.push({element,priority})}}
+announce(message,alert=false){if(message instanceof jQuery){message=message[0]}
+if(!message){return}
+if(this._landed){this._announce(message,alert)}else{this._messages.push({message,alert})}}
+defer(promise){this._deferred.push(promise)}}
+lcg.landing=new lcg.Landing()
 lcg.lang=(document.documentElement.lang||navigator.language||'en').split('-')[0]
 lcg.catalogs={}
 lcg.gettext=function(domain){function locale_data(data){const meta=data['']||{}
