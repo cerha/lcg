@@ -6,6 +6,13 @@ file are described in [doc/standards/changelog.md](doc/standards/changelog.md).
 
 ## Unreleased
 
+### Common
+- New pytest plugin `lcg.testing` for testing the exported content in a web
+  browser through Playwright (the behavior of the JavaScript code and the
+  accessibility).  The tests marked by `browser` load the content by the
+  fixture `load_content` and are skipped when Playwright is not installed,
+  unless `PYTEST_REQUIRE_BROWSER` is set ([`lcg.testing`](lcg/testing.py)).
+
 ### HTML
 
 #### Accessibility

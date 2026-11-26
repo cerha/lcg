@@ -52,3 +52,58 @@ jobs:
 
       - name: Run tests
         run: make test
+
+  # The browser tests (marked by 'browser', see lcg/testing.py) run in a
+  # separate job, so that their failures are distinguished from the other
+  # tests.  They are skipped in the job above, where Playwright is missing,
+  # while here PYTEST_REQUIRE_BROWSER makes them fail when they can't run.
+  browser-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      PYTEST_REQUIRE_BROWSER: 1
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext rsync
+
+      - name: Create virtualenv
+        run: |
+          python -m venv .venv
+          echo "${PWD}/.venv/bin" >> $GITHUB_PATH
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install --group build --group test --group browser
+
+      - name: Build and install the wheel
+        run: |
+          make build
+          pip install $(echo dist/lcg_framework-*-any.whl)
+
+      - name: Get the Playwright version
+        id: playwright
+        run: echo "version=$(python -c 'import importlib.metadata as m; print(m.version("playwright"))')" >> $GITHUB_OUTPUT
+
+      - name: Cache the browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ steps.playwright.outputs.version }}
+
+      - name: Install the browsers
+        run: playwright install --with-deps chromium webkit
+
+      - name: Run browser tests
+        run: python -m pytest lcg/test.py -v -m browser --browser chromium --browser webkit

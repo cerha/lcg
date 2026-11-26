@@ -48,11 +48,15 @@ all = [
 # (see the Makefile) and the build backend itself.  Python 3 only.
 build = ["babel", "pojson", "rjsmin", "flit"]
 test = ["pytest", "coverage", "coveralls"]
+# The browser tests (see lcg/testing.py).  The browsers themselves are
+# installed by 'playwright install chromium'.
+browser = ["pytest-playwright"]
 lint = ["flake8"]
 release = ["twine"]
 dev = [
     {include-group = "build"},
     {include-group = "test"},
+    {include-group = "browser"},
     {include-group = "lint"},
     {include-group = "release"},
 ]
